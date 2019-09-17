@@ -297,12 +297,29 @@ class editor_Models_Import_FileParser_XmlParser {
      * @return NULL|mixed
      */
     public function getParent($selector) {
-        $stackIndex = count($this->xmlStack) - 1; //remove current node
-        $tag = $this->parseSelector($selector, $selectorParts);
-        if($stackIndex <= 0 || empty($selectorParts)) { 
-            //if current node is root node, there is no parent
+        $result = $this->getParents($selector, 1);
+        if(empty($result)) {
             return null;
         }
+        return array_shift($result);
+    }
+    
+    /**
+     * returns all parent nodes, matching to the given selector, empty array if no match found
+     * @param string $selector
+     * @param integer $limit defaults to 0, which means no limit; limits the count of given found parents
+     * @return array
+     */
+    public function getParents(string $selector, int $limit = 0): array {
+        $stackIndex = count($this->xmlStack) - 1; //remove current node
+        $selectorParts = [];
+        $tag = $this->parseSelector($selector, $selectorParts);
+        $result = [];
+        if($stackIndex <= 0 || empty($selectorParts)) { 
+            //if current node is root node, there is no parent
+            return $result;
+        }
+        $i = 0;
         while($stackIndex >= 0) {
             $node = $this->xmlStack[$stackIndex];
             if($node['tag'] !== $tag) {
@@ -311,11 +328,15 @@ class editor_Models_Import_FileParser_XmlParser {
             }
             //for the selector match the Index has to be increased again, since the doesSelectorMatch decreases it
             if($this->doesSelectorMatch($selectorParts, $stackIndex + 1)) {
-                return $node;
+                $result[] = $node;
+                $i++; //faster as count($result) 
+                if($limit > 0 && $limit >= $i) {
+                    return $result;
+                }
             }
             $stackIndex--;
         }
-        return null;
+        return $result;
     }
     
     /**

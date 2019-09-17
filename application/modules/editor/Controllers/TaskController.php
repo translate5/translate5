@@ -121,6 +121,11 @@ class editor_TaskController extends ZfExtended_RestController {
         ZfExtended_UnprocessableEntity::addCodes([
             'E1064' => 'The referenced customer does not exist (anymore).'
         ], 'editor.task');
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1159' => 'Task usageMode can only be modified, if no user is assigned to the task.',
+            'E1163' => 'Your job was removed, therefore you are not allowed to access that task anymore.',
+            'E1164' => 'You tried to open the task for editing, but in the meantime you are not allowed to edit the task anymore.',
+        ], 'editor.task');
         
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
@@ -460,6 +465,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
         
         $this->setDataInEntity();
+        $this->entity->setUsageMode($this->config->runtimeOptions->import->initialTaskUsageMode);
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         
@@ -622,7 +628,7 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $workerModel ZfExtended_Models_Worker */
         $workerModel->loadFirstOf('editor_Models_Import_Worker', $this->entity->getTaskGuid());
         $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
-        $worker->schedulePrepared();
+        $worker && $worker->schedulePrepared();
     }
 
     /**
@@ -797,6 +803,7 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $this->checkTaskAttributeField();
         //was formerly in JS: if a userState is transfered, then entityVersion has to be ignored!
+        // but what we do is to check the previous userState. So we have control if entity was not uptodate regarding state, and we could assume the wanted transition since we have a start (the previous) and an end (the new) state
         if(!empty($this->data->userState)) {
             unset($this->data->entityVersion);
         }
@@ -805,22 +812,32 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         $this->processClientReferenceVersion();
         $this->setDataInEntity();
+        $this->validateUsageMode();
         $this->entity->validate();
         $this->initWorkflow();
         
         $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         $tua = $this->workflow->getTaskUserAssoc($taskguid, $this->user->data->userGuid);
-        if(!$mayLoadAllTasks &&
-                ($this->isOpenTaskRequest(true)&&
-                    !$this->workflow->isWriteable($tua)
-                || $this->isOpenTaskRequest(false,true)&&
-                    !$this->workflow->isReadable($tua)
-                )
-           ){
+        //mayLoadAllTasks is only true, if the current "PM" is not associated to the task directly. 
+        // If it is (pm override false) directly associated, the workflow must be considered it the task is openable / writeable.  
+        $mayLoadAllTasks = $mayLoadAllTasks && (empty($tua) || $tua->getIsPmOverride());
+        $isTaskDisallowEditing = $this->isEditTaskRequest() && !$this->workflow->isWriteable($tua);
+        $isTaskDisallowReading = $this->isViewTaskRequest() && !$this->workflow->isReadable($tua);
+        if(!$mayLoadAllTasks && ($isTaskDisallowEditing || $isTaskDisallowReading)){
             //if the task was already in session, we must delete it. 
             //If not the user will always receive an error in JS, and would not be able to do anything.
             $this->unregisterTask(); //FIXME XXX the changes in the session made by this method is not stored in the session!
-            //wir laufen auf dem server hier öfters rein
+            if(empty($tua)) {
+                throw ZfExtended_Models_Entity_Conflict::createResponse('E1163',[
+                    'userState' => 'Ihre Zuweisung zur Aufgabe wurde entfernt, daher können Sie diese nicht mehr zur Bearbeitung öffnen.',
+                ]);
+            }
+            if($isTaskDisallowEditing && $this->data->userStatePrevious != $tua->getState()) {
+                throw ZfExtended_Models_Entity_Conflict::createResponse('E1164',[
+                    'userState' => 'Sie haben versucht die Aufgabe zur Bearbeitung zu öffnen. Das ist in der Zwischenzeit nicht mehr möglich.',
+                ]);
+            }
+            //no access as generic fallback
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
@@ -876,6 +893,26 @@ class editor_TaskController extends ZfExtended_RestController {
         // We do this here to have it immediately available e.g. when opening segments.
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
+    }
+    
+    /**
+     * Throws a ZfExtended_Models_Entity_Conflict if usageMode is changed and the task has already assigned users
+     */
+    protected function validateUsageMode() {
+        if(!$this->entity->isModified('usageMode')) {
+            return;
+        }
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $used = $tua->loadByTaskGuidList([$this->entity->getTaskGuid()]);
+        if(empty($used)) {
+            return;
+        }
+        throw ZfExtended_Models_Entity_Conflict::createResponse('E1159', [
+            'usageMode' => [
+                'usersAssigned' => 'Der Nutzungsmodus der Aufgabe kann verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.'
+            ]
+        ]);
     }
     
     protected function addPixelMapping() {
@@ -1004,25 +1041,43 @@ class editor_TaskController extends ZfExtended_RestController {
     
     /**
      * returns true if PUT Requests opens a task for editing or readonly
-     * 
-     * - its not allowed to set both parameters to true
-     * @param bool $editOnly if set to true returns true only if its a real editing (not readonly) request
-     * @param bool $viewOnly if set to true returns true only if its a readonly request
-     * 
      * @return boolean
      */
-    protected function isOpenTaskRequest($editOnly = false,$viewOnly = false) {
+    protected function isOpenTaskRequest(): bool {
+        return $this->isEditTaskRequest() || $this->isViewTaskRequest();
+    }
+    
+    /**
+     * returns true if PUT Requests opens a task for editing or readonly
+     * @return boolean
+     */
+    protected function isLeavingTaskRequest(): bool {
         if(empty($this->data->userState)) {
             return false;
         }
-        if($editOnly && $viewOnly){
-            throw new Zend_Exception('editOnly and viewOnly can not both be true');
+        return $this->data->userState == $this->workflow::STATE_OPEN || $this->data->userState == $this->workflow::STATE_FINISH;
+    }
+    
+    /**
+     * returns true if PUT Requests opens a task for editing
+     * @return boolean
+     */
+    protected function isEditTaskRequest(): bool {
+        if(empty($this->data->userState)) {
+            return false;
         }
-        $s = $this->data->userState;
-        $workflow = $this->workflow;
-        return $editOnly && $s == $workflow::STATE_EDIT 
-           || !$editOnly && ($s == $workflow::STATE_EDIT || $s == $workflow::STATE_VIEW)
-           || $viewOnly && $s == $workflow::STATE_VIEW;
+        return $this->data->userState == $this->workflow::STATE_EDIT;
+    }
+    
+    /**
+     * returns true if PUT Requests opens a task for viewing(readonly)
+     * @return boolean
+     */
+    protected function isViewTaskRequest(): bool {
+        if(empty($this->data->userState)) {
+            return false;
+        }
+        return $this->data->userState == $this->workflow::STATE_VIEW;
     }
     
     /**
@@ -1046,12 +1101,11 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function openAndLock() {
         $task = $this->entity;
-        if($this->isOpenTaskRequest(true)){
-            $workflow = $this->workflow;
+        if($this->isEditTaskRequest()){
             $unconfirmed = $task->getState() == $task::STATE_UNCONFIRMED;
-            //first check for confirmation, if unconfirmed, don't lock just set to view mode!
+            //first check for confirmation on task level, if unconfirmed, don't lock just set to view mode!
             if($unconfirmed || !$task->lock($this->now)){
-                $this->data->userState = $workflow::STATE_VIEW;
+                $this->data->userState = $this->workflow::STATE_VIEW;
             }
         }
         if($this->isOpenTaskRequest()){
@@ -1074,10 +1128,6 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function closeAndUnlock() {
         $workflow = $this->workflow;
-        $closingStates = array(
-            $workflow::STATE_FINISH,
-            $workflow::STATE_OPEN
-        );
         $task = $this->entity;
         $hasState = !empty($this->data->userState);
         $isEnding = isset($this->data->state) && $this->data->state == $task::STATE_END;
@@ -1086,14 +1136,12 @@ class editor_TaskController extends ZfExtended_RestController {
             //This state change will be saved at the end of this method.
             $this->data->userState = $workflow::STATE_OPEN;
         }
-        if(!$isEnding && (!$hasState || !in_array($this->data->userState, $closingStates))){
+        if(!$isEnding && (!$this->isLeavingTaskRequest())){
             return;
         }
-        if($this->entity->getLockingUser() == $this->user->data->userGuid) {
-            if(!$this->entity->unlock()){
-                throw new Zend_Exception('task '.$this->entity->getTaskGuid().
-                        ' could not be unlocked by user '.$this->user->data->userGuid);
-            }
+        if($this->entity->getLockingUser() == $this->user->data->userGuid && !$this->entity->unlock()) {
+            throw new Zend_Exception('task '.$this->entity->getTaskGuid().
+                    ' could not be unlocked by user '.$this->user->data->userGuid);
         }
         $this->unregisterTask();
         
@@ -1122,6 +1170,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(empty($this->data->userState)) {
             return;
         }
+        settype($this->data->userStatePrevious, 'string');
 
         if(!in_array($this->data->userState, $this->workflow->getStates())) {
             throw new ZfExtended_ValidateException('Given UserState '.$this->data->userState.' does not exist.');
@@ -1141,6 +1190,12 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
             if(! $isEditAllTasks){
+                if($this->isLeavingTaskRequest()) {
+                    $messages = Zend_Registry::get('rest_messages');
+                    /* @var $messages ZfExtended_Models_Messages */
+                    $messages->addError('Achtung: die aktuell geschlossene Aufgabe wurde Ihnen entzogen.');
+                    return; //just allow the user to leave the task - but send a message
+                }
                 throw $e;
             }
             $userTaskAssoc->setUserGuid($userGuid);
@@ -1150,7 +1205,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $isPmOverride = true;
             $userTaskAssoc->setIsPmOverride($isPmOverride);
         }
-
         $oldUserTaskAssoc = clone $userTaskAssoc;
         
         if($isOpen){
@@ -1167,7 +1221,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $userTaskAssoc->setUsedState(null);
         }
         
-        if($this->workflow->isStateChangeable($userTaskAssoc)) {
+        if($this->workflow->isStateChangeable($userTaskAssoc, $this->data->userStatePrevious)) {
             $userTaskAssoc->setState($this->data->userState);
         }
         
@@ -1444,7 +1498,11 @@ class editor_TaskController extends ZfExtended_RestController {
             }
             foreach($assocs as $assoc){
                 unset($assoc['id']);
-                $assoc['taskGuid']=$newTaskGuid;
+                if(!empty($assoc['autoCreatedOnImport'])) {
+                    //do not clone such TermCollection associations, since they are recreated through the cloned import package
+                    continue; 
+                }
+                $assoc['taskGuid'] = $newTaskGuid;
                 $model->init($assoc);
                 $model->save();
             }

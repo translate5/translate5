@@ -236,6 +236,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
     
     /**
      * tests the export results
+     * @depends testSegmentEditing
      * @param stdClass $task
      * @param string $exportUrl
      * @param string $fileToCompare
@@ -254,6 +255,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertFileExists($pathToZip);
         
         $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/install-unix.apache2.html.sdlxliff');
+        //file_put_contents('/home/tlauria/foo.sdlxliff', $exportedFile);
         $expectedResult = $this->api()->getFileContent('export-assert.sdlxliff');
         
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.sdlxliff');

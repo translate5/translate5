@@ -151,6 +151,11 @@ abstract class editor_Models_Export_FileParser {
     protected $log;
     
     /**
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $segmentFieldManager;
+    
+    /**
      * 
      * @param int $fileId
      * @param bool $diff
@@ -177,6 +182,8 @@ abstract class editor_Models_Export_FileParser {
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
         $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
+        $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $this->segmentFieldManager->initFields($this->_taskGuid);
 
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
     }
@@ -253,11 +260,7 @@ abstract class editor_Models_Export_FileParser {
             $file = $this->writeMatchRate($file,$i);
             
             if($this->config->runtimeOptions->editor->export->exportComments) {
-                $commentsId = $this->getSegmentComments($matches[1]);
-                
-                if(!empty($commentsId)){
-                    $file = $this->writeCommentGuidToSegment($file, $i, $commentsId);
-                }
+                $file[$i] = $this->injectComments($matches[1], $file[$i], $field);
             }
 
             $i = $i + 2;
@@ -266,22 +269,15 @@ abstract class editor_Models_Export_FileParser {
     }
     
     /**
-     * for overwriting purposes only
-     * @param array $file
-     * @param int $i
-     * @param string $id
-     */
-    protected function writeCommentGuidToSegment(array $file, int $i, $id) {
-    }
-    
-    /**
-     * for setting $this-comments, if needed by the child class
-     * for overwriting purposes only
+     * for injecting comment markers into the content which was replaced from placeholder
+     * for overwriting purposes
      * @param int $segmentId
+     * @param string $segment
+     * @param string $field
      * @return string $id of comments index in $this->comments | null if no comments exist
      */
-    protected function getSegmentComments(int $segmentId) {
-        return null;
+    protected function injectComments(int $segmentId, string $segment, string $field) {
+        return $segment;
     }
     
     /**
@@ -341,7 +337,7 @@ abstract class editor_Models_Export_FileParser {
         $edited = $this->tagHelper->protect($edited);
         $edited = $this->removeTermTags($edited);
         $edited = $this->tagHelper->unprotect($edited);
-        $this->compareTags($segment, $segment->getSource(), $edited);
+        $this->compareTags($segment, $edited, $field);
         
         //count length after removing removeTrackChanges and removeTermTags 
         // so that the same remove must not be done again inside of textLength
@@ -377,10 +373,18 @@ abstract class editor_Models_Export_FileParser {
     /**
      * Compares the real tags (ignores whitespace tags) of a source and target string, track the differences between the both along the segmentNrInTask
      * @param editor_Models_Segment $segment
-     * @param string $source
      * @param string $target
      */
-    protected function compareTags(editor_Models_Segment $segment, $source, $target) {
+    protected function compareTags(editor_Models_Segment $segment, string $target, string $field) {
+        $isTranslationTask = $this->_task->getEmptyTargets();
+        $segmentNotTranslated = $segment->getAutoStateId() == editor_Models_Segment_AutoStates::NOT_TRANSLATED;
+        //do the tag compare only if $field is editable (normally source is not)
+        $fieldInfo = $this->segmentFieldManager->getByName($field);
+        if(!$fieldInfo || !$fieldInfo->editable || $isTranslationTask && $segmentNotTranslated) {
+            return;
+        }
+        //if it was a translation task, we have to compare agains the source tags, otherwise against the field original
+        $source = $isTranslationTask ? $segment->getSource() : $segment->getFieldOriginal($field);
         $sourceTags = $this->tagHelper->getRealTags($source);
         $targetTags = $this->tagHelper->getRealTags($target);
         $notInTarget = $this->tagHelper->diffArray($sourceTags, $targetTags);
@@ -391,6 +395,7 @@ abstract class editor_Models_Export_FileParser {
         $this->segmentsWithTagErrors[] = [
             'id' => $segment->getId(),
             'fileId' => $segment->getFileId(),
+            'field' => $field,
             'segmentNrInTask' => $segment->getSegmentNrInTask(),
             'additionalInTarget' => $notInSource,
             'missingInTarget' => $notInTarget,

@@ -46,6 +46,9 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
      * @return string
      */
     public function renderUserList(array $users) {
+        $notifyConfig = Zend_Registry::get('config')->runtimeOptions->editor->notification;
+        $columns = $notifyConfig->userListColumns->toArray();
+        
         // anonymize users?
         $task = $this->view->task;
         /* @var $task editor_Models_Task */
@@ -68,29 +71,27 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
         $result = array('<table cellpadding="4">');
         $th = '<th align="left">';
         $result[] = '<tr>';
-        $result[] = $th.$t->_('Nachname').'</th>';
-        $result[] = $th.$t->_('Vorname').'</th>';
-        $result[] = $th.$t->_('Login').'</th>';
-        $result[] = $th.$t->_('E-Mail Adresse').'</th>';
-        if($hasRole) {
-            $result[] = $th.$t->_('Rolle').'</th>';
+        
+        $colHeads = ['surName' => 'Nachname', 'firstName' => 'Vorname', 'login' => 'Login', 'email' => 'E-Mail Adresse', 'role' => 'Rolle', 'state' => 'Status'];
+        
+        if(!$hasRole) {
+            //remove 'role' from $columns;
+            $columns = array_diff($columns, ['role']);
         }
-        if($hasState) {
-            $result[] = $th.$t->_('Status').'</th>';
+        if(!$hasState) {
+            //remove 'state' from $columns;
+            $columns = array_diff($columns, ['state']);
+        }
+        
+        foreach($columns as $col) {
+            $result[] = $th.$t->_($colHeads[$col]).'</th>';
         }
         $result[] = '</tr>';
         
         foreach($users as $user) {
             $result[] = "\n".'<tr>';
-            $result[] = '<td>'.$user['surName'].'</td>';
-            $result[] = '<td>'.$user['firstName'].'</td>';
-            $result[] = '<td>'.$user['login'].'</td>';
-            $result[] = '<td>'.$user['email'].'</td>';
-            if($hasRole) {
-                $result[] = '<td>'.$t->_($user['role']).'</td>';
-            }
-            if($hasState) {
-                $result[] = '<td>'.$t->_($user['state']).'</td>';
+            foreach($columns as $col) {
+                $result[] = '<td>'.$user[$col].'</td>';
             }
             $result[] = '</tr>';
         }

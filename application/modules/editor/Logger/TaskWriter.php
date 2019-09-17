@@ -27,6 +27,7 @@
  */
 class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
     public function write(ZfExtended_Logger_Event $event) {
+        $event = clone $event;
         $task = $event->extra['task'];
         /* @var $task editor_Models_Task */
         $taskLog = ZfExtended_Factory::get('editor_Models_Logger_Task');

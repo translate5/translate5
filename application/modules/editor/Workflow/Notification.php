@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
-     * @var ZfExtended_Mail
+     * @var ZfExtended_TemplateBasedMail
      */
     protected $mailer;
     
@@ -89,7 +89,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param array $parameters
      */
     protected function createNotification(string $role, string $template, array $parameters) {
-        $this->mailer = ZfExtended_Factory::get('ZfExtended_Mail');
+        $this->mailer = ZfExtended_Factory::get('ZfExtended_TemplateBasedMail');
         $this->mailer->setParameters($parameters);
         $this->mailer->setTemplate($this->getMailTemplate($role, $template));
     }
@@ -190,7 +190,10 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->tua = clone $this->config->newTua; //we just reuse the already used entity
         $currentStep = $workflow->getStepOfRole($triggeringRole);
         if($currentStep === false){
-            error_log("No workflow step to Role ".$triggeringRole." found! This is actually a workflow config error!");
+            $this->log->warn('E1013', 'No workflow step to Role {role} found! This is actually a workflow config error!', [
+                'task' => $task,
+                'role' => $triggeringRole,
+            ]);
         }
         $segments = $this->getStepSegments($currentStep);
         
@@ -255,7 +258,10 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->tua = clone $this->config->newTua; //we just reuse the already used entity
         $currentStep = $workflow->getStepOfRole($triggeringRole);
         if($currentStep === false){
-            error_log("No workflow step to Role ".$triggeringRole." found! This is actually a workflow config error!");
+            $this->log->warn('E1013', 'No workflow step to Role {role} found! This is actually a workflow config error!', [
+                'task' => $task,
+                'role' => $triggeringRole,
+            ]);
         }
         
         $currentUsers = $this->tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggeringRole, ['state']);
@@ -280,6 +286,46 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
             $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
             $this->notify($pm);
+        }
+    }
+    
+    /**
+     * Sends a notification to users which are removed automatically from the task
+     * The Users to be notified must be given in the parameter array key 'deleted' 
+     */
+    public function notifyCompetitiveDeleted(array $parameter) {
+        $triggerConfig = $this->initTriggerConfig([$parameter]);
+        $this->tua = $this->config->newTua;
+        settype($triggerConfig->deleted, 'array');
+        
+        if ($this->config->task->anonymizeUsers(false)) {
+            $params = [];
+        }
+        else {
+            $params = [
+                //we do not pass the whole userObject to keep data private 
+                'responsibleUser' => [
+                    'surName' => $triggerConfig->currentUser->surName,
+                    'firstName' => $triggerConfig->currentUser->firstName,
+                    'login' => $triggerConfig->currentUser->login,
+                    'email' => $triggerConfig->currentUser->email,
+                ]
+            ];
+        }
+        
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        foreach($triggerConfig->deleted as $deleted) {
+            $user->loadByGuid($deleted['userGuid']);
+            $workflow = $this->config->workflow;
+            $labels = $workflow->getLabels(false);
+            $roles = $workflow->getRoles();
+            $params['task'] = $this->config->task;
+            $params['role'] = $labels[array_search($deleted['role'], $roles)];
+            
+            $this->createNotification($deleted['role'], __FUNCTION__, $params);
+            $this->addCopyReceivers($triggerConfig, $deleted['role']);
+            $this->notify((array) $user->getDataObject());
         }
     }
     
@@ -322,11 +368,12 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $workflow = $this->config->workflow;
         $labels = $workflow->getLabels(false);
+        $tuas = $this->tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggerConfig->role ?? null, ['state', 'role']);
         
-        $tuas = $this->tua->loadUsersOfTaskWithRole($task->getTaskGuid(), editor_Workflow_Abstract::ROLE_LECTOR, ['state','role']);
         $roles = array_column($tuas, 'role');
+        //sort first $roles, then sort $tuas to the same order (via the indexes)
         array_multisort($roles, SORT_ASC, SORT_STRING, $tuas);
-        
+        $aRoleOccursMultipleTimes = count($roles) !== count(array_flip($roles));
         foreach($tuas as &$tua) {
             $tua['originalRole'] = $tua['role'];
             $tua['role'] = $labels[array_search($tua['role'], $workflow->getRoles())];
@@ -342,6 +389,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             'pm' => $pm,
             'task' => $this->config->task,
             'associatedUsers' => $tuas,
+            //the disclaimer is needed only, if from one role multiple users are assigned. If it is only one proofreader then no dislaimer is needed
+            'addCompetitiveDisclaimer' => $aRoleOccursMultipleTimes && $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE
         ];
         
         foreach($tuas as $tua) {
@@ -527,8 +576,9 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      */
     protected function attachXliffSegmentList($segmentHash, array $segments,$currentStep) {
         $config = Zend_Registry::get('config');
-        $xlfAttachment = (boolean) $config->runtimeOptions->notification->enableSegmentXlfAttachment;
-        $xlfFile =       (boolean) $config->runtimeOptions->editor->notification->saveXmlToFile;
+        $notifyConfig = $config->runtimeOptions->editor->notification;
+        $xlfAttachment = (boolean) $notifyConfig->enableSegmentXlfAttachment;
+        $xlfFile =       (boolean) $notifyConfig->saveXmlToFile;
         
         if(empty($segments) || (!$xlfAttachment && !$xlfFile)) {
             return;
@@ -537,7 +587,9 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $xliffConverter=$this->getXliffConverter($currentStep,$config);
             
             if(!$xliffConverter){
-                error_log("Error on xliff converter initialization. Task guid -> ".$this->config->task->getTaskGuid());
+                $this->log->warn('E1013', 'Error on xliff converter initialization', [
+                    'task' => $this->config->task
+                ]);
                 return;
             }
             
@@ -545,15 +597,11 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
                 $this->xmlCache[$segmentHash] = $xliff = $xliffConverter->convert($this->config->task, $segments);
             }
             catch(Exception $e) {
-                $log = ZfExtended_Factory::get('ZfExtended_Log');
-                /* @var $log ZfExtended_Log */
-                $task = $this->config->task;
-                $subject = 'error in changes.xliff creation for task '.$task->getTaskGuid();
-                $msg = "changes.xliff could not be created!\n\n";
-                $msg .= 'Task: '.$task->getTaskName()."\n";
-                $msg .= 'TaskGuid: '.$task->getTaskGuid()."\n\n";
-                $msg .= 'Exception: '.$e."\n";
-                $log->log($subject, $msg);
+                $msg = 'changes.xliff could not be created';
+                $this->log->warn('E1013', $msg, [
+                    'task' => $this->config->task
+                ]);
+                $this->log->exception($e, ['level' => $this->log::LEVEL_WARN]);
                 //if file saving is enabled we save the file with the debug content 
                 $this->xmlCache[$segmentHash] = $xliff = $msg;
                 //but we disable attaching it to the mail:
@@ -581,7 +629,10 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     protected function saveXmlToFile($xml) {
         $path = $this->config->task->getAbsoluteTaskDataPath();
         if(!is_dir($path) || !is_writeable($path)) {
-            error_log('cant write changes.xliff file to path: '.$path);
+            $this->log->warn('E1013', 'cant write changes.xliff file to path: {path}', [
+                'task' => $this->config->task,
+                'path' => $path
+            ]);
             return;
         }
         $suffix = '.xliff';
@@ -598,7 +649,10 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $outFile = $path.DIRECTORY_SEPARATOR.$filename.'-'.($i++).$suffix;
         }
         if(file_put_contents($outFile, $xml) == 0) {
-            error_log('Error on writing XML File: '.$outFile);
+            $this->log->warn('E1013', 'Error on writing XML File: {path}', [
+                'task' => $this->config->task,
+                'path' => $outFile
+            ]);
         }
     }
     

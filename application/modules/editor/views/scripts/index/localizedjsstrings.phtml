@@ -419,8 +419,7 @@ Ext.define('Editor.controller.Localizer', {
         messages: {
             assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
             assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
-            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>',
-            userNotifySuccess: '<?php echo $this->translate->_('Benutzer wurden erfolgreich per E-Mail benachrichtigt');?>',
+            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
         }
     });
 
@@ -543,7 +542,12 @@ Ext.define('Editor.controller.Localizer', {
             btnReload: '<?php echo $this->translate->_('Aktualisieren');?>',
             fullMatchLabel: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
             editTrue: '<?php echo $this->translate->_('Ja');?>',
-            editFalse: '<?php echo $this->translate->_('Nein');?>'
+            editFalse: '<?php echo $this->translate->_('Nein');?>',
+            usageModeTitle: '<?php echo $this->translate->_('Mehrere Benutzer');?>',
+            usageModeInfo: '<?php echo $this->translate->_('Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden');?>',
+            usageModeDisabled: '<?php echo $this->translate->_('Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.');?>',
+            usageModeCoop: '<?php echo $this->translate->_('Mehrere Benutzer bearbeiten dieselbe Aufgabe');?>',
+            usageModeCompetitive: '<?php echo $this->translate->_('Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.');?>'
         }
     });
     
@@ -641,7 +645,10 @@ Ext.define('Editor.controller.Localizer', {
         title: '<?php echo $this->translate->_('Einstellungen zu Aufgabe "{0}"');?>',
         strings: {
             close: '<?php echo $this->translate->_('Fenster schließen');?>',
-            events: '<?php echo $this->translate->_('Ereignisse');?>'
+            events: '<?php echo $this->translate->_('Ereignisse');?>',
+            notifyUsersTitle: '<?php echo $this->translate->_('Zugewiesene Benutzer benachrichtigen?');?>',
+            notifyUsersMsg: '<?php echo $this->translate->_('Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?');?>',
+            userNotifySuccess: '<?php echo $this->translate->_('Benutzer wurden erfolgreich per E-Mail benachrichtigt');?>'
         }
     });
     
@@ -695,9 +702,7 @@ Ext.define('Editor.controller.Localizer', {
             removeUser: '<?php echo $this->translate->_('Benutzer entfernen');?>',
             removeUserTip: '<?php echo $this->translate->_('Den gewählten Benutzer aus dieser Aufgabe entfernen.');?>',
             save: '<?php echo $this->translate->_('Änderungen speichern');?>',
-            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
-            btnNotify: '<?php echo $this->translate->_('Lektoren benachrichtigen');?>',
-            btnNotifyTip: '<?php echo $this->translate->_('Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren');?>'
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
         }
     });
 
@@ -745,6 +750,7 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             title: '<?php echo $this->translate->_('Aufgabe bestätigen?');?>', 
             confirmMsg: '<?php echo $this->translate->_('Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.');?>', 
+            confirmCompetitive: '<?php echo $this->translate->_('<br/><br/>Allen anderen Benutzern wird die Aufgabe entzogen<br/> und sie wird ausschließlich in Ihrer Verantwortung liegen.');?>',
             confirmBtn: '<?php echo $this->translate->_('bestätigen');?>' 
         }
     });
@@ -911,6 +917,7 @@ Ext.define('Editor.controller.Localizer', {
         actionResetPw: '<?php echo $this->translate->_('Passwort des Benutzers zurücksetzen');?>',
         gender_female: '<?php echo $this->translate->_('Frau');?>',
         gender_male: '<?php echo $this->translate->_('Herr');?>',
+        gender_neutral: '<?php echo $this->translate->_('keine Angabe');?>',
         reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
         reloadBtnTip: '<?php echo $this->translate->_('Benutzerliste vom Server aktualisieren.');?>',
         sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
@@ -934,6 +941,7 @@ Ext.define('Editor.controller.Localizer', {
         genderLabel: '<?php echo $this->translate->_('Anrede');?>',
         genderMale: '<?php echo $this->translate->_('Herr');?>',
         genderFemale: '<?php echo $this->translate->_('Frau');?>',
+        genderNeutral: '<?php echo $this->translate->_('Ohne');?>',
         loginTip: '<?php echo $this->translate->_('Anmeldename (Angabe notwendig)');?>',
         loginLabel: '<?php echo $this->translate->_('Anmeldename¹');?>',
         emailTip: '<?php echo $this->translate->_('E-Mail Adresse (Angabe notwendig)');?>',

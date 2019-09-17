@@ -74,10 +74,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
         component: {
             'segmentsHtmleditor': {
+                initialize: 'initEditor',
                 push: 'handleAfterContentUpdate'
             },
             '#segmentStatusStrip': {
-                afterRender: 'initSpellCheckPlugin'
+                afterRender: 'initTargetLang'
             },
             '#segmentStatusStrip #btnRunSpellCheck': {
                 click: 'startSpellCheckViaButton'
@@ -160,32 +161,32 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.consoleLog('---------------- SpellCheck: onDestroy FINISHED. -------------');
     },
     /**
-     * Init the SpellCheck-Plugin: 
+     * Init basics according to the task's target-language: 
      * - what's the target-language?
-     * - is this target-language supported by the SpellCheck-tool(s) we use?
      * - do we use keyboard-idle or a statusStrip-button to start a SpellCheck?
      */
-    initSpellCheckPlugin: function(statusStrip) {
+    initTargetLang: function(statusStrip) {
         var me = this;
-        me.consoleLog('0.2 initSpellCheckPlugin.');
+        me.consoleLog('0.2 SpellCheck: initTargetLang.');
         me.setTargetLangCode();
         me.setDisableSpellCheckByIdle(statusStrip);
+    },
+    /**
+     * Initialize Editor in general and language-support.
+     */
+    initEditor: function(editor) {
+        var me = this;
+        me.consoleLog('0.3 SpellCheck: initEditor.');
+        me.editor = editor;
         me.setLanguageSupport();
     },
     /**
-     * Init Editor
+     * SpellCheck-specific for Editor
      */
-    initEditor: function() {
-        var me = this,
-            plug,
-            editor;
-        me.consoleLog('0.3 SpellCheck: initEditor.');
-        // Initialize Editor in general:
-        plug = me.getSegmentGrid().editingPlugin;
-        editor = plug.editor;           // → this is the row editor component;
-        me.editor = editor.mainEditor;  // → this is the HtmlEditor
+    initSpellCheckInEditor: function() {
+        var me = this;
+        me.consoleLog('0.4 SpellCheck: initSpellCheckInEditor.');
         me.injectCSSForEditor();
-        // SpellCheck-specific for Editor:
         me.initTooltips();
         me.initEvents();
         me.setBrowserSpellcheck();
@@ -223,22 +224,21 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     initEvents: function() {
         var me = this,
-            editorDoc = Ext.get(me.editor.getDoc()),
+            docEl = Ext.get(me.editor.getDoc()),
             tooltipBody = Ext.getBody();
         me.consoleLog('SpellCheck: initEvents...');
         
         if (!me.disableSpellCheckByIdle) {
-            editorDoc.on('keydown', me.handleKeyDown, me, {priority: 9980, delegated: false});
+            docEl.on({
+                keyup:{
+                    delegated: false,
+                    priority: 9980,
+                    fn: me.handleKeyUp,
+                    scope: this,
+                    preventDefault: false
+                }
+            });
         }
-        
-        editorDoc.on({
-            click:{
-                delegated: false,
-                fn: me.handleClickInEditor,
-                scope: this,
-                preventDefault: true
-            }
-        });
         
         me.editor.on({
             afterInsertMarkup:{
@@ -249,6 +249,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 options: {priority: -800}   // for fireEvent('afterInsertMarkup'): SpellCheck must run after(!!!) TrackChanges: 
                                             // 1. TrackChanges needs the given range before SpellCheck changes it
                                             // 2. SpellCheck will start an Ajax-call
+            }
+        });
+        
+        docEl.on({
+            click:{
+                delegated: false,
+                fn: me.handleClickInEditor,
+                scope: this,
+                preventDefault: false
             }
         });
         
@@ -351,17 +360,18 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     
     handleClickInEditor: function() {
         var me = this;
+        me.consoleLog('SpellCheck: handleClickInEditor...');
         me.terminateSpellCheck();
     },
     /**
      * Handle KeyDown-Events of Editor.view.segments.HtmlEditor
      * @param {Object} event
      */
-    handleKeyDown: function(event) {
+    handleKeyUp: function(event) {
         var me = this;
-        me.consoleLog('SpellCheck: handleKeyDown...');
+        me.consoleLog('SpellCheck: handleKeyUp...');
         if (!me.isSupportedLanguage) {
-            me.consoleLog('handleKeyDown stopped because language is not supported or SpellCheck-Tool does not run.');
+            me.consoleLog('handleKeyUp stopped because language is not supported or SpellCheck-Tool does not run.');
             return;
         }
         me.initKeyDownEvent(event);
@@ -384,11 +394,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             break;
             case (!me.ignoreEvent || me.eventIsArrowKey()):
                 me.consoleLog('The user is still editing!');
-                me.startSpellCheckViaTimer();
+                me.startSpellCheckViaTimer(); // TODO: HÄ?????
             break;
         }
         
-        me.startSpellCheckViaTimer();
+        me.startSpellCheckViaTimer(); // TODO: HÄ?????
         
         // Stop event?
         if(me.stopEvent) {
@@ -437,13 +447,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (me.disableSpellCheckByIdle) {
             me.setEditorDisabled(true);
         }
+        // TrackChanges must remove it's placeholder.
+        me.fireEvent('removePlaceholdersInEditor');
         
         editorContentAsText = me.getEditorContentAsText(false);
         
-        if (editorContentAsText === '') {
+        if (editorContentAsText.trim() === '') {
             me.consoleLog('startSpellCheck stopped because editorContentAsText = ""');
             me.terminateSpellCheck();
-            return;
+            return true;
         }
         me.consoleLog('startSpellCheck for editorContentAsText: ' + editorContentAsText);
         
@@ -451,9 +463,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         spellCheckProcessID = Ext.Date.format(new Date(), 'time');
         me.spellCheckInProgressID = spellCheckProcessID;
         me.consoleLog('me.spellCheckInProgressID: ' + spellCheckProcessID);
-        
-        // TrackChanges must remove it's placeholder.
-        me.fireEvent('removePlaceholdersInEditor');
         
         // where is the caret at the moment?
         me.bookmarkForCaret = me.getPositionOfCaret();
@@ -503,6 +512,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         clearTimeout(me.editIdleTimer);
         me.editIdleTimer = null;
         me.spellCheckInProgressID = false;
+        
+        me.getEditorBody().focus();
+        
+        if (me.disableSpellCheckByIdle) {
+            me.setEditorDisabled(false);
+        }
     },
     
     // =========================================================================

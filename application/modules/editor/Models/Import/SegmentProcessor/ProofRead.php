@@ -137,6 +137,13 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
         
         //TODO: add the autopropageted, locked as new fields LEK_segments_meta
         //and set them here
+
+        //add custom meta fields
+        if(!empty($attributes->customMetaAttributes)) {
+            foreach($attributes->customMetaAttributes as $key => $value) {
+                $meta->__call('set'.ucfirst($key), [$value]);
+            }
+        }
         $meta->setSiblingData($seg);
         $meta->save();
     }

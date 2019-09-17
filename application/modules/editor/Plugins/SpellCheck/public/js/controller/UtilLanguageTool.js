@@ -69,6 +69,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
             },
             failure: function(response){
                 me.consoleLog('- Checking supported languages (LanguageTool) failed: ' + response.status);
+                me.terminateSpellCheck();
             }
         });
     },
@@ -82,12 +83,13 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
         if (resultLT.rows === false) {
             me.isSupportedLanguage = false;
             me.languageToCheckLongCode = null;
+            me.consoleLog('=> isSupportedLanguage: ' + me.isSupportedLanguage + ' (' + me.languageToCheckLongCode + ')');
         } else {
             me.isSupportedLanguage = true;
             me.languageToCheckLongCode = resultLT.rows.longCode;
-            me.initEditor();
+            me.consoleLog('=> isSupportedLanguage: ' + me.isSupportedLanguage + ' (' + me.languageToCheckLongCode + ')');
+            me.initSpellCheckInEditor();
         }
-        me.consoleLog('=> isSupportedLanguage: ' + me.isSupportedLanguage + ' (' + me.languageToCheckLongCode + ')');
     },
     /**
      * 
@@ -119,6 +121,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
                 },
                 failure: function(response){
                     me.consoleLog('runSpellCheckWithTool (LanguageTool) failed: ' + response.status);
+                    me.terminateSpellCheck();
                 } 
             });
     },

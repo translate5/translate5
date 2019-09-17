@@ -24,5 +24,11 @@ TO_RUN="editorAPI"
 fi
 
 #starting test suite:
-phpunit --verbose --include-path $INCLUDES --bootstrap bootstrap.php $TO_RUN
-exit $?
+
+if phpunit --atleast-version 8.0.0; then 
+    phpunit --verbose --cache-result-file ${APPLICATION_ROOT}application/modules/editor/testcases/.phpunit.result.cache  --include-path $INCLUDES --bootstrap bootstrap.php $TO_RUN
+    exit $?
+else
+    phpunit --verbose --include-path $INCLUDES --bootstrap bootstrap.php $TO_RUN
+    exit $?
+fi

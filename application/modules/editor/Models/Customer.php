@@ -94,12 +94,8 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     public function getConfig() {
         // This is a temporary preparation for implementing TRANSLATE-471.
         
-        $config = new Zend_Config([], true);
-        
         // Step 1: start with systemwide config
-        $origConfig = Zend_Registry::get('config');
-        /* @var $origConfig Zend_Config */
-        $config->merge($origConfig);
+        $config = new Zend_Config(Zend_Registry::get('config')->toArray(), true);
         
         // Step 2: anything customer-specific?
         if (!empty($this->getId())) {

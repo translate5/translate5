@@ -98,11 +98,6 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * @var array 
      */
     protected $endTags = array();
-    /**
-     *
-     * @var editor_Models_Segment_Meta
-     */
-    protected $meta;
 
     /**
      * (non-PHPdoc)
@@ -123,8 +118,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         parent::__construct($path, $fileName, $fileId, $task);
         $this->initImageTags();
         $this->initHelper();
-        $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-        $this->meta->addMeta('transitLockedForRefMat', editor_Models_Segment_Meta::META_TYPE_BOOLEAN, 0, 'defines, if segment is marked in transitFile as locked for translation memory use');
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $meta editor_Models_Segment_Meta */
+        $meta->addMeta('transitLockedForRefMat', editor_Models_Segment_Meta::META_TYPE_BOOLEAN, 0, 'defines, if segment is marked in transitFile as locked for translation memory use');
+        
         $transitLangInfo = Zend_Registry::get('transitLangInfo');
         $this->sourceExtension = $transitLangInfo['source'];
         $this->targetExtension = $transitLangInfo['target'];
@@ -193,8 +190,8 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             $transUnit = array('source'=>$source,'target'=>$target);
             
             $this->extractSegment($transUnit);
-            $segmentId = (int)$this->setAndSaveSegmentValues();
-            $this->setSegmentsMeta($seg,$target,$segmentId);//pass target instead of getting it inside of setSegmentsMeta to save performance
+            $this->addCustomSegmentsMeta($attributes, $seg, $target);//pass target instead of getting it inside of updateSegmentsMeta to save performance
+            $this->setAndSaveSegmentValues();
             $counterTrans++;
         }
         
@@ -226,21 +223,13 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * @param string $targetText
      * @param int $segmentId 
      */
-    protected function setSegmentsMeta(editor_Plugins_Transit_Segment $targetseg,string $targetText,int $segmentId) {
-        $save = false;
+    protected function addCustomSegmentsMeta(editor_Models_Import_FileParser_SegmentAttributes $attributes, editor_Plugins_Transit_Segment $targetseg,string $targetText) {
         if($targetseg->getAccessStatus()===editor_Plugins_Transit_Segment::ACCESS_NO_REFMAT){
-            $save = true;
-            $this->meta->setTransitLockedForRefMat(1);
+            $attributes->customMetaAttributes['transitLockedForRefMat'] = 1;
         }
         if($targetseg->getStatus()===editor_Plugins_Transit_Segment::STATUS_NOT_TRANSLATED || $targetText === ''){
             //@todo: enable setting of $this->meta->setNotTranslated(1); on empty target for other import formats
-            $save = true;
-            $this->meta->setNotTranslated(1);
-        }
-        if($save){
-            $this->meta->setSegmentId($segmentId);
-            $this->meta->setTaskGuid($this->task->getTaskGuid());
-            $this->meta->save();
+            $attributes->customMetaAttributes['notTranslated'] = 1;
         }
     }
     

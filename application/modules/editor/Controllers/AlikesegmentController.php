@@ -218,14 +218,21 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                  * Jeglicher Fehler im Zusammenhang mit dem Speichervorgang kann applikationsseitig ignoriert werden, 
                  * das Segment darf lediglich nicht in der Rückgabe an den Browser mit auftauchen. Somit erscheint das 
                  * Segment dem Benutzer als unlektoriert und kann es dann bei Bedarf von Hand lektorieren.
-                 * Fürs Debugging wirds geloggt.
+                 * Fürs Debugging wirds geloggt. (if debugs are active)
                  */  
-                $log = new ZfExtended_Log(false);
-                $log->logException($e);
-                $msg  = 'Loaded Segment Master '.print_r($this->entity->getDataObject(),1)."\n";
-                empty($entity) || $msg .= 'Prepared Segment Alike  '.print_r($entity->getDataObject(),1);
-                empty($history) || $msg .= 'Prepared Segment History  '.print_r($history->getDataObject(),1);
-                $log->log('Additional log info to previous '.get_class($e).' exception', $msg);
+                $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.repetition');
+                /* @var $logger ZfExtended_Logger */
+                $data = [
+                    'level' => $logger::LEVEL_DEBUG,
+                    'loadedSegmentMaster' => $this->entity->getDataObject(),
+                ];
+                if(!empty($entity)) {
+                    $data['preparedRepetition'] = $entity->getDataObject();
+                }
+                if(!empty($entity)) {
+                    $data['preparedRepetitionHistory'] = $history->getDataObject();
+                }
+                $logger->exception($e, $data);
                 continue;
             }
             //Mit ID als Index um Uniqness sicherzustellen (

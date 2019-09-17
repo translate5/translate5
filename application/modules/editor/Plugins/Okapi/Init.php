@@ -43,78 +43,72 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     private $okapiFileTypes = array(
+            'okapi', //currently needed, see TRANSLATE-1019
             
-            //FIXME WARNING: Only suffixes are used. MimeTypes are not needed anymore, since mimetype check was deactivated in UploadProcessor
-            // but since there is currently no time to refactor the stuff, we leave it as it is and refactor it later
+            'pdf',
             
-            'okapi' => ['application/xml','text/xml'], //currently needed, see TRANSLATE-1019
-            
-            'pdf' => ['text/html'],
-            
-            'html' => ['text/html'],
-            'htm' => ['text/html'],
-            'xml' => ['application/xml','text/xml'],
+            'html',
+            'htm',
+            'xml',
             //'csv' => ['text/csv'], disabled due our own importer
-            'txt' => ['text/plain'],
-            'dita' => ['application/dita+xml'],
-            'ditamap' => ['application/dita+xml'],
-            'c' => ['text/plain', 'text/c-x'],
-            'h' => ['text/plain', 'text/h-x'],
-            'cpp' => ['text/plain', 'text/c-x'],
-            'dtd' => ['application/xml-dtd'],
-            'wcml' => ['application/octet-stream'],
-            'idml' => ['application/octet-stream'],
-            'strings' => ['application/octet-stream'],
-            'properties' => ['application/octet-stream'],
-            'properties' => ['application/octet-stream'],
-            'json' => ['application/json'],
-            'catkeys' => ['application/octet-stream'], //guessed
-            'catkeys' => ['application/octet-stream'],
-            'md' => ['text/markdown'],
-            'xlsx' => ['application/octet-stream', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.openxmlformats'],
-            'xlsm' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.openxmlformats'],
-            'xltx' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.openxmlformats'],
-            'xltm' => ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.openxmlformats'],
-            'pptx' => ['application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/vnd.openxmlformats'],
-            'pptm' => ['application/vnd.ms-powerpoint.presentation.macroEnabled.12', 'application/vnd.openxmlformats'],
-            'potx' => ['application/vnd.openxmlformats-officedocument.presentationml.template', 'application/vnd.openxmlformats'],
-            'potm' => ['application/vnd.ms-powerpoint.template.macroEnabled.12', 'application/vnd.openxmlformats'],
-            'ppsx' => ['application/vnd.openxmlformats-officedocument.presentationml.slideshow', 'application/vnd.openxmlformats'],
-            'ppsm' => ['application/vnd.ms-powerpoint.slideshow.macroEnabled.12', 'application/vnd.openxmlformats'],
-            'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats'],
-            'docm' => ['application/vnd.ms-word.document.macroEnabled.12', 'application/vnd.openxmlformats'],
-            'dotx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.template', 'application/vnd.openxmlformats'],
-            'dotm' => ['application/vnd.ms-word.template.macroEnabled.12', 'application/vnd.openxmlformats'],
-            'vsdx' => ['application/vnd.visio'],
-            'vsdm' => ['application/vnd.visio'],
-            'mif' => ['application/vnd.visio'],
-            'ods' => ['application/octet-stream'],
-            'ots' => ['application/octet-stream'],
-            'odg' => ['application/octet-stream'],
-            'otg' => ['application/octet-stream'],
-            'odp' => ['application/octet-stream'],
-            'otp' => ['application/octet-stream'],
-            'odt' => ['application/octet-stream'],
-            'ott' => ['application/octet-stream'],
-            'pentm' => ['application/octet-stream'],
-            'php' => ['application/octet-stream'],
-            'po' => ['application/octet-stream'],
-            'rkm' => ['application/octet-stream'],
-            'rdf' => ['application/octet-stream'],
-            'resx' => ['application/octet-stream'],
-            'lang' => ['application/octet-stream'],
-            'srt' => ['application/octet-stream'],
-            'tsv' => ['application/octet-stream'],
-            'tmx' => ['application/octet-stream'],
-            'txp' => ['application/octet-stream'],
-            'rtf' => ['application/octet-stream'],
-            'ts' => ['application/octet-stream'],
-            'ttx' => ['application/octet-stream'],
-            'txml' => ['application/octet-stream'],
-            'vrsz' => ['application/octet-stream'],
-            'wix' => ['application/octet-stream'],
-            'yml' => ['application/octet-stream'],
-            'yaml' => ['application/octet-stream'], 
+            'txt',
+            'dita',
+            'ditamap',
+            'c',
+            'h',
+            'cpp',
+            'dtd',
+            'wcml',
+            'idml',
+            'strings',
+            'properties',
+            'json',
+            'catkeys',
+            'md',
+            'xlsx',
+            'xlsm',
+            'xltx',
+            'xltm',
+            'pptx',
+            'pptm',
+            'potx',
+            'potm',
+            'ppsx',
+            'ppsm',
+            'docx',
+            'docm',
+            'dotx',
+            'dotm',
+            'vsdx',
+            'vsdm',
+            'mif',
+            'ods',
+            'ots',
+            'odg',
+            'otg',
+            'odp',
+            'otp',
+            'odt',
+            'ott',
+            'pentm',
+            'php',
+            'po',
+            'rkm',
+            'rdf',
+            'resx',
+            'lang',
+            'srt',
+            'tsv',
+            'tmx',
+            'txp',
+            'rtf',
+            'ts',
+            'ttx',
+            'txml',
+            'vrsz',
+            'wix',
+            'yml',
+            'yaml',
     );
     
     /**
@@ -153,8 +147,8 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         $this->fileTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $fileTypes editor_Models_Import_SupportedFileTypes */
-        foreach ($this->okapiFileTypes as $ext => $mimes) {
-            $this->fileTypes->register($ext, $mimes);
+        foreach ($this->okapiFileTypes as $ext) {
+            $this->fileTypes->register($ext);
         }
         $this->initEvents();
     }
@@ -316,7 +310,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             return true;
         }
             
-        return in_array($extension,array_keys($this->okapiFileTypes));
+        return in_array($extension, $this->okapiFileTypes);
     }
     
     /**

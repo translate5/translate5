@@ -56,6 +56,11 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
   protected $validatorInstanceClass = 'editor_Models_Validator_Comment';
 
   /**
+   * @var editor_Models_Comment_Meta
+   */
+  protected $meta;
+  
+  /**
    * renders a single comment
    * @param Zend_View $view
    * @param array $comment
@@ -142,5 +147,24 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
       ->where('userGuid != ?', $sessionUser->data->userGuid);
       $res = $this->db->getAdapter()->fetchAll($s);
       return empty($res);
+  }
+  
+  /**
+   * convenient method to get the comment meta data
+   * @return editor_Models_Comment_Meta
+   */
+  public function meta() {
+      if(empty($this->meta)) {
+          $this->meta = ZfExtended_Factory::get('editor_Models_Comment_Meta');
+      }
+      elseif($this->getId() == $this->meta->getCommentId()) {
+          return $this->meta;
+      }
+      try {
+          $this->meta->loadByCommentId($this->getId());
+      } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+          $this->meta->init(array('commentId' => $this->getId()));
+      }
+      return $this->meta;
   }
 }

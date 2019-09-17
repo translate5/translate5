@@ -45,5 +45,8 @@ class editor_Models_Validator_Term_Attribute extends ZfExtended_Models_Validator
     $this->addValidator('attrId', 'stringLength', array('min' => 0, 'max' => 100));
     $this->addValidator('attrLang', 'stringLength', array('min' => 0, 'max' => 45));
     $this->addValidator('value', 'stringLength', array('min' => 0, 'max' => 65535));
+    $this->addValidator('userGuid', 'stringLength', array('min' => 0, 'max' => 38));
+    $this->addValidator('userName', 'stringLength', array('min' => 0, 'max' => 255));
+    $this->addValidator('processStatus', 'stringLength', array('min' => 0, 'max' => 128));
   }
 }

@@ -40,17 +40,9 @@ END LICENSE AND COPYRIGHT
  *  For the reference no id must be set, so that auto ids are generated on client side
  */
 class editor_Models_Import_DirectoryParser_ReferenceFiles extends editor_Models_Import_DirectoryParser_WorkingFiles {
-    /**
-     * empty array disables file extension filter
-     * @var array
-     */
-    protected $_importExtensionList = array();
-
-    protected $exceptionOnNoFilesFound = false;
-    
     public function __construct() {
         //disable (empty) the filter for reference files:
-        $this->_importExtensionList = [];
+        $this->supportedFiles = null;
     }
     
     /**

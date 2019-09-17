@@ -56,43 +56,96 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      * @param int $segmentId
      * @return string $id of comments index in $this->comments | null if no comments exist
      */
-    protected function getSegmentComments(int $segmentId){
+    protected function injectComments(int $segmentId, string $segment, string $field) {
         $commentModel = ZfExtended_Factory::get('editor_Models_Comment');
         /* @var $commentModel editor_Models_Comment */
         $comments = $commentModel->loadBySegmentAndTaskPlain($segmentId, $this->_taskGuid);
         
-        $tag = '<Comment severity="Medium" user="%1$s" date="%2$s" version="1.0">%3$s</Comment>';
-        $tags=array();
-        foreach($comments as $comment) {
-            $modifiedObj = new DateTime($comment['modified']);
-            //if the +0200 at the end makes trouble use the following
-            //gmdate('Y-m-d\TH:i:s\Z', $modified->getTimestamp());
-            $modified = $modifiedObj->format($modifiedObj::ATOM);
-            $tags[] = sprintf($tag, htmlspecialchars($comment['userName']), $modified, htmlspecialchars($comment['comment']));
+        //we may only run this function once per segment, so restrict to $field target
+        if(empty($comments) || $field != 'target') {
+            return $segment;
         }
-        if(empty($tags)){
-            return null;
-        }
+        
+        $commentMeta = ZfExtended_Factory::get('editor_Models_Comment_Meta');
+        /* @var $commentMeta editor_Models_Comment_Meta */
+        
+        $tag = '<Comment severity="%1$s" user="%2$s" date="%3$s" version="%4$s">%5$s</Comment>';
         $guidHelper = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'Guid'
         );
         /* @var $guidHelper ZfExtended_Controller_Helper_Guid */
-        $guid = $guidHelper->create();
-        $this->comments[$guid] = '<cmt-def id="'.$guid.'"><Comments>'.implode('', $tags).'</Comments></cmt-def>';
-        return $guid;
+        
+        //since we can not preserve mrksof comments on text parts only, all target comments always relate to the whole target
+        //there fore one guid for all target comments of one segment is needed
+        $targetGuid = $guidHelper->create();
+        $cmtDefContainer = [];
+        $hasTargetComments = false;
+        foreach($comments as $comment) {
+            $tagParams = [];
+            $guid = $this->processOneComment($comment, $tagParams, $commentMeta);
+            if(empty($guid)) {
+                //target comment
+                $hasTargetComments = true;
+                $guidToUse = $targetGuid;
+            }
+            else {
+                //source comment
+                $guidToUse = $guid;
+            }
+            settype($cmtDefContainer[$guidToUse], 'array');
+            $cmtDefContainer[$guidToUse][] = vsprintf($tag, $tagParams);
+        }
+
+        //group all Comments by guid into one cmt-def
+        foreach($cmtDefContainer as $guid => $comments) {
+            $this->comments[$guid] = '<cmt-def id="'.$guid.'"><Comments>'.implode('', $comments).'</Comments></cmt-def>';
+        }
+
+        if($hasTargetComments) {
+            return '<mrk mtype="x-sdl-comment" sdl:cid="'.$targetGuid.'">'.$segment.'</mrk>';
+        }
+        //if only source comments, we don't have to add the markers since in source they exist already
+        return $segment;
+    }
+    
+    /**
+     * fills the given tagparams array with content for Comment tag generation
+     * returns the original source comment guid or empty string if target comment 
+     * @param array $comment
+     * @param array $tagParams
+     * @param editor_Models_Comment_Meta $commentMeta
+     * @return string original source comment guid or empty string if target comment or no source comment guid found
+     */
+    protected function processOneComment(array $comment, array &$tagParams, editor_Models_Comment_Meta $commentMeta): string {
+        $modifiedObj = new DateTime($comment['modified']);
+        //if the +0200 at the end makes trouble use the following
+        //gmdate('Y-m-d\TH:i:s\Z', $modified->getTimestamp());
+        $tagParams = [
+            'severity' => 'Medium',
+            'user' => htmlspecialchars($comment['userName']),
+            'date' => $modifiedObj->format($modifiedObj::ATOM),
+            'version' => '1.0',
+            'comment' => htmlspecialchars($comment['comment']),
+        ];
+        if($comment['userGuid'] !== editor_Models_Import_FileParser_Sdlxliff::USERGUID) {
+            return '';
+        }
+        try {
+            $commentMeta->loadByCommentId($comment['id']);
+            $tagParams['severity'] = $commentMeta->getSeverity();
+            $tagParams['version'] = $commentMeta->getVersion();
+            
+            //currenly only source comments may (and must since in skeleton) reuse there original id
+            if($commentMeta->getAffectedField() === editor_Models_Import_FileParser_Sdlxliff::SOURCE) {
+                return $commentMeta->getOriginalId();
+            }
+        }
+        catch (ZfExtended_Models_Entity_NotFoundException $e){
+            //do nothing if no meta found, assume it is a target comment then → return empty guid
+        }
+        return '';
     }
 
-    /**
-     * @param array $file that contains file as array as splitted by parse function
-     * @param int $i position of current segment in the file array
-     * @param string $id of the comment(s) inside of $this->comments array
-     * @return array
-     */
-    protected function writeCommentGuidToSegment(array $file, int $i, $id) {
-        $file[$i] = '<mrk mtype="x-sdl-comment" sdl:cid="'.$id.'">'.$file[$i].'</mrk>';
-        return $file;
-    }
- 
     /**
      * dedicated to write the match-Rate to the right position in the target format
      * @param array $file that contains file as array as splitted by parse function
@@ -123,7 +176,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         parent::getFile();
         $this->_exportFile = preg_replace('"(<mrk[^>]*[^/])></mrk>"i', '\\1/>', $this->_exportFile);
         $this->injectRevisions();
-        $this->injectComments();
+        $this->injectCommentsHead();
         return $this->_exportFile;
     }
 
@@ -154,7 +207,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
     /**
      * 
      */
-    protected function injectComments() {
+    protected function injectCommentsHead() {
         if(!empty($this->comments)){
             $commentsAsString = implode('', $this->comments);
             if (strpos($this->_exportFile, '</cmt-defs>')!== false) {

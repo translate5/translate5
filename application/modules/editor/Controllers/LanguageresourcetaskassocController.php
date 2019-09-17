@@ -117,6 +117,10 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
      */
     protected function decodePutData() {
         parent::decodePutData();
+        
+        //this flag may not be set via API
+        unset($this->data->autoCreatedOnImport);
+        
         $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
         try{
@@ -141,9 +145,10 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
      *     
      * @param string $action
      * @param editor_Models_LanguageResources_Taskassoc
+     * @return editor_Models_LanguageResources_LanguageResource
      */
-    protected function fireAfterAssocChangeEvent($action,editor_Models_LanguageResources_Taskassoc $entity){
-        $lr=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+    protected function fireAfterAssocChangeEvent($action,editor_Models_LanguageResources_Taskassoc $entity): editor_Models_LanguageResources_LanguageResource{
+        $lr = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $lr editor_Models_LanguageResources_LanguageResource */
         $lr->load($entity->getLanguageResourceId());
         
@@ -154,5 +159,6 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
         $this->events->trigger($eventName, $this, array(
             'entity' => $entity,
         ));
+        return $lr;
     }
 }
