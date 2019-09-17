@@ -104,6 +104,13 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
      */
     getValidFiletypes:function(){
         return ['tm','tmx'];
+    },
+    
+    /***
+     * Get the import window for handleImportTm()
+     */
+    getImportWindow:function(){
+        return 'importTmWindow';
     }
 
 

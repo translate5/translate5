@@ -384,14 +384,8 @@ Ext.define('Editor.controller.TmOverview', {
     },
     handleImportTm : function(view, cell, cellIdx, rec){
         //find the import window from the service name
-        var importWindow='';
-        if(rec.get('serviceName')==Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME){
-            importWindow='importCollectionWindow';
-        }
-        if(rec.get('serviceName')==Editor.model.LanguageResources.Resource.OPENTM2_SERVICE_NAME){
-            importWindow='importTmWindow';
-        }
-        var win = Ext.widget(importWindow);
+        var importWindow = Editor.util.LanguageResources.getService(rec.get('serviceName')).getImportWindow(),
+            win = Ext.widget(importWindow);
         win.loadRecord(rec);
         win.show();
     },

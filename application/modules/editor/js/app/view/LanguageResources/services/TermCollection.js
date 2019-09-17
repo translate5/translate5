@@ -88,6 +88,13 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
     		return 'x-hidden-display';
     	}
     	return 'ico-tm-import';
+    },
+    
+    /***
+     * Get the import window for handleImportTm()
+     */
+    getImportWindow:function(){
+        return 'importCollectionWindow';
     }
     
 });
