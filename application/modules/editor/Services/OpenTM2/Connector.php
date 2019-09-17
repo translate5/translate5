@@ -186,21 +186,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         /* @var $file editor_Models_File */
         $file->load($segment->getFileId());
         
-        $trackChange=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-        /* @var $trackChange editor_Models_Segment_TrackChangeTag */
-        
-        $source= $trackChange->removeTrackChanges($this->getQueryString($segment));
-        //restore the whitespaces to real characters
-        $source = $this->internalTag->restore($source, true);
-        $source = $this->whitespaceHelper->unprotectWhitespace($source);
-        $source = $this->internalTag->toXliffPaired($source);
-        
-        $target= $trackChange->removeTrackChanges($segment->getTargetEdit());
-        //restore the whitespaces to real characters
-        $target = $this->internalTag->restore($target, true);
-        $target = $this->whitespaceHelper->unprotectWhitespace($target);
-        $target = $this->internalTag->toXliffPaired($target);
-        
+        $source= $this->prepareSegmentContent($this->getQueryString($segment));
+        $target= $this->prepareSegmentContent($segment->getTargetEdit());
         if($this->api->update($source, $target, $segment, $file->getFileName())) {
             $messages->addNotice('Segment im TM aktualisiert!');
             return;

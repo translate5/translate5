@@ -42,10 +42,16 @@ class editor_Plugins_NecTm_HttpApi {
     const ENC_TYPE = 'application/json; charset=utf-8';
     
     /**
-     * for JWT-Authorization: MemCache-Id for Access-Token
+     * for JWT-Authorization: MemCache-Id for access-token
      * @var string
      */
-    const TOKEN_CACHE_KEY = 'NecTmAccessToken';
+    const CACHE_TOKEN_KEY = 'NecTmAccessToken';
+    
+    /**
+     * We also cache who uses our access-token.
+     * @var string
+     */
+    const CACHE_USERNAME_KEY = 'NecTmUser';
     
     /**
      * Api-URL from zf configuration
@@ -96,12 +102,12 @@ class editor_Plugins_NecTm_HttpApi {
      * Set the token to authorize access to NEC-TM's APIs for the configured-user.
      * @return string|false
      */
-    protected function setAccessToken() {
+    protected function loginAndSetAccessToken() {
         $token = $this->login();
         if (!$token) {
             return false; // no token available
         }
-        $this->memCache->save($token, self::TOKEN_CACHE_KEY);
+        $this->memCache->save($token, self::CACHE_TOKEN_KEY);
         return $token;
     }
     
@@ -110,11 +116,23 @@ class editor_Plugins_NecTm_HttpApi {
      * @return string|false
      */
     protected function getAccessToken() {
-        $cachedToken = $this->memCache->load(self::TOKEN_CACHE_KEY);
+        $cachedToken = $this->memCache->load(self::CACHE_TOKEN_KEY);
         if (!$cachedToken || empty($cachedToken)) {
-            $cachedToken = $this->setAccessToken();
+            $cachedToken = $this->loginAndSetAccessToken();
         }
         return $cachedToken;
+    }
+    
+    /**
+     * Returns the username our access-token belongs to.
+     * @return string|false
+     */
+    protected function getUsername() {
+        $cachedUsername = $this->memCache->load(self::CACHE_USERNAME_KEY);
+        if (!$cachedUsername || empty($cachedUsername)) {
+            $this->loginAndSetAccessToken();
+        }
+        return $this->memCache->load(self::CACHE_USERNAME_KEY);
     }
     
     /**
@@ -127,10 +145,10 @@ class editor_Plugins_NecTm_HttpApi {
         /* @var $config Zend_Config */
         $credentials = $config->runtimeOptions->plugins->NecTm->credentials->toArray();
         $auth = explode(':', $credentials[0]);
-        $this->username = $auth[0];
+        $this->memCache->save($auth[0], self::CACHE_USERNAME_KEY);
         
         $data = new stdClass();
-        $data->username = $this->username;
+        $data->username = $this->getUsername();
         $data->password = $auth[1];
         
         $http = $this->getHttp('POST','auth');
@@ -248,13 +266,20 @@ class editor_Plugins_NecTm_HttpApi {
     
     /**
      * Import translation memory segments from TMX file.
-     * @param file $file        ("Zipped TMX file to import.") // TODO: type?
-     * @param string $tag       ("Tag name of the imported file.")
-     * @param string $lang_pair ("2-letter language codes join by underscore.")
-     * @return boolean
+     * @param string $file
+     * @param string $sourceLang
+     * @param string $targetLang
+     * @param array $tagIds (= assigned categories AND top-level-categories)
      */
-    public function importTMXfile($file, $tag, $lang_pair) {
-        // TODO
+    public function importTMXfile($file, $sourceLang, $targetLang, $tagIds) {
+        $method = 'PUT';
+        $endpointPath = 'tm/import';
+        $data = [];
+        $params = array('langpair' => $sourceLang.'_'.$targetLang, // "2-letter language codes join by underscore."
+                        'tag'      => 'tag878'); // TODO: multiple tags allowed here?
+        $files = array('file' => $file);
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params, $files);
+        return $processResponse;
     }
     
     /**
@@ -263,10 +288,10 @@ class editor_Plugins_NecTm_HttpApi {
      * @param string $targetText
      * @param string $sourceLang
      * @param string $targetLang
-     * @param string $tagId      ("Translation unit tag.")
+     * @param array $tagIds (= assigned categories AND top-level-categories)
      * @return boolean
      */
-    public function addTMUnit($sourceText, $targetText, $sourceLang, $targetLang, $tagId) {
+    public function addTMUnit($sourceText, $targetText, $sourceLang, $targetLang, $tagIds) {
         $method = 'POST';
         $endpointPath = 'tm';
         $data = [];
@@ -274,7 +299,7 @@ class editor_Plugins_NecTm_HttpApi {
                         'ttext' => $targetText,
                         'slang' => $sourceLang,
                         'tlang' => $targetLang,
-                        'tag'   => $tagId); // TODO: handle multiple tags in our languageResource by running a request for each?
+                        'tag'   => $tagIds);
         $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
         return $processResponse;
     }
@@ -284,10 +309,10 @@ class editor_Plugins_NecTm_HttpApi {
      * @param string|array $mime
      * @param string $sourceLang
      * @param string $targetLang
-     * @param string $tagId
+     * @param array $tagIds (= assigned categories AND top-level-categories)
      * @return boolean
      */
-    public function get($mime, $sourceLang, $targetLang, $tagId) {
+    public function get($mime, $sourceLang, $targetLang, $tagIds) {
         if (is_array($mime)) {
             $mime = implode(',', $mime);
         }
@@ -298,9 +323,11 @@ class editor_Plugins_NecTm_HttpApi {
         $data = [];
         $params = array('slang' => $sourceLang,
                         'tlang' => $targetLang,
-                        'tag'   => $tagId[0] ?? ''); // TODO: how to handle multiple tags?
+                        'tag'   => $tagIds);
         $this->necTmRequest($method, $endpointPath, $data, $params);
         $job_id = $this->result->job_id; // = ID of export task invoked in the background
+        
+        // TODO: wait for the job to be finished!
         
         // Step 2: "Download exported file"
         $method = 'GET';
@@ -315,6 +342,28 @@ class editor_Plugins_NecTm_HttpApi {
             return true;
         }
         return $this->processResponse($response);
+    }
+    
+    /** Check the api status
+     * @return boolean
+     */
+    public function getStatus(){
+        return $this->getUserinfos(); // test status by checking our user
+        // TODO: NEC-TM-Api also returns 404 if a user doesn't exist. The Api itself might be available!
+    }
+    
+    /** 
+     * Get user details.
+     * NEC-TM-Api returns 404 if user doesn't exist.
+     * @return boolean
+     */
+    protected function getUserinfos(){
+        $method = 'GET';
+        $endpointPath = 'users/'.$this->getUsername();
+        $data = [];
+        $params = [];
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
+        return $processResponse;
     }
     
     // -------------------------------------------------------------------------
@@ -371,17 +420,23 @@ class editor_Plugins_NecTm_HttpApi {
      * @param string $endpointPath
      * @param array $data
      * @param array $params
+     * @param array $files (files[formname] = filename)
      * @return boolean
      */
-    protected function necTmRequest($method, $endpointPath = '', $data = [], $params = []) {
+    protected function necTmRequest($method, $endpointPath = '', $data = [], $params = [], $files = []) {
         $http = $this->getHttp($method, $endpointPath);
         $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
         if (!empty($data)) {
             $http->setRawData(json_encode($data), self::ENC_TYPE);
         }
         if (!empty($params)) {
-            $setParameter = ($method == 'GET') ? 'setParameterGet' : 'setParameterPost';
+            $setParameter = ($method == 'POST') ? 'setParameterPost' : 'setParameterGet';
             $http->$setParameter($params);
+        }
+        if (!empty($files)) {
+            foreach ($files as $formname => $filename) {
+                $http->setFileUpload($filename,$formname);
+            }
         }
         $response = $this->request($http);
         $processResponse = $this->processResponse($response);

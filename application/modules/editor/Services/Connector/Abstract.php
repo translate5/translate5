@@ -224,6 +224,24 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /**
+     * Prepare sources and targets for being handled by the LanguageResource:
+     * - removeTrackChanges
+     * - restore whitespaces to real characters
+     * @param string $contentString
+     * @return string $preparedString
+     */
+    protected function prepareSegmentContent(string $contentString) {
+        $preparedString = $contentString;
+        // removeTrackChanges
+        $preparedString = $this->trackChange->removeTrackChanges($preparedString);
+        //restore the whitespaces to real characters
+        $preparedString = $this->internalTag->restore($preparedString, true);
+        $preparedString = $this->whitespaceHelper->unprotectWhitespace($preparedString);
+        $preparedString = $this->internalTag->toXliffPaired($preparedString);
+        return $preparedString;
+    }
+    
+    /**
      * restores whitespace in segment content and removes track changes before
      * @param string $queryString
      * @return string

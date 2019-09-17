@@ -177,16 +177,29 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
-    public function addTm(array $fileinfo = null,array $params=null) {
-        // TODO
+    public function addTm(array $fileinfo = null, array $params=null) {
+        $validFileTypes = $this->getValidFiletypes();
+        if (empty($validFileTypes['TMX'])) {
+            throw new ZfExtended_NotFoundException('NEC-TM: Cannot addTm for TMX-file; valid file types are missing.');
+        }
+        $noFile = empty($fileinfo);
+        $tmxUpload = !$noFile && in_array($fileinfo['type'], $validFileTypes['TMX']) && preg_match('/\.tmx$/', $fileinfo['name']);
+        if ($tmxUpload) {
+            if ($this->api->importTMXfile($fileinfo['tmp_name'], $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
+                $test = 3;
+                return true;
+            }
+        }
+        $this->handleNecTmError('LanguageResources - could not add TMX to NEC-TM'." LanguageResource: \n");
+        return false;
     }
     
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::addAdditionalTm()
+     * @see editor_Services_Connector_FilebasedAbstract::addAdditionalTm()
      */
     public function addAdditionalTm(array $fileinfo = null,array $params=null){
-        // TODO
+        return $this->addTm($fileinfo, $params);
     }
     
     /**
@@ -219,6 +232,15 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             return $this->api->getResult();
         }
         $this->throwBadGateway();
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Services_Connector_Abstract::update()
+     */
+    public function update(editor_Models_Segment $segment) {
+        // TODO: Can NEC-TM-Api do updates at all? Just found so far: $this->api->addTMUnit()
+        // Otherwise we might use delete and import?
     }
     
     /**
@@ -348,7 +370,10 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @throws ZfExtended_BadGateway
      */
     protected function throwBadGateway() {
-        // TODO
+        $e = new ZfExtended_BadGateway('Die angefragte NEC-TM Instanz meldete folgenden Fehler:');
+        $e->setDomain('LanguageResources');
+        $e->setErrors($this->api->getErrors());
+        throw $e;
     }
     
     /**
@@ -358,16 +383,18 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @param string $logMsg
      */
     protected function handleNecTmError($logMsg) {
-        // TODO
-    }
-    
-    /**
-     * Replaces not allowed characters with "_" in memory names
-     * @param string $name
-     * @return string
-     */
-    protected function filterName($name){
-        // TODO
+        $errors = $this->api->getErrors();
+        
+        $messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
+        $msg = 'Von NEC-TM gemeldeter Fehler';
+        $messages->addError($msg, 'core', null, $errors);
+        
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        /* @var $log ZfExtended_Log */
+        $data  = print_r($this->languageResource->getDataObject(),1);
+        $data .= " \nError\n".print_r($errors,1);
+        $log->logError($logMsg, $data);
     }
     
     /**
@@ -375,7 +402,10 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
-        // TODO
+        if($this->api->getStatus()){
+            return self::STATUS_AVAILABLE;
+        }
+        return self::STATUS_NOCONNECTION;
     }
     
     /***
