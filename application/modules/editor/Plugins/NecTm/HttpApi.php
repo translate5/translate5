@@ -42,6 +42,18 @@ class editor_Plugins_NecTm_HttpApi {
     const ENC_TYPE = 'application/json; charset=utf-8';
     
     /**
+     * The status the NEC-TM-Api returns if a job has been finished sucessfully.
+     * @var string
+     */
+    const JOB_STATUS_SUCCEEDED = "succeded";
+    
+    /**
+     * How long to wait when checking if a job was succesful, e.g when exporting and downloading a tmx from the NEC-TM-Api.
+     * @var integer
+     */
+    const JOB_STATUS_TIMETOWAIT = 20; // = seconds
+    
+    /**
      * for JWT-Authorization: MemCache-Id for access-token
      * @var string
      */
@@ -317,7 +329,7 @@ class editor_Plugins_NecTm_HttpApi {
             $mime = implode(',', $mime);
         }
         
-        // Step 1: "Export translation memory segments to zipped TMX file(s)"
+        // Step 1: Export translation memory segments to zipped TMX file(s)
         $method = 'POST';
         $endpointPath = 'tm/export';
         $data = [];
@@ -325,13 +337,17 @@ class editor_Plugins_NecTm_HttpApi {
                         'tlang' => $targetLang,
                         'tag'   => $tagIds);
         $this->necTmRequest($method, $endpointPath, $data, $params);
-        $job_id = $this->result->job_id; // = ID of export task invoked in the background
+        $jobId = $this->result->job_id; // = ID of export task invoked in the background.
         
-        // TODO: wait for the job to be finished!
+        // Step 2: wait for the job to be finished
+        $jobIsSucceeded = $this->isSuccessfulJob($jobId);
+        if (!$jobIsSucceeded) {
+            return false;
+        }
         
-        // Step 2: "Download exported file"
+        // Step 3: Download exported file
         $method = 'GET';
-        $endpointPath = 'tm/export/file/'.$job_id;
+        $endpointPath = 'tm/export/file/'.$jobId;
         $http = $this->getHttp($method, $endpointPath);
         $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
         $http->setConfig(['timeout' => 1200]);
@@ -344,7 +360,42 @@ class editor_Plugins_NecTm_HttpApi {
         return $this->processResponse($response);
     }
     
-    /** Check the api status
+    /**
+     * A job is successful if the NEC-TM-Api returns the corresponding status within
+     * a given time. (for the NEC-TM-Api, every import or export is a "Job".)
+     * @param string $jobId
+     * @return boolean 
+     */
+    protected function isSuccessfulJob($jobId) {
+        $jobIsSucceeded = '';
+        $starttime = time();
+        while ($jobIsSucceeded != self::JOB_STATUS_SUCCEEDED) {
+            $timeElapsed = time() - $starttime;
+            if ($timeElapsed > self::JOB_STATUS_TIMETOWAIT) {
+                break;
+            }
+            $jobIsSucceeded = $this->getJobStatus($jobId);
+        }
+        return $jobIsSucceeded == self::JOB_STATUS_SUCCEEDED;
+    }
+    
+    /** 
+     * Returns the status for the given job-Id.
+     * @param string $jobId
+     * @return string status 
+     */
+    protected function getJobStatus($jobId){
+        $method = 'GET';
+        $endpointPath = 'jobs/'.$jobId;
+        $data = [];
+        $params = [];
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
+        error_log($this->result->jobs[0]->status);
+        return $this->result->jobs[0]->status;
+    }
+    
+    /** 
+     * Check the api status.
      * @return boolean
      */
     public function getStatus(){

@@ -186,7 +186,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         $tmxUpload = !$noFile && in_array($fileinfo['type'], $validFileTypes['TMX']) && preg_match('/\.tmx$/', $fileinfo['name']);
         if ($tmxUpload) {
             if ($this->api->importTMXfile($fileinfo['tmp_name'], $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
-                $test = 3;
                 return true;
             }
         }
@@ -232,6 +231,10 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             return $this->api->getResult();
         }
         $this->throwBadGateway();
+        return false;
+        // TODO: If we return false, the editor_LanguageresourceinstanceController
+        // continues anyway and shows details as xml in a new tab.
+        // (For testing you can set the $this->api::JOB_STATUS_TIMETOWAIT to 2 or so.)
     }
     
     /**
