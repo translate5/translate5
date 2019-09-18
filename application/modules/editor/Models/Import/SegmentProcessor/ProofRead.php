@@ -135,6 +135,14 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
             $meta->setTransunitId($seg->getSegmentNrInTask());
         }
         
+        if(!empty($attributes->autopropagated)) {
+            $meta->setAutopropagated($attributes->autopropagated);
+        }
+        
+        if(!empty($attributes->locked)) {
+            $meta->setLocked($attributes->locked);
+        }
+        
         //TODO: add the autopropageted, locked as new fields LEK_segments_meta
         //and set them here
 
