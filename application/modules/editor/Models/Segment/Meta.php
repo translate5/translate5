@@ -51,6 +51,10 @@ END LICENSE AND COPYRIGHT
  * @method void setAdditionalUnitLength() setAdditionalUnitLength(int $length)
  * @method integer getAdditionalMrkLength() getAdditionalMrkLength()
  * @method void setAdditionalMrkLength() setAdditionalMrkLength(int $length)
+ * @method integer getAutopropagated() getAutopropagated()
+ * @method void setAutopropagated() setAutopropagated(int $autopropagated)
+ * @method integer getLocked() getLocked()
+ * @method void setLocked() setLocked(int $locked)
  */
 class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
