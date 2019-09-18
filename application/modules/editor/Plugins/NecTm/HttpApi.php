@@ -340,6 +340,7 @@ class editor_Plugins_NecTm_HttpApi {
         $jobId = $this->result->job_id; // = ID of export task invoked in the background.
         
         // Step 2: wait for the job to be finished
+        // TODO: create worker
         $jobIsSucceeded = $this->isSuccessfulJob($jobId);
         if (!$jobIsSucceeded) {
             return false;
