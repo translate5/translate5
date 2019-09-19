@@ -64,7 +64,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     layout:'fit',
     
     taskGuid:null,
-    
+    defaultListenerScope:true,
+    listeners:{
+    	activate:'onMatchAnalysisPanelActivate'
+    },    
     initConfig: function(instanceConfig) {
         var me = this,
             columnRenderer=function(val, meta, record) {
@@ -76,9 +79,6 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
             
         config = {
             title:me.strings.tabTitle,
-            listeners:{
-            	activate:me.onMatchAnalysisPanelActivate
-            },
             items:[{
                     xtype:'grid',
                     itemId:'matchAnalysisGrid',
