@@ -37,10 +37,18 @@ END LICENSE AND COPYRIGHT
 $this->render('general.phtml');
 
 $params = [        
-        'header' => $this->header,
-        'footer' => $this->footer,
-        'role' => $this->translate->_($this->role),
+    'header' => $this->header,
+    'footer' => $this->footer,
+    'role' => $this->translate->_($this->role),
+    'responsibleUser' => '', //by default empty string, if given then it will be filled up
 ];
+
+//may be empty (with anon users for example)
+if(!empty($this->responsibleUser)) {
+    $params['responsibleUser'] = $this->responsibleUser;
+    //put in separate template fragment, so that clients can overwrite (or disable by overwriting) that data
+    $params['responsibleUser'] = $this->templateApply('{responsibleUser.firstName} {responsibleUser.surName} ({responsibleUser.email}) ist nun für die Aufgabe verantwortlich.<br />', $params);
+}
 
 $taskNr = $this->task->getTaskNr();
 if(!empty($taskNr)) {
@@ -52,8 +60,8 @@ $template = '{header}
     
 ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
 <br />
-Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.<br />
-<br />
+<b>Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.</b><br />
+<br />{responsibleUser}
 {footer}';
 
 $this->textbody = strip_tags($this->templateApply($template, $params));

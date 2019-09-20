@@ -71,9 +71,15 @@ class editor_SessionController extends ZfExtended_SessionController {
         $user = new Zend_Session_Namespace('user');
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
-        $tua->loadByParams($user->data->userGuid, $taskGuid);
+        try {
+            $tua->loadByParams($user->data->userGuid, $taskGuid);
+            $state = $workflow->getInitialUsageState($tua);
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //without tua we can open it with edit, nothing will be confirmed then
+            $state = $workflow::STATE_EDIT;
+        }
         
-        $state = $workflow->getInitialUsageState($tua);
         
         $params = ['id' => $task->getId(), 'data' => '{"userState":"'.$state.'","id":'.$task->getId().'}'];
         $this->forward('put', 'task', 'editor', $params);

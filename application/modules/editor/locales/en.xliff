@@ -3494,26 +3494,39 @@ More information can be found in the task property window in the tab events.<br 
     <source>Translate5 - Aufgabe durch anderen Benutzer übernommen</source>
     <target>Translate5 - another user took responsibility for the task</target>
 </trans-unit>
-<trans-unit id='e2hlYWRlcn0KICAgIAplaW4gYW5kZXJlciBCZW51dHplciBoYXQgaW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gZGllIFZlcmFudHdvcnR1bmcgZsO8ciBkaWUgQXVmZ2FiZSA8Yj57dGFzay50YXNrTnJ9IC0ge3Rhc2sudGFza05hbWV9PC9iPiDDvGJlcm5vbW1lbi48YnIgLz4KPGJyIC8+CklocmUgWnV3ZWlzdW5nIHp1ciBBdWZnYWJlIHd1cmRlIGF1dG9tYXRpc2NoIGVudGZlcm50LjxiciAvPgo8YnIgLz4Ke2Zvb3Rlcn0='>
+<trans-unit id='RGFzIEtvbW1lbnRhcmF0dHJpYnV0IGlzdCBlcmZvcmRlcmxpY2g='>
+    <source>Das Kommentarattribut ist erforderlich</source>
+    <target>The comment attribute is required</target>
+</trans-unit>
+<trans-unit id='e3Jlc3BvbnNpYmxlVXNlci5maXJzdE5hbWV9IHtyZXNwb25zaWJsZVVzZXIuc3VyTmFtZX0gKHtyZXNwb25zaWJsZVVzZXIuZW1haWx9KSBpc3QgbnVuIGbDvHIgZGllIEF1ZmdhYmUgdmVyYW50d29ydGxpY2guPGJyIC8+'>
+    <source>{responsibleUser.firstName} {responsibleUser.surName} ({responsibleUser.email}) ist nun für die Aufgabe verantwortlich.<br /></source>
+    <target>{responsibleUser.firstName} {responsibleUser.surName} ({responsibleUser.email}) is now responsible for the task.<br /></target>
+</trans-unit>
+<trans-unit id='e2hlYWRlcn0KICAgIAplaW4gYW5kZXJlciBCZW51dHplciBoYXQgaW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gZGllIFZlcmFudHdvcnR1bmcgZsO8ciBkaWUgQXVmZ2FiZSA8Yj57dGFzay50YXNrTnJ9IC0ge3Rhc2sudGFza05hbWV9PC9iPiDDvGJlcm5vbW1lbi48YnIgLz4KPGJyIC8+CjxiPklocmUgWnV3ZWlzdW5nIHp1ciBBdWZnYWJlIHd1cmRlIGF1dG9tYXRpc2NoIGVudGZlcm50LjwvYj48YnIgLz4KPGJyIC8+e3Jlc3BvbnNpYmxlVXNlcn0Ke2Zvb3Rlcn0='>
     <source>{header}
 
 ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
 <br />
-Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.<br />
-<br />
+<b>Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.</b><br />
+<br />{responsibleUser}
 {footer}</source>
 <target>{header}
 
 another user took responsibility for the task <b>{task.taskNr} - {task.taskName}</b> in the task-portal {portalLink}.<br />
 <br />
-You have been automatically unassigned from the task.<br />
-<br />
+<b>You have been automatically unassigned from the task.</b><br />
+<br />{responsibleUser}
 {footer}</target>
 </trans-unit>
-<trans-unit id='RGFzIEtvbW1lbnRhcmF0dHJpYnV0IGlzdCBlcmZvcmRlcmxpY2g='>
-    <source>Das Kommentarattribut ist erforderlich</source>
-    <target>The comment attribute is required</target>
+<trans-unit id='a2VpbmUgQW5nYWJl'>
+    <source>keine Angabe</source>
+    <target>not specified</target>
 </trans-unit>
+<trans-unit id='T2huZQ=='>
+    <source>Ohne</source>
+    <target>None</target>
+</trans-unit>
+<trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
     </body>
   </file>
 </xliff>
