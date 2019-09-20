@@ -242,6 +242,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_Abstract::update()
      */
     public function update(editor_Models_Segment $segment) {
+        $messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
         $source = $this->prepareSegmentContent($this->getQueryString($segment));
         $target = $this->prepareSegmentContent($segment->getTargetEdit());
         if($this->api->addTMUnit($source, $target, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)) {

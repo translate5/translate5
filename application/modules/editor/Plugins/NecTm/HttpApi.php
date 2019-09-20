@@ -223,7 +223,7 @@ class editor_Plugins_NecTm_HttpApi {
                         'slang'       => $sourceLang,
                         'tlang'       => $targetLang,
                         // 'min_match' => '75'      // "Return only match above or equal to given threshold (0-100)"; default: ​ 75
-                        'aut_trans'   => false,     // "Apply machine translation if match score is less than a threshold"; default: true
+                        'aut_trans'   => 'false',   // "Apply machine translation if match score is less than a threshold"; default: true
                         // 'concordance' => false,  // "Concordance search mode"; default: false
                         // 'strip_tags'  => false,  // "Strip all XML tags from the query"; default: false
                         'tag'         => $tagIds);
@@ -250,8 +250,8 @@ class editor_Plugins_NecTm_HttpApi {
                         'slang'       => $sourceLang,
                         'tlang'       => $targetLang,
                         // 'min_match' => '75'      // "Return only match above or equal to given threshold (0-100)"; default: ​ 75
-                        'aut_trans'   => false,     // "Apply machine translation if match score is less than a threshold"; default: true
-                        'concordance' => true,      // "Concordance search mode"; default: false
+                        'aut_trans'   => 'false',   // "Apply machine translation if match score is less than a threshold"; default: true
+                        'concordance' => 'true',    // "Concordance search mode"; default: false
                         // 'strip_tags'  => false,  // "Strip all XML tags from the query"; default: false
                         'tag'         => $tagIds);
         $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
@@ -479,15 +479,29 @@ class editor_Plugins_NecTm_HttpApi {
      * @return boolean
      */
     protected function necTmRequest($method, $endpointPath = '', $data = [], $params = [], $files = []) {
-        $http = $this->getHttp($method, $endpointPath);
+        // Zend would add array-keys to the parameter-name if the value is an array:
+        //     ?tag[0]=abc&tag[1]=def
+        // But what we need is:
+        //     ?tag=abc?tag=def
+        // (NEC-TM-Api uses get-Params or form-data only, so we are save adding the params this way:)
+        $queryParams = [];
+        $query = '';
+        if (!empty($params)) {
+            foreach ($params as $key => $value) {
+                if(is_array($value)) {
+                    foreach ($value as $value2) {
+                        $queryParams[] = $key.'='.urlencode($value2);
+                    }
+                } else {
+                    $queryParams[] = $key.'='.urlencode($value);
+                }
+            }
+            $query = '?' . implode("&",$queryParams);
+        }
+        $http = $this->getHttp($method, $endpointPath.$query);
         $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
         if (!empty($data)) {
             $http->setRawData(json_encode($data), self::ENC_TYPE);
-        }
-        if (!empty($params)) {
-            //$setParameter = ($method == 'POST') ? 'setParameterGPost' : 'setParameterGet'; // TODO: check this
-            $setParameter = 'setParameterGet';
-            $http->$setParameter($params);
         }
         if (!empty($files)) {
             foreach ($files as $formname => $filename) {
@@ -587,9 +601,9 @@ class editor_Plugins_NecTm_HttpApi {
         $this->result = $result;
         
         //check for error messages from body
-        if (!empty($result->message)) {
+        if (!empty($result->ReturnValue) && $result->ReturnValue > 0) {
             $error = new stdClass();
-            $error->type = 'Error: '.$result->message; // TODO
+            $error->type = 'Error: '.$result->ReturnValue;
             $error->error = $result->message;
             $error->url = $url;
             $error->method = $this->httpMethod;
