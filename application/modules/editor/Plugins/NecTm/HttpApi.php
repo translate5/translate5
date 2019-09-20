@@ -288,14 +288,16 @@ class editor_Plugins_NecTm_HttpApi {
         $endpointPath = 'tm/import';
         $data = [];
         $params = array('langpair' => $sourceLang.'_'.$targetLang, // "2-letter language codes join by underscore."
-                        'tag'      => 'tag878'); // TODO: multiple tags allowed here?
+                        'tag'      => $tagIds);
         $files = array('file' => $file);
         $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params, $files);
         return $processResponse;
     }
     
     /**
-     * Add new translation memory unit.
+     * Add new translation memory unit. 
+     * If source and target are the same, NEC-TM updates the data (tags, dates, ...). Otherwise
+     * a new unit will be created.
      * @param string $sourceText
      * @param string $targetText
      * @param string $sourceLang
@@ -304,6 +306,7 @@ class editor_Plugins_NecTm_HttpApi {
      * @return boolean
      */
     public function addTMUnit($sourceText, $targetText, $sourceLang, $targetLang, $tagIds) {
+        // TODO: also use param "file_name"?
         $method = 'POST';
         $endpointPath = 'tm';
         $data = [];
@@ -482,7 +485,8 @@ class editor_Plugins_NecTm_HttpApi {
             $http->setRawData(json_encode($data), self::ENC_TYPE);
         }
         if (!empty($params)) {
-            $setParameter = ($method == 'POST') ? 'setParameterPost' : 'setParameterGet';
+            //$setParameter = ($method == 'POST') ? 'setParameterGPost' : 'setParameterGet'; // TODO: check this
+            $setParameter = 'setParameterGet';
             $http->$setParameter($params);
         }
         if (!empty($files)) {
@@ -583,10 +587,10 @@ class editor_Plugins_NecTm_HttpApi {
         $this->result = $result;
         
         //check for error messages from body
-        if (!empty($result->ReturnValue) && $result->ReturnValue > 0) {
+        if (!empty($result->message)) {
             $error = new stdClass();
-            $error->type = 'Error Nr. '.$result->ReturnValue;
-            $error->error = $result->ErrorMsg;
+            $error->type = 'Error: '.$result->message; // TODO
+            $error->error = $result->message;
             $error->url = $url;
             $error->method = $this->httpMethod;
             $this->error[] = $error;

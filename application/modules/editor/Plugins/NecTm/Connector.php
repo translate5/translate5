@@ -242,8 +242,26 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_Abstract::update()
      */
     public function update(editor_Models_Segment $segment) {
-        // TODO: Can NEC-TM-Api do updates at all? Just found so far: $this->api->addTMUnit()
-        // Otherwise we might use delete and import?
+        $source = $this->prepareSegmentContent($this->getQueryString($segment));
+        $target = $this->prepareSegmentContent($segment->getTargetEdit());
+        if($this->api->addTMUnit($source, $target, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)) {
+            $messages->addNotice('Segment im TM aktualisiert!');
+            return;
+        }
+        
+        $errors = $this->api->getErrors();
+        //$messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
+        
+        $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren Sie Ihren Administrator! <br />Gemeldete Fehler:';
+        $messages->addError($msg, 'core', null, $errors);
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        /* @var $log ZfExtended_Log */
+        $msg = 'LanguageResources - could not save segment to TM'." LanguageResource: \n";
+        $data  = print_r($this->languageResource->getDataObject(),1);
+        $data .= " \nSegment\n".print_r($segment->getDataObject(),1);
+        $data .= " \nError\n".print_r($errors,1);
+        $log->logError($msg, $data);
     }
     
     /**
