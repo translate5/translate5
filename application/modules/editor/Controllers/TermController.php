@@ -150,6 +150,7 @@ class editor_TermController extends ZfExtended_RestController {
             /* @var $entry editor_Models_TermCollection_TermEntry */
             $entry->setCollectionId($this->data->collectionId);
             $entry->setGroupId($this->_helper->guid->create());
+            $entry->setIsProposal(true);
             $entry->save();
             
             //update or create the term entry creation/modification attributes
@@ -249,6 +250,7 @@ class editor_TermController extends ZfExtended_RestController {
             
             $entry->setCollectionId($this->data->collectionId);
             $entry->setGroupId($this->_helper->guid->create());
+            $entry->setIsProposal(true);
             $entry->setId($entry->save());
             
             $this->entity->setTermEntryId($entry->getId());

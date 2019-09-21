@@ -468,10 +468,12 @@ class editor_Plugins_TermImport_Services_Import {
         if(empty($this->configMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY])){
             return;
         }
+        //check if delete old entries is configured in the config file
+        $removeProposals=!empty($this->configMap[self::DELETE_PROPOSALS_OLDER_THAN_KEY]);
         
         $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
         /* @var $termEntry editor_Models_TermCollection_TermEntry */
-        $termEntry->removeOlderThan($collectionId, NOW_ISO);
+        $termEntry->removeOlderThan($collectionId, NOW_ISO,$removeProposals);
         $this->logProfiling('removeEntriesOlderThenImport for collection '.$collectionId);
     }
     
@@ -500,7 +502,7 @@ class editor_Plugins_TermImport_Services_Import {
         $proposals=ZfExtended_Factory::get('editor_Models_Term_Proposal');
         /* @var $proposal editor_Models_Term_Proposal */
         $theDate=!$deleteOlderThanCurrentImport && !empty($olderThan) ? $olderThan :  NOW_ISO;
-        $proposals->removeOlderThan([$collectionId],$theDate);
+        $proposals->removeOlderThan([$collectionId],$theDate,true);
         
         $attributeProposals=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
         /* @var $attributeProposals editor_Models_Term_AttributeProposal */
