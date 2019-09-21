@@ -908,18 +908,26 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$taskGuid]);
         /* @var $segments editor_Models_Segment_Iterator */
+        $segmentHistory=ZfExtended_Factory::get('editor_Models_SegmentHistory');
+        /* @var $segmentHistory editor_Models_SegmentHistory */
         foreach ($segments as $segment){
             if($segment->getEditable() == $edit100PercentMatch || $segment->getMatchRate()<100){
                 continue;
             }
+            $actualHistory=$segmentHistory->loadBySegmentId($segment->getId(),1);
+            if(empty($actualHistory)){
+                
+            }
+            $history=$segment->getNewHistoryEntity();
             //TODO: if it is blocked use Autostates: calculateImportState
             //calculate the editable and the autostatus, see the example in editor_Models_Import_FileParser::setCalculatedSegmentAttributes
             $segment->setEditable($edit100PercentMatch);
             
             //TODO: add segment history save here before the segment is saved
-            
             //INFO: load the autostatus from the history table when the 
             //INFO: if the segment history is empty, caluclate with calculateImportState
+            
+            $history->save();
             $segment->save();
         }
     }
