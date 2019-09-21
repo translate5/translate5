@@ -275,7 +275,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     }
     
     /***
-     * Query the google cloud api for the search string
+     * Query the NEC-TM-api for the search string
      * @param string $searchString
      * @param bool $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @return editor_Services_ServiceResult

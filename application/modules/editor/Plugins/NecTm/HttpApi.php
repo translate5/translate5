@@ -200,8 +200,8 @@ class editor_Plugins_NecTm_HttpApi {
         $method = 'GET';
         $endpointPath = 'tags';
         $data = [];
-        $params = [];
-        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
+        $queryParams = [];
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $queryParams);
         $result = $this->result;
         $this->result = $result->tags;
         return $processResponse;
@@ -219,15 +219,15 @@ class editor_Plugins_NecTm_HttpApi {
         $method = 'GET';
         $endpointPath = 'tm';
         $data = [];
-        $params = array('q'           => $queryString,
-                        'slang'       => $sourceLang,
-                        'tlang'       => $targetLang,
-                        // 'min_match' => '75'      // "Return only match above or equal to given threshold (0-100)"; default: ​ 75
-                        'aut_trans'   => 'false',   // "Apply machine translation if match score is less than a threshold"; default: true
-                        // 'concordance' => false,  // "Concordance search mode"; default: false
-                        // 'strip_tags'  => false,  // "Strip all XML tags from the query"; default: false
-                        'tag'         => $tagIds);
-        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
+        $queryParams = array('q'           => $queryString,
+                             'slang'       => $sourceLang,
+                             'tlang'       => $targetLang,
+                             // 'min_match' => '75'      // "Return only match above or equal to given threshold (0-100)"; default: ​ 75
+                             'aut_trans'   => 'false',   // "Apply machine translation if match score is less than a threshold"; default: true
+                             // 'concordance' => false,  // "Concordance search mode"; default: false
+                             // 'strip_tags'  => false,  // "Strip all XML tags from the query"; default: false
+                             'tag'         => $tagIds);
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $queryParams);
         $results = $this->result->results; // TODO: multiple results??
         $this->result = $results[0] ?? $results;
         return $processResponse;
@@ -246,15 +246,15 @@ class editor_Plugins_NecTm_HttpApi {
         $method = 'GET';
         $endpointPath = 'tm';
         $data = [];
-        $params = array('q'           => $searchString,
-                        'slang'       => $sourceLang,
-                        'tlang'       => $targetLang,
-                        // 'min_match' => '75'      // "Return only match above or equal to given threshold (0-100)"; default: ​ 75
-                        'aut_trans'   => 'false',   // "Apply machine translation if match score is less than a threshold"; default: true
-                        'concordance' => 'true',    // "Concordance search mode"; default: false
-                        // 'strip_tags'  => false,  // "Strip all XML tags from the query"; default: false
-                        'tag'         => $tagIds);
-        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
+        $queryParams = array('q'           => $searchString,
+                             'slang'       => $sourceLang,
+                             'tlang'       => $targetLang,
+                             // 'min_match' => '75'      // "Return only match above or equal to given threshold (0-100)"; default: ​ 75
+                             'aut_trans'   => 'false',   // "Apply machine translation if match score is less than a threshold"; default: true
+                             'concordance' => 'true',    // "Concordance search mode"; default: false
+                             // 'strip_tags'  => false,  // "Strip all XML tags from the query"; default: false
+                             'tag'         => $tagIds);
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $queryParams);
         // NEC-TM doesn't offer to search by field; we must filter the results manually:
         $allResults = $this->result->results;
         $results = [];
@@ -287,10 +287,10 @@ class editor_Plugins_NecTm_HttpApi {
         $method = 'PUT';
         $endpointPath = 'tm/import';
         $data = [];
-        $params = array('langpair' => $sourceLang.'_'.$targetLang, // "2-letter language codes join by underscore."
-                        'tag'      => $tagIds);
+        $queryParams = array('langpair' => $sourceLang.'_'.$targetLang, // "2-letter language codes join by underscore."
+                             'tag'      => $tagIds);
         $files = array('file' => $file);
-        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params, $files);
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $queryParams, $files);
         return $processResponse;
     }
     
@@ -310,12 +310,12 @@ class editor_Plugins_NecTm_HttpApi {
         $method = 'POST';
         $endpointPath = 'tm';
         $data = [];
-        $params = array('stext' => $sourceText,
-                        'ttext' => $targetText,
-                        'slang' => $sourceLang,
-                        'tlang' => $targetLang,
-                        'tag'   => $tagIds);
-        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
+        $queryParams = array('stext' => $sourceText,
+                             'ttext' => $targetText,
+                             'slang' => $sourceLang,
+                             'tlang' => $targetLang,
+                             'tag'   => $tagIds);
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $queryParams);
         return $processResponse;
     }
     
@@ -336,10 +336,10 @@ class editor_Plugins_NecTm_HttpApi {
         $method = 'POST';
         $endpointPath = 'tm/export';
         $data = [];
-        $params = array('slang' => $sourceLang,
-                        'tlang' => $targetLang,
-                        'tag'   => $tagIds);
-        $this->necTmRequest($method, $endpointPath, $data, $params);
+        $queryParams = array('slang' => $sourceLang,
+                             'tlang' => $targetLang,
+                             'tag'   => $tagIds);
+        $this->necTmRequest($method, $endpointPath, $data, $queryParams);
         $jobId = $this->result->job_id; // = ID of export task invoked in the background.
         
         // Step 2: wait for the job to be finished
@@ -392,8 +392,8 @@ class editor_Plugins_NecTm_HttpApi {
         $method = 'GET';
         $endpointPath = 'jobs/'.$jobId;
         $data = [];
-        $params = [];
-        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
+        $queryParams = [];
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $queryParams);
         error_log($this->result->jobs[0]->status);
         return $this->result->jobs[0]->status;
     }
@@ -416,8 +416,8 @@ class editor_Plugins_NecTm_HttpApi {
         $method = 'GET';
         $endpointPath = 'users/'.$this->getUsername();
         $data = [];
-        $params = [];
-        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
+        $queryParams = [];
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $queryParams);
         return $processResponse;
     }
     
@@ -474,29 +474,28 @@ class editor_Plugins_NecTm_HttpApi {
      * @param string $method
      * @param string $endpointPath
      * @param array $data
-     * @param array $params
+     * @param array $queryParams
      * @param array $files (files[formname] = filename)
      * @return boolean
      */
-    protected function necTmRequest($method, $endpointPath = '', $data = [], $params = [], $files = []) {
-        // Zend would add array-keys to the parameter-name if the value is an array:
+    protected function necTmRequest($method, $endpointPath = '', $data = [], $queryParams = [], $files = []) {
+        // Zend's setParameterGet() would add array-keys to the parameter-name if the value is an array:
         //     ?tag[0]=abc&tag[1]=def
         // But what we need is:
-        //     ?tag=abc?tag=def
-        // (NEC-TM-Api uses get-Params or form-data only, so we are save adding the params this way:)
-        $queryParams = [];
+        //     ?tag=abc&tag=def
         $query = '';
-        if (!empty($params)) {
-            foreach ($params as $key => $value) {
+        $paramsForQuery = [];
+        if (!empty($queryParams)) {
+            foreach ($queryParams as $name => $value) {
                 if(is_array($value)) {
-                    foreach ($value as $value2) {
-                        $queryParams[] = $key.'='.urlencode($value2);
+                    foreach ($value as $valueFromArray) {
+                        $paramsForQuery[] = $name.'='.urlencode($valueFromArray);
                     }
                 } else {
-                    $queryParams[] = $key.'='.urlencode($value);
+                    $paramsForQuery[] = $name.'='.urlencode($value);
                 }
             }
-            $query = '?' . implode("&",$queryParams);
+            $query = '?' . implode("&",$paramsForQuery);
         }
         $http = $this->getHttp($method, $endpointPath.$query);
         $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
