@@ -76,27 +76,27 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         },{
             xtype:'datefield',
             fieldLabel: me.strings.deleteTermEntriesDate,
-            itemId:'deleteEntriesModifiedOlderThan',
-            name:'deleteEntriesModifiedOlderThan',
+            itemId:'deleteTermsModifiedOlderThan',
+            name:'deleteTermsModifiedOlderThan',
             listeners:{
             	change:function(datefield,newValue){
             		var form=me.down('form').getForm(),
-            			proposalsCb=form.findField('deletProposalsOlderThan'),
-            			currentImportCb=form.findField('deleteEntriesOlderThanCurrentImport');
+            			proposalsCb=form.findField('deleteProposalsOlderThan'),
+            			currentImportCb=form.findField('deleteTermsOlderThanCurrentImport');
             		proposalsCb.setDisabled(!newValue && !currentImportCb.checked);
             	}
             },
         },{
             xtype:'checkbox',
             fieldLabel: me.strings.deleteTermEitriesImport,
-            itemId:'deleteEntriesOlderThanCurrentImport',
-            name:'deleteEntriesOlderThanCurrentImport',
+            itemId:'deleteTermsOlderThanCurrentImport',
+            name:'deleteTermsOlderThanCurrentImport',
             value:false,
             listeners:{
             	change:function(checkbox,newValue){
             		var form=me.down('form').getForm(),
-            			proposalsCb=form.findField('deletProposalsOlderThan'),
-            			deletedateField=form.findField('deleteEntriesModifiedOlderThan');
+            			proposalsCb=form.findField('deleteProposalsOlderThan'),
+            			deletedateField=form.findField('deleteTermsModifiedOlderThan');
             		
             		proposalsCb.setDisabled(!newValue && deletedateField.getValue()==null);
             	}
@@ -104,8 +104,8 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         },{
             xtype:'checkbox',
             fieldLabel: me.strings.deleteTermProposals,
-            itemId:'deletProposalsOlderThan',
-            name:'deletProposalsOlderThan',
+            itemId:'deleteProposalsOlderThan',
+            name:'deleteProposalsOlderThan',
             disabled:true,
             inputValue:true,
             value:false

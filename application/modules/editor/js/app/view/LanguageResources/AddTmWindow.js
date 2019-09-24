@@ -155,8 +155,8 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                 },{
                     xtype:'datefield',
                     fieldLabel: me.strings.deleteTermEntriesDate,
-                    itemId:'deleteEntriesModifiedOlderThan',
-                    name:'deleteEntriesModifiedOlderThan',
+                    itemId:'deleteTermsModifiedOlderThan',
+                    name:'deleteTermsModifiedOlderThan',
                     bind:{
                         hidden:'{!isTermCollectionResource}',
                         disabled:'{!isTermCollectionResource}'
@@ -164,8 +164,8 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                 },{
                     xtype:'checkbox',
                     fieldLabel: me.strings.deleteTermEitriesImport,
-                    itemId:'deleteEntriesOlderThanCurrentImport',
-                    name:'deleteEntriesOlderThanCurrentImport',
+                    itemId:'deleteTermsOlderThanCurrentImport',
+                    name:'deleteTermsOlderThanCurrentImport',
                     value:false,
                     bind:{
                         hidden:'{!isTermCollectionResource}',
