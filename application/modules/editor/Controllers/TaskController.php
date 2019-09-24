@@ -796,7 +796,6 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $oldTask = clone $this->entity;
         $this->decodePutData();
-        
         if(isset($this->data->edit100PercentMatch)){
             settype($this->data->edit100PercentMatch, 'integer');
         }
@@ -864,9 +863,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->closeAndUnlock();
         
         //if the edit100PercentMatch is changed, update the value for all segments in the task
-        //TODO: if the version is not the same and edit100PercentMatch true, throw exception that it is not posible
         if(isset($this->data->edit100PercentMatch)){
-            $this->entity->updateSegmentsEdit100PercentMatch($this->entity->getTaskGuid(), (boolean)$this->data->edit100PercentMatch);
+            $this->entity->updateSegmentsEdit100PercentMatch($this->entity, (boolean)$this->data->edit100PercentMatch);
         }
         
         $this->entity->save();
