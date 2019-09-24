@@ -1691,4 +1691,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             }
         }
     }
+    
+    /**
+     * returns true if at least one target has a translation set
+     */
+    public function isTargetTranslated() {
+        foreach($this->segmentdata as $name => $data) {
+            $field = $this->segmentFieldManager->getByName($name);
+            if($field->type !== editor_Models_SegmentField::TYPE_TARGET) {
+                continue;
+            }
+            if(!empty($data['original'])) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
 }
