@@ -756,7 +756,7 @@ a.x-btn span.task-confirmation {
     font-weight: bold;
     font-style: italic;
 }
-.pretranslateCheckboxIcon:before {
+.pretranslateCheckboxIcon:after {
     content: "";
     display: block;
     background-image:url(../images/information.png); 
