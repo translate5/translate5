@@ -620,14 +620,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
     
     /***
-     * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be freturned.
-     * The fuzzy languageResource name format is: oldname+Fuzzy-Analysis
+     * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be returned.
      * @param int $analysisId
      * @throws ZfExtended_NotFoundException
      * @return editor_Services_Connector_Abstract
      */
     public function initForFuzzyAnalysis($analysisId) {
-        $suffix = '-fuzzy-'.$analysisId;
         $mime="TM";
         $this->isInternalFuzzy = true;
         $validExportTypes = $this->getValidExportTypes();
@@ -637,15 +635,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
         $data = $this->getTm($validExportTypes[$mime]);
         
-        $fuzzyName = $this->languageResource->getSpecificData('fileName').$suffix;
-        $this->api->createMemory($fuzzyName, $this->languageResource->getSourceLangRfc5646(), $data);
+        $fuzzyFileName = $this->renderFuzzyLanguageResourceName($this->languageResource->getSpecificData('fileName'), $analysisId);
+        $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangRfc5646(), $data);
         
         $fuzzyLanguageResource = clone $this->languageResource;
         /* @var $fuzzyLanguageResource editor_Models_LanguageResources_LanguageResource  */
         
         //visualized name:
-        $fuzzyLanguageResource->setName($this->languageResource->getName().$suffix);
-        $fuzzyLanguageResource->addSpecificData('fileName', $fuzzyName);
+        $fuzzyLanguageResourceName = $this->renderFuzzyLanguageResourceName($this->languageResource->getName(), $analysisId);
+        $fuzzyLanguageResource->setName($fuzzyLanguageResourceName);
+        $fuzzyLanguageResource->addSpecificData('fileName', $fuzzyFileName);
         $fuzzyLanguageResource->setId(null);
         
         $connector = ZfExtended_Factory::get(get_class($this));

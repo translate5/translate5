@@ -47,6 +47,8 @@ abstract class editor_Services_Connector_Abstract {
     const STATUS_NOCONNECTION = 'noconnection';
     const STATUS_NOVALIDLICENSE = 'novalidlicense';
     
+    const FUZZY_SUFFIX = '-fuzzy-';
+    
     /*** 
      * Default resource matchrate
      * @var integer
@@ -323,6 +325,13 @@ abstract class editor_Services_Connector_Abstract {
      */
     public function initForFuzzyAnalysis($analysisId) {
         return $this;
+    }
+    
+    /**
+     * The fuzzy languageResource name format is: oldname-fuzzy-AnalysisId
+     */
+    protected function renderFuzzyLanguageResourceName($name, $analysisId) {
+        return $name.self::FUZZY_SUFFIX.$analysisId;
     }
     
     /***
