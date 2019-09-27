@@ -1701,7 +1701,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             if($field->type !== editor_Models_SegmentField::TYPE_TARGET) {
                 continue;
             }
-            if(!empty($data['original'])) {
+            if(!(empty($data['original'])&&$data['original']!=="0")) {
                 return true;
             }
         }
