@@ -310,7 +310,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             //we ensure that columns with the same name in one csv file are made unique
             // this is needed by addfield to map fields between different files 
             // if mid exists multiple times in the header, only the last one is used. 
-            if(empty($foundHeader[$colHead]) && $csvSettings[$colHead] !=="0") {
+            if(empty($foundHeader[$colHead]) && $foundHeader[$colHead] !=="0") {
                 $foundHeader[$colHead] = 1;
             }
             else {
