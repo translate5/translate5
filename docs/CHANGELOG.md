@@ -3,6 +3,17 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.2.8] - 2019-09-24
+###Bugfixes
+TRANSLATE-1045: javascript error: rendered block refreshed at (this is the fix for the doRefreshView override function in the BufferedRenderer)
+TRANSLATE-1219: Editor iframe body is reset and therefore not usable due missing content
+TRANSLATE-1756: Excel export error with segments containing an equal sign at the beginning
+TRANSLATE-1796: Error on match analysis tab panel open
+TRANSLATE-1797: Deleting of terms on import does not work
+TRANSLATE-1798: showSubLanguages in TermPortal does not work as it should
+TRANSLATE-1799: TermEntry Proposals get deleted, when they should not
+TRANSLATE-1800: Uncaught Error: rendered block refreshed at 0 rows
+
 ## [3.2.7] - 2019-09-12
 ###Added
 TRANSLATE-1736: Config switch to disable sub-languages for TermPortal search field
