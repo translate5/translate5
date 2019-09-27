@@ -149,7 +149,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @return editor_Services_ServiceResult
      */
     protected function queryCollectionResults($queryString, $reimportWhitespace = false,$field='source'){
-        if(empty($queryString)) {
+        if(empty($queryString) && $queryString !== "0") {
             return $this->resultList;
         }
         $entity=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');

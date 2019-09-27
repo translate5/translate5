@@ -210,7 +210,7 @@ class editor_Services_Microsoft_HttpApi {
     protected function processResponse($response) {
         $result=json_decode($response,true);
         $translation=isset($result[0]['translations']) ? $result[0]['translations'] : [];
-        if(empty($translation)){
+        if(empty($translation)&& $translation !== "0"){
             return empty($this->error);
         }
         

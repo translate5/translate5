@@ -104,7 +104,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @return editor_Services_ServiceResult
      */
     protected function queryMicrosoftApi($searchString, $reimportWhitespace = false){
-        if(empty($searchString)) {
+        if(empty($searchString)&&$searchString!=="0") {
             return $this->resultList;
         }
         
@@ -124,7 +124,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         $metaData=[];
         $translation="";
         foreach ($result as $res) {
-            if(empty($translation)){
+            if(empty($translation)&& $translation !== "0"){
                 $translation=$res['text'];
                 if($reimportWhitespace) {
                     $translation = $this->importWhitespaceFromTagLessQuery($translation);
