@@ -591,6 +591,14 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         return $this;
     }
     
+    /***
+     * Check if the attribute is processStatus attribute
+     * @return boolean
+     */
+    public function isProcessStatusAttribute(){
+        return $this->getAttrType()=='processStatus' && $this->getName()=='termNote';
+    }
+    
     public function getDataObject() {
         $result=parent::getDataObject();
         //set the attribute origin type(when no termId is provided it is termEntry attribute otherwise term attribute)
