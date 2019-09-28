@@ -182,7 +182,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             default:
                 return '<b>Programming Error! invalid tag type used!</b>';
         }
-        if(empty($text)) {
+        if(empty($text)&&$text!=="0") {
             $text = htmlentities($originalContent);
         }
         $tagNr = $this->getShortTagNumber($rid);
