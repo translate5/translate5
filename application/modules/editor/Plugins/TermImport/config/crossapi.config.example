@@ -18,11 +18,13 @@ deleteTermsModifiedOlderThan=2018-05-01
 ;possible values: true or false
 deleteTermsOlderThanCurrentImport=false
 
-;Deletes all term proposals older then deleteTermsModifiedOlderThan date.
-;If the deleteTermsModifiedOlderThan is not set, then the current date will be used
-;The current date will be used also when deleteTermsOlderThanCurrentImport is true
+;Delete all proposals in a listed termCollections, that have a creation date older than the this configs value.
 ;possible values: true or false
-deleteProposalsOlderThan=true
+deleteProposalsOlderThan=2018-05-01
+
+;Delete all proposals in a listed termCollections, that have a creation date older than the start of the current import.
+;possible values: true or false
+deleteProposalsOlderThanCurrentImport=false
 
 apiUsername=crossapi.user
 apiPassword=pass
