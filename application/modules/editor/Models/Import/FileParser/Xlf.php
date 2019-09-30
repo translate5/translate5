@@ -663,7 +663,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $placeHolders = [];
         
         //must be set before the loop, since in the loop the currentTarget is cleared on success
-        $hasTargets = !empty($this->currentTarget);
+        $hasTargets = !(empty($this->currentTarget) && $this->currentTarget !=="0");
         $sourceEdit = $this->task->getEnableSourceEditing();
         
         //find mrk mids missing in source and add them marked as missing
@@ -703,19 +703,19 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $sourceSegment = $this->xmlparser->join($sourceChunks);
                 
                 //if there is no source content, nothing can be done
-                if(empty($sourceSegment)){
+                if(empty($sourceSegment) && $sourceSegment !== "0"){
                     unset($this->currentTarget[$mid]);
                     continue;
                 }
             }
             
-            if($sourceEdit && $isSourceMrkMissing || $hasTargets && empty($this->currentTarget[$mid])){
+            if($sourceEdit && $isSourceMrkMissing || $hasTargets && (empty($this->currentTarget[$mid]) && $this->currentTarget[$mid] !== "0")){
                 $this->throwSegmentationException('E1067', [
                     'transUnitId' => $this->xmlparser->getAttribute($transUnit, 'id', '-na-'),
                     'mid' => $mid,
                 ]);
             }
-            if(empty($this->currentTarget) || empty($this->currentTarget[$mid])){
+            if(empty($this->currentTarget) || empty($this->currentTarget[$mid]) && $this->currentTarget[$mid] !== "0"){
                 $targetChunksOriginal = $targetChunks = [];
                 $currentTarget = '';
             }
@@ -808,8 +808,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->setMid($this->_mid.'-'.$mid);
             }
             
-            $emptyTarget = empty($targetChunksOriginal);
-            $hasOriginalTarget = !empty($this->segmentData[$targetName]['original']);
+            $emptyTarget = empty($targetChunksOriginal) && $targetChunksOriginal !== "0";
+            $hasOriginalTarget = !(empty($this->segmentData[$targetName]['original']) && $this->segmentData[$targetName]['original']!=="0");
             //if source contains tags only or is empty (and is no missing source) then we are able to ignore non textual segments 
             if(!$isSourceMrkMissing && !$this->hasText($this->segmentData[$sourceName]['original']) && ($emptyTarget || $hasOriginalTarget)) {
                 //if empty target, we fill the target with the source content, and ignore the segment then in translation
@@ -1151,6 +1151,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         $preserveWhitespace = $openerMeta['preserveWhitespace'];
         $content = $this->xmlparser->getRange($openerMeta['openerKey']+1, $closerKey - 1, true);
-        return $preserveWhitespace ? empty($content) : (strlen(trim($content)) === 0);
+        return $preserveWhitespace ? (empty($content) && $content !== "0") : (strlen(trim($content)) === 0);
     }
 }

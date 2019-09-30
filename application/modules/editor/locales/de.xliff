@@ -1202,8 +1202,6 @@ Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRo
 <trans-unit id='QmVudXR6ZXIgd3VyZGVuIGVyZm9sZ3JlaWNoIHBlciBFLU1haWwgYmVuYWNocmljaHRpZ3Q='><source>Benutzer wurden erfolgreich per E-Mail benachrichtigt</source><target>Benutzer wurden erfolgreich per E-Mail benachrichtigt</target></trans-unit>
 <trans-unit id='RWlnZW5zY2hhZnRlbg=='><source>Eigenschaften</source><target>Eigenschaften</target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgZXJmb2xncmVpY2ggYWt0dWFsaXNpZXJ0'><source>Die Aufgabe wurde erfolgreich aktualisiert</source><target>Die Aufgabe wurde erfolgreich aktualisiert</target></trans-unit>
-<trans-unit id='TGVrdG9yZW4gYmVuYWNocmljaHRpZ2Vu'><source>Lektoren benachrichtigen</source><target>Lektoren benachrichtigen</target></trans-unit>
-<trans-unit id='QWxsZSBCZW51dHplciDDvGJlciBkaWUgWnV3ZWlzdW5nIGRlciBBdWZnYWJlIGdlc2FtbWVsdCBpbmZvcm1pZXJlbg=='><source>Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren</source><target>Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren</target></trans-unit>
 <trans-unit id='UXVlbGxzcHJhY2hlKG4p'><source>Quellsprache(n)</source><target>Quellsprache(n)</target></trans-unit>
 <trans-unit id='WmllbHNwcmFjaGUobik='><source>Zielsprache(n)</source><target>Zielsprache(n)</target></trans-unit>
 <trans-unit id='QXV0b21hdGlzY2hlIFp1d2Vpc3VuZw=='><source>Automatische Zuweisung</source><target>Automatische Zuweisung</target></trans-unit>
@@ -1613,6 +1611,43 @@ Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften 
 <trans-unit id='QWNodHVuZzogRWluZSDDhG5kZXJ1bmcgZGVyIERlZmluaXRpb24gd2lya3Qgc2ljaCBhdWYgYWxsZSBUZXJtZSBkaWVzZXIgU3ByYWNoZSBhdXMu'><source>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</source><target>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</target></trans-unit>
 <trans-unit id='WnVtIMOEbmRlcm4gZGVyIERlZmluaXRpb24gw7ZmZm5lbiBTaWUgYml0dGUgZGllIEVpbnRyYWdzZWlnZW5zY2hhZnRlbi4='><source>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</source><target>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</target></trans-unit>
 <trans-unit id='SGlud2Vpcw=='><source>Hinweis</source><target>Hinweis</target></trans-unit>
+<trans-unit id='Cjxici8+Cjxici8+PGI+QWNodHVuZzo8L2I+IEtvbmt1cnJpZXJlbmRlIEJlbnV0emVyOiBEZXIgZXJzdGUgQmVudXR6ZXIsIGRlciBlaW5lbiBKb2IgYW5uaW1tdCwgZsO8aHJ0IGVpbmVuIEpvYiBhdXMuIEFsbGVuIGFuZGVyZW4gd2lyZCBhdXRvbWF0aXNjaCBkaWUgQXVmZ2FiZSBlbnR6b2dlbi4KPGJyLz4='><source>
+<br/>
+<br/><b>Achtung:</b> Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.
+<br/></source><target>
+<br/>
+<br/><b>Achtung:</b> Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.
+<br/></target></trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplcg=='><source>Mehrere Benutzer</source><target>Mehrere Benutzer</target></trans-unit>
+<trans-unit id='V2VubiBtZWhyZXJlIEJlbnV0emVyIGRlbXNlbGJlbiBXb3JrZmxvdy1TY2hyaXR0IHp1Z2V3aWVzZW4gd2VyZGVu'><source>Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden</source><target>Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden</target></trans-unit>
+<trans-unit id='RGllc2UgT3B0aW9uIGthbm4gbnVyIHZlcsOkbmRlcnQgd2VyZGVuLCB3ZW5uIGtlaW4gQmVudXR6ZXIgZGVyIEF1ZmdhYmUgenVnZXdpZXNlbiBpc3Qu'><source>Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</source><target>Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</target></trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGRpZXNlbGJlIEF1ZmdhYmU='><source>Mehrere Benutzer bearbeiten dieselbe Aufgabe</source><target>Mehrere Benutzer bearbeiten dieselbe Aufgabe</target></trans-unit>
+<trans-unit id='S29ua3VycmllcmVuZGUgQmVudXR6ZXI6IERlciBlcnN0ZSBCZW51dHplciwgZGVyIGVpbmVuIEpvYiBhbm5pbW10LCBmw7xocnQgZWluZW4gSm9iIGF1cy4gQWxsZW4gYW5kZXJlbiB3aXJkIGF1dG9tYXRpc2NoIGRpZSBBdWZnYWJlIGVudHpvZ2VuLg=='><source>Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.</source><target>Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.</target></trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXIgYmVuYWNocmljaHRpZ2VuPw=='><source>Zugewiesene Benutzer benachrichtigen?</source><target>Zugewiesene Benutzer benachrichtigen?</target></trans-unit>
+<trans-unit id='U29sbGVuIGRpZSB6dWdld2llc2VuZW4gQmVudXR6ZXIgw7xiZXIgZGllIFp1d2Vpc3VuZyBkZXIgQXVmZ2FiZSBiZW5hY2hyaWNodGlnIHdlcmRlbj8='><source>Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?</source><target>Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?</target></trans-unit>
+<trans-unit id='PGJyLz48YnIvPkFsbGVuIGFuZGVyZW4gQmVudXR6ZXJuIHdpcmQgZGllIEF1ZmdhYmUgZW50em9nZW48YnIvPiB1bmQgc2llIHdpcmQgYXVzc2NobGllw59saWNoIGluIElocmVyIFZlcmFudHdvcnR1bmcgbGllZ2VuLg=='><source><br/><br/>Allen anderen Benutzern wird die Aufgabe entzogen<br/> und sie wird ausschließlich in Ihrer Verantwortung liegen.</source><target><br/><br/>Allen anderen Benutzern wird die Aufgabe entzogen<br/> und sie wird ausschließlich in Ihrer Verantwortung liegen.</target></trans-unit>
+<trans-unit id='QWNodHVuZzogZGllIGFrdHVlbGwgZ2VzY2hsb3NzZW5lIEF1ZmdhYmUgd3VyZGUgSWhuZW4gZW50em9nZW4u'><source>Achtung: die aktuell geschlossene Aufgabe wurde Ihnen entzogen.</source><target>Achtung: die aktuell geschlossene Aufgabe wurde Ihnen entzogen.</target></trans-unit>
+<trans-unit id='U2llIGvDtm5uZW4gZGVuIEpvYiB6dXIgWmVpdCBuaWNodCBiZWFyYmVpdGVuLCBkZXIgQmVudXR6ZXIgaGF0IGRpZSBBdWZnYWJlIGJlcmVpdHMgenVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldC4='><source>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</source><target>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZHVyY2ggYW5kZXJlbiBCZW51dHplciDDvGJlcm5vbW1lbg=='><source>Translate5 - Aufgabe durch anderen Benutzer übernommen</source><target>Translate5 - Aufgabe durch anderen Benutzer übernommen</target></trans-unit>
+<trans-unit id='RGFzIEtvbW1lbnRhcmF0dHJpYnV0IGlzdCBlcmZvcmRlcmxpY2g='><source>Das Kommentarattribut ist erforderlich</source><target>Das Kommentarattribut ist erforderlich</target></trans-unit>
+<trans-unit id='e3Jlc3BvbnNpYmxlVXNlci5maXJzdE5hbWV9IHtyZXNwb25zaWJsZVVzZXIuc3VyTmFtZX0gKHtyZXNwb25zaWJsZVVzZXIuZW1haWx9KSBpc3QgbnVuIGbDvHIgZGllIEF1ZmdhYmUgdmVyYW50d29ydGxpY2guPGJyIC8+'><source>{responsibleUser.firstName} {responsibleUser.surName} ({responsibleUser.email}) ist nun für die Aufgabe verantwortlich.<br /></source><target>{responsibleUser.firstName} {responsibleUser.surName} ({responsibleUser.email}) ist nun für die Aufgabe verantwortlich.<br /></target></trans-unit>
+<trans-unit id='e2hlYWRlcn0KICAgIAplaW4gYW5kZXJlciBCZW51dHplciBoYXQgaW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gZGllIFZlcmFudHdvcnR1bmcgZsO8ciBkaWUgQXVmZ2FiZSA8Yj57dGFzay50YXNrTnJ9IC0ge3Rhc2sudGFza05hbWV9PC9iPiDDvGJlcm5vbW1lbi48YnIgLz4KPGJyIC8+CjxiPklocmUgWnV3ZWlzdW5nIHp1ciBBdWZnYWJlIHd1cmRlIGF1dG9tYXRpc2NoIGVudGZlcm50LjwvYj48YnIgLz4KPGJyIC8+e3Jlc3BvbnNpYmxlVXNlcn0Ke2Zvb3Rlcn0='><source>{header}
+
+ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
+<br />
+<b>Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.</b><br />
+<br />{responsibleUser}
+{footer}</source><target>{header}
+
+ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
+<br />
+<b>Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.</b><br />
+<br />{responsibleUser}
+{footer}</target></trans-unit>
+<trans-unit id='a2VpbmUgQW5nYWJl'><source>keine Angabe</source><target>keine Angabe</target></trans-unit>
+<trans-unit id='T2huZQ=='><source>Ohne</source><target>Ohne</target></trans-unit>
+<trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Sehr geehrte(r)</target></trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Vorschläge löschen älter als aktueller Import</target></trans-unit>
   </body>
  </file>
 </xliff>

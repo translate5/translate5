@@ -106,6 +106,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $frontendLocaleNormalized=$this->normalizeLanguage($this->_session->locale);
         $preselectedLang=null;
         
+        //check if the sub languages should be displayed
+        $isShowSubLanguages=$config->runtimeOptions->TermPortal->showSubLanguages;
+        
         foreach ($langsArray as &$lng){
 
             //set preselected term-search language based on user locale language
@@ -117,16 +120,34 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             }
             
             $isSingleLang=strpos($lng['rfc5646'], '-')===false;
+            $lng['languageGroup']=[$lng['id']];
             
-            //find all language sublings when the language is without "-" (de -> de-De, de-Au ..)
-            if($isSingleLang){
-                //load all similar languages
+            //if show sub languages is disabled, and it is a sub language
+            if(!$isShowSubLanguages && !$isSingleLang){
+                
+                //find the normalized rfc value and load the root language
+                $normalized=$this->normalizeLanguage($lng['rfc5646']);
+                $lng=$languagesModel->loadByRfc5646($normalized[0])->toArray();
+                
+                //find the group for the root language
                 $group=$languagesModel->findLanguageGroup($lng['rfc5646']);
                 $lng['languageGroup']=!empty($group) ? array_column($group, 'id') : [];
                 continue;
             }
-            $lng['languageGroup']=[$lng['id']];
+            
+            if(!$isSingleLang){
+                continue;
+            }
+            
+            //find all language sublings when the language is without "-" (de -> de-De, de-Au ..)
+            //load all similar languages
+            $group=$languagesModel->findLanguageGroup($lng['rfc5646']);
+            $lng['languageGroup']=!empty($group) ? array_column($group, 'id') : [];
         }
+        
+        
+        $temp = array_unique(array_column($langsArray, 'id'));
+        $langsArray = array_intersect_key($langsArray, $temp);
         
         //all languages in the available term collections for the user
         $this->view->languages=$langsArray;
@@ -134,9 +155,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         // all language-combinations that are available in InstantTranslate
         $languageResourcesLanguages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
         /* @var $languageResourcesLanguages editor_Models_LanguageResources_Languages */
-        $languageCombinations = $languageResourcesLanguages->getLanguageCombinationsForLoggedUser();
-        $this->view->Php2JsVars()->set('instanttranslate.targetsForSources', $languageCombinations->targetsForSources);
-        
+        $this->view->Php2JsVars()->set('instanttranslate.targetsForSources', $languageResourcesLanguages->getTargetsForSources());
         
         //rfc language code to language flag mapping
         $this->view->Php2JsVars()->set('apps.termportal.rfcFlags',$languagesModel->loadAllKeyValueCustom('rfc5646', 'iso3166Part1alpha2',true));
@@ -144,6 +163,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $this->view->Php2JsVars()->set('apps.termportal.idToRfcLanguageMap',$languagesModel->loadAllKeyValueCustom('id', 'rfc5646'));
         //rfc to languagename map
         $this->view->Php2JsVars()->set('apps.termportal.rfcToLanguageNameMap',$languagesModel->loadAllKeyValueCustom('rfc5646', 'langName'));
+        
+        //are all languages available in the new term dropdown select
+        $this->view->Php2JsVars()->set('apps.termportal.newTermAllLanguagesAvailable',(boolean)$config->runtimeOptions->termportal->newTermAllLanguagesAvailable);
         
         $this->view->moduleFolder = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module').'/';
         
@@ -223,8 +245,13 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             "editDefinitionMsgAffectsAllTerms"=>$this->translate->_("Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus."),
             "editDefinitionMsgUseTermEntry"=>$this->translate->_("Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften."),
             "editDefinitionMsgTitle"=>$this->translate->_("Hinweis"),
-            "acceptedFromTmComment"=>$this->translate->_("Aus MT übernommen")
+            "acceptedFromTmComment"=>$this->translate->_("Aus MT übernommen"),
+            "commentAttributeMandatoryMessage"=>$this->translate->_("Das Kommentarattribut ist erforderlich"),
+            "commentAttributeMandatoryTitle"=>$this->translate->_("Info")
         ]);
+        
+        //is the comment attribute mandatory when new term or term proposal is made
+        $this->view->Php2JsVars()->set('apps.termportal.commentAttributeMandatory', (boolean)$config->runtimeOptions->termportal->commentAttributeMandatory);
         
         // for filtering in front-end: get the names for the available collectionIds
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');

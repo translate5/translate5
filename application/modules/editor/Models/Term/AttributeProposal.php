@@ -85,7 +85,6 @@ class editor_Models_Term_AttributeProposal extends ZfExtended_Models_Entity_Abst
         ])>0;
     }
     
-    
     /***
      * Remove old attribute proposals from the collection by given date.
      *

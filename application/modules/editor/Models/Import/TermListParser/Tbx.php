@@ -998,6 +998,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $attribute->setInternalCount($internalCount);
         $attribute->saveOrUpdate();
         
+        //if it is procesStatuss attribute, update the term procesStatuss value
+        if($attribute->isProcessStatusAttribute()){
+            $this->termContainer['processStatus']=$attribute->getValue();
+        }
+        
         //add the inserted/update attribute to the collection
         $this->termAttirbuteContainer[]=$attribute->getId();
         return $attribute;

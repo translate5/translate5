@@ -159,7 +159,7 @@ class editor_Services_Manager {
     }
     
     public function updateSegment(editor_Models_Segment $segment) {
-        if(empty($segment->getTargetEdit())){
+        if(empty($segment->getTargetEdit())&&$segment->getTargetEdit()!=="0"){
             return;
         }
         $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Services_Connector $connector, $languageResource, $assoc) use ($segment) {

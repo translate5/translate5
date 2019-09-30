@@ -164,7 +164,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
         
         $this->xmlparser->registerOther(function($other, $key) {
             //if other is empty or is deleted text we do not count and track it  
-            if(empty($other) || $this->xmlparser->getParent('mrk[mtype=x-sdl-deleted]')) {
+            if((empty($other)&&$other!=="0") || $this->xmlparser->getParent('mrk[mtype=x-sdl-deleted]')) {
                 return;
             }
             // we count the chunks of othercontent inside the mtype="seg" mrk.
@@ -272,7 +272,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
             
             //we loop over the found mrk MIDs and save the according content and get the placeholder
             foreach($mrkMids as $idx => $mid) {
-                if($this->wasEmptyTarget || empty($this->targetMrkContent[$idx])) {
+                if($this->wasEmptyTarget || empty($this->targetMrkContent[$idx]) && $this->targetMrkContent[$idx]!=="0") {
                     $placeHolder = $segmentSaver($mid, $this->sourceMrkContent[$idx], null, $this->unitComments[$mid] ?? []);
                 }
                 else {

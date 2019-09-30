@@ -32,29 +32,37 @@ END LICENSE AND COPYRIGHT
  * @version 2.0
  *
  */
-/* @var $this Zend_View */
-$this->subject = $this->translate->_('Translate5 - Aufgabe freigegeben').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
 
+/* @var $this Zend_View */
 $this->render('general.phtml');
 
-$template = '{header}
-Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> für Sie freigegeben.<br />
-<br />
-Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />
-{changedSegments}
-<hr />
-<br />
-{footer}';
-
-$this->textbody = strip_tags($this->templateApply($template, [
-    'task' => $this->task->getDataObject(),
+$params = [        
     'header' => $this->header,
     'footer' => $this->footer,
-    'previousRole' => $this->translate->_('Übersetzer'),
-    'changedSegments' => $this->htmlOnly,
-]));
+    'role' => $this->translate->_($this->role),
+    'responsibleUser' => '', //by default empty string, if given then it will be filled up
+];
 
-echo $this->templateApply($template, [
-    //just overwrite the changedSegments
-    'changedSegments' => $this->workflowNotifyHtmlMailSegmentList($this->segments),
-]);
+//may be empty (with anon users for example)
+if(!empty($this->responsibleUser)) {
+    $params['responsibleUser'] = $this->responsibleUser;
+    //put in separate template fragment, so that clients can overwrite (or disable by overwriting) that data
+    $params['responsibleUser'] = $this->templateApply('{responsibleUser.firstName} {responsibleUser.surName} ({responsibleUser.email}) ist nun für die Aufgabe verantwortlich.<br />', $params);
+}
+
+$taskNr = $this->task->getTaskNr();
+if(!empty($taskNr)) {
+    $taskNr .= ' - ';
+}
+$this->subject = $this->translate->_('Translate5 - Aufgabe durch anderen Benutzer übernommen').' "'.$taskNr.$this->task->getTaskName().'"';
+
+$template = '{header}
+    
+ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
+<br />
+<b>Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.</b><br />
+<br />{responsibleUser}
+{footer}';
+
+$this->textbody = strip_tags($this->templateApply($template, $params));
+echo $this->templateApply($template, $params);

@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 
+/* @var $this Zend_View */
 $this->render('general.phtml');
 
 $params = [        
@@ -65,6 +66,10 @@ $this->textbody = strip_tags($this->templateApply($template, $params));
 if(!empty($this->associatedUsers)) {
     $params['proofreadersFragment'] = $this->translate->_("\n<br/>".'<b>Alle der Aufgabe zugeordneten Benutzer:</b>'."\n<br/>");
     $params['proofreadersFragment'] .= $this->workflowNotifyMail()->renderUserList($this->associatedUsers);
+}
+if($this->addCompetitiveDisclaimer) {
+    //the disclaimer is injected to the role for correct positioning also we do not have to touch all client overwritten templates
+    $params['role'] .= $this->translate->_("\n<br/>\n<br/>".'<b>Achtung:</b> Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.'."\n<br/>");
 }
 echo $this->templateApply($template, $params);
 

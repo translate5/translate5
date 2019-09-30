@@ -947,18 +947,59 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Remove old terms by given date.
-     * The term attributes also will be removed.
+     * Remove terms where the updated date is older than the given one.
      * 
      * @param array $collectionIds
      * @param string $olderThan
      * @return boolean
      */
     public function removeOldTerms(array $collectionIds, $olderThan){
-       return $this->db->delete([
-           'updated < ?' => $olderThan,
-           'collectionId in (?)' => $collectionIds,
-       ])>0;
+        //get all terms in the collection older than the date
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from(['t'=>'LEK_terms'],['t.id'])
+        ->joinLeft(['p'=>'LEK_term_proposal'],'p.termId=t.id ',['p.term'])
+        ->where('t.updated < ?', $olderThan)
+        ->where('t.collectionId in (?)',$collectionIds)
+        ->where('t.processStatus NOT IN (?)',self::PROCESS_STATUS_UNPROCESSED);
+        $result=$this->db->fetchAll($s)->toArray();
+        
+        if(empty($result)){
+            return false;
+        }
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $deleteProposals=[];
+        //for each of the terms with the proposals, use the proposal value as the
+        //new term value in the original term, after the original term is updated, remove
+        //the proposal
+        foreach ($result as $key=>$res){
+            if(empty($res['term'])){
+                continue;
+            }
+            $term->load($res['id']);
+            $term->setTerm($res['term']);
+            $term->setUpdated(NOW_ISO);
+            $term->setProcessStatus(self::PROCESS_STATUS_UNPROCESSED);
+            $term->save();
+            $deleteProposals[]=$res['id'];
+            unset($result[$key]);
+        }
+        //remove the collected proposals
+        if(!empty($deleteProposals)){
+            $proposal=ZfExtended_Factory::get('editor_Models_Term_Proposal');
+            /* @var $proposal editor_Models_Term_Proposal */
+            $proposal->db->delete([
+                'termId IN(?)' => $deleteProposals
+            ]);
+        }
+        
+        $result=array_column($result,'id');
+        if(empty($result)){
+            return false;
+        }
+        //delete the collected old terms
+        return $this->db->delete(['id IN(?)'=>$result])>0;
     }
 
     

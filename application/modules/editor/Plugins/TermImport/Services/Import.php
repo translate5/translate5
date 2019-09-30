@@ -107,29 +107,35 @@ class editor_Plugins_TermImport_Services_Import {
     const CROSS_API_TMP_FILENAME="Apiresponsetmpfilename.tbx";
     
     /***
-     * Deletes all termEntries in all listed termCollections, that have a modification date older than the listed one.
-     * Since every entry that exists in a TBX gets a new updated date on TBX-import, even if it is not changed: Simply set this date to yesterday to delete all terms, that are not part of the current import
+     * Deletes all terms in all listed termCollections, that have a modification date older than the listed one.
+     * Since every term that exists in a TBX gets a new updated date on TBX-import, even if it is not changed: Simply set this date to yesterday to delete all terms, that are not part of the current import
      * The updated date is a date internal to translate5 and different from the modified date of the term, that is shown in the interface
      * @var string
      */
-    const DELETE_ENTRIES_KEY="deleteEntriesModifiedOlderThan";
+    const DELETE_ENTRIES_KEY="deleteTermsModifiedOlderThan";
     
     
     /***
-     * Config key for deleting entries older than current import date.
+     * Config key for deleting terms older than current import date.
      * @var string
      */
-    CONST DELETE_OLDER_IMPORT_ENTRIES_KEY="deleteEntriesOlderThanCurrentImport";
+    CONST DELETE_TERMS_OLDER_THAN_IMPORT_KEY="deleteTermsOlderThanCurrentImport";
     
     
     /***
-     * Deletes all term proposals older then deleteEntriesModifiedOlderThan date.
-     * If the deleteEntriesModifiedOlderThan is not set, then the current date will be used
-     * The current date will be used also when deleteEntriesOlderThanCurrentImport is true
+     * Config key for deletes all proposals older then deleteProposalsOlderThan date.
      * 
      * @var string
      */
-    CONST DELETE_PROPOSALS_OLDER_THAN_KEY="deletProposalsOlderThan";
+    CONST DELETE_PROPOSALS_OLDER_THAN_KEY="deleteProposalsOlderThan";
+    
+    
+    /***
+     * Config key form delete all proposals older than the NOW_ISO
+     * 
+     * @var string
+     */
+    CONST DELETE_PROPOSALS_OLDER_THAN_IMPORT_KEY="deleteProposalsOlderThanCurrentImport";
     
     
     /***
@@ -204,7 +210,7 @@ class editor_Plugins_TermImport_Services_Import {
             $this->importTbx($file, $importDir.$file, $params);
             
             //remove old term entries and terms
-            $this->removeEntriesOlderThenImport($params['collectionId']);
+            $this->removeTermsOlderThenImport($params['collectionId']);
             
             //remove term proposals
             $this->removeProposalsOlderThan($params['collectionId']);
@@ -214,8 +220,18 @@ class editor_Plugins_TermImport_Services_Import {
             $this->returnMessage[]="No files where imported";
         }
 
-        //remove old term entries and terms
-        $this->removeOldTermsAndEntries($affectedCollections);
+        if(empty($affectedCollections)){
+            return $this->returnMessage;
+        }
+        
+        //remove old terms
+        $this->removeOldTerms($affectedCollections);
+        
+        //remove proposals older than current import
+        $this->removeProposalsOlderThenImport($affectedCollections);
+        
+        //clean the empty term entries
+        $this->removeEmptyTermEntries($affectedCollections);
         
         return $this->returnMessage;
     }
@@ -295,11 +311,6 @@ class editor_Plugins_TermImport_Services_Import {
             //absolute file path
             $file=$exportFilesDir.$file;
             
-            //remove old term entries and terms
-            $this->removeEntriesOlderThenImport($params['collectionId']);
-            
-            //remove term proposals
-            $this->removeProposalsOlderThan($params['collectionId']);
             
             $affectedCollections[] = $params['collectionId'];
             
@@ -320,6 +331,12 @@ class editor_Plugins_TermImport_Services_Import {
             
             $this->importTbx($file, $tmpFile, $params);
             
+            //remove old term entries and terms
+            $this->removeTermsOlderThenImport($params['collectionId']);
+            
+            //remove term proposals
+            $this->removeProposalsOlderThan($params['collectionId']);
+            
             //remove the tmp file
             if (file_exists($tmpFile)) {
                 unlink($tmpFile);
@@ -329,8 +346,18 @@ class editor_Plugins_TermImport_Services_Import {
             $this->returnMessage[]="No files where imported";
         }
         
-        //remove old term entries and terms
-        $this->removeOldTermsAndEntries($affectedCollections);
+        if(empty($affectedCollections)){
+            return $this->returnMessage;
+        }
+        
+        //remove old terms
+        $this->removeOldTerms($affectedCollections);
+        
+        //remove proposals older than current import
+        $this->removeProposalsOlderThenImport($affectedCollections);
+        
+        //clean the empty term entries
+        $this->removeEmptyTermEntries($affectedCollections);
         
         return $this->returnMessage;
     }
@@ -435,11 +462,10 @@ class editor_Plugins_TermImport_Services_Import {
     
     /***
      * Remove terms older than the configured date in the config file.
-     * Also remove the empty term entries in the same term collection 
      * @param array $collectionIds
      * @param string $olderThan
      */
-    private function removeOldTermsAndEntries(array $collectionIds){
+    private function removeOldTerms(array $collectionIds){
         //check if delete old tasks is configured in the config file
         if(empty($this->configMap[self::DELETE_ENTRIES_KEY])){
             return;
@@ -448,36 +474,30 @@ class editor_Plugins_TermImport_Services_Import {
         
         $termModel=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $termModel editor_Models_Term */
-        
         $termModel->removeOldTerms($collectionIds, $olderThan);
-        
-        //remove all empty term entries from the same term collection
-        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
-        /* @var $termEntry editor_Models_TermCollection_TermEntry */
-        $termEntry->removeEmptyFromCollection($collectionIds);
-        $this->logProfiling('removeOldTermsAndEntries for collections '.join(',', $collectionIds));
+        $this->logProfiling('removeOldTerms for collections '.join(',', $collectionIds));
     }
     
     /***
-     * Remove term entries older than $importDate
+     * Remove terms older than current date: NOW_ISO
+     * 
      * @param int $collectionId
      */
-    private function removeEntriesOlderThenImport($collectionId){
-        //check if delete old entries is configured in the config file
-        if(empty($this->configMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY])){
+    private function removeTermsOlderThenImport($collectionId){
+        //check if delete old terms is configured in the config file
+        if(empty($this->configMap[self::DELETE_TERMS_OLDER_THAN_IMPORT_KEY])){
             return;
         }
         
-        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
-        /* @var $termEntry editor_Models_TermCollection_TermEntry */
-        $termEntry->removeOlderThan($collectionId, NOW_ISO);
-        $this->logProfiling('removeEntriesOlderThenImport for collection '.$collectionId);
+        $termModel=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $termModel editor_Models_Term */
+        $termModel->removeOldTerms([$collectionId], NOW_ISO);
+        
+        $this->logProfiling('removeTermsOlderThenImport for collection '.$collectionId);
     }
     
     /***
-     * Deletes all term proposals older then deleteEntriesModifiedOlderThan date.
-     * If the deleteEntriesModifiedOlderThan is not set, then the current date will be used
-     * The current date will be used also when deleteEntriesOlderThanCurrentImport is true
+     * Delete all proposals older than deleteProposalsOlderThan date.
      * 
      * @param int $collectionId
      */
@@ -486,27 +506,53 @@ class editor_Plugins_TermImport_Services_Import {
         if(empty($this->configMap[self::DELETE_PROPOSALS_OLDER_THAN_KEY])){
             return;
         }
-        
-        $olderThan=null;
-        //check if delete old tasks is configured in the config file
-        if(!empty($this->configMap[self::DELETE_ENTRIES_KEY])){
-            $olderThan=$this->configMap[self::DELETE_ENTRIES_KEY];
+        $olderThan=$this->configMap[self::DELETE_PROPOSALS_OLDER_THAN_KEY];;
+        $this->removeOldProposals([$collectionId], $olderThan);
+        $this->logProfiling('removeProposalsOlderThan for collection '.$collectionId);
+    }
+    
+    /***
+     * Remove proposals older than curent import 
+     * @param array $collectionIds
+     */
+    private function removeProposalsOlderThenImport(array $collectionIds){
+        //check if delete old terms is configured in the config file
+        if(empty($this->configMap[self::DELETE_TERMS_OLDER_THAN_IMPORT_KEY])){
+            return;
         }
-        
-        //check if delete old entries is configured in the config file
-        $deleteOlderThanCurrentImport=!empty($this->configMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY]);
-        
+        $this->removeOldProposals($collectionIds, NOW_ISO);
+        $this->logProfiling('removeProposalsOlderThenImport for collection '.print_r($collectionIds,1));
+    }
+    
+    /***
+     * Remove empty term entries (term entries without any term in it).
+     * Only the empty term entries from the same term collection will be removed.
+     *  
+     * @param array $collectionIds
+     */
+    protected function removeEmptyTermEntries(array $collectionIds) {
+        //remove all empty term entries from the same term collection
+        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+        /* @var $termEntry editor_Models_TermCollection_TermEntry */
+        $termEntry->removeEmptyFromCollection($collectionIds);
+        $this->logProfiling('removeEmptyTermEntries for collections '.join(',', $collectionIds));
+    }
+    
+    /***
+     * Remove proposals for given collection and where the last change for the proposal is older than $olderThan date
+     * 
+     * @param array $collectionIds
+     * @param string $olderThan
+     */
+    protected function removeOldProposals(array $collectionIds,string $olderThan){
         $proposals=ZfExtended_Factory::get('editor_Models_Term_Proposal');
         /* @var $proposals editor_Models_Term_Proposal */
-        $theDate=!$deleteOlderThanCurrentImport && !empty($olderThan) ? $olderThan :  NOW_ISO;
-        $proposals->removeOlderThan([$collectionId],$theDate);
+        $proposals->removeOlderThan($collectionIds,$olderThan);
         
         $attributeProposals=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
         /* @var $attributeProposals editor_Models_Term_AttributeProposal */
         //remove the attirubte proposals
-        $attributeProposals->removeOlderThan([$collectionId],$theDate);
-        
-        $this->logProfiling('removeProposalsOlderThan for collection '.$collectionId);
+        $attributeProposals->removeOlderThan($collectionIds,$olderThan);
     }
     
     /***

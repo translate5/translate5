@@ -33,13 +33,20 @@ $http=ZfExtended_Factory::get('Zend_Controller_Request_Http');
 
 $portal =(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] .$http->getBaseUrl().'/';
 
+$salutation=$this->translate->_('Sehr geehrte(r)');
+if($this->receiver->gender == 'f'){
+    $salutation=$this->translate->_('Sehr geehrte Frau');
+}else if($this->receiver->gender == 'm'){
+    $salutation=$this->translate->_('Sehr geehrter Herr');
+}
+
 //fill data with generally needed variables
 $data = [
     'portalUrl' => $portal,
     'portalLink' => '<a href="'.$portal.'">'.$portal.'</a>',
     'companyName' => $this->config->runtimeOptions->companyName,
-    'salutation' => $this->translate->_($this->receiver->gender == 'f' ? 'Sehr geehrte Frau' : 'Sehr geehrter Herr'),
-    'surName' => $this->receiver->surName,
+    'salutation' => $salutation,
+    'surName' => $this->receiver->gender=='n' ? ($this->receiver->firstName.' '.$this->receiver->surName) : $this->receiver->surName,
 ];
 
 //prepare the htmlOnly disclaimer
