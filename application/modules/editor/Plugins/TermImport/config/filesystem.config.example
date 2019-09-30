@@ -18,8 +18,7 @@ deleteTermsModifiedOlderThan=2018-05-01
 ;possible values: true or false
 deleteTermsOlderThanCurrentImport=true
 
-;Delete all proposals in a listed termCollections, that have a creation date older than the this configs value.
-;possible values: true or false
+;Delete all proposals in a listed termCollections, that have a creation date older than this configs value.
 deleteProposalsOlderThan=2018-05-01
 
 ;Delete all proposals in a listed termCollections, that have a creation date older than the start of the current import.
