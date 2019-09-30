@@ -475,6 +475,8 @@ class editor_Plugins_TermImport_Services_Import {
         $termModel=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $termModel editor_Models_Term */
         $termModel->removeOldTerms($collectionIds, $olderThan);
+        //clean the old tbx files from the disc
+        $this->removeCollectionTbxFromDisc($collectionIds, strtotime($olderThan));
         $this->logProfiling('removeOldTerms for collections '.join(',', $collectionIds));
     }
     
@@ -492,7 +494,8 @@ class editor_Plugins_TermImport_Services_Import {
         $termModel=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $termModel editor_Models_Term */
         $termModel->removeOldTerms([$collectionId], NOW_ISO);
-        
+        //clean the old tbx files from the disc
+        $this->removeCollectionTbxFromDisc([$collectionId], strtotime(NOW_ISO));
         $this->logProfiling('removeTermsOlderThenImport for collection '.$collectionId);
     }
     
@@ -553,6 +556,21 @@ class editor_Plugins_TermImport_Services_Import {
         /* @var $attributeProposals editor_Models_Term_AttributeProposal */
         //remove the attirubte proposals
         $attributeProposals->removeOlderThan($collectionIds,$olderThan);
+    }
+    
+    
+    /****
+     * Remove term collection tbx files from the tbx-import directory older than the given timestamp
+     * @param array $collections
+     * @param int $olderThan
+     */
+    protected function removeCollectionTbxFromDisc(array $collections,int $olderThan){
+        $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $collection editor_Models_TermCollection_TermCollection */
+        foreach ($collections as $c) {
+            $collection->removeOldCollectionTbxFiles($c, $olderThan);
+        }
+        $this->logProfiling('removeCollectionTbxFromDisc for collections '.join(',', $collections));
     }
     
     /***
