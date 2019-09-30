@@ -97,11 +97,12 @@ Ext.define('Editor.controller.LanguageResources', {
       instantTranslate:'#UT#Sofortübersetzung'
   },
   init: function() {
-      //add the default service interceptor instance 
-      Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.Default'));
+	  //INFO: the default service is initialized in the TmOverview controller
+	  //since this controller can be disabled via the acl right, and the service classes are used
+	  //in the tmoverview panel
+	  
       //add the specific service instances, if needed
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.TermCollection'));
-      
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.OpenTM2'));
   },
   assocStore: null,

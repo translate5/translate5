@@ -45,6 +45,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         genderLabel: '#UT#Anrede',
         genderMale: '#UT#Herr',
         genderFemale: '#UT#Frau',
+        genderNeutral: '#UT#Ohne',
         loginTip: '#UT#Anmeldename (Angabe notwendig)',
         loginLabel: '#UT#Anmeldename¹',
         emailTip: '#UT#E-Mail Adresse (Angabe notwendig)',
@@ -144,7 +145,8 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                             //columns: 1,
                             items: [
                                     {boxLabel: me.strings.genderFemale, name: 'gender', inputValue: 'f'},
-                                    {boxLabel: me.strings.genderMale, name: 'gender', inputValue: 'm'}
+                                    {boxLabel: me.strings.genderMale, name: 'gender', inputValue: 'm'},
+                                    {boxLabel: me.strings.genderNeutral, name: 'gender', inputValue: 'n'}
                                     ]
                         },{
                             xtype: 'fieldcontainer',

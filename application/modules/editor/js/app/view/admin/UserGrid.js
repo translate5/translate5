@@ -56,6 +56,7 @@ Ext.define('Editor.view.admin.UserGrid', {
       actionResetPw: '#UT#Passwort des Benutzers zurücksetzen',
       gender_female: '#UT#weiblich',
       gender_male: '#UT#männlich',
+      gender_neutral: '#UT#keine Angabe',
       reloadBtn: '#UT#Aktualisieren',
       reloadBtnTip: '#UT#Benutzerliste vom Server aktualisieren.',
       sourceLangageLabel:'#UT#Quellsprache(n)',
@@ -126,7 +127,15 @@ Ext.define('Editor.view.admin.UserGrid', {
           xtype: 'gridcolumn',
           width: 60,
           renderer: function(v, meta, rec) {
-              var gender = (v == 'm' ? 'male' : 'female');
+              var gender = 'neutral';
+              switch(v) {
+                  case 'm':
+                      gender = 'male';
+                      break;
+                  case 'f':
+                      gender = 'female';
+                      break;
+              }
               meta.tdAttr = 'data-qtip="' + this.strings['gender_'+gender]+'"';
               meta.tdCls = 'gender-'+gender;
               return '&nbsp;';
@@ -136,6 +145,7 @@ Ext.define('Editor.view.admin.UserGrid', {
           filter: {
             type: 'list',
             options: [
+                ['n', me.strings.gender_neutral],
                 ['m', me.strings.gender_male],
                 ['f', me.strings.gender_female]
             ],
