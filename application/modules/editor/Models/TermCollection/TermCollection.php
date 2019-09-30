@@ -374,4 +374,21 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
             $recursivedircleaner->delete($collectionPath);
         }
     }
+    
+    /***
+     * Remove collection tbx files from the tbx-imprt directory where the file modification date is older than the given one
+     * 
+     * @param int $collectionId
+     * @param int $olderThan: this is unix timestamp
+     */
+    public function removeOldCollectionTbxFiles(int $collectionId,int $olderThan){
+        $collectionPath=editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().'tc_'.$collectionId;
+        if(is_dir($collectionPath)){
+            /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
+            $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+                'Recursivedircleaner'
+                );
+            $recursivedircleaner->deleteOldFiles($collectionPath,$olderThan);
+        }
+    }
 }
