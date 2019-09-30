@@ -149,8 +149,9 @@ class editor_Models_Excel_ExImport {
     public function addSegment(int $nr, string $source, string $target) {
         $sheet = $this->getSheetJob();
         $sheet->setCellValue('A'.$this->segmentRow, $nr);
-        $sheet->setCellValue('B'.$this->segmentRow, $source);
-        $sheet->setCellValue('C'.$this->segmentRow, $target);
+        // for the following fields setCellValueExplicit() is used. Else this fields will be interpreted as formula fields if a segment starts with "="
+        $sheet->setCellValueExplicit('B'.$this->segmentRow, $source, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+        $sheet->setCellValueExplicit('C'.$this->segmentRow, $target, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
         
         // disable write protection for fields 'target' and 'comment'
         $sheet->getStyle('C'.$this->segmentRow)->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);

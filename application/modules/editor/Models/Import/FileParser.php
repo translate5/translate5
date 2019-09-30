@@ -412,7 +412,7 @@ abstract class editor_Models_Import_FileParser {
             if($field->type !== editor_Models_SegmentField::TYPE_TARGET) {
                 continue;
             }
-            if(!empty($data['original'])) {
+            if(!(empty($data['original']) && $data['original'] !== "0")) {
                 return true;
             }
         }

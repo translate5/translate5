@@ -47,8 +47,8 @@ class editor_Logger_TaskMailToPm extends ZfExtended_Logger_Writer_Abstract {
         
         $event = clone $event; //clone it, so that extra data is not manipulated in object
         
-        $mailer = ZfExtended_Factory::get('ZfExtended_Mail');
-        /* @var $mailer ZfExtended_Mail */
+        $mailer = ZfExtended_Factory::get('ZfExtended_TemplateBasedMail');
+        /* @var $mailer ZfExtended_TemplateBasedMail */
         $mailer->setParameters([
             'task' => $task,
             'event' => $event,

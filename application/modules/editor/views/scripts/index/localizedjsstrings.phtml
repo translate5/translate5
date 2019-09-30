@@ -923,6 +923,7 @@ Ext.define('Editor.controller.Localizer', {
         actionResetPw: '<?php echo $this->translate->_('Passwort des Benutzers zurücksetzen');?>',
         gender_female: '<?php echo $this->translate->_('Frau');?>',
         gender_male: '<?php echo $this->translate->_('Herr');?>',
+        gender_neutral: '<?php echo $this->translate->_('keine Angabe');?>',
         reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
         reloadBtnTip: '<?php echo $this->translate->_('Benutzerliste vom Server aktualisieren.');?>',
         sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
@@ -946,6 +947,7 @@ Ext.define('Editor.controller.Localizer', {
         genderLabel: '<?php echo $this->translate->_('Anrede');?>',
         genderMale: '<?php echo $this->translate->_('Herr');?>',
         genderFemale: '<?php echo $this->translate->_('Frau');?>',
+        genderNeutral: '<?php echo $this->translate->_('Ohne');?>',
         loginTip: '<?php echo $this->translate->_('Anmeldename (Angabe notwendig)');?>',
         loginLabel: '<?php echo $this->translate->_('Anmeldename¹');?>',
         emailTip: '<?php echo $this->translate->_('E-Mail Adresse (Angabe notwendig)');?>',
@@ -1228,8 +1230,6 @@ Ext.define('Editor.controller.Localizer', {
             useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
             customers: '<?php echo $this->translate->_('Für diese Kunden nutzen');?>',
             mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
-            deleteTermEntriesDate:'<?php echo $this->translate->_('Termeinträge löschen älter als');?>',
-            deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
             collection: '<?php echo $this->translate->_('TBX-Datei');?>',
             importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
         }
@@ -1340,7 +1340,8 @@ Ext.define('Editor.controller.Localizer', {
             deleteTermEntriesDate:'<?php echo $this->translate->_('Termeinträge löschen älter als');?>',
             deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
             helpButtonTooltip:'<?php echo $this->translate->_('Info zum Term-Collection');?>',
-            deleteTermProposals:'<?php echo $this->translate->_('Vorschläge löschen älter als');?>'
+            deleteTermProposalsDate:'<?php echo $this->translate->_('Vorschläge löschen älter als');?>',
+            deleteTermProposalsImport:'<?php echo $this->translate->_('Vorschläge löschen älter als aktueller Import');?>'
         }
     });
     

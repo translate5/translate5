@@ -94,7 +94,7 @@ class editor_Models_Import_FileParser_XmlParser {
         $this->nonXmlBlocks = [];
         $xml = preg_replace_callback('/(<!\[CDATA\[.*?\]\]>)|(<!--.*?-->)/s', function($item){
             $id = count($this->nonXmlBlocks);
-            if(empty($item[1]) && !empty($item[2])) {
+            if(empty($item[1]) && $item[1]!=="0" && (!empty($item[2]) || $item[2]!=="0")) {
                 $key = '<xml-comment id="comment-'.$id.'"/>';
             }
             else {

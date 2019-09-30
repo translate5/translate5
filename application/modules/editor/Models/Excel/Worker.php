@@ -124,7 +124,7 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
      * @param ZfExtended_Models_User $user
      */
     public function mailSegmentErrors(ZfExtended_Models_User $user) {
-        $mailer = ZfExtended_Factory::get('ZfExtended_Mail');
+        $mailer = ZfExtended_Factory::get('ZfExtended_TemplateBasedMail');
         $mailer->setParameters([
             'segmentErrors' => $this->getSegmentErrors(),
             'task' => $this->task,

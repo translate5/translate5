@@ -387,6 +387,8 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->setName('transac');
         $this->setAttrType($type);
         $this->setValue($type);
+        $this->setUserGuid($user->data->userGuid);
+        $this->setUserName($fullName);
         //save the transac attribute
         $parentId=$this->save();
         
@@ -408,6 +410,8 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->setParentId($parentId);
         $this->setName('date');
         $this->setValue(time());
+        $this->setUserGuid($user->data->userGuid);
+        $this->setUserName($fullName);
         //save the date attribute
         $this->save();
         
@@ -428,6 +432,8 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->setName('transacNote');
         $this->setAttrType('responsiblePerson');
         $this->setValue($fullName);
+        $this->setUserGuid($user->data->userGuid);
+        $this->setUserName($fullName);
         //save the responsible person attribute
         $this->save();
     }
@@ -583,6 +589,14 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->hasField('updated') && $this->setUpdated(NOW_ISO);
         $this->save();
         return $this;
+    }
+    
+    /***
+     * Check if the attribute is processStatus attribute
+     * @return boolean
+     */
+    public function isProcessStatusAttribute(){
+        return $this->getAttrType()=='processStatus' && $this->getName()=='termNote';
     }
     
     public function getDataObject() {

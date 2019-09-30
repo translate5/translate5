@@ -240,7 +240,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $queryString = $this->getQueryString($segment);
         
         //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
-        if(empty($queryString)) {
+        if(empty($queryString) && $queryString !== "0") {
             return $this->resultList;
         }
         
@@ -442,7 +442,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function translate(string $searchString){
         //return empty result when no search string
-        if(empty($searchString)) {
+        if(empty($searchString) && $searchString !== "0") {
             return $this->resultList;
         }
         

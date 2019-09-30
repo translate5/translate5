@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
-     * @var ZfExtended_Mail
+     * @var ZfExtended_TemplateBasedMail
      */
     protected $mailer;
     
@@ -89,7 +89,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param array $parameters
      */
     protected function createNotification(string $role, string $template, array $parameters) {
-        $this->mailer = ZfExtended_Factory::get('ZfExtended_Mail');
+        $this->mailer = ZfExtended_Factory::get('ZfExtended_TemplateBasedMail');
         $this->mailer->setParameters($parameters);
         $this->mailer->setTemplate($this->getMailTemplate($role, $template));
     }
@@ -298,6 +298,21 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->tua = $this->config->newTua;
         settype($triggerConfig->deleted, 'array');
         
+        if ($this->config->task->anonymizeUsers(false)) {
+            $params = [];
+        }
+        else {
+            $params = [
+                //we do not pass the whole userObject to keep data private 
+                'responsibleUser' => [
+                    'surName' => $triggerConfig->currentUser->surName,
+                    'firstName' => $triggerConfig->currentUser->firstName,
+                    'login' => $triggerConfig->currentUser->login,
+                    'email' => $triggerConfig->currentUser->email,
+                ]
+            ];
+        }
+        
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         foreach($triggerConfig->deleted as $deleted) {
@@ -305,10 +320,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $workflow = $this->config->workflow;
             $labels = $workflow->getLabels(false);
             $roles = $workflow->getRoles();
-            $params = [
-                'task' => $this->config->task,
-                'role' => $labels[array_search($deleted['role'], $roles)],
-            ];
+            $params['task'] = $this->config->task;
+            $params['role'] = $labels[array_search($deleted['role'], $roles)];
             
             $this->createNotification($deleted['role'], __FUNCTION__, $params);
             $this->addCopyReceivers($triggerConfig, $deleted['role']);
@@ -563,8 +576,9 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      */
     protected function attachXliffSegmentList($segmentHash, array $segments,$currentStep) {
         $config = Zend_Registry::get('config');
-        $xlfAttachment = (boolean) $config->runtimeOptions->notification->enableSegmentXlfAttachment;
-        $xlfFile =       (boolean) $config->runtimeOptions->editor->notification->saveXmlToFile;
+        $notifyConfig = $config->runtimeOptions->editor->notification;
+        $xlfAttachment = (boolean) $notifyConfig->enableSegmentXlfAttachment;
+        $xlfFile =       (boolean) $notifyConfig->saveXmlToFile;
         
         if(empty($segments) || (!$xlfAttachment && !$xlfFile)) {
             return;
