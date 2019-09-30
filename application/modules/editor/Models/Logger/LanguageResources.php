@@ -71,7 +71,14 @@ class editor_Models_Logger_LanguageResources extends ZfExtended_Models_Entity_Ab
         return $this->computeTotalCount($s);;
     }
     
-    public function getEventsCountGruped($languageResourcesIds) {
+    /***
+     * Get the events count grouped by language resource id and events count
+     *  for the given language resources
+     * 
+     * @param array $languageResourcesIds
+     * @return array
+     */
+    public function getEventsCountGrouped($languageResourcesIds) {
         $s = $this->db->select()
         ->from('LEK_languageresources_log',array('count(*) as logCount','languageResourceId'))
         ->where('languageResourceId IN(?)', $languageResourcesIds)

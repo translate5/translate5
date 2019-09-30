@@ -101,7 +101,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         $eventLogger=ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
         /* @var $eventLogger editor_Models_Logger_LanguageResources */
-        $eventLoggerGroupped=$eventLogger->getEventsCountGruped($languageResourcesId);
+        $eventLoggerGroupped=$eventLogger->getEventsCountGrouped($languageResourcesId);
         
         //get all assocs grouped by language resource id
         $customerAssocModel=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
@@ -143,7 +143,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageresource['useAsDefault'] = $this->getCustassocDefault($custAssoc, 'useAsDefault', $id);
             $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
-            //TODO: move me to the frontend, and also to the get action
             $languageresource['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
         }
     }
@@ -248,7 +247,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         $eventLogger=ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
         /* @var $eventLogger editor_Models_Logger_LanguageResources */
-        $eventLoggerGroupped=$eventLogger->getEventsCountGruped([$this->entity->getId()]);
+        $eventLoggerGroupped=$eventLogger->getEventsCountGrouped([$this->entity->getId()]);
         $this->view->rows->eventsCount = isset($eventLoggerGroupped[$this->entity->getId()]) ? (integer)$eventLoggerGroupped[$this->entity->getId()] : 0;
         
         $moreInfo = ''; //init as empty string, filled on demand by reference
