@@ -958,7 +958,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
         ->setIntegrityCheck(false)
         ->from(['t'=>'LEK_terms'],['t.id'])
-        ->joinLeft(['p'=>'LEK_term_proposal'],'p.termId=t.id ',['p.term'])
+        ->joinLeft(['p'=>'LEK_term_proposal'],'p.termId=t.id ',['p.term','p.created','p.userGuid','p.userName'])
         ->where('t.updated < ?', $olderThan)
         ->where('t.collectionId in (?)',$collectionIds)
         ->where('t.processStatus NOT IN (?)',self::PROCESS_STATUS_UNPROCESSED);
@@ -979,8 +979,12 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             }
             $term->load($res['id']);
             $term->setTerm($res['term']);
+            $term->setCreated($res['created']);
             $term->setUpdated(NOW_ISO);
+            $term->setUserGuid($res['userGuid']);
+            $term->setUserName($res['userName']);
             $term->setProcessStatus(self::PROCESS_STATUS_UNPROCESSED);
+            //TODO: update here the proposal values (also the all proposals attributes, in our case no only the date groups)
             $term->save();
             $deleteProposals[]=$res['id'];
             unset($result[$key]);

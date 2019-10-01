@@ -1,43 +1,44 @@
 ;;;; ATTENTION: the below variables need to be placed above the areas [FileMapping] and [CollectionMapping]
-
+ 
 ;import directory of the tbx files
-importDir=/path/to/your/translate5/data/tbx-import/filesystem/;
-
-;mergeTerms: Allowed values: true or false. 
-;If this is true, terms will be merged as described at https://confluence.translate5.net/display/TAD/Term+Collection. 
+importDir=/var/www/translate5/data/tbx-import/filesystem/;
+ 
+;mergeTerms: Allowed values: true or false.
+;If this is true, terms will be merged as described at https://confluence.translate5.net/display/TAD/Term+Collection.
 ;Otherwise all terms will be added to the termCollection, if the ID in the TBX does NOT exist already in the DB
 ;when the ID of the termEntry of the TBX does already exist in the DB, the terms of this termEntry will always be merged
 mergeTerms=true;
-
-;Deletes all terms in all listed termCollections, that have a modification date older than the listed one.
-;Since every term that exists in a TBX gets a new updated date on TBX-import, even if it is not changed: Simply set this date to yesterday to delete all terms, that are not part of the current import
-;The updated date is a date internal to translate5 and different from the modified date of the term, that is shown in the interface
+ 
+;Deletes all terms in all listed termCollections, that have a updated date older than the date configured for "deleteTermsModifiedOlderThan".
+;Every term in a termCollection has a creation date, a modification date and an updated dated.
+;The creation date and the modification date are taken from the dates as they appear in the TBX file.
+;The updated date is not shown in the GUI and is changed every time a user changes the term through touching
+;it in the GUI or through an import
 deleteTermsModifiedOlderThan=2018-05-01
-
-;Deletes all terms in all listed termCollections, that have a modification date older than the start of the current import.
+ 
+;Deletes all terms in all listed termCollections, that have an "updated date" older than the start of the current import.
+;To learn, what the "updated date" is, please read above
 ;possible values: true or false
 deleteTermsOlderThanCurrentImport=true
-
+ 
 ;Delete all proposals in a listed termCollections, that have a creation date older than this configs value.
 deleteProposalsOlderThan=2018-05-01
-
+ 
 ;Delete all proposals in a listed termCollections, that have a creation date older than the start of the current import.
 ;possible values: true or false
 deleteProposalsOlderThanCurrentImport=false
-
-;;;; ATTENTION: the above variables need to be placed above the areas [FileMapping] and [CollectionMapping]
  
-;mapping between file and term collection name
+;;;; ATTENTION: the above variables need to be placed above the areas [FileMapping] and [CollectionMapping]
+  
+;mapping between tbx file and term collection name
 [FileMapping]
 Term.tbx=exampletermCollection;
 Term1.tbx=exampletermCollection;
 Term2.tbx=exampletermCollection;
-Export.tbx=exampletermCollection;
 example2.tbx=exampletermCollection2;
 example3.tbx=exampletermCollection3
-
+ 
 ;mapping between term collection name and customer number
 [CollectionMapping]
-exampletermCollection3=10001;
-exampletermCollection2=100001;
-exampletermCollection=10002;
+exampletermCollection3=1000;
+exampletermCollection2=1003;

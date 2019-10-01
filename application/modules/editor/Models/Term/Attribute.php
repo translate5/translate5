@@ -306,12 +306,20 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         return $this->createChildTree($rows);
     }
     
-    /***
-     * Handle transac attributes group. If no transac group attributes exist for the entity, new one will be created.
-     * 
-     * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
-     */
-    public function handleTransacGroup($entity){
+    public function updateTransacGroup($entity,array $attributes){
+        $parent=$this->getTransacGroup($entity,'creation');
+        if(empty($parent)){
+            $parent=$this->getTransacGroup($entity,'origination');
+        }
+        $s=$this->db->select()
+        ->where('parentId IN(?)',array_column($parent,'id'));
+        $child=$this->db->fetchAll($s)->toArray();
+        $torals=array_merge($parent,$child);
+        //TODO: now update the values of the attributes from the attributes array
+        //make this function so it can be called with type param ? so we can reuse it 
+    }
+    
+    public function getTransacGroup($entity,string $type){
         $s=$this->db->select();
         if($entity instanceof editor_Models_Term){
             $s->where('termId=?',$entity->getId());
@@ -321,8 +329,17 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             $s->where('termId IS NULL');
         }
         $s->where('name="transac"')
-        ->where('attrType="modification"');
-        $ret=$this->db->fetchAll($s)->toArray();
+        ->where('attrType=?',$type);
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /***
+     * Handle transac attributes group. If no transac group attributes exist for the entity, new one will be created.
+     * 
+     * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
+     */
+    public function handleTransacGroup($entity){
+        $ret=$this->getTransacGroup($entity, 'modification');
         //if the transac group exist, do nothing
         if(!empty($ret)){
             return false;
