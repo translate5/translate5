@@ -8,15 +8,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use React\Http\Response;
 
 /**
- * FIXME use WampServerInterface with subscribing?
  */
 class MessageBus implements MessageComponentInterface
 {
-    /** 
-     * @var array $instanceConnections keep the connections divided by translate5 instances using this service
-     */
-    protected $instanceConnections = [];
-    
     /**
      * container of the different instances handled by this MessageBus
      * @var array
@@ -32,24 +26,13 @@ class MessageBus implements MessageComponentInterface
         $this->logger = Logger::getInstance();
     }
 
-    public function onMessage(ConnectionInterface $conn, $message) {
-        //$message from frontend comes without serverid, must be added via connection mapping
-        
-        $serverId = $this->getServerIdFromConn($conn);
-        $instance = $this->getInstance($serverId);
-        $msg = json_decode($message, true);
-        //FIXME react on JSON errors
-        settype($msg['payload'], 'array');
-        $msg['instance'] = $serverId; //from connected URL
-        $this->logger->debug('Data from frontend', $msg);
-        $msg['conn'] = $conn;
-        $instance->passMessage(new FrontendMsg($msg));
-    }
-
     public function onOpen(ConnectionInterface $conn) {
         /* @var $conn->httpRequest GuzzleHttp\Psr7\Request */
-        
-        $instance = $this->getInstance($this->getServerIdFromConn($conn));
+        $data = $this->getDataFromConn($conn);
+        //we store sessionId and instanceId directly in the connection:
+        $conn->sessionId = $data['sessionId'];
+        $conn->serverId = $data['serverId'];
+        $instance = $this->getInstance($conn->serverId);
         if(empty($instance)) {
             //FIXME log that no serverId was given and close there fore the connection
             $conn->close();
@@ -59,15 +42,27 @@ class MessageBus implements MessageComponentInterface
     }
     
     public function onClose(ConnectionInterface $conn) {
-        $instance = $this->getInstance($this->getServerIdFromConn($conn));
+        $instance = $this->getInstance($conn->serverId);
         $instance->close($conn);
+    }
+    
+    public function onMessage(ConnectionInterface $conn, $message) {
+        //the serverId and sessionId are stored in the $conn object
+        $instance = $this->getInstance($conn->serverId);
+        $msg = json_decode($message, true);
+        //FIXME react on JSON errors
+        settype($msg['payload'], 'array');
+        $this->logger->debug('Data from frontend', $msg);
+        $msg['conn'] = $conn;
+        $instance->passFrontendMessage(new FrontendMsg($msg), $conn);
     }
     
     public function onError(ConnectionInterface $conn, \Exception $e) {
         //FIXME what means onError? 
-        //close connection then too?
-        $instance = $this->getInstance($this->getServerIdFromConn($conn));
-        $instance->close($conn);
+        $this->logger->error($e);
+        //close connection on error? May make sense only in special cases, not in general
+        //$instance = $this->getInstance($conn->serverId);
+        //$instance->close($conn);
     }
     
     /**
@@ -75,13 +70,17 @@ class MessageBus implements MessageComponentInterface
      */
     public function processServerRequest(ServerRequestInterface $request) {
         $body = $request->getParsedBody();
-        settype($body['instance'], 'string');
+        if(empty($body)){
+            return $this->debugResponse();
+        }
+        settype($body['instance'], 'string'); //from server side we have to deliver the instance as msg attribute
         settype($body['channel'], 'string');
         settype($body['command'], 'string');
         settype($body['payload'], 'string');
 
         $this->logger->debug('server request', $body);
-        $this->handleMessage($body);
+        $instance = $this->getInstance($body['instance']);
+        $instance->passBackendMessage(new BackendMsg($body));
         
         //FIXME define default values which trigger a log entry (if channel / message is empty)
         
@@ -94,26 +93,29 @@ class MessageBus implements MessageComponentInterface
             );
     }
     
-    protected function handleMessage(array $msgData) {
-        $msg = new BackendMsg($msgData);
-        $instance = $this->getInstance($msg->instance);
-        $instance->passMessage($msg);
+    protected function debugResponse() {
+        $data = ['instances' => []];
+        foreach($this->instances as $instance) {
+            $data['instances'][] = $instance->debug();
+        }
+        return new Response(200, ['Content-Type' => 'application/json'], json_encode($data));
     }
     
     /**
      * returns the serverId (internal instance id) of a connection object
      */
-    protected function getServerIdFromConn(ConnectionInterface $conn) {
+    protected function getDataFromConn(ConnectionInterface $conn) {
         //get the serverId from the connection open request
         $params= null;
-        parse_str(ltrim($conn->httpRequest->getRequestTarget(), '/?'), $params);
+        parse_str($conn->httpRequest->getUri()->getQuery(), $params);
         if(empty($params) || empty($params['serverId'])) {
-            return null;
+            return [];
         }
-        return $params['serverId'];
+        settype($params['sessionId'], 'string');
+        return $params;
     }
     
-    protected function getInstance($serverId): AppInstance {
+    protected function getInstance($serverId): ?AppInstance {
         if(empty($serverId)) {
             return null;
         }

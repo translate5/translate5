@@ -29,18 +29,26 @@ END LICENSE AND COPYRIGHT
 /**
  */
 class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract {
+    const CHANNEL_TASK = 'task';
+    const CHANNEL_CHAT = 'chat';
+    
+    /**
+     * @var editor_Plugins_FrontEndMessageBus_Bus
+     */
+    protected $bus;
+    
     protected $frontendControllers = array(
         'pluginFrontEndMessageBus' => 'Editor.plugins.FrontEndMessageBus.controller.MessageBus',
     );
     
     public function init() {
+        $this->bus = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Bus');
         $this->initEvents();
     }
     
     protected function initEvents() {
-        //FIXME Dummy call to test stuff
-        $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handleTest'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
+        $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
 
         // FIXME send the session id to the message bus, so that the user is known and allowed to communicate
         // → idea here: Instead listening to a login event, we just attach to the IndexController. 
@@ -50,7 +58,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         //   additionally we should create a sync function, triggered by the periodical cron and triggerable when the MessageBus restarts.
         //   sync should just deliver all sessions with logged in users, and opened tasks (if any) to the MessageBus.
         //   Sensefull?
-        $this->eventManager->attach('Editor_IndexController', 'beforeIndexAction', array($this, 'handleAfterIndexAction'));
+        $this->eventManager->attach('Editor_IndexController', 'beforeIndexAction', array($this, 'handleStartSession'));
         
         //TODO test logout calls:
         $this->eventManager->attach('editor_SessionController', 'beforeDeleteAction', array($this, 'handleLogout'));
@@ -76,21 +84,10 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     /**
      * @param Zend_EventManager_Event $event
      */
-    public function handleTest(Zend_EventManager_Event $event) {
-        $taskMsg = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Channels_Task');
-        /* @var $taskMsg editor_Plugins_FrontEndMessageBus_Channels_Task */
-        $taskMsg->test();
-    }
-    
-    /**
-     * @param Zend_EventManager_Event $event
-     */
-    public function handleAfterIndexAction(Zend_EventManager_Event $event) {
-        $taskMsg = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Channels_Instance');
-        /* @var $taskMsg editor_Plugins_FrontEndMessageBus_Channels_Instance */
+    public function handleStartSession(Zend_EventManager_Event $event) {
         $user = new Zend_Session_Namespace('user');
         if(!empty($user->data->userGuid)) {
-            $taskMsg->startSession(Zend_Session::getId(), $user->data);
+            $this->bus->startSession(Zend_Session::getId(), $user->data);
         }
     }
     
@@ -108,18 +105,32 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
             $sessionId = $params['id'];
         }
         
-        $taskMsg = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Channels_Instance');
-        /* @var $taskMsg editor_Plugins_FrontEndMessageBus_Channels_Instance */
-        $taskMsg->stopSession($sessionId);
+        $this->bus->stopSession($sessionId);
     }
     
     /**
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
-        $taskMsg = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Channels_Task');
-        /* @var $taskMsg editor_Plugins_FrontEndMessageBus_Channels_Task */
-        $taskMsg->open($event->getParam('task'));
-        //FIXME add information about the current user and Session!
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
+        
+        $this->bus->notify(self::CHANNEL_TASK, 'open', [
+            'task' => $task->getDataObject(),
+            'sessionId' => Zend_Session::getId(),
+        ]);
+    }
+    
+    /**
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterTaskClose(Zend_EventManager_Event $event) {
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
+        
+        $this->bus->notify(self::CHANNEL_TASK, 'close', [
+            'task' => $task->getDataObject(),
+            'sessionId' => Zend_Session::getId(),
+        ]);
     }
 }

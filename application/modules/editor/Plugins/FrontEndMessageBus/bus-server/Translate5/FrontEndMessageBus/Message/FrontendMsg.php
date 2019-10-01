@@ -36,8 +36,4 @@ class FrontendMsg extends Msg {
      */
     public $conn;
     
-    /**
-     * @var string
-     */
-    public $sessionId;
 }

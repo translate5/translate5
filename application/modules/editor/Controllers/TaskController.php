@@ -463,6 +463,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         
+//FIXME zusätzlich sollte die API mit einer customerNr umgehen können die dann zur customerId konvertiret wird
         if(empty($this->data['customerId'])){
             $this->entity->setDefaultCustomerId();
             $this->data['customerId'] = $this->entity->getCustomerId();
@@ -1099,6 +1100,11 @@ class editor_TaskController extends ZfExtended_RestController {
         if($resetToOpen) {
             $this->updateUserState($this->user->data->userGuid, true);
         }
+        $this->events->trigger("afterTaskClose", $this, array(
+            'task' => $task,
+            'view' => $this->view,
+            'openState' => $this->data->userState)
+        );
     }
     
     /**

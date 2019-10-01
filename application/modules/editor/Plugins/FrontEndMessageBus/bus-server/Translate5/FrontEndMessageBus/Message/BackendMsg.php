@@ -30,4 +30,9 @@ namespace Translate5\FrontEndMessageBus\Message;
 /**
  */
 class BackendMsg extends Msg {
+    /**
+     * From the backend the serverId is delivered in the msg 
+     * @var string
+     */
+    public $instance;
 }

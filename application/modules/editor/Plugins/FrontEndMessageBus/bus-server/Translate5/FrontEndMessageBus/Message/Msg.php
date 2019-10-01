@@ -17,12 +17,6 @@ abstract class Msg {
     public $command;
     
     /**
-     * The serverId of the translate5 instance from where the message came
-     * @var string
-     */
-    public $instance;
-    
-    /**
      * the payload data
      * @var mixed
      */
@@ -40,6 +34,18 @@ abstract class Msg {
                 $this->$key = $msgData[$key];
             }
         }
+    }
+    
+    /**
+     * @return string[]|mixed[]
+     */
+    public function toDbgArray() {
+        return [
+            'class' => get_class($this),
+            'channel' => $this->channel,
+            'command' => $this->command,
+            'payload' => $this->payload,
+        ];
     }
     
     public function __toString() {

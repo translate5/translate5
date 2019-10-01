@@ -365,6 +365,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.branding', (string) $this->translate->_($ed->branding));
         $php2js->set('app.user', $userSession->data);
         $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));
+        $php2js->set('app.sessionKey', session_name());
         
         $allRoles = $acl->getAllRoles();
         $roles = array();

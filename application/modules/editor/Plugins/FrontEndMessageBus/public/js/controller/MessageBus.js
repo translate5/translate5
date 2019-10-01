@@ -57,7 +57,8 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         });
     },
     clickSegment: function(view, segment) {
-        this.bus.send('task', 'segmentClick', [segment.get('id')]);
+        //taskGuid is necessary for the future when we can open multiple tasks in one session
+        this.bus.send('task', 'segmentClick', [segment.get('taskGuid'), segment.get('id')]);
     },
     enterSegment: function() {
         console.log('enterSegment', arguments);
