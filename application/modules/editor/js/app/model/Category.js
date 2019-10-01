@@ -43,8 +43,12 @@ Ext.define('Editor.model.Category', {
   fields: [
     {name: 'id', type: 'int'},
     {name: 'origin', type: 'string'},
+    {name: 'label', type: 'string'},
     {name: 'originalCategoryId', type: 'string'},
-    {name: 'comment', type: 'string'},
+    {name: 'specificData', type: 'string'},
+    {name: 'customLabel', type: 'string', persist: false, convert: function(v, rec) {
+        return rec.get('label') + ' (' + rec.get('originalCategoryId') + ')';
+    }},
   ],
   idProperty: 'id',
   proxy : {

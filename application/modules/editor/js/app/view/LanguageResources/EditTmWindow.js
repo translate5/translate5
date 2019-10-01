@@ -175,7 +175,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         for(var i=0;i<value.length;i++){
                             retval.push(value[i]);
                         }
-                        return retval.join(',');
+                        return retval.join('<br>');
                     },
                     toolTip: me.strings.categories,
                     fieldLabel: me.strings.categories,

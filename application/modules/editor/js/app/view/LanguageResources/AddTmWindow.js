@@ -245,7 +245,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     disabled: true,
                     typeAhead: true,
                     valueField: 'id',
-                    displayField: 'label',
+                    displayField: 'customLabel',
                     multiSelect: true,
                     queryMode: 'local',
                     encodeSubmitValue: true
