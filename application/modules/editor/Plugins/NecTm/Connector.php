@@ -337,7 +337,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
                         $this->categoriesModel->loadByOriginalCategoryId($tagId);
                         $label = $this->categoriesModel->getLabel();
                         $type = $this->categoriesModel->getSpecificData('type');
-                        $tags[] = $label.' ('.$type.')';
+                        $tags[] = $label.' ('.$tagId.', '.$type.')';
                     }
                     $item->value = $tags;
                 }
@@ -447,14 +447,40 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     }
     
     /***
-     * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be freturned.
-     * The fuzzy languageResource name format is: oldname+Fuzzy-Analysis
+     * 
+     * THIS IS NOT IMPLEMENTED SO FAR.
+     * Clone the existing tm (= NEC-TM: tags) with "fuzzy" name. The new fuzzy connector will be returned.
      * @param int $analysisId
-     * @throws ZfExtended_NotFoundException
-     * @return editor_Services_Connector_Abstract
+     * @return editor_Plugins_NecTm_Connector
      */
     public function initForFuzzyAnalysis($analysisId) {
-        // TODO
+        return false;
+        // = TODO :)
+        
+        $this->isInternalFuzzy = true;
+        $fuzzyLanguageResource = clone $this->languageResource;
+        /* @var $fuzzyLanguageResource editor_Models_LanguageResources_LanguageResource  */
+        
+        // - The fuzzyLanguageResource can use all the NEC-TM-tags that it has cloned. 
+        // - For saving internal translations, we introduce an extra tag (our internal translations must save to this extra-tag only!).
+        // - After analyzing, this extra tag and all its content must be removed from the NEC-TM.
+        
+        $fuzzyLanguageResourceName = $this->renderFuzzyLanguageResourceName($this->languageResource->getName(), $analysisId);
+        $fuzzyLanguageResource->setName($fuzzyLanguageResourceName);
+        $fuzzyLanguageResource->setId(null); // TODO: why do we do this?
+        
+        $fuzzyTagName = $this->renderFuzzyLanguageResourceName('translate5InternalFuzzyTag', $analysisId);
+        // TODO:
+        // - create extra tag in NEC-TM
+        // - use this tag when saving new internal translations
+        // - afterwards: delete this tag and remove all its content
+        $fuzzyLanguageResource->addSpecificData('internalFuzzyTag', $fuzzyTagName);
+        
+        $connector = ZfExtended_Factory::get(get_class($this));
+        /* @var $connector editor_Services_Connector */
+        $connector->connectTo($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());
+        $connector->isInternalFuzzy = true;
+        return $connector;
     }
     
     /***

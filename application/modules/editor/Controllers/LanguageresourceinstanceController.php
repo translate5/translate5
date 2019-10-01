@@ -55,6 +55,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected $internalTag;
     
+    /**
+     * @var editor_Models_Categories
+     */
+    protected $categories;
+    
     public function init() {
         //add filter type for languages
         $finalTableForAssoc = new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId');
@@ -69,6 +74,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //set same join for sorting!
         $this->_sortColMap['resourcesCustomers'] = $this->_filterTypeMap['resourcesCustomers']['string'];
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->categories = ZfExtended_Factory::get('editor_Models_Categories');
         parent::init();
     }
     
@@ -107,8 +113,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $categoryAssocModel = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
         /* @var $categoryAssocModel editor_Models_LanguageResources_CategoryAssoc */
         $categoryAssocs = $categoryAssocModel->loadCategoryIdsGrouped();
-        $categoriesEntity = ZfExtended_Factory::get('editor_Models_Categories');
-        /* @var $categoriesEntity editor_Models_Categories */
         
         $languages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
         /* @var $languages editor_Models_LanguageResources_Languages */
@@ -148,11 +152,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
             
-            // categories (for the moment: just display labels for info)
+            // categories (for the moment: just display labels for info, no editing)
             $categoryLabels = [];
             foreach ($this->getCategoryassoc($categoryAssocs, 'categoryId', $id) as $categoryId) {
-                $categoriesEntity->load($categoryId);
-                $categoryLabels[] = $categoriesEntity->getLabel();
+                $categoryLabels[] = $this->renderCategoryCustomLabel($categoryId);
             }
             $languageresource['categories'] = $categoryLabels;
         }
@@ -224,6 +227,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
     
     /**
+     * Renders the label of a category with details (currently: original Id).
+     * @param integer $categoryId
+     * @return string 
+     */
+    protected function renderCategoryCustomLabel($categoryId) {
+        $this->categories->load($categoryId);
+        return $this->categories->getLabel().' ('.$this->categories->getOriginalCategoryId().')';
+    }
+    
+    /**
      * Adds status information to the get request
      * {@inheritDoc}
      * @see ZfExtended_RestController::getAction()
@@ -268,11 +281,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         // for the moment: just display labels for info
         $categoryLabels = [];
-        $categoriesEntity = ZfExtended_Factory::get('editor_Models_Categories');
-        /* @var $categoriesEntity editor_Models_Categories */
         foreach ($categoryIds as $categoryId) {
-            $categoriesEntity->load($categoryId);
-            $categoryLabels[] = $categoriesEntity->getLabel();
+            $categoryLabels[] = $this->renderCategoryCustomLabel($categoryId);
         }
         $this->view->rows->categories = $categoryLabels;
         
