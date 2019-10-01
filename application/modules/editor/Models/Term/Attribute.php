@@ -306,20 +306,41 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         return $this->createChildTree($rows);
     }
     
-    public function updateTransacGroup($entity,array $attributes){
-        $parent=$this->getTransacGroup($entity,'creation');
-        if(empty($parent)){
-            $parent=$this->getTransacGroup($entity,'origination');
+    //TODO: to many params 
+    public function updateTransacGroup($entity,array $types,string $created,int $timestamp,string $userGuid){
+        $attributes=$this->getTransacGroup($entity,['creation','origination']);
+        if(!empty($attributes)){
+            $s=$this->db->select()
+            ->where('parentId IN(?)',array_column($attributes,'id'));
+            $child=$this->db->fetchAll($s)->toArray();
+            $attributes=array_merge($attributes,$child);
         }
-        $s=$this->db->select()
-        ->where('parentId IN(?)',array_column($parent,'id'));
-        $child=$this->db->fetchAll($s)->toArray();
-        $torals=array_merge($parent,$child);
+        if(empty($attributes)){
+            return false;
+        }
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->loadByGuid($userGuid);
+        
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        foreach ($attributes as $rec){
+            //TODO: is the save okay ?
+            $attribute->init($rec);
+            $attribute->setCreated($created);
+            if($attribute->getName()=='date'){
+                $attribute->setValue($timestamp);
+            }
+            $attribute->setUserGuid($user->getUserGuid());
+            $attribute->setUserName($user->getUserName());
+            $attribute->save();
+            
+        }
         //TODO: now update the values of the attributes from the attributes array
         //make this function so it can be called with type param ? so we can reuse it 
     }
     
-    public function getTransacGroup($entity,string $type){
+    public function getTransacGroup($entity,array $types){
         $s=$this->db->select();
         if($entity instanceof editor_Models_Term){
             $s->where('termId=?',$entity->getId());
@@ -329,7 +350,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             $s->where('termId IS NULL');
         }
         $s->where('name="transac"')
-        ->where('attrType=?',$type);
+        ->where('attrType IN(?)',$types);
         return $this->db->fetchAll($s)->toArray();
     }
     
@@ -339,7 +360,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
      * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
      */
     public function handleTransacGroup($entity){
-        $ret=$this->getTransacGroup($entity, 'modification');
+        $ret=$this->getTransacGroup($entity, ['modification']);
         //if the transac group exist, do nothing
         if(!empty($ret)){
             return false;
