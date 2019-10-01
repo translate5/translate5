@@ -26,10 +26,11 @@ $server->listen($webSockPhp);
 $server->on('error', function(\Exception $error) {
     //FIXME error handling
     error_log($error);
+    //TODO: use the Translate5\FrontEndMessageBus for the error handling
 });
 
 // WebSocket Server: open public server for connections from Browsers 
 // FIXME make server and port configurable, see above
-$app = new \Ratchet\App('t5dev.localdev', '9056', '0.0.0.0', $loop);
+$app = new \Ratchet\App('translate5.local', '9056', '0.0.0.0', $loop);
 $app->route('/translate5', $bus);
 $app->run();

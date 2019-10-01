@@ -87,6 +87,7 @@ class AppInstance {
      * @param BackendMsg $msg
      */
     public function passBackendMessage(BackendMsg $msg) {
+        //INFO: this is the handler for all messages comming from the t5 backend
         settype($msg->payload, 'array');
         //for security reasons messages to the instance may only come from the Backend! 
         if($msg->channel == self::CHANNEL_INSTANCE) {
@@ -113,6 +114,7 @@ class AppInstance {
      * @param ConnectionInterface $conn
      */
     public function passFrontendMessage(FrontendMsg $msg, ConnectionInterface $conn) {
+        //INFO: here we will get a message from the t5 frontend
         //$conn is Ratchet\WebSocket\WsConnection
         //do we have to diff between frontend and backend messages?
         settype($msg->payload, 'array');

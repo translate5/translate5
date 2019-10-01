@@ -28,6 +28,9 @@ class Task extends Channel {
      * @param FrontendMsg $request
      */
     public function segmentClick(FrontendMsg $request) {
+        //INFO: get the messsage -> fron the frontendmsg request
+        //filter the receivers   -> $sessionsForTask and also $this->instance->getConnections()
+        //send the message       -> for the filtered $con, send answer to the registered browsers
         $currentSessionId = $request->conn->sessionId;
         
         settype($request->payload[0], 'string');

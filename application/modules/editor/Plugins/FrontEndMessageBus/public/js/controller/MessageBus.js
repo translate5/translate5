@@ -57,10 +57,14 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         });
     },
     clickSegment: function(view, segment) {
+        //INFO: this is the comunicatio from the fronted to the backend
         //taskGuid is necessary for the future when we can open multiple tasks in one session
         this.bus.send('task', 'segmentClick', [segment.get('taskGuid'), segment.get('id')]);
     },
     enterSegment: function() {
+        //TODO: to prevent the two users same segment open in the same time
+        //track the open segments in the Task changel, and only the firs who rich is able to edit the segments
+        // all othe users should be somehow informed thaht it is allready in use
         console.log('enterSegment', arguments);
         //me.bus.send();
     },
