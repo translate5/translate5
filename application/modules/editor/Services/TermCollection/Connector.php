@@ -69,7 +69,8 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         
         $termModel=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $termModel editor_Models_Term */
-        
+        $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $collection editor_Models_TermCollection_TermCollection */
         $validator = new Zend_Validate_Date();
         $validator->setFormat('Y-m-d H:i:s');
         
@@ -80,12 +81,16 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
                 $params['deleteTermsModifiedOlderThan'] = date('Y-m-d H:i:s', strtotime($params['deleteTermsModifiedOlderThan']));
             }
             $termModel->removeOldTerms([$this->languageResource->getId()], $params['deleteTermsModifiedOlderThan']);
+            //clean the old tbx files from the disc
+            $collection->removeOldCollectionTbxFiles($this->languageResource->getId(), strtotime($params['deleteTermsModifiedOlderThan']));
         }
         
         $deleteOlderThanCurrentImport=isset($params['deleteTermsOlderThanCurrentImport']) && filter_var($params['deleteTermsOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
         //delete termcollection terms older then current import date
         if($deleteOlderThanCurrentImport){
             $termModel->removeOldTerms([$this->languageResource->getId()], NOW_ISO);
+            //clean the old tbx files from the disc
+            $collection->removeOldCollectionTbxFiles($this->languageResource->getId(), strtotime(NOW_ISO));
         }
         
         //check if the delete proposal older than date is set
