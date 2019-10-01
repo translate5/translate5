@@ -77,11 +77,11 @@ Ext.define('Editor.util.messageBus.MessageBus', {
     },
     initSocket: function() {
         var ws,
-            me = this;
-        //FIXME url, port etc from config
+            me = this,
+            url = 'ws://t5dev.localdev:9056/translate5'; //FIXME let me come from config, see server.php for notes to config
         // the serverId ensures that we communicate with the correct instance, additional security comes from the sessionId, which must match
-        // authentication by passing the session id (or a hash from it, or something) to the server in a first send.
-        ws = me.socket = new WebSocket('ws://localhost:9056/?serverId='+Editor.data.app.serverId);
+        // authentication by passing the session id to the server
+        ws = me.socket = new WebSocket(url+'?serverId='+Editor.data.app.serverId+'&sessionId='+Ext.util.Cookies.get(Editor.data.app.sessionKey));
         ws.onmessage = function(evt) {
             var data = Ext.JSON.decode(evt.data);
             //FIXME error handling if JSON decode fail
@@ -90,8 +90,7 @@ Ext.define('Editor.util.messageBus.MessageBus', {
             console.log(evt);
         };
         ws.onopen = function (event) { 
-            //FIXME send here auth request
-            ws.send('test');
+            //currently nothing here
         }
         ws.onclose = function (event) {
             //FIXME if connection close try to reconnect, see https://stackoverflow.com/a/31985557/1749200
@@ -100,12 +99,10 @@ Ext.define('Editor.util.messageBus.MessageBus', {
         //FIXME onerror → no connection, disable message bus. How is the plan, make it disableable at all??
     },
     send: function(channel, command, data) {
-        //FIXME we need always the session as identifier!
         var msgObj = {
             channel: channel,
             command: command, 
-            data: data,
-            sessionId: 123 //FIXME read out sessionId from cookie, first configured cookie key must be given to Editor.data.app.
+            payload: data || null
         };
         this.socket.send(Ext.JSON.encode(msgObj));
     }

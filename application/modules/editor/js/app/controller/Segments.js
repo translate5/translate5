@@ -103,9 +103,9 @@ Ext.define('Editor.controller.Segments', {
   listen: {
       messagebus: {
           '#translate5 task': {
-              segmentlock: function() {
+              segmentselect: function() {
                   console.log(arguments);
-                  Editor.MessageBox.addInfo('Lock Segment');
+                  Editor.MessageBox.addInfo('Selected Segment');
               }
           }
       },
