@@ -33,11 +33,11 @@ END LICENSE AND COPYRIGHT
 $currentDomain=$_SERVER['HTTP_HOST'].APPLICATION_RUNDIR.'/';
 $user=ZfExtended_Factory::get('ZfExtended_Models_User');
 /* @var $user ZfExtended_Models_User */
-$domain=$user->getUserCustomerDomain($this->receiver->userGuid, $currentDomain);
-if(!$domain){
-    $domain=$this->config->runtimeOptions->server->name.APPLICATION_RUNDIR;
+$costomerId=$user->isValidCustomerDomain($this->receiver->userGuid, $currentDomain);
+if(!$costomerId){
+    $currentDomain=$this->config->runtimeOptions->server->name.APPLICATION_RUNDIR;
 }
-$portal = $this->config->runtimeOptions->server->protocol.$domain;
+$portal = $this->config->runtimeOptions->server->protocol.$currentDomain;
 
 $salutation=$this->translate->_('Sehr geehrte(r)');
 if($this->receiver->gender == 'f'){
