@@ -27,11 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * 
-  `term` varchar(19000) NOT NULL DEFAULT '' COMMENT 'the proposed term',
-  `created` timestamp NOT NULL DEFAULT current_timestamp(),
- * 
- * 
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
  * @method string getTerm() getTerm()
@@ -119,12 +114,12 @@ class editor_Models_Term_Proposal extends ZfExtended_Models_Entity_Abstract {
         /* @var $term editor_Models_Term */
         //remove proposals from the term table
         $rowsCount=$term->db->delete([
-            'updated < ?' => $olderThan,
+            'updated <= ?' => $olderThan,
             'collectionId in (?)' => $collectionIds,
             'processStatus=?'=>$term::PROCESS_STATUS_UNPROCESSED
         ]);
         return ($this->db->delete([
-            'created < ?' => $olderThan,
+            'created <= ?' => $olderThan,
             'collectionId in (?)' => $collectionIds,
         ])+$rowsCount)>0;
     }

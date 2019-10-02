@@ -86,6 +86,16 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         'transac'
     ];
     
+    /***
+     * Available attrType for transac group transac attribute 
+     * @var array
+     */
+    public static $trasacGroupTypes=[
+        'creation',
+        'origination',//Info:in some tbx files, the value orgination is used for representing creations
+        'modification'
+    ];
+    
     /**
      * creates a new, unsaved term attribute history entity
      * @return editor_Models_Term_AttributeHistory
@@ -116,7 +126,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         }
         return !($name == 'date'
             || $name=='termNote' && $type=='processStatus'
-            || $name=='transacNote' && ($type=='responsiblePerson' || $type=='responsibility')
+            || $name=='transacNote' && ($this->isResponsablePersonAttribute($type))
             || $name=='transac' && ($type=='creation' || $type=='origination')
             || $name=='transac' && $type=='modification');
     }
@@ -306,9 +316,15 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         return $this->createChildTree($rows);
     }
     
-    //TODO: to many params 
-    public function updateTransacGroup($entity,array $types,string $created,int $timestamp,string $userGuid){
-        $attributes=$this->getTransacGroup($entity,['creation','origination']);
+    /***
+     * //TODO: the username is wrong
+     * Update the term transac group attributes from the proposal attributes
+     * @param editor_Models_Term $term
+     * @param editor_Models_Term_Proposal $proposal
+     * @return boolean
+     */
+    public function updateTermTransacGroupFromProposal(editor_Models_Term $term,editor_Models_Term_Proposal $proposal){
+        $attributes=$this->getTransacGroup($term,self::$trasacGroupTypes);
         if(!empty($attributes)){
             $s=$this->db->select()
             ->where('parentId IN(?)',array_column($attributes,'id'));
@@ -318,28 +334,31 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         if(empty($attributes)){
             return false;
         }
-        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        $user->loadByGuid($userGuid);
-        
-        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $attribute editor_Models_Term_Attribute */
         foreach ($attributes as $rec){
-            //TODO: is the save okay ?
-            $attribute->init($rec);
-            $attribute->setCreated($created);
+            $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+            /* @var $attribute editor_Models_Term_Attribute */
+            $attribute->load($rec['id']);
             if($attribute->getName()=='date'){
-                $attribute->setValue($timestamp);
+                $attribute->setValue(strtotime($proposal->getCreated()));
             }
-            $attribute->setUserGuid($user->getUserGuid());
-            $attribute->setUserName($user->getUserName());
+            if($attribute->isResponsablePersonAttribute()){
+                $attribute->setValue($proposal->getUserName());
+            }
+            $attribute->setUserGuid($proposal->getUserGuid());
+            $attribute->setUserName($proposal->getUserName());
             $attribute->save();
             
         }
-        //TODO: now update the values of the attributes from the attributes array
-        //make this function so it can be called with type param ? so we can reuse it 
+        return true;
     }
     
+    /***
+     * Get transac attribute for the entity and type
+     * 
+     * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
+     * @param array $types
+     * @return array
+     */
     public function getTransacGroup($entity,array $types){
         $s=$this->db->select();
         if($entity instanceof editor_Models_Term){
@@ -402,7 +421,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             if($lbl['label']=='date'){
                 $dateLabelId=$lbl['id'];
             }
-            if($lbl['label']=='transacNote' && $lbl['type']=='responsiblePerson'){
+            if($lbl['label']=='transacNote' && $this->isResponsablePersonAttribute($lbl['type'])){
                 $transacNoteLabelId=$lbl['id'];
             }
         }
@@ -532,7 +551,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
                     //convert the date to unix timestamp
                     $child['attrValue']=strtotime($termProposal['created']);
                 }
-                if($child['name']=='transacNote' && ($child['attrType']=='responsiblePerson' || $child['attrType']=='responsibility')){
+                if($child['name']=='transacNote' && $this->isResponsablePersonAttribute($child['attrType'])){
                     $child['attrValue']=$termProposal['userName'];
                 }
             }
@@ -635,6 +654,22 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
      */
     public function isProcessStatusAttribute(){
         return $this->getAttrType()=='processStatus' && $this->getName()=='termNote';
+    }
+    
+    /***
+     * Check if given AttrType is for responsable person
+     * Info: the responsable person type is saved in with different values in some tbx files
+     * @param string $type
+     * @return boolean
+     */
+    public function isResponsablePersonAttribute(string $type=null){
+        if(!empty($type)){
+            return $type=='responsiblePerson' || $type=='responsibility';
+        }
+        if($this->getAttrType()!=null){
+            return $this->getAttrType()=='responsiblePerson' || $this->getAttrType()=='responsibility';
+        }
+        return false;
     }
     
     public function getDataObject() {
