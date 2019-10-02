@@ -46,6 +46,7 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.EditTmWindow',
         'Editor.view.LanguageResources.TaskGridWindow',
         'Editor.view.LanguageResources.ImportCollectionWindow',
+        'Editor.view.LanguageResources.log.LogWindow',
         'Editor.view.LanguageResources.ProposalExport',
         'Editor.view.LanguageResources.services.Default'
     ],
@@ -53,7 +54,8 @@ Ext.define('Editor.controller.TmOverview', {
     stores:[
         'Editor.store.LanguageResources.Resources',
         'Editor.store.LanguageResources.LanguageResource',
-        'Editor.store.LanguageResources.SdlEngine'
+        'Editor.store.LanguageResources.SdlEngine',
+        'Editor.store.LanguageResources.Logs'
     ],
     strings: {
         languageresource: '#UT#Sprach-Resourcen',
@@ -377,6 +379,13 @@ Ext.define('Editor.controller.TmOverview', {
         form.reset();
         window.close();
     },
+    handleLogTm:function(view, cell, cellIdx, rec){
+        var win = Ext.widget('languageResourcesLogLogWindow',{
+        	languageResource:rec
+        });
+        win.show();
+        win.load();
+    },
     handleEditTm : function(view, cell, cellIdx, rec){
         var win = Ext.widget('editTmWindow');
         win.loadRecord(rec);
@@ -426,6 +435,9 @@ Ext.define('Editor.controller.TmOverview', {
                 break;
             case 'export':
                 me.handleExportProposalClick(view,cell,col,record);
+                break;
+            case 'log':
+                me.handleLogTm(view,cell,col,record);
                 break;
         }
     },

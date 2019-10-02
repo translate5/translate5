@@ -546,7 +546,7 @@ tr.customState td div {font-style: italic;}
 .ico-task-preferences {background-image: url("../images/page_gear.png");}
 .ico-task-reopen {background-image: url("../images/control_start.png");}
 .ico-task-delete {background-image: url("../images/page_delete.png");}
-.ico-task-log {background-image: url("../images/information.png");}
+.ico-task-log {background-image: url("../images/error.png");}
 .ico-task-clone {background-image: url("../images/page_copy.png");}
 .ico-task-showexportmenu {background-image: url("../images/database_go.png");}
 .ico-task-clone {background-image: url("../images/page_copy.png");}
@@ -727,6 +727,7 @@ a.x-btn span.task-confirmation {
 .language-ressource-import .ico-tm-import {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}
 .language-ressource-export .ico-tm-download {background-image: url(../images/book_go.png);background-repeat:no-repeat;background-position:center;}
 .ico-tm-magnifier {background-image: url(../images/magnifier.png) !important;background-repeat:no-repeat;background-position:center;}
+.ico-tm-log {background-image: url(../images/error.png);background-repeat:no-repeat;background-position:center;}
 /*
 .matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 */

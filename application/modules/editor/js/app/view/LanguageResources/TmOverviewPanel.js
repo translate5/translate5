@@ -178,6 +178,15 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
 	                    	return Editor.util.LanguageResources.getService(r.get('serviceName')).getExportTooltip();
 	                    }
+                    },{
+                        tooltip: me.strings.log,
+                        action: 'log',
+                        getTip:function(view,metadata,record,rowIndex,colIndex,store){
+                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getLogTooltip(record);
+	                    },
+	                    getClass:function(view,metadata,record,rowIndex,colIndex,store){
+	                    	return Editor.util.LanguageResources.getService(record.get('serviceName')).getLogIconClass(record);
+	                    }
                     }],
                 },{
                     xtype: 'gridcolumn',
