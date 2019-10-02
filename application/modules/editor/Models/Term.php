@@ -958,7 +958,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
         ->setIntegrityCheck(false)
         ->from(['t'=>'LEK_terms'],['t.id'])
-        ->joinLeft(['p'=>'LEK_term_proposal'],'p.termId=t.id ',['p.term'])
+        ->joinLeft(['p'=>'LEK_term_proposal'],'p.termId=t.id ',['p.term','p.created','p.userGuid','p.userName'])
         ->where('t.updated < ?', $olderThan)
         ->where('t.collectionId in (?)',$collectionIds)
         ->where('t.processStatus NOT IN (?)',self::PROCESS_STATUS_UNPROCESSED);
@@ -969,6 +969,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         }
         $term=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        
         $deleteProposals=[];
         //for each of the terms with the proposals, use the proposal value as the
         //new term value in the original term, after the original term is updated, remove
@@ -977,10 +980,25 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             if(empty($res['term'])){
                 continue;
             }
+            $proposal=ZfExtended_Factory::get('editor_Models_Term_Proposal');
+            /* @var $proposal editor_Models_Term_Proposal */
+            $proposal->init([
+                'created'=>$res['created'],
+                'userGuid'=>$res['userGuid'],
+                'userName'=>$res['userName'],
+            ]);
+            
             $term->load($res['id']);
             $term->setTerm($res['term']);
+            $term->setCreated($res['created']);
             $term->setUpdated(NOW_ISO);
+            $term->setUserGuid($res['userGuid']);
+            $term->setUserName($res['userName']);
             $term->setProcessStatus(self::PROCESS_STATUS_UNPROCESSED);
+            //TODO: with the next termportal step(add new attribute and so)
+            //update/merge those new proposal attributes to
+            //now only the transac group should be modefied
+            $attribute->updateTermTransacGroupFromProposal($term,$proposal);
             $term->save();
             $deleteProposals[]=$res['id'];
             unset($result[$key]);

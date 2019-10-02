@@ -1,42 +1,37 @@
-;;;; ATTENTION: the below variables need to be placed above the areas [FileMapping] and [CollectionMapping]
+crossAPIurl=http://win.translate5.net
+crossExportFilesDir=/var/www/translate5/data/tbx-import/crossapi/
+apiUsername=crossapi.user
+apiPassword=pass
  
-crossAPIurl=http://example.net
-crossExportFilesDir=/path/to/your/translate5/data/tbx-import/crossapi-import-templates/
-
-;mergeTerms: Allowed values: true or false. 
-;If this is true, terms will be merged as described at https://confluence.translate5.net/display/TAD/Term+Collection. 
+ 
+;mergeTerms: Allowed values: true or false.
+;If this is true, terms will be merged as described at https://confluence.translate5.net/display/TAD/Term+Collection.
 ;Otherwise all terms will be added to the termCollection, if the ID in the TBX does NOT exist already in the DB
 ;when the ID of the termEntry of the TBX does already exist in the DB, the terms of this termEntry will always be merged
 mergeTerms=true;
-
+ 
 ;Deletes all terms in all listed termCollections, that have a modification date older than the listed one.
 ;Since every term that exists in a TBX gets a new updated date on TBX-import, even if it is not changed: Simply set this date to yesterday to delete all terms, that are not part of the current import
 ;The updated date is a date internal to translate5 and different from the modified date of the term, that is shown in the interface
 deleteTermsModifiedOlderThan=2018-05-01
-
-;Deletes all terms in all listed termCollections, that have a modification date older than the the start of the current import.
+ 
+;Deletes all terms in all listed termCollections, that have a modification date older than the start of the current import.
 ;possible values: true or false
-deleteTermsOlderThanCurrentImport=false
-
+deleteTermsOlderThanCurrentImport=true
+ 
 ;Delete all proposals in a listed termCollections, that have a creation date older than this configs value.
 deleteProposalsOlderThan=2018-05-01
-
+ 
 ;Delete all proposals in a listed termCollections, that have a creation date older than the start of the current import.
 ;possible values: true or false
 deleteProposalsOlderThanCurrentImport=false
-
-apiUsername=crossapi.user
-apiPassword=pass
-
-;;;; ATTENTION: the above variables need to be placed above the areas [FileMapping] and [CollectionMapping]
  
-
 ;mapping between across export template and term collection
 [FileMapping]
 template-1.export=exampletermCollection
-
+ 
 ;mapping between term collection name and customer number
 [CollectionMapping]
 exampletermCollection3=10001;
 exampletermCollection2=10002;
-exampletermCollection=10002;
+exampletermCollection=123456789;
