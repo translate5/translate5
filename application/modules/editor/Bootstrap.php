@@ -405,6 +405,16 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_tasks', $queryRoute);
         
+
+        $this->front->getRouter()->addRoute('editorLanguageResourcesEvents', new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/:id/events',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'events'
+            )
+        ));
+
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/export',
             array(
@@ -413,7 +423,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'export'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_export', $queryRoute);
-        
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/testexport',
             array(
@@ -422,7 +431,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'testexport'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_testexport', $queryRoute);
-        
         #Language resource rutes end
     }
     

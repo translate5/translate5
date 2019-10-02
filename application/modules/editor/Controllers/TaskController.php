@@ -639,12 +639,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
         $import->setUserInfos($this->user->data->userGuid, $this->user->data->userName);
-
+        
         $import->setLanguages(
-                        $this->entity->getSourceLang(), 
-                        $this->entity->getTargetLang(), 
-                        $this->entity->getRelaisLang(), 
-                        editor_Models_Languages::LANG_TYPE_ID);
+            $this->entity->getSourceLang(),
+            $this->entity->getTargetLang(),
+            $this->entity->getRelaisLang(),
+            editor_Models_Languages::LANG_TYPE_ID);
         $import->setTask($this->entity);
         $dp = $this->upload->getDataProvider();
         

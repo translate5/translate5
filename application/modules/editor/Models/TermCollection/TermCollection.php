@@ -57,7 +57,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * @param string $name
      * @param array $customers
      * 
-     * @return int
+     * @return editor_Models_TermCollection_TermCollection
      */
     public function create(string $name,array $customers){
         $this->setName($name);
@@ -80,7 +80,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
             /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
             $customerAssoc->addAssocs($customers, $resourceId);
         }
-        return $resourceId;
+        return $this;
     }
     
     /***

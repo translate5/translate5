@@ -3407,6 +3407,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Excel hochladen</source>
     <target>Upload excel</target>
 </trans-unit>
+<trans-unit id='TG9n'><source>Log</source><target>Log</target></trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIFdhcm51bmcgenUgQXVmZ2FiZQ=='>
     <source>Translate5 - Warnung zu Aufgabe</source>
     <target>Translate5 - Warning to task</target>

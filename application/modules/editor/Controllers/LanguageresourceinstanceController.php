@@ -96,7 +96,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
         };
         
-        $this->prepareTaskInfo(array_column($this->view->rows, 'id'));
+        $languageResourcesId=array_column($this->view->rows, 'id');
+        $this->prepareTaskInfo($languageResourcesId);
+        
+        $eventLogger=ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
+        /* @var $eventLogger editor_Models_Logger_LanguageResources */
+        $eventLoggerGroupped=$eventLogger->getEventsCountGrouped($languageResourcesId);
         
         //get all assocs grouped by language resource id
         $customerAssocModel=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
@@ -138,6 +143,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageresource['useAsDefault'] = $this->getCustassocDefault($custAssoc, 'useAsDefault', $id);
             $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
+            $languageresource['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
         }
     }
     
@@ -238,6 +244,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         foreach($meta as $key => $v) {
             $this->view->rows->{$key} = $v;
         }
+        
+        $eventLogger=ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
+        /* @var $eventLogger editor_Models_Logger_LanguageResources */
+        $eventLoggerGroupped=$eventLogger->getEventsCountGrouped([$this->entity->getId()]);
+        $this->view->rows->eventsCount = isset($eventLoggerGroupped[$this->entity->getId()]) ? (integer)$eventLoggerGroupped[$this->entity->getId()] : 0;
         
         $moreInfo = ''; //init as empty string, filled on demand by reference
         $connector = $serviceManager->getConnector($this->entity);
@@ -347,6 +358,34 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
     }
     
+    
+    /**
+     * returns the logged events for the given language resource
+     */
+    public function eventsAction() {
+        $this->getAction();
+        $events = ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
+        /* @var $events editor_Models_Logger_LanguageResources */
+        
+        //filter and limit for events entity
+        $offset = $this->_getParam('start');
+        $limit = $this->_getParam('limit');
+        settype($offset, 'integer');
+        settype($limit, 'integer');
+        $events->limit(max(0, $offset), $limit);
+        
+        $filter = ZfExtended_Factory::get($this->filterClass,array(
+            $events,
+            $this->_getParam('filter')
+        ));
+        
+        $filter->setSort($this->_getParam('sort', '[{"property":"id","direction":"DESC"}]'));
+        $events->filterAndSort($filter);
+        
+        $this->view->rows = $events->loadByLanguageResourceId($this->entity->getId());
+        $this->view->total = $events->getTotalByLanguageResourceId($this->entity->getId());
+    }
+    
     private function prepareTaskInfo($languageResourceids) {
         /* @var $assocs editor_Models_LanguageResources_Taskassoc */
         $assocs = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
@@ -420,7 +459,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $validExportTypes = $connector->getValidExportTypes();
         
         if(empty($validExportTypes[$type])){
-            throw new ZfExtended_NotFoundException('Can not download in format '.$type);
+            throw new ZfExtended_Models_Entity_NotFoundException('Can not download in format '.$type);
         }
         
         $data = $connector->getTm($validExportTypes[$type]);
@@ -504,7 +543,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
         if(!$resource->getFilebased()) {
-            throw new ZfExtended_Models_Entity_NotFoundException('Requested languageResource is not filebased!');
+            throw new ZfExtended_ValidateException('Requested languageResource is not filebased!');
         }
         
         //upload errors are handled in handleAdditionalFileUpload

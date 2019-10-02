@@ -25,39 +25,17 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
 /**
- * Entity Model for segment meta data
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
+ * Should be used for errors in the context of tbx import processing
  */
-class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
-    protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';
-    
-    public function loadByTaskGuid($taskGuid) {
-        return $this->loadRow('taskGuid = ?', $taskGuid);
-    }
-    
+class editor_Models_Import_TermListParser_Exception extends ZfExtended_ErrorCodeException {
     /**
-     * Adds an empty meta data rowset to the DB.
+     * @var string
      */
-    public function initEmptyRowset(){
-        $db = new $this->dbInstanceClass;
-        /* @var $db Zend_Db_Table_Abstract */
-        try {
-            $db->insert(array('taskGuid' => $this->getTaskGuid()));
-        }
-        catch(Zend_Db_Statement_Exception $e) {
-            try {
-                $this->handleIntegrityConstraintException($e);
-                throw $e;
-            }
-            catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-                //"duplicate entry" errors are ignored.
-                return;
-            }
-        }
-    }
+    protected $origin = 'import.termlistparser';
+    
+    static protected $localErrorCodes = [
+        'E1023' => 'Unable to read the provided tbx file {filename}',
+        'E1028' => '{message}. \n Term collection name: {name}'
+    ];
 }
