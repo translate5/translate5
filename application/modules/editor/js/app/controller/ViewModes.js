@@ -305,7 +305,8 @@ Ext.define('Editor.controller.ViewModes', {
             }
         });
 
-        Ext.Array.each(me.visibleColumns, function(col){
+        //set the ergonimic columns back to visible
+        Ext.Array.each(grid.columns, function(col){
             if(! col.isErgonomicVisible){
                 col.hide();
             }
