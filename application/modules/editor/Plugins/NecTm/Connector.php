@@ -454,8 +454,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @return editor_Plugins_NecTm_Connector
      */
     public function initForFuzzyAnalysis($analysisId) {
-        return false;
-        // = TODO :)
+        return $this;
+        // = TODO (wait for NEC-TM-APi to delete tags WITH deleting their contents)
         
         $this->isInternalFuzzy = true;
         $fuzzyLanguageResource = clone $this->languageResource;
