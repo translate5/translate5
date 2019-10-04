@@ -292,6 +292,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         //init the logger (this will write in the language resources log and in the main log)
         $this->logger=Zend_Registry::get('logger');
         $this->user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        $this->termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
     }
 
     /**
@@ -317,14 +318,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         
         //create term collection for the task and customer
         //the term collection will be created with autoCreateOnImport flag
-        $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        
-        
-        $this->termCollectionId = $termCollection->create("Term Collection for ".$this->task->getTaskName(), $this->customerIds);
+        $this->termCollection->create("Term Collection for ".$this->task->getTaskName(), $this->customerIds);
         
         //add termcollection to task assoc
-        $termCollection->addTermCollectionTaskAssoc($this->termCollection->getId(), $task->getTaskGuid());
+        $this->termCollection->addTermCollectionTaskAssoc($this->termCollection->getId(), $task->getTaskGuid());
         
         //all tbx files in the same term collection
         foreach($tbxfiles as $file) {
