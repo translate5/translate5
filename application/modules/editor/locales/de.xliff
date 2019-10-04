@@ -1420,7 +1420,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='VEJYIERhdGVpIGltcG9ydGllcmVu'><source>TBX Datei importieren</source><target>TBX Datei importieren</target></trans-unit>
 <trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gZXJmb2xncmVpY2ggaW1wb3J0aWVydCE='><source>Weitere Term-Collection Daten erfolgreich importiert!</source><target>Weitere Term-Collection Daten erfolgreich importiert!</target></trans-unit>
 <trans-unit id='VGVybWVpbnRyw6RnZSB2ZXJzY2htZWx6ZW4='><source>Termeinträge verschmelzen</source><target>Termeinträge verschmelzen</target></trans-unit>
-<trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxz'><source>Termeinträge löschen älter als</source><target>Termeinträge löschen älter als</target></trans-unit>
+<trans-unit id='VGVybWUgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Terme löschen, deren letzte Berührung länger her ist als</source><target>Terme löschen, deren letzte Berührung länger her ist als</target></trans-unit>
 <trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxzIGFrdHVlbGxlciBJbXBvcnQ='><source>Termeinträge löschen älter als aktueller Import</source><target>Termeinträge löschen älter als aktueller Import</target></trans-unit>
 <trans-unit id='SW5mbyB6dW0gVGVybS1Db2xsZWN0aW9u'><source>Info zum Term-Collection</source><target>Info zum Term-Collection</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRtw6Rzc2lnIGFrdGl2IGbDvHI='><source>Standardmässig aktiv für</source><target>Standardmässig aktiv für</target></trans-unit>
@@ -1572,7 +1572,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>TermProposer</target></trans-unit>
 <trans-unit id='T3BlbklkIElzc3Vlcg=='><source>OpenId Issuer</source><target>OpenId Issuer</target></trans-unit>
 <trans-unit id='SsO8bmdlciBhbHMgb2RlciBnbGVpY2g='><source>Jünger als oder gleich</source><target>Jünger als oder gleich</target></trans-unit>
-<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscw=='><source>Vorschläge löschen älter als</source><target>Vorschläge löschen älter als</target></trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Vorschläge löschen, deren letzte Berührung länger her ist als</source><target>Vorschläge löschen, deren letzte Berührung länger her ist als</target></trans-unit>
 <trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IGFwcGVhciB0byBiZSBhbiBpbnRlZ2Vy'><source>'%value%' does not appear to be an integer</source><target>'%value%' does not appear to be an integer</target></trans-unit>
 
 <trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIFRlcm0='><source>Änderung zu bestehendem Term</source><target>Änderung zu bestehendem Term</target></trans-unit>

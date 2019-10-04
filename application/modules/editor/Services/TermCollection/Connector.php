@@ -75,14 +75,14 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $validator->setFormat('Y-m-d H:i:s');
         
         //delete collection term entries older then the parameter date
-        if(isset($params['deleteTermsModifiedOlderThan']) && !empty($params['deleteTermsModifiedOlderThan'])){
+        if(isset($params['deleteTermsLastTouchedOlderThan']) && !empty($params['deleteTermsLastTouchedOlderThan'])){
             
-            if(!$validator->isValid($params['deleteTermsModifiedOlderThan'])){
-                $params['deleteTermsModifiedOlderThan'] = date('Y-m-d H:i:s', strtotime($params['deleteTermsModifiedOlderThan']));
+            if(!$validator->isValid($params['deleteTermsLastTouchedOlderThan'])){
+                $params['deleteTermsLastTouchedOlderThan'] = date('Y-m-d H:i:s', strtotime($params['deleteTermsLastTouchedOlderThan']));
             }
-            $termModel->removeOldTerms([$this->languageResource->getId()], $params['deleteTermsModifiedOlderThan']);
+            $termModel->removeOldTerms([$this->languageResource->getId()], $params['deleteTermsLastTouchedOlderThan']);
             //clean the old tbx files from the disc
-            $collection->removeOldCollectionTbxFiles($this->languageResource->getId(), strtotime($params['deleteTermsModifiedOlderThan']));
+            $collection->removeOldCollectionTbxFiles($this->languageResource->getId(), strtotime($params['deleteTermsLastTouchedOlderThan']));
         }
         
         $deleteOlderThanCurrentImport=isset($params['deleteTermsOlderThanCurrentImport']) && filter_var($params['deleteTermsOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
@@ -95,9 +95,9 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         
         //check if the delete proposal older than date is set
         $deleteProposalsDate=null;
-        if(!empty($params['deleteProposalsOlderThan']) && !$validator->isValid($params['deleteProposalsOlderThan'])){
+        if(!empty($params['deleteProposalsLastTouchedOlderThan']) && !$validator->isValid($params['deleteProposalsLastTouchedOlderThan'])){
             //the date is set but it is not in the required format
-            $deleteProposalsDate = date('Y-m-d H:i:s', strtotime($params['deleteProposalsOlderThan']));
+            $deleteProposalsDate = date('Y-m-d H:i:s', strtotime($params['deleteProposalsLastTouchedOlderThan']));
         }
         
         //the delet proposals older than the current import is set, use the now_iso as reference date

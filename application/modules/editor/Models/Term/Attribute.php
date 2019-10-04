@@ -317,7 +317,6 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * //TODO: the username is wrong
      * Update the term transac group attributes from the proposal attributes
      * @param editor_Models_Term $term
      * @param editor_Models_Term_Proposal $proposal
@@ -338,7 +337,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
             /* @var $attribute editor_Models_Term_Attribute */
             $attribute->load($rec['id']);
-            if($attribute->getName()=='date'){
+            if($attribute->isDateAttribute()){
                 $attribute->setValue(strtotime($proposal->getCreated()));
             }
             if($attribute->isResponsablePersonAttribute()){
@@ -350,6 +349,22 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             
         }
         return true;
+    }
+    /***
+     * Update term processStatus attribute with the given value
+     * @param editor_Models_Term $term
+     * @param string $processStatus
+     * @return boolean
+     */
+    public function updateTermProcessStatus(editor_Models_Term $term,string $processStatus){
+        return $this->db->update([
+            'value' =>$processStatus,
+            'processStatus' => $processStatus
+        ], [
+            'termId=?' => $term->getId(),
+            'name=?' =>'termNote',
+            'attrType=?' => 'processStatus'
+        ])>0;
     }
     
     /***
@@ -668,6 +683,23 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         }
         if($this->getAttrType()!=null){
             return $this->getAttrType()=='responsiblePerson' || $this->getAttrType()=='responsibility';
+        }
+        return false;
+    }
+    
+    /***
+     * Check if it is date attribute. Can be checked via $name param, or if the attribute row is loaded via
+     * $this->getName()
+     * 
+     * @param string $name
+     * @return boolean
+     */
+    public function isDateAttribute(string $name=null) {
+        if(!empty($name)){
+            return $name=='date';
+        }
+        if($this->getName()!=null){
+            return $this->getName()=='date';
         }
         return false;
     }

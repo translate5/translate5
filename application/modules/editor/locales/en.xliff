@@ -3014,9 +3014,9 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Termeinträge verschmelzen</source>
     <target>Merge term entries</target>
 </trans-unit>
-<trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxz'>
-    <source>Termeinträge löschen älter als</source>
-    <target>Delete term entries older than</target>
+<trans-unit id='VGVybWUgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='>
+    <source>Terme löschen, deren letzte Berührung länger her ist als</source>
+    <target>Delete terms last touched longer ago than</target>
 </trans-unit>
 
 <trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxzIGFrdHVlbGxlciBJbXBvcnQ='>
@@ -3373,7 +3373,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='VGVybWlub2xvZ2llcG9ydGFsLVNwcmFjaGVu'><source>Terminologieportal-Sprachen</source><target>TermPortal-languages</target></trans-unit>
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>All languages available</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Saving the term will also create a new entry for</target></trans-unit>
-<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscw=='><source>Vorschläge löschen älter als</source><target>Delete proposals older than</target></trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Vorschläge löschen, deren letzte Berührung länger her ist als</source><target>Delete proposals last touched longer ago than</target></trans-unit>
 <trans-unit id='VGVybTogVm9yc2NobGFnIGzDtnNjaGVu'><source>Term: Vorschlag löschen</source><target>Term: Delete proposal</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIFRlcm0='><source>Änderung zu bestehendem Term</source><target>Change to existing term</target></trans-unit>
 <trans-unit id='UHJvemVzcy1TdGF0dXM='><source>Prozess-Status</source><target>Prozess status</target></trans-unit>

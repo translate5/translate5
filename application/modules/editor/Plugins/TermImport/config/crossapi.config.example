@@ -13,14 +13,14 @@ mergeTerms=true;
 ;Deletes all terms in all listed termCollections, that have a modification date older than the listed one.
 ;Since every term that exists in a TBX gets a new updated date on TBX-import, even if it is not changed: Simply set this date to yesterday to delete all terms, that are not part of the current import
 ;The updated date is a date internal to translate5 and different from the modified date of the term, that is shown in the interface
-deleteTermsModifiedOlderThan=2018-05-01
+deleteTermsLastTouchedOlderThan=2018-05-01
  
-;Deletes all terms in all listed termCollections, that have a modification date older than the start of the current import.
+;Deletes all terms in all listed termCollections, that have a updated date older than the start of the current import.
 ;possible values: true or false
 deleteTermsOlderThanCurrentImport=true
  
 ;Delete all proposals in a listed termCollections, that have a creation date older than this configs value.
-deleteProposalsOlderThan=2018-05-01
+deleteProposalsLastTouchedOlderThan=2018-05-01
  
 ;Delete all proposals in a listed termCollections, that have a creation date older than the start of the current import.
 ;possible values: true or false

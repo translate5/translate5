@@ -999,6 +999,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             //update/merge those new proposal attributes to
             //now only the transac group should be modefied
             $attribute->updateTermTransacGroupFromProposal($term,$proposal);
+            $attribute->updateTermProcessStatus($term, $term::PROCESS_STATUS_UNPROCESSED);
             $term->save();
             $deleteProposals[]=$res['id'];
             unset($result[$key]);

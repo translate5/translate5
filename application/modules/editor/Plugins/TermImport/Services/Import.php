@@ -112,7 +112,7 @@ class editor_Plugins_TermImport_Services_Import {
      * The updated date is a date internal to translate5 and different from the modified date of the term, that is shown in the interface
      * @var string
      */
-    const DELETE_ENTRIES_KEY="deleteTermsModifiedOlderThan";
+    const DELETE_ENTRIES_KEY="deleteTermsLastTouchedOlderThan";
     
     
     /***
@@ -123,11 +123,11 @@ class editor_Plugins_TermImport_Services_Import {
     
     
     /***
-     * Config key for deletes all proposals older then deleteProposalsOlderThan date.
+     * Config key for deletes all proposals older then deleteProposalsLastTouchedOlderThan date.
      * 
      * @var string
      */
-    CONST DELETE_PROPOSALS_OLDER_THAN_KEY="deleteProposalsOlderThan";
+    CONST DELETE_PROPOSALS_OLDER_THAN_KEY="deleteProposalsLastTouchedOlderThan";
     
     
     /***
@@ -500,7 +500,7 @@ class editor_Plugins_TermImport_Services_Import {
     }
     
     /***
-     * Delete all proposals older than deleteProposalsOlderThan date.
+     * Delete all proposals older than deleteProposalsLastTouchedOlderThan date.
      * 
      * @param int $collectionId
      */
