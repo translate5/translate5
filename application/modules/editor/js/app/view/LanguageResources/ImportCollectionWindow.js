@@ -38,10 +38,10 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         save: '#UT#Importieren',
         cancel: '#UT#Abbrechen',
         mergeTerms:'#UT#Termeinträge verschmelzen',
-        deleteTermEntriesDate:'#UT#Termeinträge löschen älter als',
+        deleteTermEntriesDate:'#UT#Terme löschen, deren letzte Berührung länger her ist als',
         deleteTermEitriesImport:'#UT#Termeinträge löschen älter als aktueller Import',
         helpButtonTooltip:'#UT#Info zum Term-Collection',
-        deleteTermProposals:'#UT#Vorschläge löschen älter als',
+        deleteTermProposals:'#UT#Vorschläge löschen, deren letzte Berührung länger her ist als',
         deleteTermProposalsImport:'#UT#Vorschläge löschen älter als aktueller Import'
     },
     tools:[{
@@ -77,8 +77,8 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         },{
             xtype:'datefield',
             fieldLabel: me.strings.deleteTermEntriesDate,
-            itemId:'deleteTermsModifiedOlderThan',
-            name:'deleteTermsModifiedOlderThan',
+            itemId:'deleteTermsLastTouchedOlderThan',
+            name:'deleteTermsLastTouchedOlderThan',
             listeners:{
 	            change:function(field,newValue){
 	        		me.handleFieldPairDisable('deleteTermsOlderThanCurrentImport',newValue);
@@ -92,14 +92,14 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
             value:false,
             listeners:{
 	            change:function(field,newValue){
-	        		me.handleFieldPairDisable('deleteTermsModifiedOlderThan',newValue);
+	        		me.handleFieldPairDisable('deleteTermsLastTouchedOlderThan',newValue);
 	        	}
             }
         },{
             xtype:'datefield',
             fieldLabel: me.strings.deleteTermProposalsDate,
-            itemId:'deleteProposalsOlderThan',
-            name:'deleteProposalsOlderThan',
+            itemId:'deleteProposalsLastTouchedOlderThan',
+            name:'deleteProposalsLastTouchedOlderThan',
             inputValue:true,
             value:false,
             listeners:{
@@ -116,7 +116,7 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
             value:false,
             listeners:{
             	change:function(field,newValue){
-            		me.handleFieldPairDisable('deleteProposalsOlderThan',newValue);
+            		me.handleFieldPairDisable('deleteProposalsLastTouchedOlderThan',newValue);
             	}
             }
         });
