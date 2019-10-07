@@ -88,7 +88,7 @@ Ext.define('Editor.controller.ViewModes', {
             	click:'onLogoutHeaderBtnClick'
             },
             '#leaveTaskHeaderBtn':{
-            	click:'onleaveTaskHeaderBtn'
+            	click:'onLeaveTaskHeaderBtn'
             },
             '#segmentgrid': {
                 beforestartedit: 'checkModeBeforeEdit'
@@ -474,7 +474,7 @@ Ext.define('Editor.controller.ViewModes', {
     /***
      * Called when the leave task is clicked. This button will provide a dialog, so the user can decide between leave the task or finish the task
      */
-    onleaveTaskHeaderBtn:function(){
+    onLeaveTaskHeaderBtn:function(){
         var me=this,
             user = Editor.app.authenticatedUser,
             task = Editor.data.task;

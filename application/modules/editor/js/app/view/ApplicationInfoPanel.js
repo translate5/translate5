@@ -32,19 +32,15 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.ApplicationInfoPanel', {
 	extend:'Ext.container.Container',
     alias: 'widget.applicationInfoPanel',
-    
+    cls: 'head-panel-info-panel',
+    itemId: 'applicationInfoPanel',
+    tpl:Editor.util.Constants.appInfoTpl,
     strings: {
         task: '#UT#Aufgabe',
         loggedinAs: '#UT# Eingeloggter Benutzer',
         loginName: '#UT# Loginname',
         readonly: '#UT# - [LESEMODUS]',
     },
-    
-    xtype: 'container',
-    cls: 'head-panel-info-panel',
-    itemId: 'applicationInfoPanel',
-    tpl:Editor.util.Constants.appInfoTpl,
-    
     /***
      * Get the default tpl data
      */

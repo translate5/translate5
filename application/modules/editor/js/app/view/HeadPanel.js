@@ -51,73 +51,77 @@ Ext.define('Editor.view.HeadPanel', {
         readonly: '#UT# - [LESEMODUS]',
         help: '#UT#Hilfe'
     },
-    initComponent: function() {
-        var me = this,
-            isEditor = false; //FIXME Thomas initial value differs for example for ITL
-            translations = [];
-            
-        Ext.Object.each(Editor.data.translations, function(i, n) {
-            translations.push([i, n]);
-        });
-
-        Ext.applyIf(me, {
-            items: [{
-                    xtype: 'container',
-                    cls: 'head-panel-brand',
-                    html: Editor.data.app.branding,
-                    flex: 1
+    
+    initConfig: function(instanceConfig) {
+    	var me = this,
+	        isEditor = false, //FIXME Thomas initial value differs for example for ITL
+	        translations = [];
+	        
+	    Ext.Object.each(Editor.data.translations, function(i, n) {
+	        translations.push([i, n]);
+	    });
+	    
+        var config = {
+    		items: [{
+                xtype: 'container',
+                cls: 'head-panel-brand',
+                html: Editor.data.app.branding,
+                flex: 1
+            },{
+                xtype: 'applicationInfoPanel'
+            },{
+                xtype: 'toolbar',
+                itemId: 'top-menu',
+                cls: 'head-panel-toolbar',
+                ui: 'footer',
+                items: [{
+                    xtype: 'tbfill'
                 },{
-                    xtype: 'applicationInfoPanel'
+                    xtype: 'button',
+                    itemId: 'logoutSingle',
+                    text: me.strings.logout
                 },{
-                    xtype: 'toolbar',
-                    itemId: 'top-menu',
-                    cls: 'head-panel-toolbar',
-                    ui: 'footer',
-                    items: [{
-                        xtype: 'tbfill'
-                    },{
-                        xtype: 'button',
-                        itemId: 'logoutSingle',
-                        text: me.strings.logout
-                    },{
-                        xtype: 'button',
-                        text: me.strings.tasks,
-                        itemId: 'tasksMenu',
-                        hidden: isEditor,
-                        menu: {
-                            xtype: 'menu',
-                            items: [{
-                                xtype: 'menuitem',
-                                iconCls: 'ico-task-back',
-                                itemId: 'backBtn',
-                                text: me.strings.back
-                            },{
-                                xtype: 'menuitem',
-                                iconCls: 'ico-task-finish',
-                                hidden: true,
-                                itemId: 'finishBtn',
-                                text: me.strings.finishBtn
-                            },{
-                                xtype: 'menuitem',
-                                hidden: true,
-                                iconCls: 'ico-task-end',
-                                itemId: 'closeBtn',
-                                text: me.strings.endBtn
-                            }]
-                        }
-                    },{
-                        xtype: 'combo',
-                        itemId: 'languageSwitch',
-                        width:110,
-                        forceSelection: true,
-                        value: Editor.data.locale,
-                        editable: false,
-                        store: translations,
-                        queryMode: 'local'
-                    }]
-                }
-            ]
-        });
-        me.callParent(arguments);
+                    xtype: 'button',
+                    text: me.strings.tasks,
+                    itemId: 'tasksMenu',
+                    hidden: isEditor,
+                    menu: {
+                        xtype: 'menu',
+                        items: [{
+                            xtype: 'menuitem',
+                            iconCls: 'ico-task-back',
+                            itemId: 'backBtn',
+                            text: me.strings.back
+                        },{
+                            xtype: 'menuitem',
+                            iconCls: 'ico-task-finish',
+                            hidden: true,
+                            itemId: 'finishBtn',
+                            text: me.strings.finishBtn
+                        },{
+                            xtype: 'menuitem',
+                            hidden: true,
+                            iconCls: 'ico-task-end',
+                            itemId: 'closeBtn',
+                            text: me.strings.endBtn
+                        }]
+                    }
+                },{
+                    xtype: 'combo',
+                    itemId: 'languageSwitch',
+                    width:110,
+                    forceSelection: true,
+                    value: Editor.data.locale,
+                    editable: false,
+                    store: translations,
+                    queryMode: 'local'
+                }]
+            }]
+        };
+        
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([ config ]);
     }
 });

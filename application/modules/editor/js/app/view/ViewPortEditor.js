@@ -89,10 +89,17 @@ Ext.define('Editor.view.ViewPortEditor', {
               width: 330,
               weight: 30,
               collapsible: true,
-              layout: 'fit',
+              layout:'border',
               animCollapse: !Ext.isIE, //BugID 3
               items:[{
+            	  xtype: 'panel',
+            	  cls: 'head-panel-brand',
+            	  region: 'north',
+            	  autoScroll:true,
+            	  html: Editor.data.app.branding,
+              },{
                   xtype: 'panel',
+                  region: 'center',
                   listeners: {
                       afterrender: function() {
                           this.disable();
