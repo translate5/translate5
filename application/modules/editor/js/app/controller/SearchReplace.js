@@ -80,6 +80,9 @@ Ext.define('Editor.controller.SearchReplace', {
             'segmentsHtmleditor': {
                 initialize: 'initEditor',
                 push: 'handleAfterPush'
+            },
+            'segmentsToolbar':{
+            	render:'onSegmentsToolbarRender'
             }
         },
         controller:{
@@ -224,7 +227,8 @@ Ext.define('Editor.controller.SearchReplace', {
         characterLimitError:'#UT#Der Suchstring ist zu groß',
         noIndexFound:'#UT#Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.',
         searchAndReplaceMenuItem:'#UT#Suchen und ersetzen',
-        replaceAllErrors: "#UT#Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten."
+        replaceAllErrors: "#UT#Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.",
+        searchReplaceToolbarBtn:'#UT#Suche'
     },
     
     constructor:function(){
@@ -308,6 +312,25 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     setTrackChangesInternalFlag:function(isSearchReplaceRange){
         this.fireEvent('isSearchReplaceRangeChange',isSearchReplaceRange);
+    },
+    
+    /***
+     * On segments toolbar render handler
+     */
+    onSegmentsToolbarRender:function(toolbar){
+    	var me=this;
+    	toolbar.insert(11,[{
+            xtype: 'button',
+            itemId: 'searchReplaceToolbarBtn',
+            cls: 'searchReplaceToolbarBtn',
+            icon: Editor.data.moduleFolder+'images/magnifier.png',
+            text: me.strings.searchReplaceToolbarBtn,
+            handler:function(){
+            	me.showSearchAndReplaceWindow(null);
+            }
+        },{
+            xtype: 'tbseparator'
+        }])
     },
     
     /***
