@@ -149,6 +149,8 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_clearSortAndFilterTooltip = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>';
   	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Lesezeichen');?>';
   	gridToolbar.item_helpTooltip = '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>';
+  	gridToolbar.item_logoutheaderbtn = '<?php echo $this->translate->_('Ausloggen');?>';
+  	gridToolbar.item_leavetaskheaderbtn = '<?php echo $this->translate->_('Aufgabe verlassen');?>';
     
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
 
@@ -230,7 +232,13 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.controller.ViewModes", {
         override: "Editor.controller.ViewModes",
-        messageIsViewMode: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.');?>'
+        messageIsViewMode: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.');?>',
+        strings:{
+            leaveTaskWindowTitle: '<?php echo $this->translate->_('Zurück zur Aufgabeliste');?>',
+            leaveTaskWindowMessage: '<?php echo $this->translate->_('Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?');?>',
+            leaveTaskWindowFinishBtn: '<?php echo $this->translate->_('Fertig und Aufgabe beenden');?>',
+            leaveTaskWindowCancelBtn: '<?php echo $this->translate->_('Aufgabe später weiterbearbeiten');?>'
+        }
     });
   	
   	Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
@@ -785,6 +793,7 @@ Ext.define('Editor.controller.Localizer', {
             noIndexFound: '<?php echo $this->translate->_('Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.');?>',
             searchAndReplaceMenuItem: '<?php echo $this->translate->_('Suchen und ersetzen');?>',
             replaceAllErrors: '<?php echo $this->translate->_('Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.');?>',
+            searchReplaceToolbarBtn: '<?php echo $this->translate->_('Suche');?>'
         }
     });
     
@@ -844,6 +853,16 @@ Ext.define('Editor.controller.Localizer', {
             history: '<?php echo $this->translate->_('HISTORY');?>',
             notrackchangesplugin: '<?php echo $this->translate->_('TrackChanges found, but Plugin is not activated.');?>',
             severity: '<?php echo $this->translate->_('Gewichtung');?>'
+        }
+    });
+    
+     Ext.define("Editor.locale.view.ApplicationInfoPanel", {
+        override: "Editor.view.ApplicationInfoPanel",
+        strings: {
+            task: '<?php echo $this->translate->_('Aufgabe');?>',
+            loggedinAs: '<?php echo $this->translate->_(' Eingeloggter Benutzer');?>',
+            loginName: '<?php echo $this->translate->_(' Loginname');?>',
+            readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
         }
     });
     
