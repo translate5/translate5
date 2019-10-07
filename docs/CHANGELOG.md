@@ -3,6 +3,18 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.2.9] - 2019-10-07
+###Added
+TRANSLATE-1671: (Un)lock 100%-Matches in task properties
+TRANSLATE-1803: New-options-for-automatic-term-proposal-deletion
+TRANSLATE-1816: Create a search & replace button
+TRANSLATE-1817: Get rid of head panel in editor
+
+###Bugfixes
+TRANSLATE-1551: Readonly task is editable when using VisualReview
+TRANSLATE-1761: Clean-up-tbx-for-filesystem-import-directory
+TRANSLATE-1790: In-the-general-mail-template-the-portal-link-points-to-wrong-url
+
 ## [3.2.8] - 2019-09-24
 ###Bugfixes
 TRANSLATE-1045: javascript error: rendered block refreshed at (this is the fix for the doRefreshView override function in the BufferedRenderer)
