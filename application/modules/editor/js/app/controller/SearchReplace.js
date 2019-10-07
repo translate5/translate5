@@ -319,7 +319,7 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     onSegmentsToolbarRender:function(toolbar){
     	var me=this;
-    	toolbar.insert(7,[{
+    	toolbar.insert(11,[{
             xtype: 'button',
             itemId: 'searchReplaceToolbarBtn',
             cls: 'searchReplaceToolbarBtn',

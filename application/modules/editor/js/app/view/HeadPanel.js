@@ -51,28 +51,6 @@ Ext.define('Editor.view.HeadPanel', {
         readonly: '#UT# - [LESEMODUS]',
         help: '#UT#Hilfe'
     },
-    infoTpl: [
-                  '<div class="info-line"><span class="user-label">{userLabel}:</span> <span class="user-name">{user.firstName} {user.surName}</span></div>',
-                  '<div class="info-line"><span class="login-label">{loginLabel}:</span> <span class="user-login">{user.login}</span></div>',
-                  '<tpl if="task">',
-                  '<div class="info-line"><span class="task-label">{taskLabel}:</span> <span class="task-name">{task.taskName}</span>',
-                  '</tpl>',
-                  '<tpl if="isReadonly">',
-                  '<span class="task-readonly">{readonlyLabel}</span>',
-                  '</tpl>',
-                  '<tpl if="task">',
-                  '</div>',
-                  '</tpl>',
-                  '<tpl if="task && showTaskGuid">',
-                  '<div class="info-line"><span class="task-label">TaskGuid:</span> <span class="task-name">{task.taskGuid}</span></div>',
-                  '</tpl>',
-                  '<tpl if="version">',
-                  '<div class="info-line"><span class="task-label">Version:</span> <span class="task-name">{version}</span></div>',
-                  '</tpl>',
-                  '<tpl if="browser">',
-                  '<div class="info-line"><span class="task-label">Browser:</span> <span class="task-name">{browser}</span></div>',
-                  '</tpl>'
-                  ],
     initComponent: function() {
         var me = this,
             isEditor = false; //FIXME Thomas initial value differs for example for ITL
@@ -89,10 +67,7 @@ Ext.define('Editor.view.HeadPanel', {
                     html: Editor.data.app.branding,
                     flex: 1
                 },{
-                    xtype: 'container',
-                    cls: 'head-panel-info-panel',
-                    tpl: me.infoTpl,
-                    itemId: 'infoPanel'
+                    xtype: 'applicationInfoPanel'
                 },{
                     xtype: 'toolbar',
                     itemId: 'top-menu',

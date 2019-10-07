@@ -78,8 +78,17 @@ Ext.define('Editor.controller.ViewModes', {
             'gridpanel segmentsToolbar menucheckitem[group="tagMode"]' : {
                 click : 'handleTagButtonClick'
             },
+            'gridpanel segmentsToolbar menucheckitem[group="localeMenuGroup"]' : {
+                click : 'handleLocaleMenuClick'
+            },
             'button[type="segment-zoom"]' : {
                 click : 'handleTagZoomClick'
+            },
+            '#logoutHeaderBtn':{
+            	click:'onLogoutHeaderBtnClick'
+            },
+            '#leaveTaskHeaderBtn':{
+            	click:'onleaveTaskHeaderBtn'
             },
             '#segmentgrid': {
                 beforestartedit: 'checkModeBeforeEdit'
@@ -87,6 +96,12 @@ Ext.define('Editor.controller.ViewModes', {
         }
     },
     messageIsViewMode: '#UT#Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.',
+    strings:{
+        leaveTaskWindowTitle:'#UT#Zurück zur Aufgabeliste',
+        leaveTaskWindowMessage:'#UT#Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?',
+        leaveTaskWindowFinishBtn:'#UT#Fertig und Aufgabe beenden',
+        leaveTaskWindowCancelBtn:'#UT#Aufgabe später weiterbearbeiten'
+    },
     currentSegmentSize: null,
     /**
      * Flag when true, editor can not be set into a non readonly mode
@@ -370,6 +385,14 @@ Ext.define('Editor.controller.ViewModes', {
                 break;
         }
     },
+    
+    /***
+     * On locale switch click. This will change the translate5 interface language
+     */
+    handleLocaleMenuClick:function(btn){
+    	Editor.app.setTranslation(btn.getValue());
+    },
+    
     getActiveEditor: function() {
         if(! this.getSegmentGrid().editingPlugin.editor){
         return null;
@@ -439,5 +462,86 @@ Ext.define('Editor.controller.ViewModes', {
         Ext.getBody().removeCls(oldSize);
         Ext.getBody().addCls(size);
         me.fireEvent('segmentSizeChanged', me, size, oldSize);
+    },
+    
+    /***
+     * Logout button handler
+     */
+    onLogoutHeaderBtnClick:function(){
+    	Editor.app.logout();
+    },
+    
+    /***
+     * Called when the leave task is clicked. This button will provide a dialog, so the user can decide between leave the task or finish the task
+     */
+    onleaveTaskHeaderBtn:function(){
+        var me=this,
+            user = Editor.app.authenticatedUser,
+            task = Editor.data.task;
+        
+        //without any loaded task or if the HeadPanel controller does not exist we can not leave the task
+        if(!task || !Editor.controller.HeadPanel){
+            return;
+        }
+        
+        //check if the user is allowed to finish the task
+        if(!user.isAllowed('editorFinishTask', task)){
+            me.handleLeaveTaskButton("backBtn");
+            return;
+        }
+        
+        var mbox=Ext.create('Ext.window.MessageBox',{
+        	//this is the only way to set custom button in extjs 6.2 in messagebox dialog
+            makeButton: function(btnIdx) {
+                var btnId = this.buttonIds[btnIdx],
+                	cls='';
+                if(btnId=='no'){
+                	cls='ico-arrow-back';
+                }
+                
+                if(btnId=='yes'){
+                	cls='ico-finish-task';
+                }
+                return new Ext.button.Button({
+                    handler: this.btnCallback,
+                    itemId: btnId,
+                    scope: this,
+                    text: this.buttonText[btnId],
+                    minWidth: 75,
+                    iconCls:cls
+                });
+            },
+        });
+        
+        mbox.show({
+        	title: me.strings.leaveTaskWindowTitle,
+            msg: me.strings.leaveTaskWindowMessage,
+            buttons: Ext.Msg.YESNO,
+            fn:me.handleLeaveTaskButton,
+            scope:me,
+            defaultFocus:'no',
+            icon: Ext.MessageBox.QUESTION,
+            buttonText: {
+                yes: me.strings.leaveTaskWindowFinishBtn,
+                no: me.strings.leaveTaskWindowCancelBtn
+            }
+        });
+    },
+    
+    /***
+     * Handler for the leave task dialog window.
+     * 
+     */
+    handleLeaveTaskButton:function(button){
+        if(button=="cancel"){
+            return false
+        }
+        var headPanelController = Editor.app.getController('HeadPanel'),
+            btnConfig = {
+            itemId:(button=="yes")?"finishBtn":"backBtn"
+        };
+        
+        headPanelController.tasksMenuDispatcher(null,btnConfig);
     }
+    
 });

@@ -62,7 +62,7 @@ Ext.define('Editor.view.ViewPortEditor', {
     items_west_title: '#UT#Dateien',
     initComponent: function() {
       var me = this,
-          items = [me.getNorth(),{
+          items = [{
               xtype: 'panel',
               region: 'west',
               weight: 30,
@@ -124,12 +124,5 @@ Ext.define('Editor.view.ViewPortEditor', {
           items: items
       });
       me.callParent(arguments);
-    },
-    getNorth: function() {
-        return {
-            region: 'north',
-            weight: 40,
-            xtype: 'headPanel'
-        };
     }
 });
