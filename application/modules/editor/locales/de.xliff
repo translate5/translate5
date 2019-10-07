@@ -1477,7 +1477,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='RGllIFp1d2Vpc3VuZyB6d2lzY2hlbiBBdWZnYWJlIHVuZCBCZW51dHplciBrYW5uIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIGRhIGRpZSBBdWZnYWJlIGR1cmNoIGRlbiBCZW51dHplciBnZXNwZXJydCBpc3Qu'><source>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.</source><target>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.</target></trans-unit>
 <trans-unit id='RGllc2UgS3VuZGVubnVtbWVyIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'><source>Diese Kundennummer wird bereits verwendet.</source><target>Diese Kundennummer wird bereits verwendet.</target></trans-unit>
 <trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKe+7vy4='><source>Der referenzierte Kunde existiert nicht (mehr)﻿.</source><target>Der referenzierte Kunde existiert nicht (mehr)﻿.</target></trans-unit>
-<trans-unit id='QW5zaWNodHNtb2R1cw=='><source>Ansichtsmodus</source><target>Ansichtsmodus</target></trans-unit>
+<trans-unit id='QW5zaWNodA=='><source>Ansicht</source><target>Ansicht</target></trans-unit>
 <trans-unit id='VW5iZWthbm50ZXIgVGVybSBTdGF0dXM='><source>Unbekannter Term Status</source><target>Unbekannter Term Status</target></trans-unit>
 <trans-unit id='RXJzdGVsbHVuZw=='><source>Erstellung</source><target>Erstellung</target></trans-unit>
 <trans-unit id='RWludHLDpGdl'><source>Einträge</source><target>Einträge</target></trans-unit>
@@ -1649,6 +1649,7 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='T2huZQ=='><source>Ohne</source><target>Ohne</target></trans-unit>
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Sehr geehrte(r)</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Vorschläge löschen älter als aktueller Import</target></trans-unit>
+<trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Ausloggen</target></trans-unit>
   </body>
  </file>
 </xliff>
