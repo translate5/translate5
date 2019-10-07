@@ -284,7 +284,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
      */
     addToolbarInfoButtonTpl:function(){
         var tpl = new Ext.XTemplate(Editor.util.Constants.appInfoTpl),
-        	infoPanel=Ext.widget('applicationInfoPanel');
+        	infoPanel=Ext.create('Editor.view.ApplicationInfoPanel');
         return tpl.applyTemplate(infoPanel.getEditorTplData());
     }
 });

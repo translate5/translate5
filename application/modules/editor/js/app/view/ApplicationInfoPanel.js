@@ -30,6 +30,7 @@ END LICENSE AND COPYRIGHT
  * @extends Ext.container.Container
  */
 Ext.define('Editor.view.ApplicationInfoPanel', {
+	extend:'Ext.container.Container',
     alias: 'widget.applicationInfoPanel',
     
     strings: {
