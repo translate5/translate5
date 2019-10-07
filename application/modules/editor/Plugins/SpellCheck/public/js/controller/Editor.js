@@ -44,6 +44,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
              'Editor.util.Event',
              'Editor.util.Range',
              'Editor.util.SegmentEditor',
+             'Editor.util.Constants',
              'Editor.plugins.SpellCheck.controller.UtilLanguageTool',
              'Editor.controller.SearchReplace',
              'Editor.util.SearchReplaceUtils'],
