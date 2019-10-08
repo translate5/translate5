@@ -2824,6 +2824,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Dateibasiertes TM herunterladen und lokal speichern</source>
   <target>Download and save locally the filebased TM</target>
 </trans-unit>
+<trans-unit id='QWxzIFRNWC1EYXRlaSBoZXJ1bnRlcmxhZGVuIHVuZCBsb2thbCBzcGVpY2hlcm4='>
+    <source>Als TMX-Datei herunterladen und lokal speichern</source>
+    <target>Download TMX-file and save it locally</target>
+    </trans-unit>
 <trans-unit id='SGluenVmw7xnZW4='>
   <source>Hinzufügen</source>
   <target>Add</target>
@@ -3436,6 +3440,7 @@ More information can be found in the task property window in the tab events.<br 
 <trans-unit id='QWNodHVuZzogRWluZSDDhG5kZXJ1bmcgZGVyIERlZmluaXRpb24gd2lya3Qgc2ljaCBhdWYgYWxsZSBUZXJtZSBkaWVzZXIgU3ByYWNoZSBhdXMu'><source>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</source><target>Editing this definition will affect all terms of this language.</target></trans-unit>
 <trans-unit id='WnVtIMOEbmRlcm4gZGVyIERlZmluaXRpb24gw7ZmZm5lbiBTaWUgYml0dGUgZGllIEVpbnRyYWdzZWlnZW5zY2hhZnRlbi4='><source>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</source><target>Please open the 'Term entry attributes' for editing this definition.</target></trans-unit>
 <trans-unit id='SGlud2Vpcw=='><source>Hinweis</source><target>Please note:</target></trans-unit>
+<trans-unit id='S2F0ZWdvcmllbg=='><source>Kategorien</source><target>Categories</target></trans-unit>
 <trans-unit id='Cjxici8+Cjxici8+PGI+QWNodHVuZzo8L2I+IEtvbmt1cnJpZXJlbmRlIEJlbnV0emVyOiBEZXIgZXJzdGUgQmVudXR6ZXIsIGRlciBlaW5lbiBKb2IgYW5uaW1tdCwgZsO8aHJ0IGVpbmVuIEpvYiBhdXMuIEFsbGVuIGFuZGVyZW4gd2lyZCBhdXRvbWF0aXNjaCBkaWUgQXVmZ2FiZSBlbnR6b2dlbi4KPGJyLz4='>
     <source>
 <br/>

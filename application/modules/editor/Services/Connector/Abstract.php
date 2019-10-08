@@ -47,6 +47,8 @@ abstract class editor_Services_Connector_Abstract {
     const STATUS_NOCONNECTION = 'noconnection';
     const STATUS_NOVALIDLICENSE = 'novalidlicense';
     
+    const FUZZY_SUFFIX = '-fuzzy-';
+    
     /*** 
      * Default resource matchrate
      * @var integer
@@ -224,6 +226,24 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /**
+     * Prepare sources and targets for being handled by the LanguageResource:
+     * - removeTrackChanges
+     * - restore whitespaces to real characters
+     * @param string $contentString
+     * @return string $preparedString
+     */
+    protected function prepareSegmentContent(string $contentString) {
+        $preparedString = $contentString;
+        // removeTrackChanges
+        $preparedString = $this->trackChange->removeTrackChanges($preparedString);
+        //restore the whitespaces to real characters
+        $preparedString = $this->internalTag->restore($preparedString, true);
+        $preparedString = $this->whitespaceHelper->unprotectWhitespace($preparedString);
+        $preparedString = $this->internalTag->toXliffPaired($preparedString);
+        return $preparedString;
+    }
+    
+    /**
      * restores whitespace in segment content and removes track changes before
      * @param string $queryString
      * @return string
@@ -244,6 +264,19 @@ abstract class editor_Services_Connector_Abstract {
     protected function importWhitespaceFromTagLessQuery($textNode) {
         $textNode = $this->whitespaceHelper->protectWhitespace($textNode, false);
         return $this->whitespaceTagReplacer($textNode);
+    }
+    
+    /**
+     * (For concordance search:) Highlight the searchString in the found source/target.
+     * @param string $searchString
+     * @param string $haystack
+     * @param bool $doit
+     */
+    protected function highlight ($searchString, $haystack, $doit) {
+        if(!$doit){
+            return $haystack;
+        }
+        return preg_replace('/('.preg_quote($searchString, '/').')/i', '<span class="highlight">\1</span>', $haystack);
     }
     
     /**
@@ -292,6 +325,13 @@ abstract class editor_Services_Connector_Abstract {
      */
     public function initForFuzzyAnalysis($analysisId) {
         return $this;
+    }
+    
+    /**
+     * The fuzzy languageResource name format is: oldname-fuzzy-AnalysisId
+     */
+    protected function renderFuzzyLanguageResourceName($name, $analysisId) {
+        return $name.self::FUZZY_SUFFIX.$analysisId;
     }
     
     /***

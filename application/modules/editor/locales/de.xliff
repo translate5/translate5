@@ -1349,6 +1349,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='><source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source><target>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</target></trans-unit>
 <trans-unit id='UmVzc291cmNlOiB7bmFtZX0='><source>Ressource: {name}</source><target>Ressource: {name}</target></trans-unit>
 <trans-unit id='RGF0ZWliYXNpZXJ0ZXMgVE0gaGVydW50ZXJsYWRlbiB1bmQgbG9rYWwgc3BlaWNoZXJu'><source>Dateibasiertes TM herunterladen und lokal speichern</source><target>Dateibasiertes TM herunterladen und lokal speichern</target></trans-unit>
+<trans-unit id='QWxzIFRNWC1EYXRlaSBoZXJ1bnRlcmxhZGVuIHVuZCBsb2thbCBzcGVpY2hlcm4='><source>Als TMX-Datei herunterladen und lokal speichern</source><target>Als TMX-Datei herunterladen und lokal speichern</target></trans-unit>
 <trans-unit id='ezB9IEVyZ2Vibmlzc2U='><source>{0} Ergebnisse</source><target>{0} Ergebnisse</target></trans-unit>
 <trans-unit id='S2VpbmUgU3ByYWNoLVJlc291cmNlbiB6dWdld2llc2VuLg=='><source>Keine Sprach-Resourcen zugewiesen.</source><target>Keine Sprach-Resourcen zugewiesen.</target></trans-unit>
 <trans-unit id='S2VpbmUgQXVmZ2FiZW4genVnZXdpZXNlbi4='><source>Keine Aufgaben zugewiesen.</source><target>Keine Aufgaben zugewiesen.</target></trans-unit>
@@ -1612,6 +1613,7 @@ Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften 
 <trans-unit id='QWNodHVuZzogRWluZSDDhG5kZXJ1bmcgZGVyIERlZmluaXRpb24gd2lya3Qgc2ljaCBhdWYgYWxsZSBUZXJtZSBkaWVzZXIgU3ByYWNoZSBhdXMu'><source>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</source><target>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</target></trans-unit>
 <trans-unit id='WnVtIMOEbmRlcm4gZGVyIERlZmluaXRpb24gw7ZmZm5lbiBTaWUgYml0dGUgZGllIEVpbnRyYWdzZWlnZW5zY2hhZnRlbi4='><source>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</source><target>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</target></trans-unit>
 <trans-unit id='SGlud2Vpcw=='><source>Hinweis</source><target>Hinweis</target></trans-unit>
+<trans-unit id='S2F0ZWdvcmllbg=='><source>Kategorien</source><target>Kategorien</target></trans-unit>
 <trans-unit id='Cjxici8+Cjxici8+PGI+QWNodHVuZzo8L2I+IEtvbmt1cnJpZXJlbmRlIEJlbnV0emVyOiBEZXIgZXJzdGUgQmVudXR6ZXIsIGRlciBlaW5lbiBKb2IgYW5uaW1tdCwgZsO8aHJ0IGVpbmVuIEpvYiBhdXMuIEFsbGVuIGFuZGVyZW4gd2lyZCBhdXRvbWF0aXNjaCBkaWUgQXVmZ2FiZSBlbnR6b2dlbi4KPGJyLz4='><source>
 <br/>
 <br/><b>Achtung:</b> Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.
