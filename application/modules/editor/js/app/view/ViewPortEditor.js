@@ -94,6 +94,8 @@ Ext.define('Editor.view.ViewPortEditor', {
               items:[{
             	  xtype: 'panel',
             	  cls: 'head-panel-brand',
+            	  maxHeight:150,
+            	  maxWidth:'100%',
             	  region: 'north',
             	  autoScroll:true,
             	  html: Editor.data.app.branding,
