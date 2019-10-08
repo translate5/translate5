@@ -333,18 +333,23 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
                 $item = new stdClass();
                 $item->name = $name;
                 $item->value = $found->{$name};
-                if($name == 'update_date') {
-                    $item->value = date('Y-m-d H:i:s T', strtotime($item->value));
-                }
-                if($name == 'tag') {
-                    $tagIds = $item->value;
-                    foreach ($tagIds as $tagId) {
-                        $this->categoriesModel->loadByOriginalCategoryId($tagId);
-                        $label = $this->categoriesModel->getLabel();
-                        $type = $this->categoriesModel->getSpecificData('type');
-                        $tags[] = $label.' ('.$tagId.', '.$type.')';
-                    }
-                    $item->value = $tags;
+                switch ($name) {
+                    case 'file_name':
+                        $item->value = $this->languageResource->getSpecificData('fileName');
+                        break;
+                    case 'tag':
+                        $tagIds = $item->value;
+                        foreach ($tagIds as $tagId) {
+                            $this->categoriesModel->loadByOriginalCategoryId($tagId);
+                            $label = $this->categoriesModel->getLabel();
+                            $type = $this->categoriesModel->getSpecificData('type');
+                            $tags[] = $label.' ('.$tagId.', '.$type.')';
+                        }
+                        $item->value = $tags;
+                        break;
+                    case 'update_date':
+                        $item->value = date('Y-m-d H:i:s T', strtotime($item->value));
+                        break;
                 }
                 $result[] = $item;
             }
