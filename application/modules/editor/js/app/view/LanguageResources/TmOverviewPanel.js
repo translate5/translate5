@@ -394,20 +394,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         }
         record.set('status',record.STATUS_LOADING);
         record.load();
-    },
-
-    /***
-     * Show import icon only for importable resources
-     */
-    showImport:function(record){
-    	return Ext.Array.contains(['OpenTM2','TermCollection'],record.get('serviceName'));
-    },
-    
-    /***
-     * Show download icon only for downloadable resources
-     */
-    showDownload:function(record){
-    	return Ext.Array.contains(['OpenTM2'],record.get('serviceName'));
     }
     
     

@@ -398,14 +398,8 @@ Ext.define('Editor.controller.TmOverview', {
     },
     handleImportTm : function(view, cell, cellIdx, rec){
         //find the import window from the service name
-        var importWindow='';
-        if(rec.get('serviceName')==Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME){
-            importWindow='importCollectionWindow';
-        }
-        if(rec.get('serviceName')==Editor.model.LanguageResources.Resource.OPENTM2_SERVICE_NAME){
-            importWindow='importTmWindow';
-        }
-        var win = Ext.widget(importWindow);
+        var importWindow = Editor.util.LanguageResources.getService(rec.get('serviceName')).getImportWindow(),
+            win = Ext.widget(importWindow);
         win.loadRecord(rec);
         win.show();
     },
@@ -446,25 +440,36 @@ Ext.define('Editor.controller.TmOverview', {
             proxy = rec.proxy,
             id = rec.getId(),
             url = proxy.getUrl(),
-            menu;
+            menu,
+            filetypes = Editor.util.LanguageResources.getService(rec.get('serviceName')).getValidFiletypes(),
+            createMenuItems = function() {
+                var items = [];
+                if (filetypes.indexOf('tm') !== -1) {
+                    items.push({
+                        itemId: 'exportTm',
+                        hrefTarget: '_blank',
+                        href: url+'/download.tm',
+                        text: me.strings.exportTm
+                    });
+                }
+                if (filetypes.indexOf('tmx') !== -1) {
+                    items.push({
+                        itemId: 'exportTmx',
+                        hrefTarget: '_blank',
+                        href: url+'/download.tmx',
+                        text : me.strings.exportTmx
+                    });
+                }
+                return items;
+            };
 
         if (!url.match(proxy.slashRe)) {
             url += '/';
         }
         url += encodeURIComponent(id);
 
-        menu = Ext.widget('menu', {
-            items: [{
-                itemId: 'exportTm',
-                hrefTarget: '_blank',
-                href: url+'/download.tm',
-                text: me.strings.exportTm
-            },{
-                itemId: 'exportTmx',
-                hrefTarget: '_blank',
-                href: url+'/download.tmx',
-                text : me.strings.exportTmx
-            }]    
+        menu = Ext.widget('menu', { 
+            items: createMenuItems()
         });
         menu.showAt(ev.getXY());
     },
