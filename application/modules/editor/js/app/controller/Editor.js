@@ -42,7 +42,8 @@ Ext.define('Editor.controller.Editor', {
     requires: [
         'Editor.view.segments.EditorKeyMap',
         'Editor.controller.editor.PrevNextSegment',
-        'Editor.view.task.ConfirmationWindow'
+        'Editor.view.task.ConfirmationWindow',
+        'Editor.util.Constants'
     ],
     mixins: ['Editor.util.Event',
         	 'Editor.util.Range'

@@ -181,12 +181,18 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             renderer: dateRenderer
         }));
         
+        
         //is the user allowed to edit the Edit100PercentMatch
         items.push(me.applyIfNotAllowed({
             xtype: 'checkbox',
             fieldLabel:me.strings.fullMatchLabel,
             name:'edit100PercentMatch',
-            itemId:'edit100PercentMatch'
+            itemId:'edit100PercentMatch',
+            listeners:{
+            	change:function(cb, newValue, oldValue, eOpts ){
+            		 me.lookupViewModel().get('currentTask').set('edit100PercentMatch',newValue);
+            	} 
+            }
         },'editorEditTaskEdit100PercentMatch',{
             xtype: 'displayfield',
             renderer: function(value, displayField) {

@@ -63,18 +63,6 @@ Ext.define('Editor.view.segments.Grid', {
     stateful: false,
     store: 'Segments',
     title: '#UT#Segmentliste und Editor',
-    tools: [
-        {
-            type: 'up',
-            itemId: 'headPanelUp'
-        },
-        {
-            type: 'down',
-            hidden: true,
-            itemId: 'headPanelDown'
-        }
-    ],
-    
     title_readonly: '#UT#Segmentliste und Editor - [LESEMODUS]',
     title_addition_unconfirmed: '#UT# - [AUFGABE UNBESTÄTIGT]',
     column_edited: '#UT#bearbeibar',    

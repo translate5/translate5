@@ -204,10 +204,23 @@ function checkSubLanguage(locale) {
  */
 function addLanguageToSelect(languageId,languageRfc5646) {
     var $langSel = $('#language'), 
-        selected, opts_list;
-    if ($("#language option[value='"+languageRfc5646+"']").length > 0) {
+        selected, opts_list,
+        langExist=false;
+    
+    //check if the given language exist as option in the sellect
+    $('#language option').each(function() {
+    	var allVals=$(this).val().split(',');
+    	if(langExist){
+    		return false;
+    	}
+    	langExist=$.inArray(languageId,allVals)!== -1;
+    });
+    
+    //do not add the language as option if the language exist as sellect
+    if (langExist) {
         return;
     }
+    
     $langSel.append('<option value="'+languageId+'">'+languageRfc5646+'</option>');
     // https://stackoverflow.com/a/26232541
     selected = $langSel.val();

@@ -60,12 +60,10 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         customers:'#UT#Für diese Kunden nutzen',
         useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
         mergeTerms:'#UT#Termeinträge verschmelzen',
-        deleteTermEntriesDate:'#UT#Termeinträge löschen älter als',
-        deleteTermEitriesImport:'#UT#Termeinträge löschen älter als aktueller Import',
         collection:'#UT#TBX-Datei',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!'
     },
-    height : 500,
+    height : 450,
     width : 500,
     modal : true,
     layout:'fit',
@@ -79,14 +77,6 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
 
     initConfig : function(instanceConfig) {
         var me = this,
-        langCombo = {
-                xtype: 'combo',
-                typeAhead: true,
-                displayField: 'label',
-                queryMode: 'local',
-                valueField: 'id'
-            },
-            config = {},
             defaults = {
                 labelWidth: 160,
                 anchor: '100%'
@@ -154,25 +144,6 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     itemId:'mergeTerms',
                     name:'mergeTerms',
                     value:true
-                },{
-                    xtype:'datefield',
-                    fieldLabel: me.strings.deleteTermEntriesDate,
-                    itemId:'deleteEntriesModifiedOlderThan',
-                    name:'deleteEntriesModifiedOlderThan',
-                    bind:{
-                        hidden:'{!isTermCollectionResource}',
-                        disabled:'{!isTermCollectionResource}'
-                    }
-                },{
-                    xtype:'checkbox',
-                    fieldLabel: me.strings.deleteTermEitriesImport,
-                    itemId:'deleteEntriesOlderThanCurrentImport',
-                    name:'deleteEntriesOlderThanCurrentImport',
-                    value:false,
-                    bind:{
-                        hidden:'{!isTermCollectionResource}',
-                        disabled:'{!isTermCollectionResource}'
-                    }
                 },{
                     xtype:'customers',
                     name:'resourcesCustomers',

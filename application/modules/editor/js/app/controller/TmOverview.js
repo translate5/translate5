@@ -46,13 +46,16 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.EditTmWindow',
         'Editor.view.LanguageResources.TaskGridWindow',
         'Editor.view.LanguageResources.ImportCollectionWindow',
-        'Editor.view.LanguageResources.ProposalExport'
+        'Editor.view.LanguageResources.log.LogWindow',
+        'Editor.view.LanguageResources.ProposalExport',
+        'Editor.view.LanguageResources.services.Default'
     ],
     models: ['Editor.model.admin.Task', 'Editor.model.LanguageResources.Resource','Editor.model.LanguageResources.LanguageResource'],
     stores:[
         'Editor.store.LanguageResources.Resources',
         'Editor.store.LanguageResources.LanguageResource',
-        'Editor.store.LanguageResources.SdlEngine'
+        'Editor.store.LanguageResources.SdlEngine',
+        'Editor.store.LanguageResources.Logs'
     ],
     strings: {
         languageresource: '#UT#Sprach-Resourcen',
@@ -164,6 +167,10 @@ Ext.define('Editor.controller.TmOverview', {
             name: 'taskassocs', type: 'auto', persist: false
         });
 
+        //add the default service interceptor instance
+        //this needs to be initialized here, since the service classes are used in the tmoverview panel
+        Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.Default'));
+        
         //define task to reload importing tasks
         me.checkImportingRecordsTask = Ext.TaskManager.newTask({
             run: function(){
@@ -372,6 +379,13 @@ Ext.define('Editor.controller.TmOverview', {
         form.reset();
         window.close();
     },
+    handleLogTm:function(view, cell, cellIdx, rec){
+        var win = Ext.widget('languageResourcesLogLogWindow',{
+        	languageResource:rec
+        });
+        win.show();
+        win.load();
+    },
     handleEditTm : function(view, cell, cellIdx, rec){
         var win = Ext.widget('editTmWindow');
         win.loadRecord(rec);
@@ -415,6 +429,9 @@ Ext.define('Editor.controller.TmOverview', {
                 break;
             case 'export':
                 me.handleExportProposalClick(view,cell,col,record);
+                break;
+            case 'log':
+                me.handleLogTm(view,cell,col,record);
                 break;
         }
     },
