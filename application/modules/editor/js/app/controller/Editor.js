@@ -808,13 +808,20 @@ Ext.define('Editor.controller.Editor', {
             ed = me.getEditPlugin(),
             rowMeta = me.prevNextSegment.getCalculated(),
             callback,
-            sel;
+            sel,
+            scrollMode=ed.self.STARTEDIT_MOVEEDITOR;
+        
+        //if the next segment is not visible, scroll the grid,
+        //if it is visible move the editor
+        if(!rowMeta.isNextVisible){
+        	scrollMode=ed.self.STARTEDIT_SCROLLUNDER;
+        }
         
         //if we have a nextSegment and it is rendered, bring into the view and open it
         if (rowMeta.rec && grid.getView().getNode(rowMeta.rec)) {
             selModel.select(rowMeta.rec);
             //REMIND here was startEdit defered with 300 millis, is this still needed?
-            ed.startEdit(rowMeta.rec, rowMeta.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
+            ed.startEdit(rowMeta.rec, rowMeta.lastColumn,scrollMode);
             return;
         }
 
@@ -823,7 +830,7 @@ Ext.define('Editor.controller.Editor', {
             callback = function() {
                 grid.selectOrFocus(rowMeta.idx);
                 sel = selModel.getSelection();
-                ed.startEdit(sel[0], rowMeta.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
+                ed.startEdit(sel[0], rowMeta.lastColumn,scrollMode);
             };
             grid.scrollTo(rowMeta.idx, {
                 callback: callback,
