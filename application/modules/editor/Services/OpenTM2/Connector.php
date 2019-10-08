@@ -227,7 +227,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $queryString = $this->getQueryString($segment);
         
         //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
-        if(empty($queryString)) {
+        if(empty($queryString) && $queryString !== "0") {
             return $this->resultList;
         }
         
@@ -263,9 +263,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 
                 $this->validateInternalTags($found, $segment);
                 
-                //check if the found source has invalid xml
-                if($xmlParser->isStringValidXml($found->target)){
-                    //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied, 
+                try {
+                    //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied,
                     // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
                     $target = $xmlParser->parse($found->target);
                     $target = $this->internalTag->reapply2dMap($target, $map);
@@ -278,27 +277,25 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                     $source = $this->internalTag->reapply2dMap($source, $map);
                     $source = $this->replaceAdditionalTags($source, $mapCount);
                     $this->resultList->setSource($source);
-                    
-                }else{
+                } catch (editor_Models_Import_FileParser_InvalidXMLException $e) {
                     //the source has invalid xml -> remove all tags from the result, and reduce the matchrate by 2%
                     $matchrate=$this->reduceMatchrate($found->matchRate,2);
                     $found->target=strip_tags($found->target);
                     $this->resultList->addResult($found->target, $matchrate, $this->getMetaData($found));
                 }
-                
-                //check if the source has invalid xml
-                if($xmlParser->isStringValidXml($found->source)){
+
+                try {
                     //about whitespace see target
                     $source = $xmlParser->parse($found->source);
                     $source = $this->internalTag->reapply2dMap($source, $map);
                     $source = $this->replaceAdditionalTags($source, $mapCount);
                     $this->resultList->setSource($source);
-                }else{
+                    
+                } catch (editor_Models_Import_FileParser_InvalidXMLException $e) {
+                    
                     //the source has invalid xml -> remove all tags
                     $this->resultList->setSource(strip_tags($found->source));
                 }
-                
-                
 
             }
             return $this->getResultListGrouped();
@@ -425,7 +422,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function translate(string $searchString){
         //return empty result when no search string
-        if(empty($searchString)) {
+        if(empty($searchString) && $searchString !== "0") {
             return $this->resultList;
         }
         

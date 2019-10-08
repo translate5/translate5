@@ -26,16 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TermCollection_TermEntry extends ZfExtended_Models_Validator_Abstract {
-  
-  /**
-   * Validators for Term Collection
-   */
-  protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible 
-    $this->addValidator('id', 'int');
-    $this->addValidator('collectionId', 'int');
-    $this->addValidator('groupId', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('isProposal', 'boolean');
-  }
+/**
+ * DB encapsulation class
+ */
+class editor_Models_Db_Logger_LanguageResources extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_languageresources_log';
+    public $_primary = 'id';
 }

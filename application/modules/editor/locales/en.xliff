@@ -3018,9 +3018,9 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Termeinträge verschmelzen</source>
     <target>Merge term entries</target>
 </trans-unit>
-<trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxz'>
-    <source>Termeinträge löschen älter als</source>
-    <target>Delete term entries older than</target>
+<trans-unit id='VGVybWUgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='>
+    <source>Terme löschen, deren letzte Berührung länger her ist als</source>
+    <target>Delete terms last touched longer ago than</target>
 </trans-unit>
 
 <trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxzIGFrdHVlbGxlciBJbXBvcnQ='>
@@ -3280,8 +3280,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Der referenzierte Kunde existiert nicht (mehr)﻿.</source>
     <target>The referenced customer does not exist (anymore).</target>
 </trans-unit>
-<trans-unit id='QW5zaWNodHNtb2R1cw=='>
-    <source>Ansichtsmodus</source>
+<trans-unit id='QW5zaWNodA=='>
+    <source>Ansicht</source>
     <target>View mode</target>
 </trans-unit>
 <trans-unit id='RXJlaWduaXNzZSB6dSBBdWZnYWJlICJ7MH0i'>
@@ -3377,7 +3377,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='VGVybWlub2xvZ2llcG9ydGFsLVNwcmFjaGVu'><source>Terminologieportal-Sprachen</source><target>TermPortal-languages</target></trans-unit>
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>All languages available</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Saving the term will also create a new entry for</target></trans-unit>
-<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscw=='><source>Vorschläge löschen älter als</source><target>Delete proposals older than</target></trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Vorschläge löschen, deren letzte Berührung länger her ist als</source><target>Delete proposals last touched longer ago than</target></trans-unit>
 <trans-unit id='VGVybTogVm9yc2NobGFnIGzDtnNjaGVu'><source>Term: Vorschlag löschen</source><target>Term: Delete proposal</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIFRlcm0='><source>Änderung zu bestehendem Term</source><target>Change to existing term</target></trans-unit>
 <trans-unit id='UHJvemVzcy1TdGF0dXM='><source>Prozess-Status</source><target>Prozess status</target></trans-unit>
@@ -3411,6 +3411,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Excel hochladen</source>
     <target>Upload excel</target>
 </trans-unit>
+<trans-unit id='TG9n'><source>Log</source><target>Log</target></trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIFdhcm51bmcgenUgQXVmZ2FiZQ=='>
     <source>Translate5 - Warnung zu Aufgabe</source>
     <target>Translate5 - Warning to task</target>
@@ -3527,6 +3528,8 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <target>None</target>
 </trans-unit>
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Delete proposals older than current import</target></trans-unit>
+<trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Log out</target></trans-unit>
     </body>
   </file>
 </xliff>

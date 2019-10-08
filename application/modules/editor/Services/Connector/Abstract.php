@@ -211,7 +211,7 @@ abstract class editor_Services_Connector_Abstract {
         //1. organizational preparation
         $qs = $this->getQueryString($segment);
         $this->resultList->setDefaultSource($qs);
-        if(empty($qs)) {
+        if(empty($qs) && $qs !== "0") {
             return $qs;
         }
         

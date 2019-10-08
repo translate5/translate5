@@ -25,17 +25,17 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-class editor_Models_Validator_TermCollection_TermEntry extends ZfExtended_Models_Validator_Abstract {
-  
-  /**
-   * Validators for Term Collection
-   */
-  protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible 
-    $this->addValidator('id', 'int');
-    $this->addValidator('collectionId', 'int');
-    $this->addValidator('groupId', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('isProposal', 'boolean');
-  }
+/**
+ * Should be used for errors in the context of tbx import processing
+ */
+class editor_Models_Import_TermListParser_Exception extends ZfExtended_ErrorCodeException {
+    /**
+     * @var string
+     */
+    protected $origin = 'import.termlistparser';
+    
+    static protected $localErrorCodes = [
+        'E1023' => 'Unable to read the provided tbx file {filename}',
+        'E1028' => '{message}. \n Term collection name: {name}'
+    ];
 }

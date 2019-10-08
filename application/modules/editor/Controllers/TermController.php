@@ -150,6 +150,7 @@ class editor_TermController extends ZfExtended_RestController {
             /* @var $entry editor_Models_TermCollection_TermEntry */
             $entry->setCollectionId($this->data->collectionId);
             $entry->setGroupId($this->_helper->guid->create());
+            $entry->setIsProposal(true);
             $entry->save();
             
             //update or create the term entry creation/modification attributes
@@ -249,6 +250,7 @@ class editor_TermController extends ZfExtended_RestController {
             
             $entry->setCollectionId($this->data->collectionId);
             $entry->setGroupId($this->_helper->guid->create());
+            $entry->setIsProposal(true);
             $entry->setId($entry->save());
             
             $this->entity->setTermEntryId($entry->getId());
@@ -474,21 +476,18 @@ class editor_TermController extends ZfExtended_RestController {
         $term->setUpdated(null);
         $term->setId($term->save());
         
-        //create or update or create the term transac group attributes
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
-
+        //check or create the term processStatus attribute
         $attribute->checkOrCreateProcessStatus($term->getId());
-        
         
         //if the term is added from the instant transalte MT engine, set the default comment
         if($this->data->isTermProposalFromInstantTranslate){
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
             $attribute->addTermComment($term->getId(), $translate->_("Aus MT übernommen"));
         }
-        
+        //create or update or create the term transac group attributes
         $attribute->handleTransacGroup($term);
-        $attribute->checkOrCreateProcessStatus($term->getId());
     }
     
     /**

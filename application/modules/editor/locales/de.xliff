@@ -1421,7 +1421,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='VEJYIERhdGVpIGltcG9ydGllcmVu'><source>TBX Datei importieren</source><target>TBX Datei importieren</target></trans-unit>
 <trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gZXJmb2xncmVpY2ggaW1wb3J0aWVydCE='><source>Weitere Term-Collection Daten erfolgreich importiert!</source><target>Weitere Term-Collection Daten erfolgreich importiert!</target></trans-unit>
 <trans-unit id='VGVybWVpbnRyw6RnZSB2ZXJzY2htZWx6ZW4='><source>Termeinträge verschmelzen</source><target>Termeinträge verschmelzen</target></trans-unit>
-<trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxz'><source>Termeinträge löschen älter als</source><target>Termeinträge löschen älter als</target></trans-unit>
+<trans-unit id='VGVybWUgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Terme löschen, deren letzte Berührung länger her ist als</source><target>Terme löschen, deren letzte Berührung länger her ist als</target></trans-unit>
 <trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxzIGFrdHVlbGxlciBJbXBvcnQ='><source>Termeinträge löschen älter als aktueller Import</source><target>Termeinträge löschen älter als aktueller Import</target></trans-unit>
 <trans-unit id='SW5mbyB6dW0gVGVybS1Db2xsZWN0aW9u'><source>Info zum Term-Collection</source><target>Info zum Term-Collection</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRtw6Rzc2lnIGFrdGl2IGbDvHI='><source>Standardmässig aktiv für</source><target>Standardmässig aktiv für</target></trans-unit>
@@ -1478,7 +1478,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='RGllIFp1d2Vpc3VuZyB6d2lzY2hlbiBBdWZnYWJlIHVuZCBCZW51dHplciBrYW5uIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIGRhIGRpZSBBdWZnYWJlIGR1cmNoIGRlbiBCZW51dHplciBnZXNwZXJydCBpc3Qu'><source>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.</source><target>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.</target></trans-unit>
 <trans-unit id='RGllc2UgS3VuZGVubnVtbWVyIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'><source>Diese Kundennummer wird bereits verwendet.</source><target>Diese Kundennummer wird bereits verwendet.</target></trans-unit>
 <trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKe+7vy4='><source>Der referenzierte Kunde existiert nicht (mehr)﻿.</source><target>Der referenzierte Kunde existiert nicht (mehr)﻿.</target></trans-unit>
-<trans-unit id='QW5zaWNodHNtb2R1cw=='><source>Ansichtsmodus</source><target>Ansichtsmodus</target></trans-unit>
+<trans-unit id='QW5zaWNodA=='><source>Ansicht</source><target>Ansicht</target></trans-unit>
 <trans-unit id='VW5iZWthbm50ZXIgVGVybSBTdGF0dXM='><source>Unbekannter Term Status</source><target>Unbekannter Term Status</target></trans-unit>
 <trans-unit id='RXJzdGVsbHVuZw=='><source>Erstellung</source><target>Erstellung</target></trans-unit>
 <trans-unit id='RWludHLDpGdl'><source>Einträge</source><target>Einträge</target></trans-unit>
@@ -1573,7 +1573,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>TermProposer</target></trans-unit>
 <trans-unit id='T3BlbklkIElzc3Vlcg=='><source>OpenId Issuer</source><target>OpenId Issuer</target></trans-unit>
 <trans-unit id='SsO8bmdlciBhbHMgb2RlciBnbGVpY2g='><source>Jünger als oder gleich</source><target>Jünger als oder gleich</target></trans-unit>
-<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscw=='><source>Vorschläge löschen älter als</source><target>Vorschläge löschen älter als</target></trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Vorschläge löschen, deren letzte Berührung länger her ist als</source><target>Vorschläge löschen, deren letzte Berührung länger her ist als</target></trans-unit>
 <trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IGFwcGVhciB0byBiZSBhbiBpbnRlZ2Vy'><source>'%value%' does not appear to be an integer</source><target>'%value%' does not appear to be an integer</target></trans-unit>
 
 <trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIFRlcm0='><source>Änderung zu bestehendem Term</source><target>Änderung zu bestehendem Term</target></trans-unit>
@@ -1590,6 +1590,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='RXJsYXVidCBpc3QgaGllciBudXIgZGFzIEhvY2hsYWRlbiB2b24gKi54bHN4LURhdGVpZW4gLg=='><source>Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .</source><target>Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .</target></trans-unit>
 <trans-unit id='RGF0ZWkgd2lyZCBob2NoZ2VsYWRlbg=='><source>Datei wird hochgeladen</source><target>Datei wird hochgeladen</target></trans-unit>
 <trans-unit id='RXhjZWwgaG9jaGxhZGVu'><source>Excel hochladen</source><target>Excel hochladen</target></trans-unit>
+<trans-unit id='TG9n'><source>Log</source><target>Log</target></trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIFdhcm51bmcgenUgQXVmZ2FiZQ=='><source>Translate5 - Warnung zu Aufgabe</source><target>Translate5 - Warnung zu Aufgabe</target></trans-unit>
 <trans-unit id='e2hlYWRlcn0KSW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gZ2FiIGVzIHp1IG5hY2hmb2xnZW5kZXIgQXVmZ2FiZSBmb2xnZW5kZSBXYXJudW5nOiA8YnIgLz4KPGJyIC8+CjxiPldhcm51bmc6PC9iPiB7d2FybmluZ308YnIgLz4KPGI+Q29kZTo8L2I+IHtjb2RlfTxiciAvPgo8Yj5CZXJlaWNoOjwvYj4ge2RvbWFpbn08YnIgLz4KV2VpdGVyZSBJbmZvcm1hdGlvbmVuIGZpbmRlbiBzaWNoIGluIGRlciBBbndlbmR1bmcgaW4gZGVuIEF1ZmdhYmVuZWlnZW5zY2hhZnRlbiBpbSBSZWl0ZXIgRXJlaWduaXNzZS4gPGJyIC8+PGJyIC8+Cnt0YXNrRnJhZ21lbnR9e2Zvb3Rlcn0='><source>{header}
 Im Projektportal {portalLink} gab es zu nachfolgender Aufgabe folgende Warnung: <br />
@@ -1649,6 +1650,8 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='a2VpbmUgQW5nYWJl'><source>keine Angabe</source><target>keine Angabe</target></trans-unit>
 <trans-unit id='T2huZQ=='><source>Ohne</source><target>Ohne</target></trans-unit>
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Sehr geehrte(r)</target></trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Vorschläge löschen älter als aktueller Import</target></trans-unit>
+<trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Ausloggen</target></trans-unit>
   </body>
  </file>
 </xliff>

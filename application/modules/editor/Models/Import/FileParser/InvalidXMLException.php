@@ -26,16 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TermCollection_TermEntry extends ZfExtended_Models_Validator_Abstract {
-  
-  /**
-   * Validators for Term Collection
-   */
-  protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible 
-    $this->addValidator('id', 'int');
-    $this->addValidator('collectionId', 'int');
-    $this->addValidator('groupId', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('isProposal', 'boolean');
-  }
+/**
+ *
+ */
+class editor_Models_Import_FileParser_InvalidXMLException extends ZfExtended_ErrorCodeException {
+    /**
+     * @var string
+     */
+    protected $origin = 'import.fileparser';
+    
+    static protected $localErrorCodes = [
+        'E1024'=>'Invalid XML: expected closing "{closingTag}" tag, but got tag "{receivedTag}". Opening tag was: {openingTag}'
+    ];
 }

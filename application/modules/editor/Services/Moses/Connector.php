@@ -100,7 +100,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
      * @return editor_Services_ServiceResult
      */
     protected function queryMosesApi($searchString, $reimportWhitespace = false){
-        if(empty($searchString)) {
+        if(empty($searchString) && $searchString !== "0") {
             return $this->resultList;
         }
         $res = $this->languageResource->getResource();
@@ -118,7 +118,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
         
         $res = $this->sendToProxy($proxy, $params);
         
-        if(!empty($res['text'])){
+        if(!(empty($res['text']) && $res['text'] !== "0")){
             $res['text'] = str_replace(array('\[','\]'), array('[',']'), $res['text']);
             if($reimportWhitespace) {
                 $res['text'] = $this->importWhitespaceFromTagLessQuery($res['text']);

@@ -131,7 +131,7 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.Grid.prototype.target_original = ' <?php echo $this->translate->_('(zur Importzeit)');?>';
   	
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
-  	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansichtsmodus');?>';
+  	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansicht');?>';
   	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Details (nur Lesemodus)');?>';
   	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Details');?>';
   	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Normal');?>';
@@ -149,6 +149,8 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_clearSortAndFilterTooltip = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>';
   	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Lesezeichen');?>';
   	gridToolbar.item_helpTooltip = '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>';
+  	gridToolbar.item_logoutheaderbtn = '<?php echo $this->translate->_('Ausloggen');?>';
+  	gridToolbar.item_leavetaskheaderbtn = '<?php echo $this->translate->_('Aufgabe verlassen');?>';
     
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
 
@@ -230,7 +232,13 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.controller.ViewModes", {
         override: "Editor.controller.ViewModes",
-        messageIsViewMode: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.');?>'
+        messageIsViewMode: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.');?>',
+        strings:{
+            leaveTaskWindowTitle: '<?php echo $this->translate->_('Zurück zur Aufgabeliste');?>',
+            leaveTaskWindowMessage: '<?php echo $this->translate->_('Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?');?>',
+            leaveTaskWindowFinishBtn: '<?php echo $this->translate->_('Fertig und Aufgabe beenden');?>',
+            leaveTaskWindowCancelBtn: '<?php echo $this->translate->_('Aufgabe später weiterbearbeiten');?>'
+        }
     });
   	
   	Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
@@ -526,6 +534,12 @@ Ext.define('Editor.controller.Localizer', {
     	}
     });
     
+    
+    Ext.define("Editor.locale.de.view.LanguageResources.log.LogWindow", {
+        override: "Editor.view.LanguageResources.log.LogWindow",
+        title: '<?php echo $this->translate->_('Ereignisse zu Sprachresource "{0}"');?>'
+    });
+    
     Ext.define("Editor.locale.de.view.admin.task.TaskAttributes", {
         override: "Editor.view.admin.task.TaskAttributes",
         title: '<?php echo $this->translate->_('Eigenschaften');?>',
@@ -779,6 +793,7 @@ Ext.define('Editor.controller.Localizer', {
             noIndexFound: '<?php echo $this->translate->_('Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.');?>',
             searchAndReplaceMenuItem: '<?php echo $this->translate->_('Suchen und ersetzen');?>',
             replaceAllErrors: '<?php echo $this->translate->_('Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.');?>',
+            searchReplaceToolbarBtn: '<?php echo $this->translate->_('Suche');?>'
         }
     });
     
@@ -838,6 +853,16 @@ Ext.define('Editor.controller.Localizer', {
             history: '<?php echo $this->translate->_('HISTORY');?>',
             notrackchangesplugin: '<?php echo $this->translate->_('TrackChanges found, but Plugin is not activated.');?>',
             severity: '<?php echo $this->translate->_('Gewichtung');?>'
+        }
+    });
+    
+     Ext.define("Editor.locale.view.ApplicationInfoPanel", {
+        override: "Editor.view.ApplicationInfoPanel",
+        strings: {
+            task: '<?php echo $this->translate->_('Aufgabe');?>',
+            loggedinAs: '<?php echo $this->translate->_(' Eingeloggter Benutzer');?>',
+            loginName: '<?php echo $this->translate->_(' Loginname');?>',
+            readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
         }
     });
     
@@ -1225,8 +1250,6 @@ Ext.define('Editor.controller.Localizer', {
             useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
             customers: '<?php echo $this->translate->_('Für diese Kunden nutzen');?>',
             mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
-            deleteTermEntriesDate:'<?php echo $this->translate->_('Termeinträge löschen älter als');?>',
-            deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
             collection: '<?php echo $this->translate->_('TBX-Datei');?>',
             importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
         }
@@ -1299,7 +1322,8 @@ Ext.define('Editor.controller.Localizer', {
 
     Ext.define("Editor.locale.view.LanguageResources.services.Default", {
         override: "Editor.view.LanguageResources.services.Default",
-        exportTooltip: '<?php echo $this->translate->_('Exportieren');?>'
+        exportTooltip: '<?php echo $this->translate->_('Exportieren');?>',
+        log: '<?php echo $this->translate->_('Log');?>'
     });
     
     Ext.define("Editor.locale.view.LanguageResources.services.OpenTM2", {
@@ -1334,10 +1358,11 @@ Ext.define('Editor.controller.Localizer', {
             save: '<?php echo $this->translate->_('Importieren');?>',
             cancel: '<?php echo $this->translate->_('Abbrechen');?>',
             mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
-            deleteTermEntriesDate:'<?php echo $this->translate->_('Termeinträge löschen älter als');?>',
+            deleteTermEntriesDate:'<?php echo $this->translate->_('Terme löschen, deren letzte Berührung länger her ist als');?>',
             deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
             helpButtonTooltip:'<?php echo $this->translate->_('Info zum Term-Collection');?>',
-            deleteTermProposals:'<?php echo $this->translate->_('Vorschläge löschen älter als');?>'
+            deleteTermProposalsDate:'<?php echo $this->translate->_('Vorschläge löschen, deren letzte Berührung länger her ist als');?>',
+            deleteTermProposalsImport:'<?php echo $this->translate->_('Vorschläge löschen älter als aktueller Import');?>'
         }
     });
     

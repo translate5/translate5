@@ -194,7 +194,7 @@ class editor_Models_Import_UploadProcessor {
         return $args;
     }
     
-    /**
+     /**
      * Adds an upload error
      * @see editor_Models_Import_UploadProcessor::throwOnUploadError
      * @param string $errorType

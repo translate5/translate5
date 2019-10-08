@@ -27,11 +27,17 @@ END LICENSE AND COPYRIGHT
 */
 
 
-//used to calculate the base url from the request
-$http=ZfExtended_Factory::get('Zend_Controller_Request_Http');
-/* @var $http Zend_Controller_Request_Http */
-
-$portal =(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] .$http->getBaseUrl().'/';
+//check if there is customer domain defined for the user
+//and use it as portal link in the mail
+//otherwise use the defined domain in the zf config as portal link
+$currentDomain=$_SERVER['HTTP_HOST'].APPLICATION_RUNDIR.'/';
+$user=ZfExtended_Factory::get('ZfExtended_Models_User');
+/* @var $user ZfExtended_Models_User */
+$costomerId=$user->isValidCustomerDomain($this->receiver->userGuid, $currentDomain);
+if(!$costomerId){
+    $currentDomain=$this->config->runtimeOptions->server->name.APPLICATION_RUNDIR;
+}
+$portal = $this->config->runtimeOptions->server->protocol.$currentDomain;
 
 $salutation=$this->translate->_('Sehr geehrte(r)');
 if($this->receiver->gender == 'f'){

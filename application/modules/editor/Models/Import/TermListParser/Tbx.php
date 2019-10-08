@@ -121,13 +121,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     
     
     /***
-     * Term collection id
-     * 
-     * @var integer
-     */
-    public $termCollectionId;
-    
-    /***
      * The actual term entry id from the lek_term_entry table
      * 
      * @var int
@@ -269,6 +262,21 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     public $importSource="";
     
     /***
+     * @var editor_Models_TermCollection_TermCollection
+     */
+    protected $termCollection;
+    
+    /***
+     * @var $logger ZfExtended_Logger 
+     */ 
+    protected $logger;
+    
+    /**
+     * @var Zend_Config
+     */
+    protected $config;
+
+	/***
      * 
      * @var ZfExtended_Models_User
      */
@@ -279,7 +287,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             //Mindestversion siehe http://www.php.net/manual/de/xmlreader.readstring.php
             throw new Zend_Exception('LIBXML_VERSION must be at least 2.6.20 (or as integer 20620).');
         }
+        $this->config = Zend_Registry::get('config');
+        
+        //init the logger (this will write in the language resources log and in the main log)
+        $this->logger=Zend_Registry::get('logger');
         $this->user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        $this->termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
     }
 
     /**
@@ -305,21 +318,19 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         
         //create term collection for the task and customer
         //the term collection will be created with autoCreateOnImport flag
-        $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        
-        $this->termCollectionId = $termCollection->create("Term Collection for ".$this->task->getTaskName(), $this->customerIds);
+        $this->termCollection->create("Term Collection for ".$this->task->getTaskName(), $this->customerIds);
         
         //add termcollection to task assoc
-        $termCollection->addTermCollectionTaskAssoc($this->termCollectionId, $task->getTaskGuid());
+        $this->termCollection->addTermCollectionTaskAssoc($this->termCollection->getId(), $task->getTaskGuid());
         
         //all tbx files in the same term collection
         foreach($tbxfiles as $file) {
-            
-            if(! $file->isReadable()){
-                throw new ZfExtended_Exception($file.' is not Readable!');
+            if(!$file->isReadable()){
+                throw new editor_Models_Import_TermListParser_Exception('E1023',[
+                    'filename'=>$file,
+                    'languageResource'=>$this->termCollection
+                ]);
             }
-            
             $this->task->setTerminologie(1);
             
             //languages welche aus dem TBX importiert werden sollen
@@ -327,7 +338,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             $this->languages[$meta->getTargetLang()->getId()] = $this->normalizeLanguage($meta->getTargetLang()->getRfc5646());
            
             //start with file parse
-            $this->parseTbxFile([$file->getPathname()],$this->termCollectionId);
+            $this->parseTbxFile([$file->getPathname()],$this->termCollection->getId());
 
             //check if the languages in the task are valid for the term collection
             $this->validateTbxLanguages();
@@ -347,6 +358,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         //if something is wrong with the fileparse,
         try {
             foreach ($filePath as $path){
+                $this->termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+                $this->termCollection->load($termCollectionId);
                 
                 $tmpName = $path['tmp_name'] ?? $path;
                 $fileName = $path['name'] ?? null;
@@ -354,8 +367,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $this->xml = new XmlReader();
                 //$this->xml->open(self::getTbxPath($task));
                 $this->xml->open($tmpName, null, LIBXML_PARSEHUGE);
-                
-                $this->termCollectionId=$termCollectionId;
                 
                 //Bis zum ersten TermEntry springen und alle TermEntries verarbeiten.
                 while($this->fastForwardTo('termEntry')) {
@@ -372,7 +383,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $this->updateCollectionLanguage();
             }
         }catch (Exception $e){
-            error_log("Something went wrong with tbx file parsing. Error message:".$e->getMessage());
+            $this->logger->exception($e,[
+                'level'=>ZfExtended_Logger::LEVEL_ERROR,
+                'extra'=>[
+                    'languageResource'=>$this->termCollection
+                ]
+            ]);
             return false;
         }
         
@@ -452,7 +468,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         /* @var $termEntry editor_Models_TermCollection_TermEntry */
         //check if the termEntry exist in the current collection
 
-        $existingEntry=$termEntry->getTermEntryByIdAndCollection($this->actualTermEntry,$this->termCollectionId);
+        $existingEntry=$termEntry->getTermEntryByIdAndCollection($this->actualTermEntry,$this->termCollection->getId());
         
         
         if($existingEntry && $existingEntry['id']>0){
@@ -630,7 +646,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $langModel->loadByRfc5646($this->actualLang);
                 $this->actualLangId=$langModel->getId();
             } catch (ZfExtended_Models_Entity_NotFoundException$e) {
-                error_log("Unable to imprt terms in this language set. Invalid Rfc5646 language code. Language code:".$this->actualLang);
+                $this->log("Unable to imprt terms in this language set. Invalid Rfc5646 language code. Language code:".$this->actualLang);
                 while($this->xml->read() && $this->xml->name !== 'langSet'){}
             }
         }
@@ -939,7 +955,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             return false;
         }
         
-        error_log("Unsupported tag found during the tbx parsing:#Tag name:".$this->xml->name.'#Term collection id:'.$this->termCollectionId.'#');
+        $this->log("Unsupported tag found during the tbx parsing:#Tag name:".$this->xml->name.'#Term collection id:'.$this->termCollection->getId().'#');
     }
     
     /***
@@ -998,6 +1014,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $attribute->setInternalCount($internalCount);
         $attribute->saveOrUpdate();
         
+        //if it is procesStatuss attribute, update the term procesStatuss value
+        if($attribute->isProcessStatusAttribute()){
+            $this->termContainer['processStatus']=$attribute->getValue();
+        }
+        
         //add the inserted/update attribute to the collection
         $this->termAttirbuteContainer[]=$attribute->getId();
         return $attribute;
@@ -1014,7 +1035,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     protected function getAttributeObject($parentId){
         $attribute = ZfExtended_Factory::get('editor_Models_Term_Attribute');
         
-        $attribute->setCollectionId($this->termCollectionId);
+        $attribute->setCollectionId($this->termCollection->getId());
         
         $attribute->setLanguage($this->actualLang);
         if(!$parentId){
@@ -1120,11 +1141,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         return ($this->xml->nodeType === XmlReader::ELEMENT);
     }
 
-    protected function log($logMessage) {
-        $msg = $logMessage.'. Task: '.$this->task->getTaskGuid();
-        /* @var $log ZfExtended_Log */
-        $log = ZfExtended_Factory::get('ZfExtended_Log');
-        $log->logError($msg);
+    protected function log($logMessage,$code='E1028') {
+        $data=[
+            'languageResource'=>$this->termCollection
+        ];
+        if(!empty($this->task)){
+            $data['task']=$this->task;
+        }
+        $this->logger->info($code,$logMessage,$data);
     }
     
     private function getIdTermEntry() {
@@ -1180,7 +1204,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         //actualTermEntry
         $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
         /* @var $termEntry editor_Models_TermCollection_TermEntry */
-        $termEntry->setCollectionId($this->termCollectionId);
+        $termEntry->setCollectionId($this->termCollection->getId());
         $termEntry->setGroupId($this->actualTermEntry);
         $termEntry->save();
         return $termEntry->getId();
@@ -1212,7 +1236,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     private function handleTermDb(){
         $term=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
-        $terms=$term->isUpdateTermForCollection($this->actualTermEntry,$this->actualTermIdTbx,$this->termCollectionId);
+        $terms=$term->isUpdateTermForCollection($this->actualTermEntry,$this->actualTermIdTbx,$this->termCollection->getId());
         
         //if term is found(should return single row since termId is unique)
         if($terms->count()>0){
@@ -1229,8 +1253,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             }
         }
         //check if the term with the same termEntry,collection but different termId exist
-        $tmpTermValue=$term->getRestTermsOfGroup($this->actualTermEntry, $this->actualTermIdTbx, $this->termCollectionId);
         
+        $tmpTermValue=$term->getRestTermsOfGroup($this->actualTermEntry, $this->actualTermIdTbx, $this->termCollection->getId());
+
         $addNewTerm=$tmpTermValue->count()>0;
         if($addNewTerm){
 
@@ -1257,7 +1282,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         
         if($this->mergeTerms){
             //check if the term text exist in the term collection within the language
-            $tmpTermValue=$term->findTermInCollection($this->xml->readInnerXml(), $this->actualLangId, $this->termCollectionId);
+            $tmpTermValue=$term->findTermInCollection($this->xml->readInnerXml(), $this->actualLangId, $this->termCollection->getId());
 
             if($tmpTermValue && $tmpTermValue->count()>0){
                 
@@ -1286,7 +1311,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             //the status will be updated when is found from the termNote
             $this->termContainer['definition']=$this->actualDefinition;
             $this->termContainer['language']=(int)$this->actualLangId;
-            $this->termContainer['collectionId']=$this->termCollectionId;
+            $this->termContainer['collectionId']=$this->termCollection->getId();
             $this->termContainer['updated']=date("Y-m-d H:i:s");
             $this->termContainer['userGuid']=$this->user->getUserGuid();
             $this->termContainer['userName']=$this->user->getUserName();
@@ -1309,7 +1334,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $this->termContainer['definition']=$this->actualDefinition;
         $this->termContainer['groupId']=$this->actualTermEntry;
         $this->termContainer['language']=(int)$this->actualLangId;
-        $this->termContainer['collectionId']=$this->termCollectionId;
+        $this->termContainer['collectionId']=$this->termCollection->getId();
         $this->termContainer['termEntryId']=$this->actualTermEntryIdDb;
         $this->termContainer['updated']=date("Y-m-d H:i:s");
         $this->termContainer['userGuid']=$this->user->getUserGuid();
@@ -1328,11 +1353,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         
         $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
-        $collLangs=$collection->getLanguagesInTermCollections(array($this->termCollectionId));
+        $collLangs=$collection->getLanguagesInTermCollections(array($this->termCollection->getId()));
         
         //disable terminology when no terms for the term collection are available
         if(empty($collLangs)){
-            error_log("Terminologie is disabled because no terms in the termcollection are found. TermcollectionId: ".$this->termCollectionId);
+            $this->log("Terminologie is disabled because no terms in the termcollection are found. TermcollectionId: ".$this->termCollection->getId());
             $this->task->setTerminologie(0);
             return false;
         }
@@ -1352,7 +1377,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             return true;
         }
 
-        error_log('For the following languages no term has been found in the tbx file: '.implode(', ', $notProcessed));
+        $this->log('For the following languages no term has been found in the tbx file: '.implode(', ', $notProcessed));
         $this->task->setTerminologie(0);
         return false;
     }
@@ -1364,12 +1389,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         //remove old language assocs
         $assoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
         /* @var $assoc editor_Models_LanguageResources_Languages */
-        $assoc->removeByResourceId([$this->termCollectionId]);
+        $assoc->removeByResourceId([$this->termCollection->getId()]);
         
         //add the new language assocs
         $model=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $model editor_Models_Term */
-        $model->updateAssocLanguages([$this->termCollectionId]);
+        $model->updateAssocLanguages([$this->termCollection->getId()]);
         
     }
     
@@ -1385,7 +1410,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $proposal=ZfExtended_Factory::get('editor_Models_Term_Proposal');
         /* @var $proposal editor_Models_Term_Proposal */
         
-        $proposalInCollection=$proposal->findProposalInCollection($this->termContainer['term'], $this->termContainer['language'], $this->termCollectionId);
+        $proposalInCollection=$proposal->findProposalInCollection($this->termContainer['term'], $this->termContainer['language'], $this->termCollection->getId());
         if($proposalInCollection->count()<1){
             return false;
         }
@@ -1417,21 +1442,21 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         }
         
         $tbxImportDirectoryPath=APPLICATION_PATH.'/../data/tbx-import/';
-        $newFilePath=$tbxImportDirectoryPath.'tbx-for-'.$this->importSource.'-import/tc_'.$this->termCollectionId;
+        $newFilePath=$tbxImportDirectoryPath.'tbx-for-'.$this->importSource.'-import/tc_'.$this->termCollection->getId();
         
         //check if the directory exist and it is writable
         if(is_dir($tbxImportDirectoryPath) && !is_writable($tbxImportDirectoryPath)){
-            error_log("Unable to save the tbx file to the tbx import path. The file is not writable. Import path: ".$tbxImportDirectoryPath." , termcollectionId: ".$this->termCollectionId);
+            $this->log("Unable to save the tbx file to the tbx import path. The file is not writable. Import path: ".$tbxImportDirectoryPath." , termcollectionId: ".$this->termCollection->getId());
             return;
         }
         
         try {
             if(!file_exists($newFilePath) && !@mkdir($newFilePath, 0777, true)){
-                error_log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$this->termCollectionId);
+                $this->log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$this->termCollection->getId());
                 return;
             }
         } catch (Exception $e) {
-            error_log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$this->termCollectionId);
+            $this->log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$this->termCollection->getId());
             return;
         }
         

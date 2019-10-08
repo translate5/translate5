@@ -33,6 +33,8 @@ END LICENSE AND COPYRIGHT
  * @method void setGroupId() setGroupId(string $groupId)
  * @method integer getCollectionId() getCollectionId()
  * @method void setCollectionId() setCollectionId(integer $id)
+ * @method boolean getIsProposal() getIsProposal()
+ * @method void setIsProposal() setIsProposal(boolean $isProposal)
  */
 class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermEntry';
@@ -107,14 +109,19 @@ class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Ab
      * 
      * @param int $collectionId
      * @param string $olderThan
+     * @param boolean $removeProposal
      * @return boolean : true if rows are removed
      */
-    public function removeOlderThan($collectionId, $olderThan){
+    public function removeOlderThan($collectionId, $olderThan,$removeProposal=false){
         //find all modefied entries older than $olderThan date
         //the query will find the lates modefied term entry attribute, if the term entry attribute update date is older than $olderThan, remove the termEntry
         $collectionId = (int) $collectionId;
+        $entryType=[0];
+        if($removeProposal){
+            $entryType[]=1;
+        }
     //FIXME testen ob die methode das macht was sie soll
-        return $this->db->delete(['id IN (SELECT t.termEntryId
+        return $this->db->delete([' isProposal IN('.implode(',', $entryType).') AND id IN (SELECT t.termEntryId
             	FROM LEK_term_attributes t
             	INNER JOIN (SELECT termEntryId, MAX(updated) as MaxDate FROM LEK_term_attributes WHERE termId is null AND collectionId = '.$collectionId.' GROUP BY termEntryId)
             	tm ON t.termEntryId = tm.termEntryId AND t.updated = tm.MaxDate
