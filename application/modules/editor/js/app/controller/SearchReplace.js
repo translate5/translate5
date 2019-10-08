@@ -1251,7 +1251,7 @@ Ext.define('Editor.controller.SearchReplace', {
             results=activeTabViewModel.get('result'),
             saveCurrentOpen=activeTab.down('#saveCurrentOpen').checked,
             searchTopChekbox=activeTab.down('#searchTopChekbox').checked,
-            indexBoundaries=me.getVisibleRowIndexBoundaries(grid),
+            indexBoundaries=grid.getVisibleRowIndexBoundaries(),
             goToIndex=null,
             goToIndexEdited=null,
             tmpRowNumber=null,
@@ -1618,33 +1618,6 @@ Ext.define('Editor.controller.SearchReplace', {
             }
             createNew && this.handleSearchReplaceHotkey(null);
         }
-    },
-    
-    /***
-     * Return visible row indexes in segment grid
-     * @param {Object} segment grid
-     * @returns {Object} { top:topIndex, bottom:bottomIndex }
-     */
-    getVisibleRowIndexBoundaries:function(grid){
-        var view=grid.getView(),
-            vTop = view.el.getTop(),
-            vBottom = view.el.getBottom(),
-            top=-1, bottom=-1;
-
-
-        Ext.each(view.getNodes(), function (node) {
-            if (top<0 && Ext.fly(node).getBottom() > vTop) {
-                top=view.indexOf(node);
-            }
-            if (Ext.fly(node).getTop() < vBottom) {
-                bottom = view.indexOf(node);
-            }
-        });
-
-        return {
-            top:top,
-            bottom:bottom,
-        };
     },
     
     /***

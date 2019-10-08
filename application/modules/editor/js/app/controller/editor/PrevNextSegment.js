@@ -104,7 +104,8 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
             ret = {
                 nextEditable: null,
                 nextEditableFiltered: null,
-                isBorderReached: false
+                isBorderReached: false,
+                isNextVisible:false//is the next column visible in the segments grid
             }
       
         //no current record, or current not editable
@@ -226,7 +227,8 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
             ed = me.editingPlugin,
             grid = ed.grid,
             isBorderReached = rowMeta.isBorderReached,
-            rowMeta = filtered ? rowMeta.nextEditableFiltered : rowMeta.nextEditable;
+            rowMeta = filtered ? rowMeta.nextEditableFiltered : rowMeta.nextEditable,
+            prevIndex=me.prev.nextEditable ? me.prev.nextEditable.idx : 0;
             
         if(!rowMeta) {
             rowMeta = {}; //nothing found
@@ -240,6 +242,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         rowMeta.errorText = errorText;
         rowMeta.isLoading = !!me.isLoading;
         rowMeta.isBorderReached = isBorderReached;
+        rowMeta.isNextVisible = me.isNextVisible(rowMeta.idx,prevIndex);
         return rowMeta;
     },
     fetchFromServer: function(){
@@ -307,5 +310,30 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
                 me.fireEvent('prevnextloaded',me);
             }
         });
+    },
+    
+    /***
+     * Check if the next column is visible in the segments grid
+     */
+    isNextVisible:function(nextIndex,currentIdx){
+    	var me=this,
+    		segmentsGrid=me.editingPlugin.grid,
+            total = segmentsGrid.store.getTotalCount(),
+	    	indexBoundaries=segmentsGrid.getVisibleRowIndexBoundaries(segmentsGrid),
+	    	indexGridOffset=3,//number of segments offset for the editor
+	    	isOffsetBorder=(nextIndex-indexGridOffset <= 0 || nextIndex+indexGridOffset >= total);
+    	
+    	//if the border is reached with o
+    	if(isOffsetBorder){
+    		indexGridOffset=0;
+    	}
+    	
+    	//calculate the offset based of if the next segments is after or before the prev
+    	if(currentIdx>=nextIndex){
+    		indexBoundaries.top=indexBoundaries.top+indexGridOffset;
+    	}else{
+    		indexBoundaries.bottom=indexBoundaries.bottom-indexGridOffset;
+    	}
+	    return nextIndex>=indexBoundaries.top && nextIndex<=indexBoundaries.bottom;
     }
 });
