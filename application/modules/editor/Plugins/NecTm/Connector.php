@@ -119,11 +119,14 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     
     /**
      * NEC-TM-Api: "Both slang and tlang parameters are expected to be ISO639-1 codes without the locale."
-     * @param string $langRfc5646
+     * @param string $langRfc5646 (= e.g. 'en-US', 'en')
      * @return string (= the generic language, e.g. 'en')
      */
     protected function getLangCodeForNecTm($langRfc5646) {
-        return explode("-", $langRfc5646)[0];
+        if (!is_string($langRfc5646)) { // e.g. Array[0] when we just delete a NEC-TM-LanguageResource
+            return null;
+        }
+        return explode("-", $langRfc5646)[0] ?? $langRfc5646;
     }
     
     /**
@@ -188,9 +191,11 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             if ($this->api->importTMXfile($fileinfo['tmp_name'], $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
                 return true;
             }
+            $this->handleNecTmError('LanguageResources - could not add TMX to NEC-TM'." LanguageResource: \n");
+            return false;
         }
-        $this->handleNecTmError('LanguageResources - could not add TMX to NEC-TM'." LanguageResource: \n");
-        return false;
+        // NEC-TM-Api does not need a file; LanguageResource works anyway.
+        return true;
     }
     
     /**
@@ -232,8 +237,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         }
         $this->throwBadGateway();
         return false;
-        // TODO: If we return false, the editor_LanguageresourceinstanceController
-        // continues anyway and shows details as xml in a new tab.
+        // TODO: If we return false, the editor_LanguageresourceinstanceController continues anyway and shows details as xml in a new tab.
         // (For testing you can set the $this->api::JOB_STATUS_TIMETOWAIT to 2 or so.)
     }
     
@@ -246,7 +250,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         /* @var $messages ZfExtended_Models_Messages */
         $source = $this->prepareSegmentContent($this->getQueryString($segment));
         $target = $this->prepareSegmentContent($segment->getTargetEdit());
-        if($this->api->addTMUnit($source, $target, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)) {
+        $filename = $this->languageResource->getSpecificData('fileName');  //  (= if file was imported for LanguageResource on creation)
+        if($this->api->addTMUnit($source, $target, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories, $filename)) {
             $messages->addNotice('Segment im TM aktualisiert!');
             return;
         }
@@ -377,15 +382,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_Abstract::translate()
      */
     public function translate(string $searchString){
-        // TODO
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::delete()
-     */
-    public function delete() {
-        // TODO
+        // TODO: check for additional handling when implementing TRANSLATE-1252
+        return $this->queryNecTmApi($searchString);
     }
     
     /**
@@ -443,7 +441,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @return integer
      */
     protected function calculateMatchRate($matchRate,$metaData,$segment,$filename){
-        // TODO
+        // TODO (context-matches not supported by NEC-TM-Api so far)
     }
     
     /***
@@ -455,7 +453,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      */
     public function initForFuzzyAnalysis($analysisId) {
         return $this;
-        // = TODO (wait for NEC-TM-APi to delete tags WITH deleting their contents)
+        // TODO (wait for NEC-TM-APi to delete tags WITH deleting their contents)
         
         $this->isInternalFuzzy = true;
         $fuzzyLanguageResource = clone $this->languageResource;
@@ -470,10 +468,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         $fuzzyLanguageResource->setId(null); // TODO: why do we do this?
         
         $fuzzyTagName = $this->renderFuzzyLanguageResourceName('translate5InternalFuzzyTag', $analysisId);
-        // TODO:
-        // - create extra tag in NEC-TM
-        // - use this tag when saving new internal translations
-        // - afterwards: delete this tag and remove all its content
+        // TODO: (1) create extra tag in NEC-TM (2) use this tag when saving new internal translations (3) afterwards: delete this tag and remove all its content
         $fuzzyLanguageResource->addSpecificData('internalFuzzyTag', $fuzzyTagName);
         
         $connector = ZfExtended_Factory::get(get_class($this));
@@ -488,17 +483,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @return editor_Services_ServiceResult|number
      */
     public function getResultListGrouped() {
-        // TODO
-    }
-    
-    /***
-     * Reduce the given matchrate to given percent.
-     * It is used when unsupported tags are found in the response result, and those tags are removed.
-     * @param integer $matchrate
-     * @param integer $reducePercent
-     * @return number
-     */
-    protected function reduceMatchrate($matchrate,$reducePercent) {
-        // TODO
+        // TODO (check if results can contain multiple 100%-matches)
     }
 }

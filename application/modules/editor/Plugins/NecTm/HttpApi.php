@@ -302,19 +302,20 @@ class editor_Plugins_NecTm_HttpApi {
      * @param string $targetText
      * @param string $sourceLang
      * @param string $targetLang
+     * @param string|null $filename (= if file was imported for LanguageResource on creation)
      * @param array $tagIds (= assigned categories AND top-level-categories)
      * @return boolean
      */
-    public function addTMUnit($sourceText, $targetText, $sourceLang, $targetLang, $tagIds) {
-        // TODO: also use param "file_name"?
+    public function addTMUnit($sourceText, $targetText, $sourceLang, $targetLang, $tagIds, $filename) {
         $method = 'POST';
         $endpointPath = 'tm';
         $data = [];
-        $queryParams = array('stext' => $sourceText,
-                             'ttext' => $targetText,
-                             'slang' => $sourceLang,
-                             'tlang' => $targetLang,
-                             'tag'   => $tagIds);
+        $queryParams = array('stext'     => $sourceText,
+                             'ttext'     => $targetText,
+                             'slang'     => $sourceLang,
+                             'tlang'     => $targetLang,
+                             'tag'       => $tagIds,
+                             'file_name' => $filename);
         $processResponse = $this->necTmRequest($method, $endpointPath, $data, $queryParams);
         return $processResponse;
     }
@@ -487,6 +488,9 @@ class editor_Plugins_NecTm_HttpApi {
         $paramsForQuery = [];
         if (!empty($queryParams)) {
             foreach ($queryParams as $name => $value) {
+                if (is_null($value)) {
+                    continue;
+                }
                 if(is_array($value)) {
                     foreach ($value as $valueFromArray) {
                         $paramsForQuery[] = $name.'='.urlencode($valueFromArray);
