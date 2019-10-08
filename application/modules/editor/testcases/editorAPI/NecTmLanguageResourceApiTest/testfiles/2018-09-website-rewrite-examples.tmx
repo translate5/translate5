@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+
+<tmx version="1.4">
+  <header creationtoolversion="1.5.1.0" segtype="sentence" adminlang="en-us" srclang="de-DE" o-tmf="OpenTM2" creationtool="OpenTM2" datatype="xml" />
+  <body>
+    <tu tuid="1" datatype="xml" creationdate="20130730T002215Z">
+      <prop type="tmgr:segNum">1</prop>
+      <prop type="tmgr:markup">OTMXML</prop>
+      <prop type="tmgr:docname">none</prop>
+      <tuv xml:lang="de-DE">
+        <prop type="tmgr:language">German(reform)</prop>
+        <seg>Consulting, Unterstützung, Updates - MittagQI - Quality Informatics</seg>
+      </tuv>
+      <tuv xml:lang="en-UK">
+        <prop type="tmgr:language">ENGLISH(U.K.)</prop>
+        <seg>Consulting, Support, Updates - MittagQI - Quality Informatics</seg>
+      </tuv>
+    </tu>
+    <tu tuid="40" datatype="xml" creationdate="20130730T020126Z">
+      <prop type="tmgr:segNum">39</prop>
+      <prop type="tmgr:markup">OTMXML</prop>
+      <prop type="tmgr:docname">none</prop>
+      <tuv xml:lang="de-DE">
+        <prop type="tmgr:language">German(reform)</prop>
+        <seg>Unterstützung</seg>
+      </tuv>
+      <tuv xml:lang="en-UK">
+        <prop type="tmgr:language">ENGLISH(U.K.)</prop>
+        <seg>Support</seg>
+      </tuv>
+    </tu>
+    <tu tuid="69" datatype="xml" creationdate="20130730T041402Z">
+      <prop type="tmgr:segNum">68</prop>
+      <prop type="tmgr:markup">OTMXML</prop>
+      <prop type="tmgr:docname">none</prop>
+      <tuv xml:lang="de-DE">
+        <prop type="tmgr:language">German(reform)</prop>
+        <seg>translate5 ist Open Source:</seg>
+      </tuv>
+      <tuv xml:lang="en-UK">
+        <prop type="tmgr:language">ENGLISH(U.K.)</prop>
+        <seg>translate5 is Open Source:</seg>
+      </tuv>
+    </tu>
+    <tu tuid="682" creationdate="20180603T091904Z">
+      <prop type="tmgr:segNum">684</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">Schnittstellen _ Across.html</prop>
+      <tuv xml:lang="de-DE">
+        <prop type="tmgr:language">German(reform)</prop>
+        <seg>  CMS</seg>
+      </tuv>
+      <tuv xml:lang="en-US">
+        <prop type="tmgr:language">ENGLISH(U.S.)</prop>
+        <seg>  CMS</seg>
+      </tuv>
+    </tu>
+    <tu tuid="681" creationdate="20180603T091859Z">
+      <prop type="tmgr:segNum">683</prop>
+      <prop type="tmgr:markup">OTMXUXLF</prop>
+      <prop type="tmgr:docname">Schnittstellen _ Across.html</prop>
+      <tuv xml:lang="de-DE">
+        <prop type="tmgr:language">German(reform)</prop>
+        <seg>  Maschinelle Übersetzung</seg>
+      </tuv>
+      <tuv xml:lang="en-US">
+        <prop type="tmgr:language">ENGLISH(U.S.)</prop>
+        <seg>  Machine Translation</seg>
+      </tuv>
+    </tu>
+  </body>
+</tmx>
