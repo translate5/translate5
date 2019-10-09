@@ -25,5 +25,5 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-UPDATE `Zf_configuration` SET `default` = '[\"zh\", \"ja\", \"ko\", \"ko-KR\",\"zh-CN\",\"zh-HK\",\"zh-MO\",\"zh-SG\",\"zh-TW\",\"ja-JP\"]' WHERE `Zf_configuration`.`name` = 'runtimeOptions.termTagger.targetStringMatch';
-UPDATE `Zf_configuration` SET `value` = '[\"zh\", \"ja\", \"ko\", \"ko-KR\",\"zh-CN\",\"zh-HK\",\"zh-MO\",\"zh-SG\",\"zh-TW\",\"ja-JP\"]' WHERE `Zf_configuration`.`name` = 'runtimeOptions.termTagger.targetStringMatch';
+UPDATE `Zf_configuration` SET `default` = '[\"zh\", \"ja\", \"ko\", \"ko-KR\",\"zh-CN\",\"zh-HK\",\"zh-MO\",\"zh-SG\",\"zh-TW\",\"ja-JP\",\"th\",\"th-TH\"]' WHERE `Zf_configuration`.`name` = 'runtimeOptions.termTagger.targetStringMatch';
+UPDATE `Zf_configuration` SET `value` = '[\"zh\", \"ja\", \"ko\", \"ko-KR\",\"zh-CN\",\"zh-HK\",\"zh-MO\",\"zh-SG\",\"zh-TW\",\"ja-JP\",\"th\",\"th-TH\"]' WHERE `Zf_configuration`.`name` = 'runtimeOptions.termTagger.targetStringMatch';
