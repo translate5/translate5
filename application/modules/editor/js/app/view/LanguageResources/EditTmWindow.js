@@ -56,7 +56,8 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         customers:'#UT#Kunden',
         useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
         collection:'#UT#TBX-Datei',
-        importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!'
+        importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
+        categories: '#UT#Kategorien',
     },
     
     listeners:{
@@ -101,6 +102,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                 items: [{
                     xtype: 'displayfield',
                     name:'resourceId',
+                    id:'resourceId',
                     renderer: function(id) {
                         var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
                             resource = store.getById(id);
@@ -158,6 +160,26 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     labelWidth: 160,
                     anchor: '100%',
                     name: 'color'
+                },{
+                    // Categories: currently only active for Plugin
+                    // (here: display the categories only, don't edit them
+                    // after the LanguageResource has been created)
+                    xtype: 'displayfield',
+                    name:'categories',
+                    id:'categories',
+                    renderer: function(value) {
+                        if(!value){
+                            return '';
+                        }
+                        var retval=[];
+                        for(var i=0;i<value.length;i++){
+                            retval.push(value[i]);
+                        }
+                        return retval.join('<br>');
+                    },
+                    toolTip: me.strings.categories,
+                    fieldLabel: me.strings.categories,
+                    disabled: true
                 }]
             }],
             dockedItems : [{

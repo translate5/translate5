@@ -395,5 +395,32 @@ Ext.define('Editor.view.segments.Grid', {
         else {
             sm.select(rowIdx);
         }
-    }
+    },
+    
+    /***
+     * Return visible row indexes in segment grid
+     * TODO if needed move this as overide so it can be used for all grids
+     * @returns {Object} { top:topIndex, bottom:bottomIndex }
+     */
+    getVisibleRowIndexBoundaries:function(){
+        var view=this.getView(),
+            vTop = view.el.getTop(),
+            vBottom = view.el.getBottom(),
+            top=-1, bottom=-1;
+
+
+        Ext.each(view.getNodes(), function (node) {
+            if (top<0 && Ext.fly(node).getBottom() > vTop) {
+                top=view.indexOf(node);
+            }
+            if (Ext.fly(node).getTop() < vBottom) {
+                bottom = view.indexOf(node);
+            }
+        });
+
+        return {
+            top:top,
+            bottom:bottom,
+        };
+    },
 });
