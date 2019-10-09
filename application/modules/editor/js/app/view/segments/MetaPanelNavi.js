@@ -69,8 +69,8 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     item_whitespaceButtonGroup: '#UT#Sonderzeichen hinzufügen',
     initComponent: function() {
       var me = this,
-          fields = Editor.data.task.segmentFields(),
-          editableCnt = 0,
+          //fields = Editor.data.task.segmentFields(),
+          //editableCnt = 0,
           useHNavArrow = false,
           userCanModifyWhitespaceTags = Editor.data.segments.userCanModifyWhitespaceTags,
           userCanInsertWhitespaceTags = Editor.data.segments.userCanInsertWhitespaceTags,
@@ -81,19 +81,22 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
                   text: text
               };
           };
-          
-      fields.each(function(field) {
-          if(field.get('editable')) {
-              editableCnt++;
-          }
-      });
-      useHNavArrow = editableCnt > 1;
+
+      //TODO: this is disabled because of the TRANSLATE-1827 !!!
+      //the button layout when the buttons are active is calculated wrong!!!
+      //fields.each(function(field) {
+      //    if(field.get('editable')) {
+      //        editableCnt++;
+      //    }
+      //});
+      //useHNavArrow = editableCnt > 1;
       
       items=[{
     	  xtype:'container',
     	  layout: {
     		  type: 'hbox'
 	      },
+	      width: '100%',
     	  items:[{
 	          xtype: 'buttongroup',
 	          columns: 3,
@@ -208,36 +211,33 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
       // whitespace-icons
       if (userCanModifyWhitespaceTags && userCanInsertWhitespaceTags) {
     	  items.push({
-	 		 	xtype: 'fieldset',
-	 		 	title:me.item_whitespaceButtonGroup,
-	 		 	layout: {
-	 		 		pack: 'start',
-	 		 		type: 'hbox'
-    	        },
-	 			defaults: {
-	 				scale: 'small',
-	 				margin: '2 2 2 2',
-	 			},
-	 			items:[{
-	 				xtype: 'button',
-	 	             cls: 'whitespaceIcon',
-	 	             text: '→',
-	 	             itemId: 'btnInsertWhitespaceTab',
-	 	             tooltip: 'TAB'
-	 			},{
-	 				xtype: 'button',
-	 	             cls: 'whitespaceIcon',
-	 	             text: '↵',
-	 	             itemId: 'btnInsertWhitespaceNewline',
-	 	             tooltip: 'SHIFT+ENTER'
-	 			},{
-	 				xtype: 'button',
-	 	             cls: 'whitespaceIcon',
-	 	             text: '⎵',
-	 	             itemId: 'btnInsertWhitespaceNbsp',
-	 	             tooltip: 'CTRL+SHIFT+Space'
-	 			}]
-    	   });
+  	 		 	xtype: 'fieldset',
+  	 		 	width: '100%',
+  	 		 	title:me.item_whitespaceButtonGroup,
+  	 			defaults: {
+  	 				scale: 'small',
+  	 				margin: '2 2 2 2',
+  	 			},
+  	 			items:[{
+  	 				xtype: 'button',
+  	 	             cls: 'whitespaceIcon',
+  	 	             text: '→',
+  	 	             itemId: 'btnInsertWhitespaceTab',
+  	 	             tooltip: 'TAB'
+  	 			},{
+  	 				xtype: 'button',
+  	 	             cls: 'whitespaceIcon',
+  	 	             text: '↵',
+  	 	             itemId: 'btnInsertWhitespaceNewline',
+  	 	             tooltip: 'SHIFT+ENTER'
+  	 			},{
+  	 				xtype: 'button',
+  	 	             cls: 'whitespaceIcon',
+  	 	             text: '⎵',
+  	 	             itemId: 'btnInsertWhitespaceNbsp',
+  	 	             tooltip: 'CTRL+SHIFT+Space'
+  	 			}]
+    	  });
       }
          
       Ext.applyIf(me, {
