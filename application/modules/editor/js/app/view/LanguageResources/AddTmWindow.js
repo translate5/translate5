@@ -63,10 +63,11 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         collection:'#UT#TBX-Datei',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!'
     },
-    height : 450,
+    height : 500,
     width : 500,
     modal : true,
     layout:'fit',
+    autoScroll: true,
 
     tmxRegex: /\.(tm|tmx)$/i,
     tbxRegex: /\.(tbx)$/i,
@@ -88,6 +89,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                 padding: 5,
                 ui: 'default-frame',
                 defaults: defaults,
+                scrollable: 'y',
                 items: [{
                     xtype: 'combo',
                     name:'resourceId',
