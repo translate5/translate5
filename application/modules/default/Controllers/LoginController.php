@@ -164,26 +164,33 @@ class LoginController extends ZfExtended_Controllers_Login {
             $this->_form->addElement($link);
         }
         
-        //authenticate with the configured openid client
-        if($isCustomerSet && $oidc->authenticate()){
-            //INFO: disable the openid logout, enable only if requested
-            //if($this->_request->getParam('id_token')!=null){
-            //    $userSession = new Zend_Session_Namespace('openId');
-            //    $userSession->data->idToken = $this->_request->getParam('id_token');
-            //}
-            //create the user in the translate5 system or update if the user already exist
-            $user = $oidc->createUser();
-            if(!$user){
-                return;
+        try {
+            //authenticate with the configured openid client
+            if($isCustomerSet && $oidc->authenticate()){
+                //INFO: disable the openid logout, enable only if requested
+                //if($this->_request->getParam('id_token')!=null){
+                //    $userSession = new Zend_Session_Namespace('openId');
+                //    $userSession->data->idToken = $this->_request->getParam('id_token');
+                //}
+                //create the user in the translate5 system or update if the user already exist
+                $user = $oidc->createUser();
+                if(!$user){
+                    return;
+                }
+                //init the user session and redirect to the editor
+                
+                $invalidLoginCounter = ZfExtended_Factory::get('ZfExtended_Models_Invalidlogin',array($user->getLogin()));
+                /* @var $invalidLoginCounter ZfExtended_Models_Invalidlogin */
+                $invalidLoginCounter->resetCounter(); // bei erfolgreichem login den counter zurücksetzen
+                $this->_userModel->setUserSessionNamespaceWithoutPwCheck($user->getLogin());
+                $this->getFrontController()->getPlugin('ZfExtended_Controllers_Plugins_SessionRegenerate')->updateSession(true);
+                $this->initDataAndRedirect();
             }
-            //init the user session and redirect to the editor
-            
-            $invalidLoginCounter = ZfExtended_Factory::get('ZfExtended_Models_Invalidlogin',array($user->getLogin()));
-            /* @var $invalidLoginCounter ZfExtended_Models_Invalidlogin */
-            $invalidLoginCounter->resetCounter(); // bei erfolgreichem login den counter zurücksetzen
-            $this->_userModel->setUserSessionNamespaceWithoutPwCheck($user->getLogin());
-            $this->getFrontController()->getPlugin('ZfExtended_Controllers_Plugins_SessionRegenerate')->updateSession(true);
-            $this->initDataAndRedirect();
+        } catch (ZfExtended_OpenIDConnectClientException $e) {
+            //when an openid exceptions happens so send the user simplified info message, more should be found in the error log
+            $this->view->errors = true;
+            $this->_form->addError($this->_translate->_('Anmeldung mit Single Sign On schlug fehl, bitte versuchen Sie es erneut.'));
+            return;
         }
     }
     
