@@ -189,7 +189,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         } catch (ZfExtended_OpenIDConnectClientException $e) {
             //when an openid exceptions happens so send the user simplified info message, more should be found in the error log
             $this->view->errors = true;
-            $this->_form->addError($this->_translate->_('Anmeldung mit Openid nicht möglich, bitte versuchen Sie es erneut.'));
+            $this->_form->addError($this->_translate->_('Anmeldung mit Single Sign On schlug fehl, bitte versuchen Sie es erneut.'));
             return;
         }
     }
