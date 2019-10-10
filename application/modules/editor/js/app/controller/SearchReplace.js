@@ -318,8 +318,20 @@ Ext.define('Editor.controller.SearchReplace', {
      * On segments toolbar render handler
      */
     onSegmentsToolbarRender:function(toolbar){
-    	var me=this;
-    	toolbar.insert(11,[{
+    	var me=this,
+    		index=7,
+    		segmentsToolbar=Ext.ComponentQuery.query('segmentsToolbar');
+    	
+    	//calculate the index of the search button
+    	if(segmentsToolbar.length>0){
+    		segmentsToolbar=segmentsToolbar[0];
+    		var watchListFilterBtn=segmentsToolbar.down('#watchListFilterBtn');
+    		if(watchListFilterBtn){
+    			index=segmentsToolbar.items.indexOf(watchListFilterBtn);
+    		}
+    	}
+    	
+    	toolbar.insert(index,[{
             xtype: 'button',
             itemId: 'searchReplaceToolbarBtn',
             cls: 'searchReplaceToolbarBtn',
