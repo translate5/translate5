@@ -249,25 +249,11 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         text: me.item_helpTooltip,
                         showDelay: 0
                     }
-                },{
-                	xtype: 'button',
-                    itemId:'toolbarInfoButton',
-                    icon: Editor.data.moduleFolder+'images/information.png',
-                    tooltip: me.addToolbarInfoButtonTpl()
                 }]
             };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
-    },
-    
-    /***
-     * Add the toolbarinfo button tooltip
-     */
-    addToolbarInfoButtonTpl:function(){
-        var tpl = new Ext.XTemplate(Editor.util.Constants.appInfoTpl),
-        	infoPanel=Ext.create('Editor.view.ApplicationInfoPanel');
-        return tpl.applyTemplate(infoPanel.getEditorTplData());
     }
 });
