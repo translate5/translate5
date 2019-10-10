@@ -59,8 +59,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_clearSortAndFilterTooltip: '#UT#Sortierung und Filter zurücksetzen',
     item_watchListFilterBtn: '#UT#Lesezeichen',
     item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
-    item_logoutheaderbtn:'#UT#Ausloggen',
-    item_leavetaskheaderbtn:'#UT#Aufgabe verlassen',
     viewModel: {
         formulas: {
             isNormalEdit: function(get) {
@@ -179,22 +177,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             });
             
             config = {
-                items: [,{
-                	xtype: 'button',
-                	itemId:'logoutHeaderBtn',
-                	text:me.item_logoutheaderbtn,
-                	hidden: !Editor.controller.HeadPanel
-                },{
-                    xtype: 'tbseparator'
-                },{
-                	 xtype: 'button',
-                     itemId: 'leaveTaskHeaderBtn',
-                     icon: Editor.data.moduleFolder+'images/table_back.png',
-                     text:me.item_leavetaskheaderbtn,
-                     hidden: !Editor.controller.HeadPanel
-                },{
-                    xtype: 'tbseparator'
-                },{
+                items: [{
                     xtype: 'button',
                     text:me.item_viewModesMenu,
                     itemId: 'viewModeMenu',

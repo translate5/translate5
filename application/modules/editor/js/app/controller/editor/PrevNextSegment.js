@@ -317,23 +317,23 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
      */
     isNextVisible:function(nextIndex,currentIdx){
     	var me=this,
+    		topInvisibleOffset=-3,//the offset for the top columns wich are not visible for the user, but are calculated as visible from extjs
     		segmentsGrid=me.editingPlugin.grid,
-            total = segmentsGrid.store.getTotalCount(),
+    		total = segmentsGrid.store.getTotalCount(),
 	    	indexBoundaries=segmentsGrid.getVisibleRowIndexBoundaries(segmentsGrid),
-	    	indexGridOffset=3,//number of segments offset for the editor
-	    	isOffsetBorder=(nextIndex-indexGridOffset <= 0 || nextIndex+indexGridOffset >= total);
+	    	indexGridOffset=Math.round((indexBoundaries.bottom-indexBoundaries.top)/2),//number of segments offset for the editor
+	    	isOffsetBorder=(nextIndex-indexGridOffset <= topInvisibleOffset || nextIndex+indexGridOffset >= total);
     	
     	//if the border is reached with o
     	if(isOffsetBorder){
-    		indexGridOffset=0;
+    		return true;
     	}
-    	
     	//calculate the offset based of if the next segments is after or before the prev
     	if(currentIdx>=nextIndex){
     		indexBoundaries.top=indexBoundaries.top+indexGridOffset;
     	}else{
     		indexBoundaries.bottom=indexBoundaries.bottom-indexGridOffset;
     	}
-	    return nextIndex>=indexBoundaries.top && nextIndex<=indexBoundaries.bottom;
+	    return nextIndex>indexBoundaries.top && nextIndex<indexBoundaries.bottom;
     }
 });

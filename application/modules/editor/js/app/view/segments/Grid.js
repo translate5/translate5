@@ -68,7 +68,8 @@ Ext.define('Editor.view.segments.Grid', {
     column_edited: '#UT#bearbeibar',    
     target_original: '#UT# (zur Importzeit)',    
     column_edited_icon: '{0} <img src="{1}" class="icon-editable" alt="{2}" title="{3}">',
-    
+    item_logoutheaderbtn:'#UT#Ausloggen',
+    item_leavetaskheaderbtn:'#UT#Aufgabe verlassen',
     columnMap:{},
     hasRelaisColumn: false,
     stateData: {},
@@ -259,6 +260,21 @@ Ext.define('Editor.view.segments.Grid', {
     			  grid.down('headercontainer').sortOnClick=false;
     		  }
     		},
+    		header: {
+    	        items: [{
+    	        	xtype: 'button',
+    	        	itemId:'logoutHeaderBtn',
+    	        	icon: Editor.data.moduleFolder+'images/door_out.png',
+    	        	text:me.item_logoutheaderbtn,
+    	        	hidden: !Editor.controller.HeadPanel || Editor.data.editor.toolbar.hideLogoutButton
+    	        }, {
+    	        	xtype: 'button',
+    	            itemId: 'leaveTaskHeaderBtn',
+    	            icon: Editor.data.moduleFolder+'images/table_back.png',
+    	            text:me.item_leavetaskheaderbtn,
+    	            hidden: !Editor.controller.HeadPanel || Editor.data.editor.toolbar.hideLeaveTaskButton
+    	        }]
+    	    },
             columns: columns
         });
 
