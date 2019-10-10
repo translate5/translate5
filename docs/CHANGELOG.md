@@ -3,6 +3,10 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.2.10] - 2019-10-08
+###Added
+TRANSLATE-1774: Integrate NEC-TM with translate5 as LanguageResource
+
 ## [3.2.9] - 2019-10-07
 ###Added
 TRANSLATE-1671: (Un)lock 100%-Matches in task properties
