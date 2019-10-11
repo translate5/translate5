@@ -68,9 +68,6 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @return [array] list with user arrays
      */
     public function loadUsersOfTaskWithRole(string $taskGuid, $role, array $assocFields = [], $state = null){
-        if (empty($role)) {
-            return [];
-        }
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $db = $this->db;
         $s = $user->db->select()
@@ -177,15 +174,20 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Updates the stored user states of an given taskGuid 
+     * Updates the stored user states of an given taskGuid (may exclude the current user if enabled by third parameter)
      * @param string $state
      * @param string $role
+     * @param boolean $expectMySelf if true, the internally loaded userGuid is excluded from the the update
      */
-    public function setStateForRoleAndTask(string $state, string $role) {
-        $this->db->update(array('state' => $state), array(
+    public function setStateForRoleAndTask(string $state, string $role, $expectMySelf = false) {
+        $where = [
             'role = ?' => $role,
             'taskGuid = ?' => $this->getTaskGuid(),
-        ));
+        ];
+        if($expectMySelf) {
+            $where['userGuid != ?'] = $this->getUserGuid();
+        }
+        $this->db->update(['state' => $state], $where);
     }
     
     /**
@@ -277,6 +279,41 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             'isPmOverride = 1',
         ));
         $this->init();
+    }
+    
+    /**
+     * deletes all other users to a task expect the given one, optionally filtered by role.
+     * Mainly needed for dealing with competitive users
+     * @param string $taskGuid
+     * @param string $userGuid
+     * @param string $role
+     * @return boolean|array returns the deleted tuas as array or false if the tua list was modified by other users 
+     */
+    public function deleteOtherUsers(string $taskGuid, string $userGuid, string $role = null): array {
+        $delete = [
+            'taskGuid = ?' => $taskGuid,
+            'userGuid != ?' => $userGuid,
+            'isPmOverride = ?' => 0,
+        ];
+        if(!empty($role)) {
+            $delete['role = ?'] = $role;
+        }
+        
+        $s = $this->db->select();
+        foreach($delete as $sql => $value) {
+            $s->where($sql, $value);
+        }
+        $otherTuas = $this->db->fetchAll($s)->toArray();
+        $this->db->getAdapter()->beginTransaction();
+        $deleted = $this->db->delete($delete);
+        //something was changed, roll back the delete and return false
+        if(count($otherTuas) !== $deleted) {
+            $this->db->getAdapter()->rollBack();
+            return false;
+        }
+        $this->db->getAdapter()->commit();
+        $this->updateTask($taskGuid);
+        return $otherTuas;
     }
 
     /**

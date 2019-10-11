@@ -289,13 +289,13 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $type = false;
 
             //we ignore empty colHeads on import, so we have to track their col position
-            if(empty($colHead)) {
+            if(empty($colHead) && $colHead!=="0") {
                 $i++; //increase the col index, but do nothing else!
                 continue;
             }
 
             //get type and editable state of the field
-            if(empty($csvSettings[$colHead])){
+            if(empty($csvSettings[$colHead]) && $csvSettings[$colHead] !=="0"){
                 //if no column is configured, its a target
                 $type = editor_Models_SegmentField::TYPE_TARGET;
                 $editable = true;
@@ -310,7 +310,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             //we ensure that columns with the same name in one csv file are made unique
             // this is needed by addfield to map fields between different files 
             // if mid exists multiple times in the header, only the last one is used. 
-            if(empty($foundHeader[$colHead])) {
+            if(empty($foundHeader[$colHead]) && $foundHeader[$colHead] !=="0") {
                 $foundHeader[$colHead] = 1;
             }
             else {
@@ -356,7 +356,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             }
             $field = $this->segmentFieldManager->getByName($name);
             $isSource = $field->type == editor_Models_SegmentField::TYPE_SOURCE;
-            if(empty($lineArr[$idx])) {
+            if(empty($lineArr[$idx]) && $lineArr[$idx] !== "0") {
                 $original = '';
             }
             else {

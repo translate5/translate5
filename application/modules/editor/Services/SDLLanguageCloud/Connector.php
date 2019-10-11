@@ -94,7 +94,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @return editor_Services_ServiceResult
      */
     protected function querySdlApi($searchString, $reimportWhitespace = false){
-        if(empty($searchString)) {
+        if(empty($searchString) && $searchString !== "0") {
             return $this->resultList;
         }
         

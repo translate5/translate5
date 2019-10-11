@@ -129,9 +129,11 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_('Segmentliste und Editor - [LESEMODUS]');?>';
   	Editor.view.segments.Grid.prototype.title_addition_unconfirmed = '<?php echo $this->translate->_(' - [AUFGABE UNBESTÄTIGT]');?>';
   	Editor.view.segments.Grid.prototype.target_original = ' <?php echo $this->translate->_('(zur Importzeit)');?>';
+  	Editor.view.segments.Grid.prototype.item_logoutheaderbtn = '<?php echo $this->translate->_('Ausloggen');?>';
+  	Editor.view.segments.Grid.prototype.item_leavetaskheaderbtn = '<?php echo $this->translate->_('Aufgabe verlassen');?>';
   	
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
-  	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansichtsmodus');?>';
+  	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansicht');?>';
   	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Details (nur Lesemodus)');?>';
   	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Details');?>';
   	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Normal');?>';
@@ -230,7 +232,13 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.controller.ViewModes", {
         override: "Editor.controller.ViewModes",
-        messageIsViewMode: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.');?>'
+        messageIsViewMode: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.');?>',
+        strings:{
+            leaveTaskWindowTitle: '<?php echo $this->translate->_('Zurück zur Aufgabeliste');?>',
+            leaveTaskWindowMessage: '<?php echo $this->translate->_('Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?');?>',
+            leaveTaskWindowFinishBtn: '<?php echo $this->translate->_('Fertig und Aufgabe beenden');?>',
+            leaveTaskWindowCancelBtn: '<?php echo $this->translate->_('Aufgabe später weiterbearbeiten');?>'
+        }
     });
   	
   	Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
@@ -288,6 +296,7 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern und nächstes Segment im Workflow öffnen (ALT + Bild ↓)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern und vorheriges Segment im Workflow öffnen (ALT + Bild ↑)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_whitespaceButtonGroup= '<?php echo $this->translate->_('Sonderzeichen hinzufügen:');?>';
    
     Ext.define("Editor.locale.de.controller.Editor", {
         override: "Editor.controller.Editor",
@@ -419,8 +428,7 @@ Ext.define('Editor.controller.Localizer', {
         messages: {
             assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
             assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
-            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>',
-            userNotifySuccess: '<?php echo $this->translate->_('Benutzer wurden erfolgreich per E-Mail benachrichtigt');?>',
+            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
         }
     });
 
@@ -527,6 +535,12 @@ Ext.define('Editor.controller.Localizer', {
     	}
     });
     
+    
+    Ext.define("Editor.locale.de.view.LanguageResources.log.LogWindow", {
+        override: "Editor.view.LanguageResources.log.LogWindow",
+        title: '<?php echo $this->translate->_('Ereignisse zu Sprachresource "{0}"');?>'
+    });
+    
     Ext.define("Editor.locale.de.view.admin.task.TaskAttributes", {
         override: "Editor.view.admin.task.TaskAttributes",
         title: '<?php echo $this->translate->_('Eigenschaften');?>',
@@ -543,7 +557,12 @@ Ext.define('Editor.controller.Localizer', {
             btnReload: '<?php echo $this->translate->_('Aktualisieren');?>',
             fullMatchLabel: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
             editTrue: '<?php echo $this->translate->_('Ja');?>',
-            editFalse: '<?php echo $this->translate->_('Nein');?>'
+            editFalse: '<?php echo $this->translate->_('Nein');?>',
+            usageModeTitle: '<?php echo $this->translate->_('Mehrere Benutzer');?>',
+            usageModeInfo: '<?php echo $this->translate->_('Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden');?>',
+            usageModeDisabled: '<?php echo $this->translate->_('Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.');?>',
+            usageModeCoop: '<?php echo $this->translate->_('Mehrere Benutzer bearbeiten dieselbe Aufgabe');?>',
+            usageModeCompetitive: '<?php echo $this->translate->_('Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.');?>'
         }
     });
     
@@ -641,7 +660,10 @@ Ext.define('Editor.controller.Localizer', {
         title: '<?php echo $this->translate->_('Einstellungen zu Aufgabe "{0}"');?>',
         strings: {
             close: '<?php echo $this->translate->_('Fenster schließen');?>',
-            events: '<?php echo $this->translate->_('Ereignisse');?>'
+            events: '<?php echo $this->translate->_('Ereignisse');?>',
+            notifyUsersTitle: '<?php echo $this->translate->_('Zugewiesene Benutzer benachrichtigen?');?>',
+            notifyUsersMsg: '<?php echo $this->translate->_('Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?');?>',
+            userNotifySuccess: '<?php echo $this->translate->_('Benutzer wurden erfolgreich per E-Mail benachrichtigt');?>'
         }
     });
     
@@ -695,9 +717,7 @@ Ext.define('Editor.controller.Localizer', {
             removeUser: '<?php echo $this->translate->_('Benutzer entfernen');?>',
             removeUserTip: '<?php echo $this->translate->_('Den gewählten Benutzer aus dieser Aufgabe entfernen.');?>',
             save: '<?php echo $this->translate->_('Änderungen speichern');?>',
-            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
-            btnNotify: '<?php echo $this->translate->_('Lektoren benachrichtigen');?>',
-            btnNotifyTip: '<?php echo $this->translate->_('Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren');?>'
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
         }
     });
 
@@ -745,6 +765,7 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             title: '<?php echo $this->translate->_('Aufgabe bestätigen?');?>', 
             confirmMsg: '<?php echo $this->translate->_('Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.');?>', 
+            confirmCompetitive: '<?php echo $this->translate->_('<br/><br/>Allen anderen Benutzern wird die Aufgabe entzogen<br/> und sie wird ausschließlich in Ihrer Verantwortung liegen.');?>',
             confirmBtn: '<?php echo $this->translate->_('bestätigen');?>' 
         }
     });
@@ -773,6 +794,7 @@ Ext.define('Editor.controller.Localizer', {
             noIndexFound: '<?php echo $this->translate->_('Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.');?>',
             searchAndReplaceMenuItem: '<?php echo $this->translate->_('Suchen und ersetzen');?>',
             replaceAllErrors: '<?php echo $this->translate->_('Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.');?>',
+            searchReplaceToolbarBtn: '<?php echo $this->translate->_('Suche');?>'
         }
     });
     
@@ -832,6 +854,16 @@ Ext.define('Editor.controller.Localizer', {
             history: '<?php echo $this->translate->_('HISTORY');?>',
             notrackchangesplugin: '<?php echo $this->translate->_('TrackChanges found, but Plugin is not activated.');?>',
             severity: '<?php echo $this->translate->_('Gewichtung');?>'
+        }
+    });
+    
+     Ext.define("Editor.locale.view.ApplicationInfoPanel", {
+        override: "Editor.view.ApplicationInfoPanel",
+        strings: {
+            task: '<?php echo $this->translate->_('Aufgabe');?>',
+            loggedinAs: '<?php echo $this->translate->_(' Eingeloggter Benutzer');?>',
+            loginName: '<?php echo $this->translate->_(' Loginname');?>',
+            readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
         }
     });
     
@@ -911,6 +943,7 @@ Ext.define('Editor.controller.Localizer', {
         actionResetPw: '<?php echo $this->translate->_('Passwort des Benutzers zurücksetzen');?>',
         gender_female: '<?php echo $this->translate->_('Frau');?>',
         gender_male: '<?php echo $this->translate->_('Herr');?>',
+        gender_neutral: '<?php echo $this->translate->_('keine Angabe');?>',
         reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
         reloadBtnTip: '<?php echo $this->translate->_('Benutzerliste vom Server aktualisieren.');?>',
         sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
@@ -934,6 +967,7 @@ Ext.define('Editor.controller.Localizer', {
         genderLabel: '<?php echo $this->translate->_('Anrede');?>',
         genderMale: '<?php echo $this->translate->_('Herr');?>',
         genderFemale: '<?php echo $this->translate->_('Frau');?>',
+        genderNeutral: '<?php echo $this->translate->_('Ohne');?>',
         loginTip: '<?php echo $this->translate->_('Anmeldename (Angabe notwendig)');?>',
         loginLabel: '<?php echo $this->translate->_('Anmeldename¹');?>',
         emailTip: '<?php echo $this->translate->_('E-Mail Adresse (Angabe notwendig)');?>',
@@ -1210,14 +1244,13 @@ Ext.define('Editor.controller.Localizer', {
             file: '<?php echo $this->translate->_('TM/TMX-Datei (optional)');?>',
             importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
             color: '<?php echo $this->translate->_('Farbe');?>',
+            categories: '<?php echo $this->translate->_('Kategorien');?>',
             colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
             cancel: '<?php echo $this->translate->_('Abbrechen');?>',
             useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
             customers: '<?php echo $this->translate->_('Für diese Kunden nutzen');?>',
             mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
-            deleteTermEntriesDate:'<?php echo $this->translate->_('Termeinträge löschen älter als');?>',
-            deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
             collection: '<?php echo $this->translate->_('TBX-Datei');?>',
             importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
         }
@@ -1240,7 +1273,8 @@ Ext.define('Editor.controller.Localizer', {
             useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
             customers: '<?php echo $this->translate->_('Für diese Kunden nutzen');?>',
             collection: '<?php echo $this->translate->_('TBX-Datei');?>',
-            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
+            categories: '<?php echo $this->translate->_('Kategorien');?>'
         }
     });
     
@@ -1289,7 +1323,8 @@ Ext.define('Editor.controller.Localizer', {
 
     Ext.define("Editor.locale.view.LanguageResources.services.Default", {
         override: "Editor.view.LanguageResources.services.Default",
-        exportTooltip: '<?php echo $this->translate->_('Exportieren');?>'
+        exportTooltip: '<?php echo $this->translate->_('Exportieren');?>',
+        log: '<?php echo $this->translate->_('Log');?>'
     });
     
     Ext.define("Editor.locale.view.LanguageResources.services.OpenTM2", {
@@ -1324,10 +1359,11 @@ Ext.define('Editor.controller.Localizer', {
             save: '<?php echo $this->translate->_('Importieren');?>',
             cancel: '<?php echo $this->translate->_('Abbrechen');?>',
             mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
-            deleteTermEntriesDate:'<?php echo $this->translate->_('Termeinträge löschen älter als');?>',
+            deleteTermEntriesDate:'<?php echo $this->translate->_('Terme löschen, deren letzte Berührung länger her ist als');?>',
             deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
             helpButtonTooltip:'<?php echo $this->translate->_('Info zum Term-Collection');?>',
-            deleteTermProposals:'<?php echo $this->translate->_('Vorschläge löschen älter als');?>'
+            deleteTermProposalsDate:'<?php echo $this->translate->_('Vorschläge löschen, deren letzte Berührung länger her ist als');?>',
+            deleteTermProposalsImport:'<?php echo $this->translate->_('Vorschläge löschen älter als aktueller Import');?>'
         }
     });
     

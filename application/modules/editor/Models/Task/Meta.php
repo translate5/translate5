@@ -55,7 +55,7 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
                 throw $e;
             }
             catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-                //"duplicate entry" errors are ignored. 
+                //"duplicate entry" errors are ignored.
                 return;
             }
         }

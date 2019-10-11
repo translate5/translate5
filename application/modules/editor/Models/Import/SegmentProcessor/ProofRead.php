@@ -134,6 +134,18 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
             //transunitId must not be null, so if no info given we use segmentNr to assume that just the single segment is in a transunit
             $meta->setTransunitId($seg->getSegmentNrInTask());
         }
+        
+        if(!empty($attributes->autopropagated)) {
+            $meta->setAutopropagated($attributes->autopropagated);
+        }
+        
+        if(!empty($attributes->locked)) {
+            $meta->setLocked($attributes->locked);
+        }
+        
+        //TODO: add the autopropageted, locked as new fields LEK_segments_meta
+        //and set them here
+
         //add custom meta fields
         if(!empty($attributes->customMetaAttributes)) {
             foreach($attributes->customMetaAttributes as $key => $value) {

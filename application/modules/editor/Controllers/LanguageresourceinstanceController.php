@@ -55,6 +55,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected $internalTag;
     
+    /**
+     * @var editor_Models_Categories
+     */
+    protected $categories;
+    
     public function init() {
         //add filter type for languages
         $finalTableForAssoc = new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId');
@@ -69,6 +74,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //set same join for sorting!
         $this->_sortColMap['resourcesCustomers'] = $this->_filterTypeMap['resourcesCustomers']['string'];
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->categories = ZfExtended_Factory::get('editor_Models_Categories');
         parent::init();
     }
     
@@ -96,12 +102,22 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
         };
         
-        $this->prepareTaskInfo(array_column($this->view->rows, 'id'));
+        $languageResourcesId=array_column($this->view->rows, 'id');
+        $this->prepareTaskInfo($languageResourcesId);
+        
+        $eventLogger=ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
+        /* @var $eventLogger editor_Models_Logger_LanguageResources */
+        $eventLoggerGroupped=$eventLogger->getEventsCountGrouped($languageResourcesId);
         
         //get all assocs grouped by language resource id
         $customerAssocModel=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssocModel editor_Models_LanguageResources_CustomerAssoc */
         $custAssoc=$customerAssocModel->loadCustomerIdsGrouped();
+        
+        // for assigned categories
+        $categoryAssocModel = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
+        /* @var $categoryAssocModel editor_Models_LanguageResources_CategoryAssoc */
+        $categoryAssocs = $categoryAssocModel->loadCategoryIdsGrouped();
         
         $languages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
         /* @var $languages editor_Models_LanguageResources_Languages */
@@ -133,11 +149,22 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
             
             $id = $languageresource['id'];
+            
             //add customer assocs
             $languageresource['resourcesCustomers'] = $this->getCustassoc($custAssoc, 'customerId', $id);
             $languageresource['useAsDefault'] = $this->getCustassocDefault($custAssoc, 'useAsDefault', $id);
+            
             $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
+            
+            // categories (for the moment: just display labels for info, no editing)
+            $categoryLabels = [];
+            foreach ($this->getCategoryassoc($categoryAssocs, 'categoryId', $id) as $categoryId) {
+                $categoryLabels[] = $this->renderCategoryCustomLabel($categoryId);
+            }
+            $languageresource['categories'] = $categoryLabels;
+            
+            $languageresource['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
         }
     }
     
@@ -170,6 +197,21 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         return array_filter(array_column($data[$id], $index));
     }
     
+    /**
+     * Retrieves specific data from the given data container
+     * @param array $data
+     * @param string $index the datafield to get
+     * @param int $id the language resource id
+     * @return array
+     */
+    protected function getCategoryassoc(array $data, $index, $id) {
+        if(empty($data[$id])){
+            return [];
+        }
+        //remove 0 and null values
+        return array_filter(array_column($data[$id], $index));
+    }
+    
     /***
      * Retrives the useAsDefault customers for the given language resource
      * @param array $data
@@ -192,6 +234,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
     
     /**
+     * Renders the label of a category with details (currently: original Id).
+     * @param integer $categoryId
+     * @return string 
+     */
+    protected function renderCategoryCustomLabel($categoryId) {
+        $this->categories->load($categoryId);
+        return $this->categories->getLabel().' ('.$this->categories->getOriginalCategoryId().')';
+    }
+    
+    /**
      * Adds status information to the get request
      * {@inheritDoc}
      * @see ZfExtended_RestController::getAction()
@@ -208,12 +260,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         
-        $assocs=$customerAssoc->loadByLanguageResourceId($this->entity->getId());
+        $customerAssocs=$customerAssoc->loadByLanguageResourceId($this->entity->getId());
         
         $default=[];
         $customers=[];
         //get the customers and the default customers
-        foreach ($assocs as $value) {
+        foreach ($customerAssocs as $value) {
             if(!empty($value['useAsDefault'])){
                 $default[]=$value['customerId'];
             }
@@ -223,6 +275,23 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         $this->view->rows->resourcesCustomers=$customers;
         $this->view->rows->useAsDefault=$default;
+        
+        // categories that are assigned to the resource
+        $categoryIds = [];
+        $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
+        /* @var $categoryAssoc editor_Models_LanguageResources_CategoryAssoc */
+        $categoryAssocs = $categoryAssoc->loadByLanguageResourceId($this->entity->getId());
+        foreach ($categoryAssocs as $value) {
+            if(!empty($value['categoryId'])){
+                $categoryIds[] = $value['categoryId'];
+            }
+        }
+        // for the moment: just display labels for info
+        $categoryLabels = [];
+        foreach ($categoryIds as $categoryId) {
+            $categoryLabels[] = $this->renderCategoryCustomLabel($categoryId);
+        }
+        $this->view->rows->categories = $categoryLabels;
         
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $t ZfExtended_Zendoverwrites_Translate */
@@ -238,6 +307,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         foreach($meta as $key => $v) {
             $this->view->rows->{$key} = $v;
         }
+        
+        $eventLogger=ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
+        /* @var $eventLogger editor_Models_Logger_LanguageResources */
+        $eventLoggerGroupped=$eventLogger->getEventsCountGrouped([$this->entity->getId()]);
+        $this->view->rows->eventsCount = isset($eventLoggerGroupped[$this->entity->getId()]) ? (integer)$eventLoggerGroupped[$this->entity->getId()] : 0;
         
         $moreInfo = ''; //init as empty string, filled on demand by reference
         $connector = $serviceManager->getConnector($this->entity);
@@ -347,6 +421,34 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
     }
     
+    
+    /**
+     * returns the logged events for the given language resource
+     */
+    public function eventsAction() {
+        $this->getAction();
+        $events = ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
+        /* @var $events editor_Models_Logger_LanguageResources */
+        
+        //filter and limit for events entity
+        $offset = $this->_getParam('start');
+        $limit = $this->_getParam('limit');
+        settype($offset, 'integer');
+        settype($limit, 'integer');
+        $events->limit(max(0, $offset), $limit);
+        
+        $filter = ZfExtended_Factory::get($this->filterClass,array(
+            $events,
+            $this->_getParam('filter')
+        ));
+        
+        $filter->setSort($this->_getParam('sort', '[{"property":"id","direction":"DESC"}]'));
+        $events->filterAndSort($filter);
+        
+        $this->view->rows = $events->loadByLanguageResourceId($this->entity->getId());
+        $this->view->total = $events->getTotalByLanguageResourceId($this->entity->getId());
+    }
+    
     private function prepareTaskInfo($languageResourceids) {
         /* @var $assocs editor_Models_LanguageResources_Taskassoc */
         $assocs = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
@@ -420,7 +522,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $validExportTypes = $connector->getValidExportTypes();
         
         if(empty($validExportTypes[$type])){
-            throw new ZfExtended_NotFoundException('Can not download in format '.$type);
+            throw new ZfExtended_Models_Entity_NotFoundException('Can not download in format '.$type);
         }
         
         $data = $connector->getTm($validExportTypes[$type]);
@@ -458,6 +560,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         try {
             $customerAssoc->saveAssocRequest($this->data);
+        }
+        catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            $this->entity->delete();
+            throw $e;
+        }
+        
+        //check and save categories assoc db entry
+        $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
+        /* @var $categoryAssoc editor_Models_LanguageResources_CategoryAssoc */
+        try {
+            $categoryAssoc->saveAssocRequest($this->data);
         }
         catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             $this->entity->delete();
@@ -504,7 +617,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
         if(!$resource->getFilebased()) {
-            throw new ZfExtended_Models_Entity_NotFoundException('Requested languageResource is not filebased!');
+            throw new ZfExtended_ValidateException('Requested languageResource is not filebased!');
         }
         
         //upload errors are handled in handleAdditionalFileUpload

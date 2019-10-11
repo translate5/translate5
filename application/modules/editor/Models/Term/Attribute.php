@@ -86,6 +86,16 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         'transac'
     ];
     
+    /***
+     * Available attrType for transac group transac attribute 
+     * @var array
+     */
+    public static $trasacGroupTypes=[
+        'creation',
+        'origination',//Info:in some tbx files, the value orgination is used for representing creations
+        'modification'
+    ];
+    
     /**
      * creates a new, unsaved term attribute history entity
      * @return editor_Models_Term_AttributeHistory
@@ -116,7 +126,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         }
         return !($name == 'date'
             || $name=='termNote' && $type=='processStatus'
-            || $name=='transacNote' && ($type=='responsiblePerson' || $type=='responsibility')
+            || $name=='transacNote' && ($this->isResponsablePersonAttribute($type))
             || $name=='transac' && ($type=='creation' || $type=='origination')
             || $name=='transac' && $type=='modification');
     }
@@ -307,11 +317,64 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Handle transac attributes group. If no transac group attributes exist for the entity, new one will be created.
+     * Update the term transac group attributes from the proposal attributes
+     * @param editor_Models_Term $term
+     * @param editor_Models_Term_Proposal $proposal
+     * @return boolean
+     */
+    public function updateTermTransacGroupFromProposal(editor_Models_Term $term,editor_Models_Term_Proposal $proposal){
+        $attributes=$this->getTransacGroup($term,self::$trasacGroupTypes);
+        if(!empty($attributes)){
+            $s=$this->db->select()
+            ->where('parentId IN(?)',array_column($attributes,'id'));
+            $child=$this->db->fetchAll($s)->toArray();
+            $attributes=array_merge($attributes,$child);
+        }
+        if(empty($attributes)){
+            return false;
+        }
+        foreach ($attributes as $rec){
+            $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+            /* @var $attribute editor_Models_Term_Attribute */
+            $attribute->load($rec['id']);
+            if($attribute->isDateAttribute()){
+                $attribute->setValue(strtotime($proposal->getCreated()));
+            }
+            if($attribute->isResponsablePersonAttribute()){
+                $attribute->setValue($proposal->getUserName());
+            }
+            $attribute->setUserGuid($proposal->getUserGuid());
+            $attribute->setUserName($proposal->getUserName());
+            $attribute->save();
+            
+        }
+        return true;
+    }
+    /***
+     * Update term processStatus attribute with the given value
+     * @param editor_Models_Term $term
+     * @param string $processStatus
+     * @return boolean
+     */
+    public function updateTermProcessStatus(editor_Models_Term $term,string $processStatus){
+        return $this->db->update([
+            'value' =>$processStatus,
+            'processStatus' => $processStatus
+        ], [
+            'termId=?' => $term->getId(),
+            'name=?' =>'termNote',
+            'attrType=?' => 'processStatus'
+        ])>0;
+    }
+    
+    /***
+     * Get transac attribute for the entity and type
      * 
      * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
+     * @param array $types
+     * @return array
      */
-    public function handleTransacGroup($entity){
+    public function getTransacGroup($entity,array $types){
         $s=$this->db->select();
         if($entity instanceof editor_Models_Term){
             $s->where('termId=?',$entity->getId());
@@ -321,8 +384,17 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             $s->where('termId IS NULL');
         }
         $s->where('name="transac"')
-        ->where('attrType="modification"');
-        $ret=$this->db->fetchAll($s)->toArray();
+        ->where('attrType IN(?)',$types);
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /***
+     * Handle transac attributes group. If no transac group attributes exist for the entity, new one will be created.
+     * 
+     * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
+     */
+    public function handleTransacGroup($entity){
+        $ret=$this->getTransacGroup($entity, ['modification']);
         //if the transac group exist, do nothing
         if(!empty($ret)){
             return false;
@@ -364,7 +436,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             if($lbl['label']=='date'){
                 $dateLabelId=$lbl['id'];
             }
-            if($lbl['label']=='transacNote' && $lbl['type']=='responsiblePerson'){
+            if($lbl['label']=='transacNote' && $this->isResponsablePersonAttribute($lbl['type'])){
                 $transacNoteLabelId=$lbl['id'];
             }
         }
@@ -387,6 +459,8 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->setName('transac');
         $this->setAttrType($type);
         $this->setValue($type);
+        $this->setUserGuid($user->data->userGuid);
+        $this->setUserName($fullName);
         //save the transac attribute
         $parentId=$this->save();
         
@@ -408,6 +482,8 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->setParentId($parentId);
         $this->setName('date');
         $this->setValue(time());
+        $this->setUserGuid($user->data->userGuid);
+        $this->setUserName($fullName);
         //save the date attribute
         $this->save();
         
@@ -428,6 +504,8 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->setName('transacNote');
         $this->setAttrType('responsiblePerson');
         $this->setValue($fullName);
+        $this->setUserGuid($user->data->userGuid);
+        $this->setUserName($fullName);
         //save the responsible person attribute
         $this->save();
     }
@@ -488,7 +566,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
                     //convert the date to unix timestamp
                     $child['attrValue']=strtotime($termProposal['created']);
                 }
-                if($child['name']=='transacNote' && ($child['attrType']=='responsiblePerson' || $child['attrType']=='responsibility')){
+                if($child['name']=='transacNote' && $this->isResponsablePersonAttribute($child['attrType'])){
                     $child['attrValue']=$termProposal['userName'];
                 }
             }
@@ -583,6 +661,47 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->hasField('updated') && $this->setUpdated(NOW_ISO);
         $this->save();
         return $this;
+    }
+    
+    /***
+     * Check if the attribute is processStatus attribute
+     * @return boolean
+     */
+    public function isProcessStatusAttribute(){
+        return $this->getAttrType()=='processStatus' && $this->getName()=='termNote';
+    }
+    
+    /***
+     * Check if given AttrType is for responsable person
+     * Info: the responsable person type is saved in with different values in some tbx files
+     * @param string $type
+     * @return boolean
+     */
+    public function isResponsablePersonAttribute(string $type=null){
+        if(!empty($type)){
+            return $type=='responsiblePerson' || $type=='responsibility';
+        }
+        if($this->getAttrType()!=null){
+            return $this->getAttrType()=='responsiblePerson' || $this->getAttrType()=='responsibility';
+        }
+        return false;
+    }
+    
+    /***
+     * Check if it is date attribute. Can be checked via $name param, or if the attribute row is loaded via
+     * $this->getName()
+     * 
+     * @param string $name
+     * @return boolean
+     */
+    public function isDateAttribute(string $name=null) {
+        if(!empty($name)){
+            return $name=='date';
+        }
+        if($this->getName()!=null){
+            return $this->getName()=='date';
+        }
+        return false;
     }
     
     public function getDataObject() {

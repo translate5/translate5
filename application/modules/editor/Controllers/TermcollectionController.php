@@ -52,8 +52,8 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $this->setDataInEntity($this->postBlacklist);
         if($this->validate()){
             $customerIds=explode(',', $this->data->customerIds);
-            $collectionId=$this->entity->create($this->data->name,$customerIds);
-            $this->entity->setId($collectionId);
+            $collection=$this->entity->create($this->data->name,$customerIds);
+            $this->entity->setId($collection->getId());
             $this->view->rows = $this->entity->getDataObject();
         }
     }

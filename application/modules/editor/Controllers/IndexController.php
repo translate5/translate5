@@ -254,7 +254,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       $this->view->Php2JsVars()->set('headerOptions.height', (int)$rop->headerOptions->height);
       $this->view->Php2JsVars()->set('languages', $this->getAvailableLanguages());
-      $this->view->Php2JsVars()->set('translations', $this->translate->getAvailableTranslations());
+      
+      $translatsion=$this->translate->getAvailableTranslations();
+      //add custom translations to the frontend locale label
+      foreach ($translatsion as &$value){
+          $value=$value.' '.$this->translate->_('Oberfläche');
+      }
+      $this->view->Php2JsVars()->set('translations',$translatsion);
       
       //Editor.data.enableSourceEditing → still needed for enabling / disabling the whole feature (Checkbox at Import).
       $this->view->Php2JsVars()->set('enableSourceEditing', (bool) $rop->import->enableSourceEditing);
@@ -292,6 +298,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       //is the openid data visible for the default customer
       $this->view->Php2JsVars()->set('customers.openid.showOpenIdDefaultCustomerData',(boolean)$rop->customers->openid->showOpenIdDefaultCustomerData);
+      
+      //boolean config if the logout button in the segments editor header is visible or not
+      $this->view->Php2JsVars()->set('editor.toolbar.hideLogoutButton',(boolean)$rop->editor->toolbar->hideLogoutButton);
+      //boolean config if the leave task button button in the segments editor header is visible or not
+      $this->view->Php2JsVars()->set('editor.toolbar.hideLeaveTaskButton',(boolean)$rop->editor->toolbar->hideLeaveTaskButton);
       
       $this->setLanguageResourceJsVars();
       
