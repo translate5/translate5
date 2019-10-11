@@ -39,4 +39,4 @@ INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `valu
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES
-('runtimeOptions.worker.editor_Plugins_NecTm_Worker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running workers of the Okapi worker');
+('runtimeOptions.worker.editor_Plugins_NecTm_Worker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running workers of the NEC-TM-categories-synchronization worker');
