@@ -261,18 +261,25 @@ Ext.define('Editor.view.segments.Grid', {
     		  }
     		},
     		header: {
+    			padding:'8 8 8 8',//align the buttons with the toolbar buttons
     	        items: [{
-    	        	xtype: 'button',
-    	        	itemId:'logoutHeaderBtn',
-    	        	icon: Editor.data.moduleFolder+'images/door_out.png',
-    	        	text:me.item_logoutheaderbtn,
-    	        	hidden: !Editor.controller.HeadPanel || Editor.data.editor.toolbar.hideLogoutButton
-    	        }, {
+                	xtype: 'button',
+                	frame:false,
+                    itemId:'toolbarInfoButton',
+                    icon: Editor.data.moduleFolder+'images/information-white.png',
+                    tooltip: me.addToolbarInfoButtonTpl()
+    	        },{
     	        	xtype: 'button',
     	            itemId: 'leaveTaskHeaderBtn',
     	            icon: Editor.data.moduleFolder+'images/table_back.png',
     	            text:me.item_leavetaskheaderbtn,
     	            hidden: !Editor.controller.HeadPanel || Editor.data.editor.toolbar.hideLeaveTaskButton
+    	        },{
+    	        	xtype: 'button',
+    	        	itemId:'logoutHeaderBtn',
+    	        	icon: Editor.data.moduleFolder+'images/door_out.png',
+    	        	text:me.item_logoutheaderbtn,
+    	        	hidden: !Editor.controller.HeadPanel || Editor.data.editor.toolbar.hideLogoutButton
     	        }]
     	    },
             columns: columns
@@ -439,4 +446,13 @@ Ext.define('Editor.view.segments.Grid', {
             bottom:bottom,
         };
     },
+    
+    /***
+     * Add the toolbarinfo button tooltip
+     */
+    addToolbarInfoButtonTpl:function(){
+        var tpl = new Ext.XTemplate(Editor.util.Constants.appInfoTpl),
+        	infoPanel=Ext.create('Editor.view.ApplicationInfoPanel');
+        return tpl.applyTemplate(infoPanel.getEditorTplData());
+    }
 });

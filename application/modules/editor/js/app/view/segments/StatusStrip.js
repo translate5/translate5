@@ -53,39 +53,13 @@ Ext.define('Editor.view.segments.StatusStrip', {
         var me = this,
             config = {
             },
-            configItems = [],
-            userCanModifyWhitespaceTags = Editor.data.segments.userCanModifyWhitespaceTags,
-            userCanInsertWhitespaceTags = Editor.data.segments.userCanInsertWhitespaceTags,
-            whitespaceIcons = '';
+            configItems = [];
+        
         //add the minmaxlength component if the config is provided
         if(Editor.data.segments.enableCountSegmentLength){
             configItems.push({
                     xtype:'segment.minmaxlength',
                     htmlEditor:instanceConfig.htmlEditor
-                });
-        }
-        // whitespace-icons
-        if (userCanModifyWhitespaceTags && userCanInsertWhitespaceTags) {
-            configItems.push({
-                    xtype: 'button',
-                    cls: 'whitespaceIcon',
-                    text: '→',
-                    itemId: 'btnInsertWhitespaceTab',
-                    tooltip: 'TAB'
-                });
-            configItems.push({
-                    xtype: 'button',
-                    cls: 'whitespaceIcon',
-                    text: '↵',
-                    itemId: 'btnInsertWhitespaceNewline',
-                    tooltip: 'SHIFT+ENTER'
-                });
-            configItems.push({
-                    xtype: 'button',
-                    cls: 'whitespaceIcon',
-                    text: '⎵',
-                    itemId: 'btnInsertWhitespaceNbsp',
-                    tooltip: 'CTRL+SHIFT+Space'
                 });
         }
         

@@ -127,13 +127,13 @@ Ext.define('Editor.controller.Editor', {
             'taskConfirmationWindow button': {
                 click:'taskConfirm'
             },
-            '#segmentStatusStrip #btnInsertWhitespaceNbsp': {
+            '#naviToolbar #btnInsertWhitespaceNbsp': {
                 click: 'insertWhitespaceNbsp'
             },
-            '#segmentStatusStrip #btnInsertWhitespaceNewline': {
+            '#naviToolbar #btnInsertWhitespaceNewline': {
                 click: 'insertWhitespaceNewline'
             },
-            '#segmentStatusStrip #btnInsertWhitespaceTab': {
+            '#naviToolbar #btnInsertWhitespaceTab': {
                 click: 'insertWhitespaceTab'
             }
         }
@@ -811,9 +811,8 @@ Ext.define('Editor.controller.Editor', {
             sel,
             scrollMode=ed.self.STARTEDIT_MOVEEDITOR;
         
-        //if the next segment is not visible, scroll the grid,
-        //if it is visible move the editor
-        if(!rowMeta.isNextVisible){
+        //if the editor should be scrolled or moved
+        if(!rowMeta.isMoveEditor){
         	scrollMode=ed.self.STARTEDIT_SCROLLUNDER;
         }
         

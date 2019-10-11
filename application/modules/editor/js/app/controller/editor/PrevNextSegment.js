@@ -105,7 +105,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
                 nextEditable: null,
                 nextEditableFiltered: null,
                 isBorderReached: false,
-                isNextVisible:false//is the next column visible in the segments grid
+                isMoveEditor:false//move or scroll the editor
             }
       
         //no current record, or current not editable
@@ -242,7 +242,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         rowMeta.errorText = errorText;
         rowMeta.isLoading = !!me.isLoading;
         rowMeta.isBorderReached = isBorderReached;
-        rowMeta.isNextVisible = me.isNextVisible(rowMeta.idx,prevIndex);
+        rowMeta.isMoveEditor = me.isMoveEditor(rowMeta.idx,prevIndex);
         return rowMeta;
     },
     fetchFromServer: function(){
@@ -313,27 +313,31 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
     },
     
     /***
-     * Check if the next column is visible in the segments grid
+     * Calculate base on the visible columns in the grid, if the editor should be moved or scrolled.
+     * true: for move editor
+     * false: for scroll editor
      */
-    isNextVisible:function(nextIndex,currentIdx){
+    isMoveEditor:function(nextIndex,currentIdx){
     	var me=this,
-    		topInvisibleOffset=-3,//the offset for the top columns wich are not visible for the user, but are calculated as visible from extjs
     		segmentsGrid=me.editingPlugin.grid,
     		total = segmentsGrid.store.getTotalCount(),
-	    	indexBoundaries=segmentsGrid.getVisibleRowIndexBoundaries(segmentsGrid),
-	    	indexGridOffset=Math.round((indexBoundaries.bottom-indexBoundaries.top)/2),//number of segments offset for the editor
-	    	isOffsetBorder=(nextIndex-indexGridOffset <= topInvisibleOffset || nextIndex+indexGridOffset >= total);
+	    	indexBoundaries=segmentsGrid.getVisibleRowIndexBoundaries(),
+	    	indexGridOffset=Math.round((indexBoundaries.bottom-indexBoundaries.top)/3),
+	    	forwardOffset=Math.round(indexGridOffset*2.2),
+	    	backwardOffset=Math.round(indexGridOffset*0.8),
+	    	goForward=nextIndex>currentIdx;
     	
-    	//if the border is reached with o
+    	
+		var isOffsetBorder=goForward ? (nextIndex+forwardOffset >= total) : (nextIndex-backwardOffset <= 0);
+    	
+    	//if the border is reached with offset, all left columns should be visible
     	if(isOffsetBorder){
     		return true;
     	}
-    	//calculate the offset based of if the next segments is after or before the prev
-    	if(currentIdx>=nextIndex){
-    		indexBoundaries.top=indexBoundaries.top+indexGridOffset;
-    	}else{
-    		indexBoundaries.bottom=indexBoundaries.bottom-indexGridOffset;
+    	
+    	if(goForward){
+    		return nextIndex<(indexBoundaries.bottom-forwardOffset);
     	}
-	    return nextIndex>indexBoundaries.top && nextIndex<indexBoundaries.bottom;
+    	return nextIndex>(backwardOffset+indexBoundaries.top);
     }
 });
