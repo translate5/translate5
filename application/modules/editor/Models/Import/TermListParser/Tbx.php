@@ -733,7 +733,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
           return;
         }
         $this->termContainer['status']=$this->getMappedStatus($this->xml->readString(), $type);
-        $this->termContainer['updated']=date("Y-m-d H:i:s");
+        $this->termContainer['updated']=NOW_ISO;
         $this->termContainer['userGuid']=$this->user->getUserGuid();
         $this->termContainer['userName']=$this->user->getUserName();
     }
@@ -1246,7 +1246,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $this->termContainer['id']=$t->id;
                 $this->termContainer['language']=$t->language;
                 $this->termContainer['term']=$this->xml->readInnerXml();
-                $this->termContainer['updated']=date("Y-m-d H:i:s");
+                $this->termContainer['updated']=NOW_ISO;
                 $this->termContainer['userGuid']=$this->user->getUserGuid();
                 $this->termContainer['userName']=$this->user->getUserName();
                 return;
@@ -1272,7 +1272,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $this->termContainer['term']=$this->xml->readInnerXml();
                 $this->termContainer['language']=$t->language;
                 $this->termContainer['definition']=$this->actualDefinition;
-                $this->termContainer['updated']=date("Y-m-d H:i:s");
+                $this->termContainer['updated']=NOW_ISO;
                 $this->termContainer['userGuid']=$this->user->getUserGuid();
                 $this->termContainer['userName']=$this->user->getUserName();
                 return;
@@ -1294,7 +1294,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $this->termContainer['id']=$tmpTermValue['id'];
                 $this->termContainer['language']=$tmpTermValue['language'];
                 $this->termContainer['definition']=$this->actualDefinition;
-                $this->termContainer['updated']=date("Y-m-d H:i:s");
+                $this->termContainer['updated']=NOW_ISO;
                 $this->termContainer['userGuid']=$this->user->getUserGuid();
                 $this->termContainer['userName']=$this->user->getUserName();
                 
@@ -1312,7 +1312,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             $this->termContainer['definition']=$this->actualDefinition;
             $this->termContainer['language']=(int)$this->actualLangId;
             $this->termContainer['collectionId']=$this->termCollection->getId();
-            $this->termContainer['updated']=date("Y-m-d H:i:s");
+            $this->termContainer['updated']=NOW_ISO;
             $this->termContainer['userGuid']=$this->user->getUserGuid();
             $this->termContainer['userName']=$this->user->getUserName();
             
@@ -1336,7 +1336,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $this->termContainer['language']=(int)$this->actualLangId;
         $this->termContainer['collectionId']=$this->termCollection->getId();
         $this->termContainer['termEntryId']=$this->actualTermEntryIdDb;
-        $this->termContainer['updated']=date("Y-m-d H:i:s");
+        $this->termContainer['updated']=NOW_ISO;
         $this->termContainer['userGuid']=$this->user->getUserGuid();
         $this->termContainer['userName']=$this->user->getUserName();
     }

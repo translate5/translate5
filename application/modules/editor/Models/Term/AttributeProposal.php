@@ -94,7 +94,7 @@ class editor_Models_Term_AttributeProposal extends ZfExtended_Models_Entity_Abst
      */
     public function removeOlderThan(array $collectionIds,string $olderThan){
         return $this->db->delete([
-            'created <= ?' => $olderThan,
+            'created < ?' => $olderThan,
             'collectionId in (?)' => $collectionIds,
         ])>0;
     }
