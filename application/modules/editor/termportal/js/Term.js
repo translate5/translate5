@@ -94,11 +94,9 @@ var Term={
 		 * On term/term entry results tab before activate event
 		 */
 		onResultTabBeforeActivate:function(){
-			//if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-    			return false;
-        	}			
+            if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
+                return false;
+            }
 		},
 		
 		/***
@@ -1108,12 +1106,10 @@ var Term={
 			if(parent.length === 0){
 				return;
 			}
-			
-			 //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-    			return false;
-        	}
+
+            if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
+                return false;
+            }
 			
 			var yesCallback=function(){
 				//ajax call to the remove proposal action
@@ -1175,12 +1171,10 @@ var Term={
          */
         onAddTermEntryClick: function(event){
             console.log('onAddTermEntryClick');
-            
-            //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-    			return false;
-        	}
+
+            if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
+                return false;
+            }
         	
             var me = event.data.scope,
                 filteredCollections = getFilteredCollections();
@@ -1221,12 +1215,10 @@ var Term={
                 $_termSkeleton = me.$_termTable.find('.is-new'), // TODO: use DOM-cache
                 $termEditorSpan = $_termSkeleton.find('[data-editable]'),
                 $termEditorHolder = me.$_termTable.find('div[data-term-id="-1"]');
-            
-            //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-    			return false;
-        	}
+
+            if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
+                return false;
+            }
         	
             // if language is not set yet, draw language-select first...
             if (me.newTermLanguageId === null) {
@@ -1265,12 +1257,10 @@ var Term={
         		//close the opened term editor
         		termHeader.find('span.proposal-cancel').mouseup();
         	}
-        	
-        	//if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-    			return false;
-        	}
+
+            if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
+                return false;
+            }
         	
         	//render the cancel icons for the attributes
         	this.drawProposalButtons('attributeEditingOpened')

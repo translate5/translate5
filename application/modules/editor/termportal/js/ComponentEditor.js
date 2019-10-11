@@ -53,12 +53,10 @@ var ComponentEditor={
 		if(!Editor.data.app.user.isTermProposalAllowed){
 			return;
 		}
-		
-		//show info message if the comment attribute mandatory flag is set and the comment component editor is active
-    	if(Editor.data.apps.termportal.commentAttributeMandatory && this.isCommentComponentEditorActive()){
-			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-			return false;
-    	}
+
+        if (!this.isCommmentAttributeRequirementMet()) {
+            return false;
+        }
     	
         console.log('addTermComponentEditor');
 		var me=this,
@@ -123,12 +121,10 @@ var ComponentEditor={
 		if(!Editor.data.app.user.isTermProposalAllowed){
 			return;
 		}
-		
-		//if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-			return false;
-    	}
+
+        if (!this.isCommmentAttributeRequirementMet()) {
+            return false;
+        }
     	
         console.log('addAttributeComponentEditor');
 		var me=this,
@@ -594,6 +590,20 @@ var ComponentEditor={
     isCommentComponentEditorActive:function(){
     	var commentEditors=this.$_termTable.find('textarea[data-editable-comment]');
 		return commentEditors.length>0;
+    },
+    
+    /**
+     * Are the requirements for the comment-attribute met? If not, show a message and return false.
+     * Otherwise return true.
+     * @return bool
+     */
+    isCommmentAttributeRequirementMet: function() {
+        // If the comment attribute mandatory flag is set, check if there is unclosed comment editor.
+        if (Editor.data.apps.termportal.commentAttributeMandatory && this.isCommentComponentEditorActive()) {
+            showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'], proposalTranslations['commentAttributeMandatoryTitle']);
+            return false;
+        }
+        return true;
     }
 };
 
