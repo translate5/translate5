@@ -811,9 +811,8 @@ Ext.define('Editor.controller.Editor', {
             sel,
             scrollMode=ed.self.STARTEDIT_MOVEEDITOR;
         
-        //if the next segment is not visible, scroll the grid,
-        //if it is visible move the editor
-        if(!rowMeta.isNextVisible){
+        //if the editor should be scrolled or moved
+        if(!rowMeta.isMoveEditor){
         	scrollMode=ed.self.STARTEDIT_SCROLLUNDER;
         }
         
