@@ -26,17 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.PreferencesWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.taskpreferences',
-    data: {
-        userAssocDirty: false,
-    },
-    formulas: {
-        workflowMetadata: {
-            get: function(get) {
-                return this.get('currentTask').getWorkflowMetaData();
-            }
-        }
-    }
+/**#@++
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
+/**
+ * Store für Editor.model.Comment
+ * @class Editor.store.Comments
+ * @extends Ext.data.Store
+ */
+Ext.define('Editor.store.Categories', {
+  extend : 'Ext.data.Store',
+  model: 'Editor.model.Category',
+  storeId: 'Tags',
+  autoLoad: false,
+  pageSize: 0
 });

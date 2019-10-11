@@ -63,24 +63,13 @@ Ext.define('Editor.view.segments.Grid', {
     stateful: false,
     store: 'Segments',
     title: '#UT#Segmentliste und Editor',
-    tools: [
-        {
-            type: 'up',
-            itemId: 'headPanelUp'
-        },
-        {
-            type: 'down',
-            hidden: true,
-            itemId: 'headPanelDown'
-        }
-    ],
-    
     title_readonly: '#UT#Segmentliste und Editor - [LESEMODUS]',
     title_addition_unconfirmed: '#UT# - [AUFGABE UNBESTÄTIGT]',
     column_edited: '#UT#bearbeibar',    
     target_original: '#UT# (zur Importzeit)',    
     column_edited_icon: '{0} <img src="{1}" class="icon-editable" alt="{2}" title="{3}">',
-    
+    item_logoutheaderbtn:'#UT#Ausloggen',
+    item_leavetaskheaderbtn:'#UT#Aufgabe verlassen',
     columnMap:{},
     hasRelaisColumn: false,
     stateData: {},
@@ -271,6 +260,28 @@ Ext.define('Editor.view.segments.Grid', {
     			  grid.down('headercontainer').sortOnClick=false;
     		  }
     		},
+    		header: {
+    			padding:'8 8 8 8',//align the buttons with the toolbar buttons
+    	        items: [{
+                	xtype: 'button',
+                	frame:false,
+                    itemId:'toolbarInfoButton',
+                    icon: Editor.data.moduleFolder+'images/information-white.png',
+                    tooltip: me.addToolbarInfoButtonTpl()
+    	        },{
+    	        	xtype: 'button',
+    	            itemId: 'leaveTaskHeaderBtn',
+    	            icon: Editor.data.moduleFolder+'images/table_back.png',
+    	            text:me.item_leavetaskheaderbtn,
+    	            hidden: !Editor.controller.HeadPanel || Editor.data.editor.toolbar.hideLeaveTaskButton
+    	        },{
+    	        	xtype: 'button',
+    	        	itemId:'logoutHeaderBtn',
+    	        	icon: Editor.data.moduleFolder+'images/door_out.png',
+    	        	text:me.item_logoutheaderbtn,
+    	        	hidden: !Editor.controller.HeadPanel || Editor.data.editor.toolbar.hideLogoutButton
+    	        }]
+    	    },
             columns: columns
         });
 
@@ -407,5 +418,41 @@ Ext.define('Editor.view.segments.Grid', {
         else {
             sm.select(rowIdx);
         }
+    },
+    
+    /***
+     * Return visible row indexes in segment grid
+     * TODO if needed move this as overide so it can be used for all grids
+     * @returns {Object} { top:topIndex, bottom:bottomIndex }
+     */
+    getVisibleRowIndexBoundaries:function(){
+        var view=this.getView(),
+            vTop = view.el.getTop(),
+            vBottom = view.el.getBottom(),
+            top=-1, bottom=-1;
+
+
+        Ext.each(view.getNodes(), function (node) {
+            if (top<0 && Ext.fly(node).getBottom() > vTop) {
+                top=view.indexOf(node);
+            }
+            if (Ext.fly(node).getTop() < vBottom) {
+                bottom = view.indexOf(node);
+            }
+        });
+
+        return {
+            top:top,
+            bottom:bottom,
+        };
+    },
+    
+    /***
+     * Add the toolbarinfo button tooltip
+     */
+    addToolbarInfoButtonTpl:function(){
+        var tpl = new Ext.XTemplate(Editor.util.Constants.appInfoTpl),
+        	infoPanel=Ext.create('Editor.view.ApplicationInfoPanel');
+        return tpl.applyTemplate(infoPanel.getEditorTplData());
     }
 });

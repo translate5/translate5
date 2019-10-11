@@ -41,6 +41,9 @@ Ext.define('Editor.controller.HeadPanel', {
   extend : 'Ext.app.Controller',
   views: ['HeadPanel','HelpWindow'],
   helpBtn: '#UT#Hilfe',
+  requires:[
+  	'Editor.view.ApplicationInfoPanel'
+  ],
   refs:[{
       ref : 'headPanel',
       selector : 'headPanel'
@@ -53,6 +56,9 @@ Ext.define('Editor.controller.HeadPanel', {
   },{
       ref: 'northPanelEditor',
       selector: '#editorViewport headPanel[region="north"]'
+  },{
+	  ref:'applicationInfoPanel',
+	  selector:'#applicationInfoPanel'
   }],
   listen: {
       controller: {
@@ -132,20 +138,8 @@ Ext.define('Editor.controller.HeadPanel', {
       if(!this.getHeadPanel()) {
           return;
       }
-      var hp = this.getHeadPanel(),
-          data = {
-              user: Editor.app.authenticatedUser.data,
-              task: Editor.data.task.data,
-              showTaskGuid: Editor.data.debug && Editor.data.debug.showTaskGuid,
-              version: Editor.data.debug && Editor.data.app.version + ' (ext '+Ext.getVersion().version+')',
-              browser: Editor.data.debug && Ext.browser.identity,
-              taskLabel: hp.strings.task,
-              userLabel: hp.strings.loggedinAs,
-              loginLabel: hp.strings.loginName,
-              readonlyLabel: hp.strings.readonly,
-              isReadonly: Editor.data.task.isReadOnly()
-          };
-      hp.down('#infoPanel').update(data);
+      var hp = this.getHeadPanel();
+      hp.down('#applicationInfoPanel').update(this.getApplicationInfoPanel().getEditorTplData());
       hp.down('#tasksMenu').show();
   },
   /**
@@ -153,16 +147,7 @@ Ext.define('Editor.controller.HeadPanel', {
    */
   handleInitAdmin: function() {
       var hp = this.getHeadPanel();
-      hp.down('#infoPanel').update({
-          user: Editor.app.authenticatedUser.data,
-          task: null,
-          showTaskGuid: false,
-          version: Editor.data.debug && Editor.data.app.version + ' (ext '+Ext.getVersion().version+')',
-          browser: Editor.data.debug && Ext.browser.identity,
-          taskLabel: hp.strings.task,
-          userLabel: hp.strings.loggedinAs,
-          loginLabel: hp.strings.loginName
-      });
+      hp.down('#applicationInfoPanel').update(this.getApplicationInfoPanel().getAdminTplData());
       hp.down('#tasksMenu').hide();
   },
   handleLogout: function() {

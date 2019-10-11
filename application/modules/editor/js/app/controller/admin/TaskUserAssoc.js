@@ -40,9 +40,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       ref: 'assocDelBtn',
       selector: '#adminTaskUserAssocGrid #remove-user-btn'
   },{
-    ref: 'assocNotifyBtn',
-    selector:'#adminTaskUserAssocGrid #notify-user-btn'  
-  },{
       ref: 'userAssocGrid',
       selector: '#adminTaskUserAssocGrid'
   },{
@@ -61,8 +58,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   messages: {
       assocSave: '#UT#Eintrag gespeichert!',
       assocDeleted: '#UT#Eintrag gelöscht!',
-      assocSaveError: '#UT#Fehler beim Speichern der Änderungen!',
-      userNotifySuccess:'#UT#Benutzer wurden erfolgreich per E-Mail benachrichtigt'
+      assocSaveError: '#UT#Fehler beim Speichern der Änderungen!'
   },
   //***********************************************************************************
   //Begin Events
@@ -105,9 +101,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           '#adminTaskUserAssocGrid #add-user-btn': {
               click: me.handleAddUser
           },
-          '#adminTaskUserAssocGrid #notify-user-btn': {
-              click: me.handleNotifyUserBtn
-          },
           'adminTaskUserAssoc combo[name="role"]': {
               change: me.initState
           },
@@ -146,44 +139,22 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           meta = task.getWorkflowMetaData(),
           role = meta.steps2roles[task.get('workflowStepName')] || Ext.Object.getKeys(meta.roles)[0],
           state = Ext.Object.getKeys(meta.states)[0],
-          newRec = assoc.model.create({
-              taskGuid: task.get('taskGuid'),
-              role: role,
-              state: state
-          });
+          newRec;
+      //in competitive mode instead OPEN / UNCONFIRMED is used
+      if(task.get('usageMode') == task.USAGE_MODE_COMPETITIVE && state == task.USER_STATE_OPEN){
+          state = task.USER_STATE_UNCONFIRMED
+      }
+      newRec = assoc.model.create({
+          taskGuid: task.get('taskGuid'),
+          role: role,
+          state: state
+      });
       me.getAssocDelBtn().disable();
       me.getEditInfo().hide();
       me.getUserAssocForm().show();
       me.getUserAssocForm().setDisabled(false);
       me.getUserAssoc().loadRecord(newRec);
       me.initState(null, role, '');
-  },
-  
-  /***
-   * Notify users handler
-   */
-  handleNotifyUserBtn:function(){
-      var me=this,
-          task = me.getPrefWindow().actualTask;
-
-      Ext.Ajax.request({
-          url: Editor.data.restpath+'task/'+task.get('id')+'/workflow',
-          method: 'POST',
-          params: {
-              trigger:'notifyAllUsersAboutTaskAssociation'
-          },
-          scope: me,
-          success: function(response){
-              var responseData = Ext.JSON.decode(response.responseText);
-              if(!responseData){
-                  return;
-              }
-              Editor.MessageBox.addSuccess(me.messages.userNotifySuccess);
-          },
-          failure: function(response){
-              Editor.app.getController('ServerException').handleException(response);
-          }
-      });
   },
   
   /**
@@ -217,9 +188,14 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           assoc = me.getAdminTaskUserAssocsStore();
       
       Ext.Array.each(toDelete, function(toDel){
+          me.getPrefWindow().lookupViewModel().set('userAssocDirty', true);
           toDel.eraseVersioned(task, {
               success: function(rec, op) {
                   assoc.remove(toDel);
+                  if(assoc.getCount() == 0) {
+                      //if there is no user assoc entry anymore, we consider that as not dirty
+                      me.getPrefWindow().lookupViewModel().set('userAssocDirty', false);
+                  }
                   me.updateUsers(assoc);
                   me.fireEvent('removeUserAssoc', me, toDel, assoc);
                   task.load();//reload only the task, not the whole task prefs, should be OK
@@ -247,6 +223,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           return;
       }
       me.getPrefWindow().setLoading(true);
+      me.getPrefWindow().lookupViewModel().set('userAssocDirty', true);
       rec.saveVersioned(task, {
           success: function(savedRec, op) {
               me.handleCancel();
@@ -273,13 +250,10 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    * @param {} store
    */
   updateUsers: function(store) {
-      var me = this,
-          assocNotifyBtn=me.getAssocNotifyBtn();
+      var me = this;
       if(me.getUserAssoc()) {
           me.getUserAssoc().excludeLogins = store.collect('login');
       }
-      //disable the button if there is no record in the store
-      assocNotifyBtn && assocNotifyBtn.setDisabled(store.getCount()< 1)
   },
   /**
    * sets the initial state value dependent on the role
@@ -292,6 +266,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           form = me.getUserAssocForm(),
           task = me.getPrefWindow().actualTask,
           stateCombo = form.down('combo[name="state"]'),
+          isCompetitive = task.get('usageMode') == task.USAGE_MODE_COMPETITIVE,
           newState = task.USER_STATE_OPEN,
           rec = form.getRecord(),
           isChanged = stateCombo.getValue() != rec.get('state'),
@@ -308,6 +283,9 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       });
       if(initialStates && initialStates[newValue]) {
           newState = initialStates[newValue];
+      }
+      if(isCompetitive && newState == task.USER_STATE_OPEN) {
+          newState = task.USER_STATE_UNCONFIRMED;
       }
       rec.set('state', newState);
       stateCombo.setValue(newState);

@@ -38,10 +38,11 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         save: '#UT#Importieren',
         cancel: '#UT#Abbrechen',
         mergeTerms:'#UT#Termeinträge verschmelzen',
-        deleteTermEntriesDate:'#UT#Termeinträge löschen älter als',
+        deleteTermEntriesDate:'#UT#Terme löschen, deren letzte Berührung länger her ist als',
         deleteTermEitriesImport:'#UT#Termeinträge löschen älter als aktueller Import',
         helpButtonTooltip:'#UT#Info zum Term-Collection',
-        deleteTermProposals:'#UT#Vorschläge löschen älter als'
+        deleteTermProposals:'#UT#Vorschläge löschen, deren letzte Berührung länger her ist als',
+        deleteTermProposalsImport:'#UT#Vorschläge löschen älter als aktueller Import'
     },
     tools:[{
         type:'help',
@@ -53,7 +54,7 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         var me = this,
             config = {
                 title:me.strings.title,
-                height : 360,
+                height : 460,
                 tools:[{
                     type:'help',
                     tooltip:me.strings.helpButtonTooltip,
@@ -76,39 +77,48 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         },{
             xtype:'datefield',
             fieldLabel: me.strings.deleteTermEntriesDate,
-            itemId:'deleteEntriesModifiedOlderThan',
-            name:'deleteEntriesModifiedOlderThan',
+            itemId:'deleteTermsLastTouchedOlderThan',
+            name:'deleteTermsLastTouchedOlderThan',
             listeners:{
-            	change:function(datefield,newValue){
-            		var form=me.down('form').getForm(),
-            			proposalsCb=form.findField('deletProposalsOlderThan'),
-            			currentImportCb=form.findField('deleteEntriesOlderThanCurrentImport');
-            		proposalsCb.setDisabled(!newValue && !currentImportCb.checked);
-            	}
-            },
+	            change:function(field,newValue){
+	        		me.handleFieldPairDisable('deleteTermsOlderThanCurrentImport',newValue);
+	        	}
+            }
         },{
             xtype:'checkbox',
             fieldLabel: me.strings.deleteTermEitriesImport,
-            itemId:'deleteEntriesOlderThanCurrentImport',
-            name:'deleteEntriesOlderThanCurrentImport',
+            itemId:'deleteTermsOlderThanCurrentImport',
+            name:'deleteTermsOlderThanCurrentImport',
             value:false,
             listeners:{
-            	change:function(checkbox,newValue){
-            		var form=me.down('form').getForm(),
-            			proposalsCb=form.findField('deletProposalsOlderThan'),
-            			deletedateField=form.findField('deleteEntriesModifiedOlderThan');
-            		
-            		proposalsCb.setDisabled(!newValue && deletedateField.getValue()==null);
+	            change:function(field,newValue){
+	        		me.handleFieldPairDisable('deleteTermsLastTouchedOlderThan',newValue);
+	        	}
+            }
+        },{
+            xtype:'datefield',
+            fieldLabel: me.strings.deleteTermProposalsDate,
+            itemId:'deleteProposalsLastTouchedOlderThan',
+            name:'deleteProposalsLastTouchedOlderThan',
+            inputValue:true,
+            value:false,
+            listeners:{
+            	change:function(field,newValue){
+            		me.handleFieldPairDisable('deleteProposalsOlderThanCurrentImport',newValue);
             	}
             }
         },{
             xtype:'checkbox',
-            fieldLabel: me.strings.deleteTermProposals,
-            itemId:'deletProposalsOlderThan',
-            name:'deletProposalsOlderThan',
-            disabled:true,
+            fieldLabel: me.strings.deleteTermProposalsImport,
+            itemId:'deleteProposalsOlderThanCurrentImport',
+            name:'deleteProposalsOlderThanCurrentImport',
             inputValue:true,
-            value:false
+            value:false,
+            listeners:{
+            	change:function(field,newValue){
+            		me.handleFieldPairDisable('deleteProposalsLastTouchedOlderThan',newValue);
+            	}
+            }
         });
         me.down('filefield[name="tmUpload"]').regex=/\.tbx$/i;
     },
@@ -118,5 +128,14 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
      */
     loadRecord: function(record) {
         this.languageResourceRecord = record;
+    },
+    
+    /***
+     * Disable or enable the given field based on the pair value
+     */
+    handleFieldPairDisable:function(field,value){
+		var form=this.down('form').getForm(),
+			pairField=form.findField(field);
+		pairField.setDisabled(value);
     }
 });

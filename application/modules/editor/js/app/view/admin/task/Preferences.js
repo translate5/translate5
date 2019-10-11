@@ -42,6 +42,8 @@ Ext.define('Editor.view.admin.task.Preferences', {
     workflow_label: '#UT#Workflow',
     editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
 
+    //TODO: uncomment me when internal event listeners are used here
+    //defaultListenerScope:true,
     initComponent: function() {
         var me = this,
             workflows = [],

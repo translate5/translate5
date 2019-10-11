@@ -80,6 +80,9 @@ Ext.define('Editor.controller.SearchReplace', {
             'segmentsHtmleditor': {
                 initialize: 'initEditor',
                 push: 'handleAfterPush'
+            },
+            'segmentsToolbar':{
+            	render:'onSegmentsToolbarRender'
             }
         },
         controller:{
@@ -224,7 +227,8 @@ Ext.define('Editor.controller.SearchReplace', {
         characterLimitError:'#UT#Der Suchstring ist zu groß',
         noIndexFound:'#UT#Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.',
         searchAndReplaceMenuItem:'#UT#Suchen und ersetzen',
-        replaceAllErrors: "#UT#Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten."
+        replaceAllErrors: "#UT#Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.",
+        searchReplaceToolbarBtn:'#UT#Suche'
     },
     
     constructor:function(){
@@ -308,6 +312,37 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     setTrackChangesInternalFlag:function(isSearchReplaceRange){
         this.fireEvent('isSearchReplaceRangeChange',isSearchReplaceRange);
+    },
+    
+    /***
+     * On segments toolbar render handler
+     */
+    onSegmentsToolbarRender:function(toolbar){
+    	var me=this,
+    		index=7,
+    		segmentsToolbar=Ext.ComponentQuery.query('segmentsToolbar');
+    	
+    	//calculate the index of the search button
+    	if(segmentsToolbar.length>0){
+    		segmentsToolbar=segmentsToolbar[0];
+    		var watchListFilterBtn=segmentsToolbar.down('#watchListFilterBtn');
+    		if(watchListFilterBtn){
+    			index=segmentsToolbar.items.indexOf(watchListFilterBtn);
+    		}
+    	}
+    	
+    	toolbar.insert(index,[{
+            xtype: 'button',
+            itemId: 'searchReplaceToolbarBtn',
+            cls: 'searchReplaceToolbarBtn',
+            icon: Editor.data.moduleFolder+'images/magnifier.png',
+            text: me.strings.searchReplaceToolbarBtn,
+            handler:function(){
+            	me.showSearchAndReplaceWindow(null);
+            }
+        },{
+            xtype: 'tbseparator'
+        }])
     },
     
     /***
@@ -578,7 +613,8 @@ Ext.define('Editor.controller.SearchReplace', {
             ed=grid.editingPlugin;
         
         
-        if(!ed.editing){
+        if(!ed.editing || me.isSearchRequired()){
+        	me.triggerSearch(field);
             return;
         }
 
@@ -795,7 +831,12 @@ Ext.define('Editor.controller.SearchReplace', {
 
         //get the search parametars (with filter and sort included)
         params=me.getSearchReplaceParams();
-
+        
+        if(!params['searchField']){
+        	activeTab.isValid();
+        	return;
+        }
+        
         Ext.Ajax.request({
             url: Editor.data.restpath+'segment/search',
             params:params,
@@ -1228,7 +1269,7 @@ Ext.define('Editor.controller.SearchReplace', {
             results=activeTabViewModel.get('result'),
             saveCurrentOpen=activeTab.down('#saveCurrentOpen').checked,
             searchTopChekbox=activeTab.down('#searchTopChekbox').checked,
-            indexBoundaries=me.getVisibleRowIndexBoundaries(grid),
+            indexBoundaries=grid.getVisibleRowIndexBoundaries(),
             goToIndex=null,
             goToIndexEdited=null,
             tmpRowNumber=null,
@@ -1595,33 +1636,6 @@ Ext.define('Editor.controller.SearchReplace', {
             }
             createNew && this.handleSearchReplaceHotkey(null);
         }
-    },
-    
-    /***
-     * Return visible row indexes in segment grid
-     * @param {Object} segment grid
-     * @returns {Object} { top:topIndex, bottom:bottomIndex }
-     */
-    getVisibleRowIndexBoundaries:function(grid){
-        var view=grid.getView(),
-            vTop = view.el.getTop(),
-            vBottom = view.el.getBottom(),
-            top=-1, bottom=-1;
-
-
-        Ext.each(view.getNodes(), function (node) {
-            if (top<0 && Ext.fly(node).getBottom() > vTop) {
-                top=view.indexOf(node);
-            }
-            if (Ext.fly(node).getTop() < vBottom) {
-                bottom = view.indexOf(node);
-            }
-        });
-
-        return {
-            top:top,
-            bottom:bottom,
-        };
     },
     
     /***

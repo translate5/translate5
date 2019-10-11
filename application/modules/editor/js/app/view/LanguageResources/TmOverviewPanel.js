@@ -178,6 +178,15 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
 	                    	return Editor.util.LanguageResources.getService(r.get('serviceName')).getExportTooltip();
 	                    }
+                    },{
+                        tooltip: me.strings.log,
+                        action: 'log',
+                        getTip:function(view,metadata,record,rowIndex,colIndex,store){
+                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getLogTooltip(record);
+	                    },
+	                    getClass:function(view,metadata,record,rowIndex,colIndex,store){
+	                    	return Editor.util.LanguageResources.getService(record.get('serviceName')).getLogIconClass(record);
+	                    }
                     }],
                 },{
                     xtype: 'gridcolumn',
@@ -385,20 +394,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         }
         record.set('status',record.STATUS_LOADING);
         record.load();
-    },
-
-    /***
-     * Show import icon only for importable resources
-     */
-    showImport:function(record){
-    	return Ext.Array.contains(['OpenTM2','TermCollection'],record.get('serviceName'));
-    },
-    
-    /***
-     * Show download icon only for downloadable resources
-     */
-    showDownload:function(record){
-    	return Ext.Array.contains(['OpenTM2'],record.get('serviceName'));
     }
     
     

@@ -623,6 +623,14 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
         } else {
             view.refresh();
         }
+        
+        // If there are columns to trigger rendering, and the rendered block or not either the view size 
+        // or, if store count less than view size, the store count, then try to refresh the view table
+        if (view.getVisibleColumnManager().getColumns().length && rows.getCount() !== Math.min(me.store.getCount(), me.viewSize)) {
+        	//see Alex comment(3.2.6) in https://jira.translate5.net/browse/TRANSLATE-1045 
+        	view.refresh();
+        }
+        
         //<debug> 
         // If there are columns to trigger rendering, and the rendered block os not either the view size 
         // or, if store count less than view size, the store count, then there's a bug. 

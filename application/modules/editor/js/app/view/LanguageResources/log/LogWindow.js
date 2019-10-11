@@ -26,17 +26,32 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.PreferencesWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.taskpreferences',
-    data: {
-        userAssocDirty: false,
-    },
-    formulas: {
-        workflowMetadata: {
-            get: function(get) {
-                return this.get('currentTask').getWorkflowMetaData();
-            }
+Ext.define('Editor.view.LanguageResources.log.LogWindow', {
+    extend: 'Editor.view.admin.log.Window',
+    alias: 'widget.languageResourcesLogLogWindow',
+    requires: [
+        'Editor.view.LanguageResources.log.LogGrid',
+        'Editor.view.admin.log.Window'
+    ],
+    languageResource: null,
+    title: '#UT#Ereignisse zu Sprachresource "{0}"',
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config;
+        me.languageResource =instanceConfig.languageResource;
+        config = {
+    		title: Ext.String.format(me.title, me.languageResource.get('name')),
+            items : [{
+                xtype: 'languageResourcesLogLogGrid'
+            }] 
+        };
+        
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
         }
+        return me.callParent([config]);
+    },
+    load: function(options) {
+        this.down('languageResourcesLogLogGrid').load(this.languageResource.getId());
     }
 });

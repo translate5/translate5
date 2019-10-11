@@ -77,91 +77,111 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     },
     initConfig: function(instanceConfig) {
             var me = this,
+		        config,
+		        menu;
+            
+            menu={
+                xtype: 'menu',
+                items: [{
+                    xtype: 'menucheckitem',
+                    mode:{
+                        type: 'editMode',
+                        readonly: true
+                    },
+                    bind: {
+                        checked: '{isNormalView}'
+                    },
+                    text: me.item_viewModeBtn,
+                    group: 'toggleView',
+                    textAlign: 'left'
+                },{
+                    xtype: 'menucheckitem',
+                    checked: true, //FIXME must always calculated now! also the visible items! → do this through a view model for the Toolbar
+                    mode:{
+                        type: 'editMode',
+                        readonly: false
+                    },
+                    bind: {
+                        checked: '{isNormalEdit}',
+                        hidden: '{taskIsReadonly}'
+                    },
+                    text: me.item_editModeBtn,
+                    group: 'toggleView',
+                    textAlign: 'left'
+                },{
+                    xtype: 'menucheckitem',
+                    mode:{
+                        type: 'ergonomicMode',
+                        readonly: false
+                    },
+                    bind: {
+                        checked: '{isErgoEdit}',
+                        hidden: '{taskIsReadonly}'
+                    },
+                    text: me.item_ergonomicModeBtn,
+                    group: 'toggleView',
+                    textAlign: 'left'
+                },{
+                    xtype: 'menucheckitem',
+                    mode:{
+                        type: 'ergonomicMode',
+                        readonly: true
+                    },
+                    bind: {
+                        checked: '{isErgoView}'
+                    },
+                    text: me.item_ergonomicModeReadonlyBtn,
+                    group: 'toggleView',
+                    textAlign: 'left'
+                },{
+                    xtype: 'menuseparator'
+                },{
+                    xtype: 'menucheckitem',
+                    itemId: 'hideTagBtn',
+                    bind: {
+                        disabled: '{!editorIsReadonly}'
+                    },
+                    text: me.item_hideTagBtn,
+                    tagMode: 'hide',
+                    group: 'tagMode'
+                },{
+                    xtype: 'menucheckitem',
+                    itemId: 'shortTagBtn',
+                    checked: true,
+                    text: me.item_shortTagBtn,
+                    tagMode: 'short',
+                    group: 'tagMode'
+                },{
+                    xtype: 'menucheckitem',
+                    itemId: 'fullTagBtn',
+                    checked: true,
+                    text: me.item_fullTagBtn,
+                    tagMode: 'full',
+                    group: 'tagMode'
+                },{
+                    xtype: 'menuseparator'
+                }]
+            };
+            
+            //add the available translate5 translations
+            Ext.Object.each(Editor.data.translations, function(i, n) {
+                menu.items.push({
+                    xtype: 'menucheckitem',
+                    itemId: 'localeMenuItem'+i,
+                    checked: Editor.data.locale==i,
+                    text: n,
+                    value:i,
+                    tagMode: 'full',
+                    group: 'localeMenuGroup'
+                });
+            });
+            
             config = {
                 items: [{
                     xtype: 'button',
                     text:me.item_viewModesMenu,
                     itemId: 'viewModeMenu',
-                    menu: {
-                        xtype: 'menu',
-                        items: [{
-                            xtype: 'menucheckitem',
-                            mode:{
-                                type: 'editMode',
-                                readonly: true
-                            },
-                            bind: {
-                                checked: '{isNormalView}'
-                            },
-                            text: me.item_viewModeBtn,
-                            group: 'toggleView',
-                            textAlign: 'left'
-                        },{
-                            xtype: 'menucheckitem',
-                            checked: true, //FIXME must always calculated now! also the visible items! → do this through a view model for the Toolbar
-                            mode:{
-                                type: 'editMode',
-                                readonly: false
-                            },
-                            bind: {
-                                checked: '{isNormalEdit}',
-                                hidden: '{taskIsReadonly}'
-                            },
-                            text: me.item_editModeBtn,
-                            group: 'toggleView',
-                            textAlign: 'left'
-                        },{
-                            xtype: 'menucheckitem',
-                            mode:{
-                                type: 'ergonomicMode',
-                                readonly: false
-                            },
-                            bind: {
-                                checked: '{isErgoEdit}',
-                                hidden: '{taskIsReadonly}'
-                            },
-                            text: me.item_ergonomicModeBtn,
-                            group: 'toggleView',
-                            textAlign: 'left'
-                        },{
-                            xtype: 'menucheckitem',
-                            mode:{
-                                type: 'ergonomicMode',
-                                readonly: true
-                            },
-                            bind: {
-                                checked: '{isErgoView}'
-                            },
-                            text: me.item_ergonomicModeReadonlyBtn,
-                            group: 'toggleView',
-                            textAlign: 'left'
-                        },{
-                            xtype: 'menuseparator'
-                        },{
-                            xtype: 'menucheckitem',
-                            itemId: 'hideTagBtn',
-                            bind: {
-                                disabled: '{!editorIsReadonly}'
-                            },
-                            text: me.item_hideTagBtn,
-                            tagMode: 'hide',
-                            group: 'tagMode'
-                        },{
-                            xtype: 'menucheckitem',
-                            itemId: 'shortTagBtn',
-                            checked: true,
-                            text: me.item_shortTagBtn,
-                            tagMode: 'short',
-                            group: 'tagMode'
-                        },{
-                            xtype: 'menucheckitem',
-                            itemId: 'fullTagBtn',
-                            checked: true,
-                            text: me.item_fullTagBtn,
-                            tagMode: 'full',
-                            group: 'tagMode'
-                        }]
-                    }
+                    menu:menu
                 },{
                     xtype: 'tbseparator'
                 },{
@@ -200,8 +220,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     itemId: 'watchListFilterBtn',
                     cls: 'watchListFilterBtn',
                     enableToggle: true,
-                    icon: Editor.data.moduleFolder+'images/star.png',
-                    text: me.item_watchListFilterBtn
+                    icon: Editor.data.moduleFolder+'images/show_bookmarks.png'
                 },{
                     xtype: 'tbseparator',
                     hidden: !Editor.data.task.hasQmSub()
@@ -218,6 +237,10 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'tbfill'
                 },{
                     xtype: 'button',
+                    itemId: 'optionsBtn',
+                    text: me.item_optionsTagBtn
+                },{
+                    xtype: 'button',
                     //FIXME let me come from a config:
                     href: 'http://confluence.translate5.net/display/BUS/Editor+keyboard+shortcuts',
                     hrefTarget: '_blank',
@@ -226,10 +249,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         text: me.item_helpTooltip,
                         showDelay: 0
                     }
-                },{
-                    xtype: 'button',
-                    itemId: 'optionsBtn',
-                    text: me.item_optionsTagBtn
                 }]
             };
         if (instanceConfig) {

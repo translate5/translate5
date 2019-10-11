@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,17 +25,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.PreferencesWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.taskpreferences',
-    data: {
-        userAssocDirty: false,
-    },
-    formulas: {
-        workflowMetadata: {
-            get: function(get) {
-                return this.get('currentTask').getWorkflowMetaData();
-            }
-        }
-    }
+Ext.define('Editor.view.LanguageResources.log.LogGrid', {
+    extend: 'Editor.view.admin.log.Grid',
+    alias: 'widget.languageResourcesLogLogGrid',
+    store: 'Editor.store.LanguageResources.Logs',
+    cls: 'languageResourcesLogLogGrid',
+    entityUrlPart: 'languageresourceinstance'
 });

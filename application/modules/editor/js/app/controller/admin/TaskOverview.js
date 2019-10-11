@@ -594,6 +594,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   getTaskMaskBindings: function(){
       var app = Editor.app;
       return {
+          callback: function(rec, op) {
+              Editor.MessageBox.addByOperation(op);
+          },
           success: app.unmask,
           failure: function(rec, op){
               var recs = op.getRecords(),
@@ -680,6 +683,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       task.save({
           //prevent default ServerException handling
           preventDefaultHandler: true,
+          callback: function(rec, op) {
+              Editor.MessageBox.addByOperation(op);
+          },
           success: function() {
               store.load();
               app.unmask();

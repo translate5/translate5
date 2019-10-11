@@ -104,7 +104,8 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
             ret = {
                 nextEditable: null,
                 nextEditableFiltered: null,
-                isBorderReached: false
+                isBorderReached: false,
+                isMoveEditor:false//move or scroll the editor
             }
       
         //no current record, or current not editable
@@ -226,7 +227,8 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
             ed = me.editingPlugin,
             grid = ed.grid,
             isBorderReached = rowMeta.isBorderReached,
-            rowMeta = filtered ? rowMeta.nextEditableFiltered : rowMeta.nextEditable;
+            rowMeta = filtered ? rowMeta.nextEditableFiltered : rowMeta.nextEditable,
+            prevIndex=me.prev.nextEditable ? me.prev.nextEditable.idx : 0;
             
         if(!rowMeta) {
             rowMeta = {}; //nothing found
@@ -240,6 +242,7 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
         rowMeta.errorText = errorText;
         rowMeta.isLoading = !!me.isLoading;
         rowMeta.isBorderReached = isBorderReached;
+        rowMeta.isMoveEditor = me.isMoveEditor(rowMeta.idx,prevIndex);
         return rowMeta;
     },
     fetchFromServer: function(){
@@ -307,5 +310,34 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
                 me.fireEvent('prevnextloaded',me);
             }
         });
+    },
+    
+    /***
+     * Calculate base on the visible columns in the grid, if the editor should be moved or scrolled.
+     * true: for move editor
+     * false: for scroll editor
+     */
+    isMoveEditor:function(nextIndex,currentIdx){
+    	var me=this,
+    		segmentsGrid=me.editingPlugin.grid,
+    		total = segmentsGrid.store.getTotalCount(),
+	    	indexBoundaries=segmentsGrid.getVisibleRowIndexBoundaries(),
+	    	indexGridOffset=Math.round((indexBoundaries.bottom-indexBoundaries.top)/3),
+	    	forwardOffset=Math.round(indexGridOffset*2.2),
+	    	backwardOffset=Math.round(indexGridOffset*0.8),
+	    	goForward=nextIndex>currentIdx;
+    	
+    	
+		var isOffsetBorder=goForward ? (nextIndex+forwardOffset >= total) : (nextIndex-backwardOffset <= 0);
+    	
+    	//if the border is reached with offset, all left columns should be visible
+    	if(isOffsetBorder){
+    		return true;
+    	}
+    	
+    	if(goForward){
+    		return nextIndex<(indexBoundaries.bottom-forwardOffset);
+    	}
+    	return nextIndex>(backwardOffset+indexBoundaries.top);
     }
 });

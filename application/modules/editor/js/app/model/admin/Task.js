@@ -39,6 +39,9 @@ Ext.define('Editor.model.admin.Task', {
   USER_STATE_VIEW: 'view',
   USER_STATE_WAITING: 'waiting',
   USER_STATE_FINISH: 'finished',
+  USER_STATE_UNCONFIRMED: 'unconfirmed',
+  USAGE_MODE_COMPETITIVE: 'competitive',
+  USAGE_MODE_COOPERATIVE: 'cooperative',
   states: {
       ERROR: 'error',
       IMPORT: 'import',
@@ -80,7 +83,12 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'lastErrors', type: 'auto'},
     {name: 'emptyTargets', type: 'boolean', persist: false},
     {name: 'userState', type: 'string', isEqual: function() {
-      return false;
+      return false; //ensures that the value is also send when it was set to the same value
+    }},
+    //for workflow actions are mostly basing on state transitions. There fore the previous state is very useful.
+    {name: 'userStatePrevious', type: 'string', critical: true, mapping: function(data) {
+        //init the value with the old value 
+        return data.userState;
     }},
     {name: 'userRole', type: 'string', persist: false},
     {name: 'isUsed', type: 'boolean', persist: false}, //actually not used, so no isUsed method
@@ -88,7 +96,8 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'users', type: 'auto', persist: false},
     {name: 'userCount', type: 'integer', persist: false},
     {name: 'defaultSegmentLayout', type: 'boolean', persist: false},
-    {name: 'notEditContent', type: 'boolean'}
+    {name: 'notEditContent', type: 'boolean'},
+    {name: 'usageMode', type: 'string'}
   ],
   hasMany: [{
       model: 'Editor.model.segment.Field',
@@ -176,11 +185,15 @@ Ext.define('Editor.model.admin.Task', {
       return this.get('state') == this.states.IMPORT;
   },
   /**
-   * returns if task is still in import state
+   * returns if task is unconfirmed for the current user
    * @returns {Boolean}
    */
   isUnconfirmed: function() {
-      return this.get('state') == this.states.UNCONFIRMED;
+      var me = this, unconfirmed = me.USER_STATE_UNCONFIRMED;
+      if(this.get('state') == this.states.UNCONFIRMED) {
+          return true;
+      }
+      return me.modified && me.modified.userState == unconfirmed || me.get('userState') == unconfirmed;
   },
   /**
    * returns if task had errors while import
@@ -214,7 +227,7 @@ Ext.define('Editor.model.admin.Task', {
       if(me.get('userRole') == 'visitor' || me.get('userState') == me.USER_STATE_VIEW){
           return true;
       }
-      return me.isLocked() || me.isFinished() || me.isWaiting() || me.isEnded();
+      return me.isLocked() || me.isFinished() || me.isWaiting() || me.isEnded() || me.isUnconfirmed();
   },
   /**
    * returns if task is ended

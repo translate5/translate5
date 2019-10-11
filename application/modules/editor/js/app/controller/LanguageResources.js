@@ -97,11 +97,12 @@ Ext.define('Editor.controller.LanguageResources', {
       instantTranslate:'#UT#Sofortübersetzung'
   },
   init: function() {
-      //add the default service interceptor instance 
-      Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.Default'));
+	  //INFO: the default service is initialized in the TmOverview controller
+	  //since this controller can be disabled via the acl right, and the service classes are used
+	  //in the tmoverview panel
+	  
       //add the specific service instances, if needed
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.TermCollection'));
-      
       Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.OpenTM2'));
   },
   assocStore: null,
@@ -174,6 +175,9 @@ Ext.define('Editor.controller.LanguageResources', {
           me.setValueForEditor(matchRecord.get('target'));
           me.fireEvent('prepareCompleteReplace',matchRecord.get('target'),false); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
           editor.mainEditor.setValueAndMarkup(me.languageResourceValueForEditor, rec, editor.columnToEdit);
+          if(Editor.data.task.get('emptyTargets')) {
+        	  editor.mainEditor.insertMarkup(rec.get('source'), true);
+    	  }
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);

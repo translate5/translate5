@@ -367,17 +367,6 @@ table.message-box-data .error {}
 #segment-grid .segment-min-max .valid-length {
     background-color: #24f324;
 }
-
-#segment-grid .segment-statusstrip .whitespaceIcon {
-    float: left;
-    padding: 5px 3px;
-    margin: 0px !important;
-    border-top:  0px !important;
-    border-right: 1px solid #fff;
-    border-bottom:  0px !important;
-    border-left:  0px !important;
-}
-
 .ico-comment-add {background-image: url("../images/comment_add.png");}
 .ico-comment-edit {background-image: url("../images/comment_edit.png");background-repeat: no-repeat;}
 .ico-comment-delete {background-image: url("../images/comment_delete.png");background-repeat: no-repeat;}
@@ -546,7 +535,7 @@ tr.customState td div {font-style: italic;}
 .ico-task-preferences {background-image: url("../images/page_gear.png");}
 .ico-task-reopen {background-image: url("../images/control_start.png");}
 .ico-task-delete {background-image: url("../images/page_delete.png");}
-.ico-task-log {background-image: url("../images/information.png");}
+.ico-task-log {background-image: url("../images/error.png");}
 .ico-task-clone {background-image: url("../images/page_copy.png");}
 .ico-task-showexportmenu {background-image: url("../images/database_go.png");}
 .ico-task-clone {background-image: url("../images/page_copy.png");}
@@ -586,6 +575,7 @@ tr.customState td div {font-style: italic;}
 
 /* User Admin */
 .gender-male {background: url("../images/user.png") no-repeat 6px center;}
+.gender-neutral {background: url("../images/user_gray.png") no-repeat 6px center;}
 .gender-female {background: url("../images/user_female.png") no-repeat 6px center;}
 .ico-user-edit {background: url("../images/user_edit.png") no-repeat center;}
 .ico-user-save {background: url("../images/disk.png") no-repeat center;}
@@ -726,6 +716,7 @@ a.x-btn span.task-confirmation {
 .language-ressource-import .ico-tm-import {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}
 .language-ressource-export .ico-tm-download {background-image: url(../images/book_go.png);background-repeat:no-repeat;background-position:center;}
 .ico-tm-magnifier {background-image: url(../images/magnifier.png) !important;background-repeat:no-repeat;background-position:center;}
+.ico-tm-log {background-image: url(../images/error.png);background-repeat:no-repeat;background-position:center;}
 /*
 .matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 */
@@ -755,7 +746,7 @@ a.x-btn span.task-confirmation {
     font-weight: bold;
     font-style: italic;
 }
-.pretranslateCheckboxIcon:before {
+.pretranslateCheckboxIcon:after {
     content: "";
     display: block;
     background-image:url(../images/information.png); 

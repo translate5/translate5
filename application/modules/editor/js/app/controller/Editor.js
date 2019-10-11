@@ -42,7 +42,8 @@ Ext.define('Editor.controller.Editor', {
     requires: [
         'Editor.view.segments.EditorKeyMap',
         'Editor.controller.editor.PrevNextSegment',
-        'Editor.view.task.ConfirmationWindow'
+        'Editor.view.task.ConfirmationWindow',
+        'Editor.util.Constants'
     ],
     mixins: ['Editor.util.Event',
         	 'Editor.util.Range'
@@ -126,13 +127,13 @@ Ext.define('Editor.controller.Editor', {
             'taskConfirmationWindow button': {
                 click:'taskConfirm'
             },
-            '#segmentStatusStrip #btnInsertWhitespaceNbsp': {
+            '#naviToolbar #btnInsertWhitespaceNbsp': {
                 click: 'insertWhitespaceNbsp'
             },
-            '#segmentStatusStrip #btnInsertWhitespaceNewline': {
+            '#naviToolbar #btnInsertWhitespaceNewline': {
                 click: 'insertWhitespaceNewline'
             },
-            '#segmentStatusStrip #btnInsertWhitespaceTab': {
+            '#naviToolbar #btnInsertWhitespaceTab': {
                 click: 'insertWhitespaceTab'
             }
         }
@@ -807,13 +808,19 @@ Ext.define('Editor.controller.Editor', {
             ed = me.getEditPlugin(),
             rowMeta = me.prevNextSegment.getCalculated(),
             callback,
-            sel;
+            sel,
+            scrollMode=ed.self.STARTEDIT_MOVEEDITOR;
+        
+        //if the editor should be scrolled or moved
+        if(!rowMeta.isMoveEditor){
+        	scrollMode=ed.self.STARTEDIT_SCROLLUNDER;
+        }
         
         //if we have a nextSegment and it is rendered, bring into the view and open it
         if (rowMeta.rec && grid.getView().getNode(rowMeta.rec)) {
             selModel.select(rowMeta.rec);
             //REMIND here was startEdit defered with 300 millis, is this still needed?
-            ed.startEdit(rowMeta.rec, rowMeta.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
+            ed.startEdit(rowMeta.rec, rowMeta.lastColumn,scrollMode);
             return;
         }
 
@@ -822,7 +829,7 @@ Ext.define('Editor.controller.Editor', {
             callback = function() {
                 grid.selectOrFocus(rowMeta.idx);
                 sel = selModel.getSelection();
-                ed.startEdit(sel[0], rowMeta.lastColumn, ed.self.STARTEDIT_SCROLLUNDER);
+                ed.startEdit(sel[0], rowMeta.lastColumn,scrollMode);
             };
             grid.scrollTo(rowMeta.idx, {
                 callback: callback,

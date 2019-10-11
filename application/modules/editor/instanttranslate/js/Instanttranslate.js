@@ -245,9 +245,11 @@ function handleAfterLocalesChange() {
  * @returns {Boolean}
  */
 function hasEnginesForLanguageCombination() {
-	var returnValue=isSourceTargetAvailable($("#sourceLocale").val(),$("#targetLocale").val());
-	returnValue ? $("#switchSourceTarget").removeAttr("disabled") : $("#switchSourceTarget").attr("disabled", true);
-	returnValue ? $("#switchSourceTarget").removeClass( "switchSourceTargetDisabled" ) : $("#switchSourceTarget").addClass( "switchSourceTargetDisabled" );
+	var returnValue=isSourceTargetAvailable($("#sourceLocale").val(),$("#targetLocale").val()),
+		isDisableButton=!isSourceTargetAvailable($("#targetLocale").val(),$("#sourceLocale").val());//switch source and target so the other way arround is checked
+	//the button is disabled when for the target as source there is no source as target
+	$("#switchSourceTarget").prop("disabled", isDisableButton);
+	isDisableButton ?$("#switchSourceTarget").addClass( "switchSourceTargetDisabled" ) :  $("#switchSourceTarget").removeClass( "switchSourceTargetDisabled" );
     return returnValue;
 }
 
@@ -261,6 +263,20 @@ function isSourceTargetAvailable(sourceRfc,targetRfc){
     var targetLocalesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceRfc);
     return targetLocalesAvailable.indexOf(targetRfc) !== -1;
 }
+
+/***
+ * Set the first first available target locale for the given source locale
+ * @returns
+ */
+function setTargetFirstAvailable(sourceRfc){
+	var targetLocalesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceRfc);
+	if(targetLocalesAvailable.length<1){
+		return;
+	}
+	$("#targetLocale").val(targetLocalesAvailable[0]);
+	$("#targetLocale").selectmenu("refresh");
+}
+
 
 /**
  * What locales are available for translation for the given locale?

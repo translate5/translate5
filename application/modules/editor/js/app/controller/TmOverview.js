@@ -46,13 +46,16 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.EditTmWindow',
         'Editor.view.LanguageResources.TaskGridWindow',
         'Editor.view.LanguageResources.ImportCollectionWindow',
-        'Editor.view.LanguageResources.ProposalExport'
+        'Editor.view.LanguageResources.log.LogWindow',
+        'Editor.view.LanguageResources.ProposalExport',
+        'Editor.view.LanguageResources.services.Default'
     ],
     models: ['Editor.model.admin.Task', 'Editor.model.LanguageResources.Resource','Editor.model.LanguageResources.LanguageResource'],
     stores:[
         'Editor.store.LanguageResources.Resources',
         'Editor.store.LanguageResources.LanguageResource',
-        'Editor.store.LanguageResources.SdlEngine'
+        'Editor.store.LanguageResources.SdlEngine',
+        'Editor.store.LanguageResources.Logs'
     ],
     strings: {
         languageresource: '#UT#Sprach-Resourcen',
@@ -164,6 +167,10 @@ Ext.define('Editor.controller.TmOverview', {
             name: 'taskassocs', type: 'auto', persist: false
         });
 
+        //add the default service interceptor instance
+        //this needs to be initialized here, since the service classes are used in the tmoverview panel
+        Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.Default'));
+        
         //define task to reload importing tasks
         me.checkImportingRecordsTask = Ext.TaskManager.newTask({
             run: function(){
@@ -372,6 +379,13 @@ Ext.define('Editor.controller.TmOverview', {
         form.reset();
         window.close();
     },
+    handleLogTm:function(view, cell, cellIdx, rec){
+        var win = Ext.widget('languageResourcesLogLogWindow',{
+        	languageResource:rec
+        });
+        win.show();
+        win.load();
+    },
     handleEditTm : function(view, cell, cellIdx, rec){
         var win = Ext.widget('editTmWindow');
         win.loadRecord(rec);
@@ -384,14 +398,8 @@ Ext.define('Editor.controller.TmOverview', {
     },
     handleImportTm : function(view, cell, cellIdx, rec){
         //find the import window from the service name
-        var importWindow='';
-        if(rec.get('serviceName')==Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME){
-            importWindow='importCollectionWindow';
-        }
-        if(rec.get('serviceName')==Editor.model.LanguageResources.Resource.OPENTM2_SERVICE_NAME){
-            importWindow='importTmWindow';
-        }
-        var win = Ext.widget(importWindow);
+        var importWindow = Editor.util.LanguageResources.getService(rec.get('serviceName')).getImportWindow(),
+            win = Ext.widget(importWindow);
         win.loadRecord(rec);
         win.show();
     },
@@ -422,6 +430,9 @@ Ext.define('Editor.controller.TmOverview', {
             case 'export':
                 me.handleExportProposalClick(view,cell,col,record);
                 break;
+            case 'log':
+                me.handleLogTm(view,cell,col,record);
+                break;
         }
     },
     handleDownloadTm : function(view, cell, cellIdx, rec, ev){
@@ -429,25 +440,36 @@ Ext.define('Editor.controller.TmOverview', {
             proxy = rec.proxy,
             id = rec.getId(),
             url = proxy.getUrl(),
-            menu;
+            menu,
+            filetypes = Editor.util.LanguageResources.getService(rec.get('serviceName')).getValidFiletypes(),
+            createMenuItems = function() {
+                var items = [];
+                if (filetypes.indexOf('tm') !== -1) {
+                    items.push({
+                        itemId: 'exportTm',
+                        hrefTarget: '_blank',
+                        href: url+'/download.tm',
+                        text: me.strings.exportTm
+                    });
+                }
+                if (filetypes.indexOf('tmx') !== -1) {
+                    items.push({
+                        itemId: 'exportTmx',
+                        hrefTarget: '_blank',
+                        href: url+'/download.tmx',
+                        text : me.strings.exportTmx
+                    });
+                }
+                return items;
+            };
 
         if (!url.match(proxy.slashRe)) {
             url += '/';
         }
         url += encodeURIComponent(id);
 
-        menu = Ext.widget('menu', {
-            items: [{
-                itemId: 'exportTm',
-                hrefTarget: '_blank',
-                href: url+'/download.tm',
-                text: me.strings.exportTm
-            },{
-                itemId: 'exportTmx',
-                hrefTarget: '_blank',
-                href: url+'/download.tmx',
-                text : me.strings.exportTmx
-            }]    
+        menu = Ext.widget('menu', { 
+            items: createMenuItems()
         });
         menu.showAt(ev.getXY());
     },

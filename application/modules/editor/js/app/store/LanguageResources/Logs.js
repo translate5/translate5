@@ -26,17 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.PreferencesWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.taskpreferences',
-    data: {
-        userAssocDirty: false,
-    },
-    formulas: {
-        workflowMetadata: {
-            get: function(get) {
-                return this.get('currentTask').getWorkflowMetaData();
-            }
-        }
-    }
+/**
+ * @class Editor.store.LanguageResources.Logs
+ * @extends Ext.data.Store
+ */
+Ext.define('Editor.store.LanguageResources.Logs', {
+  extend : 'Ext.data.Store',
+  model: 'Editor.model.LanguageResources.Log',
+  remoteSort: true,
+  remoteFilter: true,
+  autoLoad: false,
+  // must then be set to false after initing the grid and store
+  suppressNextFilter: true, 
+  pageSize: 0
 });

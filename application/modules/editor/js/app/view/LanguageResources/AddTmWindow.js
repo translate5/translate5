@@ -36,7 +36,8 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         'Editor.view.LanguageResources.EngineCombo',
         'Editor.view.LanguageResources.TmWindowViewController',
         'Editor.view.LanguageResources.TmWindowViewModel',
-        'Editor.view.LanguageCombo'
+        'Editor.view.LanguageCombo',
+        'Editor.store.Categories'
     ],
     controller: 'tmwindowviewcontroller',
     viewModel: {
@@ -51,6 +52,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         name: '#UT#Name',
         file: '#UT#TM/TMX-Datei (optional)',
         importTmxType: '#UT#Bitte verwenden Sie eine TM oder TMX Datei!',
+        categories: '#UT#Kategorien',
         color: '#UT#Farbe',
         colorTooltip: '#UT#Farbe dieser Sprachressource',
         save: '#UT#Speichern',
@@ -58,8 +60,6 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         customers:'#UT#Für diese Kunden nutzen',
         useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
         mergeTerms:'#UT#Termeinträge verschmelzen',
-        deleteTermEntriesDate:'#UT#Termeinträge löschen älter als',
-        deleteTermEitriesImport:'#UT#Termeinträge löschen älter als aktueller Import',
         collection:'#UT#TBX-Datei',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!'
     },
@@ -67,6 +67,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
     width : 500,
     modal : true,
     layout:'fit',
+    autoScroll: true,
 
     tmxRegex: /\.(tm|tmx)$/i,
     tbxRegex: /\.(tbx)$/i,
@@ -77,14 +78,6 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
 
     initConfig : function(instanceConfig) {
         var me = this,
-        langCombo = {
-                xtype: 'combo',
-                typeAhead: true,
-                displayField: 'label',
-                queryMode: 'local',
-                valueField: 'id'
-            },
-            config = {},
             defaults = {
                 labelWidth: 160,
                 anchor: '100%'
@@ -96,6 +89,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                 padding: 5,
                 ui: 'default-frame',
                 defaults: defaults,
+                scrollable: 'y',
                 items: [{
                     xtype: 'combo',
                     name:'resourceId',
@@ -152,25 +146,6 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     itemId:'mergeTerms',
                     name:'mergeTerms',
                     value:true
-                },{
-                    xtype:'datefield',
-                    fieldLabel: me.strings.deleteTermEntriesDate,
-                    itemId:'deleteEntriesModifiedOlderThan',
-                    name:'deleteEntriesModifiedOlderThan',
-                    bind:{
-                        hidden:'{!isTermCollectionResource}',
-                        disabled:'{!isTermCollectionResource}'
-                    }
-                },{
-                    xtype:'checkbox',
-                    fieldLabel: me.strings.deleteTermEitriesImport,
-                    itemId:'deleteEntriesOlderThanCurrentImport',
-                    name:'deleteEntriesOlderThanCurrentImport',
-                    value:false,
-                    bind:{
-                        hidden:'{!isTermCollectionResource}',
-                        disabled:'{!isTermCollectionResource}'
-                    }
                 },{
                     xtype:'customers',
                     name:'resourcesCustomers',
@@ -234,6 +209,19 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     bind:{
                         fieldLabel:'{uploadLabel}' //me.strings.file
                     }
+                },{
+                    xtype: 'tagfield',
+                    name: 'categories',
+                    id: 'categories',
+                    store: Ext.create('Editor.store.Categories').load(),
+                    fieldLabel: me.strings.categories,
+                    disabled: true,
+                    typeAhead: true,
+                    valueField: 'id',
+                    displayField: 'customLabel',
+                    multiSelect: true,
+                    queryMode: 'local',
+                    encodeSubmitValue: true
                 }]
             }],
             dockedItems : [{

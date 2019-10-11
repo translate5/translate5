@@ -40,6 +40,7 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
     id: 'Default',
 
     exportTooltip:'#UT#Exportieren',
+    log:'#UT#Log',
     
     /**
      * returns the row css class for the associated service in the tm overview panel
@@ -95,7 +96,42 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
      * Get download language reources action icon tooltip
      */
     getDownloadTooltip:function(){
-    	return false;
+        return false;
+    },
+    
+    /***
+     * Get log language reources action icon class
+     */
+    getLogIconClass:function(record){
+        if(record.get('eventsCount') > 0){
+            return 'ico-tm-log';
+        }
+        return 'x-hidden-display';
+    },
+    
+    /***
+     * Get log language reources action icon tooltip
+     */
+    getLogTooltip:function(record){
+        if(record.get('eventsCount') > 0){
+            return this.log;
+        }
+        return false;
+    },
+    
+    /***
+     * Get valid file-types for download.
+     * @return array
+     */
+    getValidFiletypes:function(){
+        return ['tm','tmx'];
+    },
+    
+    /***
+     * Get the import window for handleImportTm()
+     */
+    getImportWindow:function(){
+        return 'importTmWindow';
     }
 
 
