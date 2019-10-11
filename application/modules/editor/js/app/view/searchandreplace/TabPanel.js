@@ -82,8 +82,7 @@ Ext.define('Editor.view.searchandreplace.TabPanel', {
                         xtype: 'button',
                         itemId:'replaceButton',
                         bind:{
-                            visible:'{!isSearchView}',
-                            disabled:'{!isSearchResultsFound}'
+                            visible:'{!isSearchView}'
                         },
                         text: me.strings.replaceButton 
                     },{ 

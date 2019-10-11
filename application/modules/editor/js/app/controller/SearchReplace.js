@@ -613,7 +613,8 @@ Ext.define('Editor.controller.SearchReplace', {
             ed=grid.editingPlugin;
         
         
-        if(!ed.editing){
+        if(!ed.editing || me.isSearchRequired()){
+        	me.triggerSearch(field);
             return;
         }
 
@@ -830,7 +831,12 @@ Ext.define('Editor.controller.SearchReplace', {
 
         //get the search parametars (with filter and sort included)
         params=me.getSearchReplaceParams();
-
+        
+        if(!params['searchField']){
+        	activeTab.isValid();
+        	return;
+        }
+        
         Ext.Ajax.request({
             url: Editor.data.restpath+'segment/search',
             params:params,
