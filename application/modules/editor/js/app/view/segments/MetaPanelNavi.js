@@ -229,6 +229,7 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
   	 				},
   	 				width:28,
   	 				height:28,
+  	 				padding:0,
   	 				text: '→',
   	 				itemId: 'btnInsertWhitespaceTab',
   	 				tooltip: 'TAB'
@@ -241,6 +242,7 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
   	 				},
   	 				width:28,
   	 				height:28,
+  	 				padding:0,
   	 				text: '↵',
   	 				itemId: 'btnInsertWhitespaceNewline',
   	 				tooltip: 'SHIFT+ENTER'
@@ -253,6 +255,7 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
   	 				},
   	 				width:28,
   	 				height:28,
+  	 				padding:0,
   	 				text: '⎵',
   	 				itemId: 'btnInsertWhitespaceNbsp',
   	 				tooltip: 'CTRL+SHIFT+Space'
