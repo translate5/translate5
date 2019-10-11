@@ -266,7 +266,7 @@ Ext.define('Editor.view.segments.Grid', {
                 	xtype: 'button',
                 	frame:false,
                     itemId:'toolbarInfoButton',
-                    iconCls:'x-fa fa-info-circle',
+                    icon: Editor.data.moduleFolder+'images/information-white.png',
                     tooltip: me.addToolbarInfoButtonTpl()
     	        },{
     	        	xtype: 'button',
