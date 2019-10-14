@@ -189,7 +189,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $source= $this->prepareSegmentContent($this->getQueryString($segment));
         $target= $this->prepareSegmentContent($segment->getTargetEdit());
         if($this->api->update($source, $target, $segment, $file->getFileName())) {
-            $messages->addNotice('Segment im TM aktualisiert!');
             return;
         }
         

@@ -252,7 +252,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         $target = $this->prepareSegmentContent($segment->getTargetEdit());
         $filename = $this->languageResource->getSpecificData('fileName');  //  (= if file was imported for LanguageResource on creation)
         if($this->api->addTMUnit($source, $target, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories, $filename)) {
-            $messages->addNotice('Segment im TM aktualisiert!');
             return;
         }
         

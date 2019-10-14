@@ -2949,11 +2949,6 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>importing</target>
 </trans-unit>
 
-<trans-unit id='U2VnbWVudCBpbSBUTSBha3R1YWxpc2llcnQh'>
-    <source>Segment im TM aktualisiert!</source>
-    <target>Segment updated in the TM!</target>
-</trans-unit>
-
 <trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'>
     <source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source>
     <target>The queried OpenTM2 instance is not available</target>
