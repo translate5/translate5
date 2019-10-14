@@ -59,6 +59,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_clearSortAndFilterTooltip: '#UT#Sortierung und Filter zurücksetzen',
     item_watchListFilterBtn: '#UT#Lesezeichen',
     item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
+    item_showBookmarkedSegments: '#UT#Nur Segmente mit Lesezeichen anzeigen',
     viewModel: {
         formulas: {
             isNormalEdit: function(get) {
@@ -220,6 +221,10 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     itemId: 'watchListFilterBtn',
                     cls: 'watchListFilterBtn',
                     enableToggle: true,
+                    tooltip: {
+                        text: me.item_showBookmarkedSegments,
+                        showDelay: 0
+                    },
                     icon: Editor.data.moduleFolder+'images/show_bookmarks.png'
                 },{
                     xtype: 'tbseparator',
