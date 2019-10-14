@@ -98,7 +98,7 @@ Ext.define('Editor.view.ViewPortEditor', {
             	  maxWidth:'100%',
             	  region: 'north',
             	  autoScroll:true,
-            	  html: Editor.data.app.branding,
+            	  html: Editor.data.app.customHtmlContainer,
               },{
                   xtype: 'panel',
                   region: 'center',
