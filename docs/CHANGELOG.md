@@ -3,6 +3,16 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.2.11] - 2019-10-14
+###Changed
+TRANSLATE-1378 Search & Replace: Activate "Replace"-key right away
+TRANSLATE-1615 Move whitespace buttons to segment meta-panel
+TRANSLATE-1815 Segment editor should automatically move down a bit
+TRANSLATE-1836: Get rid of message "Segment updated in TM!"
+
+###Bugfixes
+TRANSLATE-1826: Include east asian sub-languages and thai in string-based termTagging
+
 ## [3.2.10] - 2019-10-08
 ###Added
 TRANSLATE-1774: Integrate NEC-TM with translate5 as LanguageResource
