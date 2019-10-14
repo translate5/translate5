@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  * 
  * TODO is this class layer necessary?, currently all functions can be moved without a problem into the Init.php 
  */
+require __DIR__.'/bus-server/Configuration.php';//message bus config
 class editor_Plugins_FrontEndMessageBus_Bus {
     const CHANNEL = 'instance';
     
@@ -52,7 +53,8 @@ class editor_Plugins_FrontEndMessageBus_Bus {
     public function notify($channel, $command, $data = null) {
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
-        $http->setUri('http://localhost:9057');
+        $uri=MESSAGE_BUS_SERVER_PROTOCOL.'://'.MESSAGE_BUS_SERVER_IP.':'.MESSAGE_BUS_SERVER_PORT;
+        $http->setUri($uri);
         //FIXME from config, see server.php for notes about config
         
         //FIXME the value behind "instance" is used to identify the current instance via a unique hash
@@ -63,7 +65,13 @@ class editor_Plugins_FrontEndMessageBus_Bus {
         $http->setParameterPost('channel', $channel);
         $http->setParameterPost('command', $command);
         $http->setParameterPost('payload', json_encode($data));
-        $resp = $http->request($http::POST);
+        
+        try {
+            $this->processResponse($http->request($http::POST));
+        }
+        catch (Exception $e) {
+            error_log('Error on message bus channel notify. The error was: '.PHP_EOL.$e->getMessage().PHP_EOL.$e->getTraceAsString());
+        }
         
         //FIXME if host is not reachable, deactivate plugin temporarly (like termtagger DOWN check)
         // for performance reasons we should alternativly use unix sockets (https://stackoverflow.com/questions/4489975/how-to-send-datagrams-through-a-unix-socket-from-php) if possoble.
@@ -73,5 +81,40 @@ class editor_Plugins_FrontEndMessageBus_Bus {
         
         //TODO may not bring an exception to the frontend if an error happens here, just log it and good.
         //TODO log response, log JSON encode errors
+    }
+    
+    /**
+     * Parses and processes the response
+     * 
+     * @param Zend_Http_Response $response
+     * @return boolean
+     */
+    protected function processResponse(Zend_Http_Response $response) {
+        $validStates = [200, 201];
+        
+        //check for HTTP State (REST errors)
+        if(!in_array($response->getStatus(), $validStates)) {
+            error_log('Invalid response type in message bus channel notify process response. Response status was:'.$response->getStatus());
+            error_log(print_r($response,1));
+            return false;
+        }
+        
+        $responseBody = trim($response->getBody());
+        $result = (empty($responseBody)) ? '' : json_decode($responseBody);
+        
+        //TODO: why this returns error ? see the error log on page reload
+        //check for JSON errors
+        if(json_last_error() > 0){
+            error_log('Invalid json response in message bus channel notify process response. The json error was:'.PHP_EOL.json_last_error_msg());
+            error_log(print_r($response,1));
+            return false;
+        }
+        if(empty($result)){
+            error_log('Empty json response in message bus channel notify process response.');
+            error_log(print_r($response,1));
+            return false;
+        }
+        
+        return true;
     }
 }

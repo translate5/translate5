@@ -2,6 +2,8 @@
 use Translate5\FrontEndMessageBus\MessageBus;
 
 require __DIR__ . '/bus-server/vendor/autoload.php';
+require __DIR__.'/bus-server/Configuration.php';//message bus config
+require __DIR__.'/Configuration.php';//server bus client config
 
 /**
  * TODO use eclipse external tools for running / restart while development
@@ -20,7 +22,7 @@ $bus = new MessageBus();
 // FIXME use unix sockets here if possible, where possible means if IP is a localdevice, see comment in notify method too
 //   React\Socket\Server is able to deal with unix:// schema so far
 //   the counterpart in editor_Plugins_FrontEndMessageBus_Bus::notify (Zend_Http_Client using Zend_Http_Client_Adapter_Socket) too.
-$webSockPhp = new React\Socket\Server('127.0.0.1:9057', $loop);
+$webSockPhp = new React\Socket\Server(MESSAGE_BUS_SERVER_IP.':'.MESSAGE_BUS_SERVER_PORT, $loop);
 $server = new React\Http\Server([$bus, 'processServerRequest']);
 $server->listen($webSockPhp);
 $server->on('error', function(\Exception $error) {
@@ -29,8 +31,9 @@ $server->on('error', function(\Exception $error) {
     //TODO: use the Translate5\FrontEndMessageBus for the error handling
 });
 
+$clientConfig=new editor_Plugins_FrontEndMessageBus_Configuration();
 // WebSocket Server: open public server for connections from Browsers 
 // FIXME make server and port configurable, see above
-$app = new \Ratchet\App('translate5.local', '9056', '0.0.0.0', $loop);
+$app = new \Ratchet\App($clientConfig->getDomain(),$clientConfig->getPort(), '0.0.0.0', $loop);
 $app->route('/translate5', $bus);
 $app->run();
