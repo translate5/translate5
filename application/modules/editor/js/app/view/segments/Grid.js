@@ -264,7 +264,6 @@ Ext.define('Editor.view.segments.Grid', {
     			padding:'8 8 8 8',//align the buttons with the toolbar buttons
     	        items: [{
                 	xtype: 'button',
-                	frame:false,
                     itemId:'toolbarInfoButton',
                     icon: Editor.data.moduleFolder+'images/information-white.png',
                     tooltip: me.addToolbarInfoButtonTpl()

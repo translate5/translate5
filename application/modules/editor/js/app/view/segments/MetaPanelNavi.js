@@ -41,7 +41,10 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     extend: 'Ext.toolbar.Toolbar',
     
     border: false,
-    layout: 'vbox',
+    layout: {
+        type: 'vbox',
+        align: 'left'
+    },
     
     itemId: 'naviToolbar',
 
@@ -66,7 +69,7 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     item_nextFiltered: '#UT#Nicht speichern und nächstes Segment im Workflow öffnen (ALT + Bild ↓)',
     item_prev: '#UT#Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)',
     item_prevFiltered: '#UT#Nicht speichern und vorheriges Segment im Workflow öffnen (ALT + Bild ↑)',
-    item_whitespaceButtonGroup: '#UT#Sonderzeichen hinzufügen',
+    item_whitespaceButtonGroup: '#UT#Sonderzeichen hinzufügen:',
     initComponent: function() {
       var me = this,
           //fields = Editor.data.task.segmentFields(),
@@ -96,7 +99,7 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
     	  layout: {
     		  type: 'hbox'
 	      },
-	      width: '100%',
+	      flex:1,
     	  items:[{
 	          xtype: 'buttongroup',
 	          columns: 3,
@@ -211,31 +214,51 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
       // whitespace-icons
       if (userCanModifyWhitespaceTags && userCanInsertWhitespaceTags) {
     	  items.push({
-  	 		 	xtype: 'fieldset',
-  	 		 	width: '100%',
-  	 		 	title:me.item_whitespaceButtonGroup,
-  	 			defaults: {
-  	 				scale: 'small',
-  	 				margin: '2 2 2 2',
-  	 			},
+  	 		 	xtype: 'buttongroup',
+  	 		 	width:'97%',
+  	 		 	height:45,
   	 			items:[{
-  	 				xtype: 'button',
-  	 	             cls: 'whitespaceIcon',
-  	 	             text: '→',
-  	 	             itemId: 'btnInsertWhitespaceTab',
-  	 	             tooltip: 'TAB'
+  	 				xtype: 'displayfield',
+  	 	            value: me.item_whitespaceButtonGroup
   	 			},{
   	 				xtype: 'button',
-  	 	             cls: 'whitespaceIcon',
-  	 	             text: '↵',
-  	 	             itemId: 'btnInsertWhitespaceNewline',
-  	 	             tooltip: 'SHIFT+ENTER'
+  	 				border: 1,
+  	 				style: {
+  	 				    borderColor: '#d0d0d0',
+  	 				    borderStyle: 'solid'
+  	 				},
+  	 				width:28,
+  	 				height:28,
+  	 				padding:0,
+  	 				text: '→',
+  	 				itemId: 'btnInsertWhitespaceTab',
+  	 				tooltip: 'TAB'
   	 			},{
   	 				xtype: 'button',
-  	 	             cls: 'whitespaceIcon',
-  	 	             text: '⎵',
-  	 	             itemId: 'btnInsertWhitespaceNbsp',
-  	 	             tooltip: 'CTRL+SHIFT+Space'
+  	 				border: 1,
+  	 				style: {
+  	 				    borderColor: '#d0d0d0',
+  	 				    borderStyle: 'solid'
+  	 				},
+  	 				width:28,
+  	 				height:28,
+  	 				padding:0,
+  	 				text: '↵',
+  	 				itemId: 'btnInsertWhitespaceNewline',
+  	 				tooltip: 'SHIFT+ENTER'
+  	 			},{
+  	 				xtype: 'button',
+  	 				border: 1,
+  	 				style: {
+  	 				    borderColor: '#d0d0d0',
+  	 				    borderStyle: 'solid'
+  	 				},
+  	 				width:28,
+  	 				height:28,
+  	 				padding:0,
+  	 				text: '⎵',
+  	 				itemId: 'btnInsertWhitespaceNbsp',
+  	 				tooltip: 'CTRL+SHIFT+Space'
   	 			}]
     	  });
       }
