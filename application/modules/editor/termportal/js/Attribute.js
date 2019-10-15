@@ -422,9 +422,9 @@ var Attribute={
 	 */
 	handleAttributeHeaderText:function(attribute,addColon){
 	    var noHeaderName=attribute.name + (attribute.attrType ? (" "+attribute.attrType) : ""),
-	    	headerText=attribute.headerText ? attribute.headerText :  noHeaderName;//if no headerText use attribute name + if exist attribute type
-	    
-	    return headerText+ (addColon ? ":" : "");
+	    	headerText=attribute.headerText ? attribute.headerText :  noHeaderName,//if no headerText use attribute name + if exist attribute type
+            headerTextTranslated = translations[headerText] ? translations[headerText] : headerText;
+        return headerTextTranslated + (addColon ? ":" : "");
 	},
 	
 	/***
