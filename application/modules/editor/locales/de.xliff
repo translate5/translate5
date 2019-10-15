@@ -214,6 +214,8 @@
 <trans-unit id='QmVhcmJlaXRldCB1bmQgR2VzcGVycnQgZHVyY2ggezB9'><source>Bearbeitet und Gesperrt durch {0}</source><target>Bearbeitet und Gesperrt durch {0}</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSBoaW56dWbDvGdlbg=='><source>Aufgabe hinzufügen</source><target>Aufgabe hinzufügen</target></trans-unit>
 <trans-unit id='RWluZSBuZXVlIEF1ZmdhYmUgaGluenVmw7xnZW4u'><source>Eine neue Aufgabe hinzufügen.</source><target>Eine neue Aufgabe hinzufügen.</target></trans-unit>
+<trans-unit id='TWV0YS1EYXRlbiBleHBvcnRpZXJlbg=='><source>Meta-Daten exportieren</source><target>Meta-Daten exportieren</target></trans-unit>
+<trans-unit id='TWV0YS1EYXRlbiBmw7xyIGFsbGUgZ2VmaWx0ZXJ0ZW4gQXVmZ2FiZW4gZXhwb3J0aWVyZW4u'><source>Meta-Daten für alle gefilterten Aufgaben exportieren.</source><target>Meta-Daten für alle gefilterten Aufgaben exportieren.</target></trans-unit>
 <trans-unit id='QWt0dWFsaXNpZXJlbg=='><source>Aktualisieren</source><target>Aktualisieren</target></trans-unit>
 <trans-unit id='QXVmZ2FiZW5saXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4u'><source>Aufgabenliste vom Server aktualisieren.</source><target>Aufgabenliste vom Server aktualisieren.</target></trans-unit>
 <trans-unit id='QXVmdHJhZ3Nuci4='><source>Auftragsnr.</source><target>Auftragsnr.</target></trans-unit>
