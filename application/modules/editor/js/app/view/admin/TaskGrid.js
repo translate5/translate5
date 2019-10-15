@@ -71,6 +71,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       lockedSystem: '#UT#Durch das System gesperrt mit dem Status \'{0}\'',
       addTask: '#UT#Aufgabe hinzufügen',
       addTaskTip: '#UT#Eine neue Aufgabe hinzufügen.',
+      exportMetaDataBtn: '#UT#Meta-Daten exportieren',
+      exportMetaDataBtnTip: '#UT#Meta-Daten für alle gefilterten Aufgaben exportieren.',
       reloadBtn: '#UT#Aktualisieren',
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.',
       emptyTargets: '#UT#Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe)."'
@@ -573,10 +575,22 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   tooltip: me.strings.addTaskTip
               },{
                   xtype: 'button',
+                  iconCls: 'ico-export',
+                  itemId: 'export-meta-data-btn',
+                  text: me.strings.exportMetaDataBtn,
+                  tooltip: me.strings.exportMetaDataBtnTip
+              },{
+                  xtype: 'button',
                   iconCls: 'ico-refresh',
                   itemId: 'reload-task-btn',
                   text: me.strings.reloadBtn,
                   tooltip: me.strings.reloadBtnTip
+              },{
+                  xtype: 'label',
+                  html: 'Bearbeitungszeit: 7 Tage'
+              },{
+                  xtype: 'label',
+                  html: '70% Excel-Export Nutzung'
               }]
             },{
                 xtype: 'pagingtoolbar',
