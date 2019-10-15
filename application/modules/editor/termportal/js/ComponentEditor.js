@@ -252,26 +252,23 @@ var ComponentEditor={
         me.isNew = (!$el.data('id') == undefined || $el.data('id') < 1); 
         
         // don't send the request? then reset component only.
-        if (!me.isNew && me.stopRequest($el,$input)){
+        if (me.stopRequest($el,$input)){
             //get initial html for the component
-            var dummyData={
+            var initialData={
                     'attributeOriginType':$el.data('type'),
                     'attributeId':$el.data('id'),
                     'proposable':true
             },
-            componentRenderData=Attribute.getAttributeRenderData(dummyData,$el.text());
+            componentRenderData=Attribute.getAttributeRenderData(initialData,$el.text());
 
             $input.replaceWith(componentRenderData);
             me.isComponentEditorActive();
+
+            Term.newTermLanguageId=null;
+            Term.newTermRfcLanguage=null;
+            Term.findTermsAndAttributes(Term.newTermGroupId);
+            
             return;
-        }
-        
-        //check if the new term request should be canceled (empty value)
-        if($input.val() === '' || $.trim($input.val()) === ''){
-        	Term.newTermLanguageId=null;
-        	Term.newTermRfcLanguage=null;
-    		Term.findTermsAndAttributes(Term.newTermGroupId);
-    		return;
         }
 		
 		route=me.typeRouteMap[$el.data('type')];
