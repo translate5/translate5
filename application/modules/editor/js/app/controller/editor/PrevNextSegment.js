@@ -314,30 +314,45 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
     
     /***
      * Calculate base on the visible columns in the grid, if the editor should be moved or scrolled.
+     * Additionaly, for big scrolls, it will set the top offset of the editor with the calculated offset value
      * true: for move editor
      * false: for scroll editor
      */
     isMoveEditor:function(nextIndex,currentIdx){
+    	//this part will calculate the start and end segments border
+    	//when start-end segment border is visible, the editor should only move, not scroll
     	var me=this,
     		segmentsGrid=me.editingPlugin.grid,
     		total = segmentsGrid.store.getTotalCount(),
 	    	indexBoundaries=segmentsGrid.getVisibleRowIndexBoundaries(),
-	    	indexGridOffset=Math.round((indexBoundaries.bottom-indexBoundaries.top)/3),
-	    	forwardOffset=Math.round(indexGridOffset*2.2),
-	    	backwardOffset=Math.round(indexGridOffset*0.8),
+	    	isIndexVisible=nextIndex>=indexBoundaries.top && nextIndex<=indexBoundaries.bottom,//is the next index in the view boundaries
+	    	indexGridOffset=Math.round((indexBoundaries.bottom-indexBoundaries.top)/4),
+	    	forwardOffset=Math.round(indexGridOffset*3.2),
+	    	backwardOffset=indexGridOffset,
 	    	goForward=nextIndex>currentIdx;
     	
-    	
+    	//calculate if the offset border is reached
 		var isOffsetBorder=goForward ? (nextIndex+forwardOffset >= total) : (nextIndex-backwardOffset <= 0);
     	
-    	//if the border is reached with offset, all left columns should be visible
+    	//if the first/last segment is in the visible area, move the editor
     	if(isOffsetBorder){
     		return true;
     	}
+    	//move the editor when the current editor position is bellow or after aproximatly 1/3 of the screand
+    	var totalHeight=me.editingPlugin.view.getHeight(),//the visible view height
+    		scrollDelta=me.editingPlugin.editor.getScrollDeltaCustom(),//scrolled editor pixels
+    		eh=me.editingPlugin.editor.getHeight(),
+    		ey=me.editingPlugin.editor.getY(),
+    		offset=totalHeight * 0.20;
     	
-    	if(goForward){
-    		return nextIndex<(indexBoundaries.bottom-forwardOffset);
+    	//if the next is not visible, this is a big scroll, so add the ofset to editorLocalTop
+    	if(!isIndexVisible){
+    		me.editingPlugin.editor.editorLocalTop=offset;
+    		return false;
     	}
-    	return nextIndex>(backwardOffset+indexBoundaries.top);
+    	if(goForward){
+    		return offset+eh >scrollDelta;
+    	}
+    	return offset+(2*eh) < scrollDelta;
     }
 });

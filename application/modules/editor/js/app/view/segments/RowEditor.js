@@ -337,6 +337,31 @@ Ext.define('Editor.view.segments.RowEditor', {
         }
         return deltaY;
     },
+    
+    /***
+     * Get editor visible scroll height
+     */
+    getScrollDeltaCustom: function() {
+        var me = this,
+            scrollingViewDom = me.scrollingViewEl.dom,
+            context = me.context,
+            body = me.body,
+            deltaY = 0;
+
+        if (!context) {
+        	return deltaY; 
+        }
+        deltaY = Ext.fly(context.row).getOffsetsTo(scrollingViewDom)[1];
+        if (deltaY < 0) {
+        	deltaY -= body.getBorderPadding().beforeY;
+        }else if (deltaY > 0) {
+        	deltaY = Math.max(deltaY + me.getHeight(), 0);
+                if (deltaY > 0) {
+                    deltaY -= body.getBorderPadding().afterY;
+                }
+            }
+        return deltaY;
+    },
 
     /**
      * Start editing the specified grid at the specified position.
