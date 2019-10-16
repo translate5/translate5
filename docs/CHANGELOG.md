@@ -3,6 +3,14 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.2.12] - 2019-10-16
+###Added
+TRANSLATE-1838: OpenID integration: Support different roles for default roles than for maximal allowed roles
+
+###Bugfixes
+TRANSLATE-1719: The supplied node is incorrect or has an incorrect ancestor for this operation
+TRANSLATE-1820: TermPortal (engl.): "comment", not "note" or "Anmerkung"
+
 ## [3.2.11] - 2019-10-14
 ###Changed
 TRANSLATE-1378 Search & Replace: Activate "Replace"-key right away
