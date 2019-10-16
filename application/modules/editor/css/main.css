@@ -746,7 +746,7 @@ a.x-btn span.task-confirmation {
     font-weight: bold;
     font-style: italic;
 }
-.pretranslateCheckboxIcon:after {
+.checkBoxLableInfoIcon:after{
     content: "";
     display: block;
     background-image:url(../images/information.png); 
@@ -756,6 +756,12 @@ a.x-btn span.task-confirmation {
     float: left;
     margin: 0 0 0 0;
 }
+.checkBoxLableInfoIconDefault {
+	background-repeat: no-repeat;
+    background-position:right top;
+    background-image: url(../images/information.png) !important;
+}
+
 .adminTaskGrid tr:hover td.taskassocs > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 .adminTaskGrid .x-grid-header-ct .taskassocs > div {background:url(../images/share.png) no-repeat 10px 9px;}
 .adminTaskGrid .x-grid-header-ct .segmentsUpdateable > div {background:url(../images/book_edit.png) no-repeat 10px 9px;}

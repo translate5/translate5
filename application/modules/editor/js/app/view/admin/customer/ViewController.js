@@ -47,11 +47,18 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         formPanel.loadRecord(record);
         
         var roles = record.get('openIdServerRoles').split(','),
-        	rolesBoxes=me.getView().down('#rolesGroup').items.items;
+        	rolesBoxes=me.getView().down('#serverRolesGroup').items.items;
         Ext.Array.forEach(rolesBoxes, function(item) {
             item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
         });
         
+    	roles = record.get('openIdDefaultServerRoles').split(',');
+    	rolesBoxes=me.getView().down('#defaultRolesGroup').items.items;
+    	
+	    Ext.Array.forEach(rolesBoxes, function(item) {
+	        item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
+	    });
+	    
         removeButton.setDisabled(false);
         
         //hide the openid data for the default customer if it is configured so
