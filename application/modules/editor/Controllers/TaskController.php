@@ -209,6 +209,11 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $this->view->rows = $this->loadAll();
         $this->view->total = $this->totalCount;
+        
+        $kpi = ZfExtended_Factory::get('editor_Models_KPI');
+        /* @var $kpi editor_Models_KPI */
+        $this->view->averageProcessingTime = $kpi->getAverageProcessingTime();
+        $this->view->excelExportUsage = $kpi->getExcelExportUsage();
     }
     
     /**
