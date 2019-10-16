@@ -230,7 +230,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                             disabled:'{!hasTmOrCollection}'
                         },
                         value: 1,
-                        cls:'pretranslateCheckboxIcon',
+                        cls:'checkBoxLableInfoIcon',
                         boxLabel:me.strings.pretranslateTmAndTerm,
                         autoEl: {
                             tag: 'div',
@@ -261,7 +261,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                     disabled:'{!hasMt}'
                 },
                 value: 1,
-                cls:'pretranslateCheckboxIcon',
+                cls:'checkBoxLableInfoIcon',
                 boxLabel:me.strings.pretranslateMt,
                 autoEl: {
                     tag: 'div',
@@ -274,6 +274,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                     disabled:'{!hasTermcollection}'
                 },
                 value: 1,
+                cls:'checkBoxLableInfoIcon',
                 boxLabel:me.strings.termtaggerSegment,
                 autoEl: {
                     tag: 'div',

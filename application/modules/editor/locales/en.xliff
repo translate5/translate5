@@ -3528,6 +3528,9 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Add special characters:</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Leave task</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Show only bookmarked segments</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRyb2xsZW4='><source>Standardrollen</source><target>Default roles</target></trans-unit>
+<trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>System roles the OpenID server is allowed to set in translate5.</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Default system roles are used, if the OpenId server does not pass any system roles for the user, that logs on.</target></trans-unit>
     </body>
   </file>
 </xliff>
