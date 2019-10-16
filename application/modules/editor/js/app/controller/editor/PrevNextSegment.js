@@ -342,7 +342,6 @@ Ext.define('Editor.controller.editor.PrevNextSegment', {
     	var totalHeight=me.editingPlugin.view.getHeight(),//the visible view height
     		scrollDelta=me.editingPlugin.editor.getScrollDeltaCustom(),//scrolled editor pixels
     		eh=me.editingPlugin.editor.getHeight(),
-    		ey=me.editingPlugin.editor.getY(),
     		offset=totalHeight * 0.20;
     	
     	//if the next is not visible, this is a big scroll, so add the ofset to editorLocalTop
