@@ -151,6 +151,7 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_clearSortAndFilterTooltip = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>';
   	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Lesezeichen');?>';
   	gridToolbar.item_helpTooltip = '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>';
+  	gridToolbar.item_showBookmarkedSegments = '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>';
     
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
 
@@ -1084,12 +1085,15 @@ Ext.define('Editor.controller.Localizer', {
             openIdServer:'<?php echo $this->translate->_("OpenId server");?>',
             openIdIssuer:'<?php echo $this->translate->_("OpenId Issuer");?>',
             openIdAuth2Url:'<?php echo $this->translate->_("OpenId OAuth URL");?>',
-            rolesLabel:'<?php echo $this->translate->_("Systemrollen");?>',
+            defaultRolesGroupLabel:'<?php echo $this->translate->_("Standardrollen");?>',
+            serverRolesGroupLabel:'<?php echo $this->translate->_("Erlaubte Rollen");?>',
             openIdClientId:'<?php echo $this->translate->_("OpenId Benutzername");?>',
             openIdClientSecret:'<?php echo $this->translate->_("OpenId Passwort");?>',
             openIdRedirectLabel:'<?php echo $this->translate->_("Verlinkter Text Loginseite");?>',
             openIdRedirectCheckbox:'<?php echo $this->translate->_("Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.");?>',
-            anonymizeUsers:'<?php echo $this->translate->_("User anonymisieren?");?>'
+            anonymizeUsers:'<?php echo $this->translate->_("User anonymisieren?");?>',
+            defaultRolesGroupLabelTooltip:'<?php echo $this->translate->_("Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.");?>',
+            serverRolesGroupLabelTooltip:'<?php echo $this->translate->_("Systemrollen, die der OpenID-Server in translate5 festlegen darf.");?>'
         }
     });
 

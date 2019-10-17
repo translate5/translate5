@@ -1379,7 +1379,6 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='S2VpbmUgVmVyYmluZHVuZyE='><source>Keine Verbindung!</source><target>Keine Verbindung!</target></trans-unit>
 <trans-unit id='S2VpbmUgZ8O8bHRpZ2UgTGl6ZW56Lg=='><source>Keine gültige Lizenz.</source><target>Keine gültige Lizenz.</target></trans-unit>
 <trans-unit id='aW1wb3J0aWVydA=='><source>importiert</source><target>importiert</target></trans-unit>
-<trans-unit id='U2VnbWVudCBpbSBUTSBha3R1YWxpc2llcnQh'><source>Segment im TM aktualisiert!</source><target>Segment im TM aktualisiert!</target></trans-unit>
 <trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'><source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source><target>Die angefragte OpenTM2 Instanz ist nicht erreichbar</target></trans-unit>
 <trans-unit id='S3VuZGUgYmVyZWl0cyBkZXIgUmVzc291cmNlIHswfSBhbHMgU3RhbmRhcmQgZsO8ciB7MX0gYmlzIHsyfSB6dWdld2llc2VuIC0gWnVvcmRudW5nIGVudGZlcm5lbiB1bmQgZGVyIGFrdHVlbGxlbiBSZXNzb3VyY2UgenV3ZWlzZW4/'><source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source><target>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRrdW5kZQ=='><source>Standardkunde</source><target>Standardkunde</target></trans-unit>
@@ -1654,6 +1653,11 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Ausloggen</target></trans-unit>
 <trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Sonderzeichen hinzufügen:</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Aufgabe verlassen</target></trans-unit>
+<trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Nur Segmente mit Lesezeichen anzeigen</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRyb2xsZW4='><source>Standardrollen</source><target>Standardrollen</target></trans-unit>
+<trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</target></trans-unit>
+<trans-unit id='RXJsYXVidGUgUm9sbGVu'><source>Erlaubte Rollen</source><target>Erlaubte Rollen</target></trans-unit>
   </body>
  </file>
 </xliff>

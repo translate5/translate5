@@ -2949,11 +2949,6 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>importing</target>
 </trans-unit>
 
-<trans-unit id='U2VnbWVudCBpbSBUTSBha3R1YWxpc2llcnQh'>
-    <source>Segment im TM aktualisiert!</source>
-    <target>Segment updated in the TM!</target>
-</trans-unit>
-
 <trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'>
     <source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source>
     <target>The queried OpenTM2 instance is not available</target>
@@ -3092,7 +3087,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='QW5tZXJrdW5n'>
     <source>Anmerkung</source>
-    <target>Note</target>
+    <target>Comment</target>
 </trans-unit>
 
 <trans-unit id='QWRtaW5pc3RyYXRpdmVyIFN0YXR1cw=='>
@@ -3532,6 +3527,11 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Log out</target></trans-unit>
 <trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Add special characters:</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Leave task</target></trans-unit>
+<trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Show only bookmarked segments</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRyb2xsZW4='><source>Standardrollen</source><target>Default roles</target></trans-unit>
+<trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>System roles the OpenID server is allowed to set in translate5.</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Default system roles are used, if the OpenId server does not pass any system roles for the user, that logs on.</target></trans-unit>
+<trans-unit id='RXJsYXVidGUgUm9sbGVu'><source>Erlaubte Rollen</source><target>Allowed roles</target></trans-unit>
     </body>
   </file>
 </xliff>

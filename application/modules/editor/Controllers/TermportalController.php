@@ -206,7 +206,10 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "processstatus"=>$this->translate->_("Prozessstatus"),
                 "instantTranslateInto"=>$this->translate->_("Sofortübersetzung nach"),
                 "TermPortalLanguages"=>$this->translate->_("Terminologieportal-Sprachen"),
-                "AllLanguagesAvailable"=>$this->translate->_("Alle verfügbaren Sprachen")
+                "AllLanguagesAvailable"=>$this->translate->_("Alle verfügbaren Sprachen"),
+                "Anmerkung"=>$this->translate->_("Anmerkung"),
+                "Letzte Änderung"=>$this->translate->_("Letzte Änderung"),
+                "Datum"=>$this->translate->_("Datum")
         );
         
         $this->view->translations=$translatedStrings;
