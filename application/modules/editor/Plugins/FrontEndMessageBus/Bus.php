@@ -27,15 +27,27 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * MessageBus class usable in translate5 (counterpart in translate5 to messageBus in server.php)
  * encapsulates defined commands directly to the MessageBus
  * @method void startSession() startSession($sessionId, stdClass $userData)
  * @method void stopSession() stopSession($sessionId)
  * 
  * TODO is this class layer necessary?, currently all functions can be moved without a problem into the Init.php 
  */
-require __DIR__.'/bus-server/Configuration.php';//message bus config
 class editor_Plugins_FrontEndMessageBus_Bus {
     const CHANNEL = 'instance';
+    
+    protected $uri;
+    
+    public function __construct() {
+        $config = Zend_Registry::get('config');
+        if(isset($config->runtimeOptions->plugins->FrontEndMessageBus)) {
+            $this->uri = $config->runtimeOptions->plugins->FrontEndMessageBus->messageBusURI;
+        }
+        else {
+            error_log("Not configured!");
+        }
+    }
     
     //here methods could be implemented if more logic is needed as just passing the arguments directly to the MessageBus via __call 
     // this could be for example necessary to convert entities like editor_Models_Task to native stdClass / array data. 
@@ -51,11 +63,12 @@ class editor_Plugins_FrontEndMessageBus_Bus {
     }
     
     public function notify($channel, $command, $data = null) {
+        if(empty($this->uri)) {
+            return;
+        }
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
-        $uri=MESSAGE_BUS_SERVER_PROTOCOL.'://'.MESSAGE_BUS_SERVER_IP.':'.MESSAGE_BUS_SERVER_PORT;
-        $http->setUri($uri);
-        //FIXME from config, see server.php for notes about config
+        $http->setUri($this->uri);
         
         //FIXME the value behind "instance" is used to identify the current instance via a unique hash
         // Should we implement insted a configurable instance key? Similar to OpenTM2 prefix, to identify / distinguish translate5 instances

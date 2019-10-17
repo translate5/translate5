@@ -643,7 +643,28 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         }
         //currently this method is fixed to JS:
         header('Content-Type: '.$types[$extension]);
+        //FIXME add version URL suffix to plugin.css inclusion
+        header('Last-Modified: '.gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));
+        //with etags we would have to use the values of $_SERVER['HTTP_IF_NONE_MATCH'] too!
+        //makes sense to do so!
+        //header('ETag: '.md5(of file content));
+        
+        header_remove('Cache-Control');
+        header_remove('Expires');
+        header_remove('Pragma');
+        header_remove('X-Powered-By');
+        
+        /*
+        header('Pragma: public');
+        header('Cache-Control: max-age=86400');
+        header('Expires: '. gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
+        header('Content-Type: image/png');
+        */
+        
+       
+
         readfile($wholePath);
+        //FIXME: Optimierung bei den Plugin Assets: public Dateien die durch die Plugins geroutet werden, sollten chachebar sein und B keine Plugin Inits triggern. Geht letzteres überhaupt wg. VisualReview welches die Dateien ebenfalls hier durchschiebt?
         exit;
     }
     
