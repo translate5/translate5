@@ -74,7 +74,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
         openIdClientSecret:'#UT#OpenId Passwort',
         openIdAuth2Url:'#UT#OpenId OAuth URL',
         defaultRolesGroupLabel: '#UT#Standardrollen',
-        serverRolesGroupLabel: '#UT#Systemrollen',
+        serverRolesGroupLabel: '#UT#Erlaubte Rollen',
         openIdRedirectLabel:'#UT#Verlinkter Text Loginseite',
         openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.',
         anonymizeUsers:'#UT#User anonymisieren?',
