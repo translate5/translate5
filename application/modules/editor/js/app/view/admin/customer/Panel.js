@@ -73,10 +73,13 @@ Ext.define('Editor.view.admin.customer.Panel', {
         openIdClientId:'#UT#OpenId Benutzername',
         openIdClientSecret:'#UT#OpenId Passwort',
         openIdAuth2Url:'#UT#OpenId OAuth URL',
-        rolesLabel: '#UT#Systemrollen',
+        defaultRolesGroupLabel: '#UT#Standardrollen',
+        serverRolesGroupLabel: '#UT#Erlaubte Rollen',
         openIdRedirectLabel:'#UT#Verlinkter Text Loginseite',
         openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.',
-        anonymizeUsers:'#UT#User anonymisieren?'
+        anonymizeUsers:'#UT#User anonymisieren?',
+        defaultRolesGroupLabelTooltip: '#UT#Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.',
+        serverRolesGroupLabelTooltip: '#UT#Systemrollen, die der OpenID-Server in translate5 festlegen darf.'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -321,12 +324,33 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                             	}
                                             },{
                                                 xtype: 'hidden',
+                                                name: 'openIdDefaultServerRoles'
+                                            },{
+        	                                    xtype: 'checkboxgroup',
+        	                                    itemId: 'defaultRolesGroup',
+        	                                    cls: 'x-check-group-alt',
+        	                                    labelClsExtra: 'checkBoxLableInfoIconDefault',
+        	                                    fieldLabel: me.strings.defaultRolesGroupLabel,
+        	                                    autoEl: {
+        	                                        tag: 'span',
+        	                                        'data-qtip': me.strings.defaultRolesGroupLabelTooltip
+        	                                    },
+        	                                    items: roles,
+        	                                    columns: 3
+                                            },{
+                                                xtype: 'hidden',
                                                 name: 'openIdServerRoles'
                                             },{
         	                                    xtype: 'checkboxgroup',
-        	                                    itemId: 'rolesGroup',
+        	                                    name: 'serverRolesGroup',
+        	                                    itemId: 'serverRolesGroup',
         	                                    cls: 'x-check-group-alt',
-        	                                    fieldLabel: me.strings.rolesLabel,
+        	                                    labelClsExtra: 'checkBoxLableInfoIconDefault',
+        	                                    fieldLabel: me.strings.serverRolesGroupLabel,
+        	                                    autoEl: {
+        	                                        tag: 'span',
+        	                                        'data-qtip': me.strings.serverRolesGroupLabelTooltip
+        	                                    },
         	                                    items: roles,
         	                                    columns: 3
                                             },{
@@ -467,12 +491,17 @@ Ext.define('Editor.view.admin.customer.Panel', {
      * @param {Boolean} checked
      */
     roleCheckChange: function(box, checked) {
-        var roles = [],
-            boxes = box.up('#rolesGroup').query('checkbox[checked=true]');
-        Ext.Array.forEach(boxes, function(box){
-            roles.push(box.initialConfig.value);
-        });
-        box.up('form').down('hidden[name="openIdServerRoles"]').setValue(roles.join(','));
+    	var roles = [],
+    		holder=box.up('checkboxgroup'),
+	        boxes = holder.query('checkbox[checked=true]'),
+	        holderMap={
+	    		serverRolesGroup:'openIdServerRoles',
+	    		defaultRolesGroup:'openIdDefaultServerRoles'
+    		};
+	    Ext.Array.forEach(boxes, function(box){
+	        roles.push(box.initialConfig.value);
+	    });
+        box.up('form').down('hidden[name="'+holderMap[holder.getItemId()]+'"]').setValue(roles.join(','));
     },
 
     /***

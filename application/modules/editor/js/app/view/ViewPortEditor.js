@@ -91,6 +91,10 @@ Ext.define('Editor.view.ViewPortEditor', {
               collapsible: true,
               layout:'border',
               animCollapse: !Ext.isIE, //BugID 3
+              border:0,
+              header:{
+            	  height:49,
+              },
               items:[{
             	  xtype: 'panel',
             	  cls: 'head-panel-brand',
@@ -98,7 +102,8 @@ Ext.define('Editor.view.ViewPortEditor', {
             	  maxWidth:'100%',
             	  region: 'north',
             	  autoScroll:true,
-            	  html: Editor.data.app.branding,
+            	  border:0,
+            	  html: Editor.data.app.customHtmlContainer,
               },{
                   xtype: 'panel',
                   region: 'center',
