@@ -797,3 +797,17 @@ a.x-btn span.task-confirmation {
 .tools-help-icon .x-tool-home{
 	background-image:url(../images/help.png) !important;
 }
+
+
+.userSellectedSegments td {
+    border-top: thin solid red; 
+    border-bottom: thin solid red;
+}
+
+.userSellectedSegments td:first-child {
+    border-left: thin solid red;
+}
+
+.userSellectedSegments td:last-child {
+    border-right: thin solid red;
+}

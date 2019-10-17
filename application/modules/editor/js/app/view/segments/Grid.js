@@ -55,8 +55,12 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.WorkflowStep',
         'Editor.view.segments.column.Editable',
         'Editor.view.segments.column.IsWatched',
-        'Editor.util.SegmentContent'
+        'Editor.util.SegmentContent',
+        'Editor.view.segments.GridViewModel'
     ],
+    viewModel: {
+        type: "segmentsGrid"
+    },
     plugins: ['gridfilters'],
     alias: 'widget.segments.grid',
     id: 'segment-grid',
@@ -74,12 +78,17 @@ Ext.define('Editor.view.segments.Grid', {
     hasRelaisColumn: false,
     stateData: {},
     qualityData: {},
+    userSellectedSegments:[],
+    userSellectedSegmentsCss:'userSellectedSegments',
     constructor: function() {
         this.plugins = [
             'gridfilters',
             Ext.create('Editor.view.segments.RowEditing')
         ];
         this.callParent(arguments);
+    },
+    bind:{
+    	userSellectedSegments:'{addUserSellectedSegments}'
     },
     initComponent: function() {
         var me = this,
@@ -453,5 +462,58 @@ Ext.define('Editor.view.segments.Grid', {
         var tpl = new Ext.XTemplate(Editor.util.Constants.appInfoTpl),
         	infoPanel=Ext.create('Editor.view.ApplicationInfoPanel');
         return tpl.applyTemplate(infoPanel.getEditorTplData());
+    },
+    
+    /***
+     * Set the user selected segmetns. In the collection array
+     * the kew is the user guid an the value is the sellected segment
+     */
+    setUserSellectedSegments:function(data){
+    	if(!data){
+    		return;
+    	}
+        var me=this;
+        //with this alway the last selected for the user will be in the array
+        me.userSellectedSegments[data.user]=data.segment;
+    	console.log(this.userSellectedSegments);
+    	me.undateUserSelectedSegments();
+    },
+    
+    getUserSellectedSegments:function(){
+    	return this.userSellectedSegments;
+    },
+    
+    /***
+     * Update the grid rows with the selected segments from the users
+     */
+    undateUserSelectedSegments:function(){
+        var me=this;
+        me.clearUserSelectedSegments();
+    	var grid=Ext.getCmp('segment-grid'),
+    		view=grid.getView(),
+    		segmentStore=Ext.StoreManager.get('Segments'),
+    		row=null;
+        
+
+        for (var key in me.userSellectedSegments) {
+            // skip loop if the property is from prototype
+            if (!me.userSellectedSegments.hasOwnProperty(key)){
+                continue;
+            }
+            var segment= me.userSellectedSegments[key];
+            segment=segmentStore.findRecord('id',segment);
+    		if(!segment){
+    			return;
+    		}
+    		row=view.getRow(segment);
+    		if(!row){
+    			return;
+    		}
+    		Ext.get(row).addCls(me.userSellectedSegmentsCss)
+        }
+    },
+
+    clearUserSelectedSegments:function(){
+        Ext.select('tr.'+this.userSellectedSegmentsCss).removeCls(this.userSellectedSegmentsCss);
     }
 });

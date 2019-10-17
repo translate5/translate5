@@ -103,10 +103,7 @@ Ext.define('Editor.controller.Segments', {
   listen: {
       messagebus: {
           '#translate5 task': {
-              segmentselect: function() {
-                  console.log(arguments);
-                  Editor.MessageBox.addInfo('Selected Segment');
-              }
+              segmentselect:'onMessageBusSegmentSelect'
           }
       },
       controller: {
@@ -673,5 +670,19 @@ Ext.define('Editor.controller.Segments', {
       if(me.loadingMaskRequests == 0) {
           me.getViewport().setLoading(false);
       }
+  },
+
+  /***
+   * On multi user segment sellect
+   */
+  onMessageBusSegmentSelect:function(data) {
+	  var grid=Ext.getCmp('segment-grid'),
+	  	vm=grid.getViewModel();
+	  
+	  vm.set('addUserSellectedSegments',{
+		  segment:data.segmentId,
+		  user:data.userGuid
+	  });
   }
+  
 });
