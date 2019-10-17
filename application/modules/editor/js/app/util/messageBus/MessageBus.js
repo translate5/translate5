@@ -78,7 +78,7 @@ Ext.define('Editor.util.messageBus.MessageBus', {
     initSocket: function() {
         var ws,
             me = this,
-            conf = Editor.data.app.plugins.FrontEndMessageBus,
+            conf = Editor.data.plugins.FrontEndMessageBus,
             url = [];
         if(!conf) {
             console.log("WS communication deactivated due missing configuration of the socket server.");
@@ -86,11 +86,11 @@ Ext.define('Editor.util.messageBus.MessageBus', {
         }
         url.push(conf.socketServer.schema, '://');
         url.push(conf.socketServer.httpHost || window.location.hostname);
-        url.push(conf.socketServer.port, conf.socketServer.route);
+        url.push(':', conf.socketServer.port, conf.socketServer.route);
         // the serverId ensures that we communicate with the correct instance, additional security comes from the sessionId, which must match
         // authentication by passing the session id to the server
         url.push('?serverId=', Editor.data.app.serverId, '&sessionId=', Ext.util.Cookies.get(Editor.data.app.sessionKey));
-        ws = me.socket = new WebSocket(url.join());
+        ws = me.socket = new WebSocket(url.join(''));
         ws.onmessage = function(evt) {
             var data = Ext.JSON.decode(evt.data);
             //FIXME error handling if JSON decode fail
