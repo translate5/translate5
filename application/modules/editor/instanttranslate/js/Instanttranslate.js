@@ -226,7 +226,7 @@ function handleAfterLocalesChange() {
         hideTranslations();
         showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
         return;
-    };
+    }
     // Translations can be submitted:
     showTranslations();
     // If fileUpload is possible for currently chosen languages, show text accordingly:
@@ -324,9 +324,13 @@ $('#sourceText').bind('keyup', function() {
         hideTranslations();
         showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
         return;
-    };
+    }
     if($('#sourceText').val().length > 0 && $('#sourceText').val() === latestTextToTranslate) {
         return;
+    }
+    //if the instant translate is disabled, do not translate
+    if(!instantTranslationIsActive){
+    	return;
     }
     startTimerForInstantTranslation();
 });
@@ -393,7 +397,7 @@ function startTranslation() {
         hideTranslations();
         showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
         return;
-    };
+    }
     // translate a file?
     if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
         // TODO: we can get here via startTimerForInstantTranslation 
@@ -1006,10 +1010,10 @@ function clearAllErrorMessages() {
 // 'sign' = show indicator in addition to content (currently used for text-translations)
 // 'state' = shown layer upon content (currently used for file-translations)
 function startLoadingSign() {
-    if ($('#translations').is(":visible")) {
+	if ($('#translations').is(":visible") && $('#translations').html()!='') {
         $('#translations').find('.loadingSpinnerIndicator').show();
     } else {
-        $('#target').children('.loadingSpinnerIndicator').show();
+    	$('#target').children('.loadingSpinnerIndicator').show();
     }
 }
 function stopLoadingSign() {
