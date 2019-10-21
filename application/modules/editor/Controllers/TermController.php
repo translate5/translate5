@@ -419,8 +419,22 @@ class editor_TermController extends ZfExtended_RestController {
         }
         $this->proposal->delete();
         $termEntry->deleteEmptyTermEntry($termEntryId);
+        
+        //remove all term attribute proposals to
+        //https://jira.translate5.net/browse/TS-174
+        $attributeProposal=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
+        /* @var $attributeProposal editor_Models_Term_AttributeProposal */
+        $attributeProposal->removeAllTermAttributeProposals($this->entity->getId());
+        
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->proposal = null;
+        
+        //load all attributes for the term
+        $rows=$this->entity->findTermAndAttributes($this->entity->getId());
+        $rows=$this->entity->groupTermsAndAttributes($rows);
+        if(!empty($rows) && !empty($rows[0]['attributes'])){
+            $this->view->rows->attributes =$rows[0]['attributes'];
+        }
     }
     
     /***
