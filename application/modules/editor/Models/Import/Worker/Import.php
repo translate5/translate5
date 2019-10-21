@@ -139,6 +139,8 @@ class editor_Models_Import_Worker_Import {
         $repHash = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash', array($this->task, $this->segmentFieldManager));
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_ProofRead', array($this->task, $this->importConfig));
         /* @var $segProc editor_Models_Import_SegmentProcessor_ProofRead */
+        
+        $filesProcessedAtAll = 0;
         foreach ($filelist as $fileId => $path) {
             $path = $fileFilter->applyImportFilters($path, $fileId, $filelist);
             $params = $this->getFileparserParams($path, $fileId);
@@ -152,8 +154,17 @@ class editor_Models_Import_Worker_Import {
             $parser->addSegmentProcessor($repHash);
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
+            $filesProcessedAtAll++;
             $this->countWords($parser->getWordCount());
         }
+        
+        if($filesProcessedAtAll === 0) {
+            //E1166: Although there were importable files in the task, no files were imported. Investigate the log for preceeding errors.
+            throw new editor_Models_Import_FileParser_NoParserException('E1166', [
+                'task' => $this->task
+            ]);
+        }
+        
         if ($this->task->getWordCount() == 0) {
             $this->task->setWordCount($this->wordCount);
         }
