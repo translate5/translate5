@@ -1368,6 +1368,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $attributeModel=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attributeModel editor_Models_Term_Attribute */
         $isAttributeProposalAllowed=$attributeModel->isProposableAllowed();
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         //map the term id to array index (this is used because the jquery json decode changes the array sorting based on the termId)
         $keyMap=[];
@@ -1419,6 +1420,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 if(in_array($key,$termProposalColumns)){
                     $termProposalData[$termProposalColumnsNameMap[$key]]=$value;
                     continue;
+                }
+                
+                if($key=='headerText'){
+                    $value=$translate->_($value);
                 }
                 //it is attribute column
                 $atr[$key]=$value;
