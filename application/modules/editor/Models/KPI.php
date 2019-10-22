@@ -31,18 +31,39 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_KPI {
     
+    protected $tasks;
+    
+    /**
+     * Which tasks the KPI are to be calculated for.
+     * @param $rows
+     */
+    public function setTasks($rows) {
+        $this->tasks = $rows;
+    }
+    
+    /**
+     * Get the KPI-statistics.
+     * @return array
+     */
+    public function getStatistics() {
+        $statistics = [];
+        $statistics['averageProcessingTime'] = $this->getAverageProcessingTime();
+        $statistics['excelExportUsage'] = $this->getExcelExportUsage();
+        return $statistics;
+    }
+    
     /**
      * 
      */
-    public function getAverageProcessingTime() {
-        return '7 Tage'; // TODO :)
+    protected function getAverageProcessingTime() {
+        return 'APT ' . date("h:i:sa"); // TODO :)
     }
     
     /**
      *
      */
-    public function getExcelExportUsage() {
-        return '70%'; // TODO :)
+    protected function getExcelExportUsage() {
+        return 'EEU ' . date("h:i:sa"); // TODO :)
     }
     
 }

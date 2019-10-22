@@ -163,6 +163,14 @@ class editor_TaskController extends ZfExtended_RestController {
         ])
         ->addActionContext('export', 'importArchive')
         
+        ->addContext('xlsx', [
+            'headers' => [
+                'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // TODO Content-Type prüfen
+            ]
+        ])
+        ->addActionContext('index', 'xlsx')
+        
+        
         /*
         ->addContext('excel', [
             'headers' => [
@@ -207,13 +215,22 @@ class editor_TaskController extends ZfExtended_RestController {
         $f = $this->entity->getFilter();
         $f->hasSort() || $f->addSort('orderdate', true);
         
-        $this->view->rows = $this->loadAll();
+        $rows = $this->loadAll();
+        $this->view->rows = $this->loadAll($rows);
         $this->view->total = $this->totalCount;
         
         $kpi = ZfExtended_Factory::get('editor_Models_KPI');
         /* @var $kpi editor_Models_KPI */
-        $this->view->averageProcessingTime = $kpi->getAverageProcessingTime();
-        $this->view->excelExportUsage = $kpi->getExcelExportUsage();
+        $kpi->setTasks($rows);
+        //since we don't use metaData otherwise, we can overwrite it completely:
+        $this->view->metaData = new stdClass();
+        $this->view->metaData->statistics = $kpi->getStatistics();
+        
+        // for KPI-Export
+        $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
+        if ($context == 'xlsx') {
+            // TODO
+        }
     }
     
     /**

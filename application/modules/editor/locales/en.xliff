@@ -184,6 +184,14 @@
         <source>Keine Benutzer zugeordnet!</source>
         <target>No user assigned!</target>
       </trans-unit>
+      <trans-unit id='TWV0YS1EYXRlbiBleHBvcnRpZXJlbg=='>
+        <source>Meta-Daten exportieren</source>
+        <target>Export meta data</target>
+      </trans-unit>
+      <trans-unit id='TWV0YS1EYXRlbiBmw7xyIGFsbGUgZ2VmaWx0ZXJ0ZW4gQXVmZ2FiZW4gZXhwb3J0aWVyZW4u'>
+        <source>Meta-Daten für alle gefilterten Aufgaben exportieren.</source>
+        <target>Export meta data for all filtered tasks.</target>
+      </trans-unit>
       <trans-unit id="UXVlbGxzcHJhY2hl">
         <source>Quellsprache</source>
         <target>Source language</target>
