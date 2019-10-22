@@ -570,7 +570,7 @@ var Term={
             termAttributesHtmlContainer.push('</h3>');
             
             //draw term attrbute contaner with the attributes
-            termAttributesHtmlContainer.push(Attribute.getTermAttributeContainerRenderData(term));
+            termAttributesHtmlContainer.push(Attribute.getTermAttributeContainerRenderData(term,true));
             
             return termAttributesHtmlContainer.join('');
 		},
@@ -740,8 +740,9 @@ var Term={
 		 * Append or remove buttons for proposals in the DOM.
 		 * Address elements as specific as possible (= avoid long jQuery-selects).
          * @param elements
+         * @param id
 		 */
-        drawProposalButtons: function (elements){
+        drawProposalButtons: function (elements,id){
         	if(!Editor.data.app.user.isTermProposalAllowed){
 				return;
 			}
@@ -802,6 +803,14 @@ var Term={
                     titleAdd = proposalTranslations['addTermAttributeProposal'];
                     titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
+                    break;
+                case 'singleterm':
+                	var termHolder=me.$_termTable.find('div[data-term-id="'+id+'"]');
+                	$_selectorDelete = termHolder.find('.is-proposal');
+                    $_selectorEdit = termHolder.find('.proposable.is-finalized');
+                    termHolder.children('.proposal-btn').remove();
+                    titleDelete = proposalTranslations['deleteProposal'];
+                    titleEdit = proposalTranslations['editProposal'];
                     break;
                 default:
                     // e.g. after updateComponent(): show ProposalButtons according to the new state
@@ -1286,18 +1295,15 @@ var Term={
 
         	$termParent.switchClass('is-proposal','is-finalized');
         	
-        	$termAttributeHolder.remove();
-        	
-        	//create the term attribute container with the fresh data
-        	$termParent.after(termAttributeContainerData);
+        	$termAttributeHolder.empty();
+        	//replace the term attribute container with the fresh data
+        	$termAttributeHolder.append(termAttributeContainerData);
         	
     		me.$_termTable.accordion('refresh');
 			me.initInstantTranslateSelect();
+			
 			me.drawProposalButtons($termParent);
-
-			$termAttributeHolder = me.$_termTable.find('div[data-term-id="' + term.id + '"]');
-			//TODO: why this does this not updates the buttons ?
-        	me.drawProposalButtons($termAttributeHolder);
+        	me.drawProposalButtons('singleterm',term.id);
         }
 };
 

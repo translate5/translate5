@@ -496,19 +496,26 @@ var Attribute={
 	
 	/***
 	 * Return the term attribute container render data.
+	 * If addHolder is set, the html will be surrounded with termAttributeHolder div
 	 */
-	getTermAttributeContainerRenderData:function(term){
+	getTermAttributeContainerRenderData:function(term,addHolder){
 		var me=this,
 			termRflLang = (term.attributes[0] !== undefined) ? term.attributes[0].language : '',
 			renderData=[];	
 		
-		renderData.push('<div data-term-id="'+term.termId+'" data-collection-id="'+term.collectionId+'" class="term-attributes">');
+		if(addHolder){
+			renderData.push('<div data-term-id="'+term.termId+'" data-collection-id="'+term.collectionId+'" class="term-attributes">');
+		}
+		
         if (term.termId !== -1) {
             renderData.push(Term.renderInstantTranslateIntegrationForTerm(termRflLang));
         }
         //draw term attributes
         renderData.push(me.renderTermAttributes(term,termRflLang));
-        renderData.push('</div>');
+		
+        if(addHolder){
+			renderData.push('</div>');
+        }
         return renderData.join(' ');
 	},
 
