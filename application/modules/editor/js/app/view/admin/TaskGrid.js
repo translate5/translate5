@@ -578,7 +578,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   iconCls: 'ico-export',
                   itemId: 'export-meta-data-btn',
                   text: me.strings.exportMetaDataBtn,
-                  tooltip: me.strings.exportMetaDataBtnTip
+                  tooltip: me.strings.exportMetaDataBtnTip,
+                  hrefTarget: '_blank',
+                  href: Editor.data.restpath + 'task?format=xlsx'
               },{
                   xtype: 'button',
                   iconCls: 'ico-refresh',
@@ -587,10 +589,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   tooltip: me.strings.reloadBtnTip
               },{
                   xtype: 'label',
-                  html: 'Bearbeitungszeit: 7 Tage'
+                  itemId: 'kpi-average-processing-time-label'
               },{
                   xtype: 'label',
-                  html: '70% Excel-Export Nutzung'
+                  itemId: 'kpi-excel-export-usage-label'
               }]
             },{
                 xtype: 'pagingtoolbar',

@@ -58,6 +58,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },{
       ref: 'taskAddWindow',
       selector: '#adminTaskAddWindow'
+  },{
+      ref: 'averageProcessingTimeLabel',
+      selector: '#adminTaskGrid #kpi-average-processing-time-label'
+  },{
+      ref: 'excelExportUsageLabel',
+      selector: '#adminTaskGrid #kpi-excel-export-usage-label'
   }],
   alias: 'controller.taskOverviewController',
   
@@ -104,60 +110,68 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskImportButtonText:'#UT#Aufgabe importieren',
       taskDeleteButtonText:'#UT#Aufgabe löschen'
   },
-  init : function() {
-      var me = this;
-      //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
-      Editor.app.on('adminViewportClosed', me.clearTasks, me);
-      Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
-      
-      me.getAdminTasksStore().on('load', me.startCheckImportStates, me);
-      
-      me.control({
+  listen: {
+      controller: {
+          '#Editor.$application': {
+              adminViewportClosed: 'clearTasks',
+              editorViewportOpened: 'handleInitEditor'
+          },
+      },
+      component: {
           'headPanel toolbar#top-menu' : {
-              beforerender: me.initMainMenu
+              beforerender: 'initMainMenu'
           },
           'button#task-admin-btn': {
-              click: me.openTaskGrid
+              click: 'openTaskGrid'
           },
           '#adminTaskGrid': {
-              hide: me.handleAfterHide,
-              show: me.handleAfterShow,
-              celldblclick: me.handleGridClick, 
-              cellclick: me.handleGridClick 
+              hide: 'handleAfterHide',
+              show: 'handleAfterShow',
+              celldblclick: 'handleGridClick', 
+              cellclick: 'handleGridClick' 
           },
           '#adminTaskGrid #reload-task-btn': {
-              click: me.handleTaskReload
+              click: 'handleTaskReload'
           },
           '#adminTaskGrid taskActionColumn': {
-              click: me.taskActionDispatcher
+              click: 'taskActionDispatcher'
           },
           '#adminTaskGrid #add-task-btn': {
-              click: me.handleTaskAddShow
+              click: 'handleTaskAddShow'
           },
           '#adminTaskAddWindow': {
-              show:me.onAdminTaskAddWindowShow,
-              close:me.onAdminTaskAddWindowClose
+              show: 'onAdminTaskAddWindowShow',
+              close: 'onAdminTaskAddWindowClose'
            },
           '#adminTaskAddWindow #add-task-btn': {
-              click: me.handleTaskAdd
+              click: 'handleTaskAdd'
           },
           '#adminTaskAddWindow #cancel-task-btn': {
-              click: me.handleTaskCancel
+              click: 'handleTaskCancel'
           },
           '#adminTaskAddWindow #continue-wizard-btn': {
-              click: me.handleContinueWizardClick
+              click: 'handleContinueWizardClick'
           },
           '#adminTaskAddWindow #skip-wizard-btn': {
-              click: me.handleSkipWizardClick
+              click: 'handleSkipWizardClick'
           },
           '#adminTaskAddWindow filefield[name=importUpload]': {
-              change: me.handleChangeImportFile
+              change: 'handleChangeImportFile'
           },
           'adminTaskAddWindow panel:not([hidden])': {
-              wizardCardFinished:me.onWizardCardFinished,
-              wizardCardSkiped:me.onWizardCardSkiped
+              wizardCardFinished: 'onWizardCardFinished',
+              wizardCardSkiped: 'onWizardCardSkiped'
           }
-      });
+      },
+      store: {
+          '#admin.Tasks': {
+              load: 'startCheckImportStates',
+              metachange: function(taskstore, meta) {
+                  this.getAverageProcessingTimeLabel().update(meta.statistics.averageProcessingTime);
+                  this.getExcelExportUsageLabel().update(meta.statistics.excelExportUsage);
+              }
+          }
+      }
   },
     //***********************************************************************************
     //Begin Events
