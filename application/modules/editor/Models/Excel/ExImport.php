@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
  /**
  * General model for Excel ex- and im-ports.
  * Will be used by the models under ../Export/Excel.php respectively ../Import/Excel.php
- * TODO: use editor_Models_PHPSpreadsheet and remove repeated code (see editor_Models_Task_Excel_Metadata as example)
+ * TODO: refactor (= implement with ZfExtended_Models_Entity_ExcelExport)
  */
 
 require_once APPLICATION_PATH.'/../library/PhpSpreadsheet/vendor/autoload.php';

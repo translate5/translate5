@@ -36,7 +36,12 @@ END LICENSE AND COPYRIGHT
  * General model for Excel Metadata (= task overview and statistics).
  */
 
-class editor_Models_Task_Excel_Metadata extends editor_Models_PHPSpreadsheet {
+class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelExport {
+    
+    /**
+     * @var ZfExtended_Models_Entity_ExcelExport
+     */
+    protected $excelExport;
     
     /**
      * The name of the sheet that contains the 'task overview' data (aka the tasks)
@@ -58,12 +63,24 @@ class editor_Models_Task_Excel_Metadata extends editor_Models_PHPSpreadsheet {
     protected $taskRow = 2;
     
     /**
+     * Create a new, empty excel
+     * @return editor_Models_Task_Excel_Metadata
+     */
+    public function __construct() {
+        $this->excelExport = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
+        $this->excelExport->initDefaultFormat();
+    }
+    
+    /**
      * Init the Excel-file for our purpose.
      */
     public function initExcel() {
+        // remove initial sheet
+        $this->excelExport->removeWorksheetByIndex(0);
+        
         // add two sheets 'task overview' and 'meta data'
-        $this->addSheet(self::$sheetNameTaskOverview, 0);
-        $this->addSheet(self::$sheetNameMeta, 1);
+        $this->excelExport->addWorksheet(self::$sheetNameTaskOverview, 0);
+        $this->excelExport->addWorksheet(self::$sheetNameMeta, 1);
         
         // and init the sheets taskoverview + meta
         $this->initSheetTaskOverview();
@@ -80,6 +97,14 @@ class editor_Models_Task_Excel_Metadata extends editor_Models_PHPSpreadsheet {
      * init the sheet meta data'
      */
     protected function initSheetMeta() {
+    }
+    
+    /**
+     * Get the excel as Spreadsheet object
+     * @return \PhpOffice\PhpSpreadsheet\Spreadsheet
+     */
+    public function getSpreadsheet() : \PhpOffice\PhpSpreadsheet\Spreadsheet {
+        return $this->excelExport->getSpreadsheet();
     }
 }
 

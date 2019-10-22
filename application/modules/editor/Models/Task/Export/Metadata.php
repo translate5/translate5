@@ -29,9 +29,12 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Export given tasks, their filtering and their key performance indicators (KPI) as an Excel-file.
- * // TODO: refactor (see repeated code from editor_Models_Export_Excel)
  */
 class editor_Models_Task_Export_Metadata {
+    /**
+     * @var editor_Models_Task_Excel_Metadata
+     */
+    protected $excelMetadata;
     
     /**
      * @var array
@@ -102,13 +105,13 @@ class editor_Models_Task_Export_Metadata {
      * @param string $fileName where the XLS should go to
      */
     protected function export(string $fileName): void {
-        $this->excel = editor_Models_Task_Excel_Metadata::createNewExcel();
-        $this->excel->initExcel();
+        $this->excelMetadata = ZfExtended_Factory::get('editor_Models_Task_Excel_Metadata');
+        $this->excelMetadata->initExcel();
         
         // add all the data
         
         // .. then send the excel
-        $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->excel->getExcel());
+        $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->excelMetadata->getSpreadsheet());
         $writer->save($fileName);
     }
     
