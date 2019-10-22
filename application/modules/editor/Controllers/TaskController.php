@@ -222,14 +222,19 @@ class editor_TaskController extends ZfExtended_RestController {
         $kpi = ZfExtended_Factory::get('editor_Models_KPI');
         /* @var $kpi editor_Models_KPI */
         $kpi->setTasks($rows);
+        $kpiStatistics = $kpi->getStatistics();
         //since we don't use metaData otherwise, we can overwrite it completely:
         $this->view->metaData = new stdClass();
-        $this->view->metaData->statistics = $kpi->getStatistics();
+        $this->view->metaData->statistics = $kpiStatistics;
         
-        // for KPI-Export
+        // ... or as Metadata-Excel-Export (= task-overview, filters, key performance indicators KPI):
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
         if ($context == 'xlsx') {
-            // TODO
+            $exportMetaData = ZfExtended_Factory::get('editor_Models_Task_Export_Metadata');
+            /* @var $metaDataExcel editor_Models_Task_Export_Metadata */
+            $exportMetaData->setTasks($rows);
+            $exportMetaData->setKpiStatistics($kpiStatistics);
+            $exportMetaData->exportAsDownload();
         }
     }
     
