@@ -31,14 +31,36 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_KPI {
     
-    protected $tasks;
+    /**
+     * Tasks the KPI are to be calculated for.
+     * @var array
+     */
+    protected $tasks = [];
     
     /**
-     * Which tasks the KPI are to be calculated for.
-     * @param $rows
+     * @var ZfExtended_Zendoverwrites_Translate
      */
-    public function setTasks($rows) {
+    protected $translate;
+    
+    public function __construct() {
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+    }
+    
+    /**
+     * Set the tasks the KPI are to be calculated for.
+     * @param array $rows
+     */
+    public function setTasks(array $rows) {
         $this->tasks = $rows;
+    }
+    
+    /**
+     * Can KPI-statistics be calculated at all?
+     * @return bool
+     */
+    protected function hasStatistics() : bool {
+        // no tasks? no statistics!
+        return count($this->tasks) > 0;
     }
     
     /**
@@ -53,17 +75,35 @@ class editor_Models_KPI {
     }
     
     /**
-     * 
+     * Calculate and return the average processing time for the tasks.
      */
     protected function getAverageProcessingTime() {
+        if (!$this->hasStatistics()) {
+            return '';
+        }
         return 'APT ' . date("h:i:sa"); // TODO :)
     }
     
     /**
-     *
+     * Calculate and return the Excel-export-usage of the tasks
+     * (= percent of the tasks exported at least once).
+     * @return string
      */
     protected function getExcelExportUsage() {
-        return 'EEU ' . date("h:i:sa"); // TODO :)
+        if (!$this->hasStatistics()) {
+            return '';
+        }
+        $nrExported = 0;
+        $allTaskGuids = array_column($this->tasks, 'taskGuid');
+        $excelExport = ZfExtended_Factory::get('editor_Models_Task_ExcelExport');
+        /* @var $excelExport editor_Models_Task_ExcelExport */
+        foreach ($allTaskGuids as $taskGuid) {
+            if ($excelExport->isExported($taskGuid)) {
+                $nrExported++;
+            }
+        }
+        $percentage = ($nrExported / count($allTaskGuids)) * 100;
+        return sprintf($this->translate->_('%0.2f%% Excel-Export Nutzung'), $percentage);
     }
     
 }

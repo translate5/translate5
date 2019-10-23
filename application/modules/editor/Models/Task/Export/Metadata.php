@@ -29,6 +29,8 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Export given tasks, their filtering and their key performance indicators (KPI) as an Excel-file.
+ * This class should not directly interact with the PHPSpreadsheet, this is done via editor_Models_Task_Excel_Metadata.
+ * TODO: Achieve this completely by refactoring export(), exportAsDownload() and exportAsFile().
  */
 class editor_Models_Task_Export_Metadata {
     /**
@@ -37,11 +39,19 @@ class editor_Models_Task_Export_Metadata {
     protected $excelMetadata;
     
     /**
+     * Tasks as currently filtered by the user.
      * @var array
      */
     protected $tasks;
     
     /**
+     * Filters currently applied by the user.
+     * @var array
+     */
+    protected $filters;
+    
+    /**
+     * Key Performance Indicators (KPI) for the current tasks.
      * @var array
      */
     protected $kpiStatistics;
@@ -64,8 +74,16 @@ class editor_Models_Task_Export_Metadata {
     }
     
     /**
+     * Set the filters that the user applied in the task overview.
+     * @param array $rows
+     */
+    public function setFilters(array $filters) {
+        $this->filters = $filters;
+    }
+    
+    /**
      * Set KPI-statistics.
-     * @param array$rows
+     * @param array $rows
      */
     public function setKpiStatistics(array $kpiStatistics) {
         $this->kpiStatistics = $kpiStatistics;

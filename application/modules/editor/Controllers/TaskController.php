@@ -216,7 +216,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $f->hasSort() || $f->addSort('orderdate', true);
         
         $rows = $this->loadAll();
-        $this->view->rows = $this->loadAll($rows);
+        $this->view->rows = $rows;
         $this->view->total = $this->totalCount;
         
         $kpi = ZfExtended_Factory::get('editor_Models_KPI');
@@ -227,12 +227,13 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->view->metaData = new stdClass();
         $this->view->metaData->statistics = $kpiStatistics;
         
-        // ... or as Metadata-Excel-Export (= task-overview, filters, key performance indicators KPI):
+        // ... or as Metadata-Excel-Export (= task-overview, filter, key performance indicators KPI):
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
         if ($context == 'xlsx') {
             $exportMetaData = ZfExtended_Factory::get('editor_Models_Task_Export_Metadata');
             /* @var $metaDataExcel editor_Models_Task_Export_Metadata */
             $exportMetaData->setTasks($rows);
+            $exportMetaData->setFilters(json_decode($this->getParam('filter')));
             $exportMetaData->setKpiStatistics($kpiStatistics);
             $exportMetaData->exportAsDownload();
         }

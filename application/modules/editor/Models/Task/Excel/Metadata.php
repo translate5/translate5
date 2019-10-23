@@ -33,7 +33,8 @@ END LICENSE AND COPYRIGHT
  *
 
  /**
- * General model for Excel Metadata (= task overview and statistics).
+ * General model for Excel Metadata (= task overview and statistics). 
+ * Handles all interactions with the PHPSpreadsheet (via ZfExtended_Models_Entity_ExcelExport).
  */
 
 class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelExport {
