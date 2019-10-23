@@ -38,15 +38,6 @@ class editor_Models_KPI {
     protected $tasks = [];
     
     /**
-     * @var ZfExtended_Zendoverwrites_Translate
-     */
-    protected $translate;
-    
-    public function __construct() {
-        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-    }
-    
-    /**
      * Set the tasks the KPI are to be calculated for.
      * @param array $rows
      */
@@ -76,18 +67,34 @@ class editor_Models_KPI {
     
     /**
      * Calculate and return the average processing time for the tasks.
+     * Current implementation:
+     * - startDate: order date
+     * - endDate: delivery date (real)
+     * TODO: With TRANSLATE-1455, change these to:
+     * - startDate: assigned
+     * - endDate: review delivered
+     * @return float|string Number of days or '' if statistics can't be calculated
      */
     protected function getAverageProcessingTime() {
         if (!$this->hasStatistics()) {
             return '';
         }
-        return 'APT ' . date("h:i:sa"); // TODO :)
+        $allProcessingTimes = [];
+        foreach ($this->tasks as $task) {
+            // TODO: would it be better to retrieve these dates from the task-model?
+            $startDate = new DateTime($task['orderdate']);
+            $endDate = new DateTime($task['realDeliveryDate']); // if realDeliveryDate isn't set so far, current date is used
+            $processingTime = $endDate->diff($startDate);
+            $allProcessingTimes[] = $processingTime->format('%a');
+        }
+        $average = array_sum($allProcessingTimes) / count($allProcessingTimes);
+        return round($average, 0);
     }
     
     /**
      * Calculate and return the Excel-export-usage of the tasks
      * (= percent of the tasks exported at least once).
-     * @return string
+     * @return float|string Number of percentage (0-100) or '' if statistics can't be calculated
      */
     protected function getExcelExportUsage() {
         if (!$this->hasStatistics()) {
@@ -103,7 +110,7 @@ class editor_Models_KPI {
             }
         }
         $percentage = ($nrExported / count($allTaskGuids)) * 100;
-        return sprintf($this->translate->_('%0.2f%% Excel-Export Nutzung'), $percentage);
+        return round($percentage,2);
     }
     
 }

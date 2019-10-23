@@ -57,11 +57,17 @@ class editor_Models_Task_Export_Metadata {
     protected $kpiStatistics;
     
     /**
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    protected $translate;
+    
+    /**
      * @var ZfExtended_Logger
      */
     protected $log;
     
     public function __construct() {
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.task.excel.metadata');
     }
     
@@ -87,6 +93,15 @@ class editor_Models_Task_Export_Metadata {
      */
     public function setKpiStatistics(array $kpiStatistics) {
         $this->kpiStatistics = $kpiStatistics;
+    }
+    
+    /**
+     * Get a KPI-value by the indicator's name.
+     * @param string $name
+     * @return string
+     */
+    protected function getKpiKpiByName(string $name) {
+        return $this->kpiStatistics[$name];
     }
     
     /**
@@ -126,11 +141,44 @@ class editor_Models_Task_Export_Metadata {
         $this->excelMetadata = ZfExtended_Factory::get('editor_Models_Task_Excel_Metadata');
         $this->excelMetadata->initExcel();
         
-        // add all the data
+        // (1) add data: tasks
+        // TODO: columns must appear in the same order as in the task-overview
+        
+        // (2) add data: filters
+        
+        // (3) add data: KPI
+        $this->excelMetadata->addKPI($this->renderKpiAverageProcessingTime());
+        $this->excelMetadata->addKPI($this->renderKpiExcelExportUsage());
         
         // .. then send the excel
         $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->excelMetadata->getSpreadsheet());
         $writer->save($fileName);
+    }
+    
+    /**
+     * KPI: Render translated version of the Average Processing Time.
+     * @return string
+     */
+    protected function renderKpiAverageProcessingTime() : string {
+        $averageProcessingTime = '';
+        $average = $this->getKpiKpiByName('averageProcessingTime');
+        if ($average != '') {
+            $averageProcessingTime = sprintf($this->translate->_('Ø Bearbeitungszeit: %0.0f Tage'), round($average, 0));
+        }
+        return $averageProcessingTime;
+    }
+    
+    /**
+     * KPI: Render translated version of the Excel Export Usage.
+     * @return string
+     */
+    protected function renderKpiExcelExportUsage() : string {
+        $excelExportUsage = '';
+        $percentage = $this->getKpiKpiByName('excelExportUsage');
+        if ($percentage != '') {
+            $excelExportUsage = sprintf($this->translate->_('%0.2f%% Excel-Export Nutzung'), $percentage);
+        }
+        return $excelExportUsage;
     }
     
     /**

@@ -3536,8 +3536,10 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Add special characters:</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Leave task</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Show only bookmarked segments</target></trans-unit>
-<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdDogJTAuMmYgVGFnZQ=='><source>Ø Bearbeitungszeit: %0.2f Tage</source><target>Ø Processing Time: %0.2f days</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdDogJTAuMGYgVGFnZQ=='><source>Ø Bearbeitungszeit: %0.0f Tage</source><target>Ø Processing Time: %0.0f days</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdDogezB9IFRhZ2U='><source>Ø Bearbeitungszeit: {0} Tage</source><target>Ø Processing Time: {0} days</target></trans-unit>
 <trans-unit id='JTAuMmYlJSBFeGNlbC1FeHBvcnQgTnV0enVuZw=='><source>%0.2f%% Excel-Export Nutzung</source><target>%0.2f%% Excel-Exports</target></trans-unit>
+<trans-unit id='ezB9JSBFeGNlbC1FeHBvcnQgTnV0enVuZw=='><source>{0}% Excel-Export Nutzung</source><target>{0}% Excel-Exports</target></trans-unit>
     </body>
   </file>
 </xliff>

@@ -1656,8 +1656,10 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Sonderzeichen hinzufügen:</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Aufgabe verlassen</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Nur Segmente mit Lesezeichen anzeigen</target></trans-unit>
-<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdDogJTAuMmYgVGFnZQ=='><source>Ø Bearbeitungszeit: %0.2f Tage</source><target>Ø Bearbeitungszeit: %0.2f Tage</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdDogJTAuMGYgVGFnZQ=='><source>Ø Bearbeitungszeit: %0.0f Tage</source><target>Ø Bearbeitungszeit: %0.0f Tage</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdDogezB9IFRhZ2U='><source>Ø Bearbeitungszeit: {0} Tage</source><target>Ø Bearbeitungszeit: {0} Tage</target></trans-unit>
 <trans-unit id='JTAuMmYlJSBFeGNlbC1FeHBvcnQgTnV0enVuZw=='><source>%0.2f%% Excel-Export Nutzung</source><target>%0.2f%% Excel-Export Nutzung</target></trans-unit>
+<trans-unit id='ezB9JSBFeGNlbC1FeHBvcnQgTnV0enVuZw=='><source>{0}% Excel-Export Nutzung</source><target>{0}% Excel-Export Nutzung</target></trans-unit>
   </body>
  </file>
 </xliff>

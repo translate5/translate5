@@ -56,12 +56,16 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
     protected static $sheetNameMeta = 'meta data';
     
     /**
-     * the number of the row of the next task:
-     * - will be written by ->addTask()
-     * - or will be read out by ->getTask()
+     * the number of the row of the next task
      * @var integer
      */
     protected $taskRow = 2;
+    
+    /**
+     * the number of the row of the next KPI-item
+     * @var integer
+     */
+    protected $kpiRow = 2;
     
     /**
      * Create a new, empty excel
@@ -89,7 +93,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
     }
     
     /**
-     * init the sheet 'review job'
+     * init the sheet 'task overview'
      */
     protected function initSheetTaskOverview() {
     }
@@ -98,6 +102,29 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      * init the sheet meta data'
      */
     protected function initSheetMeta() {
+        $sheet = $this->excelExport->getWorksheetByName(self::$sheetNameMeta);
+        // setting write protection for the whole sheet
+        $sheet->getProtection()->setSheet(true);
+        
+        // set font-size to "14" for the whole sheet
+        $sheet->getParent()->getDefaultStyle()->applyFromArray([
+            'font' => [
+                'size' => '12',
+            ],
+        ]);
+        
+        // set column width
+        $sheet->getColumnDimension('A')->setWidth(200);
+    }
+    
+    /**
+     * Add a KPI-item to the Excel.
+     * @param string $kpiValue
+     */
+    public function addKPI($kpiValue) {
+        $sheet = $this->excelExport->getWorksheetByName(self::$sheetNameMeta);
+        $sheet->setCellValue('A'.$this->kpiRow, $kpiValue);
+        $this->kpiRow++;
     }
     
     /**
