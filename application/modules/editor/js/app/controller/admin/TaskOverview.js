@@ -59,6 +59,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       ref: 'taskAddWindow',
       selector: '#adminTaskAddWindow'
   },{
+      ref: 'exportMetaDataBtn',
+      selector: '#adminTaskGrid #export-meta-data-btn'
+  },{
       ref: 'averageProcessingTimeLabel',
       selector: '#adminTaskGrid #kpi-average-processing-time-label'
   },{
@@ -166,10 +169,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       store: {
           '#admin.Tasks': {
               load: 'startCheckImportStates',
-              metachange: function(taskstore, meta) {
-                  this.getAverageProcessingTimeLabel().update(meta.statistics.averageProcessingTime);
-                  this.getExcelExportUsageLabel().update(meta.statistics.excelExportUsage);
-              }
+              metachange : function(taskstore, meta) {
+                    var params = {},
+                        proxy = taskstore.getProxy();
+                    params['format'] = 'xlsx';
+                    params[proxy.getFilterParam()] = proxy.encodeFilters(taskstore.getFilters().items);
+                    this.getExportMetaDataBtn().setHref(Editor.data.restpath + 'task?' + Ext.urlEncode(params));
+                    this.getAverageProcessingTimeLabel().update(meta.statistics.averageProcessingTime);
+                    this.getExcelExportUsageLabel().update(meta.statistics.excelExportUsage);
+                }
           }
       }
   },
