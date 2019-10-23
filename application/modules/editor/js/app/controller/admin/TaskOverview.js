@@ -111,7 +111,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       deleteTaskDialogMessage:'#UT#Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?',
       deleteTaskDialogTitle:'#UT#Aufgabe löschen',
       taskImportButtonText:'#UT#Aufgabe importieren',
-      taskDeleteButtonText:'#UT#Aufgabe löschen'
+      taskDeleteButtonText:'#UT#Aufgabe löschen',
+      averageProcessingTimeContent:'Ø Bearbeitungszeit: {0} Tage',
+      excelExportUsageContent:'{0}% Excel-Export Nutzung'
   },
   listen: {
       controller: {
@@ -170,13 +172,22 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           '#admin.Tasks': {
               load: 'startCheckImportStates',
               metachange : function(taskstore, meta) {
-                    var params = {},
-                        proxy = taskstore.getProxy();
+                    var me = this,
+                        params = {},
+                        proxy = taskstore.getProxy(),
+                        averageProcessingTimeMessage = '',
+                        excelExportUsageMessage = '';
+                    if (meta.statistics.averageProcessingTime !== '') {
+                        averageProcessingTimeMessage = Ext.String.format(me.strings.averageProcessingTimeContent, meta.statistics.averageProcessingTime);
+                    }
+                    if (meta.statistics.excelExportUsage !== '') {
+                        excelExportUsageMessage = Ext.String.format(me.strings.excelExportUsageContent, meta.statistics.excelExportUsage);
+                    }
                     params['format'] = 'xlsx';
                     params[proxy.getFilterParam()] = proxy.encodeFilters(taskstore.getFilters().items);
-                    this.getExportMetaDataBtn().setHref(Editor.data.restpath + 'task?' + Ext.urlEncode(params));
-                    this.getAverageProcessingTimeLabel().update(meta.statistics.averageProcessingTime);
-                    this.getExcelExportUsageLabel().update(meta.statistics.excelExportUsage);
+                    me.getExportMetaDataBtn().setHref(Editor.data.restpath + 'task?' + Ext.urlEncode(params));
+                    me.getAverageProcessingTimeLabel().update(averageProcessingTimeMessage);
+                    me.getExcelExportUsageLabel().update(excelExportUsageMessage);
                 }
           }
       }
