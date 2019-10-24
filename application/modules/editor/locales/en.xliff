@@ -3458,10 +3458,6 @@ More information can be found in the task property window in the tab events.<br 
     <source>Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</source>
     <target>Option can only be changed, if no user is assigned</target>
 </trans-unit>
-<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGRpZXNlbGJlIEF1ZmdhYmU='>
-    <source>Mehrere Benutzer bearbeiten dieselbe Aufgabe</source>
-    <target>Multiple users editing same task</target>
-</trans-unit>
 <trans-unit id='S29ua3VycmllcmVuZGUgQmVudXR6ZXI6IERlciBlcnN0ZSBCZW51dHplciwgZGVyIGVpbmVuIEpvYiBhbm5pbW10LCBmw7xocnQgZWluZW4gSm9iIGF1cy4gQWxsZW4gYW5kZXJlbiB3aXJkIGF1dG9tYXRpc2NoIGRpZSBBdWZnYWJlIGVudHpvZ2VuLg=='>
     <source>Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.</source>
     <target>Competing users: First user, who accepts job, does job. Others are unassigned automatically.</target>
@@ -3522,16 +3518,58 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Ohne</source>
     <target>None</target>
 </trans-unit>
-<trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
-<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Delete proposals older than current import</target></trans-unit>
-<trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Log out</target></trans-unit>
-<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Add special characters:</target></trans-unit>
-<trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Leave task</target></trans-unit>
-<trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Show only bookmarked segments</target></trans-unit>
-<trans-unit id='U3RhbmRhcmRyb2xsZW4='><source>Standardrollen</source><target>Default roles</target></trans-unit>
-<trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>System roles the OpenID server is allowed to set in translate5.</target></trans-unit>
-<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Default system roles are used, if the OpenId server does not pass any system roles for the user, that logs on.</target></trans-unit>
-<trans-unit id='RXJsYXVidGUgUm9sbGVu'><source>Erlaubte Rollen</source><target>Allowed roles</target></trans-unit>
+<trans-unit id='U2VociBnZWVocnRlKHIp'>
+    <source>Sehr geehrte(r)</source>
+    <target>Dear</target>
+</trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'>
+    <source>Vorschläge löschen älter als aktueller Import</source>
+    <target>Delete proposals older than current import</target>
+</trans-unit>
+<trans-unit id='QXVzbG9nZ2Vu'>
+    <source>Ausloggen</source>
+    <target>Log out</target>
+</trans-unit>
+<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='>
+    <source>Sonderzeichen hinzufügen:</source>
+    <target>Add special characters:</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='>
+    <source>Aufgabe verlassen</source>
+    <target>Leave task</target>
+</trans-unit>
+<trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='>
+    <source>Nur Segmente mit Lesezeichen anzeigen</source>
+    <target>Show only bookmarked segments</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRyb2xsZW4='>
+    <source>Standardrollen</source>
+    <target>Default roles</target>
+</trans-unit>
+<trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='>
+    <source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source>
+    <target>System roles the OpenID server is allowed to set in translate5.</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='>
+    <source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source>
+    <target>Default system roles are used, if the OpenId server does not pass any system roles for the user, that logs on.</target>
+</trans-unit>
+<trans-unit id='RXJsYXVidGUgUm9sbGVu'>
+    <source>Erlaubte Rollen</source>
+    <target>Allowed roles</target>
+</trans-unit>
+<trans-unit id='QmVhcmJlaXRldCB1bmQgR2VzcGVycnQgZHVyY2ggbWVocmVyZSBCZW51dHplcg=='>
+    <source>Bearbeitet und Gesperrt durch mehrere Benutzer</source>
+    <target>Edited and locked by multiple users</target>
+</trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGFid2VjaHNlbG5kIGRpZXNlbGJlIEF1ZmdhYmU='>
+    <source>Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe</source>
+    <target>Multiple users editing alternating the same task</target>
+</trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGdsZWljaHplaXRpZyBkaWVzZWxiZSBBdWZnYWJl'>
+    <source>Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe</source>
+    <target>Multiple users editing simultaneously the same task</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

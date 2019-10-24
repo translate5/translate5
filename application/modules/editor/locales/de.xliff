@@ -1574,7 +1574,6 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='SsO8bmdlciBhbHMgb2RlciBnbGVpY2g='><source>Jünger als oder gleich</source><target>Jünger als oder gleich</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Vorschläge löschen, deren letzte Berührung länger her ist als</source><target>Vorschläge löschen, deren letzte Berührung länger her ist als</target></trans-unit>
 <trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IGFwcGVhciB0byBiZSBhbiBpbnRlZ2Vy'><source>'%value%' does not appear to be an integer</source><target>'%value%' does not appear to be an integer</target></trans-unit>
-
 <trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIFRlcm0='><source>Änderung zu bestehendem Term</source><target>Änderung zu bestehendem Term</target></trans-unit>
 <trans-unit id='UHJvemVzcy1TdGF0dXM='><source>Prozess-Status</source><target>Prozess-Status</target></trans-unit>
 <trans-unit id='QXR0cmlidXRzLVNjaGzDvHNzZWw='><source>Attributs-Schlüssel</source><target>Attributs-Schlüssel</target></trans-unit>
@@ -1623,7 +1622,6 @@ Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften 
 <trans-unit id='TWVocmVyZSBCZW51dHplcg=='><source>Mehrere Benutzer</source><target>Mehrere Benutzer</target></trans-unit>
 <trans-unit id='V2VubiBtZWhyZXJlIEJlbnV0emVyIGRlbXNlbGJlbiBXb3JrZmxvdy1TY2hyaXR0IHp1Z2V3aWVzZW4gd2VyZGVu'><source>Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden</source><target>Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden</target></trans-unit>
 <trans-unit id='RGllc2UgT3B0aW9uIGthbm4gbnVyIHZlcsOkbmRlcnQgd2VyZGVuLCB3ZW5uIGtlaW4gQmVudXR6ZXIgZGVyIEF1ZmdhYmUgenVnZXdpZXNlbiBpc3Qu'><source>Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</source><target>Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</target></trans-unit>
-<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGRpZXNlbGJlIEF1ZmdhYmU='><source>Mehrere Benutzer bearbeiten dieselbe Aufgabe</source><target>Mehrere Benutzer bearbeiten dieselbe Aufgabe</target></trans-unit>
 <trans-unit id='S29ua3VycmllcmVuZGUgQmVudXR6ZXI6IERlciBlcnN0ZSBCZW51dHplciwgZGVyIGVpbmVuIEpvYiBhbm5pbW10LCBmw7xocnQgZWluZW4gSm9iIGF1cy4gQWxsZW4gYW5kZXJlbiB3aXJkIGF1dG9tYXRpc2NoIGRpZSBBdWZnYWJlIGVudHpvZ2VuLg=='><source>Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.</source><target>Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.</target></trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXIgYmVuYWNocmljaHRpZ2VuPw=='><source>Zugewiesene Benutzer benachrichtigen?</source><target>Zugewiesene Benutzer benachrichtigen?</target></trans-unit>
 <trans-unit id='U29sbGVuIGRpZSB6dWdld2llc2VuZW4gQmVudXR6ZXIgw7xiZXIgZGllIFp1d2Vpc3VuZyBkZXIgQXVmZ2FiZSBiZW5hY2hyaWNodGlnIHdlcmRlbj8='><source>Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?</source><target>Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?</target></trans-unit>
@@ -1658,6 +1656,9 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</target></trans-unit>
 <trans-unit id='RXJsYXVidGUgUm9sbGVu'><source>Erlaubte Rollen</source><target>Erlaubte Rollen</target></trans-unit>
+<trans-unit id='QmVhcmJlaXRldCB1bmQgR2VzcGVycnQgZHVyY2ggbWVocmVyZSBCZW51dHplcg=='><source>Bearbeitet und Gesperrt durch mehrere Benutzer</source><target>Bearbeitet und Gesperrt durch mehrere Benutzer</target></trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGFid2VjaHNlbG5kIGRpZXNlbGJlIEF1ZmdhYmU='><source>Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe</source><target>Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe</target></trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGdsZWljaHplaXRpZyBkaWVzZWxiZSBBdWZnYWJl'><source>Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe</source><target>Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe</target></trans-unit>
   </body>
  </file>
 </xliff>
