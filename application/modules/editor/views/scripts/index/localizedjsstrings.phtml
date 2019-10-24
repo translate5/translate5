@@ -488,6 +488,7 @@ Ext.define('Editor.controller.Localizer', {
             notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
             locked: '<?php echo $this->translate->_('in Arbeit');?>',
             lockedBy: '<?php echo $this->translate->_('Bearbeitet und Gesperrt durch {0}');?>',
+            lockedMultiUser: '<?php echo $this->translate->_('Bearbeitet und Gesperrt durch mehrere Benutzer');?>',
             lockedSystem: '<?php echo $this->translate->_('Durch das System gesperrt mit dem Status \'{0}\'');?>',
             addTask: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',
             addTaskTip: '<?php echo $this->translate->_('Eine neue Aufgabe hinzufügen.');?>',
@@ -562,8 +563,9 @@ Ext.define('Editor.controller.Localizer', {
             usageModeTitle: '<?php echo $this->translate->_('Mehrere Benutzer');?>',
             usageModeInfo: '<?php echo $this->translate->_('Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden');?>',
             usageModeDisabled: '<?php echo $this->translate->_('Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.');?>',
-            usageModeCoop: '<?php echo $this->translate->_('Mehrere Benutzer bearbeiten dieselbe Aufgabe');?>',
-            usageModeCompetitive: '<?php echo $this->translate->_('Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.');?>'
+            usageModeCoop: '<?php echo $this->translate->_('Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe');?>',
+            usageModeCompetitive: '<?php echo $this->translate->_('Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.');?>',
+            usageModeSimultaneous: '<?php echo $this->translate->_('Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe');?>'
         }
     });
     

@@ -57,7 +57,7 @@ abstract class editor_Models_Excel_AbstractExImport {
      * @return bool
      */
     public function taskLock(editor_Models_Task $task) : bool {
-        if(!$task->lock(NOW_ISO, true)) {
+        if(!$task->lock(NOW_ISO, self::TASK_STATE_ISEXCELEXPORTED)) {
             $this->log->debug('E0000', 'Excel Export: task lock failed');
             return FALSE;
         }

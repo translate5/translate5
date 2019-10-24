@@ -907,6 +907,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(empty($used)) {
             return;
         }
+        //FIXME also throw an exception if task is locked
         throw ZfExtended_Models_Entity_Conflict::createResponse('E1159', [
             'usageMode' => [
                 'usersAssigned' => 'Der Nutzungsmodus der Aufgabe kann verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.'
@@ -1100,10 +1101,14 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function openAndLock() {
         $task = $this->entity;
+        /* @var $task editor_Models_Task */
         if($this->isEditTaskRequest()){
+            $isMultiUser = $task->getUsageMode() == $task::USAGE_MODE_SIMULTANEOUS;
             $unconfirmed = $task->getState() == $task::STATE_UNCONFIRMED;
             //first check for confirmation on task level, if unconfirmed, don't lock just set to view mode!
-            if($unconfirmed || !$task->lock($this->now)){
+            //if no multiuser, try to lock for user
+            //if multiuser, try a system lock
+            if($unconfirmed || !($isMultiUser ? $task->lock($this->now, $task::USAGE_MODE_SIMULTANEOUS) : $task->lockForSessionUser($this->now))){
                 $this->data->userState = $this->workflow::STATE_VIEW;
             }
         }
@@ -1138,7 +1143,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!$isEnding && (!$this->isLeavingTaskRequest())){
             return;
         }
-        if($this->entity->getLockingUser() == $this->user->data->userGuid && !$this->entity->unlock()) {
+        if(!$this->entity->unlockForUser($this->user->data->userGuid) && $this->entity->getUsageMode() != $this->entity::USAGE_MODE_SIMULTANEOUS) {
             throw new Zend_Exception('task '.$this->entity->getTaskGuid().
                     ' could not be unlocked by user '.$this->user->data->userGuid);
         }
@@ -1150,7 +1155,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->events->trigger("afterTaskClose", $this, array(
             'task' => $task,
             'view' => $this->view,
-            'openState' => $this->data->userState)
+            'openState' => $this->data->userState ?? null)
         );
     }
     

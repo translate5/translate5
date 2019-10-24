@@ -174,11 +174,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     protected function setJsVarsInView() {
-        $rop = $this->config->runtimeOptions;
+      $rop = $this->config->runtimeOptions;
         
-        $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
+      $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
         
-        $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
+      $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
       $this->view->Php2JsVars()->set('restpath', $restPath);
       $this->view->Php2JsVars()->set('basePath', APPLICATION_RUNDIR);
       $this->view->Php2JsVars()->set('moduleFolder', $this->view->publicModulePath.'/');
@@ -304,6 +304,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //boolean config if the leave task button button in the segments editor header is visible or not
       $this->view->Php2JsVars()->set('editor.toolbar.hideLeaveTaskButton',(boolean)$rop->editor->toolbar->hideLeaveTaskButton);
       
+      $this->view->Php2JsVars()->set('tasks.simultaneousEditingKey', editor_Models_Task::INTERNAL_LOCK.editor_Models_Task::USAGE_MODE_SIMULTANEOUS);
       $this->setLanguageResourceJsVars();
       
       $this->setJsAppData();

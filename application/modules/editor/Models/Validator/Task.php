@@ -63,6 +63,6 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('enableSourceEditing', 'int');
     $this->addValidator('importAppVersion', 'stringLength', array('min' => 0, 'max' => 64));
     $this->addValidator('customerId', 'int');
-    $this->addValidator('usageMode', 'inArray', [[editor_Models_Task::USAGE_MODE_COMPETITIVE, editor_Models_Task::USAGE_MODE_COOPERATIVE]]);
+    $this->addValidator('usageMode', 'inArray', [[editor_Models_Task::USAGE_MODE_COMPETITIVE, editor_Models_Task::USAGE_MODE_COOPERATIVE, editor_Models_Task::USAGE_MODE_SIMULTANEOUS]]);
   }
 }
