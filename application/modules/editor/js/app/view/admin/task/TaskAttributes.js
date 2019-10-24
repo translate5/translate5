@@ -51,8 +51,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         usageModeTitle: "#UT#Mehrere Benutzer",
         usageModeInfo: "#UT#Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden",
         usageModeDisabled: "#UT#Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.",
-        usageModeCoop: "#UT#Mehrere Benutzer bearbeiten dieselbe Aufgabe",
-        usageModeCompetitive: "#UT#Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen."
+        usageModeCoop: "#UT#Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe",
+        usageModeCompetitive: "#UT#Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.",
+        usageModeSimultaneous: "#UT#Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe"
     },
     itemId:'taskAttributesPanel',
     controller:'taskattributesviewcontroller',
@@ -257,6 +258,14 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                     boxLabel  : me.strings.usageModeCompetitive,
                     name      : 'usageMode',
                     inputValue: 'competitive',
+                    bind: {
+                        disabled:'{disableUsageMode}'
+                    }
+                }, {
+                    //readonly bind: admin.TaskUserAssocs mit Inhalt
+                    boxLabel  : me.strings.usageModeSimultaneous,
+                    name      : 'usageMode',
+                    inputValue: 'simultaneous',
                     bind: {
                         disabled:'{disableUsageMode}'
                     }

@@ -377,7 +377,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           }
           return;
       }
-      if(!rec.isLocked() && (isTaskNr || dbl)) {
+      if(rec.isOpenable() && (isTaskNr || dbl)) {
           this.openTaskRequest(rec);
       }
   },

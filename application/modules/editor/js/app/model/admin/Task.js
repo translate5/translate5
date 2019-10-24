@@ -42,6 +42,7 @@ Ext.define('Editor.model.admin.Task', {
   USER_STATE_UNCONFIRMED: 'unconfirmed',
   USAGE_MODE_COMPETITIVE: 'competitive',
   USAGE_MODE_COOPERATIVE: 'cooperative',
+  USAGE_MODE_SIMULTANEOUS: 'simultaneous',
   states: {
       ERROR: 'error',
       IMPORT: 'import',
@@ -128,7 +129,20 @@ Ext.define('Editor.model.admin.Task', {
       return this.get('qmSubEnabled');
   },
   /**
-   * returns if task is locked
+   * returns if task is editable depending on task locking and usagemode
+   * does not evaluate waiting/finished etc. Therefore is isReadonly 
+   * @return {Boolean}
+   */
+  isEditable: function() {
+      //if the task is edited by multiple users, it is not locked in the frontend.
+      if(this.isLocked() && this.get('lockedInternalSessionUniqId') == Editor.data.tasks.simultaneousEditingKey) {
+          return true; 
+      }
+      return !this.isLocked();
+  },
+  /**
+   * returns if task is locked (either by a user or by system)
+   * With simultaneous editing the task is also locked, but user should be able to edit, therefore is the isEditable. 
    * @return {Boolean}
    */
   isLocked: function() {
@@ -223,11 +237,10 @@ Ext.define('Editor.model.admin.Task', {
    */
   isReadOnly: function() {
       var me = this;
-      //FIXME nextRelease This should be done by userRights, a clear way isnt specified yet. Perhaps move to Editor.model.admin.User.isAllowed!
       if(me.get('userRole') == 'visitor' || me.get('userState') == me.USER_STATE_VIEW){
           return true;
       }
-      return me.isLocked() || me.isFinished() || me.isWaiting() || me.isEnded() || me.isUnconfirmed();
+      return !me.isEditable() || me.isFinished() || me.isWaiting() || me.isEnded() || me.isUnconfirmed();
   },
   /**
    * returns if task is ended
