@@ -432,10 +432,8 @@ function getFilteredProcessStats() {
  * @returns
  */
 function showInfoMessage(message,title){
-	var yesText=proposalTranslations['Ja'],
-		buttons={
-		};
-	buttons[yesText]=function(){
+	var buttons={};
+	buttons['Ok']=function(){
 	    $(this).dialog('close');
 	};
 	// Define the Dialog and its properties.

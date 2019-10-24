@@ -171,7 +171,9 @@ var Attribute={
             url,
             $attribute,
             yesCallback,
-            yesText;
+            yesText=proposalTranslations['Ja'],
+			noText=proposalTranslations['Nein'],
+			buttons={};
         
         if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
             return false;
@@ -193,6 +195,8 @@ var Attribute={
 		        dataType: "json",	
 		        type: "POST",
 		        success: function(result){
+		        	//on the next term click, fatch the data from the server, and update the cache
+		    		Term.reloadTermEntry=true;
 		        	//reload the termEntry when the attribute is deleted (not proposal)
 		        	if(!result.rows || result.rows.length === 0){
 		        		//TODO: if needed add also for termentry attributes
@@ -209,12 +213,7 @@ var Attribute={
 		        		return;
 		        	}
 		        	
-		        	
 		        	var attributeData=result.rows;
-		        	
-		        	//on the next term click, fatch the data from the server, and update the cache
-		    		Term.reloadTermEntry=true;
-		    		
 		        	//the term attribute is definition, remove and update the content for the term and term entry attribute definition dom
 		    		if(attributeData.attrType === 'definition'){
 		    			me.checkAndUpdateDeffinition(attributeData);
@@ -233,11 +232,6 @@ var Attribute={
 		        }
 		    });
 		};
-		
-		yesText=proposalTranslations['Ja'],
-			noText=proposalTranslations['Nein'],
-			buttons={
-			};
 		
 		buttons[yesText]=function(){
             $(this).dialog('close');
@@ -592,6 +586,47 @@ var Attribute={
     		}
     	}
     	return labelName+' '+labelType;
+    },
+    
+    /***
+     * Remove the complete attribute from the term attribute holder by given term attribute component editor
+     */
+    removeNewInputAttribute:function($componentEditor){
+    	 //find the term holder and remove each unexisting comment attribute dom
+        var $termHolder=$componentEditor.parents('div[data-term-id]');
+        $termHolder.children('p[data-id="-1"]').remove();
+        $termHolder.children('h4[data-attribute-id="-1"]').remove();
+        $componentEditor.replaceWith('');
+    },
+    
+    /***
+     * Reset the comment attribute component to its initial state
+     * @param {Object} $$componentEditor   = the textarea(component editor)
+     * @param {Object} attributeData = the comment attribute data. If no comment attribute data is provided, the function will try to find it in the cache
+     */
+    resetCommentAttributeComponent:function($componentEditor,attributeData){
+    	//if no attribute data is provided, try to find the data from the cache
+    	if(!attributeData){
+    		var $termHolder=$componentEditor.parents('div[data-term-id]'),
+	    		termId=$termHolder.data('term-id'),
+	    		termData=Term.getTermDataFromCache(Term.newTermGroupId,termId);
+    		
+    		for(var i=0;i<termData.attributes.length;i++){
+    			var attribute=termData.attributes[i];
+    			if(attribute.name=='note'){
+    				attributeData=attribute;
+    				break;
+    			}
+    		}
+    	}
+    	//if still no attribute data, it is a new comment -> remove the attribute
+    	if(!attributeData){
+    		this.removeNewInputAttribute($componentEditor);
+    		return;
+    	}
+    	//the comment attribute data exist, render the attribute from the data
+        var componentRenderData=Attribute.getAttributeRenderData(attributeData,attributeData.attrValue);
+        $componentEditor.replaceWith(componentRenderData);
     }
 };
 

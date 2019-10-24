@@ -386,6 +386,15 @@ var Term={
                             return;
                         }
 		                
+		            	//var accordion = $(this);
+		            	if($(event.toElement).is("textarea")){
+		            		event.preventDefault();
+		            		return;
+		            	}
+		            	if($(event.toElement).hasClass("proposal-btn") && ui.newHeader.length === 0){
+		            		event.preventDefault();
+		            		return;
+		                }
 		                //if the cancel panding changes return false, do not expand/collapse the current header
 		                if(!me.cancelPendingChanges(ui.oldHeader)){
 		                	event.preventDefault();
@@ -1271,6 +1280,27 @@ var Term={
 	    		$(editor).mouseup();
 	        });
 	    	return true;
+        },
+        
+        /***
+         * Get term data from the cache
+         */
+        getTermDataFromCache:function(termGroupid,termId){
+        	var me=this,
+        		data=[];
+        	
+        	if(!me.termGroupsCache[termGroupid] || !me.termGroupsCache[termGroupid].rows || !me.termGroupsCache[termGroupid].rows[me.KEY_TERM_ATTRIBUTES]){
+        		return data;
+        	}
+        	data=me.termGroupsCache[termGroupid].rows[me.KEY_TERM_ATTRIBUTES];
+    		for(var i=0;i<data.length;i++){
+        		var term=data[i];
+        		//the field value in cache is the termid
+        		if(term.value==termId){
+        			return term;
+        		}
+        	}
+    		return [];
         }
 };
 
