@@ -448,14 +448,24 @@ var Attribute={
 	        }
 	        attVal=$.datepicker.formatDate(dateFormat, new Date(attVal*1000));
 	    }
-	    if (attribute.attrType === "processStatus" && attVal === "finalized") {
-	    	attVal='<img src="' + moduleFolder + 'images/tick.png" alt="finalized" title="finalized">';
-	    }else if(attribute.attrType === "processStatus" && attVal === "provisionallyProcessed"){
-	    	attVal="-";
-	    } else {
-	    	attVal=attVal.replace(/$/mg,'<br>');
-	    }
 	    
+	    //for the processStatus attribute render icon or translated text
+	    if(attribute.name === "termNote" && attribute.attrType === "processStatus"){
+	    	var tooltip=Editor.data.apps.termportal.allProcessstatus[attVal] ? Editor.data.apps.termportal.allProcessstatus[attVal] : attVal;
+	    	//when the attribute is processStatus, translate the given processStatus value
+	    	switch(attVal) {
+	    	  case "finalized":
+	    		  attVal='<img src="' + moduleFolder + 'images/tick.png" alt="'+tooltip+'" title="'+tooltip+'">';
+	    	    break;
+	    	  case "provisionallyProcessed":
+	    		  attVal="-";
+	    	    break;
+	    	  default:
+	    		  //for all other processStatus values use the translated value string
+	    		  attVal=tooltip;
+	    		  attVal=attVal.replace(/$/mg,'<br>');
+	    	}
+	    }
 	    return me.getAttributeRenderData(attribute,attVal);
 	},
 	
@@ -482,6 +492,24 @@ var Attribute={
 		
 		//the user has proposal rights -> init attribute proposal span
 		return me.getProposalDefaultHtml(attributeData.attributeOriginType,attributeData.attributeId,attValue,attributeData);
+	},
+	
+	/***
+	 * Return the term attribute container render data.
+	 */
+	getTermAttributeContainerRenderData:function(term){
+		var me=this,
+			termRflLang = (term.attributes[0] !== undefined) ? term.attributes[0].language : '',
+			renderData=[];	
+		
+		renderData.push('<div data-term-id="'+term.termId+'" data-collection-id="'+term.collectionId+'" class="term-attributes">');
+        if (term.termId !== -1) {
+            renderData.push(Term.renderInstantTranslateIntegrationForTerm(termRflLang));
+        }
+        //draw term attributes
+        renderData.push(me.renderTermAttributes(term,termRflLang));
+        renderData.push('</div>');
+        return renderData.join(' ');
 	},
 
 	/***
