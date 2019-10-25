@@ -53,48 +53,22 @@ var ComponentEditor={
 		if(!Editor.data.app.user.isTermProposalAllowed){
 			return;
 		}
-		
-		//show info message if the comment attribute mandatory flag is set and the comment component editor is active
-    	if(Editor.data.apps.termportal.commentAttributeMandatory && this.isCommentComponentEditorActive()){
-			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-			return false;
-    	}
+
+        if (!this.isCommmentAttributeRequirementMet()) {
+            return false;
+        }
     	
         console.log('addTermComponentEditor');
 		var me=this,
-			$input= $('<textarea />').val($element.text()),
-			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
+			$input= $('<textarea />').val($element.text());
+		
+		//add comment component editor
+		me.onEditTermCommentComponentHandler($termAttributeHolder,$element.data('id') > 0);
 		
 		//reset the flag
 		me.isNew=false;
-		
-		//check if it is new comment attribute
-		if($commentPanel.length === 0 && $element.data('id') > 0){
-			$commentPanel=$termAttributeHolder.find('.isAttributeComment');
-		}
-		
 		//copy the collection id from the attribute holder data to the term element data
 		$element.attr("data-collection-id",$termAttributeHolder.data('collectionId'));
-		
-		//the comment field does not exist for the term, create new
-		if($commentPanel.length === 0 && $element.data('id') > 0){
-			var dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute'),
-				drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute),
-				$instantTranslateComponent=$termAttributeHolder.find('div.instanttranslate-integration');
-			
-			//if the instant translate component exist, add the comment editor always after it
-			if($instantTranslateComponent.length>0){
-				$instantTranslateComponent.after(drawData);
-			}else{
-				$termAttributeHolder.prepend(drawData);
-			}
-			
-			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
-		}
-		
-		if($commentPanel.prop('tagName') === 'SPAN'){
-			me.addCommentAttributeEditor($commentPanel);
-		}
 		
 		$element.replaceWith($input);
         
@@ -104,6 +78,9 @@ var ComponentEditor={
         
         me.isComponentEditorActive();
         
+        me.$_termTable.off( "mouseup", ".term-data.proposable .proposal-save");
+        me.$_termTable.off( "mouseup", ".term-data.proposable .proposal-cancel");
+        	
         me.$_termTable.one('mouseup', '.term-data.proposable .proposal-save',function() {
             me.saveComponentChange($element,$input);
         });
@@ -123,18 +100,17 @@ var ComponentEditor={
 		if(!Editor.data.app.user.isTermProposalAllowed){
 			return;
 		}
-		
-		//if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-			return false;
-    	}
+
+        if (!this.isCommmentAttributeRequirementMet()) {
+            return false;
+        }
     	
         console.log('addAttributeComponentEditor');
 		var me=this,
 			$input= $('<textarea />').val($element.text());
 		
 		
+		$input.off('change keyup keydown paste cut');
 		$input.on('change keyup keydown paste cut', function () {
 			//resite the input when there is more than 50 characters in it
 			if($(this).val().length>50){
@@ -148,6 +124,12 @@ var ComponentEditor={
         me.addKeyboardShortcuts($element,$input);
         
         me.isComponentEditorActive();
+        
+        
+        me.$_termEntryAttributesTable.off('mouseup', '.proposal-save');
+        me.$_termEntryAttributesTable.off('mouseup', '.proposal-cancel');
+        me.$_termTable.off('mouseup', '.proposal-save');
+        me.$_termTable.off('mouseup', '.proposal-cancel');
         
         //the attibute can be term attribute or term entry attribute
         //register the event listeners for both tables because of the deffinition
@@ -183,7 +165,7 @@ var ComponentEditor={
 		
 		
 		$input.on('change keyup keydown paste cut', function () {
-			//resite the input when there is more than 50 characters in it
+			//resize the input when there is more than 50 characters in it
 			if($(this).val().length>50){
 				$(this).height(150);
 				$(this).width(350);
@@ -212,7 +194,7 @@ var ComponentEditor={
      * @param {Object} $input   = the textarea with the proposed content
      */
     cancelComponentChange:function($element,$input){
-        $input.val(''); // this will force saveComponentChange() to stop the saving.
+    	$input.val('');// this will force saveComponentChange() to stop the saving.
         this.saveComponentChange($element,$input);
     },
     
@@ -248,15 +230,21 @@ var ComponentEditor={
             dataKey,
             url,
             requestData={},
-            isTerm=$el.data('type')=='term';
-        
-        Term.drawProposalButtons('componentEditorClosed');
+            isTerm=$el.data('type')=='term',
+            isCancelRequest=me.stopRequest($el,$input);
         
         // if id is not provided, this is a proposal on empty term entry // TODO: is this comment correct? We can also create a new Term WITHIN an existing TermEntry!
         me.isNew = (!$el.data('id') == undefined || $el.data('id') < 1); 
         
+        //if the cancel component is for a term, cancel the comment component editor to
+        if(isTerm && isCancelRequest){
+        	me.closeCommentComponentEditor($el.data('id'));
+        }
+
+        Term.drawProposalButtons('componentEditorClosed');
+        
         // don't send the request? then reset component only.
-        if (!me.isNew && me.stopRequest($el,$input)){
+        if (!me.isNew && isCancelRequest){
             //get initial html for the component
             var dummyData={
                     'attributeOriginType':$el.data('type'),
@@ -272,10 +260,10 @@ var ComponentEditor={
         
         //check if the new term request should be canceled (empty value)
         if($input.val() === '' || $.trim($input.val()) === ''){
-        	Term.newTermLanguageId=null;
-        	Term.newTermRfcLanguage=null;
-    		Term.findTermsAndAttributes(Term.newTermGroupId);
-    		return;
+            Term.newTermLanguageId=null;
+            Term.newTermRfcLanguage=null;
+            Term.findTermsAndAttributes(Term.newTermGroupId);
+            return;
         }
 		
 		route=me.typeRouteMap[$el.data('type')];
@@ -318,21 +306,10 @@ var ComponentEditor={
 	
 	saveCommentChange:function($element,$input){
 	    var me = this,
-            $termHolder,
             $parent,
             url,
             requestData;
 
-	    
-    	//if the comment panel is mandatory, display the info message
-		if($input.val()=='' && Editor.data.apps.termportal.commentAttributeMandatory){
-			var dialog=showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-			dialog.on('dialogclose', function(event) {
-				$input.focus();
-			});
-			return;
-		}
-		
 		//if the comment is new autogenerated comment from tm, do not ignore the saveing
 		var isNewCommentFromTm=$input.val()==proposalTranslations['acceptedFromTmComment'] && $element.data('id')==-1;
         // don't send the request? then update front-end only.
@@ -340,27 +317,28 @@ var ComponentEditor={
             
             Term.drawProposalButtons('commentAttributeEditorClosed');
             
+            //if it is a new term(in new term case the comment attribute does not exist in the db)
+            //or if it is a new attribute
             if (me.isNew || $element.data('id')<1) {
-                //find the term holder and remove each unexisting comment attribute dom
-                $termHolder=$input.parents('div[data-term-id]');
-                $termHolder.children('p[data-id="-1"]').remove();
-                $termHolder.children('h4[data-attribute-id="-1"]').remove();
-                $input.replaceWith('');
+            	//remove the comment attribute from the dom
+                Attribute.removeNewInputAttribute($input);
                 me.isComponentEditorActive();
                 return;
             }
 
-            //get initial html for the component
+            //get the inital data for the comment attribute component
             var dummyData={
                     'attributeOriginType':$element.data('type'),
                     'attributeId':$element.data('id'),
                     'name':'note',
                     'headerText:':Attribute.findTranslatedAttributeLabel('note',null),
+                    'attrValue':$element.text(),
                     'proposable':true
-            },
-            componentRenderData=Attribute.getAttributeRenderData(dummyData,$element.text());
-
-            $input.replaceWith(componentRenderData);
+            };
+            
+            //the comment attribute exist, rerender the initial attribute data
+            //reset the comment attribute editor with the inital data
+            Attribute.resetCommentAttributeComponent($input,dummyData);
             me.isComponentEditorActive();
             return;
 		}
@@ -392,13 +370,8 @@ var ComponentEditor={
 			attrType=$element.data('type'),
 		    isTerm=attrType=='term',
 		    renderData=null,
-		    attributeRenderData=null,
 		    $elParent=null,
-            $commentPanel,
-            dummyCommentAttribute,
-            drawData='',
             $termAttributeHolder,
-            instantTranslateInto,
             activeTabSelector,
             activeTab;
 			
@@ -409,12 +382,6 @@ var ComponentEditor={
 			
 			// (if necessary:) add language to select
 			addLanguageToSelect(result.language, result.languageRfc5646);
-
-			//for the new term, term attribute render data is required
-			if (me.isNew) {
-				var termRflLang=(result.attributes && result.attributes[0].language!=undefined) ? result.attributes[0].language : '';
-				attributeRenderData=Attribute.renderTermAttributes(result,termRflLang);
-			}
 		}else{
 			renderData=Attribute.getAttributeRenderData(result,result.value);
 			
@@ -428,6 +395,7 @@ var ComponentEditor={
         		
 			}
 			$elParent=Attribute.getTermAttributeHeader($element.data('id'),attrType);
+			$elParent.attr('data-attribute-id', result.attributeId);
 		}
 		
 		//reload the term entry data if term entry results are available
@@ -439,10 +407,6 @@ var ComponentEditor={
         $elParent.attr('data-term-value', result.term);
         $elParent.attr('data-term-id', result.termId);
         $elParent.attr('data-groupid', result.groupId);
-        
-        if(!isTerm){
-        	$elParent.attr('data-attribute-id', result.attributeId);
-        }
         
         $elParent.removeClass('is-finalized').removeClass('is-new').addClass('is-proposal');
         $elParent.removeClass('in-editing');
@@ -460,70 +424,33 @@ var ComponentEditor={
 			Attribute.checkAndUpdateDeffinition(result);
 			return;
 		}
+		
+		//reload the term attribute data
+		Term.refreshTermAttributeContent(result);
+		
 		$termAttributeHolder = me.$_termTable.find('div[data-term-id="' + result.termId + '"]');
-		//if it is comment, and the comment panel does not exist, add the comment panel after the proposed term is saved
-		$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
-		//the comment field does not exist for the term, create new
-		if($commentPanel.length === 0){
-			
-			$termAttributeHolder=me.$_termTable.find('div[data-term-id=-1]');//find the parent term holder (not saved term with termid -1)
-			instantTranslateInto=Term.renderInstantTranslateIntegrationForTerm(result.language);
-			
-			//update the term holder dom with the new term id
-			$termAttributeHolder.attr("data-term-id",result.termId);
-			$termAttributeHolder.attr("data-groupid",result.groupId);
-			
-			//for the new term, render the attributes to
-			if(me.isNew && attributeRenderData && attributeRenderData!=''){
-				drawData+=attributeRenderData;
-	        }
-
-			//attach the comment attribute draw data to the term holder
-			$termAttributeHolder.prepend(drawData);
-			
-			$commentPanel=$termAttributeHolder.find('.isAttributeComment');
-			if($commentPanel.length === 0){
-				var commentValue=isTermProposalFromInstantTranslate ? proposalTranslations['acceptedFromTmComment'] : null;
-
-				dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute',commentValue);
-				
-				$termAttributeHolder.prepend(Attribute.handleAttributeDrawData(dummyCommentAttribute));
-			}
-			
-
-			//render the instant translate into select
-			if(instantTranslateInto){
-				$termAttributeHolder.prepend(instantTranslateInto);
-				Term.initInstantTranslateSelect();
-			}
-			
-			//find the comment panel and start the comment editor
-            // (for existing terms, the comment editor is started by clicking it)
-			if (me.isNew) {
-				//reset the data for the propose term component
-				//only the term specific data is reset, the other data is loaded from the newly saved term
-				Term.newTermName=proposalTranslations['addTermProposal'] + '...';
-				Term.newTermRfcLanguage=null;
-				Term.newTermLanguageId=null;
-				Term.newTermAttributes=[];
-				Term.newTermCollectionId=result.collectionId;
-				Term.newTermGroupId=result.groupId;
-				Term.newTermTermEntryId=result.termEntryId;
-				
-				me.$_termTable.prepend(Term.renderNewTermSkeleton(result));
-				me.$_termTable.accordion('refresh');
-				
-				Term.drawProposalButtons('attribute');
-				Term.drawProposalButtons('terms');
-            
-	            $commentPanel=$termAttributeHolder.find('[data-editable-comment]');
-	            if($commentPanel.length>0 && $commentPanel.prop('tagName') === 'SPAN'){
-	                me.addCommentAttributeEditor($commentPanel);
-	            }
-			}
+		//handle the term comment attribute
+		me.onEditTermCommentComponentHandler($termAttributeHolder,true);
+		
+		if (me.isNew) {
+			//reset the data for the propose term component
+			//only the term specific data is reset, the other data is loaded from the newly saved term
+			Term.newTermName=proposalTranslations['addTermProposal'] + '...';
+			Term.newTermRfcLanguage=null;
+			Term.newTermLanguageId=null;
+			Term.newTermAttributes=[];
+			Term.newTermCollectionId=result.collectionId;
+			Term.newTermGroupId=result.groupId;
+			Term.newTermTermEntryId=result.termEntryId;
+			me.$_termTable.prepend(Term.renderNewTermSkeleton(result));
+			me.$_termTable.accordion('refresh');
+			Term.drawProposalButtons('terms');
 		}
 		
-        // "reset", is valid only once (= when coming from TermPortal)
+		Term.drawProposalButtons($termAttributeHolder);
+		
+		
+		// "reset", is valid only once (= when coming from TermPortal)
         if(isTermProposalFromInstantTranslate) {
             isTermProposalFromInstantTranslate = false;
         }
@@ -593,7 +520,80 @@ var ComponentEditor={
      */
     isCommentComponentEditorActive:function(){
     	var commentEditors=this.$_termTable.find('textarea[data-editable-comment]');
-		return commentEditors.length>0;
+    	if(commentEditors.length>0){
+    		commentEditors.focus();
+    		return true;
+    	}
+		return false;
+    },
+    
+    /**
+     * Are the requirements for the comment-attribute met? If not, show a message and return false.
+     * Otherwise return true.
+     * @return bool
+     */
+    isCommmentAttributeRequirementMet: function() {
+        // If the comment attribute mandatory flag is set, check if there is unclosed comment editor.
+        if (Editor.data.apps.termportal.commentAttributeMandatory && this.isCommentComponentEditorActive()) {
+            showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'], proposalTranslations['commentAttributeMandatoryTitle']);
+            return false;
+        }
+        return true;
+    },
+    
+    /***
+     * Close coment component editor for given termId
+     * The function will search for comment component editor within the term attributes
+     */
+    closeCommentComponentEditor:function(termId){
+    	var me=this;
+    	//check if there is an active component editor
+    	if(!me.isCommentComponentEditorActive()){
+    		return;
+    	}
+    	//find the term attribute holder and the comment component editor inside
+    	var $termAttributeHolder = me.$_termTable.find('div[data-term-id="'+termId+ '"]'),
+    		commentEditor=$termAttributeHolder.find('textarea[data-editable-comment]');
+    	
+    	if(commentEditor.length<1){
+    		return;
+		}
+    	//reset the comment attribute
+    	//this will remove(the comment attribute does not exist in the db) or rerender(the attribute exist in db) the comment attribute
+    	Attribute.resetCommentAttributeComponent(commentEditor);
+    },
+    
+    /***
+     * Find/render and open the comment component editor in the term attribute holder area.
+     */
+    onEditTermCommentComponentHandler:function($termAttributeHolder,isExistingElement){
+    	var me=this,
+			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
+		
+		//check if it is new comment attribute
+		if($commentPanel.length === 0 && isExistingElement){
+			$commentPanel=$termAttributeHolder.find('.isAttributeComment');
+		}
+		
+		//the comment field does not exist for the term, create new
+		if($commentPanel.length === 0 && isExistingElement){
+			var dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute'),
+				drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute),
+				$instantTranslateComponent=$termAttributeHolder.find('div.instanttranslate-integration');
+			
+			//if the instant translate component exist, add the comment editor always after it
+			if($instantTranslateComponent.length>0){
+				$instantTranslateComponent.after(drawData);
+			}else{
+				$termAttributeHolder.prepend(drawData);
+			}
+			
+			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
+		}
+		
+		if($commentPanel.prop('tagName') === 'SPAN'){
+			me.addCommentAttributeEditor($commentPanel);
+		}
     }
 };
 
