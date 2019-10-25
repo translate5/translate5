@@ -1126,6 +1126,21 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
+     * Get loaded data as object with term attributes included
+     * @return stdClass
+     */
+    public function getDataObjectWithAttributes() {
+        $result=$this->getDataObject();
+        //load all attributes for the term
+        $rows=$this->groupTermsAndAttributes($this->findTermAndAttributes($result->id));
+        $result->attributes=[];
+        if(!empty($rows) && !empty($rows[0]['attributes'])){
+            $result->attributes =$rows[0]['attributes'];
+        }
+        return $result;
+    }
+    
+    /***
      * Check if the term is proposable.
      * It is proposable when the term status is not unproccessed and the user is allowed for term proposal operation
      * @param string $status
