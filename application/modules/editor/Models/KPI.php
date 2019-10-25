@@ -81,9 +81,13 @@ class editor_Models_KPI {
         }
         $allProcessingTimes = [];
         foreach ($this->tasks as $task) {
+            if ($task['realDeliveryDate'] == null) {
+                // Only tasks that already do have an end-date are to be included.
+                continue;
+            }
             // TODO: would it be better to retrieve these dates from the task-model?
             $startDate = new DateTime($task['orderdate']);
-            $endDate = new DateTime($task['realDeliveryDate']); // if realDeliveryDate isn't set so far, current date is used
+            $endDate = new DateTime($task['realDeliveryDate']);
             $processingTime = $endDate->diff($startDate);
             $allProcessingTimes[] = $processingTime->format('%a');
         }
