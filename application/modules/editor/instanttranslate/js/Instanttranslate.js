@@ -867,8 +867,7 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
  * we initiate drawing the links here.
  */
 function checkTermPortalIntegration() {
-    var html = '',
-        searchTerms = [],
+    var searchTerms = [],
         nonExistingTerms = [];
     // check user rights
     if(!Editor.data.app.user.isUserTermproposer) {
@@ -891,6 +890,7 @@ function checkTermPortalIntegration() {
         type: "POST",
         data: {
             'searchTerms':JSON.stringify(searchTerms),
+            'targetLang':$("#targetLocale").val()
         },
         success: function(result){
             nonExistingTerms = result.rows;
