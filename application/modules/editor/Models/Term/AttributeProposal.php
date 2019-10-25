@@ -95,7 +95,7 @@ class editor_Models_Term_AttributeProposal extends ZfExtended_Models_Entity_Abst
         /* @var $attribute editor_Models_Term_Attribute */
         //remove the term attribute proposals from the term attribute table
         $count2=$attribute->db->delete(['termId=?' => $termId,'processStatus=?'=>editor_Models_Term::PROCESS_STATUS_UNPROCESSED]);
-        return $count1+$count2>0;
+        return $count1 + $count2 > 0;
     }
     
     /***
