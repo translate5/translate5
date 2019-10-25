@@ -447,8 +447,7 @@ var ComponentEditor={
 			Term.drawProposalButtons('terms');
 		}
 		
-		Term.drawProposalButtons($termAttributeHolder);
-		
+		Term.drawProposalButtons('singleterm', result.termId);
 		
 		// "reset", is valid only once (= when coming from TermPortal)
         if(isTermProposalFromInstantTranslate) {

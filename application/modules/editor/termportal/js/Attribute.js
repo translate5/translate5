@@ -282,7 +282,7 @@ var Attribute={
         // ... a proposal for a term that already existed (attribute.proposal = "xyz")
         // ... or a proposal for a new term (attribute.proposal = null, but attrProcessStatus is "unprocessed")
         isProposal = ' is-finalized'; 
-        if (attribute.proposal !== null || attribute.attrProcessStatus === "unprocessed") {
+        if (attribute.proposal || attribute.attrProcessStatus === "unprocessed") {
             isProposal = ' is-proposal';
         }
         
