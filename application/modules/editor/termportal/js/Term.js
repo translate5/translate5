@@ -494,7 +494,6 @@ var Term={
                 clientsForCollection,
                 isProposal,
                 proposable = (term.proposable !== false) ? ' proposable' : '', // = does the user have the rights to handle proposals for this term?,
-                instantTranslateIntegrationForTerm,
                 termHeader=[];
             
             // "is-proposal" can be ... 
@@ -570,14 +569,8 @@ var Term={
             
             termAttributesHtmlContainer.push('</h3>');
             
-            //draw term attributes
-            termAttributesHtmlContainer.push('<div data-term-id="'+term.termId+'" data-collection-id="'+term.collectionId+'" class="term-attributes">');
-            if (term.termId !== -1) {
-                instantTranslateIntegrationForTerm = me.renderInstantTranslateIntegrationForTerm(termRflLang);
-                termAttributesHtmlContainer.push(instantTranslateIntegrationForTerm);
-            }
-            termAttributesHtmlContainer.push(Attribute.renderTermAttributes(term,termRflLang));
-            termAttributesHtmlContainer.push('</div>');
+            //draw term attrbute contaner with the attributes
+            termAttributesHtmlContainer.push(Attribute.getTermAttributeContainerRenderData(term,true));
             
             return termAttributesHtmlContainer.join('');
 		},
@@ -747,8 +740,9 @@ var Term={
 		 * Append or remove buttons for proposals in the DOM.
 		 * Address elements as specific as possible (= avoid long jQuery-selects).
          * @param elements
+         * @param id
 		 */
-        drawProposalButtons: function (elements){
+        drawProposalButtons: function (elements,id){
         	if(!Editor.data.app.user.isTermProposalAllowed){
 				return;
 			}
@@ -809,6 +803,14 @@ var Term={
                     titleAdd = proposalTranslations['addTermAttributeProposal'];
                     titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
+                    break;
+                case 'singleterm':
+                	var termHolder=me.$_termTable.find('div[data-term-id="'+id+'"]');
+                	$_selectorDelete = termHolder.find('.is-proposal');
+                    $_selectorEdit = termHolder.find('.proposable.is-finalized');
+                    termHolder.children('.proposal-btn').remove();
+                    titleDelete = proposalTranslations['deleteProposal'];
+                    titleEdit = proposalTranslations['editProposal'];
                     break;
                 default:
                     // e.g. after updateComponent(): show ProposalButtons according to the new state
@@ -1132,16 +1134,7 @@ var Term={
 			        		me.findTermsAndAttributes(groupId);
 			        		return;
 			        	}
-			        	
-			        	//the term proposal is removed, render the initial term proposable content
-			        	var renderData=me.renderTermData(result.rows),
-			        		ins=$parent.find('ins');
-			        		
-			        	ins.replaceWith(renderData);
-			        	$parent.find('del').empty();
-
-			        	$parent.switchClass('is-proposal','is-finalized');
-			        	me.drawProposalButtons($parent);
+			        	me.onTermProposalRemove($parent,result.rows);
 			        }
 			    });
 			};
@@ -1281,6 +1274,36 @@ var Term={
 	    		$(editor).mouseup();
 	        });
 	    	return true;
+        },
+        
+        /***
+         * After the term is removed handler.
+         * This will update the new term content with the new data
+         * @param $termParent : the acordion h3 term header
+         * @param term: the term data with attributes
+         */ 
+        onTermProposalRemove:function($termParent,term){
+        	//the term proposal is removed, render the initial term proposable content
+        	var me=this,
+        		renderData=me.renderTermData(term),
+        		ins=$termParent.find('ins'),
+        		$termAttributeHolder = me.$_termTable.find('div[data-term-id="' + term.id + '"]'),
+        		termAttributeContainerData=Attribute.getTermAttributeContainerRenderData(term);
+        		
+        	ins.replaceWith(renderData);
+        	$termParent.find('del').empty();
+
+        	$termParent.switchClass('is-proposal','is-finalized');
+        	
+        	$termAttributeHolder.empty();
+        	//replace the term attribute container with the fresh data
+        	$termAttributeHolder.append(termAttributeContainerData);
+        	
+    		me.$_termTable.accordion('refresh');
+			me.initInstantTranslateSelect();
+			
+			me.drawProposalButtons($termParent);
+        	me.drawProposalButtons('singleterm',term.id);
         }
 };
 
