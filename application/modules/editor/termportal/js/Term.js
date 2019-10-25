@@ -1147,6 +1147,9 @@ var Term={
 
 			        	$parent.switchClass('is-proposal','is-finalized');
 			        	me.drawProposalButtons($parent);
+			        	
+			        	//refresh the term attribute data
+			        	me.refreshTermAttributeContent(result.rows);
 			        }
 			    });
 			};
@@ -1301,6 +1304,29 @@ var Term={
         		}
         	}
     		return [];
+        },
+        
+        /***
+         * Rerfresh the term attribute container with the fresh data from the database
+         */
+        refreshTermAttributeContent:function(term){
+			//for the new term, term attribute render data is required
+			var termRflLang=(term.attributes && term.attributes[0].language!=undefined) ? term.attributes[0].language : '',
+				attributeRenderData=Attribute.renderTermAttributes(term,termRflLang),
+				$termHeader=Term.getTermHeader(term.termId),
+				instantTranslateInto=Term.renderInstantTranslateIntegrationForTerm(term.language),
+				$termAttributeHolder=$termHeader.next('div[data-term-id]');
+			
+			$termAttributeHolder.attr('data-term-id', term.termId);
+			$termAttributeHolder.attr("data-groupid",term.groupId);
+			$termAttributeHolder.empty();
+			$termAttributeHolder.append(attributeRenderData);
+			
+			//render the instant translate into select
+			if(instantTranslateInto){
+				$termAttributeHolder.prepend(instantTranslateInto);
+				Term.initInstantTranslateSelect();
+			}
         }
 };
 

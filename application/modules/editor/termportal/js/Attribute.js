@@ -274,6 +274,7 @@ var Attribute={
             attVal,
             flagContent = '',
             isDefinition='',
+            isModificationTransacGroup='',
             childData=[],
             childDataText;
             
@@ -289,7 +290,11 @@ var Attribute={
         	isDefinition=' is-definition ';
         }
         
-        headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + isProposal + isDefinition +'" data-attribute-id="'+attribute.attributeId+'">';
+        if(me.isTransacModificationAttribute(attribute)){
+        	isModificationTransacGroup=' is-transac-modification ';
+        }
+        
+        headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' +isModificationTransacGroup+ proposable + isProposal + isDefinition +'" data-attribute-id="'+attribute.attributeId+'">';
         headerTagClose='</h4>';
         
 	    switch(attribute.name) {
@@ -308,10 +313,10 @@ var Attribute={
 	                    
 	                    //the data tag is displayed as first in this group
 	                    if(child.name === "date"){
-	                        childData.unshift(me.getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)));
+	                        childData.unshift(me.getAttributeContainerRender(child,(childDataText + ' ' + attVal)));
 	                        return true;
 	                    }
-	                    childData.push(me.getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)));
+	                    childData.push(me.getAttributeContainerRender(child,(childDataText + ' ' + attVal)));
 	                });
 	                html+=childData.join('');
 	            }
@@ -490,11 +495,18 @@ var Attribute={
 	 * The attribute container holder. All attributes and attribute proposals must be surrounded with this container.
 	 */
 	getAttributeContainerRender:function(attribute,html){
-		var isComment='';
-		if(attribute && attribute.name === 'note'){
-			isComment='class="isAttributeComment"';
+		var me=this,
+			addClass='';
+		if(me.isNoteAttribute(attribute)){
+			addClass='class="isAttributeComment"';
 		}
-		return '<p '+isComment+' data-type="'+attribute.attributeOriginType+'" data-id="'+attribute.attributeId+'">'+html+'</p>';
+		if(me.isDateAttribute(attribute)){
+			addClass='class="isAttributeDate"';
+		}
+		if(me.isResponsiblePersonAttribute(attribute)){
+			addClass='class="isResponsiblePerson"';
+		}
+		return '<p '+addClass+' data-type="'+attribute.attributeOriginType+'" data-id="'+attribute.attributeId+'">'+html+'</p>';
 	},
 	
 	/***
@@ -627,6 +639,40 @@ var Attribute={
     	//the comment attribute data exist, render the attribute from the data
         var componentRenderData=Attribute.getAttributeRenderData(attributeData,attributeData.attrValue);
         $componentEditor.replaceWith(componentRenderData);
+    },
+    
+    /***
+     * Check if the given attribute is od type transac date
+     */
+    isDateAttribute:function(attribute){
+    	return attribute && attribute.name=='date';
+    },
+    
+    /***
+     * Check if the given attribute is of type note (comment)
+     */
+    isNoteAttribute:function(attribute){
+    	return attribute && attribute.name=='note';
+    },
+    
+    /***
+     * Check if the given attribute is for resposible person (the person name in the transac group)
+     */
+    isResponsiblePersonAttribute:function(attribute){
+    	if(!attribute){
+    		return false;
+    	}
+    	return attribute.name=='transacNote' && (attribute.attrType=='responsiblePerson' || attribute.attrType=='responsibility');
+    },
+    
+    /***
+     * Check if the given attribute is of type transac modification
+     */
+    isTransacModificationAttribute:function(attribute){
+    	if(!attribute){
+    		return false;
+    	}
+    	return attribute.name=='transac' && attribute.attrType=='modification';
     }
 };
 
