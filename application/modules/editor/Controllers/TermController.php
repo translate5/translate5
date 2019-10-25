@@ -82,17 +82,11 @@ class editor_TermController extends ZfExtended_RestController {
         /* @var $attribute editor_Models_Term_Attribute */
         $attribute->checkOrCreateProcessStatus($this->entity->getId());
 
-        //load all attributes for the term
-        $rows=$this->entity->findTermAndAttributes($this->entity->getId());
-        $rows=$this->entity->groupTermsAndAttributes($rows);
-        if(!empty($rows) && !empty($rows[0]['attributes'])){
-            $this->view->rows->attributes =$rows[0]['attributes'];
-        }
-        
+        $this->view->rows = $this->entity->getDataObjectWithAttributes();
         //load the term entry attributes
         $this->view->rows->termEntryAttributes=$attribute->getAttributesForTermEntry($this->entity->getGroupId(),[$this->entity->getCollectionId()]);
         
-        if(!empty($rows) && !empty($this->view->rows->language)){
+        if(!empty($this->view->rows->attributes) && !empty($this->view->rows->language)){
             $language = ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $language editor_Models_Languages */
             $language->load($this->view->rows->language);
@@ -304,6 +298,7 @@ class editor_TermController extends ZfExtended_RestController {
         
         $attribute->handleTransacGroup($this->entity);
         
+        $this->view->rows = $this->entity->getDataObjectWithAttributes();
         //update the view
         $this->view->rows->proposal = $this->proposal->getDataObject();
     }
@@ -391,7 +386,7 @@ class editor_TermController extends ZfExtended_RestController {
         $this->entity->save();
         $this->proposal->delete();
         $history->save();
-        $this->view->rows = $this->entity->getDataObject();
+        $this->view->rows = $this->entity->getDataObjectWithAttributes();
         $this->view->rows->proposal = null;
     }
     
@@ -419,7 +414,7 @@ class editor_TermController extends ZfExtended_RestController {
         }
         $this->proposal->delete();
         $termEntry->deleteEmptyTermEntry($termEntryId);
-        $this->view->rows = $this->entity->getDataObject();
+        $this->view->rows = $this->entity->getDataObjectWithAttributes();
         $this->view->rows->proposal = null;
     }
     
