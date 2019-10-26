@@ -578,8 +578,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   iconCls: 'ico-export',
                   itemId: 'export-meta-data-btn',
                   text: me.strings.exportMetaDataBtn,
-                  tooltip: me.strings.exportMetaDataBtnTip,
-                  hrefTarget: '_blank'
+                  tooltip: me.strings.exportMetaDataBtnTip
               },{
                   xtype: 'button',
                   iconCls: 'ico-refresh',

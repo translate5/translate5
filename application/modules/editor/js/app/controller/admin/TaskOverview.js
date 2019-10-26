@@ -133,7 +133,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               hide: 'handleAfterHide',
               show: 'handleAfterShow',
               celldblclick: 'handleGridClick', 
-              cellclick: 'handleGridClick' 
+              cellclick: 'handleGridClick',
+              columnhide: 'setHrefForMetadataExport',
+              columnshow: 'setHrefForMetadataExport',
+              filterchange: 'setHrefForMetadataExport'
           },
           '#adminTaskGrid #reload-task-btn': {
               click: 'handleTaskReload'
@@ -173,8 +176,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               load: 'startCheckImportStates',
               metachange : function(taskstore, meta) {
                     var me = this,
-                        params = {},
-                        proxy = taskstore.getProxy(),
                         averageProcessingTimeMessage = '',
                         excelExportUsageMessage = '';
                     if (meta.statistics.averageProcessingTime !== '') {
@@ -183,9 +184,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                     if (meta.statistics.excelExportUsage !== '') {
                         excelExportUsageMessage = Ext.String.format(me.strings.excelExportUsageContent, meta.statistics.excelExportUsage);
                     }
-                    params['format'] = 'xlsx';
-                    params[proxy.getFilterParam()] = proxy.encodeFilters(taskstore.getFilters().items);
-                    me.getExportMetaDataBtn().setHref(Editor.data.restpath + 'task?' + Ext.urlEncode(params));
                     me.getAverageProcessingTimeLabel().update(averageProcessingTimeMessage);
                     me.getExcelExportUsageLabel().update(excelExportUsageMessage);
                 }
@@ -967,5 +965,35 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           return !this.fireEvent('periodicalTaskReloadIgnore', task);
       }          
       return false;
-  }  
+  },
+  
+  /**
+   * Set the link for the metadata-export; adds the current state
+   * of the grid (visible columns, filtering).
+   * 
+   */
+  setHrefForMetadataExport: function() {
+      var me = this,
+          taskStore = Ext.StoreManager.get('admin.Tasks'),
+          proxy = taskStore.getProxy(),
+          params = {},
+          taskGrid = Ext.ComponentQuery.query('#adminTaskGrid')[0],
+          visibleColumns = taskGrid.getVisibleColumns(),
+          length = visibleColumns.length,
+          i,
+          col,
+          visibleColumnsNames = [];
+      for (i=0; i < length; i++){
+          col = visibleColumns[i];
+          if (col.hasOwnProperty('dataIndex')) {
+              // taskActionColumn has no dataIndex, but is not needed anyway
+              visibleColumnsNames.push(col.dataIndex);
+          }
+      }
+      params['format'] = 'xlsx';
+      params[proxy.getFilterParam()] = proxy.encodeFilters(taskStore.getFilters().items);
+      params['visibleColumns'] = JSON.stringify(visibleColumnsNames);
+      me.getExportMetaDataBtn().setHref(Editor.data.restpath + 'task?' + Ext.urlEncode(params));
+      // TODO: this might get too long for GET => use POST instead
+  }
 });
