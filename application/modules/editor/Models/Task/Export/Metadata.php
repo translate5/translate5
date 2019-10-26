@@ -51,6 +51,12 @@ class editor_Models_Task_Export_Metadata {
     protected $filters;
     
     /**
+     * Visible columns of the task-grid (order and names).
+     * @var array
+     */
+    protected $columns;
+    
+    /**
      * Key Performance Indicators (KPI) for the current tasks.
      * @var array
      */
@@ -85,6 +91,14 @@ class editor_Models_Task_Export_Metadata {
      */
     public function setFilters(array $filters) {
         $this->filters = $filters;
+    }
+    
+    /**
+     * Set the columns that are currently visible in the task overview.
+     * @param array $rows
+     */
+    public function setColumns(array $columns) {
+        $this->columns = $columns;
     }
     
     /**
@@ -139,14 +153,21 @@ class editor_Models_Task_Export_Metadata {
      */
     protected function export(string $fileName): void {
         $this->excelMetadata = ZfExtended_Factory::get('editor_Models_Task_Excel_Metadata');
-        $this->excelMetadata->initExcel();
+        $this->excelMetadata->initExcel($this->columns);
         
         // (1) add data: tasks
-        // TODO: columns must appear in the same order as in the task-overview
+        foreach ($this->tasks as $task) {
+            $this->excelMetadata->addTask($task);
+        }
         
         // (2) add data: filters
+        $this->excelMetadata->addMetadataHeadline('Filters'); // TODO: use translation
+        foreach ($this->filters as $filter) {
+            $this->excelMetadata->addFilter($filter);
+        }
         
         // (3) add data: KPI
+        $this->excelMetadata->addMetadataHeadline('KPI'); // TODO: use translation
         $this->excelMetadata->addKPI($this->renderKpiAverageProcessingTime());
         $this->excelMetadata->addKPI($this->renderKpiExcelExportUsage());
         

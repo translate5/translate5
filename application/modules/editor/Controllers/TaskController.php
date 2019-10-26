@@ -231,9 +231,10 @@ class editor_TaskController extends ZfExtended_RestController {
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
         if ($context == 'xlsx') {
             $exportMetaData = ZfExtended_Factory::get('editor_Models_Task_Export_Metadata');
-            /* @var $metaDataExcel editor_Models_Task_Export_Metadata */
+            /* @var $exportMetaData editor_Models_Task_Export_Metadata */
             $exportMetaData->setTasks($rows);
             $exportMetaData->setFilters(json_decode($this->getParam('filter')));
+            $exportMetaData->setColumns(json_decode($this->getParam('visibleColumns')));
             $exportMetaData->setKpiStatistics($kpiStatistics);
             $exportMetaData->exportAsDownload();
         }
