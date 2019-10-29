@@ -39,21 +39,60 @@ Ext.define('Editor.util.messageBus.MessageBus', {
     mixins: [
         'Ext.mixin.Observable'
     ],
+    
+    /**
+     * connection is not yet open.
+     * @property {Number} CONNECTING
+     * @readonly
+     */
+    CONNECTING: 0,
+
+    /**
+     * connection is open and ready to communicate.
+     * @property {Number} OPEN
+     * @readonly
+     */
+    OPEN: 1,
+
+    /**
+     * connection is in the process of closing.
+     * @property {Number} CLOSING
+     * @readonly
+     */
+    CLOSING: 2,
+
+    /**
+     * connection is closed or couldn't be opened.
+     * @property {Number} CLOSED
+     * @readonly
+     */
+    CLOSED: 3,
+    
     /**
      */
     config: {
-        busId: null, //must be different for different connections
+        /**
+         * @cfg {String} busId (required) An identifier for different WebSocket connections
+         */
+        busId: '',
+        
+        /**
+         * @cfg {String} url (required) The WebSocket URL
+         */
+        url: '',
+
+        /**
+         * @cfg {Boolean} reconnect If true, tries to re-connect the socket if closed by the server
+         */
+        reconnect: true,
+
+        /**
+         * @cfg {Int} reconnectInterval Interval for trying a reconnection, in milliseconds
+         */
+        reconnectInterval: 5000
     },
-    
-    
-    //FIXME we need a MessageBUs controller, which listenes to arbitary events in Translate5 (like segment open)
-    // reacts on that event and sends the message via messageBus to the server. So far the counter part to the messageBus.EventDomain
-    // This controller keeps also the internal state (segment opened, if yes which one) so that if the connection dies, 
-    // the socket can be reopened and the data resend to the server. 
-    // The problem is, if the socket server restarts, all data is gone, how to handle that?
-    
-    
     socket: null,
+    reconnectTask: null,
     constructor: function(config) {
         var me = this,
             busId;
@@ -68,44 +107,92 @@ Ext.define('Editor.util.messageBus.MessageBus', {
         }
 
         if (busId) {
-            //FIXME do we need a manager???
-            //Ext.data.StoreManager.register(me);
+            //TODO do we need a manager???
+            //similar to: Ext.data.StoreManager.register(me);
         }
         
         this.initSocket();
-        //FIXME this must be an observable in order that it can be used by the event domains 
     },
     initSocket: function() {
         var ws,
             me = this,
-            conf = Editor.data.plugins.FrontEndMessageBus,
-            url = [];
-        if(!conf) {
-            console.log("WS communication deactivated due missing configuration of the socket server.");
+            url = me.getUrl();
+        if(!url) {
+            Ext.raise('MessageBus: No URL for the websocket connection was given!');
             return;
         }
-        url.push(conf.socketServer.schema, '://');
-        url.push(conf.socketServer.httpHost || window.location.hostname);
-        url.push(':', conf.socketServer.port, conf.socketServer.route);
-        // the serverId ensures that we communicate with the correct instance, additional security comes from the sessionId, which must match
-        // authentication by passing the session id to the server
-        url.push('?serverId=', Editor.data.app.serverId, '&sessionId=', Ext.util.Cookies.get(Editor.data.app.sessionKey));
-        ws = me.socket = new WebSocket(url.join(''));
+        ws = me.socket = new WebSocket(url);
+        
+        /**
+         * WebSocket on message handler
+         */
         ws.onmessage = function(evt) {
-            var data = Ext.JSON.decode(evt.data);
-            //FIXME error handling if JSON decode fail
+            var data;
+            try {
+                data = Ext.JSON.decode(evt.data);
+            }catch(e) {
+                Ext.Logger.warn('MessageBus: could not decode message JSON.');
+                return;
+            }
+            
             me.currentChannel = data.channel;
             me.fireEvent(data.command, data.payload);
-            console.log(evt);
         };
-        ws.onopen = function (event) { 
-            //currently nothing here
+        
+        /**
+         * WebSocket on open handler
+         */
+        ws.onopen = function (event) {
+            //TODO me.fireEvent(); on open?
+            // if there is a reconnection task, disable it on successful connection open
+            if (me.reconnectTask) {
+                Ext.Logger.info('MessageBus: reconnected busId '+me.getBusId());
+                Ext.TaskManager.stop(me.reconnectTask);
+                me.reconnectTask = null;
+            }
         }
+        
+        /**
+         * WebSocket on close handler
+         */
         ws.onclose = function (event) {
-            //FIXME if connection close try to reconnect, see https://stackoverflow.com/a/31985557/1749200
-            console.log("CONNECTION CLOSE");
+            //TODO me.fireEvent(); on close?
+            //TODO if there remains no connection, should the message bus disabled? How is the plan, make it disableable at all??
+            //start reconnection interval task
+            Ext.Logger.info('MessageBus: connection close busId '+me.getBusId());
+            if (me.getReconnect() && !me.reconnectTask) {
+                me.reconnectTask = Ext.TaskManager.start({
+                    interval: me.getReconnectInterval(),
+                    run: function () {
+                        if (me.getReadyStatus() === me.CLOSED) {
+                            me.initSocket();
+                        }
+                    }
+                });
+            }
         }
-        //FIXME onerror → no connection, disable message bus. How is the plan, make it disableable at all??
+        
+        /**
+         * WebSocket on error handler
+         */
+        ws.onerror = function (event) {
+            //TODO me.fireEvent(); on error?
+            //event did not provide useful information in some tests, so currently no further processing of event here 
+        }
+    },
+    /**
+     * returns if the websocket connection is ready
+     * @return {Boolean} true if connection is ready, false otherwise
+     */
+    isReady: function () {
+        return this.getReadyStatus() === this.OPEN;
+    },
+    /**
+     * returns the current websocket status 
+     * @return {Number} current websocket status (0: connecting, 1: open, 2: closing, 3: closed)
+     */
+    getReadyStatus: function () {
+        return this.socket.readyState;
     },
     send: function(channel, command, data) {
         var msgObj = {
@@ -113,6 +200,8 @@ Ext.define('Editor.util.messageBus.MessageBus', {
             command: command, 
             payload: data || null
         };
-        this.socket.send(Ext.JSON.encode(msgObj));
+        if (this.isReady()) {
+            this.socket.send(Ext.JSON.encode(msgObj));
+        }
     }
 });
