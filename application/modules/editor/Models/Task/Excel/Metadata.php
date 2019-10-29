@@ -40,6 +40,12 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelExport {
     
     /**
+     * general max width for all cols in the Excel.
+     * @var int
+     */
+    CONST COL_MAX_WIDTH = 40; // just test what looks best
+    
+    /**
      * @var ZfExtended_Models_Entity_ExcelExport
      */
     protected $excelExport;
@@ -48,12 +54,13 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      * The name of the sheet that contains the 'task overview' data (aka the tasks)
      * @var string
      */
-    protected static $sheetNameTaskOverview = 'task overview';
+    protected $sheetNameTaskOverview;
+    
     /**
      * The name of the sheet that contains the 'meta data' (aka filtering and KPI-statistics)
      * @var string
      */
-    protected static $sheetNameMeta = 'meta data';
+    protected $sheetNameMetadata;
     
     /**
      * the number of the row of the next task
@@ -74,12 +81,20 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
     protected $metadataRow = 1;
     
     /**
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    protected $translate;
+    
+    /**
      * Create a new, empty excel
      * @return editor_Models_Task_Excel_Metadata
      */
     public function __construct() {
         $this->excelExport = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
         $this->excelExport->initDefaultFormat();
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $this->sheetNameTaskOverview = $this->translate->_('Aufgabenübersicht');
+        $this->sheetNameMetadata = $this->translate->_('Meta-Daten');
     }
     
     /**
@@ -93,8 +108,8 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
         $this->excelExport->removeWorksheetByIndex(0);
         
         // add two sheets 'task overview' and 'meta data'
-        $this->excelExport->addWorksheet(self::$sheetNameTaskOverview, 0);
-        $this->excelExport->addWorksheet(self::$sheetNameMeta, 1);
+        $this->excelExport->addWorksheet($this->sheetNameTaskOverview, 0);
+        $this->excelExport->addWorksheet($this->sheetNameMetadata, 1);
         
         // and init the sheets taskoverview + meta
         $this->initSheetTaskOverview();
@@ -105,9 +120,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      * Init the sheet 'task overview'.
      */
     protected function initSheetTaskOverview() {
-        $sheet = $this->excelExport->getWorksheetByName(self::$sheetNameTaskOverview);
-        // setting write protection for the whole sheet
-        $sheet->getProtection()->setSheet(true);
+        $sheet = $this->excelExport->getWorksheetByName($this->sheetNameTaskOverview);
         
         // set font-size to "12" for the whole sheet
         $sheet->getParent()->getDefaultStyle()->applyFromArray([
@@ -118,8 +131,17 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
         
         // write fieldnames in header, set their font to bold, set their width to auto
         $sheetCols = range('A','Z');
-        foreach ($this->taskColumns as $key => $col) {
-            $sheet->setCellValue($sheetCols[$key].'1', $col);
+        $taskModel = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $taskModel editor_Models_Task */
+        $taskGridTextCols = $taskModel::getTaskGridTextCols();
+        foreach ($this->taskColumns as $key => $colName) {
+            if (array_key_exists($colName, $taskGridTextCols)) {
+                // We seem to provide translations only for those column-names that are set in the Taskgrid
+                $colHeadline = $this->translate->_($taskGridTextCols[$colName]);
+            } else {
+                $colHeadline = $colName;
+            }
+            $sheet->setCellValue($sheetCols[$key].'1', $colHeadline);
             $sheet->getStyle($sheetCols[$key].'1')->getFont()->setBold(true);
             $sheet->getColumnDimension($sheetCols[$key])->setAutoSize(true);
         }
@@ -129,9 +151,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      * init the sheet 'meta data'
      */
     protected function initSheetMeta() {
-        $sheet = $this->excelExport->getWorksheetByName(self::$sheetNameMeta);
-        // setting write protection for the whole sheet
-        $sheet->getProtection()->setSheet(true);
+        $sheet = $this->excelExport->getWorksheetByName($this->sheetNameMetadata);
         
         // set font-size to "12" for the whole sheet
         $sheet->getParent()->getDefaultStyle()->applyFromArray([
@@ -145,14 +165,67 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
     }
     
     /**
-     * Add a task to the Excel.
-     * @param string $kpiValue
+     * Add a task to the Excel. The result should look exactly as in the taskGrid.
+     * @param array $task
      */
     public function addTask($task) {
-        $sheet = $this->excelExport->getWorksheetByName(self::$sheetNameTaskOverview);
+        $sheet = $this->excelExport->getWorksheetByName($this->sheetNameTaskOverview);
         $sheetCols = range('A','Z');
-        foreach ($this->taskColumns as $key => $col) {
-            $sheet->setCellValue($sheetCols[$key].$this->taskRow, $task[$col]);
+        foreach ($this->taskColumns as $key => $colName) {
+            if (!array_key_exists($colName, $task)) {
+                // eg taskassoc is not always set for every task
+                continue;
+            }
+            switch ($colName) {
+                case 'customerId':
+                    $customer = ZfExtended_Factory::get('editor_Models_Customer');
+                    /* @var $customer editor_Models_Customer */
+                    $customer->load($task['customerId']);
+                    $value = $customer->getName();
+                    break;
+                case 'orderdate':
+                case 'realDeliveryDate':
+                case 'targetDeliveryDate':
+                    $format = Zend_Locale_Format::getDateFormat();
+                    $date = new Zend_Date($task[$colName], Zend_Date::ISO_8601);
+                    $value = $date->toString($format);
+                    break;
+                case 'relaisLang':
+                case 'sourceLang':
+                case 'targetLang':
+                    if ($task[$colName] == 0) {
+                        // relaisLang might not be set = ok
+                        $value = '';
+                    } else {
+                        $languages = ZfExtended_Factory::get('editor_Models_Languages');
+                        /* @var $languages editor_Models_Languages */
+                        $languages->load($task[$colName]);
+                        $value = $languages->getLangName() . ' (' . $languages->getRfc5646() . ')';
+                    }
+                    break;
+                case 'state':
+                    $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($task['taskGuid']);
+                    /* @var $workflow editor_Workflow_Abstract */
+                    $states = $workflow->getStates();
+                    $labels = $workflow->getLabels(true);
+                    $value = $labels[array_search($task['state'], $states)];
+                    break;
+                case 'workflow':
+                    $value = $task['workflow'] . ' (' . $task['workflowStepName'] . ')';
+                    break;
+                case 'taskassocs':
+                    $allTaskassocs= $task['taskassocs'];
+                    $values = [];
+                    foreach ($allTaskassocs as $assoc) {
+                        $values[] = $assoc['name'] . ' (' . $assoc['serviceName'] . ')';
+                    }
+                    $value = count($allTaskassocs) . ': ' . implode(', ', $values);
+                    break;
+                default:
+                    $value = $task[$colName];
+                    break;
+            }
+            $sheet->setCellValue($sheetCols[$key].$this->taskRow, $value);
         }
         $this->taskRow++;
     }
@@ -162,7 +235,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      * @param string $filter
      */
     public function addMetadataHeadline($headline) {
-        $sheet = $this->excelExport->getWorksheetByName(self::$sheetNameMeta);
+        $sheet = $this->excelExport->getWorksheetByName($this->sheetNameMetadata);
         $sheet->setCellValue('A'.$this->metadataRow, $headline);
         $sheet->getStyle('A'.$this->metadataRow)->getFont()->setBold(true);
         $this->metadataRow++;
@@ -173,7 +246,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      * @param string $filter
      */
     public function addFilter($filter) {
-        $sheet = $this->excelExport->getWorksheetByName(self::$sheetNameMeta);
+        $sheet = $this->excelExport->getWorksheetByName($this->sheetNameMetadata);
         switch (true) {
             case is_array($filter->value):
                 $value = implode($filter->value,', ');
@@ -191,7 +264,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
      * @param string $kpiValue
      */
     public function addKPI($kpiValue) {
-        $sheet = $this->excelExport->getWorksheetByName(self::$sheetNameMeta);
+        $sheet = $this->excelExport->getWorksheetByName($this->sheetNameMetadata);
         $sheet->setCellValue('A'.$this->metadataRow, $kpiValue);
         $this->metadataRow++;
     }
@@ -203,14 +276,24 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
     public function getSpreadsheet() : \PhpOffice\PhpSpreadsheet\Spreadsheet {
         return $this->excelExport->getSpreadsheet();
     }
-}
-
-/**
- * Helper class to define a structure for the task data stored in the excel 
- */
-class taskExcelMetadataTaskContainer {
-    public $nr;
-    public $source;
-    public $target;
-    public $comment;
+    
+    /**
+     * Set autowidth with maximum for all columns in the Excel.
+     */
+    public function setColWidth() {
+        // https://github.com/PHPOffice/PhpSpreadsheet/issues/275
+        foreach ($this->excelExport->getAllWorksheets() as $sheet) {
+            $sheet->calculateColumnWidths();
+            foreach ($sheet->getColumnDimensions() as $colDim) {
+                if (!$colDim->getAutoSize()) {
+                    continue;
+                }
+                $colWidth = $colDim->getWidth();
+                if ($colWidth > self::COL_MAX_WIDTH) {
+                    $colDim->setAutoSize(false);
+                    $colDim->setWidth(self::COL_MAX_WIDTH);
+                }
+            }
+        }
+    }
 }

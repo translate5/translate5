@@ -155,21 +155,28 @@ class editor_Models_Task_Export_Metadata {
         $this->excelMetadata = ZfExtended_Factory::get('editor_Models_Task_Excel_Metadata');
         $this->excelMetadata->initExcel($this->columns);
         
-        // (1) add data: tasks
-        foreach ($this->tasks as $task) {
-            $this->excelMetadata->addTask($task);
+        // add data: filters
+        $this->excelMetadata->addMetadataHeadline($this->translate->_('Filter'));
+        if (count($this->filters) == 0) {
+            $this->filters[] = (object)['property' =>' ', 'operator' => ' ', 'value' => '-'];
         }
-        
-        // (2) add data: filters
-        $this->excelMetadata->addMetadataHeadline('Filters'); // TODO: use translation
         foreach ($this->filters as $filter) {
             $this->excelMetadata->addFilter($filter);
         }
         
-        // (3) add data: KPI
-        $this->excelMetadata->addMetadataHeadline('KPI'); // TODO: use translation
+        // add data: KPI
+        $this->excelMetadata->addMetadataHeadline($this->translate->_('KPI'));
         $this->excelMetadata->addKPI($this->renderKpiAverageProcessingTime());
         $this->excelMetadata->addKPI($this->renderKpiExcelExportUsage());
+        
+        // add data: tasks
+        foreach ($this->tasks as $task) {
+            $this->excelMetadata->addTask($task);
+        }
+        // what we added latest, will be the first sheet when opening the excel-file.
+        
+        // finalize the layout
+        $this->excelMetadata->setColWidth();
         
         // .. then send the excel
         $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->excelMetadata->getSpreadsheet());
