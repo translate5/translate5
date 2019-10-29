@@ -239,7 +239,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           states = [],
           config,
           //we must have here an own ordered list of states to be filtered 
-          stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'user_state_unconfirmed', 'task_state_import'],
+          stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'task_state_unconfirmed', 'user_state_unconfirmed', 'task_state_import'],
           relaisLanguages = Ext.Array.clone(Editor.data.languages),
           addQtip = function(meta, text) {
               meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text)+'"';

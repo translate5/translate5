@@ -228,22 +228,26 @@ Ext.define('Editor.controller.ServerException', {
             //422 unprocessable entity: normally the errors are shown via form.markInvalid. 
             // If not, we add up the error message with info from the payload
             case 422: 
-            //FIXME the errors coming with a translation, should show the error message directly, without introduction text
+                var errorsToUse;
                 if(json.errorMessage && json.errorsTranslated) {
-                    Ext.Object.each(json.errorsTranslated, function(field, errors) {
-                        Ext.Array.each(errors, function(error) {
-                            json.errorMessage = json.errorMessage+'<br>'+error;
-                        });
-                    });
+                    Ext.Logger.warn('Original Error (a translated version was shown to the user): ' + json.errorMessage);
+                    errorsToUse = json.errorsTranslated;
                 }
-                if(json.errorMessage && json.errors) {
-                    Ext.Object.each(json.errors, function(field, errors) {
-                        Ext.Object.each(errors, function(key, error) {
-                            json.errorMessage = json.errorMessage+'<br>'+error;
-                        });
-                    });
+                else if(json.errorMessage && json.errors) {
+                    errorsToUse = json.errors;
                 }
-                break;
+                else {
+                    Editor.MessageBox.addError(str["409"]+'<ul><li>'+json.errorMessage+'</li></ul>');
+                    return;
+                }
+                json.errorMessage = [];
+                Ext.Object.each(errorsToUse, function(field, errors) {
+                    Ext.Object.each(errors, function(key, error) {
+                        json.errorMessage.push(error);
+                    });
+                });
+                Editor.MessageBox.addError(str["409"]+'<ul><li>'+json.errorMessage.join('</li><li>')+'</li></ul>');
+                return;
             case 406: //Not Acceptable: show message from server
                 Editor.MessageBox.addError(getServerMsg());
             case 502: //Bad Gateway → the real error is coming from a requested third party system
