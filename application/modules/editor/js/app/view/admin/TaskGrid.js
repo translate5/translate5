@@ -37,7 +37,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
   layout: {
       type: 'fit'
   },
-  text_cols: {
+  text_cols: { // in case of any changes, pls also update getTaskGridTextCols() in editor_Models_Task
       taskNr: '#UT#Auftragsnr.',
       taskName: '#UT#Aufgabenname',
       taskActions: '#UT#Aktionen',
