@@ -39,6 +39,11 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     extend: 'Ext.app.Controller',
     listen: {
+        messagebus: {
+            '#translate5 instance': {
+                pong: 'onMessageBusPong'
+            }
+        },
         component: {
             '#segmentgrid' : {
                 itemclick: 'clickSegment',
@@ -49,11 +54,25 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         }
     },
     init: function(){
-        var me = this;
+        var me = this,
+            conf = Editor.data.plugins.FrontEndMessageBus,
+            url = [];
         me.callParent(arguments);
         
+        if(!conf) {
+            Ext.Logger.warn("MessageBus WebSocket communication deactivated due missing configuration of the socket server.");
+            return;
+        }
+        url.push(conf.socketServer.schema, '://');
+        url.push(conf.socketServer.httpHost || window.location.hostname);
+        url.push(':', conf.socketServer.port, conf.socketServer.route);
+        // the serverId ensures that we communicate with the correct instance, additional security comes from the sessionId, which must match
+        // authentication by passing the session id to the server
+        url.push('?serverId=', Editor.data.app.serverId, '&sessionId=', Ext.util.Cookies.get(Editor.data.app.sessionKey));
+        
         me.bus = new Editor.util.messageBus.MessageBus({
-            id: 'translate5'
+            id: 'translate5',
+            url: url.join('')
         });
     },
     clickSegment: function(view, segment) {
@@ -71,5 +90,8 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     leaveSegment: function() {
         console.log('leaveSegment', arguments);
         //me.bus.send();
+    },
+    onMessageBusPong: function() {
+        Ext.Logger.info('Received a pong on my ping');
     }
 });

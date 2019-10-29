@@ -43,7 +43,8 @@ class AppInstance {
     public function __construct($serverId) {
         error_log("NEW INSTANCE ".$serverId);
         $this->connections = new \SplObjectStorage;
-        $this->logger = Logger::getInstance();
+        $this->logger = clone Logger::getInstance();
+        $this->logger->setDomain('FrontEndMessageBus - App Instance '.$serverId);
         $this->channels = [];
         $this->serverId = $serverId;
     }
@@ -69,7 +70,6 @@ class AppInstance {
      * @param ConnectionInterface $conn
      */
     public function connect(ConnectionInterface $conn) {
-        error_log("OPEN ".$conn->sessionId);
         $this->connections->attach($conn);
     }
     
@@ -118,7 +118,13 @@ class AppInstance {
         //$conn is Ratchet\WebSocket\WsConnection
         //do we have to diff between frontend and backend messages?
         settype($msg->payload, 'array');
-        $channel = $this->getChannel($msg->channel);
+        settype($msg->channel, 'string');
+        if($msg->channel === self::CHANNEL_INSTANCE) {
+            $channel = $this;
+        }
+        else {
+            $channel = $this->getChannel($msg->channel);
+        }
         if(empty($this->sessions[$conn->sessionId])) {
             //currently we do nothing here, since the session from the GUI is not known to the server! 
             // TODO should we trigger a resync of the sessions into the MessageBus via the frontend? (mutex run on the server side) 
@@ -134,15 +140,14 @@ class AppInstance {
      * @param string $channel
      * @return Channel
      */
-    protected function getChannel(string $channel): Channel {
+    protected function getChannel(string $channel): ?Channel {
         if(!empty($this->channels[$channel])) {
             return $this->channels[$channel];
         }
         
         $channelCls = 'Translate5\\FrontEndMessageBus\\Channel\\'.ucfirst($channel);
         if(!class_exists($channelCls)) {
-            //FIXME errorhandling if class not found
-            error_log("Not Found channel ".$channel);
+            $this->logger->error('Channel class not found: '.$channel);
             return null;
         }
         return $this->channels[$channel] = new $channelCls($this);
@@ -170,6 +175,21 @@ class AppInstance {
         unset($this->sessions[$sessionId]);
         //TODO clean session from user in user session map
         //TODO notify all Channels about the session removall??? At least in task the sessionIds are implicitly used in taskToSessionMap and should be cleaned up
+    }
+    
+    /**
+     * Logs that the ping was received
+     */
+    protected function ping($msg = null) {
+        if($msg instanceof FrontendMsg){
+            $result = new FrontendMsg();
+            $result->channel = self::CHANNEL_INSTANCE;
+            $result->command = 'pong';
+            $msg->conn->send((string) $result);
+            $this->logger->info('Pinged from Frontend');
+            return;
+        }
+        $this->logger->info('Pinged from Backend');
     }
     
     public function debug(): array {

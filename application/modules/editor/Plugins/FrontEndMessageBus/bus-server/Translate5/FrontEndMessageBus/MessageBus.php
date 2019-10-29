@@ -34,7 +34,7 @@ class MessageBus implements MessageComponentInterface
         $conn->serverId = $data['serverId'];
         $instance = $this->getInstance($conn->serverId);
         if(empty($instance)) {
-            //FIXME log that no serverId was given and close there fore the connection
+            $this->logger->error('connection open: no instance ID was given', LOG_SOCKET);
             $conn->close();
             return;
         }
@@ -50,7 +50,13 @@ class MessageBus implements MessageComponentInterface
         //the serverId and sessionId are stored in the $conn object
         $instance = $this->getInstance($conn->serverId);
         $msg = json_decode($message, true);
-        //FIXME react on JSON errors
+        
+        //check for JSON errors
+        if(json_last_error() > 0){
+            $this->logger->error('error on message (JSON) decode: '.json_last_error_msg(), LOG_SOCKET, ['message' => $message]);
+            return;
+        }
+        
         settype($msg['payload'], 'array');
         $this->logger->debug('Data from frontend', $msg);
         $msg['conn'] = $conn;
@@ -81,16 +87,10 @@ class MessageBus implements MessageComponentInterface
         $this->logger->debug('server request', $body);
         $instance = $this->getInstance($body['instance']);
         $instance->passBackendMessage(new BackendMsg($body));
-        
-        //FIXME define default values which trigger a log entry (if channel / message is empty)
-        
-        return new Response(
-            200,
-            array(
-                'Content-Type' => 'text/plain'
-            ),
-            "Hello World!\n" //FIXME what to return here?
-            );
+
+        //this can be used to pass back information into the instance
+        $response = "{}\n";
+        return new Response(200, ['Content-Type' => 'text/plain'], $response);
     }
     
     protected function debugResponse() {

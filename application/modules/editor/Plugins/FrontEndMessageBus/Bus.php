@@ -31,21 +31,26 @@ END LICENSE AND COPYRIGHT
  * encapsulates defined commands directly to the MessageBus
  * @method void startSession() startSession($sessionId, stdClass $userData)
  * @method void stopSession() stopSession($sessionId)
- * 
- * TODO is this class layer necessary?, currently all functions can be moved without a problem into the Init.php 
+ * @method void ping() ping()
  */
 class editor_Plugins_FrontEndMessageBus_Bus {
     const CHANNEL = 'instance';
     
     protected $uri;
     
+    /**
+     * @var ZfExtended_Logger
+     */
+    protected $logger;
+    
     public function __construct() {
         $config = Zend_Registry::get('config');
+        $this->logger = Zend_Registry::get('logger')->cloneMe('plugin.frontendmessagebus');
         if(isset($config->runtimeOptions->plugins->FrontEndMessageBus)) {
             $this->uri = $config->runtimeOptions->plugins->FrontEndMessageBus->messageBusURI;
         }
         else {
-            error_log("Not configured!");
+            $this->logger->error('E1175', 'FrontEndMessageBus: Missing configuration - runtimeOptions.plugins.FrontEndMessageBus.messageBusURI must be set in configuration.');
         }
     }
     
@@ -70,10 +75,6 @@ class editor_Plugins_FrontEndMessageBus_Bus {
         /* @var $http Zend_Http_Client */
         $http->setUri($this->uri);
         
-        //FIXME the value behind "instance" is used to identify the current instance via a unique hash
-        // Should we implement insted a configurable instance key? Similar to OpenTM2 prefix, to identify / distinguish translate5 instances
-        // when message bus is reused in one instance? Very danger: if the value is not changed on copying the instance this enabled security risks.
-        // If the calculation is changed Should replace the serverId in library/ZfExtended/Worker/TriggerByHttp.php then too
         $http->setParameterPost('instance', ZfExtended_Utils::installationHash('MessageBus'));
         $http->setParameterPost('channel', $channel);
         $http->setParameterPost('command', $command);
@@ -83,17 +84,12 @@ class editor_Plugins_FrontEndMessageBus_Bus {
             $this->processResponse($http->request($http::POST));
         }
         catch (Exception $e) {
-            error_log('Error on message bus channel notify. The error was: '.PHP_EOL.$e->getMessage().PHP_EOL.$e->getTraceAsString());
+            $this->logger->exception($e, [
+                'level' => $this->logger::LEVEL_WARN
+            ]);
         }
         
         //FIXME if host is not reachable, deactivate plugin temporarly (like termtagger DOWN check)
-        // for performance reasons we should alternativly use unix sockets (https://stackoverflow.com/questions/4489975/how-to-send-datagrams-through-a-unix-socket-from-php) if possoble.
-        // this should be used automatically (like in mysql) if it is a unixoid OS and host is localhost or 127.0.0.x
-        // another improvement, set the underlying Zend_Http_Client_Adapter_Socket to non blocking
-        // see https://reactphp.org/socket/#unixconnector
-        
-        //TODO may not bring an exception to the frontend if an error happens here, just log it and good.
-        //TODO log response, log JSON encode errors
     }
     
     /**
@@ -107,25 +103,29 @@ class editor_Plugins_FrontEndMessageBus_Bus {
         
         //check for HTTP State (REST errors)
         if(!in_array($response->getStatus(), $validStates)) {
-            error_log('Invalid response type in message bus channel notify process response. Response status was:'.$response->getStatus());
-            error_log(print_r($response,1));
-            return false;
+            //Response status "{status}" in indicates failure in communication with message bus.
+            throw new editor_Plugins_FrontEndMessageBus_BusException('E1176', [
+                'status' => $response->getStatus(),
+                'response' => $response,
+            ]);
         }
         
         $responseBody = trim($response->getBody());
         $result = (empty($responseBody)) ? '' : json_decode($responseBody);
         
-        //TODO: why this returns error ? see the error log on page reload
         //check for JSON errors
         if(json_last_error() > 0){
-            error_log('Invalid json response in message bus channel notify process response. The json error was:'.PHP_EOL.json_last_error_msg());
-            error_log(print_r($response,1));
-            return false;
+            //FrontEndMessageBus: parse error in JSON response
+            throw new editor_Plugins_FrontEndMessageBus_BusException('E1177', [
+                'msg' => json_last_error_msg(),
+                'response' => $response,
+            ]);
         }
-        if(empty($result)){
-            error_log('Empty json response in message bus channel notify process response.');
-            error_log(print_r($response,1));
-            return false;
+        if(empty($result) && strlen($result) == 0){
+            //FrontEndMessageBus: empty JSON response.
+            throw new editor_Plugins_FrontEndMessageBus_BusException('E1178', [
+                'response' => $response,
+            ]);
         }
         
         return true;

@@ -49,6 +49,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     protected function initEvents() {
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
+        $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handlePing'));
 
         // FIXME send the session id to the message bus, so that the user is known and allowed to communicate
         // → idea here: Instead listening to a login event, we just attach to the IndexController. 
@@ -96,6 +97,8 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $view = $event->getParam('view');
         /* @var $view Zend_View_Interface */
         $view->Php2JsVars()->set('plugins.FrontEndMessageBus.socketServer', $this->getConfig()->socketServer);
+        
+        $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
     }
     
     /**
@@ -139,5 +142,12 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
             'task' => $task->getDataObject(),
             'sessionId' => Zend_Session::getId(),
         ]);
+    }
+    
+    /**
+     * @param Zend_EventManager_Event $event
+     */
+    public function handlePing(Zend_EventManager_Event $event) {
+        $this->bus->ping();
     }
 }

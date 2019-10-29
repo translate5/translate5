@@ -28,8 +28,12 @@ abstract class Msg {
             $keys = array_keys(get_object_vars($this));
             foreach($keys as $key) {
                 if($key == 'payload' && $this instanceof BackendMsg) {
-                    $msgData[$key] = json_decode($msgData[$key], true);
-                    //FIXME JSON error handling / logging
+                    $this->$key = json_decode($msgData[$key], true);
+                    //check for JSON errors
+                    if(json_last_error() > 0){
+                        $this->logger->error('error on BackendMsg payload (JSON) decode: '.json_last_error_msg(), LOG_HTTP, ['payload' => $msgData[$key]]);
+                    }
+                    continue;
                 }
                 $this->$key = $msgData[$key];
             }
@@ -49,7 +53,10 @@ abstract class Msg {
     }
     
     public function __toString() {
-        //FIXME error handling?
-        return json_encode($this);
+        $result = json_encode($this);
+        if($result === false && json_last_error() > 0){
+            $this->logger->error('error on BackendMsg (JSON) encode: '.json_last_error_msg(), LOG_HTTP, ['msg' => $this]);
+        }
+        return $result;
     }
 }

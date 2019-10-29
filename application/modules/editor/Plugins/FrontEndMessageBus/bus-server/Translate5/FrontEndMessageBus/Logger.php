@@ -3,12 +3,12 @@ namespace Translate5\FrontEndMessageBus;
 
 /**
  * 
- * @method void fatal() fatal(string $message, $extra = null)
- * @method void error() error(string $message, $extra = null)
- * @method void warn() warn  (string $message, $extra = null)
- * @method void info() info  (string $message, $extra = null)
- * @method void debug() debug(string $message, $extra = null)
- * @method void trace() trace(string $message, $extra = null)
+ * @method void fatal() fatal(string $message, $domain = null)
+ * @method void error() error(string $message, $domain = null)
+ * @method void warn() warn  (string $message, $domain = null)
+ * @method void info() info  (string $message, $domain = null)
+ * @method void debug() debug(string $message, $domain = null)
+ * @method void trace() trace(string $message, $domain = null)
  */
 class Logger {
     
@@ -16,6 +16,11 @@ class Logger {
      * @var Logger
      */
     protected static $instance;
+    
+    /**
+     * @var string
+     */
+    protected $domain = 'FrontEndMessageBus';
     
     protected function __construct() {
         //singleton only
@@ -31,13 +36,33 @@ class Logger {
         return self::$instance;
     }
     
-    public function __call($name, $args) {
-        $trace = debug_backtrace(2, 2);
-        settype($trace[1], 'array');
-        settype($trace[1]['class'], 'string');
-        settype($trace[1]['function'], 'string');
-        $msg = strtoupper($name).' '.$trace[1]['class'].'::'.$trace[1]['function'].': '.$args[0]."\n".print_r($args[1],1);
-        echo $msg;
+    /**
+     * Clone the logger with customized logging domain
+     * @param string $domain
+     */
+    public function cloneMe(string $domain) {
+        $this->domain = $domain;
+    }
+    
+    public function exception(\Exception $e, $domain) {
+        $this->__call('Exception', [$domain, $e->__toString()]);
+    }
+    
+    public function __call(string $name, array $args) {
+        $message = array_shift($args);
+        $second = array_shift($args);
+        if(!is_null($second) && is_string($second)) {
+            $domain = $second;
+            $second = array_shift($args);
+        }
+        else {
+            $domain = $this->domain;
+        }
+        $msg = strtoupper($name).' - '.$domain.': '.$message;
+        if(!is_null($second) && (is_array($second) || is_object($second))) {
+            $msg .= "\n".print_r($second,1);
+        }
+        echo $msg."\n";
         error_log($msg);
     }
 }
