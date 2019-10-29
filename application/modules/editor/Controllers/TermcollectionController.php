@@ -189,12 +189,22 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
     public function searchtermexistsAction(){
         $params = $this->getRequest()->getParams();
         $searchTerms = json_decode($params['searchTerms']);
+        
+        //get the language root and find all fuzzy languages
+        $lang=$params['targetLang'];
+        $lang=explode('-', $lang);
+        $lang=$lang[0];
+        $languages=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languages editor_Models_Languages */
+        $languages->loadByRfc5646($lang);
+        $langs=$languages->getFuzzyLanguages($languages->getId());
+        
         $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
         $collectionIds = $termCollection->getCollectionForAuthenticatedUser();
         $term = ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
-        $this->view->rows = $term->getNonExistingTermsInAnyCollection($searchTerms, $collectionIds);
+        $this->view->rows = $term->getNonExistingTermsInAnyCollection($searchTerms, $collectionIds,$langs);
     }
     
     /***

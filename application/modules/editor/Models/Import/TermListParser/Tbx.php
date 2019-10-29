@@ -1148,6 +1148,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         if(!empty($this->task)){
             $data['task']=$this->task;
         }
+        $data['userGuid']=$this->user->getUserGuid();
+        $data['userName']=$this->user->getUserName();
         $this->logger->info($code,$logMessage,$data);
     }
     

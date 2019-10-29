@@ -830,7 +830,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         //init validations
         $upload->isValid(self::FILE_UPLOAD_NAME);
-        $importInfo = $upload->getFileInfo(self::FILE_UPLOAD_NAME);
+        try {
+            //this will throw an Zend_File_Transfer_Exception when the file does not exist
+            $importInfo = $upload->getFileInfo(self::FILE_UPLOAD_NAME);
+        } catch (Zend_File_Transfer_Exception $e) {
+            //no tmUpload field was given, this can happen only from the api
+            //allow empty filebased language resource without file upload
+            return false;
+        }
         
         //checking general upload errors
         $errorNr = $importInfo[self::FILE_UPLOAD_NAME]['error'];

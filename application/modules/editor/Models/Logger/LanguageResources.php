@@ -43,8 +43,10 @@ class editor_Models_Logger_LanguageResources extends ZfExtended_Models_Entity_Ab
         $this->setDomain($event->domain);
         $this->setWorker($event->worker);
         $this->setMessage($event->message);
-        $this->setAuthUserGuid($event->userGuid);
-        $this->setAuthUser($event->userLogin);
+        $userGuid=$event->extra['userGuid'] ?? '';
+        $userName=$event->extra['userName'] ?? '';
+        $this->setAuthUserGuid($userGuid);
+        $this->setAuthUser($userName);
         $this->setCreated($event->created);
     }
     

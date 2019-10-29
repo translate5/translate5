@@ -792,14 +792,19 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * any of the given collections.
      * @param array $searchTerms with objects {'text':'abc', 'id':123}
      * @param array $collectionIds
+     * @param array $language
      * @return array $nonExistingTerms with objects {'text':'abc', 'id':123}
      */
-    public function getNonExistingTermsInAnyCollection($searchTerms, $collectionIds){
+    public function getNonExistingTermsInAnyCollection(array $searchTerms,array $collectionIds,array $language){
         $nonExistingTerms = [];
+        if(empty($searchTerms) || empty($collectionIds) || empty($language)){
+            return $nonExistingTerms;
+        }
         foreach ($searchTerms as $term) {
             $s = $this->db->select()
             ->where('term = ?', $term->text)
-            ->where('collectionId IN(?)', $collectionIds);
+            ->where('collectionId IN(?)', $collectionIds)
+            ->where('language IN (?)',$language);
             $terms = $this->db->fetchAll($s);
             if ($terms->count() == 0) {
                 $nonExistingTerms[] = $term;
@@ -1121,6 +1126,21 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
+     * Get loaded data as object with term attributes included
+     * @return stdClass
+     */
+    public function getDataObjectWithAttributes() {
+        $result=$this->getDataObject();
+        //load all attributes for the term
+        $rows=$this->groupTermsAndAttributes($this->findTermAndAttributes($result->id));
+        $result->attributes=[];
+        if(!empty($rows) && !empty($rows[0]['attributes'])){
+            $result->attributes =$rows[0]['attributes'];
+        }
+        return $result;
+    }
+    
+    /***
      * Check if the term is proposable.
      * It is proposable when the term status is not unproccessed and the user is allowed for term proposal operation
      * @param string $status
@@ -1368,6 +1388,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $attributeModel=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attributeModel editor_Models_Term_Attribute */
         $isAttributeProposalAllowed=$attributeModel->isProposableAllowed();
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         //map the term id to array index (this is used because the jquery json decode changes the array sorting based on the termId)
         $keyMap=[];
@@ -1419,6 +1440,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 if(in_array($key,$termProposalColumns)){
                     $termProposalData[$termProposalColumnsNameMap[$key]]=$value;
                     continue;
+                }
+                
+                if($key=='headerText'){
+                    $value=$translate->_($value);
                 }
                 //it is attribute column
                 $atr[$key]=$value;

@@ -394,6 +394,9 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
      * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
      */
     public function handleTransacGroup($entity){
+        if($entity->getId()==null){
+            return false;
+        }
         $ret=$this->getTransacGroup($entity, ['modification']);
         //if the transac group exist, do nothing
         if(!empty($ret)){
