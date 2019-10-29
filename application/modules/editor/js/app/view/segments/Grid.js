@@ -312,6 +312,7 @@ Ext.define('Editor.view.segments.Grid', {
                         var newClass = 'segment-font-sizable',
                             // only on non sorted list we mark last file segments
                             isDefaultSort = (store.sorters.length == 0),
+                            tracking = Editor.data.task.userTracking(),
                             isFirstInFile = false,
                             nextRec = null;
                         
@@ -321,6 +322,10 @@ Ext.define('Editor.view.segments.Grid', {
                         me.lastRowIdx = rowIndex;
                         if (!record.get('editable')) {
                             newClass += ' editing-disabled';
+                        }
+                        if(record.get('usedByUserGuid')) {
+                            tracking = tracking.getAt(tracking.findExact('userGuid', record.get('usedByUserGuid')));
+                            newClass += ' other-user-select usernr-'+tracking.get('taskOpenerNumber');
                         }
                         return newClass;
                     }
