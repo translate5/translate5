@@ -175,7 +175,6 @@ Ext.application({
   openEditor: function(task) {
       var me = this,
           languages = Ext.getStore('admin.Languages'),
-          taskUserTrackingsStore,
           closeEvent;
       
       if(! (task instanceof Editor.model.admin.Task)) {
@@ -185,8 +184,6 @@ Ext.application({
       Editor.data.task = task;
       Editor.model.Segment.redefine(task.segmentFields());
       
-      Editor.data.taskUserTracking = Ext.create('Editor.store.admin.TaskUserTrackings').load();
-
       Editor.data.taskLanguages = {
           source: languages.getById(task.get('sourceLang')),
           relais: languages.getById(task.get('relaisLang')),
