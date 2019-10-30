@@ -51,6 +51,7 @@ var TermEntry={
 	    drawDataContainer=commentAttribute.concat(drawDataContainer);
 	    
 	    me.$_termEntryAttributesTable.append(drawDataContainer.join(''));
+	    Term.drawProposalButtons('attribute');
 	},
 
     

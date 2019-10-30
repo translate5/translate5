@@ -1347,6 +1347,15 @@ var Term={
 				$termAttributeHolder.prepend(instantTranslateInto);
 				Term.initInstantTranslateSelect();
 			}
+        },
+        
+        /***
+         * Find the current active term in the accordion
+         */
+        findActiveTermHeader:function(){
+        	var me=this,
+        		activeTermHeader= me.$_termTable.find('h3.ui-accordion-header-active');
+        	return activeTermHeader.length>0 ? activeTermHeader : null;
         }
 };
 
