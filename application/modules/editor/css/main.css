@@ -797,3 +797,5 @@ a.x-btn span.task-confirmation {
 .tools-help-icon .x-tool-home{
 	background-image:url(../images/help.png) !important;
 }
+.ico-arrow-back {background-image: url(../images/arrow_left.png);}
+.ico-finish-task {background-image: url(../images/tick.png);}
