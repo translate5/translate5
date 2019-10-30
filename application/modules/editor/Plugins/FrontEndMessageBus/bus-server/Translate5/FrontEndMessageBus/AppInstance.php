@@ -78,7 +78,8 @@ class AppInstance {
      * @param ConnectionInterface $conn
      */
     public function close(ConnectionInterface $conn) {
-        error_log("CLOSE ".$conn->sessionId);
+        //FIXME notify each channel about close, in task channel release locked and selected segments.
+        // selected segments should be possible by just send an empty selection userGuid to all other users
         $this->connections->detach($conn);
     }
     
@@ -128,6 +129,8 @@ class AppInstance {
         if(empty($this->sessions[$conn->sessionId])) {
             //currently we do nothing here, since the session from the GUI is not known to the server! 
             // TODO should we trigger a resync of the sessions into the MessageBus via the frontend? (mutex run on the server side) 
+            error_log("FOOBAR");
+        call_user_func_array([$channel, $msg->command], [$msg]);
             return;
         }
         $this->logger->info('front-end call', $msg->toDbgArray());
@@ -163,6 +166,9 @@ class AppInstance {
      * @param array $user
      */
     protected function startSession(string $sessionId, array $user) {
+        //we need an additional public usable session ID, since one user can have multiple sessions
+        // to distinguish between the private sessionId, we call the public one sessionHash and store it along the user
+        $user['sessionHash'] = bin2hex(random_bytes(32));
         $this->sessions[$sessionId] = $user;
         //TODO a map from a user to his sessions will also be needed. By userId or userGuid? probably guid, since in task useage we are also using the guids
     }

@@ -52,6 +52,7 @@ class Task extends Channel {
             //FIXME in the frontend the userGuid can be used via the anon user stuff to display the userame or the anonymzed one
             //TODO implement and use a hasSession instead, which returns null or userGuid
             'userGuid' => $this->instance->getSessions()[$currentSessionId]['userGuid'], 
+            'sessionHash' => $this->instance->getSessions()[$currentSessionId]['sessionHash'], 
         ];
         
         foreach($this->instance->getConnections() as $conn) {

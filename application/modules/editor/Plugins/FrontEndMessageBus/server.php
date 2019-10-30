@@ -32,5 +32,5 @@ $port = $config->socketServer->port;
 $listen = $config->socketServer->listen;
 $logger->info('starting on '.$host.':'.$port.' listen to '.$listen, LOG_SOCKET);
 $app = new \Ratchet\App($host, $port, $listen, $loop);
-$app->route($config->socketServer->route, $bus);
+$app->route($config->socketServer->route, $bus, ['*']); 
 $app->run();
