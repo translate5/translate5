@@ -64,6 +64,8 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         
         //TODO test logout calls:
         $this->eventManager->attach('editor_SessionController', 'beforeDeleteAction', array($this, 'handleLogout'));
+        $this->eventManager->attach('editor_SessionController', 'resyncOperation', array($this, 'handleSessionResync'));
+        
         $this->eventManager->attach('LoginController', 'logoutAction', array($this, 'handleLogout'));
         
         
@@ -79,7 +81,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $applicationState = $event->getParam('applicationState');
         $applicationState->messageBus = new stdClass();
         
-        //TODO return information if message bus is alive or not
+        //TODO return information if message bus is alive or not, return debug statement from message server on success.
         $applicationState->messageBus->running = true;
     }
     
@@ -116,6 +118,33 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         }
         
         $this->bus->stopSession($sessionId);
+    }
+    
+    /**
+     * resync the application state (session and task if opened) into the socket server
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleSessionResync(Zend_EventManager_Event $event) {
+        //startSession and taskOpen etc into the server
+        // we are lazy and reuse our other handlers
+        
+        error_log("RESYNC SESSION");
+        
+        //resync session
+        $this->handleStartSession($event);
+        
+        //resync task open state
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $session = new Zend_Session_Namespace();
+        try {
+            $task->loadByTaskGuid($session->taskGuid);
+            $event->setParam('task', $task);
+            $this->handleAfterTaskOpen($event);
+        }
+        catch (ZfExtended_NotFoundException $e) {
+            //if the task is gone, we can not open it and do nothing
+        }
     }
     
     /**

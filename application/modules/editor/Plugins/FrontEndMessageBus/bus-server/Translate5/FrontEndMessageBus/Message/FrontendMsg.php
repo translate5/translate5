@@ -36,4 +36,16 @@ class FrontendMsg extends Msg {
      */
     public $conn;
     
+    public static function create(string $channel, string $command, array $payload = [], ConnectionInterface $conn = null): FrontendMsg  {
+        $msg = new self();
+        $msg->channel = $channel;
+        $msg->command = $command;
+        $msg->payload = $payload;
+        $msg->conn = $conn;
+        return $msg;
+    }
+    
+    public function send() {
+        $this->conn->send((string) $this);
+    }
 }

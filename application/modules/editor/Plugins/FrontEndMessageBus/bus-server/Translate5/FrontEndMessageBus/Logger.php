@@ -59,10 +59,10 @@ class Logger {
             $domain = $this->domain;
         }
         $msg = strtoupper($name).' - '.$domain.': '.$message;
+        echo $msg."\n";
         if(!is_null($second) && (is_array($second) || is_object($second))) {
             $msg .= "\n".print_r($second,1);
         }
-        echo $msg."\n";
         error_log($msg);
     }
 }

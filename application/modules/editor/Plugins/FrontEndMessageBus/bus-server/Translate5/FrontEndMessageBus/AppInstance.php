@@ -1,7 +1,6 @@
 <?php
 namespace Translate5\FrontEndMessageBus;
 use Ratchet\ConnectionInterface;
-use Translate5\FrontEndMessageBus\Message\Msg;
 use Translate5\FrontEndMessageBus\Message\FrontendMsg;
 use Translate5\FrontEndMessageBus\Message\BackendMsg;
 
@@ -66,6 +65,23 @@ class AppInstance {
     }
     
     /**
+     * Returns the user array to the given sessionId, or null if not found. 
+     * If the optional $field is given, the valueof the user array with same name is returned.   
+     * @param string $sessionId
+     * @param string  $field optional, if given return this field of the stored user array instead the user array itself
+     * @return mixed
+     */
+    public function getSession($sessionId, $field = null) {
+        if(empty($this->sessions[$sessionId])) {
+            return null;
+        }
+        if(is_null($field)) {
+            return $this->sessions[$sessionId];
+        }
+        return $this->sessions[$sessionId][$field];
+    }
+    
+    /**
      * Attach the given conne3ction to the application instance
      * @param ConnectionInterface $conn
      */
@@ -127,10 +143,11 @@ class AppInstance {
             $channel = $this->getChannel($msg->channel);
         }
         if(empty($this->sessions[$conn->sessionId])) {
-            //currently we do nothing here, since the session from the GUI is not known to the server! 
-            // TODO should we trigger a resync of the sessions into the MessageBus via the frontend? (mutex run on the server side) 
-            error_log("FOOBAR");
-        call_user_func_array([$channel, $msg->command], [$msg]);
+            //the session from the GUI is not known to the server, so we trigger a resync per session
+            //TODO possible improvement here: only send one resync to the GUIs (mutex here) and this GUI requests then the resync for all sessions
+            // pro: only one resync request per instance then
+            // con: we sync all sessions from the session table, also API sessions etc, instead only the ones which are only used by GUIs
+            FrontendMsg::create(self::CHANNEL_INSTANCE, 'resyncSession', [], $conn)->send();
             return;
         }
         $this->logger->info('front-end call', $msg->toDbgArray());
@@ -168,7 +185,7 @@ class AppInstance {
     protected function startSession(string $sessionId, array $user) {
         //we need an additional public usable session ID, since one user can have multiple sessions
         // to distinguish between the private sessionId, we call the public one sessionHash and store it along the user
-        $user['sessionHash'] = bin2hex(random_bytes(32));
+        $user['sessionHash'] = bin2hex(random_bytes(16));
         $this->sessions[$sessionId] = $user;
         //TODO a map from a user to his sessions will also be needed. By userId or userGuid? probably guid, since in task useage we are also using the guids
     }
@@ -188,10 +205,7 @@ class AppInstance {
      */
     protected function ping($msg = null) {
         if($msg instanceof FrontendMsg){
-            $result = new FrontendMsg();
-            $result->channel = self::CHANNEL_INSTANCE;
-            $result->command = 'pong';
-            $msg->conn->send((string) $result);
+            FrontendMsg::create(self::CHANNEL_INSTANCE, 'pong', [], $msg->conn)->send();
             $this->logger->info('Pinged from Frontend');
             return;
         }

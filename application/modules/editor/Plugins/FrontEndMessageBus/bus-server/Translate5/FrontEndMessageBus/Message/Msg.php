@@ -22,6 +22,9 @@ abstract class Msg {
      */
     public $payload;
     
+    /**
+     * @param array $msgData
+     */
     public function __construct(array $msgData = null) {
         if(!empty($msgData)) {
             // we assume all data must be given if there is a msgData to init from

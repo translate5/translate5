@@ -780,7 +780,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $obj = $this->entity->getDataObject();
         
         $userAssocInfos = $this->_helper->TaskUserInfo->initUserAssocInfos([$taskguid]);
-        $this->invokeTaskUserTracking($taskguid, $userAssocInfos[$taskguid]['role']);
+        $this->invokeTaskUserTracking($taskguid, $userAssocInfos[$taskguid]['role'] ?? '');
         
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj; 

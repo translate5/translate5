@@ -40,15 +40,21 @@ END LICENSE AND COPYRIGHT
 
 @CHARSET "UTF-8";
 
- 
-
 /* Attention: same (similar) Colors are reused in TrackChanges PlugIn (plugin.css and UtilEditor.js), if changing here, change them there too! */
+#segment-grid .x-grid-item .other-user-edit.usernr-1,
 #segment-grid .x-grid-item .other-user-select.usernr-1 {background-color: #f9e788;}    /* yellow pale */
+#segment-grid .x-grid-item .other-user-edit.usernr-2,
 #segment-grid .x-grid-item .other-user-select.usernr-2 {background-color: #f9b372;}    /* orange pale */
+#segment-grid .x-grid-item .other-user-edit.usernr-3,
 #segment-grid .x-grid-item .other-user-select.usernr-3 {background-color: #cbe0f9;}    /* blue pale */
+#segment-grid .x-grid-item .other-user-edit.usernr-4,
 #segment-grid .x-grid-item .other-user-select.usernr-4 {background-color: #f3d5ed;}    /* lilac pale */
+#segment-grid .x-grid-item .other-user-edit.usernr-5,
 #segment-grid .x-grid-item .other-user-select.usernr-5 {background-color: #e4fb81;}    /* yellowish green pale */
+#segment-grid .x-grid-item .other-user-edit.usernr-6,
 #segment-grid .x-grid-item .other-user-select.usernr-6 {background-color: #FFD8D4;}    /* pink pale */
+#segment-grid .x-grid-item .other-user-edit.usernr-7,
 #segment-grid .x-grid-item .other-user-select.usernr-7 {background-color: #9af2db;}    /* turquoise pale */
+#segment-grid .x-grid-item .other-user-edit.usernr-8,
 #segment-grid .x-grid-item .other-user-select.usernr-8 {background-color: #b5f3bf;}    /* lime green pale */
 

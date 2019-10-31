@@ -1,16 +1,14 @@
 <?php
 namespace Translate5\FrontEndMessageBus\Channel;
 use Ratchet\ConnectionInterface;
-use Translate5\FrontEndMessageBus\AppInstance;
-use Translate5\FrontEndMessageBus\Message;
 use Translate5\FrontEndMessageBus\Message\FrontendMsg;
 use Translate5\FrontEndMessageBus\Channel;
-use Translate5\FrontEndMessageBus\Message\BackendMsg;
 
 /**
  * Encapsulates logic specific to an opened task in an instance
  */
 class Task extends Channel {
+    const CHANNEL_NAME = 'task';
     
     /**
      * Maps a taskGuid to a list of sessions where the task is opened
@@ -18,19 +16,71 @@ class Task extends Channel {
      */
     protected $taskToSessionMap = [];
     
+    protected $editedSegments = [];
+    
     /*************************
      * Frontend Methods
      *************************/
+    public function segmentEditRequest(FrontendMsg $request) {
+        $currentSessionId = $request->conn->sessionId;
+        
+        //the taskGuid
+        settype($request->payload[0], 'string');
+        $taskGuid = $request->payload[0];
+        
+        //the segmentId
+        settype($request->payload[1], 'integer');
+        $segmentId = $request->payload[1];
+        
+        $sessionsForTask = $this->taskToSessionMap[$taskGuid] ?? [];
+        if(!in_array($currentSessionId, $sessionsForTask)) {
+            //if current session is not valid for task, someone provided manually a different taskGuid
+            return;
+        }
+        
+        //release other segment(s) of this session/connection
+        if(!empty($request->conn->openedSegmentId)) {
+            unset($this->editedSegments[$request->conn->openedSegmentId]);
+        }
+        
+        if(empty($this->editedSegments[$segmentId])) {
+            $commandToSender = 'segmentOpenAck'; //ACK
+            $request->conn->openedSegmentId = $segmentId;
+            $this->editedSegments[$segmentId] = $request->conn;
+        }
+        else {
+            $commandToSender = 'segmentOpenNak'; //NAK
+        }
+
+        //sending the other users that the segment is locked
+        $result = FrontendMsg::create(self::CHANNEL_NAME, 'segmentLocked', [
+            'segmentId' => $segmentId,
+            'userGuid' => $this->instance->getSession($currentSessionId, 'userGuid'),
+            'sessionHash' => $this->instance->getSession($currentSessionId, 'sessionHash'),
+        ]);
+        
+        foreach($this->instance->getConnections() as $conn) {
+            /* @var $conn ConnectionInterface */
+            if(!in_array($conn->sessionId, $sessionsForTask)) {
+                //ignore myself and ignore all other connections not belonging to that task
+                continue;
+            }
+            //since we reuse the FrontendMsg we have to change the command on each answer
+            if($conn === $request->conn) {
+                $result->command = $commandToSender;
+            }
+            else {
+                $result->command = 'segmentLocked';
+            }
+            $conn->send((string) $result);
+        }
+    }
     
     /**
      * react on a segment click from frontend
-     * FIXME implement segment open / save / close similar to this function. 
      * @param FrontendMsg $request
      */
     public function segmentClick(FrontendMsg $request) {
-        //INFO: get the messsage -> fron the frontendmsg request
-        //filter the receivers   -> $sessionsForTask and also $this->instance->getConnections()
-        //send the message       -> for the filtered $con, send answer to the registered browsers
         $currentSessionId = $request->conn->sessionId;
         
         settype($request->payload[0], 'string');
@@ -44,16 +94,11 @@ class Task extends Channel {
             return;
         }
         
-        $result = new FrontendMsg();
-        $result->channel = 'task'; //convert to segment channel in frontend??? separation unclear
-        $result->command = 'segmentselect';
-        $result->payload = [
+        $result = FrontendMsg::create(self::CHANNEL_NAME, 'segmentselect', [
             'segmentId' => $request->payload[1],
-            //FIXME in the frontend the userGuid can be used via the anon user stuff to display the userame or the anonymzed one
-            //TODO implement and use a hasSession instead, which returns null or userGuid
-            'userGuid' => $this->instance->getSessions()[$currentSessionId]['userGuid'], 
-            'sessionHash' => $this->instance->getSessions()[$currentSessionId]['sessionHash'], 
-        ];
+            'userGuid' => $this->instance->getSession($currentSessionId, 'userGuid'),
+            'sessionHash' => $this->instance->getSession($currentSessionId, 'sessionHash'),
+        ]);
         
         foreach($this->instance->getConnections() as $conn) {
             /* @var $conn ConnectionInterface */
@@ -90,6 +135,7 @@ class Task extends Channel {
             $this->taskToSessionMap[$task['taskGuid']] = [];
         }
         $this->taskToSessionMap[$task['taskGuid']][] = $sessionId;
+        $this->taskToSessionMap[$task['taskGuid']] = array_unique($this->taskToSessionMap[$task['taskGuid']]);
     }
     
     /**
