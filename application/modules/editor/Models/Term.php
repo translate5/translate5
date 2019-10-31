@@ -652,9 +652,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Load term and attribute proposals yunger as $youngerAs date within the given collection
+     * Load all term and attribute proposals, or if second parameter is given load only proposals younger as $youngerAs date within the given collection(s)
      * @param array $collectionId
-     * @param string $youngerAs
+     * @param string $youngerAs optional, if omitted all proposals are loaded
      */
     public function loadProposalExportData(array $collectionIds, string $youngerAs = ''){
         $adapter=$this->db->getAdapter();
