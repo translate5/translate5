@@ -1659,6 +1659,7 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='QmVhcmJlaXRldCB1bmQgR2VzcGVycnQgZHVyY2ggbWVocmVyZSBCZW51dHplcg=='><source>Bearbeitet und Gesperrt durch mehrere Benutzer</source><target>Bearbeitet und Gesperrt durch mehrere Benutzer</target></trans-unit>
 <trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGFid2VjaHNlbG5kIGRpZXNlbGJlIEF1ZmdhYmU='><source>Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe</source><target>Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe</target></trans-unit>
 <trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGdsZWljaHplaXRpZyBkaWVzZWxiZSBBdWZnYWJl'><source>Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe</source><target>Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe</target></trans-unit>
+<trans-unit id='SW4gQmVhcmJlaXR1bmc='><source>In Bearbeitung</source><target>In Bearbeitung</target></trans-unit>
   </body>
  </file>
 </xliff>
