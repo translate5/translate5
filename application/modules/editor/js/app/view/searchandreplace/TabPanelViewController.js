@@ -47,7 +47,6 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewController', {
     onTabPanelTabChange:function(tabpanel,newCard,oldCard,eOpts){
         var me=this,
             tabViewModel=me.getView().getViewModel(),
-            searchReplaceWindow=me.getView().up('window'),
             newSearchField=newCard.down('#searchField'),
             oldSearchField=oldCard.down('#searchField'),
             isSearchTab=newCard.xtype == 'searchTab';

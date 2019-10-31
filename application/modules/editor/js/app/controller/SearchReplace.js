@@ -578,7 +578,14 @@ Ext.define('Editor.controller.SearchReplace', {
      * Handler for search
      */
     triggerSearch:function(field,ev,eOpts){
-        var me=this;
+        var me=this,
+        	tabPanel=me.getTabPanel(),
+        	activeTab=tabPanel.getActiveTab(),
+        	isValid=activeTab.isValid();
+        
+        if(!isValid){
+        	return;
+        }
         
         //set the current field from where the search is triggered
         me.searchFieldTrigger=field;
@@ -782,9 +789,10 @@ Ext.define('Editor.controller.SearchReplace', {
                 data:combo.up('#searchTab') ? searchStoreData :replaceStoreData
             }));
             var rec = combo.findRecord('id',me.activeColumnDataIndex);
-            if(rec){
-                combo.setSelection(rec);
+            if(!rec){
+            	rec=combo.getStore().getAt(0);
             }
+            combo.setSelection(rec);
         });
     },
     
@@ -831,11 +839,6 @@ Ext.define('Editor.controller.SearchReplace', {
 
         //get the search parametars (with filter and sort included)
         params=me.getSearchReplaceParams();
-        
-        if(!params['searchField']){
-        	activeTab.isValid();
-        	return;
-        }
         
         Ext.Ajax.request({
             url: Editor.data.restpath+'segment/search',
@@ -1663,7 +1666,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 params[formFields[i].itemId]=formFields[i].getValue();
             }
         }
-
+        
         if(isReplace){
             params['durations']=me.timeTracking;
         }
@@ -1675,7 +1678,6 @@ Ext.define('Editor.controller.SearchReplace', {
             params['userTrackingId']=Editor.data.task.get('userTrackingId');
             params['userColorNr']=Editor.data.task.get('userColorNr');
         }
-
         return params;
     },
 
