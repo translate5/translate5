@@ -54,6 +54,8 @@ Ext.define('Editor.util.messageBus.EventDomain', {
         if ('#'+target.getBusId() !== selector[0]) {
             return false;
         }
-        return selector[1] === target.currentChannel;
+        //selector count = 1: only #busId was given, therefore the currentChannel must be empty to match (events directly from bus instance)
+        //selector count > 1: a channel was given, so we have to compare agains the currentChannel of the target
+        return selector.length === 1 && !target.currentChannel || selector[1] === target.currentChannel;
     }
 });

@@ -54,6 +54,10 @@ Ext.define('Editor.view.segments.column.InfoToolTipMixin', {
             }
             me.otherRenderers[item.dataIndex] = item;
         });
+        /**
+         * Fires an event on the columns using this mixin. On this way more otherRenderers can be added
+         */
+        me.fireEvent('initOtherRenderers', me.otherRenderers);
     },
     /**
      * Render the QTip info data about the segment

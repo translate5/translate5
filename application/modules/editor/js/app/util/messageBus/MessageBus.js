@@ -92,6 +92,7 @@ Ext.define('Editor.util.messageBus.MessageBus', {
         reconnectInterval: 5000
     },
     socket: null,
+    currentChannel: null,
     reconnectTask: null,
     constructor: function(config) {
         var me = this,
@@ -143,12 +144,16 @@ Ext.define('Editor.util.messageBus.MessageBus', {
          * WebSocket on open handler
          */
         ws.onopen = function (event) {
-            //TODO me.fireEvent(); on open?
+            me.currentChannel = null; //needed in order to let the events come from the bus instance
             // if there is a reconnection task, disable it on successful connection open
             if (me.reconnectTask) {
                 Ext.Logger.info('MessageBus: reconnected busId '+me.getBusId());
                 Ext.TaskManager.stop(me.reconnectTask);
                 me.reconnectTask = null;
+                me.fireEvent('reconnect', me, event);
+            }
+            else {
+                me.fireEvent('open', me, event);
             }
         }
         
@@ -156,7 +161,8 @@ Ext.define('Editor.util.messageBus.MessageBus', {
          * WebSocket on close handler
          */
         ws.onclose = function (event) {
-            //TODO me.fireEvent(); on close?
+            me.currentChannel = null; //needed in order to let the events come from the bus instance
+            me.fireEvent('close', me, event);
             //TODO if there remains no connection, should the message bus disabled? How is the plan, make it disableable at all??
             //start reconnection interval task
             Ext.Logger.info('MessageBus: connection close busId '+me.getBusId());
@@ -176,7 +182,8 @@ Ext.define('Editor.util.messageBus.MessageBus', {
          * WebSocket on error handler
          */
         ws.onerror = function (event) {
-            //TODO me.fireEvent(); on error?
+            me.currentChannel = null; //needed in order to let the events come from the bus instance
+            me.fireEvent('error', me, event);
             //event did not provide useful information in some tests, so currently no further processing of event here 
         }
     },

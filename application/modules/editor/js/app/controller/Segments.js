@@ -84,7 +84,6 @@ Ext.define('Editor.controller.Segments', {
   saveChainMutex: false,
   changeAlikeOperation: null,
   defaultRowHeight: 15,
-  userToSegmentMap: {},
   refs : [{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
@@ -102,11 +101,6 @@ Ext.define('Editor.controller.Segments', {
       selector : '#watchListFilterBtn'
   }],
   listen: {
-      messagebus: {
-          '#translate5 task': {
-              segmentselect:'onMessageBusSegmentSelect'
-          }
-      },
       controller: {
           '#Editor.$application': {
               editorViewportClosed: 'clearSegments'
@@ -671,32 +665,5 @@ Ext.define('Editor.controller.Segments', {
       if(me.loadingMaskRequests == 0) {
           me.getViewport().setLoading(false);
       }
-  },
-
-  /***
-   * On multi user segment sellect
-   */
-  onMessageBusSegmentSelect:function(data) {
-      var me = this,
-          selectedId = data.segmentId, 
-          byUserGuid = data.userGuid,
-          grid = me.getSegmentGrid(),
-          segment;
-
-      //remove color mark from previous segment
-      if(me.userToSegmentMap[byUserGuid] && (segment = grid.store.getById(me.userToSegmentMap[byUserGuid]))) {
-          //FIXME Problem, Feature of segment selecting will be more complicated, since multiple users can select a segment. 
-          // Therefore we do not implement that, use the user selection for demonstration, 
-          // and remove the selection feature after implementing the real locking feature. 
-          segment.set('usedByUserGuid', '');
-          segment.commit(false, ['usedByUserGuid']);
-      }
-      //add color mark to current segment
-      if(segment = grid.store.getById(selectedId)) {
-          segment.set('usedByUserGuid', byUserGuid);
-          segment.commit(false, ['usedByUserGuid']);
-      }
-      me.userToSegmentMap[byUserGuid] = selectedId;
   }
-  
 });

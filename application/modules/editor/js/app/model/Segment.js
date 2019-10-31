@@ -86,8 +86,7 @@ Ext.define('Editor.model.Segment', {
             return Ext.JSON.decode(val);
         }, persist: false},
         {name: 'isWatched', type: 'boolean', persist: false},
-        {name: 'segmentUserAssocId', type: 'int', persist: false},
-        {name: 'usedByUserGuid', type: 'string', persist: false, defaultValue: ''}
+        {name: 'segmentUserAssocId', type: 'int', persist: false}
     ],
     idProperty: 'id',
     proxy : {

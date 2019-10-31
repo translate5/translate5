@@ -631,6 +631,9 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
         	view.refresh();
         }
         
+        //TL: Additional Info here: below error raise is also triggered if there is an exception in row rendering, 
+        //    for example if there is an exception in getRowClass 
+        
         //<debug> 
         // If there are columns to trigger rendering, and the rendered block os not either the view size 
         // or, if store count less than view size, the store count, then there's a bug. 
