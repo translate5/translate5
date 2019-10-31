@@ -106,6 +106,14 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
     
     /**
+     * send the latest created notification to the list of users
+     * @param ZfExtended_Models_User $user
+     */
+    protected function notifyUser(ZfExtended_Models_User $user) {
+        $this->mailer->sendToUser($user);
+    }
+    
+    /**
      * Adds the users of the given cc/bcc role config to the email - if receiverRole is configured in config
      * @param stdClass $triggerConfig the config object given in action matrix
      * @param string $receiverRole the original receiver role of the notification to be sended
@@ -129,9 +137,12 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
                     $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
                     /* @var $userModel ZfExtended_Models_User */
                     foreach($roles as $singleUser) {
-                        $return=$userModel->loadByLogin($singleUser);
-                        if(isset($return)){
-                            $users[] = $return->toArray();
+                        try {
+                            $userModel->loadByLogin($singleUser);
+                            $users[] = (array) $userModel->getDataObject();
+                        }
+                        catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                            // do nothing if the user was not found
                         }
                     }
                 }
@@ -167,6 +178,9 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             return $defaultConfig;
         }
         $config = reset($config);
+        if(empty($config)) {
+            return $defaultConfig;
+        }
         foreach($config as $key => $v) {
             $defaultConfig->{$key} = $v;
         }
@@ -325,7 +339,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             
             $this->createNotification($deleted['role'], __FUNCTION__, $params);
             $this->addCopyReceivers($triggerConfig, $deleted['role']);
-            $this->notify((array) $user->getDataObject());
+            $this->notifyUser($user);
         }
     }
     
@@ -353,7 +367,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $this->createNotification($tua->getRole(), __FUNCTION__, $params);
         $this->addCopyReceivers($triggerConfig, $tua->getRole());
-        $this->notify((array) $user->getDataObject());
+        $this->notifyUser($user);
     }
     
     /**
@@ -399,7 +413,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $this->createNotification(ACL_ROLE_PM, 'notifyNewTaskAssigned', $params);
             $user->loadByGuid($tua['userGuid']);
             $this->addCopyReceivers($triggerConfig, $tua['originalRole']);
-            $this->notify((array) $user->getDataObject());
+            $this->notifyUser($user);
         }
     }
     
@@ -432,7 +446,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params);
         $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
-        $this->notify((array) $user->getDataObject());
+        $this->notifyUser($user);
     }
     
     
@@ -505,8 +519,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         }
     }
     
-    /***
-     * Notify the configured user with the daily term and term attribute proposals.
+    /**
+     * Notify the configured user with term and term attribute proposals of the configured or all termcollections
      * The attached export data in the mail will be in excel format.
      */
     public function notifyTermProposals(){
@@ -515,26 +529,33 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             return;
         }
         
-        $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
-        /* @var $service editor_Services_TermCollection_Service */
-        $lr=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $lr editor_Models_LanguageResources_LanguageResource */
-        
-        //load all existing term collections
-        $collections=$lr->loadByResourceId($service->getServiceNamespace());
+        //use all collections if no collections are given in workflow action config
+        if(empty($triggerConfig->collections)) {
+            $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+            /* @var $service editor_Services_TermCollection_Service */
+            $lr=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var $lr editor_Models_LanguageResources_LanguageResource */
+            
+            //load all existing term collections
+            $collections=$lr->loadByResourceId($service->getServiceNamespace());
+            $collections=array_column($collections,'id');
+        }
+        else {
+            $collections = $triggerConfig->collections;
+            if(!is_array($collections)) {
+                $collections = [$collections];
+            }
+        }
         
         if(empty($collections)){
             return;
         }
         
-        //export yunger as one day before now
-        $exportDate=date('Y-m-d',strtotime("-1 days"));
-        $collections=array_column($collections,'id');
         $proposals=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $proposals editor_Models_Term */
         
         //load the term and term entry proposals data for all term collections and younger as $exportDate
-        $rows = $proposals->loadProposalExportData($exportDate,$collections);
+        $rows = $proposals->loadProposalExportData($collections);
         if(empty($rows)){
             return;
         }
@@ -556,11 +577,9 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         /* @var $user ZfExtended_Models_User */
         $user->loadByLogin($triggerConfig->receiverUser);
         
-        $this->createNotification('visitor', __FUNCTION__, [
-            'exportDate'=>$exportDate
-        ]);
+        $this->createNotification('visitor', __FUNCTION__, []);
         $this->mailer->setAttachment([$attachment]);
-        $this->notify([(array)$user->getDataObject()]);
+        $this->notifyUser($user);
         
         //remove the tmp file from the disc
         unlink($file);

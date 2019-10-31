@@ -635,7 +635,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if(is_string($collectionIds)){
             $collectionIds=explode(',', $collectionIds);
         }
-        $rows = $proposals->loadProposalExportData($this->getParam('exportDate'),$collectionIds);
+        $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $termCollection editor_Models_TermCollection_TermCollection */
+        $allowedCollections = $termCollection->getCollectionForAuthenticatedUser();
+        $rows = $proposals->loadProposalExportData(array_intersect($collectionIds, $allowedCollections), $this->getParam('exportDate'));
         if(empty($rows)){
             $this->view->message='No results where found.';
             return;
@@ -648,9 +651,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * assigned collections of the customers of the authenticated user
      */
     public function testexportAction() {
-        $proposals=ZfExtended_Factory::get('editor_Models_Term');
+        $proposals = ZfExtended_Factory::get('editor_Models_Term');
         /* @var $proposals editor_Models_Term */
-        $this->view->rows=$proposals->loadProposalExportData();
+        $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $termCollection editor_Models_TermCollection_TermCollection */
+        $this->view->rows = $proposals->loadProposalExportData($termCollection->getCollectionForAuthenticatedUser(), date('Y-m-d'));
     }
     
     

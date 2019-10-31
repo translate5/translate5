@@ -652,21 +652,20 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Load term and attribute proposals yunger as $youngerAs date within the given collection
-     * @param string $youngerAs
+     * Load all term and attribute proposals, or if second parameter is given load only proposals younger as $youngerAs date within the given collection(s)
      * @param array $collectionId
+     * @param string $youngerAs optional, if omitted all proposals are loaded
      */
-    public function loadProposalExportData(string $youngerAs='',array $collectionIds=[]){
-        //if no date is set, se to current
-        if(empty($youngerAs)){
-            $youngerAs=date('Y-m-d');
-        }
-        if(empty($collectionIds)){
-            $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            /* @var $termCollection editor_Models_TermCollection_TermCollection */
-            $collectionIds=$termCollection->getCollectionForAuthenticatedUser();
-        }
+    public function loadProposalExportData(array $collectionIds, string $youngerAs = ''){
         $adapter=$this->db->getAdapter();
+        $bindParams = [join(',', $collectionIds)];
+        $termYoungerSql = $attrYoungerSql = '';
+        if(!empty($youngerAs)) {
+            $bindParams[] = $youngerAs;
+            $bindParams[] = $youngerAs;
+            $termYoungerSql = ' and (t.created >=? || tp.created >= ?)';
+            $attrYoungerSql = ' and (ta.created >=? || tap.created >=?)';
+        }
         $termSql="SELECT
             		t.termEntryId as 'term-termEntryId',
             		t.definition as 'term-definition',
@@ -694,12 +693,11 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         			LEFT OUTER JOIN
         			LEK_term_proposal tp ON tp.termId = t.id
         			INNER JOIN LEK_languages l ON t.language=l.id 
-                    		where ".$adapter->quoteInto('t.collectionId IN(?)',$collectionIds)." 
-        		and (t.created >=? || tp.created >= ?) 
+                where t.collectionId IN(?)".$termYoungerSql." 
         		and (tp.term is not null or t.processStatus='unprocessed')
         		order by t.groupId,t.term";
         
-        $termResult=$adapter->query($termSql,[$youngerAs,$youngerAs])->fetchAll();
+        $termResult=$adapter->query($termSql,$bindParams)->fetchAll();
         
         $attributeSql="SELECT
                         ta.id as 'attribute-id',
@@ -731,12 +729,11 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                         LEFT OUTER JOIN LEK_terms t on ta.termId=t.id
                         LEFT OUTER JOIN LEK_term_proposal tp on tp.termId=t.id 
                         LEFT OUTER JOIN LEK_languages l ON t.language=l.id 
-                	where ".$adapter->quoteInto('ta.collectionId IN(?)',$collectionIds)." 
-                	and (ta.created >=? || tap.created >=?) 
+                	where ta.collectionId IN(?)".$attrYoungerSql." 
                 	and (tap.value is not null or ta.processStatus='unprocessed')
                 	order by ta.termEntryId,ta.termId";
         
-        $attributeResult=$adapter->query($attributeSql,[$youngerAs,$youngerAs])->fetchAll();
+        $attributeResult=$adapter->query($attributeSql,$bindParams)->fetchAll();
         
         //merge term proposals with term attributes and term entry attributes proposals
         $resultArray=array_merge($termResult,$attributeResult);
