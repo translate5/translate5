@@ -200,7 +200,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           // - add invisible placeholder, otherwise Firefox might not be able to detect selections correctly (= html instead of the body)
           // - will be removed on saving anyway (or even before during clean-up of the TrackChanges)
           value = '&#8203;';
-          console.log("setValueAndMarkup (Workaround Firefox): add invisible placeholder");
       }
       me.currentSegment = segment;
       me.setValue(me.markupForEditor(value)+checkTag);
@@ -217,8 +216,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   privates: {
       getFocusEl: function() {
           if (Ext.isGecko) {
-              console.log("... getFocusEl this.iframeEl:");
-              console.dir(this.iframeEl);
+              console.log("... getFocusEl this.iframeEl id:");
+              console.dir(this.iframeEl.id);
           }
           return Ext.isGecko ? this.iframeEl : Ext.fly(this.getEditorBody());
       }
