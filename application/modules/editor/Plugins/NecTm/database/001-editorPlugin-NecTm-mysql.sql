@@ -27,16 +27,19 @@
 -- */
 
 
+-- enable NecTm-Plugin for front-end user
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
 VALUES ('editor', 'editor', 'frontend', 'pluginNecTm'),
 ('editor', 'admin', 'frontend', 'pluginNecTm'),
 ('editor', 'pm', 'frontend', 'pluginNecTm');
 
+-- configs for NecTm-Plugin
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
 ('runtimeOptions.plugins.NecTm.server', 1, 'editor', 'plugins', '[]', '[]', '', 'list', 'NEC-TM Api Server; format: ["SCHEME://HOST:PORT"]'),
 ('runtimeOptions.plugins.NecTm.credentials', 1, 'editor', 'editor', '[]', '[]', '', 'list', 'Credentials (licenses) to the NEC-TM API; format: ["username:password"]'),
 ('runtimeOptions.plugins.NecTm.topLevelCategoriesIds', 1, 'editor', 'editor', '[]', '[]', '', 'list', 'Only TM data below the top-level categories can be accessed (plus all public data). Enter the NEC-TM\'s tag-ids here, not their tag-names! Example: ["tag391","tag840"]');
 
+-- synch with NecTm-Categories (there: "tags") is handled by worker
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES
 ('runtimeOptions.worker.editor_Plugins_NecTm_Worker.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running workers of the NEC-TM-categories-synchronization worker');

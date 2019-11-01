@@ -83,8 +83,6 @@ class editor_Models_LanguageResources_CategoryAssoc extends ZfExtended_Models_En
         if(is_object($data)){
             $data = json_decode(json_encode($data), true);
         }
-        $test1 = isset($data['categories']);
-        $test2 = isset($data['categories']) && isset($data['id']);
         return isset($data['categories']) && isset($data['id']);
     }
     
