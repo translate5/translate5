@@ -91,6 +91,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     const PM_ALL_INCLUDED = 'allIncluded';
     const PM_NOT_INCLUDED = 'notIncluded';
     
+    /***
+     * The default search type in search and replace
+     * @var string
+     */
+    const DEFAULT_SEARCH_TYPE='normalSearch';
+    
+    /***
+     * The default field when no search field is provided by search and repalce
+     * @var string
+     */
+    const DEFAULT_SEARCH_FIELD='source';
+    
+    
     protected $dbInstanceClass          = 'editor_Models_Db_Segments';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Segment';
     
@@ -198,6 +211,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->reInitDb($taskGuid);
         $this->segmentFieldManager->initFields($taskGuid);
         
+        //set the default search params when no values are given
+        $parameters=$this->setDefaultSearchParameters($parameters);
+        
         //get the search sql string
         $searchQuery=$this->buildSearchString($parameters);
         
@@ -231,9 +247,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             WHERE targetEditToSort  REGEXP '[0-9]';
          */
         $this->addWatchlistJoin($select);
-        $result = $this->loadFilterdCustom($select);
-        
-        return $result;
+        return $this->loadFilterdCustom($select);
     }
     
     /***
@@ -247,11 +261,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
         $queryString=$parameters['searchField'];
         $searchInField=$parameters['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
-        $searchType = $parameters['searchType'] ?? null;
         $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true') : false;
         
         //search type regular expression
-        if($searchType==='regularExpressionSearch'){
+        if($parameters['searchType']==='regularExpressionSearch'){
             //simples way to test if the regular expression is valid
             //try {
                 //@preg_match($patern, 'Test string');
@@ -264,7 +277,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             return $adapter->quoteIdentifier($searchInField).' REGEXP BINARY '.$adapter->quote($queryString);
         }
         //search type regular wildcard
-        if($searchType==='wildcardsSearch'){
+        if($parameters['searchType']==='wildcardsSearch'){
             $queryString=str_replace("*","%",$queryString);
             $queryString=str_replace("?","_",$queryString);
         }
@@ -1706,6 +1719,22 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             }
         }
         return false;
+    }
+    
+    
+    /***
+     * Set the default values for the required search parameters when no value is provided
+     * @param array $parameters
+     * @return array
+     */
+    public function setDefaultSearchParameters(array $parameters){
+        if(empty($parameters['searchInField'])){
+            $parameters['searchInField']=self::DEFAULT_SEARCH_FIELD;
+        }
+        if(empty($parameters['searchType'])){
+            $parameters['searchType']=self::DEFAULT_SEARCH_TYPE;
+        }
+        return $parameters;
     }
     
 }

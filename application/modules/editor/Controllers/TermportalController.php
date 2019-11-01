@@ -206,9 +206,11 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "processstatus"=>$this->translate->_("Prozessstatus"),
                 "instantTranslateInto"=>$this->translate->_("Sofortübersetzung nach"),
                 "TermPortalLanguages"=>$this->translate->_("Terminologieportal-Sprachen"),
-                "AllLanguagesAvailable"=>$this->translate->_("Alle verfügbaren Sprachen")
+                "AllLanguagesAvailable"=>$this->translate->_("Alle verfügbaren Sprachen"),
+                "Anmerkung"=>$this->translate->_("Anmerkung"),
+                "Letzte Änderung"=>$this->translate->_("Letzte Änderung"),
+                "Datum"=>$this->translate->_("Datum")
         );
-        
         $this->view->translations=$translatedStrings;
         
         $term=ZfExtended_Factory::get('editor_Models_Term');
@@ -290,6 +292,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             $allProcessStatus[$processstatus] = $this->translate->_($processstatus);
         }
         $this->view->allProcessstatus = $allProcessStatus;
+        //set the processStatus translations so it can be used in the frontend to
+        $this->view->Php2JsVars()->set('apps.termportal.allProcessstatus',$allProcessStatus);
     }
     
     /**

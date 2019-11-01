@@ -53,6 +53,8 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
     protected $tables = array(
             'LEK_browser_log' => false,
             'LEK_customer' => false,
+            'LEK_categories' => false,
+            'LEK_languageresources_category_assoc' => false,
             'LEK_change_log' => false,
             'LEK_comments' => 'taskGuid',
             'LEK_comment_meta' => 'taskGuid',

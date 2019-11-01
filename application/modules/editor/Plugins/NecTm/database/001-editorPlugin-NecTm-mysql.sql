@@ -35,7 +35,7 @@ VALUES ('editor', 'editor', 'frontend', 'pluginNecTm'),
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
 ('runtimeOptions.plugins.NecTm.server', 1, 'editor', 'plugins', '[]', '[]', '', 'list', 'NEC-TM Api Server; format: ["SCHEME://HOST:PORT"]'),
 ('runtimeOptions.plugins.NecTm.credentials', 1, 'editor', 'editor', '[]', '[]', '', 'list', 'Credentials (licenses) to the NEC-TM API; format: ["username:password"]'),
-('runtimeOptions.plugins.NecTm.topLevelCategoriesIds', 1, 'editor', 'editor', '[]', '[]', '', 'list', 'Only TM data below the top-level categories can be accessed (plus all public data). Enter the tag-ids from NEC-TM here, not their tag-names! Example: ["tag391","tag840"]');
+('runtimeOptions.plugins.NecTm.topLevelCategoriesIds', 1, 'editor', 'editor', '[]', '[]', '', 'list', 'Only TM data below the top-level categories can be accessed (plus all public data). Enter the NEC-TM\'s tag-ids here, not their tag-names! Example: ["tag391","tag840"]');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES

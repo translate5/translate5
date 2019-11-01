@@ -64,6 +64,9 @@
  * @method string getOpenIdServerRoles() getOpenIdServerRoles()
  * @method void setOpenIdServerRoles() setOpenIdServerRoles(string $openIdServerRoles)
  * 
+ * @method string getOpenIdDefaultServerRoles() getOpenIdDefaultServerRoles()
+ * @method void setOpenIdDefaultServerRoles() setOpenIdDefaultServerRoles(string $openIdDefaultServerRoles)
+ * 
  * @method string getOpenIdClientId() getOpenIdClientId()
  * @method void setOpenIdClientId() setOpenIdClientId(string $openIdClientId)
  * 
