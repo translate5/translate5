@@ -52,6 +52,12 @@ class editor_Models_LanguageResources_CategoryAssoc extends ZfExtended_Models_En
         }
         $categories = json_decode($data['categories']);
         if (json_last_error() != JSON_ERROR_NONE) {
+            $logger = Zend_Registry::get('logger');
+            /* @var $logger ZfExtended_Logger */
+            $logger->error('E1179', 'Save category assocs: categories could not be JSON-decoded with message: {msg}', [
+                'msg' => json_last_error_msg(),
+                'data' => $data['categories']
+            ]);
             return;
         }
         $this->addAssocs($categories, $data['id']);

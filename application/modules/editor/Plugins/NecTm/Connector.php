@@ -156,7 +156,12 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             || $this->getLangCodeForNecTm($targetLangRfc) !== $this->targetLangForNecTm) {
                 // If the languages we already stored for the Connector from the LanguageResource differ
                 // from the languages given by the segment now, we really have a problem.
-            error_log('validateLanguages: NOT OK'); // TODO: throw error
+                throw new editor_Plugins_NecTm_Exception('E1182', [
+                    'sourceLangId' => $sourceLangId,
+                    'targetLangId' => $targetLangId,
+                    'sourceLangForNecTm' => $this->sourceLangForNecTm,
+                    'targetLangForNecTm' => $this->targetLangForNecTm
+                ]);
         }
     }
     
@@ -246,8 +251,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_Abstract::update()
      */
     public function update(editor_Models_Segment $segment) {
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
         $source = $this->prepareSegmentContent($this->getQueryString($segment));
         $target = $this->prepareSegmentContent($segment->getTargetEdit());
         $filename = $this->languageResource->getSpecificData('fileName');  //  (= if file was imported for LanguageResource on creation)
@@ -256,18 +259,17 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         }
         
         $errors = $this->api->getErrors();
-        //$messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
         
+        $messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
         $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren Sie Ihren Administrator! <br />Gemeldete Fehler:';
-        $messages->addError($msg, 'core', null, $errors);
-        $log = ZfExtended_Factory::get('ZfExtended_Log');
-        /* @var $log ZfExtended_Log */
-        $msg = 'LanguageResources - could not save segment to TM'." LanguageResource: \n";
-        $data  = print_r($this->languageResource->getDataObject(),1);
-        $data .= " \nSegment\n".print_r($segment->getDataObject(),1);
-        $data .= " \nError\n".print_r($errors,1);
-        $log->logError($msg, $data);
+        $messages->addError($msg, 'plugin.nectm', null, $errors);
+        
+        throw new editor_Plugins_NecTm_Exception('E1183', [
+            'LanguageResource' => print_r($this->languageResource->getDataObject(),1),
+            'Segment' => print_r($segment->getDataObject(),1),
+            'Error' => print_r($errors,1)
+        ]);
     }
     
     /**
@@ -415,11 +417,10 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         $msg = 'Von NEC-TM gemeldeter Fehler';
         $messages->addError($msg, 'core', null, $errors);
         
-        $log = ZfExtended_Factory::get('ZfExtended_Log');
-        /* @var $log ZfExtended_Log */
-        $data  = print_r($this->languageResource->getDataObject(),1);
-        $data .= " \nError\n".print_r($errors,1);
-        $log->logError($logMsg, $data);
+        throw new editor_Plugins_NecTm_Exception('E1162', [
+            'LanguageResource' => print_r($this->languageResource->getDataObject(),1),
+            'Error' => print_r($errors,1)
+        ]);
     }
     
     /**
