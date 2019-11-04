@@ -76,7 +76,7 @@ class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
         }
         $view->Php2JsVars()->set('plugins.ChangeLog.lastSeenChangelogId', $lastChangeLogId);
         
-        $view->headLink()->appendStylesheet(APPLICATION_RUNDIR.'/editor/plugins/resources/changeLog/plugin.css');
+        $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
     }
     
     /**
