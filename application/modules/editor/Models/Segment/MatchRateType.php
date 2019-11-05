@@ -147,7 +147,6 @@ class editor_Models_Segment_MatchRateType {
         self::TYPE_AUTO_ALIGNED,
         self::TYPE_AUTO_PROPAGATED,
         self::TYPE_DOCUMENT_MATCH,
-        self::TYPE_INTERNAL_FUZZY_AVAILABLE,
         self::TYPE_MISSING_SOURCE_MRK,
         self::TYPE_MISSING_TARGET_MRK,
         self::TYPE_INTERACTIVE,
