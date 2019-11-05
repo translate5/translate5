@@ -80,6 +80,12 @@ Ext.define('Editor.util.messageBus.MessageBus', {
          * @cfg {String} url (required) The WebSocket URL
          */
         url: '',
+        
+        
+        /**
+         * @cfg {Object} optional parameters for the WebSocket connection
+         */
+        params: null,
 
         /**
          * @cfg {Boolean} reconnect If true, tries to re-connect the socket if closed by the server
@@ -117,11 +123,17 @@ Ext.define('Editor.util.messageBus.MessageBus', {
     initSocket: function() {
         var ws,
             me = this,
-            url = me.getUrl();
+            url = me.getUrl(),
+            params = me.getParams();
         if(!url) {
             Ext.raise('MessageBus: No URL for the websocket connection was given!');
             return;
         }
+        
+        if(Ext.isObject(params)) {
+            url = url+'?'+Ext.Object.toQueryString(params);
+        }
+        
         ws = me.socket = new WebSocket(url);
         
         /**
