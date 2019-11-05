@@ -50,6 +50,8 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
         $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handlePing'));
+        $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleSegmentSave'));
+        
 
         // FIXME send the session id to the message bus, so that the user is known and allowed to communicate
         // → idea here: Instead listening to a login event, we just attach to the IndexController. 
@@ -98,7 +100,12 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
         /* @var $view Zend_View_Interface */
+        //the configured socket server 
         $view->Php2JsVars()->set('plugins.FrontEndMessageBus.socketServer', $this->getConfig()->socketServer);
+        
+        //a random connectionId. calculating a random value on server side is more reliable as in frontend: 
+        // see https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+        $view->Php2JsVars()->set('plugins.FrontEndMessageBus.connectionId', bin2hex(random_bytes(16)));
         
         $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
     }
@@ -137,6 +144,9 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $session = new Zend_Session_Namespace();
+        if(empty($session->taskGuid)) {
+            return;
+        }
         try {
             $task->loadByTaskGuid($session->taskGuid);
             $event->setParam('task', $task);
@@ -169,6 +179,24 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         
         $this->bus->notify(self::CHANNEL_TASK, 'close', [
             'task' => $task->getDataObject(),
+            'sessionId' => Zend_Session::getId(),
+        ]);
+    }
+    
+    /**
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleSegmentSave(Zend_EventManager_Event $event) {
+        $segment = $event->getParam('entity');
+        /* @var $segment editor_Models_Segment */
+        
+        $f = Zend_Registry::get('frontController');
+        /* @var $f Zend_Controller_Front */
+        $connectionId = $f->getRequest()->getHeader('X-Translate5-MessageBus-ConnId');
+        
+        $this->bus->notify(self::CHANNEL_TASK, 'segmentSave', [
+            'connectionId' => $connectionId,
+            'segment' => $segment->getDataObject(),
             'sessionId' => Zend_Session::getId(),
         ]);
     }

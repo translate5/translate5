@@ -32,18 +32,19 @@ class MessageBus implements MessageComponentInterface
         //we store sessionId and instanceId directly in the connection:
         $conn->sessionId = $data['sessionId'];
         $conn->serverId = $data['serverId'];
+        $conn->connectionId = $data['connectionId'];
         $instance = $this->getInstance($conn->serverId);
         if(empty($instance)) {
             $this->logger->error('connection open: no instance ID was given', LOG_SOCKET);
             $conn->close();
             return;
         }
-        $instance->connect($conn);
+        $instance->onOpen($conn);
     }
     
     public function onClose(ConnectionInterface $conn) {
         $instance = $this->getInstance($conn->serverId);
-        $instance->close($conn);
+        $instance->onClose($conn);
     }
     
     public function onMessage(ConnectionInterface $conn, $message) {
@@ -66,6 +67,8 @@ class MessageBus implements MessageComponentInterface
     public function onError(ConnectionInterface $conn, \Exception $e) {
         //FIXME what means onError? 
         $this->logger->error($e);
+        $instance = $this->getInstance($conn->serverId);
+        $instance->onError($conn);
         //close connection on error? May make sense only in special cases, not in general
         //$instance = $this->getInstance($conn->serverId);
         //$instance->close($conn);

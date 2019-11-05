@@ -85,18 +85,34 @@ class AppInstance {
      * Attach the given conne3ction to the application instance
      * @param ConnectionInterface $conn
      */
-    public function connect(ConnectionInterface $conn) {
+    public function onOpen(ConnectionInterface $conn) {
         $this->connections->attach($conn);
+        $this->eachChannel(__FUNCTION__, $conn);
     }
     
     /**
      * remove the given connection from the application instance
      * @param ConnectionInterface $conn
      */
-    public function close(ConnectionInterface $conn) {
+    public function onClose(ConnectionInterface $conn) {
         //FIXME notify each channel about close, in task channel release locked and selected segments.
         // selected segments should be possible by just send an empty selection userGuid to all other users
+        $this->eachChannel(__FUNCTION__, $conn);
         $this->connections->detach($conn);
+    }
+    
+    /**
+     * remove the given connection from the application instance
+     * @param ConnectionInterface $conn
+     */
+    public function onError(ConnectionInterface $conn, \Exception $e) {
+        $this->eachChannel(__FUNCTION__, $conn, $e);
+    }
+    
+    protected function eachChannel($method, ... $args){
+        foreach($this->channels as $channel) {
+            call_user_func_array([$channel, $method], $args);
+        }
     }
     
     /**
@@ -183,9 +199,6 @@ class AppInstance {
      * @param array $user
      */
     protected function startSession(string $sessionId, array $user) {
-        //we need an additional public usable session ID, since one user can have multiple sessions
-        // to distinguish between the private sessionId, we call the public one sessionHash and store it along the user
-        $user['sessionHash'] = bin2hex(random_bytes(16));
         $this->sessions[$sessionId] = $user;
         //TODO a map from a user to his sessions will also be needed. By userId or userGuid? probably guid, since in task useage we are also using the guids
     }
@@ -222,6 +235,7 @@ class AppInstance {
             $data['connections'][] = [
                 'sessionId' => $conn->sessionId,
                 'instance' => $conn->serverId,
+                'connectionId' => $conn->connectionId,
             ];
         }
         foreach($this->channels as $channel) {

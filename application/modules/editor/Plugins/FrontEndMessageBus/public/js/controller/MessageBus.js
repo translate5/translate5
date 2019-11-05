@@ -57,6 +57,13 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                 segmentOpenAck: 'onSegmentOpenAck',
                 segmentOpenNak: 'onSegmentOpenNak',
                 segmentLocked: 'onSegmentLocked',
+                segmentLeave: 'onSegmentLeave',
+                segmentSave: 'onSegmentSave'
+            }
+        },
+        store: {
+            '#Segments': {
+                prefetch: 'onSegmentPefetch'
             }
         },
         component: {
@@ -64,11 +71,10 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                 initOtherRenderers: 'injectToolTipInfo'
             },
             '#segmentgrid' : {
-                renderrowclass: 'onSegmentUpdate',
+                renderrowclass: 'onSegmentRender',
                 itemclick: 'clickSegment',
                 beforestartedit: 'enterSegment',
                 canceledit: 'leaveSegment',
-                edit: 'leaveSegment'
             }
         }
     },
@@ -85,13 +91,23 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         url.push(conf.socketServer.schema, '://');
         url.push(conf.socketServer.httpHost || window.location.hostname);
         url.push(':', conf.socketServer.port, conf.socketServer.route);
-        // the serverId ensures that we communicate with the correct instance, additional security comes from the sessionId, which must match
-        // authentication by passing the session id to the server
-        url.push('?serverId=', Editor.data.app.serverId, '&sessionId=', Ext.util.Cookies.get(Editor.data.app.sessionKey));
+        
+        Ext.Ajax.setDefaultHeaders(Ext.apply({
+            'X-Translate5-MessageBus-ConnId': conf.connectionId
+        }, Ext.Ajax.getDefaultHeaders()));
         
         me.bus = new Editor.util.messageBus.MessageBus({
             id: 'translate5',
-            url: url.join('')
+            url: url.join(''),
+            params: {
+                // the serverId ensures that we communicate with the correct instance
+                serverId: Editor.data.app.serverId,
+                // additional security comes from the sessionId, which must match
+                // authentication by passing the session id to the server
+                sessionId: Ext.util.Cookies.get(Editor.data.app.sessionKey),
+                //needed to identify different browser windows with same sessionId persistent over reconnections
+                connectionId: conf.connectionId
+            }
         });
         me.segmentUsageData = new Ext.util.Collection();
     },
@@ -102,6 +118,14 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
      */
     onReconnect: function(bus){
         bus.send('instance', 'ping');
+        var me = this,
+            grid = me.getSegmentGrid(),
+            sel;
+
+        if(grid && (sel = grid.getSelectionModel().getSelection()) && sel.length > 0) {
+            me.clickSegment(null, sel[0]);
+        }
+
     },
     enterSegment: function(plugin, context) {
         //if we got the segment, we can proceed with segment opening
@@ -114,6 +138,9 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         me.currentSegmentEditContext = context;
         
             return false;
+    },
+    leaveSegment: function(plugin, context) {
+        this.bus.send('task', 'segmentLeave', [context.record.get('taskGuid'), context.record.get('id')]);
     },
     /**
      * If we receive a segment edit ACK from the server, we open it  
@@ -130,43 +157,65 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     onSegmentOpenNak: function() {
         console.log('onSegmentOpenNak', arguments);
     },
+    onSegmentLeave: function(data) {
+        this.segmentUnlock(this.getSegmentMeta(data.segmentId), data.connectionId);
+    },
+    onSegmentSave: function(data) {
+        var segment,
+            grid = this.getSegmentGrid();
+        if(segment = grid.store.getById(data.segmentId)) {
+            console.log("reload updated segment", segment.data);
+            this.segmentUnlock(this.getSegmentMeta(data.segmentId), data.connectionId, true);
+            segment.load();
+        }
+    },
     onSegmentLocked: function(data) {
         var me = this,
             selectedId = data.segmentId, 
             byUserGuid = data.userGuid,
-            sessionHash = data.sessionHash,
+            connectionId = data.connectionId,
             grid = me.getSegmentGrid(),
             meta = me.getSegmentMeta(selectedId),
             segment;
     
         //remove previous edit lock from that locking connection
         me.segmentUsageData.each(function(meta) {
-            if(meta.editingConn === sessionHash) {
-                meta.editingConn = false;
-                meta.editingUser = false;
-                //remove color mark from previous segment
-                if(segment = grid.store.getById(meta.id)) {
-                    segment.set('editable', segment.getPreviousValue('editable'));
-                    segment.set('autoStateId', segment.getPreviousValue('autoStateId'));
-                    segment.commit(false); //trigger render
-                }
+            me.segmentUnlock(meta, connectionId);
+            if(meta.id !== selectedId) {
+                me.removeUnused(meta);
             }
         });
         
         //add user id as selector to the segment
-        meta.editingConn = sessionHash;
+        meta.editingConn = connectionId;
         meta.editingUser = byUserGuid;
         
         //add color mark to current segment
         if(segment = grid.store.getById(selectedId)) {
-            segment.set('editable', false);
-            segment.set('autoStateId', Editor.data.segments.autoStates.EDITING_BY_USER);
-            segment.commit(false); //trigger render
+            me.markSegmentEdited(segment);
         }
     },
-    leaveSegment: function() {
-        console.log('leaveSegment', arguments);
-        //me.bus.send();
+    markSegmentEdited: function(segment) {
+        segment.set('editable', false);
+        segment.set('autoStateId', Editor.data.segments.autoStates.EDITING_BY_USER);
+        segment.commit(false); //trigger render
+    },
+    segmentUnlock: function(meta, connectionId, keepRender) {
+        var me = this, segment,
+            grid = me.getSegmentGrid();
+
+        if(meta.editingConn !== connectionId) {
+            return;
+        }
+        meta.editingConn = false;
+        meta.editingUser = false;
+        //remove color mark from previous segment
+        if(!keepRender && (segment = grid.store.getById(meta.id))) {
+            segment.set('editable', segment.getPrevious('editable'));
+            segment.set('autoStateId', segment.getPrevious('autoStateId'));
+            segment.commit(false); //trigger render
+            console.log("segment unlocked", segment.data);
+        }
     },
     onMessageBusPong: function() {
         Ext.Logger.info('Received a pong on my ping');
@@ -184,7 +233,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         }
         return map.add({
             id: segmentId,
-            selectingSessions: {},
+            selectingConns: {},
             editingUser: false,
             editingConn: false
         });
@@ -201,31 +250,49 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         var me = this,
             selectedId = data.segmentId, 
             byUserGuid = data.userGuid,
-            sessionHash = data.sessionHash,
+            connectionId = data.connectionId,
             grid = me.getSegmentGrid(),
             meta = me.getSegmentMeta(selectedId),
             segment;
         
         //remove previous selection
         me.segmentUsageData.each(function(meta) {
-            if(Ext.isDefined(meta.selectingSessions[sessionHash])) {
-                delete meta.selectingSessions[sessionHash];
+            if(Ext.isDefined(meta.selectingConns[connectionId])) {
+                delete meta.selectingConns[connectionId];
                 //remove color mark from previous segment
                 if(segment = grid.store.getById(meta.id)) {
                     segment.commit(false); //trigger render
                 }
             }
+            if(meta.id !== selectedId) {
+                me.removeUnused(meta);
+            }
         });
         
         //add user id as selector to the segment
-        meta.selectingSessions[sessionHash] = byUserGuid;
+        meta.selectingConns[connectionId] = byUserGuid;
         
         //add color mark to current segment
         if(segment = grid.store.getById(selectedId)) {
             segment.commit(false); //trigger render
         }
     },
-    onSegmentUpdate: function(rowClass, segment, index, store) {
+    removeUnused: function(meta) {
+        if(meta && Ext.Object.isEmpty(meta.selectingConns) && !meta.editingConn && !meta.editingUser) {
+            this.segmentUsageData.remove(meta);
+        }
+    },
+    onSegmentPefetch: function(store, segments) {
+        var me = this;
+        Ext.Array.each(segments, function(segment){
+            var meta = me.segmentUsageData.get(segment.get('id'));
+            if(meta && meta.editingConn && meta.editingUser) {
+                me.markSegmentEdited(segment);
+            }
+            
+        });
+    },
+    onSegmentRender: function(rowClass, segment, index, store) {
         //modify rowClass here
         var me = this, 
             meta = me.segmentUsageData.get(segment.get('id')),
@@ -238,19 +305,18 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         }
         //check if segment is edited by somebody
         if(meta.editingConn) {
-            meta.editingConn = sessionHash;
-            meta.editingUser = byUserGuid;
             trackedUser = tracking.getAt(tracking.findExact('userGuid', meta.editingUser));
+            
             if(trackedUser) {
                 rowClass.push('other-user-edit'); 
                 rowClass.push('usernr-'+trackedUser.get('taskOpenerNumber'));
                 return false; 
             }
-            return; //if the segment is edited, this should be visualized.
+            return; //if the segment is edited, this should be visualized and not the following selection stuff
         }
         //check if segment is selected by somebody and colorize it, but only if it is not edited. 
-        if(meta.selectingSessions) {
-            Ext.Object.each(meta.selectingSessions, function(sessionHash, userGuid) {
+        if(meta.selectingConns) {
+            Ext.Object.each(meta.selectingConns, function(connectionId, userGuid) {
                 trackedUser = tracking.getAt(tracking.findExact('userGuid', userGuid));
                 if(trackedUser) {
                     rowClass.push('other-user-select');
@@ -259,6 +325,21 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                 }
             });
         }
+    },
+    onResyncSession: function() {
+        var sessionId = Ext.util.Cookies.get(Editor.data.app.sessionKey);
+        Ext.Ajax.request({
+            url: Editor.data.restpath+'session/'+sessionId+'/resync/operation',
+            method: "POST",
+            scope: this,
+            success: function(response){
+                Ext.Logger.info('Session resync successfull');
+            }, 
+            failure: function(response){
+                Ext.Logger.warn('Session resync failed!');
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        })
     },
     /**
      * Injects the selecting users into the segmentNrInTask and AutoState tooltip
@@ -272,8 +353,8 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                 var meta = me.segmentUsageData.get(record.get('id')),
                     result = [], trackedUser;
                 //if we have a meta entry to the rendering segment, check selections
-                if(Ext.isDefined(meta) && meta.selectingSessions) {
-                    Ext.Object.each(meta.selectingSessions, function(sessionHash, userGuid) {
+                if(Ext.isDefined(meta) && meta.selectingConns) {
+                    Ext.Object.each(meta.selectingConns, function(connectionId, userGuid) {
                         trackedUser = tracking.getAt(tracking.findExact('userGuid', userGuid));
                         trackedUser && result.push(trackedUser.get('userName'));
                     });
@@ -295,20 +376,5 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             },
             scope: me
         };
-    },
-    onResyncSession: function() {
-        var sessionId = Ext.util.Cookies.get(Editor.data.app.sessionKey);
-        Ext.Ajax.request({
-            url: Editor.data.restpath+'session/'+sessionId+'/resync/operation',
-            method: "POST",
-            scope: this,
-            success: function(response){
-                Ext.Logger.info('Session resync successfull');
-            }, 
-            failure: function(response){
-                Ext.Logger.warn('Session resync failed!');
-                Editor.app.getController('ServerException').handleException(response);
-            }
-        })
     }
 });

@@ -39,41 +39,32 @@ class Task extends Channel {
         }
         
         //release other segment(s) of this session/connection
-        if(!empty($request->conn->openedSegmentId)) {
-            unset($this->editedSegments[$request->conn->openedSegmentId]);
-        }
+        $this->releaseLocalSegment($request->conn->openedSegmentId ?? 0);
         
-        if(empty($this->editedSegments[$segmentId])) {
-            $commandToSender = 'segmentOpenAck'; //ACK
-            $request->conn->openedSegmentId = $segmentId;
-            $this->editedSegments[$segmentId] = $request->conn;
-        }
-        else {
-            $commandToSender = 'segmentOpenNak'; //NAK
-        }
-
         //sending the other users that the segment is locked
         $result = FrontendMsg::create(self::CHANNEL_NAME, 'segmentLocked', [
             'segmentId' => $segmentId,
             'userGuid' => $this->instance->getSession($currentSessionId, 'userGuid'),
-            'sessionHash' => $this->instance->getSession($currentSessionId, 'sessionHash'),
+            'connectionId' => $request->conn->connectionId,
         ]);
         
-        foreach($this->instance->getConnections() as $conn) {
-            /* @var $conn ConnectionInterface */
-            if(!in_array($conn->sessionId, $sessionsForTask)) {
-                //ignore myself and ignore all other connections not belonging to that task
-                continue;
-            }
-            //since we reuse the FrontendMsg we have to change the command on each answer
-            if($conn === $request->conn) {
-                $result->command = $commandToSender;
-            }
-            else {
-                $result->command = 'segmentLocked';
-            }
-            $conn->send((string) $result);
+        if(!empty($this->editedSegments[$segmentId])) {
+            $result->command = 'segmentOpenNak'; //NAK
+            $request->conn->send((string) $result);
+            return;
         }
+        
+        //send ACK to requesting user
+        $result->command = 'segmentOpenAck';
+        $request->conn->send((string) $result);
+        
+        //registered opened segment locally
+        $request->conn->openedSegmentId = $segmentId;
+        $this->editedSegments[$segmentId] = $request->conn;
+        
+        //send lock info to other task users
+        $result->command = 'segmentLocked';
+        $this->sendToTaskUsers($taskGuid, $currentSessionId, $result, $request->conn);
     }
     
     /**
@@ -81,12 +72,44 @@ class Task extends Channel {
      * @param FrontendMsg $request
      */
     public function segmentClick(FrontendMsg $request) {
-        $currentSessionId = $request->conn->sessionId;
-        
-        settype($request->payload[0], 'string');
         settype($request->payload[1], 'integer');
-        $taskGuid = $request->payload[0];
         
+        $result = FrontendMsg::create(self::CHANNEL_NAME, 'segmentselect', [
+            'segmentId' => $request->payload[1],
+            'userGuid' => $this->instance->getSession($request->conn->sessionId, 'userGuid'),
+            'connectionId' => $request->conn->connectionId,
+        ]);
+        
+        $this->sendToOthersOnTask($request, $result);
+    }
+    
+    public function segmentLeave(FrontendMsg $request) {
+        $this->releaseLocalSegment($request->conn->openedSegmentId ?? 0);
+        $this->sendToOthersOnTask($request, FrontendMsg::create(self::CHANNEL_NAME, 'segmentLeave', [
+            'segmentId' => $request->payload[1],
+            'userGuid' => $this->instance->getSession($request->conn->sessionId, 'userGuid'),
+            'connectionId' => $request->conn->connectionId,
+        ]));
+    }
+    
+    /**
+     * Sends the $result msg to all other connections expect the one where $request is coming from
+     * @param FrontendMsg $request
+     * @param FrontendMsg $result
+     */
+    protected function sendToOthersOnTask(FrontendMsg $request, FrontendMsg $result) {
+        settype($request->payload[0], 'string');
+        $this->sendToTaskUsers($request->payload[0], $request->conn->sessionId, $result, $request->conn);
+    }
+    
+    /**
+     * Sends the $result FrontendMsg to all connections of a task. Expect to the optionally given $connectionToExclude which will mostly be the initiator itself
+     * @param string $taskGuid
+     * @param string $currentSessionId
+     * @param FrontendMsg $result
+     * @param ConnectionInterface $connectionToExclude
+     */
+    protected function sendToTaskUsers(string $taskGuid, string $currentSessionId, FrontendMsg $result, ConnectionInterface $connectionToExclude = null) {
         $sessionsForTask = $this->taskToSessionMap[$taskGuid] ?? [];
         
         if(!in_array($currentSessionId, $sessionsForTask)) {
@@ -94,15 +117,10 @@ class Task extends Channel {
             return;
         }
         
-        $result = FrontendMsg::create(self::CHANNEL_NAME, 'segmentselect', [
-            'segmentId' => $request->payload[1],
-            'userGuid' => $this->instance->getSession($currentSessionId, 'userGuid'),
-            'sessionHash' => $this->instance->getSession($currentSessionId, 'sessionHash'),
-        ]);
-        
         foreach($this->instance->getConnections() as $conn) {
             /* @var $conn ConnectionInterface */
-            if($conn === $request->conn || !in_array($conn->sessionId, $sessionsForTask)) {
+            $excludeConnection = !is_null($connectionToExclude) && $conn === $connectionToExclude;
+            if($excludeConnection || !in_array($conn->sessionId, $sessionsForTask)) {
                 //ignore myself and ignore all other connections not belonging to that task
                 continue;
             }
@@ -110,20 +128,58 @@ class Task extends Channel {
         }
     }
     
-    public function segmentOpen(FrontendMsg $request) {
-        //we have to send a true / false answer to the current connection wether the segment can be locked or not. 
-        // If a segment is already locked, it can not be locked again.
-        //since segmentId is unique per instance, a storage like $this->lockedSegments[$segmentId] = $userGuid should be sufficient.
-        //return false here should stop 
+    /**
+     * Release an internally locked segment
+     * @param ConnectionInterface $conn
+     */
+    protected function releaseLocalSegment(int $segmentId) {
+        if(!empty($segmentId) && !empty($this->editedSegments[$segmentId])) {
+            $conn = $this->editedSegments[$segmentId];
+            $conn->openedSegmentId = null;
+            unset($this->editedSegments[$segmentId]);
+        }
     }
     
-    public function segmentSave(FrontendMsg $request) {
-        
+    /**
+     * remove the given connection from the application instance
+     * @param ConnectionInterface $conn
+     */
+    public function onClose(ConnectionInterface $conn) {
+        $this->releaseLocalSegment($conn->openedSegmentId ?? 0); 
     }
     
     /*************************
      * Backend Methods
      *************************/
+    
+    /**
+     * handles a segment save (PUT) in translate5. 
+     * Segment saving can not be handled on websocket level, since if the segmentsave is triggered via websockets, the segment data is not yet in the DB. 
+     * To solve that we would have to invoke in one of the frontend final save callbacks - or as it is done now just on the segment PUT in translate5 backend.  
+     * @param string $connectionId
+     * @param array $segment
+     * @param string $sessionId
+     */
+    public function segmentSave(string $connectionId, array $segment, string $sessionId) {
+        $this->releaseLocalSegment($segment['id']);
+
+        //find the connection of the saver to exclude it in the answer
+        $connectionToExclude = null;
+        foreach($this->instance->getConnections() as $conn) {
+            //the session must match too, otherwise the connectionId was spoofed
+            if($conn->connectionId === $connectionId && $conn->sessionId === $sessionId) {
+                $connectionToExclude = $conn;
+                break;
+            }
+        }
+        
+        //$exlcudeMySelf über connection Liste und connectionId
+        $this->sendToTaskUsers($segment['taskGuid'], $sessionId, FrontendMsg::create(self::CHANNEL_NAME, 'segmentSave', [
+            'segmentId' => (int) $segment['id'],
+            'userGuid' => $this->instance->getSession($sessionId, 'userGuid'),
+            'connectionId' => $connectionId,
+        ]), $connectionToExclude);
+    }
     
     /**
      * Open the task for the session
@@ -151,6 +207,13 @@ class Task extends Channel {
     }
     
     public function debug(): array {
-        return ['taskToSessions' => $this->taskToSessionMap];
+        $segments = [];
+        foreach($this->editedSegments as $segId => $conn) {
+            $segments[$segId] = $conn->connectionId;
+        }
+        return [
+            'taskToSessions' => $this->taskToSessionMap,
+            'editedSegments' => $segments
+        ];
     }
 }
