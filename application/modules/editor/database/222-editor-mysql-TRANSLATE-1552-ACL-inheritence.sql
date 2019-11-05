@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -15,8 +14,9 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -25,4 +25,12 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-$this->subject = $this->translate->_('Terminologie vorschläge');
+
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
+VALUES ('editor', 'pm', 'auto_set_role', 'editor'),
+('editor', 'admin', 'auto_set_role', 'editor'),
+('editor', 'admin', 'auto_set_role', 'pm'),
+('editor', 'api', 'auto_set_role', 'editor'),
+('editor', 'api', 'auto_set_role', 'pm'),
+('editor', 'api', 'auto_set_role', 'admin');
