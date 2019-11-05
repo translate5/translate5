@@ -136,6 +136,7 @@ class editor_Models_Import {
      * @return editor_Models_Task
      */
     public function createTask(stdClass $params) {
+        $config = Zend_Registry::get('config');
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->setTaskName($params->taskName);
@@ -144,6 +145,7 @@ class editor_Models_Import {
         $task->setEdit100PercentMatch((int)$params->editFullMatch);
         $task->setLockLocked((int)$params->lockLocked);
         $task->setImportAppVersion(ZfExtended_Utils::getAppVersion());
+        $task->setUsageMode($config->runtimeOptions->import->initialTaskUsageMode);
         
         $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $pm ZfExtended_Models_User */
@@ -168,7 +170,6 @@ class editor_Models_Import {
         $task->setWordCount($params->wordCount);
         $task->setTargetDeliveryDate($params->targetDeliveryDate);
         $task->setOrderdate($params->orderDate);
-        $config = Zend_Registry::get('config');
         //Task based Source Editing can only be enabled if its allowed in the whole editor instance 
         $enableSourceEditing = (bool) $config->runtimeOptions->import->enableSourceEditing;
         $task->setEnableSourceEditing((int) (! empty($params->enableSourceEditing) && $enableSourceEditing));
