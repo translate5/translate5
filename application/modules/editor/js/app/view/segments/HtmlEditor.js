@@ -617,8 +617,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
     
       Ext.each(node.childNodes, function(item){
-          var markupImage,
-              text, img;
+          var text;
           if(Ext.isTextNode(item)){
               text = item.data;
               result.push(Ext.htmlEncode(text));
@@ -809,7 +808,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
           }
           else {
-              if(img.parentNode.nodeName.toLowerCase()!=="del") {
+        	  //TODO: add nodes without ids ?
+              //if(img.parentNode.nodeName.toLowerCase()!=="del" && img.id && img.id!="") {
+        	  if(img.parentNode.nodeName.toLowerCase()!=="del") {
                   foundIds.push(img.id);
               }
           }
