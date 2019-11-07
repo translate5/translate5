@@ -65,13 +65,11 @@ class MessageBus implements MessageComponentInterface
     }
     
     public function onError(ConnectionInterface $conn, \Exception $e) {
-        //FIXME what means onError? 
+        echo 'Exception '.get_class($e).': '.$e->getMessage()."\n";
+        echo ' in '.$e->getFile().' ('.$e->getLine().')'."\n";
         $this->logger->error($e);
         $instance = $this->getInstance($conn->serverId);
         $instance->onError($conn);
-        //close connection on error? May make sense only in special cases, not in general
-        //$instance = $this->getInstance($conn->serverId);
-        //$instance->close($conn);
     }
     
     /**

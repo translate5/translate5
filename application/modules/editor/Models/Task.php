@@ -525,9 +525,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function cleanupLockedJobs() {
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
-        //this gives us the possibility to define session independant locks:
-        $validSessionIds .= ' union select distinct lockedInternalSessionUniqId sessionMapInternalUniqId from LEK_task where lockedInternalSessionUniqId like "'.self::INTERNAL_LOCK.'%"';
-        $where = 'not locked is null and (lockedInternalSessionUniqId not in ('.$validSessionIds.') or lockedInternalSessionUniqId is null)';
+        //the below not like "*translate5InternalLock*%" gives us the possibility to define session independant locks:
+        $where = 'not locked is null and (
+            lockedInternalSessionUniqId not in ('.$validSessionIds.')
+            and lockedInternalSessionUniqId not like "*translate5InternalLock*%" 
+            or lockedInternalSessionUniqId is null)';
         $this->db->update(array('lockingUser' => null, 'locked' => null, 'lockedInternalSessionUniqId' => null), $where);
         
         //clean up remaining multi user task locks where no user is editing anymore 
@@ -551,7 +553,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param string $lockId String to distinguish different lock types 
      * @return boolean
      */
-    public function lock(string $datetime, string $lockId): bool {
+    public function lock(string $datetime, string $lockId = ''): bool {
         return $this->_lock($datetime, ZfExtended_Models_User::SYSTEM_GUID, self::INTERNAL_LOCK.$lockId);
     }
     
