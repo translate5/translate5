@@ -55,7 +55,9 @@ Ext.define('Editor.view.searchandreplace.TabPanel', {
         replaceAllButton:'#UT#Alles ersetzen',
         searchButton:'#UT#Suchen',
         replaceButton:'#UT#Ersetzen',
-        mqmNotSupporterTooltip:'#Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt'
+        mqmNotSupporterTooltip:'#UT#Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt',
+        multiUsersTooltip:'#UT#Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe'
+        	
     },
     
     initConfig : function(instanceConfig) {
@@ -95,8 +97,8 @@ Ext.define('Editor.view.searchandreplace.TabPanel', {
                         },
                         bind:{
                             visible:'{!isSearchView}',
-                            disabled:'{isDisableReplaceButton}',
-                            tooltip:'{isMqmTooltip}'
+                            disabled:'{isDisableReplaceAllButton}',
+                            tooltip:'{isReplaceAllTooltip}'
                         },
                         text: me.strings.replaceAllButton
                     },{ 
