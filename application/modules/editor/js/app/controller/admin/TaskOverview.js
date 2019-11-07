@@ -99,21 +99,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskImportButtonText:'#UT#Aufgabe importieren',
       taskDeleteButtonText:'#UT#Aufgabe löschen'
   },
-  listen: {
-      messagebus: {
-          '#translate5 task': {
-              test: function() {
-                  //FIXME remove me
-                  alert("DEMO OPEN");
-              },
-              
-              open: function() {
-                  //FIXME remove me
-                  alert("DEMO OPEN");
-              }
-          }
-      }
-  },
   init : function() {
       var me = this;
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings

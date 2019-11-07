@@ -190,7 +190,7 @@ Ext.define('Editor.controller.ChangeAlike', {
         //id des bearbeiteten Segments
         id = rec.get('id'),
         store = me.getStore('AlikeSegments'),
-        segmentStore = me.getSegmentGrid().getStore()
+        segmentStore = me.getSegmentGrid().getStore(),
         segmentsProxy = segmentStore.getProxy(),
         params = {};
     

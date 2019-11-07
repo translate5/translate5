@@ -248,7 +248,6 @@ Ext.define('Editor.controller.Segments', {
     var me = this,
         store = me.getSegmentsStore(),
         grid = me.getSegmentGrid(),
-        btn = me.getWatchListFilterBtn(),
         filters = me.getSegmentGrid().filters;
     grid.selModel.deselectAll();
     me.clearSegmentSort();
@@ -269,7 +268,6 @@ Ext.define('Editor.controller.Segments', {
         grid = me.getSegmentGrid(),
         gridFilters = grid.filters,
         filters = gridFilters.store.filters,
-        btn = me.getWatchListFilterBtn(),
         found = false,
         otherFound = false,
         column;
@@ -305,7 +303,6 @@ Ext.define('Editor.controller.Segments', {
   handleWatchlistRemoved: function(rec) {
       var me = this, 
           btn = me.getWatchListFilterBtn();
-          store = me.getSegmentsStore();
       if(!btn.pressed) {
           return;
       }
