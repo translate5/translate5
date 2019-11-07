@@ -16,11 +16,8 @@
  */
 $configuration = [
     'messageServer' => [
-        //address: IP address or UNIX socket to listen for connections of translate5 instances 
+        //address: IP address to listen for connections of translate5 instances 
         // MUST match the server configured in messageServer config in the instance. 
-        // UNIX sockets should be used here if possible, to reduce latency.
-        // where possible means if IP is a localdevice and OS is unixoid
-        // Example: unix:///tmp/translate5MessageBus or 127.0.0.1
         'address' => '127.0.0.1',
         
         //port:       Port to listen on.
@@ -29,7 +26,7 @@ $configuration = [
     ],
     'socketServer' => [
         //httpHost:   HTTP hostname clients intend to connect to. 
-        // MUST match the socketServer config in the instance. 
+        // IMPORTANT MUST match the socketServer config in the translate5 instance and (if used) in Apache ProxyPass statement! 
         // (MUST match JS `new WebSocket('ws://$httpHost');`)
         'httpHost' => 'SET.A.VALID.HOSTNAME.HERE',
         
