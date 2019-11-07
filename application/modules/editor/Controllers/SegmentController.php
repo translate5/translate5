@@ -336,8 +336,15 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      */
     public function replaceallAction(){
         $parameters=$this->getAllParams();
+
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($parameters['taskGuid']);
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $t ZfExtended_Zendoverwrites_Translate */;
+        /* @var $t ZfExtended_Zendoverwrites_Translate */
+        if($task->getUsageMode()==$task::USAGE_MODE_SIMULTANEOUS){
+            throw new editor_Models_SearchAndReplace_Exception('E1192',['task'=>$task]);
+        }
         
         //check if the required search parametars are in the request
         $this->checkRequiredSearchParameters($parameters);
