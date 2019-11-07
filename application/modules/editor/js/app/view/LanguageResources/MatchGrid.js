@@ -132,19 +132,21 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
           },{
 	          xtype: 'gridcolumn',
 	          flex: 5,
+              enableTextSelection: true,
 			  hideable: false,
 			  sortable: false,
 	          cellWrap: true,
-			  tdCls: 'segment-tag-column source '+segField.getDirectionCls('source'),
+			  tdCls: 'x-selectable segment-tag-column source '+segField.getDirectionCls('source'),
 	          dataIndex: 'source',
 	          text: me.strings.source
 	      },{
 	          xtype: 'gridcolumn',
 	          flex: 5,
+              enableTextSelection: true,
 			  hideable: false,
 		      sortable: false,
 	          cellWrap: true,
-			  tdCls: 'segment-tag-column target '+segField.getDirectionCls('target'),
+			  tdCls: 'x-selectable segment-tag-column target '+segField.getDirectionCls('target'),
 	          dataIndex: 'target',
 	          text: me.strings.target
 	      },{
