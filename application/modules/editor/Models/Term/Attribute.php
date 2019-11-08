@@ -709,12 +709,29 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     
     public function getDataObject() {
         $result=parent::getDataObject();
+        //TODO: for non proposal users, ignore the custom attribute values for the api
         //set the attribute origin type(when no termId is provided it is termEntry attribute otherwise term attribute)
         $result->attributeOriginType=empty($result->termId) ? 'termEntryAttribute' : 'termAttribute';
         $result->attributeId=$result->id;
         $result->proposable=$this->isProposableAllowed() && $this->isProposable($result->name,$result->attrType);
         $result->attrProcessStatus=$result->processStatus;//used by termporatl
         $result->attrValue=$result->value;//used by termporatl
+        //get the attribute header for the label
+        //the header value will be translated
+        $result->headerText=$result->name.' '.$result->attrType;
+        try {
+            $label=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
+            /* @var $label editor_Models_TermCollection_TermAttributesLabel */
+            $label->load($result->labelId);
+            if($label->getLabelText()!=null && $label->getLabelText()!=''){
+                $result->headerText=$label->getLabelText();
+            }
+        } catch (Exception $e) {
+            //just catch if unfound is thrown
+        }
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        //translate the header text
+        $result->headerText=$translate->_($result->headerText);
         return $result;
     }
 }
