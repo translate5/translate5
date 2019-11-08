@@ -263,9 +263,13 @@ var ComponentEditor={
         
         //check if the new term request should be canceled (empty value)
         if($input.val() === '' || $.trim($input.val()) === ''){
-            Term.newTermLanguageId=null;
-            Term.newTermRfcLanguage=null;
-            Term.findTermsAndAttributes(Term.newTermGroupId);
+        	//the new term proposal is canceled, reset all new proposal data and reload the term entry
+        	var termEntryIdReload=Term.newTermTermEntryId;
+        	//reset the instanttranslate termproposal flag 
+        	isTermProposalFromInstantTranslate=false;
+            Term.resetNewTermData();
+            //reload the term entry
+            Term.findTermsAndAttributes(termEntryIdReload);
             return;
         }
 		
@@ -394,6 +398,7 @@ var ComponentEditor={
 	        $elParent.attr('data-term-value', result.term);
 	        $elParent.attr('data-term-id', result.termId);
 	        $elParent.attr('data-groupid', result.groupId);
+	        $elParent.attr('data-termEntryId', result.termEntryId);
 	        
 		}else{
 			renderData=Attribute.getAttributeRenderData(result,result.value);

@@ -56,13 +56,13 @@ var selectItem = function (event, ui) {
     }
     if (origEvent.type === 'click'){
         event.preventDefault();
-        console.log('clicked item: ' + ui.item.groupId);
+        console.log('clicked item: ' + ui.item.termEntryId);
         Term.searchTerm(ui.item.label);
         Term.disableLimit=true;
         return;
     }
 
-    console.log('selectItem: ' + ui.item.groupId);
+    console.log('selectItem: ' + ui.item.termEntryId);
     
     //empty term options component
     $('#searchTermsSelect').empty();
@@ -73,12 +73,12 @@ var selectItem = function (event, ui) {
         showFinalResultContent();
     }
     
-    console.log('selectItem: ' + ui.item.groupId);
+    console.log('selectItem: ' + ui.item.termEntryId);
 
     Term.fillSearchTermSelect(ui.item.label);
-    
+
     //find the attributes for
-    Term.findTermsAndAttributes(ui.item.groupId);
+    Term.findTermsAndAttributes(ui.item.termEntryId);
     //$('#search').val(ui.item.value);
     return false;
 };

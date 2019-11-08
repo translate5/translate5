@@ -87,7 +87,7 @@ var Term={
             me.newTermTermEntryId = $selected.attr('data-termentryid');
             me.newTermGroupId = $selected.attr('data-value');
             // show Terms and Attributes
-            me.findTermsAndAttributes($selected.attr('data-value'));
+            me.findTermsAndAttributes($selected.attr('data-termentryid'));
 		},
 		
 		/***
@@ -263,7 +263,7 @@ var Term={
                 me.newTermGroupId = me.searchTermsResponse[0].groupId;
 	            me.newTermTermEntryId = me.searchTermsResponse[0].termEntryId;
 				console.log('fillSearchTermSelect: only one record => find the attributes and display them');
-				me.findTermsAndAttributes(me.searchTermsResponse[0].groupId);
+				me.findTermsAndAttributes(me.searchTermsResponse[0].termEntryId);
 				return;
 			}
 			
@@ -279,32 +279,32 @@ var Term={
 		},
 		
 		/***
-		 * Find all terms and terms attributes for the given term entry id (groupId)
-		 * @param termGroupid
+		 * Find all terms and terms attributes for the given term entry id
+		 * @param termEntryId
 		 * @returns
 		 */
-		findTermsAndAttributes:function(termGroupid){
-		    if (termGroupid === undefined) {
+		findTermsAndAttributes:function(termEntryId){
+		    if (termEntryId === undefined) {
 		        return; // TODO (quick & dirty - the REAL problem is: this should not happen at all!!)
 		    }
 			var me=this;
-		    console.log('findTermsAndAttributes() for: ' + termGroupid);
+		    console.log('findTermsAndAttributes() for: ' + termEntryId);
 		    Attribute.languageDefinitionContent=[];
             
             me.$_termCollectionSelect.hide();
             
 		    //check the cache
             if (me.reloadTermEntry) {
-                me.termGroupsCache = []; // FIXME: better remove only the groupId's items from the cache instead of setting reloadTermEntry to true!
+                me.termGroupsCache = []; // FIXME: better remove only the termEntryId's items from the cache instead of setting reloadTermEntry to true!
                 me.reloadTermEntry=false; //reset term entry reload flag
                 
                 //hide the no result error if the term is created via no found search
                 me.$_searchErrorNoResults.hide();
                 me.resetNewTermData();
             }
-		    if(me.termGroupsCache[termGroupid]){
-		    	TermEntry.drawTermEntryAttributes(me.termGroupsCache[termGroupid].rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
-		        me.drawTermTable(me.termGroupsCache[termGroupid].rows[me.KEY_TERM_ATTRIBUTES]);
+		    if(me.termGroupsCache[termEntryId]){
+		    	TermEntry.drawTermEntryAttributes(me.termGroupsCache[termEntryId].rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
+		        me.drawTermTable(me.termGroupsCache[termEntryId].rows[me.KEY_TERM_ATTRIBUTES]);
 		        return;
 		    }
 		    
@@ -313,7 +313,7 @@ var Term={
 		        dataType: 'json',
 		        type: 'POST',
 		        data: {
-		            'groupId':termGroupid,
+		            'termEntryId':termEntryId,
 		            'collectionId':getFilteredCollections()
 		        },
 		        success: function(result){
@@ -325,7 +325,7 @@ var Term={
 		        	}
 		        	
 		            //store the results to the cache
-		            me.termGroupsCache[termGroupid]=result;
+		            me.termGroupsCache[termEntryId]=result;
 		            
 		            TermEntry.drawTermEntryAttributes(result.rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
 
@@ -524,6 +524,7 @@ var Term={
             termHeader.push('data-term-value="'+term.term+'"');
             termHeader.push('data-term-id="'+term.termId+'"');
             termHeader.push('data-groupid="'+term.groupId+'"');
+            termHeader.push('data-termEntryId="'+term.termEntryId+'"');
             termHeader.push('data-language="'+term.languageId+'"');
             if (term.proposal && term.proposal !== undefined) {
             	termHeader.push('data-proposal="'+term.proposal.term+'"');
@@ -961,6 +962,7 @@ var Term={
                 'definition': '',
                 'desc': '',
                 'groupId': me.newTermGroupId,
+                'termEntryId': me.newTermTermEntryId,
                 'label': '',
                 'languageId': me.newTermLanguageId,
                 'proposal': null,
@@ -1138,7 +1140,7 @@ var Term={
 				//ajax call to the remove proposal action
 				var me=event.data.scope,
 					url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace('{ID}',$parent.attr("data-term-id")),
-					groupId=$parent.data('groupid') || me.newTermGroupId;
+					termEntryId=$parent.data('termEntryId') || me.newTermTermEntryId;
 
 				$.ajax({
 			        url: url,
@@ -1148,7 +1150,7 @@ var Term={
 			        	me.reloadTermEntry=true;
 			        	//reload the termEntry when the term is removed
 			        	if(!result.rows || result.rows.length === 0){
-			        		me.findTermsAndAttributes(groupId);
+			        		me.findTermsAndAttributes(termEntryId);
 			        		return;
 			        	}
 			        	me.onTermProposalRemove($parent,result.rows);
@@ -1320,14 +1322,14 @@ var Term={
     	/***
          * Get term data from the cache
          */
-        getTermDataFromCache:function(termGroupid,termId){
+        getTermDataFromCache:function(termEntryId,termId){
         	var me=this,
         		data=[];
         	
-        	if(!me.termGroupsCache[termGroupid] || !me.termGroupsCache[termGroupid].rows || !me.termGroupsCache[termGroupid].rows[me.KEY_TERM_ATTRIBUTES]){
+        	if(!me.termGroupsCache[termEntryId] || !me.termGroupsCache[termEntryId].rows || !me.termGroupsCache[termEntryId].rows[me.KEY_TERM_ATTRIBUTES]){
         		return data;
         	}
-        	data=me.termGroupsCache[termGroupid].rows[me.KEY_TERM_ATTRIBUTES];
+        	data=me.termGroupsCache[termEntryId].rows[me.KEY_TERM_ATTRIBUTES];
     		for(var i=0;i<data.length;i++){
         		var term=data[i];
         		//the field value in cache is the termid
@@ -1348,9 +1350,10 @@ var Term={
 				$termHeader=Term.getTermHeader(term.termId),
 				instantTranslateInto=Term.renderInstantTranslateIntegrationForTerm(term.language),
 				$termAttributeHolder=$termHeader.next('div[data-term-id]');
-			
+
 			$termAttributeHolder.attr('data-term-id', term.termId);
 			$termAttributeHolder.attr("data-groupid",term.groupId);
+			$termAttributeHolder.attr("data-termEntryId",term.termEntryId);
 			$termAttributeHolder.empty();
 			$termAttributeHolder.append(attributeRenderData);
 			
