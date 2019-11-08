@@ -33,7 +33,8 @@ END LICENSE AND COPYRIGHT
  *
 
 /**
- * abstract base class for ex und import of excel files
+ * abstract base class for ex und import of excel files containing segment-data.
+ * TODO: move this whole Excel-package to Segments-folder.
  */
 abstract class editor_Models_Excel_AbstractExImport {
     /**

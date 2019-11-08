@@ -163,6 +163,14 @@ class editor_TaskController extends ZfExtended_RestController {
         ])
         ->addActionContext('export', 'importArchive')
         
+        ->addContext('xlsx', [
+            'headers' => [
+                'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // TODO Content-Type prüfen
+            ]
+        ])
+        ->addActionContext('index', 'xlsx')
+        
+        
         /*
         ->addContext('excel', [
             'headers' => [
@@ -207,8 +215,29 @@ class editor_TaskController extends ZfExtended_RestController {
         $f = $this->entity->getFilter();
         $f->hasSort() || $f->addSort('orderdate', true);
         
-        $this->view->rows = $this->loadAll();
+        $rows = $this->loadAll();
+        $this->view->rows = $rows;
         $this->view->total = $this->totalCount;
+        
+        $kpi = ZfExtended_Factory::get('editor_Models_KPI');
+        /* @var $kpi editor_Models_KPI */
+        $kpi->setTasks($rows);
+        $kpiStatistics = $kpi->getStatistics();
+        //since we don't use metaData otherwise, we can overwrite it completely:
+        $this->view->metaData = new stdClass();
+        $this->view->metaData->statistics = $kpiStatistics;
+        
+        // ... or as Metadata-Excel-Export (= task-overview, filter, key performance indicators KPI):
+        $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
+        if ($context == 'xlsx') {
+            $exportMetaData = ZfExtended_Factory::get('editor_Models_Task_Export_Metadata');
+            /* @var $exportMetaData editor_Models_Task_Export_Metadata */
+            $exportMetaData->setTasks($rows);
+            $exportMetaData->setFilters(json_decode($this->getParam('filter')));
+            $exportMetaData->setColumns(json_decode($this->getParam('visibleColumns')));
+            $exportMetaData->setKpiStatistics($kpiStatistics);
+            $exportMetaData->exportAsDownload();
+        }
     }
     
     /**

@@ -939,4 +939,35 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $segment->save();
         }
     }
+    
+    /**
+     * Returns the matching of col-names as set in Editor.view.admin.TaskGrid.
+     * @return array
+     */
+    public static function getTaskGridTextCols () {
+        return array (
+            'taskNr' => 'Auftragsnr.',
+            'taskName' => 'Aufgabenname',
+            'taskActions' => 'Aktionen',
+            'sourceLang' => 'Quellsprache',
+            'relaisLang' => 'Relaissprache',
+            'targetLang' => 'Zielsprache',
+            'state' =>'Status',
+            'customerId' => 'Endkunde',
+            'pmGuid' => 'Projektmanager',
+            'users' => 'Benutzer',
+            'wordCount' => 'Wörter',
+            'wordCountTT' => 'Anzahl Wörter',
+            'fileCount' => 'Dateien',
+            'targetDeliveryDate' => 'Lieferdatum (soll)',
+            'realDeliveryDate' => 'Lieferdatum (ist)',
+            'referenceFiles' => 'Referenzdateien',
+            'terminologie' => 'Terminologie',
+            'fullMatchEdit' => '100% Matches sind editierbar',
+            'lockLocked' => 'In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
+            'orderdate' => 'Bestelldatum',
+            'enableSourceEditing' => 'Quellsprache bearbeitbar',
+            'emptyTargets' => 'Übersetzungsaufgabe (kein Review)'
+        );
+    }
 }

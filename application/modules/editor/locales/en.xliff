@@ -184,6 +184,18 @@
         <source>Keine Benutzer zugeordnet!</source>
         <target>No user assigned!</target>
       </trans-unit>
+      <trans-unit id='TWV0YS1EYXRlbg=='>
+        <source>Meta-Daten</source>
+        <target>Meta data</target>
+      </trans-unit>
+      <trans-unit id='TWV0YS1EYXRlbiBleHBvcnRpZXJlbg=='>
+        <source>Meta-Daten exportieren</source>
+        <target>Export meta data</target>
+      </trans-unit>
+      <trans-unit id='TWV0YS1EYXRlbiBmw7xyIGFsbGUgZ2VmaWx0ZXJ0ZW4gQXVmZ2FiZW4gZXhwb3J0aWVyZW4u'>
+        <source>Meta-Daten für alle gefilterten Aufgaben exportieren.</source>
+        <target>Export meta data for all filtered tasks.</target>
+      </trans-unit>
       <trans-unit id="UXVlbGxzcHJhY2hl">
         <source>Quellsprache</source>
         <target>Source language</target>
@@ -3528,6 +3540,11 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Add special characters:</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Leave task</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Show only bookmarked segments</target></trans-unit>
+<trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdDogJTAuMGYgVGFnZQ=='><source>Ø Bearbeitungszeit: %0.0f Tage</source><target>Ø Processing Time: %0.0f days</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdDogezB9IFRhZ2U='><source>Ø Bearbeitungszeit: {0} Tage</source><target>Ø Processing Time: {0} days</target></trans-unit>
+<trans-unit id='JTAuMmYlJSBFeGNlbC1FeHBvcnQgTnV0enVuZw=='><source>%0.2f%% Excel-Export Nutzung</source><target>%0.2f%% Excel-Exports</target></trans-unit>
+<trans-unit id='ezB9JSBFeGNlbC1FeHBvcnQgTnV0enVuZw=='><source>{0}% Excel-Export Nutzung</source><target>{0}% Excel-Exports</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRyb2xsZW4='><source>Standardrollen</source><target>Default roles</target></trans-unit>
 <trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>System roles the OpenID server is allowed to set in translate5.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Default system roles are used, if the OpenId server does not pass any system roles for the user, that logs on.</target></trans-unit>
