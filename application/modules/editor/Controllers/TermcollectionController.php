@@ -159,24 +159,21 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         }else{
             $collectionIds=$termCollection->getCollectionForAuthenticatedUser();
         }
-
-        
         
         if(empty($collectionIds)){
             $this->view->rows=$responseArray;
             return;
         }
         
-        
         $model=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $model editor_Models_Term */
         
-        if(isset($params['groupId'])){
-            $responseArray['termAttributes'] = $model->groupTermsAndAttributes($model->searchTermAttributesInTermentry($params['groupId'],$collectionIds));
+        if(isset($params['termEntryId'])){
+            $responseArray['termAttributes'] = $model->groupTermsAndAttributes($model->searchTermAttributesInTermentry($params['termEntryId'],$collectionIds));
             
             $entryAttr=ZfExtended_Factory::get('editor_Models_Term_Attribute');
             /* @var $entryAttr editor_Models_Term_Attribute */
-            $responseArray['termEntryAttributes']=$entryAttr->getAttributesForTermEntry($params['groupId'],$collectionIds);
+            $responseArray['termEntryAttributes']=$entryAttr->getAttributesForTermEntry($params['termEntryId'],$collectionIds);
             
         }
         $this->view->rows=$responseArray;

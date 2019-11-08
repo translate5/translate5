@@ -104,8 +104,8 @@ class TermProposalTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertTrue(is_object($proposal) && $proposal->attrValue=='Alex test comment',"Unable to propose comment the term");
         
         
-        //[6] search for the term attributes in the term groupId
-        $attributes=$this->api()->requestJson('editor/termcollection/searchattribute', 'GET', ['groupId' =>$term->groupId]);
+        //[6] search for the term attributes in the term termEntryId
+        $attributes=$this->api()->requestJson('editor/termcollection/searchattribute', 'GET', ['termEntryId' =>$term->termEntryId]);
         //validate the term attributes
         $this->assertTrue(is_array($attributes->termAttributes),"No attributes where found for the test proposal term.");
         $attributes=$attributes->termAttributes;
