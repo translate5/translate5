@@ -442,6 +442,7 @@ div.loading div#loading-indicator-text {
 .ico-error {background-image: url("../images/exclamation.png");}
 .ico-cancel {background-image: url("../images/cross.png");}
 .ico-task-add {background-image: url("../images/page_add.png");}
+.ico-export {background-image: url("../images/database_go.png");}
 .ico-user-add {background-image: url("../images/user_add.png");}
 .ico-user-del {background-image: url("../images/user_delete.png");}
 .ico-add {background-image: url("../images/table_row_insert.png");}

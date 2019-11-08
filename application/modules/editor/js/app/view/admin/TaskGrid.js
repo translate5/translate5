@@ -37,7 +37,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
   layout: {
       type: 'fit'
   },
-  text_cols: {
+  text_cols: { // in case of any changes, pls also update getTaskGridTextCols() in editor_Models_Task
       taskNr: '#UT#Auftragsnr.',
       taskName: '#UT#Aufgabenname',
       taskActions: '#UT#Aktionen',
@@ -71,6 +71,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       lockedSystem: '#UT#Durch das System gesperrt mit dem Status \'{0}\'',
       addTask: '#UT#Aufgabe hinzufügen',
       addTaskTip: '#UT#Eine neue Aufgabe hinzufügen.',
+      exportMetaDataBtn: '#UT#Meta-Daten exportieren',
+      exportMetaDataBtnTip: '#UT#Meta-Daten für alle gefilterten Aufgaben exportieren.',
       reloadBtn: '#UT#Aktualisieren',
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.',
       emptyTargets: '#UT#Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe)."'
@@ -573,10 +575,22 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   tooltip: me.strings.addTaskTip
               },{
                   xtype: 'button',
+                  iconCls: 'ico-export',
+                  itemId: 'export-meta-data-btn',
+                  text: me.strings.exportMetaDataBtn,
+                  tooltip: me.strings.exportMetaDataBtnTip
+              },{
+                  xtype: 'button',
                   iconCls: 'ico-refresh',
                   itemId: 'reload-task-btn',
                   text: me.strings.reloadBtn,
                   tooltip: me.strings.reloadBtnTip
+              },{
+                  xtype: 'label',
+                  itemId: 'kpi-average-processing-time-label'
+              },{
+                  xtype: 'label',
+                  itemId: 'kpi-excel-export-usage-label'
               }]
             },{
                 xtype: 'pagingtoolbar',
