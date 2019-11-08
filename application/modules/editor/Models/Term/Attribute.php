@@ -251,11 +251,11 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Get all attributes for the given term entry (groupId)
-     * @param string $groupId - original termEntry id from the tbx
+     * @param string $termEntryId
      * @param array $collectionIds
      * @return array|NULL
      */
-    public function getAttributesForTermEntry($groupId,$collectionIds){
+    public function getAttributesForTermEntry($termEntryId,$collectionIds){
         $cols = array(
             'LEK_term_attributes.id AS attributeId',
             'LEK_term_attributes.labelId as labelId',
@@ -289,7 +289,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         }
         
         $s->where('LEK_term_attributes.termId is null')
-        ->where('LEK_term_entry.groupId=?',$groupId)
+        ->where('LEK_term_entry.id=?',$termEntryId)
         ->where('LEK_term_entry.collectionId IN(?)',$collectionIds);
         $s->setIntegrityCheck(false);
         $rows=$this->db->fetchAll($s)->toArray();

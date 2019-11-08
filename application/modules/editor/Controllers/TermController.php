@@ -84,7 +84,7 @@ class editor_TermController extends ZfExtended_RestController {
 
         $this->view->rows = $this->entity->getDataObjectWithAttributes();
         //load the term entry attributes
-        $this->view->rows->termEntryAttributes=$attribute->getAttributesForTermEntry($this->entity->getGroupId(),[$this->entity->getCollectionId()]);
+        $this->view->rows->termEntryAttributes=$attribute->getAttributesForTermEntry($this->entity->getTermEntryId(),[$this->entity->getCollectionId()]);
         
         if(!empty($this->view->rows->attributes) && !empty($this->view->rows->language)){
             $language = ZfExtended_Factory::get('editor_Models_Languages');

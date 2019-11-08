@@ -921,13 +921,14 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /***
      * Find term attributes in the given term entry (lek_terms groupId)
      * 
-     * @param string $groupId
+     * @param string $termEntryId
      * @param array $collectionIds
      * @return array
      */
-    public function searchTermAttributesInTermentry($groupId,$collectionIds){
+    //TODO: update the references
+    public function searchTermAttributesInTermentry($termEntryId,$collectionIds){
         $s=$this->getSearchTermSelect();
-        $s->where('groupId=?',$groupId)
+        $s->where('LEK_terms.termEntryId=?',$termEntryId)
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->order('LEK_languages.rfc5646')
         ->order('LEK_terms.term')
