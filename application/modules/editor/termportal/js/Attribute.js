@@ -376,12 +376,14 @@ var Attribute={
 		if(!attribute.proposal){
 			this.removeDomProposal(this.$_termTable,attribute);
 			this.removeDomProposal(this.$_termEntryAttributesTable,attribute);
+			//this will refresh the languageDefinitionContent definition holder 
+			this.handleAttributeDrawData(attribute);
 			return;
 		}
 
 		var me = this,
 			renderData=me.getAttributeRenderData(attribute,attribute.value),
-			$attributes = me.$_resultTermsHolder.find('span[data-editable][data-type][data-id="'+attribute.attributeId+'"]');
+			$attributes = me.$_termTable.find('span[data-id="'+attribute.attributeId+'"]');
 		
 		$attributes.each(function(i,att){
 			att=$(att);

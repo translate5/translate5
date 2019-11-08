@@ -761,7 +761,7 @@ var Term={
                 htmlProposalEditIcon    = '<span class="proposal-btn proposal-edit ui-icon ui-icon-pencil"></span>',
                 htmlProposalSaveIcon    = '<span class="proposal-btn proposal-save ui-icon ui-icon-check"></span>',
                 htmlProposalCancelIcon  = '<span class="proposal-btn proposal-cancel ui-icon ui-icon-close"></span>',
-                $_selectorAdd = false, $_selectorDelete = false, $_selectorEdit = false, $_selectorSave = false, $_selectorCancel = false,
+                $_selectorAdd = false, $_selectorDelete = false, $_selectorEdit =false, $_selectorSave = false, $_selectorCancel = false,
                 titleAdd, titleDelete, titleEdit, titleSave, titleCancel,
         		selectedArea='#'+$('#resultTermsHolder ul>.ui-tabs-active').attr('aria-controls');
             
@@ -832,17 +832,29 @@ var Term={
                 $_selectorRemove.removeClass('in-editing');
                 $_selectorRemove.children('.proposal-btn').remove();
             }
-            if ($_selectorAdd && $_selectorAdd.children('.proposal-btn.proposal-add').length === 0) {
-                $_selectorAdd.append(htmlProposalAddIcon);
-                $_selectorAdd.find('.proposal-add').prop('title', titleAdd);
+            if($_selectorAdd){
+            	$_selectorAdd.each(function() {
+            		if ($( this ).children('.proposal-btn.proposal-add').length === 0) {
+            			$( this ).append(htmlProposalAddIcon);
+            			$( this ).find('.proposal-add').prop('title', titleAdd);
+            		}
+            	});
             }
-            if ($_selectorEdit && $_selectorEdit.children('.proposal-btn.proposal-edit').length === 0) {
-                $_selectorEdit.append(htmlProposalEditIcon);
-                $_selectorEdit.children('.proposal-edit').prop('title', titleEdit);
+            if($_selectorEdit){
+            	$_selectorEdit.each(function() {
+            		if ($( this ).children('.proposal-btn.proposal-edit').length === 0) {
+            			$( this ).append(htmlProposalEditIcon);
+            			$( this ).children('.proposal-edit').prop('title', titleEdit);
+            		}
+            	});
             }
-            if ($_selectorDelete && $_selectorDelete.children('.proposal-btn.proposal-delete').length === 0) {
-                $_selectorDelete.append(htmlProposalDeleteIcon);
-                $_selectorDelete.children('.proposal-delete').prop('title', titleDelete);
+            if($_selectorDelete){
+            	$_selectorDelete.each(function() {
+            		if ($( this ).children('.proposal-btn.proposal-delete').length === 0) {
+            			$( this ).append(htmlProposalDeleteIcon);
+            			$( this ).children('.proposal-delete').prop('title', titleDelete);
+            		}
+            	});
             }
             if ($_selectorSave) {
                 $_selectorSave.addClass('in-editing');
@@ -1125,7 +1137,7 @@ var Term={
 			var yesCallback=function(){
 				//ajax call to the remove proposal action
 				var me=event.data.scope,
-					url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace('{ID}',$parent.data('term-id')),
+					url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace('{ID}',$parent.attr("data-term-id")),
 					groupId=$parent.data('groupid') || me.newTermGroupId;
 
 				$.ajax({
