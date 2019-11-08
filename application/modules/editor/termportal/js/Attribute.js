@@ -183,8 +183,8 @@ var Attribute={
 		if($parent.length === 0){
 			return;
 		}
-		
-        attributeId=$parent.data('attributeId');
+
+		attributeId=$parent.attr('data-attribute-id');
         
 		yesCallback=function(){
 			//ajax call to the remove proposal action
@@ -200,7 +200,7 @@ var Attribute={
 		        	//reload the termEntry when the attribute is deleted (not proposal)
 		        	if(!result.rows || result.rows.length === 0){
 		        		//TODO: if needed add also for termentry attributes
-		        		$attribute=me.getAttributeComponent($parent.data('attributeId'),'termAttribute');
+		        		$attribute=me.getAttributeComponent($parent.attr('data-attribute-id'),'termAttribute');
 		        		//if no regular comment holder is found, check for the newly created
 		        		if(!$attribute || $attribute.length === 0){
 		        			$attribute=me.$_termTable.find('p[data-id~="-1"][data-type~="termAttribute"]');
@@ -658,7 +658,7 @@ var Attribute={
     	if(!attributeData){
     		var $termHolder=$componentEditor.parents('div[data-term-id]'),
 	    		termId=$termHolder.data('term-id'),
-	    		termData=Term.getTermDataFromCache(Term.newTermGroupId,termId);
+	    		termData=Term.getTermDataFromCache(Term.newTermTermEntryId,termId);
     		
     		for(var i=0;i<termData.attributes.length;i++){
     			var attribute=termData.attributes[i];
