@@ -52,8 +52,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
         }
     },
     strings:{
-        addCustomer:'#UT#Hinzufügen',
-        refreshCustomer:'Aktualisieren',
+        reload:'Aktualisieren',
         customerName:'#UT#Kundenname',
         customerNumber:'#UT#Kundennummer',
         save:'#UT#Speichern',
@@ -440,22 +439,22 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         items: [
                             {
                                 xtype: 'button',
-                                iconCls: 'ico-user-add',
-                                text: me.strings.addCustomer,
+                                iconCls: 'ico-refresh',
+                                text: me.strings.reload,
                                 listeners: {
                                     click: {
-                                        fn: 'add',
+                                        fn: 'refresh',
                                         scope: 'controller'
                                     }
                                 }
                             },
                             {
                                 xtype: 'button',
-                                iconCls: 'ico-refresh',
-                                text: me.strings.refreshCustomer,
+                                iconCls: 'ico-user-add',
+                                text: me.strings.addCustomerTitle,
                                 listeners: {
                                     click: {
-                                        fn: 'refresh',
+                                        fn: 'add',
                                         scope: 'controller'
                                     }
                                 }

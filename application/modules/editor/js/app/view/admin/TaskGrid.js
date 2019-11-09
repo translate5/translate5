@@ -73,6 +73,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       addTaskTip: '#UT#Eine neue Aufgabe hinzufügen.',
       exportMetaDataBtn: '#UT#Meta-Daten exportieren',
       exportMetaDataBtnTip: '#UT#Meta-Daten für alle gefilterten Aufgaben exportieren.',
+      showKPIBtn: '#UT#Auswertungen anzeigen',
+      showKPIBtnTip: '#UT#Auswertungen für alle gefilterten Aufgaben anzeigen.',
       reloadBtn: '#UT#Aktualisieren',
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.',
       emptyTargets: '#UT#Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe)."'
@@ -568,6 +570,12 @@ Ext.define('Editor.view.admin.TaskGrid', {
               dock: 'top',
               items: [{
                   xtype: 'button',
+                  iconCls: 'ico-refresh',
+                  itemId: 'reload-task-btn',
+                  text: me.strings.reloadBtn,
+                  tooltip: me.strings.reloadBtnTip
+              },{
+                  xtype: 'button',
                   iconCls: 'ico-task-add',
                   itemId: 'add-task-btn',
                   text: me.strings.addTask,
@@ -581,16 +589,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   tooltip: me.strings.exportMetaDataBtnTip
               },{
                   xtype: 'button',
-                  iconCls: 'ico-refresh',
-                  itemId: 'reload-task-btn',
-                  text: me.strings.reloadBtn,
-                  tooltip: me.strings.reloadBtnTip
-              },{
-                  xtype: 'label',
-                  itemId: 'kpi-average-processing-time-label'
-              },{
-                  xtype: 'label',
-                  itemId: 'kpi-excel-export-usage-label'
+                  iconCls: 'ico-export',
+                  itemId: 'show-kpi-btn',
+                  text: me.strings.showKPIBtn,
+                  tooltip: me.strings.showKPIBtnTip
               }]
             },{
                 xtype: 'pagingtoolbar',
@@ -598,6 +600,12 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 store: 'admin.Tasks',
                 dock: 'bottom',
                 displayInfo: true
+            },{
+                xtype: 'label',
+                itemId: 'kpi-average-processing-time-label'
+            },{
+                xtype: 'label',
+                itemId: 'kpi-excel-export-usage-label'
             }]
         };
         

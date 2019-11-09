@@ -112,7 +112,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       deleteTaskDialogTitle:'#UT#Aufgabe löschen',
       taskImportButtonText:'#UT#Aufgabe importieren',
       taskDeleteButtonText:'#UT#Aufgabe löschen',
-      averageProcessingTimeContent:'Ø Bearbeitungszeit: {0} Tage',
+      averageProcessingTimeContent:'Ø Bearbeitungszeit Lektor: {0} Tage',
       excelExportUsageContent:'{0}% Excel-Export Nutzung'
   },
   listen: {
@@ -146,6 +146,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
           '#adminTaskGrid #add-task-btn': {
               click: 'handleTaskAddShow'
+          },
+          '#adminTaskGrid #show-kpi-btn': {
+              click: 'handleKPIShow'
           },
           '#adminTaskAddWindow': {
               show: 'onAdminTaskAddWindowShow',
@@ -539,6 +542,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       }
       Ext.widget('adminTaskAddWindow').show();
   },
+  
+  handleKPIShow: function() {
+      alert('handleKPIShow');
+      // TODO
+  },
+  
   /**
    * reloads the Task Grid, will also be called from other controllers
    */
