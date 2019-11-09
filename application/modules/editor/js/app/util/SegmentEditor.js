@@ -156,7 +156,6 @@ Ext.define('Editor.util.SegmentEditor', {
         //add emptySpace only once
         if ((Ext.isGecko || Ext.isWebKit) && me.isEmptyEditor() && check.test(content.trim())) {
             me.getEditorBody().innerHTML = emptySpace;
-            me.consoleLog("Firefox: Editor must never be empty => Placeholder added.");
         }
     },
     /**
