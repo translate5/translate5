@@ -1666,6 +1666,11 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</target></trans-unit>
 <trans-unit id='RXJsYXVidGUgUm9sbGVu'><source>Erlaubte Rollen</source><target>Erlaubte Rollen</target></trans-unit>
+<trans-unit id='RGVyIHJlZmVyZW56aWVydGUgQmVudXR6ZXIgaXN0IGRlciBBdWZnYWJlIG5pY2h0IG1laHIgenVnZXdpZXNlbiBvZGVyIGV4aXN0aWVydCBuaWNodCBtZWhyLg=='><source>Der referenzierte Benutzer ist der Aufgabe nicht mehr zugewiesen oder existiert nicht mehr.</source><target>Der referenzierte Benutzer ist der Aufgabe nicht mehr zugewiesen oder existiert nicht mehr.</target></trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRpZSBBdWZnYWJlIGJlZW5kZW4gdW5kIHp1csO8Y2tzZW5kZW4sIG9kZXIgbcO2Y2h0ZW4gU2llIGRpZXNlIHNww6R0ZXIgd2VpdGVyYmVhcmJlaXRlbj8='><source>Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?</source><target>Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?</target></trans-unit>
+<trans-unit id='RmVydGlnIHVuZCBBdWZnYWJlIGJlZW5kZW4='><source>Fertig und Aufgabe beenden</source><target>Fertig und Aufgabe beenden</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSBzcMOkdGVyIHdlaXRlcmJlYXJiZWl0ZW4='><source>Aufgabe später weiterbearbeiten</source><target>Aufgabe später weiterbearbeiten</target></trans-unit>
+<trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZWxpc3Rl'><source>Zurück zur Aufgabeliste</source><target>Zurück zur Aufgabeliste</target></trans-unit>
   </body>
  </file>
 </xliff>
