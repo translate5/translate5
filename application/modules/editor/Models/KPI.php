@@ -79,7 +79,14 @@ class editor_Models_KPI {
         if (!$this->hasStatistics()) {
             return '';
         }
+        $average = '';
         $allProcessingTimes = [];
+        
+        // If this is will ever be needed for showing the taskGrid, we should not
+        // iterate through all filtered tasks, but change to pure SQL such as:
+        //    SELECT ROUND(AVG(TIMESTAMPDIFF(DAY,orderDate, realDeliveryDate)),0)
+        //    FROM LEK_task
+        //    WHERE not realDeliveryDate is null and not orderDate is null;
         foreach ($this->tasks as $task) {
             if ($task['realDeliveryDate'] == null) {
                 // Only tasks that already do have an end-date are to be included.
@@ -91,8 +98,11 @@ class editor_Models_KPI {
             $processingTime = $endDate->diff($startDate);
             $allProcessingTimes[] = $processingTime->format('%a');
         }
-        $average = array_sum($allProcessingTimes) / count($allProcessingTimes);
-        return round($average, 0);
+        if (count($allProcessingTimes) > 0) {
+            $average = array_sum($allProcessingTimes) / count($allProcessingTimes);
+            $average = round($average, 0);
+        }
+        return $average;
     }
     
     /**
@@ -105,6 +115,9 @@ class editor_Models_KPI {
             return '';
         }
         $nrExported = 0;
+        
+        // If this is will ever be needed for showing the taskGrid, we should not
+        // iterate through all filtered tasks, but change to pure SQL.
         $allTaskGuids = array_column($this->tasks, 'taskGuid');
         $excelExport = ZfExtended_Factory::get('editor_Models_Task_ExcelExport');
         /* @var $excelExport editor_Models_Task_ExcelExport */
@@ -113,6 +126,7 @@ class editor_Models_KPI {
                 $nrExported++;
             }
         }
+        
         $percentage = ($nrExported / count($allTaskGuids)) * 100;
         return round($percentage,2);
     }

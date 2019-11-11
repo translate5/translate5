@@ -168,7 +168,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // TODO Content-Type prüfen
             ]
         ])
-        ->addActionContext('index', 'xlsx')
+        ->addActionContext('kpi', 'xlsx')
         
         
         /*
@@ -218,14 +218,26 @@ class editor_TaskController extends ZfExtended_RestController {
         $rows = $this->loadAll();
         $this->view->rows = $rows;
         $this->view->total = $this->totalCount;
+    }
+    
+    /**
+     * For requests that get the Key Performance Indicators (KPI)
+     * for the currently filtered tasks. If the tasks are not to be limited
+     * to those that are visible in the grid, the request must have set the 
+     * limit accordingly (= for all filtered tasks: no limit).
+     */
+    public function  kpiAction() {
+        $f = $this->entity->getFilter();
+        $f->hasSort() || $f->addSort('orderdate', true);
+        $rows = $this->loadAll();
         
         $kpi = ZfExtended_Factory::get('editor_Models_KPI');
         /* @var $kpi editor_Models_KPI */
         $kpi->setTasks($rows);
         $kpiStatistics = $kpi->getStatistics();
-        //since we don't use metaData otherwise, we can overwrite it completely:
-        $this->view->metaData = new stdClass();
-        $this->view->metaData->statistics = $kpiStatistics;
+        
+        // For Front-End:
+        $this->view->kpiStatistics = $kpiStatistics;
         
         // ... or as Metadata-Excel-Export (= task-overview, filter, key performance indicators KPI):
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
