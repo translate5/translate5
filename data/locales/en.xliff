@@ -1373,7 +1373,7 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id="UE0="><source>PM</source><target>pm</target></trans-unit>
 <trans-unit id="YmVlbmRldA=="><source>beendet</source><target>ended</target></trans-unit>
 <trans-unit id="QmVhcmJlaXRldCB1bmQgR2VzcGVycnQgZHVyY2ggezB9"><source>Bearbeitet und Gesperrt durch {0}</source><target>Edited and locked by {0}</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBoaW56dWbDvGdlbg=="><source>Aufgabe hinzufügen</source><target>Add Task</target></trans-unit>
+<trans-unit id="QXVmZ2FiZSBoaW56dWbDvGdlbg=="><source>Aufgabe hinzufügen</source><target>Add task</target></trans-unit>
 <trans-unit id="RWluZSBuZXVlIEF1ZmdhYmUgaGluenVmw7xnZW4u"><source>Eine neue Aufgabe hinzufügen.</source><target>Add a new task.</target></trans-unit>
 <trans-unit id="QWt0dWFsaXNpZXJlbg=="><source>Aktualisieren</source><target>Refresh</target></trans-unit>
 <trans-unit id="QXVmZ2FiZW5saXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4u"><source>Aufgabenliste vom Server aktualisieren.</source><target>Refresh task list from the server.</target></trans-unit>
