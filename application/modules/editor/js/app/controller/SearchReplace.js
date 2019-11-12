@@ -1370,52 +1370,51 @@ Ext.define('Editor.controller.SearchReplace', {
             activeTab=tabPanel.getActiveTab(),
             replaceField=activeTab.down('#searchInField'),
             searchInLockedSegments=activeTab.down('#searchInLockedSegments').checked,
-            selectedColumnDataIndex=replaceField.getSelection().get('id');
-
-        callback = function() {
-            grid.selectOrFocus(goToIndex);
-            var sel = selModel.getSelection();
-
-            if(saveCurrentOpen===false && ed.editing){
-                ed.cancelEdit();
-            }
-            
-            if(me.isContentEditableField()){
-                var theColum=grid.query('gridcolumn[dataIndex="'+selectedColumnDataIndex+'"]'),
-                    editableColumn=null;
-                
-                if(theColum.length>0){
-                    editableColumn=theColum[0];
-                }
-                
-                ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_MOVEEDITOR);
-                
-                //clean the mark tags from the editor
-                me.cleanMarkTags();
-
-                //if is not a locked segment search, do regular find match
-                if(!searchInLockedSegments){
-                    me.findMatchesDelay();
-                }
-            }
-
-            //no editable content or locked search, find matches in the cell
-            if(!me.isContentEditableField() || searchInLockedSegments){
-                var visibleColumns=grid.query('gridcolumn:not([hidden])'),
-                    cellIndex=0;
-    
-                //find the index of the searched column
-                for(var i=0;i<visibleColumns.length;i++){
-                    if(visibleColumns[i].dataIndex===selectedColumnDataIndex){
-                        cellIndex=i;
-                        break;
-                    }
-                }
-                //get searched cell in the selected row
-                var gridCell=grid.getView().getCell(sel[0], cellIndex);
-                me.findMatchesGrid(gridCell);
-            }
-        };
+            selectedColumnDataIndex=replaceField.getSelection().get('id'),
+            callback = function() {
+	            grid.selectOrFocus(goToIndex);
+	            var sel = selModel.getSelection();
+	
+	            if(saveCurrentOpen===false && ed.editing){
+	                ed.cancelEdit();
+	            }
+	            
+	            if(me.isContentEditableField()){
+	                var theColum=grid.query('gridcolumn[dataIndex="'+selectedColumnDataIndex+'"]'),
+	                    editableColumn=null;
+	                
+	                if(theColum.length>0){
+	                    editableColumn=theColum[0];
+	                }
+	                
+	                ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_MOVEEDITOR);
+	                
+	                //clean the mark tags from the editor
+	                me.cleanMarkTags();
+	
+	                //if is not a locked segment search, do regular find match
+	                if(!searchInLockedSegments){
+	                    me.findMatchesDelay();
+	                }
+	            }
+	
+	            //no editable content or locked search, find matches in the cell
+	            if(!me.isContentEditableField() || searchInLockedSegments){
+	                var visibleColumns=grid.query('gridcolumn:not([hidden])'),
+	                    cellIndex=0;
+	    
+	                //find the index of the searched column
+	                for(var i=0;i<visibleColumns.length;i++){
+	                    if(visibleColumns[i].dataIndex===selectedColumnDataIndex){
+	                        cellIndex=i;
+	                        break;
+	                    }
+	                }
+	                //get searched cell in the selected row
+	                var gridCell=grid.getView().getCell(sel[0], cellIndex);
+	                me.findMatchesGrid(gridCell);
+	            }
+	        };
         
         grid.scrollTo(goToIndex, {
             callback: callback,
