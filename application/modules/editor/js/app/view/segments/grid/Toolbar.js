@@ -60,6 +60,9 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_watchListFilterBtn: '#UT#Lesezeichen',
     item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
     item_showBookmarkedSegments: '#UT#Nur Segmente mit Lesezeichen anzeigen',
+    strings:{
+    	interfaceTranslation:'#UT#Oberfläche'
+    },
     viewModel: {
         formulas: {
             isNormalEdit: function(get) {
@@ -170,7 +173,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'menucheckitem',
                     itemId: 'localeMenuItem'+i,
                     checked: Editor.data.locale==i,
-                    text: n,
+                    text: n+' '+me.strings.interfaceTranslation,
                     value:i,
                     tagMode: 'full',
                     group: 'localeMenuGroup'
