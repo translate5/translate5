@@ -217,6 +217,8 @@
 <trans-unit id='TWV0YS1EYXRlbg=='><source>Meta-Daten</source><target>Meta-Daten</target></trans-unit>
 <trans-unit id='TWV0YS1EYXRlbiBleHBvcnRpZXJlbg=='><source>Meta-Daten exportieren</source><target>Meta-Daten exportieren</target></trans-unit>
 <trans-unit id='TWV0YS1EYXRlbiBmw7xyIGFsbGUgZ2VmaWx0ZXJ0ZW4gQXVmZ2FiZW4gZXhwb3J0aWVyZW4u'><source>Meta-Daten für alle gefilterten Aufgaben exportieren.</source><target>Meta-Daten für alle gefilterten Aufgaben exportieren.</target></trans-unit>
+<trans-unit id='QXVzd2VydHVuZ2VuIGFuemVpZ2Vu'><source>Auswertungen anzeigen</source><target>Auswertungen anzeigen</target></trans-unit>
+<trans-unit id='QXVzd2VydHVuZ2VuIGbDvHIgYWxsZSBnZWZpbHRlcnRlbiBBdWZnYWJlbiBhbnplaWdlbi4='><source>Auswertungen für alle gefilterten Aufgaben anzeigen.</source><target>Auswertungen für alle gefilterten Aufgaben anzeigen.</target></trans-unit>
 <trans-unit id='QWt0dWFsaXNpZXJlbg=='><source>Aktualisieren</source><target>Aktualisieren</target></trans-unit>
 <trans-unit id='QXVmZ2FiZW5saXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4u'><source>Aufgabenliste vom Server aktualisieren.</source><target>Aufgabenliste vom Server aktualisieren.</target></trans-unit>
 <trans-unit id='QXVmdHJhZ3Nuci4='><source>Auftragsnr.</source><target>Auftragsnr.</target></trans-unit>
@@ -1658,10 +1660,13 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Aufgabe verlassen</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Nur Segmente mit Lesezeichen anzeigen</target></trans-unit>
 <trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
-<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdDogJTAuMGYgVGFnZQ=='><source>Ø Bearbeitungszeit: %0.0f Tage</source><target>Ø Bearbeitungszeit: %0.0f Tage</target></trans-unit>
-<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdDogezB9IFRhZ2U='><source>Ø Bearbeitungszeit: {0} Tage</source><target>Ø Bearbeitungszeit: {0} Tage</target></trans-unit>
-<trans-unit id='JTAuMmYlJSBFeGNlbC1FeHBvcnQgTnV0enVuZw=='><source>%0.2f%% Excel-Export Nutzung</source><target>%0.2f%% Excel-Export Nutzung</target></trans-unit>
-<trans-unit id='ezB9JSBFeGNlbC1FeHBvcnQgTnV0enVuZw=='><source>{0}% Excel-Export Nutzung</source><target>{0}% Excel-Export Nutzung</target></trans-unit>
+<trans-unit id='S2V5IFBlcmZvcm1hbmNlIEluZGljYXRvcnM='><source>Key Performance Indicators</source><target>Key Performance Indicators</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCBMZWt0b3I='><source>Ø Bearbeitungszeit Lektor</source><target>Ø Bearbeitungszeit Lektor</target></trans-unit>
+<trans-unit id='JTAuMGYgVGFnZQ=='><source>%0.0f Tage</source><target>%0.0f Tage</target></trans-unit>
+<trans-unit id='ezB9IFRhZ2U='><source>{0} Tage</source><target>{0} Tage</target></trans-unit>
+<trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdCB2b24gZGVyIFp1d2Vpc3VuZyBiaXMgenVtIEFic2NobHVzcyBlaW5lciBBdWZnYWJlLg=='><source>Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.</source><target>Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.</target></trans-unit>
+<trans-unit id='RXhjZWwtRXhwb3J0IE51dHp1bmc='><source>Excel-Export Nutzung</source><target>Excel-Export Nutzung</target></trans-unit>
+<trans-unit id='UHJvemVudCBkZXIgQXVmZ2FiZW4sIGJlaSBkZW5lbiBkZXIgRXhjZWwtRXhwb3J0IGRlciBTZWdtZW50dGFiZWxsZSBnZW51dHp0IHd1cmRlLg=='><source>Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.</source><target>Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRyb2xsZW4='><source>Standardrollen</source><target>Standardrollen</target></trans-unit>
 <trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</target></trans-unit>
@@ -1671,6 +1676,9 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='RmVydGlnIHVuZCBBdWZnYWJlIGJlZW5kZW4='><source>Fertig und Aufgabe beenden</source><target>Fertig und Aufgabe beenden</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSBzcMOkdGVyIHdlaXRlcmJlYXJiZWl0ZW4='><source>Aufgabe später weiterbearbeiten</source><target>Aufgabe später weiterbearbeiten</target></trans-unit>
 <trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZWxpc3Rl'><source>Zurück zur Aufgabeliste</source><target>Zurück zur Aufgabeliste</target></trans-unit>
+<trans-unit id='WmFobCB6dWdld2llc2VuZXIgQmVudXR6ZXI='><source>Zahl zugewiesener Benutzer</source><target>Zahl zugewiesener Benutzer</target></trans-unit>
+<trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc291cmNlbg=='><source>Anzahl zugewiesene Sprachresourcen</source><target>Anzahl zugewiesene Sprachresourcen</target></trans-unit>
+<trans-unit id='MTAwJS1UcmVmZmVyIGVkaXRpZXJiYXI='><source>100%-Treffer editierbar</source><target>100%-Treffer editierbar</target></trans-unit>
   </body>
  </file>
 </xliff>

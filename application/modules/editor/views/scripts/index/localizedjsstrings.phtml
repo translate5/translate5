@@ -457,8 +457,9 @@ Ext.define('Editor.controller.Localizer', {
             deleteTaskDialogTitle:'<?php echo $this->translate->_('Aufgabe löschen');?>',
             taskImportButtonText:'<?php echo $this->translate->_('Aufgabe importieren');?>',
             taskDeleteButtonText:'<?php echo $this->translate->_('Aufgabe löschen');?>',
-            averageProcessingTimeContent:'<?php echo $this->translate->_('Ø Bearbeitungszeit: {0} Tage');?>',
-            excelExportUsageContent:'<?php echo $this->translate->_('{0}% Excel-Export Nutzung');?>'
+            averageProcessingTimeLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Lektor');?>',
+            averageProcessingTimeDays:'<?php echo $this->translate->_('{0} Tage');?>',
+            excelExportUsageLabel:'<?php echo $this->translate->_('Excel-Export Nutzung');?>'
         },
         confirmStrings: {
             "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -495,6 +496,8 @@ Ext.define('Editor.controller.Localizer', {
             addTaskTip: '<?php echo $this->translate->_('Eine neue Aufgabe hinzufügen.');?>',
             exportMetaDataBtn: '<?php echo $this->translate->_('Meta-Daten exportieren');?>',
             exportMetaDataBtnTip: '<?php echo $this->translate->_('Meta-Daten für alle gefilterten Aufgaben exportieren.');?>',
+            showKPIBtn: '<?php echo $this->translate->_('Auswertungen anzeigen');?>',
+            showKPIBtnTip: '<?php echo $this->translate->_('Auswertungen für alle gefilterten Aufgaben anzeigen.');?>',
             reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
             reloadBtnTip: '<?php echo $this->translate->_('Aufgabenliste vom Server aktualisieren.');?>',
             noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>',
@@ -523,6 +526,16 @@ Ext.define('Editor.controller.Localizer', {
             orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>',
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.KpiWindow", {
+        override: "Editor.view.admin.task.KpiWindow",
+        title: '<?php echo $this->translate->_('Key Performance Indicators');?>',
+        strings: {
+            closeBtn: '<?php echo $this->translate->_('Fenster schließen');?>',
+            averageProcessingTimeToolTip: '<?php echo $this->translate->_('Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.');?>',
+            excelExportUsageToolTip: '<?php echo $this->translate->_('Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.');?>',
         }
     });
     
@@ -1070,8 +1083,7 @@ Ext.define('Editor.controller.Localizer', {
     	override: "Editor.view.admin.customer.Panel",
         title:'<?php echo $this->translate->_("Kundenübersicht");?>',
         strings: {
-            addCustomer:'<?php echo $this->translate->_("Hinzufügen");?>',
-            refreshCustomer:'<?php echo $this->translate->_("Aktualisieren");?>',
+            reload:'<?php echo $this->translate->_("Aktualisieren");?>',
             customerName:'<?php echo $this->translate->_("Kundenname");?>',
             customerNumber:'<?php echo $this->translate->_("Kundennummer");?>',
             save:'<?php echo $this->translate->_("Speichern");?>',
@@ -1297,7 +1309,7 @@ Ext.define('Editor.controller.Localizer', {
             resource: '<?php echo $this->translate->_('Ressource');?>',
             refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
             color: '<?php echo $this->translate->_('Farbe');?>',
-            add: '<?php echo $this->translate->_('Hinzufügen');?>',
+            addResource: '<?php echo $this->translate->_('Sprachressource hinzufügen');?>',
             import: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen');?>',
             importCollection: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen');?>',
             noTaskAssigned: '<?php echo $this->translate->_('Keine Aufgaben zugewiesen.');?>',

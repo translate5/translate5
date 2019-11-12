@@ -135,13 +135,12 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
         /* @var $taskModel editor_Models_Task */
         $taskGridTextCols = $taskModel::getTaskGridTextCols();
         foreach ($this->taskColumns as $key => $colName) {
-            if (array_key_exists($colName, $taskGridTextCols)) {
-                // We seem to provide translations only for those column-names that are set in the Taskgrid
+            if (array_key_exists($colName, $taskGridTextCols)) { // Not all column-names in the taskGrid have a translation.
                 $colHeadline = $this->translate->_($taskGridTextCols[$colName]);
             } else {
                 $colHeadline = $colName;
             }
-            $sheet->setCellValue($sheetCols[$key].'1', $colHeadline);
+            $sheet->setCellValue($sheetCols[$key].'1', ucfirst($colHeadline));
             $sheet->getStyle($sheetCols[$key].'1')->getFont()->setBold(true);
             $sheet->getColumnDimension($sheetCols[$key])->setAutoSize(true);
         }

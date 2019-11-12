@@ -73,13 +73,20 @@ class editor_Models_KPI {
      * TODO: With TRANSLATE-1455, change these to:
      * - startDate: assigned
      * - endDate: review delivered
-     * @return float|string Number of days or '' if statistics can't be calculated
+     * @return float|string Number of days or '-' if statistics can't be calculated
      */
     protected function getAverageProcessingTime() {
         if (!$this->hasStatistics()) {
-            return '';
+            return '-';
         }
+        $average = '-';
         $allProcessingTimes = [];
+        
+        // If this is will ever be needed for showing the taskGrid, we should not
+        // iterate through all filtered tasks, but change to pure SQL such as:
+        //    SELECT ROUND(AVG(TIMESTAMPDIFF(DAY,orderDate, realDeliveryDate)),0)
+        //    FROM LEK_task
+        //    WHERE not realDeliveryDate is null and not orderDate is null;
         foreach ($this->tasks as $task) {
             if ($task['realDeliveryDate'] == null) {
                 // Only tasks that already do have an end-date are to be included.
@@ -91,20 +98,26 @@ class editor_Models_KPI {
             $processingTime = $endDate->diff($startDate);
             $allProcessingTimes[] = $processingTime->format('%a');
         }
-        $average = array_sum($allProcessingTimes) / count($allProcessingTimes);
-        return round($average, 0);
+        if (count($allProcessingTimes) > 0) {
+            $average = array_sum($allProcessingTimes) / count($allProcessingTimes);
+            $average = round($average, 0);
+        }
+        return $average;
     }
     
     /**
      * Calculate and return the Excel-export-usage of the tasks
      * (= percent of the tasks exported at least once).
-     * @return float|string Number of percentage (0-100) or '' if statistics can't be calculated
+     * @return string Percentage (0-100%) or '-' if statistics can't be calculated
      */
     protected function getExcelExportUsage() {
         if (!$this->hasStatistics()) {
-            return '';
+            return '-';
         }
         $nrExported = 0;
+        
+        // If this is will ever be needed for showing the taskGrid, we should not
+        // iterate through all filtered tasks, but change to pure SQL.
         $allTaskGuids = array_column($this->tasks, 'taskGuid');
         $excelExport = ZfExtended_Factory::get('editor_Models_Task_ExcelExport');
         /* @var $excelExport editor_Models_Task_ExcelExport */
@@ -113,8 +126,9 @@ class editor_Models_KPI {
                 $nrExported++;
             }
         }
-        $percentage = ($nrExported / count($allTaskGuids)) * 100;
-        return round($percentage,2);
+        
+        $percentage = ($nrExported / count($allTaskGuids)) * 100; // after $this->hasStatistics(), count($allTaskGuids) will always be > 0
+        return round($percentage,2) . '%';
     }
     
 }

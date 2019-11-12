@@ -196,6 +196,14 @@
         <source>Meta-Daten für alle gefilterten Aufgaben exportieren.</source>
         <target>Export meta data for all filtered tasks.</target>
       </trans-unit>
+      <trans-unit id='QXVzd2VydHVuZ2VuIGFuemVpZ2Vu'>
+        <source>Auswertungen anzeigen</source>
+        <target>Show KPIs</target>
+      </trans-unit>
+      <trans-unit id='QXVzd2VydHVuZ2VuIGbDvHIgYWxsZSBnZWZpbHRlcnRlbiBBdWZnYWJlbiBhbnplaWdlbi4='>
+        <source>Auswertungen für alle gefilterten Aufgaben anzeigen.</source>
+        <target>Show KPIs for all filtered tasks.</target>
+      </trans-unit>
       <trans-unit id="UXVlbGxzcHJhY2hl">
         <source>Quellsprache</source>
         <target>Source language</target>
@@ -210,7 +218,7 @@
       </trans-unit>
       <trans-unit id="UXVlbGxzcHJhY2hlIGJlYXJiZWl0YmFy">
         <source>Quellsprache bearbeitbar</source>
-        <target>source language editable</target>
+        <target>Source language editable</target>
       </trans-unit>
       <trans-unit id="SW1wb3J0ZGF0ZWnCuQ==">
         <source>Importdatei&#xB9;</source>
@@ -2576,7 +2584,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='S3VuZGUgaGluenVmw7xnZW4='>
     <source>Kunde hinzufügen</source>
-    <target>Add a client</target>
+    <target>Add client</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGUgd2lyZCBnZXNwZWljaGVydC4u'>
@@ -3541,10 +3549,13 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Leave task</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Show only bookmarked segments</target></trans-unit>
 <trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
-<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdDogJTAuMGYgVGFnZQ=='><source>Ø Bearbeitungszeit: %0.0f Tage</source><target>Ø Processing Time: %0.0f days</target></trans-unit>
-<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdDogezB9IFRhZ2U='><source>Ø Bearbeitungszeit: {0} Tage</source><target>Ø Processing Time: {0} days</target></trans-unit>
-<trans-unit id='JTAuMmYlJSBFeGNlbC1FeHBvcnQgTnV0enVuZw=='><source>%0.2f%% Excel-Export Nutzung</source><target>%0.2f%% Excel-Exports</target></trans-unit>
-<trans-unit id='ezB9JSBFeGNlbC1FeHBvcnQgTnV0enVuZw=='><source>{0}% Excel-Export Nutzung</source><target>{0}% Excel-Exports</target></trans-unit>
+<trans-unit id='S2V5IFBlcmZvcm1hbmNlIEluZGljYXRvcnM='><source>Key Performance Indicators</source><target>Key Performance Indicators</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCBMZWt0b3I='><source>Ø Bearbeitungszeit Lektor</source><target>Ø Processing Time Reviewer</target></trans-unit>
+<trans-unit id='JTAuMGYgVGFnZQ=='><source>%0.0f Tage</source><target>%0.0f days</target></trans-unit>
+<trans-unit id='ezB9IFRhZ2U='><source>{0} Tage</source><target>{0} days</target></trans-unit>
+<trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdCB2b24gZGVyIFp1d2Vpc3VuZyBiaXMgenVtIEFic2NobHVzcyBlaW5lciBBdWZnYWJlLg=='><source>Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.</source><target>Average time from assignment of the job to finishing of the job.</target></trans-unit>
+<trans-unit id='RXhjZWwtRXhwb3J0IE51dHp1bmc='><source>Excel-Export Nutzung</source><target>Excel-Exports</target></trans-unit>
+<trans-unit id='UHJvemVudCBkZXIgQXVmZ2FiZW4sIGJlaSBkZW5lbiBkZXIgRXhjZWwtRXhwb3J0IGRlciBTZWdtZW50dGFiZWxsZSBnZW51dHp0IHd1cmRlLg=='><source>Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.</source><target>Percentage of the tasks, where the exporting of segments as Excel has been used within the process.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRyb2xsZW4='><source>Standardrollen</source><target>Default roles</target></trans-unit>
 <trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>System roles the OpenID server is allowed to set in translate5.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Default system roles are used, if the OpenId server does not pass any system roles for the user, that logs on.</target></trans-unit>
@@ -3553,6 +3564,11 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='TcO2Y2h0ZW4gU2llIGRpZSBBdWZnYWJlIGJlZW5kZW4gdW5kIHp1csO8Y2tzZW5kZW4sIG9kZXIgbcO2Y2h0ZW4gU2llIGRpZXNlIHNww6R0ZXIgd2VpdGVyYmVhcmJlaXRlbj8='><source>Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?</source><target>Do you want to finish the task and submit it, or edit it again later?</target></trans-unit>
 <trans-unit id='RmVydGlnIHVuZCBBdWZnYWJlIGJlZW5kZW4='><source>Fertig und Aufgabe beenden</source><target>I‘m done. Finish task</target></trans-unit><trans-unit id='QXVmZ2FiZSBzcMOkdGVyIHdlaXRlcmJlYXJiZWl0ZW4='><source>Aufgabe später weiterbearbeiten</source><target>Continue task later</target></trans-unit>
 <trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZWxpc3Rl'><source>Zurück zur Aufgabeliste</source><target>Back to task list</target></trans-unit>
+<trans-unit id='V29ya2Zsb3c='><source>Workflow</source><target>Workflow</target></trans-unit>
+<trans-unit id='WmFobCB6dWdld2llc2VuZXIgQmVudXR6ZXI='><source>Zahl zugewiesener Benutzer</source><target>Number of users</target></trans-unit>
+<trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc291cmNlbg=='><source>Anzahl zugewiesene Sprachresourcen</source><target>Number of assigned language resources</target></trans-unit>
+<trans-unit id='MTAwJS1UcmVmZmVyIGVkaXRpZXJiYXI='><source>100%-Treffer editierbar</source><target>100% matches editable</target></trans-unit>
+<trans-unit id='UHJvamVrdG1hbmFnZXI='><source>Projektmanager</source><target>Project manager</target></trans-unit>
 </body>
   </file>
 </xliff>
