@@ -257,9 +257,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       $translatsion=$this->translate->getAvailableTranslations();
       //add custom translations to the frontend locale label
-      foreach ($translatsion as &$value){
-          $value=$value.' '.$this->translate->_('Oberfläche');
-      }
       $this->view->Php2JsVars()->set('translations',$translatsion);
       
       //Editor.data.enableSourceEditing → still needed for enabling / disabling the whole feature (Checkbox at Import).
