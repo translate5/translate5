@@ -73,13 +73,13 @@ class editor_Models_KPI {
      * TODO: With TRANSLATE-1455, change these to:
      * - startDate: assigned
      * - endDate: review delivered
-     * @return float|string Number of days or '' if statistics can't be calculated
+     * @return float|string Number of days or '-' if statistics can't be calculated
      */
     protected function getAverageProcessingTime() {
         if (!$this->hasStatistics()) {
-            return '';
+            return '-';
         }
-        $average = '';
+        $average = '-';
         $allProcessingTimes = [];
         
         // If this is will ever be needed for showing the taskGrid, we should not
@@ -108,11 +108,11 @@ class editor_Models_KPI {
     /**
      * Calculate and return the Excel-export-usage of the tasks
      * (= percent of the tasks exported at least once).
-     * @return float|string Number of percentage (0-100) or '' if statistics can't be calculated
+     * @return string Percentage (0-100%) or '-' if statistics can't be calculated
      */
     protected function getExcelExportUsage() {
         if (!$this->hasStatistics()) {
-            return '';
+            return '-';
         }
         $nrExported = 0;
         
@@ -127,8 +127,8 @@ class editor_Models_KPI {
             }
         }
         
-        $percentage = ($nrExported / count($allTaskGuids)) * 100;
-        return round($percentage,2);
+        $percentage = ($nrExported / count($allTaskGuids)) * 100; // after $this->hasStatistics(), count($allTaskGuids) will always be > 0
+        return round($percentage,2) . '%';
     }
     
 }

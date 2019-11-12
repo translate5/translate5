@@ -3550,11 +3550,11 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Show only bookmarked segments</target></trans-unit>
 <trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
 <trans-unit id='S2V5IFBlcmZvcm1hbmNlIEluZGljYXRvcnM='><source>Key Performance Indicators</source><target>Key Performance Indicators</target></trans-unit>
-<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCBMZWt0b3I6ICUwLjBmIFRhZ2U='><source>Ø Bearbeitungszeit Lektor: %0.0f Tage</source><target>Ø Processing Time Reviewer: %0.0f days</target></trans-unit>
-<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCBMZWt0b3I6IHswfSBUYWdl'><source>Ø Bearbeitungszeit Lektor: {0} Tage</source><target>Ø Processing Time Reviewer: {0} days</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCBMZWt0b3I='><source>Ø Bearbeitungszeit Lektor</source><target>Ø Processing Time Reviewer</target></trans-unit>
+<trans-unit id='JTAuMGYgVGFnZQ=='><source>%0.0f Tage</source><target>%0.0f days</target></trans-unit>
+<trans-unit id='ezB9IFRhZ2U='><source>{0} Tage</source><target>{0} days</target></trans-unit>
 <trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdCB2b24gZGVyIFp1d2Vpc3VuZyBiaXMgenVtIEFic2NobHVzcyBlaW5lciBBdWZnYWJlLg=='><source>Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.</source><target>Average time from assignment of the job to finishing of the job.</target></trans-unit>
-<trans-unit id='JTAuMmYlJSBFeGNlbC1FeHBvcnQgTnV0enVuZw=='><source>%0.2f%% Excel-Export Nutzung</source><target>%0.2f%% Excel-Exports</target></trans-unit>
-<trans-unit id='ezB9JSBFeGNlbC1FeHBvcnQgTnV0enVuZw=='><source>{0}% Excel-Export Nutzung</source><target>{0}% Excel-Exports</target></trans-unit>
+<trans-unit id='RXhjZWwtRXhwb3J0IE51dHp1bmc='><source>Excel-Export Nutzung</source><target>Excel-Exports</target></trans-unit>
 <trans-unit id='UHJvemVudCBkZXIgQXVmZ2FiZW4sIGJlaSBkZW5lbiBkZXIgRXhjZWwtRXhwb3J0IGRlciBTZWdtZW50dGFiZWxsZSBnZW51dHp0IHd1cmRlLg=='><source>Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.</source><target>Percentage of the tasks, where the exporting of segments as Excel has been used within the process.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRyb2xsZW4='><source>Standardrollen</source><target>Default roles</target></trans-unit>
 <trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>System roles the OpenID server is allowed to set in translate5.</target></trans-unit>

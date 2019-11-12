@@ -114,7 +114,7 @@ class editor_Models_Task_Export_Metadata {
      * @param string $name
      * @return string
      */
-    protected function getKpiKpiByName(string $name) {
+    protected function getKpiValueByName(string $name) {
         return $this->kpiStatistics[$name];
     }
     
@@ -188,12 +188,11 @@ class editor_Models_Task_Export_Metadata {
      * @return string
      */
     protected function renderKpiAverageProcessingTime() : string {
-        $averageProcessingTime = '';
-        $average = $this->getKpiKpiByName('averageProcessingTime');
-        if ($average != '') {
-            $averageProcessingTime = sprintf($this->translate->_('Ø Bearbeitungszeit Lektor: %0.0f Tage'), round($average, 0));
+        $average = $this->getKpiValueByName('averageProcessingTime');
+        if ($average != '-') {
+            $average = sprintf($this->translate->_('%0.0f Tage'), round($average, 0));
         }
-        return $averageProcessingTime;
+        return $this->translate->_('Ø Bearbeitungszeit Lektor') . ': ' . $average;
     }
     
     /**
@@ -201,12 +200,8 @@ class editor_Models_Task_Export_Metadata {
      * @return string
      */
     protected function renderKpiExcelExportUsage() : string {
-        $excelExportUsage = '';
-        $percentage = $this->getKpiKpiByName('excelExportUsage');
-        if ($percentage != '') {
-            $excelExportUsage = sprintf($this->translate->_('%0.2f%% Excel-Export Nutzung'), $percentage);
-        }
-        return $excelExportUsage;
+        $percentage = $this->getKpiValueByName('excelExportUsage');
+        return $percentage . ' ' . $this->translate->_('Excel-Export Nutzung');
     }
     
     /**
