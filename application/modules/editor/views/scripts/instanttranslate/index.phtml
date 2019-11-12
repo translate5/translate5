@@ -205,11 +205,12 @@ $( function() {
             $(this).addClass("ui-state-active");
         });
     $('#logout').on("click",function(){
+    	var loginUrl=Editor.data.loginUrl || Editor.data.apps.loginUrl;
     	//check if it is used from iframe
         if(window.parent!=undefined){
-            window.parent.location = Editor.data.loginUrl;
+            window.parent.location =loginUrl;
         }else{
-        	window.parent.location = Editor.data.loginUrl;
+        	window.location =loginUrl;
         }
     });
     $('#locale').selectmenu({
@@ -284,6 +285,7 @@ $( function() {
 } );
 </script>
 
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/ErrorHandler.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js"></script>
 
 <script type="text/javascript">
