@@ -112,8 +112,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       deleteTaskDialogTitle:'#UT#Aufgabe löschen',
       taskImportButtonText:'#UT#Aufgabe importieren',
       taskDeleteButtonText:'#UT#Aufgabe löschen',
-      averageProcessingTimeContent:'Ø Bearbeitungszeit Lektor: {0} Tage',
-      excelExportUsageContent:'{0}% Excel-Export Nutzung'
+      averageProcessingTimeLabel: 'Ø Bearbeitungszeit Lektor',
+      averageProcessingTimeDays: '{0} Tage',
+      excelExportUsageLabel: 'Excel-Export Nutzung'
   },
   listen: {
       controller: {
@@ -549,15 +550,19 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           success: function(response){
               var resp = Ext.util.JSON.decode(response.responseText),
                   kpiStatistics,
-                  averageProcessingTimeMessage = '',
-                  excelExportUsageMessage = '';
+                  average,
+                  averageProcessingTimeMessage,
+                  excelExportUsageMessage;
               kpiStatistics = resp.kpiStatistics;
-              if (kpiStatistics.averageProcessingTime !== '') {
-                  averageProcessingTimeMessage = Ext.String.format(me.strings.averageProcessingTimeContent, kpiStatistics.averageProcessingTime);
+              // KPI: averageProcessingTimeMessage
+              average = kpiStatistics.averageProcessingTime;
+              if (average !== '-') {
+                  average = Ext.String.format(me.strings.averageProcessingTimeDays, average);
               }
-              if (kpiStatistics.excelExportUsage !== '') {
-                  excelExportUsageMessage = Ext.String.format(me.strings.excelExportUsageContent, kpiStatistics.excelExportUsage);
-              }
+              averageProcessingTimeMessage = me.strings.averageProcessingTimeLabel + ': ' + average;
+              // KPI: excelExportUsage
+              excelExportUsageMessage = kpiStatistics.excelExportUsage + ' ' + me.strings.excelExportUsageLabel;
+              // update fields and stop loading-icon
               me.getAverageProcessingTimeDisplay().update(averageProcessingTimeMessage);
               me.getExcelExportUsageDisplay().update(excelExportUsageMessage);
               win.setLoading(false);
