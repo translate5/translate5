@@ -36,7 +36,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   requires: ['Editor.view.admin.ExportMenu'],
   models: ['admin.Task', 'admin.task.Log'],
   stores: ['admin.Users', 'admin.Tasks','admin.Languages', 'admin.task.Logs', 'admin.TaskUserTrackings'],
-  views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow'],
+  views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow'],
   refs : [{
       ref: 'headToolBar',
       selector: 'headPanel toolbar#top-menu'
@@ -62,11 +62,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       ref: 'exportMetaDataBtn',
       selector: '#adminTaskGrid #export-meta-data-btn'
   },{
-      ref: 'averageProcessingTimeLabel',
-      selector: '#adminTaskGrid #kpi-average-processing-time-label'
+      ref: 'averageProcessingTimeDisplay',
+      selector: '#kpiWindow #kpi-average-processing-time-display'
   },{
-      ref: 'excelExportUsageLabel',
-      selector: '#adminTaskGrid #kpi-excel-export-usage-label'
+      ref: 'excelExportUsageDisplay',
+      selector: '#kpiWindow #kpi-excel-export-usage-display'
   }],
   alias: 'controller.taskOverviewController',
   
@@ -112,8 +112,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       deleteTaskDialogTitle:'#UT#Aufgabe löschen',
       taskImportButtonText:'#UT#Aufgabe importieren',
       taskDeleteButtonText:'#UT#Aufgabe löschen',
-      averageProcessingTimeContent:'Ø Bearbeitungszeit: {0} Tage',
-      excelExportUsageContent:'{0}% Excel-Export Nutzung'
+      averageProcessingTimeLabel: 'Ø Bearbeitungszeit Lektor',
+      averageProcessingTimeDays: '{0} Tage',
+      excelExportUsageLabel: 'Excel-Export Nutzung'
   },
   listen: {
       controller: {
@@ -133,10 +134,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               hide: 'handleAfterHide',
               show: 'handleAfterShow',
               celldblclick: 'handleGridClick', 
-              cellclick: 'handleGridClick',
-              columnhide: 'setHrefForMetadataExport',
-              columnshow: 'setHrefForMetadataExport',
-              filterchange: 'setHrefForMetadataExport'
+              cellclick: 'handleGridClick'
           },
           '#adminTaskGrid #reload-task-btn': {
               click: 'handleTaskReload'
@@ -146,6 +144,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
           '#adminTaskGrid #add-task-btn': {
               click: 'handleTaskAddShow'
+          },
+          '#adminTaskGrid #export-meta-data-btn': {
+              click: 'handleMetaDataExport'
+          },
+          '#adminTaskGrid #show-kpi-btn': {
+              click: 'handleKPIShow'
           },
           '#adminTaskAddWindow': {
               show: 'onAdminTaskAddWindowShow',
@@ -169,24 +173,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           'adminTaskAddWindow panel:not([hidden])': {
               wizardCardFinished: 'onWizardCardFinished',
               wizardCardSkiped: 'onWizardCardSkiped'
-          }
-      },
-      store: {
-          '#admin.Tasks': {
-              load: 'startCheckImportStates',
-              metachange : function(taskstore, meta) {
-                    var me = this,
-                        averageProcessingTimeMessage = '',
-                        excelExportUsageMessage = '';
-                    if (meta.statistics.averageProcessingTime !== '') {
-                        averageProcessingTimeMessage = Ext.String.format(me.strings.averageProcessingTimeContent, meta.statistics.averageProcessingTime);
-                    }
-                    if (meta.statistics.excelExportUsage !== '') {
-                        excelExportUsageMessage = Ext.String.format(me.strings.excelExportUsageContent, meta.statistics.excelExportUsage);
-                    }
-                    me.getAverageProcessingTimeLabel().update(averageProcessingTimeMessage);
-                    me.getExcelExportUsageLabel().update(excelExportUsageMessage);
-                }
           }
       }
   },
@@ -539,6 +525,85 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       }
       Ext.widget('adminTaskAddWindow').show();
   },
+  
+  /**
+   * Show Key Performance Indicators (KPI) for currently filtered tasks.
+   */
+  handleKPIShow: function() {
+      var me = this,
+          win = Ext.widget('adminTaskKpiWindow'),
+          taskStore = Ext.StoreManager.get('admin.Tasks'),
+          proxy = taskStore.getProxy(),
+          url = Editor.data.restpath+'task/kpi',
+          method = 'POST',
+          params = {};
+      
+      win.show();
+      win.setLoading(true);
+      
+      params[proxy.getFilterParam()] = proxy.encodeFilters(taskStore.getFilters().items);
+      
+      Ext.Ajax.request({
+          url: url,
+          method: method,
+          params: params,
+          success: function(response){
+              var resp = Ext.util.JSON.decode(response.responseText),
+                  kpiStatistics,
+                  average,
+                  averageProcessingTimeMessage,
+                  excelExportUsageMessage;
+              kpiStatistics = resp.kpiStatistics;
+              // KPI: averageProcessingTimeMessage
+              average = kpiStatistics.averageProcessingTime;
+              if (average !== '-') {
+                  average = Ext.String.format(me.strings.averageProcessingTimeDays, average);
+              }
+              averageProcessingTimeMessage = me.strings.averageProcessingTimeLabel + ': ' + average;
+              // KPI: excelExportUsage
+              excelExportUsageMessage = kpiStatistics.excelExportUsage + ' ' + me.strings.excelExportUsageLabel;
+              // update fields and stop loading-icon
+              me.getAverageProcessingTimeDisplay().update(averageProcessingTimeMessage);
+              me.getExcelExportUsageDisplay().update(excelExportUsageMessage);
+              win.setLoading(false);
+          },
+          failure: function(){
+              // TODO: show error-message?
+              win.setLoading(false);
+          } 
+      });
+  },
+  
+  /**
+   * Export the current state of taskGrid for all currently filtered tasks
+   * and their KPI-statistics.
+   */
+  handleMetaDataExport: function() {
+      var taskStore = Ext.StoreManager.get('admin.Tasks'),
+          proxy = taskStore.getProxy(),
+          params = {},
+          taskGrid = Ext.ComponentQuery.query('#adminTaskGrid')[0],
+          visibleColumns = taskGrid.getVisibleColumns(),
+          length = visibleColumns.length,
+          i,
+          col,
+          visibleColumnsNames = [],
+          href;
+      for (i=0; i < length; i++){
+          col = visibleColumns[i];
+          if (col.hasOwnProperty('dataIndex')) {
+              // taskActionColumn has no dataIndex, but is not needed anyway
+              visibleColumnsNames.push(col.dataIndex);
+          }
+      }
+      params['format'] = 'xlsx';
+      params[proxy.getFilterParam()] = proxy.encodeFilters(taskStore.getFilters().items);
+      params['visibleColumns'] = JSON.stringify(visibleColumnsNames);
+      href = Editor.data.restpath + 'task/kpi?' + Ext.urlEncode(params);
+      // TODO: this might get too long for GET => use POST instead
+      window.open(href);
+  },
+  
   /**
    * reloads the Task Grid, will also be called from other controllers
    */
@@ -965,35 +1030,5 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           return !this.fireEvent('periodicalTaskReloadIgnore', task);
       }          
       return false;
-  },
-  
-  /**
-   * Set the link for the metadata-export; adds the current state
-   * of the grid (visible columns, filtering).
-   * 
-   */
-  setHrefForMetadataExport: function() {
-      var me = this,
-          taskStore = Ext.StoreManager.get('admin.Tasks'),
-          proxy = taskStore.getProxy(),
-          params = {},
-          taskGrid = Ext.ComponentQuery.query('#adminTaskGrid')[0],
-          visibleColumns = taskGrid.getVisibleColumns(),
-          length = visibleColumns.length,
-          i,
-          col,
-          visibleColumnsNames = [];
-      for (i=0; i < length; i++){
-          col = visibleColumns[i];
-          if (col.hasOwnProperty('dataIndex')) {
-              // taskActionColumn has no dataIndex, but is not needed anyway
-              visibleColumnsNames.push(col.dataIndex);
-          }
-      }
-      params['format'] = 'xlsx';
-      params[proxy.getFilterParam()] = proxy.encodeFilters(taskStore.getFilters().items);
-      params['visibleColumns'] = JSON.stringify(visibleColumnsNames);
-      me.getExportMetaDataBtn().setHref(Editor.data.restpath + 'task?' + Ext.urlEncode(params));
-      // TODO: this might get too long for GET => use POST instead
   }
 });

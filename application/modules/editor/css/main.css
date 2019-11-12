@@ -542,6 +542,9 @@ tr.customState td div {font-style: italic;}
 .ico-task-clone {background-image: url("../images/page_copy.png");}
 .ico-task-excelreimport {background-image: url("../images/table_back.png");}
 
+/* Key Performance Indicators (KPI) */
+.ico-kpi {background-image: url("../images/page_gear.png");}
+
 /* Display */
 .adminTaskGrid tr .x-action-col-icon,
 .adminTaskGrid tr.customState td .x-action-col-icon,
@@ -761,6 +764,16 @@ a.x-btn span.task-confirmation {
 	background-repeat: no-repeat;
     background-position:right top;
     background-image: url(../images/information.png) !important;
+}
+.displayFieldInfoIcon:after {
+    content: "";
+    display: block;
+    background-image:url(../images/information.png);
+    background-repeat:no-repeat;
+    width: 20px;
+    height: 20px;
+    float: right;
+    margin: 0 0 0 5px;
 }
 
 .adminTaskGrid tr:hover td.taskassocs > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
