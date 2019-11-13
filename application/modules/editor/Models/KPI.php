@@ -38,6 +38,15 @@ class editor_Models_KPI {
     protected $tasks = [];
     
     /**
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    protected $translate;
+    
+    public function __construct() {
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+    }
+    
+    /**
      * Set the tasks the KPI are to be calculated for.
      * @param array $rows
      */
@@ -73,7 +82,7 @@ class editor_Models_KPI {
      * TODO: With TRANSLATE-1455, change these to:
      * - startDate: assigned
      * - endDate: review delivered
-     * @return float|string Number of days or '-' if statistics can't be calculated
+     * @return string '123 days' or '-' if statistics can't be calculated
      */
     protected function getAverageProcessingTime() {
         if (!$this->hasStatistics()) {
@@ -100,7 +109,7 @@ class editor_Models_KPI {
         }
         if (count($allProcessingTimes) > 0) {
             $average = array_sum($allProcessingTimes) / count($allProcessingTimes);
-            $average = round($average, 0);
+            $average = round($average, 0) . ' ' . $this->translate->_('Tage');
         }
         return $average;
     }

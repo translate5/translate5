@@ -237,7 +237,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $kpiStatistics = $kpi->getStatistics();
         
         // For Front-End:
-        $this->view->kpiStatistics = $kpiStatistics;
+        $this->view->averageProcessingTime = $kpiStatistics['averageProcessingTime'];
+        $this->view->excelExportUsage = $kpiStatistics['excelExportUsage'];
         
         // ... or as Metadata-Excel-Export (= task-overview, filter, key performance indicators KPI):
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();

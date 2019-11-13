@@ -1662,8 +1662,7 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
 <trans-unit id='S2V5IFBlcmZvcm1hbmNlIEluZGljYXRvcnM='><source>Key Performance Indicators</source><target>Key Performance Indicators</target></trans-unit>
 <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCBMZWt0b3I='><source>Ø Bearbeitungszeit Lektor</source><target>Ø Bearbeitungszeit Lektor</target></trans-unit>
-<trans-unit id='JTAuMGYgVGFnZQ=='><source>%0.0f Tage</source><target>%0.0f Tage</target></trans-unit>
-<trans-unit id='ezB9IFRhZ2U='><source>{0} Tage</source><target>{0} Tage</target></trans-unit>
+<trans-unit id='VGFnZQ=='><source>Tage</source><target>Tage</target></trans-unit>
 <trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdCB2b24gZGVyIFp1d2Vpc3VuZyBiaXMgenVtIEFic2NobHVzcyBlaW5lciBBdWZnYWJlLg=='><source>Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.</source><target>Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.</target></trans-unit>
 <trans-unit id='RXhjZWwtRXhwb3J0IE51dHp1bmc='><source>Excel-Export Nutzung</source><target>Excel-Export Nutzung</target></trans-unit>
 <trans-unit id='UHJvemVudCBkZXIgQXVmZ2FiZW4sIGJlaSBkZW5lbiBkZXIgRXhjZWwtRXhwb3J0IGRlciBTZWdtZW50dGFiZWxsZSBnZW51dHp0IHd1cmRlLg=='><source>Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.</source><target>Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.</target></trans-unit>
