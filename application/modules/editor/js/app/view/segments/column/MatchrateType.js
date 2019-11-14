@@ -229,10 +229,10 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
             var path;
             if(Editor.data.segments.matchratetypes && Editor.data.segments.matchratetypes[val]) {
                 path = Editor.data.segments.matchratetypes[val];
-                newValue[idx] = {
+                newValue.push({
                     type: val,
                     path: path
-                };
+                });
             }
         });
         return me.imgTpl.apply({types: newValue, edited: !isImport});

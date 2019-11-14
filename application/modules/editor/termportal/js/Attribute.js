@@ -110,11 +110,9 @@ var Attribute={
             
         console.log('onEditAttributeClick');
         
-        //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-			return false;
-    	}
+        if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
+            return false;
+        }
     	
         // In tbx, "definition" belongs to the <langSet> (= level between <termEntry> and <term>).
         // In the TermPoral, the user can edit definitions only in the termEntry-Attributes,
@@ -173,20 +171,20 @@ var Attribute={
             url,
             $attribute,
             yesCallback,
-            yesText;
+            yesText=proposalTranslations['Ja'],
+			noText=proposalTranslations['Nein'],
+			buttons={};
         
-        //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-			return false;
-    	}
+        if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
+            return false;
+        }
     	
         $parent=$element.parents('h4.attribute-data');//the button parrent
 		if($parent.length === 0){
 			return;
 		}
-		
-        attributeId=$parent.data('attributeId');
+
+		attributeId=$parent.attr('data-attribute-id');
         
 		yesCallback=function(){
 			//ajax call to the remove proposal action
@@ -197,10 +195,12 @@ var Attribute={
 		        dataType: "json",	
 		        type: "POST",
 		        success: function(result){
+		        	//on the next term click, fatch the data from the server, and update the cache
+		    		Term.reloadTermEntry=true;
 		        	//reload the termEntry when the attribute is deleted (not proposal)
 		        	if(!result.rows || result.rows.length === 0){
 		        		//TODO: if needed add also for termentry attributes
-		        		$attribute=me.getAttributeComponent($parent.data('attributeId'),'termAttribute');
+		        		$attribute=me.getAttributeComponent($parent.attr('data-attribute-id'),'termAttribute');
 		        		//if no regular comment holder is found, check for the newly created
 		        		if(!$attribute || $attribute.length === 0){
 		        			$attribute=me.$_termTable.find('p[data-id~="-1"][data-type~="termAttribute"]');
@@ -213,12 +213,7 @@ var Attribute={
 		        		return;
 		        	}
 		        	
-		        	
 		        	var attributeData=result.rows;
-		        	
-		        	//on the next term click, fatch the data from the server, and update the cache
-		    		Term.reloadTermEntry=true;
-		    		
 		        	//the term attribute is definition, remove and update the content for the term and term entry attribute definition dom
 		    		if(attributeData.attrType === 'definition'){
 		    			me.checkAndUpdateDeffinition(attributeData);
@@ -237,11 +232,6 @@ var Attribute={
 		        }
 		    });
 		};
-		
-		yesText=proposalTranslations['Ja'],
-			noText=proposalTranslations['Nein'],
-			buttons={
-			};
 		
 		buttons[yesText]=function(){
             $(this).dialog('close');
@@ -284,6 +274,7 @@ var Attribute={
             attVal,
             flagContent = '',
             isDefinition='',
+            isModificationTransacGroup='',
             childData=[],
             childDataText;
             
@@ -291,7 +282,7 @@ var Attribute={
         // ... a proposal for a term that already existed (attribute.proposal = "xyz")
         // ... or a proposal for a new term (attribute.proposal = null, but attrProcessStatus is "unprocessed")
         isProposal = ' is-finalized'; 
-        if (attribute.proposal !== null || attribute.attrProcessStatus === "unprocessed") {
+        if (attribute.proposal || attribute.attrProcessStatus === "unprocessed") {
             isProposal = ' is-proposal';
         }
         
@@ -299,7 +290,11 @@ var Attribute={
         	isDefinition=' is-definition ';
         }
         
-        headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + isProposal + isDefinition +'" data-attribute-id="'+attribute.attributeId+'">';
+        if(me.isTransacModificationAttribute(attribute)){
+        	isModificationTransacGroup=' is-transac-modification ';
+        }
+        
+        headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' +isModificationTransacGroup+ proposable + isProposal + isDefinition +'" data-attribute-id="'+attribute.attributeId+'">';
         headerTagClose='</h4>';
         
 	    switch(attribute.name) {
@@ -318,10 +313,10 @@ var Attribute={
 	                    
 	                    //the data tag is displayed as first in this group
 	                    if(child.name === "date"){
-	                        childData.unshift(me.getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)));
+	                        childData.unshift(me.getAttributeContainerRender(child,(childDataText + ' ' + attVal)));
 	                        return true;
 	                    }
-	                    childData.push(me.getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)));
+	                    childData.push(me.getAttributeContainerRender(child,(childDataText + ' ' + attVal)));
 	                });
 	                html+=childData.join('');
 	            }
@@ -381,12 +376,14 @@ var Attribute={
 		if(!attribute.proposal){
 			this.removeDomProposal(this.$_termTable,attribute);
 			this.removeDomProposal(this.$_termEntryAttributesTable,attribute);
+			//this will refresh the languageDefinitionContent definition holder 
+			this.handleAttributeDrawData(attribute);
 			return;
 		}
 
 		var me = this,
 			renderData=me.getAttributeRenderData(attribute,attribute.value),
-			$attributes = me.$_resultTermsHolder.find('span[data-editable][data-type][data-id="'+attribute.attributeId+'"]');
+			$attributes = me.$_termTable.find('span[data-id="'+attribute.attributeId+'"]');
 		
 		$attributes.each(function(i,att){
 			att=$(att);
@@ -448,14 +445,24 @@ var Attribute={
 	        }
 	        attVal=$.datepicker.formatDate(dateFormat, new Date(attVal*1000));
 	    }
-	    if (attribute.attrType === "processStatus" && attVal === "finalized") {
-	    	attVal='<img src="' + moduleFolder + 'images/tick.png" alt="finalized" title="finalized">';
-	    }else if(attribute.attrType === "processStatus" && attVal === "provisionallyProcessed"){
-	    	attVal="-";
-	    } else {
-	    	attVal=attVal.replace(/$/mg,'<br>');
-	    }
 	    
+	    //for the processStatus attribute render icon or translated text
+	    if(attribute.name === "termNote" && attribute.attrType === "processStatus"){
+	    	var tooltip=Editor.data.apps.termportal.allProcessstatus[attVal] ? Editor.data.apps.termportal.allProcessstatus[attVal] : attVal;
+	    	//when the attribute is processStatus, translate the given processStatus value
+	    	switch(attVal) {
+	    	  case "finalized":
+	    		  attVal='<img src="' + moduleFolder + 'images/tick.png" alt="'+tooltip+'" title="'+tooltip+'">';
+	    	    break;
+	    	  case "provisionallyProcessed":
+	    		  attVal="-";
+	    	    break;
+	    	  default:
+	    		  //for all other processStatus values use the translated value string
+	    		  attVal=tooltip;
+	    		  attVal=attVal.replace(/$/mg,'<br>');
+	    	}
+	    }
 	    return me.getAttributeRenderData(attribute,attVal);
 	},
 	
@@ -483,6 +490,31 @@ var Attribute={
 		//the user has proposal rights -> init attribute proposal span
 		return me.getProposalDefaultHtml(attributeData.attributeOriginType,attributeData.attributeId,attValue,attributeData);
 	},
+	
+	/***
+	 * Return the term attribute container render data.
+	 * If addHolder is set, the html will be surrounded with termAttributeHolder div
+	 */
+	getTermAttributeContainerRenderData:function(term,addHolder){
+		var me=this,
+			termRflLang = (term.attributes[0] !== undefined) ? term.attributes[0].language : '',
+			renderData=[];	
+		
+		if(addHolder){
+			renderData.push('<div data-term-id="'+term.termId+'" data-collection-id="'+term.collectionId+'" class="term-attributes">');
+		}
+		
+        if (term.termId !== -1) {
+            renderData.push(Term.renderInstantTranslateIntegrationForTerm(termRflLang));
+        }
+        //draw term attributes
+        renderData.push(me.renderTermAttributes(term,termRflLang));
+		
+        if(addHolder){
+			renderData.push('</div>');
+        }
+        return renderData.join(' ');
+	},
 
 	/***
 	 * Get the proposalable component default html. 
@@ -500,11 +532,18 @@ var Attribute={
 	 * The attribute container holder. All attributes and attribute proposals must be surrounded with this container.
 	 */
 	getAttributeContainerRender:function(attribute,html){
-		var isComment='';
-		if(attribute && attribute.name === 'note'){
-			isComment='class="isAttributeComment"';
+		var me=this,
+			addClass='';
+		if(me.isNoteAttribute(attribute)){
+			addClass='class="isAttributeComment"';
 		}
-		return '<p '+isComment+' data-type="'+attribute.attributeOriginType+'" data-id="'+attribute.attributeId+'">'+html+'</p>';
+		if(me.isDateAttribute(attribute)){
+			addClass='class="isAttributeDate"';
+		}
+		if(me.isResponsiblePersonAttribute(attribute)){
+			addClass='class="isResponsiblePerson"';
+		}
+		return '<p '+addClass+' data-type="'+attribute.attributeOriginType+'" data-id="'+attribute.attributeId+'">'+html+'</p>';
 	},
 	
 	/***
@@ -596,6 +635,81 @@ var Attribute={
     		}
     	}
     	return labelName+' '+labelType;
+    },
+    
+    /***
+     * Remove the complete attribute from the term attribute holder by given term attribute component editor
+     */
+    removeNewInputAttribute:function($componentEditor){
+    	 //find the term holder and remove each unexisting comment attribute dom
+        var $termHolder=$componentEditor.parents('div[data-term-id]');
+        $termHolder.children('p[data-id="-1"]').remove();
+        $termHolder.children('h4[data-attribute-id="-1"]').remove();
+        $componentEditor.replaceWith('');
+    },
+    
+    /***
+     * Reset the comment attribute component to its initial state
+     * @param {Object} $$componentEditor   = the textarea(component editor)
+     * @param {Object} attributeData = the comment attribute data. If no comment attribute data is provided, the function will try to find it in the cache
+     */
+    resetCommentAttributeComponent:function($componentEditor,attributeData){
+    	//if no attribute data is provided, try to find the data from the cache
+    	if(!attributeData){
+    		var $termHolder=$componentEditor.parents('div[data-term-id]'),
+	    		termId=$termHolder.data('term-id'),
+	    		termData=Term.getTermDataFromCache(Term.newTermTermEntryId,termId);
+    		
+    		for(var i=0;i<termData.attributes.length;i++){
+    			var attribute=termData.attributes[i];
+    			if(attribute.name=='note'){
+    				attributeData=attribute;
+    				break;
+    			}
+    		}
+    	}
+    	//if still no attribute data, it is a new comment -> remove the attribute
+    	if(!attributeData){
+    		this.removeNewInputAttribute($componentEditor);
+    		return;
+    	}
+    	//the comment attribute data exist, render the attribute from the data
+        var componentRenderData=Attribute.getAttributeRenderData(attributeData,attributeData.attrValue);
+        $componentEditor.replaceWith(componentRenderData);
+    },
+    
+    /***
+     * Check if the given attribute is od type transac date
+     */
+    isDateAttribute:function(attribute){
+    	return attribute && attribute.name=='date';
+    },
+    
+    /***
+     * Check if the given attribute is of type note (comment)
+     */
+    isNoteAttribute:function(attribute){
+    	return attribute && attribute.name=='note';
+    },
+    
+    /***
+     * Check if the given attribute is for resposible person (the person name in the transac group)
+     */
+    isResponsiblePersonAttribute:function(attribute){
+    	if(!attribute){
+    		return false;
+    	}
+    	return attribute.name=='transacNote' && (attribute.attrType=='responsiblePerson' || attribute.attrType=='responsibility');
+    },
+    
+    /***
+     * Check if the given attribute is of type transac modification
+     */
+    isTransacModificationAttribute:function(attribute){
+    	if(!attribute){
+    		return false;
+    	}
+    	return attribute.name=='transac' && attribute.attrType=='modification';
     }
 };
 

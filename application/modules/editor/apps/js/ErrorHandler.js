@@ -25,38 +25,21 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-/**
- * @class Editor.view.searchandreplace.TabPanelViewController
- * @extends Ext.app.ViewController
+/***
+ * On ajax error global handler
+ * @param event
+ * @param jqxhr
+ * @returns
  */
-Ext.define('Editor.view.searchandreplace.TabPanelViewController', {
-    extend: 'Ext.app.ViewController',
-    alias: 'controller.tabpanelviewcontroller',
-    
-    /***
-     * Close button handler
-     */
-    onCloseButtonClick:function(){
-        this.getView().up('window').destroy();
-    },
-    
-    /***
-     * On tab panel tab change handler.
-     * Set the viewmodel search view
-     */
-    onTabPanelTabChange:function(tabpanel,newCard,oldCard,eOpts){
-        var me=this,
-            tabViewModel=me.getView().getViewModel(),
-            newSearchField=newCard.down('#searchField'),
-            oldSearchField=oldCard.down('#searchField'),
-            isSearchTab=newCard.xtype == 'searchTab';
-        
-        newSearchField.setValue(oldSearchField.getRawValue());
-        newSearchField.focus();
-        
-        //set the search view flag
-        tabViewModel.set('searchView',isSearchTab);
-        newCard.getController().resetSearchParametars();
-        
-    }
+$(document).ajaxError(function(event, jqxhr) {
+	//logout on 401
+	if(jqxhr.status==401){
+		//the login url is different in the iframe
+		var loginUrl=Editor.data.loginUrl || Editor.data.apps.loginUrl;
+		if(window.parent!=undefined){
+            window.parent.location = loginUrl;
+        }else{
+        	window.location =loginUrl;
+        }
+	}
 });

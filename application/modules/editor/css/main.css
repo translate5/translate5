@@ -444,6 +444,7 @@ div.loading div#loading-indicator-text {
 .ico-error {background-image: url("../images/exclamation.png");}
 .ico-cancel {background-image: url("../images/cross.png");}
 .ico-task-add {background-image: url("../images/page_add.png");}
+.ico-export {background-image: url("../images/database_go.png");}
 .ico-user-add {background-image: url("../images/user_add.png");}
 .ico-user-del {background-image: url("../images/user_delete.png");}
 .ico-add {background-image: url("../images/table_row_insert.png");}
@@ -542,6 +543,9 @@ tr.customState td div {font-style: italic;}
 .ico-task-showexportmenu {background-image: url("../images/database_go.png");}
 .ico-task-clone {background-image: url("../images/page_copy.png");}
 .ico-task-excelreimport {background-image: url("../images/table_back.png");}
+
+/* Key Performance Indicators (KPI) */
+.ico-kpi {background-image: url("../images/page_gear.png");}
 
 /* Display */
 .adminTaskGrid tr .x-action-col-icon,
@@ -763,6 +767,16 @@ a.x-btn span.task-confirmation {
     background-position:right top;
     background-image: url(../images/information.png) !important;
 }
+.displayFieldInfoIcon:after {
+    content: "";
+    display: block;
+    background-image:url(../images/information.png);
+    background-repeat:no-repeat;
+    width: 20px;
+    height: 20px;
+    float: right;
+    margin: 0 0 0 5px;
+}
 
 .adminTaskGrid tr:hover td.taskassocs > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 .adminTaskGrid .x-grid-header-ct .taskassocs > div {background:url(../images/share.png) no-repeat 10px 9px;}
@@ -800,7 +814,6 @@ a.x-btn span.task-confirmation {
 	background-image:url(../images/help.png) !important;
 }
 
-
 .userSellectedSegments td {
     border-top: thin solid red; 
     border-bottom: thin solid red;
@@ -813,3 +826,6 @@ a.x-btn span.task-confirmation {
 .userSellectedSegments td:last-child {
     border-right: thin solid red;
 }
+
+.ico-arrow-back {background-image: url(../images/arrow_left.png);}
+.ico-finish-task {background-image: url(../images/tick.png);}

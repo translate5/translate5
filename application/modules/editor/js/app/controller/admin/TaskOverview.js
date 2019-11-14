@@ -36,7 +36,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   requires: ['Editor.view.admin.ExportMenu'],
   models: ['admin.Task', 'admin.task.Log'],
   stores: ['admin.Users', 'admin.Tasks','admin.Languages', 'admin.task.Logs'],
-  views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow'],
+  views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow'],
   refs : [{
       ref: 'headToolBar',
       selector: 'headPanel toolbar#top-menu'
@@ -58,6 +58,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },{
       ref: 'taskAddWindow',
       selector: '#adminTaskAddWindow'
+  },{
+      ref: 'exportMetaDataBtn',
+      selector: '#adminTaskGrid #export-meta-data-btn'
+  },{
+      ref: 'averageProcessingTimeDisplay',
+      selector: '#kpiWindow #kpi-average-processing-time-display'
+  },{
+      ref: 'excelExportUsageDisplay',
+      selector: '#kpiWindow #kpi-excel-export-usage-display'
   }],
   alias: 'controller.taskOverviewController',
   
@@ -97,62 +106,70 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       deleteTaskDialogMessage:'#UT#Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?',
       deleteTaskDialogTitle:'#UT#Aufgabe löschen',
       taskImportButtonText:'#UT#Aufgabe importieren',
-      taskDeleteButtonText:'#UT#Aufgabe löschen'
+      taskDeleteButtonText:'#UT#Aufgabe löschen',
+      averageProcessingTimeLabel: 'Ø Bearbeitungszeit Lektor',
+      averageProcessingTimeDays: '{0} Tage',
+      excelExportUsageLabel: 'Excel-Export Nutzung'
   },
-  init : function() {
-      var me = this;
-      //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
-      Editor.app.on('adminViewportClosed', me.clearTasks, me);
-      Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
-      
-      me.getAdminTasksStore().on('load', me.startCheckImportStates, me);
-      
-      me.control({
+  listen: {
+      controller: {
+          '#Editor.$application': {
+              adminViewportClosed: 'clearTasks',
+              editorViewportOpened: 'handleInitEditor'
+          },
+      },
+      component: {
           'headPanel toolbar#top-menu' : {
-              beforerender: me.initMainMenu
+              beforerender: 'initMainMenu'
           },
           'button#task-admin-btn': {
-              click: me.openTaskGrid
+              click: 'openTaskGrid'
           },
           '#adminTaskGrid': {
-              hide: me.handleAfterHide,
-              show: me.handleAfterShow,
-              celldblclick: me.handleGridClick, 
-              cellclick: me.handleGridClick 
+              hide: 'handleAfterHide',
+              show: 'handleAfterShow',
+              celldblclick: 'handleGridClick', 
+              cellclick: 'handleGridClick'
           },
           '#adminTaskGrid #reload-task-btn': {
-              click: me.handleTaskReload
+              click: 'handleTaskReload'
           },
           '#adminTaskGrid taskActionColumn': {
-              click: me.taskActionDispatcher
+              click: 'taskActionDispatcher'
           },
           '#adminTaskGrid #add-task-btn': {
-              click: me.handleTaskAddShow
+              click: 'handleTaskAddShow'
+          },
+          '#adminTaskGrid #export-meta-data-btn': {
+              click: 'handleMetaDataExport'
+          },
+          '#adminTaskGrid #show-kpi-btn': {
+              click: 'handleKPIShow'
           },
           '#adminTaskAddWindow': {
-              show:me.onAdminTaskAddWindowShow,
-              close:me.onAdminTaskAddWindowClose
+              show: 'onAdminTaskAddWindowShow',
+              close: 'onAdminTaskAddWindowClose'
            },
           '#adminTaskAddWindow #add-task-btn': {
-              click: me.handleTaskAdd
+              click: 'handleTaskAdd'
           },
           '#adminTaskAddWindow #cancel-task-btn': {
-              click: me.handleTaskCancel
+              click: 'handleTaskCancel'
           },
           '#adminTaskAddWindow #continue-wizard-btn': {
-              click: me.handleContinueWizardClick
+              click: 'handleContinueWizardClick'
           },
           '#adminTaskAddWindow #skip-wizard-btn': {
-              click: me.handleSkipWizardClick
+              click: 'handleSkipWizardClick'
           },
           '#adminTaskAddWindow filefield[name=importUpload]': {
-              change: me.handleChangeImportFile
+              change: 'handleChangeImportFile'
           },
           'adminTaskAddWindow panel:not([hidden])': {
-              wizardCardFinished:me.onWizardCardFinished,
-              wizardCardSkiped:me.onWizardCardSkiped
+              wizardCardFinished: 'onWizardCardFinished',
+              wizardCardSkiped: 'onWizardCardSkiped'
           }
-      });
+      }
   },
     //***********************************************************************************
     //Begin Events
@@ -501,6 +518,85 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       }
       Ext.widget('adminTaskAddWindow').show();
   },
+  
+  /**
+   * Show Key Performance Indicators (KPI) for currently filtered tasks.
+   */
+  handleKPIShow: function() {
+      var me = this,
+          win = Ext.widget('adminTaskKpiWindow'),
+          taskStore = Ext.StoreManager.get('admin.Tasks'),
+          proxy = taskStore.getProxy(),
+          url = Editor.data.restpath+'task/kpi',
+          method = 'POST',
+          params = {};
+      
+      win.show();
+      win.setLoading(true);
+      
+      params[proxy.getFilterParam()] = proxy.encodeFilters(taskStore.getFilters().items);
+      
+      Ext.Ajax.request({
+          url: url,
+          method: method,
+          params: params,
+          success: function(response){
+              var resp = Ext.util.JSON.decode(response.responseText),
+                  kpiStatistics,
+                  average,
+                  averageProcessingTimeMessage,
+                  excelExportUsageMessage;
+              kpiStatistics = resp.kpiStatistics;
+              // KPI: averageProcessingTimeMessage
+              average = kpiStatistics.averageProcessingTime;
+              if (average !== '-') {
+                  average = Ext.String.format(me.strings.averageProcessingTimeDays, average);
+              }
+              averageProcessingTimeMessage = me.strings.averageProcessingTimeLabel + ': ' + average;
+              // KPI: excelExportUsage
+              excelExportUsageMessage = kpiStatistics.excelExportUsage + ' ' + me.strings.excelExportUsageLabel;
+              // update fields and stop loading-icon
+              me.getAverageProcessingTimeDisplay().update(averageProcessingTimeMessage);
+              me.getExcelExportUsageDisplay().update(excelExportUsageMessage);
+              win.setLoading(false);
+          },
+          failure: function(){
+              // TODO: show error-message?
+              win.setLoading(false);
+          } 
+      });
+  },
+  
+  /**
+   * Export the current state of taskGrid for all currently filtered tasks
+   * and their KPI-statistics.
+   */
+  handleMetaDataExport: function() {
+      var taskStore = Ext.StoreManager.get('admin.Tasks'),
+          proxy = taskStore.getProxy(),
+          params = {},
+          taskGrid = Ext.ComponentQuery.query('#adminTaskGrid')[0],
+          visibleColumns = taskGrid.getVisibleColumns(),
+          length = visibleColumns.length,
+          i,
+          col,
+          visibleColumnsNames = [],
+          href;
+      for (i=0; i < length; i++){
+          col = visibleColumns[i];
+          if (col.hasOwnProperty('dataIndex')) {
+              // taskActionColumn has no dataIndex, but is not needed anyway
+              visibleColumnsNames.push(col.dataIndex);
+          }
+      }
+      params['format'] = 'xlsx';
+      params[proxy.getFilterParam()] = proxy.encodeFilters(taskStore.getFilters().items);
+      params['visibleColumns'] = JSON.stringify(visibleColumnsNames);
+      href = Editor.data.restpath + 'task/kpi?' + Ext.urlEncode(params);
+      // TODO: this might get too long for GET => use POST instead
+      window.open(href);
+  },
+  
   /**
    * reloads the Task Grid, will also be called from other controllers
    */
@@ -926,5 +1022,5 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           return !this.fireEvent('periodicalTaskReloadIgnore', task);
       }          
       return false;
-  }  
+  }
 });

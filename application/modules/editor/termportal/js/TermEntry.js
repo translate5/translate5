@@ -51,16 +51,17 @@ var TermEntry={
 	    drawDataContainer=commentAttribute.concat(drawDataContainer);
 	    
 	    me.$_termEntryAttributesTable.append(drawDataContainer.join(''));
+	    Term.drawProposalButtons('attribute');
 	},
 
     
     /***
-     * Update front-end for given groupId.
+     * Update front-end for given termEntryId.
      */
-    reloadTermEntry: function(groupId) {
+    reloadTermEntry: function(termEntryId) {
         console.log('reloadTermEntry');
         Term.reloadTermEntry = true;
-        Term.findTermsAndAttributes(groupId);
+        Term.findTermsAndAttributes(termEntryId);
     }
 };
 

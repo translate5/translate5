@@ -150,6 +150,12 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                     items: [
                         {
                             xtype: 'button',
+                            itemId: 'userPrefReload',
+                            iconCls: 'ico-refresh',
+                            text: me.strings.reload
+                        },
+                        {
+                            xtype: 'button',
                             itemId: 'userPrefAdd',
                             iconCls: 'ico-add',
                             text: me.strings.add
@@ -168,12 +174,6 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                                 });
                             },
                             text: me.strings.remove
-                        },
-                        {
-                            xtype: 'button',
-                            itemId: 'userPrefReload',
-                            iconCls: 'ico-refresh',
-                            text: me.strings.reload
                         }
                     ]
                 }

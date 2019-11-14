@@ -87,18 +87,16 @@ var Term={
             me.newTermTermEntryId = $selected.attr('data-termentryid');
             me.newTermGroupId = $selected.attr('data-value');
             // show Terms and Attributes
-            me.findTermsAndAttributes($selected.attr('data-value'));
+            me.findTermsAndAttributes($selected.attr('data-termentryid'));
 		},
 		
 		/***
 		 * On term/term entry results tab before activate event
 		 */
 		onResultTabBeforeActivate:function(){
-			//if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-    			return false;
-        	}			
+            if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
+                return false;
+            }
 		},
 		
 		/***
@@ -265,7 +263,7 @@ var Term={
                 me.newTermGroupId = me.searchTermsResponse[0].groupId;
 	            me.newTermTermEntryId = me.searchTermsResponse[0].termEntryId;
 				console.log('fillSearchTermSelect: only one record => find the attributes and display them');
-				me.findTermsAndAttributes(me.searchTermsResponse[0].groupId);
+				me.findTermsAndAttributes(me.searchTermsResponse[0].termEntryId);
 				return;
 			}
 			
@@ -281,32 +279,32 @@ var Term={
 		},
 		
 		/***
-		 * Find all terms and terms attributes for the given term entry id (groupId)
-		 * @param termGroupid
+		 * Find all terms and terms attributes for the given term entry id
+		 * @param termEntryId
 		 * @returns
 		 */
-		findTermsAndAttributes:function(termGroupid){
-		    if (termGroupid === undefined) {
+		findTermsAndAttributes:function(termEntryId){
+		    if (termEntryId === undefined) {
 		        return; // TODO (quick & dirty - the REAL problem is: this should not happen at all!!)
 		    }
 			var me=this;
-		    console.log('findTermsAndAttributes() for: ' + termGroupid);
+		    console.log('findTermsAndAttributes() for: ' + termEntryId);
 		    Attribute.languageDefinitionContent=[];
             
             me.$_termCollectionSelect.hide();
             
 		    //check the cache
             if (me.reloadTermEntry) {
-                me.termGroupsCache = []; // FIXME: better remove only the groupId's items from the cache instead of setting reloadTermEntry to true!
+                me.termGroupsCache = []; // FIXME: better remove only the termEntryId's items from the cache instead of setting reloadTermEntry to true!
                 me.reloadTermEntry=false; //reset term entry reload flag
                 
                 //hide the no result error if the term is created via no found search
                 me.$_searchErrorNoResults.hide();
                 me.resetNewTermData();
             }
-		    if(me.termGroupsCache[termGroupid]){
-		    	TermEntry.drawTermEntryAttributes(me.termGroupsCache[termGroupid].rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
-		        me.drawTermTable(me.termGroupsCache[termGroupid].rows[me.KEY_TERM_ATTRIBUTES]);
+		    if(me.termGroupsCache[termEntryId]){
+		    	TermEntry.drawTermEntryAttributes(me.termGroupsCache[termEntryId].rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
+		        me.drawTermTable(me.termGroupsCache[termEntryId].rows[me.KEY_TERM_ATTRIBUTES]);
 		        return;
 		    }
 		    
@@ -315,7 +313,7 @@ var Term={
 		        dataType: 'json',
 		        type: 'POST',
 		        data: {
-		            'groupId':termGroupid,
+		            'termEntryId':termEntryId,
 		            'collectionId':getFilteredCollections()
 		        },
 		        success: function(result){
@@ -327,7 +325,7 @@ var Term={
 		        	}
 		        	
 		            //store the results to the cache
-		            me.termGroupsCache[termGroupid]=result;
+		            me.termGroupsCache[termEntryId]=result;
 		            
 		            TermEntry.drawTermEntryAttributes(result.rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
 
@@ -388,6 +386,15 @@ var Term={
                             return;
                         }
 		                
+		            	//var accordion = $(this);
+		            	if($(event.toElement).is("textarea")){
+		            		event.preventDefault();
+		            		return;
+		            	}
+		            	if($(event.toElement).hasClass("proposal-btn") && ui.newHeader.length === 0){
+		            		event.preventDefault();
+		            		return;
+		                }
 		                //if the cancel panding changes return false, do not expand/collapse the current header
 		                if(!me.cancelPendingChanges(ui.oldHeader)){
 		                	event.preventDefault();
@@ -494,7 +501,6 @@ var Term={
                 clientsForCollection,
                 isProposal,
                 proposable = (term.proposable !== false) ? ' proposable' : '', // = does the user have the rights to handle proposals for this term?,
-                instantTranslateIntegrationForTerm,
                 termHeader=[];
             
             // "is-proposal" can be ... 
@@ -518,6 +524,7 @@ var Term={
             termHeader.push('data-term-value="'+term.term+'"');
             termHeader.push('data-term-id="'+term.termId+'"');
             termHeader.push('data-groupid="'+term.groupId+'"');
+            termHeader.push('data-termEntryId="'+term.termEntryId+'"');
             termHeader.push('data-language="'+term.languageId+'"');
             if (term.proposal && term.proposal !== undefined) {
             	termHeader.push('data-proposal="'+term.proposal.term+'"');
@@ -570,14 +577,8 @@ var Term={
             
             termAttributesHtmlContainer.push('</h3>');
             
-            //draw term attributes
-            termAttributesHtmlContainer.push('<div data-term-id="'+term.termId+'" data-collection-id="'+term.collectionId+'" class="term-attributes">');
-            if (term.termId !== -1) {
-                instantTranslateIntegrationForTerm = me.renderInstantTranslateIntegrationForTerm(termRflLang);
-                termAttributesHtmlContainer.push(instantTranslateIntegrationForTerm);
-            }
-            termAttributesHtmlContainer.push(Attribute.renderTermAttributes(term,termRflLang));
-            termAttributesHtmlContainer.push('</div>');
+            //draw term attrbute contaner with the attributes
+            termAttributesHtmlContainer.push(Attribute.getTermAttributeContainerRenderData(term,true));
             
             return termAttributesHtmlContainer.join('');
 		},
@@ -747,8 +748,9 @@ var Term={
 		 * Append or remove buttons for proposals in the DOM.
 		 * Address elements as specific as possible (= avoid long jQuery-selects).
          * @param elements
+         * @param id
 		 */
-        drawProposalButtons: function (elements){
+        drawProposalButtons: function (elements,id){
         	if(!Editor.data.app.user.isTermProposalAllowed){
 				return;
 			}
@@ -760,7 +762,7 @@ var Term={
                 htmlProposalEditIcon    = '<span class="proposal-btn proposal-edit ui-icon ui-icon-pencil"></span>',
                 htmlProposalSaveIcon    = '<span class="proposal-btn proposal-save ui-icon ui-icon-check"></span>',
                 htmlProposalCancelIcon  = '<span class="proposal-btn proposal-cancel ui-icon ui-icon-close"></span>',
-                $_selectorAdd = false, $_selectorDelete = false, $_selectorEdit = false, $_selectorSave = false, $_selectorCancel = false,
+                $_selectorAdd = false, $_selectorDelete = false, $_selectorEdit =false, $_selectorSave = false, $_selectorCancel = false,
                 titleAdd, titleDelete, titleEdit, titleSave, titleCancel,
         		selectedArea='#'+$('#resultTermsHolder ul>.ui-tabs-active').attr('aria-controls');
             
@@ -810,6 +812,14 @@ var Term={
                     titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
+                case 'singleterm':
+                	var termHolder=me.$_termTable.find('div[data-term-id="'+id+'"]');
+                	$_selectorDelete = termHolder.find('.is-proposal');
+                    $_selectorEdit = termHolder.find('.proposable.is-finalized');
+                    termHolder.children('.proposal-btn').remove();
+                    titleDelete = proposalTranslations['deleteProposal'];
+                    titleEdit = proposalTranslations['editProposal'];
+                    break;
                 default:
                     // e.g. after updateComponent(): show ProposalButtons according to the new state
                     $_selectorDelete = elements.filter('.is-proposal');
@@ -823,17 +833,29 @@ var Term={
                 $_selectorRemove.removeClass('in-editing');
                 $_selectorRemove.children('.proposal-btn').remove();
             }
-            if ($_selectorAdd && $_selectorAdd.children('.proposal-btn.proposal-add').length === 0) {
-                $_selectorAdd.append(htmlProposalAddIcon);
-                $_selectorAdd.find('.proposal-add').prop('title', titleAdd);
+            if($_selectorAdd){
+            	$_selectorAdd.each(function() {
+            		if ($( this ).children('.proposal-btn.proposal-add').length === 0) {
+            			$( this ).append(htmlProposalAddIcon);
+            			$( this ).find('.proposal-add').prop('title', titleAdd);
+            		}
+            	});
             }
-            if ($_selectorEdit && $_selectorEdit.children('.proposal-btn.proposal-edit').length === 0) {
-                $_selectorEdit.append(htmlProposalEditIcon);
-                $_selectorEdit.children('.proposal-edit').prop('title', titleEdit);
+            if($_selectorEdit){
+            	$_selectorEdit.each(function() {
+            		if ($( this ).children('.proposal-btn.proposal-edit').length === 0) {
+            			$( this ).append(htmlProposalEditIcon);
+            			$( this ).children('.proposal-edit').prop('title', titleEdit);
+            		}
+            	});
             }
-            if ($_selectorDelete && $_selectorDelete.children('.proposal-btn.proposal-delete').length === 0) {
-                $_selectorDelete.append(htmlProposalDeleteIcon);
-                $_selectorDelete.children('.proposal-delete').prop('title', titleDelete);
+            if($_selectorDelete){
+            	$_selectorDelete.each(function() {
+            		if ($( this ).children('.proposal-btn.proposal-delete').length === 0) {
+            			$( this ).append(htmlProposalDeleteIcon);
+            			$( this ).children('.proposal-delete').prop('title', titleDelete);
+            		}
+            	});
             }
             if ($_selectorSave) {
                 $_selectorSave.addClass('in-editing');
@@ -940,6 +962,7 @@ var Term={
                 'definition': '',
                 'desc': '',
                 'groupId': me.newTermGroupId,
+                'termEntryId': me.newTermTermEntryId,
                 'label': '',
                 'languageId': me.newTermLanguageId,
                 'proposal': null,
@@ -1108,18 +1131,16 @@ var Term={
 			if(parent.length === 0){
 				return;
 			}
-			
-			 //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-    			return false;
-        	}
+
+            if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
+                return false;
+            }
 			
 			var yesCallback=function(){
 				//ajax call to the remove proposal action
 				var me=event.data.scope,
-					url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace('{ID}',$parent.data('term-id')),
-					groupId=$parent.data('groupid') || me.newTermGroupId;
+					url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace('{ID}',$parent.attr("data-term-id")),
+					termEntryId=$parent.data('termEntryId') || me.newTermTermEntryId;
 
 				$.ajax({
 			        url: url,
@@ -1129,19 +1150,10 @@ var Term={
 			        	me.reloadTermEntry=true;
 			        	//reload the termEntry when the term is removed
 			        	if(!result.rows || result.rows.length === 0){
-			        		me.findTermsAndAttributes(groupId);
+			        		me.findTermsAndAttributes(termEntryId);
 			        		return;
 			        	}
-			        	
-			        	//the term proposal is removed, render the initial term proposable content
-			        	var renderData=me.renderTermData(result.rows),
-			        		ins=$parent.find('ins');
-			        		
-			        	ins.replaceWith(renderData);
-			        	$parent.find('del').empty();
-
-			        	$parent.switchClass('is-proposal','is-finalized');
-			        	me.drawProposalButtons($parent);
+			        	me.onTermProposalRemove($parent,result.rows);
 			        }
 			    });
 			};
@@ -1175,12 +1187,10 @@ var Term={
          */
         onAddTermEntryClick: function(event){
             console.log('onAddTermEntryClick');
-            
-            //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-    			return false;
-        	}
+
+            if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
+                return false;
+            }
         	
             var me = event.data.scope,
                 filteredCollections = getFilteredCollections();
@@ -1221,12 +1231,10 @@ var Term={
                 $_termSkeleton = me.$_termTable.find('.is-new'), // TODO: use DOM-cache
                 $termEditorSpan = $_termSkeleton.find('[data-editable]'),
                 $termEditorHolder = me.$_termTable.find('div[data-term-id="-1"]');
-            
-            //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-    			return false;
-        	}
+
+            if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
+                return false;
+            }
         	
             // if language is not set yet, draw language-select first...
             if (me.newTermLanguageId === null) {
@@ -1265,12 +1273,10 @@ var Term={
         		//close the opened term editor
         		termHeader.find('span.proposal-cancel').mouseup();
         	}
-        	
-        	//if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
-        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
-    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
-    			return false;
-        	}
+
+            if (!ComponentEditor.isCommmentAttributeRequirementMet()) {
+                return false;
+            }
         	
         	//render the cancel icons for the attributes
         	this.drawProposalButtons('attributeEditingOpened')
@@ -1281,6 +1287,90 @@ var Term={
 	    		$(editor).mouseup();
 	        });
 	    	return true;
+        },
+        
+        /***
+         * After the term is removed handler.
+         * This will update the new term content with the new data
+         * @param $termParent : the acordion h3 term header
+         * @param term: the term data with attributes
+         */ 
+        onTermProposalRemove:function($termParent,term){
+        	//the term proposal is removed, render the initial term proposable content
+        	var me=this,
+        		renderData=me.renderTermData(term),
+        		ins=$termParent.find('ins'),
+        		$termAttributeHolder = me.$_termTable.find('div[data-term-id="' + term.id + '"]'),
+        		termAttributeContainerData=Attribute.getTermAttributeContainerRenderData(term);
+        		
+        	ins.replaceWith(renderData);
+        	$termParent.find('del').empty();
+
+        	$termParent.switchClass('is-proposal','is-finalized');
+        	
+        	$termAttributeHolder.empty();
+        	//replace the term attribute container with the fresh data
+        	$termAttributeHolder.append(termAttributeContainerData);
+        	
+    		me.$_termTable.accordion('refresh');
+			me.initInstantTranslateSelect();
+			
+			me.drawProposalButtons($termParent);
+        	me.drawProposalButtons('singleterm',term.id);
+        },
+        
+    	/***
+         * Get term data from the cache
+         */
+        getTermDataFromCache:function(termEntryId,termId){
+        	var me=this,
+        		data=[];
+        	
+        	if(!me.termGroupsCache[termEntryId] || !me.termGroupsCache[termEntryId].rows || !me.termGroupsCache[termEntryId].rows[me.KEY_TERM_ATTRIBUTES]){
+        		return data;
+        	}
+        	data=me.termGroupsCache[termEntryId].rows[me.KEY_TERM_ATTRIBUTES];
+    		for(var i=0;i<data.length;i++){
+        		var term=data[i];
+        		//the field value in cache is the termid
+        		if(term.value==termId){
+        			return term;
+        		}
+        	}
+    		return [];
+        },
+        
+        /***
+         * Rerfresh the term attribute container with the fresh data from the database
+         */
+        refreshTermAttributeContent:function(term){
+			//for the new term, term attribute render data is required
+			var termRflLang=(term.attributes && term.attributes[0].language!=undefined) ? term.attributes[0].language : '',
+				attributeRenderData=Attribute.renderTermAttributes(term,termRflLang),
+				$termHeader=Term.getTermHeader(term.termId),
+				instantTranslateInto=Term.renderInstantTranslateIntegrationForTerm(term.language),
+				$termAttributeHolder=$termHeader.next('div[data-term-id]');
+
+			$termAttributeHolder.attr('data-term-id', term.termId);
+			$termAttributeHolder.attr("data-groupid",term.groupId);
+			$termAttributeHolder.attr("data-termEntryId",term.termEntryId);
+			$termAttributeHolder.empty();
+			$termAttributeHolder.append(attributeRenderData);
+			
+			//render the instant translate into select
+			if(instantTranslateInto){
+				$termAttributeHolder.prepend(instantTranslateInto);
+				Term.initInstantTranslateSelect();
+			}
+        },
+        
+        /***
+         * Find the current active term in the accordion
+         */
+        findActiveTermHeader:function(){
+        	var me=this,
+        		activeTermHeader= me.$_termTable.find('h3.ui-accordion-header-active');
+        	return activeTermHeader.length>0 ? activeTermHeader : null;
         }
 };
 

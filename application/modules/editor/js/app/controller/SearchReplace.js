@@ -578,7 +578,14 @@ Ext.define('Editor.controller.SearchReplace', {
      * Handler for search
      */
     triggerSearch:function(field,ev,eOpts){
-        var me=this;
+        var me=this,
+        	tabPanel=me.getTabPanel(),
+        	activeTab=tabPanel.getActiveTab(),
+        	isValid=activeTab.isValid();
+        
+        if(!isValid){
+        	return;
+        }
         
         //set the current field from where the search is triggered
         me.searchFieldTrigger=field;
@@ -782,9 +789,10 @@ Ext.define('Editor.controller.SearchReplace', {
                 data:combo.up('#searchTab') ? searchStoreData :replaceStoreData
             }));
             var rec = combo.findRecord('id',me.activeColumnDataIndex);
-            if(rec){
-                combo.setSelection(rec);
+            if(!rec){
+            	rec=combo.getStore().getAt(0);
             }
+            combo.setSelection(rec);
         });
     },
     
@@ -831,11 +839,6 @@ Ext.define('Editor.controller.SearchReplace', {
 
         //get the search parametars (with filter and sort included)
         params=me.getSearchReplaceParams();
-        
-        if(!params['searchField']){
-        	activeTab.isValid();
-        	return;
-        }
         
         Ext.Ajax.request({
             url: Editor.data.restpath+'segment/search',
@@ -1367,52 +1370,51 @@ Ext.define('Editor.controller.SearchReplace', {
             activeTab=tabPanel.getActiveTab(),
             replaceField=activeTab.down('#searchInField'),
             searchInLockedSegments=activeTab.down('#searchInLockedSegments').checked,
-            selectedColumnDataIndex=replaceField.getSelection().get('id');
-
-        callback = function() {
-            grid.selectOrFocus(goToIndex);
-            var sel = selModel.getSelection();
-
-            if(saveCurrentOpen===false && ed.editing){
-                ed.cancelEdit();
-            }
-            
-            if(me.isContentEditableField()){
-                var theColum=grid.query('gridcolumn[dataIndex="'+selectedColumnDataIndex+'"]'),
-                    editableColumn=null;
-                
-                if(theColum.length>0){
-                    editableColumn=theColum[0];
-                }
-                
-                ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_MOVEEDITOR);
-                
-                //clean the mark tags from the editor
-                me.cleanMarkTags();
-
-                //if is not a locked segment search, do regular find match
-                if(!searchInLockedSegments){
-                    me.findMatchesDelay();
-                }
-            }
-
-            //no editable content or locked search, find matches in the cell
-            if(!me.isContentEditableField() || searchInLockedSegments){
-                var visibleColumns=grid.query('gridcolumn:not([hidden])'),
-                    cellIndex=0;
-    
-                //find the index of the searched column
-                for(var i=0;i<visibleColumns.length;i++){
-                    if(visibleColumns[i].dataIndex===selectedColumnDataIndex){
-                        cellIndex=i;
-                        break;
-                    }
-                }
-                //get searched cell in the selected row
-                var gridCell=grid.getView().getCell(sel[0], cellIndex);
-                me.findMatchesGrid(gridCell);
-            }
-        };
+            selectedColumnDataIndex=replaceField.getSelection().get('id'),
+            callback = function() {
+	            grid.selectOrFocus(goToIndex);
+	            var sel = selModel.getSelection();
+	
+	            if(saveCurrentOpen===false && ed.editing){
+	                ed.cancelEdit();
+	            }
+	            
+	            if(me.isContentEditableField()){
+	                var theColum=grid.query('gridcolumn[dataIndex="'+selectedColumnDataIndex+'"]'),
+	                    editableColumn=null;
+	                
+	                if(theColum.length>0){
+	                    editableColumn=theColum[0];
+	                }
+	                
+	                ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_MOVEEDITOR);
+	                
+	                //clean the mark tags from the editor
+	                me.cleanMarkTags();
+	
+	                //if is not a locked segment search, do regular find match
+	                if(!searchInLockedSegments){
+	                    me.findMatchesDelay();
+	                }
+	            }
+	
+	            //no editable content or locked search, find matches in the cell
+	            if(!me.isContentEditableField() || searchInLockedSegments){
+	                var visibleColumns=grid.query('gridcolumn:not([hidden])'),
+	                    cellIndex=0;
+	    
+	                //find the index of the searched column
+	                for(var i=0;i<visibleColumns.length;i++){
+	                    if(visibleColumns[i].dataIndex===selectedColumnDataIndex){
+	                        cellIndex=i;
+	                        break;
+	                    }
+	                }
+	                //get searched cell in the selected row
+	                var gridCell=grid.getView().getCell(sel[0], cellIndex);
+	                me.findMatchesGrid(gridCell);
+	            }
+	        };
         
         grid.scrollTo(goToIndex, {
             callback: callback,
@@ -1663,7 +1665,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 params[formFields[i].itemId]=formFields[i].getValue();
             }
         }
-
+        
         if(isReplace){
             params['durations']=me.timeTracking;
         }
@@ -1675,7 +1677,6 @@ Ext.define('Editor.controller.SearchReplace', {
             params['userTrackingId']=Editor.data.task.get('userTrackingId');
             params['userColorNr']=Editor.data.task.get('userColorNr');
         }
-
         return params;
     },
 

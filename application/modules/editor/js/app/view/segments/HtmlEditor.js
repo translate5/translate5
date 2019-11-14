@@ -199,13 +199,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           // TRANSLATE-1042: Workaround Firefox
           // - add invisible placeholder, otherwise Firefox might not be able to detect selections correctly (= html instead of the body)
           // - will be removed on saving anyway (or even before during clean-up of the TrackChanges)
-          value = '&#8203;'; 
+          value = '&#8203;';
       }
       me.currentSegment = segment;
       me.setValue(me.markupForEditor(value)+checkTag);
       me.statusStrip.updateSegment(segment, fieldName);
       me.fireEvent('afterSetValueAndMarkup');
       if (Ext.isGecko) {
+          console.log("setValueAndMarkup (Workaround Firefox): getFocusEl... ");
           me.getFocusEl().focus(); // TRANSLATE-1042: Workaround Firefox
       }
   },
@@ -214,6 +215,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   privates: {
       getFocusEl: function() {
+          if (Ext.isGecko) {
+              console.log("... getFocusEl this.iframeEl id:");
+              console.dir(this.iframeEl.id);
+          }
           return Ext.isGecko ? this.iframeEl : Ext.fly(this.getEditorBody());
       }
   },
@@ -612,8 +617,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
     
       Ext.each(node.childNodes, function(item){
-          var markupImage,
-              text, img;
+          var text;
           if(Ext.isTextNode(item)){
               text = item.data;
               result.push(Ext.htmlEncode(text));
@@ -797,14 +801,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       me.duplicatedContentTags = [];
       
       Ext.each(nodelist, function(img) {
-          if(ignoreWhitespace && /whitespace/.test(img.className)) {
+    	  //ignore whitespace and nodes without ids
+          if(ignoreWhitespace && /whitespace/.test(img.className) || /^\s*$/.test(img.id)) {
               return;
           }
           if(Ext.Array.contains(foundIds, img.id) && img.parentNode.nodeName.toLowerCase()!=="del") {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
           }
           else {
-              if(img.parentNode.nodeName.toLowerCase()!=="del") {
+        	  if(img.parentNode.nodeName.toLowerCase()!=="del") {
                   foundIds.push(img.id);
               }
           }

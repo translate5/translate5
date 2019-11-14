@@ -37,29 +37,35 @@ Ext.define('Editor.view.admin.TaskGrid', {
   layout: {
       type: 'fit'
   },
-  text_cols: {
-      taskNr: '#UT#Auftragsnr.',
-      taskName: '#UT#Aufgabenname',
+  text_cols: { // in case of any changes, pls also update getTaskGridTextCols() in editor_Models_Task
+      // sorted by appearance
+      workflow: '#UT#Workflow',
       taskActions: '#UT#Aktionen',
-      sourceLang: '#UT#Quellsprache',
-      relaisLang: '#UT#Relaissprache',
-      targetLang: '#UT#Zielsprache',
       state: '#UT#Status',
       customerId: '#UT#Endkunde',
-      pmGuid: '#UT#Projektmanager',
-      users: '#UT#Benutzer',
+      taskName: '#UT#Aufgabenname',
+      taskNr: '#UT#Auftragsnr.',
       wordCount: '#UT#Wörter',
       wordCountTT: '#UT#Anzahl Wörter',
       fileCount: '#UT#Dateien',
-      targetDeliveryDate: '#UT#Lieferdatum (soll)',
-      realDeliveryDate: '#UT#Lieferdatum (ist)',
+      sourceLang: '#UT#Quellsprache',
+      relaisLang: '#UT#Relaissprache',
+      targetLang: '#UT#Zielsprache',
       referenceFiles: '#UT#Referenzdateien',
       terminologie: '#UT#Terminologie',
-      fullMatchEdit: '#UT#100% Matches sind editierbar',
-      lockLocked: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
+      userCount: '#UT#Zahl zugewiesener Benutzer',
+      users: '#UT#Benutzer',
+      taskassocs: '#UT#Anzahl zugewiesene Sprachresourcen',
+      pmName: '#UT#Projektmanager',
+      pmGuid: '#UT#Projektmanager',
       orderdate: '#UT#Bestelldatum',
+      targetDeliveryDate: '#UT#Lieferdatum (soll)',
+      realDeliveryDate: '#UT#Lieferdatum (ist)',
+      edit100PercentMatch: '#UT#100%-Treffer editierbar',
+      fullMatchEdit: '#UT#100% Matches sind editierbar',
+      emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
+      lockLocked: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
       enableSourceEditing: '#UT#Quellsprache bearbeitbar',
-      emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)'
   },
   strings: {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
@@ -72,6 +78,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
       lockedSystem: '#UT#Durch das System gesperrt mit dem Status \'{0}\'',
       addTask: '#UT#Aufgabe hinzufügen',
       addTaskTip: '#UT#Eine neue Aufgabe hinzufügen.',
+      exportMetaDataBtn: '#UT#Meta-Daten exportieren',
+      exportMetaDataBtnTip: '#UT#Meta-Daten für alle gefilterten Aufgaben exportieren.',
+      showKPIBtn: '#UT#Auswertungen anzeigen',
+      showKPIBtnTip: '#UT#Auswertungen für alle gefilterten Aufgaben anzeigen.',
       reloadBtn: '#UT#Aktualisieren',
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.',
       emptyTargets: '#UT#Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe)."'
@@ -238,7 +248,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           states = [],
           config,
           //we must have here an own ordered list of states to be filtered 
-          stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'user_state_unconfirmed', 'task_state_import'],
+          stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'task_state_unconfirmed', 'user_state_unconfirmed', 'task_state_import'],
           relaisLanguages = Ext.Array.clone(Editor.data.languages),
           addQtip = function(meta, text) {
               meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text)+'"';
@@ -572,6 +582,12 @@ Ext.define('Editor.view.admin.TaskGrid', {
               dock: 'top',
               items: [{
                   xtype: 'button',
+                  iconCls: 'ico-refresh',
+                  itemId: 'reload-task-btn',
+                  text: me.strings.reloadBtn,
+                  tooltip: me.strings.reloadBtnTip
+              },{
+                  xtype: 'button',
                   iconCls: 'ico-task-add',
                   itemId: 'add-task-btn',
                   text: me.strings.addTask,
@@ -579,10 +595,16 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   tooltip: me.strings.addTaskTip
               },{
                   xtype: 'button',
-                  iconCls: 'ico-refresh',
-                  itemId: 'reload-task-btn',
-                  text: me.strings.reloadBtn,
-                  tooltip: me.strings.reloadBtnTip
+                  iconCls: 'ico-export',
+                  itemId: 'export-meta-data-btn',
+                  text: me.strings.exportMetaDataBtn,
+                  tooltip: me.strings.exportMetaDataBtnTip
+              },{
+                  xtype: 'button',
+                  iconCls: 'ico-kpi',
+                  itemId: 'show-kpi-btn',
+                  text: me.strings.showKPIBtn,
+                  tooltip: me.strings.showKPIBtnTip
               }]
             },{
                 xtype: 'pagingtoolbar',
@@ -590,6 +612,12 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 store: 'admin.Tasks',
                 dock: 'bottom',
                 displayInfo: true
+            },{
+                xtype: 'label',
+                itemId: 'kpi-average-processing-time-label'
+            },{
+                xtype: 'label',
+                itemId: 'kpi-excel-export-usage-label'
             }]
         };
         
