@@ -29,7 +29,7 @@ class MessageBus implements MessageComponentInterface
     public function onOpen(ConnectionInterface $conn) {
         /* @var $conn->httpRequest GuzzleHttp\Psr7\Request */
         $data = $this->getDataFromConn($conn);
-        //we store sessionId and instanceId directly in the connection:
+        //we store sessionId and serverId directly in the connection:
         $conn->sessionId = $data['sessionId'];
         $conn->serverId = $data['serverId'];
         $conn->connectionId = $data['connectionId'];
@@ -59,8 +59,8 @@ class MessageBus implements MessageComponentInterface
         }
         
         settype($msg['payload'], 'array');
-        $this->logger->debug('Data from frontend', $msg);
         $msg['conn'] = $conn;
+        $this->logger->debug('IN '.$msg['channel'].'::'.$msg['command'].'('.json_encode($msg['payload']).')');
         $instance->passFrontendMessage(new FrontendMsg($msg), $conn);
     }
     
@@ -84,8 +84,9 @@ class MessageBus implements MessageComponentInterface
         settype($body['channel'], 'string');
         settype($body['command'], 'string');
         settype($body['payload'], 'string');
+        settype($body['debug'], 'string');
 
-        $this->logger->debug('server request', $body);
+        $this->logger->debug('SERVER '.$body['channel'].'::'.$body['command'].'('.$body['debug'].')', $body);
         $instance = $this->getInstance($body['instance']);
         $instance->passBackendMessage(new BackendMsg($body));
 

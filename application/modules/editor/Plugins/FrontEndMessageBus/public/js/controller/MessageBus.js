@@ -55,8 +55,9 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             },
             '#translate5 task': {
                 segmentselect:  'onSegmentSelect',
-                segmentOpenAck: 'onSegmentOpenAck',
                 segmentOpenNak: 'onSegmentOpenNak',
+                segmentLeave: 'onSegmentLeave',
+                segmentSave: 'onSegmentSave',
                 segmentLocked: 'onSegmentLocked',
                 triggerReload: 'onTriggerTaskReload',
             }
@@ -66,7 +67,15 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                 prefetch: 'onSegmentPefetch'
             }
         },
+        controller: {
+            '#ChangeAlike': {
+                cancelManualProcessing: 'onCancelChangeAlikes' 
+            }
+        },
         component: {
+            '#Editor.$application': {
+                editorViewportOpened: 'onOpenEditorViewport'
+            },
             '#segmentgrid autoStateColumn' : {
                 initOtherRenderers: 'injectToolTipInfo'
             },
@@ -128,37 +137,29 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
 
     },
     enterSegment: function(plugin, context) {
-        //if we got the segment, we can proceed with segment opening
-        if(plugin.enterSegmentAcked) {
-            return;
-        }
         var me = this;
         me.bus.send('task', 'segmentEditRequest', [context[0].get('taskGuid'), context[0].get('id')]);
         me.editorPlugin = plugin;
-        me.currentSegmentEditContext = context;
-        
-            return false;
+    },
+    onCancelChangeAlikes: function(record) {
+        this.bus.send('task', 'segmentCancelAlikes', [record.get('taskGuid'), record.get('id')]);
     },
     leaveSegment: function(plugin, context) {
         this.bus.send('task', 'segmentLeave', [context.record.get('taskGuid'), context.record.get('id')]);
     },
-    /**
-     * If we receive a segment edit ACK from the server, we open it  
-     */
-    onSegmentOpenAck: function() {
-        var plugin = this.editorPlugin, 
-            context = this.currentSegmentEditContext;
-        if(plugin && context) {
-            plugin.enterSegmentAcked = true;
-            plugin.startEdit.apply(plugin, context);
-            plugin.enterSegmentAcked = false;
+    onSegmentOpenNak: function(data) {
+        var id = data.segmentId;
+        if(this.editorPlugin.editing && this.editorPlugin.context.record.get('id') === id) {
+            this.editorPlugin.cancelEdit();
+            Ext.Msg.alert('Segment bereits in Bearbeitung', 'Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.'); //FIXME translation    
         }
     },
-    onSegmentOpenNak: function() {
-        console.log('onSegmentOpenNak', arguments);
-    },
     onSegmentLeave: function(data) {
-        this.segmentUnlock(this.getSegmentMeta(data.segmentId), data.connectionId);
+        var me = this,
+            ids = (Ext.isArray(data.segmentId) ? data.segmentId : [data.segmentId]);
+        Ext.Array.each(ids, function(id){
+            me.segmentUnlock(me.getSegmentMeta(id), data.connectionId);
+        });
     },
     onSegmentSave: function(data) {
         var segment,
@@ -171,30 +172,28 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     },
     onSegmentLocked: function(data) {
         var me = this,
-            selectedId = data.segmentId, 
+            lockedIds = (Ext.isArray(data.segmentId) ? data.segmentId : [data.segmentId]),
             byUserGuid = data.userGuid,
             connectionId = data.connectionId,
             grid = me.getSegmentGrid(),
-            meta = me.getSegmentMeta(selectedId),
             segment;
     
-        //remove previous edit lock from that locking connection
-        me.segmentUsageData.each(function(meta) {
-            me.segmentUnlock(meta, connectionId);
-            if(meta.id !== selectedId) {
-                me.removeUnused(meta);
+        //add color mark to current segment and lock segment
+        Ext.Array.each(lockedIds, function(lockedId){
+            var meta = me.getSegmentMeta(lockedId);
+            //add user id as locker to the segment
+            meta.editingConn = connectionId;
+            meta.editingUser = byUserGuid;
+            //show the editing in the segment - if loaded in the grid
+            if(segment = grid.store.getById(lockedId)) {
+                me.markSegmentEdited(segment);
             }
         });
-        
-        //add user id as selector to the segment
-        meta.editingConn = connectionId;
-        meta.editingUser = byUserGuid;
-        
-        //add color mark to current segment
-        if(segment = grid.store.getById(selectedId)) {
-            me.markSegmentEdited(segment);
-        }
     },
+    /**
+     * render the segment as edited
+     * @param {Editor.models.Segment} segment
+     */
     markSegmentEdited: function(segment) {
         segment.set('editable', false);
         segment.set('autoStateId', Editor.data.segments.autoStates.EDITING_BY_USER);
@@ -216,6 +215,8 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             segment.commit(false); //trigger render
             console.log("segment unlocked", segment.data);
         }
+        //remove segment from segmentUsageData if not used anymore
+        me.removeUnused(meta);
     },
     onMessageBusPong: function() {
         Ext.Logger.info('Received a pong on my ping');

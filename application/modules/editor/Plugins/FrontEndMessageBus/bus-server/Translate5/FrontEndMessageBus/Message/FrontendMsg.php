@@ -27,6 +27,7 @@
  */
 namespace Translate5\FrontEndMessageBus\Message;
 use Ratchet\ConnectionInterface;
+use Translate5\FrontEndMessageBus\Logger;
 
 /**
  */
@@ -36,8 +37,16 @@ class FrontendMsg extends Msg {
      */
     public $conn;
     
+    /**
+     * Creates a FrontendMsg instance with the given data
+     * @param string $channel
+     * @param string $command
+     * @param array $payload
+     * @param ConnectionInterface $conn
+     * @return FrontendMsg
+     */
     public static function create(string $channel, string $command, array $payload = [], ConnectionInterface $conn = null): FrontendMsg  {
-        $msg = new self();
+        $msg = new static();
         $msg->channel = $channel;
         $msg->command = $command;
         $msg->payload = $payload;
@@ -45,7 +54,19 @@ class FrontendMsg extends Msg {
         return $msg;
     }
     
+    /**
+     * sends the message to the internal connection (if set) 
+     */
     public function send() {
+        $this->logSend();
         $this->conn->send((string) $this);
+    }
+    
+    /**
+     * Log the message send
+     * Since we not always can send messages with $this->send, but has to use $conn->send(frontendMsg) in some situations, there should be used this log method too 
+     */
+    public function logSend() {
+        Logger::getInstance()->debug('OUT '.$this->channel.'::'.$this->command.'('.json_encode($this->payload).')');
     }
 }

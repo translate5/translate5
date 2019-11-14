@@ -37,10 +37,9 @@ class AppInstance {
     protected $serverId;
     
     public function __construct($serverId) {
-        error_log("NEW INSTANCE ".$serverId);
         $this->connections = new \SplObjectStorage;
-        $this->logger = clone Logger::getInstance();
-        $this->logger->setDomain('FrontEndMessageBus - App Instance '.$serverId);
+        $this->logger = Logger::getInstance()->cloneMe('FrontEndMessageBus - App Instance '.$serverId);
+        $this->logger->info('attached new instance');
         $this->channels = [];
         $this->serverId = $serverId;
     }
@@ -51,6 +50,14 @@ class AppInstance {
      */
     public function getConnections(): \SplObjectStorage {
         return $this->connections;
+    }
+    
+    /**
+     * returns the instance logger
+     * @return Logger
+     */
+    public function getLogger(): Logger {
+        return $this->logger;
     }
     
     /**
@@ -92,8 +99,6 @@ class AppInstance {
      * @param ConnectionInterface $conn
      */
     public function onClose(ConnectionInterface $conn) {
-        //FIXME notify each channel about close, in task channel release locked and selected segments.
-        // selected segments should be possible by just send an empty selection userGuid to all other users
         $this->eachChannel(__FUNCTION__, $conn);
         $this->connections->detach($conn);
     }
@@ -125,14 +130,12 @@ class AppInstance {
                 $this->logger->error('Message command not found!', $msg);
                 return;
             }
-            $this->logger->info('back-end instance call', $msg);
             call_user_func_array([$this, $msg->command], $msg->payload);
             $channel = $this;
         }
         else {
             $channel = $this->getChannel($msg->channel);
         }
-        $this->logger->info('back-end call', $msg);
         //in the backend the payload is a numerc array, which we can pass directly as parameters (as result the vars are named in the function then)
         call_user_func_array([$channel, $msg->command], $msg->payload);
         
@@ -163,7 +166,6 @@ class AppInstance {
             FrontendMsg::create(self::CHANNEL_INSTANCE, 'resyncSession', [], $conn)->send();
             return;
         }
-        $this->logger->info('front-end call', $msg->toDbgArray());
         //from frontend we receive a list of named parameters in the payload
         call_user_func_array([$channel, $msg->command], [$msg]);
     }
@@ -197,7 +199,6 @@ class AppInstance {
      */
     protected function startSession(string $sessionId, array $user) {
         $this->sessions[$sessionId] = $user;
-        //TODO a map from a user to his sessions will also be needed. By userId or userGuid? probably guid, since in task useage we are also using the guids
     }
     
     /**

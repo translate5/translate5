@@ -80,6 +80,12 @@ class editor_Plugins_FrontEndMessageBus_Bus {
         $http->setParameterPost('channel', $channel);
         $http->setParameterPost('command', $command);
         $http->setParameterPost('payload', json_encode($data));
+        $http->setParameterPost('debug', json_encode(array_map(function($item) {
+            if(is_object($item) && property_exists($item, 'id')) {
+                return 'ID: '.$item->id;
+            }
+            return $item;
+        }, $data)));
         
         try {
             $this->processResponse($http->request($http::POST));

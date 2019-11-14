@@ -39,9 +39,12 @@ class Logger {
     /**
      * Clone the logger with customized logging domain
      * @param string $domain
+     * @return self
      */
     public function cloneMe(string $domain) {
-        $this->domain = $domain;
+        $new = clone $this;
+        $new->domain = $domain;
+        return $new;
     }
     
     public function exception(\Exception $e, $domain) {

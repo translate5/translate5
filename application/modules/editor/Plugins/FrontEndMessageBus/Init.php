@@ -54,6 +54,8 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         
         $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handlePing'));
         $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleSegmentSave'));
+        $this->eventManager->attach('Editor_AlikesegmentController', 'afterGetAction', array($this, 'handleAlikeLoad'));
+        $this->eventManager->attach('Editor_AlikesegmentController', 'afterPutAction', array($this, 'handleAlikeSave'));
         
 
         // FIXME send the session id to the message bus, so that the user is known and allowed to communicate
@@ -169,6 +171,42 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         
         $this->bus->notify(self::CHANNEL_TASK, 'open', [
             'task' => $task->getDataObject(),
+            'sessionId' => Zend_Session::getId(),
+        ]);
+    }
+    
+    public function handleAlikeLoad(Zend_EventManager_Event $event) {
+        $f = Zend_Registry::get('frontController');
+        /* @var $f Zend_Controller_Front */
+        $connectionId = $f->getRequest()->getHeader('X-Translate5-MessageBus-ConnId');
+        
+        $masterSegment = $event->getParam('entity');
+        /* @var $masterSegment editor_Models_Segment */
+        
+        $view = $event->getParam('view');
+        $alikeIds = array_column($view->rows, 'id');
+        $this->bus->notify(self::CHANNEL_TASK, 'segmentAlikesLoaded', [
+            'connectionId' => $connectionId,
+            'masterSegment' => $masterSegment->getDataObject(),
+            'sessionId' => Zend_Session::getId(),
+            'alikeIds' => $alikeIds,
+        ]);
+    }
+    
+    /**
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAlikeSave(Zend_EventManager_Event $event) {
+        $segment = $event->getParam('entity');
+        /* @var $segment editor_Models_Segment */
+        
+        $f = Zend_Registry::get('frontController');
+        /* @var $f Zend_Controller_Front */
+        $connectionId = $f->getRequest()->getHeader('X-Translate5-MessageBus-ConnId');
+        
+        $this->bus->notify(self::CHANNEL_TASK, 'segmentAlikeSave', [
+            'connectionId' => $connectionId,
+            'segment' => $segment->getDataObject(),
             'sessionId' => Zend_Session::getId(),
         ]);
     }
