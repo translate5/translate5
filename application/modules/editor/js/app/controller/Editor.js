@@ -542,6 +542,7 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
         this.taskConfirmation = Ext.widget('taskConfirmationWindow').show();
+        me.getSegmentGrid().setTitle(task.getTaskName());
     },
     /**
      * Cleanup stuff in the editor view port

@@ -79,6 +79,7 @@ Ext.application({
   ],
   controllers: Editor.data.app.controllers,
   appFolder : Editor.data.appFolder,
+  windowTitle: '',
   viewport: null,
     //***********************************************************************************
     //Begin Events
@@ -119,6 +120,7 @@ Ext.application({
       var me = this,
       viewSize = Ext.getBody().getViewSize();
     Ext.QuickTips.init();
+    me.windowTitle = Ext.getDoc().dom.title;
 
     me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
     if(!Ext.isIE8m) {
@@ -214,6 +216,7 @@ Ext.application({
       //enable logout split button
       //disable logout normal Button
       me.fireEvent('editorViewportOpened', me, task);
+      Ext.getDoc().dom.title = me.windowTitle + ' - ' + task.getTaskName(); 
       me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
   },
   /**
@@ -266,6 +269,7 @@ Ext.application({
       
       //set the value used for displaying the help pages
       initial = me.viewport.down(me.viewport.getInitialView());
+      Ext.getDoc().dom.title = me.windowTitle;
       initial.fireEvent('show', initial);
   },
 

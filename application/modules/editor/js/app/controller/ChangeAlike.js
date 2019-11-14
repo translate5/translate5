@@ -536,6 +536,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     return rec;
   },
   handleCancelChangeAlike: function() {
+      this.fireEvent('cancelManualProcessing', this.actualRecord, this.window, this);
       this.callbackToSaveChain();
       this.window.close();
       return false; //prevent default close action

@@ -278,6 +278,17 @@ Ext.define('Editor.model.admin.Task', {
       return Editor.data.app.workflows[wf];
   },
   /**
+   * returns the taskName with (taskNr), if set.
+   * @return {String}
+   */
+  getTaskName: function() {
+      var nr = this.get('taskNr');
+      if(nr) {
+          return this.get('taskName')+' ('+nr+')';
+      }
+      return this.get('taskName');
+  },
+  /**
    * @todo improve workflow handling in Javascript, => adapt the php workflow in js, a class with same methods (like getNextStep step2Role etc)
    * actually all workflow information is encapsulated in frontendRights (thats OK) 
    * and the methods in this class (isXXX Methods and initWorkflow) method, this could be improved
