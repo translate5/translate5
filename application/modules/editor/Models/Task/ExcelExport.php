@@ -27,17 +27,37 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- *
+ * Entity Model for excel export data
+ * @method integer getId() getId()
+ * @method void setId() setId(int $id)
+ * @method string getTaskGuid() getTaskGuid()
+ * @method void setTaskGuid() setTaskGuid(string $guid)
+ * @method string getUserGuid() getUserGuid()
+ * @method void setUserGuid() setUserGuid(string $guid)
+ * @method string getExported() getExported()
+ * @method void setExported() setExported(string $timestamp)
  */
-class editor_Models_Import_FileParser_NoParserException extends editor_Models_Import_Exception {
+class editor_Models_Task_ExcelExport extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Models_Db_TaskExcelExport';
+    
     /**
-     * @var string
+     * How often has a task been exported?
+     * @param string $taskGuid
+     * @return int
      */
-    protected $domain = 'editor.import.fileparser';
-
-    static protected $localErrorCodes = [
-        'E1060' => 'For the fileextension "{extension}" no parser is registered. For available parsers see log details.',
-        'E1135' => 'There are no importable files in the Task. The following file extensions can be imported: {extensions}',
-        'E1166' => 'Although there were importable files in the task, no files were imported. Investigate the log for preceeding errors.',
-    ];
+    public function getNumberOfExportsByTaskGuid($taskGuid) : int {
+        $s = $this->db->select()
+        ->where('taskGuid = ?', $taskGuid);
+        return $this->db->fetchAll($s)->count();
+    }
+    
+    /**
+     * Has a task ever been exported at least once?
+     * @param string $taskGuid
+     * @return bool
+     */
+    public function isExported($taskGuid) : bool {
+        return $this->getNumberOfExportsByTaskGuid($taskGuid) > 0;
+    }
+    
 }

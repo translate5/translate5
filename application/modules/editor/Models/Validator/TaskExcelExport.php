@@ -26,18 +26,30 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
+/***
+ * CREATE TABLE IF NOT EXISTS `LEK_task_excelexport` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
+  `userGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to Zf_users',
+  `exported` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_LEK_task_excelexport_1`
+    FOREIGN KEY (`taskGuid`)
+    REFERENCES `LEK_task` (`taskGuid`)
+    ON DELETE CASCADE,
+  CONSTRAINT `fk_LEK_task_excelexport_2`
+    FOREIGN KEY (`userGuid`)
+    REFERENCES `Zf_users` (`userGuid`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
  *
  */
-class editor_Models_Import_FileParser_NoParserException extends editor_Models_Import_Exception {
-    /**
-     * @var string
-     */
-    protected $domain = 'editor.import.fileparser';
+class editor_Models_Validator_TaskExcelExport extends ZfExtended_Models_Validator_Abstract {
 
-    static protected $localErrorCodes = [
-        'E1060' => 'For the fileextension "{extension}" no parser is registered. For available parsers see log details.',
-        'E1135' => 'There are no importable files in the Task. The following file extensions can be imported: {extensions}',
-        'E1166' => 'Although there were importable files in the task, no files were imported. Investigate the log for preceeding errors.',
-    ];
+    protected function defineValidators() {
+        $this->addValidator('id', 'int');
+        $this->addValidator('taskGuid', 'guid');
+        $this->addValidator('userGuid', 'guid');
+        $this->addValidator('exported', 'date', array('Y-m-d H:i:s'));
+    }
 }

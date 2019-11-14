@@ -652,21 +652,20 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Load term and attribute proposals yunger as $youngerAs date within the given collection
-     * @param string $youngerAs
+     * Load all term and attribute proposals, or if second parameter is given load only proposals younger as $youngerAs date within the given collection(s)
      * @param array $collectionId
+     * @param string $youngerAs optional, if omitted all proposals are loaded
      */
-    public function loadProposalExportData(string $youngerAs='',array $collectionIds=[]){
-        //if no date is set, se to current
-        if(empty($youngerAs)){
-            $youngerAs=date('Y-m-d');
-        }
-        if(empty($collectionIds)){
-            $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            /* @var $termCollection editor_Models_TermCollection_TermCollection */
-            $collectionIds=$termCollection->getCollectionForAuthenticatedUser();
-        }
+    public function loadProposalExportData(array $collectionIds, string $youngerAs = ''){
         $adapter=$this->db->getAdapter();
+        $bindParams = [join(',', $collectionIds)];
+        $termYoungerSql = $attrYoungerSql = '';
+        if(!empty($youngerAs)) {
+            $bindParams[] = $youngerAs;
+            $bindParams[] = $youngerAs;
+            $termYoungerSql = ' and (t.created >=? || tp.created >= ?)';
+            $attrYoungerSql = ' and (ta.created >=? || tap.created >=?)';
+        }
         $termSql="SELECT
             		t.termEntryId as 'term-termEntryId',
             		t.definition as 'term-definition',
@@ -694,12 +693,11 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         			LEFT OUTER JOIN
         			LEK_term_proposal tp ON tp.termId = t.id
         			INNER JOIN LEK_languages l ON t.language=l.id 
-                    		where ".$adapter->quoteInto('t.collectionId IN(?)',$collectionIds)." 
-        		and (t.created >=? || tp.created >= ?) 
+                where t.collectionId IN(?)".$termYoungerSql." 
         		and (tp.term is not null or t.processStatus='unprocessed')
         		order by t.groupId,t.term";
         
-        $termResult=$adapter->query($termSql,[$youngerAs,$youngerAs])->fetchAll();
+        $termResult=$adapter->query($termSql,$bindParams)->fetchAll();
         
         $attributeSql="SELECT
                         ta.id as 'attribute-id',
@@ -731,12 +729,11 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                         LEFT OUTER JOIN LEK_terms t on ta.termId=t.id
                         LEFT OUTER JOIN LEK_term_proposal tp on tp.termId=t.id 
                         LEFT OUTER JOIN LEK_languages l ON t.language=l.id 
-                	where ".$adapter->quoteInto('ta.collectionId IN(?)',$collectionIds)." 
-                	and (ta.created >=? || tap.created >=?) 
+                	where ta.collectionId IN(?)".$attrYoungerSql." 
                 	and (tap.value is not null or ta.processStatus='unprocessed')
                 	order by ta.termEntryId,ta.termId";
         
-        $attributeResult=$adapter->query($attributeSql,[$youngerAs,$youngerAs])->fetchAll();
+        $attributeResult=$adapter->query($attributeSql,$bindParams)->fetchAll();
         
         //merge term proposals with term attributes and term entry attributes proposals
         $resultArray=array_merge($termResult,$attributeResult);
@@ -792,14 +789,19 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * any of the given collections.
      * @param array $searchTerms with objects {'text':'abc', 'id':123}
      * @param array $collectionIds
+     * @param array $language
      * @return array $nonExistingTerms with objects {'text':'abc', 'id':123}
      */
-    public function getNonExistingTermsInAnyCollection($searchTerms, $collectionIds){
+    public function getNonExistingTermsInAnyCollection(array $searchTerms,array $collectionIds,array $language){
         $nonExistingTerms = [];
+        if(empty($searchTerms) || empty($collectionIds) || empty($language)){
+            return $nonExistingTerms;
+        }
         foreach ($searchTerms as $term) {
             $s = $this->db->select()
             ->where('term = ?', $term->text)
-            ->where('collectionId IN(?)', $collectionIds);
+            ->where('collectionId IN(?)', $collectionIds)
+            ->where('language IN (?)',$language);
             $terms = $this->db->fetchAll($s);
             if ($terms->count() == 0) {
                 $nonExistingTerms[] = $term;
@@ -919,13 +921,14 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /***
      * Find term attributes in the given term entry (lek_terms groupId)
      * 
-     * @param string $groupId
+     * @param string $termEntryId
      * @param array $collectionIds
      * @return array
      */
-    public function searchTermAttributesInTermentry($groupId,$collectionIds){
+    //TODO: update the references
+    public function searchTermAttributesInTermentry($termEntryId,$collectionIds){
         $s=$this->getSearchTermSelect();
-        $s->where('groupId=?',$groupId)
+        $s->where('LEK_terms.termEntryId=?',$termEntryId)
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->order('LEK_languages.rfc5646')
         ->order('LEK_terms.term')
@@ -1117,6 +1120,21 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $result=parent::getDataObject();
         $result->termId=$result->id;
         $result->proposable=$this->isProposableAllowed();
+        return $result;
+    }
+    
+    /***
+     * Get loaded data as object with term attributes included
+     * @return stdClass
+     */
+    public function getDataObjectWithAttributes() {
+        $result=$this->getDataObject();
+        //load all attributes for the term
+        $rows=$this->groupTermsAndAttributes($this->findTermAndAttributes($result->id));
+        $result->attributes=[];
+        if(!empty($rows) && !empty($rows[0]['attributes'])){
+            $result->attributes =$rows[0]['attributes'];
+        }
         return $result;
     }
     
@@ -1368,6 +1386,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $attributeModel=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attributeModel editor_Models_Term_Attribute */
         $isAttributeProposalAllowed=$attributeModel->isProposableAllowed();
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         //map the term id to array index (this is used because the jquery json decode changes the array sorting based on the termId)
         $keyMap=[];
@@ -1419,6 +1438,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 if(in_array($key,$termProposalColumns)){
                     $termProposalData[$termProposalColumnsNameMap[$key]]=$value;
                     continue;
+                }
+                
+                if($key=='headerText'){
+                    $value=$translate->_($value);
                 }
                 //it is attribute column
                 $atr[$key]=$value;

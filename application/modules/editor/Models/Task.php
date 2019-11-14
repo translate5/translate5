@@ -998,4 +998,41 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $segment->save();
         }
     }
+    
+    /**
+     * Returns the matching of col-names as set in Editor.view.admin.TaskGrid.
+     * @return array
+     */
+    public static function getTaskGridTextCols () {
+        return array (
+            // A-Z
+            'customerId' => 'Endkunde',
+            'edit100PercentMatch' => '100%-Treffer editierbar',
+            'emptyTargets' => 'Übersetzungsaufgabe (kein Review)',
+            'enableSourceEditing' => 'Quellsprache bearbeitbar',
+            'fileCount' => 'Dateien',
+            'fullMatchEdit' => '100% Matches sind editierbar',
+            'lockLocked' => 'In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
+            'orderdate' => 'Bestelldatum',
+            'pmGuid' => 'Projektmanager',
+            'pmName' => 'Projektmanager',
+            'realDeliveryDate' => 'Lieferdatum (ist)',
+            'referenceFiles' => 'Referenzdateien',
+            'relaisLang' => 'Relaissprache',
+            'sourceLang' => 'Quellsprache',
+            'state' =>'Status',
+            'targetDeliveryDate' => 'Lieferdatum (soll)',
+            'targetLang' => 'Zielsprache',
+            'taskActions' => 'Aktionen',
+            'taskassocs' => 'Anzahl zugewiesene Sprachresourcen',
+            'taskName' => 'Aufgabenname',
+            'taskNr' => 'Auftragsnr.',
+            'terminologie' => 'Terminologie',
+            'users' => 'Benutzer',
+            'wordCount' => 'Wörter',
+            'wordCountTT' => 'Anzahl Wörter',
+            'workflow' => 'Workflow',
+            'userCount' => 'Zahl zugewiesener Benutzer',
+        );
+    }
 }

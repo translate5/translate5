@@ -283,6 +283,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('editorTaskStat', $taskStat);
         
+        $taskKpi = new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/kpi',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'kpi'
+            ));
+        $this->front->getRouter()->addRoute('editorTaskKpi', $taskKpi);
+        
         $workerRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/worker/queue/*',
             array(

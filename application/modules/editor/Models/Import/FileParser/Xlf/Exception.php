@@ -39,5 +39,7 @@ class editor_Models_Import_FileParser_Xlf_Exception extends editor_Models_Import
         'E1069' => 'There is other content as whitespace outside of the mrk tags. Found content: {content}',
         'E1070' => 'SUB tag of {field} is not unique due missing ID in the parent node and is ignored as separate segment therefore.',
         'E1071' => 'MRK tag of {field} has no MID attribute.',
+        'E1190' => 'The XML of the XLF file "{fileName} (id {fileId})" is invalid!',
+        'E1191' => 'The XLF file "{fileName} (id {fileId})" does not contain any translation relevant segments.',
     ];
 }

@@ -251,11 +251,11 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Get all attributes for the given term entry (groupId)
-     * @param string $groupId - original termEntry id from the tbx
+     * @param string $termEntryId
      * @param array $collectionIds
      * @return array|NULL
      */
-    public function getAttributesForTermEntry($groupId,$collectionIds){
+    public function getAttributesForTermEntry($termEntryId,$collectionIds){
         $cols = array(
             'LEK_term_attributes.id AS attributeId',
             'LEK_term_attributes.labelId as labelId',
@@ -289,7 +289,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         }
         
         $s->where('LEK_term_attributes.termId is null')
-        ->where('LEK_term_entry.groupId=?',$groupId)
+        ->where('LEK_term_entry.id=?',$termEntryId)
         ->where('LEK_term_entry.collectionId IN(?)',$collectionIds);
         $s->setIntegrityCheck(false);
         $rows=$this->db->fetchAll($s)->toArray();
@@ -394,6 +394,9 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
      * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
      */
     public function handleTransacGroup($entity){
+        if($entity->getId()==null){
+            return false;
+        }
         $ret=$this->getTransacGroup($entity, ['modification']);
         //if the transac group exist, do nothing
         if(!empty($ret)){
@@ -706,12 +709,29 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     
     public function getDataObject() {
         $result=parent::getDataObject();
+        //TODO: for non proposal users, ignore the custom attribute values for the api
         //set the attribute origin type(when no termId is provided it is termEntry attribute otherwise term attribute)
         $result->attributeOriginType=empty($result->termId) ? 'termEntryAttribute' : 'termAttribute';
         $result->attributeId=$result->id;
         $result->proposable=$this->isProposableAllowed() && $this->isProposable($result->name,$result->attrType);
         $result->attrProcessStatus=$result->processStatus;//used by termporatl
         $result->attrValue=$result->value;//used by termporatl
+        //get the attribute header for the label
+        //the header value will be translated
+        $result->headerText=$result->name.' '.$result->attrType;
+        try {
+            $label=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
+            /* @var $label editor_Models_TermCollection_TermAttributesLabel */
+            $label->load($result->labelId);
+            if($label->getLabelText()!=null && $label->getLabelText()!=''){
+                $result->headerText=$label->getLabelText();
+            }
+        } catch (Exception $e) {
+            //just catch if unfound is thrown
+        }
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        //translate the header text
+        $result->headerText=$translate->_($result->headerText);
         return $result;
     }
 }

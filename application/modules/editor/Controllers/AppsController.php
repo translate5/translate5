@@ -33,6 +33,7 @@ class Editor_AppsController extends ZfExtended_Controllers_Action {
     public function indexAction(){
         Zend_Layout::getMvcInstance()->setLayout('apps');
         Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
+        $config = Zend_Registry::get('config');
         $this->view->render('apps/layoutConfig.php');
         
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
@@ -44,6 +45,8 @@ class Editor_AppsController extends ZfExtended_Controllers_Action {
         $this->view->Php2JsVars()->set('apps.title',$translate->_('translate5-apps'));
         $this->view->Php2JsVars()->set('apps.instanttranslate.title',$translate->_('translate5-instanttranslate'));
         $this->view->Php2JsVars()->set('apps.termportal.title',$translate->_('translate5-termportal'));
+        
+        $this->view->Php2JsVars()->set('apps.loginUrl', APPLICATION_RUNDIR.$config->runtimeOptions->loginUrl);
     }
     
     /***

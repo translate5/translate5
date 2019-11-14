@@ -220,10 +220,31 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->namespaces->registerParserHandler($this->xmlparser);
         
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
-        $this->_skeletonFile = $parser->parse($this->_origFile, $preserveWhitespaceDefault);
+        
+        try {
+            $this->_skeletonFile = $parser->parse($this->_origFile, $preserveWhitespaceDefault);
+        }
+        catch(editor_Models_Import_FileParser_InvalidXMLException $e) {
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.xlf');
+            //we log the XML error as own exception, so that the error is listed in task overview
+            $e->addExtraData(['task' => $this->task]);
+            /* @var $logger ZfExtended_Logger */
+            $logger->exception($e);
+            //'E1190' => 'The XML of the XLF file "{fileName} (id {fileId})" is invalid!',
+            throw new editor_Models_Import_FileParser_Xlf_Exception('E1190', [
+                'task' => $this->task,
+                'fileName' => $this->_fileName,
+                'fileId' => $this->_fileId,
+            ], $e);
+        }
         
         if ($this->segmentCount === 0) {
-            error_log('Die Datei ' . $this->_fileName . ' enthielt keine übersetzungsrelevanten Segmente!');
+            //'E1191' => 'The XLF file "{fileName} (id {fileId})" does not contain any translation relevant segments.',
+            throw new editor_Models_Import_FileParser_Xlf_Exception('E1191', [
+                'task' => $this->task,
+                'fileName' => $this->_fileName,
+                'fileId' => $this->_fileId,
+            ]);
         }
     }
     

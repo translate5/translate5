@@ -26,18 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- *
- */
-class editor_Models_Import_FileParser_NoParserException extends editor_Models_Import_Exception {
-    /**
-     * @var string
-     */
-    protected $domain = 'editor.import.fileparser';
-
-    static protected $localErrorCodes = [
-        'E1060' => 'For the fileextension "{extension}" no parser is registered. For available parsers see log details.',
-        'E1135' => 'There are no importable files in the Task. The following file extensions can be imported: {extensions}',
-        'E1166' => 'Although there were importable files in the task, no files were imported. Investigate the log for preceeding errors.',
-    ];
+class editor_Models_Task_Excel_MetadataException extends ZfExtended_ErrorCodeException {
+        /**
+         * @var string
+         */
+        protected $domain = 'editor.task.excel.metadata';
+        
+        static protected $localErrorCodes = [
+            'E1170' => 'The Metadata of the currently filtered tasks can not be exported as Excel-file.',
+        ];
 }

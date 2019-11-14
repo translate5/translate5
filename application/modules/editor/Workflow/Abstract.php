@@ -707,20 +707,7 @@ abstract class editor_Workflow_Abstract {
      * @param bool $levelInfo optional, if true log in level info instead debug
      */
     protected function doDebug($msg, array $data = [], $levelInfo = false) {
-        if(empty($this->newTask)) {
-            return;
-        }
-        $taskGuid = $this->newTask->getTaskGuid();
-        //without that data no loggin is possible
-        if(empty($taskGuid)) {
-            return;
-        }
-        //get the logger for the task
-        if(empty($this->log[$taskGuid])) {
-            $this->log[$taskGuid] = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->newTask]);
-        }
-        $log = $this->log[$taskGuid];
-        /* @var $log editor_Logger_Workflow */
+        $log = $this->getLogger();
         
         //add the job / tua
         if(!empty($this->newTaskUserAssoc)) {
@@ -732,6 +719,26 @@ abstract class editor_Workflow_Abstract {
         else {
             $log->debug('E1013', $msg, $data);
         }
+    }
+    
+    /**
+     * returns either a task specific workflow logger or the native one
+     * @return ZfExtended_Logger
+     */
+    protected function getLogger(): ZfExtended_Logger {
+        if(empty($this->newTask)) {
+            return Zend_Registry::get('logger')->cloneMe('editor.workflow');
+        }
+        $taskGuid = $this->newTask->getTaskGuid();
+        //without that data no loggin is possible
+        if(empty($taskGuid)) {
+            return Zend_Registry::get('logger')->cloneMe('editor.workflow');
+        }
+        //get the logger for the task
+        if(empty($this->log[$taskGuid])) {
+            $this->log[$taskGuid] = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->newTask]);
+        }
+        return $this->log[$taskGuid];
     }
     
     /**
@@ -916,7 +923,10 @@ abstract class editor_Workflow_Abstract {
             }
             call_user_func([$instance, $method], json_decode($action['parameters']));
             if(json_last_error() != JSON_ERROR_NONE) {
-                $this->doDebug('Last Workflow called action: JSON Parameters for last call could not be parsed with message: '.json_last_error_msg());
+                $this->getLogger()->error('E1171', 'Workflow Action: JSON Parameters for workflow action call could not be parsed with message: {msg}', [
+                    'msg' => json_last_error_msg(),
+                    'action' => $action
+                ]);
             }
         }
     }
