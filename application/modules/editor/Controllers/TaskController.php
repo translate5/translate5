@@ -953,10 +953,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!$isEnding && (!$this->isLeavingTaskRequest())){
             return;
         }
-        if(!$this->entity->unlockForUser($this->user->data->userGuid) && $this->entity->getUsageMode() != $this->entity::USAGE_MODE_SIMULTANEOUS) {
-            throw new Zend_Exception('task '.$this->entity->getTaskGuid().
-                    ' could not be unlocked by user '.$this->user->data->userGuid);
-        }
+        $this->entity->unlockForUser($this->user->data->userGuid);
         $this->unregisterTask();
         
         if($resetToOpen) {
