@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * MessageBus class usable in translate5 (counterpart in translate5 to messageBus in server.php)
  * encapsulates defined commands directly to the MessageBus
+ * @method void triggerReload() triggerReload(string $storeId, integer $id = null) first parameter is a store id. Second optional parameter is a id to reload just a record in the previously defined store. If omitted reload the whole store.
  * @method void startSession() startSession($sessionId, stdClass $userData)
  * @method void stopSession() stopSession($sessionId)
  * @method void ping() ping()

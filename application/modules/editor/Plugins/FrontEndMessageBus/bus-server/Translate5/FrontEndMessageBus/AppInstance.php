@@ -5,9 +5,6 @@ use Translate5\FrontEndMessageBus\Message\FrontendMsg;
 use Translate5\FrontEndMessageBus\Message\BackendMsg;
 
 /**
- * FIXME general problems todos: 
- * - catch up valid sessions and connections and open tasks in instance after server reload
- * - error handling if socket server not reachable
  */
 class AppInstance {
     const CHANNEL_INSTANCE = 'instance';
@@ -213,6 +210,18 @@ class AppInstance {
         //TODO notify all Channels about the session removall??? At least in task the sessionIds are implicitly used in taskToSessionMap and should be cleaned up
     }
     
+    /**
+     * Triggers a reload of the given store and optionally a record of that store only in all connections
+     * @param string $storeId
+     * @param int $recordId
+     */
+    protected function triggerReload(string $storeId, int $recordId = null) {
+        $msg = FrontendMsg::create(self::CHANNEL_INSTANCE, 'triggerReload');
+        $msg->logSend();
+        foreach($this->getConnections() as $conn) {
+            $conn->send((string) $msg);
+        }
+    }
     /**
      * Logs that the ping was received
      */

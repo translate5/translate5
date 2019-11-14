@@ -46,7 +46,8 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     listen: {
         messagebus: {
             '#translate5': {
-                reconnect: 'onReconnect'
+                reconnect: 'onReconnect',
+                triggerReload: 'onTriggerReload',
             },
             '#translate5 instance': {
                 pong: 'onMessageBusPong',
@@ -57,8 +58,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                 segmentOpenAck: 'onSegmentOpenAck',
                 segmentOpenNak: 'onSegmentOpenNak',
                 segmentLocked: 'onSegmentLocked',
-                segmentLeave: 'onSegmentLeave',
-                segmentSave: 'onSegmentSave'
+                triggerReload: 'onTriggerTaskReload',
             }
         },
         store: {
@@ -340,6 +340,17 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                 Editor.app.getController('ServerException').handleException(response);
             }
         })
+    },
+    onOpenEditorViewport: function() {
+        this.bus.send('task', 'resyncTask', [segment.get('taskGuid')]);
+    },
+    onTriggerTaskReload: function() {
+        Ext.Logger.info('Task reload triggered');
+        Editor.data.task && Editor.data.task.load();
+    },
+    onTriggerReload: function() {
+        //idea is to reload the store given as storeid, and optionally reload only one record of the store, given by id as optional second parameter.
+        Ext.Logger.warn("generic trigger reload NOT implemented yet"); 
     },
     /**
      * Injects the selecting users into the segmentNrInTask and AutoState tooltip

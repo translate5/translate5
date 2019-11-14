@@ -206,6 +206,28 @@ class Task extends Channel {
         }
     }
     
+    /**
+     * Triggers a reload of the given store and optionally a record of that store only in all connections
+     * @param string $storeId
+     * @param string $excludeConnection optional, a connectionid which should be ignored (mostly the initiator, since he has already the latest task). defaults to null
+     * @param int $recordId
+     */
+    public function triggerReload(string $taskGuid, string $excludeConnection = null) {
+        $sessionsForTask = $this->taskToSessionMap[$taskGuid] ?? [];
+        $msg = FrontendMsg::create(self::CHANNEL_NAME, 'triggerReload');
+        $msg->logSend();
+        foreach($this->instance->getConnections() as $conn) {
+            $include = empty($excludeConnection) || $excludeConnection !== $conn->connectionId;
+            if(in_array($conn->sessionId, $sessionsForTask) && $include) {
+                $conn->send((string) $msg);
+            }
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Translate5\FrontEndMessageBus\Channel::debug()
+     */
     public function debug(): array {
         $segments = [];
         foreach($this->editedSegments as $segId => $conn) {

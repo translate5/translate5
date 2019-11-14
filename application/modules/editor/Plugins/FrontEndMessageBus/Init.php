@@ -49,6 +49,9 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     protected function initEvents() {
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
+        
+        $this->eventManager->attach('editor_Models_TaskUserTracking', 'afterUserTrackingInsert', array($this, 'handleUpdateUserTracking'));
+        
         $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handlePing'));
         $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleSegmentSave'));
         
@@ -198,6 +201,19 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
             'connectionId' => $connectionId,
             'segment' => $segment->getDataObject(),
             'sessionId' => Zend_Session::getId(),
+        ]);
+    }
+    
+    /**
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleUpdateUserTracking(Zend_EventManager_Event $event) {
+        $f = Zend_Registry::get('frontController');
+        /* @var $f Zend_Controller_Front */
+        $connectionId = $f->getRequest()->getHeader('X-Translate5-MessageBus-ConnId'); //FIXME die Aufrufe mit diesem getHeader zusammenfassen!
+        $this->bus->notify(self::CHANNEL_TASK, 'triggerReload', [
+            'taskGuid' => $event->getParam('taskGuid'),
+            'excludeConnection' => $connectionId,
         ]);
     }
     
