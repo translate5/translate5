@@ -50,7 +50,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         resource: '#UT#Ressource',
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
-        add: '#UT#Hinzufügen',
+        addResource: '#UT#Sprachressource hinzufügen',
         noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.',
         sourceLang: '#UT#Quellsprache',
         targetLang: '#UT#Zielsprache',
@@ -297,16 +297,16 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     dock: 'top',
                     items: [{
                         xtype: 'button',
-                        iconCls: 'ico-tm-add',
-                        itemId: 'btnAddTm',
-                        text: me.strings.add,
-                        tooltip: me.strings.add
-                    },{
-                        xtype: 'button',
                         iconCls: 'ico-refresh',
                         itemId: 'btnRefresh',
                         text: me.strings.refresh,
                         tooltip: me.strings.refresh
+                    },{
+                        xtype: 'button',
+                        iconCls: 'ico-tm-add',
+                        itemId: 'btnAddTm',
+                        text: me.strings.addResource,
+                        tooltip: me.strings.addResource
                     }]
                 }]
       };

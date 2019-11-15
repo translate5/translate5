@@ -216,17 +216,17 @@ Ext.define('Editor.view.admin.UserGrid', {
           dock: 'top',
           items: [{
               xtype: 'button',
+              iconCls: 'ico-refresh',
+              itemId: 'reload-user-btn',
+              text: me.strings.reloadBtn,
+              tooltip: me.strings.reloadBtnTip
+          },{
+              xtype: 'button',
               iconCls: 'ico-user-add',
               itemId: 'add-user-btn',
               text: me.strings.addUser,
               hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddUser'), 
               tooltip: me.strings.addUserTip
-          },{
-              xtype: 'button',
-              iconCls: 'ico-refresh',
-              itemId: 'reload-user-btn',
-              text: me.strings.reloadBtn,
-              tooltip: me.strings.reloadBtnTip
           }]
       },{
           xtype: 'pagingtoolbar',

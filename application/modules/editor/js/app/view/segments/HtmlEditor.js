@@ -617,8 +617,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
     
       Ext.each(node.childNodes, function(item){
-          var markupImage,
-              text, img;
+          var text;
           if(Ext.isTextNode(item)){
               text = item.data;
               result.push(Ext.htmlEncode(text));
@@ -802,14 +801,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       me.duplicatedContentTags = [];
       
       Ext.each(nodelist, function(img) {
-          if(ignoreWhitespace && /whitespace/.test(img.className)) {
+    	  //ignore whitespace and nodes without ids
+          if(ignoreWhitespace && /whitespace/.test(img.className) || /^\s*$/.test(img.id)) {
               return;
           }
           if(Ext.Array.contains(foundIds, img.id) && img.parentNode.nodeName.toLowerCase()!=="del") {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
           }
           else {
-              if(img.parentNode.nodeName.toLowerCase()!=="del") {
+        	  if(img.parentNode.nodeName.toLowerCase()!=="del") {
                   foundIds.push(img.id);
               }
           }
