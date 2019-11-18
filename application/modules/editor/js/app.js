@@ -120,6 +120,8 @@ Ext.application({
     me.browserAdvice();
     Editor.MessageBox.showInitialMessages();
     
+    me.enableJsLoggerVideo();
+    
     //Logs the users userAgent and screen size for usability improvements:
     Ext.Ajax.request({
         url: Editor.data.pathToRunDir+'/editor/index/logbrowsertype',
@@ -407,6 +409,23 @@ Ext.application({
       });
       if(!supportedBrowser) {
           Ext.MessageBox.alert(me.browserAdviceTextTitle, me.browserAdviceText);
+      }
+  },
+  
+  /**
+   * If the video recording is activated in Zf_configuration, every user 
+   * directly after log in (before loading of theRootCause) can activate it.
+   */
+  enableJsLoggerVideo: function() {
+      if (Editor.data.enableJsLoggerVideoConfig) {
+          // TODO: title and info-text
+          var title = 'enableJsLoggerVideo',
+              info = 'Help translate5\'s development with screen videos in case of errors...';
+          Ext.Msg.confirm(title, info, function(btn){
+              if(btn === 'yes') {
+                  Editor.data.enableJsLoggerVideoUser = true;
+              }
+          });
       }
   },
   

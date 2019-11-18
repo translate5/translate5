@@ -234,7 +234,7 @@ Ext.define('Editor.controller.SnapshotHistory', {
      */
     addSnapshotToLogger: function(snapshot, action) {
         try {
-            logger && logger.addLogEntry({ type : 'info', message : 'translate5 Editor Snapshot ('+action+'): '  + snapshot});
+            jslogger && jslogger.addLogEntry({ type : 'info', message : 'translate5 Editor Snapshot ('+action+'): '  + snapshot});
         } catch(err) {
             // error on adding the log entry
         }
