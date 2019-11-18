@@ -3569,6 +3569,12 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc291cmNlbg=='><source>Anzahl zugewiesene Sprachresourcen</source><target>Number of assigned language resources</target></trans-unit>
 <trans-unit id='MTAwJS1UcmVmZmVyIGVkaXRpZXJiYXI='><source>100%-Treffer editierbar</source><target>100% matches editable</target></trans-unit>
 <trans-unit id='UHJvamVrdG1hbmFnZXI='><source>Projektmanager</source><target>Project manager</target></trans-unit>
+<trans-unit id='RmlsdGVyIGhpbnp1ZsO8Z2Vu'><source>Filter hinzufügen</source><target>Add filter</target></trans-unit>
+<trans-unit id='V29ya2Zsb3ctU3RhdHVz'><source>Workflow-Status</source><target>Workflow status</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItUm9sbGU='><source>Benutzer-Rolle</source><target>User role</target></trans-unit>
+<trans-unit id='RXJ3ZWl0ZXJ0ZSBGaWx0ZXIgKFdlaXRlcmUgRmlsdGVyIGltIEtvcGYgamVkZXIgU3BhbHRlKQ=='><source>Erweiterte Filter (Weitere Filter im Kopf jeder Spalte)</source><target>Advanced filters (More filters in the head of each column)</target></trans-unit>
+<trans-unit id='QW53ZW5kZW4='><source>Anwenden</source><target>Apply</target></trans-unit>
+<trans-unit id='R2VzZXR6dGUgRmlsdGVy'><source>Gesetzte Filter</source><target>Active filters</target></trans-unit>
 </body>
   </file>
 </xliff>

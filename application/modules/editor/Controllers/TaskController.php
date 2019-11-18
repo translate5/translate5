@@ -109,12 +109,32 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $log = false;
 
     public function init() {
-        $this->_filterTypeMap = [
+        
+        //TODO: the problem with the userName filter is, what do we load on the frontend, anonimized users ?
+        //who is able to filter the users
+        //the users filter is onyl working for pm user ?
+        //Posible problem: i am not able to see the user, but the pm assigns the user to the task, am i able to filter this user ?
+        $this->_filterTypeMap= [
             'customerId' => [
                 //'string' => new ZfExtended_Models_Filter_JoinHard('editor_Models_Db_Customer', 'name', 'id', 'customerId')
                 'string' => new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId')
+            ],
+            'workflowState' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid')
+            ],
+            'userRole' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'role', 'taskGuid', 'taskGuid')
+            ],
+            'userName' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'userGuid', 'taskGuid', 'taskGuid')
             ]
         ];
+        
+        //TODO: how the sort will work ?
+        //$this->_sortColMap['workflowState'] = $this->_filterTypeMap['taskState']['list'];
+        //$this->_sortColMap['userRole'] = $this->_filterTypeMap['userRole']['list'];
+        //$this->_sortColMap['userName'] = $this->_filterTypeMap['userName']['list'];
+        
         //set same join for sorting!
         $this->_sortColMap['customerId'] = $this->_filterTypeMap['customerId']['string'];
         
