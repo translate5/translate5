@@ -136,7 +136,6 @@ Ext.define('Editor.view.segments.RowEditing', {
             Editor.MessageBox.addInfo(me.messages.edit100pWarning, 1.4);
         }
         me.editor.setMode(mode);
-        me.startVideoLogging();
         return me.callParent(arguments);
     },
     //fixing https://www.sencha.com/forum/showthread.php?309102-ExtJS-6.0.0-RowEditor-Plugin-completeEdit-does-not-set-context-to-null&p=1128826#post1128826
@@ -145,7 +144,6 @@ Ext.define('Editor.view.segments.RowEditing', {
         if(!this.editing) {
             this.context = null;
         }
-        this.stopVideoLogging();
     },
     //fixing https://www.sencha.com/forum/showthread.php?309102-ExtJS-6.0.0-RowEditor-Plugin-completeEdit-does-not-set-context-to-null&p=1128826#post1128826
     completeEdit: function() {
@@ -154,7 +152,6 @@ Ext.define('Editor.view.segments.RowEditing', {
         if(!this.editing) {
             this.context = null;
         }
-        this.stopVideoLogging();
     },
     /**
      * erlaubt das Editieren
@@ -171,30 +168,5 @@ Ext.define('Editor.view.segments.RowEditing', {
     destroy: function() {
         delete this.context;
         this.callParent(arguments);
-    },
-    
-    /**
-     * Start the video-recording of the JS-frontend-logger.
-     */
-    startVideoLogging: function() {
-        if (Editor.data.enableJsLoggerVideoUser) {
-            try {
-                jslogger && jslogger.startVideoRecording();
-            } catch(err) {
-                // error
-            }
-        }
-    },
-    /**
-     * Stop the video-recording of the JS-frontend-logger.
-     */
-    stopVideoLogging: function() {
-        if (Editor.data.enableJsLoggerVideoUser) {
-            try {
-                jslogger && jslogger.stopVideoRecording();
-            } catch(err) {
-                // error
-            }
-        }
     }
 });
