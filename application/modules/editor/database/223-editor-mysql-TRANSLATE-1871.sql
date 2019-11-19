@@ -32,4 +32,4 @@
 -- it should appear one time, after new improvement is added to the installer. (...)
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.debug.enableJsLoggerVideo', '1', 'editor', 'logging', '0', '0', '', 'boolean', 'If enabled, the JS-frontend-logger records a video of the user session. The video is done by a third party web application. Only MittagQI has access to the videos so far. If you want also access to these videos or want to further customize the logger, please contact support@translate5.net');
+VALUES ('runtimeOptions.debug.enableJsLoggerVideo', '1', 'editor', 'logging', '0', '0', '', 'boolean', 'If enabled, the user can allow the JS-frontend-logger to record a video of the segment-editing during the user session. The video is recorded by a third party web application and only stored if an error occurs while editing. Only MittagQI has access to the videos so far. If you want also access to these videos or want to further customize the logger, please contact support@translate5.net');

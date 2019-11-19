@@ -177,10 +177,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $rop = $this->config->runtimeOptions;
         
         $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
-        // Video-recording in general: must be allowed by config
+        // Video-recording: If allowed in general, then it can be set by the user after every login.
         $this->view->Php2JsVars()->set('enableJsLoggerVideoConfig', $rop->debug && $rop->debug->enableJsLoggerVideo);
-        // Video-recording for each user: start with default from config. If allowed in general, then it can be set by the user after every login.
-        $this->view->Php2JsVars()->set('enableJsLoggerVideoUser', $rop->debug && $rop->debug->enableJsLoggerVideo);
         
         $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
       $this->view->Php2JsVars()->set('restpath', $restPath);
@@ -419,7 +417,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
-            'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal');
+            'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal','JsLogger');
         
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */

@@ -39,13 +39,13 @@ END LICENSE AND COPYRIGHT
     <script>
         (function() {
             // We use the jslogger on the global scope,
-            // e.g. in order to add entries via jslogger.addLogEntry()
-            // or to start the video-recording
+            // for usage see Editor.controller.JsLogger.
             jslogger = window.RC && new RC.Logger({
                 applicationId : "1b60154d0a976fff59848a5e5607ac015df89161",
                 captureScreenshot : true,
                 recordUserActions : true,
-                recordSessionVideo : false, // start and stop the video manually for each segment 
+                recordSessionVideo : false, // start and stop the video manually for each segment
+                showIconWhileRecording: false, // can only be shown for the whole session, not during manually started recording only
                 logConsoleOutput : true,
                 logAjaxRequests : true,
                 treatFailedAjaxAsError : false,
