@@ -110,10 +110,6 @@ class editor_TaskController extends ZfExtended_RestController {
 
     public function init() {
         
-        //TODO: the problem with the userName filter is, what do we load on the frontend, anonimized users ?
-        //who is able to filter the users
-        //the users filter is onyl working for pm user ?
-        //Posible problem: i am not able to see the user, but the pm assigns the user to the task, am i able to filter this user ?
         $this->_filterTypeMap= [
             'customerId' => [
                 //'string' => new ZfExtended_Models_Filter_JoinHard('editor_Models_Db_Customer', 'name', 'id', 'customerId')
