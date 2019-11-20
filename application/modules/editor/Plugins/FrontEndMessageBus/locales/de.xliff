@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+  <!-- the transunit-ID should contain the base64-encoded source-string als used in the php source-code. This ID is used for matching. -->
+  <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
+  <file original="php-sourcecode" source-language="ha" target-language="de" datatype="php">
+    <body>
+        <trans-unit id='U2VnbWVudCBiZXJlaXRzIGluIEJlYXJiZWl0dW5n'>
+            <source>Segment bereits in Bearbeitung</source>
+            <target>Segment bereits in Bearbeitung</target>
+        </trans-unit>
+        <trans-unit id='RWluIGFuZGVyZXIgQmVudXR6ZXIgd2FyIHNjaG5lbGxlciB1bmQgaGF0IGltIE1vbWVudCBkYXMgU2VnbWVudCB6dXIgQmVhcmJlaXR1bmcgZ2VzcGVycnQu'>
+            <source>Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.</source>
+            <target>Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.</target>
+        </trans-unit>
+        <trans-unit id='QWt0dWVsbGVyIEJlYXJiZWl0ZXI='>
+            <source>Aktueller Bearbeiter</source>
+            <target>Aktueller Bearbeiter</target>
+        </trans-unit>
+        <trans-unit id='QXVzZ2V3w6RobHQgdm9u'>
+            <source>Ausgewählt von</source>
+            <target>Ausgewählt von</target>
+        </trans-unit>
+        <trans-unit id='S2VpbmUgVmVyYmluZHVuZyB6dW0gU2VydmVy'>
+            <source>Keine Verbindung zum Server</source>
+            <target>Keine Verbindung zum Server</target>
+        </trans-unit>
+        <trans-unit id='U2llIGvDtm5uZW4ga2VpbiBTZWdtZW50IGVkaXRpZXJlbiwgc28gbGFuZ2Uga2VpbmUgVmVyYmluZHVuZyB6dW0gU2VydmVyIGJlc3RlaHQu'>
+            <source>Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.</source>
+            <target>Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.</target>
+        </trans-unit>
+    </body>
+  </file>
+</xliff>

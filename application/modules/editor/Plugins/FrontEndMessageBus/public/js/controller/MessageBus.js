@@ -43,6 +43,14 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         ref : 'segmentGrid',
         selector : '#segmentgrid'
     }],
+    strings: {
+        noConnection: '#UT#Keine Verbindung zum Server',
+        noConnectionSeg: '#UT#Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.',
+        inUseTitle: '#UT#Segment bereits in Bearbeitung',
+        inUse: '#UT#Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.',
+        currentUser: '#UT#Aktueller Bearbeiter',
+        selectedBy: '#UT#Ausgewählt von'
+    },
     listen: {
         messagebus: {
             '#translate5': {
