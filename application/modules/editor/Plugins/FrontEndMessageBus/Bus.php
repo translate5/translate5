@@ -44,7 +44,14 @@ class editor_Plugins_FrontEndMessageBus_Bus {
      */
     protected $logger;
     
-    public function __construct() {
+    /**
+     * Client version string to be send to the server for version check
+     * @var string
+     */
+    protected $version;
+    
+    public function __construct($version) {
+        $this->version = $version;
         $config = Zend_Registry::get('config');
         $this->logger = Zend_Registry::get('logger')->cloneMe('plugin.frontendmessagebus');
         if(isset($config->runtimeOptions->plugins->FrontEndMessageBus)) {
@@ -76,7 +83,11 @@ class editor_Plugins_FrontEndMessageBus_Bus {
         /* @var $http Zend_Http_Client */
         $http->setUri($this->uri);
         
+        $serverName = Zend_Registry::get('config')->runtimeOptions->server->name;
+        
         $http->setParameterPost('instance', ZfExtended_Utils::installationHash('MessageBus'));
+        $http->setParameterPost('instanceName', $serverName);
+        $http->setParameterPost('version', $this->version);
         $http->setParameterPost('channel', $channel);
         $http->setParameterPost('command', $command);
         $http->setParameterPost('payload', json_encode($data));

@@ -33,6 +33,11 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     const CHANNEL_CHAT = 'chat';
     
     /**
+     * Increase me on each change! (also SERVER_VERSION in server.php!)
+     */
+    const CLIENT_VERSION = '1.0';
+    
+    /**
      * @var editor_Plugins_FrontEndMessageBus_Bus
      */
     protected $bus;
@@ -42,7 +47,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     );
     
     public function init() {
-        $this->bus = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Bus');
+        $this->bus = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Bus', [self::CLIENT_VERSION]);
         $this->initEvents();
     }
     
@@ -118,6 +123,9 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         //a random connectionId. calculating a random value on server side is more reliable as in frontend: 
         // see https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
         $view->Php2JsVars()->set('plugins.FrontEndMessageBus.connectionId', bin2hex(random_bytes(16)));
+
+        //the client version
+        $view->Php2JsVars()->set('plugins.FrontEndMessageBus.clientVersion', self::CLIENT_VERSION);
         
         $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
     }
@@ -243,7 +251,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $connectionId = $f->getRequest()->getHeader('X-Translate5-MessageBus-ConnId');
         
         $this->bus->notify(self::CHANNEL_TASK, 'segmentSave', [
-            'connectionId' => $connectionId,
+            'connectionId' => $this->getHeaderConnId(),
             'segment' => $segment->getDataObject(),
             'sessionId' => Zend_Session::getId(),
         ]);
@@ -253,12 +261,9 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      * @param Zend_EventManager_Event $event
      */
     public function handleUpdateUserTracking(Zend_EventManager_Event $event) {
-        $f = Zend_Registry::get('frontController');
-        /* @var $f Zend_Controller_Front */
-        $connectionId = $f->getRequest()->getHeader('X-Translate5-MessageBus-ConnId'); //FIXME die Aufrufe mit diesem getHeader zusammenfassen!
         $this->bus->notify(self::CHANNEL_TASK, 'triggerReload', [
             'taskGuid' => $event->getParam('taskGuid'),
-            'excludeConnection' => $connectionId,
+            'excludeConnection' => $this->getHeaderConnId(),
         ]);
     }
     
@@ -267,5 +272,15 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      */
     public function handlePing(Zend_EventManager_Event $event) {
         $this->bus->ping();
+    }
+    
+    /**
+     * returns the connection ID delivered via HTTP header to the translate5 server
+     * @return string
+     */
+    protected function getHeaderConnId(): string {
+        $f = Zend_Registry::get('frontController');
+        /* @var $f Zend_Controller_Front */
+        return $f->getRequest()->getHeader('X-Translate5-MessageBus-ConnId');
     }
 }

@@ -3,6 +3,11 @@ use Translate5\FrontEndMessageBus\Logger;
 use Translate5\FrontEndMessageBus\MessageBus;
 use Translate5\FrontEndMessageBus\Configuration;
 
+/**
+ * Increase me on each change! (also CLIENT_VERSION in Init.php!)
+ */
+const SERVER_VERSION = '1.0';
+
 require __DIR__ . '/bus-server/vendor/autoload.php';
 /**
  * For development: use eclipse external tools for running / restart
@@ -18,6 +23,7 @@ $logger = Logger::getInstance();
 $host = $config->messageServer->address;
 $port = $config->messageServer->port;
 
+$logger->info('version '.SERVER_VERSION);
 $logger->info('starting on '.$host.':'.$port, LOG_HTTP);
 $appMessageServer = new React\Socket\Server($host.':'.$port, $loop);
 $server = new React\Http\Server([$bus, 'processServerRequest']);

@@ -34,8 +34,15 @@ class MessageBus implements MessageComponentInterface
         $conn->serverId = $data['serverId'];
         $conn->connectionId = $data['connectionId'];
         $instance = $this->getInstance($conn->serverId);
+        if($data['version'] !== SERVER_VERSION) {
+            $this->logger->error('connection open: version mismatch. '.$data['version'].' on client and '.SERVER_VERSION.' on server', LOG_SOCKET);
+            $conn->send('{"command":"errorOnOpen", "error": "versionMismatch"}');
+            $conn->close();
+            return;
+        }
         if(empty($instance)) {
             $this->logger->error('connection open: no instance ID was given', LOG_SOCKET);
+            $conn->send('{"command":"errorOnOpen", "error": "noInstanceId"}');
             $conn->close();
             return;
         }
@@ -81,18 +88,30 @@ class MessageBus implements MessageComponentInterface
             return $this->debugResponse();
         }
         settype($body['instance'], 'string'); //from server side we have to deliver the instance as msg attribute
+        settype($body['instanceName'], 'string');
         settype($body['channel'], 'string');
         settype($body['command'], 'string');
         settype($body['payload'], 'string');
         settype($body['debug'], 'string');
+        settype($body['version'], 'string');
+        
 
-        $this->logger->debug('SERVER '.$body['channel'].'::'.$body['command'].'('.$body['debug'].')', $body);
-        $instance = $this->getInstance($body['instance']);
+        $this->logger->debug('SERVER '.$body['instanceName'].' '.$body['channel'].'::'.$body['command'].'('.$body['debug'].')', $body);
+        if($body['version'] !== SERVER_VERSION) {
+            $this->logger->error('Version Mismatch: client '.$body['version'].' and server '.SERVER_VERSION);
+            
+            return new Response(406, ['Content-Type' => 'application/json'], json_encode([
+                'error' => 'version mismatch',
+                'instance' => $body['instance'],
+                'client' => $body['version'],
+                'server' => SERVER_VERSION,
+            ]));
+        }
+        $instance = $this->getInstance($body['instance'], $body['instanceName']);
         $instance->passBackendMessage(new BackendMsg($body));
 
         //this can be used to pass back information into the instance
-        $response = "{}\n";
-        return new Response(200, ['Content-Type' => 'text/plain'], $response);
+        return new Response(200, ['Content-Type' => 'text/plain'], "{}\n");
     }
     
     protected function debugResponse() {
@@ -117,12 +136,15 @@ class MessageBus implements MessageComponentInterface
         return $params;
     }
     
-    protected function getInstance($serverId): ?AppInstance {
+    protected function getInstance(string $serverId, string $name = null): ?AppInstance {
         if(empty($serverId)) {
             return null;
         }
         if(empty($this->instances[$serverId])) {
             $this->instances[$serverId] = new AppInstance($serverId);
+        }
+        if(!empty($name)) {
+            $this->instances[$serverId]->setInstanceName($name);
         }
         return $this->instances[$serverId];
     }

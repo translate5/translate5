@@ -36,12 +36,21 @@ class AppInstance {
      */
     protected $serverId;
     
+    /**
+     * @var string
+     */
+    protected $serverName = 'not set yet';
+    
     public function __construct($serverId) {
         $this->connections = new \SplObjectStorage;
         $this->logger = Logger::getInstance()->cloneMe('FrontEndMessageBus - App Instance '.$serverId);
         $this->logger->info('attached new instance');
         $this->channels = [];
         $this->serverId = $serverId;
+    }
+    
+    public function setInstanceName($name) {
+        $this->serverName = $name;
     }
     
     /**
@@ -237,6 +246,8 @@ class AppInstance {
     
     public function debug(): array {
         $data = [
+            'instance' => $this->serverId,
+            'instanceName' => $this->serverName,
             'channels' => [],
             'sessions' => $this->sessions,
             'connections' => [],

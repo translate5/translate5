@@ -123,7 +123,10 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                 // authentication by passing the session id to the server
                 sessionId: Ext.util.Cookies.get(Editor.data.app.sessionKey),
                 //needed to identify different browser windows with same sessionId persistent over reconnections
-                connectionId: conf.connectionId
+                connectionId: conf.connectionId,
+                //to compare server and client version
+                version: conf.clientVersion,
+                
             }
         });
         me.segmentUsageData = new Ext.util.Collection();
