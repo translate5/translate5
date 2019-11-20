@@ -4,11 +4,13 @@ use Ratchet\ConnectionInterface;
 use Translate5\FrontEndMessageBus\Message\SegmentMsg;
 use Translate5\FrontEndMessageBus\Message\FrontendMsg;
 use Translate5\FrontEndMessageBus\Channel;
+use Translate5\FrontEndMessageBus\FrontendMsgValidator;
 
 /**
  * Encapsulates logic specific to an opened task in an instance
  */
 class Task extends Channel {
+    use FrontendMsgValidator;
     const CHANNEL_NAME = 'task';
     
     /**
@@ -70,17 +72,18 @@ class Task extends Channel {
     }
     
     /**
-     * The Browser sending this request receives all locked segments
-     * TODO alse send the selected segments
+     * A task was opened in the browser. As result the browser receives all currently opened segments
      * @param FrontendMsg $request
      */
-    public function resyncTask(FrontendMsg $request) {
+    public function openTask(FrontendMsg $request) {
+        $result = SegmentMsg::createFromFrontend($request);
+        $result->command = 'segmentLocked';
+        $request->conn->openedTask = $result->taskGuid;
         //sending the requesting user all locked segments
-        $result = FrontendMsg::create(self::CHANNEL_NAME, 'segmentLocked', [], $request->conn);
         foreach($this->editedSegments as $segmentId => $conn) {
-            $result->payload['segmentId'] = $segmentId;
-            $result->payload['userGuid'] = $this->instance->getSession($conn->sessionId, 'userGuid');
-            $result->payload['connectionId'] = $conn->connectionId;
+            $result->userGuid = $this->instance->getSession($conn->sessionId, 'userGuid');
+            $result->segmentId = $segmentId;
+            $result->connectionId = $conn->connectionId;
             $result->send();
         }
     }
@@ -110,11 +113,14 @@ class Task extends Channel {
      */
     public function segmentLeave(FrontendMsg $request) {
         $answer = $this->createSegmentAnswerFromFrontend($request, 'segmentLeave');
+        if(empty($answer)) {
+            return; //task is not opened by session, so we can not process the request
+        }
         if(!empty($this->alikeSegments[$answer->segmentId])) {
             $alikes = $this->alikeSegments[$answer->segmentId];
         }
-        $this->releaseLocalSegment($request->conn->openedSegmentId ?? 0);
-        //we delegate the leaving call to the leaveAlikes,so we send only one message
+        $this->releaseLocalSegment($answer->segmentId);
+        //we delegate the leaving call of the master segment to the leaveAlikes,so we send only one message
         $alikes[] = $answer->segmentId;
         $this->leaveAlikes($answer, $alikes);
     }
@@ -387,10 +393,36 @@ class Task extends Channel {
      * @param array $task
      * @param string $sessionId
      */
-    public function close(array $task, string $sessionId) {
+    public function close(array $task, string $sessionId, string $connectionId) {
         $idx = array_search($sessionId, $this->taskToSessionMap[$task['taskGuid']]);
         if($idx !== false) {
             unset($this->taskToSessionMap[$task['taskGuid']][$idx]);
+        }
+        
+        $result = FrontendMsg::create($this->instance::CHANNEL_INSTANCE, 'notifyUser', [
+            'message' => 'taskClosedInOtherWindow'
+        ]);
+        foreach($this->instance->getConnections() as $conn) {
+            /* @var $conn ConnectionInterface */
+            //send the notification to all connections of the same session but not to the connection which triggered the logout / task close
+            if($conn->sessionId === $sessionId && $conn->connectionId !== $connectionId) {
+                //must be logged explicitly, since we directly call send on the connection here
+                $result->logSend();
+                //and send the message
+                $conn->send((string) $result);
+            }
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Translate5\FrontEndMessageBus\Channel::stopSession()
+     */
+    public function stopSession(string $sessionId, string $connectionId) {
+        $tasks = array_keys($this->taskToSessionMap);
+        foreach($tasks as $taskGuid) {
+            //close searches for the given sessionId in the sessions of the task and removes it
+            $this->close(['taskGuid' => $taskGuid], $sessionId, $connectionId);
         }
     }
     

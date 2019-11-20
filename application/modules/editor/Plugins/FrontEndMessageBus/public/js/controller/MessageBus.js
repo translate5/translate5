@@ -54,12 +54,15 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     listen: {
         messagebus: {
             '#translate5': {
+                error: 'onError',
+                close: 'onClose',
                 reconnect: 'onReconnect',
-                triggerReload: 'onTriggerReload',
+                triggerReload: 'onTriggerReload'
             },
             '#translate5 instance': {
                 pong: 'onMessageBusPong',
-                resyncSession: 'onResyncSession'
+                resyncSession: 'onResyncSession',
+                notifyUser: 'onUserNotification'
             },
             '#translate5 task': {
                 segmentselect:  'onSegmentSelect',
@@ -67,7 +70,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                 segmentLeave: 'onSegmentLeave',
                 segmentSave: 'onSegmentSave',
                 segmentLocked: 'onSegmentLocked',
-                triggerReload: 'onTriggerTaskReload',
+                triggerReload: 'onTriggerTaskReload'
             }
         },
         store: {
@@ -130,18 +133,50 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             }
         });
         me.segmentUsageData = new Ext.util.Collection();
+
+        me.gcTask = Ext.TaskManager.start({
+            interval: 5 * 60000, //5 minutes
+            run: me.garbageCollector,
+            scope: me 
+        });
     },
     /**
      * On connection reconnect we send a ping to the server, if the reconnection was because of a server crash, 
      * the ping resyncs the session data from translate5
      * @param {Editor.util.messageBus.MessageBus} bus
      */
+    onClose: function(bus){
+        var me = this;
+        var task = new Ext.util.DelayedTask(function(){
+            if(!me.bus.isReady()) {
+                Editor.app.viewport.mask(me.strings.noConnection + '<br>' + me.bus.getUrl());
+            }
+        });
+        task.delay(1000);
+    },
+    onError: function(bus, evt, error) {
+        if(error && error === 'versionMismatch') {
+            Editor.MessageBox.addError("Server / Client version mismatch. Please contact your system administrator!");
+            bus.setReconnect(false);
+        }
+        if(error && error === 'noInstanceId') {
+            Editor.MessageBox.addError("Missing instance ID on server connect. Please contact your system administrator!");
+            bus.setReconnect(false);
+        }
+    },
     onReconnect: function(bus){
         bus.send('instance', 'ping');
+        
         var me = this,
             grid = me.getSegmentGrid(),
             sel;
 
+        Editor.app.viewport.unmask();
+        
+        if(grid && Editor.data.task) {
+            this.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
+        } 
+        
         if(grid && (sel = grid.getSelectionModel().getSelection()) && sel.length > 0) {
             me.clickSegment(null, sel[0]);
         }
@@ -149,6 +184,10 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     },
     enterSegment: function(plugin, context) {
         var me = this;
+        if(!me.bus.isReady()) {
+            Ext.Msg.alert(msg.noConnection, msg.noConnectionSeg); 
+            return;
+        }
         me.bus.send('task', 'segmentEditRequest', [context[0].get('taskGuid'), context[0].get('id')]);
         me.editorPlugin = plugin;
     },
@@ -159,10 +198,12 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         this.bus.send('task', 'segmentLeave', [context.record.get('taskGuid'), context.record.get('id')]);
     },
     onSegmentOpenNak: function(data) {
-        var id = data.segmentId;
-        if(this.editorPlugin.editing && this.editorPlugin.context.record.get('id') === id) {
-            this.editorPlugin.cancelEdit();
-            Ext.Msg.alert('Segment bereits in Bearbeitung', 'Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.'); //FIXME translation    
+        var me = this,
+            id = data.segmentId,
+            msg = me.strings;
+        if(me.editorPlugin.editing && me.editorPlugin.context.record.get('id') === id) {
+            me.editorPlugin.cancelEdit();
+            Ext.Msg.alert(msg.inUseTitle, msg.inUse);    
         }
     },
     onSegmentLeave: function(data) {
@@ -200,6 +241,18 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                 me.markSegmentEdited(segment);
             }
         });
+    },
+    onUserNotification: function(data) {
+        switch(data.message) {
+            case 'taskClosedInOtherWindow':
+                //instead of showing a message, we just trigger a reload of the window (without logout in this special case)
+                Editor.data.logoutOnWindowClose = false;
+                location.reload();
+                break;
+            default:
+                Editor.MessageBox.addInfo(data.message);
+                break;
+        }
     },
     /**
      * render the segment as edited
@@ -371,7 +424,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         var me = this,
             tracking = Editor.data.task.userTracking();
         otherRenderer._selectedUsers = {
-            text: 'Ausgewählt von', 
+            text: me.strings.selectedBy,
             renderer: function(noop, noop2, record) {
                 var meta = me.segmentUsageData.get(record.get('id')),
                     result = [], trackedUser;
@@ -387,7 +440,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             scope: me
         };
         otherRenderer._editingUser = {
-            text: 'aktueller Bearbeiter', 
+            text: me.strings.currentUser,
             renderer: function(noop, noop2, record) {
                 var meta = me.segmentUsageData.get(record.get('id')),
                 result = [], trackedUser;

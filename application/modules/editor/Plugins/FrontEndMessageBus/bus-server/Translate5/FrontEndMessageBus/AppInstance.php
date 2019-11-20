@@ -1,12 +1,14 @@
 <?php
 namespace Translate5\FrontEndMessageBus;
 use Ratchet\ConnectionInterface;
+use Translate5\FrontEndMessageBus\Message\Msg;
 use Translate5\FrontEndMessageBus\Message\FrontendMsg;
 use Translate5\FrontEndMessageBus\Message\BackendMsg;
 
 /**
  */
 class AppInstance {
+    use FrontendMsgValidator;
     const CHANNEL_INSTANCE = 'instance';
     
     /**
@@ -147,7 +149,6 @@ class AppInstance {
         }
         //in the backend the payload is a numerc array, which we can pass directly as parameters (as result the vars are named in the function then)
         call_user_func_array([$channel, $msg->command], $msg->payload);
-        
     }
     
     /**
@@ -176,7 +177,9 @@ class AppInstance {
             return;
         }
         //from frontend we receive a list of named parameters in the payload
-        call_user_func_array([$channel, $msg->command], [$msg]);
+        if($channel->isValidFrontendCall($msg->command)) {
+            call_user_func_array([$channel, $msg->command], [$msg]);
+        }
     }
 
     /**
@@ -208,16 +211,17 @@ class AppInstance {
      */
     protected function startSession(string $sessionId, array $user) {
         $this->sessions[$sessionId] = $user;
+        $this->eachChannel(__FUNCTION__, $sessionId, $user);
     }
     
     /**
      * Store the session id and user
      * @param string $sessionId
+     * @param string $connectionId the connection which requested the "stopSession"
      */
-    protected function stopSession(string $sessionId) {
+    protected function stopSession(string $sessionId, $connectionId) {
         unset($this->sessions[$sessionId]);
-        //TODO clean session from user in user session map
-        //TODO notify all Channels about the session removall??? At least in task the sessionIds are implicitly used in taskToSessionMap and should be cleaned up
+        $this->eachChannel(__FUNCTION__, $sessionId, $connectionId);
     }
     
     /**
@@ -226,7 +230,10 @@ class AppInstance {
      * @param int $recordId
      */
     protected function triggerReload(string $storeId, int $recordId = null) {
-        $msg = FrontendMsg::create(self::CHANNEL_INSTANCE, 'triggerReload');
+        $msg = FrontendMsg::create(self::CHANNEL_INSTANCE, 'triggerReload',[
+            'storeId' => $storeId, 
+            'recordId' => $recordId,
+        ]);
         $msg->logSend();
         foreach($this->getConnections() as $conn) {
             $conn->send((string) $msg);
@@ -235,7 +242,7 @@ class AppInstance {
     /**
      * Logs that the ping was received
      */
-    protected function ping($msg = null) {
+    protected function ping(Msg $msg = null) {
         if($msg instanceof FrontendMsg){
             FrontendMsg::create(self::CHANNEL_INSTANCE, 'pong', [], $msg->conn)->send();
             $this->logger->info('Pinged from Frontend');

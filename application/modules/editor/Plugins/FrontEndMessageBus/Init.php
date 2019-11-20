@@ -54,36 +54,23 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     protected function initEvents() {
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
-        
         $this->eventManager->attach('editor_Models_TaskUserTracking', 'afterUserTrackingInsert', array($this, 'handleUpdateUserTracking'));
-        
         $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handlePing'));
         $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleSegmentSave'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'afterGetAction', array($this, 'handleAlikeLoad'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'afterPutAction', array($this, 'handleAlikeSave'));
-        
-
-        // FIXME send the session id to the message bus, so that the user is known and allowed to communicate
-        // → idea here: Instead listening to a login event, we just attach to the IndexController. 
-        //   If the application is loaded there, we trigger a "connect" to the MessageBus
-        //   Then we have the user, the sessionId and so on. 
-        //   Then we have to attach to garbage cleaning and logout to remove the session
-        //   additionally we should create a sync function, triggered by the periodical cron and triggerable when the MessageBus restarts.
-        //   sync should just deliver all sessions with logged in users, and opened tasks (if any) to the MessageBus.
-        //   Sensefull?
         $this->eventManager->attach('Editor_IndexController', 'beforeIndexAction', array($this, 'handleStartSession'));
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
         
         //TODO test logout calls:
         $this->eventManager->attach('editor_SessionController', 'beforeDeleteAction', array($this, 'handleLogout'));
         $this->eventManager->attach('editor_SessionController', 'resyncOperation', array($this, 'handleSessionResync'));
-        
-        $this->eventManager->attach('LoginController', 'logoutAction', array($this, 'handleLogout'));
-        
+        $this->eventManager->attach('LoginController', 'beforeLogoutAction', array($this, 'handleLogout'));
         
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
         
+        //inject JS strings
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
     }
     
@@ -144,7 +131,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
             $sessionId = $params['id'];
         }
         
-        $this->bus->stopSession($sessionId);
+        $this->bus->stopSession($sessionId, $this->getHeaderConnId());
     }
     
     /**
@@ -191,17 +178,13 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     }
     
     public function handleAlikeLoad(Zend_EventManager_Event $event) {
-        $f = Zend_Registry::get('frontController');
-        /* @var $f Zend_Controller_Front */
-        $connectionId = $f->getRequest()->getHeader('X-Translate5-MessageBus-ConnId');
-        
         $masterSegment = $event->getParam('entity');
         /* @var $masterSegment editor_Models_Segment */
         
         $view = $event->getParam('view');
         $alikeIds = array_column($view->rows, 'id');
         $this->bus->notify(self::CHANNEL_TASK, 'segmentAlikesLoaded', [
-            'connectionId' => $connectionId,
+            'connectionId' => $this->getHeaderConnId(),
             'masterSegment' => $masterSegment->getDataObject(),
             'sessionId' => Zend_Session::getId(),
             'alikeIds' => $alikeIds,
@@ -215,12 +198,8 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $segment = $event->getParam('entity');
         /* @var $segment editor_Models_Segment */
         
-        $f = Zend_Registry::get('frontController');
-        /* @var $f Zend_Controller_Front */
-        $connectionId = $f->getRequest()->getHeader('X-Translate5-MessageBus-ConnId');
-        
         $this->bus->notify(self::CHANNEL_TASK, 'segmentAlikeSave', [
-            'connectionId' => $connectionId,
+            'connectionId' => $this->getHeaderConnId(),
             'segment' => $segment->getDataObject(),
             'sessionId' => Zend_Session::getId(),
         ]);
@@ -236,6 +215,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->bus->notify(self::CHANNEL_TASK, 'close', [
             'task' => $task->getDataObject(),
             'sessionId' => Zend_Session::getId(),
+            'connectionId' => $this->getHeaderConnId(),
         ]);
     }
     

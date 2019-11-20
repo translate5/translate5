@@ -37,7 +37,6 @@ namespace Translate5\FrontEndMessageBus\Message;
  * @property string $userGuid virtual, is passed to the underlying payload container
  * @property string $taskGuid virtual, is passed to the underlying payload container
  * @property string $segmentId virtual, is passed to the underlying payload container
- * @property string $segmentIds virtual, is passed to the underlying payload container
  * @method void segmentOpenNak() segmentOpenNak()
  * @method void segmentOpenAck() segmentOpenAck()
  * @method void segmentSave() segmentSave()

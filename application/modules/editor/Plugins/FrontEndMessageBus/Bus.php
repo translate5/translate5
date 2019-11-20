@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * encapsulates defined commands directly to the MessageBus
  * @method void triggerReload() triggerReload(string $storeId, integer $id = null) first parameter is a store id. Second optional parameter is a id to reload just a record in the previously defined store. If omitted reload the whole store.
  * @method void startSession() startSession($sessionId, stdClass $userData)
- * @method void stopSession() stopSession($sessionId)
+ * @method void stopSession() stopSession(string $sessionId, string $connectionId)
  * @method void ping() ping()
  */
 class editor_Plugins_FrontEndMessageBus_Bus {
@@ -106,8 +106,6 @@ class editor_Plugins_FrontEndMessageBus_Bus {
                 'level' => $this->logger::LEVEL_WARN
             ]);
         }
-        
-        //FIXME if host is not reachable, deactivate plugin temporarly (like termtagger DOWN check)
     }
     
     /**

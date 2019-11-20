@@ -48,4 +48,17 @@ abstract class Channel implements ComponentInterface {
     public function onError(ConnectionInterface $conn, \Exception $e) {
         //currently do nothing
     }
+    
+    public function startSession(string $sessionId) {
+        //currently do nothing
+    }
+    
+    /**
+     * the given session was stop, handle that in the channel 
+     * @param string $sessionId
+     * @param string $connectionId the connection which requested the stopSession
+     */
+    public function stopSession(string $sessionId, string $connectionId) {
+        //currently do nothing
+    }
 }
