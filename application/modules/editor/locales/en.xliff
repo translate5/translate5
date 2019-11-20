@@ -3575,6 +3575,7 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='RXJ3ZWl0ZXJ0ZSBGaWx0ZXIgKFdlaXRlcmUgRmlsdGVyIGltIEtvcGYgamVkZXIgU3BhbHRlKQ=='><source>Erweiterte Filter (Weitere Filter im Kopf jeder Spalte)</source><target>Advanced filters (More filters in the head of each column)</target></trans-unit>
 <trans-unit id='QW53ZW5kZW4='><source>Anwenden</source><target>Apply</target></trans-unit>
 <trans-unit id='R2VzZXR6dGUgRmlsdGVy'><source>Gesetzte Filter</source><target>Active filters</target></trans-unit>
+<trans-unit id='QW5vbnltaXNpZXJ0ZSBCZW51dHplciBuaWNodCBhdXN3w6RobGJhcg=='><source>Anonymisierte Benutzer nicht auswählbar</source><target>Anonymized users not selectable</target></trans-unit>
 </body>
   </file>
 </xliff>

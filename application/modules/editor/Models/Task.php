@@ -225,6 +225,27 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return parent::loadFilterdCustom($s);
     }
     
+    /***
+     * Load all task assoc users for non anonymized tasks.
+     * This is used for the user workflow filter in the advance filter store.
+     * INFO:Associated users for the anonimized tasks will not be loaded
+     * @return array
+     */
+    public function loadUserList() {
+        //set the entity filter table object
+        if(!$this->getFilter()->hasDefaultTable()){
+            $this->getFilter()->setDefaultTable('t');
+        }
+        $s=$this->db->select()
+        ->setIntegrityCheck(false)
+        ->from(['t' => 'LEK_task'], [])
+        ->join(['c'=>'LEK_customer'], 't.customerId=c.id',[])
+        ->join(['ta'=>'LEK_taskUserAssoc'],'ta.taskGuid= t.taskGuid',[])
+        ->join(['u'=>'Zf_users'],'u.userGuid=ta.userGuid',['u.*'])
+        ->where('c.anonymizeUsers=0');
+        return $this->loadFilterdCustom($s);
+    }
+    
     /**
      * gets the total count of all tasks associated to the user (filtered by the TaskUserAssoc table)
      * if $loadAll is true, load all tasks, user infos joined only where possible,

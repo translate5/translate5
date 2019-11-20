@@ -1685,6 +1685,7 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='RXJ3ZWl0ZXJ0ZSBGaWx0ZXIgKFdlaXRlcmUgRmlsdGVyIGltIEtvcGYgamVkZXIgU3BhbHRlKQ=='><source>Erweiterte Filter (Weitere Filter im Kopf jeder Spalte)</source><target>Erweiterte Filter (Weitere Filter im Kopf jeder Spalte)</target></trans-unit>
 <trans-unit id='QW53ZW5kZW4='><source>Anwenden</source><target>Anwenden</target></trans-unit>
 <trans-unit id='R2VzZXR6dGUgRmlsdGVy'><source>Gesetzte Filter</source><target>Gesetzte Filter</target></trans-unit>
+<trans-unit id='QW5vbnltaXNpZXJ0ZSBCZW51dHplciBuaWNodCBhdXN3w6RobGJhcg=='><source>Anonymisierte Benutzer nicht auswählbar</source><target>Anonymisierte Benutzer nicht auswählbar</target></trans-unit>
   </body>
  </file>
 </xliff>

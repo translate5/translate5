@@ -271,6 +271,13 @@ class editor_TaskController extends ZfExtended_RestController {
             $exportMetaData->exportAsDownload();
         }
     }
+    /***
+     * Load all task assoc users for non anonymized tasks.
+     * This is used for the user workflow filter in the advance filter store
+     */
+    public function userlistAction(){
+        $this->view->rows=$this->entity->loadUserList();
+    }
     
     /**
      * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
@@ -293,7 +300,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
             $rows = $this->entity->loadListByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
         }
-        
         $taskGuids = array_map(function($item){
             return $item['taskGuid'];
         },$rows);
