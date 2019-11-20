@@ -148,6 +148,14 @@ Ext.define('Editor.util.messageBus.MessageBus', {
                 return;
             }
             
+            if(data.command === 'errorOnOpen') {
+                console.log('↓ ', data.command, data.error);
+                me.setReconnect(false);
+                me.currentChannel = null; //needed in order to let the events come from the bus instance
+                me.fireEvent('error', me, event);
+                return;
+            }
+            
             me.currentChannel = data.channel;
             me.fireEvent(data.command, data.payload);
         };
