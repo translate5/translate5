@@ -244,6 +244,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleAfterHide: function() {
       this.getHeadToolBar().down('#task-admin-btn').show();
+      this.closeAdvancedFilterWindow();
   },
   /**
    * opens the task grid, hides all other
@@ -270,6 +271,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   handleInitEditor: function() {
       this.getHeadToolBar() && this.getHeadToolBar().down('#task-admin-btn').hide();
+      this.closeAdvancedFilterWindow();
   },
   clearTasks: function() {
       this.getAdminTasksStore().removeAll();
@@ -1082,5 +1084,18 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           return !this.fireEvent('periodicalTaskReloadIgnore', task);
       }          
       return false;
+  },
+  
+  /***
+   * Close advanced filter window
+   */
+  closeAdvancedFilterWindow:function(){
+	  var filterWindow=Ext.ComponentQuery.query('editorAdminTaskFilterFilterWindow');
+	  if(filterWindow.length<1){
+		  return;
+	  }
+	  Ext.ComponentQuery.query('editorAdminTaskFilterFilterWindow').forEach(function(win){
+		  win.destroy();
+	  });
   }
 });

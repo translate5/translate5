@@ -44,7 +44,8 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     	userNameLabel:'#UT#Benutzer',
     	applyBtn:'#UT#Anwenden',
     	cancelBtn:'#UT#Abbrechen',
-    	title: '#UT#Erweiterte Filter (Weitere Filter im Kopf jeder Spalte)'
+    	title: '#UT#Erweiterte Filter (Weitere Filter im Kopf jeder Spalte)',
+    	anonymizedUsersInfo:'#UT#Anonymisierte Benutzer nicht auswählbar',
     },
     autoScroll: true,
     height: 350,
@@ -79,13 +80,14 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
 	            displayField: 'longUserName',
                 valueField: 'userGuid',
 	            bind: {
-                    store: '{users}'
+                    store: '{userlist}',
                 },
-	            fieldLabel: me.strings.userNameLabel,
+	            fieldLabel:'¹'+ me.strings.userNameLabel,
 	            filter:{
 	            	operator: 'in',
             		property:'userName',
-    		        type:'list'
+    		        type:'list',
+    		        textLabel:me.strings.userNameLabel
 	            }
             },{
                 xtype: 'tagfield',
@@ -102,7 +104,8 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                 filter:{
                 	operator: 'in',
                 	property:'workflowState',
-                	type:'list'
+                	type:'list',
+                	textLabel:me.strings.workflowStateFilterLabel
                 }
             },{
                 xtype: 'tagfield',
@@ -119,7 +122,8 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                 filter:{
                 	operator: 'in',
                 	property:'userRole',
-                	type:'list'
+                	type:'list',
+                	textLabel:me.strings.userRoleLabel
                 }
             }],
             dockedItems: [{
@@ -145,6 +149,22 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                     	click:'onCancelBtnClick'
                     }
                 }]
+            },{
+                xtype: 'toolbar',
+                dock: 'bottom',
+                ui: 'footer',
+                align:'left',
+                layout: {
+                    type: 'vbox',
+                    align: 'left'
+                },
+                items: [{
+                	xtype: 'tbfill'
+        		},{
+        			xtype: 'container',
+                    padding: '10',
+                    html:"¹ "+me.strings.anonymizedUsersInfo
+        		}]
             }],
         
         };

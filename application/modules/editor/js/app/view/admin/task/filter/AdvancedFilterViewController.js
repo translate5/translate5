@@ -36,26 +36,17 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
     onFilterHolderBeforeDeselect:function(combo,record,index,eOpts){
     	var taskGrid=Ext.ComponentQuery.query('#adminTaskGrid')[0],
     		taskStore=Ext.StoreManager.get('admin.Tasks'),
-    		activefilters = taskStore.getFilters(false),
-    		cols = taskGrid.getColumns();
-    	
-    	//disable the filterchange since the filters are removed from here
+    		theFilter=taskGrid.getFilter(record.get('property'));
+
+    	//suspend the filterchange event so the load filters is not triggered
     	taskGrid.suspendEvents('filterchange');
-    	Ext.each(cols, function(col) {
-            if(col.filter && col.filter.dataIndex==record.get('property')) {
-            	//set the internala active value to false, so the set active is triggered
-            	col.filter.active=true;
-            	col.filter.setActive(false);
-            }
-        });
-    	//remove also all active filters which does not have associated column
-		activefilters.each(function(item) {
-			if(item.getProperty()==record.get('property')){
-				taskStore.removeFilter(item);
-			}
-	    });
-		//enable the event listener
-		taskGrid.resumeEvents('filterchange');
+    	//it is default filter, disable with filter setActive
+    	if(theFilter){
+    		theFilter.setActive(false);
+    	}else{
+    		taskStore.removeFilter(record.get('property'));
+    	}
+    	taskGrid.resumeEvents('filterchange');
     },
 
     
@@ -63,18 +54,14 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
      * Merge the advanced filters into the active filters list.
      */
     filterActiveFilters:function(records){
-    	var taskStore=Ext.StoreManager.get('admin.Tasks'),
+    	var me=this,
+    		taskStore=Ext.StoreManager.get('admin.Tasks'),
 			activefilters = taskStore.getFilters(false),
 			filtersarray = [];
 		
     	//convert all active filtes to simple array object collection
 		activefilters.each(function(item) {
-		    Ext.Array.push(filtersarray, {
-		        'operator': item.getOperator(),
-		        'property': item.getProperty(),
-		        'value' : item.getValue()
-		        //'label':item.getProperty()+' '+item.getOperator()+' '+item.getValue()
-		    });
+		    Ext.Array.push(filtersarray,me.getView().getFilterRenderObject(item));
 	    });
 		
 		//foreach advance filters, check if it is already active

@@ -52,25 +52,11 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
                     name:'filterHolder',
                     dataIndex:'filterHolder',
                     valueField: 'property',
-                    displayField: 'property',
+                    displayField: 'textLabel',
                     hideTrigger: true,
                     fieldLabel: me.strings.filterHolderLabel,
                     listeners:{
                     	beforedeselect:'onFilterHolderBeforeDeselect',
-                    	//TODO: tooltip 
-//                    	select: function (combo, value) {
-//                    		if(Ext.getCmp('advancedfilterTooltip')!==undefined){
-//                    			Ext.getCmp('advancedfilterTooltip').destroy();
-//                			}
-//                            if(combo.getRawValue() !==''){
-//                              var tooltipHtml  = combo.getRawValue().replace(/,/g,', ');
-//                              new Ext.ToolTip ({
-//                                id : 'advancedfilterTooltip',
-//                                target : combo.getEl(),
-//                                html : tooltipHtml
-//                              });
-//                            }
-//                        }
             		},
                     bind:{
                     	store:'{activeFilter}'
@@ -93,19 +79,38 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     		records=[];
     	
 		for(var i=0;i<filters.length;i++){
-			var item=filters[i];
-			Ext.Array.push(filtersarray, {
-				'operator': item.operator || item.getOperator(),
-				'property': item.property ||item.getProperty(),
-				'value' : item.value ||item.getValue()
-			});
+			Ext.Array.push(filtersarray,me.getFilterRenderObject(filters[i]));
 		}
     	//add the records to the field store
     	if(filtersarray.length>0){
     		records=filterHolder.getStore().add(filtersarray);
     	}
+    	//disable before select event, when the value is cleared
+    	filterHolder.suspendEvents('beforedeselect');
     	filterHolder.clearValue();
+    	filterHolder.resumeEvents('beforedeselect');
+    	
     	//set the new sellection
     	filterHolder.setSelection(records);
+    },
+    /***
+     * Get the filter render object for the filterHolder tagfield
+     */
+    getFilterRenderObject:function(item){
+    	var textLabel=item.textLabel,
+    		itemProperty=item.property ||item.getProperty(),
+    		taskGrid=Ext.ComponentQuery.query('#adminTaskGrid')[0],
+    		isGridFilter=item instanceof Ext.util.Filter;
+
+    	//if it is a default(grid column) filter, try to find the label from the grid
+    	if(!textLabel){
+    		textLabel=taskGrid.text_cols[itemProperty] ? taskGrid.text_cols[itemProperty] : itemProperty;
+    	}
+    	return {
+			'operator': !isGridFilter ? item.operator : item.getOperator(),
+			'property': itemProperty,
+			'value' : !isGridFilter ? item.value : item.getValue(),
+			'textLabel':textLabel
+		};
     }
 });

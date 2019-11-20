@@ -32,7 +32,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewModel', {
     stores: {
         activeFilter: {
             data: [],
-            fields:[{name: 'operator'},{name: 'property'},{name: 'type'},{name: 'value'}]
+            fields:[{name: 'operator'},{name: 'property'},{name: 'textLabel'},{name: 'value'}]
         }
     }
 });

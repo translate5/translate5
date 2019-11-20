@@ -48,5 +48,17 @@ Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
     
     onCancelBtnClick:function(){
     	this.getView().destroy();
+    },
+    
+    /***
+     * Add the task filter to the userlist store
+     */
+    onUsersStoreBeforeLoad:function(store,operation,eOpts){
+        var taskStore=Ext.StoreManager.get('admin.Tasks'),
+	        proxy=store.getProxy(),
+	        merged = Ext.merge({}, proxy.getExtraParams(), {
+	            filter:proxy.encodeFilters(taskStore.getFilters().items)
+	        });
+	    proxy.setExtraParams(merged);
     }
 });

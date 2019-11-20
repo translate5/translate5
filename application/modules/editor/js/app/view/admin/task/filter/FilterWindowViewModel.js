@@ -30,10 +30,22 @@ Ext.define('Editor.view.admin.task.filter.FilterWindowViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.editorAdminTaskFilterFilterWindow',
     stores: {
-        users: {
-            model: 'Editor.model.admin.User',
+    	userlist: {
+        	model:'Editor.model.admin.User',
             autoLoad: true,
-            pageSize: 0
+            pageSize: 0,
+            idProperty: 'id',
+            listeners: {
+                beforeload:'onUsersStoreBeforeLoad'
+            },
+            proxy : {
+              type : 'rest', 
+              url: Editor.data.restpath+'task/userlist',
+              reader : {
+                rootProperty: 'rows',
+                type : 'json'
+              }
+            }
         }
-    },
+    }
 });

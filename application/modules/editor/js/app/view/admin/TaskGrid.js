@@ -71,6 +71,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
       emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
       lockLocked: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
       enableSourceEditing: '#UT#Quellsprache bearbeitbar',
+      workflowState:'#UT#Workflow-Status',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+      userRole:'#UT#Benutzer-Rolle',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+	  userName:'#UT#Benutzer',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
   },
   strings: {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
@@ -717,14 +720,15 @@ Ext.define('Editor.view.admin.TaskGrid', {
    * Set/add filter to the task grid from filter object.
    * If the filter is not found as grid column, it will only be applied to the store
    */
-  activateGridColumnFilter: function(filters,disableFilterchange) {
+  activateGridColumnFilter: function(filters,suspendFilterchange) {
 	  var me=this;
-	  if(disableFilterchange){
+	  if(suspendFilterchange){
 		  me.suspendEvents('filterchange');
 	  }
 	  // for each filter object in the array
 	  Ext.each(filters, function(filter) {
-        var gridFilter = me.getFilter(filter.property);
+        var gridFilter = me.getFilter(filter.property),
+        	value=null;
         if(!gridFilter){
         	//the filter does not exist as column in the grid, filter the store with the filter params
         	//INFO: this can be the case when the grid is filtered with one of the advanced filters
@@ -734,11 +738,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
         gridFilter.setActive(true);
         switch(gridFilter.type) {
             case 'date':
-                var dateValue = Ext.Date.parse(filter.value, 'm/d/Y'),
-                    value;
-
+                var dateValue = Ext.Date.parse(filter.value, 'm/d/Y');
                 switch (filter.operator) {
-
                     case 'gt' :
                         value = {after: dateValue};
                         break;
@@ -754,10 +755,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 break;
 
             case 'numeric':
-                var value;
-
                 switch (filter.operator) {
-
                     case 'gt' :
                         value = {gt: filter.value};
                         break;
@@ -771,19 +769,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 gridFilter.setValue(value);
                 gridFilter.setActive(true);
                 break;
-
-            case 'list':
-                gridFilter.menu.setSelected(gridFilter.menu.selected, false);
-                gridFilter.menu.setSelected(filter.value, true);
-                break;
-
             default :
                 gridFilter.setValue(filter.value);
                 break;
         }
 	  });
 	  
-	  if(disableFilterchange){
+	  if(suspendFilterchange){
 		  me.resumeEvents('filterchange');
 	  }
 	  
