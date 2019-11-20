@@ -49,16 +49,28 @@ Ext.define('Editor.controller.JsLogger', {
             controller: {
                 '#SnapshotHistory': {
                     addLogEntryToLogger: 'addLogEntryToLogger'
+                },
+                '#Editor.$application': {
+                    editorAppLaunched: 'onEditorAppLaunched'
                 }
             }
     },
+    strings: {
+        msgTitle: '#UT#Videoaufnahme im Fehlerfall',
+        msgInfo: '#UT#Helfen Sie bei der Entwicklung von translate5: Erlauben Sie Bildschirmvideos im Fehlerfall.<br /><br />Bei einer Reihe von Fehlern kann das Open Source-Entwicklungsteam von translate5 diese nur reproduzieren und beheben, wenn die Benutzeraktionen, die  zu dem translate5-Fehler geführt haben, als Video aufgenommen werden. Es wird nur aufgezeichnet, was in translate5 passiert. Die Videoaufnahme startet erst, wenn ein Segment zur Bearbeitung geöffnet ist, und sie endet, sobald die Bearbeitung des Segments endet.<br /><br />Das Team von translate5 wäre sehr dankbar, wenn Sie diese Funktion aktivieren - vielen Dank im Voraus!<br /><br />Auch wenn die Videoaufzeichnung aktiviert ist, werden Videoaufzeichnungen nur gesendet, wenn Sie einen aufgetretenen Fehler melden.<br /><br />Videos, die mit einem Fehler in Verbindung stehen und an den Server gesendet wurden, werden gelöscht, sobald sie zur Behebung des Fehlers nicht mehr benötigt werden. Der einzige Verwendungszweck der Videos ist die Entwicklung von translate5. Die Daten werden nur für diesen Zweck verwendet.<br /><br />Weitere Informationen zur Videoaufzeichnung mit theRootCause und zum Datenschutz finden Sie unter https://confluence.translate5.net/display/CON/Collecting+data+for+fixing+errors'
+    },
+    
     hasJsLogger: false,
     enableJsLoggerVideoUser: false,
     
     /**
      * If jslogger (see jslogger.phtml) is included, we call initJsLogger() for further settings.
+     * We do this once after the Editor-App is launched because customers might use the Editor only
+     * (= without the rest of translate5), but the user's decision about activating the video-recording
+     * refers to everything they do as soon as they are logged in (don't ask them multiple times eg every time
+     * they open the Editor).
      */
-    init: function () {
+    onEditorAppLaunched: function () {
         try {
             jslogger && this.initJsLogger();
         } catch(err) {
@@ -68,7 +80,7 @@ Ext.define('Editor.controller.JsLogger', {
     
     /**
      * (1) Sets that jslogger exists and
-     * (2) makes the user set the video-recording.
+     * (2) asks the user to decide about the video-recording.
      */
     initJsLogger: function () {
         this.hasJsLogger = true;
@@ -96,19 +108,14 @@ Ext.define('Editor.controller.JsLogger', {
      * the user gets a message and can activate the video-recording.
      */
     setJsLoggerVideoByUser: function() {
-        var me = this,
-            title,
-            info;
+        var me = this;
         if (me.hasNoJsLogger()) {
             return;
         }
         if (!Editor.data.enableJsLoggerVideoConfig) {
             return;
         }
-        // TODO: title and info-text
-        title = 'enableJsLoggerVideo',
-        info = 'Help translate5\'s development with screen videos in case of errors...';
-        Ext.Msg.confirm(title, info, function(btn){
+        Ext.Msg.confirm(me.strings.msgTitle, me.strings.msgInfo, function(btn){
             if(btn === 'yes') {
                 me.enableJsLoggerVideoUser = true;
             }
