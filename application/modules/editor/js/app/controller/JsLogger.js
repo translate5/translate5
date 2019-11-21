@@ -52,6 +52,9 @@ Ext.define('Editor.controller.JsLogger', {
                 },
                 '#Editor.$application': {
                     editorAppLaunched: 'onEditorAppLaunched'
+                },
+                '#Editor.plugins.TrackChanges.controller.Editor': {
+                    addLogEntryToLogger: 'addLogEntryToLogger'
                 }
             }
     },
