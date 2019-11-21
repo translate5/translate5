@@ -152,5 +152,9 @@ class MessageBus implements MessageComponentInterface
     public function garbageCollection() {
         //TODO clean up unused instances. How to define unused? No Connections?
         //also pass gc call to instances to clean up unused sessions
+        foreach($this->instances as $instance) {
+            /* @var $instance AppInstance */
+            $instance->garbageCollection();
+        }
     }
 }

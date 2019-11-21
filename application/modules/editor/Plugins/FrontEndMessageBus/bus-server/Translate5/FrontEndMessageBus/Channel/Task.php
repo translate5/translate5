@@ -192,10 +192,10 @@ class Task extends Channel {
             return null;
         }
         
-        if(!empty($this->alikeSegments[$segmentId])) {
+        if(array_key_exists($segmentId, $this->alikeSegments)) {
             unset($this->alikeSegments[$segmentId]);
         }
-        if(!empty($this->editedSegments[$segmentId])) {
+        if(array_key_exists($segmentId, $this->editedSegments)) {
             $conn = $this->editedSegments[$segmentId];
             $conn->openedSegmentId = null;
             unset($this->editedSegments[$segmentId]);
@@ -221,7 +221,42 @@ class Task extends Channel {
      * @param ConnectionInterface $conn
      */
     public function onClose(ConnectionInterface $conn) {
-        $this->releaseLocalSegment($conn->openedSegmentId ?? 0); 
+        //FIXME Garbage Collection may delete a session (user leaves browser long time open)
+        // then the connection still exists (probably locking a segment) therefore onClose was not triggered yet to release the segment
+        // Also release a segment if the session does not exist anymore (in Garbage Collection)
+        if(true || empty($conn->openedTask)) {
+            return;
+        }
+        $request = FrontendMsg::create(self::CHANNEL_NAME, 'segmentLeave', [$conn->openedTask, $conn->openedSegmentId ?? 0], $conn);
+        if(!empty($conn->openedSegmentId)) {
+            //on connection close we release the segment, on reconnect the segment is tried to open again
+            // we just fake a frontend msg triggering the segmentLeave
+            $this->segmentLeave($request);
+        }
+        $answer = $this->createSegmentAnswerFromFrontend($request, 'segmentselect');
+        $answer->segmentId = [];
+        $answer->taskGuid = $conn->openedTask;
+        $this->sendToOthersOnTask($answer);
+    }
+    
+    /**
+     * trigger garbage collection
+     * Must be called after the instance gc, which triggers the stopSession call of this class 
+     */
+    public function onGarbageCollection() {
+        //sessions were cleaned up via stopSession from instance
+        
+        
+        //remove task guids without any session
+        $this->taskToSessionMap = array_filter($this->taskToSessionMap);
+        
+        //remove orphaned open segments
+        foreach($this->editedSegments as $segId => $conn) {
+            /* @var $conn \Ratchet\WebSocket\WsConnection */
+            if($conn->WebSocket->closing) {
+                $this->releaseLocalSegment($segId);
+            }
+        }
     }
     
     /**

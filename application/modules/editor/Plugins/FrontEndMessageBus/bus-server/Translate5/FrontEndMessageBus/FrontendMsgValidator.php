@@ -5,7 +5,7 @@ namespace Translate5\FrontEndMessageBus;
  * Checks if a given methodname in this instance is usable from frontend
  */
 trait FrontendMsgValidator {
-    protected $_validFrontendMethods = null;
+    static protected $_validFrontendMethods = null;
     
     protected function _initValidFrontendMethods() {
         $ref = new \ReflectionClass($this);
@@ -26,17 +26,17 @@ trait FrontendMsgValidator {
                 continue;
             }
             $isMsg = $cls->getName() === $msgCls || $cls->isSubclassOf($msgCls);
-            $isBackendMsg = $cls->getName() === $msgCls || $cls->isSubclassOf($backMsgCls);
+            $isBackendMsg = $cls->getName() === $backMsgCls || $cls->isSubclassOf($backMsgCls);
             if($isMsg && !$isBackendMsg) {
-                $this->_validFrontendMethods[] = $method->getName();
+                self::$_validFrontendMethods[] = $method->getName();
             }
         }
     }
     
     public function isValidFrontendCall(string $methodName) {
-        if(is_null($this->_validFrontendMethods)) {
+        if(is_null(self::$_validFrontendMethods)) {
             $this->_initValidFrontendMethods();
         }
-        return in_array($methodName, $this->_validFrontendMethods);
+        return in_array($methodName, self::$_validFrontendMethods);
     }
 }

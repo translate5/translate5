@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  * @method void startSession() startSession($sessionId, stdClass $userData)
  * @method void stopSession() stopSession(string $sessionId, string $connectionId)
  * @method void ping() ping()
+ * @method void garbageCollection() garbageCollection()
  */
 class editor_Plugins_FrontEndMessageBus_Bus {
     const CHANNEL = 'instance';
@@ -75,7 +76,7 @@ class editor_Plugins_FrontEndMessageBus_Bus {
         $this->notify(static::CHANNEL, $name, $args);
     }
     
-    public function notify($channel, $command, $data = null) {
+    public function notify($channel, $command, $data = []) {
         if(empty($this->uri)) {
             return;
         }

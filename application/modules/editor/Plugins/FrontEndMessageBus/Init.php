@@ -61,8 +61,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('Editor_AlikesegmentController', 'afterPutAction', array($this, 'handleAlikeSave'));
         $this->eventManager->attach('Editor_IndexController', 'beforeIndexAction', array($this, 'handleStartSession'));
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
-        
-        //TODO test logout calls:
+        $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', array($this, 'handleGarbageCollection'));
         $this->eventManager->attach('editor_SessionController', 'beforeDeleteAction', array($this, 'handleLogout'));
         $this->eventManager->attach('editor_SessionController', 'resyncOperation', array($this, 'handleSessionResync'));
         $this->eventManager->attach('LoginController', 'beforeLogoutAction', array($this, 'handleLogout'));
@@ -252,6 +251,14 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      */
     public function handlePing(Zend_EventManager_Event $event) {
         $this->bus->ping();
+    }
+    
+    public function handleGarbageCollection() {
+        //instance garbage collection
+        $this->bus->garbageCollection();
+        
+        //task garbage collection
+        $this->bus->notify(self::CHANNEL_TASK, 'onGarbageCollection');
     }
     
     /**

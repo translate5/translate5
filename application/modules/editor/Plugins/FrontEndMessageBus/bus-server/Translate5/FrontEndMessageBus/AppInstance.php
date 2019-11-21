@@ -272,4 +272,7 @@ class AppInstance {
         $data['connectionCount'] = count($this->connections);
         return $data;
     }
+    
+    public function garbageCollection() {
+    }
 }

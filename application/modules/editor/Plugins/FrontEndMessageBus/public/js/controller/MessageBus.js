@@ -79,14 +79,14 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             }
         },
         controller: {
+            '#Editor.$application': {
+                editorViewportOpened: 'onOpenEditorViewport'
+            },
             '#ChangeAlike': {
                 cancelManualProcessing: 'onCancelChangeAlikes' 
             }
         },
         component: {
-            '#Editor.$application': {
-                editorViewportOpened: 'onOpenEditorViewport'
-            },
             '#segmentgrid autoStateColumn' : {
                 initOtherRenderers: 'injectToolTipInfo'
             },
@@ -180,6 +180,11 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         if(grid && (sel = grid.getSelectionModel().getSelection()) && sel.length > 0) {
             me.clickSegment(null, sel[0]);
         }
+        
+        if(grid && grid.editingPlugin.editing) {
+            me.enterSegment(grid.editingPlugin, [grid.editingPlugin.context.record]);
+        }
+        
 
     },
     enterSegment: function(plugin, context) {
@@ -407,7 +412,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         })
     },
     onOpenEditorViewport: function() {
-        this.bus.send('task', 'resyncTask', [segment.get('taskGuid')]);
+        this.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
     },
     onTriggerTaskReload: function() {
         Ext.Logger.info('Task reload triggered');
@@ -452,5 +457,14 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             },
             scope: me
         };
+    },
+    /**
+     * is called every 5 Minutes and removes unused segment usage data
+     */
+    garbageCollector: function() {
+        var me = this;
+        me.segmentUsageData.each(function(meta) {
+            me.removeUnused(meta);
+        });
     }
 });
