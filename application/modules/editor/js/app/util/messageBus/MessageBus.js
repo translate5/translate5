@@ -158,6 +158,7 @@ Ext.define('Editor.util.messageBus.MessageBus', {
             
             me.currentChannel = data.channel;
             me.fireEvent(data.command, data.payload);
+console.log('↓ ', data.command, data.payload);
         };
         
         /**
@@ -228,6 +229,7 @@ Ext.define('Editor.util.messageBus.MessageBus', {
             payload: data || null
         };
         if (this.isReady()) {
+            console.log('↑', msgObj.command, msgObj.payload);
             this.socket.send(Ext.JSON.encode(msgObj));
         }
     }
