@@ -1325,7 +1325,13 @@ Ext.define('Editor.controller.Editor', {
             var me = this,
                 plug = this.getEditPlugin(),
                 editor = plug.editor.mainEditor,
-                tagIdx = Number(key) - 49; //49 shifts tag nr down to 0 for tag 1
+                tagIdx = Number(key) - 49, //49 shifts tag nr down to 0 for tag 1
+                sourceTagsForTagIdx,
+                sel,
+                selRange,
+                rangeOpen,
+                rangeClose,
+                insertBothTags;
 
             //key 0 equals to tadIdx -1 and equals to tag nr 10 (which equals to tagIdx 9)
             if(tagIdx < 0) {
@@ -1340,16 +1346,64 @@ Ext.define('Editor.controller.Editor', {
             if(!me.sourceTags || !me.sourceTags[tagIdx]){
                 return;
             }
-
+            
+            sourceTagsForTagIdx = [];
             Ext.Object.each(me.sourceTags[tagIdx], function(id, tag){
-                var tagInTarget = editor.getDoc().getElementById(id);
+                var tagObject = {'id': id, 'tag': tag}; 
+                sourceTagsForTagIdx.push(tagObject);
+            });
+            
+            // If a text range is marked, this short-cut inserts immediately the opening tag
+            // at the start of the range and the closing tag at the end of the range.
+            insertBothTags = false;
+            sel = rangy.getSelection(editor.getEditorBody());
+            selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
+            if (selRange !== null && !selRange.collapsed) {
+                insertBothTags = true;
+                rangeOpen = selRange.cloneRange();
+                rangeClose = selRange.cloneRange();
+                // Make sure to insert closing tag first, otherwise the ranges gets messy.
+                sourceTagsForTagIdx.sort(function(a, b){
+                  var x = a.id.toLowerCase();
+                  var y = b.id.toLowerCase();
+                  if (x < y) {return -1;}
+                  if (x > y) {return 1;}
+                  return 0;
+                });
+            }
+            
+            Ext.Array.each(sourceTagsForTagIdx, function(tagObject){
+                var [id, tag] = [tagObject.id, tagObject.tag],
+                    tagInTarget = editor.getDoc().getElementById(id);
                 if(tagInTarget && tagInTarget.parentNode.nodeName.toLowerCase() !== 'del'){
                     return;
                 }
+                if (insertBothTags) {
+                    switch (true) {
+                        case (id.indexOf('-open') !== -1):
+                            rangeOpen.collapse(true);
+                            sel.removeAllRanges();
+                            sel.addRange(rangeOpen);
+                        break;
+                        case (id.indexOf('-close') !== -1):
+                            rangeClose.collapse(false);
+                            sel.removeAllRanges();
+                            sel.addRange(rangeClose);
+                        break;
+                    }
+                }
                 editor.insertMarkup(tag);
-                return false;
+                if (!insertBothTags) {
+                    return false;
+                }
             });
-
+            
+            if (insertBothTags) {
+                // place cursor at the end of the formerly selected content
+                sel.removeAllRanges();
+                sel.addRange(rangeClose);
+            }
+            
             e.stopEvent();
             return false;
         },
