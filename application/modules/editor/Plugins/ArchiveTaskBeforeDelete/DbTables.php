@@ -86,6 +86,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             //not needed anymore, but keeping as reference how to to implement filters
             //'LEK_skeletonfiles' => array('--single-transaction', "--where=fileId in (select id from LEK_files where taskGuid = '{TASKGUID}')"),
             'LEK_task' => 'taskGuid',
+            'LEK_task_excelexport' => 'taskGuid',
             'LEK_taskUserAssoc' => 'taskGuid',
             'LEK_taskUserTracking' => 'taskGuid',
             'LEK_task_log' => 'taskGuid',
