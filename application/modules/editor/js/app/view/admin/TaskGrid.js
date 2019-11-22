@@ -300,11 +300,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 70,
               dataIndex: 'state',
               stateId:'state',
-              filter: {
-                  type: 'list',
-                  options: states,
-                  phpMode: false
-              },
+//TODO: disable the state filter till the state filter usage is not clear
+//read the topic for taskGrid:https://confluence.translate5.net/display/MI/Usability+enhancements
+//              filter: {
+//                  type: 'list',
+//                  options: states,
+//                  phpMode: false
+//              },
               tdCls: 'state',
               renderer: function(v, meta, rec) {
                   var userState = rec.get('userState'),
