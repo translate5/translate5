@@ -37,8 +37,10 @@ END LICENSE AND COPYRIGHT
  * @class Editor.util.SegmentEditor
  */
 Ext.define('Editor.util.SegmentEditor', {
-    mixins: ['Editor.util.DevelopmentTools'],
-    mixins: ['Editor.util.Node'],
+    mixins: [
+        'Editor.util.DevelopmentTools',
+        'Editor.util.Node'
+    ],
     
     editor: null, // = the segment's Editor (Editor.view.segments.HtmlEditor)
     
@@ -181,7 +183,7 @@ Ext.define('Editor.util.SegmentEditor', {
         return (Ext.fly(node).hasCls('qmflag') && node.hasAttribute('data-seq'));
     },
     /**
-     * Is the given node a Content-Tag?
+     * Is the given node an img-content-tag?
      * @param {Object} node
      * @returns {Boolean}
      */ 
@@ -196,7 +198,7 @@ Ext.define('Editor.util.SegmentEditor', {
      * - content in delNodes is ignored
      * Does NOT change anything in the content of the Editor.
      * @param {Boolean} collapseWhitespace
-     * @returns {Boolean}
+     * @returns {String}
      */
     getEditorContentAsText: function(collapseWhitespace) {
         var me = this,
