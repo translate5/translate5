@@ -28,7 +28,12 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.TaskGrid', {
   extend: 'Ext.grid.Panel',
-  requires: ['Editor.view.admin.TaskActionColumn','Editor.view.CheckColumn','Editor.view.admin.customer.CustomerFilter'],
+  requires: [
+	  'Editor.view.admin.TaskActionColumn',
+	  'Editor.view.CheckColumn',
+	  'Editor.view.admin.customer.CustomerFilter',
+	  'Editor.view.admin.task.filter.AdvancedFilter'
+  ],
   alias: 'widget.adminTaskGrid',
   itemId: 'adminTaskGrid',
   cls: 'adminTaskGrid',
@@ -66,6 +71,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
       emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
       lockLocked: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
       enableSourceEditing: '#UT#Quellsprache bearbeitbar',
+      workflowState:'#UT#Workflow-Status',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+      userRole:'#UT#Benutzer-Rolle',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+	  userName:'#UT#Benutzer',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
   },
   strings: {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
@@ -83,7 +91,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       showKPIBtnTip: '#UT#Auswertungen für alle gefilterten Aufgaben anzeigen.',
       reloadBtn: '#UT#Aktualisieren',
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.',
-      emptyTargets: '#UT#Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe)."'
+      emptyTargets: '#UT#Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe)."',
+      addFilterTooltip:'#UT#Filter hinzufügen'
   },
   states: {
       user_state_open: '#UT#offen',
@@ -291,11 +300,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 70,
               dataIndex: 'state',
               stateId:'state',
-              filter: {
-                  type: 'list',
-                  options: states,
-                  phpMode: false
-              },
+//TODO: disable the state filter till the state filter usage is not clear
+//read the topic for taskGrid:https://confluence.translate5.net/display/MI/Usability+enhancements
+//              filter: {
+//                  type: 'list',
+//                  options: states,
+//                  phpMode: false
+//              },
               tdCls: 'state',
               renderer: function(v, meta, rec) {
                   var userState = rec.get('userState'),
@@ -588,6 +599,12 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),
                   tooltip: me.strings.addTaskTip
               },{
+	  			  xtype:'button',
+	  			  itemId:'addAdvanceFilterBtn',
+				  iconCls : 'ico-add-filter',
+				  text:me.strings.addFilterTooltip,
+				  tooltip:me.strings.addFilterTooltip
+              },{
                   xtype: 'button',
                   iconCls: 'ico-export',
                   itemId: 'export-meta-data-btn',
@@ -600,6 +617,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   text: me.strings.showKPIBtn,
                   tooltip: me.strings.showKPIBtnTip
               }]
+            },{
+                xtype: 'editorAdminTaskFilterAdvancedFilter'
             },{
                 xtype: 'pagingtoolbar',
                 itemId:'pageingtoolbar',
@@ -697,5 +716,85 @@ Ext.define('Editor.view.admin.TaskGrid', {
   onDestroy: function() {
       this.tooltip.destroy();
       this.callParent(arguments);
-  }
+  },
+  
+  /***
+   * Set/add filter to the task grid from filter object.
+   * If the filter is not found as grid column, it will only be applied to the store
+   */
+  activateGridColumnFilter: function(filters,suspendFilterchange) {
+	  var me=this;
+	  if(suspendFilterchange){
+		  me.suspendEvents('filterchange');
+	  }
+	  // for each filter object in the array
+	  Ext.each(filters, function(filter) {
+        var gridFilter = me.getFilter(filter.property),
+        	value=null;
+        if(!gridFilter){
+        	//the filter does not exist as column in the grid, filter the store with the filter params
+        	//INFO: this can be the case when the grid is filtered with one of the advanced filters
+        	me.getStore().addFilter(filter);
+        	return true;
+        }
+        gridFilter.setActive(true);
+        switch(gridFilter.type) {
+            case 'date':
+                var dateValue = Ext.Date.parse(filter.value, 'm/d/Y');
+                switch (filter.operator) {
+                    case 'gt' :
+                        value = {after: dateValue};
+                        break;
+                    case 'lt' :
+                        value = {before: dateValue};
+                        break;
+                    case 'eq' :
+                        value = {on: dateValue};
+                        break;
+                }
+                gridFilter.setValue(value);
+                gridFilter.setActive(true);
+                break;
+
+            case 'numeric':
+                switch (filter.operator) {
+                    case 'gt' :
+                        value = {gt: filter.value};
+                        break;
+                    case 'lt' :
+                        value = {lt: filter.value};
+                        break;
+                    case 'eq' :
+                        value = {eq: filter.value};
+                        break;
+                }
+                gridFilter.setValue(value);
+                gridFilter.setActive(true);
+                break;
+            default :
+                gridFilter.setValue(filter.value);
+                break;
+        }
+	  });
+	  
+	  if(suspendFilterchange){
+		  me.resumeEvents('filterchange');
+	  }
+	  
+	},
+	
+	/***
+	 * Get grid filter by property
+	 */
+	getFilter:function(property){
+		var cols = this.getColumns(),
+			filter=null;
+    	Ext.each(cols, function(col) {
+            if(col.filter && col.filter.dataIndex==property) {
+            	filter=col.filter;
+            	return false;
+            }
+        });
+    	return filter;
+	}
 });

@@ -67,6 +67,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },{
       ref: 'excelExportUsageDisplay',
       selector: '#kpiWindow #kpi-excel-export-usage-display'
+  },{
+      ref: 'advancedFilterToolbar',
+      selector: '#advancedFilterToolbar'
+  },{
+      ref: 'filterHolder',
+      selector: '#filterHolder'
   }],
   alias: 'controller.taskOverviewController',
   
@@ -134,7 +140,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               hide: 'handleAfterHide',
               show: 'handleAfterShow',
               celldblclick: 'handleGridClick', 
-              cellclick: 'handleGridClick'
+              cellclick: 'handleGridClick',
+              filterchange:'onAdminTaskGridFilterChange'
           },
           '#adminTaskGrid #reload-task-btn': {
               click: 'handleTaskReload'
@@ -173,6 +180,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           'adminTaskAddWindow panel:not([hidden])': {
               wizardCardFinished: 'onWizardCardFinished',
               wizardCardSkiped: 'onWizardCardSkiped'
+          },
+          '#addAdvanceFilterBtn':{
+        	  click:'onAddAdvanceFilterBtnClick'
+          },
+          'editorAdminTaskFilterFilterWindow':{
+        	  advancedFilterChange:'onAdvancedFilterChange'
           }
       }
   },
@@ -231,6 +244,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleAfterHide: function() {
       this.getHeadToolBar().down('#task-admin-btn').show();
+      this.closeAdvancedFilterWindow();
   },
   /**
    * opens the task grid, hides all other
@@ -257,6 +271,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   handleInitEditor: function() {
       this.getHeadToolBar() && this.getHeadToolBar().down('#task-admin-btn').hide();
+      this.closeAdvancedFilterWindow();
   },
   clearTasks: function() {
       this.getAdminTasksStore().removeAll();
@@ -383,6 +398,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           this.openTaskRequest(rec);
       }
   },
+  
+  onAdminTaskGridFilterChange:function(store,filters,eOpts){
+	  var me=this;
+	  me.getAdvancedFilterToolbar().loadFilters(filters);
+  },
+  
   /**
    * general method to open a task, starting in readonly mode is calculated
    * @param {Editor.model.admin.Task} task
@@ -611,6 +632,39 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       this.getAdminTasksStore().load();
       this.taskUserTrackingsStore.load();
   },
+  
+  /***
+   * Add advance filter button handler
+   */
+  onAddAdvanceFilterBtnClick:function(){
+	  var me=this,
+	  	  filterWindow=Ext.widget('editorAdminTaskFilterFilterWindow'),
+	  	  filterHolder=me.getFilterHolder(),
+	  	  record=filterHolder.selection ? filterHolder.selection : [];
+	  filterWindow.loadRecord(record);
+	  filterWindow.show();
+  },
+  
+  /***
+   * Filter is applied in the advanced filter window
+   */
+  onAdvancedFilterChange:function(filter){
+	  var me=this,
+	  	  toolbar=me.getAdvancedFilterToolbar(),
+	  	  taskGrid=me.getTaskGrid(),
+	  	  taskStore=taskGrid.getStore(),
+	  	  filtersarray=toolbar.getController().filterActiveFilters(filter),
+	  	  addFilter=filtersarray && filtersarray.length>0;
+	
+	  		
+	 //clear the taskGrid store from the filters
+  	 taskStore.clearFilter(addFilter);
+  	 //add the custom filtering where the filterchange event will be suspended
+	 taskGrid.activateGridColumnFilter(filtersarray,true);
+	 //load the filters into the filter holder tagfield
+	 toolbar.loadFilters(filtersarray);
+  },
+  
   /**
    * calls local task handler, dispatching is done by the icon CSS class of the clicked img
    * the css class ico-task-foo-bar is transformed to the method handleTaskFooBar
@@ -1030,5 +1084,18 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           return !this.fireEvent('periodicalTaskReloadIgnore', task);
       }          
       return false;
+  },
+  
+  /***
+   * Close advanced filter window
+   */
+  closeAdvancedFilterWindow:function(){
+	  var filterWindow=Ext.ComponentQuery.query('editorAdminTaskFilterFilterWindow');
+	  if(filterWindow.length<1){
+		  return;
+	  }
+	  Ext.ComponentQuery.query('editorAdminTaskFilterFilterWindow').forEach(function(win){
+		  win.destroy();
+	  });
   }
 });
