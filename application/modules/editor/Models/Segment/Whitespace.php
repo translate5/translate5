@@ -59,6 +59,7 @@ class editor_Models_Segment_Whitespace {
         '/\x{2029}/u', //Hex UTF-8 bytes 	E2 80 A9//schutzbedürftiger Whitespace + von mssql nicht vertragen
         //we do not escape that any more - mssql not in use '"\x{201E}"u', //Hex UTF-8 bytes 	E2 80 9E //von mssql nicht vertragen
         //we do not escape that any more - mssql not in use '"\x{201C}"u' //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
+        '/\x{0003}/u', //Hex UTF-8 bytes or codepoint of END OF TEXT //TS-240
         '/\x{0009}/u', //Hex UTF-8 bytes or codepoint of horizontal tab
         '/\x{000B}/u', //Hex UTF-8 bytes or codepoint of vertical tab
         '/\x{000C}/u', //Hex UTF-8 bytes or codepoint of page feed
