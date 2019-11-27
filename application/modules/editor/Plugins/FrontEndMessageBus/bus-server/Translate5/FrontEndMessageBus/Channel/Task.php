@@ -1,11 +1,36 @@
 <?php
+/*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2019 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ 
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ 
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+ 
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
 namespace Translate5\FrontEndMessageBus\Channel;
 use Ratchet\ConnectionInterface;
 use Translate5\FrontEndMessageBus\Message\SegmentMsg;
 use Translate5\FrontEndMessageBus\Message\FrontendMsg;
 use Translate5\FrontEndMessageBus\Channel;
 use Translate5\FrontEndMessageBus\FrontendMsgValidator;
-
 /**
  * Encapsulates logic specific to an opened task in an instance
  */
@@ -18,6 +43,12 @@ class Task extends Channel {
      * @var array
      */
     protected $taskToSessionMap = [];
+    
+    /**
+     * contains the usertrackingId to each task
+     * @var array
+     */
+    protected $taskUserTracking = [];
     
     /**
      * If a segment is listed here, it is locked. Key = segment id, value = connection of the locking user.
@@ -68,7 +99,9 @@ class Task extends Channel {
      */
     public function segmentClick(FrontendMsg $request) {
         $answer = $this->createSegmentAnswerFromFrontend($request, 'segmentselect');
-        $this->sendToOthersOnTask($answer);
+        if(!empty($answer)) {
+            $this->sendToOthersOnTask($answer);
+        }
     }
     
     /**
@@ -81,11 +114,38 @@ class Task extends Channel {
         $request->conn->openedTask = $result->taskGuid;
         //sending the requesting user all locked segments
         foreach($this->editedSegments as $segmentId => $conn) {
-            $result->userGuid = $this->instance->getSession($conn->sessionId, 'userGuid');
+            $userGuid = $this->instance->getSession($conn->sessionId, 'userGuid');
+            $result->trackingId = $this->getUserTrackingId($result->taskGuid, $userGuid); 
             $result->segmentId = $segmentId;
             $result->connectionId = $conn->connectionId;
             $result->send();
         }
+        
+        $this->updateOnlineUsers($request->conn->sessionId, $result->taskGuid, true);
+    }
+    
+    /**
+     * Sends the list of trackingIds with theire online status to the users of a task
+     * @param string $affectedSessionId
+     * @param string $taskGuid
+     * @param bool $online true if the triggering user is online, false otherwise
+     * 
+     */
+    protected function updateOnlineUsers(string $affectedSessionId, string $taskGuid, bool $online) {
+        //update online users in task
+        $userGuid = $this->instance->getSession($affectedSessionId, 'userGuid');
+        if(empty($this->taskUserTracking[$taskGuid][$userGuid])) {
+            return;
+        }
+        $this->taskUserTracking[$taskGuid][$userGuid]['isOnline'] = $online;
+        $onlineInTask = [];
+        foreach($this->taskUserTracking[$taskGuid] as $tracking) {
+            $onlineInTask[$tracking['id']] = !empty($tracking['isOnline']);
+        }
+        $request = FrontendMsg::create(self::CHANNEL_NAME, 'updateOnlineUsers', [
+            'onlineInTask' => $onlineInTask
+        ]);
+        $this->sendToTaskUsers($taskGuid, $affectedSessionId, $request);
     }
     
     public function segmentCancelAlikes(FrontendMsg $request) {
@@ -94,6 +154,7 @@ class Task extends Channel {
             return;
         }
         
+        $alikes = [];
         //get the alike IDs (before releaseLocalSegment, they are removed there)
         if(!empty($this->alikeSegments[$answer->segmentId])) {
             $alikes = $this->alikeSegments[$answer->segmentId];
@@ -221,12 +282,10 @@ class Task extends Channel {
      * @param ConnectionInterface $conn
      */
     public function onClose(ConnectionInterface $conn) {
-        //FIXME Garbage Collection may delete a session (user leaves browser long time open)
-        // then the connection still exists (probably locking a segment) therefore onClose was not triggered yet to release the segment
-        // Also release a segment if the session does not exist anymore (in Garbage Collection)
-        if(true || empty($conn->openedTask)) {
+        if(empty($conn->openedTask)) {
             return;
         }
+        $this->updateOnlineUsers($conn->sessionId, $conn->openedTask, false);
         $request = FrontendMsg::create(self::CHANNEL_NAME, 'segmentLeave', [$conn->openedTask, $conn->openedSegmentId ?? 0], $conn);
         if(!empty($conn->openedSegmentId)) {
             //on connection close we release the segment, on reconnect the segment is tried to open again
@@ -234,6 +293,9 @@ class Task extends Channel {
             $this->segmentLeave($request);
         }
         $answer = $this->createSegmentAnswerFromFrontend($request, 'segmentselect');
+        if(empty($answer)) {
+            return;
+        }
         $answer->segmentId = [];
         $answer->taskGuid = $conn->openedTask;
         $this->sendToOthersOnTask($answer);
@@ -241,14 +303,43 @@ class Task extends Channel {
     
     /**
      * trigger garbage collection
-     * Must be called after the instance gc, which triggers the stopSession call of this class 
+     * Must be called after the instance gc, which triggers the stopSession call of this class
+     * @param array $existingSessions
+     * @return array[] returns the really used taskGuids
      */
-    public function onGarbageCollection() {
-        //sessions were cleaned up via stopSession from instance
-        
+    public function garbageCollection(array $existingSessions) {
+        //clean up sessions in each task of taskToSessionMap
+        foreach($this->taskToSessionMap as $task => $sessions) {
+            $this->taskToSessionMap[$task] = array_intersect($sessions, $existingSessions);
+        }
         
         //remove task guids without any session
         $this->taskToSessionMap = array_filter($this->taskToSessionMap);
+        $todelete = array_diff(array_keys($this->taskUserTracking), array_keys($this->taskToSessionMap));
+        foreach($todelete as $del) {
+            unset ($this->taskUserTracking[$del]);
+        }
+        
+        //get remaining sessions associated to tasks
+        $allUsedSessions = array_values($this->taskToSessionMap);
+        if(!empty($allUsedSessions)) {
+            //merge all sessions together into one array
+            $allUsedSessions = array_unique(call_user_func_array('array_merge', $allUsedSessions));
+            
+            //check if there are connections containing non existent sessions, if yes leave open segments by that connections 
+            foreach($this->instance->getConnections() as $conn) {
+                if(!empty($allUsedSessions) && in_array($conn->sessionId, $allUsedSessions)) {
+                    continue;
+                }
+                // if the connection has a locked segment, release it.
+                $request = FrontendMsg::create(self::CHANNEL_NAME, 'segmentLeave', [$conn->openedTask ?? null, $conn->openedSegmentId ?? 0], $conn);
+                if(!empty($conn->openedTask) && !empty($conn->openedSegmentId)) {
+                    //on connection close we release the segment, on reconnect the segment is tried to open again
+                    // we just fake a frontend msg triggering the segmentLeave
+                    $this->segmentLeave($request);
+                }
+            }
+        }
         
         //remove orphaned open segments
         foreach($this->editedSegments as $segId => $conn) {
@@ -257,6 +348,9 @@ class Task extends Channel {
                 $this->releaseLocalSegment($segId);
             }
         }
+        
+        //we return here only the taskGuids, really having a session 
+        return ['usedTaskGuids' => array_keys($this->taskToSessionMap)];
     }
     
     /**
@@ -274,7 +368,8 @@ class Task extends Channel {
             $answer->command = $command;
         }
         $answer->channel = self::CHANNEL_NAME;
-        $answer->userGuid = $this->instance->getSession($request->conn->sessionId, 'userGuid');
+        $userGuid = $this->instance->getSession($request->conn->sessionId, 'userGuid');
+        $answer->trackingId = $this->getUserTrackingId($request->conn->openedTask, $userGuid);
         return $answer;
     }
     
@@ -286,7 +381,11 @@ class Task extends Channel {
         $answer = SegmentMsg::create(self::CHANNEL_NAME, $command);
         /* @var $answer SegmentMsg */
         $answer->segmentId = (int) $segment['id'];
-        $answer->userGuid = $this->instance->getSession($sessionId, 'userGuid');
+        
+        $userGuid = $this->instance->getSession($sessionId, 'userGuid');
+        $conn = $this->findConnection($connectionId, $sessionId);
+        $answer->trackingId = $this->getUserTrackingId($conn->openedTask, $userGuid);
+        
         $answer->connectionId = $connectionId;
         return $answer;
     }
@@ -377,6 +476,10 @@ class Task extends Channel {
             $this->instance->getLogger()->error('segmentAlikesLoaded: connection ID mismatch');
             return;
         }
+        
+        $userGuid = $this->instance->getSession($sessionId, 'userGuid');
+        $trackingId = $this->getUserTrackingId($currentConnection->openedTask, $userGuid);
+        
         //try to lock all $alikes for this connection
         foreach($alikes as &$alikeId) {
             $alikeId = (int) $alikeId;
@@ -389,7 +492,7 @@ class Task extends Channel {
             //if one of the alikes is already locked by someone different - we have to send a NAK to the one who opened the master segment
             FrontendMsg::create(self::CHANNEL_NAME, 'segmentOpenNak', [
                 'segmentId' => (int) $masterSegment['id'],
-                'userGuid' => $this->instance->getSession($sessionId, 'userGuid'),
+                'trackingId' => $trackingId,
                 'connectionId' => $currentConnection->connectionId,
             ], $currentConnection)
             ->send();
@@ -405,7 +508,7 @@ class Task extends Channel {
         //send all other users that the segments should be locked
         $this->sendToTaskUsers($masterSegment['taskGuid'], $sessionId, FrontendMsg::create(self::CHANNEL_NAME, 'segmentLocked', [
             'segmentId' => $alikes, //maybe integer or array of int!
-            'userGuid' => $this->instance->getSession($sessionId, 'userGuid'),
+            'trackingId' => $trackingId,
             'connectionId' => $connectionId,
         ]), $currentConnection);
     }
@@ -414,13 +517,16 @@ class Task extends Channel {
      * Open the task for the session
      * @param array $task
      * @param string $sessionId
+     * @param array $userTracking
      */
-    public function open(array $task, string $sessionId) {
+    public function open(array $task, string $sessionId, array $userTracking) {
         if(!isset($this->taskToSessionMap[$task['taskGuid']]) || !is_array($this->taskToSessionMap[$task['taskGuid']])) {
             $this->taskToSessionMap[$task['taskGuid']] = [];
         }
         $this->taskToSessionMap[$task['taskGuid']][] = $sessionId;
         $this->taskToSessionMap[$task['taskGuid']] = array_unique($this->taskToSessionMap[$task['taskGuid']]);
+
+        $this->updateUserTracking($task['taskGuid'], $userTracking, $sessionId);
     }
     
     /**
@@ -429,9 +535,15 @@ class Task extends Channel {
      * @param string $sessionId
      */
     public function close(array $task, string $sessionId, string $connectionId) {
+        $this->updateOnlineUsers($sessionId, $task['taskGuid'], false);
+        
         $idx = array_search($sessionId, $this->taskToSessionMap[$task['taskGuid']]);
         if($idx !== false) {
             unset($this->taskToSessionMap[$task['taskGuid']][$idx]);
+        }
+        
+        if(empty($this->taskToSessionMap[$task['taskGuid']])) {
+            unset($this->taskUserTracking[$task['taskGuid']]);
         }
         
         $result = FrontendMsg::create($this->instance::CHANNEL_INSTANCE, 'notifyUser', [
@@ -462,7 +574,7 @@ class Task extends Channel {
     }
     
     /**
-     * Triggers a reload of the given store and optionally a record of that store only in all connections
+     * Triggers a reload of the active task in the GUI
      * @param string $storeId
      * @param string $excludeConnection optional, a connectionid which should be ignored (mostly the initiator, since he has already the latest task). defaults to null
      * @param int $recordId
@@ -480,6 +592,32 @@ class Task extends Channel {
     }
     
     /**
+     * Updates the user tracking data for the given taskGuid
+     * @param string $taskGuid
+     * @param array $userTracking
+     * @param string $sessionId optional, if omitted the frontend online state is not updated 
+     */
+    public function updateUserTracking(string $taskGuid, array $userTracking, string $sessionId = '') {
+        $userTracking = array_combine(array_column($userTracking, 'userGuid'), $userTracking);
+        //first we have to merge back the current isOnline info
+        if(!empty($this->taskUserTracking[$taskGuid])) {
+            foreach($this->taskUserTracking[$taskGuid] as $userGuid => $tracking) {
+                if(empty($userTracking[$userGuid])) {
+                    continue;
+                }
+                $userTracking[$userGuid]['isOnline'] = $tracking['isOnline'];
+            }
+        }
+        
+        $this->taskUserTracking[$taskGuid] = $userTracking;
+        
+        //if we have a sessionId, this session was openeing a task, so lets update the GUI therefore
+        if(!empty($sessionId)) {
+            $this->updateOnlineUsers($sessionId, $taskGuid, true);
+        }
+    }
+    
+    /**
      * {@inheritDoc}
      * @see \Translate5\FrontEndMessageBus\Channel::debug()
      */
@@ -489,9 +627,18 @@ class Task extends Channel {
             $segments[$segId] = $conn->connectionId;
         }
         return [
+            'userTracking' => $this->taskUserTracking,
             'taskToSessions' => $this->taskToSessionMap,
             'editedSegments' => $segments
         ];
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \Translate5\FrontEndMessageBus\Channel::getName()
+     */
+    public function getName(): string {
+        return self::CHANNEL_NAME;
     }
     
     /**
@@ -501,12 +648,21 @@ class Task extends Channel {
      * @return ConnectionInterface|null
      */
     protected function findConnection(string $connectionId, string $sessionId): ?ConnectionInterface {
-        foreach($this->instance->getConnections() as $conn) {
-            //the session must match too, otherwise the connectionId was spoofed
-            if($conn->connectionId === $connectionId && $conn->sessionId === $sessionId) {
-                return $conn;
-            }
+        $conn = $this->instance->getConnection($connectionId);
+        //the session must match too, otherwise the connectionId was spoofed
+        if(!empty($conn) && $conn->sessionId === $sessionId) {
+            return $conn;
         }
         return null;
+    }
+    
+    /**
+     * returns either the userTrackingId to a given task user combination or 0 if nothing found
+     * @param string $taskGuid
+     * @param string $userGuid
+     * @return integer
+     */
+    protected function getUserTrackingId(string $taskGuid, string $userGuid): int {
+        return $this->taskUserTracking[$taskGuid][$userGuid]['id'] ?? 0;
     }
 }

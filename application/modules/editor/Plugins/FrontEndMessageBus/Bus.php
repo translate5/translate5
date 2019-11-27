@@ -33,7 +33,8 @@ END LICENSE AND COPYRIGHT
  * @method void startSession() startSession($sessionId, stdClass $userData)
  * @method void stopSession() stopSession(string $sessionId, string $connectionId)
  * @method void ping() ping()
- * @method void garbageCollection() garbageCollection()
+ * @method void resyncDone() resyncDone(string $connectionId)
+ * @method void garbageCollection() garbageCollection(array $existingSessionIds)
  */
 class editor_Plugins_FrontEndMessageBus_Bus {
     const CHANNEL = 'instance';
@@ -71,14 +72,15 @@ class editor_Plugins_FrontEndMessageBus_Bus {
      * By default pass all functions directly to the MessageBus
      * @param string $name
      * @param array $args
+     * @return mixed
      */
     public function __call($name, array $args) {
-        $this->notify(static::CHANNEL, $name, $args);
+        return $this->notify(static::CHANNEL, $name, $args);
     }
     
     public function notify($channel, $command, $data = []) {
         if(empty($this->uri)) {
-            return;
+            return null;
         }
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
@@ -100,20 +102,21 @@ class editor_Plugins_FrontEndMessageBus_Bus {
         }, $data)));
         
         try {
-            $this->processResponse($http->request($http::POST));
+            return $this->processResponse($http->request($http::POST));
         }
         catch (Exception $e) {
             $this->logger->exception($e, [
                 'level' => $this->logger::LEVEL_WARN
             ]);
         }
+        return false;
     }
     
     /**
      * Parses and processes the response
      * 
      * @param Zend_Http_Response $response
-     * @return boolean
+     * @return mixed
      */
     protected function processResponse(Zend_Http_Response $response) {
         $validStates = [200, 201];
@@ -145,6 +148,6 @@ class editor_Plugins_FrontEndMessageBus_Bus {
             ]);
         }
         
-        return true;
+        return $result;
     }
 }

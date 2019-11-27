@@ -1,4 +1,30 @@
 <?php
+/*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2019 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ 
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ 
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+ 
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
 namespace Translate5\FrontEndMessageBus;
 use Ratchet\ConnectionInterface;
 use Translate5\FrontEndMessageBus\Message\Msg;
@@ -6,6 +32,7 @@ use Translate5\FrontEndMessageBus\Message\FrontendMsg;
 use Translate5\FrontEndMessageBus\Message\BackendMsg;
 
 /**
+ * contains the connections and channels to one translate5 instance
  */
 class AppInstance {
     use FrontendMsgValidator;
@@ -22,6 +49,12 @@ class AppInstance {
      * @var \SplObjectStorage
      */
     protected $connections = null;
+    
+    /**
+     * Maps connection IDs to theire connection object
+     * @var array
+     */
+    protected $connectionIdMap = [];
     
     /**
      * @var array
@@ -43,15 +76,36 @@ class AppInstance {
      */
     protected $serverName = 'not set yet';
     
+    protected $lastAccess = null;
+    
     public function __construct($serverId) {
         $this->connections = new \SplObjectStorage;
         $this->logger = Logger::getInstance()->cloneMe('FrontEndMessageBus - App Instance '.$serverId);
         $this->logger->info('attached new instance');
         $this->channels = [];
         $this->serverId = $serverId;
+        $this->updateLastAccess();
     }
     
-    public function setInstanceName($name) {
+    /**
+     * sets the last access timestamp
+     */
+    protected function updateLastAccess() {
+        $this->lastAccess = time();
+    }
+    
+    /**
+     * returns the last access timestamp
+     */
+    public function getLastAccess() {
+        return $this->lastAccess;
+    }
+    
+    /**
+     * sets the instance name - to identify the instance 
+     * @param string $name
+     */
+    public function setInstanceName(string $name) {
         $this->serverName = $name;
     }
     
@@ -101,6 +155,8 @@ class AppInstance {
      * @param ConnectionInterface $conn
      */
     public function onOpen(ConnectionInterface $conn) {
+        $this->updateLastAccess();
+        $this->connectionIdMap[$conn->connectionId] = $conn;
         $this->connections->attach($conn);
         $this->eachChannel(__FUNCTION__, $conn);
     }
@@ -112,6 +168,7 @@ class AppInstance {
     public function onClose(ConnectionInterface $conn) {
         $this->eachChannel(__FUNCTION__, $conn);
         $this->connections->detach($conn);
+        unset($this->connectionIdMap[$conn->connectionId]);
     }
     
     /**
@@ -122,10 +179,18 @@ class AppInstance {
         $this->eachChannel(__FUNCTION__, $conn, $e);
     }
     
+    /**
+     * calls a method on each channel and collects the results
+     * @param string $method
+     * @param mixed ...$args
+     * @return mixed[]
+     */
     protected function eachChannel($method, ... $args){
+        $result = [];
         foreach($this->channels as $channel) {
-            call_user_func_array([$channel, $method], $args);
+            $result[$channel->getName()] = call_user_func_array([$channel, $method], $args);
         }
+        return $result;
     }
     
     /**
@@ -133,22 +198,19 @@ class AppInstance {
      * @param BackendMsg $msg
      */
     public function passBackendMessage(BackendMsg $msg) {
+        $this->updateLastAccess();
         //INFO: this is the handler for all messages comming from the t5 backend
         settype($msg->payload, 'array');
         //for security reasons messages to the instance may only come from the Backend! 
-        if($msg->channel == self::CHANNEL_INSTANCE) {
-            if(!method_exists($this, $msg->command)) {
-                $this->logger->error('Message command not found!', $msg);
-                return;
-            }
-            call_user_func_array([$this, $msg->command], $msg->payload);
-            $channel = $this;
+        if($msg->channel !== self::CHANNEL_INSTANCE) {
+            //in the backend the payload is a numerc array, which we can pass directly as parameters (as result the vars are named in the function then)
+            return call_user_func_array([$this->getChannel($msg->channel), $msg->command], $msg->payload);
         }
-        else {
-            $channel = $this->getChannel($msg->channel);
+        if(!method_exists($this, $msg->command)) {
+            $this->logger->error('Message command not found!', $msg);
+            return null;
         }
-        //in the backend the payload is a numerc array, which we can pass directly as parameters (as result the vars are named in the function then)
-        call_user_func_array([$channel, $msg->command], $msg->payload);
+        return call_user_func_array([$this, $msg->command], $msg->payload);
     }
     
     /**
@@ -157,6 +219,7 @@ class AppInstance {
      * @param ConnectionInterface $conn
      */
     public function passFrontendMessage(FrontendMsg $msg, ConnectionInterface $conn) {
+        $this->updateLastAccess();
         //INFO: here we will get a message from the t5 frontend
         //$conn is Ratchet\WebSocket\WsConnection
         //do we have to diff between frontend and backend messages?
@@ -173,7 +236,11 @@ class AppInstance {
             //TODO possible improvement here: only send one resync to the GUIs (mutex here) and this GUI requests then the resync for all sessions
             // pro: only one resync request per instance then
             // con: we sync all sessions from the session table, also API sessions etc, instead only the ones which are only used by GUIs
-            FrontendMsg::create(self::CHANNEL_INSTANCE, 'resyncSession', [], $conn)->send();
+            if(empty($conn->messageQueue)) {
+                $conn->messageQueue = new \SplQueue;
+                FrontendMsg::create(self::CHANNEL_INSTANCE, 'resyncSession', [], $conn)->send();
+            }
+            $conn->messageQueue->enqueue($msg);
             return;
         }
         //from frontend we receive a list of named parameters in the payload
@@ -182,6 +249,15 @@ class AppInstance {
         }
     }
 
+    /**
+     * returns the connection to the given conn ID or null, if nothing found
+     * @param string $connectionId
+     * @return ConnectionInterface|NULL
+     */
+    public function getConnection($connectionId): ?ConnectionInterface { 
+        return $this->connectionIdMap[$connectionId] ?? null;
+    }
+    
     /**
      * returns the channel instance to the given channel
      * @param string $channel
@@ -225,7 +301,24 @@ class AppInstance {
     }
     
     /**
-     * Triggers a reload of the given store and optionally a record of that store only in all connections
+     * Processes queued frontend messages previously not processable due data not in sync
+     * @param string $connectionId
+     */
+    protected function resyncDone(string $connectionId) {
+        //process messages in the queue of that connection
+        $conn = $this->connectionIdMap[$connectionId] ?? null;
+        if(empty($conn)) {
+            return;
+        }
+        //TODO implement messagequeue in a more general manner, currently only usable for resync instances
+        while(!$conn->messageQueue->isEmpty()) {
+            $message = $conn->messageQueue->dequeue();
+            $this->passFrontendMessage($message, $conn);
+        }
+    }
+    
+    /**
+     * Triggers a reload of the given store and optionally a record of that store. Only in all connections (no connection exclusion).
      * @param string $storeId
      * @param int $recordId
      */
@@ -255,6 +348,7 @@ class AppInstance {
         $data = [
             'instance' => $this->serverId,
             'instanceName' => $this->serverName,
+            'lastAccess' => $this->lastAccess,
             'channels' => [],
             'sessions' => $this->sessions,
             'connections' => [],
@@ -273,6 +367,23 @@ class AppInstance {
         return $data;
     }
     
-    public function garbageCollection() {
+    public function garbageCollection(array $existingSessions) {
+        $toDelete = array_diff(array_keys($this->sessions), $existingSessions);
+        foreach($toDelete as $sessionId) {
+            unset($this->sessions[$sessionId]);
+        }
+        foreach($this->connections as $conn) {
+            if(isset($conn->sessionId) && in_array($conn->sessionId, $toDelete)) {
+                // send the GUI a reload message.
+                FrontendMsg::create($this::CHANNEL_INSTANCE, 'notifyUser', [
+                    'message' => 'sessionDeleted'
+                ], $conn)->send();
+                $conn->close();
+            }
+        }
+        $result = [
+            'sessionsDeletedInInstance' => $toDelete
+        ];
+        return array_merge($this->eachChannel('garbageCollection', $existingSessions), $result);
     }
 }

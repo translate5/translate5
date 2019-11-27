@@ -1,4 +1,30 @@
 <?php
+/*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2019 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ 
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ 
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+ 
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
 namespace Translate5\FrontEndMessageBus;
 use Translate5\FrontEndMessageBus\Message\FrontendMsg;
 use Translate5\FrontEndMessageBus\Message\BackendMsg;
@@ -52,6 +78,7 @@ class MessageBus implements MessageComponentInterface
     public function onClose(ConnectionInterface $conn) {
         $instance = $this->getInstance($conn->serverId);
         $instance->onClose($conn);
+        $this->garbageCollection();
     }
     
     public function onMessage(ConnectionInterface $conn, $message) {
@@ -108,12 +135,16 @@ class MessageBus implements MessageComponentInterface
             ]));
         }
         $instance = $this->getInstance($body['instance'], $body['instanceName']);
-        $instance->passBackendMessage(new BackendMsg($body));
+        $result = $instance->passBackendMessage(new BackendMsg($body));
 
         //this can be used to pass back information into the instance
-        return new Response(200, ['Content-Type' => 'text/plain'], "{}\n");
+        return new Response(200, ['Content-Type' => 'text/plain'], json_encode(['instanceResult' => $result]));
     }
     
+    /**
+     * Shortcut function to show debug data of all instances on localhost call 
+     * @return \React\Http\Response
+     */
     protected function debugResponse() {
         $data = ['instances' => []];
         foreach($this->instances as $instance) {
@@ -136,6 +167,12 @@ class MessageBus implements MessageComponentInterface
         return $params;
     }
     
+    /**
+     * returns an instance by serverId, lazy instantiation: creates the instance if not found
+     * @param string $serverId
+     * @param string $name
+     * @return AppInstance|NULL
+     */
     protected function getInstance(string $serverId, string $name = null): ?AppInstance {
         if(empty($serverId)) {
             return null;
@@ -149,12 +186,15 @@ class MessageBus implements MessageComponentInterface
         return $this->instances[$serverId];
     }
     
-    public function garbageCollection() {
-        //TODO clean up unused instances. How to define unused? No Connections?
-        //also pass gc call to instances to clean up unused sessions
-        foreach($this->instances as $instance) {
-            /* @var $instance AppInstance */
-            $instance->garbageCollection();
+    /**
+     * gc cleans unused (deactivated) instances, invocation in onClose is sufficient
+     */
+    protected function garbageCollection() {
+        $overDued = time() - 24 * 3600;
+        foreach($this->instances as $serverId => $instance) {
+            if($instance->getLastAccess() < $overDued) {
+                unset($this->instances[$serverId]);
+            }
         }
     }
 }

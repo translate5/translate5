@@ -85,9 +85,14 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     public function handleApplicationState(Zend_EventManager_Event $event) {
         $applicationState = $event->getParam('applicationState');
         $applicationState->messageBus = new stdClass();
-        
-        //TODO return information if message bus is alive or not, return debug statement from message server on success.
-        $applicationState->messageBus->running = true;
+        $applicationState->messageBus->running = false;
+
+        $dbg = $this->bus->debug();
+        $applicationState->messageBus->running = !empty($dbg);
+        if($applicationState->messageBus->running) {
+            //all the internal data should not be provided, the connection count is enough.
+            $applicationState->messageBus->connectionCount = $dbg->instanceResult->connectionCount;
+        }
     }
     
     /**
@@ -141,8 +146,6 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         //startSession and taskOpen etc into the server
         // we are lazy and reuse our other handlers
         
-        error_log("RESYNC SESSION");
-        
         //resync session
         $this->handleStartSession($event);
         
@@ -161,6 +164,9 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         catch (ZfExtended_NotFoundException $e) {
             //if the task is gone, we can not open it and do nothing
         }
+        
+        //marks the connection as in sync and trigger processing of queued messages
+        $this->bus->resyncDone($this->getHeaderConnId());
     }
     
     /**
@@ -170,9 +176,13 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
         
+        $ut = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+        /* @var $ut editor_Models_TaskUserTracking */
+        
         $this->bus->notify(self::CHANNEL_TASK, 'open', [
             'task' => $task->getDataObject(),
             'sessionId' => Zend_Session::getId(),
+            'userTracking' => $ut->getByTaskGuid($task->getTaskGuid()),
         ]);
     }
     
@@ -225,10 +235,6 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $segment = $event->getParam('entity');
         /* @var $segment editor_Models_Segment */
         
-        $f = Zend_Registry::get('frontController');
-        /* @var $f Zend_Controller_Front */
-        $connectionId = $f->getRequest()->getHeader('X-Translate5-MessageBus-ConnId');
-        
         $this->bus->notify(self::CHANNEL_TASK, 'segmentSave', [
             'connectionId' => $this->getHeaderConnId(),
             'segment' => $segment->getDataObject(),
@@ -240,9 +246,18 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      * @param Zend_EventManager_Event $event
      */
     public function handleUpdateUserTracking(Zend_EventManager_Event $event) {
+        //reload the task instance in the GUI
         $this->bus->notify(self::CHANNEL_TASK, 'triggerReload', [
             'taskGuid' => $event->getParam('taskGuid'),
             'excludeConnection' => $this->getHeaderConnId(),
+        ]);
+
+        //update the usertrackings
+        $ut = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+        /* @var $ut editor_Models_TaskUserTracking */
+        $this->bus->notify(self::CHANNEL_TASK, 'updateUserTracking', [
+            'taskGuid' => $event->getParam('taskGuid'),
+            'userTracking' => $ut->getByTaskGuid($event->getParam('taskGuid')),
         ]);
     }
     
@@ -251,14 +266,18 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      */
     public function handlePing(Zend_EventManager_Event $event) {
         $this->bus->ping();
+        $this->handleGarbageCollection();
     }
     
     public function handleGarbageCollection() {
-        //instance garbage collection
-        $this->bus->garbageCollection();
+
+        $sessions = ZfExtended_Factory::get('ZfExtended_Models_Db_Session');
+        /* @var $sessions ZfExtended_Models_Db_Session */
+        $existingSessionIds = $sessions->fetchAll($sessions->select()->reset()->from($sessions, ['session_id']));
+        $existingSessionIds = array_column($existingSessionIds->toArray(), 'session_id');
         
-        //task garbage collection
-        $this->bus->notify(self::CHANNEL_TASK, 'onGarbageCollection');
+        //instance garbage collection
+        $this->bus->garbageCollection($existingSessionIds);
     }
     
     /**

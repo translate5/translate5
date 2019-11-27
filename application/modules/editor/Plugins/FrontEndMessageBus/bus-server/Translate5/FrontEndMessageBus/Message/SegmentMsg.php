@@ -50,6 +50,7 @@ class SegmentMsg extends FrontendMsg {
         $msg = new self();
         $msg->payload = [];
         $msg->conn = $request->conn;
+        $msg->channel = $request->channel;
         
         //set internally the given taskGuid 
         settype($request->payload[0], 'string');

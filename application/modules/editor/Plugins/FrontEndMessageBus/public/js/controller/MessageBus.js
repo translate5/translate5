@@ -39,6 +39,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     extend: 'Ext.app.Controller',
     segmentUsageData: null,
+    tooltip: null,
     refs: [{
         ref : 'segmentGrid',
         selector : '#segmentgrid'
@@ -70,7 +71,8 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                 segmentLeave: 'onSegmentLeave',
                 segmentSave: 'onSegmentSave',
                 segmentLocked: 'onSegmentLocked',
-                triggerReload: 'onTriggerTaskReload'
+                triggerReload: 'onTriggerTaskReload',
+                updateOnlineUsers: 'onUpdateOnlineUsers'
             }
         },
         store: {
@@ -80,17 +82,15 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         },
         controller: {
             '#Editor.$application': {
-                editorViewportOpened: 'onOpenEditorViewport'
+                editorViewportClosed: 'onCloseEditorViewport'
             },
             '#ChangeAlike': {
                 cancelManualProcessing: 'onCancelChangeAlikes' 
             }
         },
         component: {
-            '#segmentgrid autoStateColumn' : {
-                initOtherRenderers: 'injectToolTipInfo'
-            },
             '#segmentgrid' : {
+                afterrender: 'onSegmentGridRender',
                 renderrowclass: 'onSegmentRender',
                 itemclick: 'clickSegment',
                 beforestartedit: 'enterSegment',
@@ -149,7 +149,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         var me = this;
         var task = new Ext.util.DelayedTask(function(){
             if(!me.bus.isReady()) {
-                Editor.app.viewport.mask(me.strings.noConnection + '<br>' + me.bus.getUrl());
+                Editor.app.viewport && Editor.app.viewport.mask(me.strings.noConnection + '<br>' + me.bus.getUrl());
             }
         });
         task.delay(1000);
@@ -171,6 +171,16 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             grid = me.getSegmentGrid(),
             sel;
 
+        //release all old locks (they may be not up to date anymore).
+        if(grid) {        
+            me.segmentUsageData.each(function(meta) {
+                meta.selectingConns = {};
+                if(meta.editingConn && meta.editingUser) {
+                    me.segmentUnlock(meta, meta.editingConn);
+                }
+            });
+        }
+        
         Editor.app.viewport.unmask();
         
         if(grid && Editor.data.task) {
@@ -183,9 +193,9 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         
         if(grid && grid.editingPlugin.editing) {
             me.enterSegment(grid.editingPlugin, [grid.editingPlugin.context.record]);
+            //alikes GET is triggerd again in change alike controller 
         }
         
-
     },
     enterSegment: function(plugin, context) {
         var me = this;
@@ -230,7 +240,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     onSegmentLocked: function(data) {
         var me = this,
             lockedIds = (Ext.isArray(data.segmentId) ? data.segmentId : [data.segmentId]),
-            byUserGuid = data.userGuid,
+            byTrackingId = data.trackingId,
             connectionId = data.connectionId,
             grid = me.getSegmentGrid(),
             segment;
@@ -240,15 +250,20 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             var meta = me.getSegmentMeta(lockedId);
             //add user id as locker to the segment
             meta.editingConn = connectionId;
-            meta.editingUser = byUserGuid;
+            meta.editingUser = byTrackingId;
             //show the editing in the segment - if loaded in the grid
             if(segment = grid.store.getById(lockedId)) {
                 me.markSegmentEdited(segment);
             }
         });
     },
+    /**
+     * This notifications can be send from the server. 
+     */
     onUserNotification: function(data) {
         switch(data.message) {
+            // Currently we just trigger a reload, instead showing a message. Should be fine in that situations 
+            case 'sessionDeleted':
             case 'taskClosedInOtherWindow':
                 //instead of showing a message, we just trigger a reload of the window (without logout in this special case)
                 Editor.data.logoutOnWindowClose = false;
@@ -319,7 +334,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     onSegmentSelect: function(data) {
         var me = this,
             selectedId = data.segmentId, 
-            byUserGuid = data.userGuid,
+            byTrackingId = data.trackingId,
             connectionId = data.connectionId,
             grid = me.getSegmentGrid(),
             meta = me.getSegmentMeta(selectedId),
@@ -340,7 +355,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         });
         
         //add user id as selector to the segment
-        meta.selectingConns[connectionId] = byUserGuid;
+        meta.selectingConns[connectionId] = byTrackingId;
         
         //add color mark to current segment
         if(segment = grid.store.getById(selectedId)) {
@@ -373,9 +388,10 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         if(!Ext.isDefined(meta)) {
             return;
         }
+        
         //check if segment is edited by somebody
         if(meta.editingConn) {
-            trackedUser = tracking.getAt(tracking.findExact('userGuid', meta.editingUser));
+            trackedUser = tracking.getById(meta.editingUser);
             
             if(trackedUser) {
                 rowClass.push('other-user-edit'); 
@@ -386,13 +402,14 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         }
         //check if segment is selected by somebody and colorize it, but only if it is not edited. 
         if(meta.selectingConns) {
-            Ext.Object.each(meta.selectingConns, function(connectionId, userGuid) {
-                trackedUser = tracking.getAt(tracking.findExact('userGuid', userGuid));
+            Ext.Object.each(meta.selectingConns, function(connectionId, trackingId) {
+                trackedUser = tracking.getById(trackingId);
                 if(trackedUser) {
                     rowClass.push('other-user-select');
                     rowClass.push('usernr-'+trackedUser.get('taskOpenerNumber'));
                     return false; 
                 }
+                //TODO currently we can only visualize the color of one user, 
             });
         }
     },
@@ -411,8 +428,71 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             }
         })
     },
-    onOpenEditorViewport: function() {
-        this.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
+    onSegmentGridRender: function(grid) {
+        var me = this,
+            view = grid.getView(),
+            tbar = grid.down('segmentsToolbar'),
+            idx = tbar.items.indexOf(tbar.down('tbfill'));
+        //was previously invoked in #Editor.$application': editorViewportOpened, 
+        // but then the open was triggerd when the grid was not ready yet, therefore resulting segment locks from the server were producing errors in the GUI
+        me.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
+
+        if(Editor.data.task.get('usageMode') !== Editor.data.task.USAGE_MODE_SIMULTANEOUS) {
+            return;
+        }
+
+        tbar.insert(idx, [{
+            xtype: 'tbseparator'
+        },{
+            xtype: 'dataview',
+            cls: 'multi-user-list',
+            itemSelector: '.user',
+            tpl: [
+                'other editing users: ', //FIXME translation
+                '<tpl for=".">',
+                '<tpl if="isOnline">',
+                '<span class="user usernr-{taskOpenerNumber}"><span class="icon"></span>{userName}</span>',
+                '<tpl else>',
+                '<span class="user empty"></span>', //foreach record a span.user must exist, otherwise the renderer will do strange things
+                '</tpl>',
+                '</tpl>'
+            ],
+            store: Editor.data.task.userTracking()                 
+        }]);
+
+        me.tooltip = Ext.create('Ext.tip.ToolTip', {
+            cls: 'multi-user-tip',
+            // The overall target element.
+            target: view.el,
+
+            // Each grid row causes its own separate show and hide.
+            delegate: view.itemSelector + ' tr.other-user-edit', 
+            // Moving within the row should not hide the tip.
+            trackMouse: true,
+            showOnTap: true,
+            //defaultAlign: 'bl-tl',
+            anchor: 'bottom',
+            anchorToTarget: false,
+            // Render immediately so that tip.body can be referenced prior to the first show.
+            renderTo: Ext.getBody(),
+            listeners: {
+                // Change content dynamically depending on which element triggered the show.
+                beforeshow: function (tip) {
+                    var userNr = tip.currentTarget.dom && tip.currentTarget.dom.className.match(/(^| )usernr-([0-9]+)($| )/),
+                        tracking = Editor.data.task.userTracking(),
+                        user;
+                    userNr = parseInt(userNr && userNr[2]);
+                    user = tracking.getAt(tracking.findExact('taskOpenerNumber', userNr));
+                    if(!user) {
+                        return false;
+                    }
+                    //remove color from tip itself
+                    tip.el.removeCls(['usernr-1', 'usernr-2', 'usernr-3', 'usernr-4', 'usernr-5', 'usernr-6', 'usernr-7', 'usernr-8']);
+                    tip.el.addCls('usernr-'+userNr);
+                    tip.update(user.get('userName')); //set user name
+                }
+            }
+        });
     },
     onTriggerTaskReload: function() {
         Ext.Logger.info('Task reload triggered');
@@ -421,43 +501,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     onTriggerReload: function() {
         //idea is to reload the store given as storeid, and optionally reload only one record of the store, given by id as optional second parameter.
         Ext.Logger.warn("generic trigger reload NOT implemented yet"); 
-    },
-    /**
-     * Injects the selecting users into the segmentNrInTask and AutoState tooltip
-     */
-    injectToolTipInfo: function(otherRenderer) {
-        var me = this,
-            tracking = Editor.data.task.userTracking();
-        otherRenderer._selectedUsers = {
-            text: me.strings.selectedBy,
-            renderer: function(noop, noop2, record) {
-                var meta = me.segmentUsageData.get(record.get('id')),
-                    result = [], trackedUser;
-                //if we have a meta entry to the rendering segment, check selections
-                if(Ext.isDefined(meta) && meta.selectingConns) {
-                    Ext.Object.each(meta.selectingConns, function(connectionId, userGuid) {
-                        trackedUser = tracking.getAt(tracking.findExact('userGuid', userGuid));
-                        trackedUser && result.push(trackedUser.get('userName'));
-                    });
-                }
-                return result.join('<br>');
-            },
-            scope: me
-        };
-        otherRenderer._editingUser = {
-            text: me.strings.currentUser,
-            renderer: function(noop, noop2, record) {
-                var meta = me.segmentUsageData.get(record.get('id')),
-                result = [], trackedUser;
-                //if we have a meta entry to the rendering segment, check selections
-                if(Ext.isDefined(meta) && (trackedUser = tracking.getAt(tracking.findExact('userGuid', meta.editingUser)))) {
-                    return trackedUser.get('userName');
-                }
-                return result.join('<br>');
-            },
-            scope: me
-        };
-    },
+    },    
     /**
      * is called every 5 Minutes and removes unused segment usage data
      */
@@ -466,5 +510,23 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         me.segmentUsageData.each(function(meta) {
             me.removeUnused(meta);
         });
+    },
+    onCloseEditorViewport: function() {
+        var me = this;
+        me.tooltip && me.tooltip.destroy();
+    },
+    /**
+     * Updates the online users view
+     */
+    onUpdateOnlineUsers: function(data) {
+        var store = Editor.data.task && Editor.data.task.userTracking && Editor.data.task.userTracking();
+        if(!store) {
+            return;
+        }
+        Ext.Object.each(data.onlineInTask, function(key, val){
+            var item = store.getById(key);
+                item && item.set('isOnline', val);
+        });
+        store.commitChanges();
     }
 });
