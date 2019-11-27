@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
 class KpiTest extends \ZfExtended_Test_ApiTestcase {
     
     /**
-     * What our tasknames will start with (e.g.for creating and filtering tasks).
+     * What our tasknames start with (e.g.for creating and filtering tasks).
      * @var string
      */
     protected $taskNameBase = 'API Testing::'.__CLASS__;
@@ -42,19 +42,16 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      * Settings for the tasks we create and check.
      * @var array
      */
-    protected $tasksForKPI = [array('taskNameSuffix' => 'nr1', 'doExport' => true,  'processingTime' => 'P2D')];
-    
-    protected $tasksForKPITODO = [array('taskNameSuffix' => 'nr1', 'doExport' => true,  'processingTime' => 'P1D'),
-        array('taskNameSuffix' => 'nr2', 'doExport' => true,  'processingTime' => 'P2D'),
-        array('taskNameSuffix' => 'nr3', 'doExport' => false, 'processingTime' => 'P3D')
-    ];
+    protected $tasksForKPI = [array('taskNameSuffix' => 'nr1', 'doExport' => true,  'processingTimeInDays' => 100),
+                              array('taskNameSuffix' => 'nr2', 'doExport' => false, 'processingTimeInDays' => 102)
+    ]; // TODO: add at least a third task for the real testcase
     
     /**
      * Remember the task-ids we created for deleting the tasks at the end
      * taskIds[$taskNameSuffix] = id;
      * @var array 
      */
-    protected $taskIds = [];
+    protected static $taskIds = [];
     
     /**
      * KPI average processing time: task-property for startdate
@@ -81,12 +78,12 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      * If any task exists already, filtering will be wrong!
      */
     public function testConditions() {
-        $nrTasks = $this->applyTaskGridFilter();
-        $this->assertEquals('0', $nrTasks);
+        $filteredTasks = $this->getFilteredTasks();
+        $this->assertEquals('0', count($filteredTasks));
     }
     
     /**
-     * Create tasks, create values for KPIs, check the KPI-results and delete the tasks.
+     * Create tasks, create values for KPIs, check the KPI-results .
      * @depends testConditions
      */
     public function testKPI() {
@@ -104,17 +101,12 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         
         // --- For KPI II: average processing time ---
         foreach ($this->tasksForKPI as $task) {
-            $this->setTaskProcessingDates($task['taskNameSuffix'], $task['processingTime']);
+            $interval_spec = 'P'.(string)$task['processingTimeInDays'].'D';
+            $this->setTaskProcessingDates($task['taskNameSuffix'], $interval_spec);
         }
-        
-        // get the KPIs from the API
-        $this->getKpiResultsFromApi();
         
         // check the KPI-results
         $this->checkKpiResults();
-        
-        // non-static => delete the tasks here, not in tearDownAfterClass()
-        //$this->deleteAllTasks();
     }
     
     /**
@@ -132,7 +124,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         
         // store task-id for later deleting
         $task = $this->api()->getTask();
-        $this->taskIds[$taskNameSuffix] = $task->id;
+        self::$taskIds[$taskNameSuffix] = $task->id;
     }
     
     /**
@@ -140,7 +132,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $taskNameSuffix
      */
     protected function runExcelExport(string $taskNameSuffix) {
-        $taskId = $this->taskIds[$taskNameSuffix];
+        $taskId = self::$taskIds[$taskNameSuffix];
         $this->printUnitTestOutput('runExcelExport: editor/task/'.$taskId.'/excelexport');
         $this->api()->request('editor/task/'.$taskId.'/excelexport');
     }
@@ -157,55 +149,90 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $startDate = new DateTime($now);
         $startDate->sub(new DateInterval($interval_spec));
         $startDate = $startDate->format('Y-m-d H:i:s');
-        $taskId = $this->taskIds[$taskNameSuffix];
+        $taskId = self::$taskIds[$taskNameSuffix];
         $this->printUnitTestOutput('setTaskProcessingDates for '.$taskId.': ' . $this->taskStartDate . ' = ' . $startDate .' / ' . $this->taskEndDate . ' = '.$endDate);
         $this->api()->requestJson('editor/task/'.$taskId, 'PUT', array($this->taskStartDate => $startDate, $this->taskEndDate => $endDate));
     }
     
     /**
-     * Filter the taskGrid and get the KPI-results from the API.
-     */
-    protected function getKpiResultsFromApi() {
-        $nrTasks = $this->applyTaskGridFilter();
-        $this->printUnitTestOutput('EXPECTED: ' . count($this->tasksForKPI));
-        // Does the number of found task match the number of tasks we created?
-        $this->assertEquals(count($this->tasksForKPI), $nrTasks);
-        // TODO
-    }
-    
-    /**
-     * Filter the taskGrid for our tasks only and return the number of tasks that match.
-     * @return int
-     */
-    protected function applyTaskGridFilter() {
-        // taskGrid: apply the filter for our tasks! do NOT use the limit!
-        $filter = '[{"operator":"like","value":"' . $this->taskNameBase . '","property":"taskName"}]';
-        $result = $this->api()->requestJson('editor/task?filter='.urlencode($filter), 'GET');
-        $this->printUnitTestOutput('editor/task?filter='.$filter. ' ===> FOUND: ' . count($result));
-        return count($result);
-    }
-    
-    /**
-     * Check if the KPI-result we got matches what we expect.
+     * Check if the KPI-result we get from the API matches what we expect.
      */
     protected function checkKpiResults() {
-        $this->assertEquals(3,3); // TODO
-    }
-    
-    /**
-     * Delete the tasks for all stored task-is.
-     */
-    protected function deleteAllTasks() {
-        $this->api()->login('testmanager');
-        foreach ($this->taskIds as $taskId) {
-            $this->api()->requestJson('editor/task/'.$taskId, 'PUT', array('userState' => 'open', 'id' => $taskId));
-            $this->api()->requestJson('editor/task/'.$taskId, 'DELETE');
-        }
+        // Does the number of found tasks match the number of tasks we created?
+        $filteredTasks = $this->getFilteredTasks();
+        $this->printUnitTestOutput('EXPECTED: ' . count($this->tasksForKPI));
+        $this->assertEquals(count($this->tasksForKPI), count($filteredTasks));
+        
+        // TODO: How to set the filter as form-data????
+        $result = $this->api()->requestJson('editor/task/kpi', 'POST', ['filter' => $this->renderTaskGridFilter()]);
+        $this->printUnitTestOutput('getKpiResultsFromApi: ' . print_r($result,1));
+        
+        $statistics = $this->getExpectedKpiStatistics();
+        $this->printUnitTestOutput('getExpectedKpiStatistics: ' . print_r($statistics,1));
+        
+        // averageProcessingTime from API comes with translated unit (e.g. "2 days", "14 Tage"),
+        // but these translations are not available here (are they?)
+        $search = array("days", "Tage", " ");
+        $replace = array("", "", "");
+        $result->averageProcessingTime = str_replace($search, $replace, $result->averageProcessingTime);
+        
+        $this->printUnitTestOutput('averageProcessingTime: result = ' . $result->averageProcessingTime . ' / statistics = ' . $statistics['averageProcessingTime']);
+        $this->printUnitTestOutput('excelExportUsage: result = ' . $result->excelExportUsage . ' / statistics = ' . $statistics['excelExportUsage']);
+        
+        $this->assertEquals($result->averageProcessingTime, $statistics['averageProcessingTime']);
+        $this->assertEquals($result->excelExportUsage, $statistics['excelExportUsage']);
     }
     
     public static function tearDownAfterClass(): void {
-        // tasks are deleted already
-        // TODO: What if there is an error and deleteAllTasks() is not reached????
+        self::$api->login('testmanager');
+        foreach (self::$taskIds as $taskId) {
+            fwrite(STDOUT, "\n" . '...DELETE: '.$taskId . "\n");
+            self::$api->requestJson('editor/task/'.$taskId, 'PUT', array('state' => 'error')); // TODO: this is unfortunately not allowed :( So, how can we can delete tasks without reimport?
+            self::$api->requestJson('editor/task/'.$taskId, 'DELETE');
+        }
+    }
+    
+    // -----------------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------------
+    
+    /**
+     * Renders the filter for filtering our tasks in the taskGrid.
+     * @return string
+     */
+    protected function renderTaskGridFilter() {
+        return '[{"operator":"like","value":"' . $this->taskNameBase . '","property":"taskName"}]';
+    }
+    
+    /**
+     * Filter the taskGrid for our tasks only and return the found tasks that match the filtering.
+     * @return int
+     */
+    protected function getFilteredTasks() {
+        // taskGrid: apply the filter for our tasks! do NOT use the limit!
+        $result = $this->api()->requestJson('editor/task?filter='.urlencode($this->renderTaskGridFilter()), 'GET');
+        $this->printUnitTestOutput('editor/task?filter='.$this->renderTaskGridFilter(). ' ===> FOUND: ' . count($result));
+        return $result;
+    }
+    
+    /**
+     * Get the KPI-values we expect for our tasks.
+     * @return array
+     */
+    protected function getExpectedKpiStatistics() {
+        $nrExported = 0;
+        $processingTimeInDays = 0;
+        $nrTasks = count($this->tasksForKPI);
+        foreach ($this->tasksForKPI as $task) {
+            if ($task['doExport']) {
+                $nrExported++;
+            }
+            $processingTimeInDays += $task['processingTimeInDays'];
+        }
+        $statistics = [];
+        $statistics['averageProcessingTime'] = (string)round($processingTimeInDays / $nrTasks, 0);
+        $statistics['excelExportUsage'] = round((($nrExported / $nrTasks) * 100),2) . '%';
+        return $statistics;
     }
     
     /**
@@ -213,6 +240,6 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $msg
      */
     protected function printUnitTestOutput (string $msg) {
-        fwrite(STDOUT, $msg . "\n");
+        fwrite(STDOUT, "\n" .$msg . "\n");
     }
 }
