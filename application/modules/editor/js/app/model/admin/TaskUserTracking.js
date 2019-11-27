@@ -41,7 +41,8 @@ Ext.define('Editor.model.admin.TaskUserTracking', {
     {name: 'taskName', type: 'string'},
     {name: 'surName', type: 'string'},
     {name: 'userName', type: 'string'},
-    {name: 'role', type: 'string'}
+    {name: 'role', type: 'string'},
+    {name: 'isOnline', type: 'boolean', persist: false},
   ],
   idProperty: 'id',
   proxy : {

@@ -47,8 +47,7 @@ Ext.define('Editor.view.segments.column.AutoState', {
   isErgonomicVisible: true,
   isErgonomicSetWidth: true,
   ergonomicWidth: 96,
-  isErgonomicVisible: true,
-  imgTpl: new Ext.Template('<img valign="text-bottom" class="{2}" src="'+Editor.data.moduleFolder+'images/{0}.png?v=1" alt="{1}" />'),
+  imgTpl: new Ext.Template('<img valign="text-bottom" class="{2}" src="'+Editor.data.moduleFolder+'images/{0}.png?v=2" alt="{1}" />'),
   stateLabels: [],
   filter: null,
   editor: {

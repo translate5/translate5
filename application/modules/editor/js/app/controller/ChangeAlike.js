@@ -97,6 +97,11 @@ Ext.define('Editor.controller.ChangeAlike', {
     selector : '#segmentgrid #optionsBtn'
   }],
   listen: {
+      messagebus: {
+          '#translate5': {
+              reconnect: 'handleBusReconnect',
+          }
+      },
       component: {
           '#changealikeWindow #saveBtn' : {
               click: 'handleSaveChangeAlike'
@@ -160,7 +165,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       var me = this,
           t = Editor.data.task,
           auth = Editor.app.authenticatedUser,
-          enabledACL = auth.isAllowed('useChangeAlikes');
+          enabledACL = auth.isAllowed('useChangeAlikes'),
           enabled = auth.isAllowed('useChangeAlikes', t);
       //disable the whole settings button, since no other settings are currently available!
       me.getOptionsBtn().setVisible(enabled);
@@ -201,6 +206,8 @@ Ext.define('Editor.controller.ChangeAlike', {
     params[segmentsProxy.getFilterParam()] = segmentsProxy.encodeFilters(segmentStore.getFilters().items);
     params[segmentsProxy.getSortParam()] = segmentsProxy.encodeSorters(segmentStore.getSorters().items);
     
+    //stop loading first!
+    store.getProxy().abort();
     store.load({
         url: me.alikeSegmentsUrl+'/'+id,
         params: params,
@@ -213,6 +220,17 @@ Ext.define('Editor.controller.ChangeAlike', {
   },
 
   /**
+   * on frontendmessag bus reconnection we have to retrigger the get alike call
+   */
+  handleBusReconnect: function(bus) {
+      var grid = this.getSegmentGrid();
+      if(grid && grid.editingPlugin.editing) {
+          //trigger alikes GET again! No ability to trigger that via a senseful event, 
+          this.handleBeforeEdit(grid.editingPlugin, grid.editingPlugin.context);
+      }
+  },
+  
+  /**
    * handle if alikes are successful read
    * @param {Ext.data.Operation} operation
    * @param {Integer} id
@@ -221,7 +239,6 @@ Ext.define('Editor.controller.ChangeAlike', {
       var me = this 
       
       if(me.isDisabled || ! operation.wasSuccessful()){
-          //@todo Meldung machen, dass keine WDHs geholt werden konnten!
           operation.handleReadAfterSave && operation.handleReadAfterSave();
           return;
       }
@@ -289,7 +306,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     var me = this,
         rec = me.actualRecord,
         meta = rec.get('metaCache'),
-        newLength = null;
+        newLength = null,
     
     //Daten des aktuelle bearbeiteten Segments, die angezeigten AlikeSegmente im Segment Store werden mit diesen überschrieben 
     //Hier wird auch das Alike Segment vorübergehend auf nicht editierbar gesetzt, bis das OK vom Server kommt

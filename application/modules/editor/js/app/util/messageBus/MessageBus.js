@@ -158,7 +158,7 @@ Ext.define('Editor.util.messageBus.MessageBus', {
             
             me.currentChannel = data.channel;
             me.fireEvent(data.command, data.payload);
-console.log('↓ ', data.command, data.payload);
+console.log('↓ ', data.channel, data.command, data.payload);
         };
         
         /**
@@ -184,7 +184,6 @@ console.log('↓ ', data.command, data.payload);
         ws.onclose = function (event) {
             me.currentChannel = null; //needed in order to let the events come from the bus instance
             me.fireEvent('close', me, event);
-            //TODO if there remains no connection, should the message bus disabled? How is the plan, make it disableable at all??
             //start reconnection interval task
             Ext.Logger.info('MessageBus: connection close busId '+me.getBusId());
             if (me.getReconnect() && !me.reconnectTask) {
@@ -229,7 +228,7 @@ console.log('↓ ', data.command, data.payload);
             payload: data || null
         };
         if (this.isReady()) {
-            console.log('↑', msgObj.command, msgObj.payload);
+            console.log('↑', msgObj.channel, msgObj.command, msgObj.payload);
             this.socket.send(Ext.JSON.encode(msgObj));
         }
     }
