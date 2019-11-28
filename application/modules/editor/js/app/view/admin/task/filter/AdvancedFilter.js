@@ -126,8 +126,6 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
 			filtersarray.push(me.getFilterModelObject(item));
 		});
     	
-		console.log(filtersarray);
-		
     	//add the records to the field store
     	if(filtersarray.length>0){
     		filtersarray=me.groupActiveFiltersTooltip(filtersarray);
