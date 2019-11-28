@@ -502,7 +502,7 @@ Ext.define('Editor.controller.Localizer', {
             reloadBtnTip: '<?php echo $this->translate->_('Aufgabenliste vom Server aktualisieren.');?>',
             noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>',
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).');?>',
-            addFilterTooltip: '<?php echo $this->translate->_('Filter hinzufügen');?>'
+            addFilterText: '<?php echo $this->translate->_('Erweiterte Filter');?>'
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
@@ -528,8 +528,15 @@ Ext.define('Editor.controller.Localizer', {
             enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>',
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>',
             workflowState: '<?php echo $this->translate->_('Workflow-Status');?>',
-            userRole: '<?php echo $this->translate->_('Benutzer-Rolle');?>',
-            userName: '<?php echo $this->translate->_('Benutzer');?>'
+            workflowUserRole: '<?php echo $this->translate->_('Benutzer-Rolle');?>',
+            userName: '<?php echo $this->translate->_('Benutzer');?>',
+            id: '<?php echo $this->translate->_('Id');?>',
+            taskGuid: '<?php echo $this->translate->_('Task-Guid');?>',
+            workflow: '<?php echo $this->translate->_('Workflow');?>',
+            taskassocs: '<?php echo $this->translate->_('Zugewiesene Sprach-Resourcen');?>',
+            pmName: '<?php echo $this->translate->_('Projektmanager');?>',
+            edit100PercentMatch: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
+            userCount: '<?php echo $this->translate->_('Zahl zugewiesener Benutzer');?>'
         }
     });
     
@@ -574,12 +581,13 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.task.filter.FilterWindow",
         strings:{
         	workflowStateFilterLabel: '<?php echo $this->translate->_('Workflow-Status');?>',
-        	userRoleLabel: '<?php echo $this->translate->_('Benutzer-Rolle');?>',
-        	userNameLabel: '<?php echo $this->translate->_('Benutzer');?>',
+        	workflowUserRoleLabel: '<?php echo $this->translate->_('Zugewiesene Benutzer-Rolle/n');?>',
+        	userNameLabel: '<?php echo $this->translate->_('Zugewiesene/r Benutzer');?>',
         	applyBtn: '<?php echo $this->translate->_('Anwenden');?>',
         	cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
-        	title:'<?php echo $this->translate->_('Erweiterte Filter (Weitere Filter im Kopf jeder Spalte)');?>',
-        	anonymizedUsersInfo:'<?php echo $this->translate->_('Anonymisierte Benutzer nicht auswählbar');?>'
+        	title:'<?php echo $this->translate->_('Erweiterte Filter');?>',
+        	anonymizedUsersInfo:'<?php echo $this->translate->_('Anonymisierte Benutzer nicht auswählbar');?>',
+        	gridFiltersInfo:'<?php echo $this->translate->_('Weitere Filter im Kopf jeder Spalte');?>'
         }
     });
     

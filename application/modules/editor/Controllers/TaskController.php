@@ -118,7 +118,7 @@ class editor_TaskController extends ZfExtended_RestController {
             'workflowState' => [
                 'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid')
             ],
-            'userRole' => [
+            'workflowUserRole' => [
                 'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'role', 'taskGuid', 'taskGuid')
             ],
             'userName' => [
