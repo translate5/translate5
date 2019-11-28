@@ -26,26 +26,22 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.filter.FilterWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.editorAdminTaskFilterFilterWindow',
-    stores: {
-    	userlist: {
-        	model:'Editor.model.admin.User',
-            autoLoad: true,
-            pageSize: 0,
-            idProperty: 'id',
-            listeners: {
-                beforeload:'onUsersStoreBeforeLoad'
-            },
-            proxy : {
-              type : 'rest', 
-              url: Editor.data.restpath+'task/userlist',
-              reader : {
-                rootProperty: 'rows',
-                type : 'json'
-              }
-            }
-        }
-    }
+Ext.define('Editor.store.admin.WorkflowUserRoles', {
+	extend : 'Ext.data.Store',
+	initConfig: function(instanceConfig) {
+		var me = this,
+			config={},
+			workflowUserRoles=[];
+		//Info:duplicated id values will be ignored by te store
+		Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
+			Ext.Object.each(workflow.roles, function(key, value){
+				workflowUserRoles.push({id:key,label:value});
+			});
+		});
+		config.data=workflowUserRoles;
+		if (instanceConfig) {
+			me.self.getConfigurator().merge(me, config, instanceConfig);
+		}
+	    return me.callParent([config]);
+	},
 });

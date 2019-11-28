@@ -34,7 +34,8 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
      * On advanced filter item desellect remove the task grid filter
      */
     onFilterHolderBeforeDeselect:function(combo,record,index,eOpts){
-    	var taskGrid=Ext.ComponentQuery.query('#adminTaskGrid')[0],
+    	var me=this,
+    		taskGrid=me.getView().getFilterGrid(),
     		taskStore=Ext.StoreManager.get('admin.Tasks'),
     		theFilter=taskGrid.getFilter(record.get('property'));
 
@@ -48,8 +49,15 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
     	}
     	taskGrid.resumeEvents('filterchange');
     },
-
     
+    /***
+     * On advanced filter holder select event handler
+     */
+    onFilterHolderSelect:function(combo,value){
+    	//the filter is visible if there is at least 1 active filter
+    	this.getViewModel().set('activeFiltersCount',combo.selection!==null);
+    },
+
     /***
      * Merge the advanced filters into the active filters list.
      */
@@ -61,7 +69,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
 		
     	//convert all active filtes to simple array object collection
 		activefilters.each(function(item) {
-		    Ext.Array.push(filtersarray,me.getView().getFilterRenderObject(item));
+		    Ext.Array.push(filtersarray,me.getView().getFilterModelObject(item));
 	    });
 		
 		//foreach advance filters, check if it is already active
@@ -75,7 +83,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
 			//find the advanced filter in the active filters
 			var filteredIndex=null, 
 				filtered=Ext.Array.filter(filtersarray,function(item,index){
-					if(item.property==tmpFilter.property){
+					if(item.get('property')==tmpFilter.property){
 						filteredIndex=index;
 						return true
 					}
@@ -83,7 +91,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
 				});
 			//add the filter when the filter is not active and the new value is not empty
 			if(Ext.isEmpty(filtered) && !Ext.isEmpty(tmpFilter.value)){
-				filtersarray=Ext.Array.push(filtersarray,tmpFilter);
+				filtersarray=Ext.Array.push(filtersarray,me.getView().getFilterModelObject(tmpFilter));
 				return true;
 			}
 			//when remove index is found, remove the found active filter
@@ -95,7 +103,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
 				return true;
 			}
 			//add the new filter in the active filters array
-			filtersarray=Ext.Array.push(filtersarray,tmpFilter);
+			filtersarray=Ext.Array.push(filtersarray,me.getView().getFilterModelObject(tmpFilter));
 		});
 		return filtersarray;
     }

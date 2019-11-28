@@ -30,53 +30,33 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.editorAdminTaskFilterFilterWindow',
     requires: [
-    	'Editor.view.admin.task.filter.FilterWindowViewController',
-    	'Editor.view.admin.task.filter.FilterWindowViewModel'
+    	'Editor.view.admin.task.filter.FilterWindowViewController'
 	],
     controller: 'editorAdminTaskFilterFilterWindow',
-    viewModel: {
-        type: 'editorAdminTaskFilterFilterWindow'
-    },
     itemId: 'editorAdminTaskFilterFilterWindow',
     strings: {
     	workflowStateFilterLabel:'#UT#Workflow-Status',
-    	userRoleLabel:'#UT#Benutzer-Rolle',
-    	userNameLabel:'#UT#Benutzer',
+    	workflowUserRoleLabel:'#UT#Zugewiesene Benutzer-Rolle/n',
+    	userNameLabel:'#UT#Zugewiesene/r Benutzer',
     	applyBtn:'#UT#Anwenden',
     	cancelBtn:'#UT#Abbrechen',
-    	title: '#UT#Erweiterte Filter (Weitere Filter im Kopf jeder Spalte)',
+    	title: '#UT#Erweiterte Filter',
     	anonymizedUsersInfo:'#UT#Anonymisierte Benutzer nicht auswählbar',
+    	gridFiltersInfo:'#UT#Weitere Filter im Kopf jeder Spalte'
     },
     autoScroll: true,
-    height: 350,
+    height: 400,
     width: 500,
     bodyPadding:15,
     initConfig: function(instanceConfig) {
         var me = this,
-        	config,
-        	workflowStates=[],
-        	workflowUserRoles=[];
-        
-        
-        //Info:duplicated id values will be ignored by te store
-        Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
-            Ext.Object.each(workflow.states, function(key, value){
-            	workflowStates.push({
-        			id:key,
-        			label:value
-    			});
-            });
-            Ext.Object.each(workflow.roles, function(key, value){
-        		workflowUserRoles.push({
-        			id:key,
-        			label:value
-    			});
-            });
-        });
-        
+        	config;
         config = {
     		title:me.strings.title,
             items:[{
+            	xtype:'displayfield',
+            	value:me.strings.gridFiltersInfo
+            },{
 	            xtype: 'tagfield',
 	            name:'userName',
 	            itemId:'userName',
@@ -84,9 +64,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
 	            queryMode: 'local',
 	            displayField: 'longUserName',
                 valueField: 'userGuid',
-	            bind: {
-                    store: '{userlist}',
-                },
+                store:'admin.UsersList',
 	            fieldLabel:'¹'+ me.strings.userNameLabel,
 	            filter:{
 	            	operator: 'in',
@@ -102,9 +80,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                 queryMode: 'local',
                 valueField: 'id',
                 displayField: 'label',
-                store:Ext.create('Ext.data.Store', {
-                    data:workflowStates//TODO: states from which workflow ?
-                }),
+                store:'admin.WorkflowState',
                 fieldLabel: me.strings.workflowStateFilterLabel,
                 filter:{
                 	operator: 'in',
@@ -114,21 +90,19 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                 }
             },{
                 xtype: 'tagfield',
-                name:'userRole',
-                itemId:'userRole',
+                name:'workflowUserRole',
+                itemId:'workflowUserRole',
                 typeAhead: true,
                 queryMode: 'local',
                 valueField: 'id',
                 displayField: 'label',
-                store: Ext.create('Ext.data.Store', {
-                    data: workflowUserRoles//TODO: roles from which workflow ?
-                }),
-                fieldLabel: me.strings.userRoleLabel,
+                store:'admin.WorkflowUserRoles',
+                fieldLabel: me.strings.workflowUserRoleLabel,
                 filter:{
                 	operator: 'in',
-                	property:'userRole',
+                	property:'workflowUserRole',
                 	type:'list',
-                	textLabel:me.strings.userRoleLabel
+                	textLabel:me.strings.workflowUserRoleLabel
                 }
             }],
             dockedItems: [{
