@@ -42,9 +42,11 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      * Settings for the tasks we create and check.
      * @var array
      */
-    protected $tasksForKPI = [array('taskNameSuffix' => 'nr1', 'doExport' => true,  'processingTimeInDays' => 100),
-                              array('taskNameSuffix' => 'nr2', 'doExport' => false, 'processingTimeInDays' => 102)
-    ]; // TODO: add at least a third task for the real testcase
+    protected $tasksForKPI = [array('taskNameSuffix' => 'nr1', 'doExport' => true,  'processingTimeInDays' => 10),
+                              array('taskNameSuffix' => 'nr2', 'doExport' => true,  'processingTimeInDays' => 20),
+                              array('taskNameSuffix' => 'nr3', 'doExport' => false, 'processingTimeInDays' => 30),
+                              array('taskNameSuffix' => 'nr4', 'doExport' => false, 'processingTimeInDays' => 40)
+    ];
     
     /**
      * Remember the task-ids we created for deleting the tasks at the end
@@ -187,9 +189,6 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $search = array("days", "Tage", " ");
         $replace = array("", "", "");
         $result->averageProcessingTime = str_replace($search, $replace, $result->averageProcessingTime);
-        
-        $this->printUnitTestOutput('averageProcessingTime: result = ' . $result->averageProcessingTime . ' / statistics = ' . $statistics['averageProcessingTime']);
-        $this->printUnitTestOutput('excelExportUsage: result = ' . $result->excelExportUsage . ' / statistics = ' . $statistics['excelExportUsage']);
         
         $this->assertEquals($result->averageProcessingTime, $statistics['averageProcessingTime']);
         $this->assertEquals($result->excelExportUsage, $statistics['excelExportUsage']);
