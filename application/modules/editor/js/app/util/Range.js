@@ -464,13 +464,23 @@ Ext.define('Editor.util.Range', {
             selectionInEditor = rangy.getSelection(me.getEditorBody()),
             rangeForSelection = selectionInEditor.rangeCount ? selectionInEditor.getRangeAt(0) : null,
             selectedText,
-            textInEditor;
+            selectedContent,
+            editorContentAsText,
+            idPrefix;
         if (rangeForSelection == null || rangeForSelection.collapsed){
             return false; // might be true, but we couldn't check with the current code.
         }
         selectedText = rangeForSelection.toString();
-        textInEditor = me.getEditorBody().textContent;
-        return selectedText === textInEditor;
+        selectedContent = rangeForSelection.toHtml();
+        editorContentAsText = me.getEditorContentAsText(false);
+        // if the text is not the same in the selection as in the Editor, not everything is selected 
+        if (selectedText !== editorContentAsText) {
+            return false;
+        }
+        // internal tags are relevant content, too!
+        // example: <1>German</1>  => check if <1> and/or </1> are in the selection, too
+        idPrefix = me.editor.idPrefix;
+        return (selectedContent.indexOf(idPrefix) !== -1);
     },
     
     /**
