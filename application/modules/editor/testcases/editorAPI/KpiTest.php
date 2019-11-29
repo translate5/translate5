@@ -163,8 +163,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $this->printUnitTestOutput('EXPECTED: ' . count($this->tasksForKPI));
         $this->assertEquals(count($this->tasksForKPI), count($filteredTasks));
         
-        // TODO: How to set the filter as form-data????
-        $result = $this->api()->requestJson('editor/task/kpi', 'POST', ['filter' => $this->renderTaskGridFilter()]);
+        $result = $this->api()->requestJson('editor/task/kpi', 'POST', [], ['filter' => $this->renderTaskGridFilter()]);
         $this->printUnitTestOutput('getKpiResultsFromApi: ' . print_r($result,1));
         
         $statistics = $this->getExpectedKpiStatistics();
