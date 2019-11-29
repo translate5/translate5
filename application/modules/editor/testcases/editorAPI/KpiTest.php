@@ -67,6 +67,11 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      */
     protected $taskEndDate = 'realDeliveryDate';
     
+    /**
+     * @var string contains the file name to the downloaded excel
+     */
+    protected static $tempExcel;
+    
     
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
@@ -95,7 +100,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         // --- For KPI I: number of exported tasks ---
         foreach ($this->tasksForKPI as $task) {
             if ($task['doExport']) {
-                $this->runExcelExport($task['taskNameSuffix']);
+                $this->runExcelExportAndImport($task['taskNameSuffix']);
             }
         }
         
@@ -131,10 +136,18 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      * Export a task via API.
      * @param string $taskNameSuffix
      */
-    protected function runExcelExport(string $taskNameSuffix) {
+    protected function runExcelExportAndImport(string $taskNameSuffix) {
         $taskId = self::$taskIds[$taskNameSuffix];
+        
         $this->printUnitTestOutput('runExcelExport: editor/task/'.$taskId.'/excelexport');
-        $this->api()->request('editor/task/'.$taskId.'/excelexport');
+        $response = $this->api()->request('editor/task/'.$taskId.'/excelexport');
+        self::$tempExcel = $tempExcel = tempnam(sys_get_temp_dir(), 't5testExcel');
+        file_put_contents($tempExcel, $response->getBody());
+        
+        $this->printUnitTestOutput('excelreimportUpload: editor/task/'.$taskId.'/excelreimport');
+        $this->api()->addFile('excelreimportUpload', self::$tempExcel, 'application/data');
+        $this->api()->request('editor/task/'.$taskId.'/excelreimport', 'POST');
+        $this->api()->reloadTask();
     }
     
     /**
@@ -186,7 +199,6 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         self::$api->login('testmanager');
         foreach (self::$taskIds as $taskId) {
             fwrite(STDOUT, "\n" . '...DELETE: '.$taskId . "\n");
-            self::$api->requestJson('editor/task/'.$taskId, 'PUT', array('state' => 'error')); // TODO: this is unfortunately not allowed :( So, how can we can delete tasks without reimport?
             self::$api->requestJson('editor/task/'.$taskId, 'DELETE');
         }
     }
