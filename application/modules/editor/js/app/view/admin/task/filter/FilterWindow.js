@@ -45,7 +45,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     	gridFiltersInfo:'#UT#Weitere Filter im Kopf jeder Spalte'
     },
     autoScroll: true,
-    height: 400,
+    height: 430,
     width: 500,
     bodyPadding:15,
     initConfig: function(instanceConfig) {
@@ -65,7 +65,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
 	            displayField: 'longUserName',
                 valueField: 'userGuid',
                 store:'admin.UsersList',
-	            fieldLabel:'¹'+ me.strings.userNameLabel,
+	            fieldLabel:me.strings.userNameLabel+'¹',
 	            filter:{
 	            	operator: 'in',
             		property:'userName',

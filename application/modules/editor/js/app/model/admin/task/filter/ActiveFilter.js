@@ -43,6 +43,10 @@ Ext.define('Editor.model.admin.task.filter.ActiveFilter', {
 	        if(Ext.isDate(record.get('value'))){
         		return Ext.grid.filters.filter.Date.prototype.config.fields[operator].text;
 	        }
+	        //for the boolean filter the value is listed without operator
+	        if(Ext.isBoolean(record.get('value'))){
+	        	return '';
+	        }
 			return translated[operator] ? translated[operator] : operator;
 	    },
 	},{
@@ -70,6 +74,9 @@ Ext.define('Editor.model.admin.task.filter.ActiveFilter', {
 	    	if(Ext.isDate(val)){
 	    		return Ext.Date.format(val,Editor.DATEONLY_ISO_FORMAT);
 	    	}
+	    	if(Ext.isBoolean(record.get('value'))){
+	        	return record.get('value')==true ? Ext.grid.filters.filter.Boolean.prototype.yesText : Ext.grid.filters.filter.Boolean.prototype.noText;
+	        }
 	    	return val;
 	    }
 	},{
