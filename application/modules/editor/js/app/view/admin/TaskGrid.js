@@ -74,6 +74,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       workflowState:'#UT#Workflow-Status',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
       userRole:'#UT#Benutzer-Rolle',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
 	  userName:'#UT#Benutzer',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+	  currentWorkflowStep:'#UT#Aktueller Workflow-Schritt',
+	  currentWorkflowStepProgress:'#UT#% abgeschlossen'
   },
   strings: {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
@@ -92,7 +94,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       reloadBtn: '#UT#Aktualisieren',
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.',
       emptyTargets: '#UT#Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe)."',
-      addFilterTooltip:'#UT#Filter hinzufügen'
+      addFilterTooltip:'#UT#Filter hinzufügen',
+      currentWorkflowStepProgressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im Workflow'
   },
   states: {
       user_state_open: '#UT#offen',
@@ -359,6 +362,27 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   type: 'customer' // [Multitenancy]
               },
               text: me.text_cols.customerId
+          },{
+              xtype: 'gridcolumn',
+              cls:'gridColumnInfoIconTooltipLeft',
+              width: 135,
+              dataIndex: 'currentWorkflowStepProgress',
+              stateId:'currentWorkflowStepProgress',
+              renderer:me.currentWorkflowStepProgressRenderer,
+              tooltip:me.strings.currentWorkflowStepProgressTooltip,
+              filter: {
+                  type: 'number'
+              },
+              text: me.text_cols.currentWorkflowStepProgress
+          },{
+              xtype: 'gridcolumn',
+              width: 135,
+              dataIndex: 'currentWorkflowStep',
+              stateId:'currentWorkflowStep',
+//              filter: {TODO: list filter
+//                  type: 'string'
+//              },
+              text: me.text_cols.currentWorkflowStep
           },{
               xtype: 'gridcolumn',
               width: 220,
@@ -796,5 +820,19 @@ Ext.define('Editor.view.admin.TaskGrid', {
             }
         });
     	return filter;
+	},
+	
+	/***
+	 * Render the progres bar in the currentWorkflowStepProgress column
+	 */
+	currentWorkflowStepProgressRenderer:function(value,meta,rec){
+		if(!value){
+			value=0;
+		}
+		meta.tdAttr = 'data-qtip="'+value+'%"';
+		return '<div class="x-progress x-progress-default" style="height: 13px;">'+
+					'<div value="10"; class="x-progress-bar x-progress-bar-default" style="width: ' + value + '%">'+
+					'</div>'+
+			   '</div>';
 	}
 });
