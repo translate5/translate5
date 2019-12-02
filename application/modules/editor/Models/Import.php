@@ -87,7 +87,7 @@ class editor_Models_Import {
             }
             
             $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
-            $this->task->lock(NOW_ISO, true); //locks the task
+            $this->task->lock(NOW_ISO, $this->task::STATE_IMPORT); //locks the task
             
             $this->events->trigger('beforeImport', $this, array(
                     'task' => $this->task,

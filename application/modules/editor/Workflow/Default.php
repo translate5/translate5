@@ -83,8 +83,8 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
             $nextRole = $this->getRoleOfStep($nextStep);
             $this->doDebug(__FUNCTION__." Next Role: ".$nextRole);
             if($nextRole) {
-                $isCoop = $task->getUsageMode() == $task::USAGE_MODE_COOPERATIVE;
-                $newTua->setStateForRoleAndTask($isCoop ? self::STATE_OPEN : self::STATE_UNCONFIRMED, $nextRole);
+                $isComp = $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE;
+                $newTua->setStateForRoleAndTask($isComp ? self::STATE_UNCONFIRMED : self::STATE_OPEN, $nextRole);
             }
         }
         

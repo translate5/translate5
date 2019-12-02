@@ -93,7 +93,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
         /* @var $view Zend_View_Interface */
-        $view->headLink()->appendStylesheet(APPLICATION_RUNDIR.'/editor/plugins/resources/matchAnalysis/plugin.css');
+        $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {

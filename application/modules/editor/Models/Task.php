@@ -108,6 +108,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     const USAGE_MODE_COMPETITIVE = 'competitive';
     const USAGE_MODE_COOPERATIVE = 'cooperative';
+    const USAGE_MODE_SIMULTANEOUS = 'simultaneous';
     
     const ASSOC_TABLE_ALIAS = 'LEK_taskUserAssoc';
     const TABLE_ALIAS = 'LEK_task';
@@ -539,38 +540,63 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * unlocks all tasks, where the associated session is invalid
-     * @return array an array with tasks which were unlocked
      */
     public function cleanupLockedJobs() {
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
-        //this gives us the possibility to define session independant locks:
-        $validSessionIds .= ' union select \''.self::INTERNAL_LOCK.'\' internalSessionUniqId';
-        $where = 'not locked is null and (lockedInternalSessionUniqId not in ('.$validSessionIds.') or lockedInternalSessionUniqId is null)';
-        $toUnlock = $this->db->fetchAll($this->db->select()->where($where))->toArray();
+        //the below not like "*translate5InternalLock*%" gives us the possibility to define session independant locks:
+        $where = 'not locked is null and (
+            lockedInternalSessionUniqId not in ('.$validSessionIds.')
+            and lockedInternalSessionUniqId not like "*translate5InternalLock*%" 
+            or lockedInternalSessionUniqId is null)';
         $this->db->update(array('lockingUser' => null, 'locked' => null, 'lockedInternalSessionUniqId' => null), $where);
-        return $toUnlock;
+        
+        //clean up remaining multi user task locks where no user is editing anymore 
+        $multiUserId = self::INTERNAL_LOCK.self::USAGE_MODE_SIMULTANEOUS;
+        $usedMultiUserLocks = 'SELECT t.id
+        FROM (SELECT id, taskGuid FROM LEK_task t WHERE t.lockedInternalSessionUniqId = "'.$multiUserId.'") t
+        JOIN LEK_taskUserAssoc tua on tua.taskGuid = t.taskGuid
+        WHERE not tua.usedState is null AND not tua.usedInternalSessionUniqId is null';
+        $where = 'not locked is null and lockedInternalSessionUniqId = "'.$multiUserId.'" and id not in ('.$usedMultiUserLocks.')';
+        
+        $this->db->update(array('lockingUser' => null, 'locked' => null, 'lockedInternalSessionUniqId' => null), $where);
     }
+    
+    /**
+     * locks the task 
+     * sets a locked-timestamp in LEK_task for the task, if locked column is null
+     * 
+     * @param string $datetime
+     * @param string $lockId String to distinguish different lock types 
+     * @return boolean
+     */
+    public function lock(string $datetime, string $lockId = ''): bool {
+        return $this->_lock($datetime, ZfExtended_Models_User::SYSTEM_GUID, self::INTERNAL_LOCK.$lockId);
+    }
+    
+    /**
+     * locks the task 
+     * sets a locked-timestamp in LEK_task for the task, if locked column is null
+     * 
+     * @param string $datetime
+     * @return boolean
+     */
+    public function lockForSessionUser(string $datetime): bool {
+        $user = new Zend_Session_Namespace('user');
+        $session = new Zend_Session_Namespace();
+        return $this->_lock($datetime, $user->data->userGuid, $session->internalSessionUniqId);
+    }
+    
     
     /**
      * locks the task
      * sets a locked-timestamp in LEK_task for the task, if locked column is null
      * 
      * @param string $datetime
-     * @param bool $sessionIndependant optional, default false. If true the lock is session independant, and must therefore revoked manually! 
+     * @param bool $systemLock optional, default false. If true the lock is session independant, and must therefore revoked manually! 
+     * @param string $systemIdentifier optional, default empty string. Is used to distinguish different lock types (mainly for system locks) 
      * @return boolean
-     * @throws Zend_Exception if something went wrong
      */
-    public function lock(string $datetime, $sessionIndependant = false) {
-        if($sessionIndependant) {
-            $userGuid = ZfExtended_Models_User::SYSTEM_GUID;
-            $sessionId = self::INTERNAL_LOCK;
-        }
-        else {
-            $user = new Zend_Session_Namespace('user');
-            $userGuid = $user->data->userGuid;
-            $session = new Zend_Session_Namespace();
-            $sessionId = $session->internalSessionUniqId;
-        }
+    protected function _lock(string $datetime, string $userGuid, string $sessionId): bool {
         $update = array(
             'locked' => $datetime,
             'lockingUser' => $userGuid,
@@ -579,17 +605,18 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $where = array('taskGuid = ? and locked is null'=>$this->getTaskGuid());
         $rowsUpdated = $this->db->update($update, $where);
         if($rowsUpdated === 0){
-            return !is_null($this->getLocked()) && $this->getLockingUser() == $userGuid;//already locked by this same user
+            //true if no system lock, if system lock evaluate if sessionId (and therefore the type) equals
+            $checkSystemLockType = strpos($sessionId, self::INTERNAL_LOCK) === false || $sessionId === $this->getLockedInternalSessionUniqId();
+            //already locked by the same user with the same system lock type (if applicable). 
+            return !is_null($this->getLocked()) && $this->getLockingUser() == $userGuid && $checkSystemLockType;
         }
         return true;
     }
     
     /**
-     * unlocks the task
-     * unsets a timestamp (sets it to NULL) in LEK_task for the task, if locked column is not null
+     * unlocks the task, does not check user or multi user state!
      * @return boolean false if task had not been locked or does not exist, 
      *          true if task has been unlocked successfully
-     * @throws Zend_Exception if something went wrong
      */
     public function unlock() {
         $where = array('taskGuid = ? and locked is not null'=>$this->getTaskGuid());
@@ -600,6 +627,36 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         );
         //check how many rows are updated
         return $this->db->update($data, $where) !== 0;
+    }
+    
+    /**
+     * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = currentUser) and respects multiuser editing
+     * @return boolean false if task had not been locked or does not exist, 
+     *          true if task has been unlocked successfully
+     */
+    public function unlockForUser($userGuid) {
+        $taskGuid = $this->db->getAdapter()->quote($this->getTaskGuid());
+        $userGuid = $this->db->getAdapter()->quote($userGuid);
+        $multiUserId = $this->db->getAdapter()->quote(self::INTERNAL_LOCK.self::USAGE_MODE_SIMULTANEOUS);
+        
+        $where = 'taskGuid = %1$s
+        AND locked is not null
+        AND (lockingUser = %2$s
+            OR lockedInternalSessionUniqId = %3$s
+            AND taskGuid NOT IN (SELECT taskGuid
+                FROM LEK_taskUserAssoc
+                WHERE taskGuid = %1$s
+                AND userGuid != %2$s
+                AND not usedState is null AND not usedInternalSessionUniqId is null)
+            )';
+        
+        $data = array(
+            'locked' => NULL,
+            'lockedInternalSessionUniqId' => NULL,
+            'lockingUser' => NULL,
+        );
+        //check how many rows are updated
+        return $this->db->update($data, sprintf($where, $taskGuid, $userGuid, $multiUserId)) !== 0;
     }
     
     /**

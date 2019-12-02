@@ -1,0 +1,102 @@
+/*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2019 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ 
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ 
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+ 
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
+
+@CHARSET "UTF-8";
+
+/* Attention: same (similar) Colors are reused in TrackChanges PlugIn (plugin.css and UtilEditor.js), if changing here, change them there too! */
+.multi-user-list .usernr-1 span.icon,
+.x-grid-item-selected.usernr-1,
+#segment-grid .x-grid-item .other-user-edit.usernr-1,
+#segment-grid .x-grid-item .other-user-select.usernr-1 {background-color: #f9e788;}    /* yellow pale */
+.multi-user-list .usernr-2 span.icon,
+.x-grid-item-selected.usernr-2,
+#segment-grid .x-grid-item .other-user-edit.usernr-2,
+#segment-grid .x-grid-item .other-user-select.usernr-2 {background-color: #f9b372;}    /* orange pale */
+.multi-user-list .usernr-3 span.icon,
+.x-grid-item-selected.usernr-3,
+#segment-grid .x-grid-item .other-user-edit.usernr-3,
+#segment-grid .x-grid-item .other-user-select.usernr-3 {background-color: #cbe0f9;}    /* blue pale */
+.multi-user-list .usernr-4 span.icon,
+.x-grid-item-selected.usernr-4,
+#segment-grid .x-grid-item .other-user-edit.usernr-4,
+#segment-grid .x-grid-item .other-user-select.usernr-4 {background-color: #f3d5ed;}    /* lilac pale */
+.multi-user-list .usernr-5 span.icon,
+.x-grid-item-selected.usernr-5,
+#segment-grid .x-grid-item .other-user-edit.usernr-5,
+#segment-grid .x-grid-item .other-user-select.usernr-5 {background-color: #e4fb81;}    /* yellowish green pale */
+.multi-user-list .usernr-6 span.icon,
+.x-grid-item-selected.usernr-6,
+#segment-grid .x-grid-item .other-user-edit.usernr-6,
+#segment-grid .x-grid-item .other-user-select.usernr-6 {background-color: #FFD8D4;}    /* pink pale */
+.multi-user-list .usernr-7 span.icon,
+.x-grid-item-selected.usernr-7,
+#segment-grid .x-grid-item .other-user-edit.usernr-7,
+#segment-grid .x-grid-item .other-user-select.usernr-7 {background-color: #9af2db;}    /* turquoise pale */
+.multi-user-list .usernr-8 span.icon,
+.x-grid-item-selected.usernr-8,
+#segment-grid .x-grid-item .other-user-edit.usernr-8,
+#segment-grid .x-grid-item .other-user-select.usernr-8 {background-color: #b5f3bf;}    /* lime green pale */
+
+.multi-user-list span.user {    
+    padding-right:10px;
+    padding-left:5px;
+}
+.multi-user-list span.user.empty {padding:0;}
+
+.multi-user-list span.icon {
+    height:20px;width:20px;
+    display:inline-block;
+    background: url(./user-silhouette.png?v=4) no-repeat 4px center;
+    background-size:12px 12px;
+    vertical-align:bottom;   
+    margin-right:4px;
+    border-radius: 3px;
+}
+
+.multi-user-tip .x-tip-body-default {color: #202020;}
+.multi-user-tip .x-tip-body-default .x-autocontainer-innerCt {
+	padding-left: 20px;
+    background: url(./user-silhouette.png?v=6) no-repeat left top;
+}
+
+/* tooltip */
+.multi-user-tip.x-tip-default.usernr-1 .x-tip-anchor-bottom {border-top-color: #f9e788;}
+.multi-user-tip.x-tip-default.usernr-1 { background-color: #f9e788;border-color: #f9e788;}
+.multi-user-tip.x-tip-default.usernr-2 .x-tip-anchor-bottom {border-top-color: #f9b372;}
+.multi-user-tip.x-tip-default.usernr-2 { background-color: #f9b372;border-color: #f9b372;}
+.multi-user-tip.x-tip-default.usernr-3 .x-tip-anchor-bottom {border-top-color: #cbe0f9;}
+.multi-user-tip.x-tip-default.usernr-3 { background-color: #cbe0f9;border-color: #cbe0f9;}
+.multi-user-tip.x-tip-default.usernr-4 .x-tip-anchor-bottom {border-top-color: #f3d5ed;}
+.multi-user-tip.x-tip-default.usernr-4 { background-color: #f3d5ed;border-color: #f3d5ed;}
+.multi-user-tip.x-tip-default.usernr-5 .x-tip-anchor-bottom {border-top-color: #e4fb81;}
+.multi-user-tip.x-tip-default.usernr-5 { background-color: #e4fb81;border-color: #e4fb81;}
+.multi-user-tip.x-tip-default.usernr-6 .x-tip-anchor-bottom {border-top-color: #FFD8D4;}
+.multi-user-tip.x-tip-default.usernr-6 { background-color: #FFD8D4;border-color: #FFD8D4;}
+.multi-user-tip.x-tip-default.usernr-7 .x-tip-anchor-bottom {border-top-color: #9af2db;}
+.multi-user-tip.x-tip-default.usernr-7 { background-color: #9af2db;border-color: #9af2db;}
+.multi-user-tip.x-tip-default.usernr-8 .x-tip-anchor-bottom {border-top-color: #b5f3bf;}
+.multi-user-tip.x-tip-default.usernr-8 { background-color: #b5f3bf;border-color: #b5f3bf;}
