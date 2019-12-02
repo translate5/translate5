@@ -209,9 +209,13 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             return;
         }
         
-        if(!rec.get('editable') && meta && meta.editingConn && meta.editingUser) {
-            Editor.MessageBox.addInfo(me.strings.inUseMsg);
-            return false;
+        //if segment is not editable, we do not send a editrequest at all
+        if(! rec.get('editable')) {
+            if(meta && meta.editingConn && meta.editingUser) {
+                Editor.MessageBox.addInfo(me.strings.inUseMsg);
+                return false;                
+            }
+            return;
         }
         
         me.bus.send('task', 'segmentEditRequest', [context[0].get('taskGuid'), context[0].get('id')]);

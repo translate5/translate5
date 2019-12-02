@@ -2385,7 +2385,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='RWlnZW5zY2hhZnRlbg=='>
     <source>Eigenschaften</source>
-    <target>Other properties</target>
+    <target>Properties</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSBrbG9uZW4='>
     <source>Aufgabe klonen</source>
@@ -3470,9 +3470,9 @@ More information can be found in the task property window in the tab events.<br 
     <source>Mehrere Benutzer</source>
     <target>Multiple users</target>
 </trans-unit>
-<trans-unit id='V2VubiBtZWhyZXJlIEJlbnV0emVyIGRlbXNlbGJlbiBXb3JrZmxvdy1TY2hyaXR0IHp1Z2V3aWVzZW4gd2VyZGVu'>
-    <source>Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden</source>
-    <target>When assigning multiple users to same workflow step</target>
+<trans-unit id='QmVpIFp1d2Vpc3VuZyBtZWhyZXJlciBCZW51dHplciB6dW0gc2VsYmVuIFdvcmtmbG93c2Nocml0dA=='>
+  <source>Bei Zuweisung mehrerer Benutzer zum selben Workflowschritt</source>
+  <target>When assigning multiple users to the same workflow step</target>
 </trans-unit>
 <trans-unit id='RGllc2UgT3B0aW9uIGthbm4gbnVyIHZlcsOkbmRlcnQgd2VyZGVuLCB3ZW5uIGtlaW4gQmVudXR6ZXIgZGVyIEF1ZmdhYmUgenVnZXdpZXNlbiBpc3Qu'>
     <source>Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</source>

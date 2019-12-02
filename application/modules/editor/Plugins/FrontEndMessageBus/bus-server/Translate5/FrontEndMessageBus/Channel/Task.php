@@ -537,6 +537,12 @@ class Task extends Channel {
     public function close(array $task, string $sessionId, string $connectionId) {
         $this->updateOnlineUsers($sessionId, $task['taskGuid'], false);
         
+        $this->sendToTaskUsers($task['taskGuid'], $sessionId, FrontendMsg::create(self::CHANNEL_NAME, 'segmentselect', [
+            'segmentId' => 0,
+            'trackingId' => 0,
+            'connectionId' => $connectionId,
+        ]));
+        
         $idx = array_search($sessionId, $this->taskToSessionMap[$task['taskGuid']]);
         if($idx !== false) {
             unset($this->taskToSessionMap[$task['taskGuid']][$idx]);
