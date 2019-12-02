@@ -1,3 +1,4 @@
+
 -- /*
 -- START LICENSE AND COPYRIGHT
 -- 
@@ -25,12 +26,9 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_users` (`userGuid` , `firstName` , `surName` , `gender` , `login` , `email` , `roles` , `passwd`, `editable`, `locale`)
-VALUES
-('{00000000-0000-0000-C100-CCDDEE000001}', 'manager', 'test', 'm', 'testmanager', 'support@translate5.net', 'pm,editor,admin,api', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
-('{00000000-0000-0000-C100-CCDDEE000002}', 'lector', 'test', 'm', 'testlector', 'support@translate5.net', 'editor', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
-('{00000000-0000-0000-C100-CCDDEE000003}', 'translator', 'test', 'm', 'testtranslator', 'support@translate5.net', 'editor', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
-('{00000000-0000-0000-C100-CCDDEE000004}', 'api', 'test', 'm', 'testapiuser', 'support@translate5.net', 'pm,editor,admin,api', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
-('{00000000-0000-0000-C100-CCDDEE000005}', 'termproposer', 'test', 'm', 'testtermproposer', 'support@translate5.net', 'pm,editor,api,termProposer', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en');
-
-    
+INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2019-12-02', 'TRANSLATE-1167', 'feature', 'Edit task simultanously with multiple users', 'Multiple users can edit the same task at the same time. See Translate5 confluence how to activate that feature!', '98'),
+('2019-12-02', 'TRANSLATE-1493', 'feature', 'Filter by user, workflow-step, job-status and language combination', 'Several new filters can be used in the task overview.', '98'),
+('2019-12-02', 'TRANSLATE-1889', 'change', 'rfc 5646 value for estonian is wrong', 'The RFC 5646 value for estonian was wrong', '96'),
+('2019-12-02', 'TRANSLATE-1886', 'change', 'Error on refreshing GroupShare TMs when a used TM should be deleted', 'The error is fixed right now.', '96'),
+('2019-12-02', 'TRANSLATE-1884', 'change', 'Special Character END OF TEXT in importable content produces errors.', 'The special character END OF TEXT is masked in the import now.', '96'),
+('2019-12-02', 'TRANSLATE-1840', 'change', 'Insert opening and closing tag surround text selections with one key press', 'Insert opening and closing tag surround text selections with one key press', '98');
