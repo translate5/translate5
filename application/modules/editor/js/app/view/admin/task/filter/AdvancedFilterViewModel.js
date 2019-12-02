@@ -29,10 +29,18 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.editorAdminTaskFilterAdvancedFilter',
+    data:{
+    	activeFiltersCount:0,
+    	selectedFilters:[]
+    },
     stores: {
         activeFilter: {
-            data: [],
-            fields:[{name: 'operator'},{name: 'property'},{name: 'textLabel'},{name: 'value'}]
+        	model:'Editor.model.admin.task.filter.ActiveFilter'
+        }
+    },
+    formulas: {
+        isActiveFilter: function(get){
+	        return get('activeFiltersCount')>0;
         }
     }
 });

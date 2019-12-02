@@ -21,32 +21,35 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
-
-Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
-    extend: 'Ext.app.ViewController',
-    alias: 'controller.editorAdminTaskFilterFilterWindow',
-    
-    
-    onApplyBtnClick:function(){
-    	var me=this,
-    		fields=me.getView().query('[filter]'),
-    		filter=[];
-    	//create a simple filter array object from the fields
-    	Ext.Array.each(fields, function(field) {
-			filter.push(Ext.Object.merge(field.filter,{
-				value:field.getValue()
-				//'label':field.filter.property+' '+field.filter.operator+' '+field.getValue()
-			}))
-    	});
-    	
-    	me.getView().fireEvent('advancedFilterChange',filter)
+Ext.define('Editor.store.admin.UsersList', {
+	extend : 'Ext.data.Store',
+  	model: 'Editor.model.admin.User',
+    autoLoad: true,
+    pageSize: 0,
+    idProperty: 'id',
+    listeners: {
+    	/***
+  	   * Add the task filter to the userlist store
+  	   */
+        beforeload:function(store,operation,eOpts){
+	      var taskStore=Ext.StoreManager.get('admin.Tasks'),
+		        proxy=store.getProxy(),
+		        merged = Ext.merge({}, proxy.getExtraParams(), {
+		            filter:proxy.encodeFilters(taskStore.getFilters().items)
+		        });
+		    proxy.setExtraParams(merged);
+	    }
     },
-    
-    onCancelBtnClick:function(){
-    	this.getView().destroy();
+    proxy : {
+      type : 'rest', 
+      url: Editor.data.restpath+'task/userlist',
+      reader : {
+        rootProperty: 'rows',
+        type : 'json'
+      }
     }
 });
