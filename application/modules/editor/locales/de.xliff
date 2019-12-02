@@ -1679,6 +1679,9 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='WmFobCB6dWdld2llc2VuZXIgQmVudXR6ZXI='><source>Zahl zugewiesener Benutzer</source><target>Zahl zugewiesener Benutzer</target></trans-unit>
 <trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc291cmNlbg=='><source>Anzahl zugewiesene Sprachresourcen</source><target>Anzahl zugewiesene Sprachresourcen</target></trans-unit>
 <trans-unit id='MTAwJS1UcmVmZmVyIGVkaXRpZXJiYXI='><source>100%-Treffer editierbar</source><target>100%-Treffer editierbar</target></trans-unit>
+<trans-unit id='JSBhYmdlc2NobG9zc2Vu'><source>% abgeschlossen</source><target>% abgeschlossen</target></trans-unit>
+<trans-unit id='JSBhYmdlc2NobG9zc2VuIGR1cmNoIHp1Z2V3aWVzZW5lIEJlbnV0emVyIGltIFdvcmtmbG93'><source>% abgeschlossen durch zugewiesene Benutzer im Workflow</source><target>% abgeschlossen durch zugewiesene Benutzer im Workflow</target></trans-unit>
+<trans-unit id='QWt0dWVsbGVyIFdvcmtmbG93LVNjaHJpdHQ='><source>Aktueller Workflow-Schritt</source><target>Aktueller Workflow-Schritt</target></trans-unit>
   </body>
  </file>
 </xliff>

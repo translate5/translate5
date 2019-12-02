@@ -98,6 +98,10 @@ END LICENSE AND COPYRIGHT
  * @method void setCustomerId() setCustomerId(int $customerId)
  * @method string getUsageMode() getUsageMode()
  * @method void setUsageMode() setUsageMode(string $usageMode)
+ * @method string getCurrentWorkflowStep() getCurrentWorkflowStep()
+ * @method void setCurrentWorkflowStep() setCurrentWorkflowStep(string $currentWorkflowStep)
+ * @method integer getCurrentWorkflowStepProgress() getCurrentWorkflowStepProgress()
+ * @method void setCurrentWorkflowStepProgress() setCurrentWorkflowStepProgress(int $currentWorkflowStepProgress)
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';

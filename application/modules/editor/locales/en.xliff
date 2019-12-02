@@ -3569,6 +3569,9 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc291cmNlbg=='><source>Anzahl zugewiesene Sprachresourcen</source><target>Number of assigned language resources</target></trans-unit>
 <trans-unit id='MTAwJS1UcmVmZmVyIGVkaXRpZXJiYXI='><source>100%-Treffer editierbar</source><target>100% matches editable</target></trans-unit>
 <trans-unit id='UHJvamVrdG1hbmFnZXI='><source>Projektmanager</source><target>Project manager</target></trans-unit>
+<trans-unit id='JSBhYmdlc2NobG9zc2Vu'><source>% abgeschlossen</source><target>% finished</target></trans-unit>
+<trans-unit id='JSBhYmdlc2NobG9zc2VuIGR1cmNoIHp1Z2V3aWVzZW5lIEJlbnV0emVyIGltIFdvcmtmbG93'><source>% abgeschlossen durch zugewiesene Benutzer im Workflow</source><target>% finished by assigned users in the workflow</target></trans-unit>
+<trans-unit id='QWt0dWVsbGVyIFdvcmtmbG93LVNjaHJpdHQ='><source>Aktueller Workflow-Schritt</source><target>Current workflow step</target></trans-unit>
 </body>
   </file>
 </xliff>

@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -15,8 +14,9 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -26,10 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-@CHARSET "UTF-8";
-
-
-.icon-excel-export {background-image: url("images/page_excel.png");}
-.icon-match-resources {background-image: url("images/share.png");}
-.adminTaskGrid tr.editorAnalysisTask .ico-task-analysis {background-image: url("images/chart_pie.png");display:inline-block;}
-.matchAnalysisGrid .x-grid-header-ct .info-icon > div {background:url("images/information.png") no-repeat 45px 9px;}
+ALTER TABLE `LEK_task` 
+ADD COLUMN `currentWorkflowStep` VARCHAR(60) NULL AFTER `usageMode`,
+ADD COLUMN `currentWorkflowStepProgress` INT(11) NULL AFTER `currentWorkflowStep`;
