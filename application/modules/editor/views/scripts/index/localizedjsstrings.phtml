@@ -501,7 +501,8 @@ Ext.define('Editor.controller.Localizer', {
             reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
             reloadBtnTip: '<?php echo $this->translate->_('Aufgabenliste vom Server aktualisieren.');?>',
             noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>',
-            emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).');?>'
+            emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).');?>',
+            addFilterText: '<?php echo $this->translate->_('Erweiterte Filter');?>'
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
@@ -525,7 +526,17 @@ Ext.define('Editor.controller.Localizer', {
             lockLocked: '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>',
             orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>',
-            emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>'
+            emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>',
+            workflowState: '<?php echo $this->translate->_('Workflow-Status');?>',
+            workflowUserRole: '<?php echo $this->translate->_('Benutzer-Rolle');?>',
+            userName: '<?php echo $this->translate->_('Benutzer');?>',
+            id: '<?php echo $this->translate->_('Id');?>',
+            taskGuid: '<?php echo $this->translate->_('Task-Guid');?>',
+            workflow: '<?php echo $this->translate->_('Workflow');?>',
+            taskassocs: '<?php echo $this->translate->_('Zugewiesene Sprach-Resourcen');?>',
+            pmName: '<?php echo $this->translate->_('Projektmanager');?>',
+            edit100PercentMatch: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
+            userCount: '<?php echo $this->translate->_('Zahl zugewiesener Benutzer');?>'
         }
     });
     
@@ -557,6 +568,27 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.LanguageResources.log.LogWindow", {
         override: "Editor.view.LanguageResources.log.LogWindow",
         title: '<?php echo $this->translate->_('Ereignisse zu Sprachresource "{0}"');?>'
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.filter.AdvancedFilter", {
+        override: "Editor.view.admin.task.filter.AdvancedFilter",
+        strings:{
+        	filterHolderLabel: '<?php echo $this->translate->_('Gesetzte Filter');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.filter.FilterWindow", {
+        override: "Editor.view.admin.task.filter.FilterWindow",
+        strings:{
+        	workflowStateFilterLabel: '<?php echo $this->translate->_('Workflow-Status');?>',
+        	workflowUserRoleLabel: '<?php echo $this->translate->_('Zugewiesene Benutzer-Rolle/n');?>',
+        	userNameLabel: '<?php echo $this->translate->_('Zugewiesene/r Benutzer');?>',
+        	applyBtn: '<?php echo $this->translate->_('Anwenden');?>',
+        	cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+        	title:'<?php echo $this->translate->_('Erweiterte Filter');?>',
+        	anonymizedUsersInfo:'<?php echo $this->translate->_('Anonymisierte Benutzer nicht auswählbar');?>',
+        	gridFiltersInfo:'<?php echo $this->translate->_('Weitere Filter im Kopf jeder Spalte');?>'
+        }
     });
     
     Ext.define("Editor.locale.de.view.admin.task.TaskAttributes", {

@@ -109,8 +109,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const USAGE_MODE_COMPETITIVE = 'competitive';
     const USAGE_MODE_COOPERATIVE = 'cooperative';
     
-    const ASSOC_TABLE_ALIAS = 'tua';
-    const TABLE_ALIAS = 't';
+    const ASSOC_TABLE_ALIAS = 'LEK_taskUserAssoc';
+    const TABLE_ALIAS = 'LEK_task';
     
     const INTERNAL_LOCK = '*translate5InternalLock*';
 
@@ -225,6 +225,24 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return parent::loadFilterdCustom($s);
     }
     
+    /***
+     * Load all task assoc users for non anonymized tasks.
+     * This is used for the user workflow filter in the advance filter store.
+     * INFO:Associated users for the anonimized tasks will not be loaded
+     * @return array
+     */
+    public function loadUserList() {
+        $this->getFilter()->setDefaultTable('LEK_task');
+        $s=$this->db->select()
+        ->setIntegrityCheck(false)
+        ->from('LEK_task', [])
+        ->join('LEK_customer', 'LEK_task.customerId=LEK_customer.id',[])
+        ->join('LEK_taskUserAssoc','LEK_taskUserAssoc.taskGuid= LEK_task.taskGuid',[])
+        ->join('Zf_users','Zf_users.userGuid=LEK_taskUserAssoc.userGuid',['Zf_users.*'])
+        ->where('LEK_customer.anonymizeUsers=0');
+        return $this->loadFilterdCustom($s);
+    }
+    
     /**
      * gets the total count of all tasks associated to the user (filtered by the TaskUserAssoc table)
      * if $loadAll is true, load all tasks, user infos joined only where possible,
@@ -245,25 +263,25 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * returns the SQL to retrieve the tasks of an user oder of all users joined with the users assoc infos
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks to the user
+     * TODO: when state filter is refactored, remove the tasuserassoc object cast here
      * @param string $userGuid
      * @param string $cols column definition
      * @param bool $loadAll 
      * @return Zend_Db_Table_Select
      */
     protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $loadAll = false) {
-        $alias = self::ASSOC_TABLE_ALIAS;
         $s = $this->db->select()
-        ->from(array('t' => 'LEK_task'), $cols);
+        ->from('LEK_task', $cols);
         if(!empty($this->filter)) {
-            $this->filter->setDefaultTable('t');
+            $this->filter->setDefaultTable('LEK_task');
         }
         if($loadAll) {
-            $on = $alias.'.taskGuid = t.taskGuid AND '.$alias.'.userGuid = '.$s->getAdapter()->quote($userGuid);
-            $s->joinLeft(array($alias => 'LEK_taskUserAssoc'), $on, array());
+            $on ='LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid AND LEK_taskUserAssoc_1.userGuid = '.$s->getAdapter()->quote($userGuid);
+            $s->joinLeft(['LEK_taskUserAssoc_1'=>'LEK_taskUserAssoc'], $on, array());
         }
         else {
-            $s->joinLeft(array($alias => 'LEK_taskUserAssoc'), $alias.'.taskGuid = t.taskGuid', array())
-            ->where($alias.'.userGuid = ? OR t.pmGuid = ?', $userGuid);
+            $s->joinLeft(['LEK_taskUserAssoc_1'=>'LEK_taskUserAssoc'], 'LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid', array())
+            ->where('LEK_taskUserAssoc_1.userGuid = ? OR LEK_task.pmGuid = ?', $userGuid);
         }
         return $s;
     }

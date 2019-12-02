@@ -395,6 +395,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.userRights', $acl->getFrontendRights($userRoles));
         
         $php2js->set('app.version', $this->view->appVersion);
+        
+        $filter=ZfExtended_Factory::get('ZfExtended_Models_Filter_ExtJs6');
+        /* @var $filter ZfExtended_Models_Filter_ExtJs6 */
+        $php2js->set('app.filters.translatedOperators', $filter->getTranslatedOperators());
     }
     
     protected function getAppVersion() {
