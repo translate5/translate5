@@ -27,35 +27,35 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @class Editor.model.admin.TaskUserTracking
- * @extends Ext.data.Model
+ * @class Editor.util.messageBus.EventDomain
  */
-Ext.define('Editor.model.admin.TaskUserTracking', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'int'},
-    {name: 'taskGuid', type: 'string'},
-    {name: 'userGuid', type: 'string'},
-    {name: 'taskOpenerNumber', type: 'integer'},
-    {name: 'firstName', type: 'string'},
-    {name: 'taskName', type: 'string'},
-    {name: 'surName', type: 'string'},
-    {name: 'userName', type: 'string'},
-    {name: 'role', type: 'string'},
-    {name: 'isOnline', type: 'boolean', persist: false},
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',
-    url: Editor.data.restpath+'taskusertracking',
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
+Ext.define('Editor.util.messageBus.EventDomain', {
+    extend: 'Ext.app.EventDomain',
+    singleton: true,
+    
+    type: 'messagebus',
+    
+    idMatchRe: /^\#/,
+    
+    constructor: function() {
+        var me = this;
+        me.callParent();
+        me.monitor(Editor.util.messageBus.MessageBus);
     },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+
+    /**
+     * Selektor must be #BUSID CHANNEL or * to match
+     */
+    match: function(target, selector) {
+        if (selector === '*') {
+            return true;
+        }
+        selector = selector.split(/ +/);
+        if ('#'+target.getBusId() !== selector[0]) {
+            return false;
+        }
+        //selector count = 1: only #busId was given, therefore the currentChannel must be empty to match (events directly from bus instance)
+        //selector count > 1: a channel was given, so we have to compare agains the currentChannel of the target
+        return selector.length === 1 && !target.currentChannel || selector[1] === target.currentChannel;
     }
-  }
 });

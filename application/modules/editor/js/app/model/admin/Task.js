@@ -32,7 +32,11 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.model.admin.Task', {
   extend: 'Ext.data.Model',
-  requires: ['Editor.model.segment.Field', 'Editor.model.admin.task.UserPref'],
+  requires: [
+      'Editor.model.segment.Field',
+      'Editor.model.admin.task.UserPref',
+      'Editor.model.admin.TaskUserTracking',
+  ],
   //currently we have 3 places to define userStates: IndexController for translation, JS Task Model and PHP TaskUserAssoc Model for programmatic usage
   USER_STATE_OPEN: 'open',
   USER_STATE_EDIT: 'edit',
@@ -42,6 +46,7 @@ Ext.define('Editor.model.admin.Task', {
   USER_STATE_UNCONFIRMED: 'unconfirmed',
   USAGE_MODE_COMPETITIVE: 'competitive',
   USAGE_MODE_COOPERATIVE: 'cooperative',
+  USAGE_MODE_SIMULTANEOUS: 'simultaneous',
   states: {
       ERROR: 'error',
       IMPORT: 'import',
@@ -105,6 +110,9 @@ Ext.define('Editor.model.admin.Task', {
   },{
       model: 'Editor.model.admin.task.UserPref', 
       name: 'userPrefs'
+  },{
+      model: 'Editor.model.admin.TaskUserTracking', 
+      name: 'userTracking'
   }],
   idProperty: 'id',
   proxy : {
@@ -128,7 +136,20 @@ Ext.define('Editor.model.admin.Task', {
       return this.get('qmSubEnabled');
   },
   /**
-   * returns if task is locked
+   * returns if task is editable depending on task locking and usagemode
+   * does not evaluate waiting/finished etc. Therefore is isReadonly 
+   * @return {Boolean}
+   */
+  isEditable: function() {
+      //if the task is edited by multiple users, it is not locked in the frontend.
+      if(this.isLocked() && this.get('lockedInternalSessionUniqId') == Editor.data.tasks.simultaneousEditingKey) {
+          return true; 
+      }
+      return !this.isLocked();
+  },
+  /**
+   * returns if task is locked (either by a user or by system)
+   * With simultaneous editing the task is also locked, but user should be able to edit, therefore is the isEditable. 
    * @return {Boolean}
    */
   isLocked: function() {
@@ -223,11 +244,10 @@ Ext.define('Editor.model.admin.Task', {
    */
   isReadOnly: function() {
       var me = this;
-      //FIXME nextRelease This should be done by userRights, a clear way isnt specified yet. Perhaps move to Editor.model.admin.User.isAllowed!
       if(me.get('userRole') == 'visitor' || me.get('userState') == me.USER_STATE_VIEW){
           return true;
       }
-      return me.isLocked() || me.isFinished() || me.isWaiting() || me.isEnded() || me.isUnconfirmed();
+      return !me.isEditable() || me.isFinished() || me.isWaiting() || me.isEnded() || me.isUnconfirmed();
   },
   /**
    * returns if task is ended
@@ -256,6 +276,17 @@ Ext.define('Editor.model.admin.Task', {
           Ext.Error.raise('requested workflow meta data not found! (workflow '+wf+')');
       }
       return Editor.data.app.workflows[wf];
+  },
+  /**
+   * returns the taskName with (taskNr), if set.
+   * @return {String}
+   */
+  getTaskName: function() {
+      var nr = this.get('taskNr');
+      if(nr) {
+          return this.get('taskName')+' ('+nr+')';
+      }
+      return this.get('taskName');
   },
   /**
    * @todo improve workflow handling in Javascript, => adapt the php workflow in js, a class with same methods (like getNextStep step2Role etc)

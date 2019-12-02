@@ -69,9 +69,17 @@ Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
   stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages'],
-  requires: ['Editor.view.ViewPort', Editor.data.app.viewport, 'Editor.model.ModelOverride', 'Editor.util.TaskActions'],
+  requires: [
+      'Editor.view.ViewPort', 
+      Editor.data.app.viewport, 
+      'Editor.model.ModelOverride', 
+      'Editor.util.TaskActions',
+      'Editor.util.messageBus.MessageBus',
+      'Editor.util.messageBus.EventDomain',
+  ],
   controllers: Editor.data.app.controllers,
   appFolder : Editor.data.appFolder,
+  windowTitle: '',
   viewport: null,
     //***********************************************************************************
     //Begin Events
@@ -112,6 +120,7 @@ Ext.application({
       var me = this,
       viewSize = Ext.getBody().getViewSize();
     Ext.QuickTips.init();
+    me.windowTitle = Ext.getDoc().dom.title;
 
     me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
     if(!Ext.isIE8m) {
@@ -168,7 +177,6 @@ Ext.application({
   openEditor: function(task) {
       var me = this,
           languages = Ext.getStore('admin.Languages'),
-          taskUserTrackingsStore,
           closeEvent;
       
       if(! (task instanceof Editor.model.admin.Task)) {
@@ -178,8 +186,6 @@ Ext.application({
       Editor.data.task = task;
       Editor.model.Segment.redefine(task.segmentFields());
       
-      Editor.data.taskUserTracking = Ext.create('Editor.store.admin.TaskUserTrackings').load();
-
       Editor.data.taskLanguages = {
           source: languages.getById(task.get('sourceLang')),
           relais: languages.getById(task.get('relaisLang')),
@@ -210,6 +216,7 @@ Ext.application({
       //enable logout split button
       //disable logout normal Button
       me.fireEvent('editorViewportOpened', me, task);
+      Ext.getDoc().dom.title = me.windowTitle + ' - ' + task.getTaskName(); 
       me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
   },
   /**
@@ -262,6 +269,7 @@ Ext.application({
       
       //set the value used for displaying the help pages
       initial = me.viewport.down(me.viewport.getInitialView());
+      Ext.getDoc().dom.title = me.windowTitle;
       initial.fireEvent('show', initial);
   },
 

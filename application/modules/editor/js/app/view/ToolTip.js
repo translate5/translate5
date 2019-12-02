@@ -168,7 +168,7 @@ Ext.define('Editor.view.ToolTip', {
             return me.messages.notrackchangesplugin;
         }
         trackChanges = Editor.plugins.TrackChanges.controller.Editor;
-        taskUserTrackingsStore = Ext.getStore('admin.TaskUserTrackings');
+        taskUserTrackingsStore = Editor.data.task.userTracking();
         attrnameUserTrackingId = trackChanges.ATTRIBUTE_USERTRACKINGID;
         attrnameUsername = trackChanges.ATTRIBUTE_USERNAME;
         attrnameTimestamp = trackChanges.ATTRIBUTE_TIMESTAMP;
@@ -184,7 +184,9 @@ Ext.define('Editor.view.ToolTip', {
         // Who has done it?
         if (node.hasAttribute(attrnameUserTrackingId)) {
             userTrackingId = node.getAttribute(attrnameUserTrackingId);
-            attrUserName = taskUserTrackingsStore.getUserName(userTrackingId); // returns username under consideration of anonymization
+            // returns username under consideration of anonymization
+            attrUserName = taskUserTrackingsStore.getById(parseInt(userTrackingId));
+            attrUserName = attrUserName ? attrUserName.get('userName') : '';
         } else if (node.hasAttribute(attrnameUsername)) {
             // (fallback for tasks before anonymizing was implemented)
             attrUserName = node.getAttribute(attrnameUsername);
@@ -224,7 +226,9 @@ Ext.define('Editor.view.ToolTip', {
                 attrnameHistoryUsername = trackChanges.ATTRIBUTE_USERTRACKINGID + trackChanges.ATTRIBUTE_HISTORY_SUFFIX + historyItemTimestamp;
                 if (node.hasAttribute(attrnameHistoryUsername)) {
                     historyUserTrackingId = node.getAttribute(attrnameHistoryUsername);
-                    historyItemUser = taskUserTrackingsStore.getUserName(historyUserTrackingId); // returns username under consideration of anonymization
+                    // returns username under consideration of anonymization
+                    historyItemUser = taskUserTrackingsStore.getById(parseInt(historyUserTrackingId));
+                    historyItemUser = historyItemUser ? historyItemUser.get('userName') : '';
                 } else if (node.hasAttribute(attrnameUsername)) {
                     // (fallback for tasks before anonymizing was implemented)
                     attrnameHistoryUsername = trackChanges.ATTRIBUTE_USERNAME + trackChanges.ATTRIBUTE_HISTORY_SUFFIX + historyItemTimestamp;
