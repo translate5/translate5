@@ -3,6 +3,24 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.3.1] - 2019-12-02
+###Added
+TRANSLATE-1167: Edit task simultanously with multiple users
+  Multiple users can edit the same task at the same time. See Translate5 confluence how to activate that feature!
+TRANSLATE-1493: Filter by user, workflow-step, job-status and language combination
+  Several new filters can be used in the task overview.
+
+###Changed
+TRANSLATE-1889: rfc 5646 value for estonian is wrong
+  The RFC 5646 value for estonian was wrong
+TRANSLATE-1886: Error on refreshing GroupShare TMs when a used TM should be deleted
+  The error is fixed right now.
+TRANSLATE-1884: Special Character END OF TEXT in importable content produces errors.
+  The special character END OF TEXT is masked in the import now.
+TRANSLATE-1840: Insert opening and closing tag surround text selections with one key press
+  Insert opening and closing tag surround text selections with one key press
+
+
 ## [3.2.13] - 2019-11-12
 ###Added
 TRANSLATE-1839: Show some KPIs in translate5 task overview
