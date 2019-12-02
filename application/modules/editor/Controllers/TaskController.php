@@ -98,12 +98,28 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $log = false;
 
     public function init() {
-        $this->_filterTypeMap = [
+        
+        $this->_filterTypeMap= [
             'customerId' => [
                 //'string' => new ZfExtended_Models_Filter_JoinHard('editor_Models_Db_Customer', 'name', 'id', 'customerId')
                 'string' => new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId')
+            ],
+            'workflowState' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid')
+            ],
+            'workflowUserRole' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'role', 'taskGuid', 'taskGuid')
+            ],
+            'userName' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'userGuid', 'taskGuid', 'taskGuid')
             ]
         ];
+        
+        //TODO: how the sort will work ?
+        //$this->_sortColMap['workflowState'] = $this->_filterTypeMap['taskState']['list'];
+        //$this->_sortColMap['userRole'] = $this->_filterTypeMap['userRole']['list'];
+        //$this->_sortColMap['userName'] = $this->_filterTypeMap['userName']['list'];
+        
         //set same join for sorting!
         $this->_sortColMap['customerId'] = $this->_filterTypeMap['customerId']['string'];
         
@@ -226,7 +242,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $kpiStatistics = $kpi->getStatistics();
         
         // For Front-End:
-        $this->view->kpiStatistics = $kpiStatistics;
+        $this->view->averageProcessingTime = $kpiStatistics['averageProcessingTime'];
+        $this->view->excelExportUsage = $kpiStatistics['excelExportUsage'];
         
         // ... or as Metadata-Excel-Export (= task-overview, filter, key performance indicators KPI):
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
@@ -239,6 +256,13 @@ class editor_TaskController extends ZfExtended_RestController {
             $exportMetaData->setKpiStatistics($kpiStatistics);
             $exportMetaData->exportAsDownload();
         }
+    }
+    /***
+     * Load all task assoc users for non anonymized tasks.
+     * This is used for the user workflow filter in the advance filter store
+     */
+    public function userlistAction(){
+        $this->view->rows=$this->entity->loadUserList();
     }
     
     /**
@@ -262,7 +286,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
             $rows = $this->entity->loadListByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
         }
-        
         $taskGuids = array_map(function($item){
             return $item['taskGuid'];
         },$rows);

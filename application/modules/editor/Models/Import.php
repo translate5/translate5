@@ -254,4 +254,12 @@ class editor_Models_Import {
             $worker->queue($parentId); 
         }
     }
+    
+    /***
+     * Get the import configuration
+     * @return editor_Models_Import_Configuration
+     */
+    public function getImportConfig() {
+        return $this->importConfig;
+    }
 }

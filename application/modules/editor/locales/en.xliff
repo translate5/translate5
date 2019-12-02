@@ -3603,8 +3603,7 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
 <trans-unit id='S2V5IFBlcmZvcm1hbmNlIEluZGljYXRvcnM='><source>Key Performance Indicators</source><target>Key Performance Indicators</target></trans-unit>
 <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCBMZWt0b3I='><source>Ø Bearbeitungszeit Lektor</source><target>Ø Processing Time Reviewer</target></trans-unit>
-<trans-unit id='JTAuMGYgVGFnZQ=='><source>%0.0f Tage</source><target>%0.0f days</target></trans-unit>
-<trans-unit id='ezB9IFRhZ2U='><source>{0} Tage</source><target>{0} days</target></trans-unit>
+<trans-unit id='VGFnZQ=='><source>Tage</source><target>days</target></trans-unit>
 <trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdCB2b24gZGVyIFp1d2Vpc3VuZyBiaXMgenVtIEFic2NobHVzcyBlaW5lciBBdWZnYWJlLg=='><source>Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.</source><target>Average time from assignment of the job to finishing of the job.</target></trans-unit>
 <trans-unit id='RXhjZWwtRXhwb3J0IE51dHp1bmc='><source>Excel-Export Nutzung</source><target>Excel-Exports</target></trans-unit>
 <trans-unit id='UHJvemVudCBkZXIgQXVmZ2FiZW4sIGJlaSBkZW5lbiBkZXIgRXhjZWwtRXhwb3J0IGRlciBTZWdtZW50dGFiZWxsZSBnZW51dHp0IHd1cmRlLg=='><source>Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.</source><target>Percentage of the tasks, where the exporting of segments as Excel has been used within the process.</target></trans-unit>
@@ -3621,6 +3620,27 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc291cmNlbg=='><source>Anzahl zugewiesene Sprachresourcen</source><target>Number of assigned language resources</target></trans-unit>
 <trans-unit id='MTAwJS1UcmVmZmVyIGVkaXRpZXJiYXI='><source>100%-Treffer editierbar</source><target>100% matches editable</target></trans-unit>
 <trans-unit id='UHJvamVrdG1hbmFnZXI='><source>Projektmanager</source><target>Project manager</target></trans-unit>
+<trans-unit id='RXJ3ZWl0ZXJ0ZSBGaWx0ZXI='><source>Erweiterte Filter</source><target>Advanced filters</target></trans-unit>
+<trans-unit id='V29ya2Zsb3ctU3RhdHVz'><source>Workflow-Status</source><target>Workflow status</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItUm9sbGU='><source>Benutzer-Rolle</source><target>User role</target></trans-unit>
+<trans-unit id='V2VpdGVyZSBGaWx0ZXIgaW0gS29wZiBqZWRlciBTcGFsdGU='><source>Weitere Filter im Kopf jeder Spalte</source><target>More filters in the head of each column</target></trans-unit>
+<trans-unit id='QW53ZW5kZW4='><source>Anwenden</source><target>Apply</target></trans-unit>
+<trans-unit id='R2VzZXR6dGUgRmlsdGVy'><source>Gesetzte Filter</source><target>Active filters</target></trans-unit>
+<trans-unit id='QW5vbnltaXNpZXJ0ZSBCZW51dHplciBuaWNodCBhdXN3w6RobGJhcg=='><source>Anonymisierte Benutzer nicht auswählbar</source><target>Anonymized users not selectable</target></trans-unit>
+<trans-unit id='bGlrZQ=='><source>like</source><target>Includes</target></trans-unit>
+<trans-unit id='bm90SW5MaXN0'><source>notInList</source><target>not includes</target></trans-unit>
+<trans-unit id='aW4='><source>in</source><target>Includes</target></trans-unit>
+<trans-unit id='ZXE='><source>eq</source><target>=</target></trans-unit>
+<trans-unit id='Z3Q='><source>gt</source><target>&gt;</target></trans-unit>
+<trans-unit id='Z3RlcQ=='><source>gteq</source><target>&gt;=</target></trans-unit>
+<trans-unit id='bHQ='><source>lt</source><target>&lt;</target></trans-unit>
+<trans-unit id='bHRlcQ=='><source>lteq</source><target>&lt;=</target></trans-unit>
+<trans-unit id='PQ=='><source>=</source><target>equal</target></trans-unit>
+<trans-unit id='PT0='><source>==</source><target>identical</target></trans-unit>
+<trans-unit id='SWQ='><source>Id</source><target>Id</target></trans-unit>
+<trans-unit id='VGFzay1HdWlk'><source>Task-Guid</source><target>Task-Guid</target></trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUvciBCZW51dHplcg=='><source>Zugewiesene/r Benutzer</source><target>Assigned user/s</target></trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXItUm9sbGUvbg=='><source>Zugewiesene Benutzer-Rolle/n</source><target>Assigned user role/s</target></trans-unit>
 </body>
   </file>
 </xliff>
