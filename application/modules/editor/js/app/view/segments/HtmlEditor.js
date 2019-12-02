@@ -384,17 +384,31 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         plainContent.push(Ext.htmlEncode(text));
         return;
       }
-      // Keep nodes from TrackChanges, but run replaceTagToImage for them as well
-      if( (item.tagName.toLowerCase() == 'ins' || item.tagName.toLowerCase() == 'del')  && /(^|[\s])trackchanges([\s]|$)/.test(item.className)){
+      // INS- & DEL-nodes
+      if( (item.tagName.toLowerCase() === 'ins' || item.tagName.toLowerCase() === 'del')){
           var regExOpening = new RegExp('<\s*'+item.tagName.toLowerCase()+'.*?>'),              // Example: /<\s*ins.*?>/g
               regExClosing = new RegExp('<\s*\/\s*'+item.tagName.toLowerCase()+'\s*.*?>'),      // Example: /<\s*\/\s*ins\s*.*?>/g
               openingTag =  item.outerHTML.match(regExOpening)[0],
               closingTag =  item.outerHTML.match(regExClosing)[0];
-          me.result.push(openingTag);
-          plainContent.push(openingTag);
-          me.replaceTagToImage(item, plainContent);
-          me.result.push(closingTag);
-          plainContent.push(closingTag);
+          switch (true) {
+              case /(^|[\s])trackchanges([\s]|$)/.test(item.className):
+                  // Keep nodes from TrackChanges, but run replaceTagToImage for them as well
+                  me.result.push(openingTag);
+                  plainContent.push(openingTag);
+                  me.replaceTagToImage(item, plainContent);
+                  me.result.push(closingTag);
+                  plainContent.push(closingTag);
+                  break;
+              case /(^|[\s])tmMatchGridResultTooltip([\s]|$)/.test(item.className):
+                  // diffTagger-markups in Fuzzy Matches: keep the text from ins-Tags, remove del-Tags completely
+                  if (item.tagName.toLowerCase() === 'ins') {
+                  	me.result.push(item.textContent);
+                  }
+                  if (item.tagName.toLowerCase() === 'del') {
+                  	// -
+                  }
+                  break;
+          }
           return;
       }
       if(item.tagName == 'IMG' && !me.isDuplicateSaveTag(item)){

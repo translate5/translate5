@@ -72,8 +72,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
       lockLocked: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
       enableSourceEditing: '#UT#Quellsprache bearbeitbar',
       workflowState:'#UT#Workflow-Status',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
-      userRole:'#UT#Benutzer-Rolle',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+      workflowUserRole:'#UT#Benutzer-Rolle',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
 	  userName:'#UT#Benutzer',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+	  id:'#UT#Id',
+	  taskGuid:'#UT#Task-Guid'
   },
   strings: {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
@@ -92,7 +94,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       reloadBtn: '#UT#Aktualisieren',
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.',
       emptyTargets: '#UT#Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe)."',
-      addFilterTooltip:'#UT#Filter hinzufügen'
+      addFilterText:'#UT#Erweiterte Filter'
   },
   states: {
       user_state_open: '#UT#offen',
@@ -602,8 +604,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
 	  			  xtype:'button',
 	  			  itemId:'addAdvanceFilterBtn',
 				  iconCls : 'ico-add-filter',
-				  text:me.strings.addFilterTooltip,
-				  tooltip:me.strings.addFilterTooltip
+				  text:me.strings.addFilterText,
+				  tooltip:me.strings.addFilterText
               },{
                   xtype: 'button',
                   iconCls: 'ico-export',
@@ -729,58 +731,47 @@ Ext.define('Editor.view.admin.TaskGrid', {
 	  }
 	  // for each filter object in the array
 	  Ext.each(filters, function(filter) {
-        var gridFilter = me.getFilter(filter.property),
-        	value=null;
+        var value=filter.get('value'),
+        	operator=filter.get('operator'),
+        	property=filter.get('property'),
+        	gridFilter = me.getFilter(property);
+        
         if(!gridFilter){
         	//the filter does not exist as column in the grid, filter the store with the filter params
         	//INFO: this can be the case when the grid is filtered with one of the advanced filters
-        	me.getStore().addFilter(filter);
+        	me.getStore().addFilter({
+        		"operator":operator,
+        		"value":value,
+        		"property":property
+        	});
         	return true;
         }
         gridFilter.setActive(true);
         switch(gridFilter.type) {
             case 'date':
-                var dateValue = Ext.Date.parse(filter.value, 'm/d/Y');
-                switch (filter.operator) {
-                    case 'gt' :
-                        value = {after: dateValue};
-                        break;
-                    case 'lt' :
-                        value = {before: dateValue};
-                        break;
-                    case 'eq' :
-                        value = {on: dateValue};
-                        break;
-                }
-                gridFilter.setValue(value);
-                gridFilter.setActive(true);
-                break;
-
             case 'numeric':
-                switch (filter.operator) {
+                switch (operator) {
                     case 'gt' :
-                        value = {gt: filter.value};
+                        value = {gt: value};
                         break;
                     case 'lt' :
-                        value = {lt: filter.value};
+                        value = {lt: value};
                         break;
                     case 'eq' :
-                        value = {eq: filter.value};
+                        value = {eq: value};
                         break;
                 }
                 gridFilter.setValue(value);
                 gridFilter.setActive(true);
                 break;
             default :
-                gridFilter.setValue(filter.value);
+                gridFilter.setValue(value);
                 break;
         }
 	  });
-	  
 	  if(suspendFilterchange){
 		  me.resumeEvents('filterchange');
 	  }
-	  
 	},
 	
 	/***

@@ -35,7 +35,16 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   extend : 'Ext.app.Controller',
   requires: ['Editor.view.admin.ExportMenu'],
   models: ['admin.Task', 'admin.task.Log'],
-  stores: ['admin.Users', 'admin.Tasks','admin.Languages', 'admin.task.Logs', 'admin.TaskUserTrackings'],
+  stores: [
+	  'admin.Users',
+	  'admin.UsersList',
+	  'admin.Tasks',
+	  'admin.Languages', 
+	  'admin.task.Logs', 
+	  'admin.TaskUserTrackings',
+	  'admin.WorkflowUserRoles',
+	  'admin.WorkflowState'
+  ],
   views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow'],
   refs : [{
       ref: 'headToolBar',
@@ -87,6 +96,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Anonymizing workflow-users will need the taskUserTracking-data
    */
   taskUserTrackingsStore: null,
+  
+  /***
+   * Advanced filter window component
+   */
+  advancedFilterWindow:null,
   
   /**
    * Container for translated task handler confirmation strings
@@ -401,7 +415,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   
   onAdminTaskGridFilterChange:function(store,filters,eOpts){
 	  var me=this;
-	  me.getAdvancedFilterToolbar().loadFilters(filters);
+	  //get the store active filters object as parameter
+	  me.getAdvancedFilterToolbar().loadFilters(store.getFilters(false));
   },
   
   /**
@@ -638,11 +653,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   onAddAdvanceFilterBtnClick:function(){
 	  var me=this,
-	  	  filterWindow=Ext.widget('editorAdminTaskFilterFilterWindow'),
 	  	  filterHolder=me.getFilterHolder(),
 	  	  record=filterHolder.selection ? filterHolder.selection : [];
-	  filterWindow.loadRecord(record);
-	  filterWindow.show();
+	  //reload the usersList store so the new task filter is applied
+	  Ext.StoreMgr.get('admin.UsersList').load()
+	  me.advancedFilterWindow=Ext.widget('editorAdminTaskFilterFilterWindow');
+	  me.advancedFilterWindow.loadRecord(record);
+	  me.advancedFilterWindow.show();
   },
   
   /***
@@ -655,14 +672,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  	  taskStore=taskGrid.getStore(),
 	  	  filtersarray=toolbar.getController().filterActiveFilters(filter),
 	  	  addFilter=filtersarray && filtersarray.length>0;
-	
-	  		
+
 	 //clear the taskGrid store from the filters
   	 taskStore.clearFilter(addFilter);
   	 //add the custom filtering where the filterchange event will be suspended
 	 taskGrid.activateGridColumnFilter(filtersarray,true);
 	 //load the filters into the filter holder tagfield
-	 toolbar.loadFilters(filtersarray);
+	 toolbar.loadFilters(taskStore.getFilters(false));
   },
   
   /**
@@ -1090,12 +1106,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Close advanced filter window
    */
   closeAdvancedFilterWindow:function(){
-	  var filterWindow=Ext.ComponentQuery.query('editorAdminTaskFilterFilterWindow');
-	  if(filterWindow.length<1){
-		  return;
-	  }
-	  Ext.ComponentQuery.query('editorAdminTaskFilterFilterWindow').forEach(function(win){
-		  win.destroy();
-	  });
+	  this.advancedFilterWindow && this.advancedFilterWindow.hide();
   }
 });

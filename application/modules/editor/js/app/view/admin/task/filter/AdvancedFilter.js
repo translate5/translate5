@@ -37,12 +37,22 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     requires: [
     	'Editor.view.admin.task.filter.AdvancedFilterViewController',
     	'Editor.view.admin.task.filter.AdvancedFilterViewModel',
-    	'Editor.view.admin.task.filter.FilterWindow'
+    	'Editor.view.admin.task.filter.FilterWindow',
+    	'Editor.model.admin.task.filter.ActiveFilter'
     ],
     dock: 'top',
     strings:{
     	filterHolderLabel:'#UT#Gesetzte Filter'
     },
+    bind:{
+    	visible:'{isActiveFilter}'
+    },
+    /***
+     * Filter field source mapping array. The key value array represents the filter index to filter field data source (store,array)
+     * Define the key value source in the initConfig method.
+     * To use the field/source mapping in the filter field renderer see the getFieldSourceValue function
+     */
+    filterFieldSourceMap:[],
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
@@ -53,20 +63,45 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
                     dataIndex:'filterHolder',
                     valueField: 'property',
                     displayField: 'textLabel',
+                    tipTpl:'<tpl for="tooltip">{textLabel}: {operatorTranslated} <b>{dataSourceValue}</b><br/></tpl>',
+                    maxWidth:700,
                     hideTrigger: true,
                     fieldLabel: me.strings.filterHolderLabel,
+                    queryMode: 'local',
+                    expand:function(){
+                    	return false;
+                    },
                     listeners:{
                     	beforedeselect:'onFilterHolderBeforeDeselect',
+                    	select:'onFilterHolderSelect'
             		},
                     bind:{
-                    	store:'{activeFilter}'
+                    	store:'{activeFilter}',
+                    	selection:'{selectedFilters}'
                     }
         		}]
             };
+        
+        //the filter dataIndex to source type mapping
+        //the source type mapping is used in getFieldSourceValue function for custom field value render
+        me.filterFieldSourceMap['sourceLang']='language';
+        me.filterFieldSourceMap['targetLang']='language';
+        me.filterFieldSourceMap['relaisLangLang']='language';
+        me.filterFieldSourceMap['userName']='user';
+        me.filterFieldSourceMap['workflowState']='workflowState';
+        me.filterFieldSourceMap['workflowUserRole']='workflowUserRole';
+        
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+    
+    /***
+     * return the reference of the filter grid used for the filter
+     */
+    getFilterGrid:function(){
+    	return this.up('grid');
     },
     
     /***
@@ -75,42 +110,128 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     loadFilters:function(filters){
     	var me=this,
     		filterHolder=me.down('#filterHolder'),
+    		filterHolderStore=filterHolder.getStore(),
     		filtersarray=[],
     		records=[];
+
+    	//workaround for: Cannot modify ext-empty-store
+    	//on task leave the filter change is triggered and then the loadFilters call
+    	if(filterHolderStore.isEmptyStore){
+    		filterHolder.setStore(me.getViewModel().getStore('activeFilter'));
+    		filterHolderStore=filterHolder.getStore();
+    	}
     	
-		for(var i=0;i<filters.length;i++){
-			Ext.Array.push(filtersarray,me.getFilterRenderObject(filters[i]));
-		}
+		//convert all active filtes to simple array object collection
+		filters.each(function(item) {
+			filtersarray.push(me.getFilterModelObject(item));
+		});
+    	
     	//add the records to the field store
     	if(filtersarray.length>0){
-    		records=filterHolder.getStore().add(filtersarray);
+    		filtersarray=me.groupActiveFiltersTooltip(filtersarray);
+    		records=filterHolderStore.add(filtersarray);
     	}
+    	
     	//disable before select event, when the value is cleared
     	filterHolder.suspendEvents('beforedeselect');
     	filterHolder.clearValue();
     	filterHolder.resumeEvents('beforedeselect');
     	
-    	//set the new sellection
-    	filterHolder.setSelection(records);
+    	//update the selected filters sellection
+    	me.getViewModel().set('selectedFilters',records);
+    	//update the active filter count view model
+    	me.getViewModel().set('activeFiltersCount',filtersarray.length>0);
     },
+    
     /***
-     * Get the filter render object for the filterHolder tagfield
+     * Get active filter model instance from given grid filter object 
      */
-    getFilterRenderObject:function(item){
-    	var textLabel=item.textLabel,
-    		itemProperty=item.property ||item.getProperty(),
-    		taskGrid=Ext.ComponentQuery.query('#adminTaskGrid')[0],
-    		isGridFilter=item instanceof Ext.util.Filter;
-
-    	//if it is a default(grid column) filter, try to find the label from the grid
-    	if(!textLabel){
-    		textLabel=taskGrid.text_cols[itemProperty] ? taskGrid.text_cols[itemProperty] : itemProperty;
+    getFilterModelObject:function(item){
+    	var operator=item.operator || item.getOperator(),
+    		property=item.property || item.getProperty(),
+    		value=item.value || item.getValue();
+		return Ext.create('Editor.model.admin.task.filter.ActiveFilter',{
+			'operator': operator,
+			'property': property,
+			'value' : value,
+			'dataSourceValue':this.getFieldSourceValue(property,value)
+		});
+    },
+    
+    /***
+     * Group the tooltip for the active filters. This will group the filters with multiple field options to only one field
+     * with tooltip which shows all active values.
+     */
+    groupActiveFiltersTooltip:function(filtersarray){
+    	var me=this,
+    		singleFilter=null,
+    		filterIndex=-1,
+    		returnArray=[];
+    	
+    	for(var i=0;i<filtersarray.length;i++){
+    		singleFilter=filtersarray[i];
+    		filterIndex=me.isFilterInArray(returnArray,singleFilter);
+    		if(!singleFilter.get('tooltip') && filterIndex<0){
+    			singleFilter.set('tooltip',[]);
+    			singleFilter.get('tooltip').push(singleFilter.getDataCustom());
+    			returnArray.push(singleFilter);
+    			continue;
+    		}
+    		if(filterIndex<0){
+    			continue;
+    		}
+    		returnArray[filterIndex].get('tooltip').push(singleFilter.getDataCustom());
     	}
-    	return {
-			'operator': !isGridFilter ? item.operator : item.getOperator(),
-			'property': itemProperty,
-			'value' : !isGridFilter ? item.value : item.getValue(),
-			'textLabel':textLabel
-		};
-    }
+    	return returnArray;
+    },
+    
+    /***
+     * Check if the filter exist in the given array.
+     * This will return the found array index or -1 if the field does not exist
+     */
+    isFilterInArray:function(filtersarray,filter){
+    	for(var i=0;i<filtersarray.length;i++){
+    		if(filtersarray[i].get('property')==filter.get('property')){
+    			return i;
+    		}
+    	}
+    	return -1;
+    },
+    
+    /***
+     * Get the filter render value by given field and value.
+     */
+    getFieldSourceValue:function(field,value){
+        var me=this,
+        	source=me.filterFieldSourceMap[field],
+        	findValues=function(storeKey,field,label){
+		  		  var store=Ext.StoreMgr.get(storeKey),
+		  		  	  values=[],
+		  		  	  record=null;
+		  		  for(var i=0;i<value.length;i++){
+		  			  record=store.findRecord(field,value[i],0,false,true,true);
+		  			  if(record){
+		  				  values.push(record.get(label));
+		  			  }
+		  		  }
+		  	    return values.join(',');
+        	};
+    	switch(source) {
+    	  case 'language':
+    		  //it is langauge field, use the languages store to find the record by language id
+    	    return findValues('admin.Languages','id','label')
+    	  case 'user':
+    		  //it is user column, use the users store to find the username
+    		  return findValues('admin.UsersList','userGuid','longUserName');
+    	  case 'workflowState':
+    		  //it is WorkflowState filter
+    		  return findValues('admin.WorkflowState','id','label');
+    	  case 'workflowUserRole':
+    		  //it is WorkflowUserRoles filter
+    		  return findValues('admin.WorkflowUserRoles','id','label');
+    	  default:
+    	    return value;
+    	}
+    },
+    
 });
