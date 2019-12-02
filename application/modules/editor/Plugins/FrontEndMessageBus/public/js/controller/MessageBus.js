@@ -49,7 +49,10 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         noConnectionSeg: '#UT#Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.',
         inUseTitle: '#UT#Segment bereits in Bearbeitung',
         inUse: '#UT#Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.',
+        inUseMsg: '#UT#Das ausgewählte Segment wird einen anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.',
         currentUser: '#UT#Aktueller Bearbeiter',
+        editors: '#UT#Bearbeiter: ',
+        myself: '#UT#Ich',
         selectedBy: '#UT#Ausgewählt von'
     },
     listen: {
@@ -198,11 +201,19 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         
     },
     enterSegment: function(plugin, context) {
-        var me = this;
+        var me = this,
+            rec = context[0],
+            meta = me.segmentUsageData.get(rec.get('id'));
         if(!me.bus.isReady()) {
             Ext.Msg.alert(msg.noConnection, msg.noConnectionSeg); 
             return;
         }
+        
+        if(!rec.get('editable') && meta && meta.editingConn && meta.editingUser) {
+            Editor.MessageBox.addInfo(me.strings.inUseMsg);
+            return false;
+        }
+        
         me.bus.send('task', 'segmentEditRequest', [context[0].get('taskGuid'), context[0].get('id')]);
         me.editorPlugin = plugin;
     },
@@ -431,8 +442,8 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     onSegmentGridRender: function(grid) {
         var me = this,
             view = grid.getView(),
-            tbar = grid.down('segmentsToolbar'),
-            idx = tbar.items.indexOf(tbar.down('tbfill'));
+            tracking = Editor.data.task.userTracking(),
+            trackedUser;
         //was previously invoked in #Editor.$application': editorViewportOpened, 
         // but then the open was triggerd when the grid was not ready yet, therefore resulting segment locks from the server were producing errors in the GUI
         me.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
@@ -441,25 +452,39 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             return;
         }
 
-        tbar.insert(idx, [{
-            xtype: 'tbseparator'
-        },{
+        //positioning fix after title
+        grid.header.insert(1, [{
             xtype: 'dataview',
-            cls: 'multi-user-list',
+            cls: 'multi-user-list x-btn-inner-default-small',
             itemSelector: '.user',
-            tpl: [
-                'other editing users: ', //FIXME translation
+            tpl:[
+                '<tpl if="values.length">',
+                me.strings.editors,
+                '</tpl>',                
                 '<tpl for=".">',
-                '<tpl if="isOnline">',
-                '<span class="user usernr-{taskOpenerNumber}"><span class="icon"></span>{userName}</span>',
+                '<tpl if="userGuid == Editor.data.app.user.userGuid">',
+                '<span class="user usernr-{taskOpenerNumber}"><span class="icon"></span>'+me.strings.myself+'</span>',
                 '<tpl else>',
-                '<span class="user empty"></span>', //foreach record a span.user must exist, otherwise the renderer will do strange things
+                '<span class="user usernr-{taskOpenerNumber}"><span class="icon"></span>{userName}</span>',
                 '</tpl>',
                 '</tpl>'
             ],
-            store: Editor.data.task.userTracking()                 
+            store: new Ext.data.ChainedStore({
+                source: Editor.data.task.userTracking(),
+                filters: [{
+                    property: 'isOnline',
+                    value: true
+                }]
+            })                 
+        },{
+            xtype: 'tbseparator'
         }]);
 
+        trackedUser = tracking.getAt(tracking.findExact('userGuid', Editor.data.app.user.userGuid));
+        if(trackedUser) {
+            view.selectedItemCls += ' usernr-'+trackedUser.get('taskOpenerNumber');
+        }
+        
         me.tooltip = Ext.create('Ext.tip.ToolTip', {
             cls: 'multi-user-tip',
             // The overall target element.
