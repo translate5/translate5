@@ -57,7 +57,7 @@ Ext.define('Editor.view.segments.column.AutoState', {
   initComponent: function() {
     var me = this,
         autoStates = Ext.Array.filter(Editor.data.segments.autoStateFlags, function(item) {
-                return item.id != 999;
+                return item.id != 999 && item.id != 998;
             });
     me.scope = me; //so that renderer can access this object instead the whole grid.
     Ext.each(Editor.data.segments.autoStateFlags, function(item){

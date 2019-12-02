@@ -189,11 +189,19 @@ Ext.define('Editor.controller.Segments', {
           task = Editor.data.task,
           isEditor = Editor.app.authenticatedUser.isAllowed('editorEditTask', task),
           readOnly = task.isReadOnly() || !isEditor,
-          title = readOnly ? grid.title_readonly : grid.title,
+          title = Ext.String.ellipsis(task.get('taskName'), 60),
           store = grid.store,
           proxy = store.getProxy(),
           initialGridFilters = Editor.data.initialGridFilters;
       
+      grid.getHeader().getTitle().getEl().set({
+          'data-qtip': task.getTaskName()
+      });
+      
+      if(readOnly) {
+          title = title + grid.title_readonly;
+      }
+
       if(task.isUnconfirmed()) {
           title = title + grid.title_addition_unconfirmed;
       }
