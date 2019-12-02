@@ -84,6 +84,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       notFound: '#UT#nicht gefunden',
       locked: '#UT#in Arbeit',
       lockedBy: '#UT#Bearbeitet und Gesperrt durch {0}',
+      lockedMultiUser: '#UT#Bearbeitet und Gesperrt durch mehrere Benutzer',
       lockedSystem: '#UT#Durch das System gesperrt mit dem Status \'{0}\'',
       addTask: '#UT#Aufgabe hinzufügen',
       addTaskTip: '#UT#Eine neue Aufgabe hinzufügen.',
@@ -330,6 +331,11 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   if(rec.isUnconfirmed()) {
                       addQtip(meta, me.states.task_state_unconfirmed);
                       return me.states.task_state_unconfirmed;
+                  }
+                  //locked and editable means multi user editing
+                  if(rec.isLocked() && rec.isEditable()) {
+                      addQtip(meta, Ext.String.format(me.strings.lockedMultiUser));
+                      return me.strings.locked;
                   }
                   if(rec.isLocked()) {
                       addQtip(meta, Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername')));

@@ -41,7 +41,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  'admin.Tasks',
 	  'admin.Languages', 
 	  'admin.task.Logs', 
-	  'admin.TaskUserTrackings',
 	  'admin.WorkflowUserRoles',
 	  'admin.WorkflowState'
   ],
@@ -292,8 +291,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   loadTasks: function() {
       this.getAdminTasksStore().load();
-      this.taskUserTrackingsStore = Ext.create('Editor.store.admin.TaskUserTrackings');
-      this.taskUserTrackingsStore.load();
   },
   startCheckImportStates: function(store) {
       if(!this.checkImportStateTask) {
@@ -408,7 +405,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           }
           return;
       }
-      if(!rec.isLocked() && (isTaskNr || dbl)) {
+      if(rec.isOpenable() && (isTaskNr || dbl)) {
           this.openTaskRequest(rec);
       }
   },
@@ -645,7 +642,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleTaskReload: function () {
       this.getAdminTasksStore().load();
-      this.taskUserTrackingsStore.load();
   },
   
   /***
