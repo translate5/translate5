@@ -420,7 +420,6 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                     rowClass.push('usernr-'+trackedUser.get('taskOpenerNumber'));
                     return false; 
                 }
-                //TODO currently we can only visualize the color of one user, 
             });
         }
     },

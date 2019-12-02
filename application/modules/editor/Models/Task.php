@@ -535,14 +535,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         //clean up remaining multi user task locks where no user is editing anymore 
         $multiUserId = self::INTERNAL_LOCK.self::USAGE_MODE_SIMULTANEOUS;
         $usedMultiUserLocks = 'SELECT t.id
-        FROM LEK_task t
+        FROM (SELECT id, taskGuid FROM LEK_task t WHERE t.lockedInternalSessionUniqId = "'.$multiUserId.'") t
         JOIN LEK_taskUserAssoc tua on tua.taskGuid = t.taskGuid
-        WHERE t.lockedInternalSessionUniqId = "'.$multiUserId.'"
-        AND not tua.usedState is null AND not tua.usedInternalSessionUniqId is null';
+        WHERE not tua.usedState is null AND not tua.usedInternalSessionUniqId is null';
         $where = 'not locked is null and lockedInternalSessionUniqId = "'.$multiUserId.'" and id not in ('.$usedMultiUserLocks.')';
         
         $this->db->update(array('lockingUser' => null, 'locked' => null, 'lockedInternalSessionUniqId' => null), $where);
-        
     }
     
     /**

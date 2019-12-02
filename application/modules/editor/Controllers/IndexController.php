@@ -504,7 +504,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     
     public function applicationstateAction() {
         $this->_helper->layout->disableLayout();
-        $this->view->applicationstate = ZfExtended_Debug::applicationState();
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        
+        $userSession = new Zend_Session_Namespace('user');
+        //since application state contains sensibile information we show that only to API users
+        if($acl->isInAllowedRoles($userSession->data->roles, 'backend', 'applicationstate')) {
+            $this->view->applicationstate = ZfExtended_Debug::applicationState();
+        }
     }
     
     public function generatesmalltagsAction() {
