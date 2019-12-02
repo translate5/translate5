@@ -943,6 +943,30 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $segment->save();
         }
     }
+
+    public function getSegmentsCount(string $taskGuid){
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from('LEK_segments',['COUNT(*) as total'])
+        ->where('`taskGuid`=?', $taskGuid);
+        $result= $this->db->getAdapter()->fetchRow($s);
+        return !empty($result) ? $result['total'] : -1;
+    }
+    //TODO: option 1, function to update the progress
+    //TODO: option 2, db drigger (on lek segments autostateId update) and mysql function
+    public function updateCurrentWorkflowStepProgress(array $taskGuids){
+        $segment=ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */ 
+        foreach ($taskGuids as $task) {
+            $segmentCount=$this->getSegmentsCount($task);
+            //TODO: can i use this function ?
+            //TODO: how do i map the workflow status to segment autostatus ?
+            //TODO: inside the function reinitDb is called, additional flag to disable it ?
+            $autostateCount=$segment->getAutoStateCount($task);
+            error_log('task:'.$task.' count:'.$segmentCount);
+            error_log(print_r($autostateCount,1));
+        }
+    }
     
     /**
      * Returns the matching of col-names as set in Editor.view.admin.TaskGrid.

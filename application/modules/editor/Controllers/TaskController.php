@@ -308,6 +308,8 @@ class editor_TaskController extends ZfExtended_RestController {
             $userData=$this->getUsersForRendering($rows);
         }
         
+        $this->entity->updateCurrentWorkflowStepProgress($taskGuids);
+        
         foreach ($rows as &$row) {
             $row['lastErrors'] = $this->getLastErrorMessage($row['taskGuid'], $row['state']);
             $this->initWorkflow($row['workflow']);
