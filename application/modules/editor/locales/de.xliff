@@ -1668,7 +1668,6 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</target></trans-unit>
 <trans-unit id='RXJsYXVidGUgUm9sbGVu'><source>Erlaubte Rollen</source><target>Erlaubte Rollen</target></trans-unit>
-<trans-unit id='QmVhcmJlaXRldCB1bmQgR2VzcGVycnQgZHVyY2ggbWVocmVyZSBCZW51dHplcg=='><source>Bearbeitet und Gesperrt durch mehrere Benutzer</source><target>Bearbeitet und Gesperrt durch mehrere Benutzer</target></trans-unit>
 <trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGFid2VjaHNlbG5kIGRpZXNlbGJlIEF1ZmdhYmU='><source>Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe</source><target>Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe</target></trans-unit>
 <trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGdsZWljaHplaXRpZyBkaWVzZWxiZSBBdWZnYWJl'><source>Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe</source><target>Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe</target></trans-unit>
 <trans-unit id='SW4gQmVhcmJlaXR1bmc='><source>In Bearbeitung</source><target>In Bearbeitung</target></trans-unit>
@@ -1701,6 +1700,8 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='VGFzay1HdWlk'><source>Task-Guid</source><target>Task-Guid</target></trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUvciBCZW51dHplcg=='><source>Zugewiesene/r Benutzer</source><target>Zugewiesene/r Benutzer</target></trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXItUm9sbGUvbg=='><source>Zugewiesene Benutzer-Rolle/n</source><target>Zugewiesene Benutzer-Rolle/n</target></trans-unit>
+<trans-unit id='dW5iZXN0w6R0aWd0'><source>unbestätigt</source><target>unbestätigt</target></trans-unit>
+<trans-unit id='SW4gQmVhcmJlaXR1bmcgZHVyY2g6'><source>In Bearbeitung durch:</source><target>In Bearbeitung durch:</target></trans-unit>
   </body>
  </file>
 </xliff>

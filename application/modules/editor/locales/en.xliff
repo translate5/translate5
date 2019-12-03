@@ -3578,10 +3578,6 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Erlaubte Rollen</source>
     <target>Allowed roles</target>
 </trans-unit>
-<trans-unit id='QmVhcmJlaXRldCB1bmQgR2VzcGVycnQgZHVyY2ggbWVocmVyZSBCZW51dHplcg=='>
-    <source>Bearbeitet und Gesperrt durch mehrere Benutzer</source>
-    <target>Edited and locked by multiple users</target>
-</trans-unit>
 <trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGFid2VjaHNlbG5kIGRpZXNlbGJlIEF1ZmdhYmU='>
     <source>Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe</source>
     <target>Multiple users editing alternating the same task</target>
@@ -3641,6 +3637,14 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='VGFzay1HdWlk'><source>Task-Guid</source><target>Task-Guid</target></trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUvciBCZW51dHplcg=='><source>Zugewiesene/r Benutzer</source><target>Assigned user/s</target></trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXItUm9sbGUvbg=='><source>Zugewiesene Benutzer-Rolle/n</source><target>Assigned user role/s</target></trans-unit>
+<trans-unit id='dW5iZXN0w6R0aWd0'>
+    <source>unbestätigt</source>
+    <target>unconfirmed</target>
+</trans-unit>
+<trans-unit id='SW4gQmVhcmJlaXR1bmcgZHVyY2g6'>
+    <source>In Bearbeitung durch:</source>
+    <target>In progress by:</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
