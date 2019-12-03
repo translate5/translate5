@@ -26,36 +26,22 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class Editor.model.admin.TaskUserTracking
- * @extends Ext.data.Model
- */
-Ext.define('Editor.model.admin.TaskUserTracking', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'int'},
-    {name: 'taskGuid', type: 'string'},
-    {name: 'userGuid', type: 'string'},
-    {name: 'taskOpenerNumber', type: 'integer'},
-    {name: 'firstName', type: 'string'},
-    {name: 'taskName', type: 'string'},
-    {name: 'surName', type: 'string'},
-    {name: 'userName', type: 'string'},
-    {name: 'role', type: 'string'},
-    {name: 'isOnline', type: 'boolean', persist: false},
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',
-    url: Editor.data.restpath+'taskusertracking',
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
-    },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
-    }
-  }
+Ext.define('Editor.store.admin.WorkflowUserRoles', {
+	extend : 'Ext.data.Store',
+	initConfig: function(instanceConfig) {
+		var me = this,
+			config={},
+			workflowUserRoles=[];
+		//Info:duplicated id values will be ignored by te store
+		Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
+			Ext.Object.each(workflow.roles, function(key, value){
+				workflowUserRoles.push({id:key,label:value});
+			});
+		});
+		config.data=workflowUserRoles;
+		if (instanceConfig) {
+			me.self.getConfigurator().merge(me, config, instanceConfig);
+		}
+	    return me.callParent([config]);
+	},
 });

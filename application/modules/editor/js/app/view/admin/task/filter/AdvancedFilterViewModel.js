@@ -26,36 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class Editor.model.admin.TaskUserTracking
- * @extends Ext.data.Model
- */
-Ext.define('Editor.model.admin.TaskUserTracking', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'int'},
-    {name: 'taskGuid', type: 'string'},
-    {name: 'userGuid', type: 'string'},
-    {name: 'taskOpenerNumber', type: 'integer'},
-    {name: 'firstName', type: 'string'},
-    {name: 'taskName', type: 'string'},
-    {name: 'surName', type: 'string'},
-    {name: 'userName', type: 'string'},
-    {name: 'role', type: 'string'},
-    {name: 'isOnline', type: 'boolean', persist: false},
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',
-    url: Editor.data.restpath+'taskusertracking',
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
+Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.editorAdminTaskFilterAdvancedFilter',
+    data:{
+    	activeFiltersCount:0,
+    	selectedFilters:[]
     },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+    stores: {
+        activeFilter: {
+        	model:'Editor.model.admin.task.filter.ActiveFilter'
+        }
+    },
+    formulas: {
+        isActiveFilter: function(get){
+	        return get('activeFiltersCount')>0;
+        }
     }
-  }
 });

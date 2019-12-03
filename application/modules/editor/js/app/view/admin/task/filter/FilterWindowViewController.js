@@ -21,41 +21,32 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class Editor.model.admin.TaskUserTracking
- * @extends Ext.data.Model
- */
-Ext.define('Editor.model.admin.TaskUserTracking', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'int'},
-    {name: 'taskGuid', type: 'string'},
-    {name: 'userGuid', type: 'string'},
-    {name: 'taskOpenerNumber', type: 'integer'},
-    {name: 'firstName', type: 'string'},
-    {name: 'taskName', type: 'string'},
-    {name: 'surName', type: 'string'},
-    {name: 'userName', type: 'string'},
-    {name: 'role', type: 'string'},
-    {name: 'isOnline', type: 'boolean', persist: false},
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',
-    url: Editor.data.restpath+'taskusertracking',
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
+Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.editorAdminTaskFilterFilterWindow',
+    
+    
+    onApplyBtnClick:function(){
+    	var me=this,
+    		fields=me.getView().query('[filter]'),
+    		filter=[];
+    	//create a simple filter array object from the fields
+    	Ext.Array.each(fields, function(field) {
+			filter.push(Ext.Object.merge(field.filter,{
+				value:field.getValue()
+				//'label':field.filter.property+' '+field.filter.operator+' '+field.getValue()
+			}))
+    	});
+    	
+    	me.getView().fireEvent('advancedFilterChange',filter)
     },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+    
+    onCancelBtnClick:function(){
+    	this.getView().destroy();
     }
-  }
 });

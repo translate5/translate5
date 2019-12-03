@@ -25,37 +25,31 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-/**
- * @class Editor.model.admin.TaskUserTracking
- * @extends Ext.data.Model
- */
-Ext.define('Editor.model.admin.TaskUserTracking', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'int'},
-    {name: 'taskGuid', type: 'string'},
-    {name: 'userGuid', type: 'string'},
-    {name: 'taskOpenerNumber', type: 'integer'},
-    {name: 'firstName', type: 'string'},
-    {name: 'taskName', type: 'string'},
-    {name: 'surName', type: 'string'},
-    {name: 'userName', type: 'string'},
-    {name: 'role', type: 'string'},
-    {name: 'isOnline', type: 'boolean', persist: false},
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',
-    url: Editor.data.restpath+'taskusertracking',
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
+Ext.define('Editor.store.admin.UsersList', {
+	extend : 'Ext.data.Store',
+  	model: 'Editor.model.admin.User',
+    autoLoad: true,
+    pageSize: 0,
+    idProperty: 'id',
+    listeners: {
+    	/***
+  	   * Add the task filter to the userlist store
+  	   */
+        beforeload:function(store,operation,eOpts){
+	      var taskStore=Ext.StoreManager.get('admin.Tasks'),
+		        proxy=store.getProxy(),
+		        merged = Ext.merge({}, proxy.getExtraParams(), {
+		            filter:proxy.encodeFilters(taskStore.getFilters().items)
+		        });
+		    proxy.setExtraParams(merged);
+	    }
     },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+    proxy : {
+      type : 'rest', 
+      url: Editor.data.restpath+'task/userlist',
+      reader : {
+        rootProperty: 'rows',
+        type : 'json'
+      }
     }
-  }
 });

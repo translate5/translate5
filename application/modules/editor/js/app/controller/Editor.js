@@ -206,6 +206,7 @@ Ext.define('Editor.controller.Editor', {
             'REVIEWED_PM_UNCHANGED': 12,
             'REVIEWED_PM_UNCHANGED_AUTO': 13,
             'TRANSLATED_AUTO': 14,
+            'EDITING_BY_USER': 998,
             'PENDING': 999
         };
     },
@@ -559,6 +560,7 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
         this.taskConfirmation = Ext.widget('taskConfirmationWindow').show();
+        me.getSegmentGrid().setTitle(task.getTaskName());
     },
     /**
      * Cleanup stuff in the editor view port

@@ -35,7 +35,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   extend : 'Ext.app.Controller',
   requires: ['Editor.view.admin.ExportMenu'],
   models: ['admin.Task', 'admin.task.Log'],
-  stores: ['admin.Users', 'admin.Tasks','admin.Languages', 'admin.task.Logs', 'admin.TaskUserTrackings'],
+  stores: [
+	  'admin.Users',
+	  'admin.UsersList',
+	  'admin.Tasks',
+	  'admin.Languages', 
+	  'admin.task.Logs', 
+	  'admin.WorkflowUserRoles',
+	  'admin.WorkflowState'
+  ],
   views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow'],
   refs : [{
       ref: 'headToolBar',
@@ -67,6 +75,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },{
       ref: 'excelExportUsageDisplay',
       selector: '#kpiWindow #kpi-excel-export-usage-display'
+  },{
+      ref: 'advancedFilterToolbar',
+      selector: '#advancedFilterToolbar'
+  },{
+      ref: 'filterHolder',
+      selector: '#filterHolder'
   }],
   alias: 'controller.taskOverviewController',
   
@@ -81,6 +95,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Anonymizing workflow-users will need the taskUserTracking-data
    */
   taskUserTrackingsStore: null,
+  
+  /***
+   * Advanced filter window component
+   */
+  advancedFilterWindow:null,
   
   /**
    * Container for translated task handler confirmation strings
@@ -134,7 +153,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               hide: 'handleAfterHide',
               show: 'handleAfterShow',
               celldblclick: 'handleGridClick', 
-              cellclick: 'handleGridClick'
+              cellclick: 'handleGridClick',
+              filterchange:'onAdminTaskGridFilterChange'
           },
           '#adminTaskGrid #reload-task-btn': {
               click: 'handleTaskReload'
@@ -173,6 +193,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           'adminTaskAddWindow panel:not([hidden])': {
               wizardCardFinished: 'onWizardCardFinished',
               wizardCardSkiped: 'onWizardCardSkiped'
+          },
+          '#addAdvanceFilterBtn':{
+        	  click:'onAddAdvanceFilterBtnClick'
+          },
+          'editorAdminTaskFilterFilterWindow':{
+        	  advancedFilterChange:'onAdvancedFilterChange'
           }
       }
   },
@@ -231,6 +257,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleAfterHide: function() {
       this.getHeadToolBar().down('#task-admin-btn').show();
+      this.closeAdvancedFilterWindow();
   },
   /**
    * opens the task grid, hides all other
@@ -257,14 +284,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   handleInitEditor: function() {
       this.getHeadToolBar() && this.getHeadToolBar().down('#task-admin-btn').hide();
+      this.closeAdvancedFilterWindow();
   },
   clearTasks: function() {
       this.getAdminTasksStore().removeAll();
   },
   loadTasks: function() {
       this.getAdminTasksStore().load();
-      this.taskUserTrackingsStore = Ext.create('Editor.store.admin.TaskUserTrackings');
-      this.taskUserTrackingsStore.load();
   },
   startCheckImportStates: function(store) {
       if(!this.checkImportStateTask) {
@@ -379,10 +405,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           }
           return;
       }
-      if(!rec.isLocked() && (isTaskNr || dbl)) {
+      if(rec.isOpenable() && (isTaskNr || dbl)) {
           this.openTaskRequest(rec);
       }
   },
+  
+  onAdminTaskGridFilterChange:function(store,filters,eOpts){
+	  var me=this;
+	  //get the store active filters object as parameter
+	  me.getAdvancedFilterToolbar().loadFilters(store.getFilters(false));
+  },
+  
   /**
    * general method to open a task, starting in readonly mode is calculated
    * @param {Editor.model.admin.Task} task
@@ -609,8 +642,41 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleTaskReload: function () {
       this.getAdminTasksStore().load();
-      this.taskUserTrackingsStore.load();
   },
+  
+  /***
+   * Add advance filter button handler
+   */
+  onAddAdvanceFilterBtnClick:function(){
+	  var me=this,
+	  	  filterHolder=me.getFilterHolder(),
+	  	  record=filterHolder.selection ? filterHolder.selection : [];
+	  //reload the usersList store so the new task filter is applied
+	  Ext.StoreMgr.get('admin.UsersList').load()
+	  me.advancedFilterWindow=Ext.widget('editorAdminTaskFilterFilterWindow');
+	  me.advancedFilterWindow.loadRecord(record);
+	  me.advancedFilterWindow.show();
+  },
+  
+  /***
+   * Filter is applied in the advanced filter window
+   */
+  onAdvancedFilterChange:function(filter){
+	  var me=this,
+	  	  toolbar=me.getAdvancedFilterToolbar(),
+	  	  taskGrid=me.getTaskGrid(),
+	  	  taskStore=taskGrid.getStore(),
+	  	  filtersarray=toolbar.getController().filterActiveFilters(filter),
+	  	  addFilter=filtersarray && filtersarray.length>0;
+
+	 //clear the taskGrid store from the filters
+  	 taskStore.clearFilter(addFilter);
+  	 //add the custom filtering where the filterchange event will be suspended
+	 taskGrid.activateGridColumnFilter(filtersarray,true);
+	 //load the filters into the filter holder tagfield
+	 toolbar.loadFilters(taskStore.getFilters(false));
+  },
+  
   /**
    * calls local task handler, dispatching is done by the icon CSS class of the clicked img
    * the css class ico-task-foo-bar is transformed to the method handleTaskFooBar
@@ -1030,5 +1096,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           return !this.fireEvent('periodicalTaskReloadIgnore', task);
       }          
       return false;
+  },
+  
+  /***
+   * Close advanced filter window
+   */
+  closeAdvancedFilterWindow:function(){
+	  this.advancedFilterWindow && this.advancedFilterWindow.hide();
   }
 });
