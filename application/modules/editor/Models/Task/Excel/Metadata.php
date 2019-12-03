@@ -207,7 +207,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                     /* @var $workflow editor_Workflow_Abstract */
                     $states = $workflow->getStates();
                     $labels = $workflow->getLabels(true);
-                    $value = $labels[array_search($task['state'], $states)];
+                    $value = (array_search($task['state'], $states) !== false) ? $labels[array_search($task['state'], $states)] : $task['state'];
                     break;
                 case 'workflow':
                     $value = $task['workflow'] . ' (' . $task['workflowStepName'] . ')';
