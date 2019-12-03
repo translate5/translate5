@@ -611,6 +611,7 @@ class Task extends Channel {
                 if(empty($userTracking[$userGuid])) {
                     continue;
                 }
+                settype($tracking['isOnline'], 'boolean');
                 $userTracking[$userGuid]['isOnline'] = $tracking['isOnline'];
             }
         }

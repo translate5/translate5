@@ -3478,10 +3478,6 @@ More information can be found in the task property window in the tab events.<br 
     <source>Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</source>
     <target>Option can only be changed, if no user is assigned</target>
 </trans-unit>
-<trans-unit id='S29ua3VycmllcmVuZGUgQmVudXR6ZXI6IERlciBlcnN0ZSBCZW51dHplciwgZGVyIGVpbmVuIEpvYiBhbm5pbW10LCBmw7xocnQgZWluZW4gSm9iIGF1cy4gQWxsZW4gYW5kZXJlbiB3aXJkIGF1dG9tYXRpc2NoIGRpZSBBdWZnYWJlIGVudHpvZ2VuLg=='>
-    <source>Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.</source>
-    <target>Competing users: First user, who accepts job, does job. Others are unassigned automatically.</target>
-</trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXIgYmVuYWNocmljaHRpZ2VuPw=='>
     <source>Zugewiesene Benutzer benachrichtigen?</source>
     <target>Notify assigned users?</target>
@@ -3578,10 +3574,6 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Erlaubte Rollen</source>
     <target>Allowed roles</target>
 </trans-unit>
-<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGFid2VjaHNlbG5kIGRpZXNlbGJlIEF1ZmdhYmU='>
-    <source>Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe</source>
-    <target>Multiple users editing alternating the same task</target>
-</trans-unit>
 <trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGdsZWljaHplaXRpZyBkaWVzZWxiZSBBdWZnYWJl'>
     <source>Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe</source>
     <target>Multiple users editing simultaneously the same task</target>
@@ -3644,6 +3636,31 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='SW4gQmVhcmJlaXR1bmcgZHVyY2g6'>
     <source>In Bearbeitung durch:</source>
     <target>In progress by:</target>
+</trans-unit>
+
+<trans-unit id='R2xlaWNoemVpdGlnZXMgQXJiZWl0ZW4='>
+    <source>Gleichzeitiges Arbeiten</source>
+    <target>Simultaneous Work</target>
+</trans-unit>
+<trans-unit id='QWxsZSB6dWdld2llc2VuZW4gTnV0emVyIGVpbmVzIFdvcmtmbG93c2Nocml0dHMga8O2bm5lbiBnbGVpY2h6ZWl0aWcgYXJiZWl0ZW4='>
+    <source>Alle zugewiesenen Nutzer eines Workflowschritts können gleichzeitig arbeiten</source>
+    <target>All assigned users of a workflow step can work simultaneously</target>
+</trans-unit>
+<trans-unit id='S29ua3VycmllcmVuZGUgWnV3ZWlzdW5n'>
+    <source>Konkurrierende Zuweisung</source>
+    <target>Competing assignment</target>
+</trans-unit>
+<trans-unit id='RGVyIGVyc3RlIHp1Z2V3aWVzZW5lIEJlbnV0emVyIGVpbmVzIFdvcmtmbG93c2Nocml0dHMsIGRlciBkZW4gSm9iIMO2ZmZuZXQgdW5kIGFremVwdGllcnQsIGVybGVkaWd0IGRlbiBKb2IuIEFsbGUgYW5kZXJlbiBCZW51dHplcnp1b3JkbnVuZ2VuIHdlcmRlbiBlbnRmZXJudCB1bmQgZGllIEJlbnV0emVyIGluZm9ybWllcnQu'>
+    <source>Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.</source>
+    <target>The first assigned user of a workflow step that opens and accepts the job will do the job. All other users assignments are removed and the users informed.</target>
+</trans-unit>
+<trans-unit id='U2VxdWVudGllbGxlcyBBcmJlaXRlbg=='>
+    <source>Sequentielles Arbeiten</source>
+    <target>Sequential work</target>
+</trans-unit>
+<trans-unit id='QWxsZSB6dWdld2llc2VuZW4gTnV0emVyIGVpbmVzIFdvcmtmbG93c2Nocml0dHMga8O2bm5lbiBkaWUgQXVmZ2FiZSBiZWFyYmVpdGVuLCBhYmVyIG51ciBlaW5lciBnbGVpY2h6ZWl0aWcu'>
+    <source>Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.</source>
+    <target>All assigned users of a workflow step can edit the task, but only one at a time.</target>
 </trans-unit>
 </body>
   </file>

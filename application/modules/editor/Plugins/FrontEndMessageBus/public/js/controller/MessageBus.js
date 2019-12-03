@@ -49,7 +49,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         noConnectionSeg: '#UT#Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.',
         inUseTitle: '#UT#Segment bereits in Bearbeitung',
         inUse: '#UT#Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.',
-        inUseMsg: '#UT#Das ausgewählte Segment wird einen anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.',
+        inUseMsg: '#UT#Das ausgewählte Segment wird von einem anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.',
         currentUser: '#UT#Aktueller Bearbeiter',
         editors: '#UT#Bearbeiter: ',
         myself: '#UT#Ich',
@@ -489,7 +489,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         }
         
         me.tooltip = Ext.create('Ext.tip.ToolTip', {
-            cls: 'multi-user-tip',
+            cls: 'multi-user-list multi-user-tip',
             // The overall target element.
             target: view.el,
 
@@ -515,9 +515,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                         return false;
                     }
                     //remove color from tip itself
-                    tip.el.removeCls(['usernr-1', 'usernr-2', 'usernr-3', 'usernr-4', 'usernr-5', 'usernr-6', 'usernr-7', 'usernr-8']);
-                    tip.el.addCls('usernr-'+userNr);
-                    tip.update(user.get('userName')); //set user name
+                    tip.update('<span class="usernr-'+userNr+'"><span class="icon"></span>'+user.get('userName')+'</span>'); //set user name
                 }
             }
         });
