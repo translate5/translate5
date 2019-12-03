@@ -1374,7 +1374,8 @@ Ext.define('Editor.controller.Editor', {
             }
             
             Ext.Array.each(sourceTagsForTagIdx, function(tagObject){
-                var [id, tag] = [tagObject.id, tagObject.tag],
+                var id = tagObject.id,
+		    tag = tagObject.tag,
                     tagInTarget = editor.getDoc().getElementById(id);
                 if(tagInTarget && tagInTarget.parentNode.nodeName.toLowerCase() !== 'del'){
                     return;
