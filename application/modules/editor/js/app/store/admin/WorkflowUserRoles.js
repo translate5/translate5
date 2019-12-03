@@ -21,32 +21,27 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
-    extend: 'Ext.app.ViewController',
-    alias: 'controller.editorAdminTaskFilterFilterWindow',
-    
-    
-    onApplyBtnClick:function(){
-    	var me=this,
-    		fields=me.getView().query('[filter]'),
-    		filter=[];
-    	//create a simple filter array object from the fields
-    	Ext.Array.each(fields, function(field) {
-			filter.push(Ext.Object.merge(field.filter,{
-				value:field.getValue()
-				//'label':field.filter.property+' '+field.filter.operator+' '+field.getValue()
-			}))
-    	});
-    	
-    	me.getView().fireEvent('advancedFilterChange',filter)
-    },
-    
-    onCancelBtnClick:function(){
-    	this.getView().destroy();
-    }
+Ext.define('Editor.store.admin.WorkflowUserRoles', {
+	extend : 'Ext.data.Store',
+	initConfig: function(instanceConfig) {
+		var me = this,
+			config={},
+			workflowUserRoles=[];
+		//Info:duplicated id values will be ignored by te store
+		Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
+			Ext.Object.each(workflow.roles, function(key, value){
+				workflowUserRoles.push({id:key,label:value});
+			});
+		});
+		config.data=workflowUserRoles;
+		if (instanceConfig) {
+			me.self.getConfigurator().merge(me, config, instanceConfig);
+		}
+	    return me.callParent([config]);
+	},
 });

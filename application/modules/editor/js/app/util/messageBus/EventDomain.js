@@ -26,26 +26,36 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.filter.FilterWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.editorAdminTaskFilterFilterWindow',
-    stores: {
-    	userlist: {
-        	model:'Editor.model.admin.User',
-            autoLoad: true,
-            pageSize: 0,
-            idProperty: 'id',
-            listeners: {
-                beforeload:'onUsersStoreBeforeLoad'
-            },
-            proxy : {
-              type : 'rest', 
-              url: Editor.data.restpath+'task/userlist',
-              reader : {
-                rootProperty: 'rows',
-                type : 'json'
-              }
-            }
+/**
+ * @class Editor.util.messageBus.EventDomain
+ */
+Ext.define('Editor.util.messageBus.EventDomain', {
+    extend: 'Ext.app.EventDomain',
+    singleton: true,
+    
+    type: 'messagebus',
+    
+    idMatchRe: /^\#/,
+    
+    constructor: function() {
+        var me = this;
+        me.callParent();
+        me.monitor(Editor.util.messageBus.MessageBus);
+    },
+
+    /**
+     * Selektor must be #BUSID CHANNEL or * to match
+     */
+    match: function(target, selector) {
+        if (selector === '*') {
+            return true;
         }
+        selector = selector.split(/ +/);
+        if ('#'+target.getBusId() !== selector[0]) {
+            return false;
+        }
+        //selector count = 1: only #busId was given, therefore the currentChannel must be empty to match (events directly from bus instance)
+        //selector count > 1: a channel was given, so we have to compare agains the currentChannel of the target
+        return selector.length === 1 && !target.currentChannel || selector[1] === target.currentChannel;
     }
 });

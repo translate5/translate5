@@ -49,10 +49,11 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         editTrue:'#UT#Ja',
         editFalse:'#UT#Nein',
         usageModeTitle: "#UT#Mehrere Benutzer",
-        usageModeInfo: "#UT#Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden",
+        usageModeInfo: "#UT#Bei Zuweisung mehrerer Benutzer zum selben Workflowschritt",
         usageModeDisabled: "#UT#Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.",
-        usageModeCoop: "#UT#Mehrere Benutzer bearbeiten dieselbe Aufgabe",
-        usageModeCompetitive: "#UT#Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen."
+        usageModeCoop: "#UT#Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe",
+        usageModeCompetitive: "#UT#Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.",
+        usageModeSimultaneous: "#UT#Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe"
     },
     itemId:'taskAttributesPanel',
     controller:'taskattributesviewcontroller',
@@ -68,7 +69,8 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         config = {
             title: me.title, //see EXT6UPD-9
             bodyPadding: 10,
-            frame: true,
+            layout: 'anchor',
+            autoScroll: true,
             defaults: {
                 labelWidth: 200,
                 anchor: '60%'
@@ -257,6 +259,14 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                     boxLabel  : me.strings.usageModeCompetitive,
                     name      : 'usageMode',
                     inputValue: 'competitive',
+                    bind: {
+                        disabled:'{disableUsageMode}'
+                    }
+                }, {
+                    //readonly bind: admin.TaskUserAssocs mit Inhalt
+                    boxLabel  : me.strings.usageModeSimultaneous,
+                    name      : 'usageMode',
+                    inputValue: 'simultaneous',
                     bind: {
                         disabled:'{disableUsageMode}'
                     }
