@@ -174,13 +174,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     protected function setJsVarsInView() {
-        $rop = $this->config->runtimeOptions;
+      $rop = $this->config->runtimeOptions;
+      
+      $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
+      // Video-recording: If allowed in general, then it can be set by the user after every login.
+      $this->view->Php2JsVars()->set('enableJsLoggerVideoConfig', $rop->debug && $rop->debug->enableJsLoggerVideo);
         
-        $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
-        // Video-recording: If allowed in general, then it can be set by the user after every login.
-        $this->view->Php2JsVars()->set('enableJsLoggerVideoConfig', $rop->debug && $rop->debug->enableJsLoggerVideo);
-        
-        $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
+      $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
       $this->view->Php2JsVars()->set('restpath', $restPath);
       $this->view->Php2JsVars()->set('basePath', APPLICATION_RUNDIR);
       $this->view->Php2JsVars()->set('moduleFolder', $this->view->publicModulePath.'/');
@@ -303,6 +303,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //boolean config if the leave task button button in the segments editor header is visible or not
       $this->view->Php2JsVars()->set('editor.toolbar.hideLeaveTaskButton',(boolean)$rop->editor->toolbar->hideLeaveTaskButton);
       
+      $this->view->Php2JsVars()->set('tasks.simultaneousEditingKey', editor_Models_Task::INTERNAL_LOCK.editor_Models_Task::USAGE_MODE_SIMULTANEOUS);
       $this->setLanguageResourceJsVars();
       
       $this->setJsAppData();
@@ -375,6 +376,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.branding', (string) $this->translate->_($ed->branding));
         $php2js->set('app.customHtmlContainer', (string) $this->translate->_($ed->customHtmlContainer));
         $php2js->set('app.user', $userSession->data);
+        $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));
+        $php2js->set('app.sessionKey', session_name());
         
         $allRoles = $acl->getAllRoles();
         $roles = array();
@@ -397,6 +400,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.userRights', $acl->getFrontendRights($userRoles));
         
         $php2js->set('app.version', $this->view->appVersion);
+        
+        $filter=ZfExtended_Factory::get('ZfExtended_Models_Filter_ExtJs6');
+        /* @var $filter ZfExtended_Models_Filter_ExtJs6 */
+        $php2js->set('app.filters.translatedOperators', $filter->getTranslatedOperators());
     }
     
     protected function getAppVersion() {
@@ -417,7 +424,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
+<<<<<<< HEAD
             'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal','JsLogger');
+=======
+            'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal',
+        );
+>>>>>>> origin/master
         
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
@@ -502,7 +514,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     
     public function applicationstateAction() {
         $this->_helper->layout->disableLayout();
-        $this->view->applicationstate = ZfExtended_Debug::applicationState();
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        
+        $userSession = new Zend_Session_Namespace('user');
+        //since application state contains sensibile information we show that only to API users
+        if($acl->isInAllowedRoles($userSession->data->roles, 'backend', 'applicationstate')) {
+            $this->view->applicationstate = ZfExtended_Debug::applicationState();
+        }
     }
     
     public function generatesmalltagsAction() {
@@ -640,7 +659,28 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         }
         //currently this method is fixed to JS:
         header('Content-Type: '.$types[$extension]);
+        //FIXME add version URL suffix to plugin.css inclusion
+        header('Last-Modified: '.gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));
+        //with etags we would have to use the values of $_SERVER['HTTP_IF_NONE_MATCH'] too!
+        //makes sense to do so!
+        //header('ETag: '.md5(of file content));
+        
+        header_remove('Cache-Control');
+        header_remove('Expires');
+        header_remove('Pragma');
+        header_remove('X-Powered-By');
+        
+        /*
+        header('Pragma: public');
+        header('Cache-Control: max-age=86400');
+        header('Expires: '. gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
+        header('Content-Type: image/png');
+        */
+        
+       
+
         readfile($wholePath);
+        //FIXME: Optimierung bei den Plugin Assets: public Dateien die durch die Plugins geroutet werden, sollten chachebar sein und B keine Plugin Inits triggern. Geht letzteres überhaupt wg. VisualReview welches die Dateien ebenfalls hier durchschiebt?
         exit;
     }
     
