@@ -143,6 +143,8 @@ Ext.application({
             usedWidth: viewSize.width
         }
     });
+    
+    me.fireEvent('editorAppLaunched');
   },
   /**
    * If configured the user is logged out on window close
