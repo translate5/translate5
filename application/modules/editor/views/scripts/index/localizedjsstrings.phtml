@@ -456,7 +456,9 @@ Ext.define('Editor.controller.Localizer', {
             deleteTaskDialogMessage:'<?php echo $this->translate->_('Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?');?>',
             deleteTaskDialogTitle:'<?php echo $this->translate->_('Aufgabe löschen');?>',
             taskImportButtonText:'<?php echo $this->translate->_('Aufgabe importieren');?>',
-            taskDeleteButtonText:'<?php echo $this->translate->_('Aufgabe löschen');?>'
+            taskDeleteButtonText:'<?php echo $this->translate->_('Aufgabe löschen');?>',
+            averageProcessingTimeLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Lektor');?>',
+            excelExportUsageLabel: '<?php echo $this->translate->_('Excel-Export Nutzung');?>'
         },
         confirmStrings: {
             "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -542,10 +544,8 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.task.KpiWindow",
         title: '<?php echo $this->translate->_('Key Performance Indicators');?>',
         strings: {
-            averageProcessingTimeLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Lektor');?>',
-            averageProcessingTimeToolTip: '<?php echo $this->translate->_('Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.');?>',
             closeBtn: '<?php echo $this->translate->_('Fenster schließen');?>',
-            excelExportUsageLabel:'<?php echo $this->translate->_('Excel-Export Nutzung');?>',
+            averageProcessingTimeToolTip: '<?php echo $this->translate->_('Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.');?>',
             excelExportUsageToolTip: '<?php echo $this->translate->_('Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.');?>'
         }
     });
