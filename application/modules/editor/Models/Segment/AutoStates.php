@@ -129,6 +129,12 @@ class editor_Models_Segment_AutoStates {
      * Internal state used to show segment is pending
      * @var integer
      */
+    const EDITING_BY_USER = 998;
+    
+    /**
+     * Internal state used to show segment is pending
+     * @var integer
+     */
     const PENDING = 999;
     
     protected $states = array(
@@ -158,7 +164,11 @@ class editor_Models_Segment_AutoStates {
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
         //no json_encode because later on passed to php2js, which does json-encoding
         $states = $this->states;
-        $states[self::PENDING] = 'wird ermittelt...'; //actually only needed in frontend
+
+        //only needed in frontend:
+        $states[self::PENDING] = 'wird ermittelt...'; 
+        $states[self::EDITING_BY_USER] = 'In Bearbeitung';
+        
         return array_map(function($value) use ($translate) {
             return $translate->_($value);
         }, $states);

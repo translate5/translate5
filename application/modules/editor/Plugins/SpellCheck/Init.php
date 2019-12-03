@@ -66,7 +66,7 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
         /* @var $view Zend_View_Interface */
         //To set config values:
         //$view->Php2JsVars()->set('plugins.SpellCheck.XXX', $this->getConfig()->preloadedTranslationSegments);
-        $view->headLink()->appendStylesheet(APPLICATION_RUNDIR.'/editor/plugins/resources/spellCheck/plugin.css');
+        $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {

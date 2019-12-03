@@ -1230,25 +1230,25 @@
     <source>Segment von Lesezeichenliste entfernen (STRG + D)</source>
     <target>remove segment bookmarks (CTRL + D)</target>
   </trans-unit>  
-<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgRU5URVIp'>
-  <source>Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)</source>
-  <target>Save and open next segment (CTRL + ALT + ENTER)</target>
+<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW4gKFNUUkcgKyBBTFQgKyBFTlRFUik='>
+  <source>Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)</source>
+  <target>Save and open next editable segment (CTRL + ALT + ENTER)</target>
 </trans-unit>
-<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChTVFJHICsgRU5URVIp'>
-  <source>Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)</source>
-  <target>Save and open next segment in workflow (CTRL + ENTER)</target>
+<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IGltIFdvcmtmbG93IMO2ZmZuZW4gKFNUUkcgKyBFTlRFUik='>
+  <source>Speichern und nächstes bearbeitbares Segment im Workflow öffnen (STRG + ENTER)</source>
+  <target>Save and open next editable segment in workflow (CTRL + ENTER)</target>
 </trans-unit>
-<trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbiAoU1RSRyArIEFMVCArIFNISUZUICsgRU5URVIp'>
-  <source>Speichern und vorheriges Segment öffnen (STRG + ALT + SHIFT + ENTER)</source>
-  <target>Save and open previous segment (CTRL + ALT + SHIFT + ENTER)</target>
+<trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgU0hJRlQgKyBFTlRFUik='>
+  <source>Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)</source>
+  <target>Save and open previous editable segment (CTRL + ALT + SHIFT + ENTER)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsg4oaTKQ=='>
-  <source>Nicht speichern und nächstes Segment öffnen (STRG + ALT + ↓)</source>
-  <target>Don't save and open next segment (CTRL + ALT + ↓)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW4gKFNUUkcgKyBBTFQgKyDihpMp'>
+  <source>Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)</source>
+  <target>Don't save and open next editable segment (CTRL + ALT + ↓)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbiAoU1RSRyArIEFMVCArIOKGkSk='>
-  <source>Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)</source>
-  <target>Don't save and open previous segment (CTRL + ALT + ↑)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsg4oaRKQ=='>
+  <source>Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)</source>
+  <target>Don't save and open previous editable segment (CTRL + ALT + ↑)</target>
 </trans-unit>
 <trans-unit id='RGVtIGF1c2dld8OkaGx0ZW4gU2VnbWVudCBlaW5lbiBLb21tZW50YXIgaGluenVmw7xnZW4uIChBTFQgKyBDKQ=='>
   <source>Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)</source>
@@ -1262,13 +1262,13 @@
   <source>Nächste Spalte editieren (STRG + ALT + →)</source>
   <target>Edit next column (CTRL + ALT + →)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChBTFQgKyBCaWxkIOKGkyk='>
-  <source>Nicht speichern und nächstes Segment im Workflow öffnen (ALT + Bild ↓)</source>
-  <target>Don't save and open next segment in workflow (ALT + page ↓)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IGltIFdvcmtmbG93IMO2ZmZuZW4gKEFMVCArIEJpbGQg4oaTKQ=='>
+  <source>Nicht speichern und nächstes bearbeitbares Segment im Workflow öffnen (ALT + Bild ↓)</source>
+  <target>Don't save and open next editable segment in workflow (ALT + page ↓)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgw7ZmZm5lbiAoQUxUICsgQmlsZCDihpEp'>
-  <source>Nicht speichern und vorheriges Segment im Workflow öffnen (ALT + Bild ↑)</source>
-  <target>Don't save and open previous segment in workflow (ALT + page ↑)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChBTFQgKyBCaWxkIOKGkSk='>
+  <source>Nicht speichern und vorheriges bearbeitbares Segment im Workflow öffnen (ALT + Bild ↑)</source>
+  <target>Don't save and open previous editable segment in workflow (ALT + page ↑)</target>
 </trans-unit>
 <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
   <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
@@ -2385,7 +2385,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='RWlnZW5zY2hhZnRlbg=='>
     <source>Eigenschaften</source>
-    <target>Other properties</target>
+    <target>Properties</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSBrbG9uZW4='>
     <source>Aufgabe klonen</source>
@@ -3470,17 +3470,13 @@ More information can be found in the task property window in the tab events.<br 
     <source>Mehrere Benutzer</source>
     <target>Multiple users</target>
 </trans-unit>
-<trans-unit id='V2VubiBtZWhyZXJlIEJlbnV0emVyIGRlbXNlbGJlbiBXb3JrZmxvdy1TY2hyaXR0IHp1Z2V3aWVzZW4gd2VyZGVu'>
-    <source>Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden</source>
-    <target>When assigning multiple users to same workflow step</target>
+<trans-unit id='QmVpIFp1d2Vpc3VuZyBtZWhyZXJlciBCZW51dHplciB6dW0gc2VsYmVuIFdvcmtmbG93c2Nocml0dA=='>
+  <source>Bei Zuweisung mehrerer Benutzer zum selben Workflowschritt</source>
+  <target>When assigning multiple users to the same workflow step</target>
 </trans-unit>
 <trans-unit id='RGllc2UgT3B0aW9uIGthbm4gbnVyIHZlcsOkbmRlcnQgd2VyZGVuLCB3ZW5uIGtlaW4gQmVudXR6ZXIgZGVyIEF1ZmdhYmUgenVnZXdpZXNlbiBpc3Qu'>
     <source>Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</source>
     <target>Option can only be changed, if no user is assigned</target>
-</trans-unit>
-<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGRpZXNlbGJlIEF1ZmdhYmU='>
-    <source>Mehrere Benutzer bearbeiten dieselbe Aufgabe</source>
-    <target>Multiple users editing same task</target>
 </trans-unit>
 <trans-unit id='S29ua3VycmllcmVuZGUgQmVudXR6ZXI6IERlciBlcnN0ZSBCZW51dHplciwgZGVyIGVpbmVuIEpvYiBhbm5pbW10LCBmw7xocnQgZWluZW4gSm9iIGF1cy4gQWxsZW4gYW5kZXJlbiB3aXJkIGF1dG9tYXRpc2NoIGRpZSBBdWZnYWJlIGVudHpvZ2VuLg=='>
     <source>Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.</source>
@@ -3542,6 +3538,62 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Ohne</source>
     <target>None</target>
 </trans-unit>
+<trans-unit id='U2VociBnZWVocnRlKHIp'>
+    <source>Sehr geehrte(r)</source>
+    <target>Dear</target>
+</trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'>
+    <source>Vorschläge löschen älter als aktueller Import</source>
+    <target>Delete proposals older than current import</target>
+</trans-unit>
+<trans-unit id='QXVzbG9nZ2Vu'>
+    <source>Ausloggen</source>
+    <target>Log out</target>
+</trans-unit>
+<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='>
+    <source>Sonderzeichen hinzufügen:</source>
+    <target>Add special characters:</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='>
+    <source>Aufgabe verlassen</source>
+    <target>Leave task</target>
+</trans-unit>
+<trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='>
+    <source>Nur Segmente mit Lesezeichen anzeigen</source>
+    <target>Show only bookmarked segments</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRyb2xsZW4='>
+    <source>Standardrollen</source>
+    <target>Default roles</target>
+</trans-unit>
+<trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='>
+    <source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source>
+    <target>System roles the OpenID server is allowed to set in translate5.</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='>
+    <source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source>
+    <target>Default system roles are used, if the OpenId server does not pass any system roles for the user, that logs on.</target>
+</trans-unit>
+<trans-unit id='RXJsYXVidGUgUm9sbGVu'>
+    <source>Erlaubte Rollen</source>
+    <target>Allowed roles</target>
+</trans-unit>
+<trans-unit id='QmVhcmJlaXRldCB1bmQgR2VzcGVycnQgZHVyY2ggbWVocmVyZSBCZW51dHplcg=='>
+    <source>Bearbeitet und Gesperrt durch mehrere Benutzer</source>
+    <target>Edited and locked by multiple users</target>
+</trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGFid2VjaHNlbG5kIGRpZXNlbGJlIEF1ZmdhYmU='>
+    <source>Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe</source>
+    <target>Multiple users editing alternating the same task</target>
+</trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGdsZWljaHplaXRpZyBkaWVzZWxiZSBBdWZnYWJl'>
+    <source>Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe</source>
+    <target>Multiple users editing simultaneously the same task</target>
+</trans-unit>
+<trans-unit id='SW4gQmVhcmJlaXR1bmc='>
+    <source>In Bearbeitung</source>
+    <target>In process</target>
+</trans-unit>
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Delete proposals older than current import</target></trans-unit>
 <trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Log out</target></trans-unit>
@@ -3551,8 +3603,7 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
 <trans-unit id='S2V5IFBlcmZvcm1hbmNlIEluZGljYXRvcnM='><source>Key Performance Indicators</source><target>Key Performance Indicators</target></trans-unit>
 <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCBMZWt0b3I='><source>Ø Bearbeitungszeit Lektor</source><target>Ø Processing Time Reviewer</target></trans-unit>
-<trans-unit id='JTAuMGYgVGFnZQ=='><source>%0.0f Tage</source><target>%0.0f days</target></trans-unit>
-<trans-unit id='ezB9IFRhZ2U='><source>{0} Tage</source><target>{0} days</target></trans-unit>
+<trans-unit id='VGFnZQ=='><source>Tage</source><target>days</target></trans-unit>
 <trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdCB2b24gZGVyIFp1d2Vpc3VuZyBiaXMgenVtIEFic2NobHVzcyBlaW5lciBBdWZnYWJlLg=='><source>Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.</source><target>Average time from assignment of the job to finishing of the job.</target></trans-unit>
 <trans-unit id='RXhjZWwtRXhwb3J0IE51dHp1bmc='><source>Excel-Export Nutzung</source><target>Excel-Exports</target></trans-unit>
 <trans-unit id='UHJvemVudCBkZXIgQXVmZ2FiZW4sIGJlaSBkZW5lbiBkZXIgRXhjZWwtRXhwb3J0IGRlciBTZWdtZW50dGFiZWxsZSBnZW51dHp0IHd1cmRlLg=='><source>Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.</source><target>Percentage of the tasks, where the exporting of segments as Excel has been used within the process.</target></trans-unit>
@@ -3572,6 +3623,27 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='JSBhYmdlc2NobG9zc2Vu'><source>% abgeschlossen</source><target>% finished</target></trans-unit>
 <trans-unit id='JSBhYmdlc2NobG9zc2VuIGR1cmNoIHp1Z2V3aWVzZW5lIEJlbnV0emVyIGltIFdvcmtmbG93'><source>% abgeschlossen durch zugewiesene Benutzer im Workflow</source><target>% finished by assigned users in the workflow</target></trans-unit>
 <trans-unit id='QWt0dWVsbGVyIFdvcmtmbG93LVNjaHJpdHQ='><source>Aktueller Workflow-Schritt</source><target>Current workflow step</target></trans-unit>
+<trans-unit id='RXJ3ZWl0ZXJ0ZSBGaWx0ZXI='><source>Erweiterte Filter</source><target>Advanced filters</target></trans-unit>
+<trans-unit id='V29ya2Zsb3ctU3RhdHVz'><source>Workflow-Status</source><target>Workflow status</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItUm9sbGU='><source>Benutzer-Rolle</source><target>User role</target></trans-unit>
+<trans-unit id='V2VpdGVyZSBGaWx0ZXIgaW0gS29wZiBqZWRlciBTcGFsdGU='><source>Weitere Filter im Kopf jeder Spalte</source><target>More filters in the head of each column</target></trans-unit>
+<trans-unit id='QW53ZW5kZW4='><source>Anwenden</source><target>Apply</target></trans-unit>
+<trans-unit id='R2VzZXR6dGUgRmlsdGVy'><source>Gesetzte Filter</source><target>Active filters</target></trans-unit>
+<trans-unit id='QW5vbnltaXNpZXJ0ZSBCZW51dHplciBuaWNodCBhdXN3w6RobGJhcg=='><source>Anonymisierte Benutzer nicht auswählbar</source><target>Anonymized users not selectable</target></trans-unit>
+<trans-unit id='bGlrZQ=='><source>like</source><target>Includes</target></trans-unit>
+<trans-unit id='bm90SW5MaXN0'><source>notInList</source><target>not includes</target></trans-unit>
+<trans-unit id='aW4='><source>in</source><target>Includes</target></trans-unit>
+<trans-unit id='ZXE='><source>eq</source><target>=</target></trans-unit>
+<trans-unit id='Z3Q='><source>gt</source><target>&gt;</target></trans-unit>
+<trans-unit id='Z3RlcQ=='><source>gteq</source><target>&gt;=</target></trans-unit>
+<trans-unit id='bHQ='><source>lt</source><target>&lt;</target></trans-unit>
+<trans-unit id='bHRlcQ=='><source>lteq</source><target>&lt;=</target></trans-unit>
+<trans-unit id='PQ=='><source>=</source><target>equal</target></trans-unit>
+<trans-unit id='PT0='><source>==</source><target>identical</target></trans-unit>
+<trans-unit id='SWQ='><source>Id</source><target>Id</target></trans-unit>
+<trans-unit id='VGFzay1HdWlk'><source>Task-Guid</source><target>Task-Guid</target></trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUvciBCZW51dHplcg=='><source>Zugewiesene/r Benutzer</source><target>Assigned user/s</target></trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXItUm9sbGUvbg=='><source>Zugewiesene Benutzer-Rolle/n</source><target>Assigned user role/s</target></trans-unit>
 </body>
   </file>
 </xliff>

@@ -112,9 +112,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     const USAGE_MODE_COMPETITIVE = 'competitive';
     const USAGE_MODE_COOPERATIVE = 'cooperative';
+    const USAGE_MODE_SIMULTANEOUS = 'simultaneous';
     
-    const ASSOC_TABLE_ALIAS = 'tua';
-    const TABLE_ALIAS = 't';
+    const ASSOC_TABLE_ALIAS = 'LEK_taskUserAssoc';
+    const TABLE_ALIAS = 'LEK_task';
     
     const INTERNAL_LOCK = '*translate5InternalLock*';
 
@@ -229,6 +230,24 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return parent::loadFilterdCustom($s);
     }
     
+    /***
+     * Load all task assoc users for non anonymized tasks.
+     * This is used for the user workflow filter in the advance filter store.
+     * INFO:Associated users for the anonimized tasks will not be loaded
+     * @return array
+     */
+    public function loadUserList() {
+        $this->getFilter()->setDefaultTable('LEK_task');
+        $s=$this->db->select()
+        ->setIntegrityCheck(false)
+        ->from('LEK_task', [])
+        ->join('LEK_customer', 'LEK_task.customerId=LEK_customer.id',[])
+        ->join('LEK_taskUserAssoc','LEK_taskUserAssoc.taskGuid= LEK_task.taskGuid',[])
+        ->join('Zf_users','Zf_users.userGuid=LEK_taskUserAssoc.userGuid',['Zf_users.*'])
+        ->where('LEK_customer.anonymizeUsers=0');
+        return $this->loadFilterdCustom($s);
+    }
+    
     /**
      * gets the total count of all tasks associated to the user (filtered by the TaskUserAssoc table)
      * if $loadAll is true, load all tasks, user infos joined only where possible,
@@ -249,25 +268,25 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * returns the SQL to retrieve the tasks of an user oder of all users joined with the users assoc infos
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks to the user
+     * TODO: when state filter is refactored, remove the tasuserassoc object cast here
      * @param string $userGuid
      * @param string $cols column definition
      * @param bool $loadAll 
      * @return Zend_Db_Table_Select
      */
     protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $loadAll = false) {
-        $alias = self::ASSOC_TABLE_ALIAS;
         $s = $this->db->select()
-        ->from(array('t' => 'LEK_task'), $cols);
+        ->from('LEK_task', $cols);
         if(!empty($this->filter)) {
-            $this->filter->setDefaultTable('t');
+            $this->filter->setDefaultTable('LEK_task');
         }
         if($loadAll) {
-            $on = $alias.'.taskGuid = t.taskGuid AND '.$alias.'.userGuid = '.$s->getAdapter()->quote($userGuid);
-            $s->joinLeft(array($alias => 'LEK_taskUserAssoc'), $on, array());
+            $on ='LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid AND LEK_taskUserAssoc_1.userGuid = '.$s->getAdapter()->quote($userGuid);
+            $s->joinLeft(['LEK_taskUserAssoc_1'=>'LEK_taskUserAssoc'], $on, array());
         }
         else {
-            $s->joinLeft(array($alias => 'LEK_taskUserAssoc'), $alias.'.taskGuid = t.taskGuid', array())
-            ->where($alias.'.userGuid = ? OR t.pmGuid = ?', $userGuid);
+            $s->joinLeft(['LEK_taskUserAssoc_1'=>'LEK_taskUserAssoc'], 'LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid', array())
+            ->where('LEK_taskUserAssoc_1.userGuid = ? OR LEK_task.pmGuid = ?', $userGuid);
         }
         return $s;
     }
@@ -525,38 +544,63 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * unlocks all tasks, where the associated session is invalid
-     * @return array an array with tasks which were unlocked
      */
     public function cleanupLockedJobs() {
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
-        //this gives us the possibility to define session independant locks:
-        $validSessionIds .= ' union select \''.self::INTERNAL_LOCK.'\' internalSessionUniqId';
-        $where = 'not locked is null and (lockedInternalSessionUniqId not in ('.$validSessionIds.') or lockedInternalSessionUniqId is null)';
-        $toUnlock = $this->db->fetchAll($this->db->select()->where($where))->toArray();
+        //the below not like "*translate5InternalLock*%" gives us the possibility to define session independant locks:
+        $where = 'not locked is null and (
+            lockedInternalSessionUniqId not in ('.$validSessionIds.')
+            and lockedInternalSessionUniqId not like "*translate5InternalLock*%" 
+            or lockedInternalSessionUniqId is null)';
         $this->db->update(array('lockingUser' => null, 'locked' => null, 'lockedInternalSessionUniqId' => null), $where);
-        return $toUnlock;
+        
+        //clean up remaining multi user task locks where no user is editing anymore 
+        $multiUserId = self::INTERNAL_LOCK.self::USAGE_MODE_SIMULTANEOUS;
+        $usedMultiUserLocks = 'SELECT t.id
+        FROM (SELECT id, taskGuid FROM LEK_task t WHERE t.lockedInternalSessionUniqId = "'.$multiUserId.'") t
+        JOIN LEK_taskUserAssoc tua on tua.taskGuid = t.taskGuid
+        WHERE not tua.usedState is null AND not tua.usedInternalSessionUniqId is null';
+        $where = 'not locked is null and lockedInternalSessionUniqId = "'.$multiUserId.'" and id not in ('.$usedMultiUserLocks.')';
+        
+        $this->db->update(array('lockingUser' => null, 'locked' => null, 'lockedInternalSessionUniqId' => null), $where);
     }
+    
+    /**
+     * locks the task 
+     * sets a locked-timestamp in LEK_task for the task, if locked column is null
+     * 
+     * @param string $datetime
+     * @param string $lockId String to distinguish different lock types 
+     * @return boolean
+     */
+    public function lock(string $datetime, string $lockId = ''): bool {
+        return $this->_lock($datetime, ZfExtended_Models_User::SYSTEM_GUID, self::INTERNAL_LOCK.$lockId);
+    }
+    
+    /**
+     * locks the task 
+     * sets a locked-timestamp in LEK_task for the task, if locked column is null
+     * 
+     * @param string $datetime
+     * @return boolean
+     */
+    public function lockForSessionUser(string $datetime): bool {
+        $user = new Zend_Session_Namespace('user');
+        $session = new Zend_Session_Namespace();
+        return $this->_lock($datetime, $user->data->userGuid, $session->internalSessionUniqId);
+    }
+    
     
     /**
      * locks the task
      * sets a locked-timestamp in LEK_task for the task, if locked column is null
      * 
      * @param string $datetime
-     * @param bool $sessionIndependant optional, default false. If true the lock is session independant, and must therefore revoked manually! 
+     * @param bool $systemLock optional, default false. If true the lock is session independant, and must therefore revoked manually! 
+     * @param string $systemIdentifier optional, default empty string. Is used to distinguish different lock types (mainly for system locks) 
      * @return boolean
-     * @throws Zend_Exception if something went wrong
      */
-    public function lock(string $datetime, $sessionIndependant = false) {
-        if($sessionIndependant) {
-            $userGuid = ZfExtended_Models_User::SYSTEM_GUID;
-            $sessionId = self::INTERNAL_LOCK;
-        }
-        else {
-            $user = new Zend_Session_Namespace('user');
-            $userGuid = $user->data->userGuid;
-            $session = new Zend_Session_Namespace();
-            $sessionId = $session->internalSessionUniqId;
-        }
+    protected function _lock(string $datetime, string $userGuid, string $sessionId): bool {
         $update = array(
             'locked' => $datetime,
             'lockingUser' => $userGuid,
@@ -565,17 +609,18 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $where = array('taskGuid = ? and locked is null'=>$this->getTaskGuid());
         $rowsUpdated = $this->db->update($update, $where);
         if($rowsUpdated === 0){
-            return !is_null($this->getLocked()) && $this->getLockingUser() == $userGuid;//already locked by this same user
+            //true if no system lock, if system lock evaluate if sessionId (and therefore the type) equals
+            $checkSystemLockType = strpos($sessionId, self::INTERNAL_LOCK) === false || $sessionId === $this->getLockedInternalSessionUniqId();
+            //already locked by the same user with the same system lock type (if applicable). 
+            return !is_null($this->getLocked()) && $this->getLockingUser() == $userGuid && $checkSystemLockType;
         }
         return true;
     }
     
     /**
-     * unlocks the task
-     * unsets a timestamp (sets it to NULL) in LEK_task for the task, if locked column is not null
+     * unlocks the task, does not check user or multi user state!
      * @return boolean false if task had not been locked or does not exist, 
      *          true if task has been unlocked successfully
-     * @throws Zend_Exception if something went wrong
      */
     public function unlock() {
         $where = array('taskGuid = ? and locked is not null'=>$this->getTaskGuid());
@@ -586,6 +631,36 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         );
         //check how many rows are updated
         return $this->db->update($data, $where) !== 0;
+    }
+    
+    /**
+     * unlocks the task, for a specific user. Checks if user is allowed to unlock (lockingUser = currentUser) and respects multiuser editing
+     * @return boolean false if task had not been locked or does not exist, 
+     *          true if task has been unlocked successfully
+     */
+    public function unlockForUser($userGuid) {
+        $taskGuid = $this->db->getAdapter()->quote($this->getTaskGuid());
+        $userGuid = $this->db->getAdapter()->quote($userGuid);
+        $multiUserId = $this->db->getAdapter()->quote(self::INTERNAL_LOCK.self::USAGE_MODE_SIMULTANEOUS);
+        
+        $where = 'taskGuid = %1$s
+        AND locked is not null
+        AND (lockingUser = %2$s
+            OR lockedInternalSessionUniqId = %3$s
+            AND taskGuid NOT IN (SELECT taskGuid
+                FROM LEK_taskUserAssoc
+                WHERE taskGuid = %1$s
+                AND userGuid != %2$s
+                AND not usedState is null AND not usedInternalSessionUniqId is null)
+            )';
+        
+        $data = array(
+            'locked' => NULL,
+            'lockedInternalSessionUniqId' => NULL,
+            'lockingUser' => NULL,
+        );
+        //check how many rows are updated
+        return $this->db->update($data, sprintf($where, $taskGuid, $userGuid, $multiUserId)) !== 0;
     }
     
     /**

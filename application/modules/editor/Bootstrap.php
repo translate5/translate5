@@ -199,6 +199,12 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'excelreimport'
             )
         ));
+        $this->front->getRouter()->addRoute('editorTaskUserlist', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/userlist',[
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'userlist'
+        ]));
         
         //FIXME convert me to RestLikeRoute (see filemap)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(

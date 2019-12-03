@@ -43,6 +43,13 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs6 
     protected static $isUserAssocNeeded = false;
     
     /**
+     * TODO: this needs to be refactored so it can work with joined filters
+     *       the way how the filter/filters will be implemented is defined as idea
+     *       in https://confluence.translate5.net/display/MI/Usability+enhancements
+     *       In the moment there is an idea the task status and the user status to be splited in
+     *       2 separated filters.
+     *       The state filter will be disabled till the usability in the task grid is not clear
+     *       
      * refactor the state filter given by client, separates task and user states
      * @param bool $loadAllAllowed optional, if true current user is allowed to see all tasks
      */
