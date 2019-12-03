@@ -11,6 +11,8 @@ TRANSLATE-1493: Filter by user, workflow-step, job-status and language combinati
   Several new filters can be used in the task overview.
 
 ###Changed
+TRANSLATE-1871: Enhance theRootCause integration: users can activate video-recording after login
+  Users can activate optionally video-recording after login to improve error reporting.
 TRANSLATE-1889: rfc 5646 value for estonian is wrong
   The RFC 5646 value for estonian was wrong
 TRANSLATE-1886: Error on refreshing GroupShare TMs when a used TM should be deleted
