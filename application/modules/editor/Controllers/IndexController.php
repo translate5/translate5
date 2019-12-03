@@ -424,12 +424,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
-<<<<<<< HEAD
             'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal','JsLogger');
-=======
-            'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal',
-        );
->>>>>>> origin/master
         
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
