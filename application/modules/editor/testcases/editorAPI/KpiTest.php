@@ -141,12 +141,10 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
     protected function runExcelExportAndImport(string $taskNameSuffix) {
         $taskId = self::$taskIds[$taskNameSuffix];
         
-        $this->printUnitTestOutput('runExcelExport: editor/task/'.$taskId.'/excelexport');
         $response = $this->api()->request('editor/task/'.$taskId.'/excelexport');
         self::$tempExcel = $tempExcel = tempnam(sys_get_temp_dir(), 't5testExcel');
         file_put_contents($tempExcel, $response->getBody());
         
-        $this->printUnitTestOutput('excelreimportUpload: editor/task/'.$taskId.'/excelreimport');
         $this->api()->addFile('excelreimportUpload', self::$tempExcel, 'application/data');
         $this->api()->request('editor/task/'.$taskId.'/excelreimport', 'POST');
         $this->api()->reloadTask();
@@ -165,7 +163,6 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $startDate->sub(new DateInterval($interval_spec));
         $startDate = $startDate->format('Y-m-d H:i:s');
         $taskId = self::$taskIds[$taskNameSuffix];
-        $this->printUnitTestOutput('setTaskProcessingDates for '.$taskId.': ' . $this->taskStartDate . ' = ' . $startDate .' / ' . $this->taskEndDate . ' = '.$endDate);
         $this->api()->requestJson('editor/task/'.$taskId, 'PUT', array($this->taskStartDate => $startDate, $this->taskEndDate => $endDate));
     }
     
@@ -175,14 +172,11 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
     protected function checkKpiResults() {
         // Does the number of found tasks match the number of tasks we created?
         $filteredTasks = $this->getFilteredTasks();
-        $this->printUnitTestOutput('EXPECTED: ' . count($this->tasksForKPI));
         $this->assertEquals(count($this->tasksForKPI), count($filteredTasks));
         
         $result = $this->api()->requestJson('editor/task/kpi', 'POST', [], ['filter' => $this->renderTaskGridFilter()]);
-        $this->printUnitTestOutput('getKpiResultsFromApi: ' . print_r($result,1));
         
         $statistics = $this->getExpectedKpiStatistics();
-        $this->printUnitTestOutput('getExpectedKpiStatistics: ' . print_r($statistics,1));
         
         // averageProcessingTime from API comes with translated unit (e.g. "2 days", "14 Tage"),
         // but these translations are not available here (are they?)
@@ -197,7 +191,6 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
     public static function tearDownAfterClass(): void {
         self::$api->login('testmanager');
         foreach (self::$taskIds as $taskId) {
-            fwrite(STDOUT, "\n" . '...DELETE: '.$taskId . "\n");
             self::$api->requestJson('editor/task/'.$taskId, 'DELETE');
         }
     }
@@ -221,7 +214,6 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
     protected function getFilteredTasks() {
         // taskGrid: apply the filter for our tasks! do NOT use the limit!
         $result = $this->api()->requestJson('editor/task?filter='.urlencode($this->renderTaskGridFilter()), 'GET');
-        $this->printUnitTestOutput('editor/task?filter='.$this->renderTaskGridFilter(). ' ===> FOUND: ' . count($result));
         return $result;
     }
     
@@ -243,13 +235,5 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $statistics['averageProcessingTime'] = (string)round($processingTimeInDays / $nrTasks, 0);
         $statistics['excelExportUsage'] = round((($nrExported / $nrTasks) * 100),2) . '%';
         return $statistics;
-    }
-    
-    /**
-     * Output infos during executing the unit-test.
-     * @param string $msg
-     */
-    protected function printUnitTestOutput (string $msg) {
-        fwrite(STDOUT, "\n" .$msg . "\n");
     }
 }
