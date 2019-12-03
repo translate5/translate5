@@ -84,7 +84,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       notFound: '#UT#nicht gefunden',
       locked: '#UT#in Arbeit',
       lockedBy: '#UT#Bearbeitet und Gesperrt durch {0}',
-      lockedMultiUser: '#UT#Bearbeitet und Gesperrt durch mehrere Benutzer',
+      lockedMultiUser: '#UT#In Bearbeitung durch:',
       lockedSystem: '#UT#Durch das System gesperrt mit dem Status \'{0}\'',
       addTask: '#UT#Aufgabe hinzufügen',
       addTaskTip: '#UT#Eine neue Aufgabe hinzufügen.',
@@ -263,7 +263,15 @@ Ext.define('Editor.view.admin.TaskGrid', {
           relaisLanguages = Ext.Array.clone(Editor.data.languages),
           addQtip = function(meta, text) {
               meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text)+'"';
-          };
+          },
+          multiUserTpl = new Ext.XTemplate(
+          	  me.strings.lockedMultiUser,
+          	  '<br>',
+              '<tpl for=".">',
+              '{userName} ({login})<br>',
+              '</tpl>'
+          );
+          multiUserTpl.compile();
           
           //we're hardcoding the state filter options order, all other (unordered) workflow states are added below
           Ext.Array.each(stateFilterOrder, function(state){
@@ -333,8 +341,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                       return me.states.task_state_unconfirmed;
                   }
                   //locked and editable means multi user editing
-                  if(rec.isLocked() && rec.isEditable()) {
-                      addQtip(meta, Ext.String.format(me.strings.lockedMultiUser));
+                  if(rec.isLocked() && rec.isEditable()) {                  	  
+                      addQtip(meta, multiUserTpl.apply(rec.get('users')));
                       return me.strings.locked;
                   }
                   if(rec.isLocked()) {

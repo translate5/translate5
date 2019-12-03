@@ -51,9 +51,14 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         usageModeTitle: "#UT#Mehrere Benutzer",
         usageModeInfo: "#UT#Bei Zuweisung mehrerer Benutzer zum selben Workflowschritt",
         usageModeDisabled: "#UT#Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.",
-        usageModeCoop: "#UT#Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe",
-        usageModeCompetitive: "#UT#Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.",
-        usageModeSimultaneous: "#UT#Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe"
+        
+        usageModeCoop: "#UT#Sequentielles Arbeiten",
+        usageModeCompetitive: "#UT#Konkurrierende Zuweisung",
+//FIXME Option deaktivieren wenn runtimeOptions.plugins.FrontEndMessageBus.socketServer.httpHost leer ist und Plugin fehlt!
+        usageModeSimultaneous: "#UT#Gleichzeitiges Arbeiten",
+        usageModeCoopInfo: "#UT#Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.",
+        usageModeCompetitiveInfo: "#UT#Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.",
+        usageModeSimultaneousInfo: "#UT#Alle zugewiesenen Nutzer eines Workflowschritts können gleichzeitig arbeiten"
     },
     itemId:'taskAttributesPanel',
     controller:'taskattributesviewcontroller',
