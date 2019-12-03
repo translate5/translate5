@@ -464,7 +464,9 @@ Ext.define('Editor.controller.Localizer', {
             deleteTaskDialogMessage:'<?php echo $this->translate->_('Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?');?>',
             deleteTaskDialogTitle:'<?php echo $this->translate->_('Aufgabe löschen');?>',
             taskImportButtonText:'<?php echo $this->translate->_('Aufgabe importieren');?>',
-            taskDeleteButtonText:'<?php echo $this->translate->_('Aufgabe löschen');?>'
+            taskDeleteButtonText:'<?php echo $this->translate->_('Aufgabe löschen');?>',
+            averageProcessingTimeLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Lektor');?>',
+            excelExportUsageLabel: '<?php echo $this->translate->_('Excel-Export Nutzung');?>'
         },
         confirmStrings: {
             "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -496,7 +498,7 @@ Ext.define('Editor.controller.Localizer', {
             notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
             locked: '<?php echo $this->translate->_('in Arbeit');?>',
             lockedBy: '<?php echo $this->translate->_('Bearbeitet und Gesperrt durch {0}');?>',
-            lockedMultiUser: '<?php echo $this->translate->_('Bearbeitet und Gesperrt durch mehrere Benutzer');?>',
+            lockedMultiUser: '<?php echo $this->translate->_('In Bearbeitung durch:');?>',
             lockedSystem: '<?php echo $this->translate->_('Durch das System gesperrt mit dem Status \'{0}\'');?>',
             addTask: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',
             addTaskTip: '<?php echo $this->translate->_('Eine neue Aufgabe hinzufügen.');?>',
@@ -550,10 +552,8 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.task.KpiWindow",
         title: '<?php echo $this->translate->_('Key Performance Indicators');?>',
         strings: {
-            averageProcessingTimeLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Lektor');?>',
-            averageProcessingTimeToolTip: '<?php echo $this->translate->_('Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.');?>',
             closeBtn: '<?php echo $this->translate->_('Fenster schließen');?>',
-            excelExportUsageLabel:'<?php echo $this->translate->_('Excel-Export Nutzung');?>',
+            averageProcessingTimeToolTip: '<?php echo $this->translate->_('Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.');?>',
             excelExportUsageToolTip: '<?php echo $this->translate->_('Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.');?>'
         }
     });
@@ -619,9 +619,12 @@ Ext.define('Editor.controller.Localizer', {
             usageModeTitle: '<?php echo $this->translate->_('Mehrere Benutzer');?>',
             usageModeInfo: '<?php echo $this->translate->_('Bei Zuweisung mehrerer Benutzer zum selben Workflowschritt');?>',
             usageModeDisabled: '<?php echo $this->translate->_('Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.');?>',
-            usageModeCoop: '<?php echo $this->translate->_('Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe');?>',
-            usageModeCompetitive: '<?php echo $this->translate->_('Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.');?>',
-            usageModeSimultaneous: '<?php echo $this->translate->_('Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe');?>'
+            usageModeCoop: '<?php echo $this->translate->_('Sequentielles Arbeiten');?>',
+            usageModeCompetitive: '<?php echo $this->translate->_('Konkurrierende Zuweisung');?>',
+            usageModeSimultaneous: '<?php echo $this->translate->_('Gleichzeitiges Arbeiten');?>',
+            usageModeCoopInfo: '<?php echo $this->translate->_('Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.');?>',
+            usageModeCompetitiveInfo: '<?php echo $this->translate->_('Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.');?>',
+            usageModeSimultaneousInfo: '<?php echo $this->translate->_('Alle zugewiesenen Nutzer eines Workflowschritts können gleichzeitig arbeiten');?>'
         }
     });
     
@@ -921,8 +924,8 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.ApplicationInfoPanel",
         strings: {
             task: '<?php echo $this->translate->_('Aufgabe');?>',
-            loggedinAs: '<?php echo $this->translate->_(' Eingeloggter Benutzer');?>',
-            loginName: '<?php echo $this->translate->_(' Loginname');?>',
+            loggedinAs: '<?php echo $this->translate->_('Eingeloggter Benutzer');?>',
+            loginName: '<?php echo $this->translate->_('Loginname');?>',
             readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
         }
     });

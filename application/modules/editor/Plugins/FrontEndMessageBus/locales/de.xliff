@@ -36,9 +36,9 @@
             <source>Ich</source>
             <target>Ich</target>
         </trans-unit>
-        <trans-unit id='RGFzIGF1c2dld8OkaGx0ZSBTZWdtZW50IHdpcmQgZWluZW4gYW5kZXJlbiBCZW51dHplciBiZXJlaXRzIGJlYXJiZWl0ZXQgdW5kIGthbm4gZGFoZXIgbmljaHQgZ2XDtmZmbmV0IHdlcmRlbi4='>
-            <source>Das ausgewählte Segment wird einen anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.</source>
-            <target>Das ausgewählte Segment wird einen anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.</target>
+        <trans-unit id='RGFzIGF1c2dld8OkaGx0ZSBTZWdtZW50IHdpcmQgdm9uIGVpbmVtIGFuZGVyZW4gQmVudXR6ZXIgYmVyZWl0cyBiZWFyYmVpdGV0IHVuZCBrYW5uIGRhaGVyIG5pY2h0IGdlw7ZmZm5ldCB3ZXJkZW4u'>
+            <source>Das ausgewählte Segment wird von einem anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.</source>
+            <target>Das ausgewählte Segment wird von einem anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.</target>
         </trans-unit>
     </body>
   </file>
