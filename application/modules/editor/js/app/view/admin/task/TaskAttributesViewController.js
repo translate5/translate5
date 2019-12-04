@@ -42,8 +42,11 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
 
     listen: {
         component: {
-            "taskattributes": {
+            'taskattributes': {
                 show: 'loadTask'
+            },
+            'radio[name="usageMode"]': {
+                change: 'onUsageModeChange'
             }
         }
     },
@@ -91,6 +94,12 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
     
     onCancelTaskAttributesClick:function(){
         this.getView().up('window').destroy();
+    },
+    
+    onUsageModeChange: function(field, newVal) {
+        if(field.config.inputValue == 'simultaneous' && newVal && !Editor.plugins.FrontEndMessageBus) {
+            Editor.MessageBox.addError('In order to use that mode the FrontEndMessageBus plug-in must be active!');
+        }
     }
 
 });

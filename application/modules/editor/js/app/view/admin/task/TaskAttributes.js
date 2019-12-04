@@ -54,7 +54,6 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         
         usageModeCoop: "#UT#Sequentielles Arbeiten",
         usageModeCompetitive: "#UT#Konkurrierende Zuweisung",
-//FIXME Option deaktivieren wenn runtimeOptions.plugins.FrontEndMessageBus.socketServer.httpHost leer ist und Plugin fehlt!
         usageModeSimultaneous: "#UT#Gleichzeitiges Arbeiten",
         usageModeCoopInfo: "#UT#Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.",
         usageModeCompetitiveInfo: "#UT#Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.",
