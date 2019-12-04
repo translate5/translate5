@@ -241,7 +241,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         var me = this,
             id = data.segmentId,
             msg = me.strings;
-        if(me.editorPlugin.editing && me.editorPlugin.context.record.get('id') === id) {
+        if(me.editorPlugin && me.editorPlugin.editing && me.editorPlugin.context.record.get('id') === id) {
             me.editorPlugin.cancelEdit();
             Ext.Msg.alert(msg.inUseTitle, msg.inUse);    
         }
@@ -256,8 +256,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     onSegmentSave: function(data) {
         var segment,
             grid = this.getSegmentGrid();
-        if(segment = grid.store.getById(data.segmentId)) {
-            console.log("reload updated segment", segment.data);
+        if(grid && (segment = grid.store.getById(data.segmentId))) {
             this.segmentUnlock(this.getSegmentMeta(data.segmentId), data.connectionId, true);
             segment.load();
         }
@@ -269,6 +268,10 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             connectionId = data.connectionId,
             grid = me.getSegmentGrid(),
             segment;
+        
+        if(!grid) {
+            return;
+        }
     
         //add color mark to current segment and lock segment
         Ext.Array.each(lockedIds, function(lockedId){
@@ -312,7 +315,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         var me = this, segment,
             grid = me.getSegmentGrid();
 
-        if(meta.editingConn !== connectionId) {
+        if(!grid || meta.editingConn !== connectionId) {
             return;
         }
         meta.editingConn = false;
@@ -364,6 +367,10 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             grid = me.getSegmentGrid(),
             meta = me.getSegmentMeta(selectedId),
             segment;
+        
+        if(!grid) {
+            return;
+        }
         
         //remove previous selection
         me.segmentUsageData.each(function(meta) {
@@ -550,6 +557,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     onCloseEditorViewport: function() {
         var me = this;
         me.tooltip && me.tooltip.destroy();
+        me.segmentUsageData.removeAll();
     },
     /**
      * Updates the online users view
