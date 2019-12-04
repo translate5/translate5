@@ -117,7 +117,7 @@ class Task extends Channel {
             $userGuid = $this->instance->getSession($conn->sessionId, 'userGuid');
             $result->trackingId = $this->getUserTrackingId($result->taskGuid, $userGuid); 
             $result->segmentId = $segmentId;
-            $result->connectionId = $conn->connectionId;
+            $result->connectionId = $conn->connectionId; //send back the locking connection id
             $result->send();
         }
         

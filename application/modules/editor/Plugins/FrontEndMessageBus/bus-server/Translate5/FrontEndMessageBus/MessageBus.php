@@ -59,6 +59,12 @@ class MessageBus implements MessageComponentInterface
         $conn->sessionId = $data['sessionId'];
         $conn->serverId = $data['serverId'];
         $conn->connectionId = $data['connectionId'];
+        if(empty($conn->connectionId)) {
+            $this->logger->error('connection open: no connection ID was given', LOG_SOCKET);
+            $conn->send('{"command":"errorOnOpen", "error": "noConnectionId"}');
+            $conn->close();
+            return;
+        }
         $instance = $this->getInstance($conn->serverId);
         if($data['version'] !== SERVER_VERSION) {
             $this->logger->error('connection open: version mismatch. '.$data['version'].' on client and '.SERVER_VERSION.' on server', LOG_SOCKET);
@@ -77,7 +83,7 @@ class MessageBus implements MessageComponentInterface
     
     public function onClose(ConnectionInterface $conn) {
         $instance = $this->getInstance($conn->serverId);
-        $instance->onClose($conn);
+        $instance && $instance->onClose($conn);
         $this->garbageCollection();
     }
     
@@ -89,9 +95,12 @@ class MessageBus implements MessageComponentInterface
         //check for JSON errors
         if(json_last_error() > 0){
             $this->logger->error('error on message (JSON) decode: '.json_last_error_msg(), LOG_SOCKET, ['message' => $message]);
+            $conn->close();
             return;
         }
         
+        settype($msg['channel'], 'string');
+        settype($msg['command'], 'string');
         settype($msg['payload'], 'array');
         $msg['conn'] = $conn;
         $this->logger->debug('IN '.$msg['channel'].'::'.$msg['command'].'('.json_encode($msg['payload']).')');
@@ -160,10 +169,13 @@ class MessageBus implements MessageComponentInterface
         //get the serverId from the connection open request
         $params= null;
         parse_str($conn->httpRequest->getUri()->getQuery(), $params);
-        if(empty($params) || empty($params['serverId'])) {
-            return [];
+        if(!is_array($params)) {
+            $params = [];
         }
+        settype($params['version'], 'string');
+        settype($params['serverId'], 'string');
         settype($params['sessionId'], 'string');
+        settype($params['connectionId'], 'string');
         return $params;
     }
     

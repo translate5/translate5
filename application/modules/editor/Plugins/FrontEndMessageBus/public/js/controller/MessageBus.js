@@ -111,6 +111,16 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             Ext.Logger.warn("MessageBus WebSocket communication deactivated due missing configuration of the socket server.");
             return;
         }
+        
+        //if js logging is activated, we add some interesting data to it
+        if(window.logger) {
+            logger.data.messageBus = {
+                serverId: Editor.data.app.serverId,
+                connectionId: conf.connectionId,
+                version: conf.clientVersion
+            }
+        }
+        
         url.push(conf.socketServer.schema, '://');
         url.push(conf.socketServer.httpHost || window.location.hostname);
         url.push(':', conf.socketServer.port, conf.socketServer.route);

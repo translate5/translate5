@@ -97,12 +97,15 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     
     /**
      * @param Zend_EventManager_Event $event
+     * @return boolean true if we have an authenticated user, false if not
      */
     public function handleStartSession(Zend_EventManager_Event $event) {
         $user = new Zend_Session_Namespace('user');
         if(!empty($user->data->userGuid)) {
             $this->bus->startSession(Zend_Session::getId(), $user->data);
+            return true;
         }
+        return false;
     }
     
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
@@ -147,22 +150,23 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         // we are lazy and reuse our other handlers
         
         //resync session
-        $this->handleStartSession($event);
+        if(! $this->handleStartSession($event)) {
+            return; //if we not had a valid authenticated user, we just do nothing
+        }
         
         //resync task open state
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $session = new Zend_Session_Namespace();
-        if(empty($session->taskGuid)) {
-            return;
-        }
-        try {
-            $task->loadByTaskGuid($session->taskGuid);
-            $event->setParam('task', $task);
-            $this->handleAfterTaskOpen($event);
-        }
-        catch (ZfExtended_NotFoundException $e) {
-            //if the task is gone, we can not open it and do nothing
+        if(!empty($session->taskGuid)) {
+            try {
+                $task->loadByTaskGuid($session->taskGuid);
+                $event->setParam('task', $task);
+                $this->handleAfterTaskOpen($event);
+            }
+            catch (ZfExtended_NotFoundException $e) {
+                //if the task is gone, we can not open it and do nothing
+            }
         }
         
         //marks the connection as in sync and trigger processing of queued messages
