@@ -233,11 +233,8 @@ Ext.define('Editor.controller.SnapshotHistory', {
      * @param {String} action
      */
     addSnapshotToLogger: function(snapshot, action) {
-        try {
-            logger && logger.addLogEntry({ type : 'info', message : 'translate5 Editor Snapshot ('+action+'): '  + snapshot});
-        } catch(err) {
-            // error on adding the log entry
-        }
+        var logMessage = 'translate5 Editor Snapshot ('+action+'): '  + snapshot;
+        this.fireEvent('addLogEntryToLogger', logMessage);
     },
     
     // =========================================================================

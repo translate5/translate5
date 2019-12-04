@@ -1331,6 +1331,7 @@ Ext.define('Editor.controller.Editor', {
                 sel,
                 selRange,
                 rangeOpen,
+                bookmarkOpen,
                 rangeClose,
                 insertBothTags;
 
@@ -1362,7 +1363,10 @@ Ext.define('Editor.controller.Editor', {
             if (selRange !== null && !selRange.collapsed) {
                 insertBothTags = true;
                 rangeOpen = selRange.cloneRange();
+                rangeOpen.collapse(true);
+                bookmarkOpen = rangeOpen.getBookmark();
                 rangeClose = selRange.cloneRange();
+                rangeClose.collapse(false);
                 // Make sure to insert closing tag first, otherwise the ranges gets messy.
                 sourceTagsForTagIdx.sort(function(a, b){
                   var x = a.id.toLowerCase();
@@ -1374,7 +1378,8 @@ Ext.define('Editor.controller.Editor', {
             }
             
             Ext.Array.each(sourceTagsForTagIdx, function(tagObject){
-                var [id, tag] = [tagObject.id, tagObject.tag],
+                var id = tagObject.id,
+		    tag = tagObject.tag,
                     tagInTarget = editor.getDoc().getElementById(id);
                 if(tagInTarget && tagInTarget.parentNode.nodeName.toLowerCase() !== 'del'){
                     return;
@@ -1382,14 +1387,13 @@ Ext.define('Editor.controller.Editor', {
                 if (insertBothTags) {
                     switch (true) {
                         case (id.indexOf('-open') !== -1):
-                            rangeOpen.collapse(true);
-                            sel.removeAllRanges();
-                            sel.addRange(rangeOpen);
+                            // In Firefox, sel.setSingleRange(rangeOpen) does NOT work. No idea why.
+                            // Workaround: use bookmark - THAT works somehow.
+                            selRange.moveToBookmark(bookmarkOpen);
+                            sel.setSingleRange(selRange);
                         break;
                         case (id.indexOf('-close') !== -1):
-                            rangeClose.collapse(false);
-                            sel.removeAllRanges();
-                            sel.addRange(rangeClose);
+                            sel.setSingleRange(rangeClose);
                         break;
                     }
                 }
