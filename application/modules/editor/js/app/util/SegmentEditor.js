@@ -450,18 +450,15 @@ Ext.define('Editor.util.SegmentEditor', {
      * 
      * Due to using the browser's execCommand("copy"),this cannot be called to replace the copy-function
      * (= we would run into the copy again).
+     * 
+     * @param {Boolean} doDel (optional)
      */
-    copyToClipboard: function () {
+    copyToClipboard: function (doDel=false) {
         var me = this,
         	docSel,
         	docSelBookmark,
         	docSelRange,
-            textToCopy,
-            domFrag,    // for HTMLDivElement
-            domFragEl,  // for Ext.dom.Element
-            allImgNodes,
-            imgPartnerNode,
-            imgPartnerNodeForClipboard;
+            textToCopy;
         
         if (!me.getEditorDoc()) {
         	me.consoleLog('ERROR: copyToClipboard cannot find editor!');
@@ -472,30 +469,6 @@ Ext.define('Editor.util.SegmentEditor', {
         docSelBookmark = docSel.getBookmark();
         docSelRange = docSel.rangeCount ? docSel.getRangeAt(0) : null;
         textToCopy = docSelRange.toHtml();
-        
-        // (see TRANSLATE-1213:)
-        // If we cut & paste an image that has a partner-tag, the CTRL+X will delete the partner-tag, too, so
-        // we will need to paste the partner-tag as well here (if it's not already part of the selection).
-        if (/img/.test(textToCopy)) {
-            domFrag = Ext.DomHelper.createDom({tag: 'div'});
-            Ext.DomHelper.insertHtml('afterBegin',domFrag,textToCopy);
-            domFragEl = Ext.get(domFrag);
-            allImgNodes = domFragEl.query('img');
-            Ext.Array.each(allImgNodes, function(imgNode, index, allImgNodes) {
-                imgPartnerNode = me.getPartnerTag(imgNode);
-                if (imgPartnerNode) {
-                    if (textToCopy.indexOf(imgPartnerNode.outerHTML) === -1) { // check via string = avoid yet another DOM-El....
-                        imgPartnerNodeForClipboard = imgPartnerNode.cloneNode();
-                        if(/open/.test(imgNode.className)) {
-                            Ext.get(imgNode).insertSibling(imgPartnerNodeForClipboard,'after');
-                        } else {
-                            Ext.get(imgNode).insertSibling(imgPartnerNodeForClipboard,'before');
-                        }
-                    };
-                }
-            });
-            textToCopy = domFragEl.getHtml();
-        }
         
         me.consoleLog("copyToClipboard: " + textToCopy);
         
@@ -520,6 +493,13 @@ Ext.define('Editor.util.SegmentEditor', {
                 debugger;
             }
         }
+        
         docSel.moveToBookmark(docSelBookmark);
+        
+        if (doDel) {
+            docSelRange.deleteContents();
+            docSelRange.collapse(true);
+            docSel.setSingleRange(docSelRange);
+        }
     }
 });

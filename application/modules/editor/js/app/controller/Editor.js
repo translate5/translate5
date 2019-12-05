@@ -159,6 +159,7 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-d':         ['D',{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ['S',{ctrl: true, alt: false}, me.save, true],
             'ctrl-g':         ['G',{ctrl: true, alt: false}, me.scrollToSegment, true],
+            'ctrl-x':         ['X',{ctrl: true, alt: false}, me.cutSelectionWithInternalTags, true],
             'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
             'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
@@ -446,6 +447,9 @@ Ext.define('Editor.controller.Editor', {
     initEditor: function(editor){
         var me = this,
             docEl = Ext.get(editor.getDoc());
+        
+        me.editor = editor; // for use in Editor.util.SegmentEditor
+        
         if(me.editorKeyMap) {
             me.editorKeyMap.destroy();
         }
@@ -1160,6 +1164,15 @@ Ext.define('Editor.controller.Editor', {
                 notScrollCallback: callback
             });
         }
+    },
+    cutSelectionWithInternalTags: function() {
+        var me = this,
+            plug = me.getEditPlugin();
+        //do only something when editing targets:
+        if(!me.isEditing || !/^target/.test(plug.editor.columnToEdit)){
+            return;
+        }
+        me.copyToClipboard(true); // see Editor.util.SegmentEditor
     },
     copySelectionWithInternalTags: function() {
         // The user will expect the copied text to be available in the clipboard,
