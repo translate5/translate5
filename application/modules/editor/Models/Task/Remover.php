@@ -75,7 +75,7 @@ class editor_Models_Task_Remover {
             return false;
         }
         //tries to lock the task, but delete it regardless if could be locked or not.
-        $this->task->lock(NOW_ISO, true);
+        $this->task->lock(NOW_ISO);
         
         if($removeFiles) {
             $this->removeDataDirectory();
@@ -123,7 +123,7 @@ class editor_Models_Task_Remover {
             ], ['task' => $this->task]);
         }
         
-        if(!$this->task->lock(NOW_ISO, true)) {
+        if(!$this->task->lock(NOW_ISO)) {
             //this should not happen, therefore it is not translated
             throw new ZfExtended_Models_Entity_Conflict('E1044', ['task' => $this->task]);
         }

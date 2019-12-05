@@ -126,7 +126,7 @@ Ext.define('Editor.controller.Localizer', {
 
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
-  	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_('Segmentliste und Editor - [LESEMODUS]');?>';
+  	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_(' - [LESEMODUS]');?>';
   	Editor.view.segments.Grid.prototype.title_addition_unconfirmed = '<?php echo $this->translate->_(' - [AUFGABE UNBESTÄTIGT]');?>';
   	Editor.view.segments.Grid.prototype.target_original = ' <?php echo $this->translate->_('(zur Importzeit)');?>';
   	Editor.view.segments.Grid.prototype.item_logoutheaderbtn = '<?php echo $this->translate->_('Ausloggen');?>';
@@ -288,15 +288,15 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_startWatchingSegment = '<?php echo $this->translate->_('Segment auf Lesezeichenliste (STRG + D)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_stopWatchingSegment = '<?php echo $this->translate->_('Segment von Lesezeichenliste entfernen (STRG + D)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_scrollToSegment = '<?php echo $this->translate->_('Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNextFiltered = '<?php echo $this->translate->_('Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges Segment öffnen (STRG + ALT + SHIFT + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNextFiltered = '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment im Workflow öffnen (STRG + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren (STRG + ALT + ←)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren (STRG + ALT + →)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_next = '<?php echo $this->translate->_('Nicht speichern und nächstes Segment öffnen (STRG + ALT + ↓)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern und nächstes Segment im Workflow öffnen (ALT + Bild ↓)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)');?>';
-    Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern und vorheriges Segment im Workflow öffnen (ALT + Bild ↑)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_next = '<?php echo $this->translate->_('Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern und nächstes bearbeitbares Segment im Workflow öffnen (ALT + Bild ↓)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment im Workflow öffnen (ALT + Bild ↑)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_whitespaceButtonGroup= '<?php echo $this->translate->_('Sonderzeichen hinzufügen:');?>';
    
     Ext.define("Editor.locale.de.controller.Editor", {
@@ -338,6 +338,14 @@ Ext.define('Editor.controller.Localizer', {
             cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.');?>',
             segmentToShort: '<?php echo $this->translate->_('Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.');?>',
             segmentToLong: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.controller.JsLogger", {
+        override: "Editor.controller.JsLogger",
+        strings: {
+            msgTitle: '<?php echo $this->translate->_('Videoaufnahme im Fehlerfall');?>',
+            msgInfo: '<?php echo $this->translate->_('Helfen Sie bei der Entwicklung von translate5: Erlauben Sie Bildschirmvideos im Fehlerfall.<br /><br />Bei einer Reihe von Fehlern kann das Open Source-Entwicklungsteam von translate5 diese nur reproduzieren und beheben, wenn die Benutzeraktionen, die  zu dem translate5-Fehler geführt haben, als Video aufgenommen werden. Es wird nur aufgezeichnet, was in translate5 passiert. Die Videoaufnahme startet erst, wenn ein Segment zur Bearbeitung geöffnet ist, und sie endet, sobald die Bearbeitung des Segments endet.<br /><br />Das Team von translate5 wäre sehr dankbar, wenn Sie diese Funktion aktivieren - vielen Dank im Voraus!<br /><br />Auch wenn die Videoaufzeichnung aktiviert ist, werden Videoaufzeichnungen nur gesendet, wenn Sie einen aufgetretenen Fehler melden.<br /><br />Videos, die mit einem Fehler in Verbindung stehen und an den Server gesendet wurden, werden gelöscht, sobald sie zur Behebung des Fehlers nicht mehr benötigt werden. Der einzige Verwendungszweck der Videos ist die Entwicklung von translate5. Die Daten werden nur für diesen Zweck verwendet.<br /><br />Weitere Informationen zur Videoaufzeichnung mit theRootCause und zum Datenschutz finden Sie unter https://confluence.translate5.net/x/EAArBw');?>',
         }
     });
 
@@ -458,8 +466,7 @@ Ext.define('Editor.controller.Localizer', {
             taskImportButtonText:'<?php echo $this->translate->_('Aufgabe importieren');?>',
             taskDeleteButtonText:'<?php echo $this->translate->_('Aufgabe löschen');?>',
             averageProcessingTimeLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Lektor');?>',
-            averageProcessingTimeDays:'<?php echo $this->translate->_('{0} Tage');?>',
-            excelExportUsageLabel:'<?php echo $this->translate->_('Excel-Export Nutzung');?>'
+            excelExportUsageLabel: '<?php echo $this->translate->_('Excel-Export Nutzung');?>'
         },
         confirmStrings: {
             "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -491,6 +498,7 @@ Ext.define('Editor.controller.Localizer', {
             notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
             locked: '<?php echo $this->translate->_('in Arbeit');?>',
             lockedBy: '<?php echo $this->translate->_('Bearbeitet und Gesperrt durch {0}');?>',
+            lockedMultiUser: '<?php echo $this->translate->_('In Bearbeitung durch:');?>',
             lockedSystem: '<?php echo $this->translate->_('Durch das System gesperrt mit dem Status \'{0}\'');?>',
             addTask: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',
             addTaskTip: '<?php echo $this->translate->_('Eine neue Aufgabe hinzufügen.');?>',
@@ -501,7 +509,8 @@ Ext.define('Editor.controller.Localizer', {
             reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
             reloadBtnTip: '<?php echo $this->translate->_('Aufgabenliste vom Server aktualisieren.');?>',
             noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>',
-            emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).');?>'
+            emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).');?>',
+            addFilterText: '<?php echo $this->translate->_('Erweiterte Filter');?>'
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
@@ -525,7 +534,17 @@ Ext.define('Editor.controller.Localizer', {
             lockLocked: '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>',
             orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>',
-            emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>'
+            emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>',
+            workflowState: '<?php echo $this->translate->_('Workflow-Status');?>',
+            workflowUserRole: '<?php echo $this->translate->_('Benutzer-Rolle');?>',
+            userName: '<?php echo $this->translate->_('Benutzer');?>',
+            id: '<?php echo $this->translate->_('Id');?>',
+            taskGuid: '<?php echo $this->translate->_('Task-Guid');?>',
+            workflow: '<?php echo $this->translate->_('Workflow');?>',
+            taskassocs: '<?php echo $this->translate->_('Zugewiesene Sprach-Resourcen');?>',
+            pmName: '<?php echo $this->translate->_('Projektmanager');?>',
+            edit100PercentMatch: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
+            userCount: '<?php echo $this->translate->_('Zahl zugewiesener Benutzer');?>'
         }
     });
     
@@ -535,7 +554,7 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             closeBtn: '<?php echo $this->translate->_('Fenster schließen');?>',
             averageProcessingTimeToolTip: '<?php echo $this->translate->_('Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.');?>',
-            excelExportUsageToolTip: '<?php echo $this->translate->_('Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.');?>',
+            excelExportUsageToolTip: '<?php echo $this->translate->_('Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.');?>'
         }
     });
     
@@ -559,6 +578,27 @@ Ext.define('Editor.controller.Localizer', {
         title: '<?php echo $this->translate->_('Ereignisse zu Sprachresource "{0}"');?>'
     });
     
+    Ext.define("Editor.locale.de.view.admin.task.filter.AdvancedFilter", {
+        override: "Editor.view.admin.task.filter.AdvancedFilter",
+        strings:{
+        	filterHolderLabel: '<?php echo $this->translate->_('Gesetzte Filter');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.filter.FilterWindow", {
+        override: "Editor.view.admin.task.filter.FilterWindow",
+        strings:{
+        	workflowStateFilterLabel: '<?php echo $this->translate->_('Workflow-Status');?>',
+        	workflowUserRoleLabel: '<?php echo $this->translate->_('Zugewiesene Benutzer-Rolle/n');?>',
+        	userNameLabel: '<?php echo $this->translate->_('Zugewiesene/r Benutzer');?>',
+        	applyBtn: '<?php echo $this->translate->_('Anwenden');?>',
+        	cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+        	title:'<?php echo $this->translate->_('Erweiterte Filter');?>',
+        	anonymizedUsersInfo:'<?php echo $this->translate->_('Anonymisierte Benutzer nicht auswählbar');?>',
+        	gridFiltersInfo:'<?php echo $this->translate->_('Weitere Filter im Kopf jeder Spalte');?>'
+        }
+    });
+    
     Ext.define("Editor.locale.de.view.admin.task.TaskAttributes", {
         override: "Editor.view.admin.task.TaskAttributes",
         title: '<?php echo $this->translate->_('Eigenschaften');?>',
@@ -577,10 +617,14 @@ Ext.define('Editor.controller.Localizer', {
             editTrue: '<?php echo $this->translate->_('Ja');?>',
             editFalse: '<?php echo $this->translate->_('Nein');?>',
             usageModeTitle: '<?php echo $this->translate->_('Mehrere Benutzer');?>',
-            usageModeInfo: '<?php echo $this->translate->_('Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden');?>',
+            usageModeInfo: '<?php echo $this->translate->_('Bei Zuweisung mehrerer Benutzer zum selben Workflowschritt');?>',
             usageModeDisabled: '<?php echo $this->translate->_('Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.');?>',
-            usageModeCoop: '<?php echo $this->translate->_('Mehrere Benutzer bearbeiten dieselbe Aufgabe');?>',
-            usageModeCompetitive: '<?php echo $this->translate->_('Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.');?>'
+            usageModeCoop: '<?php echo $this->translate->_('Sequentielles Arbeiten');?>',
+            usageModeCompetitive: '<?php echo $this->translate->_('Konkurrierende Zuweisung');?>',
+            usageModeSimultaneous: '<?php echo $this->translate->_('Gleichzeitiges Arbeiten');?>',
+            usageModeCoopInfo: '<?php echo $this->translate->_('Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.');?>',
+            usageModeCompetitiveInfo: '<?php echo $this->translate->_('Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.');?>',
+            usageModeSimultaneousInfo: '<?php echo $this->translate->_('Alle zugewiesenen Nutzer eines Workflowschritts können gleichzeitig arbeiten');?>'
         }
     });
     
@@ -861,6 +905,7 @@ Ext.define('Editor.controller.Localizer', {
             searchButton: '<?php echo $this->translate->_('Suchen');?>',
             replaceButton: '<?php echo $this->translate->_('Ersetzen');?>',
             mqmNotSupporterTooltip: '<?php echo $this->translate->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');?>',
+            multiUsersTooltip: '<?php echo $this->translate->_('Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe');?>'
         }
     });
     
@@ -879,8 +924,8 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.ApplicationInfoPanel",
         strings: {
             task: '<?php echo $this->translate->_('Aufgabe');?>',
-            loggedinAs: '<?php echo $this->translate->_(' Eingeloggter Benutzer');?>',
-            loginName: '<?php echo $this->translate->_(' Loginname');?>',
+            loggedinAs: '<?php echo $this->translate->_('Eingeloggter Benutzer');?>',
+            loginName: '<?php echo $this->translate->_('Loginname');?>',
             readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
         }
     });
@@ -910,6 +955,12 @@ Ext.define('Editor.controller.Localizer', {
     }//END if($hasFrontendController('Editor.controller.HeadPanel'))
     if($hasFrontendController('Editor.controller.UserPreferences')) {
 ?>
+    
+    
+    Editor.controller.UserPreferences.prototype.strings = {
+        settings: '<?php echo $this->translate->_('Meine Einstellungen');?>',
+        pwSave: '<?php echo $this->translate->_('Passwort erfolgreich gespeichert!');?>'
+    };
     
     Editor.controller.UserPreferences.prototype.strings = {
         settings: '<?php echo $this->translate->_('Meine Einstellungen');?>',
