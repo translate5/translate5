@@ -159,7 +159,7 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-d':         ['D',{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ['S',{ctrl: true, alt: false}, me.save, true],
             'ctrl-g':         ['G',{ctrl: true, alt: false}, me.scrollToSegment, true],
-            'ctrl-x':         ['X',{ctrl: true, alt: false}, me.cutSelectionWithInternalTags, true],
+            'ctrl-x':         ['X',{ctrl: true, alt: false}, me.cutSelectionWithInternalTags, false],
             'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
             'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
@@ -448,8 +448,6 @@ Ext.define('Editor.controller.Editor', {
         var me = this,
             docEl = Ext.get(editor.getDoc());
         
-        me.editor = editor; // for use in Editor.util.SegmentEditor
-        
         if(me.editorKeyMap) {
             me.editorKeyMap.destroy();
         }
@@ -499,15 +497,23 @@ Ext.define('Editor.controller.Editor', {
                 segmentId = plug.context.record.get('id'),
                 data,
                 clipboardData = (e.browserEvent.clipboardData || window.clipboardData).getData('Text'),
+                copiedFrom = me.copiedSelectionWithTagHandling.copiedFrom,
                 insertSelectionWithTagHandling = function() {
-                    // Segment A must not copy internal tags into Segment B
-                    if (segmentId !== me.copiedSelectionWithTagHandling.selSegmentId) {
-                        data = me.copiedSelectionWithTagHandling.selDataText;
-                    } else {
+                    if (copiedFrom === 'target') {
+                        // when copied from target, internal tags are still images! 
                         data = me.copiedSelectionWithTagHandling.selDataHtml;
+                        editor.insertAtCursor(data);
+                        me.handleAfterContentChange();
+                    } else {
+                        // Segment A must not copy internal tags into Segment B
+                        if (segmentId !== me.copiedSelectionWithTagHandling.selSegmentId) {
+                            data = me.copiedSelectionWithTagHandling.selDataText;
+                        } else {
+                            data = me.copiedSelectionWithTagHandling.selDataHtml;
+                        }
+                        editor.insertMarkup(data);
+                        // handleAfterContentChange() is triggered from THERE
                     }
-                    editor.insertMarkup(data);
-                    // handleAfterContentChange() is triggered from THERE
                     me.lastCopiedSelectionWithTagHandling = me.copiedSelectionWithTagHandling.selDataHtml;
                     me.lastClipboardData = clipboardData;
                 },
@@ -1167,12 +1173,22 @@ Ext.define('Editor.controller.Editor', {
     },
     cutSelectionWithInternalTags: function() {
         var me = this,
-            plug = me.getEditPlugin();
+            plug = me.getEditPlugin(),
+            sel,
+            selRange;
         //do only something when editing targets:
         if(!me.isEditing || !/^target/.test(plug.editor.columnToEdit)){
             return;
         }
-        me.copyToClipboard(true); // see Editor.util.SegmentEditor
+        // copy the selection...
+        me.copySelectionWithInternalTags();
+        // ... and delete it 
+        editor = plug.editor.mainEditor;
+        sel = rangy.getSelection(editor.getEditorBody());
+        selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
+        selRange.deleteContents();
+        selRange.collapse(true);
+        sel.setSingleRange(selRange);        
     },
     copySelectionWithInternalTags: function() {
         // The user will expect the copied text to be available in the clipboard,
@@ -1184,7 +1200,9 @@ Ext.define('Editor.controller.Editor', {
         // CTRL+C gets the selected text (including internal tags)
         var me = this,
             plug = me.getEditPlugin(),
+            editor,
             segmentId,
+            copiedFrom,
             sel,
             selRange,
             selDataHtml,
@@ -1193,6 +1211,7 @@ Ext.define('Editor.controller.Editor', {
             activeElement,
             position,
             isElementWithInternalTags = function(el){
+                return true;
                 var classNames = el.className.split(' ');
                 if (classNames.indexOf('segment-tag-container')>=0
                     || classNames.indexOf('segment-tag-column')>=0) {
@@ -1207,6 +1226,9 @@ Ext.define('Editor.controller.Editor', {
                     return true;
                 }
                 return false;
+            },
+            isEditor = function(el){
+                return (el.nodeName === 'IFRAME');
             };
             
         //do only something when editing targets:
@@ -1221,11 +1243,11 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
 
-        // Where does the copied text come from? If it's from a segment's source, we store the
-        // id from the segment, because in this case it will be allowed to paste the internal tags 
+        // Where does the copied text come from? If it's from a segment's source or the Editor itself, 
+        // we store the id from the segment, because in this case it will be allowed to paste the internal tags 
         // into the target (but only if the target belongs to the same segment as the source).
-        segmentId = isElementSourceSegment(activeElement) ? plug.context.record.get('id') : '';
-        console.log(segmentId);
+        segmentId = '';
+        copiedFrom = '';
         
         sel = rangy.getSelection();
         
@@ -1239,6 +1261,14 @@ Ext.define('Editor.controller.Editor', {
                 if(position.atStart && position.atEnd){
                     sel.selectAllChildren(activeElement);
                 }
+                segmentId = plug.context.record.get('id');
+                copiedFrom = 'source';
+                break;
+            case isEditor(activeElement):
+                editor = plug.editor.mainEditor;
+                sel = rangy.getSelection(editor.getEditorBody());
+                segmentId = plug.context.record.get('id');
+                copiedFrom = 'target';
                 break;
         } 
         
@@ -1263,7 +1293,8 @@ Ext.define('Editor.controller.Editor', {
         me.copiedSelectionWithTagHandling = {
                 'selDataHtml': selDataHtml, // = selected content WITH internal tags
                 'selDataText': selDataText, // = selected content WITHOUT internal tags
-                'selSegmentId': segmentId
+                'selSegmentId': segmentId,
+                'copiedFrom': copiedFrom
         };
     },
     copySourceToTarget: function() {
