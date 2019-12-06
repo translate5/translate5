@@ -319,8 +319,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $userData=$this->getUsersForRendering($rows);
         }
         
-        $this->entity->updateCurrentWorkflowStepProgress($taskGuids);
-        
         foreach ($rows as &$row) {
             $row['lastErrors'] = $this->getLastErrorMessage($row['taskGuid'], $row['state']);
             $this->initWorkflow($row['workflow']);
@@ -842,6 +840,11 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->entity->updateSegmentsEdit100PercentMatch($this->entity, (boolean)$this->data->edit100PercentMatch);
         }
         
+        //if the totals segment count is not set, update it before the entity is saved
+        if($this->entity->getSegmentCount()==null || $this->entity->getSegmentCount()<1){
+            $this->entity->setSegmentCount($this->entity->getTotalSegmentsCount($taskguid));
+        }
+        
         $this->entity->save();
         $obj = $this->entity->getDataObject();
         
@@ -1180,6 +1183,8 @@ class editor_TaskController extends ZfExtended_RestController {
         // We do this here to have it immediately available e.g. when opening segments.
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
+
+        $this->view->rows->workflowProgressSummary=$this->entity->getWorkflowProgressSummary();
     }
     
     public function deleteAction() {

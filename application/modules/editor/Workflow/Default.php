@@ -47,10 +47,9 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      */
     protected function handleImport(){
         $this->doDebug(__FUNCTION__);
-        $stepName = (bool) $this->newTask->getEmptyTargets() ? self::STEP_TRANSLATION : self::STEP_LECTORING;
-        $this->initWorkflowStep($this->newTask, $stepName);
+        $this->initWorkflowStep($this->newTask, self::STEP_NO_WORKFLOW);
         $this->newTask->load($this->newTask->getId()); //reload task with new workflowStepName and new calculated workflowStepNr
-        $this->callActions(__FUNCTION__, $stepName);
+        $this->callActions(__FUNCTION__, self::STEP_NO_WORKFLOW);
     }
     
     /**

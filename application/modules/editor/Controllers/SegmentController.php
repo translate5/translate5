@@ -298,6 +298,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $row = json_decode(json_encode($this->view->rows), true); // = for anonymizeUserdata(): argument 3 must be of the type array
             $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $row['userGuid'], $row);
         }
+        
+        //reload the task so the segment finish count is updated
+        $task->load($task->getId());
+        
+        //set the segmentFinishCount so the frontend viewmodel is updated
+        $this->view->rows->segmentFinishCount=$task->getSegmentFinishCount();
     }
     
     /***

@@ -85,7 +85,8 @@ class editor_Models_Segment_Updater {
         //@todo do this with events
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
-        $wfm->getActive($this->segment->getTaskGuid())->beforeSegmentSave($this->segment, $this->task);
+        $workflow=$wfm->getActive($this->segment->getTaskGuid());
+        $workflow->beforeSegmentSave($this->segment, $this->task);
         
         $this->segment->validate();
         
@@ -112,6 +113,9 @@ class editor_Models_Segment_Updater {
         $this->segment->save();
         //call after segment put handler
         $this->updateLanguageResources();
+        
+        //update the segment finish count for the current workflow step
+        $this->task->changeSegmentFinishCount($this->task, $segment->getAutoStateId(), $history->getAutoStateId());
     }
     
     /**

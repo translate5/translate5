@@ -108,7 +108,7 @@ class editor_Models_Import_Worker_Import {
         $this->importRelaisFiles();
         $this->task->createMaterializedView();
         $this->calculateEmptyTargets();
-        
+        $this->updateSegmentCount();
         //saving task twice is the simplest way to do this. has meta data is only available after import.
         $this->task->save();
         
@@ -208,6 +208,13 @@ class editor_Models_Import_Worker_Import {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         $this->task->setEmptyTargets($segment->hasEmptyTargetsOnly($this->task->getTaskGuid()));
+    }
+    
+    /***
+     * Update the segment count for the task
+     */
+    protected function updateSegmentCount(){
+        $this->task->setSegmentCount($this->task->getTotalSegmentsCount($this->task->getTaskGuid()));
     }
     
     /**

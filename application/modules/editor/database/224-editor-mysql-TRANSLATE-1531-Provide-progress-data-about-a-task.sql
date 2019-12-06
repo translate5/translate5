@@ -27,5 +27,5 @@ END LICENSE AND COPYRIGHT
 */
 
 ALTER TABLE `LEK_task` 
-ADD COLUMN `currentWorkflowStep` VARCHAR(60) NULL AFTER `usageMode`,
-ADD COLUMN `currentWorkflowStepProgress` INT(11) NULL AFTER `currentWorkflowStep`;
+ADD COLUMN `segmentCount` INT(11) NULL DEFAULT '0' AFTER `usageMode`,
+ADD COLUMN `segmentFinishCount` INT(11) NULL DEFAULT '0' AFTER `segmentCount`;

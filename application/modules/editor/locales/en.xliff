@@ -3644,6 +3644,7 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='VGFzay1HdWlk'><source>Task-Guid</source><target>Task-Guid</target></trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUvciBCZW51dHplcg=='><source>Zugewiesene/r Benutzer</source><target>Assigned user/s</target></trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXItUm9sbGUvbg=='><source>Zugewiesene Benutzer-Rolle/n</source><target>Assigned user role/s</target></trans-unit>
+<trans-unit id='S2VpbiBXb3JrZmxvdw=='><source>Kein Workflow</source><target>No workflow</target></trans-unit>
 </body>
   </file>
 </xliff>
