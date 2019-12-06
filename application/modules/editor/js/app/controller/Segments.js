@@ -99,11 +99,15 @@ Ext.define('Editor.controller.Segments', {
   },{
       ref : 'watchListFilterBtn',
       selector : '#watchListFilterBtn'
+  },{
+	  ref:'segmentsToolbar',
+	  selector:'segmentsToolbar'
   }],
   listen: {
       controller: {
           '#Editor.$application': {
-              editorViewportClosed: 'clearSegments'
+              editorViewportClosed: 'clearSegments',
+        	  editorViewportOpened: 'onOpenEditorViewport'
           },
           '#Editor': {
               saveSegment: 'saveChainStart',
@@ -112,7 +116,8 @@ Ext.define('Editor.controller.Segments', {
           '#ChangeAlike': {
               //called after currently loaded segment data is not used anymore by the save chain / change alike handling
               segmentUsageFinished: 'onSegmentUsageFinished',
-              afterUpdateChangeAlike: 'updateSiblingsMetaCache'
+              afterUpdateChangeAlike: 'updateSiblingsMetaCache',
+              alikesSaveSuccess:'onAlikesSaveSuccessHandler'
           },
           '#Fileorder': {
               itemsaved: 'handleFileSaved'
@@ -150,6 +155,11 @@ Ext.define('Editor.controller.Segments', {
       this.fileMap = {};
       this.lastFileMapParams = null;
   },
+  
+  onOpenEditorViewport: function(app, task) {
+      this.updateSegmentFinishCountViewModel(task);
+  },
+  
   /**
    * handler if segment store was loaded
    */
@@ -607,6 +617,8 @@ Ext.define('Editor.controller.Segments', {
       //this bug also exist in extjs 6.2.0
       me.fireEvent('beforeSaveCall', record);
       
+      me.updateSegmentFinishCountViewModel(record);
+      
       //invoking change alike handling:
       if(me.fireEvent('saveComplete')){
           me.saveChainEnd(); //NEXT step in save chain
@@ -644,6 +656,15 @@ Ext.define('Editor.controller.Segments', {
           });
       });
   },
+  
+  /***
+   * On save alike sucess handler
+   */
+  onAlikesSaveSuccessHandler:function(data){
+	  var value=Ext.Number.from(data.segmentFinishCount,0);
+	  this.updateSegmentFinishCountViewModel(value);
+  },
+  
   /**
    * End of the save chain.
    * fires event "chainEnd".
@@ -670,5 +691,16 @@ Ext.define('Editor.controller.Segments', {
       if(me.loadingMaskRequests == 0) {
           me.getViewport().setLoading(false);
       }
+  },
+  
+  /***
+   * Update the segmentFinishCount segments grid view model.
+   */
+  updateSegmentFinishCountViewModel:function(record){
+	  var me=this,
+	  	toolbar=me.getSegmentsToolbar(),
+	  	vm=toolbar.getViewModel(),
+	  	value=Ext.isNumber(record) ? record : record.get('segmentFinishCount');
+	  vm.set('segmentFinishCount',value);
   }
 });

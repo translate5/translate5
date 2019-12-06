@@ -486,6 +486,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     
     me.cleanUpAlikeSegments();
     Editor.MessageBox.addSuccess(Ext.String.format(alikesSaved, data.rows.length));
+    me.fireEvent('alikesSaveSuccess',data);
   },
   /**
    * Die übriggebliebenen IDs in der Pending Liste wurden auf dem Server nicht erfolgreich gespeichert, 
