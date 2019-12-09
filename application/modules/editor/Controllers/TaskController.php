@@ -112,7 +112,11 @@ class editor_TaskController extends ZfExtended_RestController {
             ],
             'userName' => [
                 'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'userGuid', 'taskGuid', 'taskGuid')
-            ]
+            ],
+            'segmentFinishCount' => [
+                'numeric' => 'percent',
+                'totalField'=>'segmentCount'
+            ],
         ];
         
         //TODO: how the sort will work ?
