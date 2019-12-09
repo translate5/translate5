@@ -32,7 +32,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
 	  'Editor.view.admin.TaskActionColumn',
 	  'Editor.view.CheckColumn',
 	  'Editor.view.admin.customer.CustomerFilter',
-	  'Editor.view.admin.task.filter.AdvancedFilter'
+	  'Editor.view.admin.task.filter.AdvancedFilter',
+	  'Editor.view.admin.task.filter.PercentFilter'
   ],
   alias: 'widget.adminTaskGrid',
   itemId: 'adminTaskGrid',
@@ -401,21 +402,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
               renderer:me.currentWorkflowStepProgressRenderer,
               tooltip:me.strings.currentWorkflowStepProgressTooltip,
               filter: {
-                  type: 'number',
-                  fields: {
-                      gt: {
-                    	  maxValue: 100,
-                          minValue: 0
-                      },
-                      eq: {
-                    	  maxValue: 100,
-                          minValue: 0
-                      },
-                      lt: {
-                    	  maxValue: 100,
-                          minValue: 0
-                      }
-                  }
+                  type: 'percent',
+                  totalField:'segmentFinishCount'
               },
               text: me.text_cols.segmentFinishCount
           },{
@@ -816,6 +804,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         switch(gridFilter.type) {
             case 'date':
             case 'numeric':
+        	case 'percent':
                 switch (operator) {
                     case 'gt' :
                         value = {gt: value};
