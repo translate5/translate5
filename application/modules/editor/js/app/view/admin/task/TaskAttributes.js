@@ -51,9 +51,13 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         usageModeTitle: "#UT#Mehrere Benutzer",
         usageModeInfo: "#UT#Bei Zuweisung mehrerer Benutzer zum selben Workflowschritt",
         usageModeDisabled: "#UT#Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.",
-        usageModeCoop: "#UT#Mehrere Benutzer bearbeiten abwechselnd dieselbe Aufgabe",
-        usageModeCompetitive: "#UT#Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.",
-        usageModeSimultaneous: "#UT#Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe"
+        
+        usageModeCoop: "#UT#Sequentielles Arbeiten",
+        usageModeCompetitive: "#UT#Konkurrierende Zuweisung",
+        usageModeSimultaneous: "#UT#Gleichzeitiges Arbeiten",
+        usageModeCoopInfo: "#UT#Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.",
+        usageModeCompetitiveInfo: "#UT#Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.",
+        usageModeSimultaneousInfo: "#UT#Alle zugewiesenen Nutzer eines Workflowschritts können gleichzeitig arbeiten"
     },
     itemId:'taskAttributesPanel',
     controller:'taskattributesviewcontroller',
@@ -225,7 +229,8 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
      */
     setUsageModeConfig: function(items) {
         var me=this,
-            auth = Editor.app.authenticatedUser;
+            auth = Editor.app.authenticatedUser,
+            infoTpl = new Ext.Template('{0} <img src="modules/editor/images/information.png" data-qtip="{1}" />');
         //without task user assoc view, this setting may also not be visible 
         if(!auth.isAllowed('editorChangeUserAssocTask')) {
             return;
@@ -247,26 +252,23 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                         hidden:'{!disableUsageMode}'
                     }
                 },{
-                    //readonly bind: admin.TaskUserAssocs mit Inhalt
-                    boxLabel  : me.strings.usageModeCoop,
+                    boxLabel  : infoTpl.apply([me.strings.usageModeSimultaneous, me.strings.usageModeSimultaneousInfo]),
                     name      : 'usageMode',
-                    inputValue: 'cooperative',
+                    inputValue: 'simultaneous',
                     bind: {
                         disabled:'{disableUsageMode}'
                     }
                 }, {
-                    //readonly bind: admin.TaskUserAssocs mit Inhalt
-                    boxLabel  : me.strings.usageModeCompetitive,
+                    boxLabel  : infoTpl.apply([me.strings.usageModeCompetitive, me.strings.usageModeCompetitiveInfo]),
                     name      : 'usageMode',
                     inputValue: 'competitive',
                     bind: {
                         disabled:'{disableUsageMode}'
                     }
                 }, {
-                    //readonly bind: admin.TaskUserAssocs mit Inhalt
-                    boxLabel  : me.strings.usageModeSimultaneous,
+                    boxLabel  : infoTpl.apply([me.strings.usageModeCoop, me.strings.usageModeCoopInfo]),
                     name      : 'usageMode',
-                    inputValue: 'simultaneous',
+                    inputValue: 'cooperative',
                     bind: {
                         disabled:'{disableUsageMode}'
                     }

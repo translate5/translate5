@@ -131,9 +131,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       deleteTaskDialogTitle:'#UT#Aufgabe löschen',
       taskImportButtonText:'#UT#Aufgabe importieren',
       taskDeleteButtonText:'#UT#Aufgabe löschen',
-      averageProcessingTimeLabel: 'Ø Bearbeitungszeit Lektor',
-      averageProcessingTimeDays: '{0} Tage',
-      excelExportUsageLabel: 'Excel-Export Nutzung'
+      averageProcessingTimeLabel: '#UT#Ø Bearbeitungszeit Lektor',
+      excelExportUsageLabel: '#UT#Excel-Export Nutzung'
   },
   listen: {
       controller: {
@@ -582,19 +581,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           params: params,
           success: function(response){
               var resp = Ext.util.JSON.decode(response.responseText),
-                  kpiStatistics,
-                  average,
                   averageProcessingTimeMessage,
                   excelExportUsageMessage;
-              kpiStatistics = resp.kpiStatistics;
-              // KPI: averageProcessingTimeMessage
-              average = kpiStatistics.averageProcessingTime;
-              if (average !== '-') {
-                  average = Ext.String.format(me.strings.averageProcessingTimeDays, average);
-              }
-              averageProcessingTimeMessage = me.strings.averageProcessingTimeLabel + ': ' + average;
+              // KPI: averageProcessingTime
+              averageProcessingTimeMessage = me.strings.averageProcessingTimeLabel + ': ' + resp.averageProcessingTime;
               // KPI: excelExportUsage
-              excelExportUsageMessage = kpiStatistics.excelExportUsage + ' ' + me.strings.excelExportUsageLabel;
+              excelExportUsageMessage = resp.excelExportUsage + ' ' + me.strings.excelExportUsageLabel;
               // update fields and stop loading-icon
               me.getAverageProcessingTimeDisplay().update(averageProcessingTimeMessage);
               me.getExcelExportUsageDisplay().update(excelExportUsageMessage);

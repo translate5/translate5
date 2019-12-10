@@ -124,7 +124,8 @@ Ext.define('Editor.util.messageBus.MessageBus', {
         var ws,
             me = this,
             url = me.getUrl(),
-            params = me.getParams();
+            params = me.getParams(),
+            errorMsg = 'Configuration error: Socket Server does not use the same protocol as the rest of the page. Either both must use SSL or both not.';
         if(!url) {
             Ext.raise('MessageBus: No URL for the websocket connection was given!');
             return;
@@ -134,6 +135,12 @@ Ext.define('Editor.util.messageBus.MessageBus', {
             url = url+'?'+Ext.Object.toQueryString(params);
         }
         
+        //page protocol and socket server protocol must be the same. Either both SSL or both not. 
+        if ((location.protocol == 'https:') !== /^wss:/.test(url)) {
+            Editor.MessageBox.addError('Please contact your administrator: '+errorMsg);
+            Ext.raise(errorMsg);
+        }
+            
         ws = me.socket = new WebSocket(url);
         
         /**
