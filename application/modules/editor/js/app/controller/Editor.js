@@ -159,6 +159,7 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-d':         ['D',{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ['S',{ctrl: true, alt: false}, me.save, true],
             'ctrl-g':         ['G',{ctrl: true, alt: false}, me.scrollToSegment, true],
+            'ctrl-c':         ['C',{ctrl: true, alt: false}, me.copySelectionWithInternalTags, false],
             'ctrl-x':         ['X',{ctrl: true, alt: false}, me.cutSelectionWithInternalTags, false],
             'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
             'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
@@ -493,7 +494,8 @@ Ext.define('Editor.controller.Editor', {
         docEl.on('paste', function(e){
             e.stopPropagation();
             e.preventDefault();
-            var plug = me.getEditPlugin(),
+            var me = this,
+                plug = me.getEditPlugin(),
                 segmentId = plug.context.record.get('id'),
                 data,
                 clipboardData = (e.browserEvent.clipboardData || window.clipboardData).getData('Text'),
@@ -1172,8 +1174,11 @@ Ext.define('Editor.controller.Editor', {
         }
     },
     cutSelectionWithInternalTags: function() {
+        // The user will expect the cut text to be available in the clipboard,
+        // so we do NOT stop the propagation of the event.
         var me = this,
             plug = me.getEditPlugin(),
+            editor,
             sel,
             selRange;
         //do only something when editing targets:
@@ -1182,13 +1187,14 @@ Ext.define('Editor.controller.Editor', {
         }
         // copy the selection...
         me.copySelectionWithInternalTags();
-        // ... and delete it 
+        // ... and with TrackChanges, handle the deletion accordingly (don't just cut the selected content!)
         editor = plug.editor.mainEditor;
         sel = rangy.getSelection(editor.getEditorBody());
         selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
-        selRange.deleteContents();
-        selRange.collapse(true);
-        sel.setSingleRange(selRange);        
+        if (selRange === null) {
+            return;
+        }
+        me.fireEvent('beforeCutSelection', selRange);
     },
     copySelectionWithInternalTags: function() {
         // The user will expect the copied text to be available in the clipboard,
@@ -1273,6 +1279,9 @@ Ext.define('Editor.controller.Editor', {
         } 
         
         selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
+        if (selRange === null) {
+            return;
+        }
         selRange = me.getRangeWithFullInternalTags(selRange);
         
         // for insert as html
