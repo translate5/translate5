@@ -617,7 +617,13 @@ Ext.define('Editor.controller.Segments', {
       //this bug also exist in extjs 6.2.0
       me.fireEvent('beforeSaveCall', record);
       
-      me.updateSegmentFinishCountViewModel(record);
+      //get the segmentFinishCount parametar from the response
+      var response=operation.getResponse(),
+      	  decoded=response.responseText && Ext.JSON.decode(response.responseText),
+		  segmentFinishCount=decoded && decoded.segmentFinishCount;
+      
+      //TODO: this should be implemented with websokets(when ready)
+      me.updateSegmentFinishCountViewModel(Ext.Number.from(segmentFinishCount,0));
       
       //invoking change alike handling:
       if(me.fireEvent('saveComplete')){

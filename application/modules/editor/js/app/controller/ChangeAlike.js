@@ -486,6 +486,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     
     me.cleanUpAlikeSegments();
     Editor.MessageBox.addSuccess(Ext.String.format(alikesSaved, data.rows.length));
+    //TODO: change to websocket
     me.fireEvent('alikesSaveSuccess',data);
   },
   /**
