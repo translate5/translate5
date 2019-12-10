@@ -499,7 +499,7 @@ Ext.define('Editor.controller.Editor', {
                 segmentId = plug.context.record.get('id'),
                 data,
                 clipboardData = (e.browserEvent.clipboardData || window.clipboardData).getData('Text'),
-                copiedFrom = me.copiedSelectionWithTagHandling.copiedFrom,
+                copiedFrom = null,
                 insertSelectionWithTagHandling = function() {
                     if (copiedFrom === 'target') {
                         // when copied from target, internal tags are still images! 
@@ -525,6 +525,9 @@ Ext.define('Editor.controller.Editor', {
                     me.copiedSelectionWithTagHandling = null;
                     me.lastClipboardData = clipboardData;
                 };
+            if (me.copiedSelectionWithTagHandling !== null && me.copiedSelectionWithTagHandling.copiedFrom) {
+                copiedFrom = me.copiedSelectionWithTagHandling.copiedFrom;
+            }
             // We must handle data from CTRL+C that can come from two scenarios:
             // - from within the t5-Tab (= in copiedSelectionWithTagHandling and in clipboard) 
             // - from outside of the document (= in clipboard).
