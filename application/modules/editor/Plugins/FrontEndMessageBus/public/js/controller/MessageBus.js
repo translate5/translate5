@@ -49,7 +49,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         noConnectionSeg: '#UT#Sie können kein Segment editieren, so lange keine Verbindung zum Server besteht.',
         inUseTitle: '#UT#Segment bereits in Bearbeitung',
         inUse: '#UT#Ein anderer Benutzer war schneller und hat im Moment das Segment zur Bearbeitung gesperrt.',
-        inUseMsg: '#UT#Das ausgewählte Segment wird einen anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.',
+        inUseMsg: '#UT#Das ausgewählte Segment wird von einem anderen Benutzer bereits bearbeitet und kann daher nicht geöffnet werden.',
         currentUser: '#UT#Aktueller Bearbeiter',
         editors: '#UT#Bearbeiter: ',
         myself: '#UT#Ich',
@@ -111,6 +111,16 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             Ext.Logger.warn("MessageBus WebSocket communication deactivated due missing configuration of the socket server.");
             return;
         }
+        
+        //if js logging is activated, we add some interesting data to it
+        if(window.logger) {
+            logger.data.messageBus = {
+                serverId: Editor.data.app.serverId,
+                connectionId: conf.connectionId,
+                version: conf.clientVersion
+            }
+        }
+        
         url.push(conf.socketServer.schema, '://');
         url.push(conf.socketServer.httpHost || window.location.hostname);
         url.push(':', conf.socketServer.port, conf.socketServer.route);
@@ -231,7 +241,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         var me = this,
             id = data.segmentId,
             msg = me.strings;
-        if(me.editorPlugin.editing && me.editorPlugin.context.record.get('id') === id) {
+        if(me.editorPlugin && me.editorPlugin.editing && me.editorPlugin.context.record.get('id') === id) {
             me.editorPlugin.cancelEdit();
             Ext.Msg.alert(msg.inUseTitle, msg.inUse);    
         }
@@ -246,8 +256,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     onSegmentSave: function(data) {
         var segment,
             grid = this.getSegmentGrid();
-        if(segment = grid.store.getById(data.segmentId)) {
-            console.log("reload updated segment", segment.data);
+        if(grid && (segment = grid.store.getById(data.segmentId))) {
             this.segmentUnlock(this.getSegmentMeta(data.segmentId), data.connectionId, true);
             segment.load();
         }
@@ -259,6 +268,10 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             connectionId = data.connectionId,
             grid = me.getSegmentGrid(),
             segment;
+        
+        if(!grid) {
+            return;
+        }
     
         //add color mark to current segment and lock segment
         Ext.Array.each(lockedIds, function(lockedId){
@@ -302,7 +315,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         var me = this, segment,
             grid = me.getSegmentGrid();
 
-        if(meta.editingConn !== connectionId) {
+        if(!grid || meta.editingConn !== connectionId) {
             return;
         }
         meta.editingConn = false;
@@ -354,6 +367,10 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             grid = me.getSegmentGrid(),
             meta = me.getSegmentMeta(selectedId),
             segment;
+        
+        if(!grid) {
+            return;
+        }
         
         //remove previous selection
         me.segmentUsageData.each(function(meta) {
@@ -489,7 +506,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         }
         
         me.tooltip = Ext.create('Ext.tip.ToolTip', {
-            cls: 'multi-user-tip',
+            cls: 'multi-user-list multi-user-tip',
             // The overall target element.
             target: view.el,
 
@@ -515,9 +532,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
                         return false;
                     }
                     //remove color from tip itself
-                    tip.el.removeCls(['usernr-1', 'usernr-2', 'usernr-3', 'usernr-4', 'usernr-5', 'usernr-6', 'usernr-7', 'usernr-8']);
-                    tip.el.addCls('usernr-'+userNr);
-                    tip.update(user.get('userName')); //set user name
+                    tip.update('<span class="usernr-'+userNr+'"><span class="icon"></span>'+user.get('userName')+'</span>'); //set user name
                 }
             }
         });
@@ -542,6 +557,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
     onCloseEditorViewport: function() {
         var me = this;
         me.tooltip && me.tooltip.destroy();
+        me.segmentUsageData.removeAll();
     },
     /**
      * Updates the online users view

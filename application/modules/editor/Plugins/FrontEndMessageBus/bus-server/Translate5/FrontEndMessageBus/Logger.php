@@ -78,6 +78,7 @@ class Logger {
     }
     
     public function __call(string $name, array $args) {
+        $date = date('Y-m-d H:i:s');
         $message = array_shift($args);
         $second = array_shift($args);
         if(!is_null($second) && is_string($second)) {
@@ -87,9 +88,10 @@ class Logger {
         else {
             $domain = $this->domain;
         }
-        $msg = strtoupper($name).' - '.$domain.': '.$message;
+        $msg = $date.' '.strtoupper($name).' - '.$domain.': '.$message;
         echo $msg."\n";
-        if(!is_null($second) && (is_array($second) || is_object($second))) {
+//FIXME print data only on verbose!
+        if(false && !is_null($second) && (is_array($second) || is_object($second))) {
             $msg .= "\n".print_r($second,1);
         }
         error_log($msg);

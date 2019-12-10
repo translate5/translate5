@@ -57,6 +57,12 @@ class AppInstance {
     protected $connectionIdMap = [];
     
     /**
+     * Contains all not yet verified connectionIds 
+     * @var array
+     */
+    protected $unverifiedConnections = [];
+    
+    /**
      * @var array
      */
     protected $channels;
@@ -89,9 +95,10 @@ class AppInstance {
     
     /**
      * sets the last access timestamp
+     * return int the current timestamp
      */
-    protected function updateLastAccess() {
-        $this->lastAccess = time();
+    protected function updateLastAccess(): int {
+        return $this->lastAccess = time();
     }
     
     /**
@@ -155,7 +162,11 @@ class AppInstance {
      * @param ConnectionInterface $conn
      */
     public function onOpen(ConnectionInterface $conn) {
-        $this->updateLastAccess();
+        $timestamp = $this->updateLastAccess();
+        //if the connection sessionId does not exist, this is either a malicious request or a reconnect after a socket server restart
+        if(empty($this->sessions[$conn->sessionId])) {
+            $this->unverifiedConnections[$conn->connectionId] = $timestamp;
+        }
         $this->connectionIdMap[$conn->connectionId] = $conn;
         $this->connections->attach($conn);
         $this->eachChannel(__FUNCTION__, $conn);
@@ -220,6 +231,7 @@ class AppInstance {
      */
     public function passFrontendMessage(FrontendMsg $msg, ConnectionInterface $conn) {
         $this->updateLastAccess();
+        $this->cleanUpUnverifiedConnections();
         //INFO: here we will get a message from the t5 frontend
         //$conn is Ratchet\WebSocket\WsConnection
         //do we have to diff between frontend and backend messages?
@@ -231,11 +243,13 @@ class AppInstance {
         else {
             $channel = $this->getChannel($msg->channel);
         }
+        //this is also triggered if the connection uses an invalid sessionId
         if(empty($this->sessions[$conn->sessionId])) {
             //the session from the GUI is not known to the server, so we trigger a resync per session
             //TODO possible improvement here: only send one resync to the GUIs (mutex here) and this GUI requests then the resync for all sessions
             // pro: only one resync request per instance then
             // con: we sync all sessions from the session table, also API sessions etc, instead only the ones which are only used by GUIs
+            // con: this interferes with session security here
             if(empty($conn->messageQueue)) {
                 $conn->messageQueue = new \SplQueue;
                 FrontendMsg::create(self::CHANNEL_INSTANCE, 'resyncSession', [], $conn)->send();
@@ -310,10 +324,38 @@ class AppInstance {
         if(empty($conn)) {
             return;
         }
+        
+        //if the resync was successfull, this means the connection has a valid session
+        if(!empty($this->unverifiedConnections[$connectionId])) {
+            unset($this->unverifiedConnections[$connectionId]);
+        }
+        
         //TODO implement messagequeue in a more general manner, currently only usable for resync instances
         while(!$conn->messageQueue->isEmpty()) {
             $message = $conn->messageQueue->dequeue();
             $this->passFrontendMessage($message, $conn);
+        }
+    }
+    
+    /**
+     * Close and clean up unverfied connections
+     */
+    protected function cleanUpUnverifiedConnections() {
+        if(empty($this->unverifiedConnections)) {
+            return;
+        }
+        foreach($this->unverifiedConnections as $connectionId => $timestamp) {
+            //$lastAccess has the stamp of the current run
+            if($this->lastAccess - $timestamp < 10) {
+                continue;
+            }
+            //if the unverifiedConnection does not resync with in 10 Seconds we assume a malicious one and we close the connection 
+            $conn = $this->connectionIdMap[$connectionId] ?? null;
+            if($conn) {
+                $this->logger->warn('Connection '.$connectionId.' closed since not resynced in 10 seconds');
+                $conn->close();
+            }
+            unset($this->unverifiedConnections[$connectionId]);
         }
     }
     
@@ -368,6 +410,7 @@ class AppInstance {
     }
     
     public function garbageCollection(array $existingSessions) {
+        $this->cleanUpUnverifiedConnections();
         $toDelete = array_diff(array_keys($this->sessions), $existingSessions);
         foreach($toDelete as $sessionId) {
             unset($this->sessions[$sessionId]);

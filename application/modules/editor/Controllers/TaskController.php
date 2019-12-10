@@ -224,7 +224,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $f = $this->entity->getFilter();
         $f->hasSort() || $f->addSort('orderdate', true);
         
-        $rows = $this->loadAll();
+        $rows = $this->loadAllWithUserData();
         $this->view->rows = $rows;
         $this->view->total = $this->totalCount;
     }
@@ -270,8 +270,8 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
-     * set qmSubEnabled for all rows
+     * loads all tasks according to the set filters
+     * @return array
      */
     public function loadAll()
     {
@@ -290,6 +290,16 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
             $rows = $this->entity->loadListByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
         }
+        return $rows;
+    }
+    
+    /**
+     * returns all (filtered) tasks with added user data
+     * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
+     * set qmSubEnabled for all rows
+     */
+    public function loadAllWithUserData() {
+        $rows = $this->loadAll();
         $taskGuids = array_map(function($item){
             return $item['taskGuid'];
         },$rows);
