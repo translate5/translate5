@@ -242,6 +242,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         //numerisches Array für korrekten JSON Export
         $this->view->rows = array_values($result);
 
+        //TODO: change to websocket
         //the alike segment save does not use the segment saver
         //the segment finish count needs to be updated after the allike segments save
         $task->updateSegmentFinishCount($task);

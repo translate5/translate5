@@ -303,7 +303,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $task->load($task->getId());
         
         //set the segmentFinishCount so the frontend viewmodel is updated
-        $this->view->rows->segmentFinishCount=$task->getSegmentFinishCount();
+        //TODO: this should be updated from the websockets
+        $this->view->segmentFinishCount=$task->getSegmentFinishCount();
     }
     
     /***
@@ -457,6 +458,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         //return the modefied segments
         $this->view->rows = $results;
+        
+        //TODO: this should be implemented via websokets
+        //reload the task and get the lates segmentFinishCount
+        $task->loadByTaskGuid($this->entity->getTaskGuid());
+        $this->view->segmentFinishCount=$task->getSegmentFinishCount();
+        
         $this->view->total=count($results);
     }
     
