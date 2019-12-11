@@ -364,6 +364,9 @@ class Task extends Channel {
         if(!$this->isSessionValidForTask($request->conn->sessionId, $answer->taskGuid)) {
             return null;
         }
+        if(!isset($request->conn->openedTask)) {
+            $request->conn->openedTask = '';
+        }
         if(!empty($command)) {
             $answer->command = $command;
         }
@@ -543,7 +546,7 @@ class Task extends Channel {
             'connectionId' => $connectionId,
         ]));
         
-        $idx = array_search($sessionId, $this->taskToSessionMap[$task['taskGuid']]);
+        $idx = array_search($sessionId, $this->taskToSessionMap[$task['taskGuid']] ?? '');
         if($idx !== false) {
             unset($this->taskToSessionMap[$task['taskGuid']][$idx]);
         }
@@ -656,6 +659,9 @@ class Task extends Channel {
      */
     protected function findConnection(string $connectionId, string $sessionId): ?ConnectionInterface {
         $conn = $this->instance->getConnection($connectionId);
+        if(!isset($conn->openedTask)) {
+            $conn->openedTask = '';
+        }
         //the session must match too, otherwise the connectionId was spoofed
         if(!empty($conn) && $conn->sessionId === $sessionId) {
             return $conn;
@@ -669,7 +675,7 @@ class Task extends Channel {
      * @param string $userGuid
      * @return integer
      */
-    protected function getUserTrackingId(string $taskGuid, string $userGuid): int {
+    protected function getUserTrackingId(string $taskGuid = null, string $userGuid = null): int {
         return $this->taskUserTracking[$taskGuid][$userGuid]['id'] ?? 0;
     }
 }

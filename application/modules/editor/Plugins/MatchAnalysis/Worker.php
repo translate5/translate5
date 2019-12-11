@@ -78,11 +78,11 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         $params = $this->workerModel->getParameters();
 
         $newState=null;
+        $this->taskOldState = $this->task->getState();
         
         //lock the task dedicated for analysis
         if($this->task->lock(NOW_ISO, self::TASK_STATE_ANALYSIS)) {
             //lock the task while match analysis are running
-            $this->taskOldState = $this->task->getState();
             $newState=self::TASK_STATE_ANALYSIS;
             $this->task->setState(self::TASK_STATE_ANALYSIS);
             $this->task->save();
