@@ -52,4 +52,13 @@ class Configuration {
     public function __get(string $name) {
         return $this->config->$name;
     }
+    
+    /**
+     * returns the given config value by name
+     * @param string $name
+     * @return mixed
+     */
+    public function __isset(string $name) {
+        return property_exists($this->config, $name);
+    }
 }

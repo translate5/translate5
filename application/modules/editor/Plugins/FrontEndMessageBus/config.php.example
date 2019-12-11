@@ -15,6 +15,9 @@
  *  For the message Server no SSL is needed since connections should be only locally!
  */
 $configuration = [
+    //put one or multiple emails here, which should receive an email when the socket server is starting (for supervisord auto restart recognition)
+    // needs a working PHP e-mail setup on the server! Does not work with Zend SMTP configured mail servers! 
+    'bootMailReceiver' => '',
     'messageServer' => [
         //address: IP address to listen for connections of translate5 instances 
         // MUST match the server configured in messageServer config in the instance. 

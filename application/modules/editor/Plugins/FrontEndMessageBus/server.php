@@ -47,11 +47,11 @@ $config = new Configuration(__DIR__.'/config.php');
 define('LOG_SOCKET', 'FrontEndMessageBus - WebSocket Server');
 define('LOG_HTTP', 'FrontEndMessageBus - Application Message Server');
 $logger = Logger::getInstance();
-
 // PHP Server: Open internal server for connection from traditional PHP application
 $host = $config->messageServer->address;
 $port = $config->messageServer->port;
 
+ob_start(); //capture boot up info for bootup mail if configured
 $logger->info('version '.SERVER_VERSION);
 $logger->info('starting on '.$host.':'.$port, LOG_HTTP);
 $appMessageServer = new React\Socket\Server($host.':'.$port, $loop);
@@ -66,6 +66,13 @@ $host = $config->socketServer->httpHost;
 $port = $config->socketServer->port;
 $listen = $config->socketServer->listen;
 $logger->info('starting on '.$host.':'.$port.' listen to '.$listen, LOG_SOCKET);
+
+//send boot up email, if configured
+$bootUpOutput = ob_get_flush();
+if(!empty($config->bootMailReceiver)) {
+    mail($config->bootMailReceiver, gethostname().': FrontEndMessageBus (re)started', $bootUpOutput);
+}
+
 $app = new \Ratchet\App($host, $port, $listen, $loop);
 $app->route($config->socketServer->route, $bus, ['*']); 
 $app->run();
