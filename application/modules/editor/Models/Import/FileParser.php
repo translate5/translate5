@@ -232,6 +232,7 @@ abstract class editor_Models_Import_FileParser {
             $p->preParseHandler($this);
         }
         $this->parse();
+        $this->matchRateType->logErrors($this->_fileName, $this->task);
         foreach($this->segmentProcessor as $p) {
             $p->postParseHandler($this);
         }
