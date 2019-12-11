@@ -39,9 +39,10 @@ class TaskEntityWorkflowTest extends \ZfExtended_Test_ApiTestcase {
             'edit100PercentMatch' => true,
         );
         
+        self::assertAppState();
+        
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-        self::assertTermTagger(); //FIXME change this test so that no termtagger is needed. (deactivate termtagging by task param possible?)
         $api->addImportFile('editorAPI/MainTest/simple-en-de.zip');
         $api->import($task);
     }

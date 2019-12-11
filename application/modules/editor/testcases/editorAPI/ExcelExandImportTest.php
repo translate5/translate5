@@ -47,12 +47,12 @@ class ExcelExandImportTest extends \ZfExtended_Test_ApiTestcase {
             
         );
         
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        $appState = $api->requestJson('editor/index/applicationstate');
-        
+        $appState = self::assertAppState();
         self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig may not be activated for this test case!');
         self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology may not be activated for this test case!');
+        
+        self::assertNeededUsers(); //last authed user is testmanager
+        self::assertLogin('testmanager');
         
         $tests = array(
             'runtimeOptions.import.xlf.preserveWhitespace' => 0,
@@ -91,7 +91,7 @@ class ExcelExandImportTest extends \ZfExtended_Test_ApiTestcase {
     public function testTaskStatus() {
         $this->api()->reloadTask();
         $task = $this->api()->getTask();
-        $this->assertEquals('*translate5InternalLock*', $task->lockedInternalSessionUniqId);
+        $this->assertEquals('*translate5InternalLock*ExcelExported', $task->lockedInternalSessionUniqId);
         $this->assertEquals('{00000000-0000-0000-0000-000000000000}', $task->lockingUser);
         $this->assertEquals('ExcelExported', $task->state);
         $this->assertNotEmpty($task->locked);

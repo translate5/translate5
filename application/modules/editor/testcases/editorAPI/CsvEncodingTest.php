@@ -45,10 +45,12 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
             'edit100PercentMatch' => true,
         );
         
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
         $appState = self::assertTermTagger();
         self::assertNotContains('editor_Plugins_ManualStatusCheck_Bootstrap', $appState->pluginsLoaded, 'Plugin ManualStatusCheck may not be activated for this test case!');
+        
+        self::assertNeededUsers(); //last authed user is testmanager
+        self::assertLogin('testmanager');
+        
         $zipfile = $api->zipTestFiles('CSV-testfiles/','CSV-test.zip');
         
         $api->addImportFile($zipfile);
