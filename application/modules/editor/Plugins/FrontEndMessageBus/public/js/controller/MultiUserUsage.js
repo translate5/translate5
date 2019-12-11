@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.ChangeLog.controller.Changelog
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
+Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
     extend: 'Ext.app.Controller',
     segmentUsageData: null,
     tooltip: null,
@@ -152,6 +152,10 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
             run: me.garbageCollector,
             scope: me 
         });
+
+        //deactivate controller, is activated again when opening a multiuser task
+        return; //FIXME prepare that socket server is only triggered for simultaneous usage, for beta testing we enable socket server just for each task 
+        this.deactivate();
     },
     /**
      * On connection reconnect we send a ping to the server, if the reconnection was because of a server crash, 
