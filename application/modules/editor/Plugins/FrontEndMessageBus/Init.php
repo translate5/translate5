@@ -44,6 +44,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     
     protected $frontendControllers = array(
         'pluginFrontEndMessageBus' => 'Editor.plugins.FrontEndMessageBus.controller.MessageBus',
+        'pluginFrontEndMessageBusMultiUser' => 'Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage',
     );
     
     public function init() {
