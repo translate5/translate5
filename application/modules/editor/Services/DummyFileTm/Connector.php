@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Moses Connector
+ * reactivate me for pretranslation and analysis tests!
  *
  * The dummy CSV file must be:
  * , separated
