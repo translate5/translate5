@@ -112,7 +112,11 @@ class editor_TaskController extends ZfExtended_RestController {
             ],
             'userName' => [
                 'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'userGuid', 'taskGuid', 'taskGuid')
-            ]
+            ],
+            'segmentFinishCount' => [
+                'numeric' => 'percent',
+                'totalField'=>'segmentCount'
+            ],
         ];
         
         //TODO: how the sort will work ?
@@ -850,6 +854,11 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->entity->updateSegmentsEdit100PercentMatch($this->entity, (boolean)$this->data->edit100PercentMatch);
         }
         
+        //if the totals segment count is not set, update it before the entity is saved
+        if($this->entity->getSegmentCount()==null || $this->entity->getSegmentCount()<1){
+            $this->entity->setSegmentCount($this->entity->getTotalSegmentsCount($taskguid));
+        }
+        
         $this->entity->save();
         $obj = $this->entity->getDataObject();
         
@@ -1188,6 +1197,8 @@ class editor_TaskController extends ZfExtended_RestController {
         // We do this here to have it immediately available e.g. when opening segments.
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
+
+        $this->view->rows->workflowProgressSummary=$this->entity->getWorkflowProgressSummary();
     }
     
     public function deleteAction() {
