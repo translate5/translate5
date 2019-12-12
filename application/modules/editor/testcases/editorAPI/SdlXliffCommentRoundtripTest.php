@@ -40,12 +40,12 @@ class SdlXliffCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
             'lockLocked' => 1,
         );
         
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
         $appState = self::assertTermTagger();
-        
         self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig may not be activated for this test case!');
         self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology may not be activated for this test case!');
+        
+        self::assertNeededUsers(); //last authed user is testmanager
+        self::assertLogin('testmanager');
         
         $tests = array(
             'runtimeOptions.editor.export.exportComments' => 1,

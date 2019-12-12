@@ -86,7 +86,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testConditions() {
         $filteredTasks = $this->getFilteredTasks();
-        $this->assertEquals('0', count($filteredTasks));
+        $this->assertEquals('0', count($filteredTasks), 'The translate5 instance contains already a task with the name "'.$this->taskNameBase.'" remove this task before!');
     }
     
     /**

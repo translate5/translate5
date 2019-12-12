@@ -89,10 +89,11 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
             'edit100PercentMatch' => true,
         );
         
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
         $appState = self::assertTermTagger();
         self::assertNotContains('editor_Plugins_ManualStatusCheck_Bootstrap', $appState->pluginsLoaded, 'Plugin ManualStatusCheck may not be activated for this test case!');
+        
+        self::assertNeededUsers(); //last authed user is testmanager
+        self::assertLogin('testmanager');
         
         $api->addImportPlain("mid,quelle,target\n".'1,"source not needed here","'.self::CSV_TARGET.'"'."\n".'2,"zeile 2","row 2"');
         $api->import($task);

@@ -40,12 +40,11 @@ class XlfImportFailTest extends \ZfExtended_Test_ApiTestcase {
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
-        self::assertNeededUsers(); //last authed user is testmanager
-        self::assertLogin('testmanager');
-        $appState = $api->requestJson('editor/index/applicationstate');
-        
+        $appState = self::assertAppState();
         self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig may not be activated for this test case!');
         self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology may not be activated for this test case!');
+        self::assertNeededUsers(); //last authed user is testmanager
+        self::assertLogin('testmanager');
     }
     
     public function testImportMissingTagId() {

@@ -89,7 +89,16 @@ class Logger {
             $domain = $this->domain;
         }
         $msg = $date.' '.strtoupper($name).' - '.$domain.': '.$message;
-        echo $msg."\n";
+        switch ($name) {
+            case 'error':
+            case 'Exception':
+                fwrite(STDERR, $msg."\n");
+            break;
+            
+            default:
+                echo $msg."\n";
+            break;
+        }
 //FIXME print data only on verbose!
         if(false && !is_null($second) && (is_array($second) || is_object($second))) {
             $msg .= "\n".print_r($second,1);
