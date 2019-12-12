@@ -298,6 +298,13 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $row = json_decode(json_encode($this->view->rows), true); // = for anonymizeUserdata(): argument 3 must be of the type array
             $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $row['userGuid'], $row);
         }
+        
+        //reload the task so the segment finish count is updated
+        $task->load($task->getId());
+        
+        //set the segmentFinishCount so the frontend viewmodel is updated
+        //TODO: this should be updated from the websockets
+        $this->view->segmentFinishCount=$task->getSegmentFinishCount();
     }
     
     /***
@@ -451,6 +458,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         //return the modefied segments
         $this->view->rows = $results;
+        
+        //TODO: this should be implemented via websokets
+        //reload the task and get the lates segmentFinishCount
+        $task->loadByTaskGuid($this->entity->getTaskGuid());
+        $this->view->segmentFinishCount=$task->getSegmentFinishCount();
+        
         $this->view->total=count($results);
     }
     

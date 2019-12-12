@@ -98,6 +98,10 @@ END LICENSE AND COPYRIGHT
  * @method void setCustomerId() setCustomerId(int $customerId)
  * @method string getUsageMode() getUsageMode()
  * @method void setUsageMode() setUsageMode(string $usageMode)
+ * @method int getSegmentCount() getSegmentCount()
+ * @method void setSegmentCount() setSegmentCount(int $segmentCount)
+ * @method integer getSegmentFinishCount() getSegmentFinishCount()
+ * @method void setSegmentFinishCount() setSegmentFinishCount(int $segmentFinishCount)
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
@@ -485,6 +489,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         $this->__call('setWorkflowStepName', [$stepName]);
         $this->db->update($data, ['taskGuid = ?' => $this->getTaskGuid()]);
+        $this->updateSegmentFinishCount($this);
     }
     
     /**
@@ -1013,6 +1018,168 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $history->save();
             $segment->save();
         }
+    }
+
+    /***
+     * Get the total segment count for given taskGuid
+     * @param string $taskGuid
+     * @return number|mixed
+     */
+    public function getTotalSegmentsCount(string $taskGuid){
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from('LEK_segments',['COUNT(*) as total'])
+        ->where('`taskGuid`=?', $taskGuid);
+        $result= $this->db->getAdapter()->fetchRow($s);
+        return $result['total'] ?? 0;
+    }
+    
+    /***
+     * Update the segment finish count based on the task workflow step valid autostates
+     * @param editor_Models_Task $task
+     */
+    public function updateSegmentFinishCount(editor_Models_Task $task){
+        $stateRoles=$this->getTaskStateRoles($task);
+        if(!$stateRoles){
+            return;
+        }
+        
+        $adapted=$this->db->getAdapter();
+        //get the autostates for the valid task workflow states
+        $segmentSelect='(SELECT COUNT(*) FROM LEK_segments WHERE autoStateId IN('.implode(',', $stateRoles).') AND taskGuid='.$adapted->quote($task->getTaskGuid()).')';
+        $this->db->update(['segmentFinishCount'=>new Zend_Db_Expr($segmentSelect)],['taskGuid=?' => $task->getTaskGuid()]);
+    }
+    
+    /***
+     * increment or decrement the segmentFinishCount value based on the given state logic
+     * @param editor_Models_Task $task
+     * @param int $newAutostate
+     * @param int $oldAutoState
+     */
+    public function changeSegmentFinishCount(editor_Models_Task $task,int $newAutostate,int $oldAutoState){
+        $stateRoles=$this->getTaskStateRoles($task);
+        if(!$stateRoles){
+            return;
+        }
+        $expression='';
+        if(in_array($newAutostate, $stateRoles) && !in_array($oldAutoState, $stateRoles)){
+            $expression='segmentFinishCount + 1 ';
+        }elseif(in_array($oldAutoState, $stateRoles) && !in_array($newAutostate, $stateRoles)){
+            $expression='segmentFinishCount - 1 ';
+        }else{
+            return;
+        }
+        $this->db->update(['segmentFinishCount'=>new Zend_Db_Expr($expression)],['taskGuid=?' => $task->getTaskGuid()]);
+    }
+    
+    /***
+     * Get all autostate ids for the active tasks workflow
+     * @param editor_Models_Task $task
+     * @return boolean|boolean|multitype:string
+     */
+    protected function getTaskStateRoles(editor_Models_Task $task){
+        $workflow=$this->getTaskActiveWorkflow($task->getTaskGuid());
+        $roleOfStep=$workflow->getRoleOfStep($task->getWorkflowStepName());
+        if(empty($roleOfStep)){
+            return false;
+        }
+        $autoState=new editor_Models_Segment_AutoStates();
+        $stateMap=$autoState->getRoleToStateMap();
+        return $stateMap[$roleOfStep] ?? false;
+    }
+    
+    
+    /***
+     * Get the wokflow progress summary column. The return layout example:
+     *   [
+     *     {workflowStep: translation, status: finished, progress: 100},
+     *     {workflowStep: proofreading, status: running, progress: 33},
+     *     {workflowStep: translatorCheck, status: open, progress: 0}
+     *   ]
+     * 
+     * @return array
+     */
+    public function getWorkflowProgressSummary() {
+        $workflowProgress=[];
+        
+        $workflow=$this->getTaskActiveWorkflow($this->getTaskGuid());
+        $autoState=new editor_Models_Segment_AutoStates();
+        $stateMap=$autoState->getRoleToStateMap();
+        
+        $steps=$workflow->getStepChain();
+        $taskStepIndex=array_search($this->getWorkflowStepName(),$steps);
+        $totalSegmentCount=$this->getSegmentCount() ?? 0;
+        //foreach task workflow chani step check calculate the workflow progress
+        $currentStepIndex=0;
+        foreach ($steps as $step){
+            //the step is before the current step, the status is finish
+            if($taskStepIndex>$currentStepIndex){
+                $workflowProgress[]=[
+                    'workflowStep'=>$step,
+                    'status'=>'finished',
+                    'progress'=>100
+                ];
+                //increment the step index
+                $currentStepIndex++;
+                continue;
+            }
+            
+            //the step is after the current step, the status is open
+            if($taskStepIndex<$currentStepIndex){
+                $workflowProgress[]=[
+                    'workflowStep'=>$step,
+                    'status'=>'open',
+                    'progress'=>0
+                ];
+                //increment the step index
+                $currentStepIndex++;
+                continue;
+            }
+            
+            //increment the step index
+            $currentStepIndex++;
+            
+            $roleOfStep=$workflow->getRoleOfStep($step);
+            if(empty($roleOfStep)){
+                continue;
+            }
+            
+            $states=$stateMap[$roleOfStep] ?? false;
+            if(!$states){
+                continue;
+            }
+            //collect the segment count for the task in the "role state map" autostates
+            $s = $this->db->select()
+            ->setIntegrityCheck(false)
+            ->from('LEK_segments',['COUNT(*) as total'])
+            ->where('`taskGuid`=?',$this->getTaskGuid())
+            ->where('autoStateId IN(?)',$states);
+            $result= $this->db->getAdapter()->fetchRow($s);
+            $progress=0;
+            $total=$result['total'] ?? 0;
+            if($total>0 && $totalSegmentCount>0){
+                $progress=($total/$totalSegmentCount)*100;
+            }
+            $workflowProgress[]=[
+                'workflowStep'=>$step, 
+                'status'=>'running', 
+                'progress'=>$progress
+            ];
+        }
+        
+        return $workflowProgress;
+    }
+    
+    /***
+     * Get the active workflow for the given taskGuid
+     * @param string $taskGuid
+     * @return editor_Workflow_Abstract
+     */
+    public function getTaskActiveWorkflow(string $taskGuid){
+        //get the current task active workflow
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        return $wfm->getActive($taskGuid);
     }
     
     /**

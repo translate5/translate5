@@ -154,6 +154,8 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_showBookmarkedSegments = '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>';
     gridToolbar.strings.interfaceTranslation = '<?php echo $this->translate->_('Oberfläche');?>';
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
+  	gridToolbar.strings.currentWorkflowStepProgressTooltip = '<?php echo $this->translate->_('% abgeschlossen durch zugewiesene Benutzer im Workflow');?>';
+  	gridToolbar.strings.finished = '<?php echo $this->translate->_('abgeschlossen');?>';
 
   	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
@@ -510,6 +512,7 @@ Ext.define('Editor.controller.Localizer', {
             reloadBtnTip: '<?php echo $this->translate->_('Aufgabenliste vom Server aktualisieren.');?>',
             noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>',
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).');?>',
+            currentWorkflowStepProgressTooltip: '<?php echo $this->translate->_('% abgeschlossen durch zugewiesene Benutzer im Workflow');?>',
             addFilterText: '<?php echo $this->translate->_('Erweiterte Filter');?>'
         },
         text_cols: {
@@ -535,6 +538,8 @@ Ext.define('Editor.controller.Localizer', {
             orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>',
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>',
+            segmentCount: '<?php echo $this->translate->_('Segmentanzahl');?>',
+            segmentFinishCount: '<?php echo $this->translate->_('% abgeschlossen');?>',
             workflowState: '<?php echo $this->translate->_('Workflow-Status');?>',
             workflowUserRole: '<?php echo $this->translate->_('Benutzer-Rolle');?>',
             userName: '<?php echo $this->translate->_('Benutzer');?>',
@@ -544,7 +549,8 @@ Ext.define('Editor.controller.Localizer', {
             taskassocs: '<?php echo $this->translate->_('Zugewiesene Sprach-Resourcen');?>',
             pmName: '<?php echo $this->translate->_('Projektmanager');?>',
             edit100PercentMatch: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
-            userCount: '<?php echo $this->translate->_('Zahl zugewiesener Benutzer');?>'
+            userCount: '<?php echo $this->translate->_('Zahl zugewiesener Benutzer');?>',
+            workflowStepName: '<?php echo $this->translate->_('Aktueller Workflow-Schritt');?>'
         }
     });
     

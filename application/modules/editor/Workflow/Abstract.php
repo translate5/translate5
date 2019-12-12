@@ -58,6 +58,7 @@ abstract class editor_Workflow_Abstract {
     const ROLE_TRANSLATORCHECK = 'translatorCheck';
     const ROLE_VISITOR = 'visitor';
     
+    const STEP_NO_WORKFLOW='no workflow';
     const STEP_TRANSLATION = 'translation';
     const STEP_LECTORING = 'lectoring';
     const STEP_TRANSLATORCHECK = 'translatorCheck';
@@ -83,6 +84,7 @@ abstract class editor_Workflow_Abstract {
         'ROLE_LECTOR' => 'Lektor',
         'ROLE_TRANSLATORCHECK' => 'Übersetzer (Überprüfung)',
         'ROLE_VISITOR' => 'Besucher',
+        'STEP_NO_WORKFLOW' => 'Kein Workflow',
         'STEP_TRANSLATION' => 'Übersetzung',
         'STEP_LECTORING' => 'Lektorat',
         'STEP_TRANSLATORCHECK' => 'Übersetzer Prüfung',
@@ -199,11 +201,13 @@ abstract class editor_Workflow_Abstract {
      * @var array 
      */
     protected $stepChain = array(
+        self::STEP_NO_WORKFLOW,
         self::STEP_TRANSLATION,
         self::STEP_LECTORING,
         self::STEP_TRANSLATORCHECK,
         self::STEP_WORKFLOW_ENDED,
     );
+    
     
     /**
      * Mapping between roles and workflowSteps. 
@@ -214,6 +218,7 @@ abstract class editor_Workflow_Abstract {
         self::STEP_LECTORING => self::ROLE_LECTOR,
         self::STEP_TRANSLATORCHECK => self::ROLE_TRANSLATORCHECK,
     );
+    
     
     /**
      * Valid state / role combination for each step
@@ -1016,11 +1021,21 @@ abstract class editor_Workflow_Abstract {
         $task->loadByTaskGuid($taskGuid);
         
         $matchingSteps = [];
-        foreach($this->validStates as $step => $roleStates) {
-            if(!$areTuasSubset($roleStates, $step)) {
-                continue;
+        $pmOvverideCount=0;
+        foreach($tuas as $tua) {
+            if($tua['isPmOverride']==1){
+                $pmOvverideCount++;
             }
-            $matchingSteps[] = $step;
+        }
+        if(empty($tuas) && count($tuas)==$pmOvverideCount){
+            $matchingSteps[]=self::STEP_NO_WORKFLOW;
+        }else{
+            foreach($this->validStates as $step => $roleStates) {
+                if(!$areTuasSubset($roleStates, $step)) {
+                    continue;
+                }
+                $matchingSteps[] = $step;
+            }
         }
         
         //if the current step is one of the possible steps for the tua configuration
