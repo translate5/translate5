@@ -554,6 +554,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       data.whitespaceTag = /nbsp|tab|space|newline/.test(className);
       if(data.whitespaceTag) {
           data.type += ' whitespace';
+          data.key = 'whitespace'+data.nr;
+      }
+      else {
+          data.key = data.type+data.nr;
       }
       return data;
   },
@@ -847,7 +851,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   checkTagOrder: function(nodelist) {
 	  var me = this, open = {}, clean = true;
 	  Ext.each(nodelist, function(img) {
-		  if(me.isDuplicateSaveTag(img) || /^remove/.test(img.id) || /-single/.test(img.id)){
+		  if(me.isDuplicateSaveTag(img) || /^remove/.test(img.id) || /(-single|-whitespace)/.test(img.id)){
 			  //ignore tags marked to remove
 			  return;
 		  }
@@ -1010,7 +1014,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @returns this.markupImages item
    */
   getMarkupImage: function(imgHtml) {
-    var matches = imgHtml.match(new RegExp('^'+this.idPrefix+'((open|close|single)([0-9]+|locked[0-9]+))'));
+    var matches = imgHtml.match(new RegExp('^'+this.idPrefix+'((open|close|single|whitespace)([0-9]+|locked[0-9]+))'));
     if (!matches || matches.length != 4) {
       return null;
     }
