@@ -73,7 +73,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         
         $xmlparser->registerElement('lekTargetSeg', null, function($tag, $key, $opener) use ($xmlparser){
             $attributes = $opener['attributes'];
-            if(empty($attributes['id'])) {
+            if(empty($attributes['id']) && $attributes['id'] !== '0') {
                 throw new Zend_Exception('Missing id attribute in '.$xmlparser->getChunk($key));
             }
             
@@ -91,7 +91,8 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         
         //convert empty <target></target> tags to single ones: <target />
         $xmlparser->registerElement('target', null, function($tag, $key, $opener) use ($xmlparser){
-            if($opener['openerKey']+1 === (int) $key || empty($xmlparser->getRange($opener['openerKey']+1, $key-1, true))) {
+            $content = $xmlparser->getRange($opener['openerKey']+1, $key-1, true);
+            if($opener['openerKey']+1 === (int) $key || empty($content) && $content !== '0') {
                 $xmlparser->replaceChunk($key, '');
                 $xmlparser->replaceChunk($opener['openerKey'], $this->makeTag($tag, true, $opener['attributes']));
             }
@@ -286,7 +287,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             $xmlparser->disableHandlersUntilEndtag();
         }, function($tag, $key, $opener) use ($xmlparser, $transunitMid, $field){
             $tagId = $this->getParentTagId($xmlparser);
-            if(empty($tagId)) {
+            if(empty($tagId) && $tagId !== '0') {
                 error_log("Could not restore sub tag content since there is no id in the surrounding <ph>,<bpt>,<ept>,<it> tag!"); //FIXME better logging
                 return;
             }

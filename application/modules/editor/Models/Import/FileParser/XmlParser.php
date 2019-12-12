@@ -523,7 +523,7 @@ class editor_Models_Import_FileParser_XmlParser {
         $this->log("START#".$tag.'#');
         $previousNode = end($this->xmlStack);
         //get the parent boolean preserve whitespace value
-        $preserve = is_null($previousNode) ? $this->preserveWhitespace : $previousNode['preserveWhitespace'];
+        $preserve = empty($previousNode) ? $this->preserveWhitespace : $previousNode['preserveWhitespace'];
         //get the XML attribute of the current node, which could not exist at all
         $preserve = $this->getAttribute($attributes, 'xml:space', $preserve ? 'preserve' : 'default');
         $this->xmlStack[] = [
