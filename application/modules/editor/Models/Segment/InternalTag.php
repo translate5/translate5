@@ -547,4 +547,41 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             'shortTag' => $shortTag
         ]);
     }
+    
+    /**
+     * Returns the short tag number to a given tag string
+     * @param string $tag
+     * @return int|NULL
+     */
+    public function getTagNumber(string $tag): ?int {
+        if(preg_match('#class="short">&lt;/?([0-9]+)/?&gt;</span#', $tag, $match)) {
+            return (int) $match[1];
+        }
+        return null;
+    }
+    
+    /**
+     * replaces a short tag number with another one
+     * @param string $tag
+     * @param int $newShortNr
+     * @return string
+     */
+    public function replaceTagNumber(string $tag, int $newShortNr): string {
+        $count = 0;
+        $res = preg_replace('#(class="short">&lt;/?)([0-9]+)(/?&gt;</span)#', '${1}'.$newShortNr.'${3}', $tag, -1, $count);
+        if($count == 0) {
+            return $res;
+        }
+        //in whitespace tags the number is also in the title
+        return preg_replace('#(ownttip"><span title="&lt;/?)([0-9]+)(/?&gt;:)#', '${1}'.$newShortNr.'${3}', $tag);
+    }
+    
+    /**
+     * Same as getTagNumber just on an array of tag strings
+     * @param array $tags
+     * @return array
+     */
+    public function getTagNumbers(array $tags) {
+        return array_map([$this, 'getTagNumber'], $tags);
+    }
 }

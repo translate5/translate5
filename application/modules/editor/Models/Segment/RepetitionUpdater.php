@@ -123,6 +123,8 @@ class editor_Models_Segment_RepetitionUpdater {
         //get only the real tags, we do not consider white tags in repetitions, 
         // this is because whitespace belongs to the content and not to the segment (tags instead belong to the segment instead)
         $tagsForRepetition = $this->tagHelper->getRealTags($originalContent);
+        $shortTagNumbers = $this->tagHelper->getTagNumbers($tagsForRepetition);
+        $newShortTagNumber = max($shortTagNumbers) + 1;
         if(empty($tagsForRepetition)) {
             //if there are no original tags we have to init $i with the realTagCount in the targetEdit for below check
             $stat = $this->tagHelper->statistic($this->trackChangesTagHelper->protect($segmentContent));
@@ -131,11 +133,16 @@ class editor_Models_Segment_RepetitionUpdater {
         else {
             $i = 0;
             $segmentContent = $this->trackChangesTagHelper->protect($segmentContent);
-            $segmentContent = $this->tagHelper->replace($segmentContent, function($match) use (&$i, $tagsForRepetition){
+            $segmentContent = $this->tagHelper->replace($segmentContent, function($match) use (&$i, $tagsForRepetition, $shortTagNumbers, &$newShortTagNumber){
                 $id = $match[3];
                 //if it is a whitespace tag, we do not replace it:
                 if(in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
-                    return $match[0];
+                    if(in_array($this->tagHelper->getTagNumber($match[0]), $shortTagNumbers)) {
+                        return $this->tagHelper->replaceTagNumber($match[0], $newShortTagNumber++);
+                    }
+                    //Problem here: this may return a tag with number <2/> which does already exist as real tag <2/> in tags for repetition 
+                    //test if numbr of returned tag exists in $tagsForRepetition, then get highest number in $tagsForRepetition and increase number from there
+                    return $match[0]; 
                 }
                 return $tagsForRepetition[$i++] ?? '';
             });
