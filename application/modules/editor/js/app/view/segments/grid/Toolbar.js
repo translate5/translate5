@@ -33,14 +33,17 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.view.segments.Grid
- * @extends Editor.view.ui.segments.Grid
+ * @class Editor.view.segments.grid.Toolbar
+ * @extends Ext.toolbar.Toolbar
  * @initalGenerated
  */
 Ext.define('Editor.view.segments.grid.Toolbar', {
     extend: 'Ext.toolbar.Toolbar',
     alias: 'widget.segmentsToolbar',
 
+    requires: [
+    	'Editor.view.segments.grid.ToolbarViewModel'
+    ],
     //Item Strings: 
     item_viewModesMenu: '#UT#Ansichtsmodus',
     item_viewModeBtn: '#UT#Details (nur Lesemodus)',
@@ -61,23 +64,12 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
     item_showBookmarkedSegments: '#UT#Nur Segmente mit Lesezeichen anzeigen',
     strings:{
-    	interfaceTranslation:'#UT#Oberfläche'
+    	interfaceTranslation:'#UT#Oberfläche',
+    	currentWorkflowStepProgressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im Workflow',
+    	finished:'#UT#abgeschlossen'
     },
     viewModel: {
-        formulas: {
-            isNormalEdit: function(get) {
-                return get('viewmodeIsEdit') && !get('editorIsReadonly');
-            },
-            isNormalView: function(get) {
-                return get('viewmodeIsEdit') && get('editorIsReadonly');
-            },
-            isErgoEdit: function(get) {
-                return get('viewmodeIsErgonomic') && !get('editorIsReadonly');
-            },
-            isErgoView: function(get) {
-                return get('viewmodeIsErgonomic') && get('editorIsReadonly');
-            }
-        }
+        type:'segmentsToolbar'
     },
     initConfig: function(instanceConfig) {
             var me = this,
@@ -242,7 +234,16 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     },
                     hidden: !Editor.data.task.hasQmSub()
                 },{
-                    xtype: 'tbfill'
+                    xtype: 'tbseparator'
+                },{
+                    xtype: 'button',
+                    itemId: 'segmentFinishCount',
+                    tooltip:me.strings.currentWorkflowStepProgressTooltip,
+                    bind:{
+                    	text:'{segmentFinishCountPercent}'+' '+me.strings.finished
+                    }
+                },{
+                	xtype: 'tbfill'
                 },{
                     xtype: 'button',
                     itemId: 'optionsBtn',

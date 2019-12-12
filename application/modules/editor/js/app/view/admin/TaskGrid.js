@@ -32,7 +32,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
 	  'Editor.view.admin.TaskActionColumn',
 	  'Editor.view.CheckColumn',
 	  'Editor.view.admin.customer.CustomerFilter',
-	  'Editor.view.admin.task.filter.AdvancedFilter'
+	  'Editor.view.admin.task.filter.AdvancedFilter',
+	  'Editor.view.admin.task.filter.PercentFilter'
   ],
   alias: 'widget.adminTaskGrid',
   itemId: 'adminTaskGrid',
@@ -74,8 +75,11 @@ Ext.define('Editor.view.admin.TaskGrid', {
       workflowState:'#UT#Workflow-Status',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
       workflowUserRole:'#UT#Benutzer-Rolle',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
 	  userName:'#UT#Benutzer',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+	  segmentCount:'#UT#Segmentanzahl',
+	  segmentFinishCount:'#UT#% abgeschlossen',
 	  id:'#UT#Id',
-	  taskGuid:'#UT#Task-Guid'
+	  taskGuid:'#UT#Task-Guid',
+	  workflowStepName:'#UT#Aktueller Workflow-Schritt'
   },
   strings: {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
@@ -95,6 +99,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       reloadBtn: '#UT#Aktualisieren',
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.',
       emptyTargets: '#UT#Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe)."',
+      addFilterTooltip:'#UT#Filter hinzufügen',
+      currentWorkflowStepProgressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im Workflow',
       addFilterText:'#UT#Erweiterte Filter'
   },
   states: {
@@ -258,6 +264,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       var me = this,
           states = [],
           config,
+          steps=[],
           //we must have here an own ordered list of states to be filtered 
           stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'task_state_unconfirmed', 'user_state_unconfirmed', 'task_state_import'],
           relaisLanguages = Ext.Array.clone(Editor.data.languages),
@@ -288,8 +295,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
                       states.push([state, me.states.forMe+' '+value]);
                   }
               });
+              Ext.Object.each(workflow.steps, function(key, value){
+            	  steps.push({
+            		  id:key,
+            		  text:value
+            	  })
+              });
           });
-        
+          
           relaisLanguages.unshift([0, me.strings.noRelaisLang]);
           
           config = {
@@ -375,6 +388,41 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   type: 'customer' // [Multitenancy]
               },
               text: me.text_cols.customerId
+          },{
+              xtype: 'gridcolumn',
+              width: 135,
+              dataIndex: 'workflowStepName',
+              stateId:'workflowStepName',
+              tooltip: me.text_cols.workflowStepName,
+              filter: {
+                  type: 'list',
+                  options:steps
+              },
+              text: me.text_cols.workflowStepName
+          },
+          {
+        	  //TODO: how do we filter percent ?
+              xtype: 'gridcolumn',
+              cls:'gridColumnInfoIconTooltipLeft',
+              width: 135,
+              dataIndex: 'segmentFinishCount',
+              stateId:'segmentFinishCount',
+              renderer:me.currentWorkflowStepProgressRenderer,
+              tooltip:me.strings.currentWorkflowStepProgressTooltip,
+              filter: {
+                  type: 'percent',
+                  totalField:'segmentFinishCount'
+              },
+              text: me.text_cols.segmentFinishCount
+          },{
+              xtype: 'gridcolumn',
+              width: 135,
+              dataIndex: 'segmentCount',
+              stateId:'segmentCount',
+              filter: {
+                  type: 'number'
+              },
+              text: me.text_cols.segmentCount
           },{
               xtype: 'gridcolumn',
               width: 220,
@@ -764,6 +812,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         switch(gridFilter.type) {
             case 'date':
             case 'numeric':
+        	case 'percent':
                 switch (operator) {
                     case 'gt' :
                         value = {gt: value};
@@ -801,5 +850,23 @@ Ext.define('Editor.view.admin.TaskGrid', {
             }
         });
     	return filter;
+	},
+	
+	/***
+	 * Render the progres bar in the segmentFinishCount column
+	 */
+	currentWorkflowStepProgressRenderer:function(value,meta,rec){
+		if(!value || rec.get('segmentCount')<1){
+			value=0;
+		}
+		if(value>0){
+			value=value/rec.get('segmentCount');
+		}
+		value=Ext.util.Format.percent(value);
+		meta.tdAttr = 'data-qtip="'+value+'"';
+		return '<div class="x-progress x-progress-default" style="height: 13px;">'+
+					'<div class="x-progress-bar x-progress-bar-default" style="width: ' + value + '">'+
+					'</div>'+
+			   '</div>';
 	}
 });
