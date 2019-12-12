@@ -75,10 +75,12 @@ Ext.define('Editor.view.segments.MetaPanel', {
                       autoScroll: true,
                       xtype: 'panel',
                       border: 0,
+                      minHeight: 60, //needed so that loader is fully shown on segments without terms
                       itemId: 'metaTermPanel',
                       cls: 'metaTermPanel',
                       loader: {
                         url: Editor.data.restpath+'segment/terms',
+                        loadMask: true,
                         renderer: 'html'
                       }
                     }
