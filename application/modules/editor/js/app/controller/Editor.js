@@ -1214,7 +1214,8 @@ Ext.define('Editor.controller.Editor', {
             copiedFrom,
             sel,
             selRange,
-            selDataHtml,
+            i,
+            selDataHtml = '',
             selInternalTags,
             selDataText,
             activeElement,
@@ -1285,11 +1286,19 @@ Ext.define('Editor.controller.Editor', {
         if (selRange === null || selRange.collapsed) {
             return;
         }
-        selRange = me.getRangeWithFullInternalTags(selRange);
+        
+        // Firefox uses multiple selections. 
+        // For example: 'abc<del>def</del>ghi'
+        // - Firefox: first range: 'abc', second range: 'ghi'
+        // - Chrome: one single range with 'abc<del>def</del>ghi'
+        for (i = 0; i < sel.rangeCount; i++) {
+            selRange = sel.getRangeAt(i);
+            selRange = me.getRangeWithFullInternalTags(selRange);
+            selDataHtml += selRange.toHtml();
+        }
         
         // for insert as html
         // (must not include element-ids that already exist in Ext.cache!)
-        selDataHtml = selRange.toHtml();
         selDataHtml = selDataHtml.replace(/id="ext-element-[0-9]+"/, '');
         
         // for insert as text only
