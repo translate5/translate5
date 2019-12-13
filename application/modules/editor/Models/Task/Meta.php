@@ -66,6 +66,9 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
      * @return number
      */
     public function resetTbxHash(array $taskGuids){
+        if(empty($taskGuids)){
+            return 0;
+        }
         return $this->db->update(['tbxHash'=>''],['taskGuid IN(?)' => $taskGuids]);
     }
 }
