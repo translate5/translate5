@@ -206,7 +206,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       me.statusStrip.updateSegment(segment, fieldName);
       me.fireEvent('afterSetValueAndMarkup');
       if (Ext.isGecko) {
-          console.log("setValueAndMarkup (Workaround Firefox): getFocusEl... ");
           me.getFocusEl().focus(); // TRANSLATE-1042: Workaround Firefox
       }
   },
@@ -215,10 +214,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   privates: {
       getFocusEl: function() {
-          if (Ext.isGecko) {
-              console.log("... getFocusEl this.iframeEl id:");
-              console.dir(this.iframeEl.id);
-          }
           return Ext.isGecko ? this.iframeEl : Ext.fly(this.getEditorBody());
       }
   },
