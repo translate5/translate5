@@ -1282,7 +1282,7 @@ Ext.define('Editor.controller.Editor', {
         } 
         
         selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
-        if (selRange === null) {
+        if (selRange === null || selRange.collapsed) {
             return;
         }
         selRange = me.getRangeWithFullInternalTags(selRange);
