@@ -135,6 +135,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       excelExportUsageLabel: '#UT#Excel-Export Nutzung'
   },
   listen: {
+      store: {
+          '#admin.Tasks': {
+              load: 'startCheckImportStates'
+          }
+      },
       controller: {
           '#Editor.$application': {
               adminViewportClosed: 'clearTasks',
