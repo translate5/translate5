@@ -53,6 +53,9 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
         if (strpos($xliff, editor_Models_Import_FileParser_Xlf_AcrossNamespace::ACROSS_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['across'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_AcrossNamespace');
         } 
+        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_MemoQNamespace::MEMOQ_XLIFF_NAMESPACE) !== false) {
+            $this->namespaces['memoq'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_MemoQNamespace');
+        } 
     }
     
     /**

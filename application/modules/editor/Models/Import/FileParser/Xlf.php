@@ -546,6 +546,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             try {
                 $this->extractSegment($opener['attributes']);
             }
+            catch(ZfExtended_ErrorCodeException $e){
+                $e->addExtraData(['trans-unit' => $opener['attributes']]);
+                throw $e;
+            }
             catch(Exception $e){
                 $e->setMessage($e->getMessage()."\n".'In trans-unit '.print_r($opener['attributes'],1));
                 throw $e;
