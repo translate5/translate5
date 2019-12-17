@@ -100,7 +100,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       reloadBtnTip: '#UT#Aufgabenliste vom Server aktualisieren.',
       emptyTargets: '#UT#Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe)."',
       addFilterTooltip:'#UT#Filter hinzufügen',
-      currentWorkflowStepProgressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im Workflow',
+      currentWorkflowStepProgressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt',
       addFilterText:'#UT#Erweiterte Filter'
   },
   states: {
@@ -265,6 +265,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           states = [],
           config,
           steps=[],
+          translatedSteps=[],
           //we must have here an own ordered list of states to be filtered 
           stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'task_state_unconfirmed', 'user_state_unconfirmed', 'task_state_import'],
           relaisLanguages = Ext.Array.clone(Editor.data.languages),
@@ -300,6 +301,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             		  id:key,
             		  text:value
             	  })
+            	  translatedSteps[key]=value;
               });
           });
           
@@ -393,6 +395,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 135,
               dataIndex: 'workflowStepName',
               stateId:'workflowStepName',
+              renderer: function(v) {
+                  return translatedSteps[v] ? translatedSteps[v] : v;
+              },
               tooltip: me.text_cols.workflowStepName,
               filter: {
                   type: 'list',
@@ -416,7 +421,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               text: me.text_cols.segmentFinishCount
           },{
               xtype: 'gridcolumn',
-              width: 135,
+              width: 70,
               dataIndex: 'segmentCount',
               stateId:'segmentCount',
               filter: {

@@ -64,9 +64,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
     item_showBookmarkedSegments: '#UT#Nur Segmente mit Lesezeichen anzeigen',
     strings:{
-    	interfaceTranslation:'#UT#Oberfläche',
-    	currentWorkflowStepProgressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im Workflow',
-    	finished:'#UT#abgeschlossen'
+    	interfaceTranslation:'#UT#Oberfläche'
     },
     viewModel: {
         type:'segmentsToolbar'
@@ -233,15 +231,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         showDelay: 0
                     },
                     hidden: !Editor.data.task.hasQmSub()
-                },{
-                    xtype: 'tbseparator'
-                },{
-                    xtype: 'button',
-                    itemId: 'segmentFinishCount',
-                    tooltip:me.strings.currentWorkflowStepProgressTooltip,
-                    bind:{
-                    	text:'{segmentFinishCountPercent}'+' '+me.strings.finished
-                    }
                 },{
                 	xtype: 'tbfill'
                 },{
