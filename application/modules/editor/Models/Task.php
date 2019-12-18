@@ -1040,14 +1040,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function updateSegmentFinishCount(editor_Models_Task $task){
         $stateRoles=$this->getTaskStateRoles($task);
-        if(!$stateRoles){
+        $isWorkflowEnded=$task->getWorkflowStepName()==editor_Workflow_Abstract::STEP_WORKFLOW_ENDED;
+        if(!$stateRoles && !$isWorkflowEnded){
             return;
         }
         
         $adapted=$this->db->getAdapter();
-        //get the autostates for the valid task workflow states
-        $segmentSelect='(SELECT COUNT(*) FROM LEK_segments WHERE autoStateId IN('.implode(',', $stateRoles).') AND taskGuid='.$adapted->quote($task->getTaskGuid()).')';
-        $this->db->update(['segmentFinishCount'=>new Zend_Db_Expr($segmentSelect)],['taskGuid=?' => $task->getTaskGuid()]);
+        //if it is workflow ended, set the count to 100% (segmentFinishCount=segmentCount)
+        if($isWorkflowEnded){
+            $expression='segmentCount';
+        }else{
+            //get the autostates for the valid task workflow states
+            $expression='(SELECT COUNT(*) FROM LEK_segments WHERE autoStateId IN('.implode(',', $stateRoles).') AND taskGuid='.$adapted->quote($task->getTaskGuid()).')';
+        }
+        $this->db->update(['segmentFinishCount'=>new Zend_Db_Expr($expression)],['taskGuid=?' => $task->getTaskGuid()]);
     }
     
     /***
