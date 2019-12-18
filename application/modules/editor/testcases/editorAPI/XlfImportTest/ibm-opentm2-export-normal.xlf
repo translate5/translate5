@@ -64,8 +64,8 @@
         </count-group>
       </trans-unit>
       <trans-unit id="9" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="AUTOSUBST" tmgr:matchratio="100">
-        <source>Test &amp;para; entities &para; and umlauts öäü¶</source>
-        <target state="translated">Teste &amp;para; Entities ¶ und Umlaute öäü¶ - edited7</target>
+        <source>Test &amp;para; entities &para; and umlauts öäü¶ and &#128; TRANSLATE-1824</source>
+        <target state="translated">Teste &amp;para; Entities ¶ und Umlaute öäü¶ und &#128; TRANSLATE-1824 - edited7</target>
         <count-group name="word count">
           <count count-type="word count" unit="word">5</count>
         </count-group>
