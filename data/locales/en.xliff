@@ -806,7 +806,7 @@
             </trans-unit>
             <trans-unit id="TGVrdG9yYXQ=">
                 <source>Lektorat</source>
-                <target>Editing</target>
+                <target>Review</target>
             </trans-unit>
             <trans-unit id="enVyw7xjayB6dXIgw5xiZXJzaWNodA==">
                 <source>zur&#xFC;ck zur &#xDC;bersicht</source>
@@ -1349,8 +1349,8 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id="RWlubG9nZ2Vu"><source>Einloggen</source><target>Login</target></trans-unit>
 <trans-unit id="UGFzc3dvcnQgbmV1IHNldHplbg=="><source>Passwort neu setzen</source><target>Reset password</target></trans-unit>
 
-<trans-unit id="TGVrdG9y"><source>Lektor</source><target>proofreader</target></trans-unit>
-<trans-unit id="w5xiZXJzZXR6ZXI="><source>Übersetzer</source><target>translator</target></trans-unit>
+<trans-unit id="TGVrdG9y"><source>Lektor</source><target>Reviewer</target></trans-unit>
+<trans-unit id="w5xiZXJzZXR6ZXI="><source>Übersetzer</source><target>Translator</target></trans-unit>
 <trans-unit id="b2ZmZW4="><source>offen</source><target>open</target></trans-unit>
 <trans-unit id="d2FydGVuZA=="><source>wartend</source><target>waiting</target></trans-unit>
 <trans-unit id="YWJnZXNjaGxvc3Nlbg=="><source>abgeschlossen</source><target>finished</target></trans-unit>
