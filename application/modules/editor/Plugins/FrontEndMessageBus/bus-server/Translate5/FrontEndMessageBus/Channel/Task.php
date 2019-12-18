@@ -663,7 +663,7 @@ class Task extends Channel {
             $conn->openedTask = '';
         }
         //the session must match too, otherwise the connectionId was spoofed
-        if(!empty($conn) && $conn->sessionId === $sessionId) {
+        if(!empty($conn) && isset($conn->sessionId) && $conn->sessionId === $sessionId) {
             return $conn;
         }
         return null;
