@@ -1751,9 +1751,9 @@
     <target>translator (check)</target>
 </trans-unit>
 
-<trans-unit id='V29ya2Zsb3cgYmVlbmRldA=='>
-    <source>Workflow beendet</source>
-    <target>translator (check)</target>
+<trans-unit id='V29ya2Zsb3cgYWJnZXNjaGxvc3Nlbg=='>
+    <source>Workflow abgeschlossen</source>
+    <target>Workflow finished</target>
 </trans-unit>
 
 <trans-unit id='w5xiZXJzZXR6dW5n'>
