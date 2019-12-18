@@ -247,7 +247,7 @@ resulting structure in PHP
   states: { current utStates }
   steps:{
     lectoring=""Lektorat"",
-    translatorCheck=""Übersetzer Prüfung"",
+    translatorCheck=""Zweites Lektorat"",
     pmCheck=""PM Prüfung""
   },
   stepChain:[""lectoring"", ""translatorCheck""]

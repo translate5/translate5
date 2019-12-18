@@ -1746,14 +1746,14 @@
   <target>Reset password</target>
 </trans-unit>
 
-<trans-unit id='w5xiZXJzZXR6ZXIgKMOcYmVycHLDvGZ1bmcp'>
-    <source>Übersetzer (Überprüfung)</source>
-    <target>translator (check)</target>
+<trans-unit id='WndlaXRlciBMZWt0b3I='>
+	<source>Zweiter Lektor</source>
+	<target>Second Reviewer</target>
 </trans-unit>
 
-<trans-unit id='V29ya2Zsb3cgYmVlbmRldA=='>
-    <source>Workflow beendet</source>
-    <target>translator (check)</target>
+<trans-unit id='V29ya2Zsb3cgYWJnZXNjaGxvc3Nlbg=='>
+    <source>Workflow abgeschlossen</source>
+    <target>Workflow finished</target>
 </trans-unit>
 
 <trans-unit id='w5xiZXJzZXR6dW5n'>
@@ -2134,19 +2134,19 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
     <b>Word-count:</b> {wordCount}<br /></target>
 </trans-unit>
 
-<trans-unit id='e2hlYWRlcn0KCkltIFByb2pla3Rwb3J0YWwge3BvcnRhbExpbmt9IHd1cmRlIElobmVuIGVpbmUgQXVmZ2FiZSB6dWdld2llc2VuLjxiciAvPgo8YnIgLz4KPGI+Um9sbGU6PC9iPiB7cm9sZX08YnIvPgp7dGFza0ZyYWdtZW50fXtwcm9vZnJlYWRlcnNGcmFnbWVudH17Zm9vdGVyfQ=='>
+<trans-unit id='e2hlYWRlcn0KCkltIFByb2pla3Rwb3J0YWwge3BvcnRhbExpbmt9IHd1cmRlIElobmVuIGVpbmUgQXVmZ2FiZSB6dWdld2llc2VuLjxiciAvPgo8YnIgLz4KPGI+Um9sbGU6PC9iPiB7cm9sZX08YnIvPgp7dGFza0ZyYWdtZW50fXtyZXZpZXdlcnNGcmFnbWVudH17Zm9vdGVyfQ=='>
     <source>{header}
 
 Im Projektportal {portalLink} wurde Ihnen eine Aufgabe zugewiesen.<br />
 <br />
 <b>Rolle:</b> {role}<br/>
-{taskFragment}{proofreadersFragment}{footer}</source>
+{taskFragment}{reviewersFragment}{footer}</source>
 <target>{header}
 
 A task was associated to you in the task-portal {portalLink}.<br />
 <br />
 <b>Role:</b> {role}<br/>
-{taskFragment}{proofreadersFragment}{footer}</target>
+{taskFragment}{reviewersFragment}{footer}</target>
 </trans-unit>
 <trans-unit id='Cjxici8+PGI+QWxsZSBkZXIgQXVmZ2FiZSB6dWdlb3JkbmV0ZW4gQmVudXR6ZXI6PC9iPgo8YnIvPg=='>
     <source>
@@ -3669,6 +3669,7 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <target>All assigned users of a workflow step can edit the task, but only one at a time.</target>
 </trans-unit>
 <trans-unit id='U2VnbWVudGFuemFobA=='><source>Segmentanzahl</source><target>Segment count</target></trans-unit>
+<trans-unit id='WndlaXRlcyBMZWt0b3JhdA=='><source>Zweites Lektorat</source><target>Second Review</target></trans-unit>
 </body>
   </file>
 </xliff>

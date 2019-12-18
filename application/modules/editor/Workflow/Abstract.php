@@ -82,14 +82,14 @@ abstract class editor_Workflow_Abstract {
         'STATE_VIEW' => 'selbst geöffnet', 
         'ROLE_TRANSLATOR' => 'Übersetzer',
         'ROLE_LECTOR' => 'Lektor',
-        'ROLE_TRANSLATORCHECK' => 'Übersetzer (Überprüfung)',
+        'ROLE_TRANSLATORCHECK' => 'Zweiter Lektor',
         'ROLE_VISITOR' => 'Besucher',
         'STEP_NO_WORKFLOW' => 'Kein Workflow',
         'STEP_TRANSLATION' => 'Übersetzung',
         'STEP_LECTORING' => 'Lektorat',
-        'STEP_TRANSLATORCHECK' => 'Übersetzer Prüfung',
+        'STEP_TRANSLATORCHECK' => 'Zweites Lektorat',
         'STEP_PM_CHECK' => 'PM Prüfung',
-        'STEP_WORKFLOW_ENDED' => 'Workflow beendet',
+        'STEP_WORKFLOW_ENDED' => 'Workflow abgeschlossen',
     );
     
     /**
@@ -1012,7 +1012,7 @@ abstract class editor_Workflow_Abstract {
                 $hasRoleToCurrentStep = $hasRoleToCurrentStep || (($this->steps2Roles[$currentStep] ?? '') == $tua['role']);
             }
             //we can only return true, if the Tuas contain at least one role belonging to the currentStep, 
-            // in other words we can not reset the task to proofreading, if we do not have a proofreader
+            // in other words we can not reset the task to proofreading, if we do not have a reviewer
             return $hasRoleToCurrentStep;
         };
         

@@ -592,11 +592,11 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      */
     protected function initItsRefPersonGuid($segment){
         $assocUsers=$this->data['assocUsers'];
-        $tmpProofreaderArray=[];
+        $tmpReviewerArray=[];
         $this->itsRevPerson=null;
         $this->itsRevPersonGuid=null;
 
-        //check if there is a proofreader assigned to the task
+        //check if there is a reviewer assigned to the task
         if(!isset($assocUsers[editor_Workflow_Abstract::ROLE_LECTOR])){
             return;
         }
@@ -606,7 +606,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             return;
         }
         
-        //if only one proofreader
+        //if only one reviewer
         if(count($assocUsers[editor_Workflow_Abstract::ROLE_LECTOR])==1){
             $this->itsRevPersonGuid=$assocUsers[editor_Workflow_Abstract::ROLE_LECTOR][0]['userGuid'];
             
@@ -614,12 +614,12 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             $this->itsRevPerson=$usr['surName'].' '.$usr['firstName'];
             return;
         }
-        //there are multiple proofreaders to the task
-        $tmpProofreaderArray=$assocUsers[editor_Workflow_Abstract::ROLE_LECTOR];
+        //there are multiple reviewer to the task
+        $tmpReviewerArray=$assocUsers[editor_Workflow_Abstract::ROLE_LECTOR];
         
         //check last editor
-        foreach ($tmpProofreaderArray as $proofreader){
-            if($proofreader['userGuid']===$segment['userGuid']){
+        foreach ($tmpReviewerArray as $reviewer){
+            if($reviewer['userGuid']===$segment['userGuid']){
                 $this->itsRevPersonGuid=$segment['userGuid'];
                 break;
             }
@@ -831,9 +831,9 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                 $unitComment[]='<!-- unit id is the segmentNrInTask of LEK_segment in translate5 with the prefix "unit"; Since we only use on segment per unit in translate5 changes xliff, the segment id is the same, but with the prefix "seg";
 its:person is the translator name, if assigned in translate5; if no translator is assigned, it is the user of the translator-check;
 translate5:personGuid is the corresponding userGuid of the person-attribute
-its:revPerson is the proofreader, if assigned in translate5;
-translate5:revPersonGuid is the userGuid of the proofreader;
-- if more than one proofreader or translator is assigned, the above attributes refer to the translator or proofreader
+its:revPerson is the reviewer, if assigned in translate5;
+translate5:revPersonGuid is the userGuid of the reviewer;
+- if more than one reviewer or translator is assigned, the above attributes refer to the translator or proofreader
   that edited the segment the last time / set the autostatus flag the last time;
 - if the last editor is no person, that is assigned to the task, it may be the project manager. If it is the project manager,
   the project manager of the task is used in the following way: If the workflow step that is currently finishd is translation
