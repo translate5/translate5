@@ -97,10 +97,15 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         //get segment list
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
 
+        //initial segment finish count for workflow step lektoring
+        $segmentFinishCount=0;
         //edit two segments
         $segToTest = $segments[2];
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'PHP Handbuch', $segToTest->id);
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+
+        //the segment is proofread, increment the finish count
+        $segmentFinishCount++;
         
         $segToTest = $segments[6];
         $nbsp = json_decode('"\u00a0"');
@@ -109,12 +114,17 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'Apache'.$nbsp.' 2.x'.$nbsp.'auf'.$nbsp.$nbsp.'Unix-Systemen', $segToTest->id);
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
+        //the segment is proofread, increment the finish count
+        $segmentFinishCount++;
+        
         //edit a segment with special characters
         $segToTest = $segments[4];
         //multiple normal spaces should also be converted to single spaces
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', "Installation auf   Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; - bearbeitet durch den Testcode", $segToTest->id);
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
+        //the segment is proofread, increment the finish count
+        $segmentFinishCount++;
         
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
 
@@ -129,6 +139,11 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
             return $item->workflowStep;
         }, $segments);
         $this->assertEquals(array('','','lectoring','','lectoring','','lectoring'), $workflowStep);
+        
+        //reloat the task and test the current workflow progress
+        $reloadProgresTask= $this->api()->reloadTask();
+        //check if the local segmentFinishCount is the same as the calculated one for the task
+        $this->assertEquals($segmentFinishCount, $reloadProgresTask->segmentFinishCount,'The segment finish count is not the same as the calculated one for the task!');
         
         //finishing the task
         $res = $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'finished', 'id' => $task->id));

@@ -131,7 +131,9 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.Grid.prototype.target_original = ' <?php echo $this->translate->_('(zur Importzeit)');?>';
   	Editor.view.segments.Grid.prototype.item_logoutheaderbtn = '<?php echo $this->translate->_('Ausloggen');?>';
   	Editor.view.segments.Grid.prototype.item_leavetaskheaderbtn = '<?php echo $this->translate->_('Aufgabe verlassen');?>';
-  	
+  	Editor.view.segments.Grid.prototype.item_progresbar_finished = '<?php echo $this->translate->_('abgeschlossen');?>';
+	Editor.view.segments.Grid.prototype.item_progresbar_currentWorkflowStepProgressTooltip = '<?php echo $this->translate->_('% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt');?>';
+
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
   	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansicht');?>';
   	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Details (nur Lesemodus)');?>';
@@ -154,8 +156,6 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_showBookmarkedSegments = '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>';
     gridToolbar.strings.interfaceTranslation = '<?php echo $this->translate->_('Oberfläche');?>';
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
-  	gridToolbar.strings.currentWorkflowStepProgressTooltip = '<?php echo $this->translate->_('% abgeschlossen durch zugewiesene Benutzer im Workflow');?>';
-  	gridToolbar.strings.finished = '<?php echo $this->translate->_('abgeschlossen');?>';
 
   	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
@@ -512,7 +512,7 @@ Ext.define('Editor.controller.Localizer', {
             reloadBtnTip: '<?php echo $this->translate->_('Aufgabenliste vom Server aktualisieren.');?>',
             noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>',
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).');?>',
-            currentWorkflowStepProgressTooltip: '<?php echo $this->translate->_('% abgeschlossen durch zugewiesene Benutzer im Workflow');?>',
+            currentWorkflowStepProgressTooltip: '<?php echo $this->translate->_('% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt');?>',
             addFilterText: '<?php echo $this->translate->_('Erweiterte Filter');?>'
         },
         text_cols: {

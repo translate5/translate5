@@ -89,7 +89,7 @@ abstract class editor_Workflow_Abstract {
         'STEP_LECTORING' => 'Lektorat',
         'STEP_TRANSLATORCHECK' => 'Übersetzer Prüfung',
         'STEP_PM_CHECK' => 'PM Prüfung',
-        'STEP_WORKFLOW_ENDED' => 'Workflow beendet',
+        'STEP_WORKFLOW_ENDED' => 'Workflow abgeschlossen',
     );
     
     /**
