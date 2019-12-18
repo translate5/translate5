@@ -25,21 +25,20 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-Ext.define('Editor.view.segments.grid.ToolbarViewModel', {
+Ext.define('Editor.view.segments.GridViewModel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.segmentsToolbar',
+    alias: 'viewmodel.segmentsGrid',
+    data: {
+        segmentFinishCount:null
+    },
     formulas: {
-        isNormalEdit: function(get) {
-            return get('viewmodeIsEdit') && !get('editorIsReadonly');
-        },
-        isNormalView: function(get) {
-            return get('viewmodeIsEdit') && get('editorIsReadonly');
-        },
-        isErgoEdit: function(get) {
-            return get('viewmodeIsErgonomic') && !get('editorIsReadonly');
-        },
-        isErgoView: function(get) {
-            return get('viewmodeIsErgonomic') && get('editorIsReadonly');
+        segmentFinishCountPercent:function(get){
+        	var value=get('segmentFinishCount'),
+        		totalCount=Editor.data.task.get('segmentCount');
+        	if(value>0 && totalCount>0){
+    			value=value/totalCount;
+    		}
+    		return value;
         }
     }
 });

@@ -188,7 +188,7 @@ Ext.define('Editor.controller.Segments', {
    * @param {Integer} new segment count to be displayed
    */
   updateFilteredCountDisplay: function(newTotal) {
-    var btn_text = this.getSegmentGrid().down('segmentsToolbar').item_clearSortAndFilterBtn;
+    var btn_text = this.getSegmentsToolbar().item_clearSortAndFilterBtn;
     btn_text = Ext.String.format('{0} ({1})', btn_text, newTotal);
     this.getResetFilterBtn().setText(btn_text);
   },
@@ -704,8 +704,8 @@ Ext.define('Editor.controller.Segments', {
    */
   updateSegmentFinishCountViewModel:function(record){
 	  var me=this,
-	  	toolbar=me.getSegmentsToolbar(),
-	  	vm=toolbar.getViewModel(),
+	  	grid=me.getSegmentGrid(),
+	  	vm=grid.getViewModel(),
 	  	value=Ext.isNumber(record) ? record : record.get('segmentFinishCount');
 	  vm.set('segmentFinishCount',value);
   }
