@@ -206,7 +206,9 @@ Ext.define('Editor.util.SegmentEditor', {
             elBody = me.getEditorBody(),
             el,
             elContentOriginal,
-            invisibleElements,
+            invisibleElements = [],
+            invisibleElementsSearchReplace,
+            invisibleElementsRangy,
             editorContentAsText,
             bookmarkForCaret,
             htmlWithWhitespaceImagesAsText,
@@ -232,7 +234,9 @@ Ext.define('Editor.util.SegmentEditor', {
         } else {
             // Do NOT collapse multiple whitespace: Remove invisible content and keep ALL of the rest.
             // = Collect all invisible elements; add selectors as needed:
-            invisibleElements = el.select('.searchreplace-hide-element'); // SearchReplaceUtils.js
+            invisibleElementsSearchReplace = el.select('.searchreplace-hide-element'); // SearchReplaceUtils.js
+            invisibleElementsRangy = el.select('.rangySelectionBoundary');             // Rangy
+            invisibleElements = invisibleElements.concat(invisibleElementsSearchReplace).concat(invisibleElementsRangy);
             Ext.Array.each(invisibleElements, function(invisibleEl) {
                 invisibleEl.destroy();
             });

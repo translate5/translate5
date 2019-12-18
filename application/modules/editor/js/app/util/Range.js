@@ -461,26 +461,51 @@ Ext.define('Editor.util.Range', {
      */
     isSelectedAllRelevantNodesInEditor: function() {
         var me = this,
-            selectionInEditor = rangy.getSelection(me.getEditorBody()),
-            rangeForSelection = selectionInEditor.rangeCount ? selectionInEditor.getRangeAt(0) : null,
+            selectionInEditor,
+            rangeForSelection,
+            el,
             selectedText,
             selectedContent,
             editorContentAsText,
-            idPrefix;
+            internalTags = [],
+            tagsOpen,
+            tagsClose,
+            tagsSingle,
+            internalTagIsNotSelected;
+        // if editor is empty, there is nothing to select
+        if (me.isEmptyEditor()) {
+            return false;
+        }
+        selectionInEditor = rangy.getSelection(me.getEditorBody());
+        rangeForSelection = selectionInEditor.rangeCount ? selectionInEditor.getRangeAt(0) : null;
         if (rangeForSelection == null || rangeForSelection.collapsed){
             return false; // might be true, but we couldn't check with the current code.
         }
-        selectedText = rangeForSelection.toString();
+        el = me.getEditorBodyExtDomElement();
+        el.select('.deleted').setStyle('visibility', 'hidden');
+        selectedText = rangeForSelection.text();
         selectedContent = rangeForSelection.toHtml();
         editorContentAsText = me.getEditorContentAsText(false);
+        el.select('.deleted').setStyle('visibility', 'visible');
         // if the text is not the same in the selection as in the Editor, not everything is selected 
         if (selectedText !== editorContentAsText) {
             return false;
         }
         // internal tags are relevant content, too!
         // example: <1>German</1>  => check if <1> and/or </1> are in the selection, too
-        idPrefix = me.editor.idPrefix;
-        return (selectedContent.indexOf(idPrefix) !== -1);
+        el = me.getEditorBodyExtDomElement();
+        tagsOpen = el.select('.open');
+        tagsClose = el.select('.close');
+        tagsSingle = el.select('.single');
+        internalTags = internalTags.concat(tagsOpen.elements).concat(tagsClose.elements).concat(tagsSingle.elements);
+        internalTagIsNotSelected = false;
+        Ext.Array.each(internalTags, function(internalTag) {
+            if (selectedContent.indexOf(internalTag.id) === -1) {
+                internalTagIsNotSelected = true;
+                return false; // break here
+            }
+        });
+        return !internalTagIsNotSelected;
     },
     
     /**
