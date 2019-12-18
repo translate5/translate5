@@ -320,6 +320,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         //add termcollection to task assoc
         $this->termCollection->addTermCollectionTaskAssoc($this->termCollection->getId(), $task->getTaskGuid());
         
+        //reset the taskHash for the task assoc of the current term collection
+        $this->resetTaskTbxHash($this->termCollection->getId());
+        
         //all tbx files in the same term collection
         foreach($tbxfiles as $file) {
             if(!$file->isReadable()){
@@ -354,9 +357,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     public function parseTbxFile(array $filePath,$termCollectionId){
         //if something is wrong with the fileparse,
         try {
+            
+            $this->termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+            $this->termCollection->load($termCollectionId);
+            
+            //reset the taskHash for the task assoc of the current term collection
+            $this->resetTaskTbxHash();
+            
             foreach ($filePath as $path){
-                $this->termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-                $this->termCollection->load($termCollectionId);
                 
                 $tmpName = $path['tmp_name'] ?? $path;
                 $fileName = $path['name'] ?? null;
@@ -1457,6 +1465,22 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     
     public function getUser() {
         return $this->user;
+    }
+    
+    /***
+     * Reset the tbx hash for the tasks using the current term collection
+     */
+    protected function resetTaskTbxHash(){
+        $taskassoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+        /* @var $taskassoc editor_Models_LanguageResources_Taskassoc */
+        $assocs=$taskassoc->getAssocTasksByLanguageResourceId($this->termCollection->getId());
+        if(empty($assocs)){
+            return;
+        }
+        $affectedTasks = array_column($assocs, 'taskGuid');
+        $meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
+        /* @var $meta editor_Models_Task_Meta */
+        $meta->resetTbxHash($affectedTasks);
     }
     
     /***
