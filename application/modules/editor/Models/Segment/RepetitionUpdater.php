@@ -124,7 +124,12 @@ class editor_Models_Segment_RepetitionUpdater {
         // this is because whitespace belongs to the content and not to the segment (tags instead belong to the segment instead)
         $tagsForRepetition = $this->tagHelper->getRealTags($originalContent);
         $shortTagNumbers = $this->tagHelper->getTagNumbers($tagsForRepetition);
-        $newShortTagNumber = max($shortTagNumbers) + 1;
+        if(empty($shortTagNumbers)) {
+            $newShortTagNumber = 1;
+        }
+        else {
+            $newShortTagNumber = max($shortTagNumbers) + 1;
+        }
         if(empty($tagsForRepetition)) {
             //if there are no original tags we have to init $i with the realTagCount in the targetEdit for below check
             $stat = $this->tagHelper->statistic($this->trackChangesTagHelper->protect($segmentContent));
