@@ -1012,7 +1012,7 @@ abstract class editor_Workflow_Abstract {
                 $hasRoleToCurrentStep = $hasRoleToCurrentStep || (($this->steps2Roles[$currentStep] ?? '') == $tua['role']);
             }
             //we can only return true, if the Tuas contain at least one role belonging to the currentStep, 
-            // in other words we can not reset the task to proofreading, if we do not have a reviewer
+            // in other words we can not reset the task to lectoring, if we do not have a reviewer
             return $hasRoleToCurrentStep;
         };
         

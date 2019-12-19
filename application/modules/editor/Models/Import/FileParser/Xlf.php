@@ -834,8 +834,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             //if source contains tags only or is empty (and is no missing source) then we are able to ignore non textual segments 
             if(!$isSourceMrkMissing && !$this->hasText($this->segmentData[$sourceName]['original']) && ($emptyTarget || $hasOriginalTarget)) {
                 //if empty target, we fill the target with the source content, and ignore the segment then in translation
-                //  on proofreading and if target content was given, then it will be ignored too
-                //  on proofreading needs $hasOriginalTarget to be true, which is the case by above if
+                //  on lectoring and if target content was given, then it will be ignored too
+                //  on lectoring needs $hasOriginalTarget to be true, which is the case by above if
                 $placeHolders[$mid] = $leadingTags.$this->xmlparser->join($emptyTarget ? $sourceChunksOriginal : $targetChunksOriginal).$trailingTags;
                 //we add the length of the ignored segment to the additionalUnitLength
                 $this->otherContent->addIgnoredSegmentLength($emptyTarget ? $sourceChunksUncut : $targetChunksUncut, $attributes);

@@ -1099,7 +1099,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Get the wokflow progress summary column. The return layout example:
      *   [
      *     {workflowStep: translation, status: finished, progress: 100},
-     *     {workflowStep: proofreading, status: running, progress: 33},
+     *     {workflowStep: lectoring, status: running, progress: 33},
      *     {workflowStep: translatorCheck, status: open, progress: 0}
      *   ]
      * 

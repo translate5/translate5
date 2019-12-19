@@ -566,7 +566,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         //it is no user that is assigned to the task, it can be pm
         if($segment['userGuid'] === $this->task->getPmGuid()){
             //If the workflow step that is currently finishd is translation or translator-check, the PM is used for its:person. 
-            //If the current workflow step is proofreading, than the project manager is used for its:revPerson
+            //If the current workflow step is review, than the project manager is used for its:revPerson
             if($this->workflowStep===editor_Workflow_Abstract::STEP_TRANSLATION || $this->workflowStep===editor_Workflow_Abstract::STEP_TRANSLATORCHECK){
                 $this->itsPersonGuid=$this->task->getPmGuid();
             }
@@ -833,11 +833,11 @@ its:person is the translator name, if assigned in translate5; if no translator i
 translate5:personGuid is the corresponding userGuid of the person-attribute
 its:revPerson is the reviewer, if assigned in translate5;
 translate5:revPersonGuid is the userGuid of the reviewer;
-- if more than one reviewer or translator is assigned, the above attributes refer to the translator or proofreader
+- if more than one reviewer or translator is assigned, the above attributes refer to the translator or reviewer
   that edited the segment the last time / set the autostatus flag the last time;
 - if the last editor is no person, that is assigned to the task, it may be the project manager. If it is the project manager,
   the project manager of the task is used in the following way: If the workflow step that is currently finishd is translation
-  or translator-check, the PM is used for its:person. If the current workflow step is proofreading,
+  or translator-check, the PM is used for its:person. If the current workflow step is reviewing,
   than the project manager is used for its:revPerson
 - if the last editor of a segment is no assigned user and not the PM, but we have more than one user assigned for a
   role, than we use the value "undefined".
