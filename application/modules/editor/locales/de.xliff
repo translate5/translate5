@@ -1713,16 +1713,6 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='U2VxdWVudGllbGxlcyBBcmJlaXRlbg=='><source>Sequentielles Arbeiten</source><target>Sequentielles Arbeiten</target></trans-unit>
 <trans-unit id='QWxsZSB6dWdld2llc2VuZW4gTnV0emVyIGVpbmVzIFdvcmtmbG93c2Nocml0dHMga8O2bm5lbiBkaWUgQXVmZ2FiZSBiZWFyYmVpdGVuLCBhYmVyIG51ciBlaW5lciBnbGVpY2h6ZWl0aWcu'><source>Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.</source><target>Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.</target></trans-unit>
 <trans-unit id='U2VnbWVudGFuemFobA=='><source>Segmentanzahl</source><target>Segmentanzahl</target></trans-unit>
-<trans-unit id='T2JlcmZsw6RjaGU='><source>Oberfläche</source><target>Oberfläche</target></trans-unit>
-<trans-unit id='RXJlaWduaXNzZSB6dSBTcHJhY2hyZXNvdXJjZSAiezB9Ig=='><source>Ereignisse zu Sprachresource "{0}"</source><target>Ereignisse zu Sprachresource "{0}"</target></trans-unit>
-<trans-unit id='TGVpY2h0ZSBNw4PCpG5nZWw='><source>Leichte Mängel</source><target>Leichte Mängel</target></trans-unit>
-<trans-unit id='TXVzcyDDg8K8YmVyYXJiZWl0ZXQgd2VyZGVu'><source>Muss Ã¼berarbeitet werden</source><target>Muss Ã¼berarbeitet werden</target></trans-unit>
-<trans-unit id='RMODwqRuaXNjaA=='><source>Dänisch</source><target>Dänisch</target></trans-unit>
-<trans-unit id='RnJhbnrDvHNpc2No'><source>Franzüsisch</source><target>Franzüsisch</target></trans-unit>
-<trans-unit id='UnVtw4PCpG5pc2No'><source>Rumänisch</source><target>Rumänisch</target></trans-unit>
-<trans-unit id='RnJhbnrDvHNpc2NoIChCZWxnaWVuKQ=='><source>Franzüsisch (Belgien)</source><target>Franzüsisch (Belgien)</target></trans-unit>
-<trans-unit id='V2Vpw4PCn3J1c3Npc2No'><source>Weißrussisch</source><target>Weißrussisch</target></trans-unit>
-<trans-unit id='UHJvZHVjdGlvbg=='><source>Production</source><target>Production</target></trans-unit>
   </body>
  </file>
 </xliff>
