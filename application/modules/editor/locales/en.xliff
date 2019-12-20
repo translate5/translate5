@@ -2832,7 +2832,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Sprach-Resourcen zuweisen</source>
   <target>Associate language resources</target>
 </trans-unit>
-<trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='>
+<trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiB1bmQgZsO8ciBkZW4gS3VuZGVuIGRlcyBnZcO2ZmZuZXRlbiBUYXNrcyB2ZXJmw7xnYmFyLg=='>
   <source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source>
   <target>No language resource available for the language combination and client of the opened task.</target>
 </trans-unit>
