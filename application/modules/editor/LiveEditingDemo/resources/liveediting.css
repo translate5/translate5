@@ -2,7 +2,7 @@
 .t5lep-frm, .t5lep-rotfrm  { position:absolute; }
 .t5lep-frm.t5lep-colorized { margin:-1px; border:1px solid #e1cb2a; background-color:rgba(225,203,42,.5); }
 .t5lep-rotfrm.t5lep-colorized { margin:-1px; border:1px solid #00ffe2; background-color:rgba(0,255,226,.5); }
-.t5lep-ele.t5lep-colorized { position:absolute; border:1px solid #ff00fc; background-color:rgba(255,0,255,.1); }
+.t5lep-ele.t5lep-colorized { position:absolute; border:1px solid #ff00ff; background-color:rgba(255,0,255,.1); }
 
 /* configurator */
 #t5lep-configurator { position:fixed; z-index:10000; top:5px; right:18px; width:200px; background-color:rgb(231, 166, 26); box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75); padding:5px;  font:10px Arial, sans-serif; }
