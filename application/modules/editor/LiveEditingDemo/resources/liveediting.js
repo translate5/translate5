@@ -128,6 +128,7 @@
 		this.fontSize = 0;
 		this.lineHeight = 0;
 		this.multiline = false;
+		this.rowspan = 1;
 		this.virtual = false;
 		this.fixed = false;
 		this.joinable = false;
@@ -139,11 +140,10 @@
 		this._subs = [];
 	};
 	LeParserElement.prototype.getRelevantTab = function(){
-		if(this.align == "left"){
-			return this._ltab;
-		} else {
+		if(this.align == "right"){
 			return this._rtab;
 		}
+		return this._ltab;
 	};
 	LeParserElement.prototype.cloneForSub = function(left, width){
 		var ele = new LeParserElement(this.top, left, width, this.height, this.rotation);
@@ -160,8 +160,9 @@
 	LeParserElement.prototype.isInLine = function(element){
 		return(this.bottom < (element.bottom + leParser.config.linePosThresh) && this.bottom > (element.bottom - leParser.config.linePosThresh) && this.top < (element.top + leParser.config.linePosThresh) && this.top > (element.top - leParser.config.linePosThresh));
 	};
-	LeParserElement.prototype.isFontEqual = function(element){
-		return(this.fontSize == element.fontSize && this.fontFamily == element.fontFamily);
+	// we may introduce a threshhold here if the pdf2htmlEx fontsize calculation has inconsistencies
+	LeParserElement.prototype.isFontSizeEqual = function(element){
+		return(this.fontSize == element.fontSize);
 	};
 	LeParserElement.prototype.isDirectlyBefore = function(element){
 		return (this.right > element.left - leParser.config.subSuperJoinThresh && this.left < element.left);
@@ -221,6 +222,68 @@
 		this.fontWeight = element.fontWeight;
 		this.fontStyle = element.fontStyle;
 	};
+	LeParserElement.prototype.isVerticallyAligned = function(element){
+		if(this.align != element.align){
+			return false;
+		}
+		if((this.align == "left" && this._ltab == element._ltab) || (this.align == "right" && this._rtab == element._rtab) || (this.align == "center" && this._ctab == element._ctab)){
+			return true;
+		}
+		return false;
+	};
+	LeParserElement.prototype.getMinLeft = function(){
+		if(this.align == "left"){
+			return this._ltab;
+		}
+		if(this.align == "right"){
+			return this._minltab;
+		}
+		return (this._ltab - this._getLeftAndRightDist());
+	};
+	LeParserElement.prototype.getMaxRight = function(){
+		if(this.align == "right"){
+			return this._rtab;
+		}
+		if(this.align == "left"){
+			return this._maxrtab;
+		}
+		return (this._rtab + this._getLeftAndRightDist());
+	};
+	LeParserElement.prototype.adjustTabs = function(left, right){
+		this._ltab = left;
+		if(this._prev != null){
+			this._prev._maxrtab = left;
+		}
+		this._rtab = right;
+		if(this._next != null){
+			this._next._minltab = right;
+		}
+	};
+	// appends an element in the process of column-building
+	LeParserElement.prototype.appendVertically = function(element){
+		if(this.align != element.align){
+			return false;
+		}
+		if(this.html.length > 0 && element.html.substr(0,2) != "<p" && element.html.substr(0,4) != "<div"){
+			this.html += "<br/>";
+		}
+		if(element.fontSize != this.fontSize || element.fontFamily != this.fontFamily || element.fontWeight != this.fontWeight || element.fontStyle != this.fontStyle){
+			this.html += ('<span style="'+this._renderFontStyle()+'">' + element.html + '</span>');
+		} else {
+			this.html += element.html;
+		}
+		this.bottom = element.bottom;
+		this.left = Math.min(this.left, element.left);
+		this.right = Math.max(this.right, element.right);
+		this.width = this.right - this.left;
+		this.height = this.bottom - this.top;
+		this.multiline = true;
+		this.joinable = false;
+		this.rowspan += element.rowspan;
+		element.joinable = false;
+		element.rendered = false;
+		return true;
+	};
 	LeParserElement.prototype._renderAsSubOrSuperTag = function(element){
 		var span = '<span style="position:relative; ';
 		if(this.top >= element.top){
@@ -236,6 +299,70 @@
 	LeParserElement.prototype._renderFontStyle = function(){
 		return 'font-family:'+this.fontFamily+'; font-size:'+this.fontSize+'px; font-style:'+this.fontStyle+'; font-weight:'+this.fontWeight+';';
 	};
+	LeParserElement.prototype._getLeftAndRightDist = function(){
+		return Math.min((this._ltab - this._minltab), (this._maxrtab - this._rtab));
+	};
+	
+	/* *************************************************************************************************** */
+	
+	var LeParserTab = function(pos, num){
+		this.pos = pos;
+		this.num = num;
+	};
+	
+	/* *************************************************************************************************** */
+	
+	var LeParserLine = function(pos, num){
+		this.pos = this.bottom = pos;
+		this.num = num;
+		this.elements = [];
+		this.fontSize = 0;
+		this.lineHeight = 0;
+	};
+	LeParserLine.prototype.addElement = function(ele){
+		if(this.fontSize < ele.fontSize){
+			this.fontSize = ele.fontSize;
+		}
+		if(this.lineHeight < ele.lineHeight){
+			this.lineHeight = ele.lineHeight;
+		}
+		this.elements.push(ele);
+	};
+	// defining the siblings of our elements and their max. tab boundries
+	LeParserLine.prototype.build = function(frameLeft, frameRight){
+		this.left = frameLeft;
+		this.right = frameRight;
+		if(this.elements.length == 0){
+			return;
+		}
+		this.elements.sort(LeParserSort.byLeft);
+		for(var i=0; i < this.elements.length; i++){
+			var e = this.elements[i];
+			e._prev = (i > 0) ? this.elements[i - 1] : null;
+			e._next = (i < (this.elements.length - 1)) ? this.elements[i + 1] : null;
+			e._above = e._below = null;
+			e._minltab = (e._prev == null) ? this.left : e._prev._rtab;
+			e._maxrtab = (e._next == null) ? this.right : e._next._ltab;
+		}
+	};
+	LeParserLine.prototype.merge = function(line){
+		for(var i=0; i < line.elements.length; i++){
+			line.elements[i]._line = this.bottom;
+			this.addElement(line.elements[i]);
+		}
+		this.build(Math.min(this.left, line.left), Math.max(this.right, line.right));
+		line.fontSize = 0;
+		line.lineHeight = 0;
+		line.elements = [];
+	};
+	LeParserLine.prototype.findAlignedElement = function(element){
+		for(var i=0; i < this.elements.length; i++){
+			if(this.elements[i].rendered && this.elements[i].isVerticallyAligned(element)){
+				return this.elements[i];
+			}
+		}
+		return null;
+	};
 
 	/* *************************************************************************************************** */
 
@@ -249,6 +376,7 @@
 		this.width = -1;
 		this.height = -1;
 		this.fontSize = 0;
+		this.minFontSize = 0;
 		this.scaleX = 1;
 		this.scaleY = 1;
 		this.transform = "";
@@ -262,6 +390,7 @@
 		// temporarily stores used in the build-phase to avoid excessive memory use
 		this._nodes = {};
 		this._lines = {};
+		this._ctabs = {};
 		this._ltabs = {};
 		this._rtabs = {};
 		this._tabs = {};
@@ -324,7 +453,7 @@
 				} else {
 					element.turnSubOrSuperToNormal(lastElement);
 				}
-			} else if(lastElement.joinable && element.isInLine(lastElement) && element.isFontEqual(lastElement) && element.isDirectlyAfter(lastElement)) {
+			} else if(lastElement.joinable && element.isInLine(lastElement) && element.isFontSizeEqual(lastElement) && element.isDirectlyAfter(lastElement)) {
 				// the last element was a joined element and we now might can append the rest of the string
 				this.removeElementProps(lastElement);
 				lastElement.appendHorizontally(element);
@@ -346,6 +475,13 @@
 			element._ltab = this._addTo(roundedPos, "_ltabs", leParser.config.tabPosThresh);
 			roundedPos = Math.round(element.right * leParser.config.tabPrecision) / leParser.config.tabPrecision;
 			element._rtab = this._addTo(roundedPos, "_rtabs", leParser.config.tabPosThresh);
+			
+			// TODO: remove
+			element._rtab2 = element._rtab;
+			
+			// "center tab" to detect text-allign center elements
+			roundedPos = Math.round(((element.right + element.left) / 2) * leParser.config.tabPrecision) / leParser.config.tabPrecision;
+			element._ctab = this._addTo(roundedPos, "_ctabs", leParser.config.tabPosThresh);
 		}
 	};
 	// can only be used to remove an element that already has been added !
@@ -358,6 +494,9 @@
 		}
 		if(element.hasOwnProperty("_rtab")){
 			this._removeFrom(element._rtab, "_rtabs");
+		}
+		if(element.hasOwnProperty("_ctab")){
+			this._removeFrom(element._ctab, "_ctabs");
 		}
 	};
 	LeParserFrame.prototype.getLastRenderedElement = function(){
@@ -383,18 +522,24 @@
 	LeParserFrame.prototype.isInRightTabs = function(right){
 		return this._isIn(right, "_rtabs", leParser.config.tabPosThresh);
 	};
+	// the central function to generate the text-flow layout.
+	// the idea is to generate a table holding all frame elements
+	// problems are the detection of overlapping rows or columns, what is either by variations in positions or even "wrong" layout generated by pdf2htmlEx
 	LeParserFrame.prototype.build = function(jPage){
 		if(this.jDomNode != null){
 			return;
 		}
-		var e, i, j, l, s, t;
+		var e, ea, es, i, j, k, l, la, r, s, t;
 		// create our ID
 		this.id = leParser.createFrameId();
 		
-		// evaluate font-size, which is the most used (sorted by weight)
+		// evaluate font-size & min fontsize which is the most used (sorted by weight)
 		for(i=0; i < this.elements.length; i++){
 			e = this.elements[i];
 			if(e.rendered){
+				if(this.minFontSize == 0 || e.fontSize < this.minFontSize){
+					this.minFontSize = e.fontSize;
+				}
 				var key = "fs"+String(e.fontSize);
 				if(key in this._fsizes){
 					this._fsizes[key].weight += leParser.stripTags(e.html).length;
@@ -425,16 +570,124 @@
 		this.right = Math.ceil(this.right * leParser.config.tabPrecision) / leParser.config.tabPrecision;
 		this.width = this.right - this.left;
 		this.height = this.bottom - this.top;
-		// sort our elements by horizontal line
-		this.elements.sort(LeParserSort.byBottom);
-		// evaluate the relevant tab for each element
-
 		
+		// evaluate the alignment for each element based on the tab-frequency, fill the per-line model
 		for(i=0; i < this.elements.length; i++){
 			e = this.elements[i];
 			if(e.rendered){
 				// evaluating the align by comparing the frequency of the tabs of all our elements
-				e.align = (this._rtabs["p"+e._rtab].num > this._ltabs["p"+e._ltab].num ) ?  "right" : "left";
+				t = Math.max(this._ltabs["p"+e._ltab].num, this._rtabs["p"+e._rtab].num, this._ctabs["p"+e._ctab].num);
+				if(this._ltabs["p"+e._ltab].num == t){
+					e.align = "left";
+				} else if(this._rtabs["p"+e._rtab].num == t) {
+					e.align = "right";
+				} else {
+					e.align = "center";
+				}
+				this._lines["p" + e._line].addElement(e);
+			}
+		}
+		// generate sorted "real" array of lines with the lines built (elements sorted by their left position, fill element siblings)
+		l = [];
+		for(i in this._lines){
+			l.push(this._lines[i]);
+		}
+		this._lines = l;		
+		this._lines.sort(LeParserSort.byPos);
+		for(i=0; i < this._lines.length; i++){
+			this._lines[i].build(_left, _right);
+		}
+		// eliminate lines, that do overlap (closer together than a line-height) and merge them.
+		// NOTE:
+		// we may have two-column-layouts with multiline-text in each column within a table with different line-height we now bring to the higher line-height. 
+		// This will be no problem here, since multiline-boxes will be rendered with their "real" lineheight. Only the whole multiline element line may be displaced if the first lines are not on the same baseline
+		if(this._lines.length > 1){
+			r = false;
+			for(i=1; i < this._lines.length; i++){
+				l = this._lines[i];
+				la = this._lines[i - 1];
+				if((l.bottom - la.bottom) < Math.floor(l.lineHeight * this.scaleY)){
+					// check if line after has a smaller distance and take it for a merge instead
+					if(((i + 1) < this._lines.length) && ((this._lines[i + 1].bottom - l.bottom) < (l.bottom - la.bottom))){
+						this._lines[i + 1].merge(l);
+					} else {
+						la.merge(l);
+					}
+					r = true;
+				}				
+			}
+			// if we merged lines we remove the now empty ones to not have to check for lines not being rendered
+			if(r){
+				l = [];
+				for(i=0; i < this._lines.length; i++){
+					if(this._lines[i].elements.length > 0)
+						l.push(this._lines[i]);
+				}
+				this._lines = l;
+			}
+		}
+		// eliminate centered textboxes, that are not useful to render as "centered" (there is a certain probability to identify textfields as "centered" that were not meant to be)
+		for(i=0; i < this._lines.length; i++){
+			l = this._lines[i];
+			for(j=0; j < l.elements.length; j++){
+				e = l.elements[j];
+				if(e.align == "center" && ((e._ltab - e._minltab) <= leParser.config.falseCenteredThresh || (e._maxrtab - e._rtab) <= leParser.config.falseCenteredThresh)){
+					e.align = "left";
+				}
+			}
+		}
+		// eliminate orphan centered textboxes, expand centered textboxes that are left or right to their max width
+		// TODO
+		
+		
+		// find verticaly aligned & spanned elements
+		// we search the complete frame for vertically aligned matches and decide for a complete column of elements if they are joined afterwards
+		if(this._lines.length > 1){
+			for(i=0; i < (this._lines.length - 1); i++){
+				l = this._lines[i];
+				for(j=0; j < l.elements.length; j++){
+					if(l.elements[j].rendered){
+						es = []; // holding the vertically aligned matches
+						es.push(l.elements[j]);
+						for(k=i+1; k < this._lines.length; k++){
+							e = this._lines[k].findAlignedElement(l.elements[j]);
+							if(e != null){
+								es.push(e);
+							}
+						}
+						if(es.length > 1){
+							this.buildColumns(es);
+						}						
+					}
+				}
+				
+			}
+		}
+
+		
+		// expand clustered centered textboxes
+		// TODO
+		
+		
+		
+		
+		
+		
+		// expand the remaining textboxes if possible
+		
+		
+		
+		
+		
+		
+		
+		/*
+		
+		
+		
+		for(i=0; i < this.elements.length; i++){
+			e = this.elements[i];
+			if(e.rendered){
 				t = e.getRelevantTab();
 				if(!this._tabs.hasOwnProperty("p"+t)){
 					this._tabs["p"+t] = t;
@@ -445,18 +698,26 @@
 			this.tabs.push(this._tabs[i]);
 		}
 		this.tabs.sort();
-		// find tab-boundries for all elements
+		
+		
+		// find tab-boundries for all elements, evaluate
 		for(i=0; i < this.elements.length; i++){
 			e = this.elements[i];
 			if(e.rendered){
-				if(e.align == "left"){
-					e._rtab = this._findNearestTab((e._ltab + e.width), true);
-				} else {
+				if(e.align == "right"){
 					e._ltab = this._findNearestTab((e._rtab - e.width), false);
+				} else {
+					e._rtab = this._findNearestTab((e._ltab + e.width), true);
 				}
+				
+				
+				
+				
 			}
 		}
-		// create rows with cols ...
+		*/
+		
+		
 		
 		
 		
@@ -474,7 +735,23 @@
 			for(i=0; i < this.elements.length; i++){
 				e = this.elements[i];
 				if(e.rendered){
-					jPage.append('<div id="'+e.id+'tmp" class="t5lep-ele t5lep-colorized" style="top:'+e.top+'px; left:'+e.left+'px; width:'+e.width+'px; height:'+e.height+'px"></div>');
+					s = (e._above != null) ? ' '+leParser.config.namespace+'-multiline' : '';
+					if(e._below != null && e._above == null)
+						s = ' '+leParser.config.namespace+'-multiline-start';
+					t = (e._prev == null) ? '' : ' prev:'+e._prev.id;
+					if(e._next != null)
+						t += ' next:'+e._next.id;
+					if(e._above != null)
+						t += ' above:'+e._above.id;
+					if(e._below != null)
+						t += ' below:'+e._below.id;
+					
+					// TODO: remove
+					t+= ' rtab2:'+e._rtab2;
+					
+					jPage.append('<div id="'+e.id+'tmp" class="'+leParser.config.namespace+'-ele '+leParser.config.namespace+'-colorized '+leParser.config.namespace+'-'+e.align+s+'" style="top:'+e.top+'px; left:'+e._ltab+'px; width:'+(e._rtab - e._ltab)+'px; height:'+e.height+'px"'
+								+' title="id:'+e.id+', align:'+e.align+', line:'+e._line+', ltab:'+e._ltab+', rtab:'+e._rtab+', ctab:'+e._ctab
+								+', maxrtab:'+e._maxrtab+', minltab:'+e._minltab+t+'"></div>');
 				}
 			}
 		}
@@ -490,10 +767,73 @@
 
 		delete  this._nodes;
 		delete  this._lines;
+		delete  this._ctabs;
 		delete  this._ltabs;
 		delete  this._rtabs;
 		delete  this._tabs;
 		delete  this._fsizes;
+	};
+	LeParserFrame.prototype.buildColumns = function(elements){
+		if(elements.length < 2){
+			return;
+		}
+		// console.log("FRAME "+this.id+" buildColumns: "+elements.length);
+		var first = elements[0], last = first, next = elements[1], merged = [],
+			minLeft = last.getMinLeft(), left = last._ltab, right = last._rtab, maxRight = last.getMaxRight(), 
+			maxLh = (first.fontSize * this.scaleY) * leParser.config.maxMultiLineHeight / 100,
+			lastLh = next._line - last._line, ml, mr, lh, lht;
+		merged.push(first);
+		for(var i=1; i < elements.length; i++){
+			next = elements[i];
+			ml = next.getMinLeft();
+			mr = next.getMaxRight();
+			lh = next._line - last._line;
+			lht = Math.abs(lh - lastLh) * 100 / lastLh;
+			if(next._ltab >= minLeft && ml <= minLeft && next._rtab <= maxRight && mr >= maxRight && next.isFontSizeEqual(first) && lht < leParser.config.maxMultiLineTresh && lh < maxLh){
+				merged.push(next);
+				if(ml > minLeft){
+					minLeft = ml;
+				}
+				if(mr < maxRight){
+					maxRight = mr;
+				}
+				if(next._ltab < left){
+					left = next._ltab;
+				}
+				if(next._rtab > right){
+					right = next._rtab;
+				}
+			} else {
+				if(merged.length > 1){
+					this.createRowspan(merged, left, right);
+				}
+				merged = [];
+				merged.push(next);
+				minLeft = next.getMinLeft();
+				left = next._ltab;
+				right = next._rtab;
+				maxRight = next.getMaxRight();
+			}
+			lastLh = lh;
+			last = next;			
+		}
+		if(merged.length > 1){
+			this.createRowspan(merged, left, right);
+		}
+	};
+	LeParserFrame.prototype.createRowspan = function(elements, left, right){
+		// console.log("FRAME "+this.id+" createRowspan: "+elements.length+" elements");
+		var lh = (elements[elements.length - 1].bottom - elements[0].bottom) / (elements.length - 1);
+		
+		
+		
+		for(var i=0; i < elements.length; i++){
+			elements[i].adjustTabs(left, right);
+			if(i > 0)
+				elements[i]._above = elements[i - 1];
+			if(i < (elements.length - 1))
+				elements[i]._below = elements[i + 1];
+		}
 	};
 	LeParserFrame.prototype.remove = function(jPage){
 		
@@ -536,7 +876,7 @@
 				return this[varName][i].pos;
 			}
 		}
-		this[varName]["p"+String(pos)] = {"pos":pos, "num":1};
+		this[varName]["p"+String(pos)] = (varName == "_lines") ? new LeParserLine(pos, 1) : new LeParserTab(pos, 1);
 		return pos;
 	};
 	LeParserFrame.prototype._removeFrom = function(pos, varName){
@@ -563,6 +903,9 @@
 			}
 			return this.tabs[0];
 		}
+	};
+	LeParserFrame.prototype._isPotentialMultiline = function(ele, eleAbove){
+		return true;
 	};
 
 	/* *************************************************************************************************** */
@@ -673,7 +1016,9 @@
 			"tabPrecision": { "type":"int", "min":1, "max":10, "step":1, "unit":"1/X", "txt":"Reciprocal precision of vertical line calculations" },
 			"linePosThresh": { "type":"float", "min":0.05, "max":10, "step":0.05, "unit":"px", "txt":"Threshhold to identify vertical positions to be on the same line" },
 			"tabPosThresh": { "type":"float", "min":0.1, "max":10, "step":0.1, "unit":"px", "txt":"Threshhold to identify horizontal positions to be on the same line" },
-			"maxMultiLineHeight": { "type":"int", "min":100, "max":250, "step":1, "unit":"percent", "txt":"Maximum line-height two following textfields will be regarded as being one multiline-field" },
+			"falseCenteredThresh": { "type":"int", "min":1, "max":20, "step":1, "unit":"px", "txt":"Threshhold to identify text-centered elements that better not be ssen as such because there is not enough whitespace to the right and left" },
+			"maxMultiLineTresh": { "type":"int", "min":0, "max":10, "step":0.5, "unit":"percent", "txt":"Maximum line-height differnce two following textfields will be regarded as being one multiline-field" },
+			"maxMultiLineHeight": { "type":"int", "min":100, "max":250, "step":1, "unit":"percent", "txt":"Maximum line-height a multiline-field can have" },
 			"subSuperFontSizeMax": { "type":"float", "min":0.1, "max":1, "step":0.05, "unit":"percent", "txt":"Maximum percentage a sub- or superscript item can have in relation to the text it is part of" },
 			"subSuperJoinThresh": { "type":"int", "min":0, "max":25, "step":1, "unit":"px", "txt":"Max distance between a sub/superscript item and a text to be rendered as belonging together" },
 			"splitOnSeperatorSpans": { "type":"bool", "unit":"", "txt":"If set the empty spans used by pdf2html to generate horizontal whitespace are used to split the text into columns" },
@@ -765,9 +1110,11 @@
 			rotationThresh: 0.9,
 			linePrecision: 2,
 			tabPrecision: 2,
-			linePosThresh: 0.25,
+			linePosThresh: 0.5,
 			tabPosThresh: 1.5,
-			maxMultiLineHeight: 175,
+			falseCenteredThresh: 5,
+			maxMultiLineTresh: 5,
+			maxMultiLineHeight: 167,
 			subSuperFontSizeMax: 0.75,
 			subSuperJoinThresh: 2,
 			splitOnSeperatorSpans: true,
