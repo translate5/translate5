@@ -445,7 +445,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @return integer
      */
     protected function calculateMatchRate($matchRate,$metaData,$segment,$filename){
-        // TODO (context-matches not supported by NEC-TM-Api so far)
+        // TODO (context-matches not supported by DeepL-Api so far)
     }
     
     /***
