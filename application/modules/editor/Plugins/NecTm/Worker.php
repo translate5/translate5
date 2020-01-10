@@ -91,7 +91,7 @@ class editor_Plugins_NecTm_Worker extends ZfExtended_Worker_Abstract {
             'level' => ZfExtended_Logger::LEVEL_WARN,
         ]);
         
-        $code = 'E1161';
+        $code = 'E1181';
         $msg = 'NecTm Plug-In: Synchronize of NEC-TM-Tags with our categories failed.';
         
         // in case of an exception we log it, but proceed with translate5

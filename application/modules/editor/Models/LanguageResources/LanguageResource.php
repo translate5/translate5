@@ -43,12 +43,9 @@ END LICENSE AND COPYRIGHT
  * @method void setServiceName() setServiceName(string $resName)
  * @method string getResourceType() getResourceType()
  * @method void setResourceType() setResourceType(string $resourceType)
- * 
- * see ZfExtended_Models_Entity_Abstract:
- * - string getSpecificData() getSpecificData()
- * - void setSpecificData() setSpecificData(string $value)
  */
 class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract {
+    use editor_Models_Entity_SpecificDataTrait;
     
     // set as match rate type when matchrate was changed
     const MATCH_RATE_TYPE_EDITED = 'matchresourceusage';

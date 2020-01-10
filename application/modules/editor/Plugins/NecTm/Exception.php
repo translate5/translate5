@@ -36,6 +36,8 @@ class editor_Plugins_NecTm_Exception extends ZfExtended_ErrorCodeException {
     protected $domain = 'plugin.nectm';
     
     static protected $localErrorCodes = [
-        'E1098' => 'NEC-TM Plug-In: Exception', // should be changed to more specific on first usage!
+        'E1162' => 'NEC-TM Plug-In: Exception',
+        'E1182' => 'NEC-TM Plug-In: The languages for the Nec-TM-LanguageResource differ from the languages of the segment.',
+        'E1183' => 'NEC-TM Plug-In: Could not save segment to TM'
     ];
 }
