@@ -45,7 +45,12 @@ Ext.define('Editor.model.File', {
     {name: 'href', type: 'string', convert: function(v) {
         //relative path fix since browser url does not always end with "/"
         if(v && v.length > 0) {
-            return Editor.data.restpath+v;
+        	//encode the route and the filename
+        	var parts = v.split('/');
+        	for(var i=0;i<parts.length;i++){
+        		parts[i]=encodeURIComponent(parts[i]);
+        	}
+        	return Editor.data.restpath+parts.join('/');
         }
         return v;
     }},
