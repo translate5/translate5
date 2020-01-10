@@ -41,11 +41,6 @@ Ext.define('Editor.plugins.NecTm.view.LanguageResources.services.NecTm', {
         download: '#UT#Als TMX-Datei herunterladen und lokal speichern'
     },
     
-    /**
-     *  flag for enabling / disabling the categories (e.g. in the addTmWindow)
-     */
-    enableCategories: true,
-    
     /***
      * Add/import new resources button default tooltip. This is rendered in the language resources grid.
      */
