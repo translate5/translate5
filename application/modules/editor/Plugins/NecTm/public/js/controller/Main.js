@@ -71,8 +71,9 @@ Ext.define('Editor.plugins.NecTm.controller.Main', {
      */
     handleResourceChanged: function(combo, record, index) {
         var form = combo.up('form'),
-            disableCategories = Editor.plugins.NecTm.view.LanguageResources.services.NecTm.enableCategories,
-            categoriesField = form.queryById('categories');
+            resourceId = form.down('combo[name="resourceId"]').getValue(),
+            categoriesField = form.queryById('categories'),
+            disableCategories = (resourceId.indexOf('editor_Plugins_NecTm') === -1);
         categoriesField.setDisabled(disableCategories);
         categoriesField.setReadOnly(disableCategories);
     },
