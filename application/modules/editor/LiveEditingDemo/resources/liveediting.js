@@ -128,6 +128,7 @@
 		this.fontSize = 0;
 		this.lineHeight = 0;
 		this.multiline = false;
+		this.colspan = 1;
 		this.rowspan = 1;
 		this.virtual = false;
 		this.fixed = false;
@@ -264,6 +265,16 @@
 			this._setRightTab(right);
 		}
 	};
+	// forces the setting of the tabs. For multiline-elements, will always be called on the holding element ...
+	// API is only for error-corrections. Sets the tabs but for multiline-elements always on all subelements of the multiline element
+	LeParserElement.prototype.setTabs = function(left, right){
+		if(this._above != null && up){
+			this._above.setTabs(left, right);
+		} else {
+			this._setRightTabVal(left);
+			this._setLeftTabVal(right);
+		}
+	};
 	// appends an element in the process of column-building
 	LeParserElement.prototype.appendVertically = function(element){
 		if(this.html.length > 0 && element.html.substr(0,2) != "<p" && element.html.substr(0,4) != "<div"){
@@ -281,10 +292,17 @@
 		this.height = this.bottom - this.top;
 		this.joinable = false;
 		this.rowspan += element.rowspan;
+		element._ltab = this._ltab;
+		element._rtab = this._rtab;
 		element.joinable = false;
 		element.rendered = false;
 		return true;
 	};
+	LeParserElement.prototype.render = function(asTable, styles, attribs){
+		// TODO: font-size, line-height#
+		styles += (styles == "") ? this._renderFontStyle() : " "+_renderFontStyle();
+		return '<div style="'+styles+'"'+attribs+'>'+this.html+'</div>';
+	};	
 	LeParserElement.prototype._renderAsSubOrSuperTag = function(element){
 		var span = '<span style="position:relative; ';
 		if(this.top >= element.top){
@@ -304,15 +322,27 @@
 		return Math.min((this._ltab - this._minltab), (this._maxrtab - this._rtab));
 	};
 	LeParserElement.prototype._setLeftTab = function(left){
-		this._ltab = left;
+		this._setLeftTabVal(left);
 		if(this._prev != null){
 			this._prev._maxrtab = left;
 		}
 	};
 	LeParserElement.prototype._setRightTab = function(right){
-		this._rtab = right;
+		this._setRightTabVal(right);
 		if(this._next != null){
 			this._next._minltab = right;
+		}
+	};
+	LeParserElement.prototype._setLeftTabVal = function(left){
+		this._ltab = left;
+		if(this._below != null){
+			this._below._setLeftTabVal(left);
+		}
+	};
+	LeParserElement.prototype._setRightTabVal = function(right){
+		this._rtab = right;
+		if(this._below != null){
+			this._below._setRightTabVal(right);
 		}
 	};
 	LeParserElement.prototype._getNextLeft = function(){
@@ -329,6 +359,7 @@
 		}
 		return prevRight;
 	};
+	
 	/* *************************************************************************************************** */
 	
 	var LeParserTab = function(pos, num){
@@ -338,14 +369,30 @@
 	
 	/* *************************************************************************************************** */
 	
-	var LeParserLine = function(pos, num){
+	// represents an empty column in the rendering process (whitespace)
+	var LeParserCol = function(ltab, rtab, colspan){
+		this._ltab = ltab;
+		this._rtab = rtab;
+		this._above = this._below = null;
+		this.colspan = colspan;
+		this.rowspan = 1;
+		this.rendered = true;
+	};
+	LeParserCol.prototype.render = function(asTable, styles, attribs){
+		return "";
+	};
+	
+	/* *************************************************************************************************** */
+	
+	var LeParserRow = function(pos, num){
 		this.pos = this.bottom = pos;
 		this.num = num;
 		this.elements = [];
 		this.fontSize = 0;
 		this.lineHeight = 0;
+		this.cols = [];
 	};
-	LeParserLine.prototype.addElement = function(ele){
+	LeParserRow.prototype.addElement = function(ele){
 		if(this.fontSize < ele.fontSize){
 			this.fontSize = ele.fontSize;
 		}
@@ -355,7 +402,7 @@
 		this.elements.push(ele);
 	};
 	// defining the siblings of our elements and their max. tab boundries
-	LeParserLine.prototype.build = function(frameLeft, frameRight){
+	LeParserRow.prototype.build = function(frameLeft, frameRight){
 		this.left = frameLeft;
 		this.right = frameRight;
 		if(this.elements.length == 0){
@@ -379,6 +426,7 @@
 					e._maxrtab = Math.max(e._rtab, e._maxrtab);
 				// we simply do not render elements that have no space to be shown, this is a rendering-bug in html2pdfEx as well ... we treat them as rendered as a layer
 				} else {
+					leParser.logError("Found overlapping element which will not be rendered: "+e.id);
 					e.fixed = true;
 					e.rendered = false;
 					e.align = "left";
@@ -388,7 +436,7 @@
 			}
 		}
 	};
-	LeParserLine.prototype.merge = function(line){
+	LeParserRow.prototype.merge = function(line){
 		for(var i=0; i < line.elements.length; i++){
 			line.elements[i]._line = this.bottom;
 			this.addElement(line.elements[i]);
@@ -398,10 +446,60 @@
 		line.lineHeight = 0;
 		line.elements = [];
 	};
-	LeParserLine.prototype.render = function(frame){
-		// TODO: implement
-		return "";
-		return "LINE: "+this.pos+"<br>";
+	// finds the empty columns to cover the existing whitespace and evaluates the colspans for our columns
+	// absolutely neccessary for this is, that all rendered elemens are expanded to a tab !
+	LeParserRow.prototype.findColumns = function(tabs, indices, frame){
+		var e, li, last = 0;
+		for(var i=0; i < this.elements.length; i++){
+			e = this.elements[i];
+			if(e.rendered || e._above != null){
+				// must not happen normally, just to force a working rendering on errors
+				if(!indices.hasOwnProperty("p"+e._ltab) || !indices.hasOwnProperty("p"+e._rtab)){
+					frame.setTabBoundries(e);
+				}
+				li = indices["p"+e._ltab];
+				if(last < li){
+					this.cols.push(new LeParserCol(tabs[last], tabs[li], (li - last)));
+				}
+				if(e.rendered){
+					this.cols.push(e);
+				}
+				last = indices["p"+e._rtab];
+			}
+		}
+		if(last < (tabs.length - 1)){
+			this.cols.push(new LeParserCol(tabs[last], tabs[tabs.length - 1], (tabs.length - 1 - last)));
+		}
+	};
+	LeParserRow.prototype.render = function(asTable, frame){
+		if(asTable){
+			return this._renderAsTable(frame);
+		}
+		return this._renderAsSequence(frame);
+	};
+	LeParserRow.prototype._renderAsSequence = function(frame){
+		var i, ele, html = '';
+		for(i = 0; i < this.elements.length; i++){
+			ele = this.elements[i];
+			if(ele.rendered){
+				html += ele.render(false, "", "");
+			}
+		}
+		return html;
+	};
+	LeParserRow.prototype._renderAsTable = function(frame){
+		var i, col, attribs = '', html = '<tr>';
+		for(i = 0; i < this.cols.length; i++){
+			col = this.cols[i];
+			if(col.colspan > 1){
+				attribs += (' colspan="'+col.colspan+'"');
+			}
+			if(col.rowspan > 1){
+				attribs += (' rowspan="'+col.rowspan+'"');
+			}
+			html += ('<td'+attribs+'>'+col.render(true, "", "")+'</td>');
+		}
+		return html+'</tr>';
 	};
 
 	/* *************************************************************************************************** */
@@ -426,6 +524,7 @@
 		this.elements = [];
 		this.rows = [];		
 		this.tabs = [];
+		this.isTable = true;
 		this.jDomNode = null;
 		// temporarily stores used in the build-phase to avoid excessive memory use
 		this._nodes = {};
@@ -742,9 +841,10 @@
 			this.tabs.push(this._tabs[i]);
 		}
 		this.tabs.sort();
+		this.isTable = (this.tabs.length > 2);
 		
 		// expand left-aligned items to harmonize the layout further
-		if(this.tabs.length > 2){		
+		if(this.isTable ){
 			for(i=0; i < this.elements.length; i++){
 				e = this.elements[i];
 				if(e.rendered){
@@ -762,11 +862,24 @@
 				}
 			}
 		}
+		// if we will render a real html-table oure lines (=rows) will need to find & render empty rows to fill the whitespace and now the rowspan & colspan of each row ...
+		if(this.isTable){
+			// helper-structure to more efficently find tab-indexes
+			this._tabs = {};
+			for(i=0; i < this.tabs.length; i++){
+				this._tabs["p"+this.tabs[i]] = i;
+			}
+			for(i=0; i < this._lines.length; i++){
+				this._lines[i].findColumns(this.tabs, this._tabs, this);
+			}
+		}
+		// explicitly delete in-between models to trigger the garbage-collection
 		delete  this._ctabs;
 		delete  this._ltabs;
 		delete  this._rtabs;
 		delete  this._tabs;
 		delete  this._fsizes;
+		
 		// renders our contents
 		this.render(jPage);
 	};
@@ -809,7 +922,6 @@
 	};
 	// really creates a multiline field out of the given line-elements
 	LeParserFrame.prototype.createRowspan = function(elements, left, right){
-		// console.log("FRAME "+this.id+" createRowspan: "+elements.length+" elements");
 		elements[0].multiLineHeight = Math.round((elements[elements.length - 1].bottom - elements[0].bottom) / (elements.length - 1) / this.scaleY * 10) / 10;
 		elements[0].multiline = true;
 		elements[0].adjustTabs(left, right);
@@ -833,12 +945,16 @@
 	};
 	// renders our evaluated layout
 	LeParserFrame.prototype.render = function(jPage){
-		
 		var e, ea, i, t;
 		var html = '<div id="'+this.id+'" class="'+leParser.createFrameClasses()+'" style="'+leParser.createFrameStyles(this)+'">';
-		// TODO: impelment table vs. div's, paddings
-		for(i=1; i < this._lines.length; i++){
-			html += this._lines[i].render(this);			
+		if(this.isTable){
+			html += '<table><tbody>';
+		}
+		for(i=0; i < this._lines.length; i++){
+			html += this._lines[i].render(this.isTable, this);			
+		}
+		if(this.isTable){
+			html += '</tbody></table>';
 		}
 		html += '</div>';
 		
@@ -894,6 +1010,27 @@
 		this.cols = [];
 		this.tabs = [];
 	};
+	// this is only a "rescue"-function to avoid the rendering to fail. If the other layout-evaluation works properly, this method must must not be called
+	// must not be called on non-rendered function !!
+	LeParserFrame.prototype.setTabBoundries = function(element){
+		leParser.logError("Frame "+this.id+" found element with tab-boundries not properly set: "+element.id);
+		var ltab = element._ltab, rtab = element._rtab;
+		if(!this._tabs.hasOwnProperty("p"+ltab)){
+			if(element._prev != null){
+				ltab = element._prev._rtab;
+			} else {
+				ltab = this._findNearestLeftTab(element.left);
+			}
+		}
+		if(!this._tabs.hasOwnProperty("p"+rtab)){
+			if(element._next != null){
+				rtab = element._next._ltab;
+			} else {
+				rtab = this._findNearestRightTab(element.right);
+			}
+		}
+		element.setTabs(ltab, rtab);
+	};
 
 	// internal helper
 
@@ -912,7 +1049,7 @@
 				return this[varName][i].pos;
 			}
 		}
-		this[varName]["p"+String(pos)] = (varName == "_lines") ? new LeParserLine(pos, 1) : new LeParserTab(pos, 1);
+		this[varName]["p"+String(pos)] = (varName == "_lines") ? new LeParserRow(pos, 1) : new LeParserTab(pos, 1);
 		return pos;
 	};
 	LeParserFrame.prototype._removeFrom = function(pos, varName){
@@ -1241,7 +1378,7 @@
 					this.pages[node.id]  = page;
 				}
 			} else {
-				this.logError('1', 'Page without ID attribute found');
+				this.logError('Page without ID attribute found');
 			}
 		},
 		findFrames: function(page, jPage){
@@ -1457,8 +1594,8 @@
 		stripTags: function(html){
 			return html.toString().replace(/(<([^>]+)>)/ig,"");
 		},
-		logError: function(code, msg){
-			console.log('LiveEditingParser ERROR ('+code+'): '+msg);
+		logError: function(msg){
+			console.log('LiveEditingParser ERROR: '+msg);
 		}
 	};
 
