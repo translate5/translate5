@@ -76,6 +76,7 @@ Ext.define('Editor.view.searchandreplace.TabPanel', {
                     items: [{ 
                         xtype: 'button',
                         itemId:'searchButton',
+                        formBind: true,
                         bind:{
                             disabled:'{isDisableSearchButton}',
                         },
