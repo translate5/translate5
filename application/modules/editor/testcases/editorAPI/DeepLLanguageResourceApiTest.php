@@ -103,7 +103,7 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         self::assertLogin('testmanager');
         self::assertCustomer();
         
-        self::$languageResourceID = 476; //$this->createLanguageResource(); TODO reactivate after developing
+        $this->createLanguageResource();
         
         $api->addImportFile($api->getFile('testcase-de-en.xlf'));
         $api->import($task);
@@ -157,7 +157,7 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $params = [];
         $params['segmentId'] = $segToEdit->id;
         $params['query'] = $segToEdit->source;
-        $this->api()->requestJson('editor/languageresourceinstance/'.self::$languageResourceID.'/query', 'GET', $params);
+        $this->api()->requestJson('editor/languageresourceinstance/'.self::$languageResourceID.'/query', 'POST', $params);
         $response = json_decode($this->api()->getLastResponse()->getBody());
         $translation = $response->rows[0]->target;
         $this->assertEquals(self::$expectedTranslations[$segToEdit->source], $translation, 'Result of translation is not as expected! Source was:'."\n".$segToEdit->source);
@@ -173,9 +173,21 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $params['source']  = static::SOURCE_LANG;
         $params['target'] = static::TARGET_LANG;
         $params['text'] = static::TEXT_TO_TRANSLATE;
-        $this->api()->requestJson('editor/instanttranslateapi/translate', 'POST', $params); // TODO: 401 Unauthorized
-        $response = $this->api()->getLastResponse();
-        fwrite(STDOUT, "\n" .'response requestJson(): ' . print_r($response,1) . "\n"); // TODO remove output
+        fwrite(STDOUT, "\n" .'params: ' . print_r($params,1) . "\n"); // TODO remove output
+        $this->api()->request('editor/instanttranslateapi/translate', 'GET', $params);
+        fwrite(STDOUT, "\n" .'request with POST: editor/instanttranslateapi/translate' . "\n"); // TODO remove output
+        // TODO
+        // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
+        // POST: request() rows are empty
+        // POST: requestJson() returns "Unprocessible Entitiy" ("No string for translation is provided")
+        // GET: rows are empty with request() AND requestJson()
+        
+        fwrite(STDOUT, "\n" .'response: ' . print_r($this->api()->getLastResponse(),1) . "\n"); // TODO remove output
+        fwrite(STDOUT, "\n" .'response getBody(): ' . print_r($this->api()->getLastResponse()->getBody(),1) . "\n"); // TODO remove output
+        $response = json_decode($this->api()->getLastResponse()->getBody());
+        fwrite(STDOUT, "\n" .'response getBody() json_decode: ' . print_r($response,1) . "\n"); // TODO remove output
+        $rows = $response->rows;
+        fwrite(STDOUT, "\n" .'rows: ' . print_r($rows,1) . "\n"); // TODO remove output
     }
 
     /**
@@ -186,6 +198,6 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         self::$api->login('testmanager');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
-        // self::$api->requestJson('editor/languageresourceinstance'.'/'.self::$languageResourceID, 'DELETE'); TODO reactivate after developing
+        self::$api->requestJson('editor/languageresourceinstance'.'/'.self::$languageResourceID, 'DELETE');
     }
 }
