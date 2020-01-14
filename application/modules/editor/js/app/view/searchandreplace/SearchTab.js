@@ -69,6 +69,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                 items:[{
                     xtype:'textfield',
                     itemId:'searchField',
+                    allowBlank:false,
                     maxLength:1024,
                     name:'searchField',
                     focusable:true,
@@ -82,6 +83,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     xtype:'combo',
                     itemId:'searchInField',
                     name:'searchInField',
+                    allowBlank:false,
                     fieldLabel:me.strings.searchInField,
                     displayField:'value',
                     valueField:'id',
