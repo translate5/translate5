@@ -115,8 +115,11 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
      */
     protected static function createLanguageResource() {
         $customer = self::api()->getCustomer();
-        $customerParam = (object) array('customerId' => $customer->id, 'useAsDefault' => 0);
-        // resourcesCustomersHidden: [{"customerId":2,"useAsDefault":0},{"customerId":8,"useAsDefault":0},{"customerId":9,"useAsDefault":0}]
+        $customerParamObj = new stdClass();
+        $customerParamObj->customerId = $customer->id;
+        $customerParamObj->useAsDefault = 0;
+        $customerParamArray = [];
+        $customerParamArray[] = $customerParamObj;
         
         $params = [];
         $params['resourceId']  = static::RESOURCE_ID;
@@ -125,9 +128,8 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $params['targetLang'] = static::TARGET_LANG_CODE;
         $params['serviceType'] = static::SERVICE_TYPE;
         $params['serviceName'] = static::SERVICE_NAME;
-        $params['resourcesCustomersHidden'] = json_encode($customerParam);
+        $params['resourcesCustomersHidden'] = json_encode($customerParamArray);
         self::api()->requestJson('editor/languageresourceinstance', 'POST', [], $params);
-        // TODO: Integrity Constraint Violation on saving\/deleting editor_Models_LanguageResources_CustomerAssoc
         $responseBody = json_decode(self::api()->getLastResponse()->getBody());
         self::$languageResourceID = $responseBody->rows->id;
     }
@@ -154,19 +156,21 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->requestJson('editor/task/'.$task->id, 'PUT', $params);
         
         // get segment list
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
-        $segToEdit = $segments[0];
+        $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $allSegments = json_decode($this->api()->getLastResponse()->getBody());
         
-        // Do we provide an expected translation at all?
-        $this->assertArrayHasKey($segToEdit->source, self::$expectedTranslations, 'Provide an expected translation for: '.$segToEdit->source);
-        
-        $params = [];
-        $params['segmentId'] = $segToEdit->id;
-        $params['query'] = $segToEdit->source;
-        $this->api()->requestJson('editor/languageresourceinstance/'.self::$languageResourceID.'/query', 'POST', $params);
-        $responseBody = json_decode($this->api()->getLastResponse()->getBody());
-        $translation = $responseBody->rows[0]->target;
-        $this->assertEquals(self::$expectedTranslations[$segToEdit->source], $translation, 'Result of translation is not as expected! Source was:'."\n".$segToEdit->source);
+        foreach ($allSegments->rows as $segment){
+            // Do we provide an expected translation at all?
+            $this->assertArrayHasKey($segment->source, self::$expectedTranslations, 'Provide an expected translation for: '.$segment->source);
+            // Does the result match our expectations?
+            $params = [];
+            $params['segmentId'] = $segment->id;
+            $params['query'] = $segment->source;
+            $this->api()->requestJson('editor/languageresourceinstance/'.self::$languageResourceID.'/query', 'POST', [], $params);
+            $responseBody = json_decode($this->api()->getLastResponse()->getBody());
+            $translation = $responseBody->rows[0]->target;
+            $this->assertEquals(self::$expectedTranslations[$segment->source], $translation, 'Result of translation is not as expected! Source was:'."\n".$segment->source);
+        }
     }
     
     /**
@@ -178,22 +182,22 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $params = [];
         $params['source']  = static::SOURCE_LANG;
         $params['target'] = static::TARGET_LANG;
-        $params['text'] = static::TEXT_TO_TRANSLATE;
-        fwrite(STDOUT, "\n" .'params: ' . print_r($params,1) . "\n"); // TODO remove output
-        $this->api()->request('editor/instanttranslateapi/translate', 'GET', $params);
-        fwrite(STDOUT, "\n" .'request with POST: editor/instanttranslateapi/translate' . "\n"); // TODO remove output
-        // TODO
-        // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
-        // POST: request() rows are empty
-        // POST: requestJson() returns "Unprocessible Entitiy" ("No string for translation is provided")
-        // GET: rows are empty with request() AND requestJson()
-        
-        fwrite(STDOUT, "\n" .'response: ' . print_r($this->api()->getLastResponse(),1) . "\n"); // TODO remove output
-        fwrite(STDOUT, "\n" .'response getBody(): ' . print_r($this->api()->getLastResponse()->getBody(),1) . "\n"); // TODO remove output
+        $params['text'] = $text = static::TEXT_TO_TRANSLATE;
+        $this->api()->requestJson('editor/instanttranslateapi/translate', 'GET', $params); // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
         $responseBody = json_decode($this->api()->getLastResponse()->getBody());
-        fwrite(STDOUT, "\n" .'response getBody() json_decode: ' . print_r($responseBody,1) . "\n"); // TODO remove output
-        $rows = $responseBody->rows;
-        fwrite(STDOUT, "\n" .'rows: ' . print_r($rows,1) . "\n"); // TODO remove output
+        $allTranslations = json_decode(json_encode($responseBody->rows), true);
+        
+        // Is anything returned for Deep at all? 
+        $this->assertArrayHasKey('DeepL', $allTranslations, 'InstantTranslate: Translations do not include a response for DeepL.');
+        
+        // Do we provide an expected translation at all?
+        $this->assertArrayHasKey($text, self::$expectedTranslations, 'Provide an expected translation for: '.$text);
+        
+        // Does the result match our expectations?
+        foreach ($allTranslations['DeepL'] as $translationFromDeepL){
+            $translation = $translationFromDeepL[0];
+            $this->assertEquals(self::$expectedTranslations[$text], $translation['target'], 'Result of translation is not as expected! Text was:'."\n".$text);
+        }
     }
 
     /**
