@@ -103,16 +103,21 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         self::assertLogin('testmanager');
         self::assertCustomer();
         
-        $this->createLanguageResource();
+        self::createLanguageResource();
         
         $api->addImportFile($api->getFile('testcase-de-en.xlf'));
         $api->import($task);
     }
     
     /**
-     * Create a DeepL-LanguageResource and store its ID.
+     * Create a DeepL-LanguageResource associate to the test-customer
+     * and store its ID.
      */
-    protected function createLanguageResource() {
+    protected static function createLanguageResource() {
+        $customer = self::api()->getCustomer();
+        $customerParam = (object) array('customerId' => $customer->id, 'useAsDefault' => 0);
+        // resourcesCustomersHidden: [{"customerId":2,"useAsDefault":0},{"customerId":8,"useAsDefault":0},{"customerId":9,"useAsDefault":0}]
+        
         $params = [];
         $params['resourceId']  = static::RESOURCE_ID;
         $params['name'] = static::LANGUAGERESOURCE_NAME;
@@ -120,10 +125,11 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $params['targetLang'] = static::TARGET_LANG_CODE;
         $params['serviceType'] = static::SERVICE_TYPE;
         $params['serviceName'] = static::SERVICE_NAME;
-        $response = $this->api()->requestJson('editor/languageresourceinstance', 'POST', $params);
-        $responseBody = json_decode($response->getBody());
+        $params['resourcesCustomersHidden'] = json_encode($customerParam);
+        self::api()->requestJson('editor/languageresourceinstance', 'POST', [], $params);
+        // TODO: Integrity Constraint Violation on saving\/deleting editor_Models_LanguageResources_CustomerAssoc
+        $responseBody = json_decode(self::api()->getLastResponse()->getBody());
         self::$languageResourceID = $responseBody->rows->id;
-        fwrite(STDOUT, "\n" .'our languageResourceID: ' . self::$languageResourceID . "\n"); // TODO remove output
     }
     
     /**
@@ -158,8 +164,8 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $params['segmentId'] = $segToEdit->id;
         $params['query'] = $segToEdit->source;
         $this->api()->requestJson('editor/languageresourceinstance/'.self::$languageResourceID.'/query', 'POST', $params);
-        $response = json_decode($this->api()->getLastResponse()->getBody());
-        $translation = $response->rows[0]->target;
+        $responseBody = json_decode($this->api()->getLastResponse()->getBody());
+        $translation = $responseBody->rows[0]->target;
         $this->assertEquals(self::$expectedTranslations[$segToEdit->source], $translation, 'Result of translation is not as expected! Source was:'."\n".$segToEdit->source);
     }
     
@@ -184,9 +190,9 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         
         fwrite(STDOUT, "\n" .'response: ' . print_r($this->api()->getLastResponse(),1) . "\n"); // TODO remove output
         fwrite(STDOUT, "\n" .'response getBody(): ' . print_r($this->api()->getLastResponse()->getBody(),1) . "\n"); // TODO remove output
-        $response = json_decode($this->api()->getLastResponse()->getBody());
-        fwrite(STDOUT, "\n" .'response getBody() json_decode: ' . print_r($response,1) . "\n"); // TODO remove output
-        $rows = $response->rows;
+        $responseBody = json_decode($this->api()->getLastResponse()->getBody());
+        fwrite(STDOUT, "\n" .'response getBody() json_decode: ' . print_r($responseBody,1) . "\n"); // TODO remove output
+        $rows = $responseBody->rows;
         fwrite(STDOUT, "\n" .'rows: ' . print_r($rows,1) . "\n"); // TODO remove output
     }
 
