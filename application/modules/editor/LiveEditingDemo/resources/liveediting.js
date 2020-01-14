@@ -75,6 +75,9 @@
 	/* *************************************************************************************************** */
 
 	var LeParserSort = {
+		numerical: function(a, b){
+			return a - b;
+		},
 		byPos: function(a, b){
 			return LeParserSort._byPropAsc(a, b, "pos");
 		},
@@ -124,6 +127,7 @@
 		this.height = height;
 		this.rotation = rotation;
 		this.rendered = false;
+		this.empty = false;
 		this.seperated = false;
 		this.fontSize = 0;
 		this.lineHeight = 0;
@@ -299,8 +303,10 @@
 		return true;
 	};
 	LeParserElement.prototype.render = function(asTable, styles, attribs){
-		// TODO: font-size, line-height#
-		styles += (styles == "") ? this._renderFontStyle() : " "+_renderFontStyle();
+		styles += (styles == "") ? this._renderFontStyle() : " "+this._renderFontStyle();
+		if(this.align == "right" || this.align == "center"){
+			styles += ' text-align:'+this.align+';';
+		}
 		return '<div style="'+styles+'"'+attribs+'>'+this.html+'</div>';
 	};	
 	LeParserElement.prototype._renderAsSubOrSuperTag = function(element){
@@ -316,7 +322,8 @@
 		return span + this.html + '</span>';
 	};
 	LeParserElement.prototype._renderFontStyle = function(){
-		return 'font-family:'+this.fontFamily+'; font-size:'+this.fontSize+'px; font-style:'+this.fontStyle+'; font-weight:'+this.fontWeight+';';
+		var lh = (this.multiline) ? this.multiLineHeight : this.lineHeight;
+		return 'font-family:'+this.fontFamily+'; font-size:'+this.fontSize+'px; font-style:'+this.fontStyle+'; font-weight:'+this.fontWeight+'; line-height:'+lh+'px; ';
 	};
 	LeParserElement.prototype._getMaxCenteredDist = function(){
 		return Math.min((this._ltab - this._minltab), (this._maxrtab - this._rtab));
@@ -369,16 +376,27 @@
 	
 	/* *************************************************************************************************** */
 	
+	var LeParserFont = function(){
+		
+	};
+	
+	/* *************************************************************************************************** */
+	
 	// represents an empty column in the rendering process (whitespace)
-	var LeParserCol = function(ltab, rtab, colspan){
-		this._ltab = ltab;
-		this._rtab = rtab;
+	var LeParserEmptyCol = function(ltab, rtab, top, bottom, colspan){
+		this._ltab = this.left = ltab;
+		this._rtab = this.right = rtab;
+		this.top = top;
+		this.bottom = bottom;
+		this.height = this.bottom - this.top;
+		this.width = this.right - this.left;
 		this._above = this._below = null;
 		this.colspan = colspan;
 		this.rowspan = 1;
 		this.rendered = true;
+		this.empty = true;
 	};
-	LeParserCol.prototype.render = function(asTable, styles, attribs){
+	LeParserEmptyCol.prototype.render = function(asTable, styles, attribs){
 		return "";
 	};
 	
@@ -386,6 +404,7 @@
 	
 	var LeParserRow = function(pos, num){
 		this.pos = this.bottom = pos;
+		this.top = 0;
 		this.num = num;
 		this.elements = [];
 		this.fontSize = 0;
@@ -398,6 +417,9 @@
 		}
 		if(this.lineHeight < ele.lineHeight){
 			this.lineHeight = ele.lineHeight;
+		}
+		if(this.top == 0 || this.top > ele.top){
+			this.top = ele.top;
 		}
 		this.elements.push(ele);
 	};
@@ -449,7 +471,7 @@
 	// finds the empty columns to cover the existing whitespace and evaluates the colspans for our columns
 	// absolutely neccessary for this is, that all rendered elemens are expanded to a tab !
 	LeParserRow.prototype.findColumns = function(tabs, indices, frame){
-		var e, li, last = 0;
+		var e, li, ri, last = 0;
 		for(var i=0; i < this.elements.length; i++){
 			e = this.elements[i];
 			if(e.rendered || e._above != null){
@@ -458,18 +480,29 @@
 					frame.setTabBoundries(e);
 				}
 				li = indices["p"+e._ltab];
+				ri = indices["p"+e._rtab];
+				e.colspan = ri - li;
 				if(last < li){
-					this.cols.push(new LeParserCol(tabs[last], tabs[li], (li - last)));
+					this.cols.push(new LeParserEmptyCol(tabs[last], tabs[li], this.top, this.bottom, (li - last)));
 				}
 				if(e.rendered){
 					this.cols.push(e);
 				}
-				last = indices["p"+e._rtab];
+				// DEBUG: console.log(e.id+": index: "+(this.cols.length - 1)+" indices: ("+li+"/"+ri+") tabs: ("+e._ltab+"/"+e._rtab+") alltabs: ["+tabs.join(',')+"]");
+				last = ri;
 			}
 		}
 		if(last < (tabs.length - 1)){
-			this.cols.push(new LeParserCol(tabs[last], tabs[tabs.length - 1], (tabs.length - 1 - last)));
+			this.cols.push(new LeParserEmptyCol(tabs[last], tabs[tabs.length - 1], this.top, this.bottom, (tabs.length - 1 - last)));
 		}
+	};
+	LeParserRow.prototype.findSections = function(frame){
+		for(var i=0; i < this.elements.length; i++){
+			if(this.elements[i].rendered){
+				this.cols.push(this.elements[i]);
+			}
+		}
+		return (this.cols.length > 0);
 	};
 	LeParserRow.prototype.render = function(asTable, frame){
 		if(asTable){
@@ -488,9 +521,10 @@
 		return html;
 	};
 	LeParserRow.prototype._renderAsTable = function(frame){
-		var i, col, attribs = '', html = '<tr>';
+		var i, col, attribs, html = '<tr>';
 		for(i = 0; i < this.cols.length; i++){
 			col = this.cols[i];
+			attribs = '';
 			if(col.colspan > 1){
 				attribs += (' colspan="'+col.colspan+'"');
 			}
@@ -693,9 +727,6 @@
 		s.sort(LeParserSort.byWeight);
 		this.fontSize = s[0].size;
 		
-		// these values match better what was evaluated for elements
-		var _left = Math.round(this.left * leParser.config.tabPrecision) / leParser.config.tabPrecision;
-		var _right = Math.round(this.right * leParser.config.tabPrecision) / leParser.config.tabPrecision;
 		// round our values to match the general precision
 		this.top = Math.floor(this.top * leParser.config.linePrecision) / leParser.config.linePrecision;
 		this.bottom = Math.ceil(this.bottom * leParser.config.linePrecision) / leParser.config.linePrecision;
@@ -728,7 +759,7 @@
 		this._lines = l;		
 		this._lines.sort(LeParserSort.byPos);
 		for(i=0; i < this._lines.length; i++){
-			this._lines[i].build(_left, _right);
+			this._lines[i].build(this.left, this.right);
 		}
 		// eliminate lines, that do overlap (closer together than a line-height) and merge them.
 		// NOTE:
@@ -800,7 +831,7 @@
 			}
 			// then harmonize them
 			for(k in this._tabs){
-				this.harmonizeAlignedColumns("center", this._tabs[k], _left, _right);
+				this.harmonizeAlignedColumns("center", this._tabs[k], this.left, this.right);
 			}
 		}
 		
@@ -820,27 +851,40 @@
 			}
 			// then harmonize them
 			for(k in this._tabs){
-				this.harmonizeAlignedColumns("right", this._tabs[k], _left, _right);
+				this.harmonizeAlignedColumns("right", this._tabs[k], this.left, this.right);
 			}
 		}
 		
 		// re-evaluate our tabs
-		this._tabs = {};
-		this._addTab(_left);
-		this._addTab(_right);
+		this._tabs = [];
+		this.tabs = [];
 		for(i=0; i < this.elements.length; i++){
 			e = this.elements[i];
 			if(e.rendered){
-				this._addTab(e._ltab);
+				this._addTo(e._ltab, "_tabs", 0);
 				if(e.align != "left"){
-					this._addTab(e._rtab);
+					this._addTo(e._rtab, "_tabs", 0);
 				}
 			}
 		}
-		for(i in this._tabs){
-			this.tabs.push(this._tabs[i]);
+		if(!this._isIn(this.left, "_tabs", leParser.config.tabPrecision)){
+			this.tabs.push(this.left);
 		}
-		this.tabs.sort();
+		for(i in this._tabs){
+			this.tabs.push(this._tabs[i].pos);
+		}
+		if(!this._isIn(this.right, "_tabs", leParser.config.tabPrecision)){
+			this.tabs.push(this.right);
+		}
+		this.tabs.sort(LeParserSort.numerical);
+		if(this.left != this.tabs[0]){
+			this.left = this.tabs[0];
+			this.width = this.right - this.left;
+		}
+		if(this.right != this.tabs[this.tabs.length - 1]){
+			this.right = this.tabs[this.tabs.length - 1];
+			this.width = this.right - this.left;
+		}
 		this.isTable = (this.tabs.length > 2);
 		
 		// expand left-aligned items to harmonize the layout further
@@ -858,7 +902,7 @@
 		} else {
 			for(i=0; i < this.elements.length; i++){
 				if(this.elements[i].align == "left"){
-					this.elements[i].increaseTabs(-1, _right);
+					this.elements[i].increaseTabs(-1, this.right);
 				}
 			}
 		}
@@ -872,6 +916,16 @@
 			for(i=0; i < this._lines.length; i++){
 				this._lines[i].findColumns(this.tabs, this._tabs, this);
 			}
+		} else {
+			// for sequences / tables with just one column, we just need the rendered lines
+			l = [];
+			for(i=0; i < this._lines.length; i++){
+				if(this._lines[i].findSections(this)){
+					l.push(this._lines[i]);
+				}
+			}
+			delete this._lines;
+			this._lines = l;
 		}
 		// explicitly delete in-between models to trigger the garbage-collection
 		delete  this._ctabs;
@@ -945,16 +999,23 @@
 	};
 	// renders our evaluated layout
 	LeParserFrame.prototype.render = function(jPage){
-		var e, ea, i, t;
+		var e, ea, i, j, l, t, w;
 		var html = '<div id="'+this.id+'" class="'+leParser.createFrameClasses()+'" style="'+leParser.createFrameStyles(this)+'">';
-		if(this.isTable){
-			html += '<table><tbody>';
-		}
-		for(i=0; i < this._lines.length; i++){
-			html += this._lines[i].render(this.isTable, this);			
-		}
-		if(this.isTable){
-			html += '</tbody></table>';
+		if(!(leParser.config.devMode && leParser.config.showCellOverlays)){
+			if(this.isTable){
+				html += '<table style="width:100%;"><colgroup>';
+				for(i=1; i < this.tabs.length; i++){
+					w = this.tabs[i] - this.tabs[i - 1];
+					html += '<col style="width:'+String(w / this.width * 100)+'%;">';
+				}
+				html += '</colgroup><tbody>';
+			}
+			for(i=0; i < this._lines.length; i++){
+				html += this._lines[i].render(this.isTable, this);			
+			}
+			if(this.isTable){
+				html += '</tbody></table>';
+			}
 		}
 		html += '</div>';
 		
@@ -962,45 +1023,77 @@
 		jPage.append(this.jDomNode);		
 
 		// in devmode we put layers above to make found elements visible
-		if(leParser.config.devMode && leParser.config.colorizeCols){
-			for(i=0; i < this.elements.length; i++){
-				e = this.elements[i];
-				if(e.rendered || e.fixed){
-					t = (e._prev == null) ? '' : ' prev:'+e._prev.id;
-					if(e._next != null)
-						t += ' next:'+e._next.id;
-					if(e._above != null)
-						t += ' above:'+e._above.id;
-					if(e._below != null)
-						t += ' below:'+e._below.id;
-					if(e.multiline)
-						t += ' multiLineHeight:'+e.multiLineHeight;
-					ea = (e.fixed) ? "fixed" : e.align;
-					
-					jPage.append('<div id="'+e.id+'tmp" class="'+leParser.config.namespace+'-ele '+leParser.config.namespace+'-colorized '+leParser.config.namespace+'-'+ea+'" style="top:'+e.top+'px; left:'+e._ltab+'px; width:'+(e._rtab - e._ltab)+'px; height:'+e.height+'px"'
-								+' title="id:'+e.id+', align:'+ea+', line:'+e._line
-								+', ltab:'+e._ltab+', minltab:'+e._minltab+', rtab:'+e._rtab+', maxrtab:'+e._maxrtab+', ctab:'+e._ctab
-								+', fontsize:'+e.fontSize+', lineheight:'+e.lineHeight+t+'"></div>');
+		if(leParser.config.devMode){
+			if(leParser.config.showCellOverlays && leParser.config.colorizeCells){
+				// render visible elements including the invisible "fixed" elements (which are just error-corrections). Therefore we cannot use the _lines model ...
+				for(i=0; i < this.elements.length; i++){
+					e = this.elements[i];
+					if(e.rendered || e.fixed){
+						jPage.append(this.renderCellOverlay(e));
+					}
+				}
+			}
+			if(leParser.config.showCellOverlays && leParser.config.colorizeEmptyCells){
+				// render empty cells representing whitespace
+				for(i=0; i < this._lines.length; i++){
+					l = this._lines[i];
+					for(j=0; j < l.cols.length; j++){
+						if(l.cols[j].empty){
+							jPage.append(this.renderCellOverlay(l.cols[j]));
+						}
+					}
 				}
 			}
 		}
 		delete  this._nodes;
 		delete  this._lines;
 	};
-	LeParserFrame.prototype.remove = function(jPage){
-		
-		
-		// TEMPORARY: just to make found elements invisible
-		if(leParser.config.devMode){
-			for(var i=0; i < this.elements.length; i++){
-				var e = this.elements[i];
-				if(e.rendered){
-					$("#"+e.id+"tmp").remove();
-				}
-			}
+	LeParserFrame.prototype.renderCellOverlay = function(element){
+		var title = '',
+			styles = 'top:'+element.top+'px; left:'+element._ltab+'px; width:'+(element._rtab - element._ltab)+'px; height:'+element.height+'px;',
+			classes = leParser.config.namespace+'-eolay '+leParser.config.namespace+'-colorized '+leParser.config.namespace+'-';
+		if(element.empty){
+			classes += 'empty';
+		} else if(element.fixed){
+			classes += 'fixed';
+		} else {
+			classes += element.align;
 		}
-		
-		
+		if(element._prev && element._prev != null){
+			title += ' prev:'+element._prev.id;
+		}
+		if(element._next && element._next != null){
+			title += ' next:'+element._next.id;
+		}
+		if(element._above && element._above != null){
+			title += ' above:'+element._above.id;
+		}
+		if(element._below && element._below != null){
+			title += ' below:'+element._below.id;
+		}
+		if(element.multiline){
+			title += ' multiLineHeight:'+element.multiLineHeight;
+		}
+		if(element.colspan > 1){
+			title += ' colspan:'+element.colspan;
+		}
+		if(element.rowspan > 1){
+			title += ' rowspan:'+element.rowspan;
+		}
+		// reduced prop-set for empty elements ...
+		if(element.empty){
+			return ('<div class="'+classes+'" style="'+styles+'" title="line:'+element.bottom+title+'"></div>');
+		}
+		return (
+			'<div id="'+element.id+'olay" class="'+classes+'" style="'+styles+'"'
+			+' title="id:'+element.id+', align:'+element.align+', line:'+element._line
+			+', ltab:'+element._ltab+', minltab:'+element._minltab+', rtab:'+element._rtab+', maxrtab:'+element._maxrtab+', ctab:'+element._ctab
+			+', fontsize:'+element.fontSize+', lineheight:'+element.lineHeight+title+'"></div>');
+	};
+	LeParserFrame.prototype.remove = function(jPage){
+		if(leParser.config.devMode){
+			$("."+leParser.config.namespace+"-eolay").remove();
+		}
 		if(this.jDomNode != null){
 			this.jDomNode.remove();
 		}
@@ -1044,7 +1137,7 @@
 	};
 	LeParserFrame.prototype._addTo = function(pos, varName, thresh){
 		for(var i in this[varName]){
-			if(Math.abs(this[varName][i].pos - pos) < thresh){
+			if(Math.abs(this[varName][i].pos - pos) <= thresh){
 				this[varName][i].num++;
 				return this[varName][i].pos;
 			}
@@ -1235,7 +1328,9 @@
 			"splitOnSeperatorSpans": { "type":"bool", "unit":"", "txt":"If set the empty spans used by pdf2html to generate horizontal whitespace are used to split the text into columns" },
 			"colorizeFrames": { "type":"bool", "unit":"", "txt":"Colorize all frames" },
 			"colorizeRows": { "type":"bool", "unit":"", "txt":"Colorize all rows in frames" },
-			"colorizeCols": { "type":"bool", "unit":"", "txt":"Colorize all columns in rows in frames" }
+			"colorizeCells": { "type":"bool", "unit":"", "txt":"Colorize all columns in rows in frames" },
+			"colorizeEmptyCells": { "type":"bool", "unit":"", "txt":"Colorize all empty (whitespace creating) columns in rows in frames" },
+			"showCellOverlays": { "type":"bool", "unit":"", "txt":"Shows the cells/cell-overlays as colored overlays over the rendered cells" }
 		};
 		this.build = function(){
 			var lc = leParser.config, lp = leParser.config.namespace, item;
@@ -1334,7 +1429,9 @@
 			devMode: false,
 			colorizeFrames: false,
 			colorizeRows: false,
-			colorizeCols: false,
+			colorizeCells: false,
+			colorizeEmptyCells: false,
+			showCellOverlays: false,
 			defaultFontSize: 11,
 			defaultLineHeight: 1.20
 		},
@@ -1444,12 +1541,6 @@
 			}
 			return false;
 		},
-		findRows: function(){
-
-		},
-		findCols: function(){
-
-		},
 		getOrAddId: function(jNode){
 			if(jNode.get(0).hasAttribute("id")){
 				return jNode.attr("id");
@@ -1477,15 +1568,15 @@
 			if(frame.scaleX != 1 && frame.scaleY != 1 && frame.transform != ""){
 				var width = frame.width / frame.scaleX;
 				var height = frame.height / frame.scaleY;
-				return 'top:'+String(frame.top - ((height - frame.height) / 2))+'px; left:'+String(frame.left - ((width - frame.width) / 2))+'px; width:'+String(width)+'px; height:'+String(height)+'px; transform:'+frame.transform+'; font-size:'+String(frame.fontSize)+'px;';
+				return 'top:'+String(frame.top - ((height - frame.height) / 2))+'px; left:'+String(frame.left - ((width - frame.width) / 2))+'px; width:'+String(Math.ceil(width))+'px; height:'+String(Math.ceil(height))+'px; transform:'+frame.transform+'; font-size:'+String(frame.fontSize)+'px;';
 			}
-			return 'top:'+String(frame.top)+'px; left:'+String(frame.left)+'px; width:'+String(frame.width)+'px; height:'+String(frame.height)+'px; font-size:'+String(frame.fontSize)+'px;';
+			return 'top:'+String(frame.top)+'px; left:'+String(frame.left)+'px; width:'+String(Math.ceil(frame.width))+'px; height:'+String(Math.ceil(frame.height))+'px; font-size:'+String(frame.fontSize)+'px;';
 		},
 		createRowClasses: function(){
 			return this.createClassesForType("row", (this.config.devMode && this.config.colorizeRows));
 		},
 		createColumnClasses: function(){
-			return this.createClassesForType("col", (this.config.devMode && this.config.colorizeCols));
+			return this.createClassesForType("col", (this.config.devMode && this.config.colorizeCells));
 		},
 		createClassesForType: function(type, addColorization){
 			if(addColorization){
@@ -1604,6 +1695,6 @@
 })(window, document, jQuery);
 
 $(document).ready(function(){
-	window.leParser.init({ "devMode":true, "colorizeFrames":true, "colorizeRows":true, "colorizeCols":true });
+	window.leParser.init({ "devMode":true, "colorizeFrames":true, "colorizeRows":true, "colorizeCells":true });
 	window.leParser.buildAllPages();
 });
