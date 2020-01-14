@@ -75,10 +75,10 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
     const TARGET_LANG = 'en';
     const TARGET_LANG_CODE = 5;
     
-    // For InstantTranslate:
-    const TEXT_TO_TRANSLATE = 'PHP Handbuch';
-    
-    // For matches (see task):
+    /**
+     * Translations to check (= see file for task-import) and what we expect as result.
+     * @var array
+     */
     protected static $expectedTranslations = [
         'PHP Handbuch' => 'PHP manual',
         'Das Haus ist blau.' => 'The house is blue.'
@@ -179,24 +179,22 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
      * and check if the result is as expected.
      */
     public function testTranslation() {
-        $params = [];
-        $params['source']  = static::SOURCE_LANG;
-        $params['target'] = static::TARGET_LANG;
-        $params['text'] = $text = static::TEXT_TO_TRANSLATE;
-        $this->api()->requestJson('editor/instanttranslateapi/translate', 'GET', $params); // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
-        $responseBody = json_decode($this->api()->getLastResponse()->getBody());
-        $allTranslations = json_decode(json_encode($responseBody->rows), true);
-        
-        // Is anything returned for Deep at all? 
-        $this->assertArrayHasKey('DeepL', $allTranslations, 'InstantTranslate: Translations do not include a response for DeepL.');
-        
-        // Do we provide an expected translation at all?
-        $this->assertArrayHasKey($text, self::$expectedTranslations, 'Provide an expected translation for: '.$text);
-        
-        // Does the result match our expectations?
-        foreach ($allTranslations['DeepL'] as $translationFromDeepL){
-            $translation = $translationFromDeepL[0];
-            $this->assertEquals(self::$expectedTranslations[$text], $translation['target'], 'Result of translation is not as expected! Text was:'."\n".$text);
+        foreach (self::$expectedTranslations as $text => $expectedTranslation){
+            $params = [];
+            $params['source']  = static::SOURCE_LANG;
+            $params['target'] = static::TARGET_LANG;
+            $params['text'] = $text;
+            $this->api()->requestJson('editor/instanttranslateapi/translate', 'GET', $params); // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
+            $responseBody = json_decode($this->api()->getLastResponse()->getBody());
+            $allTranslations = json_decode(json_encode($responseBody->rows), true);
+            // Is anything returned for Deep at all?
+            $this->assertArrayHasKey('DeepL', $allTranslations, 'InstantTranslate: Translations do not include a response for DeepL.');
+            // Does the result match our expectations?
+            foreach ($allTranslations['DeepL'] as $translationFromDeepL){
+                $translation = $translationFromDeepL[0];
+                $this->assertEquals($expectedTranslation, $translation['target'], 'Result of translation is not as expected! Text was:'."\n".$text);
+                
+            }
         }
     }
 
