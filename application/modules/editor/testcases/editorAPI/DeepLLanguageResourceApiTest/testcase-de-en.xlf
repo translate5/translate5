@@ -3,11 +3,11 @@
 <file original="simple-en-de.sdlxliff" source-language="de" target-language="en" xml:space="preserve" datatype="x-translate5">
 <body>
 <trans-unit id="1" translate5:autostateText="not_translated">
-<source>PHP Handbuch</source>
+<source><g id="92">Datum:</g> PHP Handbuch</source>
 <target></target>
 </trans-unit>
 <trans-unit id="2" translate5:autostateText="not_translated">
-<source>Das Haus ist blau.</source>
+<source>Das Haus ist <g id="93">blau</g>.</source>
 <target></target>
 </trans-unit>
 </body>

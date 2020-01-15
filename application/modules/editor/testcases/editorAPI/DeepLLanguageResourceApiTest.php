@@ -76,12 +76,20 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
     const TARGET_LANG_CODE = 5;
     
     /**
-     * Translations to check (= see file for task-import) and what we expect as result.
+     * Matches (= see file for task-import): what we expect as result.
      * @var array
      */
-    protected static $expectedTranslations = [
-        'PHP Handbuch' => 'PHP manual',
-        'Das Haus ist blau.' => 'The house is blue.'
+    protected static $expectedTranslationsForMatches = [
+        '<div class="open 672069643d22393222 internal-tag ownttip"><span title="&lt;g id=&quot;92&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="92" data-length="-1" class="full">&lt;g id=&quot;92&quot;&gt;</span></div>Datum:<div class="close 2f67 internal-tag ownttip"><span title="&lt;/g&gt;" class="short">&lt;/1&gt;</span><span data-originalid="92" data-length="-1" class="full">&lt;/g&gt;</span></div> PHP Handbuch' => '<div class="open 672069643d22393222 internal-tag ownttip"><span title="&lt;g id=&quot;92&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="92" data-length="-1" class="full">&lt;g id=&quot;92&quot;&gt;</span></div>Date:<div class="close 2f67 internal-tag ownttip"><span title="&lt;/g&gt;" class="short">&lt;/1&gt;</span><span data-originalid="92" data-length="-1" class="full">&lt;/g&gt;</span></div> PHP Manual',
+        'Das Haus ist <div class="open 672069643d22393322 internal-tag ownttip"><span title="&lt;g id=&quot;93&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="93" data-length="-1" class="full">&lt;g id=&quot;93&quot;&gt;</span></div>blau<div class="close 2f67 internal-tag ownttip"><span title="&lt;/g&gt;" class="short">&lt;/1&gt;</span><span data-originalid="93" data-length="-1" class="full">&lt;/g&gt;</span></div>.' => 'The house is <div class="open 672069643d22393322 internal-tag ownttip"><span title="&lt;g id=&quot;93&quot;&gt;" class="short">&lt;1&gt;</span><span data-originalid="93" data-length="-1" class="full">&lt;g id=&quot;93&quot;&gt;</span></div>blue<div class="close 2f67 internal-tag ownttip"><span title="&lt;/g&gt;" class="short">&lt;/1&gt;</span><span data-originalid="93" data-length="-1" class="full">&lt;/g&gt;</span></div>.'
+    ];
+    /**
+     * InstantTranslate: Translations to check and what we expect as result.
+     * @var array
+     */
+    protected static $expectedTranslationsForInstantTranslate = [
+        '[<i>Datum:</i>] PHP Handbuch' => '[<i>Date:</i>] PHP Manual',
+        'Das Haus ist <b>blau</b>.' => 'The house is <b>blue</b>.'
     ];
     
     /**
@@ -161,7 +169,7 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         
         foreach ($allSegments->rows as $segment){
             // Do we provide an expected translation at all?
-            $this->assertArrayHasKey($segment->source, self::$expectedTranslations, 'Provide an expected translation for: '.$segment->source);
+            $this->assertArrayHasKey($segment->source, self::$expectedTranslationsForMatches, 'Provide an expected translation for: '.$segment->source);
             // Does the result match our expectations?
             $params = [];
             $params['segmentId'] = $segment->id;
@@ -169,7 +177,7 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
             $this->api()->requestJson('editor/languageresourceinstance/'.self::$languageResourceID.'/query', 'POST', [], $params);
             $responseBody = json_decode($this->api()->getLastResponse()->getBody());
             $translation = $responseBody->rows[0]->target;
-            $this->assertEquals(self::$expectedTranslations[$segment->source], $translation, 'Result of translation is not as expected! Source was:'."\n".$segment->source);
+            $this->assertEquals(self::$expectedTranslationsForMatches[$segment->source], $translation, 'Result of translation is not as expected! Source was:'."\n".$segment->source);
         }
     }
     
@@ -179,7 +187,7 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
      * and check if the result is as expected.
      */
     public function testTranslation() {
-        foreach (self::$expectedTranslations as $text => $expectedTranslation){
+        foreach (self::$expectedTranslationsForInstantTranslate as $text => $expectedTranslation){
             $params = [];
             $params['source']  = static::SOURCE_LANG;
             $params['target'] = static::TARGET_LANG;
@@ -191,9 +199,9 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
             $this->assertArrayHasKey('DeepL', $allTranslations, 'InstantTranslate: Translations do not include a response for DeepL.');
             // Does the result match our expectations?
             foreach ($allTranslations['DeepL'] as $translationFromDeepL){
-                $translation = $translationFromDeepL[0];
-                $this->assertEquals($expectedTranslation, $translation['target'], 'Result of translation is not as expected! Text was:'."\n".$text);
-                
+                $translationArr = $translationFromDeepL[0];
+                $translation = htmlspecialchars_decode($translationArr['target']);
+                $this->assertEquals($expectedTranslation, $translation, 'Result of translation is not as expected! Text was:'."\n".$text);
             }
         }
     }
