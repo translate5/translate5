@@ -1,9 +1,12 @@
 /* classes must match leParser.namespace in liveediting.js ! */
-.t5lep-frm, .t5lep-rotfrm { position:absolute; }
+.t5lep-frm, .t5lep-rotfrm { position:absolute; z-index:11500; }
+.t5lep-txt {  }
+.t5lep-multiline {}
+
+/* colorization in devmode */
 .t5lep-frm.t5lep-colorized { margin:-8px; border:8px solid #e1cb2a; background-color:rgba(225,203,42,.2); }
 .t5lep-rotfrm.t5lep-colorized { margin:-1px; border:1px solid #00ffe2; background-color:rgba(0,255,226,.2); }
 .t5lep-eolay { position:absolute; box-sizing:border-box; z-index:12500; }
-
 .t5lep-eolay.t5lep-colorized { border:1px solid #ff00ff; background-color:rgba(255,0,255,.1); }
 .t5lep-eolay.t5lep-colorized.t5lep-left { background-color:rgba(255,0,255,.1); }
 .t5lep-eolay.t5lep-colorized.t5lep-right { background-color:rgba(30,230,0,.4); }

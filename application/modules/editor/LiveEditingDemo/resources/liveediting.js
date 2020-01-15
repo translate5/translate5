@@ -117,8 +117,68 @@
 	};
 	
 	/* *************************************************************************************************** */
+	
+	// represents the font-properties of an element
+	var LeParserFont = function(family, size, style, weight, lineheight, color, charheight, element){		
+		this.family = family;
+		this.size = size;
+		this.style = style;
+		this.weight = weight;
+		this.height = lineheight; // represents the line-height !
+		this.color = color;
+		this.charheight = charheight;
+		if(element && element != null && size == lineheight){
+			this.charheight = element.getUnscaledHeight();
+			if(this.charheight > this.size){
+				this.charheight = this.size;
+			}
+			// DEBUG: console.log("INIT LeParserFont: "+family+" / "+size+" / "+style+" / "+weight+" / "+lineheight+" / "+color+" / charheight: "+this.charheight);
+		} else if(charheight == 0){
+			this.charheight = size;
+		}
+	};
+	LeParserFont.prototype.isEqual = function(font){
+		return (this.family == font.family && this.size == font.size && this.style == font.style && this.weight == font.weight && this.height == font.height && this.color == font.color);
+	};
+	LeParserFont.prototype.clone = function(){
+		return new LeParserFont(this.family, this.size, this.style, this.weight, this.height, this.color, this.charheight, null);
+	};
+	LeParserFont.prototype.getStyle = function(){
+		var style = 'font-family:'+this.family+'; font-size:'+this.size+'px; font-style:'+this.style+'; font-weight:'+this.weight+'; color:'+this.color+';';
+		if(this.height > 0){
+			style += ' line-height:'+this.height+'px;';
+		}
+		return style;
+	};
+	LeParserFont.prototype.toSpan = function(html){
+		return '<span style="'+this.getStyle()+'">'+html+'</span>';
+	};
+	LeParserFont.prototype.setSize = function(size){
+		if(size != this.size){
+			if(this.height > 0){
+				this.height = size / this.size * this.height;
+			}
+			this.charheight = size / this.size * this.charheight;
+			this.size = size;
+		}
+	};
+	LeParserFont.prototype.setHeight = function(height){
+		this.height = height;
+	};
+	LeParserFont.prototype.getSize = function(){
+		return this.size;
+	};
+	LeParserFont.prototype.getLeading = function(){
+		if(this.charheight < this.size){
+			var leading = ((this.height - this.size) / 2);
+			return Math.round(leading / 2) * 2;
+		}
+		return Math.round((this.height - this.size) / 4) * 2;
+	};
 
-	var LeParserElement = function(top, left, width, height, rotation){
+	/* *************************************************************************************************** */
+
+	var LeParserElement = function(top, left, width, height, rotation, scale){
 		this.top = top;
 		this.right = left + width;
 		this.bottom = top + height;
@@ -126,11 +186,10 @@
 		this.width = width;
 		this.height = height;
 		this.rotation = rotation;
+		this.scale = scale;
 		this.rendered = false;
 		this.empty = false;
 		this.seperated = false;
-		this.fontSize = 0;
-		this.lineHeight = 0;
 		this.multiline = false;
 		this.colspan = 1;
 		this.rowspan = 1;
@@ -138,30 +197,87 @@
 		this.fixed = false;
 		this.joinable = false;
 		this.align = "left";
-		this.fontFamily = "sans-serif";
-		this.fontWeight = "400";
-		this.fontStyle = "normal";
+		this.font = null;
 		this.html = "";
 		this._subs = [];
 	};
+	LeParserElement.prototype.getScaleX = function(){
+		return (this.scale.x > 0) ? this.scale.x : 1;
+	};
+	LeParserElement.prototype.getScaleY = function(){
+		return (this.scale.y > 0) ? this.scale.y : 1;
+	};
+	LeParserElement.prototype.getUnscaledHeight = function(){
+		return (this.height / this.getScaleY());
+	};
+	LeParserElement.prototype.getFont = function(){
+		if(this.font == null){
+			this.font = leParser.getDefaultFont();
+		}
+		return this.font;
+	};
+	LeParserElement.prototype.getFont = function(){
+		if(this.font == null){
+			this.font = leParser.getDefaultFont();
+		}
+		return this.font;
+	};
+	LeParserElement.prototype.getFontStyle = function(){
+		if(this.font == null){
+			return "";
+		}
+		return this.font.getStyle();
+	};
+	LeParserElement.prototype.appendFontStyle = function(style){
+		var fs = this.getFontStyle();
+		if(fs == "" || style == ""){
+			return style+fs;
+		}
+		return style+" "+fs;
+	};
+	LeParserElement.prototype.getFontSize = function(){
+		return this.getFont().size;
+	};
+	LeParserElement.prototype.setFontSize = function(size){
+		return this.getFont().setSize(size);
+	};
+	LeParserElement.prototype.getLineHeight = function(){
+		return this.getFont().height;
+	};
+	LeParserElement.prototype.setLineHeight = function(height){
+		return this.getFont().setHeight(height);
+	};
+	LeParserElement.prototype.getTextClasses = function(){
+		var classes = leParser.config.namespace+'-txt';
+		if(this.multiline){
+			classes += ' '+leParser.config.namespace+'-multiline';
+		}
+		return classes;
+	};
+	LeParserElement.prototype.appendTextClasses = function(classes){
+		var tc = this.getTextClasses();
+		if(tc == "" || classes == ""){
+			return classes+tc;
+		}
+		return classes+" "+tc;
+	};
 	LeParserElement.prototype.cloneForSub = function(left, width){
-		var ele = new LeParserElement(this.top, left, width, this.height, this.rotation);
-		ele.lineHeight = this.lineHeight;
+		var ele = new LeParserElement(this.top, left, width, this.height, this.rotation, {"x":this.scale.x,"y":this.scale.y});
 		ele. multiline= this.multiline;
 		ele.align = this.align;
-		ele.fontSize = this.fontSize;
-		ele.fontFamily = this.fontFamily;
-		ele.fontWeight = this.fontWeight;
-		ele.fontStyle = this.fontStyle;
+		ele.font = (this.font == null) ? null : this.font.clone();
 		ele.virtual = true;
 		return ele;
 	};
 	LeParserElement.prototype.isInLine = function(element){
 		return(this.bottom < (element.bottom + leParser.config.linePosThresh) && this.bottom > (element.bottom - leParser.config.linePosThresh) && this.top < (element.top + leParser.config.linePosThresh) && this.top > (element.top - leParser.config.linePosThresh));
 	};
+	LeParserElement.prototype.isFontEqual = function(element){
+		return(this.font != null && element.font != null && this.font.isEqual(element.font));
+	};
 	// we may introduce a threshhold here if the pdfconverter fontsize calculation has inconsistencies
 	LeParserElement.prototype.isFontSizeEqual = function(element){
-		return(this.fontSize == element.fontSize);
+		return(this.getFontSize() == element.getFontSize());
 	};
 	LeParserElement.prototype.isDirectlyLeftOf = function(element){
 		return (this.right > element.left - leParser.config.subSuperJoinThresh && this.left < element.left);
@@ -173,10 +289,10 @@
 		if(this.html.length > 0 && this.html.charAt(this.html.length - 1) != " " && element.html.length > 0 && element.html.charAt(0) != " "){
 			this.html += " ";
 		}
-		if(element.fontSize != this.fontSize || element.fontFamily != this.fontFamily || element.fontWeight != this.fontWeight || element.fontStyle != this.fontStyle){
-			this.html += ('<span style="'+this._renderFontStyle()+'">' + element.html + '</span>');
-		} else {
+		if(this.isFontEqual(element)){
 			this.html += element.html;
+		} else {
+			this.html += element.getFontStyledHtml();
 		}
 		this.top = Math.min(this.top, element.top);
 		this.bottom = Math.max(this.bottom, element.bottom);
@@ -188,7 +304,7 @@
 	// Checks, if an Element is a sup-or superscript relative to the passed element
 	LeParserElement.prototype.isSubOrSuper = function(element){
 		// font too big
-		if(this.fontSize == 0 || this.fontSize > (element.fontSize * leParser.config.subSuperFontSizeMax)){
+		if(this.getFontSize() == 0 || this.getFontSize() > (element.getFontSize() * leParser.config.subSuperFontSizeMax)){
 			return false;
 		}
 		// no vertical overlap
@@ -216,10 +332,7 @@
 		this.top = element.top;
 		this.bottom = element.bottom;
 		this.height = element.height;
-		this.fontSize = element.fontSize;
-		this.fontFamily = element.fontFamily;
-		this.fontWeight = element.fontWeight;
-		this.fontStyle = element.fontStyle;
+		this.font = element.getFont().clone();
 	};
 	LeParserElement.prototype.isVerticallyAligned = function(element){
 		if(this.align != element.align){
@@ -233,7 +346,7 @@
 	LeParserElement.prototype.isMultilineCapable = function(element, scaleY){
 		if(this.isVerticallyAligned(element) && this.isFontSizeEqual(element)){
 			// comparing the max-multiline height
-			return (Math.abs(element._line - this._line) < ((this.fontSize * scaleY) * leParser.config.maxMultiLineHeight / 100));
+			return (Math.abs(element._line - this._line) < ((this.getFontSize() * scaleY) * leParser.config.maxMultiLineHeight / 100));
 		}
 		return false;
 	};
@@ -284,10 +397,10 @@
 		if(this.html.length > 0 && element.html.substr(0,2) != "<p" && element.html.substr(0,4) != "<div"){
 			this.html += "<br/>";
 		}
-		if(element.fontSize != this.fontSize || element.fontFamily != this.fontFamily || element.fontWeight != this.fontWeight || element.fontStyle != this.fontStyle){
-			this.html += ('<span style="'+this._renderFontStyle()+'">' + element.html + '</span>');
-		} else {
+		if(this.isFontEqual(element)){
 			this.html += element.html;
+		} else {
+			this.html += element.getFontStyledHtml();
 		}
 		this.bottom = element.bottom;
 		this.left = Math.min(this.left, element.left);
@@ -302,28 +415,29 @@
 		element.rendered = false;
 		return true;
 	};
-	LeParserElement.prototype.render = function(asTable, styles, attribs){
-		styles += (styles == "") ? this._renderFontStyle() : " "+this._renderFontStyle();
+	LeParserElement.prototype.render = function(asTable, styles, classes){
+		styles = this.appendFontStyle(styles);
+		classes = this.appendTextClasses(classes);
+		if(this.getFont().getLeading() > 0){
+			styles += ' margin-top:-'+this.getFont().getLeading()+'px;';
+		}
 		if(this.align == "right" || this.align == "center"){
 			styles += ' text-align:'+this.align+';';
 		}
-		return '<div style="'+styles+'"'+attribs+'>'+this.html+'</div>';
-	};	
-	LeParserElement.prototype._renderAsSubOrSuperTag = function(element){
-		var span = '<span style="position:relative; ';
-		if(this.top >= element.top){
-			// superscript:
-			span += ' top:' + String(this.bottom - element.bottom) + 'px;';
-		} else {
-			// subscript
-			span += ' bottom:' + String(element.bottom - this.bottom) + 'px;';
-		}
-		span += (' '+this._renderFontStyle()+'">');
-		return span + this.html + '</span>';
+		return '<div style="'+styles+'" class="'+classes+'">'+this.html+'</div>';
 	};
-	LeParserElement.prototype._renderFontStyle = function(){
-		var lh = (this.multiline) ? this.multiLineHeight : this.lineHeight;
-		return 'font-family:'+this.fontFamily+'; font-size:'+this.fontSize+'px; font-style:'+this.fontStyle+'; font-weight:'+this.fontWeight+'; line-height:'+lh+'px; ';
+	// renders our html wrapped in a span with our font
+	LeParserElement.prototype.getFontStyledHtml = function(){
+		if(this.font == null){
+			return this.html;
+		}
+		return this.font.toSpan(this.html);
+	};
+	LeParserElement.prototype._renderAsSubOrSuperTag = function(element){
+		// TODO we may better switch to sub / sup. Are the distances correct ??
+		var style = 'position:relative;'; 
+		style += (this.top >= element.top) ? (' top:' + String(this.bottom - element.bottom) + 'px;') : (' bottom:' + String(element.bottom - this.bottom) + 'px;');
+		return '<span style="'+this.appendFontStyle(style)+'">' + this.html + '</span>';
 	};
 	LeParserElement.prototype._getMaxCenteredDist = function(){
 		return Math.min((this._ltab - this._minltab), (this._maxrtab - this._rtab));
@@ -368,20 +482,14 @@
 	};
 	
 	/* *************************************************************************************************** */
-	
+
 	var LeParserTab = function(pos, num){
 		this.pos = pos;
 		this.num = num;
 	};
-	
+
 	/* *************************************************************************************************** */
-	
-	var LeParserFont = function(){
-		
-	};
-	
-	/* *************************************************************************************************** */
-	
+
 	// represents an empty column in the rendering process (whitespace)
 	var LeParserEmptyCol = function(ltab, rtab, top, bottom, colspan){
 		this._ltab = this.left = ltab;
@@ -399,7 +507,7 @@
 	LeParserEmptyCol.prototype.render = function(asTable, styles, attribs){
 		return "";
 	};
-	
+
 	/* *************************************************************************************************** */
 	
 	var LeParserRow = function(pos, num){
@@ -407,16 +515,12 @@
 		this.top = 0;
 		this.num = num;
 		this.elements = [];
-		this.fontSize = 0;
 		this.lineHeight = 0;
 		this.cols = [];
 	};
 	LeParserRow.prototype.addElement = function(ele){
-		if(this.fontSize < ele.fontSize){
-			this.fontSize = ele.fontSize;
-		}
-		if(this.lineHeight < ele.lineHeight){
-			this.lineHeight = ele.lineHeight;
+		if(this.lineHeight < ele.getLineHeight()){
+			this.lineHeight = ele.getLineHeight();
 		}
 		if(this.top == 0 || this.top > ele.top){
 			this.top = ele.top;
@@ -464,7 +568,6 @@
 			this.addElement(line.elements[i]);
 		}
 		this.build(Math.min(this.left, line.left), Math.max(this.right, line.right));
-		line.fontSize = 0;
 		line.lineHeight = 0;
 		line.elements = [];
 	};
@@ -547,8 +650,6 @@
 		this.bottom = 0;
 		this.width = -1;
 		this.height = -1;
-		this.fontSize = 0;
-		this.minFontSize = 0;
 		this.scaleX = 1;
 		this.scaleY = 1;
 		this.transform = "";
@@ -581,11 +682,8 @@
 			this.height = element.height;
 			// DIRTY: the first Element sets the frames transform. this is obviously dependant on pdf2html logic
 			this.transform = jNode.css("transform"); // retrieves smth. like matrix(0.25, 0, 0, 0.25, 0, 0)
-			var scale = jNode.transformationScale();
-			if(scale.x > 0 && scale.y > 0){
-				this.scaleX = scale.x;
-				this.scaleY = scale.y;
-			}
+			this.scaleX = element.getScaleX();
+			this.scaleY = element.getScaleY();
 		} else {
 			if(this.top > element.top){
 				this.top = element.top;
@@ -694,38 +792,13 @@
 	// the central function to generate the text-flow layout.
 	// the idea is to generate a table holding all frame elements
 	// problems are the detection of overlapping rows or columns, what is either by variations in positions or even "wrong" layout generated by pdfconverter
-	LeParserFrame.prototype.build = function(jPage){
+	LeParserFrame.prototype.build = function(jPage, pageWidth){
 		if(this.jDomNode != null){
 			return;
 		}
 		var e, ea, el, es, i, j, k, l, la, r, s, t;
 		// create our ID
 		this.id = leParser.createFrameId();
-		
-		// evaluate font-size & min fontsize which is the most used (sorted by weight)
-		for(i=0; i < this.elements.length; i++){
-			e = this.elements[i];
-			if(e.rendered){
-				if(this.minFontSize == 0 || e.fontSize < this.minFontSize){
-					this.minFontSize = e.fontSize;
-				}
-				var key = "fs"+String(e.fontSize);
-				if(key in this._fsizes){
-					this._fsizes[key].weight += leParser.stripTags(e.html).length;
-				} else {
-					this._fsizes[key] = {"size":e.fontSize, "weight":leParser.stripTags(e.html).length };
-				}
-			}
-		}
-		s = [];
-		for(i in this._fsizes){
-			if(this._fsizes[i].weight > 0){
-				s.push(this._fsizes[i]);
-			}
-		}
-		s.sort(LeParserSort.bySize);
-		s.sort(LeParserSort.byWeight);
-		this.fontSize = s[0].size;
 		
 		// round our values to match the general precision
 		this.top = Math.floor(this.top * leParser.config.linePrecision) / leParser.config.linePrecision;
@@ -935,7 +1008,7 @@
 		delete  this._fsizes;
 		
 		// renders our contents
-		this.render(jPage);
+		this.render(jPage, pageWidth);
 	};
 	// checks if the passed elements really can be merged to a textfield and evaluates the smallest bounding-box for the merged field
 	// this process aditionally takes the differnce between the lineheights of the building line-elements into account (threshold -> maxMultiLineTresh)
@@ -976,7 +1049,7 @@
 	};
 	// really creates a multiline field out of the given line-elements
 	LeParserFrame.prototype.createRowspan = function(elements, left, right){
-		elements[0].multiLineHeight = Math.round((elements[elements.length - 1].bottom - elements[0].bottom) / (elements.length - 1) / this.scaleY * 10) / 10;
+		elements[0].setLineHeight(Math.round((elements[elements.length - 1].bottom - elements[0].bottom) / (elements.length - 1) / this.scaleY * 10) / 10);
 		elements[0].multiline = true;
 		elements[0].adjustTabs(left, right);
 		elements[0]._below = elements[1];
@@ -998,15 +1071,28 @@
 		this._harmonizeAligned(direction, elements, left, right);
 	};
 	// renders our evaluated layout
-	LeParserFrame.prototype.render = function(jPage){
-		var e, ea, i, j, l, t, w;
+	LeParserFrame.prototype.render = function(jPage, pageWidth){
+		var e, ea, i, j, l, t, w, rtabs = [];
+		// to oevercome problems with unwanted line-breaks, we increase the size of the tabs according to a config-option and reverse proportionsl to their size (small tabs will grow more ...)
+		rtabs.push(this.tabs[0]);
+		for(i=1; i < this.tabs.length; i++){
+			w = this.tabs[i] - this.tabs[i - 1];
+			t = ((leParser.config.renderingGrowth / 100) * w) - w; // growth of tab according to rendering-growth
+			t = Math.pow(((pageWidth - w) / pageWidth), 3) * t; // fractional growth, smaller elements relative to the page grow more ...
+			rtabs.push(rtabs[rtabs.length - 1] + Math.ceil(w + t));
+		}
+		this.renderedWidth = rtabs[rtabs.length - 1] - rtabs[0];
+		// the next line will render the grown frame centered above the original one. if that's unwanted, simply use: this.renderedLeft = this.left;
+		this.renderedLeft = Math.floor(this.left - ((this.renderedWidth - this.width) / 2));		
+
+		// render the table or sequence
 		var html = '<div id="'+this.id+'" class="'+leParser.createFrameClasses()+'" style="'+leParser.createFrameStyles(this)+'">';
 		if(!(leParser.config.devMode && leParser.config.showCellOverlays)){
 			if(this.isTable){
 				html += '<table style="width:100%;"><colgroup>';
-				for(i=1; i < this.tabs.length; i++){
-					w = this.tabs[i] - this.tabs[i - 1];
-					html += '<col style="width:'+String(w / this.width * 100)+'%;">';
+				for(i=1; i < rtabs.length; i++){
+					w = rtabs[i] - rtabs[i - 1];
+					html += '<col style="width:'+String(w / this.renderedWidth * 100)+'%;">';
 				}
 				html += '</colgroup><tbody>';
 			}
@@ -1071,9 +1157,6 @@
 		if(element._below && element._below != null){
 			title += ' below:'+element._below.id;
 		}
-		if(element.multiline){
-			title += ' multiLineHeight:'+element.multiLineHeight;
-		}
 		if(element.colspan > 1){
 			title += ' colspan:'+element.colspan;
 		}
@@ -1088,7 +1171,7 @@
 			'<div id="'+element.id+'olay" class="'+classes+'" style="'+styles+'"'
 			+' title="id:'+element.id+', align:'+element.align+', line:'+element._line
 			+', ltab:'+element._ltab+', minltab:'+element._minltab+', rtab:'+element._rtab+', maxrtab:'+element._maxrtab+', ctab:'+element._ctab
-			+', fontsize:'+element.fontSize+', lineheight:'+element.lineHeight+title+'"></div>');
+			+', fontsize:'+element.getFontSize()+', lineheight:'+element.getLineHeight()+title+'"></div>');
 	};
 	LeParserFrame.prototype.remove = function(jPage){
 		if(leParser.config.devMode){
@@ -1229,12 +1312,9 @@
 		this.rotation = element.rotation;
 		this.jDomNode = jNode;
 		this.jDomLayer = null;
-		// we do not generate contents and thus do not apply scaling but scale our fontSize to keep consistency
 		this.transform = "";
 		this.scaleX = 1;
 		this.scaleY = 1;
-		var scale = jNode.transformationScale();
-		this.fontSize = element.fontSize * scale.y;
 	};
 	LeParserRotatedFrame.prototype.build = function(jPage){
 		if(this.jDomNode == null || this.jDomLayer != null)
@@ -1276,7 +1356,7 @@
 				jPage = $("+"+this.id);
 			}
 			for(var i=0; i < this.frames.length; i++){
-				this.frames[i].build(jPage);
+				this.frames[i].build(jPage, this.width);
 			}
 		};
 		this.remove = function(jPage){
@@ -1326,6 +1406,7 @@
 			"subSuperFontSizeMax": { "type":"float", "min":0.1, "max":1, "step":0.05, "unit":"percent", "txt":"Maximum percentage a sub- or superscript item can have in relation to the text it is part of" },
 			"subSuperJoinThresh": { "type":"int", "min":0, "max":25, "step":1, "unit":"px", "txt":"Max distance between a sub/superscript item and a text to be rendered as belonging together" },
 			"splitOnSeperatorSpans": { "type":"bool", "unit":"", "txt":"If set the empty spans used by pdf2html to generate horizontal whitespace are used to split the text into columns" },
+			"renderingGrowth": { "type":"int", "min":100, "max":110, "step":0.5, "unit":"percent", "txt":"when rendering the frame-width will be increased with this percentage to avoid lines breaking due to browser rounding errors" },
 			"colorizeFrames": { "type":"bool", "unit":"", "txt":"Colorize all frames" },
 			"colorizeRows": { "type":"bool", "unit":"", "txt":"Colorize all rows in frames" },
 			"colorizeCells": { "type":"bool", "unit":"", "txt":"Colorize all columns in rows in frames" },
@@ -1425,6 +1506,7 @@
 			subSuperFontSizeMax: 0.75,
 			subSuperJoinThresh: 2,
 			splitOnSeperatorSpans: true,
+			renderingGrowth: 102.5,
 			namespace: 't5lep',
 			devMode: false,
 			colorizeFrames: false,
@@ -1432,8 +1514,9 @@
 			colorizeCells: false,
 			colorizeEmptyCells: false,
 			showCellOverlays: false,
+			defaultFontFamily: "sans-serif",
 			defaultFontSize: 11,
-			defaultLineHeight: 1.20
+			defaultLineHeight: 125
 		},
 		pages: {},
 		/* a config-object can be set to manipulate the defaults */
@@ -1449,6 +1532,9 @@
 				this.configurator = new LeParserConfigurator();
 				this.configurator.build();
 			}
+		},
+		getDefaultFont: function(){
+			return new LeParserFont(this.config.defaultFontFamily, this.config.defaultFontSize, "normal", "400", this.config.defaultFontSize, "rgb(0,0,0)", 0, null);
 		},
 		buildAllPages: function(){
 			leParser.pages = {};
@@ -1495,7 +1581,7 @@
 						} else {
 							// Logic is dependant on html2pdfEX not generating layouts with padding & margin ...
 							// TODO: neccessary ???
-							if(element.height >= (element.lineHeight * 2)){
+							if(element.height >= (element.getLineHeight() * 2)){
 								element.multiline = true;
 							}
 							if(leParser.doCreateNewFrame(frame, element)){
@@ -1565,12 +1651,14 @@
 		},
 		createFrameStyles: function(frame){
 			// re-applying the matrix, this is needed to apply a proper font-size in pixels (fractions do not work ...)
+			var fWidth = frame.hasOwnProperty("renderedWidth") ? frame.renderedWidth : frame.width;
+			var fLeft = frame.hasOwnProperty("renderedLeft") ? frame.renderedLeft : frame.left;
 			if(frame.scaleX != 1 && frame.scaleY != 1 && frame.transform != ""){
-				var width = frame.width / frame.scaleX;
+				var width = fWidth / frame.scaleX;
 				var height = frame.height / frame.scaleY;
-				return 'top:'+String(frame.top - ((height - frame.height) / 2))+'px; left:'+String(frame.left - ((width - frame.width) / 2))+'px; width:'+String(Math.ceil(width))+'px; height:'+String(Math.ceil(height))+'px; transform:'+frame.transform+'; font-size:'+String(frame.fontSize)+'px;';
+				return 'top:'+String(frame.top - ((height - frame.height) / 2))+'px; left:'+String(fLeft - ((width - fWidth) / 2))+'px; width:'+String(Math.ceil(width))+'px; height:'+String(Math.ceil(height))+'px; transform:'+frame.transform+';';
 			}
-			return 'top:'+String(frame.top)+'px; left:'+String(frame.left)+'px; width:'+String(Math.ceil(frame.width))+'px; height:'+String(Math.ceil(frame.height))+'px; font-size:'+String(frame.fontSize)+'px;';
+			return 'top:'+String(frame.top)+'px; left:'+String(fLeft)+'px; width:'+String(Math.ceil(fWidth))+'px; height:'+String(Math.ceil(frame.height))+'px;';
 		},
 		createRowClasses: function(){
 			return this.createClassesForType("row", (this.config.devMode && this.config.colorizeRows));
@@ -1597,7 +1685,7 @@
 		},
 		createRenderedElement: function(jNode, node, page){
 			var clientRect = node.getBoundingClientRect();
-			var element = new LeParserElement((clientRect.top - page.top), (clientRect.left - page.left), clientRect.width, clientRect.height, jNode.rotation());
+			var element = new LeParserElement((clientRect.top - page.top), (clientRect.left - page.left), clientRect.width, clientRect.height, jNode.rotation(), jNode.transformationScale());
 			if(jNode.css("position") != "absolute")
 				return element;
 			var children = jNode.contents();
@@ -1609,26 +1697,27 @@
 				element.rotation = 0;
 			}
 			// fontSize. QUIRK: expects font-size to be set in pixels !
-			var val = jNode.css('font-size');
-			element.fontSize = (val.indexOf("px") > 0) ? parseFloat(val.split("px").join("")) : leParser.config.defaultFontSize;
-			// lineHeight, multiline. QUIRK: expects all line-heights to be set in px, % or unitless
-			val = jNode.css('line-height');
-			if(val.indexOf("px") > 0) {
-				element.lineHeight = parseFloat(val.split("px").join(""))
-			} else if(val.indexOf("%") > 0) {
-				element.lineHeight = parseFloat(val.split("%").join("")) / 100 * element.fontSize;
-			} else if(/^\d*\.?\d+$/.test(val)){
-				element.lineHeight = parseFloat(val) *  element.fontSize;
+			var fs = jNode.css('font-size'), lh = jNode.css('line-height');
+			fs = (fs.indexOf("px") > 0) ? parseFloat(fs.split("px").join("")) : leParser.config.defaultFontSize;
+			if(lh.indexOf("px") > 0) {
+				lh = parseFloat(lh.split("px").join(""))
+			} else if(lh.indexOf("%") > 0) {
+				lh = parseFloat(lh.split("%").join("")) / 100 * fs;
+			} else if(/^\d*\.?\d+$/.test(lh)){
+				lh = parseFloat(lh) *  fs;
+			} else if(lh == "normal"){
+				lh = 1.2 * fs; // DIRTY: 1.2 is the default-value according to MDN
 			} else {
-				element.lineHeight = leParser.config.defaultLineHeight *  element.fontSize;
+				// DIRTY: we assume 100% by default
+				lh = fs;
 			}
 			// we limit the min lineHeight to 100%. It seems html2pdfEX uses lineheights < fontSize for unknown reason
-			if(element.lineHeight < element.fontSize){
-				element.lineHeight = element.fontSize;
+			if(lh < fs){
+				lh = fs;
 			}
-			element.fontFamily = jNode.css('font-family');
-			element.fontWeight = jNode.css('font-weight');
-			element.fontStyle = jNode.css('font-style');
+			// for font-calculations, dimensions must be passed with their unscaled value !
+			element.font = new LeParserFont(jNode.css('font-family'), fs, jNode.css('font-style'), jNode.css('font-weight'), lh, jNode.css('color'), 0, element);
+			
 			// adding the html-nodes as strings, detect the ugly "seperator-spans"
 			var html = "", sub = null, left, right, c;
 			for(var i=0; i < children.length; i++){
