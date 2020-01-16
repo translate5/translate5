@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
-$this->doNotSavePhpForDebugging = false;
+//$this->doNotSavePhpForDebugging = false;
 
 //should be not __FILE__ in the case of wanted restarts / renamings etc
 // and must not be a constant since in installation the same named constant would we defined multiple times then
@@ -101,22 +101,20 @@ if(!empty($lectorMatch)){
         
     }
 }
+//rename the templates folder from lector to reviewer
+$mailTemplate=APPLICATION_PATH.'/../client-specific/views/editor/scripts/mail/workflow/lector';
+if(is_dir($mailTemplate)){
+    rename($mailTemplate, APPLICATION_PATH.'/../client-specific/views/editor/scripts/mail/workflow/reviewer');
+}
 
-$task=ZfExtended_Factory::get('editor_Models_Task');
-/* @var $task editor_Models_Task */
-$allTasks=$task->loadAll();
-//update task segmentCount and segmentFinishCount for all available tasks
-foreach ($allTasks as $t){
-    /* @var $t editor_Models_Task */
-    $task->init($t);
-    //update the segmentCount if it is not set
-    if($task->getSegmentCount()==null || $task->getSegmentCount()<1){
-        $segmentCount=$task->getTotalSegmentsCount($task->getTaskGuid());
-        $sql="UPDATE LEK_task SET segmentCount=? WHERE taskGuid=?";
-        $db->query($sql,[$segmentCount,$task->getTaskGuid()]);
-    }
-    //update the segment finish count
-    $task->updateSegmentFinishCount($task);
+$mailTemplate=APPLICATION_PATH.'/modules/editor/Plugins/Miele/mailTemplates/workflow/lector';
+if(is_dir($mailTemplate)){
+    rename($mailTemplate, APPLICATION_PATH.'/modules/editor/Plugins/Miele/mailTemplates/workflow/reviewer');
+}
+
+$mailTemplate=APPLICATION_PATH.'/modules/editor/views/scripts/mail/workflow/lector';
+if(is_dir($mailTemplate)){
+    rename($mailTemplate, APPLICATION_PATH.'/modules/editor/views/scripts/mail/workflow/reviewer');
 }
 
 
