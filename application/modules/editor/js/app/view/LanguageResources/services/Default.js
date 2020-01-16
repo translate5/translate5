@@ -143,5 +143,6 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
     'editor_Services_SDLLanguageCloud',
     'editor_Services_Google',
     'editor_Plugins_GroupShare',
+    'editor_Plugins_DeepL',
     */
 });
