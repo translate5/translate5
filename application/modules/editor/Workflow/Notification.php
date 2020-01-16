@@ -467,7 +467,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         ->from(array('tua' => 'LEK_taskUserAssoc'), ['taskGuid'])
         ->distinct()
         ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
-        ->where('tua.role = ?', editor_Workflow_Abstract::ROLE_LECTOR)
+        ->where('tua.role = ?', editor_Workflow_Abstract::ROLE_REVIEWER)
         ->where('tua.state != ?', editor_Workflow_Abstract::STATE_FINISH)
         ->where('t.state = ?', $task::STATE_OPEN)
         ->where('targetDeliveryDate = CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
@@ -478,7 +478,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $wf = $this->config->workflow;
         
-        $notifyRole=$wf::ROLE_LECTOR;
+        $notifyRole=$wf::ROLE_REVIEWER;
         if(isset($triggerConfig->receiverRole)){
             $notifyRole=$triggerConfig->receiverRole;
         }
@@ -747,7 +747,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             return $item;
         }, $segments);
         $segments = [];
-        $currentStep = 'lectoring';
+        $currentStep = 'reviewing';
         $params = array(
             'triggeringRole' => 'triggerROLE',
             'nextRole' => 'nextROLE',
@@ -770,7 +770,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
         //$this->addCopyReceivers($triggerConfig, $nextRole);
         $this->notify($user);
-        $this->createNotification('lector', 'notifyAllFinishOfARole', $params);
+        $this->createNotification('reviewer', 'notifyAllFinishOfARole', $params);
         $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
         //$this->addCopyReceivers($triggerConfig, $nextRole);
         $this->notify($user);

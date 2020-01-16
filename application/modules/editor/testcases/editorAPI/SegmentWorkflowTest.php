@@ -138,7 +138,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $workflowStep = array_map(function($item){
             return $item->workflowStep;
         }, $segments);
-        $this->assertEquals(array('','','lectoring','','lectoring','','lectoring'), $workflowStep);
+        $this->assertEquals(array('','','reviewing','','reviewing','','reviewing'), $workflowStep);
         
         //reloat the task and test the current workflow progress
         $reloadProgresTask= $this->api()->reloadTask();

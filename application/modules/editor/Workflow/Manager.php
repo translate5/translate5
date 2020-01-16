@@ -243,13 +243,13 @@ resulting structure in PHP
   name: 'defaultWorkflow', 
   label: 'Default Workflow', 
   anonymousFieldLabel: true | false, comes from app.ini not from wf class
-  roles: {'lector' => 'Lector' → current utRoles},
+  roles: {'reviewer' => 'Lector' → current utRoles},
   states: { current utStates }
   steps:{
-    lectoring=""Lektorat"",
+    reviewing=""Lektorat"",
     translatorCheck=""Zweites Lektorat"",
     pmCheck=""PM Prüfung""
   },
-  stepChain:[""lectoring"", ""translatorCheck""]
+  stepChain:[""reviewing"", ""translatorCheck""]
 }, {...}]"			0.5				
 }*/

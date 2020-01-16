@@ -571,7 +571,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                 $this->itsPersonGuid=$this->task->getPmGuid();
             }
             
-            if($segment['workflowStep']===editor_Workflow_Abstract::STEP_LECTORING){
+            if($segment['workflowStep']===editor_Workflow_Abstract::STEP_REVIEWING){
                 $this->revPersonGuid=$this->task->getPmGuid();
             }
         }
@@ -597,25 +597,25 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $this->itsRevPersonGuid=null;
 
         //check if there is a reviewer assigned to the task
-        if(!isset($assocUsers[editor_Workflow_Abstract::ROLE_LECTOR])){
+        if(!isset($assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER])){
             return;
         }
         
         //check if no lectors are assigned
-        if(count($assocUsers[editor_Workflow_Abstract::ROLE_LECTOR])==0){
+        if(count($assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER])==0){
             return;
         }
         
         //if only one reviewer
-        if(count($assocUsers[editor_Workflow_Abstract::ROLE_LECTOR])==1){
-            $this->itsRevPersonGuid=$assocUsers[editor_Workflow_Abstract::ROLE_LECTOR][0]['userGuid'];
+        if(count($assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER])==1){
+            $this->itsRevPersonGuid=$assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER][0]['userGuid'];
             
             $usr=$this->data['users'][$this->itsRevPersonGuid];
             $this->itsRevPerson=$usr['surName'].' '.$usr['firstName'];
             return;
         }
         //there are multiple reviewer to the task
-        $tmpReviewerArray=$assocUsers[editor_Workflow_Abstract::ROLE_LECTOR];
+        $tmpReviewerArray=$assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER];
         
         //check last editor
         foreach ($tmpReviewerArray as $reviewer){
@@ -633,7 +633,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         
         //it is no user that is assigned to the task, it can be pm
         if($segment['userGuid'] === $this->task->getPmGuid()){
-            if($this->task->getWorkflowStepName()===editor_Workflow_Abstract::STEP_LECTORING){
+            if($this->task->getWorkflowStepName()===editor_Workflow_Abstract::STEP_REVIEWING){
                 $this->itsRevPersonGuid=$this->task->getPmGuid();
             }
         }

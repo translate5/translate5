@@ -233,7 +233,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $s = $db->select()
         ->from(array('tua' => 'LEK_taskUserAssoc'))
         ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
-        ->where('tua.role = ?', $workflow::ROLE_LECTOR)
+        ->where('tua.role = ?', $workflow::ROLE_REVIEWER)
         ->where('tua.state != ?', $workflow::STATE_FINISH)
         ->where('t.state = ?', $workflow::STATE_OPEN)
         ->where('targetDeliveryDate < CURRENT_DATE');
