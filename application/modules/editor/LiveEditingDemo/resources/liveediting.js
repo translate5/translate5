@@ -1,7 +1,7 @@
 "use strict";
 
-// TODO: improve constructor of LeParserFont: too many params, make some feature-detection in the constructor instead of in the method & adjust cloning to get an easier maintainable API
-// TODO: implement LeParserFonts to have a proper evaluation of used lineHeights and apply them
+
+// TODO: implement seperate class to handle the resizing when frame-contents are changed
 
 (function(w, d, $) {
 
@@ -99,6 +99,9 @@
 		byWeight: function(a, b){
 			return LeParserSort._byPropDesc(a, b, "weight");
 		},
+		byChars: function(a, b){
+			return LeParserSort._byPropDesc(a, b, "chars");
+		},
 		_byPropAsc: function(a, b, prop){
 			if(a[prop] < b[prop]){
 				return -1;
@@ -122,37 +125,60 @@
 	/* *************************************************************************************************** */
 	
 	// represents the font-properties of an element
-	var LeParserFont = function(family, size, style, weight, lineheight, color, whitespace, charheight, element){		
-		this.family = family;
+	var LeParserFont = function(size, lineheight, element, jNode, leParserFont){
 		this.size = this._round(size);
-		this.style = style;
-		this.weight = weight;
 		this.height = this._round(lineheight); // represents the line-height !
-		this.renderedHeight = 0;
-		this.color = color;
-		this.whitespace = whitespace; // pdf2html works with explicit whitespace-rendering !!
-		this.charheight = this._round(charheight);
+		this.renderedHeight = 0; // represents the calculated line-height, either by setting it explicitly or by calculation via LeParserFontMetrics
+		this.frameIndex = -1; // indentifies the frame we belong to
 		if(element && element != null && size == lineheight){
-			this.charheight = element.getUnscaledHeight();
+			// we can evaluate the character-height by what pdf2html sets for the height of the box
+			this.charheight = this._round(element.getUnscaledHeight());
 			if(this.charheight > this.size){
 				this.charheight = this.size;
-			}
-			// DEBUG: console.log("INIT LeParserFont: "+family+" / "+size+" / "+style+" / "+weight+" / "+lineheight+" / "+color+" / charheight: "+this.charheight);
-		} else if(charheight == 0){
+			}			
+		} else {
 			this.charheight = this.size;
 		}
+		if(jNode && jNode != null){
+			// initialization from a real dom-node
+			this.family = jNode.css('font-family');
+			this.style = jNode.css('font-style');
+			this.weight = jNode.css('font-weight');
+			this.color = jNode.css('color');
+			// pdf2html works with explicit whitespace-rendering at times !!
+			this.whitespace = jNode.css('white-space');
+		} else if(leParserFont && leParserFont != null) {
+			// initialization from a clone
+			this.family = leParserFont.family;
+			this.style = leParserFont.style;
+			this.weight = leParserFont.weight;
+			this.color = leParserFont.color;
+			this.whitespace = leParserFont.whitespace;
+			this.charheight = leParserFont.charheight;
+			this.frameIndex = leParserFont.frameIndex;
+		} else {
+			// DEFAULT initialization
+			this.family = "sans-serif";
+			this.style = "normal";
+			this.weight = "400";
+			this.color = "rgb(0,0,0)";
+			this.whitespace = "normal";
+		}		
+		// DEBUG: console.log("INIT LeParserFont: family: "+this.family+" / size: "+this.size+" / style: "+this.style+" / weight: "+this.weight+" / height: "+this.height+" / color: "+this.color+" / charheight: "+this.charheight);
+	};
+	LeParserFont.prototype.clone = function(){
+		return new LeParserFont(this.size, this.height, null, null, this);
 	};
 	LeParserFont.prototype.isEqual = function(font){
 		return (this.family == font.family && this.size == font.size && this.style == font.style && this.weight == font.weight && this.height == font.height && this.color == font.color);
-	};
-	LeParserFont.prototype.clone = function(){
-		return new LeParserFont(this.family, this.size, this.style, this.weight, this.height, this.color, this.whitespace, this.charheight, null);
 	};
 	// forcedLineHeight is expected to be in PERCENT
 	LeParserFont.prototype.getStyle = function(forcedLineHeight){
 		var style = 'font-family:'+this.family+'; font-size:'+this.size+'px; font-style:'+this.style+'; font-weight:'+this.weight+'; color:'+this.color+';';
 		if(this.whitespace != "normal"){
-			style += ' white-space:'+this.whitespace+';';
+			// we convert pre to pre-wrap since pre will not allow properly breakable text if we optimize for editability
+			var wp = (this.whitespace == "pre" && !leParser.config.joinMultilineWithBr) ? "pre-wrap" : this.whitespace;
+			style += ' white-space:'+wp+';';
 		}
 		var lh = (forcedLineHeight && forcedLineHeight > 0) ? this._round(this.size * forcedLineHeight / 100) : this.getRenderedHeight();
 		if(lh > 0){
@@ -162,6 +188,9 @@
 	};
 	LeParserFont.prototype.toSpan = function(html){
 		return '<span style="'+this.getStyle(0)+'">'+html+'</span>';
+	};
+	LeParserFont.prototype.setFrameIndex = function(index){
+		this.frameIndex = index;
 	};
 	LeParserFont.prototype.setSize = function(size){
 		size = this._round(size);
@@ -187,10 +216,7 @@
 		return this.size;
 	};
 	LeParserFont.prototype.getLeading = function(){
-		return this._round((this.getRenderedHeight() - this.size) / 2);
-	};
-	LeParserFont.prototype.getScaledLeading = function(scaleY){
-		return this._round(((this.getRenderedHeight() - this.size) / 2) / scaleY);
+		return this._round((this.getRenderedHeight() - this.charheight) / 2);
 	};
 	LeParserFont.prototype.getRenderedHeight = function(){
 		// if our line-height is too small (usually all elements generated by pdfconverter have 100% line-height) we calculate one
@@ -205,20 +231,106 @@
 	
 	/* *************************************************************************************************** */
 	
-	// TODO: IMPLEMENT
-	
 	// evaluates the rendered font-heights to be able to apply useful line-heights for the single-lined textfields having no useful in pdf2Html (always 100%)
-	var LeParserFonts = function(){		
-		this.fonts = {};
-		
-		this.addFont = function(font){
-			
-		}
-		
+	var LeParserFontMetrics = function(){
+		this.byFont = {};		
+		this.bySize = {};
+		this.addFont = function(font, textLength){
+			// should not happen, but if it is tried to add an uncalculated non-multiline font ...
+			if(font.renderedHeight < font.size){
+				return;
+			}
+			var key = this._tokenize(font.family);
+			if(!this.byFont.hasOwnProperty(key)){
+				this.byFont[key] = {};
+			}
+			this._addToSize(this.byFont[key], font, textLength);
+			this._addToSize(this.bySize, font, textLength);
+		};
 		this.getHeight = function(font){
-			return (font.getSize() * leParser.config.defaultLineHeight / 100);
-		}
+			var key = this._tokenize(font.family);
+			var fKey = (font.frameIndex > -1) ? "f"+font.frameIndex : "none";
+			if(this.byFont.hasOwnProperty(key)){
+				return this._findHeight(this.byFont[key], font.size, fKey);
+			}
+			return this._findHeight(this.bySize, font.size, fKey);
+		};
+		this._addToSize = function(target, font, chars){
+			var height = font.getRenderedHeight(), sKey = this._numkey(font.size), hKey = this._numkey(height);
+			if(!target.hasOwnProperty(sKey)){
+				target[sKey] = { "size": font.size, "heights": {} };
+			}
+			if(!target[sKey].heights.hasOwnProperty(hKey)){
+				target[sKey].heights[hKey] = { "height": height, "chars": chars, frames: {} };
+			} else {
+				target[sKey].heights[hKey].chars += chars;
+			}
+			if(font.frameIndex > -1){
+				if(("f"+font.frameIndex) in target[sKey].heights[hKey].frames){
+					target[sKey].heights[hKey].frames["f"+font.frameIndex]++;
+				} else{
+					target[sKey].heights[hKey].frames["f"+font.frameIndex] = 1;
+				}
+			}
+		};
+		this._findHeight = function(target, size, fKey){			
+			var sKey = this._numkey(size);
+			if(target.hasOwnProperty(sKey)){
+				return this._findHeightInSize(target[sKey].heights, size, fKey);
+			}
+			sKey = this._findNearestInSizes(target, size);
+			if(sKey != null){
+				return this._findHeightInSize(target[sKey].heights, size, fKey);
+			}
+			return this._getDefault(size);
+		};
+		this._findHeightInSize = function(heights, size, fKey){
+			var key, hits = [];
+			// find heights with matching frames
+			for(key in heights){
+				if(heights[key].frames.hasOwnProperty(fKey)){
+					hits.push({ "height": heights[key].height, "weight": heights[key].frames[fKey] });
+				}
+			}
+			// if no matching frames found, add height with max. chars
+			if(hits.length == 0){
+				var hit = null;
+				for(key in heights){
+					if(hit == null || heights[key].chars > hit.chars){
+						hit = { "height": heights[key].height, "chars": heights[key].chars, "weight": 0 };
+					}
+				}
+				hits.push(hit);
+			}
+			// return hit, if multiple hits hit with the heighest weight (= occurances in frames)
+			if(hits.length > 1){
+				hits.sort(LeParserSort.byWeight);
+			}
+			return hits[0].height;
+		};
+		this._findNearestInSizes = function(target, size){
+			var key, nearest = null;
+			for(key in target){
+				if(nearest == null || Math.abs(target[key].size - size) < nearest.dist){
+					nearest = { "key":key, "size": target[key].size, "dist": Math.abs(target[key].size - size) };
+				}
+			}
+			if(nearest == null || nearest.size > (size * leParser.config.fontHeightMatchThresh / 100) || (nearest.size * leParser.config.fontHeightMatchThresh / 100) < size){
+				return null;
+			}
+			return nearest.key;
+		};
+		this._getDefault = function(size){
+			return (size * leParser.config.defaultLineHeight / 100);
+		};
+		this._tokenize = function(key){
+			return escape(key).split('@').join('at').split('.').join('dot').split('/').join('-').split('+').join('-').split('*').join('x').split('%').join('-');
+		};
+		this._numkey = function(num){
+			return "s"+String(num).split('.').join('-');
+		};
 	};
+	
 
 	/* *************************************************************************************************** */
 
@@ -260,12 +372,6 @@
 		}
 		return this.font;
 	};
-	LeParserElement.prototype.getFont = function(){
-		if(this.font == null){
-			this.font = leParser.getDefaultFont();
-		}
-		return this.font;
-	};
 	LeParserElement.prototype.getFontStyle = function(forcedLineHeight){
 		if(this.font == null){
 			return "";
@@ -292,13 +398,12 @@
 		return this.getFont().setRenderedHeight(height);
 	};
 	LeParserElement.prototype.getRenderedHeight = function(){
-		// TODO: do we really have to add leading ???
-		return Math.ceil(((this._getBottommost().bottom - this.top) / this.scale.y) + this.getFont().getLeading());
+		return Math.ceil(((this._getBottommost().bottom - this.top) / this.scale.y) + (2 * this.getFont().getLeading()));
 	};
 	LeParserElement.prototype.getTextClasses = function(){
-		var classes = leParser.config.namespace+'-txt';
+		var classes = leParser.namespace+'-txt';
 		if(this.multiline){
-			classes += ' '+leParser.config.namespace+'-multiline';
+			classes += ' '+leParser.namespace+'-multiline';
 		}
 		return classes;
 	};
@@ -333,8 +438,8 @@
 	LeParserElement.prototype.isDirectlyRightOf = function(element){
 		return (this.left < element.right + leParser.config.subSuperJoinThresh && this.right > element.right);
 	};
-	LeParserElement.prototype.appendHorizontally = function(element){
-		if(this.html.length > 0 && this.html.charAt(this.html.length - 1) != " " && element.html.length > 0 && element.html.charAt(0) != " "){
+	LeParserElement.prototype.appendHorizontally = function(element, withoutWhitespace){
+		if(!withoutWhitespace && this.html.length > 0 && this.html.charAt(this.html.length - 1) != " " && element.html.length > 0 && element.html.charAt(0) != " "){
 			this.html += " ";
 		}
 		if(this.isFontEqual(element)){
@@ -448,9 +553,15 @@
 		return this.font.toSpan(this.html);
 	};
 	// appends an element in the process of column-building
-	LeParserElement.prototype.appendVertically = function(element){
-		if(this.html.length > 0 && element.html.substr(0,2) != "<p" && element.html.substr(0,4) != "<div"){
-			this.html += "<br/>";
+	LeParserElement.prototype.appendVertically = function(element, forceBreak){
+		if(leParser.config.joinMultilineWithBr || forceBreak){
+			if(this.html.length > 0 && element.html.substr(0,2) != "<p" && element.html.substr(0,4) != "<div"){
+				this.html += "<br/>";
+			}
+		} else {
+			if(this.html.length > 0 && this.html.substr(-1,1) != " "&& element.html.substr(0,1) != " "){
+				this.html += " ";
+			}
 		}
 		if(this.isFontEqual(element)){
 			this.html += element.html;
@@ -473,22 +584,23 @@
 	LeParserElement.prototype.render = function(asTable, styles, classes){
 		styles = this.appendFontStyle(styles, 0);
 		classes = this.appendTextClasses(classes);
+		var attribs = (leParser.config.devMode) ? ' contenteditable="true"' : '';
 		if(this.getFont().getLeading() > 0){
 			styles += ' position:relative; top:-'+this.getFont().getLeading()+'px;';
 		}
 		if(this.align == "right" || this.align == "center"){
 			styles += ' text-align:'+this.align+';';
 		}
-		return '<div style="'+styles+'" class="'+classes+'">'+this.html+'</div>';
+		return '<div style="'+styles+'" class="'+classes+'"'+attribs+'>'+this.html+'</div>';
 	};
 	LeParserElement.prototype._renderAsSubOrSuperTag = function(element){
 		if(this.top >= element.top){
 			// sub-text mostly look correct as indices and it seems not feasible to calculate that behaviour her ...
-			return '<sub style="'+this.appendFontStyle("", 100)+'">' + this.html + '</sub>';
+			return '<sub style="'+this.appendFontStyle("", 100)+'">' + $.trim(this.html) + '</sub>';
 		}
 		// sup-tags stick to the upper baseline while in printed text they are usually higher. we have to respect that ...
 		var style = 'position:relative; bottom:' + String(element.bottom - this.bottom) + 'px;';
-		return '<sup style="'+this.appendFontStyle(style, 100)+'">' + this.html + '</sup>';
+		return '<sup style="'+this.appendFontStyle(style, 100)+'">' + $.trim(this.html) + '</sup>';
 	};
 	LeParserElement.prototype._getMaxCenteredDist = function(){
 		return Math.min((this._ltab - this._minltab), (this._maxrtab - this._rtab));
@@ -665,36 +777,49 @@
 		}
 		return (this.cols.length > 0);
 	};
-	LeParserRow.prototype.getRenderedHeight = function(){
-		return LeParserRow._currentHeight;
-	};
-	LeParserRow.prototype.render = function(frame, lines, index, numLines){
-		if(frame.isTable){
-			return this._renderAsTable(frame, lines, index, numLines);
+	// we try to compensate for summing rounding-errors due to re-fractionalize already rounded values by always taking the overall-height of the element into account
+	LeParserRow.prototype.evaluateRenderedHeight = function(frame, lines, index, numLines){
+		if(index == 0){
+			LeParserRow._currentHeight = 0;
 		}
-		return this._renderAsSequence(frame, lines, index, numLines);
+		this._renderedHeight = (index == (numLines - 1)) ?
+			Math.floor((this.bottom - this.top) / frame.scaleY)
+			: Math.floor((lines[index + 1].top / frame.scaleY) - frame.getRenderedTop() - LeParserRow._currentHeight);
+			// uncompensated code:
+			// : Math.floor((lines[index + 1].top - this.top) / frame.scaleY);
+		this._relativeTop = LeParserRow._currentHeight;
+		LeParserRow._currentHeight += this._renderedHeight;
+		return this._renderedHeight;
 	};
-	LeParserRow.prototype._renderAsSequence = function(frame, lines, index, numLines){
-		var i, ele, pad, style, html = '', height = this._evaluateRenderedHeight(frame, lines, index, numLines);
-		for(i = 0; i < this.elements.length; i++){
-			ele = this.elements[i];
-			if(ele.rendered){
-				if(height > 0){
-					// we add an padding but only half the bottom-padding to somehow keep the layout consistent
-					pad = Math.floor((height - ele.getRenderedHeight()) / 100 * leParser.config.renderedCellPadShrink);
-					style = (pad > 1 && index < (numLines - 1)) ? 'min-height:'+(height - pad)+'px; padding-bottom:'+pad+'px;' : 'min-height:'+height+'px;';
-					html += '<div style="'+style+'">';
-				} else {
-					html += '<div>';
-				}
-				html += ele.render(false, "", "");
-				html += '</div>';
+	LeParserRow.prototype.render = function(frame, index, numLines){
+		if(frame.isTable){
+			return this._renderAsTable(frame, index, numLines);
+		}
+		return this._renderAsSequence(frame, index, numLines);
+	};
+	LeParserRow.prototype._renderAsSequence = function(frame, index, numLines){
+		var i, ele, pad, style, attribs, html = '';
+		for(i = 0; i < this.cols.length; i++){
+			ele = this.cols[i];
+			if(this._renderedHeight > 0){
+				// we add an padding but only half the bottom-padding to somehow keep the layout consistent (if configured)
+				pad = (leParser.config.renderSequenceBotPads) ? Math.floor((this._renderedHeight - ele.getRenderedHeight()) / 100 * leParser.config.renderedCellPadShrink) : 0;
+				style = (pad > 1 && index < (numLines - 1)) ? 'min-height:'+(this._renderedHeight - pad)+'px; padding-bottom:'+pad+'px;' : 'min-height:'+this._renderedHeight+'px;';
+				attribs = (leParser.config.devMode) ? ' title="rendered height:'+this._renderedHeight+'px (scaled to '+(this._renderedHeight * frame.scaleY)+' px)"' : '';
+				html += '<div style="'+style+'"'+attribs+'>';
+			} else {
+				attribs = (leParser.config.devMode) ? ' title="no rendered height could be evaluated"' : '';
+				html += '<div'+attribs+'>';
 			}
+			html += ele.render(false, "", "");
+			html += '</div>';
 		}
 		return html;
 	};
-	LeParserRow.prototype._renderAsTable = function(frame, lines, index, numLines){
-		var i, col, attribs, height, tr, html = '';
+	LeParserRow.prototype._renderAsTable = function(frame, index, numLines){
+		var i, col, attribs, style, height, html = '';
+		// we add an padding that is the min bottom bpadding of all elements in the row (multiline-fields count to the row they are rendered in) if configured
+		var pad = (leParser.config.renderTableBotPads) ? this._getMinRenderedPad(frame, index) : 0;
 		for(i = 0; i < this.cols.length; i++){
 			col = this.cols[i];
 			attribs = '';
@@ -704,31 +829,36 @@
 			if(col.rowspan > 1){
 				attribs += (' rowspan="'+col.rowspan+'"');
 			}
-			html += ('<td'+attribs+'>'+col.render(true, "", "")+'</td>');
+			style = (pad > 0) ? 'margin-bottom:'+pad+'px;' : '';
+			html += ('<td'+attribs+'>'+col.render(true, style, "")+'</td>');
 		}
-		height = this._evaluateRenderedHeight(frame, lines, index, numLines);
-		attribs = (height > 0) ? ' style="height:'+height+'px;"' : '';
+		attribs = (this._renderedHeight > 0) ? ' style="height:'+this._renderedHeight+'px;"' : '';
 		if(leParser.config.devMode) {
-			attribs += ' title="rendered height:'+height+'px (scaled to '+(height * frame.scaleY)+' px)"';
+			attribs += ' title="rendered height:'+this._renderedHeight+'px (scaled to '+(this._renderedHeight * frame.scaleY)+' px)"';
 		}
 		return '<tr'+attribs+'>'+html+'</tr>';
 	};
-	// we try to compensate for summing rounding-errors due to re-fractionalize already rounded values by always taking the overall-height of the element into account
-	LeParserRow.prototype._evaluateRenderedHeight = function(frame, lines, index, numLines){
-		if(index == 0){
-			LeParserRow._currentHeight = 0;
+	LeParserRow.prototype._getMinRenderedPad = function(frame, index){
+		var i, p, pad = -1;
+		for(i = 0; i < this.cols.length; i++){
+			if(!this.cols[i].empty){
+				p = this._getRenderedElementPad(this.cols[i], frame, index);
+				if(pad == -1 || p < pad){
+					pad = p;
+				}
+			}
 		}
-		var height = (index == (numLines - 1)) ?
-			Math.floor((this.bottom - this.top) / frame.scaleY)
-			: Math.floor((lines[index + 1].top / frame.scaleY) - frame.getRenderedTop() - LeParserRow._currentHeight);
-			// uncompensated code:
-			// : Math.floor((lines[index + 1].top - this.top) / frame.scaleY);
-		if(frame.isTable)
-			height = Math.floor(height / 4) * 4;
-		LeParserRow._currentHeight += height;
-		return height;
+		return (pad < 1) ? 0 : Math.floor(pad / 100 * leParser.config.renderedCellPadShrink);
 	};
-
+	LeParserRow.prototype._getRenderedElementPad = function(element, frame, rowIndex){
+		if(!element.rendered || element.empty){
+			return 0;
+		}
+		var h = element.getRenderedHeight();
+		var rh = (element.rowspan > 1) ? (frame.getRelativeBottom(rowIndex + element.rowspan - 1) - this._relativeTop) : this._renderedHeight;
+		return ((rh - h) > 1) ? (rh - h) : 0;
+	};
+	
 
 	/* *************************************************************************************************** */
 
@@ -823,7 +953,7 @@
 			} else if(lastElement.joinable && element.isInLine(lastElement) && element.isFontSizeEqual(lastElement) && element.isDirectlyRightOf(lastElement)) {
 				// the last element was a joined element and we now might can append the rest of the string
 				this.removeElementProps(lastElement);
-				lastElement.appendHorizontally(element);
+				lastElement.appendHorizontally(element, true);
 				this.addElementProps(lastElement);
 			}
 		}
@@ -832,6 +962,8 @@
 			this._nodes[element.id] = jNode;
 		}
 		this.addElementProps(element);
+		// bind the elements font to the frame. font-metrics are expected to be consistent within a frame
+		element.getFont().setFrameIndex(this.index);
 	};
 	LeParserFrame.prototype.addElementProps = function(element){
 		// add rounded element position to lines / tabs
@@ -1145,18 +1277,26 @@
 	};
 	// really creates a multiline field out of the given line-elements
 	LeParserFrame.prototype.createRowspan = function(elements, left, right){
-		elements[0].setRenderedLineHeight(Math.round((elements[elements.length - 1].bottom - elements[0].bottom) / (elements.length - 1) / this.scaleY * 10) / 10);
+		var nlThresh, maxW = elements[0].width, lh = Math.floor((elements[elements.length - 1].bottom - elements[0].bottom) / (elements.length - 1) / this.scaleY);
+		elements[0].setRenderedLineHeight(lh);
 		elements[0].multiline = true;
 		elements[0].adjustTabs(left, right);
 		elements[0]._below = elements[1];
 		for(var i=1; i < elements.length; i++){
+			if(elements[i].width > maxW){
+				maxW = elements[i].width;
+			}
+		}
+		nlThresh = maxW / 100 * leParser.config.multilineBreakThresh;
+		for(var i=1; i < elements.length; i++){
 			elements[i].adjustTabs(left, right);
 			elements[i]._above = elements[i - 1];
-			if(i < (elements.length - 1))
+			if(i < (elements.length - 1)){
 				elements[i]._below = elements[i + 1];
-			elements[0].appendVertically(elements[i]);
+			}
+			elements[0].appendVertically(elements[i], (elements[i].width < nlThresh));
 		}
-		leParser.addMultilineFont(elements[0].getFont());
+		leParser.addMultilineFont(elements[0].getFont(), elements[0].html);
 	};
 	// tries to set shared tabs for centered elements in line
 	LeParserFrame.prototype.harmonizeAlignedColumns = function(direction, elements, left, right){
@@ -1166,6 +1306,15 @@
 			return;
 		}
 		this._harmonizeAligned(direction, elements, left, right);
+	};
+	// can only be used in the rendering-phase
+	LeParserFrame.prototype.getRelativeBottom = function(index){
+		if(index > this._lines.length - 1){
+			// must not happen
+			leParser.logError("Frame "+this.id+" LeParserFrame.prototype.getRelativeBottom: index out of bounds ("+index+")");
+			return 0;
+		}
+		return this._lines[index]._relativeTop + this._lines[index]._renderedHeight;
 	};
 	// renders our evaluated layout
 	LeParserFrame.prototype.render = function(jPage, pageWidth){
@@ -1187,23 +1336,28 @@
 		// the next line will render the grown frame centered above the original one. currently, that produces more quirks tnan it solves ...
 		// this.renderedLeft = Math.floor(this.left - ((this.renderedWidth - this.width) / 2));
 		this.renderedLeft = this.left;
-
+		
+		// prepare the rows for rendering (neccessary to calculate proper cell-heights and a too big or too small layout due to accumulated rounding-errors)
+		l = this._lines.length;
+		this.renderedHeight = 0;
+		for(i=0; i < l; i++){
+			this.renderedHeight += this._lines[i].evaluateRenderedHeight(this, this._lines, i, l);			
+		}
 		// hide the original elements
 		for(i in this._nodes){
 			if(leParser.config.devMode){
-				this._nodes[i].addClass(leParser.config.namespace+'-orig').hide();
+				this._nodes[i].addClass(leParser.namespace+'-orig').hide();
 			} else {
 				this._nodes[i].remove();
 			}
 		}
-		// render the table or sequence
+		// render the table or sequence rows
 		var html = '';
-		l = this._lines.length;
 		for(i=0; i < l; i++){
-			html += this._lines[i].render(this, this._lines, i, l);			
+			html += this._lines[i].render(this, i, l);			
 		}
 		// dev-info to check rendered layout
-		t = (leParser.config.devMode) ? ' title="rendered height: '+LeParserRow.prototype.getRenderedHeight()+'px (scaled to '+(LeParserRow.prototype.getRenderedHeight() * this.scaleY)+' px)"' : '';
+		t = (leParser.config.devMode) ? ' title="rendered height: '+this.renderedHeight+'px (scaled to '+(this.renderedHeight * this.scaleY)+' px)"' : '';
 		if(this.isTable){
 			var cols = '<colgroup>';
 			for(i=1; i < rtabs.length; i++){
@@ -1248,7 +1402,7 @@
 	LeParserFrame.prototype.renderCellOverlay = function(element){
 		var title = '',
 			styles = 'top:'+element.top+'px; left:'+element._ltab+'px; width:'+(element._rtab - element._ltab)+'px; height:'+element.height+'px;',
-			classes = leParser.config.namespace+'-eolay '+leParser.config.namespace+'-colorized '+leParser.config.namespace+'-';
+			classes = this.id+'-eolay '+leParser.namespace+'-eolay '+leParser.namespace+'-colorized '+leParser.namespace+'-';
 		if(element.empty){
 			classes += 'empty';
 		} else if(element.fixed){
@@ -1286,7 +1440,7 @@
 	};
 	// can only be called in dev-mode
 	LeParserFrame.prototype.remove = function(jPage){
-		$("#"+this.id+" ."+leParser.config.namespace+"-eolay").remove();
+		$('.'+this.id+'-eolay').remove();
 		if(this.jDomNode != null){
 			this.jDomNode.remove();
 		}
@@ -1421,24 +1575,29 @@
 		this.rotated = true;
 		this.rotation = element.rotation;
 		this.jDomNode = jNode;
-		this.jDomLayer = null;
 		this.transform = "";
 		this.scaleX = 1;
 		this.scaleY = 1;
 	};
 	LeParserRotatedFrame.prototype.build = function(jPage){
-		if(this.jDomNode == null || this.jDomLayer != null)
+		if(this.jDomNode == null){
 			return;
+		}
 		this.id = leParser.createFrameId();
+		this.jDomNode.attr("id", this.id);
 		// we add the coloration as a seperate layer to check the positions in dev-mode. therefore we do not scale & do not apply aour transformation-matrix
-		if(leParser.config.devMode && leParser.config.colorizeFrames){
-			this.jDomLayer = $('<div id="'+this.id+'" class="'+leParser.createRotatedFrameClasses()+'" style="'+leParser.createFrameStyles(this)+'"></div>');
-			jPage.append(this.jDomLayer);
+		if(leParser.config.devMode){
+			this.jDomNode.addClass(leParser.createRotatedFrameClasses());
+			this.jDomNode.prop('contenteditable', true);
 		}
 	};
 	LeParserRotatedFrame.prototype.remove = function(jPage){
-		if(this.jDomLayer != null)
-			this.jDomLayer.remove();
+		if(this.jDomNode == null){
+			return;
+		}
+		if(leParser.config.devMode){
+			this.jDomNode.removeClass(leParser.createRotatedFrameClasses());
+		}
 		this.jDomNode  = null;
 	};
 
@@ -1469,7 +1628,7 @@
 		}
 	};
 	LeParserPage.prototype.remove = function(jPage){
-		$("#"+this.id+" ."+leParser.config.namespace+"-orig").removeClass(leParser.config.namespace+"-orig").show();
+		$("#"+this.id+" ."+leParser.namespace+"-orig").removeClass(leParser.namespace+"-orig").show();
 		for(var i=0; i < this.frames.length; i++){
 			this.frames[i].remove();
 		}
@@ -1490,20 +1649,25 @@
 			"tabPrecision": { "type":"int", "min":1, "max":10, "step":1, "unit":"1/X", "txt":"Reciprocal precision of vertical line calculations" },
 			"linePosThresh": { "type":"float", "min":0.05, "max":10, "step":0.05, "unit":"px", "txt":"Threshhold to identify vertical positions to be on the same line" },
 			"tabPosThresh": { "type":"float", "min":0.1, "max":10, "step":0.1, "unit":"px", "txt":"Threshhold to identify horizontal positions to be on the same line" },
-			"maxMultiLineThresh": { "type":"int", "min":0, "max":10, "step":0.5, "unit":"percent", "txt":"Maximum line-height differnce two following textfields will be regarded as being one multiline-field" },
+			"maxMultiLineThresh": { "type":"int", "min":0, "max":25, "step":0.5, "unit":"percent", "txt":"Maximum line-height differnce two following textfields will be regarded as being one multiline-field" },
 			"maxMultiLineHeight": { "type":"int", "min":100, "max":250, "step":1, "unit":"percent", "txt":"Maximum line-height a multiline-field can have" },
+			"joinMultilineWithBr": { "type":"bool", "unit":"", "txt":"Join the lines of  multiline-fields with a line-break. If not, the text-flow may changes" },
+			"multilineBreakThresh": { "type":"int", "min":50, "max":100, "step":1, "unit":"percent", "txt":"if a line of a multiline-field is that much shorter as the field, it will be added with a linebreak in any case" },
 			"subSuperFontSizeMax": { "type":"float", "min":0.1, "max":1, "step":0.05, "unit":"percent", "txt":"Maximum percentage a sub- or superscript item can have in relation to the text it is part of" },
 			"subSuperJoinThresh": { "type":"int", "min":0, "max":25, "step":1, "unit":"px", "txt":"Max distance between a sub/superscript item and a text to be rendered as belonging together" },
 			"splitOnSeperatorSpans": { "type":"bool", "unit":"", "txt":"If set the empty spans used by pdf2html to generate horizontal whitespace are used to split the text into columns" },
+			"renderSequenceBotPads": { "type":"bool", "unit":"", "txt":"If set it is tried to add a bottom padding to sequence-elements that have a distance to the next element in the sequence" },
+			"renderTableBotPads": { "type":"bool", "unit":"", "txt":"If set it is tried to add a bottom padding to table-elements that have a distance to the next element in the column" },
 			"renderedHorGrowth": { "type":"int", "min":100, "max":110, "step":0.5, "unit":"percent", "txt":"when rendering the frame-width will be increased with this percentage to avoid lines breaking due to browser rounding errors" },
-			"renderedCellPadShrink": { "type":"int", "min":50, "max":100, "step":1, "unit":"percent", "txt":"vertical paddings of textboxes with a distance will be lowered to this percentage (does not affect the rendered grid, only if these paddings overshoot)" },
+			"renderedCellPadShrink": { "type":"int", "min":50, "max":100, "step":1, "unit":"percent", "txt":"vertical paddings of textboxes with a bottom-distance will be lowered to this percentage (as defined by renderSequenceBotPads and renderTableBotPads)" },
 			"minRenderedLineHeight": { "type":"int", "min":101, "max":120, "step":0.5, "unit":"percent", "txt":"the min. lineheight an editable textfield will have" },
+			"fontHeightMatchThresh": { "type":"int", "min":100, "max":200, "step":5, "unit":"percent", "txt":"Threshhold to find line-heights in the existing evaluated multiline-heights in percent" },
 			"colorizeFrames": { "type":"bool", "unit":"", "txt":"Colorize all frames" },
 			"showCellOverlays": { "type":"bool", "unit":"", "txt":"Shows the cells/cell-overlays as colored overlays over the rendered cells" },
 			"showEmptyCellOverlays": { "type":"bool", "unit":"", "txt":"Colorize all empty (whitespace creating) columns in rows in the cell-overlays" }
 		};
 		this.build = function(){
-			var lc = leParser.config, lp = leParser.config.namespace, item;
+			var lc = leParser.config, lp = leParser.namespace, item;
 			var html =
 				'<div id="'+lp+'-configurator">'
 				+'<form onsubmit="return leParser.configurator.render(this);">'
@@ -1538,7 +1702,7 @@
 		};
 		this.showConfig = function(){
 			var html =
-				'<div id="'+leParser.config.namespace+'-configurator-config">'
+				'<div id="'+leParser.namespace+'-configurator-config">'
 				+'<a href="javascript:leParser.configurator.closeConfig();">x</a>'
 				+'<pre>'+JSON.stringify(leParser.config, null, 5)+'</pre>'
 				+'</div>';
@@ -1546,9 +1710,12 @@
 			return false;
 		};
 		this.closeConfig = function(){
-			$("#"+leParser.config.namespace+"-configurator-config").remove();
+			$("#"+leParser.namespace+"-configurator-config").remove();
 		};
 		this.render = function(form){
+			// first remove all elements with the current props...
+			leParser.removeAllPages();
+			// now evaluate the new props
 			var ele, name;
 			$(form).find("input").each(function(){
 				if(this.type != "submit" && this.type != "reset"){
@@ -1567,21 +1734,21 @@
 				}
 			});
 			this.isToggled = false;
-			$("#"+leParser.config.namespace+"-configurator-toggle").removeClass(leParser.config.namespace+'-toggled');
-			leParser.removeAllPages();
+			$("#"+leParser.namespace+"-configurator-toggle").removeClass(leParser.namespace+'-toggled');
+			// and re-render the content with a delay
 			window.setTimeout(function(){ leParser.buildAllPages(); }, 500);
 			return false;
 		};
 		this.toggle = function(){
 			if(this.isToggled){
-				$("."+leParser.config.namespace+"-orig").fadeOut(leParser.config.configuratorFadeDuration);
-				$("."+leParser.config.namespace+"-txt").fadeIn(leParser.config.configuratorFadeDuration);
-				$("#"+leParser.config.namespace+"-configurator-toggle").removeClass(leParser.config.namespace+'-toggled');
+				$("."+leParser.namespace+"-orig").fadeOut(leParser.config.configuratorFadeDuration);
+				$("."+leParser.namespace+"-frm").fadeIn(leParser.config.configuratorFadeDuration);
+				$("#"+leParser.namespace+"-configurator-toggle").removeClass(leParser.namespace+'-toggled');
 				this.isToggled = false;
 			} else {
-				$("."+leParser.config.namespace+"-orig").fadeIn(leParser.config.configuratorFadeDuration);
-				$("."+leParser.config.namespace+"-txt").fadeOut(leParser.config.configuratorFadeDuration);
-				$("#"+leParser.config.namespace+"-configurator-toggle").addClass(leParser.config.namespace+'-toggled');
+				$("."+leParser.namespace+"-orig").fadeIn(leParser.config.configuratorFadeDuration);
+				$("."+leParser.namespace+"-frm").fadeOut(leParser.config.configuratorFadeDuration);
+				$("#"+leParser.namespace+"-configurator-toggle").addClass(leParser.namespace+'-toggled');
 				this.isToggled = true;
 			}			
 			return false;
@@ -1592,6 +1759,7 @@
 	/* *************************************************************************************************** */
 
 	w.leParser = {
+		namespace: 't5lep', // CRUCIAL: this must match LeFrameWatcher.namespace
 		maxX: 100000, // used as a fallback in calculations to mark elements to the absolute left
 		maxY: 1000000, // used as a fallback in calculations to mark elements to the absolute bottom
 		eleCounter: -1,
@@ -1608,20 +1776,23 @@
 			tabPrecision: 2,
 			linePosThresh: 0.5,
 			tabPosThresh: 1.5,
-			maxMultiLineThresh: 10,
+			maxMultiLineThresh: 15,
 			maxMultiLineHeight: 200,
+			joinMultilineWithBr: true,
+			multilineBreakThresh: 67,
 			subSuperFontSizeMax: 0.75,
 			subSuperJoinThresh: 2,
 			splitOnSeperatorSpans: true,
+			renderSequenceBotPads: true,
+			renderTableBotPads: true,
 			renderedHorGrowth: 102.5,
-			renderedCellPadShrink: 80,
+			renderedCellPadShrink: 95,
 			minRenderedLineHeight: 105,
-			namespace: 't5lep',
+			fontHeightMatchThresh: 150,
 			devMode: false,
 			colorizeFrames: false,
 			showCellOverlays: false,
 			showEmptyCellOverlays: false,
-			defaultFontFamily: "sans-serif",
 			defaultFontSize: 11,
 			defaultLineHeight: 125,
 			configuratorFadeDuration: 1000
@@ -1640,16 +1811,16 @@
 				this.configurator = new LeParserConfigurator();
 				this.configurator.build();
 			}
-			this.fonts = new LeParserFonts();
+			this.fonts = new LeParserFontMetrics();
 		},
-		addMultilineFont: function(font){
-			this.fonts.addFont(font);
+		addMultilineFont: function(font, html){
+			this.fonts.addFont(font, this.stripTags(html).length);
 		},
 		getLineHeight: function(font){
 			return this.fonts.getHeight(font);
 		},	
 		getDefaultFont: function(){
-			return new LeParserFont(this.config.defaultFontFamily, this.config.defaultFontSize, "normal", "400", this.config.defaultFontSize, "rgb(0,0,0)", "normal", 0, null);
+			element.font = new LeParserFont(this.config.defaultFontSize, this.config.defaultFontSize, null, null, null);
 		},
 		buildAllPages: function(){
 			leParser.pages = {};
@@ -1747,16 +1918,16 @@
 				return jNode.attr("id");
 			}
 			this.eleCounter++;
-			jNode.attr("id", (this.config.namespace + this.eleCounter));
-			return (this.config.namespace + this.eleCounter);
+			jNode.attr("id", (this.namespace + this.eleCounter));
+			return (this.namespace + this.eleCounter);
 		},
 		createId: function(){
 			this.eleCounter++;
-			return (this.config.namespace + this.eleCounter);
+			return (this.namespace + this.eleCounter);
 		},
 		createFrameId: function(){
 			this.frmCounter++;
-			return this.config.namespace + "-frm" + this.frmCounter;
+			return this.namespace + "-frm" + this.frmCounter;
 		},
 		createFrameClasses: function(){
 			return this.createClassesForType("frm", (this.config.devMode && this.config.colorizeFrames));
@@ -1777,9 +1948,9 @@
 		},
 		createClassesForType: function(type, addColorization){
 			if(addColorization){
-				return this.config.namespace + "-" + type + " "+this.config.namespace + "-colorized";
+				return this.namespace + "-" + type + " "+this.namespace + "-colorized";
 			}
-			return this.config.namespace + "-" + type;
+			return this.namespace + "-" + type;
 		},
 		// jQuerys implementation does not work in all cases for unknown reasons
 		getOffsetParent: function(jNode){
@@ -1825,7 +1996,7 @@
 				lh = fs;
 			}
 			// for font-calculations, dimensions must be passed with their unscaled value !
-			element.font = new LeParserFont(jNode.css('font-family'), fs, jNode.css('font-style'), jNode.css('font-weight'), lh, jNode.css('color'), jNode.css('white-space'), 0, element);
+			element.font = new LeParserFont(fs, lh, element, jNode, null);
 			
 			// adding the html-nodes as strings, detect the ugly "seperator-spans"
 			var html = "", sub = null, left, right, c;
@@ -1883,12 +2054,36 @@
 		stripTags: function(html){
 			return html.toString().replace(/(<([^>]+)>)/ig,"");
 		},
+		rTrim: function(html, maxAmount){
+			while(html.length > 0 && html.substr(-1,1) == " " && maxAmount > 0){
+				html = html.substring(0, (html.length - 1));
+				maxAmount--; 
+			}
+			return html;
+		},
+		lTrim: function(html, maxAmount){
+			while(html.length > 0 && html.substr(0,1) == " " && maxAmount > 0){
+				html = html.substr(1);
+				maxAmount--; 
+			}
+			return html;
+		},
 		logError: function(msg){
 			console.log('LiveEditingParser ERROR: '+msg);
 		}
 	};
-
-
+	
+	/* *************************************************************************************************** */
+	
+	var LeFrameWatcher = function(){
+		// CRUCIAL: this must match leParser.namespace
+		this.namespace = 't5lep';
+		
+		$("body").on('DOMSubtreeModified', "mydiv", function() {
+		    alert('changed');
+		});
+		
+	}
 
 })(window, document, jQuery);
 
