@@ -1,8 +1,6 @@
 "use strict";
 
 
-// TODO: implement seperate class to handle the resizing when frame-contents are changed
-
 (function(w, d, $) {
 
 	// quick way of adding rotation-getter to jQuery ... a plugin seems overkill for now
@@ -801,14 +799,15 @@
 		var i, ele, pad, style, attribs, html = '';
 		for(i = 0; i < this.cols.length; i++){
 			ele = this.cols[i];
+			attribs = '';
 			if(this._renderedHeight > 0){
 				// we add an padding but only half the bottom-padding to somehow keep the layout consistent (if configured)
 				pad = (leParser.config.renderSequenceBotPads) ? Math.floor((this._renderedHeight - ele.getRenderedHeight()) / 100 * leParser.config.renderedCellPadShrink) : 0;
 				style = (pad > 1 && index < (numLines - 1)) ? 'min-height:'+(this._renderedHeight - pad)+'px; padding-bottom:'+pad+'px;' : 'min-height:'+this._renderedHeight+'px;';
-				attribs = (leParser.config.devMode) ? ' title="rendered height:'+this._renderedHeight+'px (scaled to '+(this._renderedHeight * frame.scaleY)+' px)"' : '';
+				attribs += (leParser.config.devMode) ? ' title="rendered height:'+this._renderedHeight+'px (scaled to '+(this._renderedHeight * frame.scaleY)+' px)"' : '';
 				html += '<div style="'+style+'"'+attribs+'>';
 			} else {
-				attribs = (leParser.config.devMode) ? ' title="no rendered height could be evaluated"' : '';
+				attribs += (leParser.config.devMode) ? ' title="no rendered height could be evaluated"' : '';
 				html += '<div'+attribs+'>';
 			}
 			html += ele.render(false, "", "");
@@ -1365,10 +1364,13 @@
 				cols += '<col style="width:'+String(w / this.renderedWidth * 100)+'%;">';
 			}
 			cols += '</colgroup>';
-			html = '<table cellspacing="0" cellpadding="0" style="width:100%;"'+t+'>'+cols+'<tbody>'+html+'</tbody></table>';
-			t = '';
+			html = '<table cellspacing="0" cellpadding="0" border="0" style="width:100%;" class="'+leParser.namespace+'-fbox"'+t+'>'
+					+cols+'<tbody>'+html+'</tbody></table>';
+		} else {
+			// crucial: for a sequence we have to add the "fbox" which is used by the FrameWatcher to determine the real height of the content. This can't be done on the holding frame since it has a fixed layout
+			html = '<div class="'+leParser.namespace+'-fbox"'+t+'>'+html+'</div>';
 		}
-		html = '<div id="'+this.id+'" class="'+leParser.createFrameClasses()+'" style="'+leParser.createFrameStyles(this)+'"'+t+'>'+html+'</div>';
+		html = '<div id="'+this.id+'" class="'+leParser.createFrameClasses()+'" style="'+leParser.createFrameStyles(this)+'" data-scalex="'+this.scaleX+'" data-scaley="'+this.scaleY+'">'+html+'</div>';
 		
 		this.jDomNode = $(html);
 		jPage.append(this.jDomNode);		
@@ -1621,14 +1623,15 @@
 	};
 	LeParserPage.prototype.build = function(jPage){
 		if(!jPage || jPage == null){
-			jPage = $("+"+this.id);
+			jPage = $("+"+this.id);			
 		}
+		jPage.addClass(leParser.namespace+"-page");
 		for(var i=0; i < this.frames.length; i++){
 			this.frames[i].build(jPage, this.width);
 		}
 	};
 	LeParserPage.prototype.remove = function(jPage){
-		$("#"+this.id+" ."+leParser.namespace+"-orig").removeClass(leParser.namespace+"-orig").show();
+		$("#"+this.id).removeClass(leParser.namespace+"-page").find("."+leParser.namespace+"-orig").removeClass(leParser.namespace+"-orig").show();
 		for(var i=0; i < this.frames.length; i++){
 			this.frames[i].remove();
 		}
@@ -1759,7 +1762,7 @@
 	/* *************************************************************************************************** */
 
 	w.leParser = {
-		namespace: 't5lep', // CRUCIAL: this must match LeFrameWatcher.namespace
+		namespace: 't5lep', // CRUCIAL: this must match LePageWatcher.namespace
 		maxX: 100000, // used as a fallback in calculations to mark elements to the absolute left
 		maxY: 1000000, // used as a fallback in calculations to mark elements to the absolute bottom
 		eleCounter: -1,
@@ -1827,8 +1830,11 @@
 			$("#page-container").children().each(function(index){
 				leParser.parsePage(this, index);
 			});
+			// add Watcher process for all pages
+			LePageWatcher.prototype.init();
 		},
 		removeAllPages: function(){
+			LePageWatcher.prototype.remove();
 			for(var id in this.pages){
 				this.pages[id].remove();
 			}
@@ -2074,16 +2080,230 @@
 	};
 	
 	/* *************************************************************************************************** */
+	/* *************************************************************************************************** */
+	/* *************************************************************************************************** */
 	
-	var LeFrameWatcher = function(){
-		// CRUCIAL: this must match leParser.namespace
-		this.namespace = 't5lep';
-		
-		$("body").on('DOMSubtreeModified', "mydiv", function() {
-		    alert('changed');
-		});
-		
-	}
+	// Frontend-Part, frame-watcher. Coded without jQuery
+	
+	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+	
+	var LePageWatcherSort = {	
+		byTop: function(a, b){
+			if(a.top < b.top){
+				return -1;
+			}
+			if (a.top > b.top){
+				return 1;
+			}
+			return 0;
+		}
+	};
+	
+	/* *************************************************************************************************** */
+	
+	var LePageWatcher = function(node){
+		this.frames = [];
+		this.node = node;
+		this.id = node.id;
+		this.observations = { attributes: false, childList: true, characterData: true, subtree: true };
+		this.evaluatePosition();
+		var frms = node.getElementsByClassName(this.namespace+"-frm");
+		for(var i=0; i < frms.length; i++){
+			this.frames.push(new LePageWatcherFrame(this, frms[i], i));
+		}
+		this.frames.sort(LePageWatcherSort.byTop);
+	};
+	// CRUCIAL: this must match leParser.namespace
+	LePageWatcher.prototype.namespace = 't5lep';
+	// the amount a textbox can grow horizontally and we do not change it's textflow /seperately for sequence & table)
+	LePageWatcher.prototype.sequenceHorizontalThresh = 105;
+	LePageWatcher.prototype.tableHorizontalThresh = 101.5;
+	// the minimum vertical distance a frame should have to the frame before
+	LePageWatcher.prototype.frameMinVerticalDistance = 10;
+	// Must match leParser.config.linePrecision
+	LePageWatcher.prototype.linePrecision = 2;
+	
+	LePageWatcher.prototype.addFrame = function(frame){
+		this.frames[frame.id] = frame;		
+	};
+	LePageWatcher.prototype.frameChanged = function(frame){
+		this.evaluatePosition();
+		var offset = 0;
+		for(var i=0; i < this.frames.length; i++){
+			if(frame.id != this.frames[i].id){
+				this.frames[i].move(frame);
+				/*
+				if(offset == 0){
+					offset = this.frames[i].getNeededOffset(frame);
+				}
+				if(offset != 0){
+					this.frames[i].moveTop(offset);
+					frame = this.frames[i];
+					offset = 0;
+				}
+				*/
+			}
+		}
+	};
+	LePageWatcher.prototype.removeFrames = function(){
+		for(var i=0; i < this.frames.length; i++){
+			this.frames[i].remove();
+		}
+		delete this.frames;
+	};
+	// static helper API to add the watcher for all pages
+	LePageWatcher.prototype.init = function(){
+		LePageWatcher.prototype.pages = [];
+		var pages = document.body.getElementsByClassName(this.namespace+"-page");
+		for(var i=0; i < pages.length; i++){
+			LePageWatcher.prototype.pages.push(new LePageWatcher(pages[i]));
+		}
+	};
+	// static helper API to remove the watcher from all pages
+	LePageWatcher.prototype.remove = function(){
+		for(var i=0; i < LePageWatcher.prototype.pages.length; i++){
+			LePageWatcher.prototype.pages[i].removeFrames();
+		}
+		delete LePageWatcher.prototype.pages;
+	};
+	LePageWatcher.prototype.evaluatePosition = function(){
+		var rect = this.node.getBoundingClientRect();
+		this.left = rect.left;
+		this.top = rect.top;
+		this.width = rect.width;
+		this.height = rect.height;
+		this.bottom = rect.bottom;
+	};
+
+	/* *************************************************************************************************** */
+	
+	// HINT: The width-prop of a frame represents it's unscaled height while the height-property represents the scaled/rendered height.
+	var LePageWatcherFrame = function(pageWatcher, node, index){
+		this.page = pageWatcher;
+		this.id = node.id;
+		this.index = index;
+		this.node = node;
+		this.rotated = this._hasParserClass(this.node, "rotfrm");
+		// when moving frames, we need the rendered height with the transformation applied
+		var nodeRect = this.node.getBoundingClientRect();
+		this.initHeight = this.height = nodeRect.height;
+		this.initTop = this.top = nodeRect.top - this.page.top;
+		this.left = nodeRect.left;
+		this.width = nodeRect.width;
+		this.right = this.left + this.width;
+		this.initBottom = this.oldBottom = this.bottom = this.top + this.height;
+		this.isTable = false;
+		// we watch the first child (frame-box) as the frame itself has fixed width & height and will not change. this depends on the implementation in leParser ...
+		// if we can not find this node (rotated frames e.g.), we do not observe our layout
+		this.box = node.firstElementChild;
+		if(!this.rotated && this.box != null && this._hasParserClass(this.box, "fbox")){
+			this.isTable = (this.box.nodeName == "TABLE");
+			// the inner box usually is bigger than the holding frame due to text-overshoot. This has to be distracted from the height to keep the observed dimensions consistent
+			this.heightDiff = this.box.getBoundingClientRect().height - this.height;
+			this.cssTop = String(this.node.style.top);
+			this.cssTop = parseFloat(this.cssTop.substr(0, this.cssTop.length - 2));
+			// wath the changes of the frame's contents
+			var that = this;
+			this.observer = new MutationObserver(function(mutations){
+				that.changed(mutations);
+			});
+			this.observer.observe(this.box, pageWatcher.observations);
+			//  since there is no way to reliably detect the text-growth within a box, we set the parent elements width (the holding container in a sequence or the holding td in a table) as a data-attribute
+			// note: we can not set the width itself as this would affect the table-layout (no idea why though)
+			var texts = this.box.getElementsByClassName(this.page.namespace+"-txt");
+			for(var i=0; i < texts.length; i++){
+				texts[i].setAttribute("data-width", texts[i].parentNode.offsetWidth);
+			}	
+		} else {
+			this.box = null;
+			this.observer = null;
+		}
+	};
+	LePageWatcherFrame.prototype.remove = function(){
+		if(this.observer != null){
+			this.observer.disconnect();
+		}
+	};
+	LePageWatcherFrame.prototype.getNeededOffset = function(frame){
+		// rotated frames are not moved as they are regarded as fixed elements of the page
+		if(this.rotated || this.initTop < frame.initBottom){
+			return 0;
+		}
+		if((frame.bottom + this.page.frameMinVerticalDistance >= this.initTop) || (frame.oldBottom + this.page.frameMinVerticalDistance >= this.initTop)){
+			// nested horizontal overlap detection if's for the sake of performance & understandability
+			if(!(this.right < frame.left) && !(this.left > frame.right)){
+				var minDist = Math.min(Math.abs(this.initTop - frame.initBottom), this.page.frameMinVerticalDistance);
+				// we don't want to get more to the top than our initial position
+				var newTop = Math.max((frame.bottom + minDist), this.initTop);
+				// limit the movement to not let the elements disappear
+				if(newTop + this.height > this.page.height){
+					newTop = this.page.height - this.height;
+				}
+				if(newTop != this.top){
+					return newTop - this.top;
+				}
+			}
+		}
+		return 0;
+	};
+	LePageWatcherFrame.prototype.moveTop = function(offset){
+		// rotated frames are not moved as they are regarded as fixed elements of the page
+		this.top += offset;
+		offset = (this.top - this.initTop) + this.cssTop;
+		this.node.style.top = String(Math.round(offset * this.page.linePrecision) / this.page.linePrecision)+"px";
+	};
+	LePageWatcherFrame.prototype.move = function(frame){
+		var offset = this.getNeededOffset(frame);
+		if(offset != 0){
+			this.moveTop(offset);
+		}
+	};
+	LePageWatcherFrame.prototype.changed = function(mutations){
+		for(var i=0; i < mutations.length; i++){
+			if(mutations[i].type == "characterData"){
+				this._textChanged(this._getParentByParserClass(mutations[i].target,"txt"));
+				break;
+			}
+		}
+		var height = this.box.getBoundingClientRect().height - this.heightDiff;
+		var hasChanged = (this.height != height && height >= this.initHeight);
+		this.height = height;
+		this.oldBottom = this.bottom; // needed do detect a frame moved back to a position "behind the boundries"
+		this.bottom = (this.top + this.height);
+		if(hasChanged){
+			this.page.frameChanged(this);
+		}
+	};
+	LePageWatcherFrame.prototype._textChanged = function(txtBox){
+		if(txtBox != null && txtBox.offsetWidth && txtBox.scrollWidth){
+			var initW = parseInt(txtBox.getAttribute("data-width")), maxQ = (this.isTable) ? this.page.tableHorizontalThresh : this.page.sequenceHorizontalThresh;
+			if(txtBox.scrollWidth > (initW * maxQ / 100)){
+				// When a text-box "overgrows", this is mostly due to the white-space settimgs. Let's change them to a wrapping setting & remove the breaks
+				if(txtBox.style.whiteSpace == "pre" || txtBox.style.whiteSpace == "nowrap"){
+					var breaks = txtBox.getElementsByTagName("BR");
+					for(var i=0; i < breaks.length; i++){
+						txtBox.removeChild(breaks[i]);
+					}
+					txtBox.style.whiteSpace = (txtBox.style.whiteSpace == "pre") ?  "pre-wrap" : "normal";
+				}
+			}
+		}
+	};
+	LePageWatcherFrame.prototype._getParentByParserClass = function(node, name){
+		if(!node || node == null){
+			return null;
+		}
+		if(this._hasParserClass(node, name)){
+			return node;
+		}
+		return this._getParentByParserClass(node.parentElement, name);
+	};
+	LePageWatcherFrame.prototype._hasParserClass = function(node, name){
+		if(node && node.className && node.className != null){
+			return (node.className.indexOf(this.page.namespace+"-"+name) > -1);
+		}
+		return false;
+	};
 
 })(window, document, jQuery);
 
