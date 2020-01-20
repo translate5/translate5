@@ -231,7 +231,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $workflowStep = array_map(function($item){
             return $item->workflowStep;
         }, $segments);
-        $this->assertEquals(array('','','lectoring','','','','lectoring','lectoring','lectoring','','','',''), $workflowStep);
+        $this->assertEquals(array('','','reviewing','','','','reviewing','reviewing','reviewing','','','',''), $workflowStep);
     }
     
     /**

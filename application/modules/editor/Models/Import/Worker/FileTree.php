@@ -80,7 +80,7 @@ class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_A
                 $this->task
             ]);
             /* @var $filelistInstance editor_Models_Import_FileList */
-            $filelist = $filelistInstance->processProofreadFiles();
+            $filelist = $filelistInstance->processReviewedFiles();
             $filelistInstance->processReferenceFiles();
             
             $this->triggerAfter($importConfig, $filelist);

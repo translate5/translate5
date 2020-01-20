@@ -137,8 +137,8 @@ class editor_Models_Import_Worker_Import {
             
         $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
         $repHash = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash', array($this->task, $this->segmentFieldManager));
-        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_ProofRead', array($this->task, $this->importConfig));
-        /* @var $segProc editor_Models_Import_SegmentProcessor_ProofRead */
+        $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Review', array($this->task, $this->importConfig));
+        /* @var $segProc editor_Models_Import_SegmentProcessor_Review */
         
         $filesProcessedAtAll = 0;
         foreach ($filelist as $fileId => $path) {

@@ -762,7 +762,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             'state' => 'open',
             'workflow' => 'default',
             'workflowStep' => '1',
-            'workflowStepName' => 'lectoring',
+            'workflowStepName' => 'reviewing',
             'pmGuid' => '{dab18309-7dfd-4185-b27e-f490c3dcb888}',
             'pmName' => 'PM Username',
             'wordCount' => '123',

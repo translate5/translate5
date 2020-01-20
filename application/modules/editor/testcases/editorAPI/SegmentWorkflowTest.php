@@ -104,7 +104,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'PHP Handbuch', $segToTest->id);
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
 
-        //the segment is proofread, increment the finish count
+        //the segment is reviewed, increment the finish count
         $segmentFinishCount++;
         
         $segToTest = $segments[6];
@@ -114,7 +114,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', 'Apache'.$nbsp.' 2.x'.$nbsp.'auf'.$nbsp.$nbsp.'Unix-Systemen', $segToTest->id);
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
-        //the segment is proofread, increment the finish count
+        //the segment is reviewed, increment the finish count
         $segmentFinishCount++;
         
         //edit a segment with special characters
@@ -123,7 +123,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', "Installation auf   Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; - bearbeitet durch den Testcode", $segToTest->id);
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
-        //the segment is proofread, increment the finish count
+        //the segment is reviewed, increment the finish count
         $segmentFinishCount++;
         
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
@@ -138,7 +138,7 @@ class SegmentWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $workflowStep = array_map(function($item){
             return $item->workflowStep;
         }, $segments);
-        $this->assertEquals(array('','','lectoring','','lectoring','','lectoring'), $workflowStep);
+        $this->assertEquals(array('','','reviewing','','reviewing','','reviewing'), $workflowStep);
         
         //reloat the task and test the current workflow progress
         $reloadProgresTask= $this->api()->reloadTask();

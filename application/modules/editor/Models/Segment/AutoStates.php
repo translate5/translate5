@@ -198,7 +198,7 @@ class editor_Models_Segment_AutoStates {
             self::TRANSLATED,
             self::TRANSLATED_AUTO,
           ],
-          editor_Workflow_Abstract::ROLE_LECTOR => array(
+            editor_Workflow_Abstract::ROLE_REVIEWER => array(
             self::REVIEWED,
             self::REVIEWED_AUTO,
             self::REVIEWED_UNTOUCHED,
@@ -276,7 +276,7 @@ class editor_Models_Segment_AutoStates {
         if($tua->getRole() == $workflow::ROLE_TRANSLATORCHECK) {
             return self::REVIEWED_TRANSLATOR;
         }
-        if($tua->getRole() == $workflow::ROLE_LECTOR) {
+        if($tua->getRole() == $workflow::ROLE_REVIEWER) {
             return $isModified ? self::REVIEWED : self::REVIEWED_UNCHANGED;
         }
         
@@ -344,7 +344,7 @@ class editor_Models_Segment_AutoStates {
             $segment->setAutoStateId(self::REVIEWED_TRANSLATOR); //TODO if we have TRANSLATE-1704 then this must be changed too
             return;
         }
-        if($tua->getRole() == $workflow::ROLE_LECTOR) {
+        if($tua->getRole() == $workflow::ROLE_REVIEWER) {
             $segment->setAutoStateId(self::REVIEWED_UNCHANGED);
             return;
         }

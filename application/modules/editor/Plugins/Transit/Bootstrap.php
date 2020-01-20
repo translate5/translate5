@@ -47,7 +47,7 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
      *
      * @var string
      */
-    protected $proofReadDirName;
+    protected $reviewDirName;
     
     /**
      *
@@ -67,7 +67,7 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_Models_Import_Worker', 'beforeWork', array($this, 'handleBeforeImport'));
         $this->eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'handleTransitImportCleanup'), -10);
         // end of event-listeners
-        $this->proofReadDirName = $config->runtimeOptions->import->proofReadDirectory;
+        $this->reviewDirName = $config->runtimeOptions->import->proofReadDirectory;
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         /* @var $meta editor_Models_Segment_Meta */
         $meta->addMeta('transitLockedForRefMat', $meta::META_TYPE_BOOLEAN, false, 'Is set to true if segment is locked for reference material in transit file');
@@ -167,7 +167,7 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @param string $job
      */
     protected function renameTargetFiles($job) {
-        $iterator = new DirectoryIterator($this->importFolder.DIRECTORY_SEPARATOR.$this->proofReadDirName);
+        $iterator = new DirectoryIterator($this->importFolder.DIRECTORY_SEPARATOR.$this->reviewDirName);
         /* @var $fileinfo DirectoryIterator */
         foreach ($iterator as $fileinfo) {
             if(!$fileinfo->isFile()) {

@@ -663,8 +663,8 @@ class editor_TaskController extends ZfExtended_RestController {
             'E1032' => ['sourceLang', 'Die übergebene Quellsprache "{language}" ist ungültig!'],
             'E1033' => ['targetLang', 'Die übergebene Zielsprache "{language}" ist ungültig!'],
             'E1034' => ['relaisLang', 'Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.'],
-            'E1039' => ['importUpload', 'Das importierte Paket beinhaltet kein gültiges "{proofRead}" Verzeichnis.'],
-            'E1040' => ['importUpload', 'Das importierte Paket beinhaltet keine Dateien im "{proofRead}" Verzeichnis.'],
+            'E1039' => ['importUpload', 'Das importierte Paket beinhaltet kein gültiges "{review}" Verzeichnis.'],
+            'E1040' => ['importUpload', 'Das importierte Paket beinhaltet keine Dateien im "{review}" Verzeichnis.'],
         ];
         $code = $e->getErrorCode();
         if(empty($codeToFieldAndMessage[$code])) {
