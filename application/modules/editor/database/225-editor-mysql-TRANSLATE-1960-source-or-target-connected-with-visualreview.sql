@@ -27,4 +27,4 @@ END LICENSE AND COPYRIGHT
 */
 
 ALTER TABLE `LEK_task_meta` 
-ADD COLUMN `mappingType` VARCHAR(45) NULL DEFAULT 'automatic' AFTER `rigiProjecturl`;
+ADD COLUMN `mappingType` VARCHAR(45) NULL DEFAULT 'automatic';
