@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 CMD_PHP=/usr/bin/php
 CMD_MYSQL=/usr/bin/mysql
  
