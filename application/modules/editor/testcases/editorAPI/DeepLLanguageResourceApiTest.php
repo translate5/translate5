@@ -111,17 +111,15 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         self::assertLogin('testmanager');
         self::assertCustomer();
         
-        self::createLanguageResource();
-        
         $api->addImportFile($api->getFile('testcase-de-en.xlf'));
         $api->import($task);
     }
     
     /**
-     * Create a DeepL-LanguageResource associate to the test-customer
+     * Create a DeepL-LanguageResource with association to the test-customer
      * and store its ID.
      */
-    protected static function createLanguageResource() {
+    public function testCreateLanguageResource() {
         $customer = self::api()->getCustomer();
         $customerParamObj = new stdClass();
         $customerParamObj->customerId = $customer->id;
@@ -137,8 +135,9 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $params['serviceType'] = static::SERVICE_TYPE;
         $params['serviceName'] = static::SERVICE_NAME;
         $params['resourcesCustomersHidden'] = json_encode($customerParamArray);
-        self::api()->requestJson('editor/languageresourceinstance', 'POST', [], $params);
-        $responseBody = json_decode(self::api()->getLastResponse()->getBody());
+        $this->api()->requestJson('editor/languageresourceinstance', 'POST', [], $params);
+        $responseBody = json_decode($this->api()->getLastResponse()->getBody());
+        $this->assertObjectHasAttribute('rows', $responseBody, 'Creating a DeepL-LanguageResource failed. Check authorization for DeepL.');
         self::$languageResourceID = $responseBody->rows->id;
     }
     
@@ -146,6 +145,7 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
      * Matches:
      * Run a query-search with our DeepL-LanguageResource
      * and check if the result is as expected.
+     * @depends testCreateLanguageResource
      */
     public function testQuery() {
         $task = $this->api()->getTask();
@@ -185,6 +185,7 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
      * InstantTranslate:
      * Run a translation with our DeepL-LanguageResource
      * and check if the result is as expected.
+     * @depends testCreateLanguageResource
      */
     public function testTranslation() {
         foreach (self::$expectedTranslationsForInstantTranslate as $text => $expectedTranslation){
