@@ -47,7 +47,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       // sorted by appearance
       workflow: '#UT#Workflow',
       taskActions: '#UT#Aktionen',
-      state: '#UT#Status',
+      state: '#UT#Aufgabenstatus',
       customerId: '#UT#Endkunde',
       taskName: '#UT#Aufgabenname',
       taskNr: '#UT#Auftragsnr.',
@@ -79,7 +79,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
 	  segmentFinishCount:'#UT#% abgeschlossen',
 	  id:'#UT#Id',
 	  taskGuid:'#UT#Task-Guid',
-	  workflowStepName:'#UT#Aktueller Workflow-Schritt'
+	  workflowStepName:'#UT#Aktueller Workflow-Schritt',
+	  userState:'#UT#Mein Job-Status'
   },
   strings: {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
@@ -267,7 +268,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
           steps=[],
           translatedSteps=[],
           //we must have here an own ordered list of states to be filtered 
-          stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'task_state_unconfirmed', 'user_state_unconfirmed', 'task_state_import'],
+          userStates=['open','waiting','finished','unconfirmed'],
+          stateFilterOrder = ['locked','task_state_end','task_state_unconfirmed','task_state_import'],
           relaisLanguages = Ext.Array.clone(Editor.data.languages),
           addQtip = function(meta, text) {
               meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text)+'"';
@@ -287,13 +289,20 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   states.push([state, me.states[state]]);
               }
           });
+          
+          Ext.Array.each(userStates, function(state){
+        	  var s = 'user_state_'+state;
+              if(me.states[s]) {
+            	  userStates.push([state, me.states[s]]);
+              }
+          });
         
           //adding additional, not ordered states
           Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
               Ext.Object.each(workflow.states, function(key, value){
                   var state = 'user_state_'+key;
                   if(!me.states[state]) {
-                      states.push([state, me.states.forMe+' '+value]);
+                	  userStates.push([key, me.states.forMe+' '+value]);
                   }
               });
               Ext.Object.each(workflow.steps, function(key, value){
@@ -326,17 +335,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 70,
               dataIndex: 'state',
               stateId:'state',
-//TODO: disable the state filter till the state filter usage is not clear
-//read the topic for taskGrid:https://confluence.translate5.net/display/MI/Usability+enhancements
-//              filter: {
-//                  type: 'list',
-//                  options: states,
-//                  phpMode: false
-//              },
+              filter: {
+                  type: 'list',
+                  options: states,
+                  phpMode: false
+              },
               tdCls: 'state',
               renderer: function(v, meta, rec) {
-                  var userState = rec.get('userState'),
-                      wfMeta = rec.getWorkflowMetaData(),
+                  var wfMeta = rec.getWorkflowMetaData(),
                       allStates = me.prepareStates(wfMeta);
 
                   if(rec.isImporting() || rec.isErroneous()) {
@@ -368,18 +374,30 @@ Ext.define('Editor.view.admin.TaskGrid', {
                       addQtip(meta, me.strings.ended);
                       return me.strings.ended;
                   }
-                  if(!userState || userState.length == 0) {
-                      //if we got only v here, the state should be handled like locked or ended above
-                      v = allStates[v] ? allStates[v] : v;
-                      addQtip(meta, v);
-                      return v; 
-                  }
-                  //if no global state is applicable, use userState instead
-                  addQtip(meta, allStates[userState]);
-                  return allStates[userState];
+                  v = allStates[v] ? allStates[v] : v;
+                  addQtip(meta, v);
+                  return v;
               },
               text: me.text_cols.state,
               sortable: false
+          },{
+              xtype: 'gridcolumn',
+              width: 70,
+              dataIndex: 'userState',
+              stateId: 'userState',
+              text: me.text_cols.userState,
+              filter: {
+                  type: 'list',
+                  options: userStates,
+                  phpMode: false
+              },
+              renderer: function(v, meta, rec) {
+                  var userState = rec.get('userState'),
+                      wfMeta = rec.getWorkflowMetaData(),
+                      allStates = me.prepareStates(wfMeta);
+                  addQtip(meta, allStates[userState]);
+                  return allStates[userState];
+              },
           },{
               xtype: 'gridcolumn',
               width: 135,
@@ -406,7 +424,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
               text: me.text_cols.workflowStepName
           },
           {
-        	  //TODO: how do we filter percent ?
               xtype: 'gridcolumn',
               cls:'gridColumnInfoIconTooltipLeft',
               width: 135,
