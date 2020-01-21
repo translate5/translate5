@@ -117,9 +117,11 @@ class editor_TaskController extends ZfExtended_RestController {
                 'numeric' => 'percent',
                 'totalField'=>'segmentCount'
             ],
+            'userState' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+            ]
         ];
         
-        //TODO: how the sort will work ?
         //$this->_sortColMap['workflowState'] = $this->_filterTypeMap['taskState']['list'];
         //$this->_sortColMap['userRole'] = $this->_filterTypeMap['userRole']['list'];
         //$this->_sortColMap['userName'] = $this->_filterTypeMap['userName']['list'];
@@ -277,16 +279,11 @@ class editor_TaskController extends ZfExtended_RestController {
     {
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
         $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks'); 
-        $filter = $this->entity->getFilter();
-        /* @var $filter editor_Models_Filter_TaskSpecific */
-        $filter->convertStates($isAllowedToLoadAll);
-        $assocFilter = $filter->isUserAssocNeeded();
-        if(!$assocFilter && $isAllowedToLoadAll) {
+        if($isAllowedToLoadAll) {
             $this->totalCount = $this->entity->getTotalCount();
             $rows = $this->entity->loadAll();
         }
         else {
-            $filter->setUserAssocNeeded();
             $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
             $rows = $this->entity->loadListByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
         }

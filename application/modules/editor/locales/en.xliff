@@ -3666,6 +3666,8 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 </trans-unit>
 <trans-unit id='U2VnbWVudGFuemFobA=='><source>Segmentanzahl</source><target>Segment count</target></trans-unit>
 <trans-unit id='WndlaXRlcyBMZWt0b3JhdA=='><source>Zweites Lektorat</source><target>Second Review</target></trans-unit>
+<trans-unit id='QXVmZ2FiZW5zdGF0dXM='><source>Aufgabenstatus</source><target>Task status</target></trans-unit>
+<trans-unit id='TWVpbiBKb2ItU3RhdHVz'><source>Mein Job-Status</source><target>My job status</target></trans-unit>
 </body>
   </file>
 </xliff>
