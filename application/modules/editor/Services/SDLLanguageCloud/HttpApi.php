@@ -219,7 +219,7 @@ class editor_Services_SDLLanguageCloud_HttpApi {
      * @return boolean
      */
     public function getStatus(){
-        $http = $this->getHttp('GET', 'status');
+        $http = $this->getHttp('GET', 'languages'); // in order to check if the API is available and running, we request its languages.
         return $this->processResponse($this->request($http));
     }
 
