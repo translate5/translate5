@@ -106,7 +106,6 @@ Ext.define('Editor.controller.Localizer', {
         <li>Google Chrome ab Version 48</li>
         <li>Mozilla Firefox ab Version 44</li>
         <li>Apple Safari ab Version 9</li>
-        <li>Microsoft Internet Explorer Version 11</li>
         <li>Microsoft Edge</li>
     </ul>
     Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren. 
@@ -122,7 +121,6 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.app.Application.prototype.browserAdviceTextTitle = '<?php echo $this->translate->_('Nicht unterstützte Browser-Version');?>';
     Ext.app.Application.prototype.browserAdviceText = '<?php echo $disclaimer;?>';
-    Ext.app.Application.prototype.browserAdviceTextIE = '<?php echo $this->translate->_('Sie nutzen Internet Explorer. Dieser Browser wird von Version 9 bis 11 unterstützt, ist allerdings sehr langsam. Um die Anwendung in optimaler Performance nutzen zu können, empfehlen wir daher Google Chrome, Firefox oder Safari als Browser.');?>';
 
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
