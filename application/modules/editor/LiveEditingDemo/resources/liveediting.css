@@ -4,6 +4,11 @@
 .t5lep-frm td { vertical-align:top; padding:0; }
 .t5lep-txt { box-sizing:border-box; }
 
+/* ************************************ */
+/* ******** DEV Mode Styles ******** */
+/* ************************************ */
+
+
 /* colorization in devmode */
 .t5lep-frm.t5lep-colorized { margin:-8px; border:8px solid #e1cb2a; background-color:rgba(225,203,42,.2); }
 .t5lep-rotfrm.t5lep-colorized { margin:-1px; border:1px solid #00ffe2; background-color:rgba(0,255,226,.2); }
