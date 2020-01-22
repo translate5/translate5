@@ -225,7 +225,7 @@ $( function() {
             updateLocalesSelectLists($(this));
         },
         change: function() {
-            handleAfterLocalesChange();
+            checkInstantTranslation();
         }
       }).selectmenu("menuWidget").addClass("overflow localesSelectList");
     $('#targetLocale').selectmenu({
@@ -233,7 +233,7 @@ $( function() {
             updateLocalesSelectLists($(this));
         },
         change: function() {
-            handleAfterLocalesChange();
+            checkInstantTranslation();
         }
       }).selectmenu("menuWidget").addClass("overflow localesSelectList");
     $('#sourceFile').button();
@@ -258,10 +258,11 @@ $( function() {
     	setTargetFirstAvailable($('#sourceLocale').val());
     }
     // start with checking according to the locales as stored for user
-    handleAfterLocalesChange($('#targetLocale'));
+    checkInstantTranslation($('#targetLocale'));
     $("#sourceText").attr('maxlength',characterLimit);
     clearAllErrorMessages();
-    setFileTypesAllowedAndAvailable();
+    setAllowedFileTypes();
+    setfileUploadLanguageCombinationsAvailable();
     setTextForSource();
     showSource();
     $('#switchSourceTarget').button({
@@ -275,7 +276,7 @@ $( function() {
 		$("#sourceLocale").selectmenu("refresh");
 		$("#targetLocale").selectmenu("refresh");
 		var results=$('div.translation-result');
-		handleAfterLocalesChange();
+		checkInstantTranslation();
 		if(results.length>0){
 			$('#sourceText').val(results[0].textContent);
 		}
