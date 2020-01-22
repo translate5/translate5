@@ -1206,7 +1206,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      */
     private function handleTermDb(){
         $terms=$this->termModel->isUpdateTermForCollection($this->actualTermEntry,$this->actualTermIdTbx,$this->termCollection->getId());
-        
         //if term is found(should return single row since termId is unique)
         if($terms->count()>0){
             foreach ($terms as $t){
