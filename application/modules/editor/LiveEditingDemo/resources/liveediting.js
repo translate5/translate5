@@ -1637,6 +1637,17 @@
 		}
 		this.frames = [];
 	};
+	LeParserPage.prototype.getTransformedHtml = function(){
+		if(this.jDomNode == null){
+			return "";
+		}
+		var clone = this.jDomNode.clone(false);
+		if(leParser.config.devMode){
+			clone.find("."+leParser.namespace+"-orig").remove();
+			clone.find("."+leParser.namespace+"-eolay").remove();
+		}
+		return $('<div></div>').append(clone).html();
+	};
 
 	/* *************************** OPTIONAL: Configurator / Editor ************************************ */
 
@@ -2051,6 +2062,14 @@
 			}
 			return element;
 		},
+		getTransformedBodyHtml: function(){
+			var clone = $("body").clone(false);
+			if(leParser.config.devMode){
+				clone.find("."+leParser.namespace+"-orig").remove();
+				clone.find("."+leParser.namespace+"-eolay").remove();
+			}
+			return $('<div></div>').append(clone).html();
+		},
 		isSeperatorSpan: function(node){
 			return (node.nodeName.toLowerCase() === "span" && $(node).hasClass("_") && leParser.isOnlyWhitespace(String(node.textContent)));
 		},
@@ -2107,14 +2126,21 @@
 		this.id = node.id;
 		this.observations = { attributes: false, childList: true, characterData: true, subtree: true };
 		this.evaluatePosition();
+		this.bottomLine = this.height - (this.height / 100 * this.pageMinBottomDistance);
 		var frms = node.getElementsByClassName(this.namespace+"-frm");
 		for(var i=0; i < frms.length; i++){
-			this.frames.push(new LePageWatcherFrame(this, frms[i], i));
+			this.addFrame(new LePageWatcherFrame(this, frms[i], i));
 		}
 		this.frames.sort(LePageWatcherSort.byTop);
+		this.initHeight = this.height;
+		this.bottomDist = Math.floor(this.height - this.bottomLine);
 	};
 	// CRUCIAL: this must match leParser.namespace
 	LePageWatcher.prototype.namespace = 't5lep';
+	// the minimum bottom distance (equals 15mm on a DINA4 Paper)
+	LePageWatcher.prototype.pageMinBottomDistance = 5;
+	// the color the page-overshoot is marked with
+	LePageWatcher.prototype.pageOvershootBkgColor = "rgb(0,255,255,.1)";
 	// the amount a textbox can grow horizontally and we do not change it's textflow /seperately for sequence & table)
 	LePageWatcher.prototype.sequenceHorizontalThresh = 105;
 	LePageWatcher.prototype.tableHorizontalThresh = 101.5;
@@ -2124,31 +2150,52 @@
 	LePageWatcher.prototype.linePrecision = 2;
 	
 	LePageWatcher.prototype.addFrame = function(frame){
-		this.frames[frame.id] = frame;		
+		this.frames.push(frame);
+		if(frame.bottom > this.bottomLine){
+			this.bottomLine = frame.bottom;
+		}
 	};
 	LePageWatcher.prototype.frameChanged = function(frame){
 		this.evaluatePosition();
-		var offset = 0;
+		var moved, bot = frame.bottom, frames = [frame];
 		for(var i=0; i < this.frames.length; i++){
 			if(frame.id != this.frames[i].id){
-				this.frames[i].move(frame);
-				/*
-				if(offset == 0){
-					offset = this.frames[i].getNeededOffset(frame);
+				moved = this.frames[i].move(frames);
+				if(moved){
+					frames.push(this.frames[i]);
 				}
-				if(offset != 0){
-					this.frames[i].moveTop(offset);
-					frame = this.frames[i];
-					offset = 0;
-				}
-				*/
+				bot = Math.max(bot, this.frames[i].bottom);
+			}
+		}
+		this.checkHeight(bot);
+	};
+	LePageWatcher.prototype.checkHeight = function(newBottom){
+		if((newBottom + this.bottomDist) > this.initHeight){
+			this.height = newBottom + this.bottomDist;
+			this.bottom = this.top + this.height;
+			this.node.style.height = this.height + "px";
+			if(!this.hasOwnProperty("overshoot")){
+				this.overshoot = document.createElement("div");
+				this.overshoot.className = this.namespace+"-overshoot";
+				this.overshoot.style.position = "absolute";
+				this.overshoot.style.left = "0";
+				this.overshoot.style.right = "0";
+				this.overshoot.style.bottom = "0";
+				this.overshoot.style.top = this.initHeight+"px";
+				this.overshoot.style.backgroundColor = this.pageOvershootBkgColor;
+				this.node.insertBefore(this.overshoot, this.node.firstChild);
+			}
+		} else {
+			if(this.hasOwnProperty("overshoot")){
+				this.node.removeChild(this.overshoot);
+				delete this.overshoot;
 			}
 		}
 	};
 	LePageWatcher.prototype.removeFrames = function(){
 		for(var i=0; i < this.frames.length; i++){
 			this.frames[i].remove();
-		}
+		} 
 		delete this.frames;
 	};
 	// static helper API to add the watcher for all pages
@@ -2224,6 +2271,16 @@
 			this.observer.disconnect();
 		}
 	};
+	LePageWatcherFrame.prototype.calculateOffsets = function(frames){
+		var off = 0, o, i;
+		for(i = 0;  i < frames.length; i++){
+			o = this.getNeededOffset(frames[i]);
+			if(o != 0){
+				off = (off == 0) ? o : Math.max(off, o);
+			}
+		}
+		return off;
+	};
 	LePageWatcherFrame.prototype.getNeededOffset = function(frame){
 		// rotated frames are not moved as they are regarded as fixed elements of the page
 		if(this.rotated || this.initTop < frame.initBottom){
@@ -2235,10 +2292,6 @@
 				var minDist = Math.min(Math.abs(this.initTop - frame.initBottom), this.page.frameMinVerticalDistance);
 				// we don't want to get more to the top than our initial position
 				var newTop = Math.max((frame.bottom + minDist), this.initTop);
-				// limit the movement to not let the elements disappear
-				if(newTop + this.height > this.page.height){
-					newTop = this.page.height - this.height;
-				}
 				if(newTop != this.top){
 					return newTop - this.top;
 				}
@@ -2246,17 +2299,21 @@
 		}
 		return 0;
 	};
-	LePageWatcherFrame.prototype.moveTop = function(offset){
+	LePageWatcherFrame.prototype.moveVertically = function(offset){
 		// rotated frames are not moved as they are regarded as fixed elements of the page
 		this.top += offset;
+		this.oldBottom = this.bottom; // needed do detect a frame moved back to a position "behind the boundries"
+		this.bottom += offset;
 		offset = (this.top - this.initTop) + this.cssTop;
 		this.node.style.top = String(Math.round(offset * this.page.linePrecision) / this.page.linePrecision)+"px";
 	};
-	LePageWatcherFrame.prototype.move = function(frame){
-		var offset = this.getNeededOffset(frame);
+	LePageWatcherFrame.prototype.move = function(frames){
+		var offset = this.calculateOffsets(frames);
 		if(offset != 0){
-			this.moveTop(offset);
+			this.moveVertically(offset);
+			return true;
 		}
+		return false;
 	};
 	LePageWatcherFrame.prototype.changed = function(mutations){
 		for(var i=0; i < mutations.length; i++){
