@@ -425,7 +425,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               dataIndex: 'segmentCount',
               stateId:'segmentCount',
               filter: {
-                  type: 'number'
+                  type: 'numeric'
               },
               text: me.text_cols.segmentCount
           },{

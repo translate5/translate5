@@ -216,6 +216,11 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     replacedSegmentsIndex:[],
     
+    /***
+     * Required search parametars (must contain value)
+     */
+    requiredParams:['searchInField','searchField','searchType'],
+    
     strings:{
         searchInfoMessage:'#UT#Die Suche wird nur auf den gefilterten Segmenten durchgeführt',
         comboFieldLabel:'#UT#Ersetzen',
@@ -839,6 +844,12 @@ Ext.define('Editor.controller.SearchReplace', {
 
         //get the search parametars (with filter and sort included)
         params=me.getSearchReplaceParams();
+        
+        //validate the required params
+        if(!me.searchParamValidator(params)){
+        	activeTab.isValid();
+        	return;
+        }
         
         Ext.Ajax.request({
             url: Editor.data.restpath+'segment/search',
@@ -1784,7 +1795,24 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     updateSegmentsFinishCount:function(value){
     	Editor.app.getController('Segments').updateSegmentFinishCountViewModel(value);
-    }
+    },
+
+    /***
+     * Validate the required search parametars
+     */
+    searchParamValidator:function(params){
+    	var me=this,
+    		isValid=true;
+    	
+    	for(var i=0;i<me.requiredParams.length;i++){
+    		var p=me.requiredParams[i];
+    		if(!params[p] || params[p]==""){
+    			isValid=false;
+    			break;
+    		}
+    	}
+    	return isValid;
+    },
 
 });
     
