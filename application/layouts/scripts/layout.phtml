@@ -44,7 +44,7 @@ $menu = $config->runtimeOptions->content->mainMenu;
 
 
 function renderMenu ($menu, $additionalAttributes = '') {
-    if (is_null($menu)) {
+    if (is_null($menu) || empty($menu)) {
         return false;
     }
     
