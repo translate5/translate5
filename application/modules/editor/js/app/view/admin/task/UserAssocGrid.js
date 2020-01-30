@@ -43,7 +43,10 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
       save: '#UT#Änderungen speichern',
       reload: '#UT#Aktualisieren',
-      cancel: '#UT#Abbrechen'
+      cancel: '#UT#Abbrechen',
+      assignmentDateLable:'#UT#Zuweisung',
+      finishedDateLabel:'#UT#Abgeschlossen',
+      deadlineDateLable:'#UT#Deadline'
   },
   viewConfig: {
       loadMask: false
@@ -83,7 +86,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           text: me.strings.userGuidCol
       },{
           xtype: 'gridcolumn',
-          width: 160,
+          width: 100,
           dataIndex: 'role',
           renderer: function(v) {
               var vm = this.lookupViewModel();
@@ -99,6 +102,21 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               return vm.get('workflowMetadata').states[v];
           },
           text: me.strings.stateCol
+      },{
+          xtype: 'datecolumn',
+          width: 90,
+          dataIndex: 'assignmentDate',
+          text: me.strings.assignmentDateLable
+      },{
+          xtype: 'datecolumn',
+          width: 90,
+          dataIndex: 'finishedDate',
+          text: me.strings.finishedDateLabel
+      },{
+          xtype: 'datecolumn',
+          width: 90,
+          dataIndex: 'deadlineDate',
+          text: me.strings.deadlineDateLable
       }],
       dockedItems: [{
           xtype: 'toolbar',

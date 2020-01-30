@@ -38,7 +38,8 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       btnCancel: '#UT#Abbrechen',
       formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
       formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
-      editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!'
+      editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
+      fieldDeadline:'#UT#Deadline'
   },
   viewModel: {
       type: 'taskuserassoc'
@@ -46,7 +47,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   layout: {
       type: 'border'
   },
-  title: '#UT#Benutzer zu Aufgabe zuordnen',
+  title: '#UT#Benutzer',
   
   initConfig: function(instanceConfig) {
     var me = this,
@@ -121,6 +122,12 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   bind: {
                       store: '{states}'
                   }
+              },{
+            	  xtype: 'datefield',
+            	  name: 'deadlineDate',
+            	  fieldLabel: me.strings.fieldDeadline,
+            	  submitFormat: Editor.DATE_ISO_FORMAT,
+                  anchor: '100%'
               }],
               dockedItems: [{
                   xtype: 'toolbar',

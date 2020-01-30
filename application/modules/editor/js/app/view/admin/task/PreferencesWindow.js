@@ -78,9 +78,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
 
-        if(auth.isAllowed('editorEditTaskRealDeliveryDate') || 
-            auth.isAllowed('editorEditTaskOrderDate') || 
-            auth.isAllowed('editorEditTaskPm') || 
+        if(auth.isAllowed('editorEditTaskPm') || 
             auth.isAllowed('editorEditTaskDeliveryDate') ||
             auth.isAllowed('editorEditTaskTaskName')||
             auth.isAllowed('editorEditTaskEdit100PercentMatch')){

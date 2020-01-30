@@ -30,7 +30,8 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.editorAdminTaskFilterFilterWindow',
     requires: [
-    	'Editor.view.admin.task.filter.FilterWindowViewController'
+        'Editor.view.admin.task.filter.FilterWindowViewController',
+        'Editor.view.admin.task.filter.DateFilter'
 	],
     controller: 'editorAdminTaskFilterFilterWindow',
     itemId: 'editorAdminTaskFilterFilterWindow',
@@ -42,11 +43,14 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     	cancelBtn:'#UT#Abbrechen',
     	title: '#UT#Erweiterte Filter',
     	anonymizedUsersInfo:'#UT#Anonymisierte Benutzer nicht auswählbar',
-    	gridFiltersInfo:'#UT#Weitere Filter im Kopf jeder Spalte'
+        gridFiltersInfo:'#UT#Weitere Filter im Kopf jeder Spalte',
+        assignmentDateText:'#UT#Benutzer-Zuweisungsdatum',
+        finishedDateText:'#UT#Benutzer-Abschlussdatum',
+        deadlineDateText:'#UT#Benutzer-Deadline/s'
     },
     autoScroll: true,
-    height: 430,
-    width: 500,
+    height: 600,
+    width: 600,
     bodyPadding:15,
     initConfig: function(instanceConfig) {
         var me = this,
@@ -104,6 +108,24 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
                 	type:'list',
                 	textLabel:me.strings.workflowUserRoleLabel
                 }
+            },{
+                xtype:'editorAdminTaskFilterDateFilter',
+                filterLabel:me.strings.assignmentDateText,
+                filterProperty:'assignmentDate',
+                itemId:'assignmentDate',
+                title:me.strings.assignmentDateText,
+            },{
+                xtype:'editorAdminTaskFilterDateFilter',
+                filterLabel:me.strings.finishedDateText,
+                filterProperty:'finishedDate',
+                itemId:'finishedDate',
+                title:me.strings.finishedDateText,
+            },{
+                xtype:'editorAdminTaskFilterDateFilter',
+                filterLabel:me.strings.deadlineDateText,
+                filterProperty:'deadlineDate',
+                itemId:'deadlineDate',
+                title:me.strings.deadlineDateText,
             }],
             dockedItems: [{
                 xtype: 'toolbar',
@@ -163,7 +185,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     	Ext.each(record, function(rec) {
     		field=me.down('#'+rec.get('property'));
     		if(field){
-    			field.setValue(rec.get('value'));
+    			field.setValue(rec.get('value'),rec);
     		}
         });
     }

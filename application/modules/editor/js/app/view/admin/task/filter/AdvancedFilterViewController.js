@@ -45,7 +45,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
     	if(theFilter){
     		theFilter.setActive(false);
     	}else{
-    		taskStore.removeFilter(record.get('property'));
+    		taskStore.removeFilter(record.get('property')+record.get('operator'));
     	}
     	taskGrid.resumeEvents('filterchange');
     },
@@ -77,13 +77,14 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
 			var tmpFilter={
 					operator:record.operator,
 	            	property:record.property,
-	            	value:record.value
+	            	value:record.value,
+	            	type:record.type
 			};
 			
 			//find the advanced filter in the active filters
 			var filteredIndex=null, 
 				filtered=Ext.Array.filter(filtersarray,function(item,index){
-					if(item.get('property')==tmpFilter.property){
+					if((item.get('property')+item.get('operator'))==(tmpFilter.property+tmpFilter.operator)){
 						filteredIndex=index;
 						return true
 					}

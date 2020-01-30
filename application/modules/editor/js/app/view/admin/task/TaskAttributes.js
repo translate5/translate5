@@ -37,8 +37,6 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         taskName:'#UT#Aufgabenname',
         customerName:'#UT#Kunde',
         deliveryDate:'#UT#Lieferdatum (soll)',
-        realDeliveryDate:'#UT#Lieferdatum (ist)',
-        orderDate:'#UT#Bestelldatum',
         pmGuid:'#UT#Projektmanager',
         btnSave: '#UT#Speichern',
         successUpdate:'#UT#Die Aufgabe wurde erfolgreich aktualisiert',
@@ -166,27 +164,6 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             xtype: 'displayfield',
             renderer: dateRenderer
         }));
-        
-        items.push(me.applyIfNotAllowed({
-            xtype: 'datefield',
-            fieldLabel: me.strings.realDeliveryDate,
-            name:'realDeliveryDate',
-            itemId:'realDeliveryDate'
-        },'editorEditTaskRealDeliveryDate',{
-            xtype: 'displayfield',
-            renderer: dateRenderer
-        }));
-        
-        items.push(me.applyIfNotAllowed({
-            xtype: 'datefield',
-            fieldLabel: me.strings.orderDate,
-            name:'orderdate',
-            itemId:'orderdate'
-        },'editorEditTaskOrderDate',{
-            xtype: 'displayfield',
-            renderer: dateRenderer
-        }));
-        
         
         //is the user allowed to edit the Edit100PercentMatch
         items.push(me.applyIfNotAllowed({

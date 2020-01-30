@@ -46,7 +46,10 @@ Ext.define('Editor.model.admin.TaskUserAssoc', {
     {name: 'state', type: 'string'},
     {name: 'role', type: 'string'},
     {name: 'deletable', type: 'boolean'},
-    {name: 'editable', type: 'boolean'}
+    {name: 'editable', type: 'boolean'},
+    {name: 'assignmentDate', type: 'date',dateFormat: Editor.DATE_ISO_FORMAT},
+    {name: 'finishedDate', type: 'date',dateFormat: Editor.DATE_ISO_FORMAT},
+    {name: 'deadlineDate', type: 'date',dateFormat: Editor.DATE_ISO_FORMAT}
   ],
   validators: {
       taskGuid: 'presence',
