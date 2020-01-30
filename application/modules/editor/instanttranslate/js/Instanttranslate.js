@@ -99,7 +99,6 @@ function setfileUploadLanguageCombinationsAvailable() {
             languageResourceToCheck = Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId];
             // If the LanguageResources is an MT resource, we store all the language-combinations it can handle.
             if (languageResourceToCheck.fileUpload) {
-                console.log('LanguageResource for file-upload found: ' + languageResourceToCheck.name + ' (' + languageResourceToCheck.serviceName + ')'); // TODO remove console.log
                 languageResourceToCheckAllSources = languageResourceToCheck.source;
                 $.each(languageResourceToCheckAllSources, function(indexS) {
                     languageResourceToCheckAllTargets = languageResourceToCheck.target;
@@ -115,7 +114,6 @@ function setfileUploadLanguageCombinationsAvailable() {
             }
         }
     }
-    console.dir(fileUploadLanguageCombinationsAvailable);  // TODO remove console.log
 }
 /**
  * Is fileUpload available for the current language-combination?
@@ -641,9 +639,10 @@ function renderTermStatusIcon(termStatus){
  */
 function requestFileTranslate(){
     
-    alert('AT WORK');
-    stopLoadingState();
-    return;
+    //alert('AT WORK');
+    //stopLoadingState();
+    //return;
+    
     // TODO: 
     // automatically create a hidden task for the document
     // pre-translate it against the available language resources for the language combination for the customer in the same way pre-translations work for tasks through the GUI (first termCollections, second TMs, third MTs)
@@ -653,14 +652,13 @@ function requestFileTranslate(){
     // Create a formdata object and add the files
     var data = new FormData(),
         ext=getFileExtension(),
-        languageCombination = $("#sourceLocale").val()+','+$("#targetLocale").val(),
-        dataForLanguageCombination = fileTypesAllowedAndAvailable[languageCombination];
+        languageCombination = $("#sourceLocale").val()+','+$("#targetLocale").val();
     
     $.each(uploadedFiles, function(key, value){
         data.append(key, value);
     });
 
-    data.append('domainCode', dataForLanguageCombination['domainCode']); // TODO
+    //data.append('domainCode', dataForLanguageCombination['domainCode']); // TODO (IP: to do WHAT??)
     data.append('source', $("#sourceLocale").val());
     data.append('target', $("#targetLocale").val());
     
@@ -681,6 +679,7 @@ function requestFileTranslate(){
             }else{
                 // Handle errors here
                 showSourceError('ERRORS: ' + data.error);
+                $('#sourceFile').val('');
                 stopLoadingState();
             }
         },
@@ -688,6 +687,7 @@ function requestFileTranslate(){
         {
             // Handle errors here
             showSourceError('ERRORS: ' + textStatus);
+            $('#sourceFile').val('');
             stopLoadingState();
         }
     });
@@ -698,7 +698,7 @@ function requestFileTranslate(){
  * @param fileId
  * @returns
  */
-function getDownloadUrl(fileId){
+function getDownloadUrl(fileId){ // TODO: change to file from task-export
     $.ajax({
         statusCode: {
             500: function() {
