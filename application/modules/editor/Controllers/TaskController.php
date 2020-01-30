@@ -119,6 +119,15 @@ class editor_TaskController extends ZfExtended_RestController {
             ],
             'userState' => [
                 'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+            ],
+            'assignmentDate' => [
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'assignmentDate', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+            ],
+            'finishedDate' => [
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'finishedDate', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+            ],
+            'deadlineDate' => [
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'deadlineDate', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
             ]
         ];
         
@@ -224,7 +233,7 @@ class editor_TaskController extends ZfExtended_RestController {
     public function indexAction() {
         //set default sort
         $f = $this->entity->getFilter();
-        $f->hasSort() || $f->addSort('orderdate', true);
+        $f->hasSort() || $f->addSort('id', true);
         
         $rows = $this->loadAllWithUserData();
         $this->view->rows = $rows;
@@ -239,7 +248,7 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function  kpiAction() {
         $f = $this->entity->getFilter();
-        $f->hasSort() || $f->addSort('orderdate', true);
+        $f->hasSort() || $f->addSort('id', true);
         $rows = $this->loadAll();
         
         $kpi = ZfExtended_Factory::get('editor_Models_KPI');
@@ -1130,6 +1139,11 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!$disableWorkflowEvents) {
             $this->workflow->triggerBeforeEvents($oldUserTaskAssoc, $userTaskAssoc);
         }
+        //set the finished date when the user finishes a role
+        if($userTaskAssoc->getState()==editor_Workflow_Abstract::STATE_FINISH){
+            $userTaskAssoc->setFinishedDate(NOW_ISO);
+        }
+        
         $userTaskAssoc->save();
         
         if(!$disableWorkflowEvents) {
@@ -1343,8 +1357,6 @@ class editor_TaskController extends ZfExtended_RestController {
         $fieldToRight = [
             'taskName' => 'editorEditTaskTaskName',
             'targetDeliveryDate' => 'editorEditTaskDeliveryDate',
-            'realDeliveryDate' => 'editorEditTaskRealDeliveryDate',
-            'orderdate' => 'editorEditTaskOrderDate',
             'pmGuid' => 'editorEditTaskPm',
             'pmName' => 'editorEditTaskPm',
         ];

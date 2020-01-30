@@ -3668,6 +3668,13 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='WndlaXRlcyBMZWt0b3JhdA=='><source>Zweites Lektorat</source><target>Second Review</target></trans-unit>
 <trans-unit id='QXVmZ2FiZW5zdGF0dXM='><source>Aufgabenstatus</source><target>Task status</target></trans-unit>
 <trans-unit id='TWVpbiBKb2ItU3RhdHVz'><source>Mein Job-Status</source><target>My job status</target></trans-unit>
+<trans-unit id='WnV3ZWlzdW5n'><source>Zuweisung</source><target>Assignment</target></trans-unit>
+<trans-unit id='QWJnZXNjaGxvc3Nlbg=='><source>Abgeschlossen</source><target>Finished</target></trans-unit>
+<trans-unit id='RGVhZGxpbmU='><source>Deadline</source><target>Deadline</target></trans-unit>
+<trans-unit id='TWVpbmUgRGVhZGxpbmU='><source>Meine Deadline</source><target>My job deadline</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItWnV3ZWlzdW5nc2RhdHVt'><source>Benutzer-Zuweisungsdatum</source><target>Assignment date of user/s</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItQWJzY2hsdXNzZGF0dW0='><source>Benutzer-Abschlussdatum</source><target>Finish date of user/s</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItRGVhZGxpbmUvcw=='><source>Benutzer-Deadline/s</source><target>Deadline of user/s</target></trans-unit>
 </body>
   </file>
 </xliff>

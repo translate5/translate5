@@ -274,7 +274,6 @@ class editor_CheckController extends editor_TaskController {
         $this->setParam('taskNr',  $this->entity->getTaskNr());
         $this->setParam('sourceLang',  $this->entity->getSourceLang());
         $this->setParam('targetLang',  $this->entity->getTargetLang());
-        $this->setParam('orderdate',  $this->entity->getOrderdate());
         $this->setParam('targetDeliveryDate',  $this->entity->getTargetDeliveryDate());
         $this->setParam('wordCount',  $this->entity->getWordCount());
         $this->setParam('lockLocked',  $this->entity->getLockLocked());

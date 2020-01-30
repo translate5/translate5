@@ -52,6 +52,12 @@ END LICENSE AND COPYRIGHT
  * @method void setIsPmOverride() setIsPmOverride(bool $isPmOverride)
  * @method string getStaticAuthHash() getStaticAuthHash()
  * @method void setStaticAuthHash() setStaticAuthHash(string $hash)
+ * @method string getAssignmentDate() getAssignmentDate()
+ * @method void setAssignmentDate() setAssignmentDate(string $assignment)
+ * @method string getFinishedDate() getFinishedDate()
+ * @method void setFinishedDate() setFinishedDate(string $datetime)
+ * @method string getDeadlineDate() getDeadlineDate()
+ * @method void setDeadlineDate() setDeadlineDate(string $datetime)
  * 
  */
 class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
@@ -450,5 +456,10 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     public function getSummary() {
         $stmt = $this->db->getAdapter()->query('select state, role, usedstate, count(*) jobCount from LEK_taskUserAssoc group by state,role, usedstate');
         return $stmt->fetchAll();
+    }
+    
+    public function updateReviewersFinishDate(string $taskGuid,string $date){
+        $this->db->update(['finishedDate'=>$date],
+            ['taskGuid=?' => $taskGuid,'role=?' => editor_Workflow_Abstract::ROLE_REVIEWER]);
     }
 }

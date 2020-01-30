@@ -182,8 +182,6 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
                     $customer->load($task['customerId']);
                     $value = $customer->getName();
                     break;
-                case 'orderdate':
-                case 'realDeliveryDate':
                 case 'targetDeliveryDate':
                     $format = Zend_Locale_Format::getDateFormat();
                     $date = new Zend_Date($task[$colName], Zend_Date::ISO_8601);
