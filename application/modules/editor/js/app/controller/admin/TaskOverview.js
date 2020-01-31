@@ -132,7 +132,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskImportButtonText:'#UT#Aufgabe importieren',
       taskDeleteButtonText:'#UT#Aufgabe löschen',
       averageProcessingTimeLabel: '#UT#Ø Bearbeitungszeit Lektor',
-      excelExportUsageLabel: '#UT#Excel-Export Nutzung'
+      excelExportUsageLabel: '#UT#Excel-Export Nutzung',
+      averageProcessingTimeTranslatorLabel: '#UT#Ø Bearbeitungszeit Übersetzer',
+      averageProcessingTimeSecondTranslatorLabel: '#UT#Ø Bearbeitungszeit Überprüfung durch Übersetzer'
   },
   listen: {
       store: {
@@ -586,14 +588,19 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           params: params,
           success: function(response){
               var resp = Ext.util.JSON.decode(response.responseText),
-                  averageProcessingTimeMessage,
+                  averageProcessingTimeMessage=[],
                   excelExportUsageMessage;
+              
+              
               // KPI: averageProcessingTime
-              averageProcessingTimeMessage = me.strings.averageProcessingTimeLabel + ': ' + resp.averageProcessingTime;
+              averageProcessingTimeMessage.push(me.strings.averageProcessingTimeTranslatorLabel + ': ' + resp.averageProcessingTimeTranslator)
+              averageProcessingTimeMessage.push(me.strings.averageProcessingTimeLabel + ': ' + resp.averageProcessingTime);
+              averageProcessingTimeMessage.push(me.strings.averageProcessingTimeSecondTranslatorLabel + ': ' + resp.averageProcessingTimeSecondTranslator)
+              
               // KPI: excelExportUsage
               excelExportUsageMessage = resp.excelExportUsage + ' ' + me.strings.excelExportUsageLabel;
               // update fields and stop loading-icon
-              me.getAverageProcessingTimeDisplay().update(averageProcessingTimeMessage);
+              me.getAverageProcessingTimeDisplay().update(averageProcessingTimeMessage.join('</br>'));
               me.getExcelExportUsageDisplay().update(excelExportUsageMessage);
               win.setLoading(false);
           },
