@@ -70,6 +70,8 @@ class editor_Models_KPI {
     public function getStatistics() {
         $statistics = [];
         $statistics['averageProcessingTime'] = $this->getAverageProcessingTime();
+        $statistics['averageProcessingTimeTranslator'] = 10;//TODO: collect all in one query
+        $statistics['averageProcessingTimeSecondTranslator'] = 10;
         $statistics['excelExportUsage'] = $this->getExcelExportUsage();
         return $statistics;
     }
@@ -90,6 +92,13 @@ class editor_Models_KPI {
         }
         $average = '-';
         $allProcessingTimes = [];
+        
+        $taskGuids=array_column($this->tasks,'taskGuid');
+        
+        $assoc=ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $assoc editor_Models_TaskUserAssoc  */
+        $assoc->loadByTaskGuidList($taskGuids);
+        //TODO: use the assoc to do calculations: see the notes in TODOS-1455
         
         // If this is will ever be needed for showing the taskGrid, we should not
         // iterate through all filtered tasks, but change to pure SQL such as:

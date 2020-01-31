@@ -247,8 +247,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * limit accordingly (= for all filtered tasks: no limit).
      */
     public function  kpiAction() {
-        $f = $this->entity->getFilter();
-        $f->hasSort() || $f->addSort('id', true);
         $rows = $this->loadAll();
         
         $kpi = ZfExtended_Factory::get('editor_Models_KPI');
@@ -257,7 +255,10 @@ class editor_TaskController extends ZfExtended_RestController {
         $kpiStatistics = $kpi->getStatistics();
         
         // For Front-End:
+        $this->view->averageProcessingTimeTranslator = $kpiStatistics['averageProcessingTimeTranslator'];
         $this->view->averageProcessingTime = $kpiStatistics['averageProcessingTime'];
+        $this->view->averageProcessingTimeSecondTranslator = $kpiStatistics['averageProcessingTimeSecondTranslator'];
+        
         $this->view->excelExportUsage = $kpiStatistics['excelExportUsage'];
         
         // ... or as Metadata-Excel-Export (= task-overview, filter, key performance indicators KPI):

@@ -68,4 +68,13 @@ ALTER TABLE `LEK_task` DROP COLUMN `realDeliveryDate`;
 INSERT INTO `LEK_workflow_action` (`workflow`,`trigger`,`inStep`,`byRole`,`userState`,`actionClass`,`action`,`parameters`,`position`)
 VALUES 
 ('default', 'doCronDaily', null, null, null, 'editor_Plugins_Miele_Notification', 'notifyOverdueDeadline', '{"daysOffset": 2}', 0);
+
+
+ALTER TABLE `LEK_workflow_action` 
+ADD COLUMN `description` VARCHAR(1024) NULL COMMENT 'contains a human readable description for the row' AFTER `position`;
+
+UPDATE `LEK_workflow_action` SET `description`='For the separate delivery date of every role a reminder mail is send by the translate5 cronController. How much days before the deadline a reminder will be send is defined in the parameters column. Example of 2 days before deadline reminder: {\"daysOffset\": 2}' 
+WHERE `action`='notifyOverdueDeadline';
+
+
   

@@ -466,7 +466,9 @@ Ext.define('Editor.controller.Localizer', {
             taskImportButtonText:'<?php echo $this->translate->_('Aufgabe importieren');?>',
             taskDeleteButtonText:'<?php echo $this->translate->_('Aufgabe löschen');?>',
             averageProcessingTimeLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Lektor');?>',
-            excelExportUsageLabel: '<?php echo $this->translate->_('Excel-Export Nutzung');?>'
+            excelExportUsageLabel: '<?php echo $this->translate->_('Excel-Export Nutzung');?>',
+            averageProcessingTimeTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Übersetzer');?>',
+            averageProcessingTimeSecondTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Überprüfung durch Übersetzer');?>',
         },
         confirmStrings: {
             "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -561,7 +563,8 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             closeBtn: '<?php echo $this->translate->_('Fenster schließen');?>',
             averageProcessingTimeToolTip: '<?php echo $this->translate->_('Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.');?>',
-            excelExportUsageToolTip: '<?php echo $this->translate->_('Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.');?>'
+            excelExportUsageToolTip: '<?php echo $this->translate->_('Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.');?>',
+            filterInfoLabel: '<?php echo $this->translate->_('Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.');?>'
         }
     });
     
