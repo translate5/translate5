@@ -89,8 +89,10 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           width: 100,
           dataIndex: 'role',
           renderer: function(v) {
-              var vm = this.lookupViewModel();
-              return vm.get('workflowMetadata').roles[v] || v;
+              var vm = this.lookupViewModel(),
+              	vfm=vm.get('workflowMetadata'),
+              	role=(vfm.roles && vfm.roles[v]) || v;
+              return role;
           },
           text: me.strings.roleCol
       },{
