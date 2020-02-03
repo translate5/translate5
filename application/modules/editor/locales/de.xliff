@@ -1724,6 +1724,11 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnNldHplcg=='><source>Ø Bearbeitungszeit Übersetzer</source><target>Ø Bearbeitungszeit Übersetzer</target></trans-unit>
 <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnByw7xmdW5nIGR1cmNoIMOcYmVyc2V0emVy'><source>Ø Bearbeitungszeit Überprüfung durch Übersetzer</source><target>Ø Bearbeitungszeit Überprüfung durch Übersetzer</target></trans-unit>
 <trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdGVuIGJlemllaGVuIHNpY2ggYXVmIGRpZSBaZWl0ZW4gaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcu'><source>Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.</source><target>Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.</target></trans-unit>
+<trans-unit id='e2hlYWRlcn0KRGllc2UgZW1haWwgaXN0IGVpbmUgRXJpbm5lcnVuZywgZGFzcyBzaWNoIGRpZSAiRGVhZGxpbmUiIDxiPntkZWFkbGluZURhdGV9PC9iPiBmw7xyIGRpZSBBdWZnYWJlIDxiPiJ7dGFza05hbWV9IjwvYj4gbsOkaGVydC4Ke2Zvb3Rlcn0='><source>{header}
+Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> für die Aufgabe <b>"{taskName}"</b> nähert.
+{footer}</source><target>{header}
+Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> für die Aufgabe <b>"{taskName}"</b> nähert.
+{footer}</target></trans-unit>
   </body>
  </file>
 </xliff>

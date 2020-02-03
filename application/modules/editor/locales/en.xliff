@@ -3678,6 +3678,13 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnNldHplcg=='><source>Ø Bearbeitungszeit Übersetzer</source><target>Ø Processing time translator</target></trans-unit>
 <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnByw7xmdW5nIGR1cmNoIMOcYmVyc2V0emVy'><source>Ø Bearbeitungszeit Überprüfung durch Übersetzer</source><target>Ø Processing time "Check by translator"</target></trans-unit>
 <trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdGVuIGJlemllaGVuIHNpY2ggYXVmIGRpZSBaZWl0ZW4gaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcu'><source>Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.</source><target>Average times refer to all times in the current filter set.</target></trans-unit>
+
+<trans-unit id='e2hlYWRlcn0KRGllc2UgZW1haWwgaXN0IGVpbmUgRXJpbm5lcnVuZywgZGFzcyBzaWNoIGRpZSAiRGVhZGxpbmUiIDxiPntkZWFkbGluZURhdGV9PC9iPiBmw7xyIGRpZSBBdWZnYWJlIDxiPiJ7dGFza05hbWV9IjwvYj4gbsOkaGVydC4Ke2Zvb3Rlcn0='><source>{header}
+Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> für die Aufgabe <b>"{taskName}"</b> nähert.
+{footer}</source><target>{header}
+This email is a reminder that the "Deadline" <b>{deadlineDate}</b> for task <b>"{taskName}"</b> is approaching.
+{footer}</target></trans-unit>
+
 </body>
   </file>
 </xliff>

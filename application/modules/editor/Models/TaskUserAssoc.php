@@ -439,6 +439,28 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         return $this->db->fetchAll($s)->toArray();
     }
     
+    /***
+     * Load the Key Point Indicators data for the given taskGuids and states
+     * @param array $taskGuids
+     * @param array $states
+     * @return array
+     */
+    public function loadKpiData(array $taskGuids,array $states=[]){
+        if(empty($taskGuids)){
+            return [];
+        }
+        //if the states are not set uset the default states for kpi
+        if(empty($states)){
+            $states=[editor_Workflow_Abstract::ROLE_REVIEWER,editor_Workflow_Abstract::ROLE_TRANSLATOR,editor_Workflow_Abstract::ROLE_TRANSLATORCHECK];
+        }
+        $s = $this->db->select()
+        ->where('taskGuid IN(?)', $taskGuids)
+        ->where('role IN (?)',$states)
+        ->where('assignmentDate IS NOT NULL')
+        ->where('finishedDate IS NOT NULL');
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
     /**
      * calculates a random GUID and sets it as staticAuthHash
      */

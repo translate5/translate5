@@ -32,6 +32,10 @@ END LICENSE AND COPYRIGHT
  */
 class KpiTest extends \ZfExtended_Test_ApiTestcase {
     
+    const KPI_REVIEWER='averageProcessingTimeReviewer';
+    const KPI_TRANSLATOR='averageProcessingTimeTranslator';
+    const KPI_TRANSLATOR_CHECK='averageProcessingTimeSecondTranslator';
+    
     /**
      * What our tasknames start with (e.g.for creating and filtering tasks).
      * @var string
@@ -55,19 +59,23 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
      */
     protected static $taskIds = [];
     
-    /**
-     * KPI average processing time: task-property for startdate
-     * TODO: With TRANSLATE-1455, change this to: assigned
-     * @var string
+    /***
+     * Task id to taskUserAssoc id map
+     * @var array
      */
-    protected $taskStartDate = 'orderdate';
+    protected static $taskUserAssocMap=[];
     
     /**
-     * KPI average processing time: task-property for enddate
-     * TODO: With TRANSLATE-1455, change this to: review delivered
+     * KPI average processing time: taskUserAssoc-property for startdate
      * @var string
      */
-    protected $taskEndDate = 'realDeliveryDate';
+    protected $taskStartDate = 'assignmentDate';
+    
+    /**
+     * KPI average processing time: taskUserAssoc-property for enddate
+     * @var string
+     */
+    protected $taskEndDate = 'finishedDate';
     
     /**
      * @var string contains the file name to the downloaded excel
@@ -132,6 +140,11 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         // store task-id for later deleting
         $task = $this->api()->getTask();
         self::$taskIds[$taskNameSuffix] = $task->id;
+        
+        //add user to the task
+        $tua=$this->api()->addUser('testlector');
+        
+        self::$taskUserAssocMap[$task->id]=$tua->id;
     }
     
     /**
@@ -163,7 +176,8 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         $startDate->sub(new DateInterval($interval_spec));
         $startDate = $startDate->format('Y-m-d H:i:s');
         $taskId = self::$taskIds[$taskNameSuffix];
-        $this->api()->requestJson('editor/task/'.$taskId, 'PUT', array($this->taskStartDate => $startDate, $this->taskEndDate => $endDate));
+        $assocId=self::$taskUserAssocMap[$taskId];
+        $this->api()->requestJson('editor/taskuserassoc/'.$assocId, 'PUT', [$this->taskStartDate => $startDate, $this->taskEndDate => $endDate]);
     }
     
     /**
@@ -182,9 +196,9 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
         // but these translations are not available here (are they?)
         $search = array("days", "Tage", " ");
         $replace = array("", "", "");
-        $result->averageProcessingTime = str_replace($search, $replace, $result->averageProcessingTime);
-        
-        $this->assertEquals($result->averageProcessingTime, $statistics['averageProcessingTime']);
+        $result->{self::KPI_REVIEWER} = str_replace($search, $replace, $result->{self::KPI_REVIEWER});
+        //test only for reviewer (for all ther roles will be the same)
+        $this->assertEquals($result->{self::KPI_REVIEWER}, $statistics[self::KPI_REVIEWER]);
         $this->assertEquals($result->excelExportUsage, $statistics['excelExportUsage']);
     }
     
@@ -232,7 +246,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
             $processingTimeInDays += $task['processingTimeInDays'];
         }
         $statistics = [];
-        $statistics['averageProcessingTime'] = (string)round($processingTimeInDays / $nrTasks, 0);
+        $statistics[self::KPI_REVIEWER] = (string)round($processingTimeInDays / $nrTasks, 0);
         $statistics['excelExportUsage'] = round((($nrExported / $nrTasks) * 100),2) . '%';
         return $statistics;
     }

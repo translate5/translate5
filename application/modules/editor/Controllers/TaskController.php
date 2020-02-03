@@ -255,9 +255,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $kpiStatistics = $kpi->getStatistics();
         
         // For Front-End:
-        $this->view->averageProcessingTimeTranslator = $kpiStatistics['averageProcessingTimeTranslator'];
-        $this->view->averageProcessingTime = $kpiStatistics['averageProcessingTime'];
-        $this->view->averageProcessingTimeSecondTranslator = $kpiStatistics['averageProcessingTimeSecondTranslator'];
+        $this->view->{$kpi::KPI_TRANSLATOR} = $kpiStatistics[$kpi::KPI_TRANSLATOR];
+        $this->view->{$kpi::KPI_REVIEWER}= $kpiStatistics[$kpi::KPI_REVIEWER];
+        $this->view->{$kpi::KPI_TRANSLATOR_CHECK} = $kpiStatistics[$kpi::KPI_TRANSLATOR_CHECK];
         
         $this->view->excelExportUsage = $kpiStatistics['excelExportUsage'];
         

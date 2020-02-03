@@ -31,7 +31,7 @@ $this->subject = $this->translate->_('Deadline-Erinnerung');
 $this->render('general.phtml');
 
 $template = '{header}
-This email is just a reminder that the deadline date <b>{deadlineDate}</b> for the task: <b>"{taskName}"</b> is nearing soon.
+Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> für die Aufgabe <b>"{taskName}"</b> nähert.
 {footer}';
 
 $this->textbody =$this->templateApply($template, [
