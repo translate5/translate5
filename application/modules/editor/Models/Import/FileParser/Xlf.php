@@ -789,11 +789,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             
             //we cut off and store the leading target tags for later insertion 
-            $leadingTags = $this->xmlparser->join(array_splice($targetChunksOriginal, 0, $this->startShiftCount));
+            $leadingTags = $this->internalTag->restore($this->xmlparser->join(array_splice($targetChunks, 0, $this->startShiftCount)));
             
             //we cut off and store the trailing target tags for later insertion 
             if($this->endShiftCount > 0) {
-                $trailingTags = $this->xmlparser->join(array_splice($targetChunksOriginal, -$this->endShiftCount));
+                $trailingTags = $this->internalTag->restore($this->xmlparser->join(array_splice($targetChunks, -$this->endShiftCount)));
             }
             else {
                 $trailingTags = '';
