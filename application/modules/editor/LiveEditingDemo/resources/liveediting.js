@@ -2365,6 +2365,6 @@
 })(window, document, jQuery);
 
 $(document).ready(function(){
-	window.leParser.init({ "devMode":true, "colorizeFrames":true, "showCellOverlays":false });
+	window.leParser.init({ "devMode":false, "colorizeFrames":false, "showCellOverlays":false });
 	window.leParser.buildAllPages();
 });

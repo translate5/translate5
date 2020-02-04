@@ -1,0 +1,6 @@
+/* classes must match leParser.namespace in liveediting.js ! */
+.t5lep-frm, .t5lep-rotfrm { position:absolute; z-index:11500; }
+.t5lep-frm table, .t5lep-frm tr { border:none; border-spacing:0; border-collapse:collapse; padding:0; }
+.t5lep-frm td { vertical-align:top; padding:0; }
+.t5lep-txt { box-sizing:border-box; }
+
