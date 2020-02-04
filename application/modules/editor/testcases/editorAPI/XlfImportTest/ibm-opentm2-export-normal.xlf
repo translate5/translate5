@@ -265,7 +265,7 @@
       
       <trans-unit id="13" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
           <source> <bpt id="1" rid="1" />f2-13 - tag encapsulated content should be imported without tags - if target has same tag structure<ept id="2" rid="1" /> </source>
-        <target><bpt id="1" rid="1" />f2-13 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - wenn das Target die gleiche Tag Struktur hat<ept id="2" rid="1" /> </target>
+        <target><bpt id="1" rid="1" />f2-13 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - wenn das Target die gleiche Tag Struktur hat<ept id="2" rid="1" /></target>
         <count-group name="word count">
           <count count-type="word count" unit="word">24</count>
         </count-group>
