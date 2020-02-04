@@ -288,7 +288,9 @@ class editor_TaskController extends ZfExtended_RestController {
     public function loadAll()
     {
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks'); 
+        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
+        //set the default table to lek_task
+        $this->entity->getFilter()->setDefaultTable('LEK_task');
         if($isAllowedToLoadAll) {
             $this->totalCount = $this->entity->getTotalCount();
             $rows = $this->entity->loadAll();

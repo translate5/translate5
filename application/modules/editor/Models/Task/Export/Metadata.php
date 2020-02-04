@@ -188,7 +188,7 @@ class editor_Models_Task_Export_Metadata {
      * @return string
      */
     protected function renderKpiAverageProcessingTime() : string {
-        $average = $this->getKpiValueByName('averageProcessingTime');
+        $average = $this->getKpiValueByName(editor_Models_KPI::KPI_REVIEWER);
         return $this->translate->_('Ø Bearbeitungszeit Lektor') . ': ' . $average;
     }
     
