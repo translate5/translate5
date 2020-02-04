@@ -30,7 +30,7 @@ Ext.define('Editor.view.admin.task.filter.DateFilter', {
 	extend:'Ext.form.FieldSet',
     alias: 'widget.editorAdminTaskFilterDateFilter',
 	columnWidth: 0.5,
-	defaults: {anchor: '100%'},
+	padding: 5,
 	layout: 'anchor',
 	title:null,//this should be set from the instance config
 	filterLabel:null,//this should be set from the instance config
@@ -71,7 +71,7 @@ Ext.define('Editor.view.admin.task.filter.DateFilter', {
 				xtype: 'datefield',
 				anchor: '100%',
 				fieldLabel: me.strings.eqText,
-				naitemIdme: 'eqDate',
+				itemId: 'eqDate',
 				filter:{
 					 operator: 'eq',
 					 property:instanceConfig.filterProperty,

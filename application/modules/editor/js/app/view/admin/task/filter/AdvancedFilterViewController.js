@@ -37,17 +37,15 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
     	var me=this,
     		taskGrid=me.getView().getFilterGrid(),
     		taskStore=Ext.StoreManager.get('admin.Tasks'),
-    		theFilter=taskGrid.getFilter(record.get('property'));
+    		theFilter=taskGrid.getFilter(record.get('property')),
+    		filterKey=record.get('property')+record.get('operator');
 
-    	//suspend the filterchange event so the load filters is not triggered
-    	taskGrid.suspendEvents('filterchange');
     	//it is default filter, disable with filter setActive
     	if(theFilter){
     		theFilter.setActive(false);
     	}else{
-    		taskStore.removeFilter(record.get('property')+record.get('operator'));
+    		taskStore.removeFilter(filterKey);
     	}
-    	taskGrid.resumeEvents('filterchange');
     },
     
     /***
