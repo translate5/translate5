@@ -1429,10 +1429,6 @@
     <source>Hilfe</source>
     <target>Help</target>
 </trans-unit>
-<trans-unit id='PHA+QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LjwvcD48cD5UcmFuc2xhdGU1IHdpcmQgenUgZGllc2VtIFplaXRwdW5rdCBrdXJ6ZnJpc3RpZyBuaWNodCBlcnJlaWNoYmFyIHNlaW4uPC9wPjxwPkdlcGxhbnRlciBaZWl0cHVua3Q6IHswfTwvcD4='>
-    <source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></source>
-    <target><p>Warning! Maintenance at the system will start shortly.</p><p>Translate5 will not be available in this time.</p><p>Scheduled date: {0}</p></target>
-</trans-unit>
 <trans-unit id='RXMgbMOkdWZ0IGVpbmUgV2FydHVuZw=='>
     <source>Es läuft eine Wartung</source>
     <target>Maintenance is in progress</target>
@@ -1625,10 +1621,6 @@
     <source>Tastaturkürzel nachschlagen</source>
     <target>Look up keyboard short-cuts</target>
 </trans-unit>
-<trans-unit id='SW4gS8O8cnplIHdpcmQgZWluZSBTeXN0ZW13YXJ0dW5nIGR1cmNoZ2Vmw7xocnQgd2VyZGVuLiBEaWUgQW53ZW5kdW5nIGlzdCBkYW5uIGbDvHIgZWluaWdlIFplaXQgZ2VzcGVycnQuIERhdHVtIHVuZCBVaHJ6ZWl0IGRlcyBTdGFydHMgZGVyIFN5c3RlbXdhcnR1bmc6ICVz'>
-    <source>In Kürze wird eine Systemwartung durchgeführt werden. Die Anwendung ist dann für einige Zeit gesperrt. Datum und Uhrzeit des Starts der Systemwartung: %s</source>
-    <target>Maintenance will start shortly. The application will then be locked for some time. Date and time of the maintenance start: %s</target>
-</trans-unit>
 <trans-unit id='U1RSRyArIEVJTkZHIChhbHRlcm5hdGl2IFNUUkcgKyAuIChQdW5rdCkpIGtvcGllcnQgZGVuIGtvbXBsZXR0ZW4gUXVlbGx0ZXh0IGluIGRlbiBaaWVsdGV4dDxiciAvPlNUUkcgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRlbiBlbnRzcHJlY2hlbmRlbiBUYWcgaW4gZGVuIFppZWx0ZXh0IChOdWxsIGVudHNwcmljaHQgVGFnIE5yLiAxMCk8YnIgLz5TVFJHICsgU0hJRlQgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRpZSBUYWdzIG1pdCBkZW4gTnVtbWVybiAxMSBiaXMgMjAgaW4gZGVuIFppZWx0ZXh0Lg=='>
     <source>STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source>
     <target>CTRL + INS (alternatively CTRL + . (period)) copies source to target.<br />CTRL + , (comma) + &gt;number&lt; copies corresponding tag to target (zero equals number 10)<br />CTRL + SHIFT + , (comma) + &gt;number&lt; copies tag numbers 11 to 20 to target.</target>
@@ -1640,10 +1632,6 @@
 <trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgKGtlaW4gUmV2aWV3KQ=='>
     <source>Übersetzungsaufgabe (kein Review)</source>
     <target>Translation job (no review)</target>
-</trans-unit>
-<trans-unit id='PHA+QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LjwvcD48cD5UcmFuc2xhdGU1IHdpcmQgYWIgZGllc2VtIFplaXRwdW5rdCBmw7xyIGt1cnplIFplaXQgbmljaHQgZXJyZWljaGJhciBzZWluLjwvcD48cD5HZXBsYW50ZXIgWmVpdHB1bmt0OiB7MH08L3A+'>
-    <source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></source>
-    <target><p>Warning! Maintenance will start shortly.</p><p>The application will then be locked for some time.</p><p>Date and time of the maintenance start: {0}</p></target>
 </trans-unit>
 <trans-unit id='QXVzIGRlbSBTZWdtZW50IHd1cmRlbiBuaWNodCBkYXJzdGVsbGJhcmUgWmVpY2hlbiBlbnRmZXJudCAobWVocmVyZSBMZWVyemVpY2hlbiwgVGFidWxhdG9yZW4sIFplaWxlbnVtYnLDvGNoZSBldGMuKSE='>
     <source>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</source>
@@ -3664,8 +3652,18 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.</source>
     <target>All assigned users of a workflow step can edit the task, but only one at a time.</target>
 </trans-unit>
-<trans-unit id='U2VnbWVudGFuemFobA=='><source>Segmentanzahl</source><target>Segment count</target></trans-unit>
-<trans-unit id='WndlaXRlcyBMZWt0b3JhdA=='><source>Zweites Lektorat</source><target>Second Review</target></trans-unit>
+<trans-unit id='U2VnbWVudGFuemFobA=='>
+    <source>Segmentanzahl</source>
+    <target>Segment count</target>
+</trans-unit>
+<trans-unit id='WndlaXRlcyBMZWt0b3JhdA=='>
+    <source>Zweites Lektorat</source>
+    <target>Second Review</target>
+</trans-unit>
+<trans-unit id='PHA+QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LjwvcD48cD5EaWUgQW53ZW5kdW5nIHdpcmQgYWIgZGllc2VtIFplaXRwdW5rdCBmw7xyIGt1cnplIFplaXQgbmljaHQgZXJyZWljaGJhciBzZWluLjwvcD48cD5HZXBsYW50ZXIgWmVpdHB1bmt0OiB7MH08L3A+'>
+    <source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Die Anwendung wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></source>
+    <target><p>Warning! Maintenance will start shortly.</p><p>The application will then be locked for some time.</p><p>Date and time of the maintenance start:  {0}</p></target>
+</trans-unit>
 </body>
   </file>
 </xliff>
