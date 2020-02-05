@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -15,8 +14,9 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -26,18 +26,5 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * NEC-TM Exception
- */
-class editor_Plugins_NecTm_Exception extends ZfExtended_ErrorCodeException {
-    /**
-     * @var string
-     */
-    protected $domain = 'plugin.nectm';
-    
-    static protected $localErrorCodes = [
-        'E1162' => 'NEC-TM Plug-In: Exception',
-        'E1182' => 'NEC-TM Plug-In: The languages for the Nec-TM-LanguageResource differ from the languages of the segment.',
-        'E1183' => 'NEC-TM Plug-In: Could not save segment to TM'
-    ];
-}
+ALTER TABLE `LEK_task_meta` 
+ADD COLUMN `mappingType` VARCHAR(45) NULL DEFAULT 'automatic';

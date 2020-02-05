@@ -369,6 +369,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $tmpName = $path['tmp_name'] ?? $path;
                 $fileName = $path['name'] ?? null;
                 
+                //save the imported tbx to the disc
+                $this->saveFileLocal($tmpName,$fileName);
+                
                 $this->xml = new XmlReader();
                 //$this->xml->open(self::getTbxPath($task));
                 $this->xml->open($tmpName, null, LIBXML_PARSEHUGE);
@@ -380,9 +383,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 }
                 
                 $this->xml->close();
-                
-                //save the imported tbx to the disc
-                $this->saveFileLocal($tmpName,$fileName);
                 
                 //update termcollection languages in the assoc table
                 $this->updateCollectionLanguage();
@@ -1100,6 +1100,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 			   
      */
     protected function setActualLevel(){
+        if($this->xml->name=='termEntry'){
+            //reset the actual level on each new termentry
+            //the actual level is relevant only inside the termentry
+            $this->actualLevel=[];
+        }
         if($this->isStartTag()){
             array_push($this->actualLevel, $this->xml->name);
             return;
@@ -1206,7 +1211,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      */
     private function handleTermDb(){
         $terms=$this->termModel->isUpdateTermForCollection($this->actualTermEntry,$this->actualTermIdTbx,$this->termCollection->getId());
-        
         //if term is found(should return single row since termId is unique)
         if($terms->count()>0){
             foreach ($terms as $t){
@@ -1261,6 +1265,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $tmpTermValue=$tmpTermValue[0];
                 
                 $this->termContainer['id']=$tmpTermValue['id'];
+                $this->termContainer['term']=$this->xml->readInnerXml();
                 $this->termContainer['language']=$tmpTermValue['language'];
                 $this->termContainer['definition']=$this->actualDefinition;
                 $this->termContainer['updated']=NOW_ISO;

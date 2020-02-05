@@ -97,16 +97,18 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
     
     protected function validateConfig() {
         $config = $this->getConfig()->toArray();
+        $logger = Zend_Registry::get('logger');
+        /* @var $logger ZfExtended_Logger */
         if(empty($config)) {
-            error_log("NEC-TM: No config given");
+            $logger->error('E1180', 'NEC-TM: No config given');
             return false;
         }
         if(empty($config['server'])) {
-            error_log("NEC-TM: No server config given");
+            $logger->error('E1180', 'NEC-TM: No server config given');
             return false;
         }
         if(empty($config['credentials']) || !is_array($config['credentials'])) {
-            error_log("NEC-TM: No credentials config given or is no array");
+            $logger->error('E1180', 'NEC-TM: No credentials config given or is no array');
             return false;
         }
         return true;
@@ -143,12 +145,14 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
     public function synchronizeNecTmCategories() {
         // Run the snych as worker to not block other processes, especially if the api-server is slow or even down.
         $worker = ZfExtended_Factory::get('editor_Plugins_NecTm_Worker');
+        /* @var $worker editor_Plugins_NecTm_Worker */
         $params=[
             'service' => $this->service
         ];
-        /* @var $worker editor_Plugins_NecTm_Worker */
         if (!$worker->init(NULL, $params)) {
-            $this->log->logError('NecTm-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            $logger = Zend_Registry::get('logger');
+            /* @var $logger ZfExtended_Logger */
+            $logger->error('E1180', 'NEC-TM: Worker could not be initialized');
             return;
         }
         $worker->queue();

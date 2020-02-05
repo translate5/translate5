@@ -42,12 +42,10 @@ END LICENSE AND COPYRIGHT
  * @method void setLabel() setLabel(string $label)
  * @method string getOriginalCategoryId() getOriginalCategoryId()
  * @method void setOriginalCategoryId() setOriginalCategoryId(string $originalCategoryId)
- * 
- * see ZfExtended_Models_Entity_Abstract:
- * - string getSpecificData() getSpecificData()
- * - void setSpecificData() setSpecificData(string $specificData)
  */
 class editor_Models_Categories extends ZfExtended_Models_Entity_Abstract {
+    use editor_Models_Entity_SpecificDataTrait;
+    
     protected $dbInstanceClass = 'editor_Models_Db_Categories';
     protected $validatorInstanceClass = 'editor_Models_Validator_Category';
     
