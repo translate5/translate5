@@ -218,9 +218,9 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
         /* @var $filetree editor_Models_Foldertree */
         
         $files = $filetree->getPaths($taskGuid, $filetree::TYPE_FILE );
-        $proofRead = $config->runtimeOptions->import->proofReadDirectory;
+        $review = $config->runtimeOptions->import->proofReadDirectory;
         foreach ( $files as $fileid => $file ) {
-            $files [$fileid] = trim ( str_replace ( '#!#' . $proofRead, '', '#!#' . $file ), '/\\' );
+            $files [$fileid] = trim ( str_replace ( '#!#' . $review, '', '#!#' . $file ), '/\\' );
         }
         return $files;
     }

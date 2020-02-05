@@ -157,14 +157,14 @@ class editor_Models_Import_Configuration {
     }
     
     /**
-     * Gibt den absoluten Pfad (inkl. Import Root) zum Verzeichnis mit den zu lektorierenden Dateien zurück, berücksichtigt die proofRead bzw. Relaissprachen Config
+     * Gibt den absoluten Pfad (inkl. Import Root) zum Verzeichnis mit den zu lektorierenden Dateien zurück, berücksichtigt die review bzw. Relaissprachen Config
      * @return string
      */
-    public function getProofReadDir() {
+    public function getReviewDir() {
         $config = Zend_Registry::get('config');
         $prefix = $this->importFolder;
-        $proofReadDir = $config->runtimeOptions->import->proofReadDirectory;
-        return $proofReadDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$proofReadDir; 
+        $reviewDir = $config->runtimeOptions->import->proofReadDirectory;
+        return $reviewDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$reviewDir; 
     }
     
     /**
@@ -228,13 +228,13 @@ class editor_Models_Import_Configuration {
             //The import root folder does not exist.
             throw new editor_Models_Import_ConfigurationException('E1038', ['folder' => $this->importFolder]);
         }
-        $data = ['proofRead' => basename($this->getProofReadDir())];
-        if(!is_dir($this->getProofReadDir())){
-            //The imported package did not contain a valid proofRead folder.
+        $data = ['review' => basename($this->getReviewDir())];
+        if(!is_dir($this->getReviewDir())){
+            //The imported package did not contain a valid review folder.
             throw new editor_Models_Import_ConfigurationException('E1039', $data);
         }
-        if(empty(glob($this->getProofReadDir().'/*'))){
-            //The imported package did not contain any files in the proofRead folder.
+        if(empty(glob($this->getReviewDir().'/*'))){
+            //The imported package did not contain any files in the review folder.
             throw new editor_Models_Import_ConfigurationException('E1040', $data);
         }
     }
