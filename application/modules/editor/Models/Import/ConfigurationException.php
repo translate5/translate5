@@ -41,7 +41,7 @@ class editor_Models_Import_ConfigurationException extends ZfExtended_ErrorCodeEx
         'E1036' => 'The given userGuid "{userGuid}" was not valid GUID.',
         'E1037' => 'The given userName "{userName}" was not valid user name.',
         'E1038' => 'The import root folder does not exist. Path "{folder}".',
-        'E1039' => 'The imported package did not contain a valid "{proofRead}" folder.',
-        'E1040' => 'The imported package did not contain any files in the "{proofRead}" folder.',
+        'E1039' => 'The imported package did not contain a valid "{review}" folder.',
+        'E1040' => 'The imported package did not contain any files in the "{review}" folder.',
     ];
 }

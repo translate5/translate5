@@ -403,7 +403,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             'pm' => $pm,
             'task' => $this->config->task,
             'associatedUsers' => $tuas,
-            //the disclaimer is needed only, if from one role multiple users are assigned. If it is only one proofreader then no dislaimer is needed
+            //the disclaimer is needed only, if from one role multiple users are assigned. If it is only one reviewer then no dislaimer is needed
             'addCompetitiveDisclaimer' => $aRoleOccursMultipleTimes && $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE
         ];
         
@@ -467,7 +467,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         ->from(array('tua' => 'LEK_taskUserAssoc'), ['taskGuid'])
         ->distinct()
         ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
-        ->where('tua.role = ?', editor_Workflow_Abstract::ROLE_LECTOR)
+        ->where('tua.role = ?', editor_Workflow_Abstract::ROLE_REVIEWER)
         ->where('tua.state != ?', editor_Workflow_Abstract::STATE_FINISH)
         ->where('t.state = ?', $task::STATE_OPEN)
         ->where('targetDeliveryDate = CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
@@ -478,7 +478,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $wf = $this->config->workflow;
         
-        $notifyRole=$wf::ROLE_LECTOR;
+        $notifyRole=$wf::ROLE_REVIEWER;
         if(isset($triggerConfig->receiverRole)){
             $notifyRole=$triggerConfig->receiverRole;
         }
@@ -500,21 +500,21 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             
             //if the receiverUser user is configured, send mail only to receiverUser
             if(isset($triggerConfig->receiverUser)){
-                $proofreaders=[(array)$user->getDataObject()];
+                $reviewers=[(array)$user->getDataObject()];
             }else{
                 //load only users with state open
-                $proofreaders = $tua->loadUsersOfTaskWithRole($oneTask['taskGuid'], $notifyRole, ['state'], editor_Models_Task::STATE_OPEN);
+                $reviewers = $tua->loadUsersOfTaskWithRole($oneTask['taskGuid'], $notifyRole, ['state'], editor_Models_Task::STATE_OPEN);
             }
             
             $params = [
                 'task' => $this->config->task,
-                'proofreaders' => $proofreaders,
+                'reviewers' => $reviewers,
             ];
             
-            foreach($proofreaders as $proofreader) {
+            foreach($reviewers as $reviewer) {
                 $this->createNotification($notifyRole, $template, $params);
                 $this->addCopyReceivers($triggerConfig, $notifyRole);
-                $this->notify($proofreader);
+                $this->notify($reviewer);
             }
         }
     }
@@ -747,7 +747,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             return $item;
         }, $segments);
         $segments = [];
-        $currentStep = 'lectoring';
+        $currentStep = 'reviewing';
         $params = array(
             'triggeringRole' => 'triggerROLE',
             'nextRole' => 'nextROLE',
@@ -770,7 +770,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
         //$this->addCopyReceivers($triggerConfig, $nextRole);
         $this->notify($user);
-        $this->createNotification('lector', 'notifyAllFinishOfARole', $params);
+        $this->createNotification('reviewer', 'notifyAllFinishOfARole', $params);
         $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
         //$this->addCopyReceivers($triggerConfig, $nextRole);
         $this->notify($user);

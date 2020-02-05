@@ -49,7 +49,7 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract {
    */
   protected $_paths = array();
   /**
-   * @var string prefix of the filepath, i. e. proofRead/ or relais/
+   * @var string prefix of the filepath, i. e. review/ or relais/
    */
   protected $_pathPrefix = NULL;
   

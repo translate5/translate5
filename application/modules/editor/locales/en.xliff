@@ -406,7 +406,7 @@
       </trans-unit>
       <trans-unit id="IMKyIFN5c3RlbXJvbGxlbiBiZXN0aW1tZW4gZGFyw7xiZXIsIHdlbGNoZSBSZWNodGUgaW0gU3lzdGVtIGVpbiBOdXR6ZXIgaGF0LiBEaWUgUm9sbGUgRWRpdG9yIGRhcmYgYXVmIGFsbGUgS29tcG9uZW50ZW4gZGVzIEVkaXRvcnMgenVncmVpZmVuLCBzb3dpZSBhdWYgZGllIEtvbXBvbmVudGVuIGRlciBBdWZnYWJlbsO8YmVyc2ljaHQsIGRpZSBmw7xyIGRhcyBFZGl0aWVyZW4gdm9uIEF1ZmdhYmVuIG7DtnRpZyBzaW5kLiBEaWUgUm9sbGUgUE0gZGFyZiBCZW51dHplciB2ZXJ3YWx0ZW4gdW5kIEJlbnV0emVyIEF1ZmdhYmVuIGltIFdvcmtmbG93IHp1d2Vpc2VuIG9kZXIgZW50emllaGVuLiBBY2h0dW5nOiBTeXN0ZW1yb2xsZW4gZMO8cmZlbiBuaWNodCBtaXQgV29ya2Zsb3dyb2xsZW4gd2llIExla3RvciBvZGVyIMOcYmVyc2V0emVyIHZlcndlY2hzZWx0IHdlcmRlbi4gQmVudXR6ZXIgZGllIGltIFdvcmtmbG93IEF1ZmdhYmVuIMO8YmVybmVobWVuIHNvbGxlbiBtw7xzc2VuIG1pbmRlc3RlbnMgZGllIFN5c3RlbXJvbGxlIEVkaXRvciBlcmhhbHRlbi4=">
         <source> &#xB2; Systemrollen bestimmen dar&#xFC;ber, welche Rechte im System ein Nutzer hat. Die Rolle Editor darf auf alle Komponenten des Editors zugreifen, sowie auf die Komponenten der Aufgaben&#xFC;bersicht, die f&#xFC;r das Editieren von Aufgaben n&#xF6;tig sind. Die Rolle PM darf Benutzer verwalten und Benutzer Aufgaben im Workflow zuweisen oder entziehen. Achtung: Systemrollen d&#xFC;rfen nicht mit Workflowrollen wie Lektor oder &#xDC;bersetzer verwechselt werden. Benutzer die im Workflow Aufgaben &#xFC;bernehmen sollen m&#xFC;ssen mindestens die Systemrolle Editor erhalten.</source>
-        <target> &#xB2; The system roles defines the access rights of the user. The role "editor" may access all components needed for proofreading. The role "PM" may access the user administration, and is allowed to associate users to tasks. Warning: System roles are not to be confused with workflow roles like "reviewer" and "translator". Users which are part of the workflow, have to get at least the system role "editor".</target>
+        <target> &#xB2; The system roles defines the access rights of the user. The role "editor" may access all components needed for reviewing. The role "PM" may access the user administration, and is allowed to associate users to tasks. Warning: System roles are not to be confused with workflow roles like "reviewer" and "translator". Users which are part of the workflow, have to get at least the system role "editor".</target>
       </trans-unit>
       <trans-unit id="IMKzIFdpcmQga2VpbiBQYXNzd29ydCBnZXNldHp0IGJla29tbXQgZGVyIEJlbnV0emVyIGF1dG9tYXRpc2NoIGVpbmUgRS1NYWlsIHp1ciBFcnN0ZWxsdW5nIGVpbmVzIFBhc3N3b3J0cy4=">
         <source> &#xB3; Wird kein Passwort gesetzt bekommt der Benutzer automatisch eine E-Mail zur Erstellung eines Passworts.</source>
@@ -1145,7 +1145,7 @@
 	  <target>Save anyway</target>
 	</trans-unit>
     <trans-unit id='RG9wcGVsa2xpY2sgYXVmIGRpZSBaZWlsZSDDvGJlcm5pbW10IGRpZXNlbiBNYXRjaCBpbiBkYXMgZ2XDtmZmbmV0ZSBTZWdtZW50Lg=='><source>Doppelklick auf die Zeile übernimmt diesen Match in das geöffnete Segment.</source><target>Doubleclick to take over the match into the opened segment.</target></trans-unit>
-        <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>With translate5 you can proofread SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis</target></trans-unit>
+        <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>With translate5 you can review SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis</target></trans-unit>
 
 <trans-unit id='VW50ZXJzdMO8dHp1bmcgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1'><source>Unterstützung der Entwicklung von translate5</source><target>Support of translate5 development</target></trans-unit>
 <trans-unit id='VW5zZXIgZ3Jvw59lciBEYW5rIGdlaHQgYW4gZGllIGZvbGdlbmRlbiBVbnRlcm5laG1lbiB1bmQgT3JnYW5pc2F0aW9uZW4uIFNpZSBmaW5hbnppZXJlbiBkaWUgRmVhdHVyZXMsIGRpZSBzaWUgdm9uIHRyYW5zbGF0ZTUgZXJ3YXJ0ZW4u'><source>Unser großer Dank geht an die folgenden Unternehmen und Organisationen. Sie finanzieren die Features, die sie von translate5 erwarten.</source><target>All of our gratitudes go to the following companies and organizations. They finance the features they expect from translate5.</target></trans-unit>
@@ -1742,9 +1742,9 @@
   <target>Reset password</target>
 </trans-unit>
 
-<trans-unit id='w5xiZXJzZXR6ZXIgKMOcYmVycHLDvGZ1bmcp'>
-    <source>Übersetzer (Überprüfung)</source>
-    <target>translator (check)</target>
+<trans-unit id='WndlaXRlciBMZWt0b3I='>
+	<source>Zweiter Lektor</source>
+	<target>Second Reviewer</target>
 </trans-unit>
 
 <trans-unit id='V29ya2Zsb3cgYWJnZXNjaGxvc3Nlbg=='>
@@ -2034,7 +2034,7 @@ to reset your password from the following address.
     <source>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></source>
     <target>The task <b>{task.taskNr} - {task.taskName}</b> was finished by all users of the role <i>{previousRole}</i> in the task-portal {portalLink}.<br /></target>
 </trans-unit>
-<trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgbnVuIGF1dG9tYXRpc2NoIGbDvHIgZGllIGZvbGdlbmRlbiBCZW51dHplciBpbiBkZXIgUm9sbGUgPGk+e25leHRSb2xlfTwvaT4gZnJlaWdlZ2ViZW46PGJyIC8+Cnt1c2VyTGlzdH08YnIgLz4KPGJyIC8+CkRpZSBCZW51dHplciB3dXJkZW4gcGVyIEUtTWFpbCBkYXLDvGJlciBpbmZvcm1pZXJ0LjxiciAvPgo8YnIgLz4='>
+<trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgbnVuIGF1dG9tYXRpc2NoIGbDvHIgZGllIGZvbGdlbmRlbiBCZW51dHplciBpbiBkZXIgUm9sbGUgPGk+e25leHRSb2xlfTwvaT4gZnJlaWdlZ2ViZW46PGJyIC8+Cnt1c2VyTGlzdH08YnIgLz4KRGllIEJlbnV0emVyIHd1cmRlbiBwZXIgRS1NYWlsIGRhcsO8YmVyIGluZm9ybWllcnQuPGJyIC8+CjxiciAvPg=='>
     <source>Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>{nextRole}</i> freigegeben:<br />
 {userList}<br />
 <br />
@@ -2126,23 +2126,23 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
 <target><b>Task:</b> {task.taskName}<br />
     <b>Source-language:</b> {sourceLanguageTranslated}<br />
     <b>Target-language:</b> {targetLanguageTranslated}<br />
-    {relaisLanguageFragment}<b>Expected proofreading delivery date:</b> {targetDeliveryDate}<br />
+    {relaisLanguageFragment}<b>Expected reviewing delivery date:</b> {targetDeliveryDate}<br />
     <b>Word-count:</b> {wordCount}<br /></target>
 </trans-unit>
 
-<trans-unit id='e2hlYWRlcn0KCkltIFByb2pla3Rwb3J0YWwge3BvcnRhbExpbmt9IHd1cmRlIElobmVuIGVpbmUgQXVmZ2FiZSB6dWdld2llc2VuLjxiciAvPgo8YnIgLz4KPGI+Um9sbGU6PC9iPiB7cm9sZX08YnIvPgp7dGFza0ZyYWdtZW50fXtwcm9vZnJlYWRlcnNGcmFnbWVudH17Zm9vdGVyfQ=='>
+<trans-unit id='e2hlYWRlcn0KCkltIFByb2pla3Rwb3J0YWwge3BvcnRhbExpbmt9IHd1cmRlIElobmVuIGVpbmUgQXVmZ2FiZSB6dWdld2llc2VuLjxiciAvPgo8YnIgLz4KPGI+Um9sbGU6PC9iPiB7cm9sZX08YnIvPgp7dGFza0ZyYWdtZW50fXtyZXZpZXdlcnNGcmFnbWVudH17Zm9vdGVyfQ=='>
     <source>{header}
 
 Im Projektportal {portalLink} wurde Ihnen eine Aufgabe zugewiesen.<br />
 <br />
 <b>Rolle:</b> {role}<br/>
-{taskFragment}{proofreadersFragment}{footer}</source>
+{taskFragment}{reviewersFragment}{footer}</source>
 <target>{header}
 
 A task was associated to you in the task-portal {portalLink}.<br />
 <br />
 <b>Role:</b> {role}<br/>
-{taskFragment}{proofreadersFragment}{footer}</target>
+{taskFragment}{reviewersFragment}{footer}</target>
 </trans-unit>
 <trans-unit id='Cjxici8+PGI+QWxsZSBkZXIgQXVmZ2FiZSB6dWdlb3JkbmV0ZW4gQmVudXR6ZXI6PC9iPgo8YnIvPg=='>
     <source>
@@ -3232,13 +3232,13 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.</source>
   <target>A pivot language was set, but in the import package was no pivot data.</target>
 </trans-unit>
-<trans-unit id='RGFzIGltcG9ydGllcnRlIFBha2V0IGJlaW5oYWx0ZXQga2VpbiBnw7xsdGlnZXMgIntwcm9vZlJlYWR9IiBWZXJ6ZWljaG5pcy4='>
-  <source>Das importierte Paket beinhaltet kein gültiges "{proofRead}" Verzeichnis.</source>
-  <target>The imported package did not contain a valid "{proofRead}" directory.</target>
+<trans-unit id='RGFzIGltcG9ydGllcnRlIFBha2V0IGJlaW5oYWx0ZXQga2VpbiBnw7xsdGlnZXMgIntyZXZpZXd9IiBWZXJ6ZWljaG5pcy4='>
+  <source>Das importierte Paket beinhaltet kein gültiges "{review}" Verzeichnis.</source>
+  <target>The imported package did not contain a valid "{review}" directory.</target>
 </trans-unit>
-<trans-unit id='RGFzIGltcG9ydGllcnRlIFBha2V0IGJlaW5oYWx0ZXQga2VpbmUgRGF0ZWllbiBpbSAie3Byb29mUmVhZH0iIFZlcnplaWNobmlzLg=='>
-  <source>Das importierte Paket beinhaltet keine Dateien im "{proofRead}" Verzeichnis.</source>
-  <target>The imported package did not contain valid data in the "{proofRead}" directory.</target>
+<trans-unit id='RGFzIGltcG9ydGllcnRlIFBha2V0IGJlaW5oYWx0ZXQga2VpbmUgRGF0ZWllbiBpbSAie3Jldmlld30iIFZlcnplaWNobmlzLg=='>
+  <source>Das importierte Paket beinhaltet keine Dateien im "{review}" Verzeichnis.</source>
+  <target>The imported package did not contain valid data in the "{review}" directory.</target>
 </trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dCwgdW5kIGthbm4gZGFoZXIgbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbi4='>
   <source>Die Aufgabe wird von einem Benutzer benutzt, und kann daher nicht gelöscht werden.</source>
@@ -3665,6 +3665,7 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <target>All assigned users of a workflow step can edit the task, but only one at a time.</target>
 </trans-unit>
 <trans-unit id='U2VnbWVudGFuemFobA=='><source>Segmentanzahl</source><target>Segment count</target></trans-unit>
+<trans-unit id='WndlaXRlcyBMZWt0b3JhdA=='><source>Zweites Lektorat</source><target>Second Review</target></trans-unit>
 </body>
   </file>
 </xliff>

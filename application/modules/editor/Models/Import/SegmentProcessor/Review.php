@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  * Stellt Methoden zur Verarbeitung der vom Parser ermittelteten Segment Daten bereit
  * - speichert die ermittelten Segment Daten als Segmente in die DB
  */
-class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Import_SegmentProcessor {
+class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_SegmentProcessor {
     /**
      * @var Zend_Db_Adapter_Mysqli
      */

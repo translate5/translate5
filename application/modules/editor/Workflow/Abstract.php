@@ -54,13 +54,13 @@ abstract class editor_Workflow_Abstract {
     const STATE_UNCONFIRMED = 'unconfirmed'; 
     
     const ROLE_TRANSLATOR = 'translator';
-    const ROLE_LECTOR = 'lector';
+    const ROLE_REVIEWER = 'reviewer';
     const ROLE_TRANSLATORCHECK = 'translatorCheck';
     const ROLE_VISITOR = 'visitor';
     
     const STEP_NO_WORKFLOW='no workflow';
     const STEP_TRANSLATION = 'translation';
-    const STEP_LECTORING = 'lectoring';
+    const STEP_REVIEWING = 'reviewing';
     const STEP_TRANSLATORCHECK = 'translatorCheck';
     const STEP_PM_CHECK = 'pmCheck';
     const STEP_WORKFLOW_ENDED = 'workflowEnded';
@@ -81,13 +81,13 @@ abstract class editor_Workflow_Abstract {
         'STATE_EDIT' => 'selbst in Arbeit', 
         'STATE_VIEW' => 'selbst geöffnet', 
         'ROLE_TRANSLATOR' => 'Übersetzer',
-        'ROLE_LECTOR' => 'Lektor',
-        'ROLE_TRANSLATORCHECK' => 'Übersetzer (Überprüfung)',
+        'ROLE_REVIEWER' => 'Lektor',
+        'ROLE_TRANSLATORCHECK' => 'Zweiter Lektor',
         'ROLE_VISITOR' => 'Besucher',
         'STEP_NO_WORKFLOW' => 'Kein Workflow',
         'STEP_TRANSLATION' => 'Übersetzung',
-        'STEP_LECTORING' => 'Lektorat',
-        'STEP_TRANSLATORCHECK' => 'Übersetzer Prüfung',
+        'STEP_REVIEWING' => 'Lektorat',
+        'STEP_TRANSLATORCHECK' => 'Zweites Lektorat',
         'STEP_PM_CHECK' => 'PM Prüfung',
         'STEP_WORKFLOW_ENDED' => 'Workflow abgeschlossen',
     );
@@ -156,7 +156,7 @@ abstract class editor_Workflow_Abstract {
      */
     protected $readableRoles = array(
         self::ROLE_VISITOR,
-        self::ROLE_LECTOR,
+        self::ROLE_REVIEWER,
         self::ROLE_TRANSLATOR,
         self::ROLE_TRANSLATORCHECK,
     );
@@ -165,7 +165,7 @@ abstract class editor_Workflow_Abstract {
      * @var array 
      */
     protected $writeableRoles = array(
-        self::ROLE_LECTOR,
+        self::ROLE_REVIEWER,
         self::ROLE_TRANSLATOR,
         self::ROLE_TRANSLATORCHECK,
     );
@@ -203,7 +203,7 @@ abstract class editor_Workflow_Abstract {
     protected $stepChain = array(
         self::STEP_NO_WORKFLOW,
         self::STEP_TRANSLATION,
-        self::STEP_LECTORING,
+        self::STEP_REVIEWING,
         self::STEP_TRANSLATORCHECK,
         self::STEP_WORKFLOW_ENDED,
     );
@@ -215,7 +215,7 @@ abstract class editor_Workflow_Abstract {
      */
     protected $steps2Roles = array(
         self::STEP_TRANSLATION => self::ROLE_TRANSLATOR,
-        self::STEP_LECTORING => self::ROLE_LECTOR,
+        self::STEP_REVIEWING => self::ROLE_REVIEWER,
         self::STEP_TRANSLATORCHECK => self::ROLE_TRANSLATORCHECK,
     );
     
@@ -228,22 +228,22 @@ abstract class editor_Workflow_Abstract {
     protected $validStates = [
         self::STEP_TRANSLATION => [
             self::ROLE_TRANSLATOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-            self::ROLE_LECTOR => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
+            self::ROLE_REVIEWER => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
             self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
         ],
-        self::STEP_LECTORING => [
+        self::STEP_REVIEWING => [
             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-            self::ROLE_LECTOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+            self::ROLE_REVIEWER => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
             self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
         ],
         self::STEP_TRANSLATORCHECK => [
             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-            self::ROLE_LECTOR => [self::STATE_FINISH],
+            self::ROLE_REVIEWER => [self::STATE_FINISH],
             self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
         ],
         self::STEP_WORKFLOW_ENDED => [
             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-            self::ROLE_LECTOR => [self::STATE_FINISH],
+            self::ROLE_REVIEWER => [self::STATE_FINISH],
             self::ROLE_TRANSLATORCHECK => [self::STATE_FINISH],
         ],
     ];
@@ -1012,7 +1012,7 @@ abstract class editor_Workflow_Abstract {
                 $hasRoleToCurrentStep = $hasRoleToCurrentStep || (($this->steps2Roles[$currentStep] ?? '') == $tua['role']);
             }
             //we can only return true, if the Tuas contain at least one role belonging to the currentStep, 
-            // in other words we can not reset the task to proofreading, if we do not have a proofreader
+            // in other words we can not reset the task to reviewing, if we do not have a reviewer
             return $hasRoleToCurrentStep;
         };
         
