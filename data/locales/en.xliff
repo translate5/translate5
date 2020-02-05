@@ -184,7 +184,7 @@
             </trans-unit>
             <trans-unit id="RWRpdG9yIFRpdGxl">
                 <source>Editor Title</source>
-                <target>translate5 proofreading editor</target>
+                <target>translate5 reviewing editor</target>
             </trans-unit>
             <trans-unit id="SmE=">
                 <source>Ja</source>
@@ -476,13 +476,13 @@
                 <source>Zip-Datei mit Import Daten</source>
                 <target>Zip folder with import files</target>
             </trans-unit>
-            <trans-unit id='cHJvb2ZSZWFkOiBWZXJ6ZWljaG5pcyBtaXQgenUgbGVrdG9yaWVyZW5kZW4gRGF0ZWllbg=='>
-                <source>proofRead: Verzeichnis mit zu lektorierenden Dateien</source>
-                <target>proofRead: Directory with files to proofread</target>
+            <trans-unit id='cmV2aWV3OiBWZXJ6ZWljaG5pcyBtaXQgenUgbGVrdG9yaWVyZW5kZW4gRGF0ZWllbg=='>
+                <source>review: Verzeichnis mit zu lektorierenden Dateien</source>
+                <target>review: Directory with files to review</target>
             </trans-unit>
-            <trans-unit id='RGllIFppcC1EYXRlaSBtdXNzIGVpbiBWZXJ6ZWljaG5pcyAicHJvb2ZSZWFkIiBlbnRoYWx0ZW4sIHdlbGNoZXMgbWVocmVyZSBTRExYTElGRiB1bmQgLyBvZGVyIENTVi1EYXRlaWVuIGluIGVpbmVyIGJlbGllYmlnZW4gVmVyemVpY2huaXNzdHJ1a3R1ciBiZWluaGFsdGVuIGthbm4uIENTVi0gdW5kIFNETFhMSUZGLURhdGVpZW4ga8O2bm5lbiBiZWxpZWJpZyBnZW1pc2NodCB3ZXJkZW4uIERpZSBTdHJ1a3R1ciB3aXJkIGltIExla3RvcmF0IGFiZ2ViaWxkZXQu'>
-                <source>Die Zip-Datei muss ein Verzeichnis "proofRead" enthalten, welches mehrere SDLXLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</source>
-                <target>The zip folder must include a directory called "proofRead", which can contain multiple SDLXLIFF and / or openTM2-XLIFF and / or CSV files in any directory structure. CSV, openTM2-XLIFF and SDLXLIFF files can be mixed up. The structure is depicted in editing.</target>
+            <trans-unit id='RGllIFppcC1EYXRlaSBtdXNzIGVpbiBWZXJ6ZWljaG5pcyAicmV2aWV3IiBlbnRoYWx0ZW4sIHdlbGNoZXMgbWVocmVyZSBTRExYTElGRiB1bmQgLyBvZGVyIENTVi1EYXRlaWVuIGluIGVpbmVyIGJlbGllYmlnZW4gVmVyemVpY2huaXNzdHJ1a3R1ciBiZWluaGFsdGVuIGthbm4uIENTVi0gdW5kIFNETFhMSUZGLURhdGVpZW4ga8O2bm5lbiBiZWxpZWJpZyBnZW1pc2NodCB3ZXJkZW4uIERpZSBTdHJ1a3R1ciB3aXJkIGltIExla3RvcmF0IGFiZ2ViaWxkZXQu'>
+                <source>Die Zip-Datei muss ein Verzeichnis "review" enthalten, welches mehrere SDLXLIFF und / oder CSV-Dateien in einer beliebigen Verzeichnisstruktur beinhalten kann. CSV- und SDLXLIFF-Dateien können beliebig gemischt werden. Die Struktur wird im Lektorat abgebildet.</source>
+                <target>The zip folder must include a directory called "review", which can contain multiple SDLXLIFF and / or openTM2-XLIFF and / or CSV files in any directory structure. CSV, openTM2-XLIFF and SDLXLIFF files can be mixed up. The structure is depicted in editing.</target>
             </trans-unit>
             <trans-unit id='U3RydWt0dXIgdm9uIENTVi1EYXRlaWVuIChmYWxscyBhbHMgTGVrdG9yYXRzcXVlbGxlIHZlcndlbmRldCk='>
                 <source>Struktur von CSV-Dateien (falls als Lektoratsquelle verwendet)</source>
@@ -516,9 +516,9 @@
                 <source>Relaissprache zur Verfügung stellen</source>
                 <target>Provide a relay (pivot) language</target>
             </trans-unit>
-            <trans-unit id='VmVyc3RlaHQgZGVyIExla3RvciBkaWUgQXVzZ2FuZ3NzcHJhY2hlIG5pY2h0IGthbm4gaWhtIGVpbmUgUmVsYWlzc3ByYWNoZSB6dXIgVmVyZsO8Z3VuZyBnZXN0ZWxsdCB3ZXJkZW4sIGRpZSBlciB2ZXJzdGVodCAoei4gQi4gRW5nbGlzY2gpLiBEYXp1IG11c3MgZGFzIHp1IGxla3RvcmllcmVuZGUgRG9rdW1lbnQgc3RydWt0dXJnbGVpY2ggYWxzIEVuZ2xpc2Now7xiZXJzZXR6dW5nIHZvcmxpZWdlbi4gRGllc2VzIG9kZXIgZGllc2Ugc3RydWt0dXJnbGVpY2hlbiBEb2t1bWVudGUgd2VyZGVuIGltIG9wdGlvbmFsZW4gVmVyemVpY2huaXMgInJlbGFpcyIgenVyIFZlcmbDvGd1bmcgZ2VzdGVsbHQuIERhYmVpIG11c3MgZGllIERhdGVpc3RydWt0dXIgaWRlbnRpc2NoIHp1IGRlbiBJbmhhbHRlbiBpbSAicHJvb2ZSZWFkIiBWZXJ6ZWljaG5pcyBzZWluLg=='>
-                <source>Versteht der Lektor die Ausgangssprache nicht kann ihm eine Relaissprache zur Verfügung gestellt werden, die er versteht (z. B. Englisch). Dazu muss das zu lektorierende Dokument strukturgleich als Englischübersetzung vorliegen. Dieses oder diese strukturgleichen Dokumente werden im optionalen Verzeichnis "relais" zur Verfügung gestellt. Dabei muss die Dateistruktur identisch zu den Inhalten im "proofRead" Verzeichnis sein.</source>
-                <target>A relay or pivot language (for example English) can be provided, if the editor doesn't understand the source language. Therefore the English translation must have the same structure as the proofreading document. The relay files have to be placed in the optional directory "relais". The file structure here must be identical to the contents in the "proofRead" directory.</target>
+            <trans-unit id='VmVyc3RlaHQgZGVyIExla3RvciBkaWUgQXVzZ2FuZ3NzcHJhY2hlIG5pY2h0IGthbm4gaWhtIGVpbmUgUmVsYWlzc3ByYWNoZSB6dXIgVmVyZsO8Z3VuZyBnZXN0ZWxsdCB3ZXJkZW4sIGRpZSBlciB2ZXJzdGVodCAoei4gQi4gRW5nbGlzY2gpLiBEYXp1IG11c3MgZGFzIHp1IGxla3RvcmllcmVuZGUgRG9rdW1lbnQgc3RydWt0dXJnbGVpY2ggYWxzIEVuZ2xpc2Now7xiZXJzZXR6dW5nIHZvcmxpZWdlbi4gRGllc2VzIG9kZXIgZGllc2Ugc3RydWt0dXJnbGVpY2hlbiBEb2t1bWVudGUgd2VyZGVuIGltIG9wdGlvbmFsZW4gVmVyemVpY2huaXMgInJlbGFpcyIgenVyIFZlcmbDvGd1bmcgZ2VzdGVsbHQuIERhYmVpIG11c3MgZGllIERhdGVpc3RydWt0dXIgaWRlbnRpc2NoIHp1IGRlbiBJbmhhbHRlbiBpbSAicmV2aWV3IiBWZXJ6ZWljaG5pcyBzZWluLg=='>
+                <source>Versteht der Lektor die Ausgangssprache nicht kann ihm eine Relaissprache zur Verfügung gestellt werden, die er versteht (z. B. Englisch). Dazu muss das zu lektorierende Dokument strukturgleich als Englischübersetzung vorliegen. Dieses oder diese strukturgleichen Dokumente werden im optionalen Verzeichnis "relais" zur Verfügung gestellt. Dabei muss die Dateistruktur identisch zu den Inhalten im "review" Verzeichnis sein.</source>
+                <target>A relay or pivot language (for example English) can be provided, if the editor doesn't understand the source language. Therefore the English translation must have the same structure as the reviewing document. The relay files have to be placed in the optional directory "relais". The file structure here must be identical to the contents in the "review" directory.</target>
             </trans-unit>
             <trans-unit id='UmVmZXJlbnpkYXRlaWVuIHp1ciBWZXJmw7xndW5nIHN0ZWxsZW4='>
                 <source>Referenzdateien zur Verfügung stellen</source>
@@ -532,9 +532,9 @@
                 <source>Dieses Verzeichnis ist zwingend n&#xF6;tig, und beinhaltet die zu lektorierenden Dateien.</source>
                 <target>This directory is mandatory and includes the files to be edited.</target>
             </trans-unit>
-            <trans-unit id="RGllc2VzIFZlcnplaWNobmlzIGlzdCBvcHRpb25hbCwgbXVzcyB3ZW5uIHZvcmhhbmRlbiBkaWUgZ2xlaWNoZSBEYXRlaXN0cnVrdHVyIHdpZSAicHJvb2ZSZWFkIiBhdWZ3ZWlzZW4=">
-                <source>Dieses Verzeichnis ist optional, muss wenn vorhanden die gleiche Dateistruktur wie "proofRead" aufweisen</source>
-                <target>This directory is optional, but if present must have the same file structure as "proofRead"</target>
+            <trans-unit id="RGllc2VzIFZlcnplaWNobmlzIGlzdCBvcHRpb25hbCwgbXVzcyB3ZW5uIHZvcmhhbmRlbiBkaWUgZ2xlaWNoZSBEYXRlaXN0cnVrdHVyIHdpZSAicmV2aWV3IiBhdWZ3ZWlzZW4=">
+                <source>Dieses Verzeichnis ist optional, muss wenn vorhanden die gleiche Dateistruktur wie "review" aufweisen</source>
+                <target>This directory is optional, but if present must have the same file structure as "review"</target>
             </trans-unit>
             <trans-unit id="b3B0aW9uYWxlIFRCWCBEYXRlaSBtaXQgVGVybWVuLCBkaWUgZXJzdGUgZ2VmdW5kZW4gVEJYIERhdGVpIHdpcmQgdmVyd2VuZGV0">
                 <source>optionale TBX Datei mit Termen, die erste gefunden TBX Datei wird verwendet</source>
@@ -806,7 +806,7 @@
             </trans-unit>
             <trans-unit id="TGVrdG9yYXQ=">
                 <source>Lektorat</source>
-                <target>Editing</target>
+                <target>Review</target>
             </trans-unit>
             <trans-unit id="enVyw7xjayB6dXIgw5xiZXJzaWNodA==">
                 <source>zur&#xFC;ck zur &#xDC;bersicht</source>
@@ -996,7 +996,7 @@
             </trans-unit>
             <trans-unit id='RGllIG9wdGlvbmFsZSBYTUwtRGF0ZWkgenVyIEtvbmZpZ3VyYXRpb24gZGVyIFFNLVN1YnNlZ21lbnQtS3JpdGVyaWVuIGJlc3RpbW10LCB3ZWxjaGUgUU0tU3Vic2VnbWVudCBGZWhsZXJrYXRlZ29yaWVuIHfDpGhyZW5kIGRlcyBMZWt0b3JhdHMgenVyIFZlcmbDvGd1bmcgc3RlaGVuLiBFaW5lIMO8YmVyZ2ViZW5lIERhdGVpIG11c3MgaW0gRm9ybWF0IGRlciBTdGFuZGFyZGRhdGVpIGVudHNwcmVjaGVuLCB3ZWxjaGUgJXNoaWVyIGFscyBCZXNwaWVsIGhlcnVudGVyZ2VsYWRlbiB3ZXJkZW4ga2FubiVzLiBXaXJkIGtlaW5lIERhdGVpIMO8YmVyZ2ViZW4sIHdpcmQgZGllIFN0YW5kYXJkLURhdGVpIHZlcndlbmRldC4g'>
                 <source>Die optionale XML-Datei zur Konfiguration der QM-Subsegment-Kriterien bestimmt, welche QM-Subsegment Fehlerkategorien während des Lektorats zur Verfügung stehen. Eine übergebene Datei muss im Format der Standarddatei entsprechen, welche %shier als Bespiel heruntergeladen werden kann%s. Wird keine Datei übergeben, wird die Standard-Datei verwendet. </source>
-                <target>The optional XML file to configure the QM subsegment criteria determines which QM subsegment error categories are available during the proofreading. A given file must be in the same format as the default file, which %scan be downloaded here as an example%s. If no file is given, the default file is used.</target>
+                <target>The optional XML file to configure the QM subsegment criteria determines which QM subsegment error categories are available during the reviewing. A given file must be in the same format as the default file, which %scan be downloaded here as an example%s. If no file is given, the default file is used.</target>
             </trans-unit>  
             <trans-unit id="T3B0aW9uYWxlIFhNTC1EYXRlaSB6dXIgS29uZmlndXJhdGlvbiBkZXIgUU0tU3Vic2VnbWVudCBLcml0ZXJpZW4gKEJlaXNwaWVsIDxhIGhyZWY9IiVzIiB0YXJnZXQ9Il9ibGFuayI+c2llaGUgaGllcjwvYT4pLg==">
                 <source>Optionale XML-Datei zur Konfiguration der QM-Subsegment Kriterien (Beispiel 
@@ -1174,7 +1174,7 @@ E-Mail: service@MittagQI.com</pre>
             </trans-unit>
             <trans-unit id="RGllIG9wdGlvbmFsZSBYTUwtRGF0ZWkgenVyIEtvbmZpZ3VyYXRpb24gZGVyIFFNLVN1YnNlZ21lbnQtS3JpdGVyaWVuIGJlc3RpbW10LCB3ZWxjaGUgUU0tU3Vic2VnbWVudCBGZWhsZXJrYXRlZ29yaWVuIHfDpGhyZW5kIGRlcyBMZWt0b3JhdHMgenVyIFZlcmbDvGd1bmcgc3RlaGVuLiBFaW5lIMO8YmVyZ2ViZW5lIERhdGVpIG11c3MgaW0gRm9ybWF0IGRlciBTdGFuZGFyZGRhdGVpIGVudHNwcmVjaGVuLCB3ZWxjaGUgPGEgaHJlZj0iJXMiIHRhcmdldD0iX2JsYW5rIj5oaWVyIGFscyBCZXNwaWVsIGhlcnVudGVyZ2VsYWRlbiB3ZXJkZW4ga2FubjwvYT4uIFdpcmQga2VpbmUgRGF0ZWkgw7xiZXJnZWJlbiwgd2lyZCBkaWUgU3RhbmRhcmQtRGF0ZWkgdmVyd2VuZGV0LiA=">
                 <source>Die optionale XML-Datei zur Konfiguration der QM-Subsegment-Kriterien bestimmt, welche QM-Subsegment Fehlerkategorien während des Lektorats zur Verfügung stehen. Eine übergebene Datei muss im Format der Standarddatei entsprechen, welche <a href="%s" target="_blank">hier als Bespiel heruntergeladen werden kann</a>. Wird keine Datei übergeben, wird die Standard-Datei verwendet.</source>
-                <target>The optional XML file for the configuration of the QM subsegment criteria determines which QM subsegment error categories are  available during the proofreading. A given file must be in the same format as the default file, which <a href="%s" target="_blank"> can be downloaded here as an example </a>. If no file is given, the default file is used.</target>
+                <target>The optional XML file for the configuration of the QM subsegment criteria determines which QM subsegment error categories are  available during the reviewing. A given file must be in the same format as the default file, which <a href="%s" target="_blank"> can be downloaded here as an example </a>. If no file is given, the default file is used.</target>
             </trans-unit>
             <trans-unit id="QmVpIEZyYWdlbiB6dSB0cmFuc2xhdGU1Og==">
                 <source>Bei Fragen zu translate5:</source>
@@ -1238,7 +1238,7 @@ E-Mail: service@MittagQI.com</pre>
             </trans-unit>
             <trans-unit id="dHJhbnNsYXRlNSAtIE9wZW4tU291cmNlLUxla3RvcmF0IGbDvHIgZGVuIEJyb3dzZXI=">
                 <source>translate5 - Open-Source-Lektorat für den Browser</source>
-                <target>translate5 - open source proofreading environment for the browser</target>
+                <target>translate5 - open source reviewing environment for the browser</target>
             </trans-unit>
             <trans-unit id="U3BvbnNlcmluZyB2b24gdHJhbnNsYXRlNQ==">
                 <source>Sponsering von translate5</source>
@@ -1254,12 +1254,12 @@ E-Mail: service@MittagQI.com</pre>
             </trans-unit>
             <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='>
                 <source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source>
-                <target>With translate5 you can proofread SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis.</target>
+                <target>With translate5 you can review SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis.</target>
             </trans-unit>
 
             <trans-unit id="dHJhbnNsYXRlNSBiaWV0ZXQgbW9kZXJuc3RlcyBkZXNrdG9wYXJ0aWdlcyBBcmJlaXRlbiBpbSBCcm93c2VyIG1pdCB2aWVsZW4gaW50ZXJlc3NhbnRlbiwgdGVpbHdlaXNlIGVpbnppZ2FydGlnZW4gRmVhdHVyZXMu">
                 <source>translate5 bietet modernstes desktopartiges Arbeiten im Browser mit vielen interessanten, teilweise einzigartigen Features.</source>
-                <target>translate5 offers a desktop-like, cutting-edge way of proofreading in the browser with lots of interesting, sometimes unique features.</target>
+                <target>translate5 offers a desktop-like, cutting-edge way of reviewing in the browser with lots of interesting, sometimes unique features.</target>
             </trans-unit>
             <trans-unit id="dHJhbnNsYXRlNSBpc3QgT3BlbiBTb3VyY2UgdW5kIGRhbWl0IGtvc3Rlbmxvc2UgU29mdHdhcmUu">
                 <source>translate5 ist Open Source und damit kostenlose Software.</source>
@@ -1349,8 +1349,8 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id="RWlubG9nZ2Vu"><source>Einloggen</source><target>Login</target></trans-unit>
 <trans-unit id="UGFzc3dvcnQgbmV1IHNldHplbg=="><source>Passwort neu setzen</source><target>Reset password</target></trans-unit>
 
-<trans-unit id="TGVrdG9y"><source>Lektor</source><target>proofreader</target></trans-unit>
-<trans-unit id="w5xiZXJzZXR6ZXI="><source>Übersetzer</source><target>translator</target></trans-unit>
+<trans-unit id="TGVrdG9y"><source>Lektor</source><target>Reviewer</target></trans-unit>
+<trans-unit id="w5xiZXJzZXR6ZXI="><source>Übersetzer</source><target>Translator</target></trans-unit>
 <trans-unit id="b2ZmZW4="><source>offen</source><target>open</target></trans-unit>
 <trans-unit id="d2FydGVuZA=="><source>wartend</source><target>waiting</target></trans-unit>
 <trans-unit id="YWJnZXNjaGxvc3Nlbg=="><source>abgeschlossen</source><target>finished</target></trans-unit>
