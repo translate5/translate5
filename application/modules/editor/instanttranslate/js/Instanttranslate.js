@@ -695,6 +695,12 @@ function downloadFile(url){
     } else {
         newTab.location = url;
     }
+    // TODO:
+    // Als Antwort zwei Möglichkeiten anbieten:
+    // - link zum übersetzten File (= PLUS delete task)
+    // - Cancel (= delete task)
+    // und bei window.close prüfen ob der Link da ist und dann ebenfalls task löschen
+    $('#sourceFile').val('');
     stopLoadingState();
     // TODO: cleanup (delete the task!) => user must either start the download or cancel the download!
 }
