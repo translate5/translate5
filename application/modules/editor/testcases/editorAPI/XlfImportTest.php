@@ -142,6 +142,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         
         //test editing of segments with preserved whitespace and segment length count
         $segments = $this->api()->requestJson('editor/segment?page=1&start=80&limit=6');
+        $segments = array_merge($segments, $this->api()->requestJson('editor/segment?page=1&start=106&limit=1'));
         foreach($segments as $idx => $segToEdit) {
             $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToEdit->source.' - edited', $segToEdit->id);
             $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
@@ -155,7 +156,6 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
         //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegmentsPreserveWhitespaceAfterEdit-new.json", json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegmentsPreserveWhitespaceAfterEdit.json'), $data, 'Imported segments are not as expected!');
-        
         
         $task = $this->api()->getTask();
         //start task export 
@@ -193,6 +193,16 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $task = $this->api()->getTask();
         //start task export 
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, '02-preserveWhitespace.xlf', 'preserveWhitespace-exporttest.xlf');
+    }
+    
+    /**
+     * check if the whitespace between mrk tags on the import are also exported again
+     * @depends testSegmentEditing
+     */
+    public function testIssueExports() {
+        $task = $this->api()->getTask();
+        //start task export 
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, '05-Translate1971-de-en.xlf', 'Translate1971-exporttest.xlf');
     }
     
     /**

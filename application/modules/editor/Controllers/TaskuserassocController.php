@@ -116,14 +116,13 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     protected function decodePutData() {
         parent::decodePutData();
-        if(array_key_exists('staticAuthHash', $this->data)) {
-            //may not be set from outside!
-            if(is_object($this->data)) {
-                unset($this->data->staticAuthHash);
-            }
-            else {
-                unset($this->data['staticAuthHash']);
-            }
+        //may not be set from outside!
+        if(is_object($this->data) && property_exists($this->data, 'staticAuthHash')) {
+            unset($this->data->staticAuthHash);
+            return;
+        }
+        if(is_array($this->data) && array_key_exists('staticAuthHash', $this->data)) {
+            unset($this->data['staticAuthHash']);
         }
     }
     

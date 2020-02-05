@@ -173,14 +173,16 @@ class editor_Models_Segment_MatchRateType {
     static protected $validTypes = array();
     
     /**
-     * @var ZfExtended_Log
+     * Error collector
+     * @var ZfExtended_Logger_DataCollection
      */
-    static protected $log;
-    
+    protected $errors = [];
     
     public function __construct() {
         self::initValidTypes();
-        self::initLog();
+        $this->errors = ZfExtended_Factory::get('ZfExtended_Logger_DataCollection', ['editor.import.matchratetype',[
+            'E1193' => 'File "{file}" contains unknown matchrate types. See details.' //FIXME ecode
+        ]]);
     }
     
     public function init(string $initialValue) {
@@ -200,15 +202,6 @@ class editor_Models_Segment_MatchRateType {
             if(substr($const, 0, 5) === 'TYPE_') {
                 self::$validTypes[$const] = $value;
             }
-        }
-    }
-    
-    /**
-     * inits the system logger
-     */
-    static protected function initLog() {
-        if(empty(self::$log)) {
-            self::$log = ZfExtended_Factory::get('ZfExtended_Log');
         }
     }
     
@@ -257,7 +250,7 @@ class editor_Models_Segment_MatchRateType {
         
         if(empty($value) || $this->isValidType($value) === false) {
             //logs the info when a unknown matchrate type:
-            self::$log->logError('The given matchrate type '.$value.' in Segment MID '.$mid.' is unknown!');
+            $this->errors->add('E1193', ['mid' => $mid, 'matchRateType' => $value]);
             $this->data[] = self::TYPE_UNKNOWN;
         }
         $this->data[] = $value;
@@ -407,5 +400,17 @@ class editor_Models_Segment_MatchRateType {
      */
     public function __toString() {
         return join(';', $this->data);
+    }
+    
+    /**
+     * logs the collected errors if any
+     * @param string $fileName
+     * @param editor_Models_Task $task
+     */
+    public function logErrors(string $fileName, editor_Models_Task $task) {
+        $this->errors->warn('E1193', [
+            'file' => $fileName,
+            'task' => $task,
+        ]);
     }
 }

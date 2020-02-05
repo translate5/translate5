@@ -1594,5 +1594,33 @@
         "targetEditToSort": "foo 3",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_106\":{\"nr\":\"106\",\"length\":{\"targetEdit\":5}}}}",
         "isWatched": false
+    },
+    {
+        "segmentNrInTask": "107",
+        "mid": "1_1",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
+        "userName": "lector test",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "matchRateType": "import;none",
+        "qmId": null,
+        "stateId": "0",
+        "autoStateId": "1",
+        "fileOrder": "4",
+        "comments": null,
+        "workflowStepNr": "1",
+        "workflowStep": "lectoring",
+        "source": "-",
+        "sourceMd5": "336d5ebc5436534e61d16e63ddfca327",
+        "sourceToSort": "-",
+        "target": "-",
+        "targetMd5": "336d5ebc5436534e61d16e63ddfca327",
+        "targetToSort": "-",
+        "targetEdit": "- - edited",
+        "targetEditToSort": "- - edited",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_107\":{\"nr\":\"107\",\"length\":{\"targetEdit\":10}}}}",
+        "isWatched": false,
+        "isFirstofFile": true
     }
 ]

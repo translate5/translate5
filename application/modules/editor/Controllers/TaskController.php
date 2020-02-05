@@ -455,6 +455,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         
+        //if the visual review mapping type is set, se the task meta data
+        if(isset($this->data['mappingType'])){
+            $meta = $this->entity->meta();
+            $meta->setMappingType($this->data['mappingType']);
+        }
+        
 //FIXME zusätzlich sollte die API mit einer customerNr umgehen können die dann zur customerId konvertiret wird
         if(empty($this->data['customerId'])){
             $this->entity->setDefaultCustomerId();

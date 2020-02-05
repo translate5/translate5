@@ -106,7 +106,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         $this->xmlparser->registerElement('mrk', function($tag, $attributes){
             //test transunits with mrk tags are disabledd in the test xlf!
-            $this->throwParseError('The trans-unit content contains MRK tags other than type=seg, which are currently not supported! Stop Import.');
+            //The trans-unit content contains MRK tags other than type=seg, which are currently not supported! Stop Import.
+            throw new editor_Models_Import_FileParser_Xlf_Exception('E1195', [
+                'file' => $this->filename,
+                'task' => $this->task,
+            ]);
         });
         
         //since phs may contain only <sub> elements we have to handle text only inside a ph
@@ -321,6 +325,18 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     public function handleText($text) {
         if(!$this->preserveWhitespace) {
             $text = preg_replace("/[ \t\n\r]+/u", ' ', $text);
+            if(is_null($text)) {
+                $errorMsg = array_flip(array_filter(get_defined_constants(true)['pcre'], function($item){
+                    return is_int($item);
+                }))[preg_last_error()] ?? 'Unknown Error';
+                
+                // Whitespace in text content can not be cleaned by preg_replace. Error Message: "{msg}". Stop Import.
+                throw new editor_Models_Import_FileParser_Xlf_Exception('E1196', [
+                    'file' => $this->filename,
+                    'task' => $this->task,
+                    'pregMsg' => $errorMsg
+                ]);
+            }
         }
         //we have to decode entities here, otherwise our generated XLF wont be valid
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters, 
@@ -412,15 +428,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             case 'ex':
             return;
         }
-        $this->throwParseError('The file contains '.$tag.' tags, which are currently not supported! Stop Import.');
-    }
-    
-    /**
-     * convenience method to throw exceptions
-     * @param string $msg
-     * @throws ZfExtended_Exception
-     */
-    protected function throwParseError($msg) {
-        throw new ZfExtended_Exception('Task: '.$this->task->getTaskGuid().'; File: '.$this->filename.': '.$msg);
+        // The file "{file}" contains "{tag}" tags, which are currently not supported! Stop Import.
+        throw new editor_Models_Import_FileParser_Xlf_Exception('E1194', [
+            'file' => $this->filename,
+            'task' => $this->task,
+            'tag' => $tag
+        ]);
     }
 }

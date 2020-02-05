@@ -546,7 +546,7 @@ class Task extends Channel {
             'connectionId' => $connectionId,
         ]));
         
-        $idx = array_search($sessionId, $this->taskToSessionMap[$task['taskGuid']] ?? '');
+        $idx = array_search($sessionId, $this->taskToSessionMap[$task['taskGuid']] ?? []);
         if($idx !== false) {
             unset($this->taskToSessionMap[$task['taskGuid']][$idx]);
         }
@@ -659,11 +659,11 @@ class Task extends Channel {
      */
     protected function findConnection(string $connectionId, string $sessionId): ?ConnectionInterface {
         $conn = $this->instance->getConnection($connectionId);
-        if(!isset($conn->openedTask)) {
-            $conn->openedTask = '';
-        }
         //the session must match too, otherwise the connectionId was spoofed
-        if(!empty($conn) && $conn->sessionId === $sessionId) {
+        if(!empty($conn) && isset($conn->sessionId) && $conn->sessionId === $sessionId) {
+            if(!isset($conn->openedTask)) {
+                $conn->openedTask = '';
+            }
             return $conn;
         }
         return null;
