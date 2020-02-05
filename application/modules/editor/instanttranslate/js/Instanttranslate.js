@@ -638,17 +638,6 @@ function renderTermStatusIcon(termStatus){
  * @returns
  */
 function requestFileTranslate(){
-    
-    //alert('AT WORK');
-    //stopLoadingState();
-    //return;
-    
-    // TODO: 
-    // automatically create a hidden task for the document
-    // pre-translate it against the available language resources for the language combination for the customer in the same way pre-translations work for tasks through the GUI (first termCollections, second TMs, third MTs)
-    // When the document is pre-translated, we will offer it for download (as is done already with sdl languageCloud
-
-
     // Create a formdata object and add the files
     var data = new FormData(),
         ext=getFileExtension(),
@@ -658,7 +647,7 @@ function requestFileTranslate(){
         data.append(key, value);
     });
 
-    //data.append('domainCode', dataForLanguageCombination['domainCode']); // TODO (IP: to do WHAT??)
+    //data.append('domainCode', dataForLanguageCombination['domainCode']); // TODO (to do WHAT??)
     data.append('source', $("#sourceLocale").val());
     data.append('target', $("#targetLocale").val());
     
@@ -674,11 +663,12 @@ function requestFileTranslate(){
         processData: false, // Don't process the files
         contentType: false, // Set content type to false as jQuery will tell the server its a query string request
         success: function(data, textStatus, jqXHR){
-            if(typeof data.error === 'undefined'){
-                getDownloadUrl(data.fileId);
+            if(typeof data.error === 'undefined' && data.downloadUrl !== ''){
+                downloadFile(data.downloadUrl);
             }else{
                 // Handle errors here
-                showSourceError('ERRORS: ' + data.error);
+                var error = (data.downloadUrl === '') ? 'Error in task-Import.' : data.error; // TODO translations
+                showSourceError('ERRORS: ' + error);
                 $('#sourceFile').val('');
                 stopLoadingState();
             }
@@ -694,50 +684,19 @@ function requestFileTranslate(){
 }
 
 /***
- * Request a download url for given sdl file id
- * @param fileId
- * @returns
- */
-function getDownloadUrl(fileId){ // TODO: change to file from task-export
-    $.ajax({
-        statusCode: {
-            500: function() {
-                hideTranslations();
-                showLanguageResourceSelectorError('serverErrorMsg500');
-                }
-        },
-        url: Editor.data.restpath+"instanttranslateapi/url",
-        dataType: "json",
-        data: {
-            'fileId':fileId
-        },
-        success: function(result){
-            //when no url from server is provided, the file is not ready yet
-            if(result.downloadUrl==""){
-                setTimeout(function(){ getDownloadUrl(fileId); }, 1000);
-                return;
-            }
-            downloadFile(result.downloadUrl);
-        }
-    });
-}
-
-/***
- * Download the file from the sdl url.
+ * Download the file (= currently: export the task).
  * @param url
  * @returns
  */
 function downloadFile(url){
-    var hasFileExt=getFileExtension()!="",
-        fullFileName=hasFileExt ? getFileName():(getFileName()+"."+getFileExtension()),
-        newTab = window.open("about:blank", "translatedFile"),
-        newTabHref = Editor.data.restpath+"instanttranslateapi/download?fileName="+fullFileName+"&url="+url;
+    var newTab = window.open("about:blank", "translatedFile");
     if(newTab == null) { // window.open does not work in Chrome
-        window.location.href = newTabHref;
+        window.location.href = url;
     } else {
-        newTab.location = newTabHref;
+        newTab.location = url;
     }
     stopLoadingState();
+    // TODO: cleanup (delete the task!) => user must either start the download or cancel the download!
 }
 
 
