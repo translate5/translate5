@@ -157,6 +157,12 @@ class Models_Installer_Standalone {
             $this->maintenanceMode();
             exit;
         }
+        if(!empty($this->options['announceMaintenance'])) {
+            $this->addZendToIncludePath();
+            $this->initApplication();
+            $this->maintenanceMode();
+            exit;
+        }
         if(!empty($this->options['dbOnly'])) {
             $this->addZendToIncludePath();
             $this->initApplication();
@@ -205,7 +211,13 @@ class Models_Installer_Standalone {
     
     protected function maintenanceMode() {
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Maintenance.php';
+        //FIXME currently no possibility to set only the message (without a date) - which is possible in the GUI so far
         $maintenance = new Models_Installer_Maintenance();
+        if(!empty($this->options['announceMaintenance'])) {
+            $maintenance->announce($this->options['announceMaintenance'], $this->options['announceMessage']);
+            //FIXME in future set the maintenance here too
+            return;
+        }
         switch ($this->options['maintenance']) {
             case '0':
             case 'false':
@@ -220,7 +232,7 @@ class Models_Installer_Standalone {
                 break;
             
             default:
-                $maintenance->set($this->options['maintenance']);
+                $maintenance->set($this->options['maintenance'], $this->options['announceMessage']);
         };
     }
     
@@ -267,7 +279,14 @@ class Models_Installer_Standalone {
         if(is_array($options) && isset($options['mysql_bin']) && $options['mysql_bin'] != self::MYSQL_BIN) {
             $this->dbCredentials['executable'] = $options['mysql_bin'];
         }
-        while(! $this->promptDbCredentials());
+        if(!is_array($options) || empty($options['db::username']) || empty($options['db::password']) || empty($options['db::database'])) {
+            while(! $this->promptDbCredentials());
+        } else {
+            $this->dbCredentials['username'] = $options['db::username'];
+            $this->dbCredentials['password'] = $options['db::password'];
+            $this->dbCredentials['database'] = $options['db::database'];
+        }
+        
         $this->initDb();
         $this->createInstallationIni();
         $this->promptHostname();
@@ -391,6 +410,9 @@ class Models_Installer_Standalone {
      * @param array $depsToAccept
      */
     protected function acceptLicenses(array $depsToAccept) {
+        if(is_array($this->options) && ($this->options['license-ignore'] ?? false)){
+            return;
+        }
         $first = true;
         foreach($depsToAccept as $dep) {
             $licenses = ZfExtended_Models_Installer_License::create($dep);
@@ -451,6 +473,10 @@ class Models_Installer_Standalone {
      * prompt the user for the hostname, since this config is needed in the DbConfig
      */
     protected function promptHostname() {
+        if(is_array($this->options) && !empty($this->options['hostname'])) {
+            $this->hostname = $this->options['hostname'];
+            return;
+        }
         $prompt = "\nPlease enter the hostname of the virtual host which will serve Translate5";
         $prompt .= ' (default: '.$this->hostname.'): ';
         $value = $this->prompt($prompt);

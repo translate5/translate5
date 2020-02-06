@@ -19,7 +19,10 @@ case "$1" in
             ;;
 "--maintenance")  
             MODE=${2:-show};
-            CONFIG=",'maintenance' => '$MODE'"
+            CONFIG=",'maintenance' => '$MODE','announceMessage' => '$3','zend' => '/home/tlauria/www/zend-php7/'"
+            ;;
+"--announceMaintenance")  
+            CONFIG=",'announceMaintenance' => '$2','announceMessage' => '$3','zend' => '/home/tlauria/www/zend-php7/'"
             ;;
 *)          CONFIG=",'applicationZipOverride' => '$1'"
             ;;
