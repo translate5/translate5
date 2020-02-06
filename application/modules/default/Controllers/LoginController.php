@@ -117,6 +117,10 @@ class LoginController extends ZfExtended_Controllers_Login {
             $this->applicationRedirect('termportal');
         }
         
+        if($sessionUser->data->login == Zfextended_Models_User::SYSTEM_LOGIN) {
+            $this->logoutAction();
+        }
+        
         throw new ZfExtended_NoAccessException("No initial_page resource is found.");
         exit;
     }

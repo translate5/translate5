@@ -1,10 +1,10 @@
-#/bin/bash
+#!/bin/bash
 CMD_PHP=/usr/bin/php
 CMD_MYSQL=/usr/bin/mysql
- 
+
 # make sure PHP and MySQL binary exist; else die with an error message
-type -P $CMD_PHP &>/dev/null || { echo "$CMD_PHP not found. Set \$CMD_PHP in $0"; exit 1; }
-type -P $CMD_MYSQL &>/dev/null || { echo "$CMD_MYSQL not found. Set \$CMD_MYSQL in $0"; exit 1; }
+type -p $CMD_PHP &>/dev/null || { echo "$CMD_PHP not found. Set \$CMD_PHP in $0"; exit 1; }
+type -p $CMD_MYSQL &>/dev/null || { echo "$CMD_MYSQL not found. Set \$CMD_MYSQL in $0"; exit 1; }
 
 case "$1" in
 "")         CONFIG=""
@@ -19,7 +19,10 @@ case "$1" in
             ;;
 "--maintenance")  
             MODE=${2:-show};
-            CONFIG=",'maintenance' => '$MODE'"
+            CONFIG=",'maintenance' => '$MODE','announceMessage' => '$3','zend' => '/home/tlauria/www/zend-php7/'"
+            ;;
+"--announceMaintenance")  
+            CONFIG=",'announceMaintenance' => '$2','announceMessage' => '$3','zend' => '/home/tlauria/www/zend-php7/'"
             ;;
 *)          CONFIG=",'applicationZipOverride' => '$1'"
             ;;
