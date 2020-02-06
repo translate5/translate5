@@ -37,7 +37,13 @@ set_time_limit(0);
 
 //should be not __FILE__ in the case of wanted restarts / renamings etc
 // and must not be a constant since in installation the same named constant would we defined multiple times then
-$SCRIPT_IDENTIFIER = '226-editor-mysql-TRANSLATE-1531-update-segmentCount-segmentFinishCount-for-tasks.php'; 
+$SCRIPT_IDENTIFIER = '226-editor-mysql-TRANSLATE-1531-update-segmentCount-segmentFinishCount-for-tasks.php';
+
+//since on updating the segment finish count, internal workflow stuff is triggered, the system user will be loaded, 
+// to enalbe that we let assume the script that we are in a worker:
+if(!defined('ZFEXTENDED_IS_WORKER_THREAD')) {
+    define('ZFEXTENDED_IS_WORKER_THREAD', true);
+}
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
