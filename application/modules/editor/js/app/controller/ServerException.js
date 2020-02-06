@@ -340,7 +340,9 @@ function() {
 					  weight: 100,
 					  data: data
 				});
+				return;
     		}
+			mntpnl && mntpnl.destroy();
     	},
         constructor: function() {
             this.callOverridden(arguments);
