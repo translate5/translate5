@@ -664,10 +664,10 @@ function requestFileTranslate(){
         contentType: false, // Set content type to false as jQuery will tell the server its a query string request
         success: function(data, textStatus, jqXHR){
             if(typeof data.error === 'undefined' && data.downloadUrl !== ''){
-                downloadFile(data.downloadUrl);
+                downloadFile(data.downloadUrl); // TODO: = first step only!
             }else{
                 // Handle errors here
-                var error = (data.downloadUrl === '') ? 'Error in task-Import.' : data.error; // TODO translations
+                var error = (data.downloadUrl === '') ? 'Error.' : data.error; // TODO translations
                 showSourceError('ERRORS: ' + error);
                 $('#sourceFile').val('');
                 stopLoadingState();
