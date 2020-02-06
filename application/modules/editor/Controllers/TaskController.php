@@ -431,6 +431,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->init();
         //$this->decodePutData(); → not needed, data was set directly out of params because of file upload
         $this->data = $this->getAllParams();
+        //warn the api user for the orderdate ussage
+        $this->orderdateWarning();
         settype($this->data['wordCount'], 'integer');
         settype($this->data['enableSourceEditing'], 'integer');
         settype($this->data['edit100PercentMatch'], 'integer');
@@ -798,6 +800,10 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $oldTask = clone $this->entity;
         $this->decodePutData();
+        
+        //warn the api user for the orderdate ussage
+        $this->orderdateWarning();
+        
         if(isset($this->data->edit100PercentMatch)){
             settype($this->data->edit100PercentMatch, 'integer');
         }
@@ -1440,5 +1446,24 @@ class editor_TaskController extends ZfExtended_RestController {
         // E1011 is he default multipurpose error code for task logging
         $extraData['task'] = $this->entity;
         $this->taskLog->info('E1011', $message, $extraData);
+    }
+    
+    /***
+     * Warn the api users that the orderdate field is not anymore available for the api.
+     * The task deadlines are defined for each task-user-assoc job separately
+     * TODO: remove this function after all customers adopt there api calls
+     */
+    protected function orderdateWarning() {
+        $throwWarning=false;
+        if(is_array($this->data)){
+            $throwWarning=isset($this->data['orderdate']);
+        }
+        if(is_object($this->data)){
+            $throwWarning=isset($this->data->orderdate);
+        }
+        if(!$throwWarning){
+            return;
+        }
+        $this->log->warn('E1210','The orderdate for the task is deprecated. Use the LEK_taskUserAssoc deadlineDate instead.');
     }
 }

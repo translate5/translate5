@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,13 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-ALTER TABLE `LEK_taskUserAssoc` 
-ADD COLUMN `deadlineDate` DATETIME NULL;
-ALTER TABLE `LEK_taskUserAssoc` 
-ADD COLUMN `assignmentDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE `LEK_taskUserAssoc` 
-ADD COLUMN `finishedDate` DATETIME NULL;
-
+ALTER TABLE `LEK_taskUserAssoc` ADD COLUMN `deadlineDate` datetime NULL DEFAULT NULL;
+ALTER TABLE `LEK_taskUserAssoc` ADD COLUMN `assignmentDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE `LEK_taskUserAssoc` ADD COLUMN `finishedDate` datetime NULL DEFAULT NULL;
 
 #update the dedline date for all reviewers from the task orderdate
 UPDATE LEK_taskUserAssoc dest,
@@ -45,6 +40,30 @@ SET
 WHERE dest.taskGuid = src.taskGuid 
   AND dest.role ='reviewer';
   
+  
+#update the assignmentDate from the task modified date
+UPDATE LEK_taskUserAssoc dest,
+  (
+    SELECT modified,taskGuid FROM LEK_task 
+  ) src 
+SET
+  dest.assignmentDate = src.modified
+WHERE dest.taskGuid = src.taskGuid;
+
+#update all other assigment dates based on the tasklog job created entry
+UPDATE LEK_taskUserAssoc dest,
+  (
+    select tua.id,tl.created from LEK_task_log tl
+	inner join LEK_taskUserAssoc tua ON tl.taskGuid=tua.taskGuid
+	where tl.message='job created'
+	and tl.extra like 
+	concat('%','"userGuid":"',tua.userGuid,'"','%')
+    group by tua.id
+  ) src 
+SET
+  dest.assignmentDate = src.created
+WHERE dest.id = src.id;
+
 DELETE FROM `Zf_acl_rules` WHERE `right`='editorEditTaskOrderDate';
 ALTER TABLE `LEK_task` DROP COLUMN `orderdate`;
 
