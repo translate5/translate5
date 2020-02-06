@@ -40,8 +40,8 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController {
     public function init() {
         ZfExtended_UnprocessableEntity::addCodes([
             'E1172' => 'The referenced user is not associated to the task or does event not exist anymore.',
-            'E1173' => 'Missing workflow step in given data.',
-            'E1174' => 'Missing workflow step in given data.',
+            'E1205' => 'Missing workflow step in given data.',
+            'E1206' => 'Missing workflow step in given data.',
         ], 'editor.workflow.userprefs');
         parent::init();
     }
@@ -58,7 +58,7 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController {
             //a new default entry cannot be created, also a workflow step must always be set!
             if(empty($this->data->workflowStep) || empty($this->data->workflowStep) && empty($this->data->userGuid)) {
                 //should happen on API usage only, so no translation of the error here
-                throw new ZfExtended_UnprocessableEntity('E1173');
+                throw new ZfExtended_UnprocessableEntity('E1205');
             }
         }
         if($this->_request->isPut()) {
@@ -66,7 +66,7 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController {
             //since only the default entry can have an empty worflow step
             if(property_exists($this->data, 'workflowStep') && empty($this->data->workflowStep)) {
                 //should happen on API usage only, so no translation of the error here
-                throw new ZfExtended_UnprocessableEntity('E1174');
+                throw new ZfExtended_UnprocessableEntity('E1206');
             }
             if($this->entity->isDefault()) {
                 unset($this->data->workflowStep); //don't update the workflowStep of the default entry

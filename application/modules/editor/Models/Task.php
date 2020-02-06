@@ -1082,7 +1082,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return boolean|boolean|multitype:string
      */
     public function getTaskStateRoles(string $taskGuid,string $workflowStepName){
-        $workflow=$this->getTaskActiveWorkflow($taskGuid);
+        try {
+            $workflow=$this->getTaskActiveWorkflow($taskGuid);
+        } catch (ZfExtended_Exception $e) {
+            //the workflow with $workflowStepName does not exist
+            return false;
+        }
         $roleOfStep=$workflow->getRoleOfStep($workflowStepName);
         if(empty($roleOfStep)){
             return false;

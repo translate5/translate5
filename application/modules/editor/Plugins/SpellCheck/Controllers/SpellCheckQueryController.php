@@ -72,14 +72,16 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
      * |----------------------------------------------------------------------------|
      * |---from Editor-----|--see LEK_languages---|--------see LanguageTool---------|
      * |----------------------------------------------------------------------------|
-     * | targetLang (=rfc) |  ISO   | sublanguage | longcode | needed result for LT |
+     * | targetLang (=rfc) | mainl. | sublanguage | longcode | needed result for LT |
      * |----------------------------------------------------------------------------|
      * |      de           |   de   |   de-DE     |   de-DE  |       de-DE          |
      * |     de-DE         |   de   |   de-DE     |   de-DE  |       de-DE          |
      * |     de-AT         |   de   |   de-AT     |   de-AT  |       de-AT          |
      * |      fr           |   fr   |   fr-FR     |     fr   |         fr           |
      * |     fr-FR         |   fr   |   fr-FR     |     fr   |         fr           |
-     * |      he           |   il   |   he-IL     |     -    |       false          |
+     * |      he           |   he   |   he-IL     |     he   |         he           |
+     * |      cs           |   cs   |   cs-CZ     |     cs   |         cs           |
+     * |     cs-CZ         |   cs   |   cs-CZ     |     cs   |         cs           |
      * |----------------------------------------------------------------------------|
      * @param array $supportedLanguages
      * @param string $targetLangCode
@@ -89,14 +91,14 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
         $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languagesModel editor_Models_Languages */
         $sublanguage = $languagesModel->getSublanguageByRfc5646($targetLangCode);
-        $iso = $languagesModel->getIso3166Part1alpha2ByRfc5646($targetLangCode);
+        $mainlanguage = $languagesModel->getMainlanguageByRfc5646($targetLangCode);
         foreach ($supportedLanguages as $lang) {
-            if ($lang->longCode == $sublanguage) {      // priority: longCode (e.g. "de-DE") is the default sublanguage ("de-DE") of the targetLangCode ("de")
+            if ($lang->longCode == $sublanguage) {      // priority: check if longCode (e.g. "de-DE","cs") is the default sublanguage ("de-DE", "cs-CZ") of the targetLangCode ("de", "cs-CZ")
                 return $lang;
             }
         }
         foreach ($supportedLanguages as $lang) {
-            if ($lang->longCode == $iso) {              // fallback: longCode (e.g. "fr") is the ISO ("fr") of the targetLangCode ("fr")
+            if ($lang->longCode == $mainlanguage) {     // fallback: check if longCode (e.g. "fr", "cs") is the mainlanguage ("fr", "cs") of the targetLangCode ("fr", "cs-CZ")
                 return $lang;
             }
         }
