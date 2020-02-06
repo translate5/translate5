@@ -139,10 +139,18 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           meta = task.getWorkflowMetaData(),
           role = meta.steps2roles[task.get('workflowStepName')] || Ext.Object.getKeys(meta.roles)[0],
           state = Ext.Object.getKeys(meta.states)[0],
+          isTranslationTask=task.get('emptyTargets'),
           newRec;
+      
+      
       //in competitive mode instead OPEN / UNCONFIRMED is used
       if(task.get('usageMode') == task.USAGE_MODE_COMPETITIVE && state == task.USER_STATE_OPEN){
-          state = task.USER_STATE_UNCONFIRMED
+          state = task.USER_STATE_UNCONFIRMED;
+      }
+      //set the default role to translator when the task is translation task and
+      //the workflow name is no workflow
+      if(isTranslationTask && task.WORKFLOW_STEP_NO_WORKFLOW == task.get('workflowStepName')){
+    	  role=task.WORKFLOW_USER_ROLE_TRANSLATOR;
       }
       newRec = assoc.model.create({
           taskGuid: task.get('taskGuid'),

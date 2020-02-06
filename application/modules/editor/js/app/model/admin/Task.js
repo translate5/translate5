@@ -54,6 +54,8 @@ Ext.define('Editor.model.admin.Task', {
       OPEN: 'open',
       END: 'end',
   },
+  WORKFLOW_STEP_NO_WORKFLOW:'no workflow',//no workflow step constant
+  WORKFLOW_USER_ROLE_TRANSLATOR:'translator',//TODO: when needed add the other constants
   fields: [
     {name: 'id', type: 'int'},
     {name: 'taskGuid', type: 'string'},
