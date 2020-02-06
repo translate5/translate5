@@ -239,19 +239,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
       $this->view->Php2JsVars()->set('errorCodesUrl',$rop->errorCodesUrl);
       
-      //maintenance start date
-      if(isset($rop->maintenance->startDate)) {
-          $startDate = date(DATE_ISO8601, strtotime($rop->maintenance->startDate));
-      }
-      else{
-          $startDate = '';
-      }
-      $this->view->Php2JsVars()->set('maintenance.startDate',$startDate);
-      //maintenance warning panel is showed
-      $this->view->Php2JsVars()->set('maintenance.timeToNotify', $rop->maintenance->timeToNotify ?? '');
-      //minutes before the point in time of the update the application is locked for new log-ins
-      $this->view->Php2JsVars()->set('maintenance.timeToLoginLock', $rop->maintenance->timeToLoginLock ??'');
-      
       $this->view->Php2JsVars()->set('messageBox.delayFactor', $rop->messageBox->delayFactor);
       
       $this->view->Php2JsVars()->set('headerOptions.height', (int)$rop->headerOptions->height);
@@ -374,6 +361,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.viewport', $ed->editorViewPort);
         $php2js->set('app.startViewMode', $ed->startViewMode);
         $php2js->set('app.branding', (string) $this->translate->_($ed->branding));
+        $php2js->set('app.company', $this->config->runtimeOptions->companyName);
+        $php2js->set('app.name', $this->config->runtimeOptions->appName);
         $php2js->set('app.customHtmlContainer', (string) $this->translate->_($ed->customHtmlContainer));
         $php2js->set('app.user', $userSession->data);
         $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));

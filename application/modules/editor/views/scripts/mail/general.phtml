@@ -51,6 +51,7 @@ $data = [
     'portalUrl' => $portal,
     'portalLink' => '<a href="'.$portal.'">'.$portal.'</a>',
     'companyName' => $this->config->runtimeOptions->companyName,
+    'appName' => $this->config->runtimeOptions->appName,
     'salutation' => $salutation,
     'surName' => $this->receiver->gender=='n' ? ($this->receiver->firstName.' '.$this->receiver->surName) : $this->receiver->surName,
 ];
