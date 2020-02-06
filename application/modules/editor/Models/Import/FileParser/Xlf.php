@@ -724,6 +724,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             else {
                 //parse the source chunks
                 $sourceChunksOriginal = $sourceChunks = $this->xmlparser->getRange($currentSource['opener']+1, $currentSource['closer']-1, static::XML_REPARSE_CONTENT);
+                //due XML_REPARSE_CONTENT it can happen that $sourceChunksOriginal will be a string, so we just put it into an array for further processing
+                if(!is_array($sourceChunksOriginal)){
+                    $sourceChunksOriginal = [$sourceChunksOriginal];
+                }
                 $sourceChunks = $this->contentConverter->convert($sourceChunks, true, $currentSource['openerMeta']['preserveWhitespace']);
                 $sourceSegment = $this->xmlparser->join($sourceChunks);
                 
