@@ -49,6 +49,9 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
+//dummy object just to initialize the acl constants
+$acl=ZfExtended_Acl::getInstance(true);
+
 $db = Zend_Db_Table::getDefaultAdapter();
 $task=ZfExtended_Factory::get('editor_Models_Task');
 /* @var $task editor_Models_Task */
