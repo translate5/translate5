@@ -102,6 +102,8 @@ END LICENSE AND COPYRIGHT
  * @method void setSegmentCount() setSegmentCount(int $segmentCount)
  * @method integer getSegmentFinishCount() getSegmentFinishCount()
  * @method void setSegmentFinishCount() setSegmentFinishCount(int $segmentFinishCount)
+ * @method string getTaskType() getTaskType()
+ * @method void setTaskType() setTaskType(string $taskType)
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';

@@ -224,6 +224,14 @@ class editor_TaskController extends ZfExtended_RestController {
         $f = $this->entity->getFilter();
         $f->hasSort() || $f->addSort('orderdate', true);
         
+        // load only 'visible' tasks (further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
+        $f->addFilter((object)[
+            'field' => 'taskType',
+            'value' => 'default',
+            'type' => 'string',
+            'comparison' => 'eq'
+        ]);
+        
         $rows = $this->loadAllWithUserData();
         $this->view->rows = $rows;
         $this->view->total = $this->totalCount;
