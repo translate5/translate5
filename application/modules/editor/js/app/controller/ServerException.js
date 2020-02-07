@@ -313,29 +313,36 @@ function() {
     Ext.data.proxy.Server.override({
     	afterRequest: function(request,success) {
     		this.callOverridden(arguments);
-    		var response=request._operation._response;
+    		var mntpnl = Ext.first('maintenancePanel'),
+    		    viewport = Ext.first('viewport'), 
+    		    response = request._operation._response,
+    		    data = {
+    		        appName: Editor.data.app.name
+    		    };
     		if(!response){
     			return;
     		}
-    		var responseheaders = response.getAllResponseHeaders();
-    		for(var headername in responseheaders) {
-    			if(headername ==='x-translate5-shownotice'){
-    				var mntpnl = Ext.ComponentQuery.query('maintenancePanel');
-    				if(!mntpnl || mntpnl.length>0){
-    					return;
-    				}
-    				var viewport =Ext.ComponentQuery.query('viewport');
-    				if(!viewport || viewport.length<1){
-    				    return;
-    				}
-    				viewport[0].add({
-    					  xtype:'maintenancePanel',
-    					  region:'north',
-    					  weight: 100,
-    					  maintenanceStartDate:responseheaders[headername]
-    				});
-    			}
+    		//FIXME neuen WebScoket Issue anlegen, der sammelt was alles auf websockets umgebaut werden kann wenn diese Fix aktiv sind.
+    		// Diese Funktionalität gehört da mit dazu!
+    		data.date = response.getResponseHeader('x-translate5-shownotice');
+    		data.msg = response.getResponseHeader('x-translate5-maintenance-message');
+			if(data.date || data.msg){
+	            if(!viewport){
+	                return;
+                }
+				if(mntpnl){
+				    mntpnl.update(data);
+					return;
+				}
+				viewport.add({
+					  xtype:'maintenancePanel',
+					  region:'north',
+					  weight: 100,
+					  data: data
+				});
+				return;
     		}
+			mntpnl && mntpnl.destroy();
     	},
         constructor: function() {
             this.callOverridden(arguments);

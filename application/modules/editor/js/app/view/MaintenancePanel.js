@@ -36,22 +36,37 @@ Ext.define('Editor.view.MaintenancePanel', {
         en: 'l, F d, Y h:i:s A (T)',
         de: 'l, d. F, Y H:i:s (T)'
     },
-    maintenanceMessage: '#UT#<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>',
+    tpl: null,
+    maintenanceMessage: '#UT#<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Die Anwendung wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>',
     initConfig: function(instanceConfig) {
         var me = this,
-            format = me.formats[Editor.data.locale] || me.formats.en,
-            date = instanceConfig.maintenanceStartDate ? instanceConfig.maintenanceStartDate : Editor.data.maintenance.startDate,
-            date = Ext.Date.format(Ext.Date.parse(date, "c"), format),
             config = {
         		frame: false,
         		border: false,
-                html:'<div class="maintenanceInfoPanel"><strong>'+Ext.String.format(me.maintenanceMessage,date)+'</strong></div>',
                 listeners: {
                     render: function(c) {
                         me.isMaintenanceMode();
                     }
                 }
             };
+        
+        config.tpl = new Ext.XTemplate(
+            '<div class="maintenanceInfoPanel"><strong>',
+            '<tpl if="date">',
+            //the dateformat is added via string format because of two reasons: our internal translation mechanism struggles with the escaped quotes and its just not sexy in the to be translated texts
+            Ext.String.format(me.maintenanceMessage, '{[this.dateFormat(values[\'date\'])]}'), 
+            '</tpl>',
+            '<tpl if="msg">',
+            '<p>{msg}</p>',
+            '</tpl>',
+            '</strong></div>', {
+                dateFormat: function(date) {
+                    var format = me.formats[Editor.data.locale] || me.formats.en;
+                    return Ext.Date.format(Ext.Date.parse(date, "c"), format);
+                }
+            }
+        );
+        
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }

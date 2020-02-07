@@ -101,6 +101,10 @@ Ext.define('Editor.controller.Termportal', {
             var apiUrl=Editor.data.restpath+'termportal',
                 appName='termportal',
                 url=Editor.data.restpath+'apps?name='+appName+'&apiUrl='+apiUrl;
+            
+            //reset the window name, since the user can use this window to open the translate5
+            //this can happen after the user logout from termportal and login again in translate5
+            window.name='';
             window.open(url, 'termportalandinstanttranslate').focus();
             // Yet, this still does not always re-focus an already existing Termportal-Tab:
             // - "Firefox (51.) gets the handle but cannot run any Element.focus() " 
