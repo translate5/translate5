@@ -27,7 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 var editIdleTimer = null,
-    DEFAULT_FILE_EXT='txt',
     NOT_AVAILABLE_CLS = 'notavailable', // css if a (source-/target-)locale is not available in combination with the other (target-/source-)locale that is set
     uploadedFiles,//Variable to store uploaded files
     translateTextResponse = '',
@@ -633,47 +632,45 @@ function renderTermStatusIcon(termStatus){
     return termStatusHtml;
 }
 
+/* --------------- file translation ----------------------------------------- */
+
 /***
- * Request a file translate for the curent uploaded file
+ * file translation
+ * Step 1: Prepare a task for import of the file and run the pretranslation.
  * @returns
  */
 function requestFileTranslate(){
     // Create a formdata object and add the files
-    var data = new FormData(),
-        ext=getFileExtension(),
-        languageCombination = $("#sourceLocale").val()+','+$("#targetLocale").val();
+    var data = new FormData();
     
     $.each(uploadedFiles, function(key, value){
         data.append(key, value);
     });
 
     //data.append('domainCode', dataForLanguageCombination['domainCode']); // TODO (to do WHAT??)
-    data.append('source', $("#sourceLocale").val());
-    data.append('target', $("#targetLocale").val());
-    
-    //when no extension in the file is found, use default file extension
-    data.append('fileExtension', ext != "" ? ext : DEFAULT_FILE_EXT);
+    data.append('source', $('#sourceLocale').val());
+    data.append('target', $('#targetLocale').val());
     
     $.ajax({
-        url:Editor.data.restpath+"instanttranslateapi/file",
+        url:Editor.data.restpath+'instanttranslateapi/fileprepare',
         type: 'POST',
         data: data,
         cache: false,
         dataType: 'json',
         processData: false, // Don't process the files
         contentType: false, // Set content type to false as jQuery will tell the server its a query string request
-        success: function(data, textStatus, jqXHR){
-            if(typeof data.error === 'undefined' && data.downloadUrl !== ''){
-                downloadFile(data.downloadUrl); // TODO: = first step only!
+        success: function(result){
+            if(typeof result.error === 'undefined' && result.taskId !== ''){
+                importPretranslatedTask(result.taskId);
             }else{
                 // Handle errors here
-                var error = (data.downloadUrl === '') ? 'Error.' : data.error; // TODO translations
+                var error = (result.taskId === '') ? 'Error.' : data.error; // TODO translations
                 showSourceError('ERRORS: ' + error);
                 $('#sourceFile').val('');
                 stopLoadingState();
             }
         },
-        error: function(jqXHR, textStatus, errorThrown)
+        error: function(jqXHR, textStatus)
         {
             // Handle errors here
             showSourceError('ERRORS: ' + textStatus);
@@ -684,47 +681,118 @@ function requestFileTranslate(){
 }
 
 /***
+ * file translation
+ * Step 2: Run the import of the task with the pretranslation.
+ * @param int taskId
+ * @returns
+ */
+function importPretranslatedTask(taskId){
+    $.ajax({
+        statusCode: {
+            500: function() {
+                hideTranslations();
+                showLanguageResourceSelectorError('serverErrorMsg500');
+                }
+        },
+        url: Editor.data.restpath+'instanttranslateapi/fileimport',
+        dataType: 'json',
+        data: {
+            'taskId': taskId
+        },
+        success: function(result){
+            getDownloadUrl(result.taskId);
+        }
+    });
+}
+
+/***
+ * file translation
+ * Step 3: Request a download url
+ * @param int taskGuid
+ * @returns
+ */
+function getDownloadUrl(taskId){
+    $.ajax({
+        statusCode: {
+            500: function() {
+                hideTranslations();
+                showLanguageResourceSelectorError('serverErrorMsg500');
+                }
+        },
+        url: Editor.data.restpath+'instanttranslateapi/fileurl',
+        dataType: 'json',
+        data: {
+            'taskId': taskId
+        },
+        success: function(result){
+            downloadFile(result.downloadUrl, taskId);
+        }
+    });
+}
+
+/***
  * Download the file (= currently: export the task).
  * @param url
- * @returns
  */
-function downloadFile(url){
-    var newTab = window.open("about:blank", "translatedFile");
-    if(newTab == null) { // window.open does not work in Chrome
-        window.location.href = url;
-    } else {
-        newTab.location = url;
-    }
-    // TODO:
-    // Als Antwort zwei Möglichkeiten anbieten:
-    // - link zum übersetzten File (= PLUS delete task)
-    // - Cancel (= delete task)
-    // und bei window.close prüfen ob der Link da ist und dann ebenfalls task löschen
-    $('#sourceFile').val('');
+function downloadFile(url, taskId){
+    var htmlTranslatedfile = '';
+    /*
+     * 
+                    <div id="taskguid">444</div>
+                    <div id="url">/editor/task/export/id/444</div>
+                    <a id="translatedfileDownload" href="#" class="ui-button ui-widget ui-corner-all">Download translated file</a>
+                    <br>
+                    <a id="translatedfileCancel" href="#" class="ui-button ui-widget ui-corner-all">Cancel file-translation</a>
+     */
+    htmlTranslatedfile += '<div id="taskguid">'+taskId+'</div>';
+    htmlTranslatedfile += '<a id="translatedfileDownload" href="'+url+'" class="translatedfile ui-button ui-widget ui-corner-all">Download translated file</a>'; // TODO: translations!
+    htmlTranslatedfile += '<br>';
+    htmlTranslatedfile += '<a id="translatedfileCancel" href="#" class="translatedfile ui-button ui-widget ui-corner-all">Cancel file-translation</a>'; // TODO: translations!
+    $('#translatedfile').html(htmlTranslatedfile);
     stopLoadingState();
-    // TODO: cleanup (delete the task!) => user must either start the download or cancel the download!
 }
-
-
 /***
- * Get the file name of the uploaded file
- * @returns
+ * Step 4: After the translated file has been downloaded (or not), we need to do delete the hidden task etc.
  */
-function getFileName(){
-    //return without fakepath
-    return $('#sourceFile').val().replace(/.*(\/|\\)/, '');;
+function cleanupFiletranslation(taskId) {
+    test = 5;
+    return;
+    $.ajax({
+        statusCode: {
+            500: function() {
+                hideTranslations();
+                showLanguageResourceSelectorError('serverErrorMsg500');
+                }
+        },
+        url: Editor.data.restpath+'instanttranslateapi/filecleanup',
+        dataType: 'json',
+        data: {
+            'taskId': taskId
+        },
+        success: function(){
+            $('#sourceFile').val('');
+            $('#translatedfile').html('');
+        }
+    });
 }
 
-/***
- * Get file extension of the uploaded file
- * @returns
- */
-function getFileExtension(){
-    var fileName=getFileName(),
-        found = fileName.lastIndexOf('.') + 1,
-        ext = (found > 0 ? fileName.substr(found) : "");
-    return ext;
-}
+$('#translatedfileDownload').on('touchstart click',function(){
+    var taskId = $('#translatedfile #taskguid').text(),
+        newTabHref = $('#translatedfile #url').text(),
+        newTab = window.open("about:blank", "translatedFile");
+    if(newTab == null) { // window.open does not work in Chrome
+        window.location.href = newTabHref;
+    } else {
+        newTab.location = newTabHref;
+    }
+    cleanupFiletranslation(taskId);
+});
+
+$('#translatedfileCancel').on('touchstart click',function(){
+    var taskId = $('#translatedfile #taskguid').text();
+    test = 5;
+    cleanupFiletranslation(taskId);
+});
 
 /* --------------- toggle instant translation ------------------------------- */
 $('.instant-translation-toggle').click(function(){

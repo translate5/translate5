@@ -256,6 +256,11 @@ h4, p {
     }
 }
 
+#translatedfile #taskguid,
+#translatedfile #url {
+    display: none;
+}
+
 /* --------------- target --------------- */
 
 #target {
