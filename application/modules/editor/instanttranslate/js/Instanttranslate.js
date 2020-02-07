@@ -725,29 +725,29 @@ function getDownloadUrl(taskId){
             'taskId': taskId
         },
         success: function(result){
-            downloadFile(result.downloadUrl, taskId);
+            if (result.downloadUrl !== '') {
+                showDownload(result.downloadUrl, taskId);
+            } else {
+                // Handle errors here
+                showSourceError('ERROR. No translation of the file available.'); // TODO: translations!
+                $('#sourceFile').val('');
+                stopLoadingState();
+            }
         }
     });
 }
 
 /***
- * Download the file (= currently: export the task).
+ * Offer to download the file (= currently: export the task).
  * @param url
  */
-function downloadFile(url, taskId){
+function showDownload(url, taskId){
     var htmlTranslatedfile = '';
-    /*
-     * 
-                    <div id="taskguid">444</div>
-                    <div id="url">/editor/task/export/id/444</div>
-                    <a id="translatedfileDownload" href="#" class="ui-button ui-widget ui-corner-all">Download translated file</a>
-                    <br>
-                    <a id="translatedfileCancel" href="#" class="ui-button ui-widget ui-corner-all">Cancel file-translation</a>
-     */
     htmlTranslatedfile += '<div id="taskguid">'+taskId+'</div>';
-    htmlTranslatedfile += '<a id="translatedfileDownload" href="'+url+'" class="translatedfile ui-button ui-widget ui-corner-all">Download translated file</a>'; // TODO: translations!
+    htmlTranslatedfile += '<a id="translatedfileDownload" href="'+url+'" target="_top" class="ui-button ui-widget ui-corner-all">Download translated file</a>'; // TODO: translations!
     htmlTranslatedfile += '<br>';
-    htmlTranslatedfile += '<a id="translatedfileCancel" href="#" class="translatedfile ui-button ui-widget ui-corner-all">Cancel file-translation</a>'; // TODO: translations!
+    htmlTranslatedfile += '<a id="translatedfileCancel" href="#" class="ui-button ui-widget ui-corner-all">Cancel file-translation</a>'; // TODO: translations!
+    htmlTranslatedfile += '<br><span style="color:red;">TODO: Konzept zum Löschen der erstellten Task / Handhabung für die User!</span>';
     $('#translatedfile').html(htmlTranslatedfile);
     stopLoadingState();
 }
@@ -755,8 +755,6 @@ function downloadFile(url, taskId){
  * Step 4: After the translated file has been downloaded (or not), we need to do delete the hidden task etc.
  */
 function cleanupFiletranslation(taskId) {
-    test = 5;
-    return;
     $.ajax({
         statusCode: {
             500: function() {
@@ -772,25 +770,19 @@ function cleanupFiletranslation(taskId) {
         success: function(){
             $('#sourceFile').val('');
             $('#translatedfile').html('');
+        },
+        error: function()
+        {
+            // No matter if the task had already been deleted or not, 
+            // we finish the cleanup with resetting InstantTranslate:
+            $('#sourceFile').val('');
+            $('#translatedfile').html('');
         }
     });
 }
 
-$('#translatedfileDownload').on('touchstart click',function(){
-    var taskId = $('#translatedfile #taskguid').text(),
-        newTabHref = $('#translatedfile #url').text(),
-        newTab = window.open("about:blank", "translatedFile");
-    if(newTab == null) { // window.open does not work in Chrome
-        window.location.href = newTabHref;
-    } else {
-        newTab.location = newTabHref;
-    }
-    cleanupFiletranslation(taskId);
-});
-
-$('#translatedfileCancel').on('touchstart click',function(){
-    var taskId = $('#translatedfile #taskguid').text();
-    test = 5;
+$(document).on('click', '#translatedfileCancel' , function() {
+    var taskId = $('#translatedfile').find('#taskguid').text();
     cleanupFiletranslation(taskId);
 });
 
