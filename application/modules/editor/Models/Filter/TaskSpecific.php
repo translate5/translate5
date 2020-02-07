@@ -39,6 +39,14 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs6 
      */
     function setMappings($sortColMap = null, $filterTypeMap = null) {
         parent::setMappings($sortColMap,$filterTypeMap);
+        
+        //if the task state filter is set, set the filter table
+        $taskState=null;
+        if($this->hasFilter('state',$taskState)){
+            $db=$this->entity->db;
+            $taskState->table=$db->info($db::NAME);
+        }
+        
         //check if one of the set filters is userState filter
         $userStateFilter=null;
         if(!$this->hasFilter('userState',$userStateFilter)){
