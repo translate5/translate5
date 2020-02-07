@@ -646,8 +646,7 @@ function requestFileTranslate(){
     $.each(uploadedFiles, function(key, value){
         data.append(key, value);
     });
-
-    //data.append('domainCode', dataForLanguageCombination['domainCode']); // TODO (to do WHAT??)
+    
     data.append('source', $('#sourceLocale').val());
     data.append('target', $('#targetLocale').val());
     
@@ -664,7 +663,7 @@ function requestFileTranslate(){
                 importPretranslatedTask(result.taskId);
             }else{
                 // Handle errors here
-                var error = (result.taskId === '') ? 'Error.' : data.error; // TODO translations
+                var error = (result.taskId === '') ? 'Error.' : result.error; // TODO translations
                 showSourceError('ERRORS: ' + error);
                 $('#sourceFile').val('');
                 stopLoadingState();
@@ -725,14 +724,19 @@ function getDownloadUrl(taskId){
             'taskId': taskId
         },
         success: function(result){
-            if (result.downloadUrl !== '') {
-                showDownload(result.downloadUrl, taskId);
-            } else {
-                // Handle errors here
+            if(result.downloadUrl === 'error') {
+                // an error has occured.
                 showSourceError('ERROR. No translation of the file available.'); // TODO: translations!
                 $('#sourceFile').val('');
                 stopLoadingState();
+                return;
             }
+            if(result.downloadUrl === 'importing'){
+                // the file is not ready yet (= the import-worker is still running)
+                setTimeout(function(){ getDownloadUrl(taskId); }, 2000);
+                return;
+            }
+            showDownload(result.downloadUrl, taskId);
         }
     });
 }
@@ -781,9 +785,11 @@ function cleanupFiletranslation(taskId) {
     });
 }
 
-$(document).on('click', '#translatedfileCancel' , function() {
+$(document).on('click', '#translatedfileCancel' , function(e) {
     var taskId = $('#translatedfile').find('#taskguid').text();
+    e.stopPropagation();
     cleanupFiletranslation(taskId);
+    return false;
 });
 
 /* --------------- toggle instant translation ------------------------------- */

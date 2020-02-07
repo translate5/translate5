@@ -256,8 +256,7 @@ h4, p {
     }
 }
 
-#translatedfile #taskguid,
-#translatedfile #url {
+#translatedfile #taskguid {
     display: none;
 }
 
