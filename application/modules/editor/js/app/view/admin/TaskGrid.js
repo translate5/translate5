@@ -805,7 +805,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         var value=filter.get('value'),
         	operator=filter.get('operator'),
         	property=filter.get('property'),
-        	gridFilter = me.getFilter(property);
+        	gridFilter = me.getColumnFilter(property);
         
         if(!gridFilter){
         	//the filter does not exist as column in the grid, filter the store with the filter params
@@ -848,9 +848,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
 	},
 	
 	/***
-	 * Get grid filter by property
+	 * Get grid column filter by property
 	 */
-	getFilter:function(property){
+	getColumnFilter:function(property){
 		var cols = this.getColumns(),
 			filter=null;
     	Ext.each(cols, function(col) {
@@ -860,6 +860,21 @@ Ext.define('Editor.view.admin.TaskGrid', {
             }
         });
     	return filter;
+	},
+	
+	/***
+	 * Get task grid active filter/s by property
+	 */
+	getActiveFilter:function(property){
+		var me=this,
+		    returnFilter=[],
+			activefilters = me.getStore().getFilters(false);
+		activefilters.each(function(item){
+			if(property==item.getProperty()){
+				returnFilter.push(item);
+			}
+		});
+		return returnFilter;
 	},
 	
 	/***
@@ -895,7 +910,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         for(var i=0;i<users.length;i++){
         	var user=users[i],
         		redClass="",
-        		deadlineDate=new Date(user['deadlineDate']);
+        		deadlineDate=user['deadlineDate'] && new Date(user['deadlineDate']);
         	
         	if(!deadlineDate || user['userGuid']!=Editor.data.app.user['userGuid']){
         		continue;

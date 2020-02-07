@@ -36,16 +36,15 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
     onFilterHolderBeforeDeselect:function(combo,record,index,eOpts){
     	var me=this,
     		taskGrid=me.getView().getFilterGrid(),
-    		taskStore=Ext.StoreManager.get('admin.Tasks'),
-    		theFilter=taskGrid.getFilter(record.get('property')),
-    		filterKey=record.get('property')+record.get('operator');
+    		theFilter=taskGrid.getColumnFilter(record.get('property'));
 
     	//it is default filter, disable with filter setActive
     	if(theFilter){
     		theFilter.setActive(false);
-    	}else{
-    		taskStore.removeFilter(filterKey);
+    		return;
     	}
+    	//the filter is one of the advanced filters
+		me.removeAdvancedFilters(record.get('property'));
     },
     
     /***
@@ -105,5 +104,25 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
 			filtersarray=Ext.Array.push(filtersarray,me.getView().getFilterModelObject(tmpFilter));
 		});
 		return filtersarray;
+    },
+    
+    /***
+     * Remove the active advanced filter in the task grid by filter property
+     */
+    removeAdvancedFilters:function(property){
+    	var me=this,
+    		taskGrid=me.getView().getFilterGrid(),
+    		tagField=me.getView().down('#filterHolder'),
+    		records=tagField.getStore().query('property',property),//all active tagfield records for the property
+    		taskStore=Ext.StoreManager.get('admin.Tasks');
+    	
+    	records.each(function(rec){
+    		//get all active filters for the property
+    		var filters=taskGrid.getActiveFilter(rec.get('property'));
+    		Ext.each(filters, function(f) {
+    			taskStore.removeFilter(f);
+            });
+    	});
+    	
     }
 });

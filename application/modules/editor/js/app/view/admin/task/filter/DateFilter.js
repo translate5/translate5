@@ -87,10 +87,19 @@ Ext.define('Editor.view.admin.task.filter.DateFilter', {
         return me.callParent([config]);
 	},
 
+	/***
+	 * Set the field value from the given record
+	 */
 	setValue:function(value,record){
 		var me=this,
-			operator=record.get('operator'),
-			field=me.down('#'+operator+'Date');
-		field && field.setValue(value);
+			filterGroup=record.get('filtergroup') ? record.get('filtergroup') : [];
+		
+		//for each field in the record, apply the value 
+		for(var i=0;i<filterGroup.length;i++){
+			var rec=filterGroup[i],
+			    operator=rec.operator,
+				field=me.down('#'+operator+'Date');			
+			field && field.setValue(rec.value);
+		}
 	}
 });
