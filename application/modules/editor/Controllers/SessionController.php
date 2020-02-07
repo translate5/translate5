@@ -103,6 +103,7 @@ class editor_SessionController extends ZfExtended_SessionController {
      */
     protected function hashauth() {
         if($this->isMaintenanceLoginLock()){
+            throw new ZfExtended_Models_MaintenanceException('Maintenance scheduled in a few minutes: '.$date);
             return;
         }
         

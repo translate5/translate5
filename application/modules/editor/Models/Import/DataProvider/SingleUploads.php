@@ -39,7 +39,7 @@ class editor_Models_Import_DataProvider_SingleUploads  extends editor_Models_Imp
     /**
      * @var array
      */
-    protected $proofRead;
+    protected $review;
     protected $relais;
     protected $reference;
     protected $tbx;
@@ -50,13 +50,13 @@ class editor_Models_Import_DataProvider_SingleUploads  extends editor_Models_Imp
     
     /**
      * consumes all the given file paths
-     * @param array $proofRead
+     * @param array $review
      * @param array $relais optional
      * @param array $reference optional
      * @param string $tbx optional
      */
-    public function __construct(array $proofRead, array $relais = array(), array $reference = array(), array $tbx = array()){
-        $this->proofRead = $proofRead;
+    public function __construct(array $review, array $relais = array(), array $reference = array(), array $tbx = array()){
+        $this->review = $review;
         $this->relais = $relais;
         $this->reference = $reference;
         $this->tbx = $tbx;
@@ -70,19 +70,19 @@ class editor_Models_Import_DataProvider_SingleUploads  extends editor_Models_Imp
     public function checkAndPrepare(){
         $this->checkAndMakeTempImportFolder();
         parent::checkAndPrepare();
-        $this->handleProofRead();
+        $this->handleReview();
         $this->handleRelais();
         $this->handleReference();
         $this->handleTbx();
     }
 
     /**
-     * processes the proofread files
+     * processes the review files
      */
-    protected function handleProofRead() {
-        //no if empty check, since we need a proofread dir. If this will be empty, the import process throws an error
-        $proofRead = $this->config->runtimeOptions->import->proofReadDirectory;
-        $this->handleUploads($proofRead, $this->proofRead);
+    protected function handleReview() {
+        //no if empty check, since we need a review dir. If this will be empty, the import process throws an error
+        $review = $this->config->runtimeOptions->import->proofReadDirectory;
+        $this->handleUploads($review, $this->review);
     }
     
     /**

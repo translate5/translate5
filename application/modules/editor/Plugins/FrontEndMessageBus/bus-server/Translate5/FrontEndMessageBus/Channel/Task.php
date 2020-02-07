@@ -546,7 +546,7 @@ class Task extends Channel {
             'connectionId' => $connectionId,
         ]));
         
-        $idx = array_search($sessionId, $this->taskToSessionMap[$task['taskGuid']] ?? '');
+        $idx = array_search($sessionId, $this->taskToSessionMap[$task['taskGuid']] ?? []);
         if($idx !== false) {
             unset($this->taskToSessionMap[$task['taskGuid']][$idx]);
         }

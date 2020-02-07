@@ -135,7 +135,7 @@ class editor_Models_Import_UploadProcessor {
             case self::TYPE_TESTCASE:
                 $dp = 'editor_Models_Import_DataProvider_SingleUploads';
                 $args = array(
-                    array($importInfo['importUpload']), //proofReads
+                    array($importInfo['importUpload']), //reviews
                 );
                 $args = $this->handleTbx($args);
                 try {
@@ -145,7 +145,7 @@ class editor_Models_Import_UploadProcessor {
                 }
                 if($offlineTestcase===true){
                     $args = array(
-                        array($importInfo['importUpload']), //proofReads
+                        array($importInfo['importUpload']), //reviews
                         array(), // relais files
                         array(), // reference files
                         $importInfo['importTbx'], //tbx
@@ -166,7 +166,7 @@ class editor_Models_Import_UploadProcessor {
     protected function handleSingleUpload($importInfo) {
         $dp = 'editor_Models_Import_DataProvider_SingleUploads';
         $args = array(
-            array($importInfo['importUpload']), //proofReads
+            array($importInfo['importUpload']), //reviews
         );
         return $this->handleTbx($args);
     }

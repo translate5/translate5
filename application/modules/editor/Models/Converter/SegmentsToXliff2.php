@@ -566,12 +566,12 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         //it is no user that is assigned to the task, it can be pm
         if($segment['userGuid'] === $this->task->getPmGuid()){
             //If the workflow step that is currently finishd is translation or translator-check, the PM is used for its:person. 
-            //If the current workflow step is proofreading, than the project manager is used for its:revPerson
+            //If the current workflow step is review, than the project manager is used for its:revPerson
             if($this->workflowStep===editor_Workflow_Abstract::STEP_TRANSLATION || $this->workflowStep===editor_Workflow_Abstract::STEP_TRANSLATORCHECK){
                 $this->itsPersonGuid=$this->task->getPmGuid();
             }
             
-            if($segment['workflowStep']===editor_Workflow_Abstract::STEP_LECTORING){
+            if($segment['workflowStep']===editor_Workflow_Abstract::STEP_REVIEWING){
                 $this->revPersonGuid=$this->task->getPmGuid();
             }
         }
@@ -592,34 +592,34 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      */
     protected function initItsRefPersonGuid($segment){
         $assocUsers=$this->data['assocUsers'];
-        $tmpProofreaderArray=[];
+        $tmpReviewerArray=[];
         $this->itsRevPerson=null;
         $this->itsRevPersonGuid=null;
 
-        //check if there is a proofreader assigned to the task
-        if(!isset($assocUsers[editor_Workflow_Abstract::ROLE_LECTOR])){
+        //check if there is a reviewer assigned to the task
+        if(!isset($assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER])){
             return;
         }
         
         //check if no lectors are assigned
-        if(count($assocUsers[editor_Workflow_Abstract::ROLE_LECTOR])==0){
+        if(count($assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER])==0){
             return;
         }
         
-        //if only one proofreader
-        if(count($assocUsers[editor_Workflow_Abstract::ROLE_LECTOR])==1){
-            $this->itsRevPersonGuid=$assocUsers[editor_Workflow_Abstract::ROLE_LECTOR][0]['userGuid'];
+        //if only one reviewer
+        if(count($assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER])==1){
+            $this->itsRevPersonGuid=$assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER][0]['userGuid'];
             
             $usr=$this->data['users'][$this->itsRevPersonGuid];
             $this->itsRevPerson=$usr['surName'].' '.$usr['firstName'];
             return;
         }
-        //there are multiple proofreaders to the task
-        $tmpProofreaderArray=$assocUsers[editor_Workflow_Abstract::ROLE_LECTOR];
+        //there are multiple reviewer to the task
+        $tmpReviewerArray=$assocUsers[editor_Workflow_Abstract::ROLE_REVIEWER];
         
         //check last editor
-        foreach ($tmpProofreaderArray as $proofreader){
-            if($proofreader['userGuid']===$segment['userGuid']){
+        foreach ($tmpReviewerArray as $reviewer){
+            if($reviewer['userGuid']===$segment['userGuid']){
                 $this->itsRevPersonGuid=$segment['userGuid'];
                 break;
             }
@@ -633,7 +633,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         
         //it is no user that is assigned to the task, it can be pm
         if($segment['userGuid'] === $this->task->getPmGuid()){
-            if($this->task->getWorkflowStepName()===editor_Workflow_Abstract::STEP_LECTORING){
+            if($this->task->getWorkflowStepName()===editor_Workflow_Abstract::STEP_REVIEWING){
                 $this->itsRevPersonGuid=$this->task->getPmGuid();
             }
         }
@@ -831,13 +831,13 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                 $unitComment[]='<!-- unit id is the segmentNrInTask of LEK_segment in translate5 with the prefix "unit"; Since we only use on segment per unit in translate5 changes xliff, the segment id is the same, but with the prefix "seg";
 its:person is the translator name, if assigned in translate5; if no translator is assigned, it is the user of the translator-check;
 translate5:personGuid is the corresponding userGuid of the person-attribute
-its:revPerson is the proofreader, if assigned in translate5;
-translate5:revPersonGuid is the userGuid of the proofreader;
-- if more than one proofreader or translator is assigned, the above attributes refer to the translator or proofreader
+its:revPerson is the reviewer, if assigned in translate5;
+translate5:revPersonGuid is the userGuid of the reviewer;
+- if more than one reviewer or translator is assigned, the above attributes refer to the translator or reviewer
   that edited the segment the last time / set the autostatus flag the last time;
 - if the last editor is no person, that is assigned to the task, it may be the project manager. If it is the project manager,
   the project manager of the task is used in the following way: If the workflow step that is currently finishd is translation
-  or translator-check, the PM is used for its:person. If the current workflow step is proofreading,
+  or translator-check, the PM is used for its:person. If the current workflow step is reviewing,
   than the project manager is used for its:revPerson
 - if the last editor of a segment is no assigned user and not the PM, but we have more than one user assigned for a
   role, than we use the value "undefined".

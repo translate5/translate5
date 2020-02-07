@@ -40,7 +40,7 @@ $params = [
         'header' => $this->header,
         'footer' => $this->footer,
         'role' => $this->translate->_($this->role),
-        'proofreadersFragment' => '',
+        'reviewersFragment' => '',
 ];
 
 $taskNr = $this->task->getTaskNr();
@@ -55,17 +55,17 @@ $template = '{header}
 Im Projektportal {portalLink} wurde Ihnen eine Aufgabe zugewiesen.<br />
 <br />
 <b>Rolle:</b> {role}<br/>
-{taskFragment}{proofreadersFragment}{footer}';
+{taskFragment}{reviewersFragment}{footer}';
 
 
 if(!empty($this->associatedUsers)) {
-    $params['proofreadersFragment'] = $this->htmlOnly;
+    $params['reviewersFragment'] = $this->htmlOnly;
 }
 $this->textbody = strip_tags($this->templateApply($template, $params));
 
 if(!empty($this->associatedUsers)) {
-    $params['proofreadersFragment'] = $this->translate->_("\n<br/>".'<b>Alle der Aufgabe zugeordneten Benutzer:</b>'."\n<br/>");
-    $params['proofreadersFragment'] .= $this->workflowNotifyMail()->renderUserList($this->associatedUsers);
+    $params['reviewersFragment'] = $this->translate->_("\n<br/>".'<b>Alle der Aufgabe zugeordneten Benutzer:</b>'."\n<br/>");
+    $params['reviewersFragment'] .= $this->workflowNotifyMail()->renderUserList($this->associatedUsers);
 }
 if($this->addCompetitiveDisclaimer) {
     //the disclaimer is injected to the role for correct positioning also we do not have to touch all client overwritten templates

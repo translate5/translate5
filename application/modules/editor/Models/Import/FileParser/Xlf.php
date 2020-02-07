@@ -788,24 +788,24 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->endShiftCount = 0;
             }
             
-            //we cut off and store the leading target tags for later insertion 
-            $leadingTags = $this->xmlparser->join(array_splice($targetChunksOriginal, 0, $this->startShiftCount));
+            //we get and store the leading target tags for later insertion 
+            $leadingTags = $this->internalTag->restore($this->xmlparser->join(array_slice($targetChunks, 0, $this->startShiftCount)));
             
-            //we cut off and store the trailing target tags for later insertion 
+            //we get and store the trailing target tags for later insertion 
             if($this->endShiftCount > 0) {
-                $trailingTags = $this->xmlparser->join(array_splice($targetChunksOriginal, -$this->endShiftCount));
+                $trailingTags = $this->internalTag->restore($this->xmlparser->join(array_slice($targetChunks, -$this->endShiftCount)));
             }
             else {
                 $trailingTags = '';
             }
             
+            //store already converted and uncut chunks
             $sourceChunksUncut = $sourceChunks;
             $targetChunksUncut = $targetChunks;
             
             //for source column we dont have a place holder, so we just cut off the leading/trailing tags and import the rest as source 
             $sourceChunks = array_slice($sourceChunks, $this->startShiftCount, count($sourceChunks) - $this->startShiftCount - $this->endShiftCount);
             //for target we have to do the same on the converted chunks to be used, 
-            // since the above array_sPlice calls are working on the original array
             $targetChunks = array_slice($targetChunks, $this->startShiftCount, count($targetChunks) - $this->startShiftCount - $this->endShiftCount);
             
             $this->segmentData = array();
@@ -833,14 +833,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->setMid($this->_mid.'-'.$mid);
             }
             
-            $emptyTarget = empty($targetChunksOriginal) && $targetChunksOriginal !== "0";
+            $emptyTarget = empty($targetChunks) && $targetChunks !== "0";
             $hasOriginalTarget = !(empty($this->segmentData[$targetName]['original']) && $this->segmentData[$targetName]['original']!=="0");
             //if source contains tags only or is empty (and is no missing source) then we are able to ignore non textual segments 
             if(!$isSourceMrkMissing && !$this->hasText($this->segmentData[$sourceName]['original']) && ($emptyTarget || $hasOriginalTarget)) {
                 //if empty target, we fill the target with the source content, and ignore the segment then in translation
-                //  on proofreading and if target content was given, then it will be ignored too
-                //  on proofreading needs $hasOriginalTarget to be true, which is the case by above if
-                $placeHolders[$mid] = $leadingTags.$this->xmlparser->join($emptyTarget ? $sourceChunksOriginal : $targetChunksOriginal).$trailingTags;
+                //  on reviewing and if target content was given, then it will be ignored too
+                //  on reviewing needs $hasOriginalTarget to be true, which is the case by above if
+                $placeHolders[$mid] = $this->xmlparser->join($emptyTarget ? $sourceChunksOriginal : $targetChunksOriginal);
                 //we add the length of the ignored segment to the additionalUnitLength
                 $this->otherContent->addIgnoredSegmentLength($emptyTarget ? $sourceChunksUncut : $targetChunksUncut, $attributes);
                 continue;

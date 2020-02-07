@@ -1039,7 +1039,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param editor_Models_Task $task
      */
     public function updateSegmentFinishCount(editor_Models_Task $task){
-        $stateRoles=$this->getTaskStateRoles($task);
+        $stateRoles=$this->getTaskStateRoles($task->getTaskGuid(),$task->getWorkflowStepName());
         $isWorkflowEnded=$task->getWorkflowStepName()==editor_Workflow_Abstract::STEP_WORKFLOW_ENDED;
         if(!$stateRoles && !$isWorkflowEnded){
             return;
@@ -1063,7 +1063,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param int $oldAutoState
      */
     public function changeSegmentFinishCount(editor_Models_Task $task,int $newAutostate,int $oldAutoState){
-        $stateRoles=$this->getTaskStateRoles($task);
+        $stateRoles=$this->getTaskStateRoles($task->getTaskGuid(),$task->getWorkflowStepName());
         if(!$stateRoles){
             return;
         }
@@ -1080,12 +1080,19 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Get all autostate ids for the active tasks workflow
-     * @param editor_Models_Task $task
+     * 
+     * @param string $taskGuid
+     * @param string $workflowStepName
      * @return boolean|boolean|multitype:string
      */
-    protected function getTaskStateRoles(editor_Models_Task $task){
-        $workflow=$this->getTaskActiveWorkflow($task->getTaskGuid());
-        $roleOfStep=$workflow->getRoleOfStep($task->getWorkflowStepName());
+    public function getTaskStateRoles(string $taskGuid,string $workflowStepName){
+        try {
+            $workflow=$this->getTaskActiveWorkflow($taskGuid);
+        } catch (ZfExtended_Exception $e) {
+            //the workflow with $workflowStepName does not exist
+            return false;
+        }
+        $roleOfStep=$workflow->getRoleOfStep($workflowStepName);
         if(empty($roleOfStep)){
             return false;
         }
@@ -1099,7 +1106,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Get the wokflow progress summary column. The return layout example:
      *   [
      *     {workflowStep: translation, status: finished, progress: 100},
-     *     {workflowStep: proofreading, status: running, progress: 33},
+     *     {workflowStep: reviewing, status: running, progress: 33},
      *     {workflowStep: translatorCheck, status: open, progress: 0}
      *   ]
      * 
