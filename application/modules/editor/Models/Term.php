@@ -373,14 +373,14 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $sql = $this->db->getAdapter()->select()
                 ->from(array('t1' =>'LEK_terms'), array('t2.*'))
                 ->distinct()
-                ->joinLeft(array('t2' =>'LEK_terms'), 't1.groupId = t2.groupId', null)
+                ->joinLeft(array('t2' =>'LEK_terms'), 't1.groupId = t2.groupId AND t1.collectionId = t2.collectionId', null)
                 ->join(array('l' =>'LEK_languages'), 't2.language = l.id', 'rtl')
                 ->where('t1.collectionId IN(?)', $collectionIds)
-                ->where('t2.collectionId IN(?)', $collectionIds)
+                //->where('t2.collectionId IN(?)', $collectionIds)
                 ->where('t1.mid IN('.$serialIds.')')
                 ->where('t1.language IN (?)',array($sourceLang,$targetLang))
                 ->where('t2.language IN (?)',array($sourceLang,$targetLang));
-       
+        
         $terms = $this->db->getAdapter()->fetchAll($sql);
         
         $termGroups = array();
