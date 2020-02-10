@@ -41,9 +41,16 @@ class Editor_ReferencefileController extends editor_Controllers_EditorrestContro
      * @see ZfExtended_RestController::getAction()
      */
     public function getAction() {
-        $fileToDisplay = $this->getRequestedFileAbsPath();
+        /* @var $task editor_Models_Task */
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        $fileToDisplay = $this->getRequestedFileAbsPath($task);
         $file = new SplFileInfo($fileToDisplay);
         if (! $file->isFile()) {
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.referencefile');
+            $logger->warn('Etodo','A non existent reference file "{file}" was requested.',[
+                'task' => $task,
+                'file' => $this->getRequestedFileRelPath(),
+            ]);
             throw new ZfExtended_NotFoundException();
         }
 
@@ -81,19 +88,16 @@ class Editor_ReferencefileController extends editor_Controllers_EditorrestContro
      * returns the absolute file path to the requested file, checks the given URL on ../ based attacks
      * @return string
      */
-    protected function getRequestedFileAbsPath() {
+    protected function getRequestedFileAbsPath(editor_Models_Task $task) {
         $session = new Zend_Session_Namespace();
         
         if(empty($session->taskGuid)){
-            throw new ZfExtended_NotAuthenticatedException();
+            throw new ZfExtended_NotAuthenticatedException('No task registered in session!');
         }
         
-        $config = Zend_Registry::get('config');
-
-        /* @var $task editor_Models_Task */
-        $task = ZfExtended_Factory::get('editor_Models_Task');
         $task->loadByTaskGuid($session->taskGuid);
 
+        $config = Zend_Registry::get('config');
         $taskPath = $task->getAbsoluteTaskDataPath();
         $refDir = $taskPath.DIRECTORY_SEPARATOR.$config->runtimeOptions->import->referenceDirectory;
         $requestedFile = $this->getRequestedFileRelPath();
