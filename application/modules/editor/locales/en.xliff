@@ -3295,8 +3295,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Zurück zu den Ereignissen</source>
     <target>Back to the events</target>
 </trans-unit>
-<trans-unit id='QXVmZ2FiZSBGZWhsZXJoaXN0b3JpZQ=='>
-    <source>Aufgabe Fehlerhistorie</source>
+<trans-unit id='RXJlaWduaXMtUHJvdG9rb2xs'>
+    <source>Ereignis-Protokoll</source>
     <target>Task error-history</target>
 </trans-unit>
 <trans-unit id='RXJlaWduaXNzZQ=='>
@@ -3466,8 +3466,8 @@ More information can be found in the task property window in the tab events.<br 
     <source>Zugewiesene Benutzer benachrichtigen?</source>
     <target>Notify assigned users?</target>
 </trans-unit>
-<trans-unit id='U29sbGVuIGRpZSB6dWdld2llc2VuZW4gQmVudXR6ZXIgw7xiZXIgZGllIFp1d2Vpc3VuZyBkZXIgQXVmZ2FiZSBiZW5hY2hyaWNodGlnIHdlcmRlbj8='>
-    <source>Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?</source>
+<trans-unit id='U29sbGVuIGRpZSB6dWdld2llc2VuZW4gQmVudXR6ZXIgw7xiZXIgZGllIFp1d2Vpc3VuZyBkZXIgQXVmZ2FiZSBiZW5hY2hyaWNodGlndCB3ZXJkZW4/'>
+    <source>Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtigt werden?</source>
     <target>Notify the associated users about the association to the task?</target>
 </trans-unit>
 <trans-unit id='PGJyLz48YnIvPkFsbGVuIGFuZGVyZW4gQmVudXR6ZXJuIHdpcmQgZGllIEF1ZmdhYmUgZW50em9nZW48YnIvPiB1bmQgc2llIHdpcmQgYXVzc2NobGllw59saWNoIGluIElocmVyIFZlcmFudHdvcnR1bmcgbGllZ2VuLg=='>
