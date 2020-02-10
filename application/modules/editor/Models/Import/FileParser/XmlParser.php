@@ -569,7 +569,8 @@ class editor_Models_Import_FileParser_XmlParser {
                 throw new editor_Models_Import_FileParser_InvalidXMLException('E1024',[
                     'closingTag' => $opener['tag'],
                     'receivedTag' => $tag,
-                    'openingTag' => print_r($opener,1)
+                    'openingTag' => print_r($opener,1),
+                    'parseStack' => print_r($this->xmlStack,1),
                 ]);
             }
             else {
