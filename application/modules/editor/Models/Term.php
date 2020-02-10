@@ -408,7 +408,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param array $collectionIds
      * @return Zend_Db_Table_Row_Abstract | null
      */
-    public function loadByMid(string $mid,array $collectionIds) {
+    public function loadByMid(string $mid, array $collectionIds) {
         $s = $this->db->select(false);
         $s->from($this->db);
         $s->where('collectionId IN(?)', $collectionIds)->where('mid = ?', $mid);
