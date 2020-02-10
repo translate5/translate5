@@ -29,6 +29,6 @@ find . -not -path "*/data/*" -iname "en.xliff"|while read FILENAME; do
 done
 echo
 echo "created $ZIP"
-echo " Remove non wanted private Plugin XLFs!"
+echo " Please remove non wanted private Plugin XLFs manually!!!"
 echo " After translating and exporting from Translate5 rename *.zxliff back to *.xliff"
 
