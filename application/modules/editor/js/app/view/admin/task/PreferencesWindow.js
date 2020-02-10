@@ -45,7 +45,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         close: '#UT#Fenster schließen',
         events: '#UT#Ereignisse',
         notifyUsersTitle: '#UT#Zugewiesene Benutzer benachrichtigen?',
-        notifyUsersMsg: '#UT#Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?',
+        notifyUsersMsg: '#UT#Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtigt werden?',
         userNotifySuccess:'#UT#Benutzer wurden erfolgreich per E-Mail benachrichtigt'
     },
     layout: 'fit',
