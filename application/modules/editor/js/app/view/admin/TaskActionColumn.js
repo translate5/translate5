@@ -46,7 +46,7 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
       actionEnd: '#UT# Aufgabe komplett Beenden',
       actionReOpen: '#UT# beendete Aufgabe wieder öffnen',
       actionDelete: '#UT#Aufgabe komplett löschen',
-      actionLog: '#UT# Aufgabe Fehlerhistorie',
+      actionLog: '#UT# Ereignis-Protokoll',
       taskPrefs: '#UT# Aufgabenspezifische Einstellungen',
       exp: '#UT# Aufgabe exportieren',
       actionExcelReimport: '#UT# Excel Re-Importieren'
