@@ -160,7 +160,34 @@ class editor_Models_Task_Export_Metadata {
         if (count($this->filters) == 0) {
             $this->filters[] = (object)['property' =>' ', 'operator' => ' ', 'value' => '-'];
         }
+        
+        //validate if filter value is date
+        $isDate=function($value){
+            if (!$value || is_array($value) || is_object($value)) {
+                return false;
+            }
+            try {
+                new DateTime($value);
+                return true;
+            } catch (Exception $e) {
+                return false;
+            }
+        };
+        
+        $filter=ZfExtended_Factory::get('ZfExtended_Models_Filter_ExtJs6');
+        /* @var $filter ZfExtended_Models_Filter_ExtJs6 */
+        $operatorTranslated=$filter->getTranslatedOperators();
         foreach ($this->filters as $filter) {
+            //translate the filter operators
+            if(isset($operatorTranslated[$filter->operator])){
+                $filter->operator=$operatorTranslated[$filter->operator];
+            }
+            
+            if($isDate($filter->value)){
+                $date = new DateTime($filter->value);
+                $filter->value=$date->format('Y-m-d');
+            }
+            
             $this->excelMetadata->addFilter($filter);
         }
         
