@@ -232,6 +232,32 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return parent::loadFilterdCustom($s);
     }
     
+    /**
+     * loads all tasks of the given tasktype
+     * @param string $tasktype
+     * @return array
+     */
+    public function loadListByTasktype(string $tasktype) {
+        $s = $this->db->select();
+        $s->where('tasktype = ?', $tasktype);
+        return parent::loadFilterdCustom($s);
+    }
+    
+    /**
+     * loads all tasks of the given tasktype that shall be removed (either because
+     * their lifetime is over because they are errorenous).
+     * @param string $tasktype
+     * @param int $orderDaysOffset
+     * @return array
+     */
+    public function loadListForCleanupByTasktype(string $tasktype, int $orderDaysOffset) {
+        $s = $this->db->select();
+        $s->where('tasktype = ?', $tasktype);
+        $s->where('`orderDate` < (CURRENT_DATE - INTERVAL ? DAY)', $orderDaysOffset)
+          ->orWhere('state =  ?', self::STATE_ERROR);
+        return parent::loadFilterdCustom($s);
+    }
+    
     /***
      * Load all task assoc users for non anonymized tasks.
      * This is used for the user workflow filter in the advance filter store.
