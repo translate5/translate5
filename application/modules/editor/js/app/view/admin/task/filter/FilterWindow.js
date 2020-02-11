@@ -30,7 +30,8 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.editorAdminTaskFilterFilterWindow',
     requires: [
-    	'Editor.view.admin.task.filter.FilterWindowViewController'
+        'Editor.view.admin.task.filter.FilterWindowViewController',
+        'Editor.view.admin.task.filter.DateFilter'
 	],
     controller: 'editorAdminTaskFilterFilterWindow',
     itemId: 'editorAdminTaskFilterFilterWindow',
@@ -42,69 +43,102 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     	cancelBtn:'#UT#Abbrechen',
     	title: '#UT#Erweiterte Filter',
     	anonymizedUsersInfo:'#UT#Anonymisierte Benutzer nicht auswählbar',
-    	gridFiltersInfo:'#UT#Weitere Filter im Kopf jeder Spalte'
+        gridFiltersInfo:'#UT#Weitere Filter im Kopf jeder Spalte',
+        assignmentDateText:'#UT#Benutzer-Zuweisungsdatum',
+        finishedDateText:'#UT#Benutzer-Abschlussdatum',
+        deadlineDateText:'#UT#Benutzer-Deadline/s'
     },
     autoScroll: true,
-    height: 430,
-    width: 500,
-    bodyPadding:15,
+    height: 500,
+    autoWidth: true,
+    layout: {
+        type: 'table',
+        align: 'center',
+        columns: 3,
+    },
     initConfig: function(instanceConfig) {
         var me = this,
         	config;
         config = {
     		title:me.strings.title,
-            items:[{
-            	xtype:'displayfield',
-            	value:me.strings.gridFiltersInfo
-            },{
-	            xtype: 'tagfield',
-	            name:'userName',
-	            itemId:'userName',
-	            typeAhead: true,
-	            queryMode: 'local',
-	            displayField: 'longUserName',
-                valueField: 'userGuid',
-                store:'admin.UsersList',
-	            fieldLabel:me.strings.userNameLabel+'¹',
-	            filter:{
-	            	operator: 'in',
-            		property:'userName',
-    		        type:'list',
-    		        textLabel:me.strings.userNameLabel
-	            }
-            },{
-                xtype: 'tagfield',
-                name:'workflowState',
-                itemId:'workflowState',
-                typeAhead: true,
-                queryMode: 'local',
-                valueField: 'id',
-                displayField: 'label',
-                store:'admin.WorkflowState',
-                fieldLabel: me.strings.workflowStateFilterLabel,
-                filter:{
-                	operator: 'in',
-                	property:'workflowState',
-                	type:'list',
-                	textLabel:me.strings.workflowStateFilterLabel
-                }
-            },{
-                xtype: 'tagfield',
-                name:'workflowUserRole',
-                itemId:'workflowUserRole',
-                typeAhead: true,
-                queryMode: 'local',
-                valueField: 'id',
-                displayField: 'label',
-                store:'admin.WorkflowUserRoles',
-                fieldLabel: me.strings.workflowUserRoleLabel,
-                filter:{
-                	operator: 'in',
-                	property:'workflowUserRole',
-                	type:'list',
-                	textLabel:me.strings.workflowUserRoleLabel
-                }
-            }],
+    		defaults: {
+    			margin:10,
+    			labelAlign:'left',
+        		labelWidth:'100%'
+			},
+    		items: [{
+    					colspan: 3,
+    					margin:10,
+	                	xtype:'displayfield',
+	                	value:me.strings.gridFiltersInfo
+                	},{
+                		
+	    	            xtype: 'tagfield',
+	    	            name:'userName',
+	    	            itemId:'userName',
+	    	            typeAhead: true,
+	    	            queryMode: 'local',
+	    	            displayField: 'longUserName',
+	                    valueField: 'userGuid',
+	                    store:'admin.UsersList',
+	    	            fieldLabel:me.strings.userNameLabel+'¹',
+	    	            filter:{
+	    	            	operator: 'in',
+	                		property:'userName',
+	        		        type:'list',
+	        		        textLabel:me.strings.userNameLabel
+	    	            }
+	                },{
+	                    xtype: 'tagfield',
+	                    name:'workflowState',
+	                    itemId:'workflowState',
+	                    typeAhead: true,
+	                    queryMode: 'local',
+	                    valueField: 'id',
+	                    displayField: 'label',
+	                    store:'admin.WorkflowState',
+	                    fieldLabel: me.strings.workflowStateFilterLabel,
+	                    filter:{
+	                    	operator: 'in',
+	                    	property:'workflowState',
+	                    	type:'list',
+	                    	textLabel:me.strings.workflowStateFilterLabel
+	                    }
+	                },{
+	                    xtype: 'tagfield',
+	                    name:'workflowUserRole',
+	                    itemId:'workflowUserRole',
+	                    typeAhead: true,
+	                    queryMode: 'local',
+	                    valueField: 'id',
+	                    displayField: 'label',
+	                    store:'admin.WorkflowUserRoles',
+	                    fieldLabel: me.strings.workflowUserRoleLabel,
+	                    filter:{
+	                    	operator: 'in',
+	                    	property:'workflowUserRole',
+	                    	type:'list',
+	                    	textLabel:me.strings.workflowUserRoleLabel
+	                    }
+    	        },{
+                    xtype:'editorAdminTaskFilterDateFilter',
+                    filterLabel:me.strings.assignmentDateText,
+                    filterProperty:'assignmentDate',
+                    itemId:'assignmentDate',
+                    title:me.strings.assignmentDateText
+    	        },{
+    	        	 xtype:'editorAdminTaskFilterDateFilter',
+	                filterLabel:me.strings.finishedDateText,
+	                filterProperty:'finishedDate',
+	                itemId:'finishedDate',
+	                title:me.strings.finishedDateText
+    	        },{
+                    xtype:'editorAdminTaskFilterDateFilter',
+                    filterLabel:me.strings.deadlineDateText,
+                    filterProperty:'deadlineDate',
+                    itemId:'deadlineDate',
+                    title:me.strings.deadlineDateText
+    	        }],
             dockedItems: [{
                 xtype: 'toolbar',
                 dock: 'bottom',
@@ -163,7 +197,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     	Ext.each(record, function(rec) {
     		field=me.down('#'+rec.get('property'));
     		if(field){
-    			field.setValue(rec.get('value'));
+    			field.setValue(rec.get('value'),rec);
     		}
         });
     }
