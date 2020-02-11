@@ -682,6 +682,7 @@ function requestFileTranslate(){
 /***
  * file translation
  * Step 2: Run the import of the task with the pretranslation.
+ * After the import is started, we show a list of all pretranslations that are currently available.
  * @param int taskId
  * @returns
  */
@@ -698,19 +699,26 @@ function importPretranslatedTask(taskId){
         data: {
             'taskId': taskId
         },
-        success: function(result){
-            getDownloadUrl(result.taskId);
+        success: function(){
+            getDownloads();
+        },
+        error: function(jqXHR, textStatus)
+        {
+            // Handle errors here
+            showSourceError('ERRORS: ' + textStatus);
+            $('#sourceFile').val('');
+            stopLoadingState();
         }
     });
 }
 
 /***
  * file translation
- * Step 3: Request a download url
+ * Step 3: Show a list of all pretranslations that are currently available
  * @param int taskGuid
  * @returns
  */
-function getDownloadUrl(taskId){
+function getDownloads(){
     $.ajax({
         statusCode: {
             500: function() {
@@ -718,77 +726,58 @@ function getDownloadUrl(taskId){
                 showLanguageResourceSelectorError('serverErrorMsg500');
                 }
         },
-        url: Editor.data.restpath+'instanttranslateapi/fileurl',
+        url: Editor.data.restpath+'instanttranslateapi/filelist',
         dataType: 'json',
-        data: {
-            'taskId': taskId
-        },
         success: function(result){
-            if(result.downloadUrl === 'error') {
-                // an error has occured.
-                showSourceError('ERROR. No translation of the file available.'); // TODO: translations!
-                $('#sourceFile').val('');
-                stopLoadingState();
-                return;
-            }
-            if(result.downloadUrl === 'importing'){
-                // the file is not ready yet (= the import-worker is still running)
-                setTimeout(function(){ getDownloadUrl(taskId); }, 2000);
-                return;
-            }
-            showDownload(result.downloadUrl, taskId);
-        }
-    });
-}
-
-/***
- * Offer to download the file (= currently: export the task).
- * @param url
- */
-function showDownload(url, taskId){
-    var htmlTranslatedfile = '';
-    htmlTranslatedfile += '<div id="taskguid">'+taskId+'</div>';
-    htmlTranslatedfile += '<a id="translatedfileDownload" href="'+url+'" target="_top" class="ui-button ui-widget ui-corner-all">Download translated file</a>'; // TODO: translations!
-    htmlTranslatedfile += '<br>';
-    htmlTranslatedfile += '<a id="translatedfileCancel" href="#" class="ui-button ui-widget ui-corner-all">Cancel file-translation</a>'; // TODO: translations!
-    htmlTranslatedfile += '<br><span style="color:red;">TODO: Konzept zum Löschen der erstellten Task / Handhabung für die User!</span>';
-    $('#translatedfile').html(htmlTranslatedfile);
-    stopLoadingState();
-}
-/***
- * Step 4: After the translated file has been downloaded (or not), we need to do delete the hidden task etc.
- */
-function cleanupFiletranslation(taskId) {
-    $.ajax({
-        statusCode: {
-            500: function() {
-                hideTranslations();
-                showLanguageResourceSelectorError('serverErrorMsg500');
-                }
+            clearAllErrorMessages();
+            showDownloads(result.allPretranslatedFiles);
         },
-        url: Editor.data.restpath+'instanttranslateapi/filecleanup',
-        dataType: 'json',
-        data: {
-            'taskId': taskId
-        },
-        success: function(){
-            $('#sourceFile').val('');
-            $('#translatedfile').html('');
-        },
-        error: function()
+        error: function(jqXHR, textStatus)
         {
-            // No matter if the task had already been deleted or not, 
-            // we finish the cleanup with resetting InstantTranslate:
+            // Handle errors here
+            showSourceError('ERRORS: ' + textStatus);
             $('#sourceFile').val('');
-            $('#translatedfile').html('');
+            $('#pretranslatedfiles').html('');
+            stopLoadingState();
         }
     });
 }
 
-$(document).on('click', '#translatedfileCancel' , function(e) {
-    var taskId = $('#translatedfile').find('#taskguid').text();
+/***
+ * Offer to download the pretranslated files (= currently: export the task).
+ * @param array allPretranslatedFiles
+ */
+function showDownloads(allPretranslatedFiles){ // array[taskId] = array(taskName, state, downloadUrl, removeDate)
+    var pretranslatedFiles = [],
+        html = '',
+        htmlFile;
+    $.each(allPretranslatedFiles, function(taskId, taskData) {
+        htmlFile = '<li>';
+        htmlFile += taskData['taskName'];
+        if (taskData['downloadUrl'] === '') {
+            htmlFile += ' (Status: ' + taskData['state'] + '; will be deleted on ' + taskData['removeDate'] + '):<br>'; // TODO translation!
+            htmlFile += '<a href="#" class="getdownloads ui-button ui-widget ui-corner-all">[Reload]</a>'; // TODO! (API und translation!)
+            htmlFile += '<p style="font-size:80%">While the file is importing, it cannot be downloaded. Click on "Reload" to check if the status has changed.</p>'; // TODO translation!
+        } else {
+            htmlFile += ' (will be deleted on ' + taskData['removeDate'] +'):<br>'; // TODO translation!;
+            htmlFile += '<a href="' + taskData['downloadUrl'] + '" class="ui-button ui-widget ui-corner-all">[Download]</a>';
+        }
+        htmlFile += '</li>';
+        pretranslatedFiles.push(htmlFile);
+    });
+    stopLoadingState(); // TODO still needed?
+    if (pretranslatedFiles.length > 0) {
+        html += '<h2>Pretranslated files:</h2>'; // TODO translation!
+        html += '<ul>';
+        html += pretranslatedFiles.join(' ');
+        html += '</ul>';
+    }
+    $('#pretranslatedfiles').html(html);
+}
+
+$(document).on('click', '.getdownloads' , function(e) {
     e.stopPropagation();
-    cleanupFiletranslation(taskId);
+    getDownloads();
     return false;
 });
 
