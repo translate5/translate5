@@ -1148,10 +1148,6 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!$disableWorkflowEvents) {
             $this->workflow->triggerBeforeEvents($oldUserTaskAssoc, $userTaskAssoc);
         }
-        //set the finished date when the user finishes a role
-        if($userTaskAssoc->getState()==editor_Workflow_Abstract::STATE_FINISH){
-            $userTaskAssoc->setFinishedDate(NOW_ISO);
-        }
         
         $userTaskAssoc->save();
         
@@ -1451,7 +1447,7 @@ class editor_TaskController extends ZfExtended_RestController {
     /***
      * Warn the api users that the orderdate field is not anymore available for the api.
      * The task deadlines are defined for each task-user-assoc job separately
-     * TODO: remove this function after all customers adopt there api calls
+     * TODO: 11.02.2020 remove this function after all customers adopt there api calls
      */
     protected function orderdateWarning() {
         $throwWarning=false;

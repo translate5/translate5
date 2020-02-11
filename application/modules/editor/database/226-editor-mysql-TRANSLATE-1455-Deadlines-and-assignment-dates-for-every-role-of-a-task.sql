@@ -86,7 +86,7 @@ ALTER TABLE `LEK_task` DROP COLUMN `realDeliveryDate`;
 #daily cron notification days before overdued task assoc deadlines
 INSERT INTO `LEK_workflow_action` (`workflow`,`trigger`,`inStep`,`byRole`,`userState`,`actionClass`,`action`,`parameters`,`position`)
 VALUES 
-('default', 'doCronDaily', null, null, null, 'editor_Plugins_Miele_Notification', 'notifyOverdueDeadline', '{"daysOffset": 2}', 0);
+('default', 'doCronDaily', null, null, null, 'editor_Workflow_Notification', 'notifyOverdueDeadline', '{"daysOffset": 2}', 0);
 
 
 ALTER TABLE `LEK_workflow_action` 

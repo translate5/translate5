@@ -37,7 +37,7 @@ Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> 
 $this->textbody =$this->templateApply($template, [
     'header' => $this->header,
     'taskName' => $this->taskName,
-    'deadlineDate' =>$this->deadlineDate,
+    'deadlineDate' =>$this->workflowNotifyMail()->dateFormat($this->deadlineDate),
     'footer' => $this->footer
 ]);
 

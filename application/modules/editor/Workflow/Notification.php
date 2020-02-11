@@ -613,7 +613,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $user->loadByGuid($assoc['userGuid']);
             $this->createNotification($assoc['role'],__FUNCTION__,[
                 'taskName' => $assoc['taskName'],
-                'deadlineDate' =>date("m/d/Y", strtotime($assoc['deadlineDate']))
+                'deadlineDate' =>$assoc['deadlineDate']
             ]);
             $this->notifyUser($user);
         }
