@@ -749,26 +749,37 @@ function getDownloads(){
  * Offer to download the pretranslated files (= currently: export the task).
  * @param array allPretranslatedFiles
  */
-function showDownloads(allPretranslatedFiles){ // array[taskId] = array(taskName, state, downloadUrl, removeDate)
+function showDownloads(allPretranslatedFiles){ // array[taskId] = array(taskName, downloadUrl, removeDate)
     var pretranslatedFiles = [],
         html = '',
-        htmlFile;
+        htmlFile,
+        showRefreshButton = false;
     $.each(allPretranslatedFiles, function(taskId, taskData) {
         htmlFile = '<li>';
         htmlFile += taskData['taskName'];
-        if (taskData['downloadUrl'] === '') {
-            htmlFile += ' (' + Editor.data.languageresource.translatedStrings['state'] + ': ' + taskData['state'] + '; ' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] + '):<br>'; 
-            htmlFile += '<a href="#" class="getdownloads ui-button ui-widget ui-corner-all">[' + Editor.data.languageresource.translatedStrings['refresh'] + ']</a>';
-            htmlFile += '<p style="font-size:80%">' + Editor.data.languageresource.translatedStrings['noDownloadWhileImport'] + '</p>';
-        } else {
-            htmlFile += ' (' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] +'):<br>';
-            htmlFile += '<a href="' + taskData['downloadUrl'] + '" class="ui-button ui-widget ui-corner-all">[Download]</a>';
-        }
+        htmlFile += ' (' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] +'):<br>'; 
+        switch(taskData['downloadUrl']) {
+            case 'isImporting':
+                showRefreshButton = true;
+                htmlFile += '<p style="font-size:80%;">' + Editor.data.languageresource.translatedStrings['noDownloadWhileImport'] + '</p>';
+                break;
+            case 'isErroneous': 
+                htmlFile += '<p style="font-size:80%;" class="error">' + Editor.data.languageresource.translatedStrings['noDownloadAfterError'] + '</p>';
+                break;
+            case 'isNotPretranslated':
+                htmlFile += '<p style="font-size:80%;" class="error">' + Editor.data.languageresource.translatedStrings['noDownloadNotTranslated'] + '</p>';
+                break;
+            default:
+                htmlFile += '<a href="' + taskData['downloadUrl'] + '" class="ui-button ui-widget ui-corner-all">Download</a>';
+        } 
         htmlFile += '</li>';
         pretranslatedFiles.push(htmlFile);
     });
     if (pretranslatedFiles.length > 0) {
         html += '<h2>' + Editor.data.languageresource.translatedStrings['pretranslatedFiles'] + ':</h2>';
+        if (showRefreshButton) {
+            html += '<p><a href="#" class="getdownloads ui-button ui-widget ui-corner-all">' + Editor.data.languageresource.translatedStrings['refresh'] + '</a></p>';
+        }
         html += '<ul>';
         html += pretranslatedFiles.join(' ');
         html += '</ul>';
