@@ -29,3 +29,10 @@ END LICENSE AND COPYRIGHT
 -- TRANSLATE-1927: Hidden tasks needed => introduce types for tasks in core
 ALTER TABLE `LEK_task` 
 ADD COLUMN `taskType` VARCHAR(255) NULL DEFAULT 'default';
+
+-- set initialtasktypes depending on the role
+INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 
+('editor', 'api', 'initial_tasktype', 'instanttranslate-pre-translate'),
+('editor', 'api', 'initial_tasktype', 'default'),
+('editor', 'pm', 'initial_tasktype', 'default'),
+('editor', 'instantTranslate', 'initial_tasktype', 'instanttranslate-pre-translate');

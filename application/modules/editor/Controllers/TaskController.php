@@ -479,7 +479,15 @@ class editor_TaskController extends ZfExtended_RestController {
         $defaultWorkflow = $this->config->runtimeOptions->import->taskWorkflow;
         $this->entity->setWorkflow($this->workflowManager->getIdToClass($defaultWorkflow));
         
-        if($this->validate()) {
+        // TasktType:
+        // - use default tasktype as fallback
+        // - check if tasktype is allowed according to role
+        $this->entity->setTaskTypeToDefaultIfNeeded();
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        $isTaskTypeAllowed = $acl->isInAllowedRoles($this->user->data->roles, 'initial_tasktype', $this->entity->getTaskType());
+        
+        if($isTaskTypeAllowed && $this->validate()) {
             $this->initWorkflow();
             //$this->entity->save(); => is done by the import call!
             $this->processUploadedFile();

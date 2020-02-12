@@ -233,19 +233,22 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * loads all tasks of the given tasktype
+     * loads all tasks of the given tasktype that are associated to a specific user as PM
+     * @param string $pmGuid
      * @param string $tasktype
      * @return array
      */
-    public function loadListByTasktype(string $tasktype) {
+    public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype) {
         $s = $this->db->select();
+        $s->where('pmGuid = ?', $pmGuid);
         $s->where('tasktype = ?', $tasktype);
+        $s->order('orderdate ASC');
         return parent::loadFilterdCustom($s);
     }
     
     /**
-     * loads all tasks of the given tasktype that shall be removed (either because
-     * their lifetime is over because they are errorenous).
+     * loads all tasks of the given tasktype that shall be removed (because
+     * their lifetime is over).
      * @param string $tasktype
      * @param int $orderDaysOffset
      * @return array
@@ -253,8 +256,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function loadListForCleanupByTasktype(string $tasktype, int $orderDaysOffset) {
         $s = $this->db->select();
         $s->where('tasktype = ?', $tasktype);
-        $s->where('`orderDate` < (CURRENT_DATE - INTERVAL ? DAY)', $orderDaysOffset)
-          ->orWhere('state =  ?', self::STATE_ERROR);
+        $s->where('`orderDate` < (CURRENT_DATE - INTERVAL ? DAY)', $orderDaysOffset);
         return parent::loadFilterdCustom($s);
     }
     
@@ -789,6 +791,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'Guid'
         );
         $this->setTaskGuid($guidHelper->create(true));
+    }
+    
+    /**
+     * set the default taskType if no taskType is set
+     */
+    public function setTaskTypeToDefaultIfNeeded() {
+        $taskType = $this->getTaskType();
+        if(! empty($taskType)) {
+            return;
+        }
+        $this->setTaskType('default');
     }
     
     /**
