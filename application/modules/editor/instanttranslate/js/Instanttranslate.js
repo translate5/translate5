@@ -663,7 +663,7 @@ function requestFileTranslate(){
                 importPretranslatedTask(result.taskId);
             }else{
                 // Handle errors here
-                var error = (result.taskId === '') ? 'Error.' : result.error; // TODO translations
+                var error = (result.taskId === '') ? Editor.data.languageresource.translatedStrings['error'] : result.error;
                 showSourceError('ERRORS: ' + error);
                 $('#sourceFile').val('');
                 stopLoadingState();
@@ -730,7 +730,9 @@ function getDownloads(){
         dataType: 'json',
         success: function(result){
             clearAllErrorMessages();
+            $('#sourceFile').val('');
             showDownloads(result.allPretranslatedFiles);
+            stopLoadingState();
         },
         error: function(jqXHR, textStatus)
         {
@@ -755,19 +757,18 @@ function showDownloads(allPretranslatedFiles){ // array[taskId] = array(taskName
         htmlFile = '<li>';
         htmlFile += taskData['taskName'];
         if (taskData['downloadUrl'] === '') {
-            htmlFile += ' (Status: ' + taskData['state'] + '; will be deleted on ' + taskData['removeDate'] + '):<br>'; // TODO translation!
-            htmlFile += '<a href="#" class="getdownloads ui-button ui-widget ui-corner-all">[Reload]</a>'; // TODO! (API und translation!)
-            htmlFile += '<p style="font-size:80%">While the file is importing, it cannot be downloaded. Click on "Reload" to check if the status has changed.</p>'; // TODO translation!
+            htmlFile += ' (' + Editor.data.languageresource.translatedStrings['state'] + ': ' + taskData['state'] + '; ' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] + '):<br>'; 
+            htmlFile += '<a href="#" class="getdownloads ui-button ui-widget ui-corner-all">[' + Editor.data.languageresource.translatedStrings['refresh'] + ']</a>';
+            htmlFile += '<p style="font-size:80%">' + Editor.data.languageresource.translatedStrings['noDownloadWhileImport'] + '</p>';
         } else {
-            htmlFile += ' (will be deleted on ' + taskData['removeDate'] +'):<br>'; // TODO translation!;
+            htmlFile += ' (' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] +'):<br>';
             htmlFile += '<a href="' + taskData['downloadUrl'] + '" class="ui-button ui-widget ui-corner-all">[Download]</a>';
         }
         htmlFile += '</li>';
         pretranslatedFiles.push(htmlFile);
     });
-    stopLoadingState(); // TODO still needed?
     if (pretranslatedFiles.length > 0) {
-        html += '<h2>Pretranslated files:</h2>'; // TODO translation!
+        html += '<h2>' + Editor.data.languageresource.translatedStrings['pretranslatedFiles'] + ':</h2>';
         html += '<ul>';
         html += pretranslatedFiles.join(' ');
         html += '</ul>';
