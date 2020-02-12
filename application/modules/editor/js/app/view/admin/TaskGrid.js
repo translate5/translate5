@@ -47,7 +47,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       // sorted by appearance
       workflow: '#UT#Workflow',
       taskActions: '#UT#Aktionen',
-      state: '#UT#Status',
+      state: '#UT#Aufgabenstatus',
       customerId: '#UT#Endkunde',
       taskName: '#UT#Aufgabenname',
       taskNr: '#UT#Auftragsnr.',
@@ -64,9 +64,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       taskassocs: '#UT#Anzahl zugewiesene Sprachresourcen',
       pmName: '#UT#Projektmanager',
       pmGuid: '#UT#Projektmanager',
-      orderdate: '#UT#Bestelldatum',
       targetDeliveryDate: '#UT#Lieferdatum (soll)',
-      realDeliveryDate: '#UT#Lieferdatum (ist)',
       edit100PercentMatch: '#UT#100%-Treffer editierbar',
       fullMatchEdit: '#UT#100% Matches sind editierbar',
       emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
@@ -79,7 +77,12 @@ Ext.define('Editor.view.admin.TaskGrid', {
 	  segmentFinishCount:'#UT#% abgeschlossen',
 	  id:'#UT#Id',
 	  taskGuid:'#UT#Task-Guid',
-	  workflowStepName:'#UT#Aktueller Workflow-Schritt'
+	  workflowStepName:'#UT#Aktueller Workflow-Schritt',
+	  userState:'#UT#Mein Job-Status',
+      userJobDeadline:'#UT#Meine Deadline',
+      assignmentDate:'#UT#Benutzer-Zuweisungsdatum',
+      finishedDate:'#UT#Benutzer-Abschlussdatum',
+      deadlineDate:'#UT#Benutzer-Deadline/s'
   },
   strings: {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
@@ -104,12 +107,12 @@ Ext.define('Editor.view.admin.TaskGrid', {
       addFilterText:'#UT#Erweiterte Filter'
   },
   states: {
-      user_state_open: '#UT#offen',
-      user_state_waiting: '#UT#wartend',
-      user_state_finished: '#UT#abgeschlossen',
-      task_state_end: '#UT#beendet',
-      task_state_unconfirmed: '#UT#nicht bestätigt',
-      task_state_import: '#UT#import',
+      open: '#UT#offen',
+      waiting: '#UT#wartend',
+      finished: '#UT#abgeschlossen',
+      end: '#UT#beendet',
+      unconfirmed: '#UT#nicht bestätigt',
+      import: '#UT#import',
       locked: '#UT#in Arbeit',
       forMe: '#UT#für mich '
   },
@@ -267,7 +270,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
           steps=[],
           translatedSteps=[],
           //we must have here an own ordered list of states to be filtered 
-          stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'task_state_unconfirmed', 'user_state_unconfirmed', 'task_state_import'],
+          userStates=['open','waiting','finished','unconfirmed'],//TODO get me from backend
+          stateFilterOrder = ['open','locked','end','unconfirmed','import'],
           relaisLanguages = Ext.Array.clone(Editor.data.languages),
           addQtip = function(meta, text) {
               meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text)+'"';
@@ -287,13 +291,18 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   states.push([state, me.states[state]]);
               }
           });
+          
+          Ext.Array.each(userStates, function(state){
+              if(me.states[state]) {
+            	  userStates.push([state, me.states[state]]);
+              }
+          });
         
           //adding additional, not ordered states
           Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
               Ext.Object.each(workflow.states, function(key, value){
-                  var state = 'user_state_'+key;
-                  if(!me.states[state]) {
-                      states.push([state, me.states.forMe+' '+value]);
+                  if(!me.states[key]) {
+                	  userStates.push([key, me.states.forMe+' '+value]);
                   }
               });
               Ext.Object.each(workflow.steps, function(key, value){
@@ -326,17 +335,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 70,
               dataIndex: 'state',
               stateId:'state',
-//TODO: disable the state filter till the state filter usage is not clear
-//read the topic for taskGrid:https://confluence.translate5.net/display/MI/Usability+enhancements
-//              filter: {
-//                  type: 'list',
-//                  options: states,
-//                  phpMode: false
-//              },
+              filter: {
+                  type: 'list',
+                  options: states,
+                  phpMode: false
+              },
               tdCls: 'state',
               renderer: function(v, meta, rec) {
-                  var userState = rec.get('userState'),
-                      wfMeta = rec.getWorkflowMetaData(),
+                  var wfMeta = rec.getWorkflowMetaData(),
                       allStates = me.prepareStates(wfMeta);
 
                   if(rec.isImporting() || rec.isErroneous()) {
@@ -352,8 +358,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                       return me.strings.locked;
                   }
                   if(rec.isUnconfirmed()) {
-                      addQtip(meta, me.states.task_state_unconfirmed);
-                      return me.states.task_state_unconfirmed;
+                      addQtip(meta, me.states.unconfirmed);
+                      return me.states.unconfirmed;
                   }
                   //locked and editable means multi user editing
                   if(rec.isLocked() && rec.isEditable()) {                  	  
@@ -368,18 +374,37 @@ Ext.define('Editor.view.admin.TaskGrid', {
                       addQtip(meta, me.strings.ended);
                       return me.strings.ended;
                   }
-                  if(!userState || userState.length == 0) {
-                      //if we got only v here, the state should be handled like locked or ended above
-                      v = allStates[v] ? allStates[v] : v;
-                      addQtip(meta, v);
-                      return v; 
-                  }
-                  //if no global state is applicable, use userState instead
-                  addQtip(meta, allStates[userState]);
-                  return allStates[userState];
+                  v = allStates[v] ? allStates[v] : v;
+                  addQtip(meta, v);
+                  return v;
               },
               text: me.text_cols.state,
               sortable: false
+          },{
+              xtype: 'gridcolumn',
+              width: 70,
+              dataIndex: 'userState',
+              stateId: 'userState',
+              text: me.text_cols.userState,
+              filter: {
+                  type: 'list',
+                  options: userStates,
+                  phpMode: false
+              },
+              renderer: function(v, meta, rec) {
+                  var userState = rec.get('userState'),
+                      wfMeta = rec.getWorkflowMetaData(),
+                      allStates = me.prepareStates(wfMeta);
+                  addQtip(meta, allStates[userState]);
+                  return allStates[userState];
+              }
+          },{
+        	  xtype: 'gridcolumn',
+        	  width: 120,
+              dataIndex: 'userAssocDeadline',
+              stateId: 'userAssocDeadline',
+              text: me.text_cols.userJobDeadline,
+              renderer:me.userJobDeadlineRenderer
           },{
               xtype: 'gridcolumn',
               width: 135,
@@ -406,7 +431,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
               text: me.text_cols.workflowStepName
           },
           {
-        	  //TODO: how do we filter percent ?
               xtype: 'gridcolumn',
               cls:'gridColumnInfoIconTooltipLeft',
               width: 135,
@@ -575,16 +599,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
               text: me.text_cols.pmGuid
           },{
               xtype: 'datecolumn',
-              width: 100,
-              dataIndex: 'orderdate',
-              stateId: 'orderdate',
-              filter: {
-                  type: 'date',
-                  dateFormat: Editor.DATE_ISO_FORMAT
-              },
-              text: me.text_cols.orderdate
-          },{
-              xtype: 'datecolumn',
               width: 120,
               dataIndex: 'targetDeliveryDate',
               stateId: 'targetDeliveryDate',
@@ -593,16 +607,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   dateFormat: Editor.DATE_ISO_FORMAT
               },
               text: me.text_cols.targetDeliveryDate
-          },{
-              xtype: 'datecolumn',
-              width: 120,
-              dataIndex: 'realDeliveryDate',
-              stateId: 'realDeliveryDate',
-              filter: {
-                  type: 'date',
-                  dateFormat: Editor.DATE_ISO_FORMAT
-              },
-              text: me.text_cols.realDeliveryDate
           },{
               xtype: 'owncheckcolumn',
               width: 45,
@@ -801,12 +805,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
         var value=filter.get('value'),
         	operator=filter.get('operator'),
         	property=filter.get('property'),
-        	gridFilter = me.getFilter(property);
+        	gridFilter = me.getColumnFilter(property);
         
         if(!gridFilter){
         	//the filter does not exist as column in the grid, filter the store with the filter params
         	//INFO: this can be the case when the grid is filtered with one of the advanced filters
         	me.getStore().addFilter({
+                "id":property+operator,//use the property and operator as unique id
         		"operator":operator,
         		"value":value,
         		"property":property
@@ -843,9 +848,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
 	},
 	
 	/***
-	 * Get grid filter by property
+	 * Get grid column filter by property
 	 */
-	getFilter:function(property){
+	getColumnFilter:function(property){
 		var cols = this.getColumns(),
 			filter=null;
     	Ext.each(cols, function(col) {
@@ -855,6 +860,21 @@ Ext.define('Editor.view.admin.TaskGrid', {
             }
         });
     	return filter;
+	},
+	
+	/***
+	 * Get task grid active filter/s by property
+	 */
+	getActiveFilter:function(property){
+		var me=this,
+		    returnFilter=[],
+			activefilters = me.getStore().getFilters(false);
+		activefilters.each(function(item){
+			if(property==item.getProperty()){
+				returnFilter.push(item);
+			}
+		});
+		return returnFilter;
 	},
 	
 	/***
@@ -873,5 +893,35 @@ Ext.define('Editor.view.admin.TaskGrid', {
 					'<div class="x-progress-bar x-progress-bar-default" style="width: ' + value + '">'+
 					'</div>'+
 			   '</div>';
-	}
+	},
+	
+	/***
+	 * Render the deadline dates for the current user.
+	 * Overdued dates will be displayed as red
+	 */
+	userJobDeadlineRenderer:function(v, meta, rec) {
+		if(!rec.get('users')){
+		  return '';
+	  	}
+        var me=this,
+        	users=rec.get('users'),
+        	values=[];
+        
+        for(var i=0;i<users.length;i++){
+        	var user=users[i],
+        		redClass="",
+        		deadlineDate=user['deadlineDate'] && new Date(user['deadlineDate']);
+        	
+        	if(!deadlineDate || user['userGuid']!=Editor.data.app.user['userGuid']){
+        		continue;
+        	}
+        	
+        	if(deadlineDate < new Date()){
+        		redClass="redTextColumn"
+        	}
+        	deadlineDate=Ext.util.Format.date(deadlineDate,'d.m.Y')
+        	values.push('<span class="'+redClass+'">'+deadlineDate+'</span>')
+        }
+        return values.join(', ');
+    }
 });

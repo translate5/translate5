@@ -63,7 +63,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
                     dataIndex:'filterHolder',
                     valueField: 'property',
                     displayField: 'textLabel',
-                    tipTpl:'<tpl for="tooltip">{textLabel}: {operatorTranslated} <b>{dataSourceValue}</b><br/></tpl>',
+                    tipTpl:'<tpl for="filtergroup">{textLabel}: {operatorTranslated} <b>{dataSourceValue}</b><br/></tpl>',
                     maxWidth:700,
                     hideTrigger: true,
                     fieldLabel: me.strings.filterHolderLabel,
@@ -121,6 +121,8 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     		filterHolderStore=filterHolder.getStore();
     	}
     	
+    	me.getViewModel().getStore('activeFilter').removeAll();
+    	
 		//convert all active filtes to simple array object collection
 		filters.each(function(item) {
 			filtersarray.push(me.getFilterModelObject(item));
@@ -128,7 +130,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     	
     	//add the records to the field store
     	if(filtersarray.length>0){
-    		filtersarray=me.groupActiveFiltersTooltip(filtersarray);
+    		filtersarray=me.groupActiveFiltersFiltergroup(filtersarray);
     		records=filterHolderStore.add(filtersarray);
     	}
     	
@@ -159,10 +161,11 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     },
     
     /***
-     * Group the tooltip for the active filters. This will group the filters with multiple field options to only one field
-     * with tooltip which shows all active values.
+     * Create filtergroup property for all multivalued filters.
+     * The value of this property is used for rendering tooltips and custom values in the advance filter component.
+     * The value is also used to update the multivalued filters in the advanced filter window.
      */
-    groupActiveFiltersTooltip:function(filtersarray){
+    groupActiveFiltersFiltergroup:function(filtersarray){
     	var me=this,
     		singleFilter=null,
     		filterIndex=-1,
@@ -171,16 +174,16 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     	for(var i=0;i<filtersarray.length;i++){
     		singleFilter=filtersarray[i];
     		filterIndex=me.isFilterInArray(returnArray,singleFilter);
-    		if(!singleFilter.get('tooltip') && filterIndex<0){
-    			singleFilter.set('tooltip',[]);
-    			singleFilter.get('tooltip').push(singleFilter.getDataCustom());
+    		if(!singleFilter.get('filtergroup') && filterIndex<0){
+    			singleFilter.set('filtergroup',[]);
+    			singleFilter.get('filtergroup').push(singleFilter.getDataCustom());
     			returnArray.push(singleFilter);
     			continue;
     		}
     		if(filterIndex<0){
     			continue;
     		}
-    		returnArray[filterIndex].get('tooltip').push(singleFilter.getDataCustom());
+    		returnArray[filterIndex].get('filtergroup').push(singleFilter.getDataCustom());
     	}
     	return returnArray;
     },

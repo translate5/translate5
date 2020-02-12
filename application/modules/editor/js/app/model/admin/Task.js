@@ -54,7 +54,10 @@ Ext.define('Editor.model.admin.Task', {
       OPEN: 'open',
       END: 'end',
   },
-  WORKFLOW_STEP_NO_WORKFLOW:'no workflow',//no workflow step constant
+  WORKFLOW_STEP_NO_WORKFLOW:'no workflow',//default workflow step constant
+  WORKFLOW_STEP_TRANSLATION:'translation',//default workflow step constant
+  WORKFLOW_STEP_REVIEWING:'reviewing',//default workflow step constant
+  
   WORKFLOW_USER_ROLE_TRANSLATOR:'translator',//TODO: when needed add the other constants
   fields: [
     {name: 'id', type: 'int'},
@@ -77,10 +80,8 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'wordCount', type: 'integer'},
     {name: 'fileCount', type: 'integer', persist: false},
     {name: 'targetDeliveryDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
-    {name: 'realDeliveryDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
     {name: 'referenceFiles', type: 'boolean'},
     {name: 'terminologie', type: 'boolean'},
-    {name: 'orderdate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
     {name: 'edit100PercentMatch', type: 'boolean'},
     {name: 'lockLocked', type: 'boolean'},
     {name: 'enableSourceEditing', type: 'boolean'},
