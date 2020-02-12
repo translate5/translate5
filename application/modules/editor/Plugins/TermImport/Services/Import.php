@@ -428,9 +428,9 @@ class editor_Plugins_TermImport_Services_Import {
         }
         
         //create new term collection/language resource
-        $collectionId=$model->create($collectionName, [$customerId]);
+        $collection=$model->create($collectionName, [$customerId]);
         
-        return ['collectionId'=>$collectionId,'customerIds'=>[$customerId],'mergeTerms'=>true,'collectionName'=>$collectionName];
+        return ['collectionId'=>$collection->getId(),'customerIds'=>[$customerId],'mergeTerms'=>true,'collectionName'=>$collectionName];
     }
     
     private function loadConfig($configName){
