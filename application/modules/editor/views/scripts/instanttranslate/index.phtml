@@ -108,6 +108,12 @@
         "noLanguageResource"        => $translate->_("Für diese Sprachkombination steht keine SprachResource zur Verfügung."),
         "translationsForLabel"      => $translate->_("Übersetzungen für"),
         "termProposalIconTooltip"   => $translate->_("Als neuen Term im TermPortal vorschlagen"),
+        "availableUntil"            => $translate->_("verfügbar bis"),
+        "error"                     => $translate->_("Fehler"),
+        "noDownloadWhileImport"     => $translate->_("Während der Import läuft, steht die Datei noch nicht zum Download zur Verfügung. Klicken Sie \"Aktualisieren\", um den Status erneut zu prüfen."),
+        "pretranslatedFiles"        => $translate->_("Vorübersetzte Dateien"),
+        "refresh"                   => $translate->_("Aktualisieren"),
+        "state"                     => $translate->_("Status"),
     );
     $this->Php2JsVars()->set('languageresource.translatedStrings',$this->translations);
     
@@ -154,9 +160,8 @@
                 <span id="countedCharacters" class="show-if-source-is-text">0</span>
                 <input id="sourceFile" name="sourceFile" type="file" class="show-if-source-is-file"/>
             </div>
-            <div id="pretranslatedfiles">
-            </div>
         <div id="sourceError" class="instant-translation-error ui-state-error ui-corner-all"></div>
+        <div id="pretranslatedfiles"></div>
         </form>
     </div>
     <button id="switchSourceTarget">
