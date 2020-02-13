@@ -340,7 +340,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         
         // init worker and queue it
         if (!$worker->init($task->getTaskGuid(), $params)) {
-            $this->log->logError('Okapi-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
         $worker->queue($workerParentId);
