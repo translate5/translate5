@@ -805,6 +805,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * Is the task to be hidden due to its taskType?
+     * (Further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
+     */
+    public function isHiddenTask() {
+        return $this->getTaskType() != 'default';
+    }
+    
+    /**
      * generates a statistics summary to the given task
      * @return stdClass
      */
