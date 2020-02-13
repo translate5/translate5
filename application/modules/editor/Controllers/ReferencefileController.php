@@ -47,7 +47,7 @@ class Editor_ReferencefileController extends editor_Controllers_EditorrestContro
         $file = new SplFileInfo($fileToDisplay);
         if (! $file->isFile()) {
             $logger = Zend_Registry::get('logger')->cloneMe('editor.referencefile');
-            $logger->warn('Etodo','A non existent reference file "{file}" was requested.',[
+            $logger->warn('E1216','A non existent reference file "{file}" was requested.',[
                 'task' => $task,
                 'file' => $this->getRequestedFileRelPath(),
             ]);
