@@ -325,10 +325,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         }
         $langRes = $connector->getLanguageResource();
         $this->log->warn('E1101', 'Disabled Language Resource {name} ({service}) for analysing and pretranslation due too much errors.',[
-            task => $this->task,
-            languageResource => $langRes,
-            name => $langRes->getName(),
-            service => $langRes->getServiceName(),
+            'task' => $this->task,
+            'languageResource' => $langRes,
+            'name' => $langRes->getName(),
+            'service' => $langRes->getServiceName(),
         ]);
         unset($this->connectors[$id]);
         return true;
