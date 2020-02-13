@@ -45,7 +45,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         close: '#UT#Fenster schließen',
         events: '#UT#Ereignisse',
         notifyUsersTitle: '#UT#Zugewiesene Benutzer benachrichtigen?',
-        notifyUsersMsg: '#UT#Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?',
+        notifyUsersMsg: '#UT#Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtigt werden?',
         userNotifySuccess:'#UT#Benutzer wurden erfolgreich per E-Mail benachrichtigt'
     },
     layout: 'fit',
@@ -78,9 +78,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
 
-        if(auth.isAllowed('editorEditTaskRealDeliveryDate') || 
-            auth.isAllowed('editorEditTaskOrderDate') || 
-            auth.isAllowed('editorEditTaskPm') || 
+        if(auth.isAllowed('editorEditTaskPm') || 
             auth.isAllowed('editorEditTaskDeliveryDate') ||
             auth.isAllowed('editorEditTaskTaskName')||
             auth.isAllowed('editorEditTaskEdit100PercentMatch')){

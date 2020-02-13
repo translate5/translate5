@@ -40,7 +40,8 @@ Ext.define('Editor.view.admin.task.KpiWindow', {
     strings: {
         closeBtn: '#UT#Fenster schließen',
         averageProcessingTimeToolTip: '#UT#Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.',
-        excelExportUsageToolTip: '#UT#Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.'
+        excelExportUsageToolTip: '#UT#Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.',
+        filterInfoLabel:'#UT#Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.'
     },
     
     initConfig: function(instanceConfig) {
@@ -51,6 +52,9 @@ Ext.define('Editor.view.admin.task.KpiWindow', {
                 xtype: 'panel',
                 dock: 'top',
                 items: [{
+                    xtype: 'displayfield',
+                    value:me.strings.filterInfoLabel
+                },{
                     xtype: 'displayfield',
                     itemId: 'kpi-average-processing-time-display',
                     margin: 5,
