@@ -103,6 +103,13 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
         $oldStep = $task->getWorkflowStepName();
+        
+        //set the finished date when the user finishes a role
+        if($newTua->getState()==editor_Workflow_Abstract::STATE_FINISH){
+            $newTua->setFinishedDate(NOW_ISO);
+            $newTua->save();
+        }
+        
         $this->callActions(__FUNCTION__, $oldStep, $newTua->getRole(), $newTua->getState());
     }
     

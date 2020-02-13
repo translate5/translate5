@@ -43,7 +43,8 @@ END LICENSE AND COPYRIGHT
  * @method void setActionClass() setActionClass(string $class)
  * @method string getAction() getAction()
  * @method void setAction() setAction(string $action)
- * 
+ * @method string getDescription() getDescription()
+ * @method void setDescription() setDescription(string $description)
  */
 class editor_Models_Workflow_Action extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass          = 'editor_Models_Db_Workflow_Action';

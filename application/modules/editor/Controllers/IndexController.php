@@ -757,9 +757,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             'pmGuid' => '{dab18309-7dfd-4185-b27e-f490c3dcb888}',
             'pmName' => 'PM Username',
             'wordCount' => '123',
-            'targetDeliveryDate' => '2017-12-21 00:00:00',
-            'realDeliveryDate' => null,
-            'orderdate' => '2017-12-20 00:00:00',
+            'targetDeliveryDate' => '2017-12-21 00:00:00'
         ]);
         $config->task = $config->oldTask;
         $config->importConfig = new editor_Models_Import_Configuration();

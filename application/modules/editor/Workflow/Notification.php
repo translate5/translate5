@@ -586,6 +586,39 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
     
     
+    /***
+     * Notify the the associated users when the deadlineDate is over the defined days in the config
+     */
+    public function notifyOverdueDeadline(){
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
+        $daysOffset=isset($triggerConfig->daysOffset) ? $triggerConfig->daysOffset : 1;
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        
+        //load all task assocks where the deadlineDate date overdue the current date - days offset
+        $db = Zend_Registry::get('db');
+        /* @var $db Zend_Db_Table */
+        $s = $db->select()
+        ->from(array('tua' => 'LEK_taskUserAssoc'), ['userGuid','role','deadlineDate'])
+        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid',['taskName'])
+        ->where('t.state NOT IN(?)', [$task::STATE_ERROR,$task::STATE_END])
+        ->where('tua.state NOT IN(?)', [editor_Workflow_Abstract::STATE_FINISH])
+        ->where('tua.deadlineDate = CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
+        $userAssocs = $db->fetchAll($s);
+        
+        foreach($userAssocs as $assoc) {
+            $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+            /* @var $user ZfExtended_Models_User */
+            $user->loadByGuid($assoc['userGuid']);
+            $this->createNotification($assoc['role'],__FUNCTION__,[
+                'taskName' => $assoc['taskName'],
+                'deadlineDate' =>$assoc['deadlineDate']
+            ]);
+            $this->notifyUser($user);
+        }
+    }
+    
     
     /**
      * attaches the segmentList as attachment to the internal mailer object

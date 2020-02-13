@@ -466,7 +466,9 @@ Ext.define('Editor.controller.Localizer', {
             taskImportButtonText:'<?php echo $this->translate->_('Aufgabe importieren');?>',
             taskDeleteButtonText:'<?php echo $this->translate->_('Aufgabe löschen');?>',
             averageProcessingTimeLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Lektor');?>',
-            excelExportUsageLabel: '<?php echo $this->translate->_('Excel-Export Nutzung');?>'
+            excelExportUsageLabel: '<?php echo $this->translate->_('Excel-Export Nutzung');?>',
+            averageProcessingTimeTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Übersetzer');?>',
+            averageProcessingTimeSecondTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Überprüfung durch Übersetzer');?>',
         },
         confirmStrings: {
             "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -483,13 +485,13 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.TaskGrid",
         title: '<?php echo $this->translate->_('Aufgabenübersicht');?>',
         states: {
-            user_state_open: '<?php echo $this->translate->_('offen');?>',
+            open: '<?php echo $this->translate->_('offen');?>',
             locked: '<?php echo $this->translate->_('in Arbeit');?>',
-            user_state_waiting: '<?php echo $this->translate->_('wartend');?>',
-            user_state_finished: '<?php echo $this->translate->_('abgeschlossen');?>',
-            task_state_end: '<?php echo $this->translate->_('beendet');?>',
-            task_state_unconfirmed: '<?php echo $this->translate->_('nicht bestätigt');?>',
-            task_state_import: '<?php echo $this->translate->_('import');?>',
+            waiting: '<?php echo $this->translate->_('wartend');?>',
+            finished: '<?php echo $this->translate->_('abgeschlossen');?>',
+            end: '<?php echo $this->translate->_('beendet');?>',
+            unconfirmed: '<?php echo $this->translate->_('nicht bestätigt');?>',
+            import: '<?php echo $this->translate->_('import');?>',
             forMe: '<?php echo $this->translate->_('für mich ');?>'
         },
         strings: {
@@ -520,7 +522,7 @@ Ext.define('Editor.controller.Localizer', {
             sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
             relaisLang: '<?php echo $this->translate->_('Relaissprache');?>',
             targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
-            state: '<?php echo $this->translate->_('Status');?>',
+            state: '<?php echo $this->translate->_('Aufgabenstatus');?>',
             customerId: '<?php echo $this->translate->_('Endkunde');?>',
             pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
             users: '<?php echo $this->translate->_('Benutzer');?>',
@@ -528,12 +530,10 @@ Ext.define('Editor.controller.Localizer', {
             wordCountTT: '<?php echo $this->translate->_('Anzahl Wörter');?>',
             fileCount: '<?php echo $this->translate->_('Dateien');?>',
             targetDeliveryDate: '<?php echo $this->translate->_('Lieferdatum (soll)');?>',
-            realDeliveryDate: '<?php echo $this->translate->_('Lieferdatum (ist)');?>',
             referenceFiles: '<?php echo $this->translate->_('Referenzdateien');?>',
             terminologie: '<?php echo $this->translate->_('Terminologie');?>',
             fullMatchEdit: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
             lockLocked: '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>',
-            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>',
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>',
             segmentCount: '<?php echo $this->translate->_('Segmentanzahl');?>',
@@ -548,7 +548,12 @@ Ext.define('Editor.controller.Localizer', {
             pmName: '<?php echo $this->translate->_('Projektmanager');?>',
             edit100PercentMatch: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
             userCount: '<?php echo $this->translate->_('Zahl zugewiesener Benutzer');?>',
-            workflowStepName: '<?php echo $this->translate->_('Aktueller Workflow-Schritt');?>'
+            workflowStepName: '<?php echo $this->translate->_('Aktueller Workflow-Schritt');?>',
+            userState: '<?php echo $this->translate->_('Mein Job-Status');?>',
+            userJobDeadline: '<?php echo $this->translate->_('Meine Deadline');?>',
+            assignmentDate:'<?php echo $this->translate->_('Benutzer-Zuweisungsdatum');?>',
+            finishedDate:'<?php echo $this->translate->_('Benutzer-Abschlussdatum');?>',
+            deadlineDate:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>'
         }
     });
     
@@ -558,7 +563,8 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             closeBtn: '<?php echo $this->translate->_('Fenster schließen');?>',
             averageProcessingTimeToolTip: '<?php echo $this->translate->_('Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.');?>',
-            excelExportUsageToolTip: '<?php echo $this->translate->_('Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.');?>'
+            excelExportUsageToolTip: '<?php echo $this->translate->_('Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.');?>',
+            filterInfoLabel: '<?php echo $this->translate->_('Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.');?>'
         }
     });
     
@@ -599,10 +605,22 @@ Ext.define('Editor.controller.Localizer', {
         	cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
         	title:'<?php echo $this->translate->_('Erweiterte Filter');?>',
         	anonymizedUsersInfo:'<?php echo $this->translate->_('Anonymisierte Benutzer nicht auswählbar');?>',
-        	gridFiltersInfo:'<?php echo $this->translate->_('Weitere Filter im Kopf jeder Spalte');?>'
+        	gridFiltersInfo:'<?php echo $this->translate->_('Weitere Filter im Kopf jeder Spalte');?>',
+            assignmentDateText:'<?php echo $this->translate->_('Benutzer-Zuweisungsdatum');?>',
+            finishedDateText:'<?php echo $this->translate->_('Benutzer-Abschlussdatum');?>',
+            deadlineDateText:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>'
         }
     });
-    
+
+    Ext.define("Editor.locale.de.view.admin.task.filter.DateFilter", {
+        override: "Editor.view.admin.task.filter.DateFilter",
+        strings:{
+        	eqText: '<?php echo $this->translate->_('am');?>',
+        	gtText: '<?php echo $this->translate->_('nach');?>',
+        	ltText: '<?php echo $this->translate->_('bevor');?>',
+        }
+    });
+
     Ext.define("Editor.locale.de.view.admin.task.TaskAttributes", {
         override: "Editor.view.admin.task.TaskAttributes",
         title: '<?php echo $this->translate->_('Eigenschaften');?>',
@@ -610,8 +628,6 @@ Ext.define('Editor.controller.Localizer', {
             taskName: '<?php echo $this->translate->_('Aufgabenname');?>',
             customerName: '<?php echo $this->translate->_('Kunde');?>',
             deliveryDate: '<?php echo $this->translate->_('Lieferdatum (soll)');?>',
-            realDeliveryDate: '<?php echo $this->translate->_('Lieferdatum (ist)');?>',
-            orderDate: '<?php echo $this->translate->_('Bestelldatum');?>',
             pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
             btnSave: '<?php echo $this->translate->_('Speichern');?>',
             successUpdate: '<?php echo $this->translate->_('Die Aufgabe wurde erfolgreich aktualisiert');?>',
@@ -653,7 +669,6 @@ Ext.define('Editor.controller.Localizer', {
             targetDeliveryLabel: '<?php echo $this->translate->_('Lieferdatum');?>',
             fullMatchLabel: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
             lockLockedLabel: '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>',
-            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             sourceEditLabel: '<?php echo $this->translate->_('Ausgangstext ist editierbar');?>',
             bottomInfo: '<?php echo $this->translate->_('¹ Diese Angaben / Daten werden für den Import zwingend benötigt.');?>',
             feedbackText: '<?php echo $this->translate->_('Fehler beim Import!');?>',
@@ -756,7 +771,7 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.view.admin.task.UserAssoc", {
         override: "Editor.view.admin.task.UserAssoc",
-        title: '<?php echo $this->translate->_('Benutzer zu Aufgabe zuordnen');?>',
+        title: '<?php echo $this->translate->_('Benutzer');?>',
         strings: {
             fieldRole: '<?php echo $this->translate->_('Rolle');?>',
             fieldState: '<?php echo $this->translate->_('Status');?>',
@@ -765,7 +780,8 @@ Ext.define('Editor.controller.Localizer', {
             btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
             formTitleAdd: '<?php echo $this->translate->_('Benutzerzuweisung hinzufügen:');?>',
             formTitleEdit: '<?php echo $this->translate->_('Bearbeite Benutzer "{0}"');?>',
-            editInfo: '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>'
+            editInfo: '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>',
+            fieldDeadline: '<?php echo $this->translate->_('Deadline');?>'
         }
     });
     
@@ -783,7 +799,10 @@ Ext.define('Editor.controller.Localizer', {
             removeUser: '<?php echo $this->translate->_('Benutzer entfernen');?>',
             removeUserTip: '<?php echo $this->translate->_('Den gewählten Benutzer aus dieser Aufgabe entfernen.');?>',
             save: '<?php echo $this->translate->_('Änderungen speichern');?>',
-            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            assignmentDateLable: '<?php echo $this->translate->_('Zuweisung');?>',
+            finishedDateLabel: '<?php echo $this->translate->_('Abgeschlossen');?>',
+            deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>'
         }
     });
 
@@ -1275,7 +1294,7 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.view.LanguageResources.TaskAssocPanel", {
         override: "Editor.view.LanguageResources.TaskAssocPanel",
-        title: '<?php echo $this->translate->_('Sprach-Resourcen zuweisen');?>',
+        title: '<?php echo $this->translate->_('Sprach-Resourcen');?>',
         strings: {
             reload: '<?php echo $this->translate->_('Aktualisieren');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
