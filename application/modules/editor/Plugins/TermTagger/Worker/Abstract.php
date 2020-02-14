@@ -143,12 +143,10 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
         }
 
         if($workerCountToStart == 0) {
-            if (!$this->task->isHiddenTask()) { // if the task is not visible, the terms in the segment don't need to be tagged.
-                //E1131No TermTaggers available, please enable term taggers to import this task.
-                throw new editor_Plugins_TermTagger_Exception_Down('E1131', [
-                    'task' => $this->task
-                ]);
-            }
+            //E1131No TermTaggers available, please enable term taggers to import this task.
+            throw new editor_Plugins_TermTagger_Exception_Down('E1131', [
+                'task' => $this->task
+            ]);
         }
         
         for($i=0;$i<$workerCountToStart;$i++){

@@ -227,7 +227,7 @@ class editor_TaskController extends ZfExtended_RestController {
         // load only 'visible' tasks (further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
         $f->addFilter((object)[
             'field' => 'taskType',
-            'value' => 'default',
+            'value' => $this->entity->getDefaultTasktype(),
             'type' => 'string',
             'comparison' => 'eq'
         ]);
@@ -452,6 +452,11 @@ class editor_TaskController extends ZfExtended_RestController {
             //TODO test what happens with new error logging if PM does not exist? 
             $pm->loadByGuid($this->data['pmGuid']);
         }
+        
+        if (empty($this->data['taskType'])) {
+            $this->data['taskType'] = $this->entity->getDefaultTasktype();
+        }
+        
         $this->data['pmName'] = $pm->getUsernameLong();
         $this->processClientReferenceVersion();
         $this->_helper->Api->convertLanguageParameters($this->data['sourceLang']);
@@ -479,15 +484,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $defaultWorkflow = $this->config->runtimeOptions->import->taskWorkflow;
         $this->entity->setWorkflow($this->workflowManager->getIdToClass($defaultWorkflow));
         
-        // TasktType:
-        // - use default tasktype as fallback
-        // - check if tasktype is allowed according to role
-        $this->entity->setTaskTypeToDefaultIfNeeded();
-        $acl = ZfExtended_Acl::getInstance();
-        /* @var $acl ZfExtended_Acl */
-        $isTaskTypeAllowed = $acl->isInAllowedRoles($this->user->data->roles, 'initial_tasktype', $this->entity->getTaskType());
-        
-        if($isTaskTypeAllowed && $this->validate()) {
+        if($this->validate()) {
             $this->initWorkflow();
             //$this->entity->save(); => is done by the import call!
             $this->processUploadedFile();
@@ -817,6 +814,9 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         if(isset($this->data->enableSourceEditing)){
             $this->data->enableSourceEditing = (boolean)$this->data->enableSourceEditing;
+        }
+        if (isset($this->data->initial_tasktype)) {
+            unset($this->data->initial_tasktype);
         }
         $this->processClientReferenceVersion();
         $this->setDataInEntity();
@@ -1181,10 +1181,30 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * gets and validates the uploaded zip file
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::additionalValidations()
      */
     protected function additionalValidations() {
+        //gets and validates the uploaded zip file
         $this->upload->initAndValidate();
+        // validate the taskType
+        $this->validateTaskType();
+    }
+    
+    /**
+     * Validate the taskType: check if given tasktype is allowed according to role
+     * @throws ZfExtended_UnprocessableEntity
+     */
+    protected function validateTaskType() {
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        $isTaskTypeAllowed = $acl->isInAllowedRoles($this->user->data->roles, 'initial_tasktype', $this->entity->getTaskType());
+        if (!$isTaskTypeAllowed) {
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1217' => 'TaskType not valid.'
+            ], 'editor.task');
+            throw new ZfExtended_UnprocessableEntity('E1217');
+        }
     }
 
     /**

@@ -116,6 +116,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const USAGE_MODE_COOPERATIVE = 'cooperative';
     const USAGE_MODE_SIMULTANEOUS = 'simultaneous';
     
+    const INITIAL_TASKTYPE_DEFAULT = 'default';
+    
     const ASSOC_TABLE_ALIAS = 'LEK_taskUserAssoc';
     const TABLE_ALIAS = 'LEK_task';
     
@@ -794,14 +796,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * set the default taskType if no taskType is set
+     * Returns the default initial tasktype.
+     * @return string
      */
-    public function setTaskTypeToDefaultIfNeeded() {
-        $taskType = $this->getTaskType();
-        if(! empty($taskType)) {
-            return;
-        }
-        $this->setTaskType('default');
+    public function getDefaultTasktype () {
+        return self::INITIAL_TASKTYPE_DEFAULT;
     }
     
     /**
@@ -809,7 +808,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * (Further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
      */
     public function isHiddenTask() {
-        return $this->getTaskType() != 'default';
+        return $this->getTaskType() != $this->getDefaultTasktype();
     }
     
     /**
@@ -960,6 +959,30 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $this->loadByTaskGuid($taskGuid);
         $this->setTerminologie(!empty($result));
         $this->save();
+    }
+    
+    /**
+     * Overwrite getTerminologie: Return the DB value or false depending on the taskType.
+     * @return boolean
+     */
+    public function getTerminologie() {
+        if ($this->isHiddenTask()) {
+            // For hidden tasks, terms don't need to be tagged (= no TermTagger needed).
+            return false;
+        }
+        return parent::get('terminologie');
+    }
+    
+    /**
+     * Overwrite setTerminologie: saves false instead of the given value depending on the taskType.
+     * @param bool $flag
+     */
+    public function setTerminologie($flag) {
+        if ($this->isHiddenTask()) {
+            // For hidden tasks, terms don't need to be tagged (= no TermTagger needed).
+            $flag = false;
+        }
+        return parent::set('terminologie', $flag);
     }
     
     /**

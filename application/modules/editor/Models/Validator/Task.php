@@ -65,7 +65,8 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('customerId', 'int');
     $this->addValidator('segmentCount', 'int');
     $this->addValidator('segmentFinishCount', 'int');
-    $this->addValidator('taskType', 'stringLength', array('min' => 0, 'max' => 255));
+    // TODO: add taskType-validation of InstantTranslate-Plugin from there
+    $this->addValidator('taskType', 'inArray', [[editor_Models_Task::INITIAL_TASKTYPE_DEFAULT, editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE]]);
     $this->addValidator('usageMode', 'inArray', [[editor_Models_Task::USAGE_MODE_COMPETITIVE, editor_Models_Task::USAGE_MODE_COOPERATIVE, editor_Models_Task::USAGE_MODE_SIMULTANEOUS]]);
   }
 }

@@ -77,9 +77,9 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
     }
     
     /**
-     * returns the segment count of the given taskGuid
+     * returns the segmenthistory count of the given taskGuid
      * @param string $taskGuid
-     * @return integer the segment count
+     * @return integer the segmenthistory count
      */
     public function count($taskGuid) {
         $s = $this->db->select()
