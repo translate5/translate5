@@ -127,6 +127,22 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     }
     
     /***
+     * Load the last analysis by the taskGuid.
+     * The return result are not grouped
+     * @param string $taskGuid
+     * @return array
+     */
+    public function loadLastByTaskGuid(string $taskGuid){
+        //load the latest analysis for the given taskGuid
+        $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
+        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
+        $analysisAssoc=$analysisAssoc->loadNewestByTaskGuid($taskGuid);
+        $s=$this->db->select()
+        ->where('analysisId=?',$analysisAssoc['id']);
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /***
      * Group the results by matchrate. Each row is one language resource result group.
      * @param array $results
      * @param array $analysisAssoc

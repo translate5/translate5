@@ -44,6 +44,14 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
             // Reason is unfixed: TRANSLATE-1637: MatchAnalysis: Errors in Frontend when analysing multiple tasks
             throw new editor_Plugins_MatchAnalysis_Exception("E1103");
         }
+        
+        //INFO: this is a non api property. It is used only for the tests
+        //if not grouped is set, load all analysis records (only the last analysis) for the task guid
+        $notGrouped=$this->getParam('notGrouped', false);
+        if($notGrouped){
+            $this->view->rows=$this->entity->loadLastByTaskGuid($taskGuid);
+            return;
+        }
         $this->view->rows=$this->entity->loadByBestMatchRate($taskGuid);
     }
     

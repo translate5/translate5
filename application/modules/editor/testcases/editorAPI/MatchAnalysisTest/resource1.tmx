@@ -214,7 +214,7 @@
     <tu tuid="17" creationdate="20181218T101559Z">
       <prop type="tmgr:segNum">0</prop>
       <prop type="tmgr:markup">OTMXUXLF</prop>
-      <prop type="tmgr:docname">test-fuer-analyse.html</prop>
+      <prop type="tmgr:docname">test-analyse.html</prop>
       <tuv xml:lang="de-DE">
         <prop type="tmgr:language">German(reform)</prop>
         <seg>Across Language Server</seg>
@@ -4426,7 +4426,7 @@
     <tu tuid="341" creationdate="20181218T150257Z">
       <prop type="tmgr:segNum">0</prop>
       <prop type="tmgr:markup">OTMXUXLF</prop>
-      <prop type="tmgr:docname">test-fuer-analyse.html</prop>
+      <prop type="tmgr:docname">test-analyse.html</prop>
       <tuv xml:lang="de-DE">
         <prop type="tmgr:language">German(reform)</prop>
         <seg>Übersicht</seg>
@@ -5960,7 +5960,7 @@
     <tu tuid="459" creationdate="20181218T100115Z">
       <prop type="tmgr:segNum">0</prop>
       <prop type="tmgr:markup">OTMXUXLF</prop>
-      <prop type="tmgr:docname">test-fuer-analyse.html</prop>
+      <prop type="tmgr:docname">test-analyse.html</prop>
       <tuv xml:lang="de-DE">
         <prop type="tmgr:language">German(reform)</prop>
         <seg>translate5 - Consulting zu Einsatz, Installation und Bedienung</seg>

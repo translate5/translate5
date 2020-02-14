@@ -27,6 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * Match analysis tests.
+ * The test will check if the current codebase provides a valid matchanalysis test results.
+ * The valid test results are counted by hand and thay are correct.
+ * 
  */
 class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
     
@@ -34,6 +38,8 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
     
     protected static $sourceLangRfc='de';
     protected static $targetLangRfc='en';
+    
+    protected static $prefix='MATEST';
     
     /**
      */
@@ -45,22 +51,94 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertCustomer();//assert the test customer
+    }
+    
+    /***
+     * Import all required resources and task before the validation
+     */
+    public function testSetupData(){
+        $this->addTm('resource1.tmx',$this->getLrRenderName('resource1'));
+        $this->addTm('resource2.tmx',$this->getLrRenderName('resource2'));
+        $this->addTermCollection('collection.tbx', $this->getLrRenderName('resource3'));
+        $this->createTask();
+        $this->addTaskAssoc($this->getLrRenderName('resource1'));
+        $this->addTaskAssoc($this->getLrRenderName('resource2'));
+        $this->addTaskAssoc($this->getLrRenderName('resource3'));
+        $this->queueAnalysys();
+        $this->startImport();
+        $this->checkTaskState();
+    }
+    
+    /***
+     * Validate the analysis results.
+     * 1. the first validation will validate the grouped results for the analysis
+     * 2. the second validation will validate the all existing results for the analyis
+     */
+    public function testValidateResults(){
+        $analysis=$this->api()->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
+            'taskGuid'=>$this->api()->getTask()->taskGuid
+        ]);
+        
+        $this->assertNotEmpty($analysis,'No results found for the matchanalysis.');
+        //remove the created timestamp since is not relevant for the test
+        foreach ($analysis as &$a){
+            unset($a->created);
+        }
+        
+        //this is to recreate the file from the api response
+        //file_put_contents($this->api()->getFile('analysis.txt', null, false), json_encode($analysis));
+        $expected=$this->api()->getFileContent('analysis.txt');
+        $actual=json_encode($analysis);
+        //check for differences between the expected and the actual content
+        $this->assertEquals($expected, $actual, "The expected file an the result file does not match.");
+        
+        
+        //not test all results and matches
+        $analysis=$this->api()->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
+            'taskGuid'=>$this->api()->getTask()->taskGuid,
+            'notGrouped'=>$this->api()->getTask()->taskGuid
+        ]);
+        $this->assertNotEmpty($analysis,'No results found for the matchanalysis.');
+        //remove some of the unneeded columns
+        foreach ($analysis as &$a){
+            unset($a->id);
+            unset($a->taskGuid);
+            unset($a->analysisId);
+            unset($a->segmentId);
+            unset($a->languageResourceid);
+        }
+        
+        //file_put_contents($this->api()->getFile('allanalysis.txt', null, false), json_encode($analysis));
+        $expected=$this->api()->getFileContent('allanalysis.txt');
+        $actual=json_encode($analysis);
+        //check for differences between the expected and the actual content
+        $this->assertEquals($expected, $actual, "The expected file(allanalysis) an the result file does not match.");
+        
+    }
+    
+    /***
+     * Create the task. The task will not be imported directly autoStartImport is 0!
+     */
+    protected function createTask(){
         $task =[
             'taskName' => 'API Testing::'.__CLASS__, //no date in file name possible here!
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'customerId'=>self::$api->getCustomer()->id
+            'customerId'=>self::$api->getCustomer()->id,
+            'autoStartImport'=>0
         ];
-        
         self::assertLogin('testmanager');
         self::$api->addImportFile(self::$api->getFile('test-analyse.html'));
-        self::$api->import($task);
+        self::$api->import($task,false,false);
+        error_log('Task created. '.$this->api()->getTask()->taskName);
     }
     
     /***
-     * Import the required language resources for the analysis
+     * Add the translation memory resource. OpenTM2 in our case
+     * @param string $fileName
+     * @param string $name
      */
-    public function testImportLanguageResources(){
+    protected function addTm(string $fileName,string $name){
         $customer = self::api()->getCustomer();
         $customerParamObj = new stdClass();
         $customerParamObj->customerId = $customer->id;
@@ -79,61 +157,91 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         ];
         
         //create the resource 1 and import the file
-        $params['name']='API Testing::'.__CLASS__.'_resource1';
-        $this->api()->addFile('tmUpload', $this->api()->getFile('resource1.tmx'), "application/xml");
+        $params['name']=$name;
+        $this->api()->addFile('tmUpload', $this->api()->getFile($fileName), "application/xml");
         $resource = $this->api()->requestJson('editor/languageresourceinstance', 'POST',$params);
         $this->assertTrue(is_object($resource), 'Unable to create the language resource:'.$params['name']);
         $this->assertEquals($params['name'], $resource->name);
         self::$collectionMap[$params['name']]=$resource->id;
+        error_log("Language resources created. ".$resource->name);
         
-        //create the resource 2 and import the file
-        $params['name']='API Testing::'.__CLASS__.'_resource2';
-        $this->api()->addFile('tmUpload', $this->api()->getFile('resource2.tmx'), "application/xml");
-        $resource = $this->api()->requestJson('editor/languageresourceinstance', 'POST',$params);
-        $this->assertTrue(is_object($resource), 'Unable to create the language resource:'.$params['name']);
-        $this->assertEquals($params['name'], $resource->name);
-        self::$collectionMap[$params['name']]=$resource->id;
+        $resp = $this->api()->requestJson('editor/languageresourceinstance/'.$resource->id, 'GET',[]);
         
+        error_log('Languageresources status check:'.$resp->status);
+        $counter=0;
+        $limitCheck=20;
+        while ($resp->status!='available'){
+            if($resp->status=='error'){
+                break;
+            }
+            //break after 20 trys
+            if($counter==$limitCheck){
+                break;
+            }
+            sleep(5);
+            $resp = $this->api()->requestJson('editor/languageresourceinstance/'.$resp->id, 'GET',[]);
+            error_log('Languageresources status check '.$counter.'/'.$limitCheck.' state: '.$resp->status);
+            $counter++;
+        }
+        
+        $this->assertEquals('available',$resp->status,'Tm import stoped. Tm state is:'.$resp->status);
+    }
+    
+    /***
+     * Add the term collection resource
+     * @param string $fileName
+     * @param string $name
+     */
+    protected function addTermCollection(string $fileName,string $name) {
+        $customer = self::api()->getCustomer();
+        $customerParamObj = new stdClass();
+        $customerParamObj->customerId = $customer->id;
+        $customerParamObj->useAsDefault = 0;
+        $customerParamArray = [];
+        $customerParamArray[] = $customerParamObj;
+        
+        $params=[];
         //create the resource 3 and import the file
-        $params['name']='API Testing::'.__CLASS__.'_resource3';
+        $params['name']=$name;
         $params['resourceId']='editor_Services_TermCollection';
         $params['serviceType']='editor_Services_TermCollection';
+        $params['resourcesCustomers']=$customer->id;
+        $params['resourcesCustomersHidden']=json_encode($customerParamArray);
         $params['serviceName']='TermCollection';
         $params['mergeTerms']=false;
-        unset($params['sourceLang']);
-        unset($params['targetLang']);
         //create and import the term collection languageresource
-        $this->api()->addFile('tmUpload', $this->api()->getFile('collection.tbx'), "application/xml");
+        $this->api()->addFile('tmUpload', $this->api()->getFile($fileName), "application/xml");
         $resource = $this->api()->requestJson('editor/languageresourceinstance', 'POST',$params);
-        $this->assertTrue(is_object($resource), 'Unable to create the language resource:'.$params['name']);
-        $this->assertEquals($params['name'], $resource->name);
+        $this->assertTrue(is_object($resource), 'Unable to create the language resource:'.$name);
+        $this->assertEquals($name, $resource->name);
         
         //check the response
         $response=$this->api()->requestJson('editor/termcollection/export', 'POST',['collectionId' =>$resource->id]);
         $this->assertTrue(is_object($response),"Unable to export the terms by term collection");
         $this->assertNotEmpty($response->filedata,"The exported tbx file by collection is empty");
         
-        self::$collectionMap[$params['name']]=$resource->id;
-        
-        $task=$this->api()->getTask();
-        
-        // associate languageresource to task
-        $params = [];
-        $params['languageResourceId'] = self::$collectionMap['API Testing::'.__CLASS__.'_resource1'];
-        $params['taskGuid'] = $task->taskGuid;
-        $params['segmentsUpdateable'] = 0;
-        $this->api()->requestJson('editor/languageresourcetaskassoc', 'POST', $params);
-        
-        $params['languageResourceId'] = self::$collectionMap['API Testing::'.__CLASS__.'_resource2'];
-        $this->api()->requestJson('editor/languageresourcetaskassoc', 'POST', $params);
-        
-        $params['languageResourceId'] = self::$collectionMap['API Testing::'.__CLASS__.'_resource3'];
-        $this->api()->requestJson('editor/languageresourcetaskassoc', 'POST', $params);
+        self::$collectionMap[$name]=$resource->id;
+        error_log("Termcollection created. ".$resource->name);
     }
     
-    public function testStartAnalysis() {
-        $task=$this->api()->getTask();
-        
+    /***
+     * Add task to languageresource assoc
+     * @param string $name
+     */
+    protected function addTaskAssoc(string $name){
+        // associate languageresource to task
+        $this->api()->requestJson('editor/languageresourcetaskassoc', 'POST',[
+            'languageResourceId'=>self::$collectionMap[$name],
+            'taskGuid'=>$this->api()->getTask()->taskGuid,
+            'segmentsUpdateable'=>0
+        ]);
+        error_log('Languageresources assoc to task. '.$name.' -> '.$this->api()->getTask()->taskGuid);
+    }
+    
+    /***
+     * Queue the match anlysis worker
+     */
+    protected function queueAnalysys(){
         //run the analysis
         $params=[];
         $params['internalFuzzy']= 1;
@@ -142,54 +250,63 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $params['pretranslateMt']= 0;
         $params['termtaggerSegment']= 0;
         $params['isTaskImport']= 0;
-        
-        $this->api()->requestJson('editor/task/'.$task->id.'/pretranslation/operation', 'PUT', $params,$params);
-        
-        $task=$this->api()->reloadTask();
-        error_log('Task status check: '.$task->state);
+        $this->api()->requestJson('editor/task/'.$this->api()->getTask()->id.'/pretranslation/operation', 'PUT', $params,$params);
+        error_log("Queue pretranslation and analysis.");
+    }
+    
+    /***
+     * Start the import process
+     */
+    protected function startImport(){
+        $this->api()->requestJson('editor/task/'.$this->api()->getTask()->id.'/import', 'GET');
+        error_log('Import workers started.');
+    }
+    
+    /***
+     * Check the task state
+     */
+    protected function checkTaskState(){
+        $this->api()->reloadTask();
+        error_log('Task status:'.$this->api()->getTask()->state);
         $counter=0;
-        while ($task->state!='open'){
-            if($task->state=='error'){
+        $limitCheck=20;
+        while ($this->api()->getTask()->state!='open'){
+            if($this->api()->getTask()->state=='error'){
                 break;
             }
             //break after 20 trys
-            if($counter==20){
+            if($counter==$limitCheck){
                 break;
             }
             sleep(5);
-            $task=$this->api()->reloadTask();
-            error_log('Task status check: '.$task->state);
+            $this->api()->reloadTask();
+            error_log('Task state check '.$counter.'/'.$limitCheck.' state: '.$this->api()->getTask()->state);
             $counter++;
         }
-        $this->assertEquals('open',$task->state,'Pretranslation stopped. Task has state '.$task->state);
         
-        $analysis=$this->api()->requestJson('editor/plugins_matchanalysis_matchanalysis', 'GET',[
-            'taskGuid'=>$task->taskGuid
-        ]);
-        $this->assertNotEmpty($analysis,'No results found for the matchanalysis.');
-        //remove the created timestamp since is not relevant for the test
-        foreach ($analysis as &$a){
-            unset($a->created);
-        }
-        
-        //this is to recreate the file from the api response
-        file_put_contents($this->api()->getFile('analysis.txt', null, false), json_encode($analysis));
-        
-        $expected=$this->api()->getFileContent('analysis.txt');
-        $actual=json_encode($analysis);
-        
-        //check for differences between the expected and the actual content
-        $this->assertEquals($expected, $actual, "The expected file an the result file does not match.");
+        $this->assertEquals('open',$this->api()->getTask()->state,'Pretranslation stopped. Task has state '.$this->api()->getTask()->state);
     }
     
+    /***
+     * Return the languageresource render name with the prefix
+     * @param string $name
+     * @return string
+     */
+    protected function getLrRenderName(string $name){
+        return self::$prefix.$name;
+    }
+    
+    /***
+     * Cleand up the resources and the task
+     */
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
         
-        self::$api->requestJson('editor/termcollection/'.self::$collectionMap['API Testing::'.__CLASS__.'_resource1'],'DELETE');
-        self::$api->requestJson('editor/termcollection/'.self::$collectionMap['API Testing::'.__CLASS__.'_resource2'],'DELETE');
-        self::$api->requestJson('editor/termcollection/'.self::$collectionMap['API Testing::'.__CLASS__.'_resource3'],'DELETE');
+        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->requestJson('editor/languageresourceinstance/'.self::$collectionMap[self::getLrRenderName('resource1')],'DELETE');
+        self::$api->requestJson('editor/languageresourceinstance/'.self::$collectionMap[self::getLrRenderName('resource2')],'DELETE');
+        self::$api->requestJson('editor/termcollection/'.self::$collectionMap[self::getLrRenderName('resource3')],'DELETE');
     }
 }
