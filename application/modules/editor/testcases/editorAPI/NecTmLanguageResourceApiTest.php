@@ -73,6 +73,7 @@ class NecTmLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         self::assertNeededUsers(); // last authed user is testmanager
         self::assertLogin('testmanager');
         self::assertCustomer();
+        self::markTestIncomplete("Still in progress!");
     }
     
     /**
