@@ -105,7 +105,16 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         );
         
         $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_DeepL_Init', $appState->pluginsLoaded, 'DeepL-Plugin must be activated for this test case!');
+        if(!in_array('editor_Plugins_DeepL_Init', $appState->pluginsLoaded)) {
+            self::markTestSkipped('DeepL-Plugin must be activated for this test case, which is not the case!');
+            return;
+        }
+        
+        $tests = array(
+            'runtimeOptions.plugins.DeepL.server' => null, //null checks for no concrete value but if not empty
+            'runtimeOptions.plugins.DeepL.authkey' => null, //null checks for no concrete value but if not empty
+        );
+        self::$api->testConfig($tests);
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
