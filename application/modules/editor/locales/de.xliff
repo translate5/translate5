@@ -769,7 +769,10 @@
 {usersCurrentRole}<br />
 {footer}</target></trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgYWJnZXNjaGxvc3Nlbg=='><source>Translate5 - Aufgabe abgeschlossen</source><target>Translate5 - Aufgabe abgeschlossen</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRvcg=='><source>translator</source><target>translator</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRvcg=='><source>translator</source><target>Übersetzer</target></trans-unit>
+<trans-unit id='cmV2aWV3ZXI='><source>reviewer</source><target>Lektor</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRvckNoZWNr'><source>translatorCheck</source><target>Zweiter Lektor</target></trans-unit>
+<trans-unit id='dmlzaXRvcg=='><source>visitor</source><target>Besucher</target></trans-unit>
 <trans-unit id='RS1NYWlsIEFkcmVzc2U='><source>E-Mail Adresse</source><target>E-Mail Adresse</target></trans-unit>
 <trans-unit id='U2VociBnZWVocnRlciBIZXJy'><source>Sehr geehrter Herr</source><target>Sehr geehrter Herr</target></trans-unit>
 <trans-unit id='bGVjdG9y'><source>lector</source><target>lector</target></trans-unit>
@@ -1720,13 +1723,17 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='QmVudXR6ZXItQWJzY2hsdXNzZGF0dW0='><source>Benutzer-Abschlussdatum</source><target>Benutzer-Abschlussdatum</target></trans-unit>
 <trans-unit id='QmVudXR6ZXItRGVhZGxpbmUvcw=='><source>Benutzer-Deadline/s</source><target>Benutzer-Deadline/s</target></trans-unit>
 <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnNldHplcg=='><source>Ø Bearbeitungszeit Übersetzer</source><target>Ø Bearbeitungszeit Übersetzer</target></trans-unit>
-<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnByw7xmdW5nIGR1cmNoIMOcYmVyc2V0emVy'><source>Ø Bearbeitungszeit Überprüfung durch Übersetzer</source><target>Ø Bearbeitungszeit Überprüfung durch Übersetzer</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCB6d2VpdGVyIExla3Rvcg=='><source>Ø Bearbeitungszeit zweiter Lektor</source><target>Ø Bearbeitungszeit zweiter Lektor</target></trans-unit>
 <trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdGVuIGJlemllaGVuIHNpY2ggYXVmIGRpZSBaZWl0ZW4gaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcu'><source>Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.</source><target>Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.</target></trans-unit>
 <trans-unit id='e2hlYWRlcn0KRGllc2UgZW1haWwgaXN0IGVpbmUgRXJpbm5lcnVuZywgZGFzcyBzaWNoIGRpZSAiRGVhZGxpbmUiIDxiPntkZWFkbGluZURhdGV9PC9iPiBmw7xyIGRpZSBBdWZnYWJlIDxiPiJ7dGFza05hbWV9IjwvYj4gbsOkaGVydC4Ke2Zvb3Rlcn0='><source>{header}
 Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> für die Aufgabe <b>"{taskName}"</b> nähert.
 {footer}</source><target>{header}
 Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> für die Aufgabe <b>"{taskName}"</b> nähert.
 {footer}</target></trans-unit>
+<trans-unit id='Sm9iLVN0YXR1cw=='><source>Job-Status</source><target>Job-Status</target></trans-unit>
+<trans-unit id='WnV3ZWlzdW5nc2RhdHVt'><source>Zuweisungsdatum</source><target>Zuweisungsdatum</target></trans-unit>
+<trans-unit id='QWJzY2hsdXNzZGF0dW0='><source>Abschlussdatum</source><target>Abschlussdatum</target></trans-unit>
+<trans-unit id='RGVhZGxpbmUgRGF0dW0='><source>Deadline Datum</source><target>Deadline Datum</target></trans-unit>
   </body>
  </file>
 </xliff>

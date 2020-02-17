@@ -3668,13 +3668,21 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='QmVudXR6ZXItQWJzY2hsdXNzZGF0dW0='><source>Benutzer-Abschlussdatum</source><target>Finish date of user/s</target></trans-unit>
 <trans-unit id='QmVudXR6ZXItRGVhZGxpbmUvcw=='><source>Benutzer-Deadline/s</source><target>Deadline of user/s</target></trans-unit>
 <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnNldHplcg=='><source>Ø Bearbeitungszeit Übersetzer</source><target>Ø Processing time translator</target></trans-unit>
-<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnByw7xmdW5nIGR1cmNoIMOcYmVyc2V0emVy'><source>Ø Bearbeitungszeit Überprüfung durch Übersetzer</source><target>Ø Processing time "Check by translator"</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCB6d2VpdGVyIExla3Rvcg=='><source>Ø Bearbeitungszeit zweiter Lektor</source><target>Ø Processing time Second Reviewer</target></trans-unit>
 <trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdGVuIGJlemllaGVuIHNpY2ggYXVmIGRpZSBaZWl0ZW4gaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcu'><source>Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.</source><target>Average times refer to all times in the current filter set.</target></trans-unit>
 <trans-unit id='e2hlYWRlcn0KRGllc2UgZW1haWwgaXN0IGVpbmUgRXJpbm5lcnVuZywgZGFzcyBzaWNoIGRpZSAiRGVhZGxpbmUiIDxiPntkZWFkbGluZURhdGV9PC9iPiBmw7xyIGRpZSBBdWZnYWJlIDxiPiJ7dGFza05hbWV9IjwvYj4gbsOkaGVydC4Ke2Zvb3Rlcn0='><source>{header}
 Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> für die Aufgabe <b>"{taskName}"</b> nähert.
 {footer}</source><target>{header}
 This email is a reminder that the "Deadline" <b>{deadlineDate}</b> for task <b>"{taskName}"</b> is approaching.
 {footer}</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRvcg=='><source>translator</source><target>Translator</target></trans-unit>
+<trans-unit id='cmV2aWV3ZXI='><source>reviewer</source><target>Reviewer</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRvckNoZWNr'><source>translatorCheck</source><target>Second Reviewer</target></trans-unit>
+<trans-unit id='dmlzaXRvcg=='><source>visitor</source><target>visitor</target></trans-unit>
+<trans-unit id='Sm9iLVN0YXR1cw=='><source>Job-Status</source><target>Job status</target></trans-unit>
+<trans-unit id='WnV3ZWlzdW5nc2RhdHVt'><source>Zuweisungsdatum</source><target>Assignment date</target></trans-unit>
+<trans-unit id='QWJzY2hsdXNzZGF0dW0='><source>Abschlussdatum</source><target>Finish date</target></trans-unit>
+<trans-unit id='RGVhZGxpbmUgRGF0dW0='><source>Deadline Datum</source><target>Deadline date</target></trans-unit>
 </body>
   </file>
 </xliff>
