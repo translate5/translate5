@@ -26,34 +26,23 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.admin.WorkflowUserRoles', {
+Ext.define('Editor.store.admin.WorkflowSteps', {
 	extend : 'Ext.data.Store',
 	initConfig: function(instanceConfig) {
 		var me = this,
-			config={},
-			workflowUserRoles=[];
+			config={};
+		
 		if (instanceConfig) {
 			me.self.getConfigurator().merge(me, config, instanceConfig);
 		}
 	    var returnConfig= me.callParent([config]);
-
-	    //required order
-	    me.add({id:'translator',label:''});
-	    me.add({id:'reviewer',label:''});
-	    me.add({id:'translatorCheck',label:''});
-	    me.add({id:'visitor',label:''});
 	    
-		//Info:duplicated id values will be ignored by te store
-		Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
-			Ext.Object.each(workflow.roles, function(key, value){
-				var rec=me.getById(key);
-				if(!rec){
-					me.add({id:key,label:value})
-				}else{
-					rec.set('label',value);
-				}
-			});
-		});
-		return returnConfig;
+        Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
+            Ext.Object.each(workflow.steps, function(key, value){
+				me.add({id:key,text:value});
+            });
+        });
+        
+        return returnConfig;
 	},
 });

@@ -42,7 +42,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  'admin.Languages', 
 	  'admin.task.Logs', 
 	  'admin.WorkflowUserRoles',
-	  'admin.WorkflowState'
+	  'admin.WorkflowState',
+	  'admin.WorkflowSteps'
   ],
   views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow'],
   refs : [{
@@ -134,7 +135,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       averageProcessingTimeLabel: '#UT#Ø Bearbeitungszeit Lektor',
       excelExportUsageLabel: '#UT#Excel-Export Nutzung',
       averageProcessingTimeTranslatorLabel: '#UT#Ø Bearbeitungszeit Übersetzer',
-      averageProcessingTimeSecondTranslatorLabel: '#UT#Ø Bearbeitungszeit Überprüfung durch Übersetzer'
+      averageProcessingTimeSecondTranslatorLabel: '#UT#Ø Bearbeitungszeit zweiter Lektor'
   },
   listen: {
       store: {

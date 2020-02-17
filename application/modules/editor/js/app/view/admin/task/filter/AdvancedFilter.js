@@ -90,6 +90,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
         me.filterFieldSourceMap['userName']='user';
         me.filterFieldSourceMap['workflowState']='workflowState';
         me.filterFieldSourceMap['workflowUserRole']='workflowUserRole';
+        me.filterFieldSourceMap['workflowStepName']='workflowStepName';
         
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
@@ -231,7 +232,10 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     		  return findValues('admin.WorkflowState','id','label');
     	  case 'workflowUserRole':
     		  //it is WorkflowUserRoles filter
-    		  return findValues('admin.WorkflowUserRoles','id','label');
+    		  return findValues('admin.WorkflowState','id','label');
+    	  case 'workflowStepName':
+    		  //it is WorkflowUserRoles filter
+    		  return findValues('admin.WorkflowSteps','id','text');
     	  default:
     	    return value;
     	}

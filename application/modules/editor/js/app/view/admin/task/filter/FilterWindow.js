@@ -50,7 +50,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     },
     autoScroll: true,
     height: 500,
-    autoWidth: true,
+    width: 500,
     layout: {
         type: 'table',
         align: 'center',
