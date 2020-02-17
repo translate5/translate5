@@ -69,11 +69,11 @@ class NecTmLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
      * 
      */
     public static function setUpBeforeClass(): void {
+        self::markTestIncomplete("Still in progress!");
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
         self::assertNeededUsers(); // last authed user is testmanager
         self::assertLogin('testmanager');
         self::assertCustomer();
-        self::markTestIncomplete("Still in progress!");
     }
     
     /**
