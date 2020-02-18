@@ -112,16 +112,4 @@ class editor_Models_Logger_Task extends ZfExtended_Models_Entity_Abstract {
         $s->where('taskGuid = ?', $taskGuid);
         return $this->computeTotalCount($s);;
     }
-    
-    /**
-     * load the import-log for the given $taskGuid.
-     * @param string $taskGuid
-     * @return array
-     */
-    public function loadImportOfTaskGuid($taskGuid) {
-        $s = $this->db->select();
-        $s->where('taskGuid = ?', $taskGuid);
-        $s->where('state = ?', 'import');
-        return $this->loadFilterdCustom($s);
-    }
 }
