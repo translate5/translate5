@@ -262,21 +262,26 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select();
         $s->where('pmGuid = ?', $pmGuid);
         $s->where('tasktype = ?', $tasktype);
-        $s->order('orderdate ASC');
         return parent::loadFilterdCustom($s);
     }
     
     /**
      * loads all tasks of the given tasktype that shall be removed (because
-     * their lifetime is over).
-     * @param string $tasktype
-     * @param int $orderDaysOffset
+     * their lifetime is over as given in $importDaysOffset).
+     * @param string $taskType
+     * @param int $importDaysOffset
      * @return array
      */
-    public function loadListForCleanupByTasktype(string $tasktype, int $orderDaysOffset) {
-        $s = $this->db->select();
-        $s->where('tasktype = ?', $tasktype);
-        $s->where('`orderDate` < (CURRENT_DATE - INTERVAL ? DAY)', $orderDaysOffset);
+    public function loadListForCleanupByTasktype(string $taskType, int $importDaysOffset) {
+        $s = $this->db->select()
+        ->from('LEK_task', $cols);
+        if(!empty($this->filter)) {
+            $this->filter->setDefaultTable('LEK_task');
+        }
+        $s->join('LEK_task_log', 'LEK_task_log.taskGuid = LEK_task.taskGuid',[]);
+        $s->where('LEK_task.taskType = ?', $taskType);
+        $s->where('LEK_task_log.state = ?', 'import');
+        $s->where('LEK_task_log.created < (CURRENT_DATE - INTERVAL ? DAY)', $importDaysOffset);
         return parent::loadFilterdCustom($s);
     }
     
