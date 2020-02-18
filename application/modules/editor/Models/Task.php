@@ -116,12 +116,18 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const USAGE_MODE_COOPERATIVE = 'cooperative';
     const USAGE_MODE_SIMULTANEOUS = 'simultaneous';
     
-    const INITIAL_TASKTYPE_DEFAULT = 'default';
-    
     const ASSOC_TABLE_ALIAS = 'LEK_taskUserAssoc';
     const TABLE_ALIAS = 'LEK_task';
     
     const INTERNAL_LOCK = '*translate5InternalLock*';
+    
+    const INITIAL_TASKTYPE_DEFAULT = 'default';
+    
+    /**
+     * All tasktypes that editor_Models_Validator_Task will consider.
+     * @var array
+     */
+    public static $validTaskTypes = [self::INITIAL_TASKTYPE_DEFAULT];
 
     /**
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
@@ -167,6 +173,22 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         
         $config->setReadOnly();
         return $config;
+    }
+    
+    /**
+     * Add a tasktype for the validation.
+     * @param string $taskType
+     */
+    public static function addValidTaskType($taskType) {
+        self::$validTaskTypes[] = $taskType;
+    }
+    
+    /**
+     * Return tasktypes for the validation.
+     * @return array 
+     */
+    public static function getValidTaskTypes() {
+        return self::$validTaskTypes;
     }
     
     /**
