@@ -222,6 +222,9 @@ Ext.define('MyApp.overrides.data.request.Ajax', {
 Ext.override(Ext.util.CSS, {
     /***
      * Add a custom css to the given html page
+     * FIXME replace all usages places with plain CSS files. 
+     * Problem 1: the styles are added multiple times to the editor
+     * Problem 2: maintaining of the CSS is a pain
      */
     createStyleSheetToWindow : function(window, cssText, id) {
         var ss,

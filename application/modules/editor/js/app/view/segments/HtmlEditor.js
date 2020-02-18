@@ -411,7 +411,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           return;
       }
       // Span für Terminologie
-      if(item.tagName == 'DIV' && /(^|[\s])term([\s]|$)/.test(item.className)){
+      if( /(^|[\s])term([\s]|$)/.test(item.className) ){
         termFoundCls = item.className
         if(me.fieldTypeToEdit) {
             var replacement = me.fieldTypeToEdit+'-$1';
