@@ -329,6 +329,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
             $tbxData = $tbxParser->assertTbxExists($this->task, new SplFileInfo($tbxPath));
         }
         catch (editor_Models_Term_TbxCreationException $e) {
+            //'E1116' => 'Could not load TBX into TermTagger: TBX hash is empty.',
             throw new editor_Plugins_TermTagger_Exception_Open('E1116', [
                 'task' => $this->task,
                 'termTaggerUrl' => $url,

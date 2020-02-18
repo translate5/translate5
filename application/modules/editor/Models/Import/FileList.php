@@ -35,10 +35,10 @@ END LICENSE AND COPYRIGHT
 /**
  * Import class to encapsulated all file / directory related stuff. 
  * This is: 
- * - reading the proofread tree and save it to the DB 
+ * - reading the review tree and save it to the DB 
  * - reading the reference files tree and save it to the DB 
  * - reading the relais files tree 
- * - return a list of proofread and relais files for the importer
+ * - return a list of review and relais files for the importer
  */
 class editor_Models_Import_FileList {
     
@@ -63,15 +63,14 @@ class editor_Models_Import_FileList {
     }
     
     /**
-     * Find all proofread files and stores them as foldertree, 
-     * syncs the proofread files then as plain file entities
+     * Find all review files and stores them as foldertree, 
+     * syncs the review files then as plain file entities
      * returns a file list with files to be imported
-     * @param string $proofreadDir
      */
-    public function processProofreadFiles() {
+    public function processReviewedFiles() {
         $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles', [$this->importConfig->checkFileType]);
         /* @var $parser editor_Models_Import_DirectoryParser_WorkingFiles */
-        $tree = $parser->parse($this->importConfig->getProofReadDir(), $this->task);
+        $tree = $parser->parse($this->importConfig->getReviewDir(), $this->task);
         $notImportedFiles = $parser->getNotImportedFiles();
         if(!empty($notImportedFiles)) {
             $logger = Zend_Registry::get('logger');
@@ -155,7 +154,7 @@ class editor_Models_Import_FileList {
      */
     public function hasReferenceFiles() {
         $config = Zend_Registry::get('config');
-        //If no ProofRead directory is set, the reference files must be ignored  
+        //If no review directory is set, the reference files must be ignored  
         $proofDir = $config->runtimeOptions->import->proofReadDirectory;
         $refDir = $config->runtimeOptions->import->referenceDirectory;
         return !empty($proofDir) && is_dir($this->importConfig->importFolder.DIRECTORY_SEPARATOR.$refDir);

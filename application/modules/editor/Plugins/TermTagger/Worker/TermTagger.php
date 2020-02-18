@@ -79,6 +79,15 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
     }
 
     /**
+     * single segment tagging may work with scheduled maintenance
+     * {@inheritDoc}
+     * @see editor_Models_Import_Worker_Abstract::isMaintenanceScheduled()
+     */
+    public function isMaintenanceScheduled(): bool {
+        return false;
+    }
+    
+    /**
      * (non-PHPdoc)
      *
      * @see ZfExtended_Worker_Abstract::run()

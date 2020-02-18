@@ -142,7 +142,7 @@ class editor_Models_Export_Terminology_Tbx {
             $termNote->addAttribute('type', 'normativeAuthorization');
         }
         //SimpleXML throws an error when giving null, so we need this workaround: 
-        if(empty($this->target)) {
+        if(empty($this->target) && $this->target !== '0') {
             return $this->tbx->asXML();
         }
         return $this->tbx->asXML($this->target);

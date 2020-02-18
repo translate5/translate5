@@ -82,17 +82,11 @@ class editor_TermController extends ZfExtended_RestController {
         /* @var $attribute editor_Models_Term_Attribute */
         $attribute->checkOrCreateProcessStatus($this->entity->getId());
 
-        //load all attributes for the term
-        $rows=$this->entity->findTermAndAttributes($this->entity->getId());
-        $rows=$this->entity->groupTermsAndAttributes($rows);
-        if(!empty($rows) && !empty($rows[0]['attributes'])){
-            $this->view->rows->attributes =$rows[0]['attributes'];
-        }
-        
+        $this->view->rows = $this->entity->getDataObjectWithAttributes();
         //load the term entry attributes
-        $this->view->rows->termEntryAttributes=$attribute->getAttributesForTermEntry($this->entity->getGroupId(),[$this->entity->getCollectionId()]);
+        $this->view->rows->termEntryAttributes=$attribute->getAttributesForTermEntry($this->entity->getTermEntryId(),[$this->entity->getCollectionId()]);
         
-        if(!empty($rows) && !empty($this->view->rows->language)){
+        if(!empty($this->view->rows->attributes) && !empty($this->view->rows->language)){
             $language = ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $language editor_Models_Languages */
             $language->load($this->view->rows->language);
@@ -150,6 +144,7 @@ class editor_TermController extends ZfExtended_RestController {
             /* @var $entry editor_Models_TermCollection_TermEntry */
             $entry->setCollectionId($this->data->collectionId);
             $entry->setGroupId($this->_helper->guid->create());
+            $entry->setIsProposal(true);
             $entry->save();
             
             //update or create the term entry creation/modification attributes
@@ -249,6 +244,7 @@ class editor_TermController extends ZfExtended_RestController {
             
             $entry->setCollectionId($this->data->collectionId);
             $entry->setGroupId($this->_helper->guid->create());
+            $entry->setIsProposal(true);
             $entry->setId($entry->save());
             
             $this->entity->setTermEntryId($entry->getId());
@@ -302,6 +298,7 @@ class editor_TermController extends ZfExtended_RestController {
         
         $attribute->handleTransacGroup($this->entity);
         
+        $this->view->rows = $this->entity->getDataObjectWithAttributes();
         //update the view
         $this->view->rows->proposal = $this->proposal->getDataObject();
     }
@@ -389,7 +386,7 @@ class editor_TermController extends ZfExtended_RestController {
         $this->entity->save();
         $this->proposal->delete();
         $history->save();
-        $this->view->rows = $this->entity->getDataObject();
+        $this->view->rows = $this->entity->getDataObjectWithAttributes();
         $this->view->rows->proposal = null;
     }
     
@@ -417,8 +414,22 @@ class editor_TermController extends ZfExtended_RestController {
         }
         $this->proposal->delete();
         $termEntry->deleteEmptyTermEntry($termEntryId);
-        $this->view->rows = $this->entity->getDataObject();
+
+        //remove all term attribute proposals to
+        //https://jira.translate5.net/browse/TS-174
+        $attributeProposal=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
+        /* @var $attributeProposal editor_Models_Term_AttributeProposal */
+        $attributeProposal->removeAllTermAttributeProposals($this->entity->getId());
+
+        $this->view->rows = $this->entity->getDataObjectWithAttributes();
         $this->view->rows->proposal = null;
+        
+        //load all attributes for the term
+        $rows=$this->entity->findTermAndAttributes($this->entity->getId());
+        $rows=$this->entity->groupTermsAndAttributes($rows);
+        if(!empty($rows) && !empty($rows[0]['attributes'])){
+            $this->view->rows->attributes =$rows[0]['attributes'];
+        }
     }
     
     /***
@@ -474,21 +485,18 @@ class editor_TermController extends ZfExtended_RestController {
         $term->setUpdated(null);
         $term->setId($term->save());
         
-        //create or update or create the term transac group attributes
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
-
+        //check or create the term processStatus attribute
         $attribute->checkOrCreateProcessStatus($term->getId());
-        
         
         //if the term is added from the instant transalte MT engine, set the default comment
         if($this->data->isTermProposalFromInstantTranslate){
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
             $attribute->addTermComment($term->getId(), $translate->_("Aus MT übernommen"));
         }
-        
+        //create or update or create the term transac group attributes
         $attribute->handleTransacGroup($term);
-        $attribute->checkOrCreateProcessStatus($term->getId());
     }
     
     /**

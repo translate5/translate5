@@ -94,7 +94,7 @@ class editor_Models_Import_FileParser_XmlParser {
         $this->nonXmlBlocks = [];
         $xml = preg_replace_callback('/(<!\[CDATA\[.*?\]\]>)|(<!--.*?-->)/s', function($item){
             $id = count($this->nonXmlBlocks);
-            if(empty($item[1]) && !empty($item[2])) {
+            if(empty($item[1]) && $item[1]!=="0" && (!empty($item[2]) || $item[2]!=="0")) {
                 $key = '<xml-comment id="comment-'.$id.'"/>';
             }
             else {
@@ -523,7 +523,7 @@ class editor_Models_Import_FileParser_XmlParser {
         $this->log("START#".$tag.'#');
         $previousNode = end($this->xmlStack);
         //get the parent boolean preserve whitespace value
-        $preserve = is_null($previousNode) ? $this->preserveWhitespace : $previousNode['preserveWhitespace'];
+        $preserve = empty($previousNode) ? $this->preserveWhitespace : $previousNode['preserveWhitespace'];
         //get the XML attribute of the current node, which could not exist at all
         $preserve = $this->getAttribute($attributes, 'xml:space', $preserve ? 'preserve' : 'default');
         $this->xmlStack[] = [
@@ -566,8 +566,12 @@ class editor_Models_Import_FileParser_XmlParser {
         
         if($opener['tag'] !== $tag) {
             if(empty($this->handlerError)){
-                //if you got here because of an XML error: use an external tool like xmllint to get more details!
-                throw new ZfExtended_Exception('Invalid XML: expected closing "'.$opener['tag'].'" tag, but got tag "'.$tag.'". Opening tag was: '.print_r($opener,1));
+                throw new editor_Models_Import_FileParser_InvalidXMLException('E1024',[
+                    'closingTag' => $opener['tag'],
+                    'receivedTag' => $tag,
+                    'openingTag' => print_r($opener,1),
+                    'parseStack' => print_r($this->xmlStack,1),
+                ]);
             }
             else {
                 $tag = call_user_func($this->handlerError, $opener, $tag, $key);

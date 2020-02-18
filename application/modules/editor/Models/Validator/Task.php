@@ -54,8 +54,6 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('pmName', 'stringLength', array('min' => 0, 'max' => 512));
     $this->addValidator('wordCount', 'int');
     $this->addValidator('targetDeliveryDate', 'date', array('Y-m-d H:i:s'),true);
-    $this->addValidator('realDeliveryDate', 'date', array('Y-m-d H:i:s'),true);
-    $this->addValidator('orderdate', 'date', array('Y-m-d H:i:s'),true);
     $this->addValidator('referenceFiles', 'int');
     $this->addValidator('terminologie', 'int');
     $this->addValidator('edit100PercentMatch', 'int');
@@ -63,6 +61,8 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('enableSourceEditing', 'int');
     $this->addValidator('importAppVersion', 'stringLength', array('min' => 0, 'max' => 64));
     $this->addValidator('customerId', 'int');
-    $this->addValidator('usageMode', 'inArray', [[editor_Models_Task::USAGE_MODE_COMPETITIVE, editor_Models_Task::USAGE_MODE_COOPERATIVE]]);
+    $this->addValidator('segmentCount', 'int');
+    $this->addValidator('segmentFinishCount', 'int');
+    $this->addValidator('usageMode', 'inArray', [[editor_Models_Task::USAGE_MODE_COMPETITIVE, editor_Models_Task::USAGE_MODE_COOPERATIVE, editor_Models_Task::USAGE_MODE_SIMULTANEOUS]]);
   }
 }

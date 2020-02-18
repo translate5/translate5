@@ -129,6 +129,12 @@ class editor_Models_Segment_AutoStates {
      * Internal state used to show segment is pending
      * @var integer
      */
+    const EDITING_BY_USER = 998;
+    
+    /**
+     * Internal state used to show segment is pending
+     * @var integer
+     */
     const PENDING = 999;
     
     protected $states = array(
@@ -158,7 +164,11 @@ class editor_Models_Segment_AutoStates {
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
         //no json_encode because later on passed to php2js, which does json-encoding
         $states = $this->states;
-        $states[self::PENDING] = 'wird ermittelt...'; //actually only needed in frontend
+
+        //only needed in frontend:
+        $states[self::PENDING] = 'wird ermittelt...'; 
+        $states[self::EDITING_BY_USER] = 'In Bearbeitung';
+        
         return array_map(function($value) use ($translate) {
             return $translate->_($value);
         }, $states);
@@ -188,7 +198,7 @@ class editor_Models_Segment_AutoStates {
             self::TRANSLATED,
             self::TRANSLATED_AUTO,
           ],
-          editor_Workflow_Abstract::ROLE_LECTOR => array(
+            editor_Workflow_Abstract::ROLE_REVIEWER => array(
             self::REVIEWED,
             self::REVIEWED_AUTO,
             self::REVIEWED_UNTOUCHED,
@@ -266,7 +276,7 @@ class editor_Models_Segment_AutoStates {
         if($tua->getRole() == $workflow::ROLE_TRANSLATORCHECK) {
             return self::REVIEWED_TRANSLATOR;
         }
-        if($tua->getRole() == $workflow::ROLE_LECTOR) {
+        if($tua->getRole() == $workflow::ROLE_REVIEWER) {
             return $isModified ? self::REVIEWED : self::REVIEWED_UNCHANGED;
         }
         
@@ -334,7 +344,7 @@ class editor_Models_Segment_AutoStates {
             $segment->setAutoStateId(self::REVIEWED_TRANSLATOR); //TODO if we have TRANSLATE-1704 then this must be changed too
             return;
         }
-        if($tua->getRole() == $workflow::ROLE_LECTOR) {
+        if($tua->getRole() == $workflow::ROLE_REVIEWER) {
             $segment->setAutoStateId(self::REVIEWED_UNCHANGED);
             return;
         }

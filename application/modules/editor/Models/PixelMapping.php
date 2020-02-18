@@ -96,7 +96,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
             return;
         }
         catch(Zend_Db_Statement_Exception $e) {
-                $this->handleIntegrityConstraintException($e);
+            $this->handleIntegrityConstraintException($e);
         }
     }
     

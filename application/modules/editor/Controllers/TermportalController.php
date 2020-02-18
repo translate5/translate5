@@ -120,25 +120,37 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             }
             
             $isSingleLang=strpos($lng['rfc5646'], '-')===false;
+            $lng['languageGroup']=[$lng['id']];
             
-            //ignore if the sublanguages are disabled 
+            //if show sub languages is disabled, and it is a sub language
             if(!$isShowSubLanguages && !$isSingleLang){
-                $lng=null;
-                continue;
-            }
-            
-            //find all language sublings when the language is without "-" (de -> de-De, de-Au ..)
-            if($isSingleLang){
-                //load all similar languages
+                
+                //find the normalized rfc value and load the root language
+                $normalized=$this->normalizeLanguage($lng['rfc5646']);
+                $lng=$languagesModel->loadByRfc5646($normalized[0])->toArray();
+                
+                //find the group for the root language
                 $group=$languagesModel->findLanguageGroup($lng['rfc5646']);
                 $lng['languageGroup']=!empty($group) ? array_column($group, 'id') : [];
                 continue;
             }
-            $lng['languageGroup']=[$lng['id']];
+            
+            if(!$isSingleLang){
+                continue;
+            }
+            
+            //find all language sublings when the language is without "-" (de -> de-De, de-Au ..)
+            //load all similar languages
+            $group=$languagesModel->findLanguageGroup($lng['rfc5646']);
+            $lng['languageGroup']=!empty($group) ? array_column($group, 'id') : [];
         }
         
+        
+        $temp = array_unique(array_column($langsArray, 'id'));
+        $langsArray = array_intersect_key($langsArray, $temp);
+        
         //all languages in the available term collections for the user
-        $this->view->languages=array_filter($langsArray);
+        $this->view->languages=$langsArray;
         
         // all language-combinations that are available in InstantTranslate
         $languageResourcesLanguages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
@@ -194,9 +206,11 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "processstatus"=>$this->translate->_("Prozessstatus"),
                 "instantTranslateInto"=>$this->translate->_("Sofortübersetzung nach"),
                 "TermPortalLanguages"=>$this->translate->_("Terminologieportal-Sprachen"),
-                "AllLanguagesAvailable"=>$this->translate->_("Alle verfügbaren Sprachen")
+                "AllLanguagesAvailable"=>$this->translate->_("Alle verfügbaren Sprachen"),
+                "Anmerkung"=>$this->translate->_("Anmerkung"),
+                "Letzte Änderung"=>$this->translate->_("Letzte Änderung"),
+                "Datum"=>$this->translate->_("Datum")
         );
-        
         $this->view->translations=$translatedStrings;
         
         $term=ZfExtended_Factory::get('editor_Models_Term');
@@ -278,6 +292,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             $allProcessStatus[$processstatus] = $this->translate->_($processstatus);
         }
         $this->view->allProcessstatus = $allProcessStatus;
+        //set the processStatus translations so it can be used in the frontend to
+        $this->view->Php2JsVars()->set('apps.termportal.allProcessstatus',$allProcessStatus);
     }
     
     /**

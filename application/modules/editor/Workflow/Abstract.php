@@ -54,12 +54,13 @@ abstract class editor_Workflow_Abstract {
     const STATE_UNCONFIRMED = 'unconfirmed'; 
     
     const ROLE_TRANSLATOR = 'translator';
-    const ROLE_LECTOR = 'lector';
+    const ROLE_REVIEWER = 'reviewer';
     const ROLE_TRANSLATORCHECK = 'translatorCheck';
     const ROLE_VISITOR = 'visitor';
     
+    const STEP_NO_WORKFLOW='no workflow';
     const STEP_TRANSLATION = 'translation';
-    const STEP_LECTORING = 'lectoring';
+    const STEP_REVIEWING = 'reviewing';
     const STEP_TRANSLATORCHECK = 'translatorCheck';
     const STEP_PM_CHECK = 'pmCheck';
     const STEP_WORKFLOW_ENDED = 'workflowEnded';
@@ -80,14 +81,15 @@ abstract class editor_Workflow_Abstract {
         'STATE_EDIT' => 'selbst in Arbeit', 
         'STATE_VIEW' => 'selbst geöffnet', 
         'ROLE_TRANSLATOR' => 'Übersetzer',
-        'ROLE_LECTOR' => 'Lektor',
-        'ROLE_TRANSLATORCHECK' => 'Übersetzer (Überprüfung)',
+        'ROLE_REVIEWER' => 'Lektor',
+        'ROLE_TRANSLATORCHECK' => 'Zweiter Lektor',
         'ROLE_VISITOR' => 'Besucher',
+        'STEP_NO_WORKFLOW' => 'Kein Workflow',
         'STEP_TRANSLATION' => 'Übersetzung',
-        'STEP_LECTORING' => 'Lektorat',
-        'STEP_TRANSLATORCHECK' => 'Übersetzer Prüfung',
+        'STEP_REVIEWING' => 'Lektorat',
+        'STEP_TRANSLATORCHECK' => 'Zweites Lektorat',
         'STEP_PM_CHECK' => 'PM Prüfung',
-        'STEP_WORKFLOW_ENDED' => 'Workflow beendet',
+        'STEP_WORKFLOW_ENDED' => 'Workflow abgeschlossen',
     );
     
     /**
@@ -154,7 +156,7 @@ abstract class editor_Workflow_Abstract {
      */
     protected $readableRoles = array(
         self::ROLE_VISITOR,
-        self::ROLE_LECTOR,
+        self::ROLE_REVIEWER,
         self::ROLE_TRANSLATOR,
         self::ROLE_TRANSLATORCHECK,
     );
@@ -163,7 +165,7 @@ abstract class editor_Workflow_Abstract {
      * @var array 
      */
     protected $writeableRoles = array(
-        self::ROLE_LECTOR,
+        self::ROLE_REVIEWER,
         self::ROLE_TRANSLATOR,
         self::ROLE_TRANSLATORCHECK,
     );
@@ -199,11 +201,13 @@ abstract class editor_Workflow_Abstract {
      * @var array 
      */
     protected $stepChain = array(
+        self::STEP_NO_WORKFLOW,
         self::STEP_TRANSLATION,
-        self::STEP_LECTORING,
+        self::STEP_REVIEWING,
         self::STEP_TRANSLATORCHECK,
         self::STEP_WORKFLOW_ENDED,
     );
+    
     
     /**
      * Mapping between roles and workflowSteps. 
@@ -211,9 +215,10 @@ abstract class editor_Workflow_Abstract {
      */
     protected $steps2Roles = array(
         self::STEP_TRANSLATION => self::ROLE_TRANSLATOR,
-        self::STEP_LECTORING => self::ROLE_LECTOR,
+        self::STEP_REVIEWING => self::ROLE_REVIEWER,
         self::STEP_TRANSLATORCHECK => self::ROLE_TRANSLATORCHECK,
     );
+    
     
     /**
      * Valid state / role combination for each step
@@ -223,22 +228,22 @@ abstract class editor_Workflow_Abstract {
     protected $validStates = [
         self::STEP_TRANSLATION => [
             self::ROLE_TRANSLATOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
-            self::ROLE_LECTOR => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
+            self::ROLE_REVIEWER => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
             self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
         ],
-        self::STEP_LECTORING => [
+        self::STEP_REVIEWING => [
             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-            self::ROLE_LECTOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+            self::ROLE_REVIEWER => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
             self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
         ],
         self::STEP_TRANSLATORCHECK => [
             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-            self::ROLE_LECTOR => [self::STATE_FINISH],
+            self::ROLE_REVIEWER => [self::STATE_FINISH],
             self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
         ],
         self::STEP_WORKFLOW_ENDED => [
             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-            self::ROLE_LECTOR => [self::STATE_FINISH],
+            self::ROLE_REVIEWER => [self::STATE_FINISH],
             self::ROLE_TRANSLATORCHECK => [self::STATE_FINISH],
         ],
     ];
@@ -707,20 +712,7 @@ abstract class editor_Workflow_Abstract {
      * @param bool $levelInfo optional, if true log in level info instead debug
      */
     protected function doDebug($msg, array $data = [], $levelInfo = false) {
-        if(empty($this->newTask)) {
-            return;
-        }
-        $taskGuid = $this->newTask->getTaskGuid();
-        //without that data no loggin is possible
-        if(empty($taskGuid)) {
-            return;
-        }
-        //get the logger for the task
-        if(empty($this->log[$taskGuid])) {
-            $this->log[$taskGuid] = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->newTask]);
-        }
-        $log = $this->log[$taskGuid];
-        /* @var $log editor_Logger_Workflow */
+        $log = $this->getLogger();
         
         //add the job / tua
         if(!empty($this->newTaskUserAssoc)) {
@@ -732,6 +724,26 @@ abstract class editor_Workflow_Abstract {
         else {
             $log->debug('E1013', $msg, $data);
         }
+    }
+    
+    /**
+     * returns either a task specific workflow logger or the native one
+     * @return ZfExtended_Logger
+     */
+    protected function getLogger(): ZfExtended_Logger {
+        if(empty($this->newTask)) {
+            return Zend_Registry::get('logger')->cloneMe('editor.workflow');
+        }
+        $taskGuid = $this->newTask->getTaskGuid();
+        //without that data no loggin is possible
+        if(empty($taskGuid)) {
+            return Zend_Registry::get('logger')->cloneMe('editor.workflow');
+        }
+        //get the logger for the task
+        if(empty($this->log[$taskGuid])) {
+            $this->log[$taskGuid] = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->newTask]);
+        }
+        return $this->log[$taskGuid];
     }
     
     /**
@@ -916,7 +928,10 @@ abstract class editor_Workflow_Abstract {
             }
             call_user_func([$instance, $method], json_decode($action['parameters']));
             if(json_last_error() != JSON_ERROR_NONE) {
-                $this->doDebug('Last Workflow called action: JSON Parameters for last call could not be parsed with message: '.json_last_error_msg());
+                $this->getLogger()->error('E1171', 'Workflow Action: JSON Parameters for workflow action call could not be parsed with message: {msg}', [
+                    'msg' => json_last_error_msg(),
+                    'action' => $action
+                ]);
             }
         }
     }
@@ -997,7 +1012,7 @@ abstract class editor_Workflow_Abstract {
                 $hasRoleToCurrentStep = $hasRoleToCurrentStep || (($this->steps2Roles[$currentStep] ?? '') == $tua['role']);
             }
             //we can only return true, if the Tuas contain at least one role belonging to the currentStep, 
-            // in other words we can not reset the task to proofreading, if we do not have a proofreader
+            // in other words we can not reset the task to reviewing, if we do not have a reviewer
             return $hasRoleToCurrentStep;
         };
         
@@ -1006,11 +1021,21 @@ abstract class editor_Workflow_Abstract {
         $task->loadByTaskGuid($taskGuid);
         
         $matchingSteps = [];
-        foreach($this->validStates as $step => $roleStates) {
-            if(!$areTuasSubset($roleStates, $step)) {
-                continue;
+        $pmOvverideCount=0;
+        foreach($tuas as $tua) {
+            if($tua['isPmOverride']==1){
+                $pmOvverideCount++;
             }
-            $matchingSteps[] = $step;
+        }
+        if(empty($tuas) && count($tuas)==$pmOvverideCount){
+            $matchingSteps[]=self::STEP_NO_WORKFLOW;
+        }else{
+            foreach($this->validStates as $step => $roleStates) {
+                if(!$areTuasSubset($roleStates, $step)) {
+                    continue;
+                }
+                $matchingSteps[] = $step;
+            }
         }
         
         //if the current step is one of the possible steps for the tua configuration

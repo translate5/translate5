@@ -37,7 +37,7 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
             foreach($modified as $field => $value) {
                 //we get also modified values if value is the same, but the type was changed (integer vs string)
                 // therefore we check == for 0, so we get all falsy value changes
-                // otherwise we compare typeless to get only changed values 
+                // otherwise we compare typeless to get only changed values
                 if($value == 0 || $value != $task->__call('get'.ucfirst($field),array())) {
                     $event->extra['Task field '.$field] = $value;
                 }

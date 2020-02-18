@@ -187,6 +187,9 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Import_Worke
             $assoc=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
             /* @var $assoc editor_Models_TermCollection_TermCollection */
             $collectionIds=$assoc->getCollectionsForTask($this->taskGuid);
+            if(empty($collectionIds)) {
+                return;
+            }
             $t = $this->term->loadByMid($mid, $collectionIds);
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e){

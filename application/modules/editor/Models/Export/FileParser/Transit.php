@@ -150,7 +150,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
                 continue;
             }
             
-            if(!empty($sourceText)){
+            if(!empty($sourceText) || $sourceText === '0'){
                 $sourceSeg->setText($sourceText);
             }
 

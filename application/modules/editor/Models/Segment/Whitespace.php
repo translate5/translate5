@@ -59,6 +59,7 @@ class editor_Models_Segment_Whitespace {
         '/\x{2029}/u', //Hex UTF-8 bytes 	E2 80 A9//schutzbedürftiger Whitespace + von mssql nicht vertragen
         //we do not escape that any more - mssql not in use '"\x{201E}"u', //Hex UTF-8 bytes 	E2 80 9E //von mssql nicht vertragen
         //we do not escape that any more - mssql not in use '"\x{201C}"u' //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
+        '/\x{0003}/u', //Hex UTF-8 bytes or codepoint of END OF TEXT //TS-240
         '/\x{0009}/u', //Hex UTF-8 bytes or codepoint of horizontal tab
         '/\x{000B}/u', //Hex UTF-8 bytes or codepoint of vertical tab
         '/\x{000C}/u', //Hex UTF-8 bytes or codepoint of page feed
@@ -102,10 +103,21 @@ class editor_Models_Segment_Whitespace {
             return $this->maskSpecialContent('tab', $match[2], strlen($match[2]));
         }, $textNode);
             
-            return preg_replace_callback($this->protectedUnicodeList, function ($match) {
+        //in XML based import formats we have to extend the list about some HTML entities representing some none printable characters in UTF8 
+        if($xmlBased) {
+            //see https://stackoverflow.com/questions/9587751/decoding-numeric-html-entities-via-php
+            // and https://caves.org.uk/charset_test.html  Section: Another Problem with PHP's htmlentities()
+            //since entityCleanup was called aready, we have to begin the regex with &amp; instead &
+            $textNode = preg_replace_callback('/&amp;#(128|129|1[3-5][0-9]);/', function ($match) {
                 //always one single character is masked, so length = 1
-                return $this->maskSpecialContent('char', $match[0], 1);
+                return $this->maskSpecialContent('char', '&#'.$match[1].';', 1);
             }, $textNode);
+        }
+        
+        return preg_replace_callback($this->protectedUnicodeList, function ($match) {
+            //always one single character is masked, so length = 1
+            return $this->maskSpecialContent('char', $match[0], 1);
+        }, $textNode);
     }
     
     /**

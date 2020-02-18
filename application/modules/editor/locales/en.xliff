@@ -184,6 +184,26 @@
         <source>Keine Benutzer zugeordnet!</source>
         <target>No user assigned!</target>
       </trans-unit>
+      <trans-unit id='TWV0YS1EYXRlbg=='>
+        <source>Meta-Daten</source>
+        <target>Meta data</target>
+      </trans-unit>
+      <trans-unit id='TWV0YS1EYXRlbiBleHBvcnRpZXJlbg=='>
+        <source>Meta-Daten exportieren</source>
+        <target>Export meta data</target>
+      </trans-unit>
+      <trans-unit id='TWV0YS1EYXRlbiBmw7xyIGFsbGUgZ2VmaWx0ZXJ0ZW4gQXVmZ2FiZW4gZXhwb3J0aWVyZW4u'>
+        <source>Meta-Daten für alle gefilterten Aufgaben exportieren.</source>
+        <target>Export meta data for all filtered tasks.</target>
+      </trans-unit>
+      <trans-unit id='QXVzd2VydHVuZ2VuIGFuemVpZ2Vu'>
+        <source>Auswertungen anzeigen</source>
+        <target>Show KPIs</target>
+      </trans-unit>
+      <trans-unit id='QXVzd2VydHVuZ2VuIGbDvHIgYWxsZSBnZWZpbHRlcnRlbiBBdWZnYWJlbiBhbnplaWdlbi4='>
+        <source>Auswertungen für alle gefilterten Aufgaben anzeigen.</source>
+        <target>Show KPIs for all filtered tasks.</target>
+      </trans-unit>
       <trans-unit id="UXVlbGxzcHJhY2hl">
         <source>Quellsprache</source>
         <target>Source language</target>
@@ -198,7 +218,7 @@
       </trans-unit>
       <trans-unit id="UXVlbGxzcHJhY2hlIGJlYXJiZWl0YmFy">
         <source>Quellsprache bearbeitbar</source>
-        <target>source language editable</target>
+        <target>Source language editable</target>
       </trans-unit>
       <trans-unit id="SW1wb3J0ZGF0ZWnCuQ==">
         <source>Importdatei&#xB9;</source>
@@ -386,7 +406,7 @@
       </trans-unit>
       <trans-unit id="IMKyIFN5c3RlbXJvbGxlbiBiZXN0aW1tZW4gZGFyw7xiZXIsIHdlbGNoZSBSZWNodGUgaW0gU3lzdGVtIGVpbiBOdXR6ZXIgaGF0LiBEaWUgUm9sbGUgRWRpdG9yIGRhcmYgYXVmIGFsbGUgS29tcG9uZW50ZW4gZGVzIEVkaXRvcnMgenVncmVpZmVuLCBzb3dpZSBhdWYgZGllIEtvbXBvbmVudGVuIGRlciBBdWZnYWJlbsO8YmVyc2ljaHQsIGRpZSBmw7xyIGRhcyBFZGl0aWVyZW4gdm9uIEF1ZmdhYmVuIG7DtnRpZyBzaW5kLiBEaWUgUm9sbGUgUE0gZGFyZiBCZW51dHplciB2ZXJ3YWx0ZW4gdW5kIEJlbnV0emVyIEF1ZmdhYmVuIGltIFdvcmtmbG93IHp1d2Vpc2VuIG9kZXIgZW50emllaGVuLiBBY2h0dW5nOiBTeXN0ZW1yb2xsZW4gZMO8cmZlbiBuaWNodCBtaXQgV29ya2Zsb3dyb2xsZW4gd2llIExla3RvciBvZGVyIMOcYmVyc2V0emVyIHZlcndlY2hzZWx0IHdlcmRlbi4gQmVudXR6ZXIgZGllIGltIFdvcmtmbG93IEF1ZmdhYmVuIMO8YmVybmVobWVuIHNvbGxlbiBtw7xzc2VuIG1pbmRlc3RlbnMgZGllIFN5c3RlbXJvbGxlIEVkaXRvciBlcmhhbHRlbi4=">
         <source> &#xB2; Systemrollen bestimmen dar&#xFC;ber, welche Rechte im System ein Nutzer hat. Die Rolle Editor darf auf alle Komponenten des Editors zugreifen, sowie auf die Komponenten der Aufgaben&#xFC;bersicht, die f&#xFC;r das Editieren von Aufgaben n&#xF6;tig sind. Die Rolle PM darf Benutzer verwalten und Benutzer Aufgaben im Workflow zuweisen oder entziehen. Achtung: Systemrollen d&#xFC;rfen nicht mit Workflowrollen wie Lektor oder &#xDC;bersetzer verwechselt werden. Benutzer die im Workflow Aufgaben &#xFC;bernehmen sollen m&#xFC;ssen mindestens die Systemrolle Editor erhalten.</source>
-        <target> &#xB2; The system roles defines the access rights of the user. The role "editor" may access all components needed for proofreading. The role "PM" may access the user administration, and is allowed to associate users to tasks. Warning: System roles are not to be confused with workflow roles like "reviewer" and "translator". Users which are part of the workflow, have to get at least the system role "editor".</target>
+        <target> &#xB2; The system roles defines the access rights of the user. The role "editor" may access all components needed for reviewing. The role "PM" may access the user administration, and is allowed to associate users to tasks. Warning: System roles are not to be confused with workflow roles like "reviewer" and "translator". Users which are part of the workflow, have to get at least the system role "editor".</target>
       </trans-unit>
       <trans-unit id="IMKzIFdpcmQga2VpbiBQYXNzd29ydCBnZXNldHp0IGJla29tbXQgZGVyIEJlbnV0emVyIGF1dG9tYXRpc2NoIGVpbmUgRS1NYWlsIHp1ciBFcnN0ZWxsdW5nIGVpbmVzIFBhc3N3b3J0cy4=">
         <source> &#xB3; Wird kein Passwort gesetzt bekommt der Benutzer automatisch eine E-Mail zur Erstellung eines Passworts.</source>
@@ -1125,7 +1145,7 @@
 	  <target>Save anyway</target>
 	</trans-unit>
     <trans-unit id='RG9wcGVsa2xpY2sgYXVmIGRpZSBaZWlsZSDDvGJlcm5pbW10IGRpZXNlbiBNYXRjaCBpbiBkYXMgZ2XDtmZmbmV0ZSBTZWdtZW50Lg=='><source>Doppelklick auf die Zeile übernimmt diesen Match in das geöffnete Segment.</source><target>Doubleclick to take over the match into the opened segment.</target></trans-unit>
-        <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>With translate5 you can proofread SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis</target></trans-unit>
+        <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>With translate5 you can review SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis</target></trans-unit>
 
 <trans-unit id='VW50ZXJzdMO8dHp1bmcgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1'><source>Unterstützung der Entwicklung von translate5</source><target>Support of translate5 development</target></trans-unit>
 <trans-unit id='VW5zZXIgZ3Jvw59lciBEYW5rIGdlaHQgYW4gZGllIGZvbGdlbmRlbiBVbnRlcm5laG1lbiB1bmQgT3JnYW5pc2F0aW9uZW4uIFNpZSBmaW5hbnppZXJlbiBkaWUgRmVhdHVyZXMsIGRpZSBzaWUgdm9uIHRyYW5zbGF0ZTUgZXJ3YXJ0ZW4u'><source>Unser großer Dank geht an die folgenden Unternehmen und Organisationen. Sie finanzieren die Features, die sie von translate5 erwarten.</source><target>All of our gratitudes go to the following companies and organizations. They finance the features they expect from translate5.</target></trans-unit>
@@ -1210,25 +1230,25 @@
     <source>Segment von Lesezeichenliste entfernen (STRG + D)</source>
     <target>remove segment bookmarks (CTRL + D)</target>
   </trans-unit>  
-<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgRU5URVIp'>
-  <source>Speichern und nächstes Segment öffnen (STRG + ALT + ENTER)</source>
-  <target>Save and open next segment (CTRL + ALT + ENTER)</target>
+<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW4gKFNUUkcgKyBBTFQgKyBFTlRFUik='>
+  <source>Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)</source>
+  <target>Save and open next editable segment (CTRL + ALT + ENTER)</target>
 </trans-unit>
-<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChTVFJHICsgRU5URVIp'>
-  <source>Speichern und nächstes Segment im Workflow öffnen (STRG + ENTER)</source>
-  <target>Save and open next segment in workflow (CTRL + ENTER)</target>
+<trans-unit id='U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IGltIFdvcmtmbG93IMO2ZmZuZW4gKFNUUkcgKyBFTlRFUik='>
+  <source>Speichern und nächstes bearbeitbares Segment im Workflow öffnen (STRG + ENTER)</source>
+  <target>Save and open next editable segment in workflow (CTRL + ENTER)</target>
 </trans-unit>
-<trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbiAoU1RSRyArIEFMVCArIFNISUZUICsgRU5URVIp'>
-  <source>Speichern und vorheriges Segment öffnen (STRG + ALT + SHIFT + ENTER)</source>
-  <target>Save and open previous segment (CTRL + ALT + SHIFT + ENTER)</target>
+<trans-unit id='U3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsgU0hJRlQgKyBFTlRFUik='>
+  <source>Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)</source>
+  <target>Save and open previous editable segment (CTRL + ALT + SHIFT + ENTER)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsg4oaTKQ=='>
-  <source>Nicht speichern und nächstes Segment öffnen (STRG + ALT + ↓)</source>
-  <target>Don't save and open next segment (CTRL + ALT + ↓)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IMO2ZmZuZW4gKFNUUkcgKyBBTFQgKyDihpMp'>
+  <source>Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)</source>
+  <target>Don't save and open next editable segment (CTRL + ALT + ↓)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgw7ZmZm5lbiAoU1RSRyArIEFMVCArIOKGkSk='>
-  <source>Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)</source>
-  <target>Don't save and open previous segment (CTRL + ALT + ↑)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCDDtmZmbmVuIChTVFJHICsgQUxUICsg4oaRKQ=='>
+  <source>Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)</source>
+  <target>Don't save and open previous editable segment (CTRL + ALT + ↑)</target>
 </trans-unit>
 <trans-unit id='RGVtIGF1c2dld8OkaGx0ZW4gU2VnbWVudCBlaW5lbiBLb21tZW50YXIgaGluenVmw7xnZW4uIChBTFQgKyBDKQ=='>
   <source>Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)</source>
@@ -1242,13 +1262,13 @@
   <source>Nächste Spalte editieren (STRG + ALT + →)</source>
   <target>Edit next column (CTRL + ALT + →)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChBTFQgKyBCaWxkIOKGkyk='>
-  <source>Nicht speichern und nächstes Segment im Workflow öffnen (ALT + Bild ↓)</source>
-  <target>Don't save and open next segment in workflow (ALT + page ↓)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgYmVhcmJlaXRiYXJlcyBTZWdtZW50IGltIFdvcmtmbG93IMO2ZmZuZW4gKEFMVCArIEJpbGQg4oaTKQ=='>
+  <source>Nicht speichern und nächstes bearbeitbares Segment im Workflow öffnen (ALT + Bild ↓)</source>
+  <target>Don't save and open next editable segment in workflow (ALT + page ↓)</target>
 </trans-unit>
-<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIFNlZ21lbnQgaW0gV29ya2Zsb3cgw7ZmZm5lbiAoQUxUICsgQmlsZCDihpEp'>
-  <source>Nicht speichern und vorheriges Segment im Workflow öffnen (ALT + Bild ↑)</source>
-  <target>Don't save and open previous segment in workflow (ALT + page ↑)</target>
+<trans-unit id='TmljaHQgc3BlaWNoZXJuIHVuZCB2b3JoZXJpZ2VzIGJlYXJiZWl0YmFyZXMgU2VnbWVudCBpbSBXb3JrZmxvdyDDtmZmbmVuIChBTFQgKyBCaWxkIOKGkSk='>
+  <source>Nicht speichern und vorheriges bearbeitbares Segment im Workflow öffnen (ALT + Bild ↑)</source>
+  <target>Don't save and open previous editable segment in workflow (ALT + page ↑)</target>
 </trans-unit>
 <trans-unit id='RGFzIFNlZ21lbnQgd3VyZGUgYXVmIGRlbiB1cnNwcsO8bmdsaWNoZW4gWnVzdGFuZCBuYWNoIGRlbSBJbXBvcnQgenVyw7xja2dlc2V0enQu'>
   <source>Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.</source>
@@ -1355,9 +1375,9 @@
   <source>Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.</source>
   <target>The segment cannot be edited, because the task is read-only / in view mode.</target>
 </trans-unit>
-<trans-unit id='SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiAlMSRzIG5pY2h0IG9mZml6aWVsbCB1bnRlcnN0w7x0enQuPGJyIC8+ICAgICBEaWUgQW53ZW5kdW5nIHd1cmRlIGhpbnNpY2h0bGljaCBGdW5rdGlvbmFsaXTDpHQgdW5kIFBlcmZvcm1hbmNlIGluIGRlbiBmb2xnZW5kZW4gQnJvd3NlciBvZmZpemllbGwgZ2V0ZXN0ZXQ6ICAgIDx1bD4gICAgICAgIDxsaT5Hb29nbGUgQ2hyb21lIGFiIFZlcnNpb24gNDg8L2xpPiAgICAgICAgPGxpPk1vemlsbGEgRmlyZWZveCBhYiBWZXJzaW9uIDQ0PC9saT4gICAgICAgIDxsaT5BcHBsZSBTYWZhcmkgYWIgVmVyc2lvbiA5PC9saT4gICAgICAgIDxsaT5NaWNyb3NvZnQgSW50ZXJuZXQgRXhwbG9yZXIgVmVyc2lvbiAxMTwvbGk+ICAgICAgICA8bGk+TWljcm9zb2Z0IEVkZ2U8L2xpPiAgICA8L3VsPiAgICBQcmluemlwaWVsbCBrYW5uICUxJHMgYXVjaCBtaXQgYW5kZXJlbiBCcm93c2VybiBiencuIMOkbHRlcmVuIFZlcnNpb25lbiBmdW5rdGlvbmllcmVuLiAgICAgSGllciBrYW5uIGVzIGFiZXIgenUgdW52b3JoZXJnZXNlaGVuZW4gRmVobGVybiBrb21tZW4uICAgICBQb3RlbnRpZWxsIGvDtm5uZW4gYXVjaCBtYW5jaGUgRmVhdHVyZXMga29tcGxldHQgbmljaHQgZnVua3Rpb25pZXJlbi4='>
-  <source>Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.<br />     Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:    <ul>        <li>Google Chrome ab Version 48</li>        <li>Mozilla Firefox ab Version 44</li>        <li>Apple Safari ab Version 9</li>        <li>Microsoft Internet Explorer Version 11</li>        <li>Microsoft Edge</li>    </ul>    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.     Hier kann es aber zu unvorhergesehenen Fehlern kommen.     Potentiell können auch manche Features komplett nicht funktionieren.</source>
-  <target>Your browser or your browser-version is not officially supported by %1$s.<br />The application was officially tested in the following browsers regarding functionality and performance:<ul>        <li>Google Chrome from version 48</li>        <li>Mozilla Firefox from version 44</li>        <li>Apple Safari from version 9</li>        <li>Microsoft Internet Explorer version 11</li>        <li>Microsoft Edge</li>    </ul>    In general %1$s should be able to work with other browsers and older versions. Unforeseen errors are possible then. It is possible that some features won't work at all.</target>
+<trans-unit id='SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiAlMSRzIG5pY2h0IG9mZml6aWVsbCB1bnRlcnN0w7x0enQuPGJyIC8+ICAgICBEaWUgQW53ZW5kdW5nIHd1cmRlIGhpbnNpY2h0bGljaCBGdW5rdGlvbmFsaXTDpHQgdW5kIFBlcmZvcm1hbmNlIGluIGRlbiBmb2xnZW5kZW4gQnJvd3NlciBvZmZpemllbGwgZ2V0ZXN0ZXQ6ICAgIDx1bD4gICAgICAgIDxsaT5Hb29nbGUgQ2hyb21lIGFiIFZlcnNpb24gNDg8L2xpPiAgICAgICAgPGxpPk1vemlsbGEgRmlyZWZveCBhYiBWZXJzaW9uIDQ0PC9saT4gICAgICAgIDxsaT5BcHBsZSBTYWZhcmkgYWIgVmVyc2lvbiA5PC9saT4gICAgICAgIDxsaT5NaWNyb3NvZnQgRWRnZTwvbGk+ICAgIDwvdWw+ICAgIFByaW56aXBpZWxsIGthbm4gJTEkcyBhdWNoIG1pdCBhbmRlcmVuIEJyb3dzZXJuIGJ6dy4gw6RsdGVyZW4gVmVyc2lvbmVuIGZ1bmt0aW9uaWVyZW4uICAgICBIaWVyIGthbm4gZXMgYWJlciB6dSB1bnZvcmhlcmdlc2VoZW5lbiBGZWhsZXJuIGtvbW1lbi4gICAgIFBvdGVudGllbGwga8O2bm5lbiBhdWNoIG1hbmNoZSBGZWF0dXJlcyBrb21wbGV0dCBuaWNodCBmdW5rdGlvbmllcmVuLg=='>
+  <source>Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.<br />     Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:    <ul>        <li>Google Chrome ab Version 48</li>        <li>Mozilla Firefox ab Version 44</li>        <li>Apple Safari ab Version 9</li>        <li>Microsoft Edge</li>    </ul>    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.     Hier kann es aber zu unvorhergesehenen Fehlern kommen.     Potentiell können auch manche Features komplett nicht funktionieren.</source>
+  <target>Your browser or your browser-version is not officially supported by %1$s.<br />The application was officially tested in the following browsers regarding functionality and performance:<ul>        <li>Google Chrome from version 48</li>        <li>Mozilla Firefox from version 44</li>        <li>Apple Safari from version 9</li>        <li>Microsoft Edge</li>    </ul>    In general %1$s should be able to work with other browsers and older versions. Unforeseen errors are possible then. It is possible that some features won't work at all.</target>
 </trans-unit>
 <trans-unit id='TmljaHQgdW50ZXJzdMO8dHp0ZSBCcm93c2VyLVZlcnNpb24='>
   <source>Nicht unterstützte Browser-Version</source>
@@ -1372,10 +1392,6 @@
 <trans-unit id='RGllIFNvcnRpZXJ1bmcgYnp3LiBGaWx0ZXJ1bmcgd3VyZGUgZ2XDpG5kZXJ0LCBlcyBrYW5uIG5pY2h0IHp1bSBha3R1ZWxsZW4gU2VnbWVudCB6dXLDvGNrIGdlc3BydW5nZW4gd2VyZGVuLg=='>
   <source>Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.</source>
   <target>The segment sort or filter was changed, the currently opened segment can't be scrolled back into the view.</target>
-</trans-unit>
-<trans-unit id='U2llIG51dHplbiBJbnRlcm5ldCBFeHBsb3Jlci4gRGllc2VyIEJyb3dzZXIgd2lyZCB2b24gVmVyc2lvbiA5IGJpcyAxMSB1bnRlcnN0w7x0enQsIGlzdCBhbGxlcmRpbmdzIHNlaHIgbGFuZ3NhbS4gVW0gZGllIEFud2VuZHVuZyBpbiBvcHRpbWFsZXIgUGVyZm9ybWFuY2UgbnV0emVuIHp1IGvDtm5uZW4sIGVtcGZlaGxlbiB3aXIgZGFoZXIgR29vZ2xlIENocm9tZSwgRmlyZWZveCBvZGVyIFNhZmFyaSBhbHMgQnJvd3Nlci4='>
-  <source>Sie nutzen Internet Explorer. Dieser Browser wird von Version 9 bis 11 unterstützt, ist allerdings sehr langsam. Um die Anwendung in optimaler Performance nutzen zu können, empfehlen wir daher Google Chrome, Firefox oder Safari als Browser.</source>
-  <target>You are using the Internet Explorer. This version 9 to 11 of this browser is supported, but the performance is very slow. To use the application in best performance, we recommend the usage of Google Chrome, Firefox or Safari as browser.</target>
 </trans-unit>
 <trans-unit id='TWF0Y2hyYXRlIFR5cA=='>
   <source>Matchrate Typ</source>
@@ -1412,10 +1428,6 @@
 <trans-unit id='SGlsZmU='>
     <source>Hilfe</source>
     <target>Help</target>
-</trans-unit>
-<trans-unit id='PHA+QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LjwvcD48cD5UcmFuc2xhdGU1IHdpcmQgenUgZGllc2VtIFplaXRwdW5rdCBrdXJ6ZnJpc3RpZyBuaWNodCBlcnJlaWNoYmFyIHNlaW4uPC9wPjxwPkdlcGxhbnRlciBaZWl0cHVua3Q6IHswfTwvcD4='>
-    <source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird zu diesem Zeitpunkt kurzfristig nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></source>
-    <target><p>Warning! Maintenance at the system will start shortly.</p><p>Translate5 will not be available in this time.</p><p>Scheduled date: {0}</p></target>
 </trans-unit>
 <trans-unit id='RXMgbMOkdWZ0IGVpbmUgV2FydHVuZw=='>
     <source>Es läuft eine Wartung</source>
@@ -1609,10 +1621,6 @@
     <source>Tastaturkürzel nachschlagen</source>
     <target>Look up keyboard short-cuts</target>
 </trans-unit>
-<trans-unit id='SW4gS8O8cnplIHdpcmQgZWluZSBTeXN0ZW13YXJ0dW5nIGR1cmNoZ2Vmw7xocnQgd2VyZGVuLiBEaWUgQW53ZW5kdW5nIGlzdCBkYW5uIGbDvHIgZWluaWdlIFplaXQgZ2VzcGVycnQuIERhdHVtIHVuZCBVaHJ6ZWl0IGRlcyBTdGFydHMgZGVyIFN5c3RlbXdhcnR1bmc6ICVz'>
-    <source>In Kürze wird eine Systemwartung durchgeführt werden. Die Anwendung ist dann für einige Zeit gesperrt. Datum und Uhrzeit des Starts der Systemwartung: %s</source>
-    <target>Maintenance will start shortly. The application will then be locked for some time. Date and time of the maintenance start: %s</target>
-</trans-unit>
 <trans-unit id='U1RSRyArIEVJTkZHIChhbHRlcm5hdGl2IFNUUkcgKyAuIChQdW5rdCkpIGtvcGllcnQgZGVuIGtvbXBsZXR0ZW4gUXVlbGx0ZXh0IGluIGRlbiBaaWVsdGV4dDxiciAvPlNUUkcgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRlbiBlbnRzcHJlY2hlbmRlbiBUYWcgaW4gZGVuIFppZWx0ZXh0IChOdWxsIGVudHNwcmljaHQgVGFnIE5yLiAxMCk8YnIgLz5TVFJHICsgU0hJRlQgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRpZSBUYWdzIG1pdCBkZW4gTnVtbWVybiAxMSBiaXMgMjAgaW4gZGVuIFppZWx0ZXh0Lg=='>
     <source>STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source>
     <target>CTRL + INS (alternatively CTRL + . (period)) copies source to target.<br />CTRL + , (comma) + &gt;number&lt; copies corresponding tag to target (zero equals number 10)<br />CTRL + SHIFT + , (comma) + &gt;number&lt; copies tag numbers 11 to 20 to target.</target>
@@ -1624,10 +1632,6 @@
 <trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgKGtlaW4gUmV2aWV3KQ=='>
     <source>Übersetzungsaufgabe (kein Review)</source>
     <target>Translation job (no review)</target>
-</trans-unit>
-<trans-unit id='PHA+QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LjwvcD48cD5UcmFuc2xhdGU1IHdpcmQgYWIgZGllc2VtIFplaXRwdW5rdCBmw7xyIGt1cnplIFplaXQgbmljaHQgZXJyZWljaGJhciBzZWluLjwvcD48cD5HZXBsYW50ZXIgWmVpdHB1bmt0OiB7MH08L3A+'>
-    <source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></source>
-    <target><p>Warning! Maintenance will start shortly.</p><p>The application will then be locked for some time.</p><p>Date and time of the maintenance start: {0}</p></target>
 </trans-unit>
 <trans-unit id='QXVzIGRlbSBTZWdtZW50IHd1cmRlbiBuaWNodCBkYXJzdGVsbGJhcmUgWmVpY2hlbiBlbnRmZXJudCAobWVocmVyZSBMZWVyemVpY2hlbiwgVGFidWxhdG9yZW4sIFplaWxlbnVtYnLDvGNoZSBldGMuKSE='>
     <source>Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!</source>
@@ -1726,19 +1730,19 @@
   <target>Reset password</target>
 </trans-unit>
 
-<trans-unit id='w5xiZXJzZXR6ZXIgKMOcYmVycHLDvGZ1bmcp'>
-    <source>Übersetzer (Überprüfung)</source>
-    <target>translator (check)</target>
+<trans-unit id='WndlaXRlciBMZWt0b3I='>
+	<source>Zweiter Lektor</source>
+	<target>Second Reviewer</target>
 </trans-unit>
 
-<trans-unit id='V29ya2Zsb3cgYmVlbmRldA=='>
-    <source>Workflow beendet</source>
-    <target>translator (check)</target>
+<trans-unit id='V29ya2Zsb3cgYWJnZXNjaGxvc3Nlbg=='>
+    <source>Workflow abgeschlossen</source>
+    <target>Workflow finished</target>
 </trans-unit>
 
 <trans-unit id='w5xiZXJzZXR6dW5n'>
     <source>Übersetzung</source>
-    <target>translation</target>
+    <target>Translation</target>
 </trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - task associated</target></trans-unit>
 
@@ -2018,7 +2022,7 @@ to reset your password from the following address.
     <source>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></source>
     <target>The task <b>{task.taskNr} - {task.taskName}</b> was finished by all users of the role <i>{previousRole}</i> in the task-portal {portalLink}.<br /></target>
 </trans-unit>
-<trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgbnVuIGF1dG9tYXRpc2NoIGbDvHIgZGllIGZvbGdlbmRlbiBCZW51dHplciBpbiBkZXIgUm9sbGUgPGk+e25leHRSb2xlfTwvaT4gZnJlaWdlZ2ViZW46PGJyIC8+Cnt1c2VyTGlzdH08YnIgLz4KPGJyIC8+CkRpZSBCZW51dHplciB3dXJkZW4gcGVyIEUtTWFpbCBkYXLDvGJlciBpbmZvcm1pZXJ0LjxiciAvPgo8YnIgLz4='>
+<trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgbnVuIGF1dG9tYXRpc2NoIGbDvHIgZGllIGZvbGdlbmRlbiBCZW51dHplciBpbiBkZXIgUm9sbGUgPGk+e25leHRSb2xlfTwvaT4gZnJlaWdlZ2ViZW46PGJyIC8+Cnt1c2VyTGlzdH08YnIgLz4KRGllIEJlbnV0emVyIHd1cmRlbiBwZXIgRS1NYWlsIGRhcsO8YmVyIGluZm9ybWllcnQuPGJyIC8+CjxiciAvPg=='>
     <source>Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>{nextRole}</i> freigegeben:<br />
 {userList}<br />
 <br />
@@ -2110,23 +2114,23 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
 <target><b>Task:</b> {task.taskName}<br />
     <b>Source-language:</b> {sourceLanguageTranslated}<br />
     <b>Target-language:</b> {targetLanguageTranslated}<br />
-    {relaisLanguageFragment}<b>Expected proofreading delivery date:</b> {targetDeliveryDate}<br />
+    {relaisLanguageFragment}<b>Expected reviewing delivery date:</b> {targetDeliveryDate}<br />
     <b>Word-count:</b> {wordCount}<br /></target>
 </trans-unit>
 
-<trans-unit id='e2hlYWRlcn0KCkltIFByb2pla3Rwb3J0YWwge3BvcnRhbExpbmt9IHd1cmRlIElobmVuIGVpbmUgQXVmZ2FiZSB6dWdld2llc2VuLjxiciAvPgo8YnIgLz4KPGI+Um9sbGU6PC9iPiB7cm9sZX08YnIvPgp7dGFza0ZyYWdtZW50fXtwcm9vZnJlYWRlcnNGcmFnbWVudH17Zm9vdGVyfQ=='>
+<trans-unit id='e2hlYWRlcn0KCkltIFByb2pla3Rwb3J0YWwge3BvcnRhbExpbmt9IHd1cmRlIElobmVuIGVpbmUgQXVmZ2FiZSB6dWdld2llc2VuLjxiciAvPgo8YnIgLz4KPGI+Um9sbGU6PC9iPiB7cm9sZX08YnIvPgp7dGFza0ZyYWdtZW50fXtyZXZpZXdlcnNGcmFnbWVudH17Zm9vdGVyfQ=='>
     <source>{header}
 
 Im Projektportal {portalLink} wurde Ihnen eine Aufgabe zugewiesen.<br />
 <br />
 <b>Rolle:</b> {role}<br/>
-{taskFragment}{proofreadersFragment}{footer}</source>
+{taskFragment}{reviewersFragment}{footer}</source>
 <target>{header}
 
 A task was associated to you in the task-portal {portalLink}.<br />
 <br />
 <b>Role:</b> {role}<br/>
-{taskFragment}{proofreadersFragment}{footer}</target>
+{taskFragment}{reviewersFragment}{footer}</target>
 </trans-unit>
 <trans-unit id='Cjxici8+PGI+QWxsZSBkZXIgQXVmZ2FiZSB6dWdlb3JkbmV0ZW4gQmVudXR6ZXI6PC9iPgo8YnIvPg=='>
     <source>
@@ -2365,7 +2369,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='RWlnZW5zY2hhZnRlbg=='>
     <source>Eigenschaften</source>
-    <target>Other properties</target>
+    <target>Properties</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSBrbG9uZW4='>
     <source>Aufgabe klonen</source>
@@ -2564,7 +2568,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='S3VuZGUgaGluenVmw7xnZW4='>
     <source>Kunde hinzufügen</source>
-    <target>Add a client</target>
+    <target>Add client</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGUgd2lyZCBnZXNwZWljaGVydC4u'>
@@ -2812,7 +2816,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Sprach-Resourcen zuweisen</source>
   <target>Associate language resources</target>
 </trans-unit>
-<trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='>
+<trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiB1bmQgZsO8ciBkZW4gS3VuZGVuIGRlcyBnZcO2ZmZuZXRlbiBUYXNrcyB2ZXJmw7xnYmFyLg=='>
   <source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source>
   <target>No language resource available for the language combination and client of the opened task.</target>
 </trans-unit>
@@ -2824,6 +2828,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Dateibasiertes TM herunterladen und lokal speichern</source>
   <target>Download and save locally the filebased TM</target>
 </trans-unit>
+<trans-unit id='QWxzIFRNWC1EYXRlaSBoZXJ1bnRlcmxhZGVuIHVuZCBsb2thbCBzcGVpY2hlcm4='>
+    <source>Als TMX-Datei herunterladen und lokal speichern</source>
+    <target>Download TMX-file and save it locally</target>
+    </trans-unit>
 <trans-unit id='SGluenVmw7xnZW4='>
   <source>Hinzufügen</source>
   <target>Add</target>
@@ -2945,11 +2953,6 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>importing</target>
 </trans-unit>
 
-<trans-unit id='U2VnbWVudCBpbSBUTSBha3R1YWxpc2llcnQh'>
-    <source>Segment im TM aktualisiert!</source>
-    <target>Segment updated in the TM!</target>
-</trans-unit>
-
 <trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'>
     <source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source>
     <target>The queried OpenTM2 instance is not available</target>
@@ -3014,9 +3017,9 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Termeinträge verschmelzen</source>
     <target>Merge term entries</target>
 </trans-unit>
-<trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxz'>
-    <source>Termeinträge löschen älter als</source>
-    <target>Delete term entries older than</target>
+<trans-unit id='VGVybWUgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='>
+    <source>Terme löschen, deren letzte Berührung länger her ist als</source>
+    <target>Delete terms last touched longer ago than</target>
 </trans-unit>
 
 <trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxzIGFrdHVlbGxlciBJbXBvcnQ='>
@@ -3088,7 +3091,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='QW5tZXJrdW5n'>
     <source>Anmerkung</source>
-    <target>Note</target>
+    <target>Comment</target>
 </trans-unit>
 
 <trans-unit id='QWRtaW5pc3RyYXRpdmVyIFN0YXR1cw=='>
@@ -3217,13 +3220,13 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.</source>
   <target>A pivot language was set, but in the import package was no pivot data.</target>
 </trans-unit>
-<trans-unit id='RGFzIGltcG9ydGllcnRlIFBha2V0IGJlaW5oYWx0ZXQga2VpbiBnw7xsdGlnZXMgIntwcm9vZlJlYWR9IiBWZXJ6ZWljaG5pcy4='>
-  <source>Das importierte Paket beinhaltet kein gültiges "{proofRead}" Verzeichnis.</source>
-  <target>The imported package did not contain a valid "{proofRead}" directory.</target>
+<trans-unit id='RGFzIGltcG9ydGllcnRlIFBha2V0IGJlaW5oYWx0ZXQga2VpbiBnw7xsdGlnZXMgIntyZXZpZXd9IiBWZXJ6ZWljaG5pcy4='>
+  <source>Das importierte Paket beinhaltet kein gültiges "{review}" Verzeichnis.</source>
+  <target>The imported package did not contain a valid "{review}" directory.</target>
 </trans-unit>
-<trans-unit id='RGFzIGltcG9ydGllcnRlIFBha2V0IGJlaW5oYWx0ZXQga2VpbmUgRGF0ZWllbiBpbSAie3Byb29mUmVhZH0iIFZlcnplaWNobmlzLg=='>
-  <source>Das importierte Paket beinhaltet keine Dateien im "{proofRead}" Verzeichnis.</source>
-  <target>The imported package did not contain valid data in the "{proofRead}" directory.</target>
+<trans-unit id='RGFzIGltcG9ydGllcnRlIFBha2V0IGJlaW5oYWx0ZXQga2VpbmUgRGF0ZWllbiBpbSAie3Jldmlld30iIFZlcnplaWNobmlzLg=='>
+  <source>Das importierte Paket beinhaltet keine Dateien im "{review}" Verzeichnis.</source>
+  <target>The imported package did not contain valid data in the "{review}" directory.</target>
 </trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dCwgdW5kIGthbm4gZGFoZXIgbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbi4='>
   <source>Die Aufgabe wird von einem Benutzer benutzt, und kann daher nicht gelöscht werden.</source>
@@ -3276,8 +3279,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Der referenzierte Kunde existiert nicht (mehr)﻿.</source>
     <target>The referenced customer does not exist (anymore).</target>
 </trans-unit>
-<trans-unit id='QW5zaWNodHNtb2R1cw=='>
-    <source>Ansichtsmodus</source>
+<trans-unit id='QW5zaWNodA=='>
+    <source>Ansicht</source>
     <target>View mode</target>
 </trans-unit>
 <trans-unit id='RXJlaWduaXNzZSB6dSBBdWZnYWJlICJ7MH0i'>
@@ -3292,8 +3295,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Zurück zu den Ereignissen</source>
     <target>Back to the events</target>
 </trans-unit>
-<trans-unit id='QXVmZ2FiZSBGZWhsZXJoaXN0b3JpZQ=='>
-    <source>Aufgabe Fehlerhistorie</source>
+<trans-unit id='RXJlaWduaXMtUHJvdG9rb2xs'>
+    <source>Ereignis-Protokoll</source>
     <target>Task error-history</target>
 </trans-unit>
 <trans-unit id='RXJlaWduaXNzZQ=='>
@@ -3373,7 +3376,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='VGVybWlub2xvZ2llcG9ydGFsLVNwcmFjaGVu'><source>Terminologieportal-Sprachen</source><target>TermPortal-languages</target></trans-unit>
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>All languages available</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Saving the term will also create a new entry for</target></trans-unit>
-<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscw=='><source>Vorschläge löschen älter als</source><target>Delete proposals older than</target></trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Vorschläge löschen, deren letzte Berührung länger her ist als</source><target>Delete proposals last touched longer ago than</target></trans-unit>
 <trans-unit id='VGVybTogVm9yc2NobGFnIGzDtnNjaGVu'><source>Term: Vorschlag löschen</source><target>Term: Delete proposal</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIFRlcm0='><source>Änderung zu bestehendem Term</source><target>Change to existing term</target></trans-unit>
 <trans-unit id='UHJvemVzcy1TdGF0dXM='><source>Prozess-Status</source><target>Prozess status</target></trans-unit>
@@ -3407,6 +3410,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Excel hochladen</source>
     <target>Upload excel</target>
 </trans-unit>
+<trans-unit id='TG9n'><source>Log</source><target>Log</target></trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIFdhcm51bmcgenUgQXVmZ2FiZQ=='>
     <source>Translate5 - Warnung zu Aufgabe</source>
     <target>Translate5 - Warning to task</target>
@@ -3435,6 +3439,7 @@ More information can be found in the task property window in the tab events.<br 
 <trans-unit id='QWNodHVuZzogRWluZSDDhG5kZXJ1bmcgZGVyIERlZmluaXRpb24gd2lya3Qgc2ljaCBhdWYgYWxsZSBUZXJtZSBkaWVzZXIgU3ByYWNoZSBhdXMu'><source>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</source><target>Editing this definition will affect all terms of this language.</target></trans-unit>
 <trans-unit id='WnVtIMOEbmRlcm4gZGVyIERlZmluaXRpb24gw7ZmZm5lbiBTaWUgYml0dGUgZGllIEVpbnRyYWdzZWlnZW5zY2hhZnRlbi4='><source>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</source><target>Please open the 'Term entry attributes' for editing this definition.</target></trans-unit>
 <trans-unit id='SGlud2Vpcw=='><source>Hinweis</source><target>Please note:</target></trans-unit>
+<trans-unit id='S2F0ZWdvcmllbg=='><source>Kategorien</source><target>Categories</target></trans-unit>
 <trans-unit id='Cjxici8+Cjxici8+PGI+QWNodHVuZzo8L2I+IEtvbmt1cnJpZXJlbmRlIEJlbnV0emVyOiBEZXIgZXJzdGUgQmVudXR6ZXIsIGRlciBlaW5lbiBKb2IgYW5uaW1tdCwgZsO8aHJ0IGVpbmVuIEpvYiBhdXMuIEFsbGVuIGFuZGVyZW4gd2lyZCBhdXRvbWF0aXNjaCBkaWUgQXVmZ2FiZSBlbnR6b2dlbi4KPGJyLz4='>
     <source>
 <br/>
@@ -3449,28 +3454,20 @@ More information can be found in the task property window in the tab events.<br 
     <source>Mehrere Benutzer</source>
     <target>Multiple users</target>
 </trans-unit>
-<trans-unit id='V2VubiBtZWhyZXJlIEJlbnV0emVyIGRlbXNlbGJlbiBXb3JrZmxvdy1TY2hyaXR0IHp1Z2V3aWVzZW4gd2VyZGVu'>
-    <source>Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden</source>
-    <target>When assigning multiple users to same workflow step</target>
+<trans-unit id='QmVpIFp1d2Vpc3VuZyBtZWhyZXJlciBCZW51dHplciB6dW0gc2VsYmVuIFdvcmtmbG93c2Nocml0dA=='>
+  <source>Bei Zuweisung mehrerer Benutzer zum selben Workflowschritt</source>
+  <target>When assigning multiple users to the same workflow step</target>
 </trans-unit>
 <trans-unit id='RGllc2UgT3B0aW9uIGthbm4gbnVyIHZlcsOkbmRlcnQgd2VyZGVuLCB3ZW5uIGtlaW4gQmVudXR6ZXIgZGVyIEF1ZmdhYmUgenVnZXdpZXNlbiBpc3Qu'>
     <source>Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</source>
     <target>Option can only be changed, if no user is assigned</target>
 </trans-unit>
-<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGRpZXNlbGJlIEF1ZmdhYmU='>
-    <source>Mehrere Benutzer bearbeiten dieselbe Aufgabe</source>
-    <target>Multiple users editing same task</target>
-</trans-unit>
-<trans-unit id='S29ua3VycmllcmVuZGUgQmVudXR6ZXI6IERlciBlcnN0ZSBCZW51dHplciwgZGVyIGVpbmVuIEpvYiBhbm5pbW10LCBmw7xocnQgZWluZW4gSm9iIGF1cy4gQWxsZW4gYW5kZXJlbiB3aXJkIGF1dG9tYXRpc2NoIGRpZSBBdWZnYWJlIGVudHpvZ2VuLg=='>
-    <source>Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.</source>
-    <target>Competing users: First user, who accepts job, does job. Others are unassigned automatically.</target>
-</trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXIgYmVuYWNocmljaHRpZ2VuPw=='>
     <source>Zugewiesene Benutzer benachrichtigen?</source>
     <target>Notify assigned users?</target>
 </trans-unit>
-<trans-unit id='U29sbGVuIGRpZSB6dWdld2llc2VuZW4gQmVudXR6ZXIgw7xiZXIgZGllIFp1d2Vpc3VuZyBkZXIgQXVmZ2FiZSBiZW5hY2hyaWNodGlnIHdlcmRlbj8='>
-    <source>Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?</source>
+<trans-unit id='U29sbGVuIGRpZSB6dWdld2llc2VuZW4gQmVudXR6ZXIgw7xiZXIgZGllIFp1d2Vpc3VuZyBkZXIgQXVmZ2FiZSBiZW5hY2hyaWNodGlndCB3ZXJkZW4/'>
+    <source>Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtigt werden?</source>
     <target>Notify the associated users about the association to the task?</target>
 </trans-unit>
 <trans-unit id='PGJyLz48YnIvPkFsbGVuIGFuZGVyZW4gQmVudXR6ZXJuIHdpcmQgZGllIEF1ZmdhYmUgZW50em9nZW48YnIvPiB1bmQgc2llIHdpcmQgYXVzc2NobGllw59saWNoIGluIElocmVyIFZlcmFudHdvcnR1bmcgbGllZ2VuLg=='>
@@ -3521,7 +3518,163 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Ohne</source>
     <target>None</target>
 </trans-unit>
+<trans-unit id='U2VociBnZWVocnRlKHIp'>
+    <source>Sehr geehrte(r)</source>
+    <target>Dear</target>
+</trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'>
+    <source>Vorschläge löschen älter als aktueller Import</source>
+    <target>Delete proposals older than current import</target>
+</trans-unit>
+<trans-unit id='QXVzbG9nZ2Vu'>
+    <source>Ausloggen</source>
+    <target>Log out</target>
+</trans-unit>
+<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='>
+    <source>Sonderzeichen hinzufügen:</source>
+    <target>Add special characters:</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='>
+    <source>Aufgabe verlassen</source>
+    <target>Leave task</target>
+</trans-unit>
+<trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='>
+    <source>Nur Segmente mit Lesezeichen anzeigen</source>
+    <target>Show only bookmarked segments</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRyb2xsZW4='>
+    <source>Standardrollen</source>
+    <target>Default roles</target>
+</trans-unit>
+<trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='>
+    <source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source>
+    <target>System roles the OpenID server is allowed to set in translate5.</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='>
+    <source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source>
+    <target>Default system roles are used, if the OpenId server does not pass any system roles for the user, that logs on.</target>
+</trans-unit>
+<trans-unit id='RXJsYXVidGUgUm9sbGVu'>
+    <source>Erlaubte Rollen</source>
+    <target>Allowed roles</target>
+</trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGdsZWljaHplaXRpZyBkaWVzZWxiZSBBdWZnYWJl'>
+    <source>Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe</source>
+    <target>Multiple users editing simultaneously the same task</target>
+</trans-unit>
+<trans-unit id='SW4gQmVhcmJlaXR1bmc='>
+    <source>In Bearbeitung</source>
+    <target>In process</target>
+</trans-unit>
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
-    </body>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Delete proposals older than current import</target></trans-unit>
+<trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Log out</target></trans-unit>
+<trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Add special characters:</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Leave task</target></trans-unit>
+<trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Show only bookmarked segments</target></trans-unit>
+<trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
+<trans-unit id='S2V5IFBlcmZvcm1hbmNlIEluZGljYXRvcnM='><source>Key Performance Indicators</source><target>Key Performance Indicators</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCBMZWt0b3I='><source>Ø Bearbeitungszeit Lektor</source><target>Ø Processing Time Reviewer</target></trans-unit>
+<trans-unit id='VGFnZQ=='><source>Tage</source><target>days</target></trans-unit>
+<trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdCB2b24gZGVyIFp1d2Vpc3VuZyBiaXMgenVtIEFic2NobHVzcyBlaW5lciBBdWZnYWJlLg=='><source>Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.</source><target>Average time from assignment of the job to finishing of the job.</target></trans-unit>
+<trans-unit id='RXhjZWwtRXhwb3J0IE51dHp1bmc='><source>Excel-Export Nutzung</source><target>Excel-Exports</target></trans-unit>
+<trans-unit id='UHJvemVudCBkZXIgQXVmZ2FiZW4sIGJlaSBkZW5lbiBkZXIgRXhjZWwtRXhwb3J0IGRlciBTZWdtZW50dGFiZWxsZSBnZW51dHp0IHd1cmRlLg=='><source>Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.</source><target>Percentage of the tasks, where the exporting of segments as Excel has been used within the process.</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRyb2xsZW4='><source>Standardrollen</source><target>Default roles</target></trans-unit>
+<trans-unit id='U3lzdGVtcm9sbGVuLCBkaWUgZGVyIE9wZW5JRC1TZXJ2ZXIgaW4gdHJhbnNsYXRlNSBmZXN0bGVnZW4gZGFyZi4='><source>Systemrollen, die der OpenID-Server in translate5 festlegen darf.</source><target>System roles the OpenID server is allowed to set in translate5.</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRzeXN0ZW1yb2xsZW4gd2VyZGVuIHZlcndlbmRldCwgd2VubiBkZXIgT3BlbklkLVNlcnZlciBrZWluZSBTeXN0ZW1yb2xsZW4gZsO8ciBkZW4gQmVudXR6ZXIgw7xiZXJnaWJ0LCBkZXIgc2ljaCBhbm1lbGRldC4='><source>Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.</source><target>Default system roles are used, if the OpenId server does not pass any system roles for the user, that logs on.</target></trans-unit>
+<trans-unit id='RXJsYXVidGUgUm9sbGVu'><source>Erlaubte Rollen</source><target>Allowed roles</target></trans-unit>
+<trans-unit id='RGVyIHJlZmVyZW56aWVydGUgQmVudXR6ZXIgaXN0IGRlciBBdWZnYWJlIG5pY2h0IG1laHIgenVnZXdpZXNlbiBvZGVyIGV4aXN0aWVydCBuaWNodCBtZWhyLg=='><source>Der referenzierte Benutzer ist der Aufgabe nicht mehr zugewiesen oder existiert nicht mehr.</source><target>The referenced user is not associated to the task or does event not exist anymore.</target></trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRpZSBBdWZnYWJlIGJlZW5kZW4gdW5kIHp1csO8Y2tzZW5kZW4sIG9kZXIgbcO2Y2h0ZW4gU2llIGRpZXNlIHNww6R0ZXIgd2VpdGVyYmVhcmJlaXRlbj8='><source>Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?</source><target>Do you want to finish the task and submit it, or edit it again later?</target></trans-unit>
+<trans-unit id='RmVydGlnIHVuZCBBdWZnYWJlIGJlZW5kZW4='><source>Fertig und Aufgabe beenden</source><target>I‘m done. Finish task</target></trans-unit><trans-unit id='QXVmZ2FiZSBzcMOkdGVyIHdlaXRlcmJlYXJiZWl0ZW4='><source>Aufgabe später weiterbearbeiten</source><target>Continue task later</target></trans-unit>
+<trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZWxpc3Rl'><source>Zurück zur Aufgabeliste</source><target>Back to task list</target></trans-unit>
+<trans-unit id='V29ya2Zsb3c='><source>Workflow</source><target>Workflow</target></trans-unit>
+<trans-unit id='WmFobCB6dWdld2llc2VuZXIgQmVudXR6ZXI='><source>Zahl zugewiesener Benutzer</source><target>Number of users</target></trans-unit>
+<trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc291cmNlbg=='><source>Anzahl zugewiesene Sprachresourcen</source><target>Number of assigned language resources</target></trans-unit>
+<trans-unit id='MTAwJS1UcmVmZmVyIGVkaXRpZXJiYXI='><source>100%-Treffer editierbar</source><target>100% matches editable</target></trans-unit>
+<trans-unit id='UHJvamVrdG1hbmFnZXI='><source>Projektmanager</source><target>Project manager</target></trans-unit>
+<trans-unit id='JSBhYmdlc2NobG9zc2Vu'><source>% abgeschlossen</source><target>% finished</target></trans-unit>
+<trans-unit id='JSBhYmdlc2NobG9zc2VuIGR1cmNoIHp1Z2V3aWVzZW5lIEJlbnV0emVyIGltIGFrdHVlbGxlbiBXb3JrZmxvd3NjaHJpdHQ='><source>% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt</source><target>% completed by assigned users in the current workflow step</target></trans-unit>
+<trans-unit id='QWt0dWVsbGVyIFdvcmtmbG93LVNjaHJpdHQ='><source>Aktueller Workflow-Schritt</source><target>Current workflow step</target></trans-unit>
+<trans-unit id='SGVsZmVuIFNpZSBiZWkgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1OiBFcmxhdWJlbiBTaWUgQmlsZHNjaGlybXZpZGVvcyBpbSBGZWhsZXJmYWxsLjxiciAvPjxiciAvPkJlaSBlaW5lciBSZWloZSB2b24gRmVobGVybiBrYW5uIGRhcyBPcGVuIFNvdXJjZS1FbnR3aWNrbHVuZ3N0ZWFtIHZvbiB0cmFuc2xhdGU1IGRpZXNlIG51ciByZXByb2R1emllcmVuIHVuZCBiZWhlYmVuLCB3ZW5uIGRpZSBCZW51dHplcmFrdGlvbmVuLCBkaWUgIHp1IGRlbSB0cmFuc2xhdGU1LUZlaGxlciBnZWbDvGhydCBoYWJlbiwgYWxzIFZpZGVvIGF1Zmdlbm9tbWVuIHdlcmRlbi4gRXMgd2lyZCBudXIgYXVmZ2V6ZWljaG5ldCwgd2FzIGluIHRyYW5zbGF0ZTUgcGFzc2llcnQuIERpZSBWaWRlb2F1Zm5haG1lIHN0YXJ0ZXQgZXJzdCwgd2VubiBlaW4gU2VnbWVudCB6dXIgQmVhcmJlaXR1bmcgZ2XDtmZmbmV0IGlzdCwgdW5kIHNpZSBlbmRldCwgc29iYWxkIGRpZSBCZWFyYmVpdHVuZyBkZXMgU2VnbWVudHMgZW5kZXQuPGJyIC8+PGJyIC8+RGFzIFRlYW0gdm9uIHRyYW5zbGF0ZTUgd8OkcmUgc2VociBkYW5rYmFyLCB3ZW5uIFNpZSBkaWVzZSBGdW5rdGlvbiBha3RpdmllcmVuIC0gdmllbGVuIERhbmsgaW0gVm9yYXVzITxiciAvPjxiciAvPkF1Y2ggd2VubiBkaWUgVmlkZW9hdWZ6ZWljaG51bmcgYWt0aXZpZXJ0IGlzdCwgd2VyZGVuIFZpZGVvYXVmemVpY2hudW5nZW4gbnVyIGdlc2VuZGV0LCB3ZW5uIFNpZSBlaW5lbiBhdWZnZXRyZXRlbmVuIEZlaGxlciBtZWxkZW4uPGJyIC8+PGJyIC8+VmlkZW9zLCBkaWUgbWl0IGVpbmVtIEZlaGxlciBpbiBWZXJiaW5kdW5nIHN0ZWhlbiB1bmQgYW4gZGVuIFNlcnZlciBnZXNlbmRldCB3dXJkZW4sIHdlcmRlbiBnZWzDtnNjaHQsIHNvYmFsZCBzaWUgenVyIEJlaGVidW5nIGRlcyBGZWhsZXJzIG5pY2h0IG1laHIgYmVuw7Z0aWd0IHdlcmRlbi4gRGVyIGVpbnppZ2UgVmVyd2VuZHVuZ3N6d2VjayBkZXIgVmlkZW9zIGlzdCBkaWUgRW50d2lja2x1bmcgdm9uIHRyYW5zbGF0ZTUuIERpZSBEYXRlbiB3ZXJkZW4gbnVyIGbDvHIgZGllc2VuIFp3ZWNrIHZlcndlbmRldC48YnIgLz48YnIgLz5XZWl0ZXJlIEluZm9ybWF0aW9uZW4genVyIFZpZGVvYXVmemVpY2hudW5nIG1pdCB0aGVSb290Q2F1c2UgdW5kIHp1bSBEYXRlbnNjaHV0eiBmaW5kZW4gU2llIHVudGVyIGh0dHBzOi8vY29uZmx1ZW5jZS50cmFuc2xhdGU1Lm5ldC94L0VBQXJCdw=='><source>Helfen Sie bei der Entwicklung von translate5: Erlauben Sie Bildschirmvideos im Fehlerfall.<br /><br />Bei einer Reihe von Fehlern kann das Open Source-Entwicklungsteam von translate5 diese nur reproduzieren und beheben, wenn die Benutzeraktionen, die  zu dem translate5-Fehler geführt haben, als Video aufgenommen werden. Es wird nur aufgezeichnet, was in translate5 passiert. Die Videoaufnahme startet erst, wenn ein Segment zur Bearbeitung geöffnet ist, und sie endet, sobald die Bearbeitung des Segments endet.<br /><br />Das Team von translate5 wäre sehr dankbar, wenn Sie diese Funktion aktivieren - vielen Dank im Voraus!<br /><br />Auch wenn die Videoaufzeichnung aktiviert ist, werden Videoaufzeichnungen nur gesendet, wenn Sie einen aufgetretenen Fehler melden.<br /><br />Videos, die mit einem Fehler in Verbindung stehen und an den Server gesendet wurden, werden gelöscht, sobald sie zur Behebung des Fehlers nicht mehr benötigt werden. Der einzige Verwendungszweck der Videos ist die Entwicklung von translate5. Die Daten werden nur für diesen Zweck verwendet.<br /><br />Weitere Informationen zur Videoaufzeichnung mit theRootCause und zum Datenschutz finden Sie unter https://confluence.translate5.net/x/EAArBw</source><target>Help translate5's development with screen videos in case of errors<br /><br />For a number of errors it is only possible for translate5's Open Source development team to reproduce and fix them, if user actions that led to the translate5-error are recorded as video. Only what happens inside translate5 will be recorded. The video-recording only starts when a segment is opened for editing and stops when the editing ends.<br /><br />translate5's team would be very thankful, if you activate this feature - thank you very much in advance!<br /><br />If the video recording is activated, video recordings are only sent, when you report an error that occurred.<br /><br />Videos that are connected to an error and have been sent to the server are deleted, when they are not needed any more for fixing of the error. The only usage purpose of the videos is translate5s development, and the data will be only used for this purpose.<br /><br />More information about video recording with theRootCause and data protection you can find at <a href="https://confluence.translate5.net/x/EAArBw" target="_blank">https://confluence.translate5.net/x/EAArBw</a></target></trans-unit>
+<trans-unit id='VmlkZW9hdWZuYWhtZSBpbSBGZWhsZXJmYWxs'><source>Videoaufnahme im Fehlerfall</source><target>Video recording in case of error</target></trans-unit>
+<trans-unit id='RXJ3ZWl0ZXJ0ZSBGaWx0ZXI='><source>Erweiterte Filter</source><target>Advanced filters</target></trans-unit>
+<trans-unit id='V29ya2Zsb3ctU3RhdHVz'><source>Workflow-Status</source><target>Workflow status</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItUm9sbGU='><source>Benutzer-Rolle</source><target>User role</target></trans-unit>
+<trans-unit id='V2VpdGVyZSBGaWx0ZXIgaW0gS29wZiBqZWRlciBTcGFsdGU='><source>Weitere Filter im Kopf jeder Spalte</source><target>More filters in the head of each column</target></trans-unit>
+<trans-unit id='QW53ZW5kZW4='><source>Anwenden</source><target>Apply</target></trans-unit>
+<trans-unit id='R2VzZXR6dGUgRmlsdGVy'><source>Gesetzte Filter</source><target>Active filters</target></trans-unit>
+<trans-unit id='QW5vbnltaXNpZXJ0ZSBCZW51dHplciBuaWNodCBhdXN3w6RobGJhcg=='><source>Anonymisierte Benutzer nicht auswählbar</source><target>Anonymized users not selectable</target></trans-unit>
+<trans-unit id='bGlrZQ=='><source>like</source><target>Includes</target></trans-unit>
+<trans-unit id='bm90SW5MaXN0'><source>notInList</source><target>not includes</target></trans-unit>
+<trans-unit id='aW4='><source>in</source><target>Includes</target></trans-unit>
+<trans-unit id='ZXE='><source>eq</source><target>=</target></trans-unit>
+<trans-unit id='Z3Q='><source>gt</source><target>&gt;</target></trans-unit>
+<trans-unit id='Z3RlcQ=='><source>gteq</source><target>&gt;=</target></trans-unit>
+<trans-unit id='bHQ='><source>lt</source><target>&lt;</target></trans-unit>
+<trans-unit id='bHRlcQ=='><source>lteq</source><target>&lt;=</target></trans-unit>
+<trans-unit id='PQ=='><source>=</source><target>equal</target></trans-unit>
+<trans-unit id='PT0='><source>==</source><target>identical</target></trans-unit>
+<trans-unit id='SWQ='><source>Id</source><target>Id</target></trans-unit>
+<trans-unit id='VGFzay1HdWlk'><source>Task-Guid</source><target>Task-Guid</target></trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUvciBCZW51dHplcg=='><source>Zugewiesene/r Benutzer</source><target>Assigned user/s</target></trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXItUm9sbGUvbg=='><source>Zugewiesene Benutzer-Rolle/n</source><target>Assigned user role/s</target></trans-unit>
+<trans-unit id='S2VpbiBXb3JrZmxvdw=='><source>Kein Workflow</source><target>No workflow</target></trans-unit>
+<trans-unit id='dW5iZXN0w6R0aWd0'>
+    <source>unbestätigt</source>
+    <target>unconfirmed</target>
+</trans-unit>
+<trans-unit id='SW4gQmVhcmJlaXR1bmcgZHVyY2g6'>
+    <source>In Bearbeitung durch:</source>
+    <target>In progress by:</target>
+</trans-unit>
+
+<trans-unit id='R2xlaWNoemVpdGlnZXMgQXJiZWl0ZW4='>
+    <source>Gleichzeitiges Arbeiten</source>
+    <target>Simultaneous Work</target>
+</trans-unit>
+<trans-unit id='QWxsZSB6dWdld2llc2VuZW4gTnV0emVyIGVpbmVzIFdvcmtmbG93c2Nocml0dHMga8O2bm5lbiBnbGVpY2h6ZWl0aWcgYXJiZWl0ZW4='>
+    <source>Alle zugewiesenen Nutzer eines Workflowschritts können gleichzeitig arbeiten</source>
+    <target>All assigned users of a workflow step can work simultaneously</target>
+</trans-unit>
+<trans-unit id='S29ua3VycmllcmVuZGUgWnV3ZWlzdW5n'>
+    <source>Konkurrierende Zuweisung</source>
+    <target>Competing assignment</target>
+</trans-unit>
+<trans-unit id='RGVyIGVyc3RlIHp1Z2V3aWVzZW5lIEJlbnV0emVyIGVpbmVzIFdvcmtmbG93c2Nocml0dHMsIGRlciBkZW4gSm9iIMO2ZmZuZXQgdW5kIGFremVwdGllcnQsIGVybGVkaWd0IGRlbiBKb2IuIEFsbGUgYW5kZXJlbiBCZW51dHplcnp1b3JkbnVuZ2VuIHdlcmRlbiBlbnRmZXJudCB1bmQgZGllIEJlbnV0emVyIGluZm9ybWllcnQu'>
+    <source>Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.</source>
+    <target>The first assigned user of a workflow step that opens and accepts the job will do the job. All other users assignments are removed and the users informed.</target>
+</trans-unit>
+<trans-unit id='U2VxdWVudGllbGxlcyBBcmJlaXRlbg=='>
+    <source>Sequentielles Arbeiten</source>
+    <target>Sequential work</target>
+</trans-unit>
+<trans-unit id='QWxsZSB6dWdld2llc2VuZW4gTnV0emVyIGVpbmVzIFdvcmtmbG93c2Nocml0dHMga8O2bm5lbiBkaWUgQXVmZ2FiZSBiZWFyYmVpdGVuLCBhYmVyIG51ciBlaW5lciBnbGVpY2h6ZWl0aWcu'>
+    <source>Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.</source>
+    <target>All assigned users of a workflow step can edit the task, but only one at a time.</target>
+</trans-unit>
+<trans-unit id='PHA+QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LjwvcD48cD5EaWUgQW53ZW5kdW5nIHdpcmQgYWIgZGllc2VtIFplaXRwdW5rdCBmw7xyIGt1cnplIFplaXQgbmljaHQgZXJyZWljaGJhciBzZWluLjwvcD48cD5HZXBsYW50ZXIgWmVpdHB1bmt0OiB7MH08L3A+'>
+    <source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Die Anwendung wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></source>
+    <target><p>Warning! Maintenance will start shortly.</p><p>The application will then be locked for some time.</p><p>Date and time of the maintenance start:  {0}</p></target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGFuemFobA=='><source>Segmentanzahl</source><target>Segment count</target></trans-unit>
+<trans-unit id='WndlaXRlcyBMZWt0b3JhdA=='><source>Zweites Lektorat</source><target>Second Review</target></trans-unit>
+<trans-unit id='QXVmZ2FiZW5zdGF0dXM='><source>Aufgabenstatus</source><target>Task status</target></trans-unit>
+<trans-unit id='TWVpbiBKb2ItU3RhdHVz'><source>Mein Job-Status</source><target>My job status</target></trans-unit>
+<trans-unit id='WnV3ZWlzdW5n'><source>Zuweisung</source><target>Assignment</target></trans-unit>
+<trans-unit id='QWJnZXNjaGxvc3Nlbg=='><source>Abgeschlossen</source><target>Finished</target></trans-unit>
+<trans-unit id='RGVhZGxpbmU='><source>Deadline</source><target>Deadline</target></trans-unit>
+<trans-unit id='TWVpbmUgRGVhZGxpbmU='><source>Meine Deadline</source><target>My job deadline</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItWnV3ZWlzdW5nc2RhdHVt'><source>Benutzer-Zuweisungsdatum</source><target>Assignment date of user/s</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItQWJzY2hsdXNzZGF0dW0='><source>Benutzer-Abschlussdatum</source><target>Finish date of user/s</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItRGVhZGxpbmUvcw=='><source>Benutzer-Deadline/s</source><target>Deadline of user/s</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnNldHplcg=='><source>Ø Bearbeitungszeit Übersetzer</source><target>Ø Processing time translator</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnByw7xmdW5nIGR1cmNoIMOcYmVyc2V0emVy'><source>Ø Bearbeitungszeit Überprüfung durch Übersetzer</source><target>Ø Processing time "Check by translator"</target></trans-unit>
+<trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdGVuIGJlemllaGVuIHNpY2ggYXVmIGRpZSBaZWl0ZW4gaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcu'><source>Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.</source><target>Average times refer to all times in the current filter set.</target></trans-unit>
+<trans-unit id='e2hlYWRlcn0KRGllc2UgZW1haWwgaXN0IGVpbmUgRXJpbm5lcnVuZywgZGFzcyBzaWNoIGRpZSAiRGVhZGxpbmUiIDxiPntkZWFkbGluZURhdGV9PC9iPiBmw7xyIGRpZSBBdWZnYWJlIDxiPiJ7dGFza05hbWV9IjwvYj4gbsOkaGVydC4Ke2Zvb3Rlcn0='><source>{header}
+Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> für die Aufgabe <b>"{taskName}"</b> nähert.
+{footer}</source><target>{header}
+This email is a reminder that the "Deadline" <b>{deadlineDate}</b> for task <b>"{taskName}"</b> is approaching.
+{footer}</target></trans-unit>
+</body>
   </file>
 </xliff>

@@ -140,7 +140,7 @@ class editor_Models_Export_FileParser_TransitInfoField {
             return;
         }
         $stateId = $this->segment->getStateId();
-        if(empty($stateId)){
+        if(empty($stateId) && $stateId !== '0'){
             $state = 'NO_QUALITY_STATE_SET_BY_USER';
         }
         else{
@@ -231,18 +231,8 @@ class editor_Models_Export_FileParser_TransitInfoField {
         $sourceTermsToTrack = array();
         $targetTermsToTrack = array();
         foreach($this->targetGidsCount[self::TARGET_TYPE_EDITED] as $gid => $count) {
-            if(empty($this->targetGidsCount[self::TARGET_TYPE_ORIGINAL][$gid])) {
-                $origCount = 0;
-            }
-            else {
-                $origCount = $this->targetGidsCount[self::TARGET_TYPE_ORIGINAL][$gid];
-            }
-            if(empty($this->sourceGidsStatCount[$gid])) {
-                $sourceCount = 0;
-            }
-            else {
-                $sourceCount = $this->sourceGidsStatCount[$gid]['transFound'];
-            }
+            $origCount = $this->targetGidsCount[self::TARGET_TYPE_ORIGINAL][$gid] ?? 0;
+            $sourceCount = $this->sourceGidsStatCount[$gid]['transFound'] ?? 0;
             if($count > 0 && $count > $origCount && $origCount < $sourceCount){
                 //We track all available source terms to the affected GIDs,
                 $sourceTermsToTrack = array_merge($sourceTermsToTrack, $this->gidTermsSource[$gid]);
@@ -291,7 +281,7 @@ class editor_Models_Export_FileParser_TransitInfoField {
         $mid = $termInfo['mid'];
         $res = $this->getTermAndGroupIdToMid($mid);
         $gid = $res['groupId'];
-        if(empty($gid)) {
+        if(empty($gid) && $gid !== '0') {
             return;
         }
         if(empty($this->gidTermsSource[$gid])) {
@@ -323,7 +313,7 @@ class editor_Models_Export_FileParser_TransitInfoField {
     protected function countTargetGroupUsage($target, $mid) {
         $res = $this->getTermAndGroupIdToMid($mid);
         $gid = $res['groupId'];
-        if(empty($gid)) {
+        if(empty($gid) && $gid !== '0') {
             return;
         }
         if($target == self::TARGET_TYPE_EDITED) {
@@ -345,9 +335,9 @@ class editor_Models_Export_FileParser_TransitInfoField {
      */
     protected function logFoundMismatch() {
         foreach($this->sourceGidsStatCount as $gid => $stat){
-            $foundInSource = empty($stat['transFound']) ? 0 : $stat['transFound'];
-            $notFoundInSource = empty($stat['transNotFound']) ? 0 : $stat['transNotFound'];
-            $foundInTarget = empty($this->targetGidsCount[self::TARGET_TYPE_EDITED][$gid]) ? 0 : $this->targetGidsCount[self::TARGET_TYPE_EDITED][$gid];
+            $foundInSource = $stat['transFound'] ?? 0;
+            $notFoundInSource = $stat['transNotFound'] ?? 0;
+            $foundInTarget = $this->targetGidsCount[self::TARGET_TYPE_EDITED][$gid] ?? 0;
             if(ZfExtended_Debug::hasLevel('plugin', 'transit', 4)){
                 //STRICT Mode (with many false positives because in target may more terms as in source):
                 //strict mode exists because it can reveal issues with the termtagger 

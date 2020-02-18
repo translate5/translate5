@@ -52,8 +52,8 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $this->setDataInEntity($this->postBlacklist);
         if($this->validate()){
             $customerIds=explode(',', $this->data->customerIds);
-            $collectionId=$this->entity->create($this->data->name,$customerIds);
-            $this->entity->setId($collectionId);
+            $collection=$this->entity->create($this->data->name,$customerIds);
+            $this->entity->setId($collection->getId());
             $this->view->rows = $this->entity->getDataObject();
         }
     }
@@ -159,24 +159,21 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         }else{
             $collectionIds=$termCollection->getCollectionForAuthenticatedUser();
         }
-
-        
         
         if(empty($collectionIds)){
             $this->view->rows=$responseArray;
             return;
         }
         
-        
         $model=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $model editor_Models_Term */
         
-        if(isset($params['groupId'])){
-            $responseArray['termAttributes'] = $model->groupTermsAndAttributes($model->searchTermAttributesInTermentry($params['groupId'],$collectionIds));
+        if(isset($params['termEntryId'])){
+            $responseArray['termAttributes'] = $model->groupTermsAndAttributes($model->searchTermAttributesInTermentry($params['termEntryId'],$collectionIds));
             
             $entryAttr=ZfExtended_Factory::get('editor_Models_Term_Attribute');
             /* @var $entryAttr editor_Models_Term_Attribute */
-            $responseArray['termEntryAttributes']=$entryAttr->getAttributesForTermEntry($params['groupId'],$collectionIds);
+            $responseArray['termEntryAttributes']=$entryAttr->getAttributesForTermEntry($params['termEntryId'],$collectionIds);
             
         }
         $this->view->rows=$responseArray;
@@ -189,12 +186,22 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
     public function searchtermexistsAction(){
         $params = $this->getRequest()->getParams();
         $searchTerms = json_decode($params['searchTerms']);
+        
+        //get the language root and find all fuzzy languages
+        $lang=$params['targetLang'];
+        $lang=explode('-', $lang);
+        $lang=$lang[0];
+        $languages=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languages editor_Models_Languages */
+        $languages->loadByRfc5646($lang);
+        $langs=$languages->getFuzzyLanguages($languages->getId());
+        
         $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
         $collectionIds = $termCollection->getCollectionForAuthenticatedUser();
         $term = ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
-        $this->view->rows = $term->getNonExistingTermsInAnyCollection($searchTerms, $collectionIds);
+        $this->view->rows = $term->getNonExistingTermsInAnyCollection($searchTerms, $collectionIds,$langs);
     }
     
     /***

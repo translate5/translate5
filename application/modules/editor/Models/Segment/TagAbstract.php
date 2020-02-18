@@ -104,7 +104,7 @@ abstract class editor_Models_Segment_TagAbstract {
     public function hasText(string $segmentContent): bool {
         $segmentContent = $this->replace($segmentContent, '');
         $segmentContent = trim(strip_tags($segmentContent));
-        return !empty($segmentContent);
+        return !(empty($segmentContent)&&$segmentContent!=="0");
     }
     
     /***

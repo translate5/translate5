@@ -232,6 +232,7 @@ abstract class editor_Models_Import_FileParser {
             $p->preParseHandler($this);
         }
         $this->parse();
+        $this->matchRateType->logErrors($this->_fileName, $this->task);
         foreach($this->segmentProcessor as $p) {
             $p->postParseHandler($this);
         }
@@ -412,7 +413,7 @@ abstract class editor_Models_Import_FileParser {
             if($field->type !== editor_Models_SegmentField::TYPE_TARGET) {
                 continue;
             }
-            if(!empty($data['original'])) {
+            if(!(empty($data['original']) && $data['original'] !== "0")) {
                 return true;
             }
         }

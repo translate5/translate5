@@ -220,10 +220,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         
         if($child->relaisFileStatus == editor_Models_RelaisFoldertree::RELAIS_NOT_FOUND) {
             $config = Zend_Registry::get('config');
-            $proofRead = '/'.trim($config->runtimeOptions->import->proofReadDirectory,'/').'/';
+            $review = '/'.trim($config->runtimeOptions->import->proofReadDirectory,'/').'/';
             $relaisDirectory = '/'.trim($config->runtimeOptions->import->relaisDirectory,'/').'/';
             $fullpath = $fullpath.$suffix;
-            $bilingualSourceFile = str_replace($relaisDirectory, $proofRead, $fullpath);
+            $bilingualSourceFile = str_replace($relaisDirectory, $review, $fullpath);
             
             //check for manifest file, to ensure that the file was processed via Okapi:
             $path = $this->task->getAbsoluteTaskDataPath().'/'.editor_Plugins_Okapi_Worker::OKAPI_REL_DATA_DIR.'/';
@@ -340,7 +340,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         
         // init worker and queue it
         if (!$worker->init($task->getTaskGuid(), $params)) {
-            $this->log->logError('Okapi-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
         $worker->queue($workerParentId);

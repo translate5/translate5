@@ -26,43 +26,45 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- *
- */
-class editor_TaskusertrackingController extends ZfExtended_RestController {
-
-    protected $entityClass = 'editor_Models_TaskUserTracking';
-    
+class Editor_CategoryController extends ZfExtended_RestController {
     /**
-     * @var editor_Models_TaskUserTracking
+     * @var string
+     */
+    protected $entityClass = 'editor_Models_Categories';
+
+    /**
+     * @var editor_Models_Categories
      */
     protected $entity;
-    
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
-    public function indexAction(){
-        $rows = $this->entity->loadAll();
-        $this->view->rows = $rows;
-        
-        // anonymize userinfo for view?
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        
-        $taskAnonCache = [];
-        
-        $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-        /* @var $workflowAnonymize editor_Workflow_Anonymize */
-        foreach ($this->view->rows as &$row) {
-            //cache the tasks anon config
-            if(!array_key_exists($row['taskGuid'], $taskAnonCache)) {
-                $task->loadByTaskGuid($row['taskGuid']);
-                $taskAnonCache[$row['taskGuid']] = $task->anonymizeUsers();
-            }
-            if ($taskAnonCache[$row['taskGuid']]) {
-                $row = $workflowAnonymize->anonymizeUserdata($row['taskGuid'], $row['userGuid'], $row);
-            }
-        }
+    public function indexAction()
+    {
+        // Add specific handling of the categories for the view here.
+        // (Nothing to do at the moment.)
+        parent::indexAction();
+    }
+
+    public function getAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->get');
+    }
+
+    public function putAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->put');
+    }
+
+    public function deleteAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->delete');
+    }
+
+    public function postAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->post');
     }
 }

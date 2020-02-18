@@ -53,6 +53,8 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
     protected $tables = array(
             'LEK_browser_log' => false,
             'LEK_customer' => false,
+            'LEK_categories' => false,
+            'LEK_languageresources_category_assoc' => false,
             'LEK_change_log' => false,
             'LEK_comments' => 'taskGuid',
             'LEK_comment_meta' => 'taskGuid',
@@ -63,6 +65,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             // languageresources tables disabled for archiving, since task data is not depending from them, and existence of languageresources does not depend on the existence of the task 
             'LEK_languageresources_customerassoc' => false,
             'LEK_languageresources_languages' => false,
+            'LEK_languageresources_log' => false,
             'LEK_languageresources_mt_usage_log' => false,
             'LEK_languageresources_taskassoc' => false,
             'LEK_languageresources' => false,
@@ -83,6 +86,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             //not needed anymore, but keeping as reference how to to implement filters
             //'LEK_skeletonfiles' => array('--single-transaction', "--where=fileId in (select id from LEK_files where taskGuid = '{TASKGUID}')"),
             'LEK_task' => 'taskGuid',
+            'LEK_task_excelexport' => 'taskGuid',
             'LEK_taskUserAssoc' => 'taskGuid',
             'LEK_taskUserTracking' => 'taskGuid',
             'LEK_task_log' => 'taskGuid',

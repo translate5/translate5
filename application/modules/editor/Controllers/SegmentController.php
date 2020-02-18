@@ -298,25 +298,35 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $row = json_decode(json_encode($this->view->rows), true); // = for anonymizeUserdata(): argument 3 must be of the type array
             $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $row['userGuid'], $row);
         }
+        
+        //reload the task so the segment finish count is updated
+        $task->load($task->getId());
+        
+        //set the segmentFinishCount so the frontend viewmodel is updated
+        //TODO: this should be updated from the websockets
+        $this->view->segmentFinishCount=$task->getSegmentFinishCount();
     }
     
     /***
      * Search segment action.
      */
     public function searchAction(){
-        $parametars=$this->getAllParams();
+        $parameters=$this->getAllParams();
         
-        //check if the required search parametars are in the request
-        $this->checkRequiredSearchParameters($parametars);
-        $parametars['searchField'] =  htmlentities($parametars['searchField'], ENT_XML1);
+        //set the default search parameters if no values are given
+        $parameters=$this->entity->setDefaultSearchParameters($parameters);
+        
+        //check if the required search parameters are in the request
+        $this->checkRequiredSearchParameters($parameters);
+        $parameters['searchField'] =  htmlentities($parameters['searchField'], ENT_XML1);
         
         //check character number limit
-        if(!$this->checkSearchStringLength($parametars['searchField'])){
+        if(!$this->checkSearchStringLength($parameters['searchField'])){
             return;
         }
         
-        //find all segments for the search parametars
-        $result=$this->entity->search($parametars);
+        //find all segments for the search parameters
+        $result=$this->entity->search($parameters);
         
         if(!$result|| empty($result)){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
@@ -327,7 +337,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         $this->view->rows = $result;
         $this->view->total=count($result);
-        $this->view->hasMqm=$this->isMqmTask($parametars['taskGuid']);
+        $this->view->hasMqm=$this->isMqmTask($parameters['taskGuid']);
     }
     
     /***
@@ -336,10 +346,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      */
     public function replaceallAction(){
         $parameters=$this->getAllParams();
+
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($parameters['taskGuid']);
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $t ZfExtended_Zendoverwrites_Translate */;
+        /* @var $t ZfExtended_Zendoverwrites_Translate */
+        if($task->getUsageMode()==$task::USAGE_MODE_SIMULTANEOUS){
+            throw new editor_Models_SearchAndReplace_Exception('E1192',['task'=>$task]);
+        }
         
-        //check if the required search parametars are in the request
+        //check if the required search parameters are in the request
         $this->checkRequiredSearchParameters($parameters);
         $parameters['searchField'] =  htmlentities($parameters['searchField'], ENT_XML1);
         $parameters['replaceField'] =  htmlentities($parameters['replaceField'], ENT_XML1);
@@ -357,11 +374,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             return;
         }
         
-        //find all segments for the search parametars
+        //find all segments for the search parameters
         $results=$this->entity->search($parameters);
         
         $searchInField=$parameters['searchInField'];
-        $searchType = $parameters['searchType'] ?? null;
+        $searchType = $parameters['searchType'] ?? $this->entity::DEFAULT_SEARCH_TYPE;
         $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true') : false;
         
         if(!$results || empty($results)){
@@ -377,7 +394,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             ]);
             /* @var $replace editor_Models_SearchAndReplace_ReplaceMatchesSegment */
             
-            //if the trackchanges are active, setup some trackchanges parametars
+            //if the trackchanges are active, setup some trackchanges parameters
             if(isset($parameters['isActiveTrackChanges']) && $parameters['isActiveTrackChanges']){
                 $replace->trackChangeTag->attributeWorkflowstep=$parameters['attributeWorkflowstep'];
                 $replace->trackChangeTag->userColorNr=$parameters['userColorNr'];
@@ -394,7 +411,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             //set the segment id
             $this->getRequest()->setParam('id', $result['id']);
             
-            //create the object for the data parametars
+            //create the object for the data parameters
             $ob=new stdClass();
             $ob->$searchInField=$replace->segmentText;
             $ob->autoStateId=999;
@@ -441,6 +458,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         //return the modefied segments
         $this->view->rows = $results;
+        
+        //TODO: this should be implemented via websokets
+        //reload the task and get the lates segmentFinishCount
+        $task->loadByTaskGuid($this->entity->getTaskGuid());
+        $this->view->segmentFinishCount=$task->getSegmentFinishCount();
+        
         $this->view->total=count($results);
     }
     
@@ -620,9 +643,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     private function checkSearchStringLength($searchField){
         
         $isValid=true;
-        if(!$searchField){
+        if(empty($searchField) && strlen($searchField===0)){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-            /* @var $t ZfExtended_Zendoverwrites_Translate */;;
+            /* @var $t ZfExtended_Zendoverwrites_Translate */
             
             $errors = array('searchField' => $t->_('Das Suchfeld ist leer.'));
             $e = new ZfExtended_ValidateException();
@@ -634,7 +657,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $length=strlen(utf8_decode($searchField));
         if($length>1024){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-            /* @var $t ZfExtended_Zendoverwrites_Translate */;
+            /* @var $t ZfExtended_Zendoverwrites_Translate */
             
             $errors = array('searchField' => $t->_('Der Suchbegriff ist zu groß.'));
             $e = new ZfExtended_ValidateException();
@@ -653,9 +676,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * @throws ZfExtended_ValidateException
      */
     private function checkRequiredSearchParameters(array $parameters){
-        if(empty($parameters['searchInField']) || empty($parameters['searchField']) || empty($parameters['searchType'])){
+        if(empty($parameters['searchInField']) || (empty($parameters['searchField']) && strlen($parameters['searchField'])===0) || empty($parameters['searchType'])){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-            /* @var $t ZfExtended_Zendoverwrites_Translate */;
+            /* @var $t ZfExtended_Zendoverwrites_Translate */
             $e = new ZfExtended_ValidateException();
             $e->setMessage($t->_('Missing search parameter. Required parameters: searchInField, searchField, searchType. Given was: ').print_r($parameters,1));
             throw $e;

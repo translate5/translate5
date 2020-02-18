@@ -106,6 +106,14 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
     
     /**
+     * send the latest created notification to the list of users
+     * @param ZfExtended_Models_User $user
+     */
+    protected function notifyUser(ZfExtended_Models_User $user) {
+        $this->mailer->sendToUser($user);
+    }
+    
+    /**
      * Adds the users of the given cc/bcc role config to the email - if receiverRole is configured in config
      * @param stdClass $triggerConfig the config object given in action matrix
      * @param string $receiverRole the original receiver role of the notification to be sended
@@ -129,9 +137,12 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
                     $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
                     /* @var $userModel ZfExtended_Models_User */
                     foreach($roles as $singleUser) {
-                        $return=$userModel->loadByLogin($singleUser);
-                        if(isset($return)){
-                            $users[] = $return->toArray();
+                        try {
+                            $userModel->loadByLogin($singleUser);
+                            $users[] = (array) $userModel->getDataObject();
+                        }
+                        catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                            // do nothing if the user was not found
                         }
                     }
                 }
@@ -167,6 +178,9 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             return $defaultConfig;
         }
         $config = reset($config);
+        if(empty($config)) {
+            return $defaultConfig;
+        }
         foreach($config as $key => $v) {
             $defaultConfig->{$key} = $v;
         }
@@ -325,7 +339,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             
             $this->createNotification($deleted['role'], __FUNCTION__, $params);
             $this->addCopyReceivers($triggerConfig, $deleted['role']);
-            $this->notify((array) $user->getDataObject());
+            $this->notifyUser($user);
         }
     }
     
@@ -353,7 +367,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $this->createNotification($tua->getRole(), __FUNCTION__, $params);
         $this->addCopyReceivers($triggerConfig, $tua->getRole());
-        $this->notify((array) $user->getDataObject());
+        $this->notifyUser($user);
     }
     
     /**
@@ -389,7 +403,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             'pm' => $pm,
             'task' => $this->config->task,
             'associatedUsers' => $tuas,
-            //the disclaimer is needed only, if from one role multiple users are assigned. If it is only one proofreader then no dislaimer is needed
+            //the disclaimer is needed only, if from one role multiple users are assigned. If it is only one reviewer then no dislaimer is needed
             'addCompetitiveDisclaimer' => $aRoleOccursMultipleTimes && $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE
         ];
         
@@ -399,7 +413,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $this->createNotification(ACL_ROLE_PM, 'notifyNewTaskAssigned', $params);
             $user->loadByGuid($tua['userGuid']);
             $this->addCopyReceivers($triggerConfig, $tua['originalRole']);
-            $this->notify((array) $user->getDataObject());
+            $this->notifyUser($user);
         }
     }
     
@@ -432,7 +446,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params);
         $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
-        $this->notify((array) $user->getDataObject());
+        $this->notifyUser($user);
     }
     
     
@@ -453,7 +467,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         ->from(array('tua' => 'LEK_taskUserAssoc'), ['taskGuid'])
         ->distinct()
         ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
-        ->where('tua.role = ?', editor_Workflow_Abstract::ROLE_LECTOR)
+        ->where('tua.role = ?', editor_Workflow_Abstract::ROLE_REVIEWER)
         ->where('tua.state != ?', editor_Workflow_Abstract::STATE_FINISH)
         ->where('t.state = ?', $task::STATE_OPEN)
         ->where('targetDeliveryDate = CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
@@ -464,7 +478,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $wf = $this->config->workflow;
         
-        $notifyRole=$wf::ROLE_LECTOR;
+        $notifyRole=$wf::ROLE_REVIEWER;
         if(isset($triggerConfig->receiverRole)){
             $notifyRole=$triggerConfig->receiverRole;
         }
@@ -486,27 +500,27 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             
             //if the receiverUser user is configured, send mail only to receiverUser
             if(isset($triggerConfig->receiverUser)){
-                $proofreaders=[(array)$user->getDataObject()];
+                $reviewers=[(array)$user->getDataObject()];
             }else{
                 //load only users with state open
-                $proofreaders = $tua->loadUsersOfTaskWithRole($oneTask['taskGuid'], $notifyRole, ['state'], editor_Models_Task::STATE_OPEN);
+                $reviewers = $tua->loadUsersOfTaskWithRole($oneTask['taskGuid'], $notifyRole, ['state'], editor_Models_Task::STATE_OPEN);
             }
             
             $params = [
                 'task' => $this->config->task,
-                'proofreaders' => $proofreaders,
+                'reviewers' => $reviewers,
             ];
             
-            foreach($proofreaders as $proofreader) {
+            foreach($reviewers as $reviewer) {
                 $this->createNotification($notifyRole, $template, $params);
                 $this->addCopyReceivers($triggerConfig, $notifyRole);
-                $this->notify($proofreader);
+                $this->notify($reviewer);
             }
         }
     }
     
-    /***
-     * Notify the configured user with the daily term and term attribute proposals.
+    /**
+     * Notify the configured user with term and term attribute proposals of the configured or all termcollections
      * The attached export data in the mail will be in excel format.
      */
     public function notifyTermProposals(){
@@ -515,26 +529,33 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             return;
         }
         
-        $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
-        /* @var $service editor_Services_TermCollection_Service */
-        $lr=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $lr editor_Models_LanguageResources_LanguageResource */
-        
-        //load all existing term collections
-        $collections=$lr->loadByResourceId($service->getServiceNamespace());
+        //use all collections if no collections are given in workflow action config
+        if(empty($triggerConfig->collections)) {
+            $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+            /* @var $service editor_Services_TermCollection_Service */
+            $lr=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var $lr editor_Models_LanguageResources_LanguageResource */
+            
+            //load all existing term collections
+            $collections=$lr->loadByResourceId($service->getServiceNamespace());
+            $collections=array_column($collections,'id');
+        }
+        else {
+            $collections = $triggerConfig->collections;
+            if(!is_array($collections)) {
+                $collections = [$collections];
+            }
+        }
         
         if(empty($collections)){
             return;
         }
         
-        //export yunger as one day before now
-        $exportDate=date('Y-m-d',strtotime("-1 days"));
-        $collections=array_column($collections,'id');
         $proposals=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $proposals editor_Models_Term */
         
         //load the term and term entry proposals data for all term collections and younger as $exportDate
-        $rows = $proposals->loadProposalExportData($exportDate,$collections);
+        $rows = $proposals->loadProposalExportData($collections);
         if(empty($rows)){
             return;
         }
@@ -556,16 +577,47 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         /* @var $user ZfExtended_Models_User */
         $user->loadByLogin($triggerConfig->receiverUser);
         
-        $this->createNotification('visitor', __FUNCTION__, [
-            'exportDate'=>$exportDate
-        ]);
+        $this->createNotification('visitor', __FUNCTION__, []);
         $this->mailer->setAttachment([$attachment]);
-        $this->notify([(array)$user->getDataObject()]);
+        $this->notifyUser($user);
         
         //remove the tmp file from the disc
         unlink($file);
     }
     
+    
+    /***
+     * Notify the the associated users when the deadlineDate is over the defined days in the config
+     */
+    public function notifyOverdueDeadline(){
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
+        $daysOffset=isset($triggerConfig->daysOffset) ? $triggerConfig->daysOffset : 1;
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        
+        //load all task assocks where the deadlineDate date overdue the current date - days offset
+        $db = Zend_Registry::get('db');
+        /* @var $db Zend_Db_Table */
+        $s = $db->select()
+        ->from(array('tua' => 'LEK_taskUserAssoc'), ['userGuid','role','deadlineDate'])
+        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid',['taskName'])
+        ->where('t.state NOT IN(?)', [$task::STATE_ERROR,$task::STATE_END])
+        ->where('tua.state NOT IN(?)', [editor_Workflow_Abstract::STATE_FINISH])
+        ->where('tua.deadlineDate = CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
+        $userAssocs = $db->fetchAll($s);
+        
+        foreach($userAssocs as $assoc) {
+            $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+            /* @var $user ZfExtended_Models_User */
+            $user->loadByGuid($assoc['userGuid']);
+            $this->createNotification($assoc['role'],__FUNCTION__,[
+                'taskName' => $assoc['taskName'],
+                'deadlineDate' =>$assoc['deadlineDate']
+            ]);
+            $this->notifyUser($user);
+        }
+    }
     
     
     /**
@@ -728,7 +780,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             return $item;
         }, $segments);
         $segments = [];
-        $currentStep = 'lectoring';
+        $currentStep = 'reviewing';
         $params = array(
             'triggeringRole' => 'triggerROLE',
             'nextRole' => 'nextROLE',
@@ -751,7 +803,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
         //$this->addCopyReceivers($triggerConfig, $nextRole);
         $this->notify($user);
-        $this->createNotification('lector', 'notifyAllFinishOfARole', $params);
+        $this->createNotification('reviewer', 'notifyAllFinishOfARole', $params);
         $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
         //$this->addCopyReceivers($triggerConfig, $nextRole);
         $this->notify($user);

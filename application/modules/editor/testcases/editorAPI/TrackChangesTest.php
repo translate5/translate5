@@ -41,10 +41,11 @@ class TrackChangesTest extends \ZfExtended_Test_ApiTestcase {
             'edit100PercentMatch' => true,
         );
         
+        $appState = self::assertAppState();
+        self::assertContains('editor_Plugins_TrackChanges_Init', $appState->pluginsLoaded, 'Plugin TrackChanges must be activated for this test case!');
+        
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-        $appState = $api->requestJson('editor/index/applicationstate');
-        self::assertContains('editor_Plugins_TrackChanges_Init', $appState->pluginsLoaded, 'Plugin TrackChanges must be activated for this test case!');
         
         $api->addImportFile($api->getFile('testcase-de-en.xlf'));
         
@@ -81,7 +82,7 @@ class TrackChangesTest extends \ZfExtended_Test_ApiTestcase {
      * @return string
      */
     protected function addTrackChangesAttributes($content) {
-        $attributes = 'data-userguid="{00000000-0000-0000-C100-CCDDEE000001}" data-username="Manager Test" data-usercssnr="usernr1" data-workflowstep="lectoring1" data-timestamp="2018-05-16T11:10:28+02:00"';
+        $attributes = 'data-userguid="{00000000-0000-0000-C100-CCDDEE000001}" data-username="Manager Test" data-usercssnr="usernr1" data-workflowstep="reviewing1" data-timestamp="2018-05-16T11:10:28+02:00"';
         $content = str_replace('<del>', '<del class="trackchanges ownttip deleted" '.$attributes.'>', $content);
         return str_replace('<ins>', '<ins class="trackchanges ownttip" '.$attributes.'>', $content);
     }

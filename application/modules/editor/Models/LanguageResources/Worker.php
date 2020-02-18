@@ -30,6 +30,7 @@ END LICENSE AND COPYRIGHT
  * Reimports the segments of a task back into the chosen TM
  */
 class editor_Models_LanguageResources_Worker extends editor_Models_Import_Worker_Abstract {
+    const STATE_REIMPORT = 'reimporttm';
     
     /**
      * (non-PHPdoc)
@@ -53,12 +54,13 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Import_Worker
         $params = $this->workerModel->getParameters();
         
         $task = $this->task;
-        if(!$task->lock(NOW_ISO, true)) {
-            $this->log->logError('The following task is in use and cannot be reimported: '.$task->getTaskName().' ('.$task->getTaskGuid().')');
+        if(!$task->lock(NOW_ISO, self::STATE_REIMPORT)) {
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource');
+            $logger->error('E1169', 'The task is in use and cannot be reimported into the associated language resources.');
             return false;
         }
         $oldState = $task->getState();
-        $task->setState('reimporttm');
+        $task->setState(self::STATE_REIMPORT);
         $task->save();
         $task->createMaterializedView();
         
@@ -89,7 +91,8 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Import_Worker
             $task->dropMaterializedView();
         }
         $task->unlock();
-        $this->log->logError('Task reimported successfully into the desired TM: '.$task->getTaskName().' ('.$task->getTaskGuid().')');
+        $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource');
+        $logger->info('E0000', 'Task reimported successfully into the desired TM');
         return true;
     }
 }

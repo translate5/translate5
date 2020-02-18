@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Abstract {
+    const TASK_STATE_ANALYSIS = 'matchanalysis';
     
     /***
      * Task old state before the match analysis were started
@@ -77,21 +78,22 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         $params = $this->workerModel->getParameters();
 
         $newState=null;
+        $this->taskOldState = $this->task->getState();
         
-        //can the task be locked
-        if(!$this->task->lock(NOW_ISO, true)) {
-            
-            //if the task is not in state import, the task is in use(can not be locked)
-            if($this->task->getState()!=editor_Models_Task::STATE_IMPORT){
-                error_log('Match analysis and pretranslation canot be run. The following task is in use: '.$this->task->getTaskName().' ('.$this->task->getTaskGuid().')');
-                return;
-            }
-        }else{
+        //lock the task dedicated for analysis
+        if($this->task->lock(NOW_ISO, self::TASK_STATE_ANALYSIS)) {
             //lock the task while match analysis are running
-            $this->taskOldState = $this->task->getState();
-            $newState='matchanalysis';
-            $this->task->setState('matchanalysis');
+            $newState=self::TASK_STATE_ANALYSIS;
+            $this->task->setState(self::TASK_STATE_ANALYSIS);
             $this->task->save();
+        //else check if we are in import, then no separate lock is needed. Therefore if we are not in import this is an error
+        } elseif($this->task->getState() != editor_Models_Task::STATE_IMPORT) {
+            $logger = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
+            /* @var $logger ZfExtended_Logger */
+            $logger->error('E1167', 'MatchAnalysis Plug-In: analysis and pre-translation cannot be run.', [
+                'task' => $this->task
+            ]);
+            return;
         }
         
         $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
@@ -143,7 +145,8 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         
         // init worker and queue it
         if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
-            $this->log->logError('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            $logger = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
+            $logger->error('E1168', 'MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized.');
             return false;
         }
         $worker->queue($workerId);
