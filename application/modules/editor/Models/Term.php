@@ -373,14 +373,14 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $sql = $this->db->getAdapter()->select()
                 ->from(array('t1' =>'LEK_terms'), array('t2.*'))
                 ->distinct()
-                ->joinLeft(array('t2' =>'LEK_terms'), 't1.groupId = t2.groupId', null)
+                ->joinLeft(array('t2' =>'LEK_terms'), 't1.groupId = t2.groupId AND t1.collectionId = t2.collectionId', null)
                 ->join(array('l' =>'LEK_languages'), 't2.language = l.id', 'rtl')
                 ->where('t1.collectionId IN(?)', $collectionIds)
-                ->where('t2.collectionId IN(?)', $collectionIds)
+                //->where('t2.collectionId IN(?)', $collectionIds)
                 ->where('t1.mid IN('.$serialIds.')')
                 ->where('t1.language IN (?)',array($sourceLang,$targetLang))
                 ->where('t2.language IN (?)',array($sourceLang,$targetLang));
-       
+        
         $terms = $this->db->getAdapter()->fetchAll($sql);
         
         $termGroups = array();
@@ -408,7 +408,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param array $collectionIds
      * @return Zend_Db_Table_Row_Abstract | null
      */
-    public function loadByMid(string $mid,array $collectionIds) {
+    public function loadByMid(string $mid, array $collectionIds) {
         $s = $this->db->select(false);
         $s->from($this->db);
         $s->where('collectionId IN(?)', $collectionIds)->where('mid = ?', $mid);

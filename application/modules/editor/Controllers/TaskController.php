@@ -117,9 +117,20 @@ class editor_TaskController extends ZfExtended_RestController {
                 'numeric' => 'percent',
                 'totalField'=>'segmentCount'
             ],
+            'userState' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+            ],
+            'assignmentDate' => [
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'assignmentDate', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+            ],
+            'finishedDate' => [
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'finishedDate', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+            ],
+            'deadlineDate' => [
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'deadlineDate', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+            ]
         ];
         
-        //TODO: how the sort will work ?
         //$this->_sortColMap['workflowState'] = $this->_filterTypeMap['taskState']['list'];
         //$this->_sortColMap['userRole'] = $this->_filterTypeMap['userRole']['list'];
         //$this->_sortColMap['userName'] = $this->_filterTypeMap['userName']['list'];
@@ -222,7 +233,7 @@ class editor_TaskController extends ZfExtended_RestController {
     public function indexAction() {
         //set default sort
         $f = $this->entity->getFilter();
-        $f->hasSort() || $f->addSort('orderdate', true);
+        $f->hasSort() || $f->addSort('id', true);
         
         // load only 'visible' tasks (further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
         $f->addFilter((object)[
@@ -244,8 +255,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * limit accordingly (= for all filtered tasks: no limit).
      */
     public function  kpiAction() {
-        $f = $this->entity->getFilter();
-        $f->hasSort() || $f->addSort('orderdate', true);
         $rows = $this->loadAll();
         
         $kpi = ZfExtended_Factory::get('editor_Models_KPI');
@@ -254,7 +263,10 @@ class editor_TaskController extends ZfExtended_RestController {
         $kpiStatistics = $kpi->getStatistics();
         
         // For Front-End:
-        $this->view->averageProcessingTime = $kpiStatistics['averageProcessingTime'];
+        $this->view->{$kpi::KPI_TRANSLATOR} = $kpiStatistics[$kpi::KPI_TRANSLATOR];
+        $this->view->{$kpi::KPI_REVIEWER}= $kpiStatistics[$kpi::KPI_REVIEWER];
+        $this->view->{$kpi::KPI_TRANSLATOR_CHECK} = $kpiStatistics[$kpi::KPI_TRANSLATOR_CHECK];
+        
         $this->view->excelExportUsage = $kpiStatistics['excelExportUsage'];
         
         // ... or as Metadata-Excel-Export (= task-overview, filter, key performance indicators KPI):
@@ -284,17 +296,14 @@ class editor_TaskController extends ZfExtended_RestController {
     public function loadAll()
     {
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks'); 
-        $filter = $this->entity->getFilter();
-        /* @var $filter editor_Models_Filter_TaskSpecific */
-        $filter->convertStates($isAllowedToLoadAll);
-        $assocFilter = $filter->isUserAssocNeeded();
-        if(!$assocFilter && $isAllowedToLoadAll) {
+        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
+        //set the default table to lek_task
+        $this->entity->getFilter()->setDefaultTable('LEK_task');
+        if($isAllowedToLoadAll) {
             $this->totalCount = $this->entity->getTotalCount();
             $rows = $this->entity->loadAll();
         }
         else {
-            $filter->setUserAssocNeeded();
             $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
             $rows = $this->entity->loadListByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
         }
@@ -430,6 +439,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->init();
         //$this->decodePutData(); → not needed, data was set directly out of params because of file upload
         $this->data = $this->getAllParams();
+        //warn the api user for the orderdate ussage
+        $this->orderdateWarning();
         settype($this->data['wordCount'], 'integer');
         settype($this->data['enableSourceEditing'], 'integer');
         settype($this->data['edit100PercentMatch'], 'integer');
@@ -802,6 +813,10 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $oldTask = clone $this->entity;
         $this->decodePutData();
+        
+        //warn the api user for the orderdate ussage
+        $this->orderdateWarning();
+        
         if(isset($this->data->edit100PercentMatch)){
             settype($this->data->edit100PercentMatch, 'integer');
         }
@@ -1149,6 +1164,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!$disableWorkflowEvents) {
             $this->workflow->triggerBeforeEvents($oldUserTaskAssoc, $userTaskAssoc);
         }
+        
         $userTaskAssoc->save();
         
         if(!$disableWorkflowEvents) {
@@ -1382,8 +1398,6 @@ class editor_TaskController extends ZfExtended_RestController {
         $fieldToRight = [
             'taskName' => 'editorEditTaskTaskName',
             'targetDeliveryDate' => 'editorEditTaskDeliveryDate',
-            'realDeliveryDate' => 'editorEditTaskRealDeliveryDate',
-            'orderdate' => 'editorEditTaskOrderDate',
             'pmGuid' => 'editorEditTaskPm',
             'pmName' => 'editorEditTaskPm',
         ];
@@ -1464,5 +1478,24 @@ class editor_TaskController extends ZfExtended_RestController {
         // E1011 is he default multipurpose error code for task logging
         $extraData['task'] = $this->entity;
         $this->taskLog->info('E1011', $message, $extraData);
+    }
+    
+    /***
+     * Warn the api users that the orderdate field is not anymore available for the api.
+     * The task deadlines are defined for each task-user-assoc job separately
+     * TODO: 11.02.2020 remove this function after all customers adopt there api calls
+     */
+    protected function orderdateWarning() {
+        $throwWarning=false;
+        if(is_array($this->data)){
+            $throwWarning=isset($this->data['orderdate']);
+        }
+        if(is_object($this->data)){
+            $throwWarning=isset($this->data->orderdate);
+        }
+        if(!$throwWarning){
+            return;
+        }
+        $this->log->warn('E1210','The orderdate for the task is deprecated. Use the LEK_taskUserAssoc deadlineDate instead.');
     }
 }

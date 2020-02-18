@@ -50,12 +50,13 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     }
     
     /**
-     * Updates the tasks real delivery date to the current timestamp
+     * Updates the finishDate to the current timestamp for all reviewers
      */
-    public function taskSetRealDeliveryDate() {
+    public function setReviewersFinishDate() {
         $task = $this->config->task;
-        $task->setRealDeliveryDate(date('Y-m-d', $_SERVER['REQUEST_TIME']));
-        $task->save();
+        $taskAssoc=ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $taskAssoc editor_Models_TaskUserAssoc */
+        $taskAssoc->updateReviewersFinishDate($task->getTaskGuid(),NOW_ISO);
     }
     
     /**
