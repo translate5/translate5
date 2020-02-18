@@ -644,8 +644,7 @@ function renderTermStatusIcon(termStatus){
 
 /***
  * file translation
- * Step 1: Prepare a task for import of the file and run the pretranslation.
- * @returns
+ * Create a task and start the import with the pretranslation.
  */
 function requestFileTranslate(){
     // Create a formdata object and add the files
@@ -659,7 +658,7 @@ function requestFileTranslate(){
     data.append('target', $('#targetLocale').val());
     
     $.ajax({
-        url:Editor.data.restpath+'instanttranslateapi/fileprepare',
+        url:Editor.data.restpath+'instanttranslateapi/filepretranslate',
         type: 'POST',
         data: data,
         cache: false,
@@ -668,7 +667,7 @@ function requestFileTranslate(){
         contentType: false, // Set content type to false as jQuery will tell the server its a query string request
         success: function(result){
             if(typeof result.error === 'undefined' && result.taskId !== ''){
-                importPretranslatedTask(result.taskId);
+                getDownloads();
             }else{
                 // Handle errors here
                 var error = (result.taskId === '') ? Editor.data.languageresource.translatedStrings['error'] : result.error;
@@ -676,39 +675,6 @@ function requestFileTranslate(){
                 $('#sourceFile').val('');
                 stopLoadingState();
             }
-        },
-        error: function(jqXHR, textStatus)
-        {
-            // Handle errors here
-            showSourceError('ERRORS: ' + textStatus);
-            $('#sourceFile').val('');
-            stopLoadingState();
-        }
-    });
-}
-
-/***
- * file translation
- * Step 2: Run the import of the task with the pretranslation.
- * After the import is started, we show a list of all pretranslations that are currently available.
- * @param int taskId
- * @returns
- */
-function importPretranslatedTask(taskId){
-    $.ajax({
-        statusCode: {
-            500: function() {
-                hideTranslations();
-                showLanguageResourceSelectorError('serverErrorMsg500');
-                }
-        },
-        url: Editor.data.restpath+'instanttranslateapi/fileimport',
-        dataType: 'json',
-        data: {
-            'taskId': taskId
-        },
-        success: function(){
-            getDownloads();
         },
         error: function(jqXHR, textStatus)
         {
