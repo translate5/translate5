@@ -93,6 +93,10 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         /* @var $assoc editor_Models_TermCollection_TermCollection */
         $collectionIds=$assoc->getCollectionsForTask($taskGuid);
         
+        if(empty($collectionIds)) {
+            return $source;
+        }
+        
         $source = $this->removeExistingFlags($source);
         $target = $this->removeExistingFlags($target);
 

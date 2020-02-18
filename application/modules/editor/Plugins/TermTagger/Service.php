@@ -379,7 +379,7 @@ class editor_Plugins_TermTagger_Service {
     
     private function decodeSegment($segment, $field, editor_Plugins_TermTagger_Service_ServerCommunication $request) {
         $text = $segment->$field;
-        if(empty($text)) {
+        if(empty($text) && $text !== '0') {
             return $text;
         }
         //fix TRANSLATE-713

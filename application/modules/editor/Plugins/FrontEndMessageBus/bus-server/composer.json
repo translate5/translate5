@@ -1,0 +1,12 @@
+{
+	"autoload" : {
+		"psr-4" : {
+			"Translate5\\" : "Translate5"
+		}
+	},
+	"require" : {
+		"cboden/ratchet" : "^0.4.1",
+		"react/http": "^1.0 || ^0.8",
+		"ratchet/pawl" : "^0.3.2"
+	}
+}

@@ -33,7 +33,8 @@ END LICENSE AND COPYRIGHT
  *
 
 /**
- * abstract base class for ex und import of excel files
+ * abstract base class for ex und import of excel files containing segment-data.
+ * TODO: move this whole Excel-package to Segments-folder.
  */
 abstract class editor_Models_Excel_AbstractExImport {
     /**
@@ -57,7 +58,7 @@ abstract class editor_Models_Excel_AbstractExImport {
      * @return bool
      */
     public function taskLock(editor_Models_Task $task) : bool {
-        if(!$task->lock(NOW_ISO, true)) {
+        if(!$task->lock(NOW_ISO, self::TASK_STATE_ISEXCELEXPORTED)) {
             $this->log->debug('E0000', 'Excel Export: task lock failed');
             return FALSE;
         }

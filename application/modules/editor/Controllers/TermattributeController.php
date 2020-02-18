@@ -80,7 +80,7 @@ class editor_TermattributeController extends ZfExtended_RestController {
     }
     
     /**
-     * propose a new term, this function has the same signature as the putAction, expect that it creates a new propose instead of editing the term directly
+     * propose a new attribute, this function has the same signature as the putAction, expect that it creates a new propose instead of editing the term directly
      */
     public function proposeOperation() {
         $sessionUser = new Zend_Session_Namespace('user');
@@ -123,12 +123,13 @@ class editor_TermattributeController extends ZfExtended_RestController {
         
         //set the groupid, it is used by the attribute proposal component
         $this->view->rows->groupId=$termEntry->getGroupId();
+        $this->view->rows->termEntryId=$termEntry->getId();
         
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
         
         //load the term entry attributes
-        $this->view->rows->termEntryAttributes=$attribute->getAttributesForTermEntry($termEntry->getGroupId(),[$termEntry->getCollectionId()]);
+        $this->view->rows->termEntryAttributes=$attribute->getAttributesForTermEntry($termEntry->getId(),[$termEntry->getCollectionId()]);
     }
     
     /**

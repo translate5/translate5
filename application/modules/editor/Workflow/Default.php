@@ -47,10 +47,9 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      */
     protected function handleImport(){
         $this->doDebug(__FUNCTION__);
-        $stepName = (bool) $this->newTask->getEmptyTargets() ? self::STEP_TRANSLATION : self::STEP_LECTORING;
-        $this->initWorkflowStep($this->newTask, $stepName);
+        $this->initWorkflowStep($this->newTask, self::STEP_NO_WORKFLOW);
         $this->newTask->load($this->newTask->getId()); //reload task with new workflowStepName and new calculated workflowStepNr
-        $this->callActions(__FUNCTION__, $stepName);
+        $this->callActions(__FUNCTION__, self::STEP_NO_WORKFLOW);
     }
     
     /**
@@ -83,8 +82,8 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
             $nextRole = $this->getRoleOfStep($nextStep);
             $this->doDebug(__FUNCTION__." Next Role: ".$nextRole);
             if($nextRole) {
-                $isCoop = $task->getUsageMode() == $task::USAGE_MODE_COOPERATIVE;
-                $newTua->setStateForRoleAndTask($isCoop ? self::STATE_OPEN : self::STATE_UNCONFIRMED, $nextRole);
+                $isComp = $task->getUsageMode() == $task::USAGE_MODE_COMPETITIVE;
+                $newTua->setStateForRoleAndTask($isComp ? self::STATE_UNCONFIRMED : self::STATE_OPEN, $nextRole);
             }
         }
         
@@ -104,6 +103,13 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
         $oldStep = $task->getWorkflowStepName();
+        
+        //set the finished date when the user finishes a role
+        if($newTua->getState()==editor_Workflow_Abstract::STATE_FINISH){
+            $newTua->setFinishedDate(NOW_ISO);
+            $newTua->save();
+        }
+        
         $this->callActions(__FUNCTION__, $oldStep, $newTua->getRole(), $newTua->getState());
     }
     

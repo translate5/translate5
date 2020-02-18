@@ -31,6 +31,8 @@ END LICENSE AND COPYRIGHT
  * The import process itself is encapsulated in editor_Models_Import_Worker_Import
  */
 abstract class editor_Models_Import_Worker_Abstract extends ZfExtended_Worker_Abstract {
+    use ZfExtended_Controllers_MaintenanceTrait;
+    
     /**
      * @var editor_Models_Task
      */
@@ -54,6 +56,15 @@ abstract class editor_Models_Import_Worker_Abstract extends ZfExtended_Worker_Ab
         //if no worker model is set, we don't have to call parent / init a worker model,
         // since we don't even need it in the DB when the task already has errors
         return false;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::isMaintenanceScheduled()
+     */
+    protected function isMaintenanceScheduled(): bool {
+        //additional checks posible here
+        return $this->isMaintenanceLoginLock();
     }
     
     protected function checkParentDefunc() {

@@ -234,6 +234,7 @@ class editor_Plugins_Okapi_Connector {
         }
         try {
             $http = $this->getHttpClient($url);
+            $http->setConfig(['timeout' => 15]); //for ping just 15 seconds
             $response = $http->request('GET');
             $this->processResponse($response);
         }

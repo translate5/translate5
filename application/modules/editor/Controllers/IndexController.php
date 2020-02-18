@@ -147,9 +147,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $msg = 'Eine neue Version von Translate5 ist verfügbar. Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.';
             $msgBoxConf->initialMessages[] = $this->translate->_($msg);
         } catch (Exception $e) {
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $log->logError('Latest translate5 version information could not be fetched!', (string) $e);
+            $logger = Zend_Registry::get('logger');
+            /* @var $logger ZfExtended_Logger */
+            $logger->exception($e, [
+                'level' => $logger::LEVEL_INFO
+            ]);
         }
     }
 
@@ -174,11 +176,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     protected function setJsVarsInView() {
-        $rop = $this->config->runtimeOptions;
+      $rop = $this->config->runtimeOptions;
+      
+      $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
+      // Video-recording: If allowed in general, then it can be set by the user after every login.
+      $this->view->Php2JsVars()->set('enableJsLoggerVideoConfig', $rop->debug && $rop->debug->enableJsLoggerVideo);
         
-        $this->view->enableJsLogger = $rop->debug && $rop->debug->enableJsLogger;
-        
-        $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
+      $restPath = APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
       $this->view->Php2JsVars()->set('restpath', $restPath);
       $this->view->Php2JsVars()->set('basePath', APPLICATION_RUNDIR);
       $this->view->Php2JsVars()->set('moduleFolder', $this->view->publicModulePath.'/');
@@ -237,24 +241,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
       $this->view->Php2JsVars()->set('errorCodesUrl',$rop->errorCodesUrl);
       
-      //maintenance start date
-      if(isset($rop->maintenance->startDate)) {
-          $startDate = date(DATE_ISO8601, strtotime($rop->maintenance->startDate));
-      }
-      else{
-          $startDate = '';
-      }
-      $this->view->Php2JsVars()->set('maintenance.startDate',$startDate);
-      //maintenance warning panel is showed
-      $this->view->Php2JsVars()->set('maintenance.timeToNotify', $rop->maintenance->timeToNotify ?? '');
-      //minutes before the point in time of the update the application is locked for new log-ins
-      $this->view->Php2JsVars()->set('maintenance.timeToLoginLock', $rop->maintenance->timeToLoginLock ??'');
-      
       $this->view->Php2JsVars()->set('messageBox.delayFactor', $rop->messageBox->delayFactor);
       
       $this->view->Php2JsVars()->set('headerOptions.height', (int)$rop->headerOptions->height);
       $this->view->Php2JsVars()->set('languages', $this->getAvailableLanguages());
-      $this->view->Php2JsVars()->set('translations', $this->translate->getAvailableTranslations());
+      
+      $translatsion=$this->translate->getAvailableTranslations();
+      //add custom translations to the frontend locale label
+      $this->view->Php2JsVars()->set('translations',$translatsion);
       
       //Editor.data.enableSourceEditing → still needed for enabling / disabling the whole feature (Checkbox at Import).
       $this->view->Php2JsVars()->set('enableSourceEditing', (bool) $rop->import->enableSourceEditing);
@@ -293,6 +287,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //is the openid data visible for the default customer
       $this->view->Php2JsVars()->set('customers.openid.showOpenIdDefaultCustomerData',(boolean)$rop->customers->openid->showOpenIdDefaultCustomerData);
       
+      //boolean config if the logout button in the segments editor header is visible or not
+      $this->view->Php2JsVars()->set('editor.toolbar.hideLogoutButton',(boolean)$rop->editor->toolbar->hideLogoutButton);
+      //boolean config if the leave task button button in the segments editor header is visible or not
+      $this->view->Php2JsVars()->set('editor.toolbar.hideLeaveTaskButton',(boolean)$rop->editor->toolbar->hideLeaveTaskButton);
+      
+      $this->view->Php2JsVars()->set('tasks.simultaneousEditingKey', editor_Models_Task::INTERNAL_LOCK.editor_Models_Task::USAGE_MODE_SIMULTANEOUS);
       $this->setLanguageResourceJsVars();
       
       $this->setJsAppData();
@@ -363,7 +363,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.viewport', $ed->editorViewPort);
         $php2js->set('app.startViewMode', $ed->startViewMode);
         $php2js->set('app.branding', (string) $this->translate->_($ed->branding));
+        $php2js->set('app.company', $this->config->runtimeOptions->companyName);
+        $php2js->set('app.name', $this->config->runtimeOptions->appName);
+        $php2js->set('app.customHtmlContainer', (string) $this->translate->_($ed->customHtmlContainer));
         $php2js->set('app.user', $userSession->data);
+        $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));
+        $php2js->set('app.sessionKey', session_name());
         
         $allRoles = $acl->getAllRoles();
         $roles = array();
@@ -386,6 +391,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.userRights', $acl->getFrontendRights($userRoles));
         
         $php2js->set('app.version', $this->view->appVersion);
+        
+        $filter=ZfExtended_Factory::get('ZfExtended_Models_Filter_ExtJs6');
+        /* @var $filter ZfExtended_Models_Filter_ExtJs6 */
+        $php2js->set('app.filters.translatedOperators', $filter->getTranslatedOperators());
     }
     
     protected function getAppVersion() {
@@ -406,7 +415,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
-            'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal');
+            'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal','JsLogger');
         
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
@@ -491,7 +500,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     
     public function applicationstateAction() {
         $this->_helper->layout->disableLayout();
-        $this->view->applicationstate = ZfExtended_Debug::applicationState();
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        
+        $userSession = new Zend_Session_Namespace('user');
+        //since application state contains sensibile information we show that only to API users
+        if($acl->isInAllowedRoles($userSession->data->roles, 'backend', 'applicationstate')) {
+            $this->view->applicationstate = ZfExtended_Debug::applicationState();
+        }
     }
     
     public function generatesmalltagsAction() {
@@ -629,7 +645,28 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         }
         //currently this method is fixed to JS:
         header('Content-Type: '.$types[$extension]);
+        //FIXME add version URL suffix to plugin.css inclusion
+        header('Last-Modified: '.gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));
+        //with etags we would have to use the values of $_SERVER['HTTP_IF_NONE_MATCH'] too!
+        //makes sense to do so!
+        //header('ETag: '.md5(of file content));
+        
+        header_remove('Cache-Control');
+        header_remove('Expires');
+        header_remove('Pragma');
+        header_remove('X-Powered-By');
+        
+        /*
+        header('Pragma: public');
+        header('Cache-Control: max-age=86400');
+        header('Expires: '. gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
+        header('Content-Type: image/png');
+        */
+        
+       
+
         readfile($wholePath);
+        //FIXME: Optimierung bei den Plugin Assets: public Dateien die durch die Plugins geroutet werden, sollten chachebar sein und B keine Plugin Inits triggern. Geht letzteres überhaupt wg. VisualReview welches die Dateien ebenfalls hier durchschiebt?
         exit;
     }
     
@@ -716,13 +753,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             'state' => 'open',
             'workflow' => 'default',
             'workflowStep' => '1',
-            'workflowStepName' => 'lectoring',
+            'workflowStepName' => 'reviewing',
             'pmGuid' => '{dab18309-7dfd-4185-b27e-f490c3dcb888}',
             'pmName' => 'PM Username',
             'wordCount' => '123',
-            'targetDeliveryDate' => '2017-12-21 00:00:00',
-            'realDeliveryDate' => null,
-            'orderdate' => '2017-12-20 00:00:00',
+            'targetDeliveryDate' => '2017-12-21 00:00:00'
         ]);
         $config->task = $config->oldTask;
         $config->importConfig = new editor_Models_Import_Configuration();

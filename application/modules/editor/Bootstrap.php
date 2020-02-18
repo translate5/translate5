@@ -109,7 +109,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'qmstatistics', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                                 'config', 'segmentuserassoc', 'session', 'language','termcollection','languageresourceresource','languageresourcetaskassoc',
-                                'languageresourceinstance','apps','taskusertracking', 'term', 'termattribute'
+                                'languageresourceinstance','apps','taskusertracking', 'term', 'termattribute', 'category'
             ],
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -199,6 +199,12 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'excelreimport'
             )
         ));
+        $this->front->getRouter()->addRoute('editorTaskUserlist', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/userlist',[
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'userlist'
+        ]));
         
         //FIXME convert me to RestLikeRoute (see filemap)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
@@ -282,6 +288,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'statistics'
             ));
         $this->front->getRouter()->addRoute('editorTaskStat', $taskStat);
+        
+        $taskKpi = new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/kpi',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'kpi'
+            ));
+        $this->front->getRouter()->addRoute('editorTaskKpi', $taskKpi);
         
         $workerRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/worker/queue/*',
@@ -405,6 +420,16 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_tasks', $queryRoute);
         
+
+        $this->front->getRouter()->addRoute('editorLanguageResourcesEvents', new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/:id/events',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'events'
+            )
+        ));
+
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/export',
             array(
@@ -413,7 +438,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'export'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_export', $queryRoute);
-        
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/testexport',
             array(
@@ -422,7 +446,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'testexport'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_testexport', $queryRoute);
-        
         #Language resource rutes end
     }
     

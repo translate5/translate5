@@ -87,7 +87,13 @@ class editor_Models_Import {
             }
             
             $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
-            $this->task->lock(NOW_ISO, true); //locks the task
+            
+            //if the task meta exist, save it
+            if($this->task->meta()){
+                $this->task->meta()->save();
+            }
+            
+            $this->task->lock(NOW_ISO, $this->task::STATE_IMPORT); //locks the task
             
             $this->events->trigger('beforeImport', $this, array(
                     'task' => $this->task,
@@ -136,6 +142,7 @@ class editor_Models_Import {
      * @return editor_Models_Task
      */
     public function createTask(stdClass $params) {
+        $config = Zend_Registry::get('config');
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->setTaskName($params->taskName);
@@ -144,6 +151,7 @@ class editor_Models_Import {
         $task->setEdit100PercentMatch((int)$params->editFullMatch);
         $task->setLockLocked((int)$params->lockLocked);
         $task->setImportAppVersion(ZfExtended_Utils::getAppVersion());
+        $task->setUsageMode($config->runtimeOptions->import->initialTaskUsageMode);
         
         $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $pm ZfExtended_Models_User */
@@ -167,8 +175,6 @@ class editor_Models_Import {
         $task->setWorkflow($params->workflow);
         $task->setWordCount($params->wordCount);
         $task->setTargetDeliveryDate($params->targetDeliveryDate);
-        $task->setOrderdate($params->orderDate);
-        $config = Zend_Registry::get('config');
         //Task based Source Editing can only be enabled if its allowed in the whole editor instance 
         $enableSourceEditing = (bool) $config->runtimeOptions->import->enableSourceEditing;
         $task->setEnableSourceEditing((int) (! empty($params->enableSourceEditing) && $enableSourceEditing));
@@ -252,5 +258,13 @@ class editor_Models_Import {
         if($worker->init($taskGuid)) {
             $worker->queue($parentId); 
         }
+    }
+    
+    /***
+     * Get the import configuration
+     * @return editor_Models_Import_Configuration
+     */
+    public function getImportConfig() {
+        return $this->importConfig;
     }
 }

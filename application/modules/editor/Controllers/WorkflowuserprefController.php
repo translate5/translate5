@@ -37,6 +37,15 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController {
      */
     protected $entity;
     
+    public function init() {
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1172' => 'The referenced user is not associated to the task or does event not exist anymore.',
+            'E1205' => 'Missing workflow step in given data.',
+            'E1206' => 'Missing workflow step in given data.',
+        ], 'editor.workflow.userprefs');
+        parent::init();
+    }
+    
     /**
      * overridden to prepare data
      * (non-PHPdoc)
@@ -48,20 +57,63 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController {
             unset($this->data->id); //don't set the ID from client side
             //a new default entry cannot be created, also a workflow step must always be set!
             if(empty($this->data->workflowStep) || empty($this->data->workflowStep) && empty($this->data->userGuid)) {
-                throw new ZfExtended_ValidateException('Missing workflow step in given data');
+                //should happen on API usage only, so no translation of the error here
+                throw new ZfExtended_UnprocessableEntity('E1205');
             }
         }
         if($this->_request->isPut()) {
             //we cant update an existing userpref entry to workflow step = null,
             //since only the default entry can have an empty worflow step
             if(property_exists($this->data, 'workflowStep') && empty($this->data->workflowStep)) {
-                throw new ZfExtended_ValidateException('Missing workflow step in given data');
+                //should happen on API usage only, so no translation of the error here
+                throw new ZfExtended_UnprocessableEntity('E1206');
             }
             if($this->entity->isDefault()) {
                 unset($this->data->workflowStep); //don't update the workflowStep of the default entry
                 unset($this->data->userGuid); //don't update the userGuid of the default entry
             }
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::postAction()
+     */
+    public function postAction() {
+        try {
+            parent::postAction();
+        }
+        catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            $this->handleIntegrityConstraint($e);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::putAction()
+     */
+    public function putAction() {
+        try {
+            parent::putAction();
+        }
+        catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            $this->handleIntegrityConstraint($e);
+        }
+    }
+    
+    /**
+     * converts the integrity constraint exception to an user friendly exception for the frontend
+     * @param ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     */
+    protected function handleIntegrityConstraint(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+        //check if the error comes from the customer assoc or not
+        if(! $e->isInMessage('REFERENCES `LEK_taskUserAssoc`')) {
+            throw $e;
+        }
+        throw ZfExtended_UnprocessableEntity::createResponse('E1172', [
+            'userGuid' => 'Der referenzierte Benutzer ist der Aufgabe nicht mehr zugewiesen oder existiert nicht mehr.'
+        ], [], $e);
     }
     
     /**

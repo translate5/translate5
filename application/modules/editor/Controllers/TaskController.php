@@ -51,12 +51,6 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $entity;
     
     /**
-     * Cached map of userGuids and taskGuid to userNames
-     * @var array
-     */
-    protected $cachedUserInfo = array();
-    
-    /**
      * loadAll counter buffer
      * @var integer
      */
@@ -77,11 +71,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * @var editor_Workflow_Manager 
      */
     protected $workflowManager;
-    
-    /**
-     * @var editor_Models_SegmentFieldManager
-     */
-    protected $segmentFieldManager;
     
     /**
      * @var ZfExtended_Zendoverwrites_Translate
@@ -109,12 +98,43 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $log = false;
 
     public function init() {
-        $this->_filterTypeMap = [
+        
+        $this->_filterTypeMap= [
             'customerId' => [
                 //'string' => new ZfExtended_Models_Filter_JoinHard('editor_Models_Db_Customer', 'name', 'id', 'customerId')
                 'string' => new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId')
+            ],
+            'workflowState' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid')
+            ],
+            'workflowUserRole' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'role', 'taskGuid', 'taskGuid')
+            ],
+            'userName' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'userGuid', 'taskGuid', 'taskGuid')
+            ],
+            'segmentFinishCount' => [
+                'numeric' => 'percent',
+                'totalField'=>'segmentCount'
+            ],
+            'userState' => [
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+            ],
+            'assignmentDate' => [
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'assignmentDate', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+            ],
+            'finishedDate' => [
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'finishedDate', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+            ],
+            'deadlineDate' => [
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'deadlineDate', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
             ]
         ];
+        
+        //$this->_sortColMap['workflowState'] = $this->_filterTypeMap['taskState']['list'];
+        //$this->_sortColMap['userRole'] = $this->_filterTypeMap['userRole']['list'];
+        //$this->_sortColMap['userName'] = $this->_filterTypeMap['userName']['list'];
+        
         //set same join for sorting!
         $this->_sortColMap['customerId'] = $this->_filterTypeMap['customerId']['string'];
         
@@ -163,6 +183,14 @@ class editor_TaskController extends ZfExtended_RestController {
         ])
         ->addActionContext('export', 'importArchive')
         
+        ->addContext('xlsx', [
+            'headers' => [
+                'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // TODO Content-Type prüfen
+            ]
+        ])
+        ->addActionContext('kpi', 'xlsx')
+        
+        
         /*
         ->addContext('excel', [
             'headers' => [
@@ -205,34 +233,82 @@ class editor_TaskController extends ZfExtended_RestController {
     public function indexAction() {
         //set default sort
         $f = $this->entity->getFilter();
-        $f->hasSort() || $f->addSort('orderdate', true);
+        $f->hasSort() || $f->addSort('id', true);
         
-        $this->view->rows = $this->loadAll();
+        $rows = $this->loadAllWithUserData();
+        $this->view->rows = $rows;
         $this->view->total = $this->totalCount;
     }
     
     /**
-     * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
-     * set qmSubEnabled for all rows
+     * For requests that get the Key Performance Indicators (KPI)
+     * for the currently filtered tasks. If the tasks are not to be limited
+     * to those that are visible in the grid, the request must have set the 
+     * limit accordingly (= for all filtered tasks: no limit).
+     */
+    public function  kpiAction() {
+        $rows = $this->loadAll();
+        
+        $kpi = ZfExtended_Factory::get('editor_Models_KPI');
+        /* @var $kpi editor_Models_KPI */
+        $kpi->setTasks($rows);
+        $kpiStatistics = $kpi->getStatistics();
+        
+        // For Front-End:
+        $this->view->{$kpi::KPI_TRANSLATOR} = $kpiStatistics[$kpi::KPI_TRANSLATOR];
+        $this->view->{$kpi::KPI_REVIEWER}= $kpiStatistics[$kpi::KPI_REVIEWER];
+        $this->view->{$kpi::KPI_TRANSLATOR_CHECK} = $kpiStatistics[$kpi::KPI_TRANSLATOR_CHECK];
+        
+        $this->view->excelExportUsage = $kpiStatistics['excelExportUsage'];
+        
+        // ... or as Metadata-Excel-Export (= task-overview, filter, key performance indicators KPI):
+        $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
+        if ($context == 'xlsx') {
+            $exportMetaData = ZfExtended_Factory::get('editor_Models_Task_Export_Metadata');
+            /* @var $exportMetaData editor_Models_Task_Export_Metadata */
+            $exportMetaData->setTasks($rows);
+            $exportMetaData->setFilters(json_decode($this->getParam('filter')));
+            $exportMetaData->setColumns(json_decode($this->getParam('visibleColumns')));
+            $exportMetaData->setKpiStatistics($kpiStatistics);
+            $exportMetaData->exportAsDownload();
+        }
+    }
+    /***
+     * Load all task assoc users for non anonymized tasks.
+     * This is used for the user workflow filter in the advance filter store
+     */
+    public function userlistAction(){
+        $this->view->rows=$this->entity->loadUserList();
+    }
+    
+    /**
+     * loads all tasks according to the set filters
+     * @return array
      */
     public function loadAll()
     {
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks'); 
-        $filter = $this->entity->getFilter();
-        /* @var $filter editor_Models_Filter_TaskSpecific */
-        $filter->convertStates($isAllowedToLoadAll);
-        $assocFilter = $filter->isUserAssocNeeded();
-        if(!$assocFilter && $isAllowedToLoadAll) {
+        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
+        //set the default table to lek_task
+        $this->entity->getFilter()->setDefaultTable('LEK_task');
+        if($isAllowedToLoadAll) {
             $this->totalCount = $this->entity->getTotalCount();
             $rows = $this->entity->loadAll();
         }
         else {
-            $filter->setUserAssocNeeded();
             $this->totalCount = $this->entity->getTotalCountByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
             $rows = $this->entity->loadListByUserAssoc($this->user->data->userGuid, $isAllowedToLoadAll);
         }
-        
+        return $rows;
+    }
+    
+    /**
+     * returns all (filtered) tasks with added user data
+     * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
+     * set qmSubEnabled for all rows
+     */
+    public function loadAllWithUserData() {
+        $rows = $this->loadAll();
         $taskGuids = array_map(function($item){
             return $item['taskGuid'];
         },$rows);
@@ -241,8 +317,7 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $file editor_Models_File */
         $fileCount = $file->getFileCountPerTasks($taskGuids);
         
-        $userAssocInfos = array();
-        $allAssocInfos = $this->getUserAssocInfos($taskGuids, $userAssocInfos);
+        $this->_helper->TaskUserInfo->initUserAssocInfos($taskGuids);
 
         //load the task assocs
         $languageResourcemodel = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
@@ -280,7 +355,11 @@ class editor_TaskController extends ZfExtended_RestController {
             
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
             
-            $this->addUserInfos($row, $row['taskGuid'], $userAssocInfos, $allAssocInfos);
+            $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
+            
+            $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
+            $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
+            
             $row['fileCount'] = empty($fileCount[$row['taskGuid']]) ? 0 : $fileCount[$row['taskGuid']];
             
             //add task assoc if exist
@@ -295,90 +374,6 @@ class editor_TaskController extends ZfExtended_RestController {
         return $rows;
     }
     
-    /**
-     * Fetch an array with Task User Assoc Data for the currently logged in User.
-     * Returns an array with an entry for each task, key is the taskGuid
-     * @return array
-     */
-    protected function getUserAssocInfos($taskGuids, &$userAssocInfos) {
-        $userAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $userAssoc editor_Models_TaskUserAssoc */
-        $userGuid = $this->user->data->userGuid;
-        $assocs = $userAssoc->loadByTaskGuidList($taskGuids);
-        $res = array();
-        foreach($assocs as $assoc) {
-            if(!isset($res[$assoc['taskGuid']])) {
-                $res[$assoc['taskGuid']] = array(); 
-            }
-            if($userGuid == $assoc['userGuid']) {
-                $userAssocInfos[$assoc['taskGuid']] = $assoc;
-            }
-            $userInfo = $this->getUserinfo($assoc['userGuid'], $assoc['taskGuid']);
-            $assoc['userName'] = $userInfo['surName'].', '.$userInfo['firstName'];
-            $assoc['login'] = $userInfo['login'];
-            //set only not pmOverrides
-            if(empty($assoc['isPmOverride'])) {
-                $res[$assoc['taskGuid']][] = $assoc;
-            }
-        }
-        $userSorter = function($first, $second){
-            if($first['userName'] > $second['userName']) {
-                return 1;
-            }
-            if($first['userName'] < $second['userName']) {
-                return -1;
-            }
-            return 0;
-        };
-        foreach($res as $taskGuid => $taskUsers) {
-            usort($taskUsers, $userSorter);
-            $res[$taskGuid] = $taskUsers; 
-        }
-        return $res;
-    }
-
-    /**
-     * returns the username for the given userGuid.
-     * Doing this on client side would be possible, but then it must be ensured that UsersStore is always available and loaded before TaskStore. 
-     * @param string $userGuid
-     * @param string $taskGuid
-     * @return array
-     */
-    protected function getUserinfo($userGuid, $taskGuid) {
-        $notfound = array(); //should not be, but can occur after migration of old data!
-        if(empty($userGuid)) {
-            return $notfound;
-        }
-        if(isset($this->cachedUserInfo[$userGuid])) {
-            // cache for user
-            return $this->cachedUserInfo[$userGuid];
-        }
-        if(empty($this->tmpUserDb)) {
-            $this->tmpUserDb = ZfExtended_Factory::get('ZfExtended_Models_Db_User');
-            /* @var $this->tmpUserDb ZfExtended_Models_Db_User */
-        }
-        $s = $this->tmpUserDb->select()->where('userGuid = ?', $userGuid);
-        $row = $this->tmpUserDb->fetchRow($s);
-        if(!$row) {
-            return $notfound; 
-        }
-        $userInfo = $row->toArray();
-        
-        $this->cachedUserInfo[$userGuid] = $userInfo;
-        return $userInfo; 
-    }
-    
-    /**
-     * returns the commonly used username: Firstname Lastname (login)
-     * @param array $userinfo
-     */
-    protected function getUsername(array $userinfo) {
-        if(empty($userinfo)) {
-            return '- not found -'; //should not be, but can occur e.g. after migration of old data or for lockingUsername
-        }
-        return $userinfo['firstName'].' '.$userinfo['surName'].' ('.$userinfo['login'].')';
-    }
-
     /**
      * Returns a mapping of customerIds and Names to the given rows of tasks
      * @param array $rows
@@ -436,6 +431,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->init();
         //$this->decodePutData(); → not needed, data was set directly out of params because of file upload
         $this->data = $this->getAllParams();
+        //warn the api user for the orderdate ussage
+        $this->orderdateWarning();
         settype($this->data['wordCount'], 'integer');
         settype($this->data['enableSourceEditing'], 'integer');
         settype($this->data['edit100PercentMatch'], 'integer');
@@ -469,6 +466,13 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         
+        //if the visual review mapping type is set, se the task meta data
+        if(isset($this->data['mappingType'])){
+            $meta = $this->entity->meta();
+            $meta->setMappingType($this->data['mappingType']);
+        }
+        
+//FIXME zusätzlich sollte die API mit einer customerNr umgehen können die dann zur customerId konvertiret wird
         if(empty($this->data['customerId'])){
             $this->entity->setDefaultCustomerId();
             $this->data['customerId'] = $this->entity->getCustomerId();
@@ -639,12 +643,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
         $import->setUserInfos($this->user->data->userGuid, $this->user->data->userName);
-
+        
         $import->setLanguages(
-                        $this->entity->getSourceLang(), 
-                        $this->entity->getTargetLang(), 
-                        $this->entity->getRelaisLang(), 
-                        editor_Models_Languages::LANG_TYPE_ID);
+            $this->entity->getSourceLang(),
+            $this->entity->getTargetLang(),
+            $this->entity->getRelaisLang(),
+            editor_Models_Languages::LANG_TYPE_ID);
         $import->setTask($this->entity);
         $dp = $this->upload->getDataProvider();
         
@@ -670,8 +674,8 @@ class editor_TaskController extends ZfExtended_RestController {
             'E1032' => ['sourceLang', 'Die übergebene Quellsprache "{language}" ist ungültig!'],
             'E1033' => ['targetLang', 'Die übergebene Zielsprache "{language}" ist ungültig!'],
             'E1034' => ['relaisLang', 'Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.'],
-            'E1039' => ['importUpload', 'Das importierte Paket beinhaltet kein gültiges "{proofRead}" Verzeichnis.'],
-            'E1040' => ['importUpload', 'Das importierte Paket beinhaltet keine Dateien im "{proofRead}" Verzeichnis.'],
+            'E1039' => ['importUpload', 'Das importierte Paket beinhaltet kein gültiges "{review}" Verzeichnis.'],
+            'E1040' => ['importUpload', 'Das importierte Paket beinhaltet keine Dateien im "{review}" Verzeichnis.'],
         ];
         $code = $e->getErrorCode();
         if(empty($codeToFieldAndMessage[$code])) {
@@ -797,6 +801,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $oldTask = clone $this->entity;
         $this->decodePutData();
         
+        //warn the api user for the orderdate ussage
+        $this->orderdateWarning();
+        
         if(isset($this->data->edit100PercentMatch)){
             settype($this->data->edit100PercentMatch, 'integer');
         }
@@ -865,22 +872,27 @@ class editor_TaskController extends ZfExtended_RestController {
         
         //if the edit100PercentMatch is changed, update the value for all segments in the task
         if(isset($this->data->edit100PercentMatch)){
-            $this->entity->updateSegmentsEdit100PercentMatch($this->entity->getTaskGuid(), (boolean)$this->data->edit100PercentMatch);
+            $this->entity->updateSegmentsEdit100PercentMatch($this->entity, (boolean)$this->data->edit100PercentMatch);
+        }
+        
+        //if the totals segment count is not set, update it before the entity is saved
+        if($this->entity->getSegmentCount()==null || $this->entity->getSegmentCount()<1){
+            $this->entity->setSegmentCount($this->entity->getTotalSegmentsCount($taskguid));
         }
         
         $this->entity->save();
         $obj = $this->entity->getDataObject();
         
-        $userAssocInfos = array();
-        $allAssocInfos = $this->getUserAssocInfos(array($taskguid), $userAssocInfos);
-        
-        $this->invokeTaskUserTracking($taskguid, $userAssocInfos);
+        $userAssocInfos = $this->_helper->TaskUserInfo->initUserAssocInfos([$taskguid]);
+        $this->invokeTaskUserTracking($taskguid, $userAssocInfos[$taskguid]['role'] ?? '');
         
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj; 
-        $this->addUserInfos($row, $taskguid, $userAssocInfos, $allAssocInfos);
-            
+        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
+        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
+        $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll, $this->data->userState ?? null);
         $this->view->rows = (object)$row;
+        
         if($this->isOpenTaskRequest()){
             $this->addQmSubToResult();
         }
@@ -907,6 +919,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(empty($used)) {
             return;
         }
+        //FIXME also throw an exception if task is locked
         throw ZfExtended_Models_Entity_Conflict::createResponse('E1159', [
             'usageMode' => [
                 'usersAssigned' => 'Der Nutzungsmodus der Aufgabe kann verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.'
@@ -938,104 +951,6 @@ class editor_TaskController extends ZfExtended_RestController {
         $events = ZfExtended_Factory::get('editor_Models_Logger_Task');
         /* @var $events editor_Models_Logger_Task */
         return $events->loadLastErrors($taskGuid);
-    }
-    
-    /**
-     * Adds additional user based infos to the given array.
-     * If the given taskguid is assigned to a client for anonymizing data, the added user-data is anonymized already.
-     * @param array $row gets the row to modify as reference
-     * @param string $taskguid
-     * @param array $userAssocInfos
-     * @param array $allAssocInfos
-     */
-    protected function addUserInfos(array &$row, $taskguid, array $userAssocInfos, array $allAssocInfos) {
-        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
-        //Add actual User Assoc Infos to each Task
-        if(isset($userAssocInfos[$taskguid])) {
-            $row['userRole'] = $userAssocInfos[$taskguid]['role'];
-            $row['userState'] = $userAssocInfos[$taskguid]['state'];
-            $row['userStep'] = $this->workflow->getStepOfRole($row['userRole']);
-        }
-        elseif($isEditAll && isset($this->data->userState)) {
-            $row['userState'] = $this->data->userState; //returning the given userState for usage in frontend
-        }
-        
-        //Add all User Assoc Infos to each Task
-        if(isset($allAssocInfos[$taskguid])) {
-            $reducer = function($accu, $item) {
-                return $accu || !empty($item['usedState']);
-            };
-            $row['isUsed'] = array_reduce($allAssocInfos[$taskguid], $reducer, false);
-            $row['users'] = $allAssocInfos[$taskguid];
-        }
-        
-        $row['lockingUsername'] = null;
-        
-        if(!empty($row['lockingUser'])){
-            $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser'],$taskguid));
-        }
-        
-        $fields = ZfExtended_Factory::get('editor_Models_SegmentField');
-        /* @var $fields editor_Models_SegmentField */
-        
-        $userPref = ZfExtended_Factory::get('editor_Models_Workflow_Userpref');
-        /* @var $userPref editor_Models_Workflow_Userpref */
-        
-        //we load alls fields, if we are in taskOverview and are allowed to edit all 
-        // or we have no userStep to filter / search by. 
-        // No userStep means indirectly that we do not have a TUA (pmCheck)
-        if(!$this->entity->isRegisteredInSession() && $isEditAll || empty($row['userStep'])) {
-            $row['segmentFields'] = $fields->loadByTaskGuid($taskguid);
-            //the pm sees all, so fix userprefs
-            $userPref->setNotEditContent(false);
-            $userPref->setAnonymousCols(false);
-            $userPref->setVisibility($userPref::VIS_SHOW);
-            $allFields = array_map(function($item) { 
-                return $item['name']; 
-            }, $row['segmentFields']);
-            $userPref->setFields(join(',', $allFields));
-        } else {
-            $wf = $this->workflow;
-            $userPref->loadByTaskUserAndStep($taskguid, $wf::WORKFLOW_ID, $this->user->data->userGuid, $row['userStep']);
-            $row['segmentFields'] = $fields->loadByUserPref($userPref);
-        }
-        
-        $row['userPrefs'] = array($userPref->getDataObject());
-        $row['notEditContent'] = (bool)$row['userPrefs'][0]->notEditContent;
-        
-        //$row['segmentFields'] = $fields->loadByCurrentUser($taskguid);
-        foreach($row['segmentFields'] as &$field) {
-            //TRANSLATE-318: replacing of a subpart of the column name is a client specific feature
-            $needle = $this->config->runtimeOptions->segments->fieldMetaIdentifier;
-            if(!empty($needle)) {
-                $field['label'] = str_replace($needle, '', $field['label']);
-            }
-            $field['label'] = $this->translate->_($field['label']);
-        } 
-        if(empty($this->segmentFieldManager)) {
-            $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        }
-        //sets the information if this task has default segment field layout or not
-        $row['defaultSegmentLayout'] = $this->segmentFieldManager->isDefaultLayout(array_map(function($field){
-            return $field['name'];
-        }, $row['segmentFields']));
-        
-        // anonymize userinfo?
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskguid);
-        if ($task->anonymizeUsers()) {
-            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-            /* @var $workflowAnonymize editor_Workflow_Anonymize */
-            if(!empty($row['lockingUser'])) {
-                $row = $workflowAnonymize->anonymizeUserdata($taskguid, $row['lockingUser'], $row);
-            }
-            if(!empty($row['users'])) {
-                foreach ($row['users'] as &$rowUser) {
-                    $rowUser = $workflowAnonymize->anonymizeUserdata($taskguid, $rowUser['userGuid'], $rowUser);
-                }
-            }
-        }
     }
     
     /**
@@ -1082,16 +997,16 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * invokes taskUserTracking if its an opening or an editing request
      * (no matter if the workflow-users of the task are to be anonymized or not)
-     * param string $taskguid
-     * @param array $userAssocInfos
+     * @param string $taskguid
+     * @param string $role
      */
-    protected function invokeTaskUserTracking($taskguid, $userAssocInfos) {
+    protected function invokeTaskUserTracking(string $taskguid, string $role) {
         if(!$this->isOpenTaskRequest()){
             return;
         }
         $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
         /* @var $taskUserTracking editor_Models_TaskUserTracking */
-        $taskUserTracking->insertTaskUserTrackingEntry($taskguid, $this->user->data->userGuid, $userAssocInfos[$taskguid]['role']);
+        $taskUserTracking->insertTaskUserTrackingEntry($taskguid, $this->user->data->userGuid, $role);
     }
     
     /**
@@ -1100,10 +1015,14 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function openAndLock() {
         $task = $this->entity;
+        /* @var $task editor_Models_Task */
         if($this->isEditTaskRequest()){
+            $isMultiUser = $task->getUsageMode() == $task::USAGE_MODE_SIMULTANEOUS;
             $unconfirmed = $task->getState() == $task::STATE_UNCONFIRMED;
             //first check for confirmation on task level, if unconfirmed, don't lock just set to view mode!
-            if($unconfirmed || !$task->lock($this->now)){
+            //if no multiuser, try to lock for user
+            //if multiuser, try a system lock
+            if($unconfirmed || !($isMultiUser ? $task->lock($this->now, $task::USAGE_MODE_SIMULTANEOUS) : $task->lockForSessionUser($this->now))){
                 $this->data->userState = $this->workflow::STATE_VIEW;
             }
         }
@@ -1138,15 +1057,17 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!$isEnding && (!$this->isLeavingTaskRequest())){
             return;
         }
-        if($this->entity->getLockingUser() == $this->user->data->userGuid && !$this->entity->unlock()) {
-            throw new Zend_Exception('task '.$this->entity->getTaskGuid().
-                    ' could not be unlocked by user '.$this->user->data->userGuid);
-        }
+        $this->entity->unlockForUser($this->user->data->userGuid);
         $this->unregisterTask();
         
         if($resetToOpen) {
             $this->updateUserState($this->user->data->userGuid, true);
         }
+        $this->events->trigger("afterTaskClose", $this, array(
+            'task' => $task,
+            'view' => $this->view,
+            'openState' => $this->data->userState ?? null)
+        );
     }
     
     /**
@@ -1227,6 +1148,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!$disableWorkflowEvents) {
             $this->workflow->triggerBeforeEvents($oldUserTaskAssoc, $userTaskAssoc);
         }
+        
         $userTaskAssoc->save();
         
         if(!$disableWorkflowEvents) {
@@ -1276,14 +1198,15 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $obj = $this->entity->getDataObject();
         
-        $userAssocInfos = array();
-        $allAssocInfos = $this->getUserAssocInfos(array($taskguid), $userAssocInfos);
+        $this->_helper->TaskUserInfo->initUserAssocInfos([$taskguid]);
         
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj; 
-        $this->addUserInfos($row, $taskguid, $userAssocInfos, $allAssocInfos);
-            
+        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
+        $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
+        $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
         $this->view->rows = (object)$row;
+        
         unset($this->view->rows->qmSubsegmentFlags);
         
         //add task assoc to the task
@@ -1296,6 +1219,8 @@ class editor_TaskController extends ZfExtended_RestController {
         // We do this here to have it immediately available e.g. when opening segments.
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
+
+        $this->view->rows->workflowProgressSummary=$this->entity->getWorkflowProgressSummary();
     }
     
     public function deleteAction() {
@@ -1437,8 +1362,6 @@ class editor_TaskController extends ZfExtended_RestController {
         $fieldToRight = [
             'taskName' => 'editorEditTaskTaskName',
             'targetDeliveryDate' => 'editorEditTaskDeliveryDate',
-            'realDeliveryDate' => 'editorEditTaskRealDeliveryDate',
-            'orderdate' => 'editorEditTaskOrderDate',
             'pmGuid' => 'editorEditTaskPm',
             'pmName' => 'editorEditTaskPm',
         ];
@@ -1519,5 +1442,24 @@ class editor_TaskController extends ZfExtended_RestController {
         // E1011 is he default multipurpose error code for task logging
         $extraData['task'] = $this->entity;
         $this->taskLog->info('E1011', $message, $extraData);
+    }
+    
+    /***
+     * Warn the api users that the orderdate field is not anymore available for the api.
+     * The task deadlines are defined for each task-user-assoc job separately
+     * TODO: 11.02.2020 remove this function after all customers adopt there api calls
+     */
+    protected function orderdateWarning() {
+        $throwWarning=false;
+        if(is_array($this->data)){
+            $throwWarning=isset($this->data['orderdate']);
+        }
+        if(is_object($this->data)){
+            $throwWarning=isset($this->data->orderdate);
+        }
+        if(!$throwWarning){
+            return;
+        }
+        $this->log->warn('E1210','The orderdate for the task is deprecated. Use the LEK_taskUserAssoc deadlineDate instead.');
     }
 }

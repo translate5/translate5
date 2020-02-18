@@ -373,14 +373,14 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $sql = $this->db->getAdapter()->select()
                 ->from(array('t1' =>'LEK_terms'), array('t2.*'))
                 ->distinct()
-                ->joinLeft(array('t2' =>'LEK_terms'), 't1.groupId = t2.groupId', null)
+                ->joinLeft(array('t2' =>'LEK_terms'), 't1.groupId = t2.groupId AND t1.collectionId = t2.collectionId', null)
                 ->join(array('l' =>'LEK_languages'), 't2.language = l.id', 'rtl')
                 ->where('t1.collectionId IN(?)', $collectionIds)
-                ->where('t2.collectionId IN(?)', $collectionIds)
+                //->where('t2.collectionId IN(?)', $collectionIds)
                 ->where('t1.mid IN('.$serialIds.')')
                 ->where('t1.language IN (?)',array($sourceLang,$targetLang))
                 ->where('t2.language IN (?)',array($sourceLang,$targetLang));
-       
+        
         $terms = $this->db->getAdapter()->fetchAll($sql);
         
         $termGroups = array();
@@ -408,7 +408,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param array $collectionIds
      * @return Zend_Db_Table_Row_Abstract | null
      */
-    public function loadByMid(string $mid,array $collectionIds) {
+    public function loadByMid(string $mid, array $collectionIds) {
         $s = $this->db->select(false);
         $s->from($this->db);
         $s->where('collectionId IN(?)', $collectionIds)->where('mid = ?', $mid);
@@ -652,21 +652,20 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Load term and attribute proposals yunger as $youngerAs date within the given collection
-     * @param string $youngerAs
+     * Load all term and attribute proposals, or if second parameter is given load only proposals younger as $youngerAs date within the given collection(s)
      * @param array $collectionId
+     * @param string $youngerAs optional, if omitted all proposals are loaded
      */
-    public function loadProposalExportData(string $youngerAs='',array $collectionIds=[]){
-        //if no date is set, se to current
-        if(empty($youngerAs)){
-            $youngerAs=date('Y-m-d');
-        }
-        if(empty($collectionIds)){
-            $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            /* @var $termCollection editor_Models_TermCollection_TermCollection */
-            $collectionIds=$termCollection->getCollectionForAuthenticatedUser();
-        }
+    public function loadProposalExportData(array $collectionIds, string $youngerAs = ''){
         $adapter=$this->db->getAdapter();
+        $bindParams = [join(',', $collectionIds)];
+        $termYoungerSql = $attrYoungerSql = '';
+        if(!empty($youngerAs)) {
+            $bindParams[] = $youngerAs;
+            $bindParams[] = $youngerAs;
+            $termYoungerSql = ' and (t.created >=? || tp.created >= ?)';
+            $attrYoungerSql = ' and (ta.created >=? || tap.created >=?)';
+        }
         $termSql="SELECT
             		t.termEntryId as 'term-termEntryId',
             		t.definition as 'term-definition',
@@ -694,12 +693,11 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         			LEFT OUTER JOIN
         			LEK_term_proposal tp ON tp.termId = t.id
         			INNER JOIN LEK_languages l ON t.language=l.id 
-                    		where ".$adapter->quoteInto('t.collectionId IN(?)',$collectionIds)." 
-        		and (t.created >=? || tp.created >= ?) 
+                where t.collectionId IN(?)".$termYoungerSql." 
         		and (tp.term is not null or t.processStatus='unprocessed')
         		order by t.groupId,t.term";
         
-        $termResult=$adapter->query($termSql,[$youngerAs,$youngerAs])->fetchAll();
+        $termResult=$adapter->query($termSql,$bindParams)->fetchAll();
         
         $attributeSql="SELECT
                         ta.id as 'attribute-id',
@@ -731,12 +729,11 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                         LEFT OUTER JOIN LEK_terms t on ta.termId=t.id
                         LEFT OUTER JOIN LEK_term_proposal tp on tp.termId=t.id 
                         LEFT OUTER JOIN LEK_languages l ON t.language=l.id 
-                	where ".$adapter->quoteInto('ta.collectionId IN(?)',$collectionIds)." 
-                	and (ta.created >=? || tap.created >=?) 
+                	where ta.collectionId IN(?)".$attrYoungerSql." 
                 	and (tap.value is not null or ta.processStatus='unprocessed')
                 	order by ta.termEntryId,ta.termId";
         
-        $attributeResult=$adapter->query($attributeSql,[$youngerAs,$youngerAs])->fetchAll();
+        $attributeResult=$adapter->query($attributeSql,$bindParams)->fetchAll();
         
         //merge term proposals with term attributes and term entry attributes proposals
         $resultArray=array_merge($termResult,$attributeResult);
@@ -792,14 +789,19 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * any of the given collections.
      * @param array $searchTerms with objects {'text':'abc', 'id':123}
      * @param array $collectionIds
+     * @param array $language
      * @return array $nonExistingTerms with objects {'text':'abc', 'id':123}
      */
-    public function getNonExistingTermsInAnyCollection($searchTerms, $collectionIds){
+    public function getNonExistingTermsInAnyCollection(array $searchTerms,array $collectionIds,array $language){
         $nonExistingTerms = [];
+        if(empty($searchTerms) || empty($collectionIds) || empty($language)){
+            return $nonExistingTerms;
+        }
         foreach ($searchTerms as $term) {
             $s = $this->db->select()
             ->where('term = ?', $term->text)
-            ->where('collectionId IN(?)', $collectionIds);
+            ->where('collectionId IN(?)', $collectionIds)
+            ->where('language IN (?)',$language);
             $terms = $this->db->fetchAll($s);
             if ($terms->count() == 0) {
                 $nonExistingTerms[] = $term;
@@ -919,13 +921,14 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /***
      * Find term attributes in the given term entry (lek_terms groupId)
      * 
-     * @param string $groupId
+     * @param string $termEntryId
      * @param array $collectionIds
      * @return array
      */
-    public function searchTermAttributesInTermentry($groupId,$collectionIds){
+    //TODO: update the references
+    public function searchTermAttributesInTermentry($termEntryId,$collectionIds){
         $s=$this->getSearchTermSelect();
-        $s->where('groupId=?',$groupId)
+        $s->where('LEK_terms.termEntryId=?',$termEntryId)
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->order('LEK_languages.rfc5646')
         ->order('LEK_terms.term')
@@ -947,18 +950,78 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Remove old terms by given date.
-     * The term attributes also will be removed.
+     * Remove terms where the updated date is older than the given one.
      * 
      * @param array $collectionIds
      * @param string $olderThan
      * @return boolean
      */
     public function removeOldTerms(array $collectionIds, $olderThan){
-       return $this->db->delete([
-           'updated < ?' => $olderThan,
-           'collectionId in (?)' => $collectionIds,
-       ])>0;
+        //get all terms in the collection older than the date
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from(['t'=>'LEK_terms'],['t.id'])
+        ->joinLeft(['p'=>'LEK_term_proposal'],'p.termId=t.id ',['p.term','p.created','p.userGuid','p.userName'])
+        ->where('t.updated < ?', $olderThan)
+        ->where('t.collectionId in (?)',$collectionIds)
+        ->where('t.processStatus NOT IN (?)',self::PROCESS_STATUS_UNPROCESSED);
+        $result=$this->db->fetchAll($s)->toArray();
+        
+        if(empty($result)){
+            return false;
+        }
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        
+        $deleteProposals=[];
+        //for each of the terms with the proposals, use the proposal value as the
+        //new term value in the original term, after the original term is updated, remove
+        //the proposal
+        foreach ($result as $key=>$res){
+            if(empty($res['term'])){
+                continue;
+            }
+            $proposal=ZfExtended_Factory::get('editor_Models_Term_Proposal');
+            /* @var $proposal editor_Models_Term_Proposal */
+            $proposal->init([
+                'created'=>$res['created'],
+                'userGuid'=>$res['userGuid'],
+                'userName'=>$res['userName'],
+            ]);
+            
+            $term->load($res['id']);
+            $term->setTerm($res['term']);
+            $term->setCreated($res['created']);
+            $term->setUpdated(NOW_ISO);
+            $term->setUserGuid($res['userGuid']);
+            $term->setUserName($res['userName']);
+            $term->setProcessStatus(self::PROCESS_STATUS_UNPROCESSED);
+            //TODO: with the next termportal step(add new attribute and so)
+            //update/merge those new proposal attributes to
+            //now only the transac group should be modefied
+            $attribute->updateTermTransacGroupFromProposal($term,$proposal);
+            $attribute->updateTermProcessStatus($term, $term::PROCESS_STATUS_UNPROCESSED);
+            $term->save();
+            $deleteProposals[]=$res['id'];
+            unset($result[$key]);
+        }
+        //remove the collected proposals
+        if(!empty($deleteProposals)){
+            $proposal=ZfExtended_Factory::get('editor_Models_Term_Proposal');
+            /* @var $proposal editor_Models_Term_Proposal */
+            $proposal->db->delete([
+                'termId IN(?)' => $deleteProposals
+            ]);
+        }
+        
+        $result=array_column($result,'id');
+        if(empty($result)){
+            return false;
+        }
+        //delete the collected old terms
+        return $this->db->delete(['id IN(?)'=>$result])>0;
     }
 
     
@@ -1057,6 +1120,21 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $result=parent::getDataObject();
         $result->termId=$result->id;
         $result->proposable=$this->isProposableAllowed();
+        return $result;
+    }
+    
+    /***
+     * Get loaded data as object with term attributes included
+     * @return stdClass
+     */
+    public function getDataObjectWithAttributes() {
+        $result=$this->getDataObject();
+        //load all attributes for the term
+        $rows=$this->groupTermsAndAttributes($this->findTermAndAttributes($result->id));
+        $result->attributes=[];
+        if(!empty($rows) && !empty($rows[0]['attributes'])){
+            $result->attributes =$rows[0]['attributes'];
+        }
         return $result;
     }
     
@@ -1308,6 +1386,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $attributeModel=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attributeModel editor_Models_Term_Attribute */
         $isAttributeProposalAllowed=$attributeModel->isProposableAllowed();
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         //map the term id to array index (this is used because the jquery json decode changes the array sorting based on the termId)
         $keyMap=[];
@@ -1359,6 +1438,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 if(in_array($key,$termProposalColumns)){
                     $termProposalData[$termProposalColumnsNameMap[$key]]=$value;
                     continue;
+                }
+                
+                if($key=='headerText'){
+                    $value=$translate->_($value);
                 }
                 //it is attribute column
                 $atr[$key]=$value;

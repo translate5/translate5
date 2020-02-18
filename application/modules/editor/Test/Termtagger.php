@@ -88,10 +88,9 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         self::$testTask->setTaskNr('');
         self::$testTask->setSourceLang(self::$sourceLangEntity['id']);
         self::$testTask->setTargetLang(self::$targetLangEntity['id']);
-        self::$testTask->setOrderdate(date('Y-m-d H:i:s'));
         self::$testTask->setTargetDeliveryDate(date('Y-m-d H:i:s'));
         self::$testTask->setWordCount(0);
-        self::$testTask->setEnableSourceEditing(false);
+        self::$testTask->setEnableSourceEditing(1);
         self::$testTask->setEdit100PercentMatch(1);
         self::$testTask->setLockLocked(1);
         self::$testTask->setTerminologie(1);
@@ -114,7 +113,6 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         $wfId = self::$testTask->getWorkflow();
         self::$workflow = $workflowManager->getCached($wfId);
         self::importFile();
-        self::$workflow->doImport(self::$testTask);
         $workflowManager->initDefaultUserPrefs(self::$testTask);
         //reload because entityVersion was changed by above workflow and workflow manager calls
         self::$testTask->load(self::$testTask->getId());
@@ -197,6 +195,14 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         $upload->initDataProvider("testcase",$importUpload);
         $dp = $upload->getDataProvider();
         $import->import($dp);
+        self::$workflow->doImport(self::$testTask,$import->getImportConfig());
+        
+        //run the queued import worker
+        $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $workerModel ZfExtended_Models_Worker */
+        $workerModel->loadFirstOf('editor_Models_Import_Worker',self::$testTask->getTaskGuid());
+        $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
+        $worker && $worker->schedulePrepared();
     }
     public static function tearDownAfterClass(): void {
         parent::tearDownAfterClass();

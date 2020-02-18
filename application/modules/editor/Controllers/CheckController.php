@@ -112,7 +112,7 @@ class editor_CheckController extends editor_TaskController {
      * do not change anything below here
      **************************/
     protected $tmpDir;
-    protected $proofReadDir;
+    protected $reviewDir;
     /**
      * @var editor_Models_Task
      */
@@ -227,17 +227,17 @@ class editor_CheckController extends editor_TaskController {
     protected function handleDirs() {
         $this->tmpDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'translate5CheckTasks'.
                 DIRECTORY_SEPARATOR;
-        $this->proofReadDir = $this->tmpDir.'proofRead'.DIRECTORY_SEPARATOR;
+        $this->reviewDir = $this->tmpDir.'review'.DIRECTORY_SEPARATOR;
         if(!is_dir($this->tmpDir))
             mkdir($this->tmpDir);
-        if(is_dir($this->proofReadDir)){
+        if(is_dir($this->reviewDir)){
             $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
                     'Recursivedircleaner'
             );
             /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
-            $recursivedircleaner->delete($this->proofReadDir);
+            $recursivedircleaner->delete($this->reviewDir);
         }
-        mkdir($this->proofReadDir);
+        mkdir($this->reviewDir);
     }
     
     protected function exportTask($taskGuid) {
@@ -252,7 +252,7 @@ class editor_CheckController extends editor_TaskController {
                     'Derzeit läuft bereits ein Export für diesen Task. Bitte versuchen Sie es in einiger Zeit nochmals.');
             exit;
         }
-        $export->_exportToFolder($this->proofReadDir,true);
+        $export->_exportToFolder($this->reviewDir,true);
         $zipFile = $this->tmpDir.'export.zip';
         $filter = ZfExtended_Factory::get('Zend_Filter_Compress',array(
             array(
@@ -262,7 +262,7 @@ class editor_CheckController extends editor_TaskController {
             )
         );
         /* @var $filter Zend_Filter_Compress */
-        if(!$filter->filter($this->proofReadDir)){
+        if(!$filter->filter($this->reviewDir)){
             throw new Zend_Exception('Could not create export-zip of task '.$taskGuid.'.');
         }
         return $zipFile;
@@ -274,7 +274,6 @@ class editor_CheckController extends editor_TaskController {
         $this->setParam('taskNr',  $this->entity->getTaskNr());
         $this->setParam('sourceLang',  $this->entity->getSourceLang());
         $this->setParam('targetLang',  $this->entity->getTargetLang());
-        $this->setParam('orderdate',  $this->entity->getOrderdate());
         $this->setParam('targetDeliveryDate',  $this->entity->getTargetDeliveryDate());
         $this->setParam('wordCount',  $this->entity->getWordCount());
         $this->setParam('lockLocked',  $this->entity->getLockLocked());

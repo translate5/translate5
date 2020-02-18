@@ -83,7 +83,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
         //must use another selector as in the Xlf Export itself. On using the same selector, the later one overwrites the first one
         $xmlparser->registerElement('trans-unit lekTargetSeg', null, function($tag, $key, $opener) use ($xmlparser, $task){
             $attributes = $opener['attributes'];
-            if(empty($attributes['id'])) {
+            if(empty($attributes['id']) && $attributes['id'] !== '0') {
                 throw new Zend_Exception('Missing id attribute in '.$xmlparser->getChunk($key));
             }
             $comment = ZfExtended_Factory::get('editor_Models_Comment');
@@ -116,7 +116,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
             $this->currentErrorInfosKey = null;
             
             $commentString = $this->processCommentsAsAnalysisResult();
-            if(empty($commentString)) {
+            if(empty($commentString) && $commentString !== '0') {
                 return;
             }
             if(empty($keyToReplace)) {

@@ -89,9 +89,9 @@ class editor_Plugins_Okapi_Tikal_Connector {
             error_log('Okapi Tikal error: target XLF file does already exist in import package and would not be overwritten! File: '.$xlf);
             return false;
         }
-        //move the generated XLF file into the proofRead folder
+        //move the generated XLF file into the review folder
         rename($xlf, $file.'.xlf');
-        $refFile = str_replace($this->importConfig->getProofReadDir(), $this->importConfig->getReferenceFilesDir(), $file);
+        $refFile = str_replace($this->importConfig->getReviewDir(), $this->importConfig->getReferenceFilesDir(), $file);
         @mkdir(dirname($refFile), 0777, true);
         //move original file to the reference file folder
         rename($file, $refFile);

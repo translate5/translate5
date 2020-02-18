@@ -72,6 +72,33 @@ class editor_Models_Term_AttributeProposal extends ZfExtended_Models_Entity_Abst
     }
     
     /***
+     * Remove term attribute proposals for given termId. The term attribute proposals from the original
+     * attribute table (attributes with processStatus=unprocessed) will be removed to
+     * 
+     * @param int $termId
+     * @return boolean
+     */
+    public function removeAllTermAttributeProposals(int $termId){
+        //collect the term attribute proposals for the term
+        $s=$this->db->select()
+        ->setIntegrityCheck(false)
+        ->from($this->db,[])
+        ->join('LEK_term_attributes', 'LEK_term_attributes.id = LEK_term_attribute_proposal.attributeId',['LEK_term_attributes.id as id'])
+        ->where('LEK_term_attributes.termId=?',$termId);
+        $rows=$this->db->fetchAll($s)->toArray();
+        $count1=0;
+        if(!empty($rows)){
+            //remove the term attribute proposals from the attribute proposals table
+            $count1=$this->db->delete(['attributeId IN(?)' => $rows]);
+        }
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        //remove the term attribute proposals from the term attribute table
+        $count2=$attribute->db->delete(['termId=?' => $termId,'processStatus=?'=>editor_Models_Term::PROCESS_STATUS_UNPROCESSED]);
+        return $count1 + $count2 > 0;
+    }
+    
+    /***
      * Remove attribute proposal by attributeId and proposal value
      *
      * @param int $attributeId

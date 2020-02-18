@@ -248,7 +248,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
     }
     
     /**
-     * copy the original files from proofRead folder to the referenceFiles folder,
+     * copy the original files from review folder to the referenceFiles folder,
      * keep original file and directory structure
      */
     protected function copyOriginalAsReference() {
@@ -261,10 +261,10 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         
         $realFile = $params['file'];
         $refFolder = $params['importFolder'].'/'.$import->referenceDirectory;
-        $proofReadFolder = $params['importFolder'].'/'.$import->proofReadDirectory;
+        $reviewFolder = $params['importFolder'].'/'.$import->proofReadDirectory;
         
-        //cut off proofread folder from realfile:
-        $relRealFile = str_replace('#'.realpath($proofReadFolder), '', '#'.realpath($realFile));
+        //cut off review folder from realfile:
+        $relRealFile = str_replace('#'.realpath($reviewFolder), '', '#'.realpath($realFile));
         $absRefFile = $refFolder.'/'.$relRealFile;
         $absRefDir = dirname($absRefFile);
         

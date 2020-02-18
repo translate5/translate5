@@ -106,6 +106,10 @@ class editor_Services_OpenTM2_HttpApi {
         //Out: { "ReturnValue":0, "ErrorMsg":"" } 
         
         $data = new stdClass();
+	$tmData = str_replace('xml:lang="mn"','xml:lang="ru"',$tmData);
+        $tmData = str_replace('xml:lang="hi"','xml:lang="ar"',$tmData);
+        $tmData = str_replace('xml:lang="mn-MN"','xml:lang="ru-RU"',$tmData);
+        $tmData = str_replace('xml:lang="hi-IN"','xml:lang="ar"',$tmData);
         $data->tmxData = base64_encode($tmData);
 
         $http = $this->getHttpWithMemory('POST', '/import');
@@ -154,12 +158,24 @@ class editor_Services_OpenTM2_HttpApi {
         if(is_array($mime)) {
             $mime = implode(',', $mime);
         }
+error_log($mime);
         $http = $this->getHttpWithMemory('GET');
         $http->setConfig(['timeout' => 1200]);
         $http->setHeaders('Accept', $mime);
         $response = $this->request($http);
         if($response->getStatus() === 200) {
             $this->result = $response->getBody();
+error_log($this->result);
+	    if($mime == "application/xml"){
+		if($this->languageResource->targetLangRfc5646 == 'mn') $this->result = str_replace('xml:lang="ru"','xml:lang="mn"',$this->result);
+		if($this->languageResource->targetLangRfc5646 == 'mn-MN') $this->result = str_replace('xml:lang="ru"','xml:lang="mn-MN"',$this->result);
+		if($this->languageResource->targetLangRfc5646 == 'hi') $this->result = str_replace('xml:lang="ar"','xml:lang="hi"',$this->result);
+		if($this->languageResource->targetLangRfc5646 == 'hi-IN') $this->result = str_replace('xml:lang="ar"','xml:lang="hi-IN"',$this->result);
+		if($this->languageResource->targetLangRfc5646 == 'mn') $this->result = str_replace('<prop type="tmgr:language">RUSSIAN</prop>','<prop type="tmgr:language">MONGOLIAN</prop>',$this->result);
+		if($this->languageResource->targetLangRfc5646 == 'mn-MN') $this->result = str_replace('<prop type="tmgr:language">RUSSIAN</prop>','<prop type="tmgr:language">MONGOLIAN</prop>',$this->result);
+		if($this->languageResource->targetLangRfc5646 == 'hi') $this->result = str_replace('<prop type="tmgr:language">ARABIC</prop>','<prop type="tmgr:language">HINDI</prop>',$this->result);
+		if($this->languageResource->targetLangRfc5646 == 'hi-IN') $this->result = str_replace('<prop type="tmgr:language">ARABIC</prop>','<prop type="tmgr:language">HINDI</prop>',$this->result);
+	    }
             return true;
         }
         
@@ -193,6 +209,10 @@ class editor_Services_OpenTM2_HttpApi {
      */
     public function lookup(editor_Models_Segment $segment, string $queryString, string $filename) {
         $json = new stdClass();
+	if($this->languageResource->targetLangRfc5646 == 'mn') $this->languageResource->targetLangRfc5646 = 'ru';
+        if($this->languageResource->targetLangRfc5646 == 'mn-MN') $this->languageResource->targetLangRfc5646 = 'ru-RU';
+        if($this->languageResource->targetLangRfc5646 == 'hi') $this->languageResource->targetLangRfc5646 = 'ar';
+        if($this->languageResource->targetLangRfc5646 == 'hi-IN') $this->languageResource->targetLangRfc5646 = 'ar';
         $json->sourceLang = $this->languageResource->sourceLangRfc5646;
         $json->targetLang = $this->languageResource->targetLangRfc5646;
         $json->source = $queryString;
@@ -207,7 +227,12 @@ class editor_Services_OpenTM2_HttpApi {
         
         $http = $this->getHttpWithMemory('POST', 'fuzzysearch');
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
-        return $this->processResponse($this->request($http));
+//ob_start();
+        $response1 =  $this->request($http);
+        $response2 =  $this->processResponse($response1);
+//var_dump($json,$response1,$response2);
+//error_log(ob_get_clean());
+         return $response2;
     }
     
     /**
@@ -268,10 +293,20 @@ class editor_Services_OpenTM2_HttpApi {
         
         $json->sourceLang = $this->languageResource->getSourceLangRfc5646();
         $json->targetLang = $this->languageResource->getTargetLangRfc5646();
+
+	if($json->targetLang == 'mn') $json->targetLang = 'ru';
+        if($json->targetLang == 'mn-MN') $json->targetLang = 'ru-RU';
+        if($json->targetLang == 'hi') $json->targetLang = 'ar';
+        if($json->targetLang == 'hi-IN') $json->targetLang = 'ar';
         
         $http = $this->getHttpWithMemory('POST', 'entry');
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
-        return $this->processResponse($this->request($http));
+
+        $response = $this->processResponse($this->request($http));
+//ob_start();
+//var_dump($json,$response);
+//error_log(ob_get_clean());
+return $response;
     }
 
     /**

@@ -52,5 +52,8 @@ class editor_Models_Validator_TaskUserAssoc extends ZfExtended_Models_Validator_
         $this->addValidator('usedState', 'inArray', array($workflow->getStates()));
         $this->addValidator('usedInternalSessionUniqId', 'stringLength', array('min' => 0, 'max' => 32));
         $this->addValidator('isPmOverride', 'boolean');
+        $this->addValidator('assignmentDate', 'date', array('Y-m-d H:i:s'),true);
+        $this->addValidator('finishedDate', 'date', array('Y-m-d H:i:s'),true);
+        $this->addValidator('deadlineDate', 'date', array('Y-m-d H:i:s'),true);
     }
 }

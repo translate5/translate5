@@ -152,7 +152,7 @@ trait editor_Models_Export_FileParser_MQMTrait {
      * Resolves overlapped image tags to match XML tree model
      *  - record all currently opened tags and delete those close 
      *  - if a closing one occurs for a recorded open one, but others opened afterwards are still open, resolve the situation and insert referencing opening and closing tags
-     *  - if a closing one occurs, that is not openend so far, record it, but do nothing (because this is willently done by the proofreader - he got a notive about the wrong tag-order)
+     *  - if a closing one occurs, that is not openend so far, record it, but do nothing (because this is willently done by the reviewer - he got a notive about the wrong tag-order)
      *  - if a opening one occurs, for a closing one, that had been recorded according the point 3, do nothing for the same reason
      * 
      * @return void

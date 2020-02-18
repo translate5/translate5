@@ -117,5 +117,20 @@ class editor_Models_Export_Excel extends editor_Models_Excel_AbstractExImport {
         // .. then send the excel
         $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->excel->getExcel());
         $writer->save($fileName);
+        
+        // ... and add a note about this export to the DB
+        $this->addTaskExported();
+    }
+    
+    /**
+     * Add an entry in the DB that the task has been exported.
+     */
+    protected function addTaskExported() {
+        $sessionUser = new Zend_Session_Namespace('user');
+        $taskExcelExportEntity = ZfExtended_Factory::get('editor_Models_Task_ExcelExport');
+        /* @var $taskExcelExportEntity editor_Models_Task_ExcelExport */
+        $taskExcelExportEntity->setTaskGuid($this->task->getTaskGuid());
+        $taskExcelExportEntity->setUserGuid($sessionUser->data->userGuid);
+        $taskExcelExportEntity->save();
     }
 }

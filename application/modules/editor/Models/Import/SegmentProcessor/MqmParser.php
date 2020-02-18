@@ -124,7 +124,7 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
             return $data;
         }
         
-        //operating on plain strings, the final ProofRead processor makes finally the md5 hash
+        //operating on plain strings, the final Review processor makes finally the md5 hash
         $data['originalMd5'] = preg_replace('#<mqm:(startIssue|)([^>]+)/>#', '', $seg);
         
         $closeTags = array();
@@ -181,7 +181,7 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         $seg = $data['original'];
 
         $data['original'] = preg_replace('#<mqm:(startIssue|endIssue)([^>]+)/>#', '', $seg);
-        //operating on plain strings, the final ProofRead processor makes finally the md5 hash
+        //operating on plain strings, the final Review processor makes finally the md5 hash
         $data['originalMd5'] = $data['original'];
 
         return $data;

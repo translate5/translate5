@@ -56,7 +56,7 @@
         echo '<div id="instantTranslateButtonContainer"></div>';
     }
 ?>
-    <div id="logoutContainer"><a id="logout" href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus">Logout</a></div>
+    <div id="logoutContainer"><a id="logout" href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus"><?php echo $translate->_('Abmelden'); ?></a></div>
 </div>
 <?php 
 if(isset($this->error)){
@@ -253,11 +253,12 @@ $( function() {
             $(this).addClass("ui-state-active");
         });
     $('#logout').on("click",function(){
+    	var loginUrl=Editor.data.loginUrl || Editor.data.apps.loginUrl;
         //check if it is used from iframe
         if(window.parent!=undefined){
-            window.parent.location = Editor.data.loginUrl;
+            window.parent.location =loginUrl;
         }else{
-        	window.parent.location = Editor.data.loginUrl;
+        	window.location =loginUrl;
         }
     });
     $('#language').selectmenu({
@@ -333,6 +334,7 @@ $( function() {
 } );
 
 </script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/ErrorHandler.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/ComponentEditor.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Attribute.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/TermEntry.js"></script>

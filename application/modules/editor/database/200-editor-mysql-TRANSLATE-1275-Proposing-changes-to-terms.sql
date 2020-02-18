@@ -47,14 +47,41 @@ ADD CONSTRAINT FOREIGN KEY (`termEntryId`) REFERENCES `LEK_term_entry` (`id`) ON
 INSERT INTO `LEK_term_attributes` (`id`, `oldId`, `labelId`, `collectionId`, `termId`, `termEntryId`, `parentId`,  `internalCount`, `language`, `name`, `attrType`, `attrDataType`, `attrTarget`, `attrId`, `attrLang`, `value`, `created`, `updated`)
 SELECT null as `id`, `id` as `oldId`, `labelId`, `collectionId`, null as `termId`, `termEntryId`, `parentId`,  `internalCount`, `language`, `name`, `attrType`, `attrDataType`, `attrTarget`, `attrId`, `attrLang`, `value`, `created`, `updated` FROM `LEK_term_entry_attributes`;
 
+
 -- update the parentId values of the copied term entry attributes to the new ids of the entries
-UPDATE `LEK_term_attributes` attr_target, `LEK_term_attributes` attr_source
+-- doing that with a copied table improves the performance in comparsion with the below out commented UPDATE a lot. 
+-- the seperated statements were running in a few minutes, where the below UPDATED was not finished after hours.
+CREATE TABLE `LEK_term_attributes_oldid` (
+    `id` int(11) DEFAULT NULL,
+    `oldId` int(11) DEFAULT NULL,
+    KEY (`id`),
+    KEY (`oldId`)
+) ENGINE=InnoDB;
+
+INSERT INTO `LEK_term_attributes_oldid` (`id`, `oldId`)
+SELECT `id`, `oldId`
+FROM `LEK_term_attributes`
+WHERE `termId` IS NULL;
+
+
+UPDATE `LEK_term_attributes` attr_target, `LEK_term_attributes_oldid` attr_source
 SET attr_target.`parentId` = attr_source.`id`
 WHERE 
   NOT attr_target.`parentId` IS NULL 
   AND attr_target.`parentId` = attr_source.`oldId`
-  AND attr_target.`termId` IS NULL 
-  AND attr_source.`termId` IS NULL;
+  AND attr_target.`termId` IS NULL;
+  
+DROP TABLE `LEK_term_attributes_oldid`;
+
+-- 
+-- the following update does the same as the above UPDATE using two tables, but is very, very, very slow.
+-- UPDATE `LEK_term_attributes` attr_target, `LEK_term_attributes` attr_source
+-- SET attr_target.`parentId` = attr_source.`id`
+-- WHERE 
+--  NOT attr_target.`parentId` IS NULL 
+--  AND attr_target.`parentId` = attr_source.`oldId`
+--  AND attr_target.`termId` IS NULL 
+--  AND attr_source.`termId` IS NULL;
 
 -- remove helper field
 ALTER TABLE `LEK_term_attributes`

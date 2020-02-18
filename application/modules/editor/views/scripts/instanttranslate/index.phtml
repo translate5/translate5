@@ -121,7 +121,7 @@
     $languageSelector[]='</form>';
     echo implode(' ', $languageSelector);
 ?>
-    <div id="logoutContainer"><a id="logout" href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus">Logout</a></div>
+    <div id="logoutContainer"><a id="logout" href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus"><?php echo $translate->_('Abmelden'); ?></a></div>
     
 </div>
 
@@ -138,8 +138,9 @@
                         $sourceLangSelected = $this->sourceSearchLanguagePreselectionLocale;
                     }
                     $optionValues=[];
+                    $sourceLangSelected=strtolower($sourceLangSelected);
                     foreach ($allSourceLanguageLocales as $sourceLangLocale) {
-                        $selected = ($sourceLangSelected != false && $sourceLangSelected == $sourceLangLocale) ? ' selected="selected"' : '';
+                        $selected = ($sourceLangSelected != false && $sourceLangSelected == strtolower($sourceLangLocale)) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
                     }
                     echo implode(' ', $optionValues);
@@ -170,8 +171,9 @@
                         $targetLangSelected = $this->targetSearchLanguagePreselectionLocale;
                     }
                     $optionValues=[];
+                    $targetLangSelected=strtolower($targetLangSelected);
                     foreach ($allTargetLanguageLocales as $targetLangLocale) {
-                        $selected = ($targetLangSelected != false && $targetLangSelected == $targetLangLocale) ? ' selected="selected"' : '';
+                        $selected = ($targetLangSelected != false && $targetLangSelected == strtolower($targetLangLocale)) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
                     }
                     echo implode(' ', $optionValues);
@@ -203,11 +205,12 @@ $( function() {
             $(this).addClass("ui-state-active");
         });
     $('#logout').on("click",function(){
+    	var loginUrl=Editor.data.loginUrl || Editor.data.apps.loginUrl;
     	//check if it is used from iframe
         if(window.parent!=undefined){
-            window.parent.location = Editor.data.loginUrl;
+            window.parent.location =loginUrl;
         }else{
-        	window.parent.location = Editor.data.loginUrl;
+        	window.location =loginUrl;
         }
     });
     $('#locale').selectmenu({
@@ -282,6 +285,7 @@ $( function() {
 } );
 </script>
 
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/ErrorHandler.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js"></script>
 
 <script type="text/javascript">

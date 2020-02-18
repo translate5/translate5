@@ -163,7 +163,10 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
       try {
           $this->meta->loadByCommentId($this->getId());
       } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-          $this->meta->init(array('commentId' => $this->getId()));
+          $this->meta->init([
+              'taskGuid' => $this->getTaskGuid(), 
+              'commentId' => $this->getId(),
+          ]);
       }
       return $this->meta;
   }
