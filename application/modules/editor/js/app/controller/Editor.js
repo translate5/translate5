@@ -507,7 +507,7 @@ Ext.define('Editor.controller.Editor', {
                         editor.insertAtCursor(data);
                         me.handleAfterContentChange();
                     } else {
-                        // Segment A must not copy internal tags into Segment B
+                        // only Segment B may copy internal tags into Segment B
                         if (segmentId !== me.copiedSelectionWithTagHandling.selSegmentId) {
                             data = me.copiedSelectionWithTagHandling.selDataText;
                         } else {
@@ -527,7 +527,11 @@ Ext.define('Editor.controller.Editor', {
                 };
             if (me.copiedSelectionWithTagHandling !== null && me.copiedSelectionWithTagHandling.copiedFrom) {
                 copiedFrom = me.copiedSelectionWithTagHandling.copiedFrom;
+                console.log('copiedFrom = me.copiedSelectionWithTagHandling.copiedFrom');
             }
+            console.log('copiedFrom: ' + copiedFrom);
+            console.log('me.copiedSelectionWithTagHandling.selDataText: ' + me.copiedSelectionWithTagHandling.selDataText);
+            console.log('me.copiedSelectionWithTagHandling.selDataHtml: ' + me.copiedSelectionWithTagHandling.selDataHtml);
             // We must handle data from CTRL+C that can come from two scenarios:
             // - from within the t5-Tab (= in copiedSelectionWithTagHandling and in clipboard) 
             // - from outside of the document (= in clipboard).
