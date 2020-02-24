@@ -340,8 +340,8 @@ class Task extends Channel {
                 }
             }
         }
-        
-        //remove orphaned open segments
+
+        //remove orphaned open segments (on closing task something similar is done too)
         foreach($this->editedSegments as $segId => $conn) {
             /* @var $conn \Ratchet\WebSocket\WsConnection */
             if($conn->WebSocket->closing) {
@@ -551,6 +551,13 @@ class Task extends Channel {
             'trackingId' => 0,
             'connectionId' => $connectionId,
         ]));
+        
+        //release all remaining edited segments on task leave for that task
+        foreach($this->editedSegments as $segmentId => $conn) {
+            if($conn->connectionId === $connectionId) {
+                $this->releaseLocalSegment($segmentId);
+            }
+        }
         
         $idx = array_search($sessionId, $this->taskToSessionMap[$task['taskGuid']] ?? []);
         if($idx !== false) {
