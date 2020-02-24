@@ -484,11 +484,17 @@ class Task extends Channel {
         $trackingId = $this->getUserTrackingId($currentConnection->openedTask, $userGuid);
         
         //try to lock all $alikes for this connection
+        $locked = [];
         foreach($alikes as &$alikeId) {
             $alikeId = (int) $alikeId;
             if(empty($this->editedSegments[$alikeId])) {
+                $locked[] = $alikeId;
                 $this->editedSegments[$alikeId] = $currentConnection;
                 continue;
+            }
+            //unlock the previously locked segments
+            foreach($locked as $unlockId) {
+                unset($this->editedSegments[$unlockId]);
             }
             //the segment with the ID in alikeId is already in use, so NAK that request:
             $this->releaseLocalSegment($masterSegment['id']);
