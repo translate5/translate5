@@ -3,6 +3,56 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.3.3] - 2020-02-17
+###Added
+TRANSLATE-1960: Define if source or target is connected with visualReview on import
+  The user can choose now if the uploaded PDF corresponds to the source or target content.
+TRANSLATE-1831: Integrate DeepL in translate5 (Only for users with support- and development)
+  The DeepL Integration is only available for users with a support- and development contract. The Plug-In must be activated and the DeepL key configured in the config for usage. See https://confluence.translate5.net/display/TPLO/DeepL
+TRANSLATE-1455: Deadlines and assignment dates for every role of a task
+  This was only possible for the whole task, now per each associated user a dedicated deadline can be defined.
+
+###Changed
+TRANSLATE-1959: InstantTranslate: handle tags in the source as part of the source-text
+  InstantTranslate is now supposed to handle tags in the source as part of the source-text.
+TRANSLATE-1918: VisualReview: log segmentation results
+  The results of the segmentation is logged into the task log and is sent via email.
+TRANSLATE-1916: Change supported browser message
+  The message about the supported browsers was changed, also IE11 is no not supported anymore.
+TRANSLATE-905: Improve maintenance mode
+  The maintenance mode has now a free-text field to display data to the users, also the maintenance can be announced to all admin users. See https://confluence.translate5.net/display/TIU/install-and-update.sh+functionality
+
+###Bugfixes
+TRANSLATE-1981: Sorting the bookmark column produces errors
+  Sorting the by default hidden bookmark column in the segment table produced an error.
+TRANSLATE-1975: Reenable Copy & Paste from term window
+  Copy and paste was not working any more for the terms listed in the segment meta panel on the right.
+TRANSLATE-1973: TrackChanges should not added by default on translation tasks without a workflow with CTRL+INS
+  When using CTRL+INS to copy the source to the target content, TrackChanges should be only added for review tasks in any case.
+TRANSLATE-1972: Default role in translation tasks should be translator not reviewer
+  This affects the front-end default role in the task user association window.
+TRANSLATE-1971: segments excluded with excluded framing ept and bpt tags could not be exported
+  Very seldom error in combination with segments containing ept and bpt tags.
+TRANSLATE-1970: Unable to open Instant-translate/Term-portal from translate5 buttons
+  This bug was applicable only if the config runtimeOptions.logoutOnWindowClose is enabled.
+TRANSLATE-1968: Correct spelling mistake
+  Fixed a german typo in the user notification on association pop-up.
+TRANSLATE-1969: Adding hunspell directories for spell checking does not work for majority of languages
+  Using external hunspell directories via LanguageTool is working now. Usage is described in https://confluence.translate5.net/display/TIU/Activate+additional+languages+for+spell+checking
+TRANSLATE-1966: File-system TBX import error on term-collection create
+  The file-system based TBX import is now working again.
+TRANSLATE-1964: OpenID: Check for provider roles before the default roles check
+  OpenID was throwing an exception if the default roles are not set for the client domain even if the openid provider provide the roles in the claims response.
+TRANSLATE-1963: Tbx import fails when importing a file
+  On TBX import the TBX parser throws an exception and the import process is stopped only when the file is uploaded from the users itself.
+TRANSLATE-1962: SDLLanguageCloud: status always returns unavailable
+  Checking the status was always returning unavailable, although the LanguageResource is available and working.
+TRANSLATE-1919: taskGuid column is missing in LEK_comment_meta
+  A database column was missing.
+TRANSLATE-1913: Missing translation if no language resource is available for the language combination
+  Just added the missing English translation.
+
+
 ## [3.3.2] - 2019-12-18
 ###Added
 TRANSLATE-1531: Provide progress data about a task
