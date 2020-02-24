@@ -191,7 +191,8 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
      * @param array $segmentsOfFile
      */
     protected function processAllSegments($filename, Traversable $segmentsOfFile) {
-        $first = $this->unifySegmentData(reset($segmentsOfFile));
+        $segmentsOfFile->rewind();
+        $first = $this->unifySegmentData($segmentsOfFile->current());
         if(empty($first)) {
             return;
         }
