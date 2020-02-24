@@ -288,7 +288,11 @@ class editor_TaskController extends ZfExtended_RestController {
      * This is used for the user workflow filter in the advance filter store
      */
     public function userlistAction(){
-        $this->view->rows=$this->entity->loadUserList();
+        // here no check for pmGuid, since this is done in task::loadListByUserAssoc
+        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
+        //set the default table to lek_task
+        $this->entity->getFilter()->setDefaultTable('LEK_task');
+        $this->view->rows=$this->entity->loadUserList($isAllowedToLoadAll,$this->user->data->userGuid);
     }
     
     /**

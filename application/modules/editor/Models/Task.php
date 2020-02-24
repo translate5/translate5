@@ -284,9 +284,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Load all task assoc users for non anonymized tasks.
      * This is used for the user workflow filter in the advance filter store.
      * INFO:Associated users for the anonimized tasks will not be loaded
+     *
+     * @param bool $loadAll
+     * @param string $userGuid
      * @return array
      */
-    public function loadUserList() {
+    public function loadUserList(bool $loadAll=false,string $userGuid) {
         $this->getFilter()->setDefaultTable('LEK_task');
         $s=$this->db->select()
         ->setIntegrityCheck(false)
@@ -295,6 +298,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         ->join('LEK_taskUserAssoc','LEK_taskUserAssoc.taskGuid= LEK_task.taskGuid',[])
         ->join('Zf_users','Zf_users.userGuid=LEK_taskUserAssoc.userGuid',['Zf_users.*'])
         ->where('LEK_customer.anonymizeUsers=0');
+        //if the user is not allow to see all other users, load only where current user is pm or is assoc
+        if(!$loadAll){
+            $s->where('LEK_taskUserAssoc.userGuid = ? OR LEK_task.pmGuid = ?',$userGuid);
+        }
+        $s->group('Zf_users.id');
         return $this->loadFilterdCustom($s);
     }
     
