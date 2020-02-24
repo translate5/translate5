@@ -32,10 +32,12 @@ Ext.define('Editor.view.admin.task.KpiWindow', {
     itemId: 'kpiWindow',
     cls: 'kpiWindow',
     minHeight : 200,
-    width : 350,
+    width : 450,
+    height:300,
     autoHeight: true,
     autoScroll: true,
     modal : true,
+    bodyPadding:10,
     layout:'fit',
     strings: {
         closeBtn: '#UT#Fenster schließen',
@@ -49,8 +51,10 @@ Ext.define('Editor.view.admin.task.KpiWindow', {
             config;
         config = {
             items: [{
+            	
                 xtype: 'panel',
                 dock: 'top',
+                border:false,
                 items: [{
                     xtype: 'displayfield',
                     value:me.strings.filterInfoLabel

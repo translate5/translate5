@@ -64,7 +64,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       taskassocs: '#UT#Anzahl zugewiesene Sprachresourcen',
       pmName: '#UT#Projektmanager',
       pmGuid: '#UT#Projektmanager',
-      targetDeliveryDate: '#UT#Lieferdatum (soll)',
+      orderdate: '#UT#Bestelldatum',
       edit100PercentMatch: '#UT#100%-Treffer editierbar',
       fullMatchEdit: '#UT#100% Matches sind editierbar',
       emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
@@ -117,6 +117,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       finished: '#UT#abgeschlossen',
       end: '#UT#beendet',
       unconfirmed: '#UT#nicht bestätigt',
+      error:'#UT#error',
       import: '#UT#import',
       locked: '#UT#in Arbeit',
       forMe: '#UT#für mich '
@@ -301,7 +302,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           config,
           //we must have here an own ordered list of states to be filtered 
           userStates=['open','waiting','finished','unconfirmed'],//TODO get me from backend
-          stateFilterOrder = ['open','locked','end','unconfirmed','import'],
+          stateFilterOrder = ['open','locked','end','unconfirmed','import','error'],
           relaisLanguages = Ext.Array.clone(Editor.data.languages),
           addQtip = function(meta, text) {
               meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text)+'"';
@@ -623,14 +624,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
               text: me.text_cols.pmGuid
           },{
               xtype: 'datecolumn',
-              width: 120,
-              dataIndex: 'targetDeliveryDate',
-              stateId: 'targetDeliveryDate',
+              width: 100,
+              dataIndex: 'orderdate',
+              stateId: 'orderdate',
               filter: {
                   type: 'date',
                   dateFormat: Editor.DATE_ISO_FORMAT
               },
-              text: me.text_cols.targetDeliveryDate
+              text: me.text_cols.orderdate
           },{
               xtype: 'owncheckcolumn',
               width: 45,

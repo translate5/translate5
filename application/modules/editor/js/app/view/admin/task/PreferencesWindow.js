@@ -79,7 +79,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         }
 
         if(auth.isAllowed('editorEditTaskPm') || 
-            auth.isAllowed('editorEditTaskDeliveryDate') ||
+            auth.isAllowed('editorEditTaskOrderDate') ||
             auth.isAllowed('editorEditTaskTaskName')||
             auth.isAllowed('editorEditTaskEdit100PercentMatch')){
             tabs.push({

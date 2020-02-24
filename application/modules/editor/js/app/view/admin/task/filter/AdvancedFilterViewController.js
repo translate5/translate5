@@ -45,6 +45,8 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
     	}
     	//the filter is one of the advanced filters
 		me.removeAdvancedFilters(record.get('property'));
+		//reset the value also in the filter window
+		me.resetAdvancedFilterFieldValue(record);
     },
     
     /***
@@ -123,6 +125,25 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilterViewController', {
     			taskStore.removeFilter(f);
             });
     	});
-    	
+    },
+    
+    /***
+     * Reset the advanced filter field value for given record.
+     */
+    resetAdvancedFilterFieldValue:function(record){
+    	var me=this,
+    		filterGroup=record.get('filtergroup') ? record.get('filtergroup') : [],
+			win=Ext.ComponentQuery.query('#editorAdminTaskFilterFilterWindow')[0];
+		
+		if(!win){
+			return;
+		}
+
+		//set values to null and update the window
+		for(var i=0;i<filterGroup.length;i++){
+			filterGroup[i].value=null;
+		}
+		record.set('value',null);
+		win.loadRecord([record]);
     }
 });

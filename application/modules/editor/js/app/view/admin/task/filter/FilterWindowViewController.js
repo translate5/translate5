@@ -30,11 +30,23 @@ Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.editorAdminTaskFilterFilterWindow',
     
+    onFilterWindowRender:function(component){
+    	var me=this,
+    		fields=me.getView().query('[filter]');
+    	
+    	//create a simple filter array object from the fields
+    	Ext.Array.each(fields, function(field) {
+    		field.on({
+    			change:'applyFilters'
+    		})
+    	});
+    },
     
-    onApplyBtnClick:function(){
+    applyFilters:function(){
     	var me=this,
     		fields=me.getView().query('[filter]'),
     		filter=[];
+    	
     	//create a simple filter array object from the fields
     	Ext.Array.each(fields, function(field) {
 			filter.push(Ext.Object.merge(field.filter,{
@@ -44,9 +56,5 @@ Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
     	});
     	
     	me.getView().fireEvent('advancedFilterChange',filter)
-    },
-    
-    onCancelBtnClick:function(){
-    	this.getView().destroy();
     }
 });

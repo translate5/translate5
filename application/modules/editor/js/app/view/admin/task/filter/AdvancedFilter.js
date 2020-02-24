@@ -232,7 +232,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     		  return findValues('admin.WorkflowState','id','label');
     	  case 'workflowUserRole':
     		  //it is WorkflowUserRoles filter
-    		  return findValues('admin.WorkflowState','id','label');
+    		  return findValues('admin.WorkflowUserRoles','id','label');
     	  case 'workflowStepName':
     		  //it is WorkflowUserRoles filter
     		  return findValues('admin.WorkflowSteps','id','text');

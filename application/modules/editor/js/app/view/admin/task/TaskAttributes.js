@@ -36,7 +36,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
     strings: {
         taskName:'#UT#Aufgabenname',
         customerName:'#UT#Kunde',
-        deliveryDate:'#UT#Lieferdatum (soll)',
+        orderDate:'#UT#Bestelldatum',
         pmGuid:'#UT#Projektmanager',
         btnSave: '#UT#Speichern',
         successUpdate:'#UT#Die Aufgabe wurde erfolgreich aktualisiert',
@@ -49,7 +49,6 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         usageModeTitle: "#UT#Mehrere Benutzer",
         usageModeInfo: "#UT#Bei Zuweisung mehrerer Benutzer zum selben Workflowschritt",
         usageModeDisabled: "#UT#Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.",
-        
         usageModeCoop: "#UT#Sequentielles Arbeiten",
         usageModeCompetitive: "#UT#Konkurrierende Zuweisung",
         usageModeSimultaneous: "#UT#Gleichzeitiges Arbeiten",
@@ -157,10 +156,10 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
 
         items.push(me.applyIfNotAllowed({
             xtype: 'datefield',
-            fieldLabel: me.strings.deliveryDate,
-            name:'targetDeliveryDate',
-            itemId:'targetDeliveryDate'
-        },'editorEditTaskDeliveryDate',{
+            fieldLabel: me.strings.orderDate,
+            name:'orderdate',
+            itemId:'orderdate'
+        },'editorEditTaskOrderDate',{
             xtype: 'displayfield',
             renderer: dateRenderer
         }));

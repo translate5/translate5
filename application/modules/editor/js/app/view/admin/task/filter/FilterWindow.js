@@ -48,143 +48,132 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
         finishedDateText:'#UT#Benutzer-Abschlussdatum',
         deadlineDateText:'#UT#Benutzer-Deadline/s'
     },
-    autoScroll: true,
-    height: 500,
-    width: 500,
-    layout: {
-        type: 'table',
-        align: 'center',
-        columns: 3,
+    listeners:{
+    	render:'onFilterWindowRender'
     },
+    bodyPadding: 20,
+    layout: 'hbox',
+    border:false,
+    width:800,
+    height:400,
+    bodyStyle: {
+    	borderWidth:0,
+    },
+    
     initConfig: function(instanceConfig) {
-        var me = this,
-        	config;
-        config = {
-    		title:me.strings.title,
-    		defaults: {
-    			margin:10,
-    			labelAlign:'left',
-        		labelWidth:'100%'
-			},
-    		items: [{
-    					colspan: 3,
-    					margin:10,
-	                	xtype:'displayfield',
-	                	value:me.strings.gridFiltersInfo
-                	},{
-                		
-	    	            xtype: 'tagfield',
-	    	            name:'userName',
-	    	            itemId:'userName',
-	    	            typeAhead: true,
-	    	            queryMode: 'local',
-	    	            displayField: 'longUserName',
-	                    valueField: 'userGuid',
-	                    store:'admin.UsersList',
-	    	            fieldLabel:me.strings.userNameLabel+'¹',
-	    	            filter:{
-	    	            	operator: 'in',
-	                		property:'userName',
-	        		        type:'list',
-	        		        textLabel:me.strings.userNameLabel
-	    	            }
-	                },{
-	                    xtype: 'tagfield',
-	                    name:'workflowState',
-	                    itemId:'workflowState',
-	                    typeAhead: true,
-	                    queryMode: 'local',
-	                    valueField: 'id',
-	                    displayField: 'label',
-	                    store:'admin.WorkflowState',
-	                    fieldLabel: me.strings.workflowStateFilterLabel,
-	                    filter:{
-	                    	operator: 'in',
-	                    	property:'workflowState',
-	                    	type:'list',
-	                    	textLabel:me.strings.workflowStateFilterLabel
-	                    }
-	                },{
-	                    xtype: 'tagfield',
-	                    name:'workflowUserRole',
-	                    itemId:'workflowUserRole',
-	                    typeAhead: true,
-	                    queryMode: 'local',
-	                    valueField: 'id',
-	                    displayField: 'label',
-	                    store:'admin.WorkflowUserRoles',
-	                    fieldLabel: me.strings.workflowUserRoleLabel,
-	                    filter:{
-	                    	operator: 'in',
-	                    	property:'workflowUserRole',
-	                    	type:'list',
-	                    	textLabel:me.strings.workflowUserRoleLabel
-	                    }
-    	        },{
-                    xtype:'editorAdminTaskFilterDateFilter',
-                    filterLabel:me.strings.assignmentDateText,
-                    filterProperty:'assignmentDate',
-                    itemId:'assignmentDate',
-                    title:me.strings.assignmentDateText
-    	        },{
-    	        	 xtype:'editorAdminTaskFilterDateFilter',
-	                filterLabel:me.strings.finishedDateText,
-	                filterProperty:'finishedDate',
-	                itemId:'finishedDate',
-	                title:me.strings.finishedDateText
-    	        },{
-                    xtype:'editorAdminTaskFilterDateFilter',
-                    filterLabel:me.strings.deadlineDateText,
-                    filterProperty:'deadlineDate',
-                    itemId:'deadlineDate',
-                    title:me.strings.deadlineDateText
-    	        }],
-            dockedItems: [{
-                xtype: 'toolbar',
-                dock: 'bottom',
-                ui: 'footer',
-                items: [{
-                	xtype: 'tbfill'
-        		},{
-                    xtype: 'button',
-                    itemId: 'applyBtn',
-                    iconCls : 'ico-save',
-                    text: me.strings.applyBtn,
-                    listeners:{
-                    	click:'onApplyBtnClick'
-                    }
-                },{
-                    xtype: 'button',
-                    itemId: 'cancelBtn',
-                    iconCls : 'ico-cancel',
-                    text: me.strings.cancelBtn,
-                    listeners:{
-                    	click:'onCancelBtnClick'
-                    }
-                }]
-            },{
-                xtype: 'toolbar',
-                dock: 'bottom',
-                ui: 'footer',
-                align:'left',
-                layout: {
-                    type: 'vbox',
-                    align: 'left'
-                },
-                items: [{
-                	xtype: 'tbfill'
-        		},{
-        			xtype: 'container',
-                    padding: '10',
-                    html:"¹ "+me.strings.anonymizedUsersInfo
-        		}]
-            }],
-        
-        };
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
-        }
-        return me.callParent([config]);
+    	var me = this,
+    		config = {
+    			title:me.strings.title,
+    			scrollable: true,
+    			defaults:{
+    				xtype: 'container',
+			        flex: 1,
+			        margin: '0 5 0 0',
+			        autoSize: true
+    			},
+				items: [{
+			        
+			        items: [{
+			            xtype: 'tagfield',
+				        name:'userName',
+				        itemId:'userName',
+				        typeAhead: true,
+				        queryMode: 'local',
+				        displayField: 'longUserName',
+				        valueField: 'userGuid',
+				        store:'admin.UsersList',
+				        fieldLabel:me.strings.userNameLabel+'¹',
+				        labelWidth:'100%',
+				        filter:{
+				        	operator: 'in',
+				    		property:'userName',
+					        type:'list',
+					        textLabel:me.strings.userNameLabel
+				        }
+				    },{
+						xtype:'editorAdminTaskFilterDateFilter',
+						filterLabel:me.strings.assignmentDateText,
+						filterProperty:'assignmentDate',
+						itemId:'assignmentDate',
+						title:me.strings.assignmentDateText
+				    }]
+			    }, {
+			        items: [{
+				        xtype: 'tagfield',
+				        name:'workflowState',
+				        itemId:'workflowState',
+				        typeAhead: true,
+				        queryMode: 'local',
+				        valueField: 'id',
+				        displayField: 'label',
+				        store:'admin.WorkflowState',
+				        fieldLabel: me.strings.workflowStateFilterLabel,
+				        labelWidth:'100%',
+				        filter:{
+				        	operator: 'in',
+				        	property:'workflowState',
+				        	type:'list',
+				        	textLabel:me.strings.workflowStateFilterLabel
+				        }
+			        }, {
+	    	        	xtype:'editorAdminTaskFilterDateFilter',
+	    	        	filterLabel:me.strings.finishedDateText,
+	    	        	filterProperty:'finishedDate',
+	    	        	itemId:'finishedDate',
+	    	        	title:me.strings.finishedDateText
+			        }]
+			    },{
+			        items: [{
+				        xtype: 'tagfield',
+				        name:'workflowUserRole',
+				        itemId:'workflowUserRole',
+				        typeAhead: true,
+				        queryMode: 'local',
+				        valueField: 'id',
+				        displayField: 'label',
+				        store:'admin.WorkflowUserRoles',
+				        fieldLabel: me.strings.workflowUserRoleLabel,
+				        labelWidth:'100%',
+				        filter:{
+				        	operator: 'in',
+				        	property:'workflowUserRole',
+				        	type:'list',
+				        	textLabel:me.strings.workflowUserRoleLabel
+				        }
+			        }, {
+	    	        	xtype:'editorAdminTaskFilterDateFilter',
+	    	        	filterLabel:me.strings.deadlineDateText,
+	    	        	filterProperty:'deadlineDate',
+	    	        	itemId:'deadlineDate',
+	    	        	title:me.strings.deadlineDateText
+			        }]
+			    }],
+			    dockedItems: [{
+					xtype: 'toolbar',
+					dock: 'bottom',
+					ui: 'footer',
+					align:'left',
+					layout: {
+						type: 'vbox',
+						align: 'left'
+					},
+					items: [{
+						xtype: 'tbfill'
+					},{
+						xtype: 'container',
+						padding: '10',
+						html:me.strings.gridFiltersInfo
+					},{
+						xtype: 'container',
+						padding: '10',
+						html:"¹ "+me.strings.anonymizedUsersInfo
+					}]
+				}]
+	      };
+	  if (instanceConfig) {
+	      me.self.getConfigurator().merge(me, config, instanceConfig);
+	  }
+	  return me.callParent([config]);
     },
     
     /***
@@ -193,12 +182,9 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     loadRecord:function(record){
     	var me=this,
     		field=null;
-    	
     	Ext.each(record, function(rec) {
     		field=me.down('#'+rec.get('property'));
-    		if(field){
-    			field.setValue(rec.get('value'),rec);
-    		}
+			field && field.setValue(rec.get('value'),rec);
         });
     }
 });
