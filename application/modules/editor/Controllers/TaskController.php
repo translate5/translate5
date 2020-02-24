@@ -235,6 +235,14 @@ class editor_TaskController extends ZfExtended_RestController {
         $f = $this->entity->getFilter();
         $f->hasSort() || $f->addSort('orderdate', true);
         
+        // load only 'visible' tasks (further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
+        $f->addFilter((object)[
+            'field' => 'taskType',
+            'value' => $this->entity->getDefaultTasktype(),
+            'type' => 'string',
+            'comparison' => 'eq'
+        ]);
+        
         $rows = $this->loadAllWithUserData();
         $this->view->rows = $rows;
         $this->view->total = $this->totalCount;
@@ -456,6 +464,11 @@ class editor_TaskController extends ZfExtended_RestController {
             //TODO test what happens with new error logging if PM does not exist? 
             $pm->loadByGuid($this->data['pmGuid']);
         }
+        
+        if (empty($this->data['taskType'])) {
+            $this->data['taskType'] = $this->entity->getDefaultTasktype();
+        }
+        
         $this->data['pmName'] = $pm->getUsernameLong();
         $this->processClientReferenceVersion();
         $this->_helper->Api->convertLanguageParameters($this->data['sourceLang']);
@@ -822,6 +835,9 @@ class editor_TaskController extends ZfExtended_RestController {
         if(isset($this->data->enableSourceEditing)){
             $this->data->enableSourceEditing = (boolean)$this->data->enableSourceEditing;
         }
+        if (isset($this->data->initial_tasktype)) {
+            unset($this->data->initial_tasktype);
+        }
         $this->processClientReferenceVersion();
         $this->setDataInEntity();
         $this->validateUsageMode();
@@ -1186,10 +1202,30 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * gets and validates the uploaded zip file
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::additionalValidations()
      */
     protected function additionalValidations() {
+        //gets and validates the uploaded zip file
         $this->upload->initAndValidate();
+        // validate the taskType
+        $this->validateTaskType();
+    }
+    
+    /**
+     * Validate the taskType: check if given tasktype is allowed according to role
+     * @throws ZfExtended_UnprocessableEntity
+     */
+    protected function validateTaskType() {
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        $isTaskTypeAllowed = $acl->isInAllowedRoles($this->user->data->roles, 'initial_tasktype', $this->entity->getTaskType());
+        if (!$isTaskTypeAllowed) {
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1217' => 'TaskType not valid.'
+            ], 'editor.task');
+            throw new ZfExtended_UnprocessableEntity('E1217');
+        }
     }
 
     /**

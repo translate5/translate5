@@ -98,6 +98,8 @@ END LICENSE AND COPYRIGHT
  * @method void setSegmentCount() setSegmentCount(int $segmentCount)
  * @method integer getSegmentFinishCount() getSegmentFinishCount()
  * @method void setSegmentFinishCount() setSegmentFinishCount(int $segmentFinishCount)
+ * @method string getTaskType() getTaskType()
+ * @method void setTaskType() setTaskType(string $taskType)
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
@@ -114,6 +116,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const TABLE_ALIAS = 'LEK_task';
     
     const INTERNAL_LOCK = '*translate5InternalLock*';
+    
+    const INITIAL_TASKTYPE_DEFAULT = 'default';
+    
+    /**
+     * All tasktypes that editor_Models_Validator_Task will consider.
+     * @var array
+     */
+    public static $validTaskTypes = [self::INITIAL_TASKTYPE_DEFAULT];
 
     /**
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
@@ -159,6 +169,22 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         
         $config->setReadOnly();
         return $config;
+    }
+    
+    /**
+     * Add a tasktype for the validation.
+     * @param string $taskType
+     */
+    public static function addValidTaskType($taskType) {
+        self::$validTaskTypes[] = $taskType;
+    }
+    
+    /**
+     * Return tasktypes for the validation.
+     * @return array 
+     */
+    public static function getValidTaskTypes() {
+        return self::$validTaskTypes;
     }
     
     /**
@@ -223,6 +249,34 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function loadListByPmGuid(string $pmGuid) {
         $s = $this->db->select();
         $s->where('pmGuid = ?', $pmGuid);
+        return parent::loadFilterdCustom($s);
+    }
+    
+    /**
+     * loads all tasks of the given tasktype that are associated to a specific user as PM
+     * @param string $pmGuid
+     * @param string $tasktype
+     * @return array
+     */
+    public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype) {
+        $s = $this->db->select();
+        $s->where('pmGuid = ?', $pmGuid);
+        $s->where('tasktype = ?', $tasktype);
+        $s->order('orderdate ASC');
+        return parent::loadFilterdCustom($s);
+    }
+    
+    /**
+     * loads all tasks of the given tasktype that shall be removed (because
+     * their lifetime is over).
+     * @param string $tasktype
+     * @param int $orderDaysOffset
+     * @return array
+     */
+    public function loadListForCleanupByTasktype(string $tasktype, int $orderDaysOffset) {
+        $s = $this->db->select();
+        $s->where('tasktype = ?', $tasktype);
+        $s->where('`orderDate` < (CURRENT_DATE - INTERVAL ? DAY)', $orderDaysOffset);
         return parent::loadFilterdCustom($s);
     }
     
@@ -760,6 +814,22 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * Returns the default initial tasktype.
+     * @return string
+     */
+    public function getDefaultTasktype () {
+        return self::INITIAL_TASKTYPE_DEFAULT;
+    }
+    
+    /**
+     * Is the task to be hidden due to its taskType?
+     * (Further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
+     */
+    public function isHiddenTask() {
+        return $this->getTaskType() != $this->getDefaultTasktype();
+    }
+    
+    /**
      * generates a statistics summary to the given task
      * @return stdClass
      */
@@ -907,6 +977,30 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $this->loadByTaskGuid($taskGuid);
         $this->setTerminologie(!empty($result));
         $this->save();
+    }
+    
+    /**
+     * Overwrite getTerminologie: Return the DB value or false depending on the taskType.
+     * @return boolean
+     */
+    public function getTerminologie() {
+        if ($this->isHiddenTask()) {
+            // For hidden tasks, terms don't need to be tagged (= no TermTagger needed).
+            return false;
+        }
+        return parent::get('terminologie');
+    }
+    
+    /**
+     * Overwrite setTerminologie: saves false instead of the given value depending on the taskType.
+     * @param bool $flag
+     */
+    public function setTerminologie($flag) {
+        if ($this->isHiddenTask()) {
+            // For hidden tasks, terms don't need to be tagged (= no TermTagger needed).
+            $flag = false;
+        }
+        return parent::set('terminologie', $flag);
     }
     
     /**

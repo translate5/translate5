@@ -1215,7 +1215,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function setEnableWatchlistJoin($value = null) {
         if(is_null($value)) {
-            $value = $this->filter->hasFilter('isWatched');
+            $value = $this->filter->hasFilter('isWatched') || $this->filter->hasSort('isWatched');
         }
         $this->watchlistFilterEnabled = $value;
     }
