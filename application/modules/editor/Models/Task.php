@@ -71,8 +71,8 @@ END LICENSE AND COPYRIGHT
  * @method void setWorkflowStepName() setWorkflowStepName(string $stepName)
  * @method integer getWordCount() getWordCount()
  * @method void setWordCount() setWordCount(int $wordcount)
- * @method string getTargetDeliveryDate() getTargetDeliveryDate()
- * @method void setTargetDeliveryDate() setTargetDeliveryDate(string $datetime)
+ * @method string getOrderdate() getOrderdate()
+ * @method void setOrderdate() setOrderdate(string $datetime)
  * @method boolean getReferenceFiles() getReferenceFiles()
  * @method void setReferenceFiles() setReferenceFiles(bool $flag)
  * @method boolean getTerminologie() getTerminologie()
@@ -1205,13 +1205,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'fileCount' => 'Dateien',
             'fullMatchEdit' => '100% Matches sind editierbar',
             'lockLocked' => 'In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
+            'orderdate' => 'Bestelldatum',
             'pmGuid' => 'Projektmanager',
             'pmName' => 'Projektmanager',
             'referenceFiles' => 'Referenzdateien',
             'relaisLang' => 'Relaissprache',
             'sourceLang' => 'Quellsprache',
             'state' =>'Status',
-            'targetDeliveryDate' => 'Lieferdatum (soll)',
             'targetLang' => 'Zielsprache',
             'taskActions' => 'Aktionen',
             'taskassocs' => 'Anzahl zugewiesene Sprachresourcen',

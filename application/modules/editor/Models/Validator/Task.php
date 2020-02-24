@@ -53,7 +53,7 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('pmGuid', 'guid');
     $this->addValidator('pmName', 'stringLength', array('min' => 0, 'max' => 512));
     $this->addValidator('wordCount', 'int');
-    $this->addValidator('targetDeliveryDate', 'date', array('Y-m-d H:i:s'),true);
+    $this->addValidator('orderdate', 'date', array('Y-m-d H:i:s'),true);
     $this->addValidator('referenceFiles', 'int');
     $this->addValidator('terminologie', 'int');
     $this->addValidator('edit100PercentMatch', 'int');
