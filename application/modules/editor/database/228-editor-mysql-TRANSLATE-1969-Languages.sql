@@ -26,5 +26,5 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-// (rfc5646:) "Sr-Cyrl" is wrong, must be "sr-Cyrl" (see comment in TRANSLATE-1969 "Adding hunspell directories ...")
+-- (rfc5646:) "Sr-Cyrl" is wrong, must be "sr-Cyrl" (see comment in TRANSLATE-1969 "Adding hunspell directories ...")
 UPDATE `LEK_languages` SET `rfc5646`='sr-Cyrl' WHERE `sublanguage`='sr-Cyrl';
