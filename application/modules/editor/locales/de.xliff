@@ -44,8 +44,8 @@
 <trans-unit id='TGVrdG9yaWVydCwgdW5iZXLDvGhydCwgYXV0by1nZXNldHp0IGJlaW0gQXVmZ2FiZW5hYnNjaGx1c3M='><source>Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss</source><target>Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss</target></trans-unit>
 <trans-unit id='TGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0'><source>Lektoriert, unverändert</source><target>Lektoriert, unverändert</target></trans-unit>
 <trans-unit id='TGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv'><source>Lektoriert, unverändert, auto</source><target>Lektoriert, unverändert, auto</target></trans-unit>
-<trans-unit id='TGVrdG9yYXQgZHVyY2ggw5xiZXJzZXR6ZXIgZ2VwcsO8ZnQ='><source>Lektorat durch Übersetzer geprüft</source><target>Lektorat durch Übersetzer geprüft</target></trans-unit>
-<trans-unit id='TGVrdG9yYXQgZHVyY2ggw5xiZXJzZXR6ZXIgZ2VwcsO8ZnQsIGF1dG8='><source>Lektorat durch Übersetzer geprüft, auto</source><target>Lektorat durch Übersetzer geprüft, auto</target></trans-unit>
+<trans-unit id="Mi4gTGVrdG9yYXQ="><source>2. Lektorat</source><target>2. Lektorat</target></trans-unit>
+<trans-unit id="Mi4gTGVrdG9yYXQsIGF1dG8="><source>2. Lektorat, auto</source><target>2. Lektorat, auto</target></trans-unit>
 <trans-unit id='UE0gbGVrdG9yaWVydA=='><source>PM lektoriert</source><target>PM lektoriert</target></trans-unit>
 <trans-unit id='UE0gbGVrdG9yaWVydCwgYXV0bw=='><source>PM lektoriert, auto</source><target>PM lektoriert, auto</target></trans-unit>
 <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0'><source>PM lektoriert, unverändert</source><target>PM lektoriert, unverändert</target></trans-unit>
@@ -769,7 +769,10 @@
 {usersCurrentRole}<br />
 {footer}</target></trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgYWJnZXNjaGxvc3Nlbg=='><source>Translate5 - Aufgabe abgeschlossen</source><target>Translate5 - Aufgabe abgeschlossen</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRvcg=='><source>translator</source><target>translator</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRvcg=='><source>translator</source><target>Übersetzer</target></trans-unit>
+<trans-unit id='cmV2aWV3ZXI='><source>reviewer</source><target>Lektor</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRvckNoZWNr'><source>translatorCheck</source><target>Zweiter Lektor</target></trans-unit>
+<trans-unit id='dmlzaXRvcg=='><source>visitor</source><target>Besucher</target></trans-unit>
 <trans-unit id='RS1NYWlsIEFkcmVzc2U='><source>E-Mail Adresse</source><target>E-Mail Adresse</target></trans-unit>
 <trans-unit id='U2VociBnZWVocnRlciBIZXJy'><source>Sehr geehrter Herr</source><target>Sehr geehrter Herr</target></trans-unit>
 <trans-unit id='bGVjdG9y'><source>lector</source><target>lector</target></trans-unit>
@@ -1127,14 +1130,14 @@ Adresse eine Link an, um Ihr Passwort neu setzen zu können.
 ------------------------------
 
 {footer}</target></trans-unit>
-<trans-unit id='e2hlYWRlcn0KCkltIFByb2pla3Rwb3J0YWwge3BvcnRhbExpbmt9IHd1cmRlIElobmVuIGRpZSBBdWZnYWJlIDxiPnt0YXNrLnRhc2tOcn0gLSB7dGFzay50YXNrTmFtZX08L2I+IHp1Z2V3aWVzZW4uPGJyIC8+CjxiciAvPgo8Yj5BdWZnYWJlOjwvYj4ge3Rhc2sudGFza05hbWV9PGJyIC8+CjxiPlF1ZWxsc3ByYWNoZTo8L2I+IHtzb3VyY2VMYW5ndWFnZVRyYW5zbGF0ZWR9PGJyIC8+CjxiPlppZWxzcHJhY2hlOjwvYj4ge3RhcmdldExhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4Ke3JlbGFpc0xhbmd1YWdlRnJhZ21lbnR9PGI+TGllZmVyZGF0dW06PC9iPiB7dGFyZ2V0RGVsaXZlcnlEYXRlfTxiciAvPgo8Yj5Xb3J0YW56YWhsOjwvYj4ge3dvcmRDb3VudH08YnIgLz4Ke3Jldmlld2Vyc0ZyYWdtZW50fXtmb290ZXJ9'><source>{header}
+<trans-unit id='e2hlYWRlcn0KCkltIFByb2pla3Rwb3J0YWwge3BvcnRhbExpbmt9IHd1cmRlIElobmVuIGRpZSBBdWZnYWJlIDxiPnt0YXNrLnRhc2tOcn0gLSB7dGFzay50YXNrTmFtZX08L2I+IHp1Z2V3aWVzZW4uPGJyIC8+CjxiciAvPgo8Yj5BdWZnYWJlOjwvYj4ge3Rhc2sudGFza05hbWV9PGJyIC8+CjxiPlF1ZWxsc3ByYWNoZTo8L2I+IHtzb3VyY2VMYW5ndWFnZVRyYW5zbGF0ZWR9PGJyIC8+CjxiPlppZWxzcHJhY2hlOjwvYj4ge3RhcmdldExhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4Ke3JlbGFpc0xhbmd1YWdlRnJhZ21lbnR9PGI+TGllZmVyZGF0dW06PC9iPiB7ZGVhZGxpbmVEYXRlfTxiciAvPgo8Yj5Xb3J0YW56YWhsOjwvYj4ge3dvcmRDb3VudH08YnIgLz4Ke3Jldmlld2Vyc0ZyYWdtZW50fXtmb290ZXJ9'><source>{header}
 
 Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.taskNr} - {task.taskName}</b> zugewiesen.<br />
 <br />
 <b>Aufgabe:</b> {task.taskName}<br />
 <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
 <b>Zielsprache:</b> {targetLanguageTranslated}<br />
-{relaisLanguageFragment}<b>Lieferdatum:</b> {targetDeliveryDate}<br />
+{relaisLanguageFragment}<b>Lieferdatum:</b> {deadlineDate}<br />
 <b>Wortanzahl:</b> {wordCount}<br />
 {reviewersFragment}{footer}</source><target>{header}
 
@@ -1143,7 +1146,7 @@ Im Projektportal {portalLink} wurde Ihnen die Aufgabe <b>{task.taskNr} - {task.t
 <b>Aufgabe:</b> {task.taskName}<br />
 <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
 <b>Zielsprache:</b> {targetLanguageTranslated}<br />
-{relaisLanguageFragment}<b>Lieferdatum:</b> {targetDeliveryDate}<br />
+{relaisLanguageFragment}<b>Lieferdatum:</b> {deadlineDate}<br />
 <b>Wortanzahl:</b> {wordCount}<br />
 {reviewersFragment}{footer}</target></trans-unit>
 <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZHVyY2ggYWxsZSBCZW51dHplciBkZXIgUm9sbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+IGFiZ2VzY2hsb3NzZW4uPGJyIC8+'><source>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></source><target>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></target></trans-unit>
@@ -1206,14 +1209,14 @@ Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRo
 <trans-unit id='UXVlbGxzcHJhY2hlKG4p'><source>Quellsprache(n)</source><target>Quellsprache(n)</target></trans-unit>
 <trans-unit id='WmllbHNwcmFjaGUobik='><source>Zielsprache(n)</source><target>Zielsprache(n)</target></trans-unit>
 <trans-unit id='QXV0b21hdGlzY2hlIFp1d2Vpc3VuZw=='><source>Automatische Zuweisung</source><target>Automatische Zuweisung</target></trans-unit>
-<trans-unit id='PGI+QXVmZ2FiZTo8L2I+IHt0YXNrLnRhc2tOYW1lfTxiciAvPgogICAgPGI+UXVlbGxzcHJhY2hlOjwvYj4ge3NvdXJjZUxhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4KICAgIDxiPlppZWxzcHJhY2hlOjwvYj4ge3RhcmdldExhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4KICAgIHtyZWxhaXNMYW5ndWFnZUZyYWdtZW50fTxiPkxpZWZlcmRhdHVtOjwvYj4ge3RhcmdldERlbGl2ZXJ5RGF0ZX08YnIgLz4KICAgIDxiPldvcnRhbnphaGw6PC9iPiB7d29yZENvdW50fTxiciAvPg=='><source><b>Aufgabe:</b> {task.taskName}<br />
+<trans-unit id='PGI+QXVmZ2FiZTo8L2I+IHt0YXNrLnRhc2tOYW1lfTxiciAvPgogICAgPGI+UXVlbGxzcHJhY2hlOjwvYj4ge3NvdXJjZUxhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4KICAgIDxiPlppZWxzcHJhY2hlOjwvYj4ge3RhcmdldExhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4KICAgIHtyZWxhaXNMYW5ndWFnZUZyYWdtZW50fTxiPkxpZWZlcmRhdHVtOjwvYj4ge2RlYWRsaW5lRGF0ZX08YnIgLz4KICAgIDxiPldvcnRhbnphaGw6PC9iPiB7d29yZENvdW50fTxiciAvPg=='><source><b>Aufgabe:</b> {task.taskName}<br />
     <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
     <b>Zielsprache:</b> {targetLanguageTranslated}<br />
-    {relaisLanguageFragment}<b>Lieferdatum:</b> {targetDeliveryDate}<br />
+    {relaisLanguageFragment}<b>Lieferdatum:</b> {deadlineDate}<br />
     <b>Wortanzahl:</b> {wordCount}<br /></source><target><b>Aufgabe:</b> {task.taskName}<br />
     <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
     <b>Zielsprache:</b> {targetLanguageTranslated}<br />
-    {relaisLanguageFragment}<b>Lieferdatum:</b> {targetDeliveryDate}<br />
+    {relaisLanguageFragment}<b>Lieferdatum:</b> {deadlineDate}<br />
     <b>Wortanzahl:</b> {wordCount}<br /></target></trans-unit>
 <trans-unit id='QmVudXR6ZXIgZGVyIHZvcmhlcmlnZW4gUm9sbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+Ogp7cHJldmlvdXNVc2Vyc308YnIvPgo='><source>Benutzer der vorherigen Rolle <i>{previousRole}</i>:
 {previousUsers}<br/>
@@ -1720,13 +1723,29 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='QmVudXR6ZXItQWJzY2hsdXNzZGF0dW0='><source>Benutzer-Abschlussdatum</source><target>Benutzer-Abschlussdatum</target></trans-unit>
 <trans-unit id='QmVudXR6ZXItRGVhZGxpbmUvcw=='><source>Benutzer-Deadline/s</source><target>Benutzer-Deadline/s</target></trans-unit>
 <trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnNldHplcg=='><source>Ø Bearbeitungszeit Übersetzer</source><target>Ø Bearbeitungszeit Übersetzer</target></trans-unit>
-<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCDDnGJlcnByw7xmdW5nIGR1cmNoIMOcYmVyc2V0emVy'><source>Ø Bearbeitungszeit Überprüfung durch Übersetzer</source><target>Ø Bearbeitungszeit Überprüfung durch Übersetzer</target></trans-unit>
+<trans-unit id='w5ggQmVhcmJlaXR1bmdzemVpdCB6d2VpdGVyIExla3Rvcg=='><source>Ø Bearbeitungszeit zweiter Lektor</source><target>Ø Bearbeitungszeit zweiter Lektor</target></trans-unit>
 <trans-unit id='RHVyY2hzY2huaXR0bGljaGUgWmVpdGVuIGJlemllaGVuIHNpY2ggYXVmIGRpZSBaZWl0ZW4gaW4gZGVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcu'><source>Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.</source><target>Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.</target></trans-unit>
 <trans-unit id='e2hlYWRlcn0KRGllc2UgZW1haWwgaXN0IGVpbmUgRXJpbm5lcnVuZywgZGFzcyBzaWNoIGRpZSAiRGVhZGxpbmUiIDxiPntkZWFkbGluZURhdGV9PC9iPiBmw7xyIGRpZSBBdWZnYWJlIDxiPiJ7dGFza05hbWV9IjwvYj4gbsOkaGVydC4Ke2Zvb3Rlcn0='><source>{header}
 Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> für die Aufgabe <b>"{taskName}"</b> nähert.
 {footer}</source><target>{header}
 Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> für die Aufgabe <b>"{taskName}"</b> nähert.
 {footer}</target></trans-unit>
+<trans-unit id='Sm9iLVN0YXR1cw=='><source>Job-Status</source><target>Job-Status</target></trans-unit>
+<trans-unit id='WnV3ZWlzdW5nc2RhdHVt'><source>Zuweisungsdatum</source><target>Zuweisungsdatum</target></trans-unit>
+<trans-unit id='QWJzY2hsdXNzZGF0dW0='><source>Abschlussdatum</source><target>Abschlussdatum</target></trans-unit>
+<trans-unit id='RGVhZGxpbmUgRGF0dW0='><source>Deadline Datum</source><target>Deadline Datum</target></trans-unit>
+<trans-unit id='RGVhZGxpbmUtRXJpbm5lcnVuZw=='><source>Deadline-Erinnerung</source><target>Deadline-Erinnerung</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItUGx1cmFs'><source>Benutzer-Plural</source><target>Benutzer</target></trans-unit>
+<trans-unit id='VGVybWluLUVyaW5uZXJ1bmcgZsO8ciBkaWUgQXVmZ2FiZSAiJXMi'><source>Termin-Erinnerung für die Aufgabe "%s"</source><target>Termin-Erinnerung für die Aufgabe "%s"</target></trans-unit>
+<trans-unit id='Yml0dGUgZGVua2VuIFNpZSBhbiBkaWUgRmVydGlnc3RlbGx1bmcgSWhyZXIgQXVmZ2FiZSB6dSB1bnRlbnN0ZWhlbmRlbSBQcm9qZWt0LiBEZXIgQWJnYWJldGVybWluIHLDvGNrdCBuw6RoZXIuPGJyLz48YnIvPlp1ciBCZWFyYmVpdHVuZyBsb2dnZW4gU2llIHNpY2ggYml0dGUgbWl0IElocmVuIHBlcnPDtm5saWNoZW4gWnVnYW5nc2RhdGVuIGhpZXIgZWluOjxici8+PGJyLz57cG9ydGFsTGlua308YnIvPjxici8+UGVyIERvcHBlbGtsaWNrIGF1ZiBkaWUgQXVmZ2FiZSBnZWxhbmdlbiBTaWUgaW4gZGVuIEVkaXRpZXJtb2R1cy48YnIvPlNpZSBrw7ZubmVuIGRpZSBCZWFyYmVpdHVuZyBJaHJlciBBdWZnYWJlIGF1Y2ggamVkZXJ6ZWl0IHVudGVyYnJlY2hlbiB1bmQgenUgZWluZW0gc3DDpHRlcmVuIFplaXRwdW5rdCB3aWVkZXIgYXVmbmVobWVuLjxici8+PGJyLz4='><source>bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin rückt näher.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/>Sie können die Bearbeitung Ihrer Aufgabe auch jederzeit unterbrechen und zu einem späteren Zeitpunkt wieder aufnehmen.<br/><br/></source><target>bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin rückt näher.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/>Sie können die Bearbeitung Ihrer Aufgabe auch jederzeit unterbrechen und zu einem späteren Zeitpunkt wieder aufnehmen.<br/><br/></target></trans-unit>
+<trans-unit id='PGJyLz48YnIvPjxiPlByb2pla3RkZXRhaWxzOjwvYj48YnIvPjxici8+PGI+UHJvamVrdHRpdGVsOjwvYj4ge3Rhc2sudGFza05hbWV9PGJyLz48Yj5RdWVsbHNwcmFjaGU6PC9iPiB7c291cmNlTGFuZ3VhZ2VUcmFuc2xhdGVkfSA8YnIvPjxiPlppZWxzcHJhY2hlOjwvYj4ge3RhcmdldExhbmd1YWdlVHJhbnNsYXRlZH0gPGJyLz48Yj5adSBiZWFyYmVpdGVuIGJpczo8L2I+IHtkZWFkbGluZURhdGV9PGJyLz48YnIvPg=='><source><br/><br/><b>Projektdetails:</b><br/><br/><b>Projekttitel:</b> {task.taskName}<br/><b>Quellsprache:</b> {sourceLanguageTranslated} <br/><b>Zielsprache:</b> {targetLanguageTranslated} <br/><b>Zu bearbeiten bis:</b> {deadlineDate}<br/><br/></source><target><br/><br/><b>Projektdetails:</b><br/><br/><b>Projekttitel:</b> {task.taskName}<br/><b>Quellsprache:</b> {sourceLanguageTranslated} <br/><b>Zielsprache:</b> {targetLanguageTranslated} <br/><b>Zu bearbeiten bis:</b> {deadlineDate}<br/><br/></target></trans-unit>
+<trans-unit id='PGJyLz48YnIvPldpciB1bnRlcnN0w7x0emVuIFNpZSBnZXJuZSBiZWkgRnJhZ2VuIHp1ciDDnGJlcnNldHp1bmcgdW5kIHRyYW5zbGF0ZTUg4oCTIHNwcmVjaGVuIFNpZSB1bnMgYml0dGUgaGllcnp1IGdlcm5lIGFuLjxici8+PGJyLz5CZXN0ZSBHcsO8w59lPGJyLz48YnIvPklociB0cmFuc2xhdGU1IFByb2pla3QtVGVhbTxici8+PGJyLz4='><source><br/><br/>Wir unterstützen Sie gerne bei Fragen zur Übersetzung und translate5 – sprechen Sie uns bitte hierzu gerne an.<br/><br/>Beste Grüße<br/><br/>Ihr translate5 Projekt-Team<br/><br/></source><target><br/><br/>Wir unterstützen Sie gerne bei Fragen zur Übersetzung und translate5 – sprechen Sie uns bitte hierzu gerne an.<br/><br/>Beste Grüße<br/><br/>Ihr translate5 Projekt-Team<br/><br/></target></trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgIiVzIiBpc3QgIiVzIiDDvGJlcmbDpGxsaWch'><source>Die Aufgabe "%s" ist "%s" überfällig!</source><target>Die Aufgabe "%s" ist "%s" überfällig!</target></trans-unit>
+<trans-unit id='Yml0dGUgZGVua2VuIFNpZSBhbiBkaWUgRmVydGlnc3RlbGx1bmcgSWhyZXIgQXVmZ2FiZSB6dSB1bnRlbnN0ZWhlbmRlbSBQcm9qZWt0LiBEZXIgQWJnYWJldGVybWluIGlzdCDDvGJlcmbDpGxsaWcuPGJyLz48YnIvPlp1ciBCZWFyYmVpdHVuZyBsb2dnZW4gU2llIHNpY2ggYml0dGUgbWl0IElocmVuIHBlcnPDtm5saWNoZW4gWnVnYW5nc2RhdGVuIGhpZXIgZWluOjxici8+PGJyLz57cG9ydGFsTGlua308YnIvPjxici8+UGVyIERvcHBlbGtsaWNrIGF1ZiBkaWUgQXVmZ2FiZSBnZWxhbmdlbiBTaWUgaW4gZGVuIEVkaXRpZXJtb2R1cy48YnIvPjxici8+'><source>bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin ist überfällig.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/><br/></source><target>bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin ist überfällig.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/><br/></target></trans-unit>
+<trans-unit id='b3Blbg=='><source>open</source><target>offen</target></trans-unit>
+<trans-unit id='d2FpdGluZw=='><source>waiting</source><target>wartend</target></trans-unit>
+<trans-unit id='ZmluaXNoZWQ='><source>finished</source><target>abgeschlossen</target></trans-unit>
+<trans-unit id='dW5jb25maXJtZWQ='><source>unconfirmed</source><target>unbestätigt</target></trans-unit>
   </body>
  </file>
 </xliff>

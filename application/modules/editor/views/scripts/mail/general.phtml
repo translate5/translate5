@@ -26,6 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/* @var $this Zend_View */
 
 //check if there is customer domain defined for the user
 //and use it as portal link in the mail
@@ -56,6 +57,37 @@ $data = [
     'surName' => $this->receiver->gender=='n' ? ($this->receiver->firstName.' '.$this->receiver->surName) : $this->receiver->surName,
 ];
 
+$dateFormater=function($date){
+    if(!isset($date) || empty($date)){
+        return '-';
+    }
+    return $this->workflowNotifyMail()->dateFormat($date);
+};
+
+if(isset($this->taskUserAssoc)){
+    //format the assoc deadlineDate to the required format
+    $this->taskUserAssoc['deadlineDate']=$dateFormater($this->taskUserAssoc['deadlineDate']);
+}
+
+//format all user assocs deadlineDates to the required format
+if(isset($this->associatedUsers) && !empty($this->associatedUsers)){
+    $this->associatedUsers=array_map(function($item) use($dateFormater){
+        $item['deadlineDate']=$dateFormater($item['deadlineDate'] ?? null);
+        return $item;
+    }, $this->associatedUsers);
+    
+}
+
+//format all user assocs deadlineDates to the required format
+if(isset($this->previousUsers) && !empty($this->previousUsers)){
+    $this->previousUsers=array_map(function($item) use($dateFormater){
+        $item['deadlineDate']=$dateFormater($item['deadlineDate'] ?? null);
+        return $item;
+    }, $this->previousUsers);
+        
+}
+
+
 //prepare the htmlOnly disclaimer
 $this->htmlOnly = $this->translate->_('- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -');
 
@@ -66,7 +98,8 @@ if(!empty($this->pm)) {
 if(!empty($this->task)) {
     $taskData = $this->workflowNotifyMail()->getTaskLanguages($this->task);
     $taskData['task'] = $this->task->getDataObject();
-    $taskData['targetDeliveryDate'] = $this->workflowNotifyMail()->dateFormat($this->task->getTargetDeliveryDate());
+
+    $taskData['deadlineDate'] = $this->taskUserAssoc['deadlineDate'];
     $taskData['wordCount'] = $this->task->getWordCount() > 0 ? $this->task->getWordCount() : '-';
     
     $customer=ZfExtended_Factory::get('editor_Models_Customer');
@@ -81,7 +114,7 @@ if(!empty($this->task)) {
     $data['taskFragment'] = $this->templateApply('<b>Aufgabe:</b> {task.taskName}<br />
     <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
     <b>Zielsprache:</b> {targetLanguageTranslated}<br />
-    {relaisLanguageFragment}<b>Lieferdatum Lektoren:</b> {targetDeliveryDate}<br />
+    {relaisLanguageFragment}<b>Lieferdatum:</b> {deadlineDate}<br />
     <b>Wortanzahl:</b> {wordCount}<br />', $taskData);
 }
 

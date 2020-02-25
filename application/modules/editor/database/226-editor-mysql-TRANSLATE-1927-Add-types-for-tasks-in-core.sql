@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -15,8 +14,9 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -26,45 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Workflow Action Configuration Struct 
- */
-class editor_Workflow_Actions_Config {
-    /**
-     * @var editor_Workflow_Abstract 
-     */
-    public $workflow;
-    
-    /**
-     * Task instance before task was changed
-     * @var editor_Models_Task 
-     */
-    public $oldTask;
-    
-    /**
-     * current task instance, with changes done by the current request
-     * @var editor_Models_Task 
-     */
-    public $task;
+-- TRANSLATE-1927: Hidden tasks needed => introduce types for tasks in core
+ALTER TABLE `LEK_task` 
+ADD COLUMN `taskType` VARCHAR(255) NULL DEFAULT 'default';
 
-    /**
-     * @var editor_Models_TaskUserAssoc
-     */
-    public $newTua;
-    
-    /**
-     * @var editor_Models_TaskUserAssoc
-     */
-    public $oldTua;
-
-    /**
-     * only available for import actions
-     * @var editor_Models_Import_Configuration
-     */
-    public $importConfig;
-    
-    /**
-     * @var ZfExtended_Models_User
-     */
-    public $authenticatedUser;
-}
+-- set initialtasktypes depending on the role
+INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 
+('editor', 'api', 'initial_tasktype', 'instanttranslate-pre-translate'),
+('editor', 'api', 'initial_tasktype', 'default'),
+('editor', 'pm', 'initial_tasktype', 'default'),
+('editor', 'instantTranslate', 'initial_tasktype', 'instanttranslate-pre-translate');

@@ -292,7 +292,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $name
      * @return string
      */
-    protected function getLrRenderName(string $name){
+    protected static function getLrRenderName(string $name){
         return self::$prefix.$name;
     }
     
