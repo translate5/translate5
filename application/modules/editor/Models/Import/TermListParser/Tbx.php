@@ -698,8 +698,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             return;
         }
         
-        // check if actual term is empty self-closing tag
-        if ($this->xml->isEmptyElement) {
+        //ignore empty term
+        if ($this->xml->isEmptyElement || $this->xml->readInnerXml()=='') {
             $this->actualTermIdTbx=null;
             return;
         }
@@ -798,7 +798,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         }
 
         //if inside description group, set the parent id from the current description tag
-        if($this->isInsideDescripGrp){
+        if($this->isInsideDescripGrp && isset($entry)){
             $this->actualParentId=$entry->getId();
         }
     }
@@ -985,15 +985,15 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      * @param int $parentId
      * @param int $internalCount: the current tag count of the same type in one group
      * 
-     * @return void|editor_Models_Term_Attribute
+     * @return null|editor_Models_Term_Attribute
      */
     protected function saveTermAttribute($parentId,$internalCount=null){
         if(!$this->isStartTag()){
-            return;
+            return null;
         }
         //do not save attributes on empty term
         if(!isset($this->termContainer['term']) || empty($this->termContainer['term'])){
-            return;
+            return null;
         }
         
         $attribute=$this->getAttributeObject($parentId);
