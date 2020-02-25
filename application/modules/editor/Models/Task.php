@@ -290,20 +290,36 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function loadUserList(bool $loadAll=false,string $userGuid) {
-        $this->getFilter()->setDefaultTable('LEK_task');
-        $s=$this->db->select()
-        ->setIntegrityCheck(false)
-        ->from('LEK_task', [])
-        ->join('LEK_customer', 'LEK_task.customerId=LEK_customer.id',[])
-        ->join('LEK_taskUserAssoc','LEK_taskUserAssoc.taskGuid= LEK_task.taskGuid',[])
-        ->join('Zf_users','Zf_users.userGuid=LEK_taskUserAssoc.userGuid',['Zf_users.*'])
-        ->where('LEK_customer.anonymizeUsers=0');
-        //if the user is not allow to see all other users, load only where current user is pm or is assoc
+        
+        $s=$this->db->select();
+        
+        //apply the frontend task filters
+        $this->applyFilterAndSort($s);
+        
+        //get the current table joins
+        $joins=$s->getPart($s::FROM);
+        
+        //check if the join already exist, if not join the table
+        if(!isset($joins['LEK_customer'])){
+            $s->join('LEK_customer', 'LEK_task.customerId=LEK_customer.id',[]);
+        }
+        //check if the join already exist, if not join the table
+        if(!isset($joins['LEK_taskUserAssoc'])){
+            $s->join('LEK_taskUserAssoc','LEK_taskUserAssoc.taskGuid= LEK_task.taskGuid',[]);
+            
+        }
+        //check if the join already exist, if not join the table
+        if(!isset($joins['Zf_users'])){
+            $s->join('Zf_users','Zf_users.userGuid=LEK_taskUserAssoc.userGuid',['Zf_users.*']);
+        }
+        
+        $s->where('LEK_customer.anonymizeUsers=0');
+        
         if(!$loadAll){
             $s->where('LEK_taskUserAssoc.userGuid = ? OR LEK_task.pmGuid = ?',$userGuid);
         }
         $s->group('Zf_users.id');
-        return $this->loadFilterdCustom($s);
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /**
