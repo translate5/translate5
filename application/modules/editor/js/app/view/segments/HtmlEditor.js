@@ -302,6 +302,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         for( i=0; i < arrLength; i++ ) {
             termTageNode = termTags[i];
             while(termTageNode.firstChild) {
+                if (termTageNode.isSameNode(lastNode)) {
+                    // If this term-tag-node is the lastNode, we must use its content as lastNode before we remove it.
+                    lastNode = termTageNode.firstChild;
+                }
                 termTageNode.parentNode.insertBefore(termTageNode.firstChild,termTageNode);
             }
             termTageNode.parentNode.removeChild(termTageNode);
