@@ -731,7 +731,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      */
     protected function deadlineNotifier(stdClass $triggerConfig,string $template,bool $isApproaching=false) {
         
-        $daysOffset=isset($triggerConfig->daysOffset) ? $triggerConfig->daysOffset : 1;
+        $daysOffset=$triggerConfig->daysOffset ?? 1;
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
