@@ -43,8 +43,53 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs6 
         //if the task state filter is set, set the filter table
         $taskState=null;
         if($this->hasFilter('state',$taskState)){
+            
             $db=$this->entity->db;
-            $taskState->table=$db->info($db::NAME);
+            $taskTable=$db->info($db::NAME);
+            $taskStateValues=$taskState->value;
+            
+            //set the task table
+            $taskState->table=$taskTable;
+            
+            //is state locked active
+            $locked=!empty($taskStateValues) && in_array('locked', $taskStateValues);
+            
+            //if locked filter state is active, add the or filter
+            if($locked){
+                
+                //remove the user task state filter
+                $this->deleteFilter('state');
+                
+                $orFilter = new stdClass();
+                $orFilter->type = 'orExpression';
+                $orFilter->field = '';
+                $orFilter->value = [];
+                
+                //add the locked filter
+                $filter = new stdClass();
+                $filter->field = 'locked';
+                $filter->type = 'notIsNull';
+                $filter->value ='';
+                $filter->table=$taskTable;
+                $orFilter->value[] =$filter;
+                
+                //remove state locked from the state values
+                if (($key = array_search('locked',$taskStateValues)) !== false) {
+                    unset($taskStateValues[$key]);
+                }
+                
+                if(!empty($taskStateValues)){
+                    //add all other state filter values
+                    $filter = new stdClass();
+                    $filter->field = 'state';
+                    $filter->type = 'list';
+                    $filter->value = $taskStateValues;
+                    $filter->table =$taskTable;
+                    $orFilter->value[] = $filter;
+                }
+                
+                $this->addFilter($orFilter);
+            }
         }
         
         //check if one of the set filters is userState filter

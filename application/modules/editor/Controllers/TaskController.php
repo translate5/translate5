@@ -233,7 +233,15 @@ class editor_TaskController extends ZfExtended_RestController {
     public function indexAction() {
         //set default sort
         $f = $this->entity->getFilter();
-        $f->hasSort() || $f->addSort('id', true);
+        $f->hasSort() || $f->addSort('orderdate', true);
+        
+        // load only 'visible' tasks (further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
+        $f->addFilter((object)[
+            'field' => 'taskType',
+            'value' => $this->entity->getDefaultTasktype(),
+            'type' => 'string',
+            'comparison' => 'eq'
+        ]);
         
         $rows = $this->loadAllWithUserData();
         $this->view->rows = $rows;
@@ -247,6 +255,8 @@ class editor_TaskController extends ZfExtended_RestController {
      * limit accordingly (= for all filtered tasks: no limit).
      */
     public function  kpiAction() {
+        $f = $this->entity->getFilter();
+        $f->hasSort() || $f->addSort('orderdate', true);
         $rows = $this->loadAll();
         
         $kpi = ZfExtended_Factory::get('editor_Models_KPI');
@@ -278,7 +288,11 @@ class editor_TaskController extends ZfExtended_RestController {
      * This is used for the user workflow filter in the advance filter store
      */
     public function userlistAction(){
-        $this->view->rows=$this->entity->loadUserList();
+        // here no check for pmGuid, since this is done in task::loadListByUserAssoc
+        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
+        //set the default table to lek_task
+        $this->entity->getFilter()->setDefaultTable('LEK_task');
+        $this->view->rows=$this->entity->loadUserList($isAllowedToLoadAll,$this->user->data->userGuid);
     }
     
     /**
@@ -431,8 +445,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->init();
         //$this->decodePutData(); → not needed, data was set directly out of params because of file upload
         $this->data = $this->getAllParams();
-        //warn the api user for the orderdate ussage
-        $this->orderdateWarning();
+
         settype($this->data['wordCount'], 'integer');
         settype($this->data['enableSourceEditing'], 'integer');
         settype($this->data['edit100PercentMatch'], 'integer');
@@ -455,6 +468,11 @@ class editor_TaskController extends ZfExtended_RestController {
             //TODO test what happens with new error logging if PM does not exist? 
             $pm->loadByGuid($this->data['pmGuid']);
         }
+        
+        if (empty($this->data['taskType'])) {
+            $this->data['taskType'] = $this->entity->getDefaultTasktype();
+        }
+        
         $this->data['pmName'] = $pm->getUsernameLong();
         $this->processClientReferenceVersion();
         $this->_helper->Api->convertLanguageParameters($this->data['sourceLang']);
@@ -496,6 +514,10 @@ class editor_TaskController extends ZfExtended_RestController {
             if($this->data['autoStartImport']) {
                 $this->startImportWorkers();
             }
+            
+            //warn the api user for the targetDeliveryDate ussage
+            $this->targetDeliveryDateWarning();
+            
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
         }
@@ -801,8 +823,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $oldTask = clone $this->entity;
         $this->decodePutData();
         
-        //warn the api user for the orderdate ussage
-        $this->orderdateWarning();
+        //warn the api user for the targetDeliveryDate ussage
+        $this->targetDeliveryDateWarning();
         
         if(isset($this->data->edit100PercentMatch)){
             settype($this->data->edit100PercentMatch, 'integer');
@@ -816,6 +838,9 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         if(isset($this->data->enableSourceEditing)){
             $this->data->enableSourceEditing = (boolean)$this->data->enableSourceEditing;
+        }
+        if (isset($this->data->initial_tasktype)) {
+            unset($this->data->initial_tasktype);
         }
         $this->processClientReferenceVersion();
         $this->setDataInEntity();
@@ -1181,10 +1206,30 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * gets and validates the uploaded zip file
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::additionalValidations()
      */
     protected function additionalValidations() {
+        //gets and validates the uploaded zip file
         $this->upload->initAndValidate();
+        // validate the taskType
+        $this->validateTaskType();
+    }
+    
+    /**
+     * Validate the taskType: check if given tasktype is allowed according to role
+     * @throws ZfExtended_UnprocessableEntity
+     */
+    protected function validateTaskType() {
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        $isTaskTypeAllowed = $acl->isInAllowedRoles($this->user->data->roles, 'initial_tasktype', $this->entity->getTaskType());
+        if (!$isTaskTypeAllowed) {
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1217' => 'TaskType not valid.'
+            ], 'editor.task');
+            throw new ZfExtended_UnprocessableEntity('E1217');
+        }
     }
 
     /**
@@ -1361,7 +1406,7 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function checkTaskAttributeField(){
         $fieldToRight = [
             'taskName' => 'editorEditTaskTaskName',
-            'targetDeliveryDate' => 'editorEditTaskDeliveryDate',
+            'orderdate' => 'editorEditTaskOrderDate',
             'pmGuid' => 'editorEditTaskPm',
             'pmName' => 'editorEditTaskPm',
         ];
@@ -1445,21 +1490,21 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /***
-     * Warn the api users that the orderdate field is not anymore available for the api.
+     * Warn the api users that the targetDeliveryDate field is not anymore available for the api.
      * The task deadlines are defined for each task-user-assoc job separately
      * TODO: 11.02.2020 remove this function after all customers adopt there api calls
      */
-    protected function orderdateWarning() {
+    protected function targetDeliveryDateWarning() {
         $throwWarning=false;
         if(is_array($this->data)){
-            $throwWarning=isset($this->data['orderdate']);
+            $throwWarning=isset($this->data['targetDeliveryDate']);
         }
         if(is_object($this->data)){
-            $throwWarning=isset($this->data->orderdate);
+            $throwWarning=isset($this->data->targetDeliveryDate);
         }
         if(!$throwWarning){
             return;
         }
-        $this->log->warn('E1210','The orderdate for the task is deprecated. Use the LEK_taskUserAssoc deadlineDate instead.');
+        $this->log->warn('E1210','The targetDeliveryDate for the task is deprecated. Use the LEK_taskUserAssoc deadlineDate instead.');
     }
 }

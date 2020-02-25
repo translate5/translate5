@@ -468,7 +468,7 @@ Ext.define('Editor.controller.Localizer', {
             averageProcessingTimeLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Lektor');?>',
             excelExportUsageLabel: '<?php echo $this->translate->_('Excel-Export Nutzung');?>',
             averageProcessingTimeTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Übersetzer');?>',
-            averageProcessingTimeSecondTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Überprüfung durch Übersetzer');?>',
+            averageProcessingTimeSecondTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit zweiter Lektor');?>',
         },
         confirmStrings: {
             "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -492,7 +492,8 @@ Ext.define('Editor.controller.Localizer', {
             end: '<?php echo $this->translate->_('beendet');?>',
             unconfirmed: '<?php echo $this->translate->_('nicht bestätigt');?>',
             import: '<?php echo $this->translate->_('import');?>',
-            forMe: '<?php echo $this->translate->_('für mich ');?>'
+            forMe: '<?php echo $this->translate->_('für mich ');?>',
+            error: '<?php echo $this->translate->_('error');?>'
         },
         strings: {
             ended: '<?php echo $this->translate->_('beendet');?>',
@@ -513,7 +514,11 @@ Ext.define('Editor.controller.Localizer', {
             noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>',
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).');?>',
             currentWorkflowStepProgressTooltip: '<?php echo $this->translate->_('% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt');?>',
-            addFilterText: '<?php echo $this->translate->_('Erweiterte Filter');?>'
+            addFilterText: '<?php echo $this->translate->_('Erweiterte Filter');?>',
+            jobStatus: '<?php echo $this->translate->_('Job-Status');?>',
+            assignmentDateHeader: '<?php echo $this->translate->_('Zuweisungsdatum');?>',
+            finishedDateHeader: '<?php echo $this->translate->_('Abschlussdatum');?>',
+            deadlineDateHeader: '<?php echo $this->translate->_('Deadline Datum');?>'
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
@@ -529,7 +534,7 @@ Ext.define('Editor.controller.Localizer', {
             wordCount: '<?php echo $this->translate->_('Wörter');?>',
             wordCountTT: '<?php echo $this->translate->_('Anzahl Wörter');?>',
             fileCount: '<?php echo $this->translate->_('Dateien');?>',
-            targetDeliveryDate: '<?php echo $this->translate->_('Lieferdatum (soll)');?>',
+            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             referenceFiles: '<?php echo $this->translate->_('Referenzdateien');?>',
             terminologie: '<?php echo $this->translate->_('Terminologie');?>',
             fullMatchEdit: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
@@ -627,7 +632,7 @@ Ext.define('Editor.controller.Localizer', {
         strings:{
             taskName: '<?php echo $this->translate->_('Aufgabenname');?>',
             customerName: '<?php echo $this->translate->_('Kunde');?>',
-            deliveryDate: '<?php echo $this->translate->_('Lieferdatum (soll)');?>',
+            orderDate: '<?php echo $this->translate->_('Bestelldatum');?>',
             pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
             btnSave: '<?php echo $this->translate->_('Speichern');?>',
             successUpdate: '<?php echo $this->translate->_('Die Aufgabe wurde erfolgreich aktualisiert');?>',
@@ -669,6 +674,7 @@ Ext.define('Editor.controller.Localizer', {
             targetDeliveryLabel: '<?php echo $this->translate->_('Lieferdatum');?>',
             fullMatchLabel: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
             lockLockedLabel: '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>',
+            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             sourceEditLabel: '<?php echo $this->translate->_('Ausgangstext ist editierbar');?>',
             bottomInfo: '<?php echo $this->translate->_('¹ Diese Angaben / Daten werden für den Import zwingend benötigt.');?>',
             feedbackText: '<?php echo $this->translate->_('Fehler beim Import!');?>',
@@ -771,7 +777,7 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.view.admin.task.UserAssoc", {
         override: "Editor.view.admin.task.UserAssoc",
-        title: '<?php echo $this->translate->_('Benutzer');?>',
+        title: '<?php echo $this->translate->_('Benutzer-Plural');?>',
         strings: {
             fieldRole: '<?php echo $this->translate->_('Rolle');?>',
             fieldState: '<?php echo $this->translate->_('Status');?>',

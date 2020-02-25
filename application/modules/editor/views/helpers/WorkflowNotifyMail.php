@@ -49,6 +49,8 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
         $notifyConfig = Zend_Registry::get('config')->runtimeOptions->editor->notification;
         $columns = $notifyConfig->userListColumns->toArray();
         
+        $receiverLocale=$this->view->receiver->locale ?? null;
+        
         // anonymize users?
         $task = $this->view->task;
         /* @var $task editor_Models_Task */
@@ -62,17 +64,18 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
                 $user = $workflowAnonymize->anonymizeUserdata($taskGuid, $user['userGuid'], $user);
             }
         }
+        //reset the tmp user variable
+        unset($user);
         
         $firstUser = reset($users);
         $hasState = !empty($firstUser) && array_key_exists('state', $firstUser);
         $hasRole = !empty($firstUser) && array_key_exists('role', $firstUser);
         $t = $this->view->translate;
-        /* @var $task editor_Models_Task */
         $result = array('<table cellpadding="4">');
         $th = '<th align="left">';
         $result[] = '<tr>';
         
-        $colHeads = ['surName' => 'Nachname', 'firstName' => 'Vorname', 'login' => 'Login', 'email' => 'E-Mail Adresse', 'role' => 'Rolle', 'state' => 'Status'];
+        $colHeads = ['surName' => 'Nachname', 'firstName' => 'Vorname', 'email' => 'E-Mail Adresse', 'role' => 'Rolle', 'state' => 'Status', 'deadlineDate'=>'Deadline Datum'];
         
         if(!$hasRole) {
             //remove 'role' from $columns;
@@ -88,10 +91,18 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
         }
         $result[] = '</tr>';
         
+        //fields to be translated for the receiver
+        $translateFieldValues=['state','role'];
+        $t = $this->view->translate;
         foreach($users as $user) {
             $result[] = "\n".'<tr>';
             foreach($columns as $col) {
-                $result[] = '<td>'.$user[$col].'</td>';
+                $val=$user[$col] ?? '';
+                if(in_array($col,$translateFieldValues) && !empty($val)){
+                    //translate the value for the receiver locale
+                    $val=$t->_($user[$col],$receiverLocale);
+                }
+                $result[] = '<td>'.$val.'</td>';
             }
             $result[] = '</tr>';
         }

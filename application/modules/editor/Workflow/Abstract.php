@@ -878,6 +878,7 @@ abstract class editor_Workflow_Abstract {
             } 
             $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua, 'task' => $task));
         }
+        $this->handleUserAssociationEdited();
         $this->recalculateWorkflowStep($newTua);
     }
     
@@ -966,6 +967,7 @@ abstract class editor_Workflow_Abstract {
         /* @var $config editor_Workflow_Actions_Config */
         $config->workflow = $this;
         $config->newTua = $this->newTaskUserAssoc;
+        $config->oldTua = $this->oldTaskUserAssoc;
         $config->oldTask = $this->oldTask;
         $config->task = $this->newTask;
         $config->importConfig = $this->importConfig;
@@ -1482,6 +1484,12 @@ abstract class editor_Workflow_Abstract {
      * will be called when a new task user association is created
      */
     abstract protected function handleUserAssociationAdded();
+    
+    /**
+     * will be called when a new task user association is edited
+     */
+    abstract protected function handleUserAssociationEdited();
+    
     
     /**
      * will be called when a task user association is deleted
