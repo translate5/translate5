@@ -32,16 +32,28 @@ Ext.define('Editor.store.admin.WorkflowUserRoles', {
 		var me = this,
 			config={},
 			workflowUserRoles=[];
-		//Info:duplicated id values will be ignored by te store
-		Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
-			Ext.Object.each(workflow.roles, function(key, value){
-				workflowUserRoles.push({id:key,label:value});
-			});
-		});
-		config.data=workflowUserRoles;
 		if (instanceConfig) {
 			me.self.getConfigurator().merge(me, config, instanceConfig);
 		}
-	    return me.callParent([config]);
+	    var returnConfig= me.callParent([config]);
+
+	    //required order
+	    me.add({id:'translator',label:''});
+	    me.add({id:'reviewer',label:''});
+	    me.add({id:'translatorCheck',label:''});
+	    me.add({id:'visitor',label:''});
+	    
+		//Info:duplicated id values will be ignored by te store
+		Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
+			Ext.Object.each(workflow.roles, function(key, value){
+				var rec=me.getById(key);
+				if(!rec){
+					me.add({id:key,label:value})
+				}else{
+					rec.set('label',value);
+				}
+			});
+		});
+		return returnConfig;
 	},
 });

@@ -31,7 +31,7 @@ Ext.define('Editor.view.admin.task.filter.DateFilter', {
     alias: 'widget.editorAdminTaskFilterDateFilter',
 	columnWidth: 0.5,
 	padding: 5,
-	layout: 'anchor',
+	layout: 'auto',
 	title:null,//this should be set from the instance config
 	filterLabel:null,//this should be set from the instance config
 	filterProperty:null,//this should be set from the instance config
@@ -45,9 +45,13 @@ Ext.define('Editor.view.admin.task.filter.DateFilter', {
         	config;
         config = {
 			title:instanceConfig.title,
-			items: [{
+			defaults:{
 				xtype: 'datefield',
-				anchor: '100%',
+				labelAlign:'left',
+				labelWidth:50,
+				width:'100%'
+			},
+			items: [{
 				fieldLabel: me.strings.gtText,
 				itemId: 'gtDate',
 				filter:{
@@ -57,8 +61,6 @@ Ext.define('Editor.view.admin.task.filter.DateFilter', {
 					 textLabel:instanceConfig.filterLabel
 				 }
 			},{
-				xtype: 'datefield',
-				anchor: '100%',
 				fieldLabel: me.strings.ltText,
 				itemId: 'ltDate',
 				filter:{
@@ -68,8 +70,6 @@ Ext.define('Editor.view.admin.task.filter.DateFilter', {
 					 textLabel:instanceConfig.filterLabel
 				 }
 			},{
-				xtype: 'datefield',
-				anchor: '100%',
 				fieldLabel: me.strings.eqText,
 				itemId: 'eqDate',
 				filter:{

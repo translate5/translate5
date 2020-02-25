@@ -64,7 +64,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       taskassocs: '#UT#Anzahl zugewiesene Sprachresourcen',
       pmName: '#UT#Projektmanager',
       pmGuid: '#UT#Projektmanager',
-      targetDeliveryDate: '#UT#Lieferdatum (soll)',
+      orderdate: '#UT#Bestelldatum',
       edit100PercentMatch: '#UT#100%-Treffer editierbar',
       fullMatchEdit: '#UT#100% Matches sind editierbar',
       emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
@@ -82,7 +82,11 @@ Ext.define('Editor.view.admin.TaskGrid', {
       userJobDeadline:'#UT#Meine Deadline',
       assignmentDate:'#UT#Benutzer-Zuweisungsdatum',
       finishedDate:'#UT#Benutzer-Abschlussdatum',
-      deadlineDate:'#UT#Benutzer-Deadline/s'
+      deadlineDate:'#UT#Benutzer-Deadline/s',
+      assignmentDateHeader:'#UT#Zuweisungsdatum',
+      finishedDateHeader:'#UT#Abschlussdatum',
+      deadlineDateHeader:'#UT#Deadline Datum',
+      
   },
   strings: {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
@@ -104,7 +108,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       emptyTargets: '#UT#Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe)."',
       addFilterTooltip:'#UT#Filter hinzufügen',
       currentWorkflowStepProgressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt',
-      addFilterText:'#UT#Erweiterte Filter'
+      addFilterText:'#UT#Erweiterte Filter',
+      jobStatus:'#UT#Job-Status'
   },
   states: {
       open: '#UT#offen',
@@ -112,6 +117,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       finished: '#UT#abgeschlossen',
       end: '#UT#beendet',
       unconfirmed: '#UT#nicht bestätigt',
+      error:'#UT#error',
       import: '#UT#import',
       locked: '#UT#in Arbeit',
       forMe: '#UT#für mich '
@@ -229,9 +235,24 @@ Ext.define('Editor.view.admin.TaskGrid', {
     me.userTipTpl = new Ext.XTemplate(
             '<tpl>',
             '<table class="task-users">',
+            '<tr>',
+            	'<th>#</th>',
+	        	'<th>'+me.text_cols.userName+'</th>',
+	        	'<th>'+me.text_cols.workflowUserRole+'</th>',
+	        	'<th>'+me.strings.jobStatus+'</th>',
+	        	'<th>'+me.strings.assignmentDateHeader+'</th>',
+	        	'<th>'+me.strings.deadlineDateHeader+'</th>',
+	        	'<th>'+me.strings.finishedDateHeader+'</th>',
+        	'</tr>',
             '<tpl for="users">',
             '<tr>',
-            '<td class="username">{userName}</td><td class="login">{login}</td><td class="role">{[this.getRole(parent, values)]}</td><td class="state">{[this.getState(parent, values)]}</td>',
+            	'<td class="">{#}</td>',
+	            '<td class="">{userName}</td>',
+	            '<td class="">{[this.getRole(parent, values)]}</td>',
+	            '<td class="">{[this.getState(parent, values)]}</td>',
+	            '<td class="">{[Ext.util.Format.date(values.assignmentDate)]}</td>',
+	            '<td class="">{[this.getDeadlineDate(values.deadlineDate)]}</td>',
+	            '<td class="">{[Ext.util.Format.date(values.finishedDate)]}</td>',
             '</tr>',
             '</tpl>',
             '</table>',
@@ -245,6 +266,18 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 },
                 getRole: function(data, user) {
                     return data.roles[user.role];
+                },
+                getDeadlineDate: function(date) {
+                	
+                	var deadlineDate=(date && date!='') && new Date(date);
+                	
+                	if(!deadlineDate){
+                		return '';
+                	}
+                	if(deadlineDate < new Date()){
+                		return '<span class="redTextColumn">'+Ext.util.Format.date(deadlineDate)+'</span>';
+                	}
+                	return Ext.util.Format.date(deadlineDate);
                 }
             }
     );
@@ -267,11 +300,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
       var me = this,
           states = [],
           config,
-          steps=[],
-          translatedSteps=[],
           //we must have here an own ordered list of states to be filtered 
           userStates=['open','waiting','finished','unconfirmed'],//TODO get me from backend
-          stateFilterOrder = ['open','locked','end','unconfirmed','import'],
+          stateFilterOrder = ['open','locked','end','unconfirmed','import','error'],
           relaisLanguages = Ext.Array.clone(Editor.data.languages),
           addQtip = function(meta, text) {
               meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text)+'"';
@@ -304,13 +335,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   if(!me.states[key]) {
                 	  userStates.push([key, me.states.forMe+' '+value]);
                   }
-              });
-              Ext.Object.each(workflow.steps, function(key, value){
-            	  steps.push({
-            		  id:key,
-            		  text:value
-            	  })
-            	  translatedSteps[key]=value;
               });
           });
           
@@ -420,13 +444,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 135,
               dataIndex: 'workflowStepName',
               stateId:'workflowStepName',
-              renderer: function(v) {
-                  return translatedSteps[v] ? translatedSteps[v] : v;
-              },
               tooltip: me.text_cols.workflowStepName,
+              renderer: function(v) {
+            	  return me.getWorkflowStepNameTranslated(v);
+            	  
+              },
               filter: {
                   type: 'list',
-                  options:steps
+                  store:'admin.WorkflowSteps'
               },
               text: me.text_cols.workflowStepName
           },
@@ -599,14 +624,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
               text: me.text_cols.pmGuid
           },{
               xtype: 'datecolumn',
-              width: 120,
-              dataIndex: 'targetDeliveryDate',
-              stateId: 'targetDeliveryDate',
+              width: 100,
+              dataIndex: 'orderdate',
+              stateId: 'orderdate',
               filter: {
                   type: 'date',
                   dateFormat: Editor.DATE_ISO_FORMAT
               },
-              text: me.text_cols.targetDeliveryDate
+              text: me.text_cols.orderdate
           },{
               xtype: 'owncheckcolumn',
               width: 45,
@@ -732,7 +757,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 dataIndex: 'workflow',
                 stateId: 'workflow',
                 renderer: function(val, meta, rec) {
-                    return val+' ('+rec.get('workflowStepName')+')';
+                    return val+' ('+me.getWorkflowStepNameTranslated(rec.get('workflowStepName'))+')';
                 },
                 filter: {
                     type: 'string'
@@ -919,9 +944,24 @@ Ext.define('Editor.view.admin.TaskGrid', {
         	if(deadlineDate < new Date()){
         		redClass="redTextColumn"
         	}
-        	deadlineDate=Ext.util.Format.date(deadlineDate,'d.m.Y')
-        	values.push('<span class="'+redClass+'">'+deadlineDate+'</span>')
+        	values.push('<span class="'+redClass+'">'+Ext.util.Format.date(deadlineDate)+'</span>');
         }
         return values.join(', ');
+    },
+    
+    /***
+     * Return the translated workflowStep name
+     */
+    getWorkflowStepNameTranslated:function(stepName){
+    	if(!stepName){
+    		return "";
+		}
+    	var store=Ext.StoreManager.get('admin.WorkflowSteps'),
+    		rec=store.getById(stepName);
+    	if(rec){
+    		stepName=rec.get('text');
+		}
+    	return stepName;
     }
+    
 });

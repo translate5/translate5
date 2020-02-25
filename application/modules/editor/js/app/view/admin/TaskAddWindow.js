@@ -59,7 +59,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         relaisLangTip: '#UT#Relaissprache (Angabe notwendig sofern Relaisdaten vorhanden)',
         relaisLangLabel: '#UT#Relaissprache',
         numberFieldLabel: '#UT#Anzahl Wörter',
-        targetDeliveryLabel: '#UT#Lieferdatum',
+        orderdate: '#UT#Bestelldatum',
         fullMatchLabel: '#UT#100% Matches sind editierbar',
         lockLockedLabel: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
         sourceEditLabel: '#UT#Ausgangstext ist editierbar',
@@ -236,10 +236,10 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     fieldLabel: me.strings.taskNrLabel
                                 },{
                                     xtype: 'datefield',
-                                    name: 'targetDeliveryDate',
+                                    name: 'orderdate',
                                     submitFormat: Editor.DATE_ISO_FORMAT,
                                     value: now,
-                                    fieldLabel: me.strings.targetDeliveryLabel
+                                    fieldLabel: me.strings.orderdate
                                 },(Editor.data.enableSourceEditing  ? {
                                     xtype: 'checkbox',
                                     inputValue: 1,

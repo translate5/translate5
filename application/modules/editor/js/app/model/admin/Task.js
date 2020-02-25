@@ -79,7 +79,7 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'pmName', type: 'string'},
     {name: 'wordCount', type: 'integer'},
     {name: 'fileCount', type: 'integer', persist: false},
-    {name: 'targetDeliveryDate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
+    {name: 'orderdate', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT},
     {name: 'referenceFiles', type: 'boolean'},
     {name: 'terminologie', type: 'boolean'},
     {name: 'edit100PercentMatch', type: 'boolean'},

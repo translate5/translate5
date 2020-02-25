@@ -21,40 +21,28 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.filter.FilterWindowViewController', {
-    extend: 'Ext.app.ViewController',
-    alias: 'controller.editorAdminTaskFilterFilterWindow',
-    
-    onFilterWindowRender:function(component){
-    	var me=this,
-    		fields=me.getView().query('[filter]');
-    	
-    	//create a simple filter array object from the fields
-    	Ext.Array.each(fields, function(field) {
-    		field.on({
-    			change:'applyFilters'
-    		})
-    	});
-    },
-    
-    applyFilters:function(){
-    	var me=this,
-    		fields=me.getView().query('[filter]'),
-    		filter=[];
-    	
-    	//create a simple filter array object from the fields
-    	Ext.Array.each(fields, function(field) {
-			filter.push(Ext.Object.merge(field.filter,{
-				value:field.getValue()
-				//'label':field.filter.property+' '+field.filter.operator+' '+field.getValue()
-			}))
-    	});
-    	
-    	me.getView().fireEvent('advancedFilterChange',filter)
-    }
+Ext.define('Editor.store.admin.WorkflowSteps', {
+	extend : 'Ext.data.Store',
+	initConfig: function(instanceConfig) {
+		var me = this,
+			config={};
+		
+		if (instanceConfig) {
+			me.self.getConfigurator().merge(me, config, instanceConfig);
+		}
+	    var returnConfig= me.callParent([config]);
+	    
+        Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
+            Ext.Object.each(workflow.steps, function(key, value){
+				me.add({id:key,text:value});
+            });
+        });
+        
+        return returnConfig;
+	},
 });

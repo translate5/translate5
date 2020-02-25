@@ -47,7 +47,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   layout: {
       type: 'border'
   },
-  title: '#UT#Benutzer',
+  title: '#UT#Benutzer-Plural',
   
   initConfig: function(instanceConfig) {
     var me = this,
