@@ -48,6 +48,10 @@ END LICENSE AND COPYRIGHT
     margin: 10px;
 }
 
+.error {
+    color: #f00;
+}
+
 /* --------------- general --------------- */
 
 h4, p {

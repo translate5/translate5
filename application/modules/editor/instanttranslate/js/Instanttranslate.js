@@ -27,7 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 var editIdleTimer = null,
-    DEFAULT_FILE_EXT='txt',
     NOT_AVAILABLE_CLS = 'notavailable', // css if a (source-/target-)locale is not available in combination with the other (target-/source-)locale that is set
     uploadedFiles,//Variable to store uploaded files
     translateTextResponse = '',
@@ -35,65 +34,10 @@ var editIdleTimer = null,
     latestTextToTranslate = '',
     instantTranslationIsActive = true,
     chosenSourceIsText = true,
-    fileTypesAllowedAndAvailable = [],
+    fileTypesAllowed = [],
+    fileUploadLanguageCombinationsAvailable = [],
     additionalTranslationsHtmlContainer='';
 
-/***
- * Store allowed file-types for all available languageResources.
- */
-function setFileTypesAllowedAndAvailable() {
-    for (languageResourceId in Editor.data.apps.instanttranslate.allLanguageResources) {
-        if(Editor.data.apps.instanttranslate.allLanguageResources.hasOwnProperty(languageResourceId)){
-            addFileTypesAllowedAndAvailable(Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId]);
-        }
-    }
-}
-/***
- * Adds the allowed file-types for the given languageResource.
- * - If two languageResources for the same language-combination are available and allow fileUploads,
- *   the one with a domainCode is prioritized.
- * - Other cases are not defined so far (e.g. what if we have THREE languageResources for the same 
- *   language-combination and TWO of them have a domainCode / what if they belong to different 
- *   services / ...).
- */
-function addFileTypesAllowedAndAvailable(languageResource) {
-    var extensionsFileTranslation,
-        serviceFileExtensions,
-        languageCombination,
-        filesTypesForLanguageCombination;
-    if(languageResource.fileUpload == false){
-        return;
-    }
-    extensionsFileTranslation = Editor.data.languageresource.fileExtension;
-    if(!extensionsFileTranslation.hasOwnProperty(languageResource.serviceName)){
-        return;
-    }
-    serviceFileExtensions = extensionsFileTranslation[languageResource.serviceName];
-    $.each(getLanguageCombinations(languageResource), function(index, languageCombination) {
-        filesTypesForLanguageCombination = [];
-        // Do we already have file-types stored for this language-combination? Then check the domainCode and prioritize accordingly.
-        if(fileTypesAllowedAndAvailable.hasOwnProperty(languageCombination)) {
-            var domainCodeStored = fileTypesAllowedAndAvailable[languageCombination].domainCode,
-                isEmptyDomainCode = (languageResource.domainCode == '' || languageResource.domainCode == null) ? true : false;
-            if (domainCodeStored != '' && isEmptyDomainCode) {
-                return;
-            } 
-        }
-        serviceFileExtensions.forEach(function(fileType) {
-            // Add file-extensions (but only if they are not stored already).
-            if ($.inArray(fileType, filesTypesForLanguageCombination) === -1) {
-                filesTypesForLanguageCombination.push(fileType);
-            }
-          });
-        if(filesTypesForLanguageCombination.length > 0) {
-            var dataForLanguageCombination = {'domainCode': languageResource.domainCode,
-                                              'sourceLocale': languageResource.source,
-                                              'targetLocale': languageResource.target,
-                                              'fileTypes': filesTypesForLanguageCombination};
-            fileTypesAllowedAndAvailable[languageCombination] = dataForLanguageCombination;
-        }
-    });
-}
 /**
  * Returns all available combinations of source- and target-language for the given languageResource.
  * - TermCollections can have multiple languages in the source and in the target 
@@ -124,41 +68,67 @@ function isAvailableLocale(localeToCheck, allLocalesAvailable) {
     return $.inArray(localeToCheck, allLocalesAvailable) !== -1;
 }
 /**
- * Which fileTypes are allowed for the current language-combination?
+ * Which fileTypes are allowed?
  * @returns array
  */
-function getAllowedFileTypes() {
-    var sourceLocale = $("#sourceLocale").val(),
-        targetLocale = $("#targetLocale").val(),
-        filesTypesForLanguageCombination,
-        addFileTypes,
-        allowedFileTypes = [];
-    for (var key in fileTypesAllowedAndAvailable) {
-        if (fileTypesAllowedAndAvailable.hasOwnProperty(key)) {
-            filesTypesForLanguageCombination = fileTypesAllowedAndAvailable[key];
-            addFileTypes = false;
-            if (isAvailableLocale(sourceLocale, filesTypesForLanguageCombination.sourceLocale) && isAvailableLocale(targetLocale, filesTypesForLanguageCombination.targetLocale)) {
-                addFileTypes = true;
-            }
-            if (addFileTypes) {
-                $.each(filesTypesForLanguageCombination.fileTypes, function(index, fileType) {
-                    if ($.inArray(fileType, allowedFileTypes) === -1) {
-                        allowedFileTypes.push(fileType);
-                    }
+function setAllowedFileTypes() {
+    fileTypesAllowed = Editor.data.languageresource.fileExtension;
+}
+/**
+ * Is the given fileType allowed?
+ * @param string fileTypeToCheck
+ * @returns array
+ */
+function isAllowedFileType(fileTypeToCheck) {
+    return $.inArray(fileTypeToCheck, fileTypesAllowed) !== -1;
+}
+
+/**
+ * For which language-combinations is file-upload available?
+ * (Current implementation: mt-resources)
+ */
+function setfileUploadLanguageCombinationsAvailable() {
+    var languageResourceId,
+        languageResourceToCheck,
+        languageResourceToCheckAllSources,
+        languageResourceToCheckAllTargets,
+        langComb;
+    for (languageResourceId in Editor.data.apps.instanttranslate.allLanguageResources) {
+        if (Editor.data.apps.instanttranslate.allLanguageResources.hasOwnProperty(languageResourceId)) {
+            languageResourceToCheck = Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId];
+            // If the LanguageResources is an MT resource, we store all the language-combinations it can handle.
+            if (languageResourceToCheck.fileUpload) {
+                languageResourceToCheckAllSources = languageResourceToCheck.source;
+                $.each(languageResourceToCheckAllSources, function(indexS) {
+                    languageResourceToCheckAllTargets = languageResourceToCheck.target;
+                    $.each(languageResourceToCheckAllTargets, function(indexT) {
+                        langComb = languageResourceToCheckAllSources[indexS] + '|' + languageResourceToCheckAllTargets[indexT];
+                        if ( languageResourceToCheckAllSources[indexS] !== languageResourceToCheckAllTargets[indexT]
+                            && $.inArray(langComb, fileUploadLanguageCombinationsAvailable) === -1) {
+                            fileUploadLanguageCombinationsAvailable.push(langComb); 
+                                
+                        }
+                    });
                 });
             }
         }
     }
-    return allowedFileTypes;
+}
+/**
+ * Is fileUpload available for the current language-combination?
+ * @returns boolean
+ */
+function isFileUploadAvailable() {
+    var langComb = $('#sourceLocale').val() + '|' + $('#targetLocale').val();
+    return $.inArray(langComb, fileUploadLanguageCombinationsAvailable) !== -1;
 }
 /***
  * If files are allowed for the current language-combination, show text accordingly.
  */
 function setTextForSource() {
     var textForSourceIsText = Editor.data.languageresource.translatedStrings['enterText'],
-        textForSourceIsFile = '',
-        allowedFileTypes = getAllowedFileTypes();
-    if (allowedFileTypes.length === 0) {
+        textForSourceIsFile = '';
+    if (!isFileUploadAvailable()) {
         // No file-upload is possible
         chosenSourceIsText = true;
         showSource();
@@ -166,11 +136,9 @@ function setTextForSource() {
         // When source is chosen to text
         textForSourceIsText += ' <span class="change-source-type">';
         textForSourceIsText += Editor.data.languageresource.translatedStrings['orTranslateFile'];
-        textForSourceIsText += ' (' + allowedFileTypes.join(', ') + ')';
         textForSourceIsText += '</span>';
         // When source is chosen to file
         textForSourceIsFile = Editor.data.languageresource.translatedStrings['uploadFile'];
-        textForSourceIsFile += ' (' + allowedFileTypes.join(', ') + ')';
         textForSourceIsFile += ' <span class="change-source-type">';
         textForSourceIsFile += Editor.data.languageresource.translatedStrings['orTranslateText'];
         textForSourceIsFile += '</span>';
@@ -208,29 +176,32 @@ function updateLocalesSelectLists(el) {
         } else {
             $(this).removeClass(NOT_AVAILABLE_CLS);
         }
-    })
+    });
 }
 
 /**
  * Every change in the language-selection starts a check if any lnguageResources
  * are available. If yes and text is already entered, the translation starts.
  */
-function handleAfterLocalesChange() {
+function checkInstantTranslation() {
     // When the language-combination changes, former translations are not valid any longer (= the text hasn't been translated already):
     latestTextToTranslate = '';
     $('#translations').html('');
     // Neither are former error-messages valid any longer:
     clearAllErrorMessages();
+    // If fileUpload is possible for currently chosen languages, show text accordingly:
+    setTextForSource();
     // Check if any engines are available for that language-combination.
     if (!hasEnginesForLanguageCombination()) {
         hideTranslations();
         showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
         return;
     }
+    if($('#sourceText').val().length > 0 && $('#sourceText').val() === latestTextToTranslate) {
+        return;
+    }
     // Translations can be submitted:
     showTranslations();
-    // If fileUpload is possible for currently chosen languages, show text accordingly:
-    setTextForSource();
     // When instantTranslation is not active; hide former translations and wait.
     if (!instantTranslationIsActive) {
         hideTranslations();
@@ -305,7 +276,7 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
                     // but not from the source to the SAME target-language.
                     if (languageResourceLocaleToAdd != selectedLocale
                         && $.inArray(languageResourceLocaleToAdd, localesAvailable) === -1) {
-                            localesAvailable.push(languageResourceLocaleToAdd); 
+                            localesAvailable.push(languageResourceLocaleToAdd);
                     }
                 });
             }
@@ -319,20 +290,7 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
 
 //start instant (sic!) translation automatically
 $('#sourceText').bind('keyup', function() {
-    // Check if any engines are available for that language-combination.
-    if (!hasEnginesForLanguageCombination()) {
-        hideTranslations();
-        showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
-        return;
-    }
-    if($('#sourceText').val().length > 0 && $('#sourceText').val() === latestTextToTranslate) {
-        return;
-    }
-    //if the instant translate is disabled, do not translate
-    if(!instantTranslationIsActive){
-    	return;
-    }
-    startTimerForInstantTranslation();
+    checkInstantTranslation();
 });
 
 //instantly after uploading a file: grab the files and set them to uploadedFiles
@@ -361,7 +319,6 @@ function grabUploadedFiles(event){
 function startFileTranslation(){
     var fileName,
         fileType,
-        fileTypesAllowed = getAllowedFileTypes(),
         fileTypesErrorList = [];
     if ($('#sourceFile').val() == "") {
         showSourceError(Editor.data.languageresource.translatedStrings['uploadFileNotFound']);
@@ -371,7 +328,7 @@ function startFileTranslation(){
     $.each(uploadedFiles, function(key, value){
         fileName = value.name;
         fileType = fileName.substr(fileName.lastIndexOf('.')+1,fileName.length);
-        if ($.inArray(fileType, fileTypesAllowed) === -1) {
+        if (!isAllowedFileType(fileType)) {
             fileTypesErrorList.push(fileType);
         }
     });
@@ -416,7 +373,6 @@ function startTranslation() {
     // otherwise: translate Text
     if ($('#sourceText').val().length === 0) {
         // no text given
-        $("#sourceIsText").addClass('source-text-error');
         $('#translations').hide();
         return;
     }
@@ -473,6 +429,14 @@ function translateText(textToTranslate,translationInProgressID){
                 translateTextResponse = result.rows;
                 fillTranslation();
             }
+            stopLoadingSign();
+        },
+        error: function(jqXHR, textStatus) {
+            var errorMsg = textStatus;
+            if (typeof jqXHR.responseJSON.errorMessage !== 'undefined') {
+                errorMsg = jqXHR.responseJSON.errorMessage;
+            }
+            showSourceError('ERRORS: ' + errorMsg);
             stopLoadingSign();
         },
         fail: function(xhr, textStatus, errorThrown){
@@ -676,61 +640,59 @@ function renderTermStatusIcon(termStatus){
     return termStatusHtml;
 }
 
+/* --------------- file translation ----------------------------------------- */
+
 /***
- * Request a file translate for the curent uploaded file
- * @returns
+ * file translation
+ * Create a task and start the import with the pretranslation.
  */
 function requestFileTranslate(){
-
     // Create a formdata object and add the files
-    var data = new FormData(),
-        ext=getFileExtension(),
-        languageCombination = $("#sourceLocale").val()+','+$("#targetLocale").val(),
-        dataForLanguageCombination = fileTypesAllowedAndAvailable[languageCombination];
+    var data = new FormData();
     
     $.each(uploadedFiles, function(key, value){
         data.append(key, value);
     });
-
-    data.append('domainCode', dataForLanguageCombination['domainCode']); // TODO
-    data.append('source', $("#sourceLocale").val());
-    data.append('target', $("#targetLocale").val());
     
-    //when no extension in the file is found, use default file extension
-    data.append('fileExtension', ext != "" ? ext : DEFAULT_FILE_EXT);
+    data.append('source', $('#sourceLocale').val());
+    data.append('target', $('#targetLocale').val());
     
     $.ajax({
-        url:Editor.data.restpath+"instanttranslateapi/file",
+        url:Editor.data.restpath+'instanttranslateapi/filepretranslate',
         type: 'POST',
         data: data,
         cache: false,
         dataType: 'json',
         processData: false, // Don't process the files
         contentType: false, // Set content type to false as jQuery will tell the server its a query string request
-        success: function(data, textStatus, jqXHR){
-            if(typeof data.error === 'undefined'){
-                getDownloadUrl(data.fileId);
+        success: function(result){
+            if(typeof result.error === 'undefined' && result.taskId !== ''){
+                getDownloads();
             }else{
                 // Handle errors here
-                showSourceError('ERRORS: ' + data.error);
+                var error = (result.taskId === '') ? Editor.data.languageresource.translatedStrings['error'] : result.error;
+                showSourceError('ERRORS: ' + error);
+                $('#sourceFile').val('');
                 stopLoadingState();
             }
         },
-        error: function(jqXHR, textStatus, errorThrown)
+        error: function(jqXHR, textStatus)
         {
             // Handle errors here
             showSourceError('ERRORS: ' + textStatus);
+            $('#sourceFile').val('');
             stopLoadingState();
         }
     });
 }
 
 /***
- * Request a download url for given sdl file id
- * @param fileId
+ * file translation
+ * Step 3: Show a list of all pretranslations that are currently available
+ * @param int taskGuid
  * @returns
  */
-function getDownloadUrl(fileId){
+function getDownloads(){
     $.ajax({
         statusCode: {
             500: function() {
@@ -738,60 +700,72 @@ function getDownloadUrl(fileId){
                 showLanguageResourceSelectorError('serverErrorMsg500');
                 }
         },
-        url: Editor.data.restpath+"instanttranslateapi/url",
-        dataType: "json",
-        data: {
-            'fileId':fileId
-        },
+        url: Editor.data.restpath+'instanttranslateapi/filelist',
+        dataType: 'json',
         success: function(result){
-            //when no url from server is provided, the file is not ready yet
-            if(result.downloadUrl==""){
-                setTimeout(function(){ getDownloadUrl(fileId); }, 1000);
-                return;
-            }
-            downloadFile(result.downloadUrl);
+            clearAllErrorMessages();
+            $('#sourceFile').val('');
+            showDownloads(result.allPretranslatedFiles);
+            stopLoadingState();
+        },
+        error: function(jqXHR, textStatus)
+        {
+            // Handle errors here
+            showSourceError('ERRORS: ' + textStatus);
+            $('#sourceFile').val('');
+            $('#pretranslatedfiles').html('');
+            stopLoadingState();
         }
-    })
+    });
 }
 
 /***
- * Download the file from the sdl url.
- * @param url
- * @returns
+ * Offer to download the pretranslated files (= currently: export the task).
+ * @param array allPretranslatedFiles
  */
-function downloadFile(url){
-    var hasFileExt=getFileExtension()!="",
-        fullFileName=hasFileExt ? getFileName():(getFileName()+"."+getFileExtension()),
-        newTab = window.open("about:blank", "translatedFile"),
-        newTabHref = Editor.data.restpath+"instanttranslateapi/download?fileName="+fullFileName+"&url="+url;
-    if(newTab == null) { // window.open does not work in Chrome
-        window.location.href = newTabHref;
-    } else {
-        newTab.location = newTabHref;
+function showDownloads(allPretranslatedFiles){ // array[taskId] = array(taskName, downloadUrl, removeDate)
+    var pretranslatedFiles = [],
+        html = '',
+        htmlFile,
+        showRefreshButton = false;
+    $.each(allPretranslatedFiles, function(taskId, taskData) {
+        htmlFile = '<li>';
+        htmlFile += taskData['taskName'];
+        htmlFile += ' (' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] +'):<br>'; 
+        switch(taskData['downloadUrl']) {
+            case 'isImporting':
+                showRefreshButton = true;
+                htmlFile += '<p style="font-size:80%;">' + Editor.data.languageresource.translatedStrings['noDownloadWhileImport'] + '</p>';
+                break;
+            case 'isErroneous': 
+                htmlFile += '<p style="font-size:80%;" class="error">' + Editor.data.languageresource.translatedStrings['noDownloadAfterError'] + '</p>';
+                break;
+            case 'isNotPretranslated':
+                htmlFile += '<p style="font-size:80%;" class="error">' + Editor.data.languageresource.translatedStrings['noDownloadNotTranslated'] + '</p>';
+                break;
+            default:
+                htmlFile += '<a href="' + taskData['downloadUrl'] + '" class="ui-button ui-widget ui-corner-all">Download</a>';
+        } 
+        htmlFile += '</li>';
+        pretranslatedFiles.push(htmlFile);
+    });
+    if (pretranslatedFiles.length > 0) {
+        html += '<h2>' + Editor.data.languageresource.translatedStrings['pretranslatedFiles'] + ':</h2>';
+        if (showRefreshButton) {
+            html += '<p><a href="#" class="getdownloads ui-button ui-widget ui-corner-all">' + Editor.data.languageresource.translatedStrings['refresh'] + '</a></p>';
+        }
+        html += '<ul>';
+        html += pretranslatedFiles.join(' ');
+        html += '</ul>';
     }
-    stopLoadingState();
+    $('#pretranslatedfiles').html(html);
 }
 
-
-/***
- * Get the file name of the uploaded file
- * @returns
- */
-function getFileName(){
-    //return without fakepath
-    return $('#sourceFile').val().replace(/.*(\/|\\)/, '');;
-}
-
-/***
- * Get file extension of the uploaded file
- * @returns
- */
-function getFileExtension(){
-    var fileName=getFileName(),
-        found = fileName.lastIndexOf('.') + 1,
-        ext = (found > 0 ? fileName.substr(found) : "");
-    return ext;
-}
+$(document).on('click', '.getdownloads' , function(e) {
+    e.stopPropagation();
+    getDownloads();
+    return false;
+});
 
 /* --------------- toggle instant translation ------------------------------- */
 $('.instant-translation-toggle').click(function(){
@@ -953,7 +927,7 @@ function openTermPortal (params) {
 function showSource() {
     $('#sourceContent').show();
     showInstantTranslationOffOn();
-    if (chosenSourceIsText || getAllowedFileTypes().length === 0) {
+    if (chosenSourceIsText || !isFileUploadAvailable()) {
         $('.show-if-source-is-text').show();
         $('.show-if-source-is-file').hide();
         $('#translations').show();
