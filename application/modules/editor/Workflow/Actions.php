@@ -219,9 +219,9 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     } 
     
     /***
-     * Checks the delivery dates, if a task is overdue, it'll be finished for all lectors, triggers normal workflow handlers if needed.
+     * Checks the deadine dates of a task assoc, if it is overdued, it'll be finished for all lectors, triggers normal workflow handlers if needed.
      */
-    public function finishOverduedTasks(){
+    public function finishOverduedTaskUserAssoc(){
         $workflow = $this->config->workflow;
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
@@ -237,7 +237,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         ->where('tua.role = ?', $workflow::ROLE_REVIEWER)
         ->where('tua.state != ?', $workflow::STATE_FINISH)
         ->where('t.state = ?', $workflow::STATE_OPEN)
-        ->where('targetDeliveryDate < CURRENT_DATE');
+        ->where('tua.deadlineDate < CURRENT_DATE');
         $taskRows = $db->fetchAll($s);
         
         foreach($taskRows as $row) {

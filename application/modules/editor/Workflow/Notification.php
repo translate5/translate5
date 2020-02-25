@@ -130,7 +130,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             foreach($receiverRoleMap as $recRole => $roles) {
                 if($recRole == '*' || $recRole == $receiverRole) {
                     foreach($roles as $role) {
-                        $users = array_merge($users,$tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $role));
+                        $users = array_merge($users,$tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $role,['deadlineDate']));
                     }
                 }
                 if($recRole == 'byUserLogin') {
@@ -218,8 +218,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
-        $users = $tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $nextRole);
-        $previousUsers = $tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggeringRole);
+        $users = $tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $nextRole,['deadlineDate']);
+        $previousUsers = $tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggeringRole,['deadlineDate']);
         $params = array(
             'triggeringRole' => $triggeringRole,
             'nextRole' => $nextRole,
@@ -278,7 +278,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             ]);
         }
         
-        $currentUsers = $this->tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggeringRole, ['state']);
+        $currentUsers = $this->tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggeringRole, ['state','deadlineDate']);
         $params = array(
             'triggeringRole' => $triggeringRole,
             'currentUsers' => $currentUsers,
@@ -363,6 +363,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             'pm' => $pm,
             'task' => $this->config->task,
             'role' => $labels[array_search($tua->getRole(), $roles)],
+            'taskUserAssoc' => (array) $this->tua->getDataObject()
         ];
         
         $this->createNotification($tua->getRole(), __FUNCTION__, $params);
@@ -380,17 +381,16 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $task = $this->config->task;
         $this->tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         
-        $workflow = $this->config->workflow;
-        $labels = $workflow->getLabels(false);
-        $tuas = $this->tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggerConfig->role ?? null, ['state', 'role']);
+        $tuas = $this->tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggerConfig->role ?? null, ['state', 'role','deadlineDate','assignmentDate','finishedDate']);
         
         $roles = array_column($tuas, 'role');
         //sort first $roles, then sort $tuas to the same order (via the indexes)
         array_multisort($roles, SORT_ASC, SORT_STRING, $tuas);
         $aRoleOccursMultipleTimes = count($roles) !== count(array_flip($roles));
+        
+        
         foreach($tuas as &$tua) {
             $tua['originalRole'] = $tua['role'];
-            $tua['role'] = $labels[array_search($tua['role'], $workflow->getRoles())];
         }
         unset ($tua);
         
@@ -409,6 +409,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         foreach($tuas as $tua) {
             $params['role'] = $tua['role'];
+            $params['taskUserAssoc'] =$tua;
             //we assume the PM user for all roles, since it is always the same template
             $this->createNotification(ACL_ROLE_PM, 'notifyNewTaskAssigned', $params);
             $user->loadByGuid($tua['userGuid']);
@@ -451,72 +452,18 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     
     
     /***
-     * Notify the lectors when the delivery date is over the defined days in the config
+     * Notify the task assock when the delivery date is over the defined days in the config
      */
-    public function notifyOverdueTasks(){
-        $triggerConfig = $this->initTriggerConfig(func_get_args());
-        $daysOffset=isset($triggerConfig->daysOffset) ? $triggerConfig->daysOffset : 1;
-        
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        
-        //load all tasks where the delivery date overdue the current date - days offset
-        $db = Zend_Registry::get('db');
-        /* @var $db Zend_Db_Table */
-        $s = $db->select()
-        ->from(array('tua' => 'LEK_taskUserAssoc'), ['taskGuid'])
-        ->distinct()
-        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
-        ->where('tua.role = ?', editor_Workflow_Abstract::ROLE_REVIEWER)
-        ->where('tua.state != ?', editor_Workflow_Abstract::STATE_FINISH)
-        ->where('t.state = ?', $task::STATE_OPEN)
-        ->where('targetDeliveryDate = CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
-        $tasks = $db->fetchAll($s);
-        
-        $this->tua = $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        
-        $wf = $this->config->workflow;
-        
-        $notifyRole=$wf::ROLE_REVIEWER;
-        if(isset($triggerConfig->receiverRole)){
-            $notifyRole=$triggerConfig->receiverRole;
-        }
-        $template=__FUNCTION__;
-        if(isset($triggerConfig->template)){
-            $template=$triggerConfig->template;
-        }
-        
-        
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        if(isset($triggerConfig->receiverUser)){
-            $user->loadByLogin($triggerConfig->receiverUser);
-        }
-        
-        foreach($tasks as $oneTask) {
-            $task->loadByTaskGuid($oneTask['taskGuid']);
-            $this->config->task = clone $task;
-            
-            //if the receiverUser user is configured, send mail only to receiverUser
-            if(isset($triggerConfig->receiverUser)){
-                $reviewers=[(array)$user->getDataObject()];
-            }else{
-                //load only users with state open
-                $reviewers = $tua->loadUsersOfTaskWithRole($oneTask['taskGuid'], $notifyRole, ['state'], editor_Models_Task::STATE_OPEN);
-            }
-            
-            $params = [
-                'task' => $this->config->task,
-                'reviewers' => $reviewers,
-            ];
-            
-            foreach($reviewers as $reviewer) {
-                $this->createNotification($notifyRole, $template, $params);
-                $this->addCopyReceivers($triggerConfig, $notifyRole);
-                $this->notify($reviewer);
-            }
-        }
+    public function notifyOverdueDeadline(){
+        $this->deadlineNotifier($this->initTriggerConfig(func_get_args()),__FUNCTION__,false);
+    }
+    
+    /***
+     * Notify the the associated users when the deadlineDate is approaching.
+     * daysOffset config: how many days before the deadline an email is send
+     */
+    public function notifyDeadlineApproaching(){
+        $this->deadlineNotifier($this->initTriggerConfig(func_get_args()),__FUNCTION__,true);
     }
     
     /**
@@ -583,40 +530,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         //remove the tmp file from the disc
         unlink($file);
-    }
-    
-    
-    /***
-     * Notify the the associated users when the deadlineDate is over the defined days in the config
-     */
-    public function notifyOverdueDeadline(){
-        $triggerConfig = $this->initTriggerConfig(func_get_args());
-        $daysOffset=isset($triggerConfig->daysOffset) ? $triggerConfig->daysOffset : 1;
-        
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        
-        //load all task assocks where the deadlineDate date overdue the current date - days offset
-        $db = Zend_Registry::get('db');
-        /* @var $db Zend_Db_Table */
-        $s = $db->select()
-        ->from(array('tua' => 'LEK_taskUserAssoc'), ['userGuid','role','deadlineDate'])
-        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid',['taskName'])
-        ->where('t.state NOT IN(?)', [$task::STATE_ERROR,$task::STATE_END])
-        ->where('tua.state NOT IN(?)', [editor_Workflow_Abstract::STATE_FINISH])
-        ->where('tua.deadlineDate = CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
-        $userAssocs = $db->fetchAll($s);
-        
-        foreach($userAssocs as $assoc) {
-            $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-            /* @var $user ZfExtended_Models_User */
-            $user->loadByGuid($assoc['userGuid']);
-            $this->createNotification($assoc['role'],__FUNCTION__,[
-                'taskName' => $assoc['taskName'],
-                'deadlineDate' =>$assoc['deadlineDate']
-            ]);
-            $this->notifyUser($user);
-        }
     }
     
     
@@ -807,5 +720,82 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->attachXliffSegmentList($segmentHash, $segments,$currentStep);
         //$this->addCopyReceivers($triggerConfig, $nextRole);
         $this->notify($user);
+    }
+    
+    /***
+     * Deadline notifier. It will send notification to the configured user assocs days before or after the current day (days +/- can be defined in config default to 1)
+     * 
+     * @param string $triggerConfig
+     * @param string $template: template to be used for the mail
+     * @param bool $isApproaching: default will notify daysOffset before deadline
+     */
+    protected function deadlineNotifier(stdClass $triggerConfig,string $template,bool $isApproaching=false) {
+        
+        $daysOffset=isset($triggerConfig->daysOffset) ? $triggerConfig->daysOffset : 1;
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        
+        $db = Zend_Registry::get('db');
+        /* @var $db Zend_Db_Table */
+        $wf = $this->config->workflow;
+        
+        //if no receiverRole is defined, all roles will be used
+        $notifyRole=null;
+        if(isset($triggerConfig->receiverRole)){
+            $notifyRole=$triggerConfig->receiverRole;
+        }
+        
+        if(isset($triggerConfig->template)){
+            $template=$triggerConfig->template;
+        }
+        
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        
+        $s = $db->select()
+        ->from(array('tua' => 'LEK_taskUserAssoc'))
+        ->join(array('u' => $user->db->info($user->db::NAME)),'tua.userGuid=u.userGuid',['userGuid', 'firstName', 'surName', 'gender', 'login', 'email', 'roles', 'locale'])
+        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid',[]);
+        if(!empty($notifyRole)){
+            $s->where('tua.role = ?', $notifyRole);
+        }
+        $s->where('tua.state != ?', $wf::STATE_FINISH)
+        ->where('t.state = ?', $task::STATE_OPEN)
+        ->where('tua.deadlineDate=CURRENT_DATE '.($isApproaching ? '+' : '-').' INTERVAL ? DAY', $daysOffset);
+        
+        $tuas = $db->fetchAll($s);
+        
+        if(empty($tuas)){
+            return ;
+        }
+        $this->tua = $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        
+        
+        if(isset($triggerConfig->receiverUser)){
+            $user->loadByLogin($triggerConfig->receiverUser);
+        }
+        
+        foreach($tuas as $tua) {
+            $task->loadByTaskGuid($tua['taskGuid']);
+            $this->config->task = clone $task;
+            
+            $assoc=$tua;
+            //if the receiverUser user is configured, send mail only to receiverUser
+            if(isset($triggerConfig->receiverUser)){
+                $assoc=(array)$user->getDataObject();
+            }
+            
+            $params = [
+                'task' => $this->config->task,
+                'taskUserAssoc'=>$tua,
+                'daysOffset'=>$daysOffset
+            ];
+            
+            $this->createNotification($tua['role'], $template, $params);
+            $this->addCopyReceivers($triggerConfig,$tua['role']);
+            $this->notify($assoc);
+        }
     }
 }

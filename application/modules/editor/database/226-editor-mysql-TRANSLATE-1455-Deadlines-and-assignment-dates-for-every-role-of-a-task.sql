@@ -30,13 +30,13 @@ ALTER TABLE `LEK_taskUserAssoc` ADD COLUMN `deadlineDate` datetime NULL DEFAULT 
 ALTER TABLE `LEK_taskUserAssoc` ADD COLUMN `assignmentDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE `LEK_taskUserAssoc` ADD COLUMN `finishedDate` datetime NULL DEFAULT NULL;
 
-#update the dedline date for all reviewers from the task orderdate
+#update the dedline date for all reviewers from the task targetDeliveryDate
 UPDATE LEK_taskUserAssoc dest,
   (
-    SELECT orderdate,taskGuid FROM LEK_task 
+    SELECT targetDeliveryDate,taskGuid FROM LEK_task 
   ) src 
 SET
-  dest.deadlineDate = src.orderdate
+  dest.deadlineDate = src.targetDeliveryDate
 WHERE dest.taskGuid = src.taskGuid 
   AND dest.role ='reviewer';
   
@@ -64,8 +64,8 @@ SET
   dest.assignmentDate = src.created
 WHERE dest.id = src.id;
 
-DELETE FROM `Zf_acl_rules` WHERE `right`='editorEditTaskOrderDate';
-ALTER TABLE `LEK_task` DROP COLUMN `orderdate`;
+DELETE FROM `Zf_acl_rules` WHERE `right`='editorEditTaskDeliveryDate';
+ALTER TABLE `LEK_task` DROP COLUMN `targetDeliveryDate`;
 
 
 #update the finishedDate for all reviewers from a task realDeliveryDate
@@ -86,14 +86,12 @@ ALTER TABLE `LEK_task` DROP COLUMN `realDeliveryDate`;
 #daily cron notification days before overdued task assoc deadlines
 INSERT INTO `LEK_workflow_action` (`workflow`,`trigger`,`inStep`,`byRole`,`userState`,`actionClass`,`action`,`parameters`,`position`)
 VALUES 
-('default', 'doCronDaily', null, null, null, 'editor_Workflow_Notification', 'notifyOverdueDeadline', '{"daysOffset": 2}', 0);
+('default', 'doCronDaily', null, null, null, 'editor_Workflow_Notification', 'notifyDeadlineApproaching', '{"daysOffset": 2}', 0);
 
 
 ALTER TABLE `LEK_workflow_action` 
 ADD COLUMN `description` VARCHAR(1024) NULL COMMENT 'contains a human readable description for the row' AFTER `position`;
 
 UPDATE `LEK_workflow_action` SET `description`='For the separate delivery date of every role a reminder mail is send by the translate5 cronController. How much days before the deadline a reminder will be send is defined in the parameters column. Example of 2 days before deadline reminder: {\"daysOffset\": 2}' 
-WHERE `action`='notifyOverdueDeadline';
-
-
+WHERE `action`='notifyDeadlineApproaching';
   
