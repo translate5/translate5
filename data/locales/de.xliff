@@ -23,6 +23,10 @@
 <trans-unit id='RXJlaWduaXNzZSB6dSBTcHJhY2hyZXNvdXJjZSAiezB9Ig=='><source>Ereignisse zu Sprachresource "{0}"</source><target>Ereignisse zu Sprachresource "{0}"</target></trans-unit>
 <trans-unit id='TG9n'><source>Log</source><target>Log</target></trans-unit>
 <trans-unit id='T2JlcmZsw6RjaGU='><source>Oberfläche</source><target>Oberfläche</target></trans-unit>
+<trans-unit id='b3Blbg=='><source>open</source><target>offen</target></trans-unit>
+<trans-unit id='d2FpdGluZw=='><source>waiting</source><target>wartend</target></trans-unit>
+<trans-unit id='ZmluaXNoZWQ='><source>finished</source><target>abgeschlossen</target></trans-unit>
+<trans-unit id='dW5jb25maXJtZWQ='><source>unconfirmed</source><target>unbestätigt</target></trans-unit>
   </body>
  </file>
 </xliff>
