@@ -401,7 +401,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               case /(^|[\s])tmMatchGridResultTooltip([\s]|$)/.test(item.className):
                   // diffTagger-markups in Fuzzy Matches: keep the text from ins-Tags, remove del-Tags completely
                   if (item.tagName.toLowerCase() === 'ins') {
-                  	me.result.push(item.textContent);
+                  	text = item.textContent.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
+                    me.result.push(Ext.htmlEncode(text));
+                    plainContent.push(Ext.htmlEncode(text));
                   }
                   if (item.tagName.toLowerCase() === 'del') {
                   	// -
