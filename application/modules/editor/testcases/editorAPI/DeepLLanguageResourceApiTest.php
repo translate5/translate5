@@ -146,7 +146,7 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $params['resourcesCustomersHidden'] = json_encode($customerParamArray);
         $this->api()->requestJson('editor/languageresourceinstance', 'POST', [], $params);
         $responseBody = json_decode($this->api()->getLastResponse()->getBody());
-        $this->assertObjectHasAttribute('rows', $responseBody, 'Creating a DeepL-LanguageResource failed. Check authorization for DeepL.');
+        $this->assertObjectHasAttribute('rows', $responseBody, 'Creating a DeepL-LanguageResource failed. Check configured runtimeOptions for DeepL.');
         self::$languageResourceID = $responseBody->rows->id;
     }
     
