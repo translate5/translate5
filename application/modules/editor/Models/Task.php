@@ -285,41 +285,30 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * This is used for the user workflow filter in the advance filter store.
      * INFO:Associated users for the anonimized tasks will not be loaded
      *
-     * @param bool $loadAll
      * @param string $userGuid
+     * @param bool $loadAll
+     * 
      * @return array
      */
-    public function loadUserList(bool $loadAll=false,string $userGuid) {
+    public function loadUserList(string $userGuid,bool $loadAll=false) {
         
-        $s=$this->db->select();
+        if(!$loadAll){
+            $s=$this->getSelectByUserAssocSql($userGuid, '*', $loadAll);
+        }else{
+            $s=$this->db->select()->setIntegrityCheck(false);
+        }
         
         //apply the frontend task filters
         $this->applyFilterAndSort($s);
-        
-        //get the current table joins
-        $joins=$s->getPart($s::FROM);
-        
-        //check if the join already exist, if not join the table
-        if(!isset($joins['LEK_customer'])){
-            $s->join('LEK_customer', 'LEK_task.customerId=LEK_customer.id',[]);
-        }
-        //check if the join already exist, if not join the table
-        if(!isset($joins['LEK_taskUserAssoc'])){
-            $s->join('LEK_taskUserAssoc','LEK_taskUserAssoc.taskGuid= LEK_task.taskGuid',[]);
-            
-        }
-        //check if the join already exist, if not join the table
-        if(!isset($joins['Zf_users'])){
-            $s->join('Zf_users','Zf_users.userGuid=LEK_taskUserAssoc.userGuid',['Zf_users.*']);
-        }
-        
-        $s->where('LEK_customer.anonymizeUsers=0');
-        
-        if(!$loadAll){
-            $s->where('LEK_taskUserAssoc.userGuid = ? OR LEK_task.pmGuid = ?',$userGuid);
-        }
-        $s->group('Zf_users.id');
-        return $this->db->fetchAll($s)->toArray();
+        //the inner query is the current task list with activ filters
+        $sql='SELECT Zf_users.*,filter.taskGuid from Zf_users, '.
+            '('.$s->assemble().') as filter '.
+             'INNER JOIN LEK_taskUserAssoc ON LEK_taskUserAssoc.taskGuid=filter.taskGuid '.
+             'INNER JOIN LEK_customer ON LEK_customer.id=filter.customerId AND LEK_customer.anonymizeUsers=0 '.
+             'WHERE Zf_users.userGuid=LEK_taskUserAssoc.userGuid '.
+             'GROUP BY Zf_users.id; ';
+        $stmt = $this->db->getAdapter()->query($sql);
+        return $stmt->fetchAll();
     }
     
     /**
