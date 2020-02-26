@@ -432,11 +432,7 @@ function translateText(textToTranslate,translationInProgressID){
             stopLoadingSign();
         },
         error: function(jqXHR, textStatus) {
-            var errorMsg = textStatus;
-            if (typeof jqXHR.responseJSON.errorMessage !== 'undefined') {
-                errorMsg = jqXHR.responseJSON.errorMessage;
-            }
-            showSourceError('ERRORS: ' + errorMsg);
+            showSourceError('ERRORS: ' + textStatus);
             stopLoadingSign();
         },
         fail: function(xhr, textStatus, errorThrown){
