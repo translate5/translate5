@@ -634,7 +634,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         if($xliff2Active){
             $xliffConf = [
                     editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_TERMINOLOGY=>true,
-                    editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF=>false,
+                    editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF=>true,
                     editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_QM=>true,
             ];
             return ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf, $currentStep]);
