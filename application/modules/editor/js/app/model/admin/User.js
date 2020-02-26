@@ -114,7 +114,8 @@ Ext.define('Editor.model.admin.User', {
               }
               break;
           case 'editorEditTask':
-              if(notOpenable || task.isReadOnly()) {
+              //it will ignore unconfirmed state as readonly
+              if(notOpenable || task.isReadOnly(true)) {
                   return false;
               }
               break;
