@@ -147,18 +147,24 @@ Ext.define('Editor.view.ViewPortEditor', {
           	  border:0,
     	};
     	
-    	if(!Editor.data.editor.editorBrandingSource){
-    		return config;
+    	//if the branding source is provided, load the content from the branding source
+    	if(Editor.data.editor.editorBrandingSource){
+    		return  Ext.Object.merge(config,{
+    			items: [{
+    				xtype: 'component',
+    				autoEl: {
+    					tag: 'iframe',
+    					style: {
+    						border : 0
+    					},
+    					src:Editor.data.editor.editorBrandingSource,
+    				}
+    			}]
+    		});
     	}
     	
-    	return  Ext.Object.merge(config,{
-    		loader:{
-    			url:Editor.data.editor.editorBrandingSource,
-    			renderer: 'html',
-    			autoLoad: true,
-    			scripts: true
-    		}
-    	});
-    	
+		return  Ext.Object.merge(config,{
+			html: Editor.data.app.customHtmlContainer,
+		});
     },
 });
