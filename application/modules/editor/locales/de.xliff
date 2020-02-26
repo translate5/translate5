@@ -1727,6 +1727,7 @@ Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> 
 {footer}</source><target>{header}
 Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> für die Aufgabe <b>"{taskName}"</b> nähert.
 {footer}</target></trans-unit>
+<trans-unit id='VVJMIGbDvHIgVmlzdWFsIFJldmlldyBIVE1M'><source>URL für Visual Review HTML</source><target>URL für Visual Review HTML</target></trans-unit>
   </body>
  </file>
 </xliff>
