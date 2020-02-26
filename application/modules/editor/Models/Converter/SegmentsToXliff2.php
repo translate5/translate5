@@ -655,9 +655,9 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     protected function prepareText($text) {
         //if active, track changes are exported as mrk tag, if not we remove the track changes content
         if($this->options[self::CONFIG_INCLUDE_DIFF]){
-            $text=$this->taghelperTrackChanges->removeTrackChanges($text);
-        }else{
             $text=$this->trackChangesAsMrk($text);
+        }else{
+            $text=$this->taghelperTrackChanges->removeTrackChanges($text);
         }
         
         // 1. toXliff converts the internal tags to xliff 2 tags
