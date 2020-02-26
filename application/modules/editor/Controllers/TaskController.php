@@ -232,9 +232,9 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function indexAction() {
         //set default sort
-        $f = $this->entity->getFilter();
-        $f->hasSort() || $f->addSort('orderdate', true);
+        $this->addDefaultSort();
         
+        $f = $this->entity->getFilter();
         // load only 'visible' tasks (further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
         $f->addFilter((object)[
             'field' => 'taskType',
@@ -255,8 +255,8 @@ class editor_TaskController extends ZfExtended_RestController {
      * limit accordingly (= for all filtered tasks: no limit).
      */
     public function  kpiAction() {
-        $f = $this->entity->getFilter();
-        $f->hasSort() || $f->addSort('orderdate', true);
+        //set default sort
+        $this->addDefaultSort();
         $rows = $this->loadAll();
         
         $kpi = ZfExtended_Factory::get('editor_Models_KPI');
@@ -288,11 +288,13 @@ class editor_TaskController extends ZfExtended_RestController {
      * This is used for the user workflow filter in the advance filter store
      */
     public function userlistAction(){
+        //set default sort
+        $this->addDefaultSort();
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
         $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
         //set the default table to lek_task
         $this->entity->getFilter()->setDefaultTable('LEK_task');
-        $this->view->rows=$this->entity->loadUserList($isAllowedToLoadAll,$this->user->data->userGuid);
+        $this->view->rows=$this->entity->loadUserList($this->user->data->userGuid,$isAllowedToLoadAll);
     }
     
     /**
@@ -1506,5 +1508,13 @@ class editor_TaskController extends ZfExtended_RestController {
             return;
         }
         $this->log->warn('E1210','The targetDeliveryDate for the task is deprecated. Use the LEK_taskUserAssoc deadlineDate instead.');
+    }
+    
+    /***
+     * Add the task default if sort is not provided
+     */
+    protected function addDefaultSort(){
+        $f = $this->entity->getFilter();
+        $f->hasSort() || $f->addSort('orderdate', true);
     }
 }
