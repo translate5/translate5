@@ -239,7 +239,6 @@ class editor_Plugins_Okapi_Connector {
             $this->processResponse($response);
         }
         catch (Exception $e) {
-            error_log($e);
             return 'Okapi '.$url.' DOWN!';
         }
         return 'Okapi '.$url.' UP!';
