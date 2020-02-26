@@ -204,13 +204,14 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
             $params['text'] = $text;
             $this->api()->requestJson('editor/instanttranslateapi/translate', 'GET', $params); // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
             $responseBody = json_decode($this->api()->getLastResponse()->getBody());
-            $allTranslations = json_decode(json_encode($responseBody->rows), true);
             // Is anything returned for Deep at all?
+            $this->assertIsObject($responseBody->rows, 'InstantTranslate: Response for translation does not return any rows.');
+            $allTranslations = (array)$responseBody->rows;
+            $this->assertIsArray($allTranslations);
             $this->assertArrayHasKey('DeepL', $allTranslations, 'InstantTranslate: Translations do not include a response for DeepL.');
             // Does the result match our expectations?
             foreach ($allTranslations['DeepL'] as $translationFromDeepL){
-                $translationArr = $translationFromDeepL[0];
-                $translation = htmlspecialchars_decode($translationArr['target']);
+                $translation = htmlspecialchars_decode($translationFromDeepL[0]->target);
                 $this->assertEquals($expectedTranslation, $translation, 'Result of translation is not as expected! Text was:'."\n".$text);
             }
         }
