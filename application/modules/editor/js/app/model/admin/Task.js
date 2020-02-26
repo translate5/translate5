@@ -245,14 +245,16 @@ Ext.define('Editor.model.admin.Task', {
   },
   /**
    * returns if task is readonly
+   * @param ignoreUnconfirmed : ignore the unconfirmed state as readonly case
    * @returns {Boolean}
    */
-  isReadOnly: function() {
-      var me = this;
+  isReadOnly: function(ignoreUnconfirmed) {    
+      var me = this,
+        isUnconfirmed=!ignoreUnconfirmed && me.isUnconfirmed();//ingore the unconfirmed state as readonly
       if(me.get('userRole') == 'visitor' || me.get('userState') == me.USER_STATE_VIEW){
           return true;
       }
-      return !me.isEditable() || me.isFinished() || me.isWaiting() || me.isEnded() || me.isUnconfirmed();
+      return !me.isEditable() || me.isFinished() || me.isWaiting() || me.isEnded() || isUnconfirmed;
   },
   /**
    * returns if task is ended
