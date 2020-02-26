@@ -308,7 +308,10 @@ trait editor_Models_Export_FileParser_MQMTrait {
         $current = true;
         while ($current!==false) {
             $current = next($this->_stack);
-            if(!is_string($current) && $current['data']['type']==='open' && isset($this->_openTagsInLoop[(int)$current['data']['id']])){
+            if(is_string($current) || !isset($current['data']['type'])) {
+                continue;
+            }
+            if($current['data']['type'] ==='open' && isset($this->_openTagsInLoop[(int)$current['data']['id']])){
                 return $current;
             }
         }
