@@ -95,16 +95,9 @@ Ext.define('Editor.view.ViewPortEditor', {
               header:{
             	  height:49,
               },
-              items:[{
-            	  xtype: 'panel',
-            	  cls: 'head-panel-brand',
-            	  maxHeight:150,
-            	  maxWidth:'100%',
-            	  region: 'north',
-            	  autoScroll:true,
-            	  border:0,
-            	  html: Editor.data.app.customHtmlContainer,
-              },{
+              items:[
+            	  	me.getBrandConfig()
+            	  ,{
                   xtype: 'panel',
                   region: 'center',
                   listeners: {
@@ -138,5 +131,40 @@ Ext.define('Editor.view.ViewPortEditor', {
           items: items
       });
       me.callParent(arguments);
-    }
+    },
+    
+    /***
+     * Get the editor branding configuration. If brandingSource is provided, component loader with this source will be initialized
+     */
+    getBrandConfig:function(){
+    	var config={
+    		  xtype: 'panel',
+          	  cls: 'head-panel-brand',
+          	  maxHeight:150,
+          	  maxWidth:'100%',
+          	  region: 'north',
+          	  autoScroll:true,
+          	  border:0,
+    	};
+    	
+    	//if the branding source is provided, load the content from the branding source
+    	if(Editor.data.editor.editorBrandingSource){
+    		return  Ext.Object.merge(config,{
+    			items: [{
+    				xtype: 'component',
+    				autoEl: {
+    					tag: 'iframe',
+    					style: {
+    						border : 0
+    					},
+    					src:Editor.data.editor.editorBrandingSource,
+    				}
+    			}]
+    		});
+    	}
+    	
+		return  Ext.Object.merge(config,{
+			html: Editor.data.app.customHtmlContainer,
+		});
+    },
 });
