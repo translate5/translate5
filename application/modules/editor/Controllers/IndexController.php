@@ -295,6 +295,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('tasks.simultaneousEditingKey', editor_Models_Task::INTERNAL_LOCK.editor_Models_Task::USAGE_MODE_SIMULTANEOUS);
       $this->setLanguageResourceJsVars();
       
+      $this->view->Php2JsVars()->set('editor.editorBrandingSource',$rop->editor->editorBrandingSource);
       $this->setJsAppData();
     }
 
