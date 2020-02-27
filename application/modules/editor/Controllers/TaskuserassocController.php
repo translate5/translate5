@@ -116,6 +116,22 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     protected function decodePutData() {
         parent::decodePutData();
+        
+        //lector deprecated message
+        $lectorUsed = false;
+        if(is_object($this->data) && property_exists($this->data, 'role') && $this->data->role == 'lector') {
+            $this->data->role = editor_Workflow_Abstract::ROLE_REVIEWER;
+            $lectorUsed = true;
+        }
+        elseif(is_array($this->data) && array_key_exists('role', $this->data) && $this->data['role'] == 'lector') {
+            $this->data['role'] = editor_Workflow_Abstract::ROLE_REVIEWER;
+            $lectorUsed = true;
+        }
+        if($lectorUsed) {
+            Zend_Registry::get('logger')->warn('E1232', 'Job creation: role "lector" is deprecated, use "reviewer" instead!');
+        }
+        
+        
         //may not be set from outside!
         if(is_object($this->data) && property_exists($this->data, 'staticAuthHash')) {
             unset($this->data->staticAuthHash);

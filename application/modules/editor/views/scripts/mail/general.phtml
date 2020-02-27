@@ -99,7 +99,7 @@ if(!empty($this->task)) {
     $taskData = $this->workflowNotifyMail()->getTaskLanguages($this->task);
     $taskData['task'] = $this->task->getDataObject();
 
-    $taskData['deadlineDate'] = $this->taskUserAssoc['deadlineDate'];
+    $taskData['deadlineDate'] = $this->taskUserAssoc['deadlineDate'] ?? '-';
     $taskData['wordCount'] = $this->task->getWordCount() > 0 ? $this->task->getWordCount() : '-';
     
     $customer=ZfExtended_Factory::get('editor_Models_Customer');
