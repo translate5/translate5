@@ -52,7 +52,7 @@ $this->textbody = strip_tags($this->templateApply($template, [
     'task' => $this->task->getDataObject(),
     'header' => $this->header,
     'footer' => $this->footer,
-    'previousRole' => $this->translate->_('Lektoren'),
+    'previousRole' => $this->translate->_($this->triggeringRole),
     'changedSegments' => $this->htmlOnly,
 ]));
 

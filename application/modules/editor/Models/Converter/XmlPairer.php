@@ -75,6 +75,19 @@ class editor_Models_Converter_XmlPairer {
      */
     protected $validCloseTags = ['ex', 'ept'];
     
+    /**
+     * Only pairs in the same container can be replaced. 
+     * Fixes TRANSLATE-1841 where immutable mrk tag pairs mess up the nested output.
+     * @var integer
+     */
+    protected $containerId = 0;
+    
+    /**
+     * container stack, see containerId
+     * @var array
+     */
+    protected $containerStack = [];
+    
     public function pairTags($xmlAllUnpaired) {
         //split up tags and text in nodes
         $this->nodeList = preg_split('/(<[^>]*>)/i', $xmlAllUnpaired, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
@@ -151,8 +164,10 @@ class editor_Models_Converter_XmlPairer {
     protected function parseNode($idx, $node) {
         $m = $this->createNode($idx, $node);
         if($m === false) {
+            $this->adjustContainerLevel($node);
             return;
         }
+        $m->containerId = end($this->containerStack);
         
         if($m->isOpener()) {
             //take care of the opener reference
@@ -203,6 +218,24 @@ class editor_Models_Converter_XmlPairer {
     }
     
     /**
+     * only single tags in the same container (like <mrk></mrk>) should be paired
+     * @param string $node
+     * @return editor_Models_Converter_XmlPairerNode|boolean
+     */
+    protected function adjustContainerLevel(string $node) {
+        $matches = [];
+        if(preg_match('#<(/)?[^>]*>#', $node, $matches)) {
+            // if the "/" is not found in matches, then it is a opener
+            if(count($matches) == 1) {
+                $this->containerStack[] = ++$this->containerId;
+            }
+            else {
+                array_pop($this->containerStack);
+            }
+        }
+    }
+    
+    /**
      * calculates the nesting level
      * @param editor_Models_Converter_XmlPairerNode $currentNode
      */
@@ -242,7 +275,7 @@ class editor_Models_Converter_XmlPairer {
      */
     protected function addAsChild(editor_Models_Converter_XmlPairerNode $currentNode) {
         foreach($this->openersById as $rid => $node) {
-            if($node->rid === $currentNode->rid) {
+            if(!is_null($node->rid) && $node->rid === $currentNode->rid) {
                 //don't add the partner as child
                 continue; 
             }
@@ -296,6 +329,12 @@ class editor_Models_Converter_XmlPairerNode {
     public $children = [];
     
     /**
+     * level for the real tag pair container of this node (existing mrk pairs for example)
+     * @var integer
+     */
+    public $containerId;
+    
+    /**
      * @param int $idx The node index in the original node array
      * @param bool $open true when open tag, false when closing tag
      * @param mixed $rid The reference ID to match open and close tag
@@ -322,6 +361,9 @@ class editor_Models_Converter_XmlPairerNode {
      * @return boolean
      */
     public function isReplaceable() {
+        if($this->containerId !== $this->partner->containerId) {
+            return false;
+        }
         foreach($this->children as $child) {
             //if one child has the same or a lesser level, this node is not replacable
             if($child->level <= $this->level) {

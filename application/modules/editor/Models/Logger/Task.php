@@ -83,7 +83,10 @@ class editor_Models_Logger_Task extends ZfExtended_Models_Entity_Abstract {
     public function loadByTaskGuid($taskGuid) {
         $s = $this->db->select();
         $s->where('taskGuid = ?', $taskGuid);
-        return $this->loadFilterdCustom($s);
+        return array_map(function($item) {
+            $item['message'] = htmlspecialchars($item['message']);
+            return $item;
+        }, $this->loadFilterdCustom($s));
     }
     
     /**
@@ -98,7 +101,10 @@ class editor_Models_Logger_Task extends ZfExtended_Models_Entity_Abstract {
         $s->where('level in (?)', [$errornousLevels]);
         $s->order('id DESC');
         $s->limit('5');
-        return $this->db->fetchAll($s)->toArray();
+        return array_map(function($item) {
+            $item['message'] = htmlspecialchars($item['message']);
+            return $item;
+        }, $this->db->fetchAll($s)->toArray());
     }
     
     /**

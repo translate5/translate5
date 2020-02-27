@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file source-language="de-DE" target-language="en-GB">
+    <body>
+      <trans-unit id="1">
+        <source>zurück <bpt id="1" rid="1" />zum Haus<ept id="2" rid="1" /></source>
+        <target>back <bpt id="1" rid="1" />to the house<ept id="2" rid="1" /></target>
+      </trans-unit>
+      <trans-unit id="2">
+        <source><bpt id="1" rid="1" />das Haus<ept id="2" rid="1" /> ist zurück</source>
+        <target><bpt id="1" rid="1" />the house<ept id="2" rid="1" /> is back</target>
+      </trans-unit>
+      <trans-unit id="3">
+        <source><bpt id="1" rid="1" />aus die maus<ept id="2" rid="1" />ENDE</source>
+        <target><bpt id="1" rid="1" />off the mouse<ept id="2" rid="1" />ENDE</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

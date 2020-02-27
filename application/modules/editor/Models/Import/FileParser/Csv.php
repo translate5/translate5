@@ -295,7 +295,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             }
 
             //get type and editable state of the field
-            if(empty($csvSettings[$colHead]) && $csvSettings[$colHead] !=="0"){
+            if(!isset($csvSettings[$colHead]) || strlen($csvSettings[$colHead]) === 0){
                 //if no column is configured, its a target
                 $type = editor_Models_SegmentField::TYPE_TARGET;
                 $editable = true;
@@ -310,11 +310,11 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             //we ensure that columns with the same name in one csv file are made unique
             // this is needed by addfield to map fields between different files 
             // if mid exists multiple times in the header, only the last one is used. 
-            if(empty($foundHeader[$colHead]) && $foundHeader[$colHead] !=="0") {
-                $foundHeader[$colHead] = 1;
+            if(isset($foundHeader[$colHead]) && strlen($foundHeader[$colHead]) > 0) {
+                $colHead .= '_'.($foundHeader[$colHead]++);
             }
             else {
-                $colHead .= '_'.($foundHeader[$colHead]++);
+                $foundHeader[$colHead] = 1;
             }
             $name = $this->segmentFieldManager->addField($colHead, $type, $editable);
             

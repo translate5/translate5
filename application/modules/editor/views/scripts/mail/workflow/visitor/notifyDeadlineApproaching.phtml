@@ -1,0 +1,55 @@
+<?php
+/*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ 
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ 
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+ 
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
+
+/* @var $this Zend_View */
+
+$this->render('general.phtml');
+
+$this->subject = sprintf('Termin-Erinnerung für die Aufgabe "%s"',$this->task->getTaskName());
+$mainText=$this->templateApply('bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin rückt näher.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/>Sie können die Bearbeitung Ihrer Aufgabe auch jederzeit unterbrechen und zu einem späteren Zeitpunkt wieder aufnehmen.<br/><br/>', $this->data);
+
+$this->header=$this->header.$mainText;
+
+$taskFragment = $this->translate->_('<br/><br/><b>Projektdetails:</b><br/><br/><b>Projekttitel:</b> {task.taskName}<br/><b>Quellsprache:</b> {sourceLanguageTranslated} <br/><b>Zielsprache:</b> {targetLanguageTranslated} <br/><b>Zu bearbeiten bis:</b> {deadlineDate}<br/><br/>');
+
+$taskFragment=$this->templateApply($taskFragment, $this->taskData);
+
+$template = '{header}
+{taskFragment}
+{footer}{footerTable}';
+
+$footerText=$this->translate->_('<br/><br/>Wir unterstützen Sie gerne bei Fragen zur Übersetzung und translate5 – sprechen Sie uns bitte hierzu gerne an.<br/><br/>Beste Grüße<br/><br/>Ihr translate5 Projekt-Team<br/><br/>');
+
+$this->textbody="To be able to see the mail layout, you need to use app which supports html.";
+
+echo $this->templateApply($template, [
+    'header' => $this->header,
+    'taskFragment'=>$taskFragment,
+    'footer' => $footerText,
+    'footerTable' => $this->footerTable
+]);

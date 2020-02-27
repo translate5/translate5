@@ -51,6 +51,11 @@ class editor_Workflow_Actions_Config {
      * @var editor_Models_TaskUserAssoc
      */
     public $newTua;
+    
+    /**
+     * @var editor_Models_TaskUserAssoc
+     */
+    public $oldTua;
 
     /**
      * only available for import actions

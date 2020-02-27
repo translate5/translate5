@@ -100,6 +100,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $name = $prefix.'ID'.$this->languageResource->getId().'-'.$this->filterName($this->languageResource->getName());
         
         $this->languageResource->addSpecificData('fileName',$name);
+        $this->languageResource->save();
         
         // If we are adding a TMX file as LanguageResource, we must create an empty memory first.
         $validFileTypes = $this->getValidFiletypes();
@@ -523,6 +524,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function getStatus(& $moreInfo){
         $name = $this->languageResource->getSpecificData('fileName');
+        
         if(empty($name)) {
             $moreInfo = 'The internal stored filename is invalid';
             return self::STATUS_NOCONNECTION;
@@ -553,6 +555,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             }
             $moreInfo = 'original OpenTM2 status '.$status;
             return self::STATUS_UNKNOWN;
+        }
+        
+        //lets check the internal state before we just print the 404 default:
+        $status = $this->languageResource->getSpecificData('status') ?? '';
+        if($status == self::STATUS_IMPORT) {
+            $moreInfo = 'TM wird noch importiert und ist daher auch noch nicht nutzbar.';
+            //FIXME thats not 100% correct here, since when it was crashed while the import it may stay on status import
+            return self::STATUS_IMPORT; 
         }
         
         //Warning: this evaluates to "available" in the GUI, see the following explanation:

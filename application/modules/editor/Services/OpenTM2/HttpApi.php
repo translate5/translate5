@@ -93,6 +93,7 @@ class editor_Services_OpenTM2_HttpApi {
         $data->data = base64_encode($tmData);
         
         $http = $this->getHttp('POST');
+        $http->setConfig(['timeout' => 1200]);
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         $res = $this->request($http);
         return $this->processResponse($res);
@@ -106,7 +107,7 @@ class editor_Services_OpenTM2_HttpApi {
         //Out: { "ReturnValue":0, "ErrorMsg":"" } 
         
         $data = new stdClass();
-	$tmData = str_replace('xml:lang="mn"','xml:lang="ru"',$tmData);
+	    $tmData = str_replace('xml:lang="mn"','xml:lang="ru"',$tmData);
         $tmData = str_replace('xml:lang="hi"','xml:lang="ar"',$tmData);
         $tmData = str_replace('xml:lang="mn-MN"','xml:lang="ru-RU"',$tmData);
         $tmData = str_replace('xml:lang="hi-IN"','xml:lang="ar"',$tmData);
@@ -158,14 +159,12 @@ class editor_Services_OpenTM2_HttpApi {
         if(is_array($mime)) {
             $mime = implode(',', $mime);
         }
-error_log($mime);
         $http = $this->getHttpWithMemory('GET');
         $http->setConfig(['timeout' => 1200]);
         $http->setHeaders('Accept', $mime);
         $response = $this->request($http);
         if($response->getStatus() === 200) {
             $this->result = $response->getBody();
-error_log($this->result);
 	    if($mime == "application/xml"){
 		if($this->languageResource->targetLangRfc5646 == 'mn') $this->result = str_replace('xml:lang="ru"','xml:lang="mn"',$this->result);
 		if($this->languageResource->targetLangRfc5646 == 'mn-MN') $this->result = str_replace('xml:lang="ru"','xml:lang="mn-MN"',$this->result);

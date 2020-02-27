@@ -174,7 +174,7 @@ class editor_Models_Import {
         
         $task->setWorkflow($params->workflow);
         $task->setWordCount($params->wordCount);
-        $task->setTargetDeliveryDate($params->targetDeliveryDate);
+        $task->setOrderdate($params->orderdate);
         //Task based Source Editing can only be enabled if its allowed in the whole editor instance 
         $enableSourceEditing = (bool) $config->runtimeOptions->import->enableSourceEditing;
         $task->setEnableSourceEditing((int) (! empty($params->enableSourceEditing) && $enableSourceEditing));

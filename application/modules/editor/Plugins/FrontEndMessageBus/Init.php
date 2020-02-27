@@ -35,7 +35,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     /**
      * Increase me on each change! (also SERVER_VERSION in server.php!)
      */
-    const CLIENT_VERSION = '1.0';
+    const CLIENT_VERSION = '1.1';
     
     /**
      * @var editor_Plugins_FrontEndMessageBus_Bus

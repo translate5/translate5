@@ -1,0 +1,28 @@
+<issues>
+	<issue type="Accuracy" level="0" description="Issues related to the extent to which the target text accurately renders the meaning of the source text" display="yes">
+		<issue type="Terminology" level="1" description="A term is translated with a term other than the one expected for the domain or otherwise specified." display="yes"/>
+		<issue type="Mistranslation" level="1" description="The target content does not accurately represent the source content." display="yes"/>
+		<issue type="Omission" level="1" description="Content is missing from the translation that is present in the source." display="yes"/>
+		<issue type="Untranslated" level="1" description="Content that should have been translated has been left untranslated." display="yes"/>
+		<issue type="Addition" level="1" description="The target text includes text not present in the source." display="yes"/>
+    </issue>
+	<issue type="Fluency" level="0" description="Issues related to the form or content of a text, irrespective as to whether it is a translation or not." display="yes">
+		<issue type="Content" level="1" description="Issues related to content, excluding presentational and/or mechanical issues." display="yes">
+			<issue type="Register" level="2" description="The text uses a linguistic register inconsistent with the specifications or general language conventions." display="yes"/>
+			<issue type="Style" level="2" description="The text has stylistic problems, other than those related to language register." display="yes"/>
+			<issue type="Inconsistency" level="2" description="The text shows internal inconsistency." display="yes"/>
+        </issue>
+		<issue type="Mechanical" level="1" description="Issues related to the presentation and/or mechanics of the text" display="yes">
+			<issue type="Spelling" level="2" description="Issues related to spelling of words" display="yes"/>
+			<issue type="Typography" level="2" description="Issues related to the mechanical presentation of text. This category should be used for any typographical errors other than spelling." display="yes"/>
+			<issue type="Grammar" level="2" description="Issues related to the grammar or syntax of the text, other than spelling and orthography." display="yes"/>
+			<issue type="Locale violation" level="2" description="The text does not adhere to locale-specific conventions or has been written for the wrong locale." display="yes"/>
+        </issue>
+		<issue type="Unintelligible" level="1" description="The exact nature of the error cannot be determined. Indicates a major break down in fluency." display="yes"/>
+    </issue>
+	<issue type="Verity" level="0" description="Issues related to the relationship between the text and its world, concerning whether it is adequate or sufficient in its representation of the world or suffers from other problems with regard to usability. The text makes statements that contradict the world of the text" display="yes">
+		<issue type="Completeness" level="1" description="The text is incomplete." display="yes"/>
+		<issue type="Legal requirements" level="1" description="A text does not meet legal requirements as set forth in the specifications." display="yes"/>
+		<issue type="Locale applicability" level="1" description="A text does not apply to the intended locale." display="yes"/>
+    </issue>
+</issues>

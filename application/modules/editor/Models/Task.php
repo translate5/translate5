@@ -71,8 +71,8 @@ END LICENSE AND COPYRIGHT
  * @method void setWorkflowStepName() setWorkflowStepName(string $stepName)
  * @method integer getWordCount() getWordCount()
  * @method void setWordCount() setWordCount(int $wordcount)
- * @method string getTargetDeliveryDate() getTargetDeliveryDate()
- * @method void setTargetDeliveryDate() setTargetDeliveryDate(string $datetime)
+ * @method string getOrderdate() getOrderdate()
+ * @method void setOrderdate() setOrderdate(string $datetime)
  * @method boolean getReferenceFiles() getReferenceFiles()
  * @method void setReferenceFiles() setReferenceFiles(bool $flag)
  * @method boolean getTerminologie() getTerminologie()
@@ -98,6 +98,8 @@ END LICENSE AND COPYRIGHT
  * @method void setSegmentCount() setSegmentCount(int $segmentCount)
  * @method integer getSegmentFinishCount() getSegmentFinishCount()
  * @method void setSegmentFinishCount() setSegmentFinishCount(int $segmentFinishCount)
+ * @method string getTaskType() getTaskType()
+ * @method void setTaskType() setTaskType(string $taskType)
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
@@ -114,6 +116,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const TABLE_ALIAS = 'LEK_task';
     
     const INTERNAL_LOCK = '*translate5InternalLock*';
+    
+    const INITIAL_TASKTYPE_DEFAULT = 'default';
+    
+    /**
+     * All tasktypes that editor_Models_Validator_Task will consider.
+     * @var array
+     */
+    public static $validTaskTypes = [self::INITIAL_TASKTYPE_DEFAULT];
 
     /**
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
@@ -159,6 +169,22 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         
         $config->setReadOnly();
         return $config;
+    }
+    
+    /**
+     * Add a tasktype for the validation.
+     * @param string $taskType
+     */
+    public static function addValidTaskType($taskType) {
+        self::$validTaskTypes[] = $taskType;
+    }
+    
+    /**
+     * Return tasktypes for the validation.
+     * @return array 
+     */
+    public static function getValidTaskTypes() {
+        return self::$validTaskTypes;
     }
     
     /**
@@ -226,22 +252,63 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         return parent::loadFilterdCustom($s);
     }
     
+    /**
+     * loads all tasks of the given tasktype that are associated to a specific user as PM
+     * @param string $pmGuid
+     * @param string $tasktype
+     * @return array
+     */
+    public function loadListByPmGuidAndTasktype(string $pmGuid, string $tasktype) {
+        $s = $this->db->select();
+        $s->where('pmGuid = ?', $pmGuid);
+        $s->where('tasktype = ?', $tasktype);
+        $s->order('orderdate ASC');
+        return parent::loadFilterdCustom($s);
+    }
+    
+    /**
+     * loads all tasks of the given tasktype that shall be removed (because
+     * their lifetime is over).
+     * @param string $tasktype
+     * @param int $orderDaysOffset
+     * @return array
+     */
+    public function loadListForCleanupByTasktype(string $tasktype, int $orderDaysOffset) {
+        $s = $this->db->select();
+        $s->where('tasktype = ?', $tasktype);
+        $s->where('`orderDate` < (CURRENT_DATE - INTERVAL ? DAY)', $orderDaysOffset);
+        return parent::loadFilterdCustom($s);
+    }
+    
     /***
      * Load all task assoc users for non anonymized tasks.
      * This is used for the user workflow filter in the advance filter store.
      * INFO:Associated users for the anonimized tasks will not be loaded
+     *
+     * @param string $userGuid
+     * @param bool $loadAll
+     * 
      * @return array
      */
-    public function loadUserList() {
-        $this->getFilter()->setDefaultTable('LEK_task');
-        $s=$this->db->select()
-        ->setIntegrityCheck(false)
-        ->from('LEK_task', [])
-        ->join('LEK_customer', 'LEK_task.customerId=LEK_customer.id',[])
-        ->join('LEK_taskUserAssoc','LEK_taskUserAssoc.taskGuid= LEK_task.taskGuid',[])
-        ->join('Zf_users','Zf_users.userGuid=LEK_taskUserAssoc.userGuid',['Zf_users.*'])
-        ->where('LEK_customer.anonymizeUsers=0');
-        return $this->loadFilterdCustom($s);
+    public function loadUserList(string $userGuid,bool $loadAll=false) {
+        
+        if(!$loadAll){
+            $s=$this->getSelectByUserAssocSql($userGuid, '*', $loadAll);
+        }else{
+            $s=$this->db->select()->setIntegrityCheck(false);
+        }
+        
+        //apply the frontend task filters
+        $this->applyFilterAndSort($s);
+        //the inner query is the current task list with activ filters
+        $sql='SELECT Zf_users.*,filter.taskGuid from Zf_users, '.
+            '('.$s->assemble().') as filter '.
+             'INNER JOIN LEK_taskUserAssoc ON LEK_taskUserAssoc.taskGuid=filter.taskGuid '.
+             'INNER JOIN LEK_customer ON LEK_customer.id=filter.customerId AND LEK_customer.anonymizeUsers=0 '.
+             'WHERE Zf_users.userGuid=LEK_taskUserAssoc.userGuid '.
+             'GROUP BY Zf_users.id; ';
+        $stmt = $this->db->getAdapter()->query($sql);
+        return $stmt->fetchAll();
     }
     
     /**
@@ -760,6 +827,22 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * Returns the default initial tasktype.
+     * @return string
+     */
+    public function getDefaultTasktype () {
+        return self::INITIAL_TASKTYPE_DEFAULT;
+    }
+    
+    /**
+     * Is the task to be hidden due to its taskType?
+     * (Further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
+     */
+    public function isHiddenTask() {
+        return $this->getTaskType() != $this->getDefaultTasktype();
+    }
+    
+    /**
      * generates a statistics summary to the given task
      * @return stdClass
      */
@@ -907,6 +990,30 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $this->loadByTaskGuid($taskGuid);
         $this->setTerminologie(!empty($result));
         $this->save();
+    }
+    
+    /**
+     * Overwrite getTerminologie: Return the DB value or false depending on the taskType.
+     * @return boolean
+     */
+    public function getTerminologie() {
+        if ($this->isHiddenTask()) {
+            // For hidden tasks, terms don't need to be tagged (= no TermTagger needed).
+            return false;
+        }
+        return parent::get('terminologie');
+    }
+    
+    /**
+     * Overwrite setTerminologie: saves false instead of the given value depending on the taskType.
+     * @param bool $flag
+     */
+    public function setTerminologie($flag) {
+        if ($this->isHiddenTask()) {
+            // For hidden tasks, terms don't need to be tagged (= no TermTagger needed).
+            $flag = false;
+        }
+        return parent::set('terminologie', $flag);
     }
     
     /**
@@ -1205,13 +1312,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'fileCount' => 'Dateien',
             'fullMatchEdit' => '100% Matches sind editierbar',
             'lockLocked' => 'In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
+            'orderdate' => 'Bestelldatum',
             'pmGuid' => 'Projektmanager',
             'pmName' => 'Projektmanager',
             'referenceFiles' => 'Referenzdateien',
             'relaisLang' => 'Relaissprache',
             'sourceLang' => 'Quellsprache',
             'state' =>'Status',
-            'targetDeliveryDate' => 'Lieferdatum (soll)',
             'targetLang' => 'Zielsprache',
             'taskActions' => 'Aktionen',
             'taskassocs' => 'Anzahl zugewiesene Sprachresourcen',

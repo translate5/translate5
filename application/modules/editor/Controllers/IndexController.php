@@ -295,6 +295,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('tasks.simultaneousEditingKey', editor_Models_Task::INTERNAL_LOCK.editor_Models_Task::USAGE_MODE_SIMULTANEOUS);
       $this->setLanguageResourceJsVars();
       
+      $this->view->Php2JsVars()->set('editor.editorBrandingSource',$rop->editor->editorBrandingSource);
       $this->setJsAppData();
     }
 
@@ -757,7 +758,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             'pmGuid' => '{dab18309-7dfd-4185-b27e-f490c3dcb888}',
             'pmName' => 'PM Username',
             'wordCount' => '123',
-            'targetDeliveryDate' => '2017-12-21 00:00:00'
+            'orderdate' => '2017-12-20 00:00:00',
         ]);
         $config->task = $config->oldTask;
         $config->importConfig = new editor_Models_Import_Configuration();
