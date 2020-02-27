@@ -872,6 +872,15 @@ class editor_TaskController extends ZfExtended_RestController {
                 ]);
             }
             //no access as generic fallback
+            $this->log->info('E9999', 'Debug data to E9999 - Keine Zugriffsberechtigung!',[
+                '$mayLoadAllTasks' => $mayLoadAllTasks,
+                'tua' => $tua ? $tua->getDataObject() : 'no tua',
+                'isPmOver' => $tua ? $tua->getIsPmOverride() : false,
+                'loadAllTasks' => $this->isAllowed('backend', 'loadAllTasks'),
+                'isAuthUserTaskPm' => $this->isAuthUserTaskPm($this->entity->getPmGuid()),
+                '$isTaskDisallowEditing' => $isTaskDisallowEditing,
+                '$isTaskDisallowReading' => $isTaskDisallowReading,
+            ]);
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
