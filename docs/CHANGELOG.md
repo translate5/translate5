@@ -3,14 +3,27 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-## [3.3.3] - 2020-02-17
+## [3.4.0] - 2020-02-27
+
+### VERY IMPORTANT NOTES for API users (due TRANSLATE-1455):
+*   On assigning users to task the role "lector" was replaced with "reviewer". When using the old value a deprecated message is created and the value is transformed. This should be changed in your application talking to translate5 very soon!
+*	In a task the fields taskDeliveryDate and realDeliveryDate are removed! The values are moved on job level (task user association). There are added the new fields deadlineDate and finishedDate. 
+
+###Special Notes
+*	TRANSLATE-1969: for adding general hunspell directories to the spellchecker see: https://confluence.translate5.net/display/TIU/Activate+additional+languages+for+spell+checking
+*	TRANSLATE-1831: DeepL is now integrated in translate5 for users with support- and development contract: See https://confluence.translate5.net/display/TPLO/DeepL
+
 ###Added
 TRANSLATE-1960: Define if source or target is connected with visualReview on import
   The user can choose now if the uploaded PDF corresponds to the source or target content.
-TRANSLATE-1831: Integrate DeepL in translate5 (Only for users with support- and development)
+TRANSLATE-1831: Integrate DeepL in translate5 (Only for users with support- and development contract)
   The DeepL Integration is only available for users with a support- and development contract. The Plug-In must be activated and the DeepL key configured in the config for usage. See https://confluence.translate5.net/display/TPLO/DeepL
 TRANSLATE-1455: Deadlines and assignment dates for every role of a task
   This was only possible for the whole task, now per each associated user a dedicated deadline can be defined.
+TRANSLATE-1987: Load custom page in the editors branding area
+  Custom content in the branding area can now be included via URL
+TRANSLATE-1927: Pre-translate documents in InstantTranslate
+  InstantTranslate is now able to translate documents
 
 ###Changed
 TRANSLATE-1959: InstantTranslate: handle tags in the source as part of the source-text
@@ -23,6 +36,20 @@ TRANSLATE-905: Improve maintenance mode
   The maintenance mode has now a free-text field to display data to the users, also the maintenance can be announced to all admin users. See https://confluence.translate5.net/display/TIU/install-and-update.sh+functionality
 
 ###Bugfixes
+TRANSLATE-1989: Erroneously locked segment on tasks with only one user and no simultaneous usage mode
+  Some segments were locked in the frontend although only one user was working on the task.
+TRANSLATE-1988: Enhanced filters button provides drop-down with to much user names
+  Only the users associated to the tasks visible to the current user should be visible.
+TRANSLATE-1986: Unable to import empty term with attributes
+  An error occurs when importing term with empty term value, valid term attributes and valid term id.
+TRANSLATE-1980: Button "open task" is missing for unaccepted jobs
+  For jobs that are not accepted so far, the "open task" action icon is missing. It should be shown again.
+TRANSLATE-1978: In InstantTranslate the Fuzzy-Match is not highlighted correctly
+  The source difference of fuzzy matches was not shown correctly.
+TRANSLATE-1911: Error if spellcheck answer returns from server after task was left already
+  When the task was left before the spellcheck answer was returned from the server an error occured.
+TRANSLATE-1841: pc elements in xliff 2.1 exports are not correctly nested in conjunction with TrackChanges Markup
+  The xliff 2.1 export produced invalid XML in some circumstances.
 TRANSLATE-1981: Sorting the bookmark column produces errors
   Sorting the by default hidden bookmark column in the segment table produced an error.
 TRANSLATE-1975: Reenable Copy & Paste from term window
