@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * 
+ * TODO: change class-name (does not handle SDL-resources only, but engines of all types).
  */
 class editor_Models_LanguageResources_SdlResources {
     
@@ -109,13 +109,13 @@ class editor_Models_LanguageResources_SdlResources {
         $sdlService=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_Service');
         /* @var $sdlService editor_Services_SDLLanguageCloud_Service */
         
-        //check if the resource supports the file upload. For now only the sdl cloud resources support.
-        $isFileUpload=function($engine) use ($sdlService){
-            if(is_object($engine) && isset($engine->serviceName)){
-                return $engine->serviceName == $sdlService->getName();
+        //check if the resource supports the file upload. (Current instruction: all MT resources.)
+        $isFileUpload=function($engine){
+            if(is_object($engine) && isset($engine->resourceType)){
+                return $engine->resourceType == editor_Models_Segment_MatchRateType::TYPE_MT;
             }
-            if(is_array($engine) && isset($engine['serviceName'])){
-                return $engine['serviceName'] == $sdlService->getName();
+            if(is_array($engine) && isset($engine['resourceType'])){
+                return $engine['resourceType'] == editor_Models_Segment_MatchRateType::TYPE_MT;
             }
             
             return false;

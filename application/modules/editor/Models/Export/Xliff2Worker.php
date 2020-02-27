@@ -94,12 +94,11 @@ class editor_Models_Export_Xliff2Worker extends ZfExtended_Worker_Abstract {
         
         $xliffConf = [
             editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_TERMINOLOGY=>true,
-            editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF=>false,
+            editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF=>true,
             editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_QM=>true,
         ];
         $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf, $task->getWorkflowStepName()]);
         /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff2 */
-        ;
         
         $this->prepareDirectory($parameters['exportToFolder']);
         $filename = $parameters['exportToFolder'].'/export-'.date('Y-m-d-H-i-s').'.xliff';

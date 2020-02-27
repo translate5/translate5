@@ -103,12 +103,13 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
             'sourceLang' => self::SOURCE_LANG,
             'targetLang' => self::TARGET_LANG
         );
-        
         $appState = self::assertAppState();
         if(!in_array('editor_Plugins_DeepL_Init', $appState->pluginsLoaded)) {
             self::markTestSkipped('DeepL-Plugin must be activated for this test case, which is not the case!');
             return;
         }
+        
+        self::assertContains('editor_Plugins_InstantTranslate_Init', $appState->pluginsLoaded, 'Plugin InstantTranslate must be activated for this test case!');
         
         $tests = array(
             'runtimeOptions.plugins.DeepL.server' => null, //null checks for no concrete value but if not empty
@@ -146,7 +147,7 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $params['resourcesCustomersHidden'] = json_encode($customerParamArray);
         $this->api()->requestJson('editor/languageresourceinstance', 'POST', [], $params);
         $responseBody = json_decode($this->api()->getLastResponse()->getBody());
-        $this->assertObjectHasAttribute('rows', $responseBody, 'Creating a DeepL-LanguageResource failed. Check authorization for DeepL.');
+        $this->assertObjectHasAttribute('rows', $responseBody, 'Creating a DeepL-LanguageResource failed. Check configured runtimeOptions for DeepL.');
         self::$languageResourceID = $responseBody->rows->id;
     }
     
@@ -204,13 +205,15 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
             $params['text'] = $text;
             $this->api()->requestJson('editor/instanttranslateapi/translate', 'GET', $params); // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
             $responseBody = json_decode($this->api()->getLastResponse()->getBody());
-            $allTranslations = json_decode(json_encode($responseBody->rows), true);
             // Is anything returned for Deep at all?
+            $this->assertIsObject($responseBody, 'InstantTranslate: Response for translation does not return an object, check error log.');
+            $this->assertIsObject($responseBody->rows, 'InstantTranslate: Response for translation does not return any rows.');
+            $allTranslations = (array)$responseBody->rows;
+            $this->assertIsArray($allTranslations);
             $this->assertArrayHasKey('DeepL', $allTranslations, 'InstantTranslate: Translations do not include a response for DeepL.');
             // Does the result match our expectations?
             foreach ($allTranslations['DeepL'] as $translationFromDeepL){
-                $translationArr = $translationFromDeepL[0];
-                $translation = htmlspecialchars_decode($translationArr['target']);
+                $translation = htmlspecialchars_decode($translationFromDeepL[0]->target);
                 $this->assertEquals($expectedTranslation, $translation, 'Result of translation is not as expected! Text was:'."\n".$text);
             }
         }

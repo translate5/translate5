@@ -587,7 +587,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $validVersions = ['1.1', '1.2'];
         $version = $this->xmlparser->getAttribute($attributes, 'version');
         if(! in_array($version, $validVersions)) {
-            throw new ZfExtended_Exception('XLF Parser supports only XLIFF Version 1.1 and 1.2, but the following xliff tag was given: '.$this->xmlparser->getChunk($key));
+            // XLF Parser supports only XLIFF Version 1.1 and 1.2, but the imported xliff tag does not match that criteria: {tag}
+            throw new editor_Models_Import_FileParser_Xlf_Exception('E1232', [
+                'task' => $this->task,
+                'tag' => $this->xmlparser->getChunk($key),
+            ]);
         }
     }
     

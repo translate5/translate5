@@ -50,11 +50,9 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
         var bus = Editor.app.getController('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage');
         if(Editor.data.task.get('usageMode') === Editor.data.task.USAGE_MODE_SIMULTANEOUS){
             bus.activate();
-            console.log("ACTIVATED");
         }
         else {
             bus.deactivate();
-            console.log("DEACTIVATED");
         }
     }
 });

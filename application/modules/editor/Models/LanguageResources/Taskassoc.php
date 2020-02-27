@@ -83,6 +83,8 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
      * If a filter "checked" is set, then only the associated languageResource's to the given task are listed
      * If the "checked" filter is omitted, all available languageResource's for the language are listed, 
      *      the boolean field checked provides the info if the languageResource is associated to the task or not 
+     * 
+     * ("The function is meant to be called only by rest call"!)
      *        
      * @param string $taskGuid
      * @return multitype:
@@ -186,6 +188,7 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
     
     /***
      * Get all available tmms for the language combination as in the provided task.
+     * (Uses loadByAssociatedTaskAndLanguage() which is meant to be called only by rest call!)
      * @param string $taskGuid
      * @return array
      */

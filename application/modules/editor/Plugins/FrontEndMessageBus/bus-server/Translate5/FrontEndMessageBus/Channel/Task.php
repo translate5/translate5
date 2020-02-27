@@ -340,8 +340,8 @@ class Task extends Channel {
                 }
             }
         }
-        
-        //remove orphaned open segments
+
+        //remove orphaned open segments (on closing task something similar is done too)
         foreach($this->editedSegments as $segId => $conn) {
             /* @var $conn \Ratchet\WebSocket\WsConnection */
             if($conn->WebSocket->closing) {
@@ -484,11 +484,17 @@ class Task extends Channel {
         $trackingId = $this->getUserTrackingId($currentConnection->openedTask, $userGuid);
         
         //try to lock all $alikes for this connection
+        $locked = [];
         foreach($alikes as &$alikeId) {
             $alikeId = (int) $alikeId;
             if(empty($this->editedSegments[$alikeId])) {
+                $locked[] = $alikeId;
                 $this->editedSegments[$alikeId] = $currentConnection;
                 continue;
+            }
+            //unlock the previously locked segments
+            foreach($locked as $unlockId) {
+                unset($this->editedSegments[$unlockId]);
             }
             //the segment with the ID in alikeId is already in use, so NAK that request:
             $this->releaseLocalSegment($masterSegment['id']);
@@ -545,6 +551,13 @@ class Task extends Channel {
             'trackingId' => 0,
             'connectionId' => $connectionId,
         ]));
+        
+        //release all remaining edited segments on task leave for that task
+        foreach($this->editedSegments as $segmentId => $conn) {
+            if($conn->connectionId === $connectionId) {
+                $this->releaseLocalSegment($segmentId);
+            }
+        }
         
         $idx = array_search($sessionId, $this->taskToSessionMap[$task['taskGuid']] ?? []);
         if($idx !== false) {

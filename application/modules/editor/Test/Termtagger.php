@@ -88,7 +88,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         self::$testTask->setTaskNr('');
         self::$testTask->setSourceLang(self::$sourceLangEntity['id']);
         self::$testTask->setTargetLang(self::$targetLangEntity['id']);
-        self::$testTask->setTargetDeliveryDate(date('Y-m-d H:i:s'));
+        self::$testTask->setOrderdate(date('Y-m-d H:i:s'));
         self::$testTask->setWordCount(0);
         self::$testTask->setEnableSourceEditing(1);
         self::$testTask->setEdit100PercentMatch(1);

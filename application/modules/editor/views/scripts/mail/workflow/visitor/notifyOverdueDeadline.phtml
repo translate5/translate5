@@ -26,20 +26,33 @@
  END LICENSE AND COPYRIGHT
  */
 
-$this->subject = $this->translate->_('Deadline-Erinnerung');
+
+/* @var $this Zend_View */
 
 $this->render('general.phtml');
 
-$template = '{header}
-Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> für die Aufgabe <b>"{taskName}"</b> nähert.
-{footer}';
+$title=$this->translate->_('Die Aufgabe "%s" ist "%s" überfällig!');
+$this->subject = sprintf($title,$this->task->getTaskName(),$this->daysOffset ?? null);
 
-$this->textbody =$this->templateApply($template, [
-    'header' => $this->header,
-    'taskName' => $this->taskName,
-    'deadlineDate' =>$this->workflowNotifyMail()->dateFormat($this->deadlineDate),
-    'footer' => $this->footer
-]);
+$mainText=$this->templateApply('bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin ist überfällig.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/><br/>', $this->data);
+
+$this->header=$this->header.$mainText;
+
+$taskFragment = $this->translate->_('<br/><br/><b>Projektdetails:</b><br/><br/><b>Projekttitel:</b> {task.taskName}<br/><b>Quellsprache:</b> {sourceLanguageTranslated} <br/><b>Zielsprache:</b> {targetLanguageTranslated} <br/><b>Zu bearbeiten bis:</b> {deadlineDate}<br/><br/>');
+
+$taskFragment=$this->templateApply($taskFragment, $this->taskData);
+
+$template = '{header}
+{taskFragment}
+{footer}{footerTable}';
+
+$footerText=$this->translate->_('<br/><br/>Wir unterstützen Sie gerne bei Fragen zur Übersetzung und translate5 – sprechen Sie uns bitte hierzu gerne an.<br/><br/>Beste Grüße<br/><br/>Ihr translate5 Projekt-Team<br/><br/>');
+
+$this->textbody="To be able to see the mail layout, you need to use app which supports html.";
 
 echo $this->templateApply($template, [
+    'header' => $this->header,
+    'taskFragment'=>$taskFragment,
+    'footer' => $footerText,
+    'footerTable' => $this->footerTable
 ]);

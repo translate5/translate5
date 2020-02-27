@@ -50,6 +50,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         
         $tests = array(
             'runtimeOptions.import.xlf.preserveWhitespace' => 0,
+            'runtimeOptions.segments.enableCountSegmentLength' => 1,
         );
         self::$api->testConfig($tests);
         

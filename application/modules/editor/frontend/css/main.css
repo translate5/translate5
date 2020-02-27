@@ -1,0 +1,829 @@
+
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/* T5DEV-161: visualReview requres this to be set to 'initial' and not to 'relative' else the review file will not be displayed! */
+div.x-container.x-container-default {position: initial;}
+
+
+#changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
+.editorAdminTaskLogGrid .x-grid-row .x-grid-cell .x-grid-cell-inner,
+#segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
+	color:#000000;
+  	white-space: normal;
+}
+
+.editorAdminTaskLogGrid .x-property-grid .x-grid-row td.x-grid-cell-last .x-grid-cell-inner {
+	font-family: monospace;
+    white-space: pre;
+}
+
+/* this default width is needed, see TRANSLATE-563 */
+#changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
+#segment-grid .x-grid-row .segment-tag-column .x-grid-cell-inner {
+  width: 250px;
+}
+
+.direction-rtl {
+    direction:rtl;
+}
+.metaTermPanel .term-group div.direction-rtl,
+td.direction-rtl.x-grid-td div.x-grid-cell-inner {
+    text-align:right !important;
+}
+
+.direction-ltr {
+    direction:ltr;
+}
+
+#segment-grid .missing-source-segment,
+#segment-grid .missing-target-segment {
+  font-style: italic;	
+  color:#acacac;
+}
+
+#segment-grid .editing-disabled,
+#segment-grid .editing-disabled.x-grid-row .x-grid-cell .x-grid-cell-inner {
+  color:#acacac;
+}
+
+.segment-tag-column div.term,
+.segment-tag-container div.term {display:inline;}
+
+.segment-tag-column div.x-grid-cell-inner div.open,
+.segment-tag-column div.x-grid-cell-inner div.close,
+.segment-tag-column div.x-grid-cell-inner div.single,
+.segment-tag-container.x-form-display-field div.open,
+.segment-tag-container.x-form-display-field div.close,
+.segment-tag-container.x-form-display-field div.single,
+.segment-tag-container .x-autocontainer-innerCt div.open,
+.segment-tag-container .x-autocontainer-innerCt div.close,
+.segment-tag-container .x-autocontainer-innerCt div.single {
+    display:inline;
+    background:#cfcfcf;
+    border-radius:4px;
+}
+
+.segment-content .x-form-display-field del,
+.segment-content .x-form-display-field img,
+.segment-tag-column div.x-grid-cell-inner del,
+.segment-tag-column div.x-grid-cell-inner img,
+.segment-tag-column div.x-grid-cell-inner div.internal-tag,
+.segment-tag-column div.x-grid-cell-inner div.internal-tag span {
+    user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: -moz-none;
+    -webkit-user-select: none;
+}
+
+/* this css is used in visual review tooltip, for displaying the internal tags, terminologie */
+.segment-tag-container.x-tip div.open,
+.segment-tag-container .x-autocontainer-innerCt div.close,
+.segment-tag-container .x-autocontainer-innerCt div.single
+{
+  color:#17385b;
+}
+#segment-grid div.x-grid-cell-inner div.open span {} /* Grafik Style für open Tag*/
+#segment-grid div.x-grid-cell-inner div.close span {} /* Grafik Style für close Tag*/
+#segment-grid div.x-grid-cell-inner div.single span {} /* Grafik Style für single Tag*/
+
+div.open + div,
+div.close + div,
+div.single + div {
+  margin-left:1px;
+}
+
+.short-tag div span.full,
+.full-tag div span.short,
+.hide-tag div span.short,
+.hide-tag div span.full{display:none;}
+
+/* special characters are always showing the fulltag, the same is done for the img tags in HtmlEditor.js */
+.short-tag div.internal-tag.tab span.short,
+.short-tag div.internal-tag.space span.short,
+.short-tag div.internal-tag.newline span.short,
+.short-tag div.internal-tag.nbsp span.short {display:none;}
+.short-tag div.internal-tag.tab span.full,
+.short-tag div.internal-tag.space span.full,
+.short-tag div.internal-tag.newline span.full,
+.short-tag div.internal-tag.nbsp span.full {display:inline;}
+
+#segment-grid span.term {
+    text-decoration: underline;
+}
+
+#segment-grid .x-grid-row-editor .x-form-display-field {
+    text-overflow: initial;
+    white-space: normal;
+    overflow: visible;
+    cursor: move;
+}
+#segment-grid .x-grid-row-editor .segment-content .x-form-display-field {
+	color:#000000;
+    cursor: text;
+}
+
+#segment-grid .x-grid-row-editor .autoState .x-form-display-field {
+    white-space: nowrap
+}
+
+.x-grid-row-editor {
+    box-shadow: -6px 0px 25px 0px rgba(0,0,0,0.75);
+}
+
+#segment-grid .x-grid-cell-inner {
+  padding-top:6px;
+  padding-bottom:6px;
+}
+
+.clearSortAndFilterBtn.activated span.x-btn-inner {
+  font-weight: bold;
+  font-style: italic;
+}
+
+.watchListFilterBtn.activated span.x-btn-inner {
+  font-weight: bold;
+  font-style: italic;
+}
+
+#segment-grid img.icon-editable {
+  background: url("../images/pencil.png") no-repeat center;
+  height:16px;
+  width:16px;
+  vertical-align: text-bottom;
+}
+
+
+/*matchRateType*/
+.matchratetype-visible .matchrateEdit img.matchRateType,
+.matchratetype-visible .matchrateEdit img.matchRateEdited,
+.matchratetype-visible .matchrateColumn img.matchRateType,
+.matchratetype-visible .matchrateColumn img.matchRateEdited {
+    display:none;
+}
+
+#imagePreload {
+    display: none
+}
+
+.editable .x-form-display-field {
+	float:none;
+	padding-left:0;
+}
+#viewportHeader {
+    border-style: none;
+}
+
+#change-alike-window img.x-tool-help {
+	vertical-align:top;
+}
+#change-alike-window p.changealike-info-text{
+	font-weight:bold;
+	font-size: smaller;
+	margin-top:10px;
+}
+.x-window-body h1,.x-window-body p{
+    margin-bottom: 7px;
+}
+
+/* Headpanel - this styles are meant to be overwritten by the customer */
+#head-panel {height: 150px;position:relative;}/* possible to overwrite bg => whole container */
+#head-panel .head-panel-brand {} /* box for html branding */
+#head-panel .head-panel-info-panel {position:absolute;right:20px !important;top:20px !important; left: auto !important; width: auto !important; }
+#head-panel .x-autocontainer-outerCt {table-layout: auto !important}
+#head-panel .head-panel-toolbar {position:absolute;right:20px !important;bottom:20px !important;width:440px; left: auto !important; top: 40px !important;background:transparent;}
+
+.head-panel-info-panel span.user-label,
+.head-panel-info-panel span.login-label,
+.head-panel-info-panel span.task-label {font-style: italic; font-weight: bold;}
+.head-panel-info-panel span.task-readonly {font-style: italic;}
+/* END - Headpanel */
+
+/*Terminologie:*/
+.metaTermPanel .term-group {padding:2px 0px; text-align:left;vertical-align: top;}
+.metaTermPanel .term-group > div {padding: 2px 1px;}
+.metaTermPanel .term-group > div.target-terms {padding-left: 14px;}
+.metaTermPanel .target-terms {border-top:1px dotted #BFC2C2;}
+
+.x-form-cb-label-after {white-space: normal;}
+
+.metaTermPanel .odd {background-color:#f6f6f6;}
+.metaTermPanel .even {background-color:#e5edf4;border-top:1px solid #d0d0d0;border-bottom:1px solid #d0d0d0;}
+.metaTermPanel img {vertical-align: top;margin-right:2px;}
+.metaTermPanel span.used {font-weight:bold;}
+
+/* Term Tags, der folgende Code ist im HtmlEditor body css redundant vorhanden. Ebenso im Helper View_Helper_WorkflowNotifyHtmlMailSegmentList */
+.segment-tag-column div.x-grid-cell-inner div.term,
+.segment-tag-container div.term {background:transparent;border-bottom:1px solid #0000ff;}
+
+#change-alike-window div.transNotFound,
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound,
+.segment-tag-container.type-source div.transNotFound {border-bottom-color:#ff0000;}
+
+#change-alike-window div.transNotDefined,
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotDefined,
+.segment-tag-container.type-source div.transNotDefined {border-bottom-color:#8F4C36;}
+
+.segment-tag-column div.x-grid-cell-inner div.notRecommended,
+.segment-tag-container div.notRecommended,
+.segment-tag-column div.x-grid-cell-inner div.supersededTerm,
+.segment-tag-container div.supersededTerm,
+.segment-tag-column div.x-grid-cell-inner div.deprecatedTerm,
+.segment-tag-container div.deprecatedTerm
+{border-bottom:none;background-color:#fa51ff;}
+
+/*qmflags*/
+#segment-grid-body img.qmflag {width: auto !important;height: 14px !important; vertical-align:middle;margin-left:1px;margin-right:1px;}
+.qmflag-menu .x-menu-item-link {padding-right:2px; padding-left:22px;margin-right:36px;}
+.qmflag-menu .x-menu-item-link .x-menu-item-text {padding: 0px !important; margin: 0px 17px 0px 0px !important; width: auto !important; height: auto !important}
+.qmflag-menu .x-menu-item-icon {right:2px;left:auto;height:14px;width: 22px !important}
+.qmflag-menu .x-menu-icon-separator {right:34px;left:auto;}
+
+.qmflag-menu .x-menu-item-arrow {
+    right: auto;
+    left:0;
+}
+.qmflag-menu .x-menu-item-arrow:before {
+    content: "\f0d9";
+}
+
+/* Fix for TRANSLATE-237 recheck on ExtJS update */
+/*.x-tip .x-tip-body {white-space: nowrap;}*/
+ /* END Fix for TRANSLATE-237 recheck on ExtJS update */
+
+/*qmsummary*/
+.x-tree-view .x-grid-item:nth-of-type(odd) .x-grid-cell {
+background-color: #EAF1FB;
+}
+.x-tree-view .x-grid-item .x-grid-cell-inner {
+    padding-right: 19px;
+}
+.x-tree-view .x-column-header-align-right .x-column-header-text {
+    padding-right: 7px;
+}
+
+/*messagebox*/
+.app-msg .x-icon-text {padding-left:20px;background:no-repeat left center;} 
+.app-msg .icon-status-error {background-image: url("../images/exclamation.png");}
+.app-msg .icon-status-warning {background-image: url("../images/error.png");}
+.app-msg .icon-status-notice {background-image: url("../images/information.png");}
+.app-msg .icon-status-ok {background-image: url("../images/tick.png");}
+table.message-box-data .type {vertical-align: top;} 
+table.message-box-data .error {} 
+
+.taskUploadCard h1 {
+	background:url("../images/exclamation.png") no-repeat left center; padding-left: 20px;
+}
+
+/* error levels */
+.icon-error-level-fatal {background-image: url("../images/errorLevels/fatal.png");height:16px; width: 16px;}
+.icon-error-level-error {background-image: url("../images/errorLevels/error.png");height:16px; width: 16px;}
+.icon-error-level-warn {background-image: url("../images/errorLevels/warn.png");height:16px; width: 16px;}
+.icon-error-level-info {background-image: url("../images/errorLevels/info.png");height:16px; width: 16px;}
+.icon-error-level-debug {background-image: url("../images/errorLevels/debug.png");height:16px; width: 16px;}
+.icon-error-level-trace {background-image: url("../images/errorLevels/trace.png");height:16px; width: 16px;}
+.icon-log-more-info {background-image: url("../images/errorLevels/table.png");height:16px; width: 16px;vertical-align: text-bottom;cursor: pointer;}
+
+/* filetree */
+.fileTree .x-grid-item-selected .x-grid-cell, .x-grid-item-selected .x-grid-rowwrap-div {
+    background-color: #99bce8 !important;
+}
+
+/* font size of HTML Editor */
+.x-html-editor-wrap textarea {
+    font-size:12px;
+}
+
+/*comments column*/
+#segment-grid .x-grid-row .comments-field .x-grid-cell-inner {
+  white-space: normal;
+  width: 200px;
+}
+#segment-grid .x-grid-row-editor img.add,
+#segment-grid .x-grid-row-editor img.edit,
+#segment-grid .comments-field .x-grid-cell-inner img {
+    display:none;
+}
+
+#segment-grid .x-grid-row-editor .autoState .x-form-display-field img.edit {
+    display:inline;
+}
+
+#segment-grid .x-grid-row-editor .x-btn {float:right;}
+#segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.add,
+#segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.edit {
+    background: url("../images/comment_edit.png") no-repeat center;
+    cursor: pointer;
+    float:right;
+    height:20px !important;
+    width:20px !important;
+    padding:0;
+    display:block;
+}
+#segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.add {
+    background-image: url("../images/comment_add.png");
+}
+#segment-grid .x-grid-item-selected .editing-disabled .comments-field img.edit,
+#segment-grid .x-grid-item-selected .editing-disabled .comments-field img.add {
+    display:none;
+}
+#segment-grid.comments-for-locked-segments .x-grid-item-selected .editing-disabled .comments-field img.edit,
+#segment-grid.comments-for-locked-segments .x-grid-item-selected .editing-disabled .comments-field img.add {
+    display:block;
+}
+
+#segment-grid .segment-min-max div {
+    font-weight:bold;
+    padding:0.1em 0.3em;
+}
+#segment-grid .segment-min-max .invalid-length {
+    background-color: #ff4242;
+}
+#segment-grid .segment-min-max .valid-length {
+    background-color: #24f324;
+}
+.ico-comment-add {background-image: url("../images/comment_add.png");}
+.ico-comment-edit {background-image: url("../images/comment_edit.png");background-repeat: no-repeat;}
+.ico-comment-delete {background-image: url("../images/comment_delete.png");background-repeat: no-repeat;}
+.comments-grid .readonly .x-action-col-icon {display:none;}
+
+.comment {margin-bottom:5px;}
+#segment-grid .comment {margin-bottom:0px; padding-right: 16px;}
+#segment-grid .comment .ellipsis {font-size:7pt;line-hight:3pt;display:block;line-height:10pt;}
+
+#segment-grid .editor-comment-display .x-form-item-body {
+    display: block;
+}
+
+.comment .content,
+.comments-grid .comment .modified,
+.comments-grid .comment .content {white-space: normal;display:block;}
+.comment .author, .comment .created, .comment .modified {font-size: 7pt; font-style: italic;line-height:10pt;}
+
+/* segment grid font sizing */
+body.segment-size-1 .segment-font-sizable .x-form-display-field,
+body.segment-size-1 .segment-font-sizable {font-size: 7pt !important;line-height: 11px;}
+/* old details mode: */
+body.segment-size-2 .segment-font-sizable .x-form-display-field,
+body.segment-size-2 .segment-font-sizable {font-size: 9pt !important;line-height: 14px;}
+body.segment-size-3 .segment-font-sizable .x-form-display-field,
+body.segment-size-3 .segment-font-sizable {font-size: 11pt !important;line-height: 19px;}
+/* old ergonomic mode: */
+body.segment-size-4 .segment-font-sizable .x-form-display-field,
+body.segment-size-4 .segment-font-sizable {font-size: 13pt !important;line-height: 23px;}
+body.segment-size-5 .segment-font-sizable .x-form-display-field,
+body.segment-size-5 .segment-font-sizable {font-size: 16pt !important;line-height: 26px;}
+body.segment-size-6 .segment-font-sizable .x-form-display-field,
+body.segment-size-6 .segment-font-sizable {font-size: 19pt !important;line-height: 30px;}
+
+/* hier vermutlich anstatt der fontsize die lineheight auf 14px fix dazu! */
+#segment-grid.ergonomic .x-grid-row .x-grid-cell.comments-field {font-size:13pt !important;}
+
+
+body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.add, 
+body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.edit {display:none;}
+
+
+.autoState-999,
+.ico-loading {background-image: url("../images/loading_ico.gif");}
+.autoState-999 {background-position: center;background-repeat: no-repeat;}
+.ico-refresh {background-image: url("../images/arrow_refresh_small.png");}
+.ico-notify-user {background-image: url("../images/email_go.png");}
+.autoState-998 {
+	background-image: url(../images/typing.gif);
+	background-size: contain;
+	background-position: bottom;
+	background-repeat: no-repeat;
+}
+
+.ico-zoom-in {background-image: url("../images/magnifier_zoom_in.png");}
+.ico-zoom-out {background-image: url("../images/magnifier_zoom_out.png");}
+
+body.loading {
+    color: #404040;
+    font-size: 13px;
+    line-height: 17px;
+    font-weight: 300;
+    font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana, sans-serif;
+}
+body.loading > div.loading {
+    height:100px;
+    width:450px;
+    margin:auto;
+    margin-top:120px;
+    text-align:left;
+    padding-left: 35px;
+    background: url("../images/loading_ico.gif") left 8px no-repeat;
+}
+div.loading div#loading-indicator-text {
+    font-style: italic;
+}
+
+/* Admin: */
+.ico-save {background-image: url("../images/tick.png");}
+.ico-error {background-image: url("../images/exclamation.png");}
+.ico-cancel {background-image: url("../images/cross.png");}
+.ico-task-add {background-image: url("../images/page_add.png");}
+.ico-export {background-image: url("../images/database_go.png");}
+.ico-user-add {background-image: url("../images/user_add.png");}
+.ico-user-del {background-image: url("../images/user_delete.png");}
+.ico-add {background-image: url("../images/table_row_insert.png");}
+.ico-del {background-image: url("../images/table_row_delete.png");}
+.ico-task-back {background-image: url("../images/table_back.png");}
+.ico-next-wizard {background-image: url("../images/arrow_right.png");}
+.ico-skip-wizard {background-image: url("../images/resultset_last.png");}
+.ico-finish-wizard {background-image: url("../images/accept.png");}
+.adminTaskGrid tr.openable td.taskNr div {text-decoration: underline;cursor: pointer !important;}
+.adminTaskGrid .locked td.state div {padding-left:20px;background:url(../images/information.png) no-repeat left center;}
+.adminTaskGrid .error td.state div {padding-left:20px;background:url(../images/exclamation.png) no-repeat left center;}
+.adminTaskGrid .unconfirmed td.state div {padding-left:20px;background:url(../images/stamp-exclamation.png) no-repeat left center;}
+.adminTaskGrid .locked.import td.state div {padding-left:6px; background:none;}
+.adminTaskGrid tr:hover td.task-users > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
+.adminTaskGrid .x-grid-header-ct .task-users > div {background:url("../images/group.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .ref-files > div {background:url("../images/page_attach.png") no-repeat 10px 9px;}
+/* Alternative Grafiken: lightbulb, report-magnify, book-open ??? */
+.adminTaskGrid .x-grid-header-ct .terminologie > div {background:url("../images/book_find.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .fullMatchEdit > div {background:url("../images/fullMatchEdit.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .lockLocked > div {background:url("../images/lock_edit.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .source-edit > div {background:url("../images/sourceEdit.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .relais-lang > div {background:url("../images/relaisLanguage.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .source-lang > div {background:url("../images/sourceLanguage.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .target-lang > div {background:url("../images/targetLanguage.png") no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .empty-targets > div {background:url("../images/emptyTargetLanguage.png") no-repeat 10px 9px;}
+
+.adminTaskGrid .x-grid-header-ct .fullMatchEdit.ux-filtered-column span,
+.adminTaskGrid .x-grid-header-ct .terminologie.ux-filtered-column span,
+.adminTaskGrid .x-grid-header-ct .ref-files.ux-filtered-column span,
+.adminTaskGrid .x-grid-header-ct .task-users.ux-filtered-column span {background:url("../images/funnel-small.png") no-repeat 12px 0px;}
+.adminTaskGrid .x-grid-header-ct .source-edit.ux-filtered-column span {background:url("../images/funnel-small.png") no-repeat 22px 0px;}
+.adminTaskGrid .x-grid-header-ct .relais-lang.ux-filtered-column span,
+.adminTaskGrid .x-grid-header-ct .target-lang.ux-filtered-column span,
+.adminTaskGrid .x-grid-header-ct .source-lang.ux-filtered-column span {background:url("../images/funnel-small.png") no-repeat 33px 0px;}
+
+.adminTaskGrid .x-grid-header-ct .task-users span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .ref-files span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .terminologie span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .fullMatchEdit span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .lockLocked span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .source-edit span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .source-lang span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .target-lang span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .empty-targets span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .relais-lang span.x-column-header-text-inner{
+    display: block;
+    overflow: hidden;
+    text-indent: 100%;
+    white-space: nowrap;
+}
+
+table.task-users td {padding-right:10px;white-space: nowrap;}
+table.task-users td.username, 
+table.task-users td.state {font-weight:bold;}
+table.task-users td.state {padding-right:0;}
+
+/*own check column*/
+.grid-ownchecker {
+    background-color: transparent;
+    height: 14px;
+}
+.grid-ownchecker-checked {
+    background-image: url("../images/tick-grey.png");
+    background-position: 2px -2px;
+    background-repeat: no-repeat;
+}
+
+/* Task Grid State Styles */
+tr.end td div,
+tr.pending td div,
+tr.finished td div {color:#acacac;}
+tr.end td div.x-grid-checkheader,
+tr.finished td div.x-grid-checkheader {opacity:0.3;display: block;overflow: hidden;text-indent: 100%;white-space: nowrap;}
+tr.end td div {text-decoration: line-through;}
+tr.error td div {color:#ff0000;}
+tr.no-users td div {color:#ff00ff;}
+tr.import td div {color:#ff9900;}
+tr.unconfirmed td div {font-style: italic;}
+tr.customState td div {font-style: italic;}
+
+/* Task Grid Actions */
+/* Icons */
+.ico-task-open {background-image: url("../images/page_view.png");}
+.ico-task-edit {background-image: url("../images/page_edit.png");}
+.ico-task-finish {background-image: url("../images/tick.png");}
+.ico-task-unfinish {background-image: url("../images/tick_back.png");}
+.ico-task-finish-all {background-image: url("../images/group_tick.png");}
+.ico-task-unfinish-all {background-image: url("../images/group_tick_back.png");}
+.ico-task-end {background-image: url("../images/control_stop.png");}
+.ico-task-change-user-assoc {background-image: url("../images/group.png");}
+.ico-task-preferences {background-image: url("../images/page_gear.png");}
+.ico-task-reopen {background-image: url("../images/control_start.png");}
+.ico-task-delete {background-image: url("../images/page_delete.png");}
+.ico-task-log {background-image: url("../images/error.png");}
+.ico-task-clone {background-image: url("../images/page_copy.png");}
+.ico-task-showexportmenu {background-image: url("../images/database_go.png");}
+.ico-task-clone {background-image: url("../images/page_copy.png");}
+.ico-task-excelreimport {background-image: url("../images/table_back.png");}
+
+/* Key Performance Indicators (KPI) */
+.ico-kpi {background-image: url("../images/page_gear.png");}
+
+/* Display */
+.adminTaskGrid tr .x-action-col-icon,
+.adminTaskGrid tr.customState td .x-action-col-icon,
+.adminTaskGrid tr.error td .x-action-col-icon,
+.adminTaskGrid tr.import td .x-action-col-icon {display:none; background-repeat: no-repeat; background-position: center;}
+.adminTaskGrid tr.editorOpenTask .ico-task-open {display:inline-block;}
+.adminTaskGrid tr.editorEditTask .ico-task-edit {display:inline-block;}
+.x-menu .ico-task-finish,
+.adminTaskGrid tr.editorFinishTask .ico-task-finish {display:inline-block;}
+.adminTaskGrid tr.editorUnfinishTask .ico-task-unfinish {display:inline-block;}
+.adminTaskGrid tr.editorFinishAllTask .ico-task-finish-all {display:inline-block;}
+.adminTaskGrid tr.editorUnfinishAllTask .ico-task-unfinish-all {display:inline-block;}
+.x-menu .ico-task-end,
+.adminTaskGrid tr.editorEndTask .ico-task-end {display:inline-block;}
+.adminTaskGrid tr.editorChangeUserAssocTask .ico-task-change-user-assoc {display:inline-block;}
+.adminTaskGrid tr.editorPreferencesTask .ico-task-preferences {display:inline-block;}
+.adminTaskGrid tr.editorReopenTask .ico-task-reopen {display:inline-block;}
+.adminTaskGrid tr.editorDeleteTask.error .ico-task-delete,
+.adminTaskGrid tr.editorDeleteTask .ico-task-delete {display:inline-block;}
+.adminTaskGrid tr.editorLogTask.customState.state-ExcelExported .ico-task-log,
+.adminTaskGrid tr.editorLogTask.error .ico-task-log {;display:inline-block;}
+.adminTaskGrid tr.editorCloneTask.error .ico-task-clone,
+.adminTaskGrid tr.editorCloneTask .ico-task-clone {display:inline-block;}
+.adminTaskGrid tr.editorShowexportmenuTask.error.downloadable .ico-task-showexportmenu,
+.adminTaskGrid tr.editorShowexportmenuTask.customState.state-ExcelExported .ico-task-open,
+.adminTaskGrid tr.editorShowexportmenuTask.customState.state-ExcelExported .ico-task-showexportmenu,
+.adminTaskGrid tr.editorShowexportmenuTask.customState.state-ExcelExported .ico-task-excelreimport,
+.adminTaskGrid tr.editorShowexportmenuTask .ico-task-showexportmenu {display: inline-block;}
+.adminTaskGrid tr.pending .x-action-col-icon {display:none !important;}
+.adminTaskGrid tr.pending td.state div {background: url("../images/loading_ico.gif") no-repeat 6px center;}
+
+
+/* User Admin */
+.gender-male {background: url("../images/user.png") no-repeat 6px center;}
+.gender-neutral {background: url("../images/user_gray.png") no-repeat 6px center;}
+.gender-female {background: url("../images/user_female.png") no-repeat 6px center;}
+.ico-user-edit {background: url("../images/user_edit.png") no-repeat center;}
+.ico-user-save {background: url("../images/disk.png") no-repeat center;}
+.ico-user-delete {background: url("../images/user_delete.png") no-repeat center;}
+.ico-user-reset-pw {background: url("../images/lock_go.png") no-repeat center;}
+.ico-setting-save {background: url("../images/disk.png") no-repeat center;}
+.not-editable .ico-user-delete {display:none;}
+.not-editable .ico-user-reset-pw {display:none;}
+
+.x-action-col-cell img{height:16px;width:16px;margin-right:2px;cursor: pointer;}
+
+#segment-grid .first-in-file td  {border-top-style: solid; border-top-width: 3px; border-top-color: #99BCE8;}
+
+/* task confirmation */
+a.x-btn span.task-confirmation {
+    background-image: url(../images/stamp.png) !important;
+}
+
+/* Fix T5DEV-147 */
+.x-form-file-wrap .x-form-trigger-wrap-default.x-form-trigger-wrap-invalid .x-form-text {
+    border-color: #cf4c35;
+}
+
+/* including package ext-theme-classic */
+.x-box-tl {
+  background: transparent no-repeat 0 0; }
+
+.x-box-tc {
+  height: 8px;
+  background: transparent repeat-x 0 0;
+  overflow: hidden; }
+
+.x-box-tr {
+  background: transparent no-repeat right -8px; }
+
+.x-box-ml {
+  background: transparent repeat-y 0;
+  padding-left: 4px;
+  overflow: hidden; }
+
+.x-box-mc {
+  background: repeat-x 0 -16px;
+  padding: 4px 10px; }
+
+.x-box-mc h3 {
+  margin: 0 0 4px 0; }
+
+.x-box-mr {
+  background: transparent repeat-y right;
+  padding-right: 4px;
+  overflow: hidden; }
+
+.x-box-bl {
+  background: transparent no-repeat 0 -16px; }
+
+.x-box-bc {
+  background: transparent repeat-x 0 -8px;
+  height: 8px;
+  overflow: hidden; }
+
+.x-box-br {
+  background: transparent no-repeat right -24px; }
+
+.x-box-tl, .x-box-bl {
+  padding-left: 8px;
+  overflow: hidden; }
+
+.x-box-tr, .x-box-br {
+  padding-right: 8px;
+  overflow: hidden; }
+
+.x-box-tl {
+  background-image: url(resources/corners.gif); }
+
+.x-box-tc {
+  background-image: url(resources/tb.gif); }
+
+.x-box-tr {
+  background-image: url(resources/corners.gif); }
+
+.x-box-ml {
+  background-image: url(resources/l.gif); }
+
+.x-box-mc {
+  background-color: #eee;
+  background-image: url(resources/tb.gif);
+  font-family: "Myriad Pro","Myriad Web","Tahoma","Helvetica","Arial",sans-serif;
+  color: #393939;
+  font-size: 15px; }
+
+.x-box-mc h3 {
+  font-size: 18px;
+  font-weight: bold; }
+
+.x-box-mr {
+  background-image: url(resources/r.gif); }
+
+.x-box-bl {
+  background-image: url(resources/corners.gif); }
+
+.x-box-bc {
+  background-image: url(resources/tb.gif); }
+
+.x-box-br {
+  background-image: url(resources/corners.gif); }
+
+.x-box-blue .x-box-bl, .x-box-blue .x-box-br, .x-box-blue .x-box-tl, .x-box-blue .x-box-tr {
+  background-image: url(resources/corners-blue.gif); }
+
+.x-box-blue .x-box-bc, .x-box-blue .x-box-mc, .x-box-blue .x-box-tc {
+  background-image: url(resources/tb-blue.gif); }
+
+.x-box-blue .x-box-mc {
+  background-color: #c3daf9; }
+
+.x-box-blue .x-box-mc h3 {
+  color: #17385b; }
+
+.x-box-blue .x-box-ml {
+  background-image: url(resources/l-blue.gif); }
+
+.x-box-blue .x-box-mr {
+  background-image: url(resources/r-blue.gif); }
+/*
+    END MESSAGEBOX STYLES
+*/
+
+.searchreplace-hide-element {display: none !important;}
+
+/* TM Overview */
+.ico-tm-edit {background-image: url(../images/book_edit.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-tasks {background-image: url(../images/tasks_assoc.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-delete {background-image: url(../images/book_delete.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-add {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-export {background-image: url(../images/database_go.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-information {background-image: url(../images/information.png); background-repeat:no-repeat; background-position:50% 50%;}
+.ico-tm-show-more {background-image: url(../images/show_more.png); background-repeat:no-repeat; background-position:50% 50%;}
+.language-ressource-import .ico-tm-import {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}
+.language-ressource-export .ico-tm-download {background-image: url(../images/book_go.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-magnifier {background-image: url(../images/magnifier.png) !important;background-repeat:no-repeat;background-position:center;}
+.ico-tm-log {background-image: url(../images/error.png);background-repeat:no-repeat;background-position:center;}
+/*
+.matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
+*/
+.matchGrid tr.match-state-loaded:hover td.info-icon > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:85% 15%;}
+
+/* Tm Overviw grid */
+.tmOverviewPanel .x-grid-header-ct .source-lang > div {background:url(../images/sourceLanguage.png) no-repeat 10px 9px;}
+.tmOverviewPanel .x-grid-header-ct .target-lang > div {background:url(../images/targetLanguage.png) no-repeat 10px 9px;}
+.tmOverviewPanel td.loading div {background: url(../images/loading_ico.gif) no-repeat center center;}
+.tmOverviewPanel .languageResource-status-noconnection td.status {color: #ff3232;}
+.tmOverviewPanel .languageResource-status-error td.status {color: #ff3232;}
+.tmOverviewPanel .languageResource-status-novalidlicense td.status {color: #ff3232;}
+
+
+.language-resource-result-panel .match-state-loading.x-grid-row .source > div,
+.language-resource-result-panel .match-state-loading.x-grid-row .target > div {
+    background:url(../../../../modules/editor/images/loading_ico.gif) no-repeat 10px center;
+    padding-left:30px;
+}
+
+.language-resource-result-panel .match-state-servererror.x-grid-row .source > div {
+    background:url(../../../../modules/editor/images/exclamation.png) no-repeat 10px center;
+    padding-left:30px;
+}
+
+.language-resource-result-panel .x-grid-row span.highlight {
+    font-weight: bold;
+    font-style: italic;
+}
+.checkBoxLableInfoIcon:after{
+    content: "";
+    display: block;
+    background-image:url(../images/information.png); 
+    background-repeat:no-repeat; 
+    width: 20px;
+    height: 20px;
+    float: left;
+    margin: 0 0 0 0;
+}
+.checkBoxLableInfoIconDefault {
+	background-repeat: no-repeat;
+    background-position:right top;
+    background-image: url(../images/information.png) !important;
+}
+.displayFieldInfoIcon:after {
+    content: "";
+    display: block;
+    background-image:url(../images/information.png);
+    background-repeat:no-repeat;
+    width: 20px;
+    height: 20px;
+    float: right;
+    margin: 0 0 0 5px;
+}
+
+.adminTaskGrid tr:hover td.taskassocs > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
+.adminTaskGrid .x-grid-header-ct .taskassocs > div {background:url(../images/share.png) no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .segmentsUpdateable > div {background:url(../images/book_edit.png) no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .taskAssocChecked > div {background:url(../images/book_link.png) no-repeat 10px 9px;}
+
+.tmOverviewPanel tr:hover td.infoIcon > div,
+.tmOverviewPanel tr:hover td.taskList > div,
+.tmOverviewPanel tr:hover td.serviceName > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:right center;}
+.tmOverviewPanel .x-grid-header-ct .taskList > div {background:url(../images/share.png) no-repeat 10px 9px;}
+
+.adminTaskGrid .x-grid-header-ct .taskassocs span.x-column-header-text-inner,
+.tmOverviewPanel .x-grid-header-ct .source-lang span.x-column-header-text-inner,
+.tmOverviewPanel .x-grid-header-ct .target-lang span.x-column-header-text-inner,
+.tmOverviewPanel .x-grid-header-ct .taskList span.x-column-header-text-inner{
+    display: block;
+    overflow: hidden;
+    text-indent: 100%;
+    white-space: nowrap;
+}
+
+/**
+ * FIXME must be removed with next ext update, fixes T5DEV-181 / https://www.sencha.com/forum/showthread.php?330718-6-2-ColorField-color-preview-doesn-t-match-color
+ */
+.x-colorpicker-field input {
+    background-color: inherit;
+}
+
+.tmMatchGridResultTooltip{
+	background-color: #f9e788;
+} 
+
+.customerPanelGrid .ico-customer-mt-export {background-image: url("../images/database_go.png");display:inline-block;}
+.tools-help-icon .x-tool-home{
+	background-image:url(../images/help.png) !important;
+}
+
+.ico-arrow-back {background-image: url(../images/arrow_left.png);}
+.ico-finish-task {background-image: url(../images/tick.png);}
+.ico-add-filter {background-image: url("../images/funnel--plus.png");}
+.gridColumnInfoIconTooltipLeft {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:left center;}
+.gridColumnInfoIconTooltipLeft .x-column-header-text-inner {padding-left: 10px;}
+.redTextColumn{
+	color:#ff0000;
+}
