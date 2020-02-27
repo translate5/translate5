@@ -158,6 +158,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         Ext.dom.GarbageCollector.collect();
         me.editor = null;
+        me.terminateSpellCheck();
         me.consoleLog('---------------- SpellCheck: onDestroy FINISHED. -------------');
     },
     /**
@@ -512,6 +513,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         clearTimeout(me.editIdleTimer);
         me.editIdleTimer = null;
         me.spellCheckInProgressID = false;
+        
+        if (me.editor === null) {
+            return;
+        }
         
         me.getEditorBody().focus();
         
