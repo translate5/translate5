@@ -47,7 +47,8 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $appState = self::assertAppState();
-        self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi may not be activated for this test case!');
+        self::assertContains('editor_Plugins_Okapi_Init', $appState->pluginsLoaded, 'Plugin Okapi must be activated for this test case!');
+        self::assertContains('editor_Plugins_InstantTranslate_Init', $appState->pluginsLoaded, 'Plugin InstantTranslate must be activated for this test case!');
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertCustomer();//assert the test customer
