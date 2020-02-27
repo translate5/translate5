@@ -1,0 +1,93 @@
+<issues>
+	<issue type="Accuracy" level="0" description="" display="yes">
+		<issue type="Terminology" level="1" description="" display="yes">
+			<issue type="Normative terminology" level="2" description="" display="yes"/>
+		</issue>
+		<issue type="Mistranslation" level="1" description="" display="yes">
+			<issue type="Overly literal" level="2" description="" display="yes"/>
+			<issue type="False friend" level="2" description="" display="yes"/>
+			<issue type="Should not have been translated" level="2" description="" display="yes"/>
+			<issue type="Date/time" level="2" description="" display="yes"/>
+			<issue type="Unit conversion" level="2" description="" display="yes"/>
+			<issue type="Number" level="2" description="" display="yes"/>
+			<issue type="Entity (such as name or place)" level="2" description="" display="yes"/>
+		</issue>
+		<issue type="Omission" level="1" description="" display="yes"/>
+		<issue type="Addition" level="1" description="" display="yes"/>
+		<issue type="Untranslated" level="1" description="" display="yes">
+			<issue type="Graphic" level="2" description="" display="yes"/>
+		</issue>
+	</issue>
+	<issue type="Fluency" level="0" description="" display="yes">
+		<issue type="Content" level="1" description="" display="yes">
+			<issue type="Register" level="2" description="" display="yes">
+				<issue type="Variants/slang" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Style" level="2" description="" display="yes">
+				<issue type="Company style" level="3" description="" display="yes"/>
+				<issue type="Style guide" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Monolingual terminology" level="2" description="" display="yes">
+				<issue type="Normative monolingual terminology" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Inconsistency" level="2" description="" display="yes">
+				<issue type="Abbreviations" level="3" description="" display="yes"/>
+				<issue type="Image vs. text" level="3" description="" display="yes"/>
+				<issue type="Discourse" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Duplication" level="2" description="" display="yes"/>
+			<issue type="Ambiguity" level="2" description="" display="yes">
+				<issue type="Unclear reference" level="3" description="" display="yes"/>
+			</issue>
+		</issue>
+		<issue type="Mechanical" level="1" description="" display="yes">
+			<issue type="Spelling" level="2" description="" display="yes">
+				<issue type="Capitalization" level="3" description="" display="yes"/>
+				<issue type="Diacritics" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Typography" level="2" description="" display="yes">
+				<issue type="Punctuation" level="3" description="" display="yes"/>
+				<issue type="Unpaired quote marks or brackets" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Grammar" level="2" description="" display="yes">
+				<issue type="Morphology (word form)" level="3" description="" display="yes"/>
+				<issue type="Part of speech" level="3" description="" display="yes"/>
+				<issue type="Agreement" level="3" description="" display="yes"/>
+				<issue type="Word order" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Locale violation" level="2" description="" display="yes">
+				<issue type="Date format" level="3" description="" display="yes"/>
+				<issue type="Time format" level="3" description="" display="yes"/>
+				<issue type="Measurement format" level="3" description="" display="yes"/>
+				<issue type="Number format" level="3" description="" display="yes"/>
+				<issue type="Quote mark type" level="3" description="" display="yes"/>
+				<issue type="National language standard" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Character encoding" level="2" description="" display="yes"/>
+			<issue type="Nonallowed characters" level="2" description="" display="yes"/>
+			<issue type="Pattern problem" level="2" description="" display="yes"/>
+			<issue type="Sorting" level="2" description="" display="yes"/>
+			<issue type="Corpus conformance" level="2" description="" display="yes"/>
+			<issue type="Link/cross-reference" level="2" description="" display="yes">
+				<issue type="Document-internal" level="3" description="" display="yes"/>
+				<issue type="Document-external" level="3" description="" display="yes"/>
+			</issue>
+			<issue type="Index/TOC" level="2" description="" display="yes">
+				<issue type="Page references" level="3" description="" display="yes"/>
+				<issue type="Index/TOC format" level="3" description="" display="yes"/>
+				<issue type="Missing /incorrect item" level="3" description="" display="yes"/>
+			</issue>
+		</issue>
+		<issue type="Unintelligible" level="1" description="" display="yes"/>
+	</issue>
+	<issue type="Verity" level="0" description="" display="yes">
+		<issue type="Completeness" level="1" description="" display="yes">
+			<issue type="Lists" level="2" description="" display="yes"/>
+			<issue type="Procedures" level="2" description="" display="yes"/>
+		</issue>
+		<issue type="Legal requirements" level="1" description="" display="yes"/>
+		<issue type="Locale applicability" level="1" description="" display="yes"/>
+	</issue>
+	<issue type="Internationalization" level="0" description="" display="yes"/>
+	<issue type="Other" level="0" description="" display="yes"/>
+</issues>
