@@ -205,6 +205,7 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
             $this->api()->requestJson('editor/instanttranslateapi/translate', 'GET', $params); // (according to Confluence: GET / according to InstantTranslate in Browser: POST)
             $responseBody = json_decode($this->api()->getLastResponse()->getBody());
             // Is anything returned for Deep at all?
+            $this->assertIsObject($responseBody, 'InstantTranslate: Response for translation does not return an object, check error log.');
             $this->assertIsObject($responseBody->rows, 'InstantTranslate: Response for translation does not return any rows.');
             $allTranslations = (array)$responseBody->rows;
             $this->assertIsArray($allTranslations);
