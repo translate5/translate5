@@ -366,6 +366,29 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * returns the (given element of) the name of the file that has been imported
+     * @param string $element optional ('filename'|'suffix'; if not set: returns basename)
+     * @return string
+     */
+    public function getImportfilename($element = '') {
+        $config = Zend_Registry::get('config')->runtimeOptions;
+        $directory = $this->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$config->import->referenceDirectory;
+        $scanned_directory = array_diff(scandir($directory), array('..', '.')); // https://www.php.net/manual/en/function.scandir.php#107215
+        $importFile = $scanned_directory[array_key_first($scanned_directory)]; // FIXME: What if there is more than one file in the import-folder? Should not happen for InstantTranslate, but in general it can...
+        switch ($element) {
+            case 'filename':
+                return pathinfo($importFile,PATHINFO_FILENAME);
+                break;
+            case 'suffix':
+                return pathinfo($importFile,PATHINFO_EXTENSION);
+                break;
+            default:
+                return pathinfo($importFile,PATHINFO_BASENAME);
+            break;
+        }
+    }
+    
+    /**
      * @param bool $asJson if true, json is returned, otherwhise assoc-array
      * @return mixed depending on $asJson
      */

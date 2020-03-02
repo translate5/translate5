@@ -741,7 +741,7 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
                 htmlFile += '<p style="font-size:80%;" class="error">' + Editor.data.languageresource.translatedStrings['noDownloadNotTranslated'] + '</p>';
                 break;
             default:
-                htmlFile += '<a href="' + taskData['downloadUrl'] + '" class="ui-button ui-widget ui-corner-all">Download</a>';
+                htmlFile += '<a href="' + taskData['downloadUrl'] + '" class="ui-button ui-widget ui-corner-all" target="_blank">Download</a>';
         } 
         htmlFile += '</li>';
         pretranslatedFiles.push(htmlFile);

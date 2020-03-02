@@ -183,6 +183,13 @@ class editor_TaskController extends ZfExtended_RestController {
         ])
         ->addActionContext('export', 'importArchive')
         
+        ->addContext('filetranslation', [
+            'headers' => [
+                'Content-Type'          => 'application/octet-stream',
+            ]
+        ])
+        ->addActionContext('export', 'filetranslation')
+        
         ->addContext('xlsx', [
             'headers' => [
                 'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // TODO Content-Type prüfen
@@ -1317,6 +1324,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 $exportFolder = $worker->initExport($this->entity);
                 break;
             
+            case 'filetranslation':
             default:
                 $this->entity->checkStateAllowsActions();
                 $worker = ZfExtended_Factory::get('editor_Models_Export_Worker');
@@ -1363,12 +1371,51 @@ class editor_TaskController extends ZfExtended_RestController {
             $suffix = '.zip';
         }
         
+        if($context == 'filetranslation') {
+            $this->provideFiletranslationDownload($zipFile);
+            exit;
+        }
+        
         $this->logInfo('Task exported', ['context' => $context, 'diff' => $diff]);
         $this->provideZipDownload($zipFile, $suffix);
         
         //rename file after usage to export.zip to keep backwards compatibility
         rename($zipFile, dirname($zipFile).DIRECTORY_SEPARATOR.'export.zip');
         exit;
+    }
+    
+    /**
+     * extracts the translated file from given $zipFile and sends it to the browser.
+     * @param string $zipFile
+     */
+    protected function provideFiletranslationDownload($zipFile) {
+        $za = new ZipArchive;
+        if ($za->open($zipFile) !== TRUE) {
+            throw new ZfExtended_NotFoundException("Archive Zip for task ".$this->entity->getTaskGuid()." could not be found");
+        }
+        // where do we find what, what is named how.
+        $languages = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languages editor_Models_Languages */
+        $languages->load($this->entity->getTargetLang());
+        $targetLangRfc = $languages->getRfc5646();
+        $filenamename = $this->entity->getImportfilename('filename');
+        $filenamesuffix = $this->entity->getImportfilename('suffix');
+        $filenameImported = $filenamename . '.' . $filenamesuffix;
+        $filenameExport = $filenamename . '_' . $targetLangRfc . '.' . $filenamesuffix;
+        $destination = $this->entity->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.'exportZip';
+        // extract and send the translated file to the browser
+        $za->extractTo($destination);
+        $translatedfile = $destination.DIRECTORY_SEPARATOR.$this->entity->getTaskGuid().DIRECTORY_SEPARATOR.$filenameImported;
+        $za->close();
+        $this->view->layout()->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        header('Content-Description: File Transfer');
+        header('Content-Disposition: attachment; filename="'.$filenameExport.'"');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        readfile($translatedfile);
     }
     
     /**
