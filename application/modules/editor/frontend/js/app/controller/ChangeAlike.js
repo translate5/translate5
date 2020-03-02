@@ -517,7 +517,7 @@ Ext.define('Editor.controller.ChangeAlike', {
   /**
    * Befüllt das Segment mit der gegebenen ID im Segment Store mit den übergebenen Daten,
    * ohne den Segment Store über die Änderung zu informieren (dass kein automatisches PUT stattfindet)
-   * speichert die Orginal Daten für ein Roleback des Segments. Die vorhandene reject / commit Methodik kann 
+   * speichert die Orginal Daten für ein Rollback des Segments. Die vorhandene reject / commit Methodik kann 
    * zur Zwischenspeicherung hier nicht verwendet werden, da diese sonst automatisch den Store gegen den Server synct. 
    * @param {Number} id
    * @param {Object} data

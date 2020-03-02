@@ -51,6 +51,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       'Editor.view.segments.PixelMapping',
       'Editor.view.segments.StatusStrip'
   ],
+  mixins: [
+      'Editor.util.HtmlCleanup'
+  ],
   componentLayout: 'htmleditorlayout',
   cls: 'x-selectable', //TRANSLATE-1021
   
@@ -229,20 +232,21 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
   },
   
-  /**
-   * Holt Daten aus dem HtmlEditor und entfernt das markup
-   * @return String
-   */
-  getValueAndUnMarkup: function(){
-    var me = this,
-    	result, length,
-    	body = me.getEditorBody();
-    me.checkTags(body);
-    me.checkSegmentLength(body.innerHTML || "");
-    result = me.unMarkup(body);
-    me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
-    return result;
-  },
+	/**
+	 * Holt Daten aus dem HtmlEditor und entfernt das markup
+	 * @return String
+	*/
+	getValueAndUnMarkup: function(){
+		var me = this,
+			result, length,
+			body = me.getEditorBody();
+		me.checkTags(body);
+		me.checkSegmentLength(body.innerHTML || "");
+		result = me.unMarkup(body);
+		me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
+		return result;
+	},
+
   /**
    * - replaces div/span to images
    * - prepares content to be edited
@@ -1108,8 +1112,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(!Ext.isString(text)) {
           text = "";
       }
-      //FIXME: improve that clean del tag by reuse methods from track changes
-      text = text.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
+
+      text = me.cleanDeleteTags(text);//clean del tag
       
       div.innerHTML = text;
       
