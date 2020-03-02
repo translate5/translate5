@@ -296,6 +296,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->setLanguageResourceJsVars();
       
       $this->view->Php2JsVars()->set('editor.editorBrandingSource',$rop->editor->editorBrandingSource);
+      
+      // sets the timeout the editor generally delays the capturing of deferred change events in msec. TODO: make runtime option ??
+      $this->view->Php2JsVars()->set('editor.deferredChangeTimeout', 250);
+      
       $this->setJsAppData();
     }
 

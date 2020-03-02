@@ -76,6 +76,7 @@ Ext.define('Editor.controller.Editor', {
     }],
     registeredTooltips: [],
     isEditing: false,
+    isCapturingChange: false,
     keyMapConfig: null,
     editorKeyMap: null,
     generalKeyMap: null,
@@ -85,6 +86,7 @@ Ext.define('Editor.controller.Editor', {
     lastCopiedSelectionWithTagHandling: '',
     copiedSelectionWithTagHandling: null,
     resetSegmentValueForEditor: null,
+    htmlEditor: null,
     listen: {
         controller: {
             '#Editor.$application': {
@@ -333,11 +335,11 @@ Ext.define('Editor.controller.Editor', {
         me.prevNextSegment.calculateRows(context);//context.record, context.rowIdx
         me.getSourceTags(context);
     },
-        getSourceTags: function(context) {
-            var me = this,
-                plug = me.getEditPlugin(),
-                source = context.record.get('source'),
-                tempNode, walkNodes;
+    getSourceTags: function(context) {
+    	var me = this,
+    		plug = me.getEditPlugin(),
+    		source = context.record.get('source'),
+            tempNode, walkNodes;
 
             me.sourceTags = [];
             //do nothing when editing the source field
@@ -373,7 +375,7 @@ Ext.define('Editor.controller.Editor', {
             });
         };
         walkNodes(tempNode);
-        },
+	},
     /**
      * Gibt die RowEditing Instanz des Grids zurück
      * @returns Editor.view.segments.RowEditing
@@ -448,6 +450,7 @@ Ext.define('Editor.controller.Editor', {
     initEditor: function(editor){
         var me = this,
             docEl = Ext.get(editor.getDoc());
+        this.htmlEditor = editor;
         
         if(me.editorKeyMap) {
             me.editorKeyMap.destroy();
@@ -626,7 +629,7 @@ Ext.define('Editor.controller.Editor', {
         me.prevNextSegment.reset();
 
         me.fireEvent('saveUnsavedComments');
-        if(me.isEditing &&rec && rec.get('editable')) {
+        if(me.isEditing && rec && rec.get('editable')) {
             me.fireEvent('prepareTrackChangesForSaving');
             me.fireEvent('saveSegment');
         }
@@ -648,6 +651,12 @@ Ext.define('Editor.controller.Editor', {
      */
     handleAfterContentChange: function() {
     	this.fireEvent('saveSnapshot'); // see SnapshotHistory
+    	// trigger deferred change handler
+    	if(!this.isCapturingChange){
+    		var me = this;
+    		this.isCapturingChange = true;
+    		setTimeout(function(){ me.handleDelayedChange(); }, Editor.data.editor.deferredChangeTimeout);
+    	}
     },
     /**
      * handleAfterCursorMove: save new position of cursor if necessary.
@@ -655,6 +664,17 @@ Ext.define('Editor.controller.Editor', {
     handleAfterCursorMove: function() {
     	this.fireEvent('updateSnapshotBookmark'); // see SnapshotHistory
     },
+    
+    /**
+     * handleAfterCursorMove: fire deferred change event if still changing
+     */    
+    handleDelayedChange: function(){
+    	if(this.isEditing) {
+    		this.fireEvent('clockedchange', this.htmlEditor.getValueAndUnMarkup()); 
+        }
+    	this.isCapturingChange = false;
+    },
+
     /**
      * After keyboard-event: handle changes if event is not to be ignored.
      * ('change'-event from segmentsHtmleditor does not work; is not really envoked when we need it!)
