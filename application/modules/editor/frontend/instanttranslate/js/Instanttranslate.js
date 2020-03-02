@@ -701,7 +701,7 @@ function getDownloads(){
         success: function(result){
             clearAllErrorMessages();
             $('#sourceFile').val('');
-            showDownloads(result.allPretranslatedFiles);
+            showDownloads(result.allPretranslatedFiles, result.dateAsOf);
             stopLoadingState();
         },
         error: function(jqXHR, textStatus)
@@ -718,8 +718,9 @@ function getDownloads(){
 /***
  * Offer to download the pretranslated files (= currently: export the task).
  * @param array allPretranslatedFiles
+ * @param string dateAsOf
  */
-function showDownloads(allPretranslatedFiles){ // array[taskId] = array(taskName, downloadUrl, removeDate)
+function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = array(taskName, downloadUrl, removeDate)
     var pretranslatedFiles = [],
         html = '',
         htmlFile,
@@ -746,7 +747,8 @@ function showDownloads(allPretranslatedFiles){ // array[taskId] = array(taskName
         pretranslatedFiles.push(htmlFile);
     });
     if (pretranslatedFiles.length > 0) {
-        html += '<h2>' + Editor.data.languageresource.translatedStrings['pretranslatedFiles'] + ':</h2>';
+        html += '<h2>' + Editor.data.languageresource.translatedStrings['pretranslatedFiles'] + '</h2>';
+        html += '<p style="font-size:small;">(' + Editor.data.languageresource.translatedStrings['asOf'] + ' ' + dateAsOf + '):</p>';
         if (showRefreshButton) {
             html += '<p><a href="#" class="getdownloads ui-button ui-widget ui-corner-all">' + Editor.data.languageresource.translatedStrings['refresh'] + '</a></p>';
         }
