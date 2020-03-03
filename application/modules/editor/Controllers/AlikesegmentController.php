@@ -133,16 +133,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         $userGuid = (new Zend_Session_Namespace('user'))->data->userGuid;
-        
-        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wfm editor_Workflow_Manager */
-        $workflow = $wfm->getByTask($task);
-        /* @var $workflow editor_Workflow_Abstract */
-        
-        //load the current workflow role for the task step
-        $userRole=$workflow->getRoleOfStep($task->getWorkflowStepName());
-        //load the user tua for the task and role
-        $tua->loadByParams($userGuid, $session->taskGuid,$userRole);
+        $tua->loadByParams($userGuid, $session->taskGuid);
         
         $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [
             $this->entity,

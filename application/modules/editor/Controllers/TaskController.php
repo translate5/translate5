@@ -307,7 +307,6 @@ class editor_TaskController extends ZfExtended_RestController {
         $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
         //set the default table to lek_task
         $this->entity->getFilter()->setDefaultTable('LEK_task');
-        $this->entity->addDefaultGroupByField('id');
         if($isAllowedToLoadAll) {
             $this->totalCount = $this->entity->getTotalCount();
             $rows = $this->entity->loadAll();
@@ -1142,16 +1141,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userTaskAssoc editor_Models_TaskUserAssoc */
         try {
-            
-            $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-            /* @var $wfm editor_Workflow_Manager */
-            $workflow = $wfm->getByTask($this->entity);
-            /* @var $workflow editor_Workflow_Abstract */
-            
-            //load the current workflow role for the task step
-            $userRole=$workflow->getRoleOfStep($task->getWorkflowStepName());
-            
-            $userTaskAssoc->loadByParams($userGuid,$taskGuid,$userRole);
+            $userTaskAssoc->loadByParams($userGuid,$taskGuid);
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {

@@ -68,14 +68,11 @@ class editor_SessionController extends ZfExtended_SessionController {
         /* @var $wfm editor_Workflow_Manager */
         $workflow = $wfm->getByTask($task);
         
-        //load the current workflow role for the task step
-        $userRole=$workflow->getRoleOfStep($task->getWorkflowStepName());
-        
         $user = new Zend_Session_Namespace('user');
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         try {
-            $tua->loadByParams($user->data->userGuid, $taskGuid,$userRole);
+            $tua->loadByParams($user->data->userGuid, $taskGuid);
             $state = $workflow->getInitialUsageState($tua);
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {

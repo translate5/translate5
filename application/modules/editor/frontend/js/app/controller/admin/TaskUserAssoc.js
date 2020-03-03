@@ -91,6 +91,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('adminViewportClosed', me.clearStores, me);
+      me.getAdminTaskUserAssocsStore().on('load', me.updateUsers, me);
       
       me.control({
           '#adminTaskUserAssocGrid': {
@@ -203,6 +204,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                       //if there is no user assoc entry anymore, we consider that as not dirty
                       me.getPrefWindow().lookupViewModel().set('userAssocDirty', false);
                   }
+                  me.updateUsers(assoc);
                   me.fireEvent('removeUserAssoc', me, toDel, assoc);
                   task.load();//reload only the task, not the whole task prefs, should be OK
                   Editor.MessageBox.addByOperation(op); //does nothing since content is not provided from server :(
@@ -235,6 +237,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
               me.handleCancel();
               if(!rec.store) {
                   store.insert(0,rec);
+                  me.updateUsers(store);
                   me.fireEvent('addUserAssoc', me, rec, store);
               }
               task.load();//reload only the task, not the whole task prefs, should be OK
@@ -250,7 +253,16 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   clearStores: function() {
       this.getAdminTaskUserAssocsStore().removeAll();
   },
-  
+  /**
+   * updates the user list to be excluded from the add user drop down
+   * @param {} store
+   */
+  updateUsers: function(store) {
+      var me = this;
+      if(me.getUserAssoc()) {
+          me.getUserAssoc().excludeLogins = store.collect('login');
+      }
+  },
   /**
    * sets the initial state value dependent on the role
    * @param {Ext.form.field.ComboBox} roleCombo
@@ -285,32 +297,5 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       }
       rec.set('state', newState);
       stateCombo.setValue(newState);
-      me.filterUserCombo(newValue)
-  },
-
-  /***
-   * Filter the user combo store based on the selected user role. The user can be assigned only onece per role.
-   */
-  filterUserCombo:function(userRole){
-	  var me = this,
-	  	form = me.getUserAssocForm(),
-	  	userAssocGrid=me.getUserAssocGrid(),
-	  	usersCombo=form.down('combo[name="userGuid"]'),
-	  	tuaUsers=[];
-	  
-	  //collect all userGuids for the current role
-      userAssocGrid.getStore().filterBy(function(rec){
-          if(rec.get('role')==userRole){
-            tuaUsers.push(rec.get('userGuid'));
-          }
-        return true;
-      });
-      
-      //filter out all current assoc users from the usersStore
-      usersCombo.getStore().addFilter([{
-    	  property: 'userGuid',
-          value:tuaUsers,
-          operator:'notin'
-	  }],true);
   }
 });
