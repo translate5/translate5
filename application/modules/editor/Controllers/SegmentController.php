@@ -158,7 +158,21 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $sessionUser = new Zend_Session_Namespace('user');
         $taskUserAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $taskUserAssoc editor_Models_TaskUserAssoc */
-        $taskUserAssoc->loadByParams($sessionUser->data->userGuid, $this->session->taskGuid);
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->session->taskGuid);
+        
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $workflow = $wfm->getByTask($task);
+        /* @var $workflow editor_Workflow_Abstract */
+        
+        //load the current workflow role for the task step
+        $userRole=$workflow->getRoleOfStep($task->getWorkflowStepName());
+
+        //load the user tua for the task and role
+        $taskUserAssoc->loadByParams($sessionUser->data->userGuid, $this->session->taskGuid,$userRole);
         if($taskUserAssoc->getIsPmOverride()) {
             $userRole = 'pm';
         }
