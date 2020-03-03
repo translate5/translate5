@@ -118,9 +118,19 @@ Ext.define('Editor.controller.JsLogger', {
         if (!Editor.data.enableJsLoggerVideoConfig) {
             return;
         }
-        Ext.Msg.confirm(me.strings.msgTitle, me.strings.msgInfo, function(btn){
-            if(btn === 'yes') {
-                me.enableJsLoggerVideoUser = true;
+        
+        var myMsg = Ext.create('Ext.window.MessageBox', {
+            // set closeAction to 'destroy' if this instance is not
+            // intended to be reused by the application
+            closeAction: 'destroy'
+        }).show({
+            title: me.strings.msgTitle,
+            message:  me.strings.msgInfo,
+            buttons: Ext.Msg.YESNO,
+            fn: function(btn) {
+                if (btn === 'yes') {
+                	 me.enableJsLoggerVideoUser = true;
+                }
             }
         });
     },
