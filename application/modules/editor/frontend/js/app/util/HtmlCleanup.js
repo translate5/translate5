@@ -48,6 +48,14 @@ Ext.define('Editor.util.HtmlCleanup', {
 		html = this.cleanDuplicateSaveImgTags(html);
 		html = this.cleanDeleteTags(html);
 		html = this.cleanInsertTags(html);
+		html = this.cleanMarkerTags(html);
+		return html;
+	},
+	// TODO: used by RowEditorColumnParts. needed there or replacable with cleanAllInternalTags ??
+	cleanAllInternalButMarkTags: function(html){
+		html = this.cleanDuplicateSaveImgTags(html);
+		html = this.cleanDeleteTags(html);
+		html = this.cleanInsertTags(html);
 		return html;
 	},
 	
@@ -65,5 +73,10 @@ Ext.define('Editor.util.HtmlCleanup', {
 	cleanInsertTags: function(html){
 		 // remove INS-Tags and keep their content:
 		return html.replace(/<ins[^>]*>/ig, '').replace(/<\/ins>/ig, '');
-	}
+	},
+	
+	cleanMarkerTags: function(html){
+		 // remove INS-Tags and keep their content:
+		return html.replace(/<mark[^>]*>+|<\/mark>/ig, '');
+	},
 });

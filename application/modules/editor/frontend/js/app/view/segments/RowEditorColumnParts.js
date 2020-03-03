@@ -350,7 +350,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         }
         
         // Remove all TrackChanges Markup
-        var cleanValue = me.cleanAllInternalTags(newValue);
+        var cleanValue = me.cleanAllInternalButMarkTags(newValue);
         
         if(cleanValue.length == 0 && record.get(me.columnToEdit).length > 0) {
             Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);

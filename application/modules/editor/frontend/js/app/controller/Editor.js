@@ -670,7 +670,7 @@ Ext.define('Editor.controller.Editor', {
      */    
     handleDelayedChange: function(){
     	if(this.isEditing) {
-    		this.fireEvent('clockedchange', this.htmlEditor.getValueAndUnMarkup()); 
+    		this.fireEvent('clockedchange', this.htmlEditor, this.getEditPlugin().context); 
         }
     	this.isCapturingChange = false;
     },
