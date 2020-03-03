@@ -124,6 +124,13 @@ Ext.define('Editor.MessageBox',{
         Ext.each(msgs, function(msg){
             Editor.MessageBox.addInfo(msg);
         });
+    },
+    /**
+     * returns a debug string to be usable in error popups with the date string and additional data. 
+     * Background is, that users often make a screenshot of an error popup, but do not provide an exact date to compare that with the log.
+     */
+    debugInfoMarkup: function(info) {
+        return '<p style="font-size: 10px;color: #808080;font-style: italic;user-select: text;">'+info+' '+Ext.Date.format(new Date(), 'Y-m-d H:i:sO')+'</p>';
     }
   },
   constructor: function(config) {
@@ -177,10 +184,12 @@ Ext.define('Editor.MessageBox',{
       ].join('');
   },
   showDirectError: function(msg, data) {
-      var box = Ext.MessageBox;
+      var box = Ext.MessageBox,
+          info = (Editor.data.task ? "- tid: "+Editor.data.task.get('id') : '');
       if(data) {
           msg = msg + Editor.MessageBox.dataTable(data);
       }
+      msg += Editor.MessageBox.debugInfoMarkup(Editor.data.app.user.login+info);
       box.show({
           title: this.titles.directError,
           msg: msg,
