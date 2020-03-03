@@ -306,7 +306,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
              'INNER JOIN LEK_taskUserAssoc ON LEK_taskUserAssoc.taskGuid=filter.taskGuid '.
              'INNER JOIN LEK_customer ON LEK_customer.id=filter.customerId AND LEK_customer.anonymizeUsers=0 '.
              'WHERE Zf_users.userGuid=LEK_taskUserAssoc.userGuid '.
-             'GROUP BY Zf_users.id; ';
+             'GROUP BY Zf_users.id '.
+             'ORDER BY Zf_users.surName; ';
         $stmt = $this->db->getAdapter()->query($sql);
         return $stmt->fetchAll();
     }
@@ -1299,7 +1300,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $workflowProgress[]=[
                 'workflowStep'=>$step, 
                 'status'=>'running', 
-                'progress'=>$progress
+                'progress'=>round($progress)
             ];
         }
         
