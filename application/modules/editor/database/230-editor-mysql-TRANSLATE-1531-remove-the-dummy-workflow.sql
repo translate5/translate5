@@ -26,4 +26,4 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-DELETE FROM `translate5new`.`Zf_configuration` WHERE `value`='editor_Workflow_Dummy';
+DELETE FROM `Zf_configuration` WHERE `value`='editor_Workflow_Dummy';
