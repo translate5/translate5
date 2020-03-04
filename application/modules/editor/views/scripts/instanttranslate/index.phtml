@@ -116,6 +116,7 @@
         "pretranslatedFiles"        => $translate->_("Vorübersetzte Dateien"),
         "refresh"                   => $translate->_("Aktualisieren"),
         "state"                     => $translate->_("Status"),
+        "asOf"                      => $translate->_("Stand:"),
     );
     $this->Php2JsVars()->set('languageresource.translatedStrings',$this->translations);
     
@@ -300,7 +301,7 @@ $( function() {
 
 <script type="text/javascript">
 // show list of available files
-showDownloads(<?php echo json_encode($this->allPretranslatedFiles); ?>);
+showDownloads(<?php echo json_encode($this->allPretranslatedFiles); ?>, <?php echo json_encode($this->dateAsOf); ?>);
 // "toggle" source (text/file)
 $(document).on('click', '.source-toggle .change-source-type' , function() {
     $('.source-toggle').toggle();

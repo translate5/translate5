@@ -306,7 +306,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
              'INNER JOIN LEK_taskUserAssoc ON LEK_taskUserAssoc.taskGuid=filter.taskGuid '.
              'INNER JOIN LEK_customer ON LEK_customer.id=filter.customerId AND LEK_customer.anonymizeUsers=0 '.
              'WHERE Zf_users.userGuid=LEK_taskUserAssoc.userGuid '.
-             'GROUP BY Zf_users.id; ';
+             'GROUP BY Zf_users.id '.
+             'ORDER BY Zf_users.surName; ';
         $stmt = $this->db->getAdapter()->query($sql);
         return $stmt->fetchAll();
     }
@@ -363,6 +364,26 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function getTasknameForDownload(string $suffix, $prefix = '') {
         return iconv('UTF-8', 'ASCII//TRANSLIT', $prefix.$this->getTaskName().$suffix);
+    }
+    
+    /**
+     * returns the (given element of) the name of the file that has been imported
+     * @param string $element optional ('filename'|'suffix'; if not set: returns basename)
+     * @return string
+     */
+    public function getImportfilename($element = '') {
+        $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
+        /* @var $treeDb editor_Models_Foldertree */
+        $filepaths = $treeDb->getPaths($this->getTaskGuid(),'file');
+        $importFile = $filepaths[array_key_first($filepaths)]; // FIXME: What if there is more than one file in the import-folder? Should not happen for InstantTranslate, but in general it can...
+        switch ($element) {
+            case 'filename':
+                return pathinfo($importFile,PATHINFO_FILENAME);
+            case 'suffix':
+                return pathinfo($importFile,PATHINFO_EXTENSION);
+            default:
+                return pathinfo($importFile,PATHINFO_BASENAME);
+        }
     }
     
     /**
@@ -1279,7 +1300,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $workflowProgress[]=[
                 'workflowStep'=>$step, 
                 'status'=>'running', 
-                'progress'=>$progress
+                'progress'=>round($progress)
             ];
         }
         
