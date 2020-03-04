@@ -104,10 +104,23 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         settype($this->data->taskGuid, 'string');
         $this->task->loadByTaskGuid($this->data->taskGuid);
         
+        $this->setLegacyDeadlineDate();
+        
         $valid = parent::validate();
         //add the login hash AFTER validating, since we don't need any validation for it
         $this->entity->createstaticAuthHash();
         return $valid;
+    }
+    
+    /**
+     * @deprecated TODO: 11.02.2020 remove this function after all customers adopt there api calls, remove also the task meta targetDeliveryDate!
+     */
+    protected function setLegacyDeadlineDate() {
+        $meta = $this->task->meta();
+        $tdd = $meta->getTargetDeliveryDate();
+        if(!empty($tdd) && empty($this->data->deadlineDate)) {
+            $this->entity->setDeadlineDate($tdd);
+        }
     }
 
     /**

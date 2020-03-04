@@ -513,6 +513,10 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->initWorkflow();
             //$this->entity->save(); => is done by the import call!
             $this->processUploadedFile();
+            
+            //warn the api user for the targetDeliveryDate ussage
+            $this->targetDeliveryDateWarning();
+            
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
             
@@ -523,9 +527,6 @@ class editor_TaskController extends ZfExtended_RestController {
             if($this->data['autoStartImport']) {
                 $this->startImportWorkers();
             }
-            
-            //warn the api user for the targetDeliveryDate ussage
-            $this->targetDeliveryDateWarning();
             
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
@@ -1547,22 +1548,31 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->taskLog->info('E1011', $message, $extraData);
     }
     
-    /***
+    /**
      * Warn the api users that the targetDeliveryDate field is not anymore available for the api.
-     * The task deadlines are defined for each task-user-assoc job separately
-     * TODO: 11.02.2020 remove this function after all customers adopt there api calls
+     * The task deadlines are defined for each task-user-assoc job separately, 
+     *  for task creation we store the given date in the task meta table and use that in the jobs, so we do not break the API
+     * @deprecated TODO: 11.02.2020 remove this function after all customers adopt there api calls
+     * @see Editor_TaskuserassocController::setLegacyDeadlineDate
      */
-    protected function targetDeliveryDateWarning() {
-        $throwWarning=false;
-        if(is_array($this->data)){
-            $throwWarning=isset($this->data['targetDeliveryDate']);
+    protected function targetDeliveryDateWarning($isPost = false) {
+        $date = false;
+        if(is_array($this->data) && isset($this->data['targetDeliveryDate'])){
+            $date = $this->data['targetDeliveryDate'];
         }
-        if(is_object($this->data)){
-            $throwWarning=isset($this->data->targetDeliveryDate);
+        if(is_object($this->data) && isset($this->data->targetDeliveryDate)){
+            $date = $this->data->targetDeliveryDate;
         }
-        if(!$throwWarning){
+        if($date === false){
             return;
         }
+        //different instance for column creation needed:
+        $taskMeta = $this->entity->meta();
+        $taskMeta->addMeta('targetDeliveryDate', $taskMeta::META_TYPE_STRING, null, 'Temporary field to store the targetDeliveryDate until all API users has migrated.');
+        $taskMeta = $this->entity->meta(true);
+        $taskMeta->setTargetDeliveryDate($date);
+        $taskMeta->save();
+        
         $this->log->warn('E1210','The targetDeliveryDate for the task is deprecated. Use the LEK_taskUserAssoc deadlineDate instead.');
     }
     

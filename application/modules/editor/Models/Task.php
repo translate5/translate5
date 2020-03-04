@@ -890,10 +890,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * convenient method to get the task meta data
+     * @param boolean $reinit if true reinits the internal meta object completely (after adding a field for example)
      * @return editor_Models_Task_Meta
      */
-    public function meta() {
-        if(empty($this->meta)) {
+    public function meta($reinit = false) {
+        if(empty($this->meta) || $reinit) {
             $this->meta = ZfExtended_Factory::get('editor_Models_Task_Meta');
         }
         elseif($this->getTaskGuid() == $this->meta->getTaskGuid()) {
