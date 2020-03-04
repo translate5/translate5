@@ -297,11 +297,9 @@ class editor_TaskController extends ZfExtended_RestController {
     public function userlistAction(){
         //set default sort
         $this->addDefaultSort();
-        // here no check for pmGuid, since this is done in task::loadListByUserAssoc
-        $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
         //set the default table to lek_task
         $this->entity->getFilter()->setDefaultTable('LEK_task');
-        $this->view->rows=$this->entity->loadUserList($this->user->data->userGuid,$isAllowedToLoadAll);
+        $this->view->rows=$this->entity->loadUserList($this->user->data->userGuid);
     }
     
     /**

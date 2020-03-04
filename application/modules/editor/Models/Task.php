@@ -286,16 +286,38 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * INFO:Associated users for the anonimized tasks will not be loaded
      *
      * @param string $userGuid
-     * @param bool $loadAll
-     * 
      * @return array
      */
-    public function loadUserList(string $userGuid,bool $loadAll=false) {
+    public function loadUserList(string $userGuid) {
+        $quoted = $this->db->getAdapter()->quote($userGuid);
+        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
         
-        if(!$loadAll){
-            $s=$this->getSelectByUserAssocSql($userGuid, '*', $loadAll);
-        }else{
-            $s=$this->db->select()->setIntegrityCheck(false);
+        // here no check for pmGuid, since this is done in task::loadListByUserAssoc
+        $loadAll = $userModel->isAllowed('backend', 'loadAllTasks');
+        $ignoreAnonStuff = $userModel->readAnonymizedUsers();
+        
+        //FIXME in future the customer  config and task config must respected here too, 
+        // means a complete refactoring probably with the anon flag into the job table (also for filtering!!!)
+        $config = Zend_Registry::get('config');
+        if($ignoreAnonStuff) {
+            //the current user may see all user data
+            $anonSql = '';
+        }
+        elseif($config->runtimeOptions->customers->anonymizeUsers) {
+            //if we get here, the user may only see the user for the task he is pm and himself
+            $anonSql = 'AND filter.pmGuid = "'.$quoted.'" OR LEK_taskUserAssoc.userGuid = "'.$quoted.'"';
+        }
+        else {
+            //the user may see only the user data from customers where the anon flag is false and where he is pm and himself
+            $anonSql = 'INNER JOIN LEK_customer ON LEK_customer.id=filter.customerId AND LEK_customer.anonymizeUsers=0';
+            $anonSql .= 'OR filter.pmGuid = "'.$quoted.'" OR LEK_taskUserAssoc.userGuid = "'.$quoted.'"';
+        }
+        
+        if($loadAll){
+            $s = $this->db->select()->setIntegrityCheck(false);
+        } else {
+            $s = $this->getSelectByUserAssocSql($userGuid, '*', $loadAll);
         }
         
         //apply the frontend task filters
@@ -304,10 +326,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $sql='SELECT Zf_users.*,filter.taskGuid from Zf_users, '.
             '('.$s->assemble().') as filter '.
              'INNER JOIN LEK_taskUserAssoc ON LEK_taskUserAssoc.taskGuid=filter.taskGuid '.
-             'INNER JOIN LEK_customer ON LEK_customer.id=filter.customerId AND LEK_customer.anonymizeUsers=0 '.
-             'WHERE Zf_users.userGuid=LEK_taskUserAssoc.userGuid '.
+             $anonSql.
+             'WHERE Zf_users.userGuid = LEK_taskUserAssoc.userGuid '.
              'GROUP BY Zf_users.id '.
              'ORDER BY Zf_users.surName; ';
+        
         $stmt = $this->db->getAdapter()->query($sql);
         return $stmt->fetchAll();
     }
