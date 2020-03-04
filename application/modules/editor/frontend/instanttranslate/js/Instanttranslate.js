@@ -750,13 +750,17 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
         html += '<h2>' + Editor.data.languageresource.translatedStrings['pretranslatedFiles'] + '</h2>';
         html += '<p style="font-size:small;">(' + Editor.data.languageresource.translatedStrings['asOf'] + ' ' + dateAsOf + '):</p>';
         if (showRefreshButton) {
-            html += '<p><a href="#" class="getdownloads ui-button ui-widget ui-corner-all">' + Editor.data.languageresource.translatedStrings['refresh'] + '</a></p>';
+            html += '<p><a href="#" id="refresh-pretranslations" class="getdownloads ui-button ui-widget ui-corner-all">' + Editor.data.languageresource.translatedStrings['refresh'] + '</a></p>';
         }
         html += '<ul>';
         html += pretranslatedFiles.join(' ');
         html += '</ul>';
     }
     $('#pretranslatedfiles').html(html);
+    // if we are still waiting for a file to be ready: try again after 10 seconds
+    if (showRefreshButton) {
+        setTimeout(function(){ $('#refresh-pretranslations').click(); }, 10000);
+    }
 }
 
 $(document).on('click', '.getdownloads' , function(e) {
