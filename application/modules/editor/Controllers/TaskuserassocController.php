@@ -117,6 +117,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     protected function setLegacyDeadlineDate() {
         $meta = $this->task->meta();
+        if(!$meta->hasField('targetDeliveryDate')) {
+            return;
+        }
         $tdd = $meta->getTargetDeliveryDate();
         if(!empty($tdd) && empty($this->data->deadlineDate)) {
             $this->entity->setDeadlineDate($tdd);
