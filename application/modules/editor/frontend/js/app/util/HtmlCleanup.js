@@ -33,36 +33,51 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.util.HtmlCleanup', {
 	
-	
+	/**
+	 * entfernt vom Editor / TrackChanges automatisch hinzugefügte unsichtbare Zeichen und alle internen Tags
+	 */
 	cleanAllUnwantedMarkup: function(html){
-		// entfernt vom Editor / TrackChanges automatisch hinzugefügte unsichtbare Zeichen und alle internen Tags
-		return this.cleanAllInternalTags(this.cleanInvisibleCharacters(html));
+		return this.cleanAllEditingTags(this.cleanInvisibleCharacters(html));
 	},
-	
+	/**
+	 * entfernt vom Editor / TrackChanges automatisch hinzugefügte unsichtbare Zeichen
+	 */
 	cleanInvisibleCharacters: function(html){
-		// entfernt vom Editor / TrackChanges automatisch hinzugefügte unsichtbare Zeichen
 		return html.replace(/\u200B|\uFEFF/g, '');
 	},
-	
-	cleanAllInternalTags: function(html){
+	/**
+	 * Cleans all editing tags added by the frontend: <ins, <del, <mark, invisible chars band the duplicatesave-images
+	 */
+	cleanAllEditingTags: function(html){
 		html = this.cleanDuplicateSaveImgTags(html);
 		html = this.cleanDeleteTags(html);
 		html = this.cleanInsertTags(html);
 		html = this.cleanMarkerTags(html);
 		return html;
 	},
-	// TODO: used by RowEditorColumnParts. needed there or replacable with cleanAllInternalTags ??
-	cleanAllInternalButMarkTags: function(html){
+	/**
+	 * TODO: used by RowEditorColumnParts. needed there or replacable with cleanAllEditingTags ??
+	 */
+	cleanAllEditingButMarkTags: function(html){
 		html = this.cleanDuplicateSaveImgTags(html);
 		html = this.cleanDeleteTags(html);
 		html = this.cleanInsertTags(html);
 		return html;
 	},
+	/**
+	 * Removes the "internal tags", div's with the classname "internal" and their contents. The replacement can be given, the default is the empty string
+	 * Multiple internal tags in a sequence are condensed to one replacement
+	 */
+	cleanInternalTags: function(html, replacement){
+		if(!replacement){
+			replacement = '';
+		}
+		return html.replace(/<[^>]+internal-tag[^>]+>.+?<\/div>/ig, replacement);
+	},
 	
 	cleanDuplicateSaveImgTags: function(html){
 		// (1) remove DEL-Tags and their content
 		return html.replace(/<img[^>]* class="duplicatesavecheck"[^>]*>/,'');
-		
 	},
 	
 	cleanDeleteTags: function(html){
