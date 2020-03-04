@@ -3,7 +3,7 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-## [3.4.0] - 2020-02-27
+## [3.4.0] - 2020-03-04
 
 ### VERY IMPORTANT NOTES for API users (due TRANSLATE-1455):
 *   On assigning users to task the role "lector" was replaced with "reviewer". When using the old value a deprecated message is created and the value is transformed. This should be changed in your application talking to translate5 very soon!
