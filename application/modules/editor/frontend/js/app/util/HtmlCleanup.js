@@ -67,12 +67,46 @@ Ext.define('Editor.util.HtmlCleanup', {
 	/**
 	 * Removes the "internal tags", div's with the classname "internal" and their contents. The replacement can be given, the default is the empty string
 	 * Multiple internal tags in a sequence are condensed to one replacement
+	 * @param string html: the markup to clean
+	 * @param string replacement: the replacement for the tag, defaults to ""
+	 * @param string itClassName: if set, can specify the classname of the internal tag to replace (can be "open", "close" or "single")
+	 * @return string: the cleaned text
 	 */
-	cleanInternalTags: function(html, replacement){
+	cleanInternalTags: function(html, replacement, itClassName){
 		if(!replacement){
 			replacement = '';
 		}
-		return html.replace(/<[^>]+internal-tag[^>]+>.+?<\/div>/ig, replacement);
+		if(!itClassName || itClassName == ''){
+			return html.replace(/<[^>]+internal-tag[^>]+>.+?<\/div>/ig, replacement);
+		}
+		var regex = new RegExp('<[^>]+internal-tag[^>]+'+itClassName+'[^>]+>.+?</div>', 'ig');
+		html = html.replace(regex, replacement);
+		var regex = new RegExp('<[^>]+'+itClassName+'[^>]+internal-tag[^>]+>.+?</div>', 'ig');
+		return html.replace(regex, replacement);
+	},
+	/**
+	 * Removes internal tags and replaces them with a split-value
+	 * In this process open-single-close combinations will lead to a single split and close followed by such a construct or open predeceeded by such a construct will be reduced to one split.
+	 * open-close combinations will be preserved as it can be assumed they once surrounded some text which was removed by the author
+	 * @param string splitKey: defaults to "<t5split>"
+	 * @return string: the cleaned text with split-values
+	 */
+	cleanInternalTagsForSplitting: function(html, splitKey){
+		if(!splitKey){
+			splitKey = '<t5split>';
+		}
+		html = this.cleanInternalTags(html, "<t5open>", 'open');
+		html = this.cleanInternalTags(html, "<t5close>", 'close');
+		html = this.cleanInternalTags(html, "<t5single>", 'single');
+		// crucial: open/close sequences may contain just internal single tags and will be replaced as a whole
+		html = html.replace(/<t5open>(<t5single>)*<t5close>/ig, '<t5split>');
+		// neighbouring open-split or split-close construct are also replaced, only open/close combinations with real content in between (or no = empty real content) shall be kept
+		html = html.replace(/<t5close>(<t5split>)+/ig, '<t5close>');
+		html = html.replace(/(<t5split>)+<t5open>/ig, '<t5open>');
+		// replace remaining open / close (and fore safety single as well)
+		html = html.replace(/<t5open>/ig, splitKey);
+		html = html.replace(/<t5close>/ig, splitKey);
+		return html.replace(/<t5single>/ig, splitKey);
 	},
 	
 	cleanDuplicateSaveImgTags: function(html){
@@ -94,4 +128,25 @@ Ext.define('Editor.util.HtmlCleanup', {
 		 // remove INS-Tags and keep their content:
 		return html.replace(/<mark[^>]*>+|<\/mark>/ig, '');
 	},
+	/**
+	 * Works just like PHPs strip tags, much safer than just html.replace(/(<([^>]+)>)/ig,'')
+	 */
+	cleanHtmlTags: function(html, allowed){
+		// making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
+		allowed = (((allowed || '') + '').toLowerCase().match(/<[a-z][a-z0-9]*>/g) || []).join('');
+		var tags = /<\/?([a-z0-9]*)\b[^>]*>?/gi, comments = /<!--[\s\S]*?-->/gi, before;
+		// removes tha '<' char at the end of the string to replicate PHP's behaviour
+		html = (html.substring(html.length - 1) === '<') ? html.substring(0, html.length - 1) : html;
+		// recursively remove tags to ensure that the returned string doesn't contain forbidden tags html previous passes (e.g. '<<bait/>switch/>')
+		while (true) {
+			before = html
+			html = before.replace(comments, '').replace(tags, function (p0, p1){
+				return allowed.indexOf('<' + p1.toLowerCase() + '>') > -1 ? p0 : '';
+			});
+			// return once no more tags are removed
+			if (before === html){
+				return html;
+			}
+		}
+	}
 });
