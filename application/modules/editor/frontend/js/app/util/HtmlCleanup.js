@@ -129,7 +129,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 		return html.replace(/<mark[^>]*>+|<\/mark>/ig, '');
 	},
 	/**
-	 * Works just like PHPs strip tags, much safer than just html.replace(/(<([^>]+)>)/ig,'')
+	 * Works just like PHPs strip_tags, much safer than just html.replace(/(<([^>]+)>)/ig,'')
 	 */
 	cleanHtmlTags: function(html, allowed){
 		// making sure the allowed arg is a string containing only tags in lowercase (<a><b><c>)
