@@ -182,8 +182,7 @@ Ext.define('Editor.controller.ServerException', {
                 }
                 statusText = appendServerMsg(str.timeout);
                 if(response && response.request) {
-                    statusText += '<p style="font-size: 10px;color: #808080;font-style: italic;user-select: text;">';
-                    statusText += 'URL: '+response.request.url+' '+Ext.Date.format(new Date(), 'Y-m-d H:i:sO')+'</p>';
+                    statusText += Editor.MessageBox.debugInfoMarkup('URL: '+response.request.url);
                 }
                 Ext.Msg.alert(str.title, statusText);
                 return;
@@ -200,6 +199,9 @@ Ext.define('Editor.controller.ServerException', {
                     }
                     Editor.MessageBox.addError(appendServerMsg(str["405_del_assoc"]));
                     return;
+                }
+                if(response && response.request) {
+                    statusText += Editor.MessageBox.debugInfoMarkup('URL: '+response.request.url);
                 }
                 Ext.Msg.alert(str.title, text+tpl.apply([status, statusText]));
                 return;
