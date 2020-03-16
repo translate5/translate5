@@ -72,9 +72,20 @@ class editor_Models_Task_Export_Metadata {
      */
     protected $log;
     
+    
+    /***
+     * Kpi locale string
+     * @var array
+     */
+    protected $kpiTypeLocales=[];
+    
     public function __construct() {
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.task.excel.metadata');
+        
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_REVIEWER]=$this->translate->_('Ø Bearbeitungszeit Lektor');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_TRANSLATOR]=$this->translate->_('Ø Bearbeitungszeit Übersetzer');
+        $this->kpiTypeLocales[editor_Models_KPI::KPI_TRANSLATOR_CHECK]=$this->translate->_('Ø Bearbeitungszeit zweiter Lektor');
     }
     
     /**
@@ -173,7 +184,26 @@ class editor_Models_Task_Export_Metadata {
                 return false;
             }
         };
-        
+
+        //convert the userName filter value(the initial value is guid)
+        $convertUserName=function($filter){
+            if(!isset($filter->value) || empty($filter->value)){
+                return false;
+            }
+            
+            $model=ZfExtended_Factory::get('ZfExtended_Models_User');
+            /* @var $model ZfExtended_Models_User */ 
+            
+            foreach ($filter->value as &$single){
+                try {
+                    $model->loadByGuid($single);
+                    $single=$model->getUserName();
+                    
+                } catch (Exception $e) {
+                    //catch notfound, this should not happen
+                }
+            }
+        };
         $filter=ZfExtended_Factory::get('ZfExtended_Models_Filter_ExtJs6');
         /* @var $filter ZfExtended_Models_Filter_ExtJs6 */
         $operatorTranslated=$filter->getTranslatedOperators();
@@ -188,12 +218,20 @@ class editor_Models_Task_Export_Metadata {
                 $filter->value=$date->format('Y-m-d');
             }
             
+            if($filter->property=='userName'){
+                $convertUserName($filter);
+            }
             $this->excelMetadata->addFilter($filter);
         }
         
+        
+        
         // add data: KPI
         $this->excelMetadata->addMetadataHeadline($this->translate->_('KPI'));
-        $this->excelMetadata->addKPI($this->renderKpiAverageProcessingTime());
+        
+        $this->excelMetadata->addKPI($this->renderKpiData(editor_Models_KPI::KPI_TRANSLATOR));
+        $this->excelMetadata->addKPI($this->renderKpiData(editor_Models_KPI::KPI_REVIEWER));
+        $this->excelMetadata->addKPI($this->renderKpiData(editor_Models_KPI::KPI_TRANSLATOR_CHECK));
         $this->excelMetadata->addKPI($this->renderKpiExcelExportUsage());
         
         // add data: tasks
@@ -210,13 +248,15 @@ class editor_Models_Task_Export_Metadata {
         $writer->save($fileName);
     }
     
-    /**
-     * KPI: Render translated version of the Average Processing Time.
+    /***
+     * Render the kpi data by given type
+     * @param string $type
      * @return string
      */
-    protected function renderKpiAverageProcessingTime() : string {
-        $average = $this->getKpiValueByName(editor_Models_KPI::KPI_REVIEWER);
-        return $this->translate->_('Ø Bearbeitungszeit Lektor') . ': ' . $average;
+    protected function renderKpiData(string $type) {
+        $average = $this->getKpiValueByName($type);
+        $text=$this->kpiTypeLocales[$type] ?? '';
+        return $text . ': ' . $average;
     }
     
     /**
