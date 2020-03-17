@@ -120,7 +120,15 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         bind: {
                             store: 'customersStore'
                         },
-                        columns: [
+                        columns: [{
+                        	xtype: 'gridcolumn',
+                            dataIndex: 'id',
+                            text: 'Id',
+                            width: 20,
+                            filter: {
+                                type: 'number'
+                            }
+                        },
                             {
                                 xtype: 'gridcolumn',
                                 dataIndex: 'name',

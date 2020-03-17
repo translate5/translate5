@@ -96,7 +96,7 @@ class editor_Workflow_Anonymize {
     public function anonymizeUserdata(string $taskGuid, string $userGuid, array $data) {
         $this->taskGuid = $taskGuid;
         $this->userGuid = $userGuid;
-        if (!$this->isOtherWorkflowUserAndNotPM()) {
+        if ($this->isCurrentUserOrPM()) {
             return $data;
         }
         $keysToAnonymize = ['comments','email','firstName','lockingUser','lockingUsername','login','userGuid','userName','surName'];
@@ -129,17 +129,14 @@ class editor_Workflow_Anonymize {
      * check here:
      * @return boolean
      */
-    protected function isOtherWorkflowUserAndNotPM() {
+    protected function isCurrentUserOrPM(): bool {
         if ($this->userGuid == $this->sessionUserGuid) {
-            return false;
+            return true;
         }
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
-        if ($this->userGuid == $task->getPmGuid()) {
-            return false;
-        }
-        return true;
+        return $this->userGuid == $task->getPmGuid();
     }
     
     /**

@@ -39,7 +39,6 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
     public function __construct() {
         parent::__construct();
         $this->logger = Zend_Registry::get('logger')->cloneMe('editor.terminology.segmentediting');
-        new Zend_Http_Client_Exception;
     }
     
     /**
