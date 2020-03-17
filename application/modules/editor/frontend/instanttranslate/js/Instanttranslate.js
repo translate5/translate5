@@ -701,7 +701,7 @@ function getDownloads(){
         success: function(result){
             clearAllErrorMessages();
             $('#sourceFile').val('');
-            showDownloads(result.allPretranslatedFiles);
+            showDownloads(result.allPretranslatedFiles, result.dateAsOf);
             stopLoadingState();
         },
         error: function(jqXHR, textStatus)
@@ -718,8 +718,9 @@ function getDownloads(){
 /***
  * Offer to download the pretranslated files (= currently: export the task).
  * @param array allPretranslatedFiles
+ * @param string dateAsOf
  */
-function showDownloads(allPretranslatedFiles){ // array[taskId] = array(taskName, downloadUrl, removeDate)
+function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = array(taskName, downloadUrl, removeDate)
     var pretranslatedFiles = [],
         html = '',
         htmlFile,
@@ -727,7 +728,8 @@ function showDownloads(allPretranslatedFiles){ // array[taskId] = array(taskName
     $.each(allPretranslatedFiles, function(taskId, taskData) {
         htmlFile = '<li>';
         htmlFile += taskData['taskName'];
-        htmlFile += ' (' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] +'):<br>'; 
+        htmlFile += ' ' + taskData['sourceLang'] +' -> ' + taskData['targetLang'];
+        htmlFile += ' (' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] +')<br>';
         switch(taskData['downloadUrl']) {
             case 'isImporting':
                 showRefreshButton = true;
@@ -740,21 +742,26 @@ function showDownloads(allPretranslatedFiles){ // array[taskId] = array(taskName
                 htmlFile += '<p style="font-size:80%;" class="error">' + Editor.data.languageresource.translatedStrings['noDownloadNotTranslated'] + '</p>';
                 break;
             default:
-                htmlFile += '<a href="' + taskData['downloadUrl'] + '" class="ui-button ui-widget ui-corner-all">Download</a>';
+                htmlFile += '<a href="' + taskData['downloadUrl'] + '" class="ui-button ui-widget ui-corner-all" target="_blank">Download</a>';
         } 
         htmlFile += '</li>';
         pretranslatedFiles.push(htmlFile);
     });
     if (pretranslatedFiles.length > 0) {
-        html += '<h2>' + Editor.data.languageresource.translatedStrings['pretranslatedFiles'] + ':</h2>';
+        html += '<h2>' + Editor.data.languageresource.translatedStrings['pretranslatedFiles'] + '</h2>';
+        html += '<p style="font-size:small;">(' + Editor.data.languageresource.translatedStrings['asOf'] + ' ' + dateAsOf + '):</p>';
         if (showRefreshButton) {
-            html += '<p><a href="#" class="getdownloads ui-button ui-widget ui-corner-all">' + Editor.data.languageresource.translatedStrings['refresh'] + '</a></p>';
+            html += '<p><a href="#" id="refresh-pretranslations" class="getdownloads ui-button ui-widget ui-corner-all">' + Editor.data.languageresource.translatedStrings['refresh'] + '</a></p>';
         }
         html += '<ul>';
         html += pretranslatedFiles.join(' ');
         html += '</ul>';
     }
     $('#pretranslatedfiles').html(html);
+    // if we are still waiting for a file to be ready: try again after 10 seconds
+    if (showRefreshButton) {
+        setTimeout(function(){ $('#refresh-pretranslations').click(); }, 10000);
+    }
 }
 
 $(document).on('click', '.getdownloads' , function(e) {

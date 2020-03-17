@@ -32,7 +32,7 @@ use Translate5\FrontEndMessageBus\Configuration;
 /**
  * Increase me on each change! (also CLIENT_VERSION in Init.php!)
  */
-const SERVER_VERSION = '1.1';
+const SERVER_VERSION = '1.0';
 
 //errors should go to stderr only!
 ini_set('display_errors', "stderr");

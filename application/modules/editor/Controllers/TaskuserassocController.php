@@ -104,10 +104,26 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         settype($this->data->taskGuid, 'string');
         $this->task->loadByTaskGuid($this->data->taskGuid);
         
+        $this->setLegacyDeadlineDate();
+        
         $valid = parent::validate();
         //add the login hash AFTER validating, since we don't need any validation for it
         $this->entity->createstaticAuthHash();
         return $valid;
+    }
+    
+    /**
+     * @deprecated TODO: 11.02.2020 remove this function after all customers adopt there api calls, remove also the task meta targetDeliveryDate!
+     */
+    protected function setLegacyDeadlineDate() {
+        $meta = $this->task->meta();
+        if(!$meta->hasField('targetDeliveryDate')) {
+            return;
+        }
+        $tdd = $meta->getTargetDeliveryDate();
+        if(!empty($tdd) && empty($this->data->deadlineDate)) {
+            $this->entity->setDeadlineDate($tdd);
+        }
     }
 
     /**
@@ -187,7 +203,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->addUserInfoToResult();
         if(isset($this->data->state) && $oldEntity->getState() != $this->data->state){
             $this->log->info('E1012', 'job status changed from {oldState} to {newState}', [
-                'tua' => $this->entity,
+                'tua' => $this->getSanitizedEntityForLog(),
                 'oldState' => $oldEntity->getState(),
                 'newState' => $this->data->state,
             ]);
@@ -203,7 +219,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         parent::postAction();
         $this->log->request();
         $this->addUserInfoToResult();
-        $this->log->info('E1012', 'job created', ['tua' => $this->entity]);
+        $this->log->info('E1012', 'job created', ['tua' => $this->getSanitizedEntityForLog()]);
         $this->applyEditableAndDeletable();
     }
     
@@ -219,7 +235,18 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->entity->setId(0);
         //we have to perform the delete call on cloned object, since the delete call resets the data in the entity, but we need it for post processing 
         $entity->delete();
-        $this->log->info('E1012', 'job deleted', ['tua' => $this->entity]);
+        $this->log->info('E1012', 'job deleted', ['tua' => $this->getSanitizedEntityForLog()]);
+    }
+    
+    /**
+     * returns the tua data with removed auth hash 
+     * @return stdClass
+     */
+    protected function getSanitizedEntityForLog(): stdClass {
+        $tua = $this->entity->getDataObject();
+        unset($tua->staticAuthHash);
+        unset($tua->usedInternalSessionUniqId);
+        return $tua;
     }
     
     /**
