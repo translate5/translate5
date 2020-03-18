@@ -37,5 +37,6 @@ class editor_Plugins_MatchAnalysis_Exception extends ZfExtended_ErrorCodeExcepti
     
     static protected $localErrorCodes = [
         'E1103' => 'MatchAnalysis Plug-In: tried to load analysis data without providing a valid taskGuid',
+        'E1239' => 'MatchAnalysis Plug-In: The associated language resource "{name}" is not available for match analysis and pre-translations.',
     ];
 }
