@@ -514,7 +514,7 @@ class editor_Plugins_NecTm_HttpApi {
         $response = $this->request($http);
         $processResponse = $this->processResponse($response);
         if (!$processResponse) {
-            $this->throwBadGateway($http);
+            $this->throwBadGateway();
         }
         return $processResponse;
     }
@@ -540,7 +540,7 @@ class editor_Plugins_NecTm_HttpApi {
                     //check next message
                     continue;
                 }
-                $this->throwBadGateway($http);
+                $this->throwBadGateway();
             }
             throw $e;
         }
@@ -550,7 +550,7 @@ class editor_Plugins_NecTm_HttpApi {
      * Throws a ZfExtended_BadGateway exception containing the underlying errors
      * @throws ZfExtended_BadGateway
      */
-    protected function throwBadGateway($http = '') {
+    protected function throwBadGateway() {
         //FIXME wenn in getErrors ein 403, dann kein Zugriff auf das TM - entweder weil nicht existent (wissen wir aber nicht) oder wegen fehlender credentials??? → den letzten Fall muss ich eh noch evaluieren
         // entpsrechend hier ein aussagekräfigerer Text ausgeben
         // Bei 401 Ebenfalls keine Zugriff Meldung
@@ -558,9 +558,6 @@ class editor_Plugins_NecTm_HttpApi {
         $e->setDomain('NEC-TM-Api');
         $errors = $this->getErrors();
         $errors[] = $this->result; //add real result to error data
-        if (!empty($http)) {
-            $errors[] = $http;
-        }
         $e->setErrors($errors);
         throw $e;
     }
