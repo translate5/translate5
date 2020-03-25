@@ -47,18 +47,23 @@ Ext.define('Editor.util.HtmlCleanup', {
 	},
 	/**
 	 * Cleans all editing tags added by the frontend: <ins, <del, <mark, invisible chars band the duplicatesave-images
+	 * Cleans also term-tagger, spellchecker and qm-tags
+	 * The cleaning of the latter expects the contents of those tags not to be complex HTML-structures, if this is the case, the code must be rewritten from a (fast) regex type to a complex markup parser
 	 */
 	cleanAllEditingTags: function(html){
 		html = this.cleanDuplicateSaveImgTags(html);
 		html = this.cleanDeleteTags(html);
 		html = this.cleanInsertTags(html);
 		html = this.cleanMarkerTags(html);
+		html = this.cleanQmTags(html);
+		html = this.cleanSpellcheckTags(html);
+		html = this.cleanTermTags(html);
 		return html;
 	},
 	/**
 	 * TODO: used by RowEditorColumnParts. needed there or replacable with cleanAllEditingTags ??
 	 */
-	cleanAllEditingButMarkTags: function(html){
+	cleanForSaveEditorContent: function(html){
 		html = this.cleanDuplicateSaveImgTags(html);
 		html = this.cleanDeleteTags(html);
 		html = this.cleanInsertTags(html);
@@ -127,6 +132,49 @@ Ext.define('Editor.util.HtmlCleanup', {
 	cleanMarkerTags: function(html){
 		 // remove INS-Tags and keep their content:
 		return html.replace(/<mark[^>]*>+|<\/mark>/ig, '');
+	},
+	
+	cleanQmTags: function(html){
+		// remove quality-management tags
+		return this.cleanByTagAndClassWithContent(html, '', 'img', 'qmflag')
+	},
+	
+	cleanSpellcheckTags: function(html){
+		// removes any spellchecker tags
+		return this.cleanByTagAndClassKeepContent(html, 'span', 'spellcheck');
+	},
+
+	cleanTermTags: function(html){
+		// removes any  term-tagger tags
+		html = this.cleanByTagAndClassKeepContent(html, 'span', 'term');
+		return this.cleanByTagAndClassKeepContent(html, 'div', 'term');
+	},
+	/**
+	 * Remove tags of a certain type with a certain class. Warning: removes also the tags content !
+	 * For now, only images will be correctly cleaned as tags without end-tags
+	 */
+	cleanByTagAndClassWithContent: function(html, replacement, tagName, className){
+		var regex = (tagName == 'img') ?
+			new RegExp('<'+tagName+'[^>]* class="'+this.cleanCreateClassSelector(className)+'"[^>]*>', 'ig') 
+			: new RegExp('<'+tagName+'[^>]* class="'+this.cleanCreateClassSelector(className)+'"[^>]*>.+?<\/'+tagName+'>', 'ig');
+		return html.replace(regex, replacement);
+	},
+	/**
+	 * Remove tags of a certain type with a certain class. Keeps the tags content
+	 * Can only be used for tags with opening/closing tag obviously
+	 * The Code is not suitable, if the inner HTML of the tag is further Markup and may fails in this case !!!
+	 */
+	cleanByTagAndClassKeepContent: function(html, tagName, className){
+		var regex = new RegExp('<'+tagName+'[^>]* class="'+this.cleanCreateClassSelector(className)+'"[^>]*>(.*)<\/'+tagName+'>', 'ig');
+		return html.replace(regex, '$2');
+	},
+	
+	/**
+	 * Creates a selector that catches a certain classname within a class-attribute.
+	 * Catches e.g. "term" if "term" was passed but not "someterm" or "atermxy"
+	 */
+	cleanCreateClassSelector: function(className){
+		return '([^">]* '+className+' [^">]*|[^">]* '+className+'|'+className+' [^">]*|'+className+')';
 	},
 	/**
 	 * Works just like PHPs strip_tags, much safer than just html.replace(/(<([^>]+)>)/ig,'')
