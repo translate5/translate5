@@ -156,7 +156,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 	cleanByTagAndClassWithContent: function(html, replacement, tagName, className){
 		var regex = (tagName == 'img') ?
 			new RegExp('<'+tagName+'[^>]* class="'+this.cleanCreateClassSelector(className)+'"[^>]*>', 'ig') 
-			: new RegExp('<'+tagName+'[^>]* class="'+this.cleanCreateClassSelector(className)+'"[^>]*>.+?<\/'+tagName+'>', 'ig');
+			: new RegExp('<'+tagName+'[^>]* class="'+this.cleanCreateClassSelector(className)+'"[^>]*>.*?<\/'+tagName+'>', 'ig');
 		return html.replace(regex, replacement);
 	},
 	/**
@@ -165,10 +165,9 @@ Ext.define('Editor.util.HtmlCleanup', {
 	 * The Code is not suitable, if the inner HTML of the tag is further Markup and may fails in this case !!!
 	 */
 	cleanByTagAndClassKeepContent: function(html, tagName, className){
-		var regex = new RegExp('<'+tagName+'[^>]* class="'+this.cleanCreateClassSelector(className)+'"[^>]*>(.*)<\/'+tagName+'>', 'ig');
+		var regex = new RegExp('<'+tagName+'[^>]* class="'+this.cleanCreateClassSelector(className)+'"[^>]*>(.*?)<\/'+tagName+'>', 'ig');
 		return html.replace(regex, '$2');
 	},
-	
 	/**
 	 * Creates a selector that catches a certain classname within a class-attribute.
 	 * Catches e.g. "term" if "term" was passed but not "someterm" or "atermxy"
