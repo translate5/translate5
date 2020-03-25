@@ -27,9 +27,16 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * This Worker reopens the task after the import was successful
+ * This Worker is triggered after a task import, regardless if the task was successfully imported or the import did not succeed due errors.
+ * Therefore this worker may not be a subclass of the editor_Models_Import_Worker_Abstract
  */
-class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Import_Worker_Abstract {
+class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract {
+    /**
+     * The final step should run in any case
+     * @var boolean
+     */
+    protected $enableParentDefuncCheck = false;
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -50,31 +57,19 @@ class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Import_Wor
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
         
-        if ($task->getState() != $task::STATE_IMPORT) {
-            return false;
-        }
+        $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $workflowManager editor_Workflow_Manager */
+        //we have to initialize the workflow so that it can listen to further events (like importCompleted)
+        $workflowManager->getByTask($task);
         
-        $task->setState($this->getInitialTaskState($task));
-        $task->save();
-        $task->unlock();
+        // importCompleted is also triggered on task errors:
+        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        $eventManager->trigger('importCompleted', $this, [
+            'task' => $task,
+            'importConfig' => $this->workerModel->getParameters()['config'],
+        ]);
         
+        //init default user prefs
         return true;
-    }
-    
-    /**
-     * returns the initial status for a task directly after import
-     * see config runtimeOptions.import.initialTaskState;
-     * @param editor_Models_Task $task
-     * @return string
-     */
-    protected function getInitialTaskState(editor_Models_Task $task) {
-        $config = Zend_Registry::get('config');
-        $status = $config->runtimeOptions->import->initialTaskState;
-        $reflection = new ReflectionObject($task);
-        $constants = $reflection->getConstants();
-        if(!in_array($status, $constants)) {
-            throw new ZfExtended_Exception('The configured initialTaskState is not valid! state: '.$status.'; valid states:'.print_r($constants,1));
-        }
-        return $status;
     }
 }

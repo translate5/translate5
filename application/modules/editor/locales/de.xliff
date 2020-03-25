@@ -1746,6 +1746,30 @@ Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> 
 <trans-unit id='d2FpdGluZw=='><source>waiting</source><target>wartend</target></trans-unit>
 <trans-unit id='ZmluaXNoZWQ='><source>finished</source><target>abgeschlossen</target></trans-unit>
 <trans-unit id='dW5jb25maXJtZWQ='><source>unconfirmed</source><target>unbestätigt</target></trans-unit>
+<trans-unit id='e2hlYWRlcn0KRGllIGZvbGdlbmRlIEF1ZmdhYmUgd3VyZGUgbWl0IEZlaGxlcm4gLyBXYXJudW5nZW4gLyBIaW53ZWlzZW4gaW1wb3J0aWVydC4gTWl0IGRlciBCaXR0ZSB1bSBCZWFjaHR1bmcuPGJyIC8+CjxiciAvPgp7dGFza0ZyYWdtZW50fQo8YnIgLz4KPGJyIC8+Cjx0YWJsZT48dHI+PHRoIHN0eWxlPSJ0ZXh0LWFsaWduOmxlZnQ7cGFkZGluZy1yaWdodDoxMHB4OyI+RGF0dW06PC90aD4KPHRoIHN0eWxlPSJ0ZXh0LWFsaWduOmxlZnQ7cGFkZGluZy1yaWdodDoxMHB4OyI+VHlwOjwvdGg+Cjx0aCBzdHlsZT0idGV4dC1hbGlnbjpsZWZ0O3BhZGRpbmctcmlnaHQ6MTBweDsiPkNvZGU6PC90aD4KPHRoIHN0eWxlPSJ0ZXh0LWFsaWduOmxlZnQ7cGFkZGluZy1yaWdodDoxMHB4OyI+TWVsZHVuZzo8L3RoPjwvdHI+Cjx0cj57bWVzc2FnZXN9PC90cj48L3RhYmxlPgp7Zm9vdGVyfQ=='><source>{header}
+Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit der Bitte um Beachtung.<br />
+<br />
+{taskFragment}
+<br />
+<br />
+<table><tr><th style="text-align:left;padding-right:10px;">Datum:</th>
+<th style="text-align:left;padding-right:10px;">Typ:</th>
+<th style="text-align:left;padding-right:10px;">Code:</th>
+<th style="text-align:left;padding-right:10px;">Meldung:</th></tr>
+<tr>{messages}</tr></table>
+{footer}</source><target>{header}
+Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit der Bitte um Beachtung.<br />
+<br />
+{taskFragment}
+<br />
+<br />
+<table><tr><th style="text-align:left;padding-right:10px;">Datum:</th>
+<th style="text-align:left;padding-right:10px;">Typ:</th>
+<th style="text-align:left;padding-right:10px;">Code:</th>
+<th style="text-align:left;padding-right:10px;">Meldung:</th></tr>
+<tr>{messages}</tr></table>
+{footer}</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgbWl0IEZlaGxlcm4gLyBXYXJudW5nZW4gaW1wb3J0aWVydA=='><source>Translate5 - Aufgabe mit Fehlern / Warnungen importiert</source><target>Translate5 - Aufgabe mit Fehlern / Warnungen importiert</target></trans-unit>
   </body>
  </file>
 </xliff>
