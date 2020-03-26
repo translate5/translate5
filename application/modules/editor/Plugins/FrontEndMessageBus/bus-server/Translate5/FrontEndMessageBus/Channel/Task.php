@@ -76,7 +76,7 @@ class Task extends Channel {
         $this->releaseLocalSegment($request->conn->openedSegmentId ?? 0);
         
         //if the segment is here already in use, we send a NAK 
-        if(!empty($this->editedSegments[$answer->segmentId])) {
+        if(!empty($this->editedSegments[$answer->segmentId]) && $this->editedSegments[$answer->segmentId] !== $request->conn) {
             $answer->segmentOpenNak();
             return;
         }
@@ -112,9 +112,14 @@ class Task extends Channel {
         $result = SegmentMsg::createFromFrontend($request);
         $result->command = 'segmentLocked';
         $request->conn->openedTask = $result->taskGuid;
+
         //sending the requesting user all locked segments
         foreach($this->editedSegments as $segmentId => $conn) {
             $userGuid = $this->instance->getSession($conn->sessionId, 'userGuid');
+            if($conn->WebSocket->closing || empty($userGuid)) {
+                //session of that connection or whole connection is gone
+                continue;
+            }
             $result->trackingId = $this->getUserTrackingId($result->taskGuid, $userGuid); 
             $result->segmentId = $segmentId;
             $result->connectionId = $conn->connectionId; //send back the locking connection id
@@ -282,23 +287,42 @@ class Task extends Channel {
      * @param ConnectionInterface $conn
      */
     public function onClose(ConnectionInterface $conn) {
-        if(empty($conn->openedTask)) {
-            return;
+        if(!empty($conn->openedTask)) {
+            $this->updateOnlineUsers($conn->sessionId, $conn->openedTask, false);
         }
-        $this->updateOnlineUsers($conn->sessionId, $conn->openedTask, false);
-        $request = FrontendMsg::create(self::CHANNEL_NAME, 'segmentLeave', [$conn->openedTask, $conn->openedSegmentId ?? 0], $conn);
-        if(!empty($conn->openedSegmentId)) {
-            //on connection close we release the segment, on reconnect the segment is tried to open again
-            // we just fake a frontend msg triggering the segmentLeave
-            $this->segmentLeave($request);
-        }
+        
+        $taskGuid = $conn->openedTask ?? '';
+        
+        //we just fake a frontend msg triggering the segmentLeave
+        $request = FrontendMsg::create(self::CHANNEL_NAME, 'segmentLeave', [$taskGuid, $conn->openedSegmentId ?? 0], $conn);
+        
+        //we also have to reset selected segments, also the segment answer can be recycled below
         $answer = $this->createSegmentAnswerFromFrontend($request, 'segmentselect');
-        if(empty($answer)) {
-            return;
+        if(!empty($answer)) {
+            $answer->segmentId = [];
+            $answer->taskGuid = $taskGuid;
+            $this->sendToOthersOnTask($answer);
         }
-        $answer->segmentId = [];
-        $answer->taskGuid = $conn->openedTask;
-        $this->sendToOthersOnTask($answer);
+        
+        //loop over all edited segments and release all segments of the closing connection
+        // if there is a concrete opened segment, on reconnect this is tried to be opened again
+        $toRelease = [];
+        foreach($this->editedSegments as $segmentId => $usedConnection) {
+            if($usedConnection !== $conn) {
+                continue;
+            }
+            //if we can't get an segment answer, we just remove the segments locally
+            if(empty($answer)) {
+                $this->releaseLocalSegment($segmentId);
+                continue;
+            }
+            $toRelease[] = $segmentId;
+        }
+        //if we have segments to be released, we also have an answer to send to the GUIs
+        if(!empty($toRelease)) {
+            //leaveAlikes can be used to release multiple segments 
+            $this->leaveAlikes($answer, $toRelease);
+        }
     }
     
     /**
@@ -321,36 +345,46 @@ class Task extends Channel {
         }
         
         //get remaining sessions associated to tasks
-        $allUsedSessions = array_values($this->taskToSessionMap);
-        if(!empty($allUsedSessions)) {
-            //merge all sessions together into one array
-            $allUsedSessions = array_unique(call_user_func_array('array_merge', $allUsedSessions));
-            
-            //check if there are connections containing non existent sessions, if yes leave open segments by that connections 
-            foreach($this->instance->getConnections() as $conn) {
-                if(!empty($allUsedSessions) && in_array($conn->sessionId, $allUsedSessions)) {
-                    continue;
-                }
-                // if the connection has a locked segment, release it.
-                $request = FrontendMsg::create(self::CHANNEL_NAME, 'segmentLeave', [$conn->openedTask ?? null, $conn->openedSegmentId ?? 0], $conn);
-                if(!empty($conn->openedTask) && !empty($conn->openedSegmentId)) {
-                    //on connection close we release the segment, on reconnect the segment is tried to open again
-                    // we just fake a frontend msg triggering the segmentLeave
-                    $this->segmentLeave($request);
-                }
-            }
-        }
+        $this->leaveSegmentsFromGarbageSessions();
 
-        //remove orphaned open segments (on closing task something similar is done too)
-        foreach($this->editedSegments as $segId => $conn) {
-            /* @var $conn \Ratchet\WebSocket\WsConnection */
-            if($conn->WebSocket->closing) {
-                $this->releaseLocalSegment($segId);
+        //we return here only the taskGuids, really having a session 
+        return ['usedTaskGuids' => array_keys($this->taskToSessionMap)];
+    }
+    
+    /**
+     * unlock segments locked by connections with dead sessions
+     */
+    private function leaveSegmentsFromGarbageSessions() {
+        $allUsedSessions = array_values($this->taskToSessionMap);
+        if(empty($allUsedSessions)) {
+            return;
+        }
+        //merge all sessions together into one array
+        $allUsedSessions = array_unique(call_user_func_array('array_merge', $allUsedSessions));
+        
+        //check if there are connections containing non existent sessions, if yes leave open segments by that connections
+        $orphanedConnections = [];
+        foreach($this->instance->getConnections() as $conn) {
+            if(!empty($allUsedSessions) && in_array($conn->sessionId, $allUsedSessions)) {
+                continue;
+            }
+            $orphanedConnections[] = $conn;
+            // if the connection has a locked segment, release it.
+            $request = FrontendMsg::create(self::CHANNEL_NAME, 'segmentLeave', [$conn->openedTask ?? null, $conn->openedSegmentId ?? 0], $conn);
+            if(!empty($conn->openedTask) && !empty($conn->openedSegmentId)) {
+                //on connection close we release the segment, on reconnect the segment is tried to open again
+                // we just fake a frontend msg triggering the segmentLeave
+                $this->segmentLeave($request);
             }
         }
         
-        //we return here only the taskGuids, really having a session 
-        return ['usedTaskGuids' => array_keys($this->taskToSessionMap)];
+        //remove orphaned open segments (on closing task something similar is done too)
+        foreach($this->editedSegments as $segId => $conn) {
+            /* @var $conn \Ratchet\WebSocket\WsConnection */
+            if($conn->WebSocket->closing || in_array($conn, $orphanedConnections)) {
+                $this->releaseLocalSegment($segId);
+            }
+        }
     }
     
     /**
@@ -492,12 +526,19 @@ class Task extends Channel {
                 $this->editedSegments[$alikeId] = $currentConnection;
                 continue;
             }
-            //unlock the previously locked segments
+            // if the segment is already locked by myself, all is OK too.
+            if($this->editedSegments[$alikeId] === $currentConnection) {
+                $locked[] = $alikeId; // it is unclear if this is correct, what is when the lock is coming from a direct open and not an alike open?
+                continue;
+            }
+            //unlock the previously locked segments, since we are going to send a NAK and break the main foreach loop
             foreach($locked as $unlockId) {
                 unset($this->editedSegments[$unlockId]);
             }
+            
             //the segment with the ID in alikeId is already in use, so NAK that request:
             $this->releaseLocalSegment($masterSegment['id']);
+            
             //if one of the alikes is already locked by someone different - we have to send a NAK to the one who opened the master segment
             FrontendMsg::create(self::CHANNEL_NAME, 'segmentOpenNak', [
                 'segmentId' => (int) $masterSegment['id'],
@@ -505,6 +546,8 @@ class Task extends Channel {
                 'connectionId' => $currentConnection->connectionId,
             ], $currentConnection)
             ->send();
+            
+            //now we have to cancel the whole alike locking
             return;
         }
         
