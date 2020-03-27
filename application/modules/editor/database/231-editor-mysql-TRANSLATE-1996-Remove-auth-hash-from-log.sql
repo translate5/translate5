@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -15,8 +14,9 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -26,16 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Exception Class to get detailed information on TermTagger-Error.
- *
- */
-class editor_Plugins_TermTagger_Exception_Open extends editor_Plugins_TermTagger_Exception_Abstract {
-    /**
-     * if a TBX could not be loaded into the termtagger this should be an error
-     * @var integer
-     */
-    protected $level = ZfExtended_Logger::LEVEL_ERROR;
-    
-    //localErrorCodes see parent abstract
-}
+update `LEK_task_log` set `extra` = replace(`extra`, substring(`extra`, locate('"staticAuthHash', `extra`), 56), '')
+where `extra` like '%staticAuthHash%' and eventCode = 'E1012';
+
+update `Zf_errorlog` set `extra` = replace(`extra`, substring(`extra`, locate('"staticAuthHash', `extra`), 56), '')
+where `extra` like '%staticAuthHash%' and eventCode = 'E1012';

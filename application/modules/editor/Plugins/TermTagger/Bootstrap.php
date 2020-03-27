@@ -62,7 +62,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         // event-listeners
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),100);
         $this->eventManager->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
-        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->eventManager->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_Models_Segment_Updater', 'beforeSegmentUpdate', array($this, 'handleBeforeSegmentUpdate'));
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
@@ -171,23 +170,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
             return false;
         }
         $worker->queue($event->getParam('parentWorkerId'));
-    }
-    
-    /**
-     * handler for event: Editor_IndexController#afterIndexAction
-     * 
-     * Writes runtimeOptions.termTagger.segmentsPerCall for use in ExtJS
-     * into JsVar Editor.data.plugins.termTagger.segmentsPerCall
-     * 
-     * @param $event Zend_EventManager_Event
-     */
-    public function handleAfterIndex(Zend_EventManager_Event $event) {
-        $view = $event->getParam('view');
-        
-        $config = Zend_Registry::get('config');
-        $termTaggerSegmentsPerCall = $config->runtimeOptions->termTagger->segmentsPerCall;
-        
-        $view->Php2JsVars()->set('plugins.termTagger.segmentsPerCall', $termTaggerSegmentsPerCall);
     }
     
     /**
