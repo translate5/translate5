@@ -467,6 +467,41 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
     
     /**
+     * Sends by default only the summary to the tasks PM if another user has created the task (for example via API)
+     * The summary can be send always if set "always": true in the config object
+     */
+    public function notifyImportErrorSummary() {
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
+        $always = $triggerConfig->always ?? false;
+        $task = $this->config->task;
+        $importer = $this->config->importConfig->userGuid;
+        
+        //if always is disabled and the PM is the importer, then we do nothing
+        if(!$always && $task->getPmGuid() === $importer) {
+            return;
+        }
+
+        $taskLog = ZfExtended_Factory::get('editor_Models_Logger_Task');
+        /* @var $taskLog editor_Models_Logger_Task */
+        $logEntries = $taskLog->loadByTaskGuid($task->getTaskGuid());
+
+        //if there is no or only the one default info log, we send no mail
+        if(empty($logEntries) || count($logEntries) == 1 && reset($logEntries)->level == ZfExtended_Logger::LEVEL_INFO) {
+            return;
+        }
+        
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->loadByGuid($task->getPmGuid());
+        
+        $this->createNotification('pm', __FUNCTION__, [
+            'task' => $task,
+            'logs' => $logEntries,
+        ]);
+        $this->notifyUser($user);
+    }
+    
+    /**
      * Notify the configured user with term and term attribute proposals of the configured or all termcollections
      * The attached export data in the mail will be in excel format.
      */

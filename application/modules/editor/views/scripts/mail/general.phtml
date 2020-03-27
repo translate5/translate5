@@ -111,6 +111,9 @@ if(!empty($this->task)) {
         $data['portalLink']='<a href="'.$customer->getDomain().'">'.$customer->getDomain().'</a>';
     }
     
+    //we have to pre-apply the relaisLang Fragment to inject the language itself
+    $taskData['relaisLanguageFragment'] = $this->templateApply($taskData['relaisLanguageFragment'], $taskData);
+    
     $data['taskFragment'] = $this->templateApply('<b>Aufgabe:</b> {task.taskName}<br />
     <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
     <b>Zielsprache:</b> {targetLanguageTranslated}<br />

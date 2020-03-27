@@ -32,6 +32,18 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTagger_Worker_Abstract {
 
     /**
+     * Defines the timeout in seconds how long a single segment needs to be tagged
+     * @var integer
+     */
+    const TIMEOUT_REQUEST = 180;
+    
+    /**
+     * Defines the timeout in seconds how long the upload and parse request of a TBX may need
+     * @var integer
+     */
+    const TIMEOUT_TBXIMPORT = 600;
+    
+    /**
      * @var editor_Plugins_TermTagger_Service_ServerCommunication 
      */
     protected $serverCommunication = null;
@@ -105,7 +117,7 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
             return false;
         }
         
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain()]);
+        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain(), self::TIMEOUT_REQUEST, self::TIMEOUT_TBXIMPORT]);
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
         $result = '';
@@ -114,7 +126,7 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
             return false;
         }
         try {
-            $this->checkTermTaggerTbx($slot, $this->serverCommunication->tbxFile);
+            $this->checkTermTaggerTbx($termTagger, $slot, $this->serverCommunication->tbxFile);
             $result = $termTagger->tagterms($slot, $this->serverCommunication);
         }
         catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
@@ -131,7 +143,7 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
             ]);
             if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
                 //editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data
-                //so we have to disable termtagging for this task, otherwise on eachsegment save we will get such a warning
+                //so we have to disable termtagging for this task, otherwise on each segment save we will get such a warning
                 $this->task->setTerminologie(0);
                 $this->task->save();
                 return false;
@@ -139,7 +151,7 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
         }
         
         // on error return false and store original untagged data
-        if (empty($result)) {
+        if (empty($result) && $result !== '0') {
             return false;
         }
         $this->result = $result->segments;

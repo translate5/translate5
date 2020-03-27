@@ -27,7 +27,8 @@
  */
 class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
     public function write(ZfExtended_Logger_Event $event) {
-        $event = clone $event;
+        // we clone the event so that we can delete the task afterwards without modifying the real event perhaps used later in another writer
+        $event = clone $event; 
         $task = $event->extra['task'];
         /* @var $task editor_Models_Task */
         $taskLog = ZfExtended_Factory::get('editor_Models_Logger_Task');
@@ -45,10 +46,13 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
         }
         $taskLog->setFromEventAndTask($event, $task);
         // we don't log the task data again, thats implicit via the taskGuid
+        // first we have to ensure that extraFlat is filled
+        $event->getExtraFlattenendAndSanitized();
+        //then we just unset the task in both
         unset($event->extra['task']); 
-        $taskLog->setExtra($this->toJson($event->extra));
+        unset($event->extraFlat['task']); 
+        $taskLog->setExtra($event->getExtraAsJson());
         $taskLog->save();
-        return;
     }
     
     public function isAccepted(ZfExtended_Logger_Event $event) {
