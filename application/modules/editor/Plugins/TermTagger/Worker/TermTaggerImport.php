@@ -31,10 +31,21 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_TermTagger_Worker_Abstract {
     /**
-     * 
-     * @var editor_Plugins_TermTagger_Service_ServerCommunication
+     * To much segments are causing timeouts when segments are longer
      */
-    private $serverCommunication = NULL;
+    const SEGMENTS_PER_CALL = 5;
+    
+    /**
+     * Defines the timeout in seconds how long a termtag call with multiple segments may need
+     * @var integer
+     */
+    const TIMEOUT_REQUEST = 300;
+    
+    /**
+     * Defines the timeout in seconds how long the upload and parse request of a TBX may need
+     * @var integer
+     */
+    const TIMEOUT_TBXIMPORT = 600;
     
     /**
      * Fieldname of the source-field of this task
@@ -121,7 +132,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      */
     public function work() {
         $taskGuid = $this->workerModel->getTaskGuid();
-        $segmentIds = $this->loadUntaggedSegmentIds($taskGuid);
+        $segmentIds = $this->loadUntaggedSegmentIds();
         
         if (empty($segmentIds)) {
             $segmentIds = $this->loadNextRetagSegmentId();
@@ -135,7 +146,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $serverCommunication = $this->fillServerCommunication($segmentIds);
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain()]);
+        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain(), self::TIMEOUT_REQUEST, self::TIMEOUT_TBXIMPORT]);
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
         $slot = $this->workerModel->getSlot();
@@ -143,7 +154,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             return false;
         }
         try {
-            $this->checkTermTaggerTbx($slot, $serverCommunication->tbxFile);
+            $this->checkTermTaggerTbx($termTagger, $slot, $serverCommunication->tbxFile);
             $result = $termTagger->tagterms($slot, $serverCommunication);
             $this->saveSegments($this->markTransFound($result->segments));
         }
@@ -205,14 +216,8 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     
     /**
      * Loads a list of segmentIds where terms are not tagged yet.
-     * Limit for this list is $config->runtimeOptions->termTagger->segmentsPerCall
-     * 
-     * @param string $taskGuid
      */
-    private function loadUntaggedSegmentIds($taskGuid) {
-        $config = Zend_Registry::get('config');
-        $limit = $config->runtimeOptions->termTagger->segmentsPerCall;
-        
+    private function loadUntaggedSegmentIds() {
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $db editor_Models_Db_Segments */
         $dbName = $db->info($db::NAME);
@@ -235,13 +240,11 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         
         $db->getAdapter()->query("lock tables `".$dbMetaName."` WRITE, ".$dbWorkerName." WRITE, ".$dbName." WRITE, ".$dbSegmentFieldName." WRITE, ".$dbSegmentDataName." WRITE");
         
-        //TODO TRANSLATE-351 - The "inprogress" setting can be improved as described in the issue!
-        
         $select = $this->getNextSegmentSelect($db);
         $sql = $select->where($dbMetaName.'.termtagState IS NULL OR '.$dbMetaName.'.termtagState IN (?)',
                             array($this::SEGMENT_STATE_UNTAGGED)) //, $this::SEGMENT_STATE_RETAG)) // later there may will be a state 'targetnotfound'
                     ->order($dbName.'.id')
-                    ->limit($limit);
+                    ->limit(self::SEGMENTS_PER_CALL);
         $segmentIds = $db->fetchAll($sql)->toArray();
         
         foreach ($segmentIds as $segmentId) {

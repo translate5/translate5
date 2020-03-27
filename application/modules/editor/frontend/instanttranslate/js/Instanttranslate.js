@@ -728,7 +728,8 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
     $.each(allPretranslatedFiles, function(taskId, taskData) {
         htmlFile = '<li>';
         htmlFile += taskData['taskName'];
-        htmlFile += ' (' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] +'):<br>'; 
+        htmlFile += ' ' + taskData['sourceLang'] +' -> ' + taskData['targetLang'];
+        htmlFile += ' (' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] +')<br>';
         switch(taskData['downloadUrl']) {
             case 'isImporting':
                 showRefreshButton = true;

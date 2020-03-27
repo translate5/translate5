@@ -27,15 +27,15 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Exception Class to get detailed information on TermTagger-Error.
- *
+ * A timeout exception is not the same as a DOWN exception.
+ * Timout means in the most cases that the termtagger is running but it is tagging and therefore could not respond
  */
-class editor_Plugins_TermTagger_Exception_Open extends editor_Plugins_TermTagger_Exception_Abstract {
+class editor_Plugins_TermTagger_Exception_TimeOut extends editor_Plugins_TermTagger_Exception_Abstract {
     /**
-     * if a TBX could not be loaded into the termtagger this should be an error
+     * timeouts are just an info
      * @var integer
      */
-    protected $level = ZfExtended_Logger::LEVEL_ERROR;
+    protected $level = ZfExtended_Logger::LEVEL_INFO;
     
     //localErrorCodes see parent abstract
 }
