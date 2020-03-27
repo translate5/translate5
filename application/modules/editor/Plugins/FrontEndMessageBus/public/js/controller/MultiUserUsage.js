@@ -39,6 +39,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
     extend: 'Ext.app.Controller',
     segmentUsageData: null,
+    onlineUsers: null,
     tooltip: null,
     refs: [{
         ref : 'segmentGrid',
@@ -154,7 +155,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
         });
 
         //deactivate controller, is activated again when opening a multiuser task
-        return; //FIXME prepare that socket server is only triggered for simultaneous usage, for beta testing we enable socket server just for each task 
+return; //FIXME prepare that socket server is only triggered for simultaneous usage, for beta testing we enable socket server just for each task 
         this.deactivate();
     },
     /**
@@ -468,6 +469,10 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
             view = grid.getView(),
             tracking = Editor.data.task.userTracking(),
             trackedUser;
+        
+        //if the list of tracking user changes, we have to update the is online information
+        tracking.on('datachanged', me.updateOnlineUsers, me);
+        
         //was previously invoked in #Editor.$application': editorViewportOpened, 
         // but then the open was triggerd when the grid was not ready yet, therefore resulting segment locks from the server were producing errors in the GUI
         me.bus.send('task', 'openTask', [Editor.data.task.get('taskGuid')]);
@@ -478,6 +483,7 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
 
         //positioning fix after title
         grid.header.insert(1, [{
+            itemId: 'multiUserList',
             xtype: 'dataview',
             cls: 'multi-user-list x-btn-inner-default-small',
             itemSelector: '.user',
@@ -542,7 +548,6 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
         });
     },
     onTriggerTaskReload: function() {
-        Ext.Logger.info('Task reload triggered');
         Editor.data.task && Editor.data.task.load();
     },
     onTriggerReload: function() {
@@ -567,11 +572,16 @@ Ext.define('Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage', {
      * Updates the online users view
      */
     onUpdateOnlineUsers: function(data) {
-        var store = Editor.data.task && Editor.data.task.userTracking && Editor.data.task.userTracking();
+        this.onlineUsers = data;
+        this.updateOnlineUsers();
+    },
+    updateOnlineUsers: function() {
+        var me = this, 
+            store = Editor.data.task && Editor.data.task.userTracking && Editor.data.task.userTracking();
         if(!store) {
             return;
         }
-        Ext.Object.each(data.onlineInTask, function(key, val){
+        Ext.Object.each(me.onlineUsers.onlineInTask, function(key, val){
             var item = store.getById(key);
                 item && item.set('isOnline', val);
         });
