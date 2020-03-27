@@ -42,7 +42,8 @@ Ext.define('Editor.model.admin.task.UserPref', {
     {name: 'anonymousCols', type: 'boolean'},
     {name: 'visibility', type: 'string'},
     {name: 'userGuid', type: 'string'},
-    {name: 'fields', type: 'string'}
+    {name: 'fields', type: 'string'},
+    {name: 'taskUserAssocId', type: 'int',defaultValue:null,allowNull:true}
   ],
   validators: {
       taskGuid: 'presence',
@@ -53,13 +54,14 @@ Ext.define('Editor.model.admin.task.UserPref', {
       //workflow: {type: 'inclusion, list: Ext.Object.getKeys(Editor.data.app.workflows)},
       //fields: {type: 'inclusion', list: Ext.Object.getKeys(Editor.data.app.utRoles)}
   },
+  
   idProperty: 'id',
   /**
    * is the Default entry if userGuid and workflowStep are empty
    * @return {Boolean} 
    */
   isDefault: function() {
-      return !this.phantom && this.get('userGuid').length == 0 && this.get('workflowStep').length == 0;
+      return !this.phantom && this.get('userGuid').length==0 && this.get('workflowStep').length == 0;
   },
   isNonEditableColumnVisible: function() {
       return (this.get('visibility') == 'show');

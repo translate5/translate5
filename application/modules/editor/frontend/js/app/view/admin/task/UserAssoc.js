@@ -183,16 +183,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
           user = me.down('combo[name="userGuid"]'),
       store = user.store;
       store.clearFilter(true);
-      if(!me.excludeLogins || me.excludeLogins.length == 0) {
-          store.load();
-      }
-      else {
-          store.load({
-              params: {
-                  defaultFilter: '[{"property":"login","operator":"notInList","value":["'+me.excludeLogins.join('","')+'"]}]'
-              }
-          });
-      }
+      store.load();
   },
   /**
    * loads the given record into the userAssoc form

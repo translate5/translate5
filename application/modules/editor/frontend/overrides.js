@@ -1080,15 +1080,19 @@ Ext.override(Ext.data.Model, {
             readAssoc = function(record) {
                 //basicly this is the same code as in readAssociated to loop through the associations
                 var roles = record.associations,
-                    key, role;
+                    key, role,assocStore;
                 for (key in roles) {
                     if (roles.hasOwnProperty(key)) {
                         role = roles[key];
                         // The class for the other role may not have loaded yet
                         if (role.cls) {
-                            //update the assoc store too                            
-                            record[role.getterName]().loadRawData(role.reader.getRoot(record.data));
-                            delete record.data[role.role];
+                        	assocStore=record[role.getterName]();
+                        	//update the assocStore if exist
+                        	if(assocStore){
+                        		//update the assoc store too                            
+                        		assocStore.loadRawData(role.reader.getRoot(record.data));
+                        		delete record.data[role.role];
+                        	}
                         }
                     }
                 }

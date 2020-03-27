@@ -211,12 +211,23 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
         $userGuid = $user->data->userGuid;
         $assocs = $userAssoc->loadByTaskGuidList($taskGuids);
         $this->allAssocInfos = [];
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
         foreach($assocs as $assoc) {
             if(!isset($this->allAssocInfos[$assoc['taskGuid']])) {
                 $this->allAssocInfos[$assoc['taskGuid']] = array();
             }
             if($userGuid == $assoc['userGuid']) {
-                $this->userAssocInfos[$assoc['taskGuid']] = $assoc;
+                //is user assoc, if the current assoc is valid role workflow role of the task workflow step
+                //one user can have multiple role of a task
+                $task->loadByTaskGuid($assoc['taskGuid']);
+                $workflow = $wfm->getByTask($task);
+                $role=$workflow->getRoleOfStep($task->getWorkflowStepName());
+                if($role==$assoc['role']){
+                    $this->userAssocInfos[$assoc['taskGuid']] = $assoc;
+                }
             }
             $userInfo = $this->getUserinfo($assoc['userGuid'], $assoc['taskGuid']);
             $assoc['userName'] = $userInfo['surName'].', '.$userInfo['firstName'];

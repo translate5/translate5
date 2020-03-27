@@ -1746,6 +1746,7 @@ Diese email ist eine Erinnerung, dass sich die "Deadline" <b>{deadlineDate}</b> 
 <trans-unit id='d2FpdGluZw=='><source>waiting</source><target>wartend</target></trans-unit>
 <trans-unit id='ZmluaXNoZWQ='><source>finished</source><target>abgeschlossen</target></trans-unit>
 <trans-unit id='dW5jb25maXJtZWQ='><source>unconfirmed</source><target>unbestätigt</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItU3BlemlhbGVpbnN0ZWxsdW5nZW4='><source>Benutzer-Spezialeinstellungen</source><target>Benutzer-Spezialeinstellungen</target></trans-unit>
   </body>
  </file>
 </xliff>

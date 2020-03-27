@@ -274,8 +274,12 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         $this->userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $workflow = $wfm->getByTask($this->task);
+        $role=$workflow->getRoleOfStep($this->task->getWorkflowStepName());
         try {
-            $this->userTaskAssoc->loadByParams($this->userGuid,$this->task->getTaskGuid());
+            $this->userTaskAssoc->loadByParams($this->userGuid,$this->task->getTaskGuid(),$role);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->userTaskAssoc->setUserGuid($this->userGuid);
             $this->userTaskAssoc->setTaskGuid($this->task->getTaskGuid());

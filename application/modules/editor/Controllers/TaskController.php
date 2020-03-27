@@ -312,6 +312,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
         //set the default table to lek_task
         $this->entity->getFilter()->setDefaultTable('LEK_task');
+        $this->entity->setDefaultGroupBy('id');
         if($isAllowedToLoadAll) {
             $this->totalCount = $this->entity->getTotalCount();
             $rows = $this->entity->loadAll();
@@ -857,7 +858,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->initWorkflow();
         
         $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
-        $tua = $this->workflow->getTaskUserAssoc($taskguid, $this->user->data->userGuid);
+        $step=$this->workflow->getRoleOfStep($this->entity->getWorkflowStepName());
+        $tua = $this->workflow->getTaskUserAssoc($taskguid, $this->user->data->userGuid,$step);
         //mayLoadAllTasks is only true, if the current "PM" is not associated to the task directly. 
         // If it is (pm override false) directly associated, the workflow must be considered it the task is openable / writeable.  
         $mayLoadAllTasks = $mayLoadAllTasks && (empty($tua) || $tua->getIsPmOverride());
@@ -1146,8 +1148,15 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userTaskAssoc editor_Models_TaskUserAssoc */
+        
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $workflow = $wfm->getByTask($this->entity);
+        
+        $role=$workflow->getRoleOfStep($this->entity->getWorkflowStepName());
+        
         try {
-            $userTaskAssoc->loadByParams($userGuid,$taskGuid);
+            $userTaskAssoc->loadByParams($userGuid,$taskGuid,$role);
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {

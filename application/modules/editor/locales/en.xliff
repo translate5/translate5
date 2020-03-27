@@ -3695,6 +3695,7 @@ This email is a reminder that the "Deadline" <b>{deadlineDate}</b> for task <b>"
 <trans-unit id='d2FpdGluZw=='><source>waiting</source><target>waiting</target></trans-unit>
 <trans-unit id='ZmluaXNoZWQ='><source>finished</source><target>finished</target></trans-unit>
 <trans-unit id='dW5jb25maXJtZWQ='><source>unconfirmed</source><target>unconfirmed</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItU3BlemlhbGVpbnN0ZWxsdW5nZW4='><source>Benutzer-Spezialeinstellungen</source><target>User special properties</target></trans-unit>
 </body>
   </file>
 </xliff>

@@ -98,7 +98,11 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         if(empty($this->config->newTua)) {
             $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             /* @var $tua editor_Models_TaskUserAssoc */
-            $tua->loadByParams($userGuid, $task->getTaskGuid());
+            $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+            /* @var $wfm editor_Workflow_Manager */
+            $workflow = $wfm->getByTask($task);
+            $role=$workflow->getRoleOfStep($task->getWorkflowStepName());
+            $tua->loadByParams($userGuid, $task->getTaskGuid(),$role);
         }
         else {
             $tua = $this->config->newTua;
@@ -119,7 +123,11 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         if(empty($this->config->newTua)) {
             $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             /* @var $tua editor_Models_TaskUserAssoc */
-            $tua->loadByParams($userGuid, $task->getTaskGuid());
+            $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+            /* @var $wfm editor_Workflow_Manager */
+            $workflow = $wfm->getByTask($task);
+            $role=$workflow->getRoleOfStep($task->getWorkflowStepName());
+            $tua->loadByParams($userGuid, $task->getTaskGuid(),$role);
         }
         else {
             $tua = $this->config->newTua;

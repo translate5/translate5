@@ -144,26 +144,19 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * loads one TaskUserAssoc Instance by given params. If params taskGuid or role are
-     * null, task is loaded regardless of taskGuid or role
-     * this method loads the assoc regardless isPmOverride is set or not
-     * 
+     * Load single task user assoc for the given task#user#role params.
      * @param string $userGuid
      * @param string $taskGuid
      * @param string $role | null
      * @param string $state | null
      * @return array
      */
-    public function loadByParams(string $userGuid, $taskGuid = null, $role = null, $state = null) {
+    public function loadByParams(string $userGuid,string $taskGuid,string $role, $state = null) {
         try {
             $s = $this->db->select()
-                ->where('userGuid = ?', $userGuid);
-            if(!is_null($taskGuid)) {
-                $s->where('taskGuid = ?', $taskGuid);
-            }
-            if(!is_null($role)) {
-                $s->where('role= ?', $role);
-            }
+                ->where('userGuid = ?', $userGuid)
+                ->where('taskGuid = ?', $taskGuid)
+                ->where('(role= ? OR isPmOverride=1)', $role);//load the given state or load pmoveride (pmoveride is when for the given task#user#role no record is found) 
             if(!is_null($state)) {
                 $s->where('state= ?', $state);
             }
@@ -172,7 +165,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $this->notFound('NotFound after other Error', $e);
         }
         if (!$row) {
-            $this->notFound(__CLASS__ . '#taskGuid + userGuid', $taskGuid.' + '.$userGuid);
+            $this->notFound(__CLASS__ . '#taskGuid + userGuid + role', $taskGuid.' + '.$userGuid.' + '.$role);
         }
         //load implies loading one Row, so use only the first row
         $this->row = $row;
