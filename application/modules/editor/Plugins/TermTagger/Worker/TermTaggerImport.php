@@ -183,7 +183,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                 'task' => $this->task
             ]);
             $this->logger->exception($exception, [
-                'level' => ZfExtended_Logger::LEVEL_WARN,
                 'domain' => 'editor.terminology.import'
             ]);
             if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
