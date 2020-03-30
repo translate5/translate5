@@ -319,8 +319,10 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
             if (!empty($tbxHash) && $termTagger->ping($url, $tbxHash)) {
                 return;
             }
+            //getDataTbx also creates the TbxHash
+            $tbx = $this->getTbxData();
             $tbxHash = $this->task->meta()->getTbxHash();
-            $termTagger->open($url, $tbxHash, $this->getTbxData());
+            $termTagger->open($url, $tbxHash, $tbx);
         }
         catch (editor_Plugins_TermTagger_Exception_Abstract $e) {
             $e->addExtraData([
