@@ -541,11 +541,11 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   onTaskMainCardRender: function(taskMainCard,eOpts) {
       var me = this,
           auth = Editor.app.authenticatedUser,
-          taskMainCardContainer = taskMainCard.down('#taskMainCardContainer');
+          taskMainCardContainer = taskMainCard.down('#taskSecondCardContainer');
       
       // add the customer field to the taskUpload window
       if (auth.isAllowed('editorCustomerSwitch')) {
-          taskMainCardContainer.add({
+          taskMainCardContainer.insert(0, {
               xtype: 'customersCombo', // user is allowed to see the CustomerSwitch => show all customers
               name: 'customerId',
               itemId: 'customerId',
@@ -553,7 +553,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               fieldLabel: me.strings.customerLabel + '¹'
           });
       } else {
-          taskMainCardContainer.add({
+          taskMainCardContainer.insert(0, {
               xtype: 'usercustomerscombo', // show only those customers that are assigned to the user
               name: 'customerId',
               itemId: 'customerId',

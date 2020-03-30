@@ -45,8 +45,18 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     
     /**
      * DataProvider specific Checks (throwing Exceptions) and actions to prepare import data
+     * @param editor_Models_Task $task
      */
-    abstract public function checkAndPrepare();
+    abstract public function checkAndPrepare(editor_Models_Task $task);
+    
+    /**
+     * sets the internal used task object
+     * @param editor_Models_Task $task
+     */
+    public function setTask(editor_Models_Task $task){
+        $this->taskPath = $task->getAbsoluteTaskDataPath();
+        $this->task = $task;
+    }
 
     /**
      * DataProvider specific method to create the import archive
@@ -101,15 +111,6 @@ abstract class editor_Models_Import_DataProvider_Abstract {
         if(!@mkdir($path)) {
             throw new Zend_Exception($errMsg);
         }
-    }
-    
-    /**
-     * sets the internal used task object
-     * @param editor_Models_Task $task
-     */
-    public function setTask(editor_Models_Task $task){
-        $this->taskPath = $task->getAbsoluteTaskDataPath();
-        $this->task = $task;
     }
     
     /**

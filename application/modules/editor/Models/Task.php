@@ -118,12 +118,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const INTERNAL_LOCK = '*translate5InternalLock*';
     
     const INITIAL_TASKTYPE_DEFAULT = 'default';
+    const INITIAL_TASKTYPE_PROJECT = 'project';
     
     /**
-     * All tasktypes that editor_Models_Validator_Task will consider.
+     * All tasktypes that editor_Models_Validator_Task will consider as valid.
      * @var array
      */
-    public static $validTaskTypes = [self::INITIAL_TASKTYPE_DEFAULT];
+    public static $validTaskTypes = [self::INITIAL_TASKTYPE_DEFAULT, self::INITIAL_TASKTYPE_PROJECT];
 
     /**
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
@@ -148,6 +149,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var string
      */
     protected $taskDataPath;
+    
+    /**
+     * On cloning we need a new taskGuid and id
+     * {@inheritDoc}
+     * @see ZfExtended_Models_Entity_Abstract::__clone()
+     */
+    public function __clone() {
+        $data = $this->row->toArray();
+        unset($data['id']);
+        unset($data['taskGuid']);
+        //before all other operations make a new row object
+        $this->init($data);
+        $this->createTaskGuidIfNeeded();
+    }
     
     /**
      * Returns a Zend_Config Object; if task specific settings exist, they are set now.
@@ -884,6 +899,22 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function isHiddenTask() {
         return $this->getTaskType() != $this->getDefaultTasktype();
+    }
+    
+    /**
+     * returns true if current task is a default task
+     * @return boolean
+     */
+    public function isTask(): bool {
+        return $this->getTaskType() == $this->getDefaultTasktype();
+    }
+    
+    /**
+     * returns true if current task is a project
+     * @return boolean
+     */
+    public function isProject(): bool {
+        return $this->getTaskType() == self::INITIAL_TASKTYPE_PROJECT;
     }
     
     /**

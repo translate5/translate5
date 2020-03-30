@@ -59,7 +59,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
     }
     
     //add download archive link if allowed
-    if(Editor.data.import.createArchivZip && Editor.app.authenticatedUser.isAllowed('downloadImportArchive', this.initialConfig.task)) {
+    if(Editor.app.authenticatedUser.isAllowed('downloadImportArchive', this.initialConfig.task)) {
         me.items.length == 0 || me.items.push("-");
         me.items.push({
             itemId: 'exportItemImportArchive',

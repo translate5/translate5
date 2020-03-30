@@ -278,9 +278,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //flag if the segment count status strip component should be displayed
       $this->view->Php2JsVars()->set('segments.enableCountSegmentLength', (bool)$rop->segments->enableCountSegmentLength);
 
-      //needed for enabling download link of archive zip
-      $this->view->Php2JsVars()->set('import.createArchivZip', (bool)$rop->import->createArchivZip);
-      
       //disable language resources match panel in editor when only termcollection is assigned to the task
       $this->view->Php2JsVars()->set('editor.LanguageResources.disableIfOnlyTermCollection',(boolean)$rop->editor->LanguageResources->disableIfOnlyTermCollection);
       

@@ -80,6 +80,22 @@ class editor_Models_Import_UploadProcessor {
     }
     
     /**
+     * Inits the dataprovider by copying the archivefile from an existing task.
+     * @param editor_Models_Task $task
+     */
+    public function initFromTask(editor_Models_Task $task) {
+        $oldTaskPath = new SplFileInfo($task->getAbsoluteTaskDataPath().'/'.editor_Models_Import_DataProvider_Abstract::TASK_ARCHIV_ZIP_NAME);
+        if(!$oldTaskPath->isFile()){
+            throw new ZfExtended_Exception('The task to be cloned does not have a import archive zip! Path: '.$oldTaskPath);
+        }
+        $copy = tempnam(sys_get_temp_dir(), 'taskclone');
+        copy($oldTaskPath, $copy);
+        $copy = new SplFileInfo($copy);
+        ZfExtended_Utils::cleanZipPaths($copy, editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT);
+        $this->initByGivenZip($copy);
+    }
+    
+    /**
      * Inits the dataprovider with the given ZIP file
      * @param SplFileInfo $pathToZip
      */

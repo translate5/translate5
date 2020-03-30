@@ -240,16 +240,6 @@ class editor_TaskController extends ZfExtended_RestController {
     public function indexAction() {
         //set default sort
         $this->addDefaultSort();
-        
-        $f = $this->entity->getFilter();
-        // load only 'visible' tasks (further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
-        $f->addFilter((object)[
-            'field' => 'taskType',
-            'value' => $this->entity->getDefaultTasktype(),
-            'type' => 'string',
-            'comparison' => 'eq'
-        ]);
-        
         $rows = $this->loadAllWithUserData();
         $this->view->rows = $rows;
         $this->view->total = $this->totalCount;
@@ -472,7 +462,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $pm->init((array)$this->user->data);
         }
         else {
-            //TODO test what happens with new error logging if PM does not exist? 
             $pm->loadByGuid($this->data['pmGuid']);
         }
         
@@ -482,11 +471,10 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $this->data['pmName'] = $pm->getUsernameLong();
         $this->processClientReferenceVersion();
-        $this->_helper->Api->convertLanguageParameters($this->data['sourceLang']);
-        $this->_helper->Api->convertLanguageParameters($this->data['targetLang']);
-        $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
         
         $this->setDataInEntity();
+        
+        $this->prepareLanguages();
         $this->entity->setUsageMode($this->config->runtimeOptions->import->initialTaskUsageMode);
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
@@ -497,11 +485,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $meta->setMappingType($this->data['mappingType']);
         }
         
-//FIXME zusätzlich sollte die API mit einer customerNr umgehen können die dann zur customerId konvertiret wird
-        if(empty($this->data['customerId'])){
-            $this->entity->setDefaultCustomerId();
-            $this->data['customerId'] = $this->entity->getCustomerId();
-        }
+        $this->prepareCustomer();
         
         //init workflow id for the task
         $defaultWorkflow = $this->config->runtimeOptions->import->taskWorkflow;
@@ -509,18 +493,48 @@ class editor_TaskController extends ZfExtended_RestController {
         
         if($this->validate()) {
             $this->initWorkflow();
-            //$this->entity->save(); => is done by the import call!
-            $this->processUploadedFile();
+            
+            //PROJECT with multiple target languages
+            $dp = $this->upload->getDataProvider();
+            if($this->entity->isProject()) {
+                $this->entity->save();
+                $this->entity->initTaskDataDirectory();
+                $dp->checkAndPrepare($this->entity);
+                $dp->archiveImportedData();
+                
+                foreach($this->data['targetLang'] as $target) {
+                    $this->upload->initFromTask($this->entity);
+                    $task = clone $this->entity;
+                    $task->setTaskType($task->getDefaultTasktype());
+                    $task->setTargetLang($target);
+                    $this->processUploadedFile($task, $this->upload->getDataProvider());
+                    $this->addDefaultLanguageResources($task);
+                    
+                    if($this->data['autoStartImport']) {
+                        $this->startImportWorkers($task);
+                    }
+                }
+                
+                $this->entity->setState($this->entity::INITIAL_TASKTYPE_PROJECT);
+                $this->entity->save();
+            } else {
+                //DEFAULT (SINGLE) TASK: 
+                
+                //was set as array in setDataInEntity
+                $this->entity->setTargetLang(reset($this->data['targetLang']));
+                //$this->entity->save(); => is done by the import call!
+                //handling project tasks is also done in processUploadedFile
+                $this->processUploadedFile($this->entity, $dp);
+                // Language resources that are assigned as default language resource for a client,
+                // are associated automatically with tasks for this client.
+                $this->addDefaultLanguageResources($this->entity);
+            }
             
             //warn the api user for the targetDeliveryDate ussage
             $this->targetDeliveryDateWarning();
             
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
-            
-            // Language resources that are assigned as default language resource for a client,
-            // are associated automatically with tasks for this client.
-            $this->addDefaultLanguageResources();
             
             if($this->data['autoStartImport']) {
                 $this->startImportWorkers();
@@ -529,13 +543,77 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
         }
+        else {
+            //we have to prevent attached events, since when we get here the task is not created, which would lead to task not found errors,
+            // but we want to result the validation error 
+            $event = Zend_EventManager_StaticEventManager::getInstance();
+            $event->clearListeners(get_class($this), "afterPostAction");
+        }
+    }
+    
+    /**
+     * prepares the languages in $this->data for the import
+     */
+    protected function prepareLanguages() {
+        if(!is_array($this->data['targetLang'])) {
+            $this->data['targetLang'] = [$this->data['targetLang']];
+        }
+        
+        $this->_helper->Api->convertLanguageParameters($this->data['sourceLang']);
+        
+        //with projects multiple targets are supported:
+        foreach($this->data['targetLang'] as &$target) {
+            $this->_helper->Api->convertLanguageParameters($target);
+        }
+        
+        //task is handled as a project (one source language, multiple target languages, each combo one own task)
+        if(count($this->data['targetLang']) > 1) {
+            //with multiple target languages, the current task will be a project!
+            $this->entity->setTaskType($this->entity::INITIAL_TASKTYPE_PROJECT);
+            $this->entity->setTargetLang(0);
+        }
+        else {
+            $this->entity->setTargetLang(reset($this->data['targetLang']));
+        }
+        
+        $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
+    }
+    
+    /**
+     * Loads the customer by id, or number, or the default customer
+     * stores the customerid internally and in this->data
+     */
+    protected function prepareCustomer() {
+        $customer = ZfExtended_Factory::get('editor_Models_Customer');
+        /* @var $customer editor_Models_Customer */
+
+        if(empty($this->data['customerId'])) {
+            $customer->loadByDefaultCustomer();
+        }
+        else {
+            try {
+                $customer->load($this->data['customerId']);
+            }
+            catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                try {
+                    $customer->loadByNumber($this->data['customerId']);
+                }
+                catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                    // do nothing here, then the validation is triggered to feedback the user
+                }
+            }
+        }
+        
+        $this->entity->setCustomerId((int) $customer->getId());
+        $this->data['customerId'] = (int) $customer->getId();
     }
     
     /**
      * Assign language resources by default that are set as useAsDefault for the task's client
      * (but only if the language combination matches).
+     * @param editor_Models_Task $task
      */
-    protected function addDefaultLanguageResources() {
+    protected function addDefaultLanguageResources(editor_Models_Task $task) {
         $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsDefault($this->data['customerId']);
@@ -548,11 +626,11 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
         foreach ($allUseAsDefaultCustomers as $defaultCustomer) {
             $languageResourceId = $defaultCustomer['languageResourceId'];
-            if ($languages->isInCollection($this->entity->getSourceLang(),'sourceLang',$languageResourceId)
-                    && $languages->isInCollection($this->entity->getTargetLang(),'targetLang',$languageResourceId) ) {
+            if ($languages->isInCollection($task->getSourceLang(),'sourceLang',$languageResourceId)
+                && $languages->isInCollection($task->getTargetLang(),'targetLang',$languageResourceId) ) {
                         $taskAssoc->init();
                         $taskAssoc->setLanguageResourceId($languageResourceId);
-                        $taskAssoc->setTaskGuid($this->entity->getTaskGuid());
+                        $taskAssoc->setTaskGuid($task->getTaskGuid());
                         $taskAssoc->save();
             }
         }
@@ -657,31 +735,54 @@ class editor_TaskController extends ZfExtended_RestController {
         ]);
     }
     
-    protected function startImportWorkers() {
+    /**
+     * starts the workers of the current or given task
+     * @param string $taskGuid optional, if empty use current task
+     */
+    protected function startImportWorkers(editor_Models_Task $task = null) {
+        
+        if(empty($task)) {
+            $task = $this->entity;
+        }
+        
+        if($task->isProject()) {
+            return;
+        }
+        
+        //import workers can only be started for tasks
+        if(!$task->isTask()) {
+            return;
+        }
+        
         $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $workerModel ZfExtended_Models_Worker */
-        $workerModel->loadFirstOf('editor_Models_Import_Worker', $this->entity->getTaskGuid());
-        $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
-        $worker && $worker->schedulePrepared();
+        try {
+            $workerModel->loadFirstOf('editor_Models_Import_Worker', $task->getTaskGuid());
+            $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
+            $worker && $worker->schedulePrepared();
+        }
+        catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            //if there is no worker, nothing can be done
+        }
     }
 
     /**
-     * imports the uploaded file
+     * imports the uploaded file into the given task
+     * @param editor_Models_Task $task
+     * @param editor_Models_Import_DataProvider_Abstract $dp
      * @throws Exception
      */
-    protected function processUploadedFile() {
+    protected function processUploadedFile(editor_Models_Task $task, editor_Models_Import_DataProvider_Abstract $dp) {
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
         $import->setUserInfos($this->user->data->userGuid, $this->user->data->userName);
         
         $import->setLanguages(
-            $this->entity->getSourceLang(),
-            $this->entity->getTargetLang(),
-            $this->entity->getRelaisLang(),
+            $task->getSourceLang(),
+            $task->getTargetLang(),
+            $task->getRelaisLang(),
             editor_Models_Languages::LANG_TYPE_ID);
-        $import->setTask($this->entity);
-        $dp = $this->upload->getDataProvider();
-        
+        $import->setTask($task);
         try {
             $import->import($dp);
         }
@@ -748,12 +849,8 @@ class editor_TaskController extends ZfExtended_RestController {
             throw new BadMethodCallException('Only HTTP method POST allowed!');
         }
         $this->getAction();
-        $oldTaskPath = new SplFileInfo($this->entity->getAbsoluteTaskDataPath().'/'.editor_Models_Import_DataProvider_Abstract::TASK_ARCHIV_ZIP_NAME);
-        if(!$oldTaskPath->isFile()){
-            throw new ZfExtended_Exception('The task to be cloned does not have a import archive zip! Path: '.$oldTaskPath);
-        }
-        $copy = tempnam(sys_get_temp_dir(), 'taskclone');
-        copy($oldTaskPath, $copy);
+
+        $this->upload->initFromTask($this->entity);
         
         $data = (array) $this->entity->getDataObject();
         $oldTaskGuid=$data['taskGuid'];
@@ -772,7 +869,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->upload->initByGivenZip($copy);
         
         if($this->validate()) {
-            $this->processUploadedFile();
+            $this->processUploadedFile($this->entity, $this->upload->getDataProvider());
             $this->cloneLanguageResources($oldTaskGuid,$this->entity->getTaskGuid());
             $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere
@@ -1243,7 +1340,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $isTaskTypeAllowed = $acl->isInAllowedRoles($this->user->data->roles, 'initial_tasktype', $this->entity->getTaskType());
         if (!$isTaskTypeAllowed) {
             ZfExtended_UnprocessableEntity::addCodes([
-                'E1217' => 'TaskType not valid.'
+                'E1217' => 'TaskType not allowed.'
             ], 'editor.task');
             throw new ZfExtended_UnprocessableEntity('E1217');
         }

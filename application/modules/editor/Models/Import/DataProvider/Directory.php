@@ -48,7 +48,7 @@ class editor_Models_Import_DataProvider_Directory  extends editor_Models_Import_
      * (non-PHPdoc)
      * @see editor_Models_Import_DataProvider_Abstract::checkAndPrepare()
      */
-    public function checkAndPrepare(){
+    public function checkAndPrepare(editor_Models_Task $task){
         if(!is_dir($this->importFolder)){
         	throw new Zend_Exception('Der übergebene importRootFolder '.$this->importFolder.' existiert nicht.');
         }
@@ -59,10 +59,6 @@ class editor_Models_Import_DataProvider_Directory  extends editor_Models_Import_
      * @see editor_Models_Import_DataProvider_Abstract::archiveImportedData()
      */
     public function archiveImportedData($filename = null) {
-        $config = Zend_Registry::get('config');
-        if(!$config->runtimeOptions->import->createArchivZip){
-        	return;
-        }
         $filter = new Zend_Filter_Compress(array(
             'adapter' => 'Zip',
             'options' => array(

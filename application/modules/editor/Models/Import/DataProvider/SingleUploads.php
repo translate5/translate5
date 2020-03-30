@@ -67,9 +67,10 @@ class editor_Models_Import_DataProvider_SingleUploads  extends editor_Models_Imp
      * (non-PHPdoc)
      * @see editor_Models_Import_DataProvider_Abstract::checkAndPrepare()
      */
-    public function checkAndPrepare(){
+    public function checkAndPrepare(editor_Models_Task $task){
+        $this->setTask($task);
         $this->checkAndMakeTempImportFolder();
-        parent::checkAndPrepare();
+        parent::checkAndPrepare($task);
         $this->handleReview();
         $this->handleRelais();
         $this->handleReference();

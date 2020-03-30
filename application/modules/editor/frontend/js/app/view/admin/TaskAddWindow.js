@@ -195,7 +195,17 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     xtype: 'languagecombo',
                                     name: 'targetLang',
                                     toolTip: me.strings.targetLangTip,
-                                    fieldLabel: me.strings.targetLangLabel
+                                    fieldLabel: me.strings.targetLangLabel,
+                                    //each combo needs its own store instance, see EXT6UPD-8
+                                    store: Ext.create(Editor.store.admin.Languages),
+                                    typeAhead: false,
+                                    displayField: 'label',
+                                    forceSelection: true,
+                                    //encodeSubmitValue: true, // → as JSON
+                                    //anyMatch: true,
+                                    queryMode: 'local',
+                                    valueField: 'id',
+                                    allowBlank: false
                                 },{
                                     xtype: 'languagecombo',
                                     name: 'relaisLang',
@@ -223,6 +233,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                 // (added dynamically by Editor.controller.admin.TaskPreferences)
                             },{
                                 xtype: 'container',
+                                itemId: 'taskSecondCardContainer',
                                 flex: 1,
                                 layout: 'anchor',
                                 defaults: {
