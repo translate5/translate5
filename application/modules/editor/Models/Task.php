@@ -1093,16 +1093,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Assign the task to the default customer.
-     */
-    public function setDefaultCustomerId() {
-        $customer = ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $customer editor_Models_Customer */
-        $customer->loadByDefaultCustomer();
-        $this->setCustomerId($customer->getId());
-    }
-    
-    /**
      * Return all combinations of font-family and font-size that are used in the task.
      * @return array
      */

@@ -350,7 +350,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   handleChangeImportFile: function(field, val){
       var name = this.getTaskAddForm().down('textfield[name=taskName]'),
           srcLang = this.getTaskAddForm().down('combo[name=sourceLang]'),
-          targetLang = this.getTaskAddForm().down('combo[name=targetLang]'),
+          targetLang = this.getTaskAddForm().down('tagfield[name^=targetLang]'),
+          customer = this.getTaskAddForm().down('combo[name=customerId]'),
+          idx,
           langs = val.match(/-([a-zA-Z]{2,5})-([a-zA-Z]{2,5})\.[^.]+$/);
       if(name.getValue() == '') {
           name.setValue(val.replace(/\.[^.]+$/, '').replace(/^C:\\fakepath\\/,''));
@@ -376,6 +378,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           }
           if(targetIdx >= 0) {
               targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
+          }
+          //if we set a language automatically we also assume the default customer
+          idx = customer.store.findExact('name', 'defaultcustomer');
+          if(idx >= 0) {
+              customer.setValue(customer.store.getAt(idx).get('id'));
           }
       }
   },
