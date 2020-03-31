@@ -455,8 +455,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $connector=$manager->getConnector($languageresource,$this->task->getSourceLang(),$this->task->getTargetLang());
 
                 $moreInfo='';
-                //ignore unavailable language resources
+                //throw a worning if the language resource is not available
                 if($connector->getStatus($moreInfo)!=editor_Services_Connector_Abstract::STATUS_AVAILABLE){
+                    $this->log->warn('E1239','MatchAnalysis Plug-In: The associated language resource "{name}" is not available for match analysis and pre-translations.',[
+                        'task' => $this->task,
+                        'name' => $languageresource->getName(),
+                        'languageResource' => $languageresource,
+                    ]);
                     continue;
                 }
                 //collect the mt resource, so it can be used for pretranslations if needed

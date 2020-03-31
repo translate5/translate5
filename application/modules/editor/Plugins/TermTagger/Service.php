@@ -30,6 +30,11 @@ END LICENSE AND COPYRIGHT
  * Service Class of Plugin "TermTagger"
  */
 class editor_Plugins_TermTagger_Service {
+    /**
+     * The timeout for connections is fix, the request timeout depends on the request type and comes from the config
+     * @var integer
+     */
+    const CONNECT_TIMEOUT = 10;
     
     /**
      * @var ZfExtended_Logger
@@ -69,6 +74,16 @@ class editor_Plugins_TermTagger_Service {
     protected $generalTrackChangesHelper;
     
     /**
+     * @var integer
+     */
+    protected $openTimeout;
+    
+    /**
+     * @var integer
+     */
+    protected $tagTimeout;
+    
+    /**
      * Two corresponding array to hold replaced tags.
      * Tags must be replaced in every text-element before send to the TermTagger-Server,
      * because TermTagger can not handle with already TermTagged-text.
@@ -89,8 +104,14 @@ class editor_Plugins_TermTagger_Service {
     private $replaceCounter = 1;
     
     
-    
-    public function __construct($logDomain) {
+    /**
+     * @param string $logDomain the domain to be used for the internal logger instance
+     * @param integer $tagTimeout the timeout to be used for tagging
+     * @param integer $openTbxTimeout the timeout to be used for opening a TBX
+     */
+    public function __construct(string $logDomain, int $tagTimeout, int $openTbxTimeout) {
+        $this->tagTimeout = $tagTimeout;
+        $this->openTimeout = $openTbxTimeout;
         $this->log = Zend_Registry::get('logger')->cloneMe($logDomain);
         $config = Zend_Registry::get('config');
         $this->config = $config->runtimeOptions->termTagger;
@@ -136,6 +157,9 @@ class editor_Plugins_TermTagger_Service {
         try {
             $response = $this->sendRequest($httpClient, $httpClient::GET);
         }
+        catch(editor_Plugins_TermTagger_Exception_TimeOut $e) {
+            return true; // the request URL is probably a termtagger which can not respond due it is processing data
+        }
         catch(editor_Plugins_TermTagger_Exception_Down $e) {
             return false;
         }
@@ -159,6 +183,10 @@ class editor_Plugins_TermTagger_Service {
      */
     public function ping(string $url, $tbxHash = false) {
         $httpClient = $this->getHttpClient($url.'/termTagger/tbxFile/'.$tbxHash);
+        $httpClient->setConfig([
+            'timeout' => self::CONNECT_TIMEOUT,
+            'request_timeout' => $this->tagTimeout //for pinging we just the same timeout as for tagging
+        ]);
         $response = $this->sendRequest($httpClient, $httpClient::HEAD);
         return ($response && (($tbxHash !== false && $this->wasSuccessfull()) || ($tbxHash === false && $this->getLastStatus() == 404)));
     }
@@ -189,7 +217,10 @@ class editor_Plugins_TermTagger_Service {
         
         // send request to TermTagger-server
         $httpClient = $this->getHttpClient($url.'/termTagger/tbxFile/');
-        $httpClient->setConfig(array('timeout' => (integer)$this->config->timeOut->tbxParsing));
+        $httpClient->setConfig([
+            'timeout' => self::CONNECT_TIMEOUT,
+            'request_timeout' => $this->openTimeout
+        ]);
         $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
         $response = $this->sendRequest($httpClient, $httpClient::POST);
         $success = $this->wasSuccessfull();
@@ -234,20 +265,19 @@ class editor_Plugins_TermTagger_Service {
                 'termTaggerUrl' => $client->getUri(true),
             ];
             
-            //currently we add all of the requested data to the log. Perhaps we get the problem which crashes the tagger
-            // on TBX upload we don't put the request to save memory
-            if(strpos($extraData['termTaggerUrl'], '/termTagger/tbxFile/') === false) {
-                $extraData['termTaggerRequest'] = print_r($client->getLastRequest(),1);
-                $extraData['termTaggerAnswer'] = print_r(!empty($result) && $result->getRawBody(),1);
-            }
-            
             //if the error is one of the following, we have a connection problem
-            //TODO add other similar checks here too
             //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://localhost:8080. Error #111: Connection refused
-            //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Read timed out after 10 seconds
             //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://michgibtesdefinitivnichtalsdomain.com:8080. Error #0: php_network_getaddresses: getaddrinfo failed: Name or service not known
-            if($isInAdapter && (strpos($msg, 'Read timed out after') === 0 || strpos($msg, 'Unable to Connect to') === 0)) {
-                throw new editor_Plugins_TermTagger_Exception_Down('E1129', $extraData, $httpException);
+            //the following IP is not routed, so it trigers a timeout on connection connect, which must result in "Unable to connect" too and not in a request timeout below
+            //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://10.255.255.1:8080. Error #111: Connection refused
+            //if the error is one of the following, we have a request timeout
+            //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Read timed out after 10 seconds
+            if($isInAdapter) {
+                if(strpos($msg, 'Read timed out after') === 0) {
+                    throw new editor_Plugins_TermTagger_Exception_TimeOut('E1240', $extraData, $httpException);
+                }elseif(strpos($msg, 'Unable to Connect to') === 0) {
+                    throw new editor_Plugins_TermTagger_Exception_Down('E1129', $extraData, $httpException);
+                }
             }
             
             //Error in communication with TermTagger
@@ -291,7 +321,10 @@ class editor_Plugins_TermTagger_Service {
         $httpClient = $this->getHttpClient($url.'/termTagger/termTag/');
         
         $httpClient->setRawData(json_encode($data), 'application/json');
-        $httpClient->setConfig(array('timeout' => (integer)$this->config->timeOut->segmentTagging));
+        $httpClient->setConfig([
+            'timeout' => self::CONNECT_TIMEOUT,
+            'request_timeout' => $this->tagTimeout
+        ]);
         $response = $this->sendRequest($httpClient, $httpClient::POST);
         
         if(!$this->wasSuccessfull()) {
