@@ -37,6 +37,12 @@ abstract class editor_Plugins_TermTagger_Exception_Abstract extends ZfExtended_E
      */
     protected $domain = 'editor.terminology';
     
+    /**
+     * Basically the termtagger exceptions produce just a warning
+     * @var integer
+     */
+    protected $level = ZfExtended_Logger::LEVEL_WARN;
+    
     protected static $localErrorCodes = [
         'E1116' => 'Could not load TBX into TermTagger: TBX hash is empty.',
         'E1117' => 'Could not load TBX into TermTagger: TermTagger HTTP result was not successful!',
@@ -47,5 +53,6 @@ abstract class editor_Plugins_TermTagger_Exception_Abstract extends ZfExtended_E
         'E1121' => 'TermTagger result could not be decoded.',
         'E1129' => 'TermTagger DOWN: The configured TermTagger "{termTaggerUrl}" is not reachable and is deactivated in translate5 temporary.',
         'E1131' => 'TermTagger DOWN: No TermTagger instances are available, please enable them and reimport this task.',
+        'E1240' => 'TermTagger TIMEOUT: The configured TermTagger "{termTaggerUrl}" did not respond in an appropriate time.',
     ];
 }

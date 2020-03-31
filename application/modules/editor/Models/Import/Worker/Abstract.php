@@ -53,6 +53,8 @@ abstract class editor_Models_Import_Worker_Abstract extends ZfExtended_Worker_Ab
             $wm->setState($wm::STATE_DEFUNCT);
             $wm->save();
         }
+        //wake up remaining - if any
+        $this->wakeUpAndStartNextWorkers();
         //if no worker model is set, we don't have to call parent / init a worker model,
         // since we don't even need it in the DB when the task already has errors
         return false;
@@ -71,9 +73,18 @@ abstract class editor_Models_Import_Worker_Abstract extends ZfExtended_Worker_Ab
         $parentsOk = parent::checkParentDefunc();
         if(!$parentsOk) {
             $this->task->setErroneous();
-            $this->workerModel->defuncRemainingOfGroup();
+            $this->defuncRemainingOfGroup();
         }
         return $parentsOk;
+    }
+    
+    /**
+     * defuncing the tasks import worker group
+     */
+    protected function defuncRemainingOfGroup() {
+        //final step must run in any case, so we exclude it here
+        $this->workerModel->defuncRemainingOfGroup(['editor_Models_Import_Worker_FinalStep']);
+        $this->wakeUpAndStartNextWorkers();
     }
     
     /**
