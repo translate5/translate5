@@ -147,7 +147,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             Zend_Registry::get('logger')->warn('E1232', 'Job creation: role "lector" is deprecated, use "reviewer" instead!');
         }
         
-        
         //may not be set from outside!
         if(is_object($this->data) && property_exists($this->data, 'staticAuthHash')) {
             unset($this->data->staticAuthHash);
