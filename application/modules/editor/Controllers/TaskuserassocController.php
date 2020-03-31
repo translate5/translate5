@@ -101,6 +101,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         if(!$this->_request->isPost()) {
             return parent::validate();
         }
+        $this->setDefaultAssignmentDate();
         settype($this->data->taskGuid, 'string');
         $this->task->loadByTaskGuid($this->data->taskGuid);
         
@@ -334,6 +335,18 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             $hasParent=$userModel->hasParent($userData->id, $this->view->rows->parentIds);
             $this->view->rows->editable=$hasParent;
             $this->view->rows->deletable=$hasParent;
+        }
+    }
+    
+    /***
+     * Set the assignmentDate with the curent time stamp.
+     * In different mysql versions the current_timestamp depends on mysql system variable (explicit_defaults_for_timestamp)
+     * https://dev.mysql.com/doc/refman/5.6/en/server-system-variables.html#sysvar_explicit_defaults_for_timestamp
+     */
+    protected function setDefaultAssignmentDate(){
+        if($this->getRequest()->isPost() && !isset($this->data->assignmentDate) || empty($this->data->assignmentDate)){
+            $this->data->assignmentDate=NOW_ISO;
+            $this->entity->setAssignmentDate(NOW_ISO);
         }
     }
 }
