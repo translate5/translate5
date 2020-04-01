@@ -30,11 +30,31 @@ Ext.define('Editor.view.HelpWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.helpWindow',
     itemId: 'helpWindow',
+    stateId:'helpWindow',
+    reference: 'helpWindow',
     cls: 'helpWindow',
     minHeight : 750,
     width : 1024,
     autoHeight: true,
     autoScroll: true,
     modal : true,
-    layout:'fit'
+    layout:'fit',
+    viewModel: true,
+    bind:{
+    	doNotShowAgain:'{cbDoNotShowAgain.checked}'
+    },
+    dockedItems: [{
+        xtype: 'toolbar',
+        dock: 'bottom',
+        items: [{
+        	xtype:'checkboxfield',
+        	boxLabel:'Do not show this window again ?',
+        	reference: 'cbDoNotShowAgain',
+            publishes: 'value',
+        	name:'cbDoNotShowAgain',
+            bind:{
+            	value:'{helpWindow.doNotShowAgain}'
+            }
+        }]
+    }]
 });

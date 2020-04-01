@@ -65,6 +65,10 @@ Ext.ClassManager.onCreated(function(className) {
     }
 });
 
+Ext.state.Manager.setProvider(new Ext.state.CookieProvider({ 
+	expires: new Date(new Date().getTime()+(10006060247)), //7 days from now 
+}));
+
 Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
