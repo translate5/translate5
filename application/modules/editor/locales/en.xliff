@@ -3722,6 +3722,10 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Translate5 - Aufgabe mit Fehlern / Warnungen importiert</source>
     <target>Translate5 - Task imported with errors / warnings / notices</target>
 </trans-unit>
+<trans-unit id='RGFzIG7DpGNoc3RlIC8gdm9yaGVyaWdlIFNlZ21lbnQgd2lyZCBub2NoIGdlc3BlaWNoZXJ0LCBiaXR0ZSB3YXJ0ZW4uLi4='>
+  <source>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</source>
+  <target>The previous / next segment is still saving, please wait...</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

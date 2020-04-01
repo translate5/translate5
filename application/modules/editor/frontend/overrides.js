@@ -1112,3 +1112,32 @@ Ext.override(Ext.data.Model, {
         this.callParent([options]);
     }
 });
+
+/**
+ * needed for ext-6.2.0
+ * no info if known as ExtJS issue and if it is fixed in the future
+ * must be rechecked (just modify a tasks usertacking on the server, make a task.load and see if task.userTracking() contains the updated data)!
+ * Problem: On using model associations (for example the task model with the associated userTracking), 
+ *          the assoc stores (for example userTracking) are not updated when reloading the task model (with load method or on save)
+ *          AND when the assoc store should get its data from task raw data (and not as a separate load request)
+ *          Here it seems that this is a bug, since in the responsible getAssociatedStore method, the case 
+ *          if a store already exists and new data is given, is just not handled. This is done right now by the below override
+ *           
+ */
+Ext.override(Ext.data.schema.Role, {
+    getAssociatedStore: function(inverseRecord, options, scope, records, allowInfer) {
+        var me = this,
+            storeName = me.getStoreName(),
+            store = inverseRecord[storeName],
+            load = options && options.reload;
+        
+        if(store && !options && !load && records) {
+            //this case is never handled in the original getAssociatedStore, but it should since otherwise the data is not loaded
+            store.loadRawData(records);
+            return store;
+        }
+        else {
+            return this.callParent([inverseRecord, options, scope, records, allowInfer]);
+        }
+    }
+});
