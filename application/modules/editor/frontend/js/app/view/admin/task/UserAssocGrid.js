@@ -49,11 +49,6 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       deadlineDateLable:'#UT#Deadline'
   },
   states: {
-      open: '#UT#offen',
-      waiting: '#UT#wartend',
-      finished: '#UT#abgeschlossen',
-      end: '#UT#beendet',
-      unconfirmed: '#UT#nicht bestätigt',
       edit: '#UT#in Arbeit',
   },
   viewConfig: {
@@ -108,7 +103,14 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           width: 90,
           dataIndex: 'state',
           renderer: function(v) {
-              return me.states[v] ? me.states[v] : v;
+        	  //is custom state translation needed
+        	  if(me.states[v]){
+        		  return me.states[v];
+        	  }
+              var vm = this.lookupViewModel(),
+            	vfm=vm.get('workflowMetadata'),
+            	state=(vfm && vfm.mergedStates && vfm.mergedStates[v]) || v;
+              return state;
           },
           text: me.strings.stateCol
       },{

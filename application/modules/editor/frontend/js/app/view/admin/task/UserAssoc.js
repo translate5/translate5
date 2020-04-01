@@ -83,6 +83,19 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   anchor: '100%',
                   xtype: 'combo',
                   allowBlank: false,
+                  editable: false,
+                  forceSelection: true,
+                  queryMode: 'local',
+                  name: 'role',
+                  fieldLabel: me.strings.fieldRole,
+                  valueField: 'id',
+                  bind: {
+                      store: '{roles}'
+                  }
+              },{
+                  anchor: '100%',
+                  xtype: 'combo',
+                  allowBlank: false,
                   listConfig: {
                       loadMask: false
                   },
@@ -96,19 +109,6 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   displayField: 'longUserName',
                   valueField: 'userGuid',
                   fieldLabel: me.strings.fieldUser
-              },{
-                  anchor: '100%',
-                  xtype: 'combo',
-                  allowBlank: false,
-                  editable: false,
-                  forceSelection: true,
-                  queryMode: 'local',
-                  name: 'role',
-                  fieldLabel: me.strings.fieldRole,
-                  valueField: 'id',
-                  bind: {
-                      store: '{roles}'
-                  }
               },{
                   anchor: '100%',
                   xtype: 'combo',

@@ -348,8 +348,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if(!empty($this->filter)) {
             $this->filter->applyToSelect($s, false);
         }
-        $this->applyDefaultGroup($s);
-        return count($this->db->fetchAll($s));
+        return $this->db->fetchRow($s)->numrows;
     }
     
     /**

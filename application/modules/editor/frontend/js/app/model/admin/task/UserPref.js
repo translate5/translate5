@@ -61,7 +61,7 @@ Ext.define('Editor.model.admin.task.UserPref', {
    * @return {Boolean} 
    */
   isDefault: function() {
-      return !this.phantom && this.get('userGuid').length==0 && this.get('workflowStep').length == 0;
+      return !this.phantom && this.get('userGuid').length == 0 && this.get('workflowStep').length == 0;
   },
   isNonEditableColumnVisible: function() {
       return (this.get('visibility') == 'show');

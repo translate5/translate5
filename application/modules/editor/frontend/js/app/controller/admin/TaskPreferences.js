@@ -137,16 +137,15 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   calculateAvailableCombinations: function() {
       var me = this,
           workflow = me.actualTask.get('workflow'),
-          steps = Ext.apply({}, me.actualTask.getWorkflowMetaData().steps),
+          steps = Ext.apply({}, me.actualTask.getWorkflowMetaData().assignableSteps),
           steps2roles = Ext.apply({}, me.actualTask.getWorkflowMetaData().steps2roles),
           tuas = me.getAdminTaskUserAssocsStore(),
           prefs = me.getAdminTaskUserPrefsStore(),
           used = {},
           cnt = 0,
-          stepsToIgnore=['pmCheck','no workflow','workflowEnded'],
           addButton,
           prefForm=me.getPrefForm();
-      
+
       me.available = {};
 
       //calculate the already used step / user combinations
@@ -168,10 +167,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       //calculate all combinations, without the already used ones
       Ext.Object.each(steps, function(k,v){
           var step = k;
-          //check if the step needs to be ignored
-          if(Ext.Array.contains(stepsToIgnore,step)) {
-              return;
-          }
           tuas.each(function(tua){
               var id = tua.get('id');
               if(steps2roles[step] && steps2roles[step] != tua.get('role')) {
