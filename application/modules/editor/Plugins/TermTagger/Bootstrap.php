@@ -62,7 +62,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         // event-listeners
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),100);
         $this->eventManager->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
-        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->eventManager->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_Models_Segment_Updater', 'beforeSegmentUpdate', array($this, 'handleBeforeSegmentUpdate'));
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
@@ -171,23 +170,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
             return false;
         }
         $worker->queue($event->getParam('parentWorkerId'));
-    }
-    
-    /**
-     * handler for event: Editor_IndexController#afterIndexAction
-     * 
-     * Writes runtimeOptions.termTagger.segmentsPerCall for use in ExtJS
-     * into JsVar Editor.data.plugins.termTagger.segmentsPerCall
-     * 
-     * @param $event Zend_EventManager_Event
-     */
-    public function handleAfterIndex(Zend_EventManager_Event $event) {
-        $view = $event->getParam('view');
-        
-        $config = Zend_Registry::get('config');
-        $termTaggerSegmentsPerCall = $config->runtimeOptions->termTagger->segmentsPerCall;
-        
-        $view->Php2JsVars()->set('plugins.termTagger.segmentsPerCall', $termTaggerSegmentsPerCall);
     }
     
     /**
@@ -343,8 +325,9 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @return stdClass
      */
     public function termtaggerState() {
+        $testTimeout = 10;
         $termtagger = new stdClass();
-        $ttService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', ['editor.terminology']);
+        $ttService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', ['editor.terminology', $testTimeout, $testTimeout]);
         /* @var $ttService editor_Plugins_TermTagger_Service */
         $termtagger->configured = $ttService->getConfiguredUrls();
         $allUrls = array_unique(call_user_func_array('array_merge', (array)$termtagger->configured));

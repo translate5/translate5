@@ -454,6 +454,16 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             try {
                 $connector=$manager->getConnector($languageresource,$this->task->getSourceLang(),$this->task->getTargetLang());
 
+                $moreInfo='';
+                //throw a worning if the language resource is not available
+                if($connector->getStatus($moreInfo)!=editor_Services_Connector_Abstract::STATUS_AVAILABLE){
+                    $this->log->warn('E1239','MatchAnalysis Plug-In: The associated language resource "{name}" is not available for match analysis and pre-translations.',[
+                        'task' => $this->task,
+                        'name' => $languageresource->getName(),
+                        'languageResource' => $languageresource,
+                    ]);
+                    continue;
+                }
                 //collect the mt resource, so it can be used for pretranslations if needed
                 //collect only if it has matchrate >= of the current set pretranslationMatchrate
                 if($resource->getType()==editor_Models_Segment_MatchRateType::TYPE_MT){
@@ -461,7 +471,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 }
                 //store the languageResource
                 $this->resources[$languageresource->getId()] = $languageresource;
-            } catch (ZfExtended_Exception $e) {
+            } catch (Exception $e) {
                 $this->log->warn('E1102', 'Unable to use connector from Language Resource "{name}". Error was: "{msg}".', [
                     'task' => $this->task,
                     'name' => $languageresource->getName(),

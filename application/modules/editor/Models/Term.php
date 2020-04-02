@@ -567,7 +567,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 'languageIds' => $langs,
             ]);
         }
-        return $exporteur->export();
+        return $result;
     }
     
     /***

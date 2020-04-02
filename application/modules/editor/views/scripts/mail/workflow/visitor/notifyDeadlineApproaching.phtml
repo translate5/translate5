@@ -30,7 +30,7 @@
 
 $this->render('general.phtml');
 
-$this->subject = sprintf('Termin-Erinnerung für die Aufgabe "%s"',$this->task->getTaskName());
+$this->subject = sprintf($this->translate->_('Termin-Erinnerung für die Aufgabe "%s"'),$this->task->getTaskName());
 $mainText=$this->templateApply('bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin rückt näher.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/>Sie können die Bearbeitung Ihrer Aufgabe auch jederzeit unterbrechen und zu einem späteren Zeitpunkt wieder aufnehmen.<br/><br/>', $this->data);
 
 $this->header=$this->header.$mainText;

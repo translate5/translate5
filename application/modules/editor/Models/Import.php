@@ -249,7 +249,14 @@ class editor_Models_Import {
         /* @var $worker editor_Models_Import_Worker_SetTaskToOpen */
         
         //queuing this worker when task has errors make no sense, init checks this.
-        if($worker->init($taskGuid)) {
+        if($worker->init($taskGuid, ['config' => $this->importConfig])) {
+            $worker->queue($parentId, null, false); 
+        }
+        
+        $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_FinalStep');
+        /* @var $worker editor_Models_Import_Worker_FinalStep */
+        
+        if($worker->init($taskGuid, ['config' => $this->importConfig])) {
             $worker->queue($parentId); 
         }
     }

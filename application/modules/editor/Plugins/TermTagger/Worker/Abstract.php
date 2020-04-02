@@ -309,45 +309,46 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      * If not already loaded, tries to load the tbx-file from the task.
      * Throws Exceptions if TBX could not be loaded!
      * @throws editor_Plugins_TermTagger_Exception_Abstract
+     * @param editor_Plugins_TermTagger_Service $termTagger the TermTagger Service to be used
      * @param string $url the TermTagger-server-url
      * @param string $tbxHash unique id of the tbx-file
      */
-    protected function checkTermTaggerTbx($url, &$tbxHash) {
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain()]);
-        /* @var $termTagger editor_Plugins_TermTagger_Service */
-        
-        // test if tbx-file is already loaded
-        if (!empty($tbxHash) && $termTagger->ping($url, $tbxHash)) {
-            return;
+    protected function checkTermTaggerTbx(editor_Plugins_TermTagger_Service $termTagger, $url, &$tbxHash) {
+        try {
+            // test if tbx-file is already loaded
+            if (!empty($tbxHash) && $termTagger->ping($url, $tbxHash)) {
+                return;
+            }
+            //getDataTbx also creates the TbxHash
+            $tbx = $this->getTbxData();
+            $tbxHash = $this->task->meta()->getTbxHash();
+            $termTagger->open($url, $tbxHash, $tbx);
         }
-        
+        catch (editor_Plugins_TermTagger_Exception_Abstract $e) {
+            $e->addExtraData([
+                'task' => $this->task,
+                'termTaggerUrl' => $url,
+            ]);
+            throw $e;
+        }
+    }
+    
+    /**
+     * returns the TBX string to be loaded into the termtagger
+     * @throws editor_Plugins_TermTagger_Exception_Open
+     * @return string
+     */
+    protected function getTbxData() {
         // try to load tbx-file to the TermTagger-server
         $tbxPath = $this->getTbxFilename($this->task);
         $tbxParser = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         /* @var $tbxParser editor_Models_Import_TermListParser_Tbx */
         try {
-            $tbxData = $tbxParser->assertTbxExists($this->task, new SplFileInfo($tbxPath));
+            return $tbxParser->assertTbxExists($this->task, new SplFileInfo($tbxPath));
         }
         catch (editor_Models_Term_TbxCreationException $e) {
             //'E1116' => 'Could not load TBX into TermTagger: TBX hash is empty.',
-            throw new editor_Plugins_TermTagger_Exception_Open('E1116', [
-                'task' => $this->task,
-                'termTaggerUrl' => $url,
-            ], $e);
-        }
-        
-        $tbxHash = $this->task->meta()->getTbxHash();
-        $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain()]);
-        /* @var $service editor_Plugins_TermTagger_Service */
-        
-        try {
-            $service->open($url, $tbxHash, $tbxData);
-        }
-        catch (editor_Plugins_TermTagger_Exception_Abstract $e) {
-            $e->addExtraData([
-                'task' => $this->task
-            ]);
-            throw $e;
+            throw new editor_Plugins_TermTagger_Exception_Open('E1116', [], $e);
         }
     }
 }

@@ -57,8 +57,13 @@ class editor_Logger_TaskMailToPm extends ZfExtended_Logger_Writer_Abstract {
         $mailer->sendToUser($pm);
     }
     
+    /**
+     * Only 'normal' tasks should send messages to the PM.
+     * {@inheritDoc}
+     * @see ZfExtended_Logger_Writer_Abstract::isAccepted()
+     */
     public function isAccepted(ZfExtended_Logger_Event $event) {
-        if(empty($event->extra) || empty($event->extra['task']) || !is_a($event->extra['task'], 'editor_Models_Task')) {
+        if(empty($event->extra) || empty($event->extra['task']) || !is_a($event->extra['task'], 'editor_Models_Task') || $event->extra['task']->isHiddenTask()) {
             return false;
         }
         return parent::isAccepted($event);

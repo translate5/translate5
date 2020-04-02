@@ -88,7 +88,7 @@ class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_A
             return true;
         } catch (Exception $e) {
             $task->setErroneous();
-            $this->workerModel->defuncRemainingOfGroup();
+            $this->defuncRemainingOfGroup();
             throw $e; 
         }
     }
