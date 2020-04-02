@@ -192,8 +192,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     toolTip: me.strings.sourceLangTip,
                                     fieldLabel: me.strings.sourceLangLabel
                                 },{
-                                    xtype: 'languagecombo',
-                                    name: 'targetLang',
+                                    xtype:'tagfield',
+                                    name:'targetLang[]',
                                     toolTip: me.strings.targetLangTip,
                                     fieldLabel: me.strings.targetLangLabel,
                                     //each combo needs its own store instance, see EXT6UPD-8

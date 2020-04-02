@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- * @deprecated This class is not working anymore, the termtagger tests should be refactored to single tests called by our default testframework
+ * @deprecated TODO This class is not working anymore, the termtagger tests should be refactored to single tests called by our default testframework
  */
 class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
     /**
@@ -47,7 +47,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         self::waitTaskReady();
         self::loadTaggedSegmentFromDb();
     }
-    
+
     public function testPassedAssertionSource() {
         $a = self::$assertion.'Source';
         $this->$a();
@@ -61,7 +61,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
     protected function assertOutputEqualsSource() {
         self::$sourceTagged = $this->removeDataTbxIdFromString(self::$sourceTagged);
         self::$expectedSource = $this->removeDataTbxIdFromString(self::$expectedSource);
-        
+
         $this->assertEquals(self::$expectedSource, self::$sourceTagged, 'The source content did not meet the expected result. <br><br><b>Expected source</b>: <br><br><pre>'.htmlentities(self::$expectedSource, ENT_HTML5, 'utf-8').'</pre><br><br><b>Retrieved source</b>: <br><br><pre>'.htmlentities(self::$sourceTagged, ENT_HTML5, 'utf-8').'</pre>');
     }
 
@@ -95,20 +95,20 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         self::$testTask->setTerminologie(1);
         self::$testTask->createTaskGuidIfNeeded();
         self::$testTask->setCustomerId(ZfExtended_Factory::get('editor_Models_Customer')->loadByDefaultCustomer()->getId());
-    }    
-    
+    }
+
     /**
      * executes the assertion-method specified in the testcase.xml
      */
     protected static function addTask() {
         $config = Zend_Registry::get('config');
         $workflowManager = ZfExtended_Factory::get('editor_Workflow_Manager');
-        
+
         //init workflow id for the task
         $defaultWorkflow = $config->runtimeOptions->import->taskWorkflow;
         self::$testTask->setWorkflow($workflowManager->getIdToClass($defaultWorkflow));
         self::$testTask->validate();
-        
+
         $wfId = self::$testTask->getWorkflow();
         self::$workflow = $workflowManager->getCached($wfId);
         self::importFile();
@@ -117,7 +117,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         self::$testTask->load(self::$testTask->getId());
         return self::$testTask;
     }
-    
+
     protected static function waitTaskReady(){
         $count = 0;
         while ($count<100 && self::$testTask->getState() !=='open') {
@@ -149,7 +149,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
                 "tmp_name" => self::$testfile->getPathname(),
                 "error" => 0,
                 "size" => self::$testfile->getSize(),
-                "options" => array(      
+                "options" => array(
                     "ignoreNoFile" => false,
                     "useByteString"=>true,
                     "magicFile"=> NULL,
@@ -165,7 +165,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
                 "tmp_name" => self::$tbxFile->getPathname(),
                 "error" => 0,
                 "size" => self::$tbxFile->getSize(),
-                "options" => array(      
+                "options" => array(
                     "ignoreNoFile" => false,
                     "useByteString"=>true,
                     "magicFile"=> NULL,
@@ -177,25 +177,25 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
             ),
         );
         Zend_Registry::set('offlineTestcase', true);
-        
+
         $import = ZfExtended_Factory::get('editor_Models_Import');
         /* @var $import editor_Models_Import */
         $import->setUserInfos(self::$testTask->getPmGuid(),  self::$testTask->getPmName());
 
         $import->setLanguages(
-                        self::$testTask->getSourceLang(), 
-                        self::$testTask->getTargetLang(), 
-                        self::$testTask->getRelaisLang(), 
+                        self::$testTask->getSourceLang(),
+                        self::$testTask->getTargetLang(),
+                        self::$testTask->getRelaisLang(),
                         editor_Models_Languages::LANG_TYPE_ID);
         $import->setTask(self::$testTask);
         $upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
         /* @var $upload editor_Models_Import_UploadProcessor */
-        
+
         $upload->initDataProvider("testcase",$importUpload);
         $dp = $upload->getDataProvider();
         $import->import($dp);
         self::$workflow->doImport(self::$testTask,$import->getImportConfig());
-        
+
         //run the queued import worker
         $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $workerModel ZfExtended_Models_Worker */
@@ -205,7 +205,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
     }
     public static function tearDownAfterClass(): void {
         parent::tearDownAfterClass();
-        
+
         $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array(self::$testTask));
         /* @var $remover editor_Models_Task_Remover */
         $remover->removeForced();
