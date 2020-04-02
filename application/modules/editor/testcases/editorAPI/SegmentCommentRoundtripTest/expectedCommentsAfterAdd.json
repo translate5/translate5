@@ -148,5 +148,13 @@
             "comment": "Dies ist ein Kommentar.",
             "isEditable": false
         }
+    ],
+    [
+        {
+            "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
+            "userName": "lector test",
+            "comment": "A test comment for segment 6",
+            "isEditable": true
+        }
     ]
 ]

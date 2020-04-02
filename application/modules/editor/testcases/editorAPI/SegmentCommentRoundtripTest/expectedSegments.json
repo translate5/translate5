@@ -161,5 +161,32 @@
         "targetEditToSort": "of the Santa Clause",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":19}}}}",
         "isWatched": false
+    },
+    {
+        "segmentNrInTask": "7",
+        "mid": "3_3",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "matchRateType": "import;none",
+        "qmId": null,
+        "stateId": "0",
+        "autoStateId": "0",
+        "fileOrder": "1",
+        "comments": null,
+        "workflowStepNr": "0",
+        "workflowStep": null,
+        "source": "Neuer Kommentarblock",
+        "sourceMd5": "98e924b24a8747e940a6b530a42d26c2",
+        "sourceToSort": "Neuer Kommentarblock",
+        "target": "New comment-block",
+        "targetMd5": "77837179af6641a50d3450b96442a3f9",
+        "targetToSort": "New comment-block",
+        "targetEdit": "New comment-block",
+        "targetEditToSort": "New comment-block",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":17}}}}",
+        "isWatched": false
     }
 ]
