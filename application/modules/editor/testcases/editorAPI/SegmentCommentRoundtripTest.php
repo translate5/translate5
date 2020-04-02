@@ -164,10 +164,16 @@ class SegmentCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
 
         //get the exported file content
         $path = $this->api()->getTaskDataDirectory();
+
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
 
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/commented-en-de.sdlxliff');
+        $this->_testExportSdlXliff($pathToZip);
+        $this->_testExportMemoQXliff($pathToZip);
+    }
+
+    protected function _testExportSdlXliff(string $pathToZip) {
+        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $this->api()->getTask()->taskGuid.'/01-sdlxliff-en-de.sdlxliff');
         //file_put_contents('/home/tlauria/foo.sdlxliff', $exportedFile);
         $expectedResult = $this->api()->getFileContent('export-assert.sdlxliff');
 
@@ -188,6 +194,26 @@ class SegmentCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
         //file_put_contents('/home/tlauria/foo-export.sdlxliff', $exportedFile);
         //file_put_contents('/home/tlauria/foo-expect.sdlxliff', $expectedResult);
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.sdlxliff');
+    }
+
+    protected function _testExportMemoQXliff(string $pathToZip) {
+        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $this->api()->getTask()->taskGuid.'/02-memoq-de-en.mqxliff');
+        //file_put_contents('/home/tlauria/foo.mqxliff', $exportedFile);
+        $expectedResult = $this->api()->getFileContent('export-assert.mqxliff');
+
+        //Since we replace only our own comments, we can leave Medium and 1.0 as fixed string, since they are currently not modifiable by translate5
+        $s = [
+            '/<mq:comment id="[0-9abcdef-]{36}" creatoruser="lector test" time="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z"/'
+        ];
+        $r = [
+            '<mq:comment id="NOT-TESTABLE" creatoruser="lector test" time="NOT-TESTABLE"'
+        ];
+        $result = preg_replace($s, $r, [$exportedFile, $expectedResult]);
+        $exportedFile = $result[0];
+        $expectedResult = $result[1];
+        //file_put_contents('/home/tlauria/foo-export.mqxliff', $exportedFile);
+        //file_put_contents('/home/tlauria/foo-expect.mqxliff', $expectedResult);
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.mqxliff');
     }
 
     public static function tearDownAfterClass(): void {
