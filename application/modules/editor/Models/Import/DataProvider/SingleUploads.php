@@ -39,14 +39,8 @@ class editor_Models_Import_DataProvider_SingleUploads  extends editor_Models_Imp
     /**
      * @var array
      */
-    protected $review;
-    protected $relais;
-    protected $reference;
-    protected $tbx;
-    /**
-     * @var Zend_Config
-     */
-    protected $config;
+    protected $filesToProcess;
+    protected $targetDirectories;
     
     /**
      * consumes all the given file paths
@@ -55,12 +49,9 @@ class editor_Models_Import_DataProvider_SingleUploads  extends editor_Models_Imp
      * @param array $reference optional
      * @param string $tbx optional
      */
-    public function __construct(array $review, array $relais = array(), array $reference = array(), array $tbx = array()){
-        $this->review = $review;
-        $this->relais = $relais;
-        $this->reference = $reference;
-        $this->tbx = $tbx;
-        $this->config = Zend_Registry::get('config');
+    public function __construct(array $filesToProcess, array $targetDirectories){
+        $this->filesToProcess = $filesToProcess;
+        $this->targetDirectories = $targetDirectories;
     }
     
     /**
@@ -70,54 +61,13 @@ class editor_Models_Import_DataProvider_SingleUploads  extends editor_Models_Imp
     public function checkAndPrepare(){
         $this->checkAndMakeTempImportFolder();
         parent::checkAndPrepare();
-        $this->handleReview();
-        $this->handleRelais();
-        $this->handleReference();
-        $this->handleTbx();
-    }
-
-    /**
-     * processes the review files
-     */
-    protected function handleReview() {
-        //no if empty check, since we need a review dir. If this will be empty, the import process throws an error
-        $review = $this->config->runtimeOptions->import->proofReadDirectory;
-        $this->handleUploads($review, $this->review);
-    }
-    
-    /**
-     * processes the relais files
-     */
-    protected function handleRelais() {
-        if(empty($this->relais)) {
-            return;
-        }
-        $relais = $this->config->runtimeOptions->import->relaisDirectory;
-        $this->handleUploads($relais, $this->relais);
-    }
-    
-    /**
-     * processes the reference files
-     */
-    protected function handleReference() {
-        if(empty($this->reference)) {
-            return;
-        }
-        $ref = $this->config->runtimeOptions->import->referenceDirectory;
-        $this->handleUploads($ref, $this->reference);
-    }
-    
-    /**
-     * processes the TBX file
-     */
-    protected function handleTbx() {
-        if(empty($this->tbx)) {
-            return;
-        }
-        $target = $this->importFolder.DIRECTORY_SEPARATOR;
-        $name = $target.DIRECTORY_SEPARATOR.$this->tbx['name'];
-        if(!move_uploaded_file($this->tbx['tmp_name'], $name)) {
-            $this->handleCannotMove($this->tbx, $target);
+        
+        foreach($this->filesToProcess as $type => $files) {
+            if(empty($files)) {
+                //if nothing was uploaded for a specific field, nothing can be done
+                continue;
+            }
+            $this->handleUploads($files, $this->targetDirectories[$type] ?? null);
         }
     }
     
@@ -126,38 +76,23 @@ class editor_Models_Import_DataProvider_SingleUploads  extends editor_Models_Imp
      * @param string $folder
      * @param array $files
      */
-    protected function handleUploads($folder, array $files) {
+    protected function handleUploads(array $files, $folder = null) {
         $target = $this->importFolder.DIRECTORY_SEPARATOR;
         if(!empty($folder)) {
             $target .= $folder;
             $this->mkdir($target);
         }
-        foreach($files as $file) {
-            $name = $target.DIRECTORY_SEPARATOR.$file['name'];
-            if(!move_uploaded_file($file['tmp_name'], $name)) {
-                $this->handleCannotMove($file, $target);
+        foreach($files as $tmpFile => $fileName) {
+            $name = $target.DIRECTORY_SEPARATOR.$fileName;
+            if(!move_uploaded_file($tmpFile, $name)) {
+                //DataProvider SingleUpload: Uploaded file "{file}" cannot be moved to "{target}',
+                throw new editor_Models_Import_DataProvider_Exception('E1244', [
+                    'task' => $this->task,
+                    'file' => $fileName,
+                    'target' => $target,
+                ]);
             }
         }
-    }
-    
-    /**
-     * reusable exception thrower
-     * @param array $file
-     * @param string $target
-     * @throws ZfExtended_Exception
-     */
-    protected function handleCannotMove($file, $target) {
-        try {
-            $offlineTestcase = Zend_Registry::get('offlineTestcase');
-        } catch (Exception $exc) {
-            $offlineTestcase = false;
-        }
-        if($offlineTestcase===true){
-            if(\copy($file['tmp_name'], $target.'/'.$file['name'])) {
-                return;
-            }
-        }
-        throw new ZfExtended_Exception('Uploaded file '.$file['name'].' cannot be moved to '.$target);
     }
     
     /**
