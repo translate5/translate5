@@ -51,6 +51,7 @@ Ext.define('Editor.controller.Editor', {
     messages: {
         segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
         segmentNotBuffered: '#UT#Das nächste / vorherige Segment wird noch geladen, bitte versuchen Sie es erneut.',
+        segmentStillSaving: '#UT#Das nächste / vorherige Segment wird noch gespeichert, bitte warten...',
         segmentsChanged: '#UT#Die Sortierung bzw. Filterung wurde geändert, es kann kein nächstes / vorheriges Segment ausgewählt werden.',
         segmentsChangedJump: '#UT#Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.',
         f2FirstOpened: '#UT#Das erste bearbeitbare Segment wurde geöffnet, da kein anderes Segment ausgewählt war.',
@@ -310,24 +311,54 @@ Ext.define('Editor.controller.Editor', {
      * saves the segment of the already opened editor and restarts startEditing call 
      */
     handleBeforeStartEdit: function(plugin, args){
-        if(!plugin.editing) {
-            //if editing is started by enter or F2 on a selected row:
-            //FIXME the check for editByCellActivation is commented because is not needed. With this
-            //the message will be reused in visualReview plugin
-            //if(plugin.editByCellActivation && !args[0].get('editable')){
-            if(!args[0].get('editable')){
-                Editor.MessageBox.addInfo(this.messages.f2Readonly);
-            }
+        var me = this, segment = args[0], i = 0, deferInterval; 
+        //if there is already an edited segment, we have to save that first
+        if(plugin.editing) {
+            this.fireEvent('prepareTrackChangesForSaving');
+            this.fireEvent('saveSegment', {
+                scope: this,
+                //when the save was successful we open the previously requested segment again
+                segmentUsageFinished: function(){
+                    plugin.startEdit.apply(plugin, args);
+                }
+            });
+            return false;
+        }
+        
+        //if segment is editable we proceed with the edit request
+        if(segment.get('editable')){
             return true;
         }
-        this.fireEvent('prepareTrackChangesForSaving');
-        this.fireEvent('saveSegment', {
-            scope: this,
-            segmentUsageFinished: function(){
-                plugin.startEdit.apply(plugin, args);
-            }
-        });
-        return false;
+
+        //if segment is not editable due a pending save, we stop the startEdit request and defer it
+        if(segment.get('autoStateId') == Editor.data.segments.autoStates.PENDING) {
+            //since there is no easy way to attach to the segment save (also it is unsure that a save is called at all)
+            // we just make a loop to check if the segment state is not pending anymore 
+            me.getSegmentGrid().setLoading(me.messages.segmentStillSaving);
+            deferInterval = Ext.interval(function(){
+                var skip = i++ > 12, 
+                    pending = segment.get('autoStateId') == Editor.data.segments.autoStates.PENDING;
+                //skip after 6 seconds, with can not edit message
+                if(skip) {
+                    Editor.MessageBox.addInfo(me.messages.f2Readonly);
+                }
+                //if the segment is not saving anymore, we try to open it
+                if(!pending && !plugin.editing) {
+                    //if editor is already editing we do not start another one
+                     plugin.startEdit.apply(plugin, args);
+                }
+                if(skip || !pending) {
+                    clearInterval(deferInterval);
+                    me.getSegmentGrid().setLoading(false);                    
+                }         
+            },500);
+            return false;
+        }
+
+        //if we reach here, we just print the segment readonly message 
+        Editor.MessageBox.addInfo(this.messages.f2Readonly);
+        
+        return true;
     },
     handleStartEdit: function(plugin, context) {
         var me = this;
@@ -336,46 +367,46 @@ Ext.define('Editor.controller.Editor', {
         me.getSourceTags(context);
     },
     getSourceTags: function(context) {
-    	var me = this,
-    		plug = me.getEditPlugin(),
-    		source = context.record.get('source'),
+        var me = this,
+            plug = me.getEditPlugin(),
+            source = context.record.get('source'),
             tempNode, walkNodes;
 
-            me.sourceTags = [];
-            //do nothing when editing the source field
-            if(/^source/.test(context.column.dataIndex)){
-                return;
-            }
+        me.sourceTags = [];
+        //do nothing when editing the source field
+        if(/^source/.test(context.column.dataIndex)){
+            return;
+        }
 
-            tempNode = document.createElement('DIV');
-            Ext.fly(tempNode).update(source);
+        tempNode = document.createElement('DIV');
+        Ext.fly(tempNode).update(source);
 
-            walkNodes = function(rootNode) {
-                Ext.each(rootNode.childNodes, function(item){
-                    if(Ext.isTextNode(item) || item.tagName !== 'DIV'){
-                        return;
-                    }
-                    if(item.tagName === 'DIV' && /(^|[\s])term([\s]|$)/.test(item.className)){
-                        walkNodes(item);
-                        return;
-                    }
-                    var divItem = Ext.fly(item),
-                        tagNr = divItem.down('span.short').dom.innerHTML.replace(/[^0-9]/g, ''),
-                        tagType = item.className.match(/^(open|single|close)\s/),
-                        //we use a real array starting at 0 for tag 1
-                        idx = tagNr-1;
-                    if(!tagType) {
-                        return;
-                    }
-                    tagType = tagType[1];
-                    if(!me.sourceTags[idx]) {
-                        me.sourceTags[idx] = {};
-                    }
-                    me.sourceTags[idx][plug.editor.mainEditor.idPrefix+tagType+tagNr] = '<div class="'+item.className+'">'+item.innerHTML+'</div>';
+        walkNodes = function(rootNode) {
+            Ext.each(rootNode.childNodes, function(item){
+                if(Ext.isTextNode(item) || item.tagName !== 'DIV'){
+                    return;
+                }
+                if(item.tagName === 'DIV' && /(^|[\s])term([\s]|$)/.test(item.className)){
+                    walkNodes(item);
+                    return;
+                }
+                var divItem = Ext.fly(item),
+                    tagNr = divItem.down('span.short').dom.innerHTML.replace(/[^0-9]/g, ''),
+                    tagType = item.className.match(/^(open|single|close)\s/),
+                    //we use a real array starting at 0 for tag 1
+                    idx = tagNr-1;
+                if(!tagType) {
+                    return;
+                }
+                tagType = tagType[1];
+                if(!me.sourceTags[idx]) {
+                    me.sourceTags[idx] = {};
+                }
+                me.sourceTags[idx][plug.editor.mainEditor.idPrefix+tagType+tagNr] = '<div class="'+item.className+'">'+item.innerHTML+'</div>';
             });
         };
         walkNodes(tempNode);
-	},
+    },
     /**
      * Gibt die RowEditing Instanz des Grids zurück
      * @returns Editor.view.segments.RowEditing

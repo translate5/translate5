@@ -330,13 +330,14 @@ Ext.define('Editor.controller.ChangeAlike', {
     me.alikesToProcess = me.getAlikesToProcess();
     me.calculateUsedTime();
     
-    //Next Step in save chain Callback
-    me.fireEvent('segmentUsageFinished', me);
-    //die 
-    //alike segmente mit den Änderungen befüllen, aber noch nicht comitten, erst im alikesSaveSuccessHandler wenn die Alike Segmente auf dem Server gespeichert sind
+    //just fill the alike segments with the changes. The commit of the them will be triggered  
+    // in alikesSaveSuccessHandler when the Alike Segments are saved on the server
     Ext.Array.each(me.alikesToProcess, function(alikeId){
         me.updateSegment(alikeId, data, newLength);
     });
+    
+    //Next Step in save chain Callback
+    me.fireEvent('segmentUsageFinished', me);
     
     //ab hier nur bei manuellem processing der Alike Segmente
     if(me.isManualProcessing()) {

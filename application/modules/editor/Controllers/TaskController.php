@@ -118,16 +118,16 @@ class editor_TaskController extends ZfExtended_RestController {
                 'totalField'=>'segmentCount'
             ],
             'userState' => [
-                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+                'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid')
             ],
             'assignmentDate' => [
-                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'assignmentDate', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'assignmentDate', 'taskGuid', 'taskGuid')
             ],
             'finishedDate' => [
-                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'finishedDate', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'finishedDate', 'taskGuid', 'taskGuid')
             ],
             'deadlineDate' => [
-                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'deadlineDate', 'taskGuid', 'taskGuid','LEK_taskUserAssoc')
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'deadlineDate', 'taskGuid', 'taskGuid')
             ]
         ];
         
@@ -497,7 +497,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $meta->setMappingType($this->data['mappingType']);
         }
         
-//FIXME zusätzlich sollte die API mit einer customerNr umgehen können die dann zur customerId konvertiret wird
         if(empty($this->data['customerId'])){
             $this->entity->setDefaultCustomerId();
             $this->data['customerId'] = $this->entity->getCustomerId();

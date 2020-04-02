@@ -30,9 +30,8 @@ END LICENSE AND COPYRIGHT
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- *
+ * @deprecated This class is not working anymore, the termtagger tests should be refactored to single tests called by our default testframework
  */
-
 class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
     /**
      *
