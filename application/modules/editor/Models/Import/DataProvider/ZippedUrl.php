@@ -44,7 +44,6 @@ class editor_Models_Import_DataProvider_ZippedUrl extends editor_Models_Import_D
     
     /**
      * @see editor_Models_Import_DataProvider_Zip::checkAndPrepare()
-     * @throws Zend_Exception
      */
     public function checkAndPrepare(editor_Models_Task $task) {
         $this->setTask($task);
@@ -56,7 +55,6 @@ class editor_Models_Import_DataProvider_ZippedUrl extends editor_Models_Import_D
     
     /**
      * fetch the zip file to import by HTTP 
-     * @throws Zend_Exception
      */
     protected function fetchFile() {
         $client = new Zend_Http_Client();
@@ -66,18 +64,21 @@ class editor_Models_Import_DataProvider_ZippedUrl extends editor_Models_Import_D
         		'timeout' => 30));
         $response = $client->request();
         if (!$response->isSuccessful()) {
-            $e = new ZfExtended_Exception();
-            $m = "No zip-file found for task %!".
-                        "\nRequested URL: %s".
-                        "\nHttp-Status-Code: %s".
-                        "\nHttp-Message: %s";
-            $m = sprintf($m,  $this->task->getTaskGuid(), $this->zipUrl,$response->getStatus(),$response->getMessage());
-            $e->setMessage($m,false);
-            throw $e;
+            //DataProvider ZippedUrl: ZIP file could not be fetched from URL
+            throw new editor_Models_Import_DataProvider_Exception('E1250', [
+                'task' => $this->task,
+                'url' => $this->zipUrl,
+                'httpStatus' => $response->getStatus(),
+                'httpMessage' => $response->getMessage(),
+            ]);
         }
         //im Folgenden werden 0 byte Große Dateien ebenfalls als Fehler betrachtet
         if (!file_put_contents($this->importZip, $response->getBody())) {
-        	throw new Zend_Exception('Zip-file of the task ' . $this->task->getTaskGuid() . ' could not be saved! Path: '.$this->importZip);
+            //DataProvider ZippedUrl: fetched file can not be saved to path
+            throw new editor_Models_Import_DataProvider_Exception('E1249', [
+                'task' => $this->task,
+                'path' => $this->importZip,
+            ]);
         }
     }
     

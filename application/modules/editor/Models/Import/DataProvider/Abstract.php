@@ -74,12 +74,16 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     
     /**
      * creates a temporary folder to contain the import data 
-     * @throws Zend_Exception
+     * @throws editor_Models_Import_DataProvider_Exception
      */
     protected function checkAndMakeTempImportFolder() {
         $this->importFolder = $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_TEMP_IMPORT;
         if(is_dir($this->importFolder)) {
-            throw new Zend_Exception('Temporary directory for Task GUID ' . $this->task->getTaskGuid() . ' already exists!');
+            //DataProvider: Temporary directory does already exist - path: "{path}"'
+            throw new editor_Models_Import_DataProvider_Exception('E1246', [
+                'task' => $this->task,
+                'path' => $this->importFolder,
+            ]);
         }
         $msg = 'Temporary directory for Task GUID ' . $this->task->getTaskGuid() . ' could not be created!';
         $this->mkdir($this->importFolder, $msg);
@@ -101,15 +105,15 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     /**
      * exception throwing mkdir
      * @param string $path
-     * @param string $errMsg
-     * @throws Zend_Exception
+     * @throws editor_Models_Import_DataProvider_Exception
      */
-    protected function mkdir($path, $errMsg = null) {
-        if(empty($errMsg)) {
-            $errMsg = 'Could not create folder '.$path;
-        }
+    protected function mkdir(string $path) {
         if(!@mkdir($path)) {
-            throw new Zend_Exception($errMsg);
+            //DataProvider: Could not create folder "{path}"
+            throw new editor_Models_Import_DataProvider_Exception('E1245', [
+                'task' => $this->task,
+                'path' => $path,
+            ]);
         }
     }
     

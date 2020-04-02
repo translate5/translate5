@@ -65,7 +65,6 @@ class editor_Models_Import_SupportedFileTypes {
         //ZIP is not provided by a specific fileparser, but is supported by the core as container format
         // same for testcases
         $this->register(editor_Models_Import_UploadProcessor::TYPE_ZIP);
-        $this->register(editor_Models_Import_UploadProcessor::TYPE_TESTCASE);
     }
     
     /**

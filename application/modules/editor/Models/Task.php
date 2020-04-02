@@ -503,15 +503,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function getQmSubsegmentSeveritiesTranslated($asJson = true, array $row = null) {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
-        if(is_null($row))$row = $this->row->toArray();
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */
+        if(is_null($row)) {
+            $row = $this->row->toArray();
+        }
         $tree = Zend_Json::decode($row['qmSubsegmentFlags'], Zend_Json::TYPE_OBJECT);
         $result = array();
         foreach($tree->severities as $key => $label) {
             $result[] = (object)array('id' => $key, 'text' => $translate->_($label));
         }
         if($asJson){
-            return Zend_Json::encode($qmFlagTree);
+            return Zend_Json::encode($tree);
         }
         return $result;
     }
@@ -996,7 +998,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         
         if(!$daysOffset){
             throw new Zend_Exception('No task taskLifetimeDays configuration defined.');
-            return;
         }
         
         $daysOffset = (int)$daysOffset; //ensure that it is plain integer

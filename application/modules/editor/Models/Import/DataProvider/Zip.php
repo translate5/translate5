@@ -58,7 +58,11 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
 	public function archiveImportedData($filename = null) {
 	    $target = $this->getZipArchivePath($filename);
 	    if(file_exists($target)) {
-	        throw new Zend_Exception('TaskData Import Archive Zip already exists: '.$target);
+	        //DataProvider Zip: TaskData Import Archive Zip already exists
+	        throw new editor_Models_Import_DataProvider_Exception('E1243', [
+	            'task' => $this->task,
+	            'target' => $target,
+	        ]);
 	    }
 	    rename($this->importZip, $target);
 	}
@@ -69,10 +73,18 @@ class editor_Models_Import_DataProvider_Zip extends editor_Models_Import_DataPro
 	protected function unzip() {
 		$zip = new ZipArchive;
 		if (!$zip->open($this->importZip)) {
-			throw new Zend_Exception('Zip Datei ' . $this->importZip . ' konnte nicht geöffnet werden!');
+		    //DataProvider Zip: zip file could not be opened
+		    throw new editor_Models_Import_DataProvider_Exception('E1241', [
+		        'task' => $this->task,
+		        'zip' => $this->importZip,
+		    ]);
 		}
 		if(!$zip->extractTo($this->importFolder)){
-			throw new Zend_Exception('Zip Datei ' . $this->importZip . ' konnte nicht entpackt werden!');
+		    //DataProvider Zip: content from zip file could not be extracted
+		    throw new editor_Models_Import_DataProvider_Exception('E1242', [
+		        'task' => $this->task,
+		        'zip' => $this->importZip,
+		    ]);
 		}
 		$zip->close();
 	}
