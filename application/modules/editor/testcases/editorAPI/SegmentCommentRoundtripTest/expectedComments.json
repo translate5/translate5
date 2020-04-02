@@ -78,5 +78,73 @@
             "modified": "2019-08-21 12:00:24",
             "isEditable": false
         }
+    ],
+    [
+        {
+            "userGuid": "memoq-imported",
+            "userName": "JF",
+            "comment": "Hallo Marc!",
+            "created": "2020-03-10 12:06:20",
+            "modified": "2020-03-10 12:06:20",
+            "isEditable": false
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "Table RTF",
+            "comment": "und &lt;b&gt;nochmal&lt;\/b&gt; einer.\n (annotates Row column; from SourceFile)",
+            "created": "2020-01-28 10:22:33",
+            "modified": "2020-01-28 10:22:33",
+            "isEditable": false
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "Table RTF",
+            "comment": "Dies ist noch einer. \n (annotates Row column; from SourceFile)",
+            "created": "2020-01-28 10:22:33",
+            "modified": "2020-01-28 10:22:33",
+            "isEditable": false
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "user1",
+            "comment": "Dies ist ein Kommentar.",
+            "created": "2020-01-27 07:21:07",
+            "modified": "2020-01-27 07:21:07",
+            "isEditable": false
+        }
+    ],
+    [
+        {
+            "userGuid": "memoq-imported",
+            "userName": "JF",
+            "comment": "Hallo Marc!",
+            "created": "2020-03-10 12:06:20",
+            "modified": "2020-03-10 12:06:20",
+            "isEditable": false
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "Table RTF",
+            "comment": "und nochmal einer.\n (annotates Row column; from SourceFile)",
+            "created": "2020-01-28 10:22:33",
+            "modified": "2020-01-28 10:22:33",
+            "isEditable": false
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "Table RTF",
+            "comment": "Dies ist noch einer. \n (annotates Row column; from SourceFile)",
+            "created": "2020-01-28 10:22:33",
+            "modified": "2020-01-28 10:22:33",
+            "isEditable": false
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "user1",
+            "comment": "Dies ist ein Kommentar.",
+            "created": "2020-01-27 07:21:07",
+            "modified": "2020-01-27 07:21:07",
+            "isEditable": false
+        }
     ]
 ]

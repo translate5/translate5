@@ -75,11 +75,11 @@ class SegmentCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=100');
         $segmentIds = array_column($segments, 'id');
         $segments = $this->prepareSegmentsForTest($segments);
-        file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/SegmentCommentRoundtripTest/expectedSegments-new.json", json_encode($segments,JSON_PRETTY_PRINT));
+        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/SegmentCommentRoundtripTest/expectedSegments-new.json", json_encode($segments,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $segments, 'Imported segments are not as expected!');
 
         $comments = $this->getCommentsForTest($segmentIds);
-        file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/SegmentCommentRoundtripTest/expectedComments-new.json", json_encode($comments,JSON_PRETTY_PRINT));
+        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/SegmentCommentRoundtripTest/expectedComments-new.json", json_encode($comments,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedComments.json'), $comments, 'Imported comments are not as expected!');
     }
 
@@ -143,11 +143,11 @@ class SegmentCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=100');
         $segmentIds = array_column($segments, 'id');
         $segments = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/SegmentCommentRoundtripTest/expectedSegmentsAfterAdd-new.json", json_encode($segments,JSON_PRETTY_PRINT));
+        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/SegmentCommentRoundtripTest/expectedSegmentsAfterAdd-new.json", json_encode($segments,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegmentsAfterAdd.json'), $segments, 'Imported segments are not as expected!');
 
         $comments = $this->getCommentsForTest($segmentIds, true);
-        file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/SegmentCommentRoundtripTest/expectedCommentsAfterAdd-new.json", json_encode($comments,JSON_PRETTY_PRINT));
+        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/SegmentCommentRoundtripTest/expectedCommentsAfterAdd-new.json", json_encode($comments,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedCommentsAfterAdd.json'), $comments, 'Imported comments are not as expected!');
     }
 

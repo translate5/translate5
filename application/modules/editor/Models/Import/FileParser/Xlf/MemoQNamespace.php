@@ -85,7 +85,7 @@ class editor_Models_Import_FileParser_Xlf_MemoQNamespace extends editor_Models_I
             $comment->setUserName($attr['creatoruser'] ?? 'no user');
             $comment->setUserGuid(self::USERGUID);
 
-            $date = date(DATE_ISO8601, strtotime($attr['creatoruser'] ?? 'now'));
+            $date = date('Y-m-d H:i:s', strtotime($attr['time'] ?? 'now'));
             $comment->setCreated($date);
             $comment->setModified($date);
             $this->comments[] = $comment;
