@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -43,14 +43,14 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
 
     /**
      * Rekonstruiert in einem Segment die ursprüngliche Form der enthaltenen Tags
-     *  
+     *
      */
     protected function parseSegment($segment) {
-        //@todo nächste Zeile rauswerfen, wenn qm-subsegments im Export korrekt abgebildet werden. Das gleiche gilt für den vermerk in tasks.phtml 
+        //@todo nächste Zeile rauswerfen, wenn qm-subsegments im Export korrekt abgebildet werden. Das gleiche gilt für den vermerk in tasks.phtml
         $segment = preg_replace('"<img[^>]*>"','', $segment);
         return parent::parseSegment($segment);
     }
-    
+
     /**
      * sets $this->comments[$guid] = '<cmt-def id="'.$guid.'"><Comments><Comment severity="Medium" user="userName" date="2016-07-21T19:40:01.80725+02:00" version="1.0">comment content</Comment>...</Comments></cmt-def>';
      * @param int $segmentId
@@ -60,24 +60,20 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         $commentModel = ZfExtended_Factory::get('editor_Models_Comment');
         /* @var $commentModel editor_Models_Comment */
         $comments = $commentModel->loadBySegmentAndTaskPlain($segmentId, $this->_taskGuid);
-        
+
         //we may only run this function once per segment, so restrict to $field target
         if(empty($comments) || $field != 'target') {
             return $segment;
         }
-        
+
         $commentMeta = ZfExtended_Factory::get('editor_Models_Comment_Meta');
         /* @var $commentMeta editor_Models_Comment_Meta */
-        
+
         $tag = '<Comment severity="%1$s" user="%2$s" date="%3$s" version="%4$s">%5$s</Comment>';
-        $guidHelper = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-            'Guid'
-        );
-        /* @var $guidHelper ZfExtended_Controller_Helper_Guid */
-        
+
         //since we can not preserve mrksof comments on text parts only, all target comments always relate to the whole target
         //there fore one guid for all target comments of one segment is needed
-        $targetGuid = $guidHelper->create();
+        $targetGuid = ZfExtended_Utils::uuid();
         $cmtDefContainer = [];
         $hasTargetComments = false;
         foreach($comments as $comment) {
@@ -107,10 +103,10 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         //if only source comments, we don't have to add the markers since in source they exist already
         return $segment;
     }
-    
+
     /**
      * fills the given tagparams array with content for Comment tag generation
-     * returns the original source comment guid or empty string if target comment 
+     * returns the original source comment guid or empty string if target comment
      * @param array $comment
      * @param array $tagParams
      * @param editor_Models_Comment_Meta $commentMeta
@@ -134,7 +130,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
             $commentMeta->loadByCommentId($comment['id']);
             $tagParams['severity'] = $commentMeta->getSeverity();
             $tagParams['version'] = $commentMeta->getVersion();
-            
+
             //currenly only source comments may (and must since in skeleton) reuse there original id
             if($commentMeta->getAffectedField() === editor_Models_Import_FileParser_Sdlxliff::SOURCE) {
                 return $commentMeta->getOriginalId();
@@ -205,7 +201,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
     }
 
     /**
-     * 
+     *
      */
     protected function injectCommentsHead() {
         if(!empty($this->comments)){
@@ -216,9 +212,9 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
                 $this->_exportFile = str_replace('</doc-info>', '<cmt-defs>' . $commentsAsString . '</cmt-defs></doc-info>', $this->_exportFile);
             }
             else {
-                $this->_exportFile = 
+                $this->_exportFile =
                         preg_replace('"(<xliff[^>]*xmlns:sdl=\")([^\"]*)(\"[^>]*>)"',
-                                '\\1\\2\\3<doc-info xmlns="\\2"><cmt-defs>' . 
+                                '\\1\\2\\3<doc-info xmlns="\\2"><cmt-defs>' .
                                 $commentsAsString . '</cmt-defs></doc-info>', $this->_exportFile);
             }
         }
@@ -235,9 +231,9 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
                 $this->_exportFile = str_replace('</doc-info>', '<rev-defs>' . $revisions . '</rev-defs></doc-info>', $this->_exportFile);
             }
             else {
-                $this->_exportFile = 
+                $this->_exportFile =
                         preg_replace('"(<xliff[^>]*xmlns:sdl=\")([^\"]*)(\"[^>]*>)"',
-                                '\\1\\2\\3<doc-info xmlns="\\2"><rev-defs>' . 
+                                '\\1\\2\\3<doc-info xmlns="\\2"><rev-defs>' .
                                 $revisions . '</rev-defs></doc-info>', $this->_exportFile);
             }
         }

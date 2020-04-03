@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -37,27 +37,22 @@ END LICENSE AND COPYRIGHT
  * XLF Fileparser Add On to parse Across XLF specific stuff
  */
 class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_Export_FileParser_Xlf_AbstractNamespace{
-    /**
-     * @var array
-     */
-    protected $comments = [];
-    
     protected $currentPropertiesKey = null;
     protected $currentErrorInfosKey = null;
     protected $currentComments = [];
-    
+
     /**
      * xmlWriter instance, reusable instance
      */
     protected static $xmlWriter;
-    
+
     public function __construct() {
         if(empty(self::$xmlWriter)) {
             self::$xmlWriter = new XmlWriter();
             self::$xmlWriter->openMemory();
         }
     }
-    
+
     /**
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::registerParserHandler()
@@ -65,40 +60,30 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         //a little bit hackish but the easiest way to get the task
         $task = func_get_arg(1);
-        
+
         $config = Zend_Registry::get('config');
         if(! $config->runtimeOptions->editor->export->exportComments) {
-            //currently only the comment export feature is implemented in the across XLF, 
+            //currently only the comment export feature is implemented in the across XLF,
             // so if exporting comments is disabled we disable just the whole function
             return;
         }
-        
+
         $xmlparser->registerElement('trans-unit ax:named-properties', null, function($tag, $key, $opener) use ($xmlparser){
             $this->currentPropertiesKey = $key;
         });
         $xmlparser->registerElement('trans-unit ax:analysisResult ax:errorInfos', null, function($tag, $key, $opener) use ($xmlparser){
             $this->currentErrorInfosKey = $key;
         });
-        
+
         //must use another selector as in the Xlf Export itself. On using the same selector, the later one overwrites the first one
         $xmlparser->registerElement('trans-unit lekTargetSeg', null, function($tag, $key, $opener) use ($xmlparser, $task){
-            $attributes = $opener['attributes'];
-            if(empty($attributes['id']) && $attributes['id'] !== '0') {
-                throw new Zend_Exception('Missing id attribute in '.$xmlparser->getChunk($key));
-            }
-            $comment = ZfExtended_Factory::get('editor_Models_Comment');
-            /* @var $comment editor_Models_Comment */
-            $comments = $comment->loadBySegmentAndTaskPlain((int) $attributes['id'], $task->getTaskGuid());
-            if(empty($comments)) {
-                return;
-            }
-            $this->comments = array_merge($comments, $this->comments);
-            
+            $this->loadComments($opener['attributes'], $xmlparser, $task);
         });
+
         $xmlparser->registerElement('xliff trans-unit', null, function($tag, $key, $opener) use ($xmlparser){
             /*
             The following code adds translate5 comments as reals across comments.
-            The reading of such comments is not implemented in across yet. 
+            The reading of such comments is not implemented in across yet.
             So we disable it here and add the comments as analysis result
             $commentString = $this->processComments();
             if(empty($this->currentPropertiesKey)) {
@@ -110,11 +95,11 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
             }
             $xmlparser->replaceChunk($key, $replacement);
             */
-            
+
             $keyToReplace = $this->currentErrorInfosKey;
             $this->currentPropertiesKey = null;
             $this->currentErrorInfosKey = null;
-            
+
             $commentString = $this->processCommentsAsAnalysisResult();
             if(empty($commentString) && $commentString !== '0') {
                 return;
@@ -130,7 +115,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
             $xmlparser->replaceChunk($keyToReplace, $replacement);
         });
     }
-    
+
     /**
      * creates real across comments out of translate5 comments
      * @return string|mixed
@@ -148,7 +133,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
             self::$xmlWriter->startElement('ax:named-property');
             self::$xmlWriter->writeAttribute('name', 'Comment');
             $this->addNamedValue('Author', $comment['userName']);
-            $this->addNamedValue('Created', date('m/d/Y H:i:s', strtotime($comment['modified']))); 
+            $this->addNamedValue('Created', date('m/d/Y H:i:s', strtotime($comment['modified'])));
             $this->addNamedValue('Annotates', 'General');
             $this->addNamedValue('Title', 'exported from translate5');
             $this->addNamedValue('Text', $comment['comment']);
@@ -157,7 +142,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
         $this->comments = [];
         return self::$xmlWriter->flush();
     }
-    
+
     /**
      * creates a named value entry
      * @param string $name
@@ -169,9 +154,9 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
         self::$xmlWriter->text($value);
         self::$xmlWriter->endElement();
     }
-    
+
     /**
-     * returns the segment comments as across analysisresult 
+     * returns the segment comments as across analysisresult
      * @return string|mixed
      */
     protected function processCommentsAsAnalysisResult() {
@@ -186,7 +171,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
             }
             self::$xmlWriter->startElement('ax:errorInfo');
             self::$xmlWriter->startElement('ax:description');
-            
+
             self::$xmlWriter->startElement('ax:type');
             self::$xmlWriter->text('Comment');
             self::$xmlWriter->endElement();
@@ -201,7 +186,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
             self::$xmlWriter->endElement();
             self::$xmlWriter->startElement('ax:examples');
             self::$xmlWriter->endElement();
-            
+
             self::$xmlWriter->endElement(); //end ax:description
             self::$xmlWriter->endElement(); //end ax:errorInfo
         }

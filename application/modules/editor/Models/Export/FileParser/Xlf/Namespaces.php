@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -38,21 +38,24 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Export_FileParser_Xlf_Namespaces extends editor_Models_Export_FileParser_Xlf_AbstractNamespace {
     protected $namespaces = [];
-    
+
     public function __construct($xliff) {
         //TODO this code could be improved by moving the following checks into each namespace class and loop through the existing classes
         // instead of hardcoding the checks here
         if (strpos($xliff, editor_Models_Import_FileParser_Xlf_TmgrNamespace::IBM_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['ibm'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_TmgrNamespace');
-        } 
+        }
         if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Translate5Namespace::TRANSLATE5_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['translate5'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_Translate5Namespace');
-        } 
+        }
         if (strpos($xliff, editor_Models_Import_FileParser_Xlf_AcrossNamespace::ACROSS_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['across'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_AcrossNamespace');
         }
+        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_MemoQNamespace::MEMOQ_XLIFF_NAMESPACE) !== false) {
+            $this->namespaces['memoq'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_MemoQNamespace');
+        }
     }
-    
+
     /**
      * {@inheritDoc}
      * @see editor_Models_Export_FileParser_Xlf_AbstractNamespace::registerParserHandler()
@@ -60,7 +63,7 @@ class editor_Models_Export_FileParser_Xlf_Namespaces extends editor_Models_Expor
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         $this->call(__FUNCTION__, func_get_args());
     }
-    
+
     protected function call($function, $arguments) {
         $result = false;
         foreach ($this->namespaces as $namespace){

@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -69,7 +69,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
     public function diffSegment($target, $edited, $changeTimestamp, $userName) {
         $escapedGTagsTarget = array();
         $escapedGTagsEdited = array();
-        
+
         $this->_changeTimestamp = $changeTimestamp;
         $this->_userName = $userName;
 
@@ -78,13 +78,13 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
 
         $targetArr = $this->escapeSingleGTags($targetArr, $escapedGTagsTarget);
         $editedArr = $this->escapeSingleGTags($editedArr, $escapedGTagsEdited);
-        
+
         $targetArr = $this->replacePairGTagsTarget($targetArr);
         $editedArr = $this->replacePairGTagsEdited($editedArr);
 
         $targetArr = $this->replacePairMrkTags($targetArr);
         $editedArr = $this->replacePairMrkTags($editedArr);
-        
+
         $targetArr = $this->wordBreakUp($targetArr);
         $editedArr = $this->wordBreakUp($editedArr);
 
@@ -95,7 +95,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
         $diffRes = $diff->process($targetArr, $editedArr);
 
         $this->_diffResPartCount = count($diffRes);
-        
+
         $getGTagsInformation = $this->getGTagsInformation($diffRes);
         $getGTagsToComplement = $this->getGTagsToComplement($getGTagsInformation);
         foreach ($diffRes as $key => &$val) {
@@ -115,7 +115,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
             }
         }
         $diffRes = str_replace('g id="term___mrkTag___', 'g id="___mrkTag___', $diffRes);//remove the mark, that it had been a term-Tag, because we do not need it anymore
-        $diffRes = preg_replace_callback('"<g id=\"___mrkTag___([^\"]+)\""', function ($match) { 
+        $diffRes = preg_replace_callback('"<g id=\"___mrkTag___([^\"]+)\""', function ($match) {
                 return '<mrk '.pack('H*', $match[1]); }, $diffRes);
         $diffRes = preg_replace('"</g id=\"___mrkTag___[^\"]+\""', '</mrk', $diffRes);
         $diffRes = preg_replace('"</g id=\"[^\"]+\""', '</g', $diffRes);
@@ -125,7 +125,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
 
     /**
      * restores all tags escaped by escapeSingleGTags
-     * 
+     *
      * @param array $segment
      * @param array $escapedIds
      * @return array $segment
@@ -140,7 +140,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
     /**
      * converts all single (self-closing) g-tags to a x-tag to work around problems in diff-tagging
      * must be used after tagBreakUp
-     * 
+     *
      * @param array $segment
      * @param array $escapedIds
      * @return array $segment
@@ -157,7 +157,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
         }
         return preg_replace($regex,'\\1x\\2\\3_esc\\4', $segment);
     }
-    
+
     /**
      * joins for the diff the tags, which mark a term and all words within to one
      * string to avoid invalid xml after the diff (and it makes sense anyway, cause
@@ -241,7 +241,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
 
     /**
      * this function has to take care of the fact, that tag-ids in a segment do not have to be unique. Therefore it is complex
-     * 
+     *
      * @param array $getGTagsInformation structure as returned by function getGTagsInformation
      * @return array getGTagsToComplement same array-format like getGTagsInformation, but only the tagIds included, for which some of the tags have been changed and some have not
      */
@@ -439,9 +439,11 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 }
             }
             $addition = implode('', $i);
-            if($addition === '')return '';
-            return '<mrk mtype="x-sdl-added" sdl:revid="' . 
-                    $this->addAdditionRevision($this->_changeTimestamp, $this->_userName)
+            if($addition === '') {
+                return '';
+            }
+            return '<mrk mtype="x-sdl-added" sdl:revid="' .
+                $this->addRevision($this->_changeTimestamp, $this->_userName, true)
                     . '">' . $addition . '</mrk>';
         }
         return '';
@@ -480,7 +482,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                                 else{
                                     $end .= '</g>';
                                 }
-                                
+
                             }
                             $val = str_replace(array('</g', '>'), array('<g', ' sdl:start="false" />'), $val);
                         }
@@ -501,9 +503,11 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 }
             }
             $deletion = implode('', $d);
-            if($deletion === '')return '';
-            return '<mrk mtype="x-sdl-deleted" sdl:revid="' . 
-                    $this->addDeleteRevision($this->_changeTimestamp, $this->_userName) . '">' .
+            if($deletion === ''){
+                return '';
+            }
+            return '<mrk mtype="x-sdl-deleted" sdl:revid="' .
+                $this->addRevision($this->_changeTimestamp, $this->_userName, false) . '">' .
                     $deletion . $end;
         }
         return '';
@@ -547,7 +551,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
             $i++;
         }
         if (count($openIds) > 0) {
-            //The number of opening and closing g-Tags had not been the same! 
+            //The number of opening and closing g-Tags had not been the same!
             throw new editor_Models_Export_DiffTagger_Exception('E1090',[
                 'segment' => implode('', $segment),
             ]);
@@ -645,13 +649,13 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
         }
         return $segment;
     }
-    
+
     /**
      * splits the segment up into HTML tags / entities on one side and plain text on the other side
      * The order in the array is important for the following wordBreakUp, since there are HTML tags and entities ignored.
      * Caution: The ignoring is done by the array index calculation there!
      * So make no array structure changing things between word and tag break up!
-     * 
+     *
      * Sdlxliff has different regex as the csv.
      *
      * @param string $segment
