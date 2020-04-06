@@ -917,8 +917,9 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         
         //if the totals segment count is not set, update it before the entity is saved
-        if($this->entity->getSegmentCount()==null || $this->entity->getSegmentCount()<1){
-            $this->entity->setSegmentCount($this->entity->getTotalSegmentsCount($taskguid));
+        if($this->entity->getSegmentCount() === null || $this->entity->getSegmentCount() < 1) {
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            $this->entity->setSegmentCount($segment->getTotalSegmentsCount($taskguid));
         }
         
         $this->entity->save();

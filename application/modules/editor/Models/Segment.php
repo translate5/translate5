@@ -520,6 +520,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Counts words; word boundary is used as defined in runtimeOptions.editor.export.wordBreakUpRegex
+     * @deprecated editor_Models_Segment_WordCount should be used instead
      * @param string $segmentContent
      * @return integer
      */
@@ -1662,6 +1663,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             ->where('targetMd5 != ?', 'd41d8cd98f00b204e9800998ecf8427e');
         $x = $this->db->fetchRow($s);
         return ((int) $x->cnt) == 0;
+    }
+    
+    /**
+     * Get the total segment count for given taskGuid
+     * @param string $taskGuid
+     * @return number|mixed
+     */
+    public function getTotalSegmentsCount(string $taskGuid){
+        $this->reInitDb($taskGuid);
+        $s = $this->db->select(true)
+        ->columns('count(*) as cnt')
+        ->where('`taskGuid`=?', $taskGuid);
+        
+        $result = $this->db->fetchRow($s);
+        return $result['cnt'] ?? 0;
     }
     
     /***

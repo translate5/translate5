@@ -55,6 +55,8 @@ END LICENSE AND COPYRIGHT
  * @method void setAutopropagated() setAutopropagated(int $autopropagated)
  * @method integer getLocked() getLocked()
  * @method void setLocked() setLocked(int $locked)
+ * @method integer getSourceWordCount() getSourceWordCount()
+ * @method void setSourceWordCount() setSourceWordCount(int $count)
  */
 class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
@@ -119,5 +121,19 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
                 ->where('taskGuid = ?', $taskGuid);
         $fonts = $this->db->fetchAll($sql);
         return $fonts->toArray();
+    }
+    
+    /**
+     * Returns the word count sum of a task as calculated on import
+     * @param string $taskGuid
+     * @return int
+     */
+    public function getWordCountSum(string $taskGuid): int {
+        $s = $this->db->select(true)
+        ->columns('sum(*) as wordCount')
+        ->where('`taskGuid` = ?', $taskGuid);
+        
+        $result = $this->db->fetchRow($s);
+        return $result['wordCount'] ?? 0;
     }
 }

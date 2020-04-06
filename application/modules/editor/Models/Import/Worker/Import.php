@@ -107,8 +107,7 @@ class editor_Models_Import_Worker_Import {
         $this->syncFileOrder();
         $this->importRelaisFiles();
         $this->task->createMaterializedView();
-        $this->calculateEmptyTargets();
-        $this->updateSegmentCount();
+        $this->calculateMetrics();
         //saving task twice is the simplest way to do this. has meta data is only available after import.
         $this->task->save();
         
@@ -155,6 +154,7 @@ class editor_Models_Import_Worker_Import {
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
             $filesProcessedAtAll++;
+            //wordcount provided by import format
             $this->countWords($parser->getWordCount());
         }
         
@@ -204,17 +204,24 @@ class editor_Models_Import_Worker_Import {
         }
     }
     
-    protected function calculateEmptyTargets() {
+    /**
+     * Calculates and sets the task metrics emptyTargets (bool), wordCount (int) and segmentCount(int)
+     */
+    protected function calculateMetrics() {
+        $taskGuid = $this->task->getTaskGuid();
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
-        $this->task->setEmptyTargets($segment->hasEmptyTargetsOnly($this->task->getTaskGuid()));
-    }
-    
-    /***
-     * Update the segment count for the task
-     */
-    protected function updateSegmentCount(){
-        $this->task->setSegmentCount($this->task->getTotalSegmentsCount($this->task->getTaskGuid()));
+        $meta = $segment->meta();
+        
+        /* @var $segment editor_Models_Segment */
+        $this->task->setEmptyTargets($segment->hasEmptyTargetsOnly($taskGuid));
+
+        //we may set the tasks wordcount only to our calculated values if there was no count given either by API or by import formats
+        if ($this->task->getWordCount() == 0) {
+            $this->task->setWordCount($meta->getWordCountSum($taskGuid));
+        }
+        
+        $this->task->setSegmentCount($segment->getTotalSegmentsCount($taskGuid));
     }
     
     /**

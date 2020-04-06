@@ -1167,20 +1167,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /***
-     * Get the total segment count for given taskGuid
-     * @param string $taskGuid
-     * @return number|mixed
-     */
-    public function getTotalSegmentsCount(string $taskGuid){
-        $s = $this->db->select()
-        ->setIntegrityCheck(false)
-        ->from('LEK_segments',['COUNT(*) as total'])
-        ->where('`taskGuid`=?', $taskGuid);
-        $result= $this->db->getAdapter()->fetchRow($s);
-        return $result['total'] ?? 0;
-    }
-
-    /***
      * Update the segment finish count based on the task workflow step valid autostates
      * @param editor_Models_Task $task
      */
