@@ -188,8 +188,8 @@ Ext.define('Editor.controller.TmOverview', {
     },
     handleAfterShow: function(panel) {
         this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
-        Editor.data.helpSection = 'languageresource';
-        Editor.data.helpSectionTitle = panel.getTitle();
+        //fire the global event for component view change
+        Ext.fireEvent('componentViewChanged','languageresource',panel.getTitle());
     },
     handleAfterHide: function() {
         this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').show();

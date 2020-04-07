@@ -267,9 +267,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
           $this->view->Php2JsVars()->set('supportedBrowsers', $rop->supportedBrowsers->toArray());
       }
       
-      //default state configuration for frontend components(grid)
-      $this->view->Php2JsVars()->set('frontend.defaultState', $rop->frontend->defaultState->toArray());
-      
       //create mailto link in the task list grid pm name column
       $this->view->Php2JsVars()->set('frontend.tasklist.pmMailTo', (boolean)$rop->frontend->tasklist->pmMailTo);
       
@@ -728,51 +725,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $this->view->noMatch = true;
             $this->view->enOut[] = ['text' => $enXliff($inputKey, $input, $input), 'matchrate' => 0];
         }
-        
-        
-    }
-    
-    public function testnotifyAction() {
-        $this->_helper->layout->disableLayout();
-        $this->_helper->viewRenderer->setNoRender();
-        
-        $class = 'editor_Workflow_Notification';
-        
-        
-        $config = ZfExtended_Factory::get('editor_Workflow_Actions_Config');
-        /* @var $config editor_Workflow_Actions_Config */
-        $config->workflow = ZfExtended_Factory::get('editor_Workflow_Default');
-        $config->newTua = null;
-        $config->oldTask = ZfExtended_Factory::get('editor_Models_Task');
-        $config->oldTask->init([
-            'taskGuid' => '{97789a10-0bbb-4de5-b4b0-c5caceba3b25}',
-            'taskNr' => '',
-            'taskName' => 'Test Task',
-            'sourceLang' => 5,
-            'targetLang' => 4,
-            'relaisLang' => 4,
-            'state' => 'open',
-            'workflow' => 'default',
-            'workflowStep' => '1',
-            'workflowStepName' => 'reviewing',
-            'pmGuid' => '{dab18309-7dfd-4185-b27e-f490c3dcb888}',
-            'pmName' => 'PM Username',
-            'wordCount' => '123',
-            'orderdate' => '2017-12-20 00:00:00',
-        ]);
-        $config->task = $config->oldTask;
-        $config->importConfig = new editor_Models_Import_Configuration();
-        $config->importConfig->importFolder = APPLICATION_PATH.'/needed/';
-        $config->importConfig->setLanguages('de', 'it', '', ZfExtended_Languages::LANG_TYPE_RFC5646);
-        $config->importConfig->userGuid = '{F1D11C25-45D2-11D0-B0E2-444553540101}';
-        $config->importConfig->userName = 'Thomas Lauria';
-        
-        $notify = ZfExtended_Factory::get($class);
-        /* @var $notify editor_Workflow_Notification */
-        $notify->init($config);
-        $notify->testNotifications();
-        echo "Sent dummy test Mails";
-        exit;
     }
 }
 

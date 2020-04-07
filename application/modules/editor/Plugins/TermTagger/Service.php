@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -30,6 +30,11 @@ END LICENSE AND COPYRIGHT
  * Service Class of Plugin "TermTagger"
  */
 class editor_Plugins_TermTagger_Service {
+    /**
+     * The timeout for connections is fix, the request timeout depends on the request type and comes from the config
+     * @var integer
+     */
+    const CONNECT_TIMEOUT = 10;
     
     /**
      * @var ZfExtended_Logger
@@ -69,6 +74,16 @@ class editor_Plugins_TermTagger_Service {
     protected $generalTrackChangesHelper;
     
     /**
+     * @var integer
+     */
+    protected $openTimeout;
+    
+    /**
+     * @var integer
+     */
+    protected $tagTimeout;
+    
+    /**
      * Two corresponding array to hold replaced tags.
      * Tags must be replaced in every text-element before send to the TermTagger-Server,
      * because TermTagger can not handle with already TermTagged-text.
@@ -77,7 +92,7 @@ class editor_Plugins_TermTagger_Service {
     private $replacedTagsReplacements = array();
     
     /**
-     * Container for segment data needed before and after tagging 
+     * Container for segment data needed before and after tagging
      * @var array
      */
     private $segments = array();
@@ -89,8 +104,14 @@ class editor_Plugins_TermTagger_Service {
     private $replaceCounter = 1;
     
     
-    
-    public function __construct($logDomain) {
+    /**
+     * @param string $logDomain the domain to be used for the internal logger instance
+     * @param integer $tagTimeout the timeout to be used for tagging
+     * @param integer $openTbxTimeout the timeout to be used for opening a TBX
+     */
+    public function __construct(string $logDomain, int $tagTimeout, int $openTbxTimeout) {
+        $this->tagTimeout = $tagTimeout;
+        $this->openTimeout = $openTbxTimeout;
         $this->log = Zend_Registry::get('logger')->cloneMe($logDomain);
         $config = Zend_Registry::get('config');
         $this->config = $config->runtimeOptions->termTagger;
@@ -109,7 +130,7 @@ class editor_Plugins_TermTagger_Service {
     }
     
     /**
-     * returns the HTTP Status of the last request 
+     * returns the HTTP Status of the last request
      * @return integer
      */
     public function getLastStatus() {
@@ -128,13 +149,16 @@ class editor_Plugins_TermTagger_Service {
     /**
      * Checks if there is a TermTagger-server behind $url.
      * @param string $url url of the TermTagger-Server
-     * @return boolean true if there is a TermTagger-Server behind $url 
+     * @return boolean true if there is a TermTagger-Server behind $url
      */
     public function testServerUrl(string $url, &$version = null) {
         $httpClient = $this->getHttpClient($url.'/termTagger');
         $httpClient->setHeaders('accept', 'text/html');
         try {
             $response = $this->sendRequest($httpClient, $httpClient::GET);
+        }
+        catch(editor_Plugins_TermTagger_Exception_TimeOut $e) {
+            return true; // the request URL is probably a termtagger which can not respond due it is processing data
         }
         catch(editor_Plugins_TermTagger_Exception_Down $e) {
             return false;
@@ -151,14 +175,18 @@ class editor_Plugins_TermTagger_Service {
     /**
      * If no $tbxHash given, checks if the TermTagger-Sever behind $url is alive.
      * If $tbxHash is given, check if Server has loaded the tbx-file with the id $tbxHash.
-     * 
+     *
      * @param string $url url of the TermTagger-Server
      * @param string tbxHash unique id for a tbx-file
-     * 
+     *
      * @return boolean True if ping was succesfull
      */
     public function ping(string $url, $tbxHash = false) {
         $httpClient = $this->getHttpClient($url.'/termTagger/tbxFile/'.$tbxHash);
+        $httpClient->setConfig([
+            'timeout' => self::CONNECT_TIMEOUT,
+            'request_timeout' => $this->tagTimeout //for pinging we just the same timeout as for tagging
+        ]);
         $response = $this->sendRequest($httpClient, $httpClient::HEAD);
         return ($response && (($tbxHash !== false && $this->wasSuccessfull()) || ($tbxHash === false && $this->getLastStatus() == 404)));
     }
@@ -166,10 +194,10 @@ class editor_Plugins_TermTagger_Service {
     
     /**
      * Load a tbx-file $tbxFilePath into the TermTagger-server behind $url where $tbxHash is a unic id for this tbx-file
-     *  
+     *
      * @param string $url url of the TermTagger-Server
      * @param string $tbxHash TBX hash
-     * @param string $tbxData TBX data 
+     * @param string $tbxData TBX data
      * @throws editor_Plugins_TermTagger_Exception_Open
      * @throws editor_Plugins_TermTagger_Exception_Request
      * @return Zend_Http_Response
@@ -189,7 +217,10 @@ class editor_Plugins_TermTagger_Service {
         
         // send request to TermTagger-server
         $httpClient = $this->getHttpClient($url.'/termTagger/tbxFile/');
-        $httpClient->setConfig(array('timeout' => (integer)$this->config->timeOut->tbxParsing));
+        $httpClient->setConfig([
+            'timeout' => self::CONNECT_TIMEOUT,
+            'request_timeout' => $this->openTimeout
+        ]);
         $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
         $response = $this->sendRequest($httpClient, $httpClient::POST);
         $success = $this->wasSuccessfull();
@@ -217,10 +248,12 @@ class editor_Plugins_TermTagger_Service {
      */
     protected function sendRequest(Zend_Http_Client $client, $method) {
         $this->lastStatus = false;
+        $start = microtime(true);
         try {
             $result = $client->request($method);
             if(ZfExtended_Debug::hasLevel('plugin', 'TermTagger')) {
                 $rand = rand();
+                error_log("TermTagger Duration (id: $rand): ".(microtime(true) - $start).'s');
                 error_log("TermTagger Request (id: $rand): ".print_r($client->getLastRequest(),1));
                 error_log("TermTagger Answer (to id $rand): ".print_r($result->getRawBody(),1));
             }
@@ -234,26 +267,24 @@ class editor_Plugins_TermTagger_Service {
                 'termTaggerUrl' => $client->getUri(true),
             ];
             
-            //currently we add all of the requested data to the log. Perhaps we get the problem which crashes the tagger
-            // on TBX upload we don't put the request to save memory
-            if(strpos($extraData['termTaggerUrl'], '/termTagger/tbxFile/') === false) {
-                $extraData['termTaggerRequest'] = print_r($client->getLastRequest(),1);
-                $extraData['termTaggerAnswer'] = print_r(!empty($result) && $result->getRawBody(),1);
-            }
-            
             //if the error is one of the following, we have a connection problem
-            //TODO add other similar checks here too
             //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://localhost:8080. Error #111: Connection refused
-            //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Read timed out after 10 seconds
             //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://michgibtesdefinitivnichtalsdomain.com:8080. Error #0: php_network_getaddresses: getaddrinfo failed: Name or service not known
-            if($isInAdapter && (strpos($msg, 'Read timed out after') === 0 || strpos($msg, 'Unable to Connect to') === 0)) {
-                throw new editor_Plugins_TermTagger_Exception_Down('E1129', $extraData, $httpException);
+            //the following IP is not routed, so it trigers a timeout on connection connect, which must result in "Unable to connect" too and not in a request timeout below
+            //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://10.255.255.1:8080. Error #111: Connection refused
+            //if the error is one of the following, we have a request timeout
+            //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Read timed out after 10 seconds
+            if($isInAdapter) {
+                if(strpos($msg, 'Read timed out after') === 0) {
+                    throw new editor_Plugins_TermTagger_Exception_TimeOut('E1240', $extraData, $httpException);
+                }elseif(strpos($msg, 'Unable to Connect to') === 0) {
+                    throw new editor_Plugins_TermTagger_Exception_Down('E1129', $extraData, $httpException);
+                }
             }
             
             //Error in communication with TermTagger
             $ecode = 'E1119';
             //This error points to an crash of the termtagger, so we can log additional data here
-            // Zend_Http_Client_Exception('Unable to read response, or response is empty');
             if($httpException instanceof Zend_Http_Client_Exception && strpos($msg, 'Unable to read response, or response is empty') === 0) {
                 $ecode = 'E1130';
             }
@@ -274,11 +305,11 @@ class editor_Plugins_TermTagger_Service {
     }
     
     /**
-     * TermTaggs segment-text(s) in $data on TermTagger-server $url 
-     * 
+     * TermTaggs segment-text(s) in $data on TermTagger-server $url
+     *
      * @param string $url
      * @param editor_Plugins_TermTagger_Service_ServerCommunication $data
-     * 
+     *
      * @return Zend_Http_Response or null on error
      */
     public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
@@ -291,7 +322,10 @@ class editor_Plugins_TermTagger_Service {
         $httpClient = $this->getHttpClient($url.'/termTagger/termTag/');
         
         $httpClient->setRawData(json_encode($data), 'application/json');
-        $httpClient->setConfig(array('timeout' => (integer)$this->config->timeOut->segmentTagging));
+        $httpClient->setConfig([
+            'timeout' => self::CONNECT_TIMEOUT,
+            'request_timeout' => $this->tagTimeout
+        ]);
         $response = $this->sendRequest($httpClient, $httpClient::POST);
         
         if(!$this->wasSuccessfull()) {
@@ -314,9 +348,7 @@ class editor_Plugins_TermTagger_Service {
             ]);
         }
         
-        $response = $this->decodeSegments($response, $data);
-        
-        return $response;
+        return $this->decodeSegments($response, $data);
     }
     
     /**
@@ -335,7 +367,7 @@ class editor_Plugins_TermTagger_Service {
 
     /**
      * restores our internal tags from the delivered img tags
-     * 
+     *
      * @param stdClass $data
      * @param editor_Plugins_TermTagger_Service_ServerCommunication $requests
      * @return stdClass

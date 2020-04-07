@@ -27,14 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * This class provides a general Worker which can be configured with a callback method which.
- * This class is designed for simple workers which dont need a own full blown worker class.
- * 
- * The following parameters are needed: 
- * class → the class which should be instanced on work. Classes with Constructor Parameters are currently not supported!
- * method → the class method which is called on work. The method receives the taskguid and the whole parameters array.
- * 
- * Be careful: This class can not be used in worker_dependencies !
+ * This Worker reopens the task after the import was successful
  */
 class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Import_Worker_Abstract {
     /**
@@ -42,7 +35,10 @@ class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Import_Wor
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        return empty($parameters);
+        if(empty($parameters['config']) || !$parameters['config'] instanceof editor_Models_Import_Configuration) {
+            throw new ZfExtended_Exception('missing or wrong parameter config, must be if instance editor_Models_Import_Configuration');
+        }
+        return true;
     }
     
     /**
@@ -62,8 +58,6 @@ class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Import_Wor
         $task->save();
         $task->unlock();
         
-        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        $eventManager->trigger('importCompleted', $this, array('task' => $task));
         return true;
     }
     

@@ -61,13 +61,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected $internalFuzzy=false;
 
-    /***
-     * Segment word count calculator
-     * 
-     * @var editor_Models_Segment_WordCount
-     */
-    protected $wordCount;
-    
     protected $connectorErrorCount = [];
     
     /**
@@ -126,15 +119,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         $taskTotalWords=0;
         //init the word count calculator
-        $this->initWordCount();
         foreach($segments as $segment) {
             /* @var $segment editor_Models_Segment */
 
-            $this->wordCount->setSegment($segment);
-            
-            //collect the total words in the task
-            $taskTotalWords+=$this->wordCount->getSourceCount();
-            
             //get the best match rate, respecting repetitions
             $bestMatchRateResult = $this->handleRepetition($segment);
             
@@ -175,11 +162,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         //remove fuzzy languageResource from opentm2
         $this->removeFuzzyResources();
-        
-        //update the task total words
-        $this->task->setWordCount($taskTotalWords);
-        $this->task->save();
-        
+
         return true;
     }
     
@@ -393,7 +376,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param mixed $matchRateResult : it can be stdClass (opentm2 match result) or int (only the matchrate)
      * @param int $languageResourceid
      */
-    public function saveAnalysis($segment,$matchRateResult,$languageResourceid){
+    protected function saveAnalysis($segment,$matchRateResult,$languageResourceid){
         $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
         /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
         $matchAnalysis->setSegmentId($segment->getId());
@@ -401,7 +384,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
         $matchAnalysis->setAnalysisId($this->analysisId);
         $matchAnalysis->setLanguageResourceid($languageResourceid);
-        $matchAnalysis->setWordCount($this->wordCount->getSourceCount());
+        $matchAnalysis->setWordCount($segment->meta()->getSourceWordCount());
         $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
 
         $isFuzzy=false;
@@ -454,6 +437,16 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             try {
                 $connector=$manager->getConnector($languageresource,$this->task->getSourceLang(),$this->task->getTargetLang());
 
+                $moreInfo='';
+                //throw a worning if the language resource is not available
+                if($connector->getStatus($moreInfo)!=editor_Services_Connector_Abstract::STATUS_AVAILABLE){
+                    $this->log->warn('E1239','MatchAnalysis Plug-In: The associated language resource "{name}" is not available for match analysis and pre-translations.',[
+                        'task' => $this->task,
+                        'name' => $languageresource->getName(),
+                        'languageResource' => $languageresource,
+                    ]);
+                    continue;
+                }
                 //collect the mt resource, so it can be used for pretranslations if needed
                 //collect only if it has matchrate >= of the current set pretranslationMatchrate
                 if($resource->getType()==editor_Models_Segment_MatchRateType::TYPE_MT){
@@ -461,7 +454,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 }
                 //store the languageResource
                 $this->resources[$languageresource->getId()] = $languageresource;
-            } catch (ZfExtended_Exception $e) {
+            } catch (Exception $e) {
                 $this->log->warn('E1102', 'Unable to use connector from Language Resource "{name}". Error was: "{msg}".', [
                     'task' => $this->task,
                     'name' => $languageresource->getName(),
@@ -492,21 +485,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         }
         return $this->connectors;
     }
-    
-    /***
-     * Init word counter 
-     */
-    protected function initWordCount(){
-        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        
-        $langModel->load($this->task->getSourceLang());
-        
-        $this->wordCount=ZfExtended_Factory::get('editor_Models_Segment_WordCount',[
-            $langModel->getRfc5646()
-        ]);
-    }
-    
+
     /***
      * Remove fuzzy resources from the opentm2
      */

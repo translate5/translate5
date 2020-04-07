@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -71,6 +71,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
     const SEGMENT_STATE_TAGGED = 'tagged';
     const SEGMENT_STATE_DEFECT = 'defect';
     const SEGMENT_STATE_RETAG = 'retag';
+    const SEGMENT_STATE_OVERSIZE = 'oversized';
     //const SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
     
     /**
@@ -125,7 +126,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      * it should be based on maxParallelProcesses instead of just having one running worker per slot. maxParallelProcesses is ignored so far.
      * @param int $parentId
      * @param string $state
-     * 
+     *
      * @see ZfExtended_Worker_Abstract::queue()
      */
     public function queue($parentId = 0, $state = NULL) {
@@ -160,7 +161,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      * and with transNotFound if not. A translation which is of type
      * editor_Models_Term::STAT_DEPRECATED or editor_Models_Term::STAT_SUPERSEDED
      * is handled as transNotFound
-     * 
+     *
      * @param array $segments array of stdClass. example: array(object(stdClass)#529 (4) {
       ["field"]=>
       string(10) "targetEdit"
@@ -171,7 +172,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
       ["target"]=>
       string(149) "Il nuovo dépliant PRODUCT INFO <div title="" class="term admittedTerm transNotFound stemmed" data-tbxid="term_00_1_IT_1_08795">motori</div>"),
        another object, ...
-     * 
+     *
      * @return stdClass $segments
     }
      */
@@ -189,7 +190,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
     
     
     /**
-     * (non-PHPdoc) 
+     * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::calculateQueuedSlot()
      */
     protected function calculateQueuedSlot() {
@@ -200,7 +201,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
     /**
      * Calculates the resource and slot for the given $resourcePool
      * Some kind of "load-balancing" is used in calculations so every resource/slot-combination is used in the same weight
-     * 
+     *
      * @param string $resourcePool
      * @return array('resource' => resourceName, 'slot' => slotName)
      */
@@ -245,7 +246,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
     
     
     /**
-     * 
+     *
      * @return array
      */
     protected function getAvailableSlots($resourcePool = 'default') {
@@ -309,45 +310,46 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      * If not already loaded, tries to load the tbx-file from the task.
      * Throws Exceptions if TBX could not be loaded!
      * @throws editor_Plugins_TermTagger_Exception_Abstract
+     * @param editor_Plugins_TermTagger_Service $termTagger the TermTagger Service to be used
      * @param string $url the TermTagger-server-url
      * @param string $tbxHash unique id of the tbx-file
      */
-    protected function checkTermTaggerTbx($url, &$tbxHash) {
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain()]);
-        /* @var $termTagger editor_Plugins_TermTagger_Service */
-        
-        // test if tbx-file is already loaded
-        if (!empty($tbxHash) && $termTagger->ping($url, $tbxHash)) {
-            return;
+    protected function checkTermTaggerTbx(editor_Plugins_TermTagger_Service $termTagger, $url, &$tbxHash) {
+        try {
+            // test if tbx-file is already loaded
+            if (!empty($tbxHash) && $termTagger->ping($url, $tbxHash)) {
+                return;
+            }
+            //getDataTbx also creates the TbxHash
+            $tbx = $this->getTbxData();
+            $tbxHash = $this->task->meta()->getTbxHash();
+            $termTagger->open($url, $tbxHash, $tbx);
         }
-        
+        catch (editor_Plugins_TermTagger_Exception_Abstract $e) {
+            $e->addExtraData([
+                'task' => $this->task,
+                'termTaggerUrl' => $url,
+            ]);
+            throw $e;
+        }
+    }
+    
+    /**
+     * returns the TBX string to be loaded into the termtagger
+     * @throws editor_Plugins_TermTagger_Exception_Open
+     * @return string
+     */
+    protected function getTbxData() {
         // try to load tbx-file to the TermTagger-server
         $tbxPath = $this->getTbxFilename($this->task);
         $tbxParser = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         /* @var $tbxParser editor_Models_Import_TermListParser_Tbx */
         try {
-            $tbxData = $tbxParser->assertTbxExists($this->task, new SplFileInfo($tbxPath));
+            return $tbxParser->assertTbxExists($this->task, new SplFileInfo($tbxPath));
         }
         catch (editor_Models_Term_TbxCreationException $e) {
             //'E1116' => 'Could not load TBX into TermTagger: TBX hash is empty.',
-            throw new editor_Plugins_TermTagger_Exception_Open('E1116', [
-                'task' => $this->task,
-                'termTaggerUrl' => $url,
-            ], $e);
-        }
-        
-        $tbxHash = $this->task->meta()->getTbxHash();
-        $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain()]);
-        /* @var $service editor_Plugins_TermTagger_Service */
-        
-        try {
-            $service->open($url, $tbxHash, $tbxData);
-        }
-        catch (editor_Plugins_TermTagger_Exception_Abstract $e) {
-            $e->addExtraData([
-                'task' => $this->task
-            ]);
-            throw $e;
+            throw new editor_Plugins_TermTagger_Exception_Open('E1116', [], $e);
         }
     }
 }

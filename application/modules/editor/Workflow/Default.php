@@ -62,6 +62,15 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
     }
 
     /**
+     * {@inheritDoc}
+     * @see editor_Workflow_Abstract::handleImportCompleted()
+     */
+    protected function handleImportCompleted(){
+        $this->doDebug(__FUNCTION__);
+        $this->callActions(__FUNCTION__);
+    }
+
+    /**
      * (non-PHPdoc)
      * @see editor_Workflow_Abstract::handleAllFinishOfARole()
      */

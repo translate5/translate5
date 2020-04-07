@@ -162,7 +162,8 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
             $firstName, $surName, $userName, $role
         );
         $stmt = $this->db->getAdapter()->query($sql, $bindings);
-        if($stmt->columnCount() > 0) {
+
+        if($stmt->rowCount() > 0) {
             //we trigger the event only, if really something was changed.
             $this->events->trigger('afterUserTrackingInsert', $this, [
                 'taskGuid' => $taskGuid, 

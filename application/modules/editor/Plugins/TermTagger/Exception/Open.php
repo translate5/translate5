@@ -31,5 +31,11 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Plugins_TermTagger_Exception_Open extends editor_Plugins_TermTagger_Exception_Abstract {
+    /**
+     * if a TBX could not be loaded into the termtagger this should be an error
+     * @var integer
+     */
+    protected $level = ZfExtended_Logger::LEVEL_ERROR;
+    
     //localErrorCodes see parent abstract
 }

@@ -331,8 +331,18 @@ class AppInstance {
         }
         
         //TODO implement messagequeue in a more general manner, currently only usable for resync instances
-        while(!$conn->messageQueue->isEmpty()) {
-            $message = $conn->messageQueue->dequeue();
+        
+        if(!isset($conn->messageQueue)) {
+            return;
+        }
+        
+        //we have to decouple the messageQueue from the connection and process it independantly, 
+        // otherwise we may stuck in an endless loop here, when the dequeued message is directly queued again in passFrontendMessage
+        $queue = $conn->messageQueue;
+        /* @var $queue \SplQueue */
+        unset($conn->messageQueue); //ensure that for that connection the queue is deleted
+        while(!$queue->isEmpty()) {
+            $message = $queue->dequeue();
             $this->passFrontendMessage($message, $conn);
         }
     }
@@ -387,6 +397,7 @@ class AppInstance {
     }
     
     public function debug(): array {
+$this->sessions = [];
         $data = [
             'instance' => $this->serverId,
             'instanceName' => $this->serverName,

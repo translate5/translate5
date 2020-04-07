@@ -302,6 +302,12 @@ abstract class editor_Workflow_Abstract {
             $this->newTask = $event->getParam('task');
             $this->handleBeforeImport();
         });
+        
+        $events->attach('editor_Models_Import_Worker_FinalStep', 'importCompleted', function(Zend_EventManager_Event $event){
+            $this->newTask = $event->getParam('task');
+            $this->importConfig = $event->getParam('importConfig');
+            $this->handleImportCompleted();
+        });
     }
     
     /**
@@ -1407,6 +1413,11 @@ abstract class editor_Workflow_Abstract {
      * will be called directly before import is started, task is already created and available
      */
     abstract protected function handleBeforeImport();
+    
+    /**
+     * will be called after import (in set task to open worker) after the task is opened and the import is complete.
+     */
+    abstract protected function handleImportCompleted();
     
     /**
      * will be called after a user has finished a task
