@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -62,7 +62,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         // event-listeners
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),100);
         $this->eventManager->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
-        $this->eventManager->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_Models_Segment_Updater', 'beforeSegmentUpdate', array($this, 'handleBeforeSegmentUpdate'));
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
@@ -120,8 +119,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
             unlink($tbxPath);
         }
         $meta = $task->meta();
-        //ensure existence of the tbxHash field
-        //$meta->addMeta('tbxHash', $meta::META_TYPE_STRING, null, 'Contains the MD5 hash of the original imported TBX file before adding IDs', 36);
         $meta->setTbxHash("");
         $meta->save();
     }
@@ -142,11 +139,18 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         return true;
     }
     
+    /**
+     * Queues the termtagger worker after import
+     *
+     * @param Zend_EventManager_Event $event
+     * @return void|boolean
+     */
     public function handleAfterTaskImport(Zend_EventManager_Event $event) {
         $config = Zend_Registry::get('config');
         $c = $config->runtimeOptions->termTagger->switchOn->import;
-        if((boolean)$c === false)
+        if((boolean)$c === false) {
             return;
+        }
         $task = $event->getParam('task');
         /* @var $task editor_Models_Task */
         if (!$task->getTerminologie()) {
@@ -161,6 +165,8 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         /* @var $meta editor_Models_Segment_Meta */
         $meta->addMeta('termtagState', $meta::META_TYPE_STRING, $worker::SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
         
+        $this->lockOversizedSegments($task, $meta, $config);
+        
         // init worker and queue it
         $params = ['resourcePool' => 'import'];
         if (!$worker->init($task->getTaskGuid(), $params)) {
@@ -173,13 +179,21 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     }
     
     /**
-     * handler for event(s): editor_Workflow_Default#[doView, doEdit]
-     * 
-     * @param $event Zend_EventManager_Event
+     * Find oversized segments and mark them as oversized
+     *
+     * @param editor_Models_Task $task
+     * @param editor_Models_Segment_Meta $meta
+     * @param Zend_Config $config
      */
-    public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
+    protected function lockOversizedSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta, Zend_Config $config) {
+        $maxWordCount = $config->runtimeOptions->termTagger->maxSegmentWordCount ?? 150;
+        $meta->db->update([
+            'termtagState' => editor_Plugins_TermTagger_Worker_TermTaggerImport::SEGMENT_STATE_OVERSIZE
+        ], [
+            'taskGuid = ?' => $task->getTaskGuid(),
+            'sourceWordCount >= ?' => $maxWordCount,
+        ]);
     }
-    
     
     /**
      * Re-TermTag the (modified) segment-text.
@@ -192,6 +206,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         }
         
         $segment = $event->getParam('entity');
+        
         /* @var $segment editor_Models_Segment */
         $taskGuid = $segment->getTaskGuid();
         
@@ -204,11 +219,20 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
             return;
         }
 
+        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
+        /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
+        
+        $messages = Zend_Registry::get('rest_messages');
+        /* @var $messages ZfExtended_Models_Messages */
+        
+        if($segment->meta()->getTermtagState() == $worker::SEGMENT_STATE_OVERSIZE) {
+            $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden: Das Segment ist zu lang.');
+            return false;
+        }
+        
         $serverCommunication = $this->fillServerCommunication($task, $segment);
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         
-        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
-        /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
         $params = ['serverCommunication' => $serverCommunication, 'resourcePool' => 'gui'];
         if (!$worker->init($taskGuid, $params)) {
             $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [
@@ -218,11 +242,10 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         }
         
         if (!$worker->run()) {
-            $messages = Zend_Registry::get('rest_messages');
-            /* @var $messages ZfExtended_Models_Messages */
             $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
             return false;
         }
+        
         $results = $worker->getResult();
         $sourceTextTagged = false;
         foreach ($results as $result) {
@@ -245,7 +268,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     /**
      * inclusive all fields of the provided $segment
      * Creates a ServerCommunication-Object initialized with $task
-     * 
+     *
      * @param editor_Models_Task $task
      * @param editor_Models_Segment $segment
      * @return editor_Plugins_TermTagger_Service_ServerCommunication
@@ -346,7 +369,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     /**
      * When using change alikes, the transFound information in the source has to be changed.
      * This is done by this handler.
-     * 
+     *
      * @param Zend_EventManager_Event $event
      */
     public function handleBeforeSaveAlike(Zend_EventManager_Event $event) {
@@ -358,7 +381,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         
         // take over source original only for non editing source, see therefore TRANSLATE-549
         // Attention for alikes and if source is editable:
-        //   - the whole content (including term trans[Not]Found info) must be changed in the editable field, 
+        //   - the whole content (including term trans[Not]Found info) must be changed in the editable field,
         //     this is done in the AlikeController
         //   - in the original only the transFound infor has to be updated, this is done here
         

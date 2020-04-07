@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -92,7 +92,7 @@ class editor_Plugins_TermTagger_Service {
     private $replacedTagsReplacements = array();
     
     /**
-     * Container for segment data needed before and after tagging 
+     * Container for segment data needed before and after tagging
      * @var array
      */
     private $segments = array();
@@ -130,7 +130,7 @@ class editor_Plugins_TermTagger_Service {
     }
     
     /**
-     * returns the HTTP Status of the last request 
+     * returns the HTTP Status of the last request
      * @return integer
      */
     public function getLastStatus() {
@@ -149,7 +149,7 @@ class editor_Plugins_TermTagger_Service {
     /**
      * Checks if there is a TermTagger-server behind $url.
      * @param string $url url of the TermTagger-Server
-     * @return boolean true if there is a TermTagger-Server behind $url 
+     * @return boolean true if there is a TermTagger-Server behind $url
      */
     public function testServerUrl(string $url, &$version = null) {
         $httpClient = $this->getHttpClient($url.'/termTagger');
@@ -175,10 +175,10 @@ class editor_Plugins_TermTagger_Service {
     /**
      * If no $tbxHash given, checks if the TermTagger-Sever behind $url is alive.
      * If $tbxHash is given, check if Server has loaded the tbx-file with the id $tbxHash.
-     * 
+     *
      * @param string $url url of the TermTagger-Server
      * @param string tbxHash unique id for a tbx-file
-     * 
+     *
      * @return boolean True if ping was succesfull
      */
     public function ping(string $url, $tbxHash = false) {
@@ -194,10 +194,10 @@ class editor_Plugins_TermTagger_Service {
     
     /**
      * Load a tbx-file $tbxFilePath into the TermTagger-server behind $url where $tbxHash is a unic id for this tbx-file
-     *  
+     *
      * @param string $url url of the TermTagger-Server
      * @param string $tbxHash TBX hash
-     * @param string $tbxData TBX data 
+     * @param string $tbxData TBX data
      * @throws editor_Plugins_TermTagger_Exception_Open
      * @throws editor_Plugins_TermTagger_Exception_Request
      * @return Zend_Http_Response
@@ -248,10 +248,12 @@ class editor_Plugins_TermTagger_Service {
      */
     protected function sendRequest(Zend_Http_Client $client, $method) {
         $this->lastStatus = false;
+        $start = microtime(true);
         try {
             $result = $client->request($method);
             if(ZfExtended_Debug::hasLevel('plugin', 'TermTagger')) {
                 $rand = rand();
+                error_log("TermTagger Duration (id: $rand): ".(microtime(true) - $start).'s');
                 error_log("TermTagger Request (id: $rand): ".print_r($client->getLastRequest(),1));
                 error_log("TermTagger Answer (to id $rand): ".print_r($result->getRawBody(),1));
             }
@@ -283,7 +285,6 @@ class editor_Plugins_TermTagger_Service {
             //Error in communication with TermTagger
             $ecode = 'E1119';
             //This error points to an crash of the termtagger, so we can log additional data here
-            // Zend_Http_Client_Exception('Unable to read response, or response is empty');
             if($httpException instanceof Zend_Http_Client_Exception && strpos($msg, 'Unable to read response, or response is empty') === 0) {
                 $ecode = 'E1130';
             }
@@ -304,11 +305,11 @@ class editor_Plugins_TermTagger_Service {
     }
     
     /**
-     * TermTaggs segment-text(s) in $data on TermTagger-server $url 
-     * 
+     * TermTaggs segment-text(s) in $data on TermTagger-server $url
+     *
      * @param string $url
      * @param editor_Plugins_TermTagger_Service_ServerCommunication $data
-     * 
+     *
      * @return Zend_Http_Response or null on error
      */
     public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
@@ -347,9 +348,7 @@ class editor_Plugins_TermTagger_Service {
             ]);
         }
         
-        $response = $this->decodeSegments($response, $data);
-        
-        return $response;
+        return $this->decodeSegments($response, $data);
     }
     
     /**
@@ -368,7 +367,7 @@ class editor_Plugins_TermTagger_Service {
 
     /**
      * restores our internal tags from the delivered img tags
-     * 
+     *
      * @param stdClass $data
      * @param editor_Plugins_TermTagger_Service_ServerCommunication $requests
      * @return stdClass
