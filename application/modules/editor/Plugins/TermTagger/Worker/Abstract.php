@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -71,6 +71,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
     const SEGMENT_STATE_TAGGED = 'tagged';
     const SEGMENT_STATE_DEFECT = 'defect';
     const SEGMENT_STATE_RETAG = 'retag';
+    const SEGMENT_STATE_OVERSIZE = 'oversized';
     //const SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
     
     /**
@@ -125,7 +126,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      * it should be based on maxParallelProcesses instead of just having one running worker per slot. maxParallelProcesses is ignored so far.
      * @param int $parentId
      * @param string $state
-     * 
+     *
      * @see ZfExtended_Worker_Abstract::queue()
      */
     public function queue($parentId = 0, $state = NULL) {
@@ -160,7 +161,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      * and with transNotFound if not. A translation which is of type
      * editor_Models_Term::STAT_DEPRECATED or editor_Models_Term::STAT_SUPERSEDED
      * is handled as transNotFound
-     * 
+     *
      * @param array $segments array of stdClass. example: array(object(stdClass)#529 (4) {
       ["field"]=>
       string(10) "targetEdit"
@@ -171,7 +172,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
       ["target"]=>
       string(149) "Il nuovo dépliant PRODUCT INFO <div title="" class="term admittedTerm transNotFound stemmed" data-tbxid="term_00_1_IT_1_08795">motori</div>"),
        another object, ...
-     * 
+     *
      * @return stdClass $segments
     }
      */
@@ -189,7 +190,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
     
     
     /**
-     * (non-PHPdoc) 
+     * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::calculateQueuedSlot()
      */
     protected function calculateQueuedSlot() {
@@ -200,7 +201,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
     /**
      * Calculates the resource and slot for the given $resourcePool
      * Some kind of "load-balancing" is used in calculations so every resource/slot-combination is used in the same weight
-     * 
+     *
      * @param string $resourcePool
      * @return array('resource' => resourceName, 'slot' => slotName)
      */
@@ -245,7 +246,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
     
     
     /**
-     * 
+     *
      * @return array
      */
     protected function getAvailableSlots($resourcePool = 'default') {
