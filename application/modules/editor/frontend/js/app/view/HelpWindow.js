@@ -59,6 +59,7 @@ Ext.define('Editor.view.HelpWindow', {
         		dockedItems: [{
         	        xtype: 'toolbar',
         	        dock: 'bottom',
+        	        hidden:me.isComponentHidden(),
         	        items: [{
         	        	xtype:'checkboxfield',
         	        	boxLabel:me.strings.cbDoNotShowAgainLabel,
@@ -77,5 +78,12 @@ Ext.define('Editor.view.HelpWindow', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+    
+    /***
+     * The component is not visible when the there is not state config for the window type
+     */
+    isComponentHidden:function(){
+    	return Ext.state.Manager.getProvider().get(this.getStateId())===undefined;
     }
 });

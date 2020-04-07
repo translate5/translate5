@@ -59,7 +59,7 @@ class editor_ConfigController extends ZfExtended_RestController {
      * @param array $row given as reference, the ini values are set in here
      */
     protected function mergeWithIni(array $root, array $path, array &$row) {
-        $row['origin'] = $row['origin'] ?? 'db';
+        $row['origin'] = $row['origin'] ?? editor_Models_Config::CONFIG_SOURCE_DB;
         $part = array_shift($path);
         if(!isset($root[$part])) {
             return;
@@ -68,7 +68,7 @@ class editor_ConfigController extends ZfExtended_RestController {
             $this->mergeWithIni($root[$part], $path, $row);
             return;
         }
-        $row['origin'] = 'ini';
+        $row['origin'] = editor_Models_Config::CONFIG_SOURCE_INI;
         $row['overwritten'] = $row['value'];
         $row['value'] = $root[$part];
         if($row['type'] == ZfExtended_Resource_DbConfig::TYPE_MAP || $row['type'] == ZfExtended_Resource_DbConfig::TYPE_LIST){
@@ -98,7 +98,7 @@ class editor_ConfigController extends ZfExtended_RestController {
         /* @var $user ZfExtended_Models_User */
         $user->load($userSession->data->id);
         
-        $this->entity->updateStateConfig($user,$this->data->name, $this->data->value);
+        $this->entity->updateConfig($user,$this->data->name, $this->data->value);
     }
     
     

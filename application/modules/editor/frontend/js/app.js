@@ -120,7 +120,7 @@ Ext.application({
       	provider=Ext.create('Editor.util.HttpStateProvider');
       provider.store.on({
     	  load:function(){
-    		  me.initViewportLunch();
+    		  me.initViewportLaunch();
     	  }
       })
       Ext.state.Manager.setProvider(provider);
@@ -128,9 +128,9 @@ Ext.application({
   },
   
   /***
-   * Init and prepare the viewport for application lunch
+   * Init and prepare the viewport for application launch
    */
-  initViewportLunch:function(){
+  initViewportLaunch:function(){
 	  var me = this,
     	viewSize = Ext.getBody().getViewSize();
     

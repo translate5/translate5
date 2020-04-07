@@ -30,6 +30,11 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Config extends ZfExtended_Models_Config {
 
+    const CONFIG_SOURCE_USER_CONFIG="user_config";
+    const CONFIG_SOURCE_ZF_CONFIG="zf_config";
+    const CONFIG_SOURCE_DB="db";
+    const CONFIG_SOURCE_INI="ini";
+    
     const CONFIG_LEVEL_SYSTEM=1;
     const CONFIG_LEVEL_INSTANCE=2;
     const CONFIG_LEVEL_CUSTOMER=4;
@@ -59,13 +64,13 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         $aclUserLvl=$this->getFilteredConstants('CONFIG_LEVEL_');
         
         $s=$this->db->select()
-        ->from('Zf_configuration',['Zf_configuration.*',new Zend_Db_Expr('"zf_config" as origin')])
+        ->from('Zf_configuration',['Zf_configuration.*',new Zend_Db_Expr('"'.self::CONFIG_SOURCE_ZF_CONFIG.'" as origin')])
         ->where('level IN(?)',$aclUserLvl);
         $zfconfig=$this->db->getAdapter()->fetchAll($s);
 
         $s=$this->db->select()
         ->setIntegrityCheck(false)
-        ->from('LEK_user_config',['LEK_user_config.*',new Zend_Db_Expr('"user_config" as origin')])
+        ->from('LEK_user_config',['LEK_user_config.*',new Zend_Db_Expr('"'.self::CONFIG_SOURCE_USER_CONFIG.'" as origin')])
         ->where('userGuid=?',$user->data->userGuid);
         $userConfig=$this->db->getAdapter()->fetchAll($s);
 
@@ -83,13 +88,12 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     }
     
     /***
-     * Update state config for given name and value and for the current user
-     * 
+     * Update the user config and the default zf_config value for given user and config name
      * @param ZfExtended_Models_User $user
      * @param string $configName
      * @param string $configValue
      */
-    public function updateStateConfig(ZfExtended_Models_User $user,string $configName,string $configValue){
+    public function updateConfig(ZfExtended_Models_User $user,string $configName,string $configValue){
         /* @var $acl ZfExtended_Acl */
         //Info: uncomment this when the frontend config managment will be available.
         //from the frontend, an level is required also as additional param, so the decision here can be made
