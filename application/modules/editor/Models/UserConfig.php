@@ -50,8 +50,8 @@ class editor_Models_UserConfig extends ZfExtended_Models_Entity_Abstract {
      */
     public function updateInsertConfig(string $userGuid,string $name,string $value) {
         $sql="INSERT INTO LEK_user_config(userGuid,name,value) ".
-        " VALUES (?,?,?)".
-        "ON DUPLICATE KEY UPDATE value = ? ";
+        " VALUES (?,?,?) ".
+        " ON DUPLICATE KEY UPDATE value = ? ";
         return $this->db->getAdapter()->query($sql,[$userGuid,$name,$value,$value]);
     }
 }

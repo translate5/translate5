@@ -75,3 +75,15 @@ VALUES
 ('runtimeOptions.frontend.defaultState.helpWindow.languageresource', '1', 'editor', 'system', '{"doNotShowAgain":false}', '', '', 'map', 'Help window default state configuration for the languageresource panel. When doNotShowAgain is set to false, the window will appear automaticly for languageresource panel. When setting this config to true or leave the field value as empty, the window will not apear automaticly.', '1');
 
 
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) 
+VALUES 
+('runtimeOptions.frontend.defaultState.adminTaskGrid', '1', 'editor', 'system', '', '', '', 'map', 'Task grid default state configuration. When this config is empty, the task grid state will not be saved or applied. For how to config this value please visit this page: https://confluence.translate5.net/display/CON/Configure+grids+and+window+state ', '1')
+ON DUPLICATE KEY UPDATE `name`='runtimeOptions.frontend.defaultState.adminTaskGrid';
+
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) 
+VALUES 
+('runtimeOptions.frontend.defaultState.adminUserGrid', '1', 'editor', 'system', '', '', '', 'map', 'User grid default state configuration. When this config is empty, the task grid state will not be saved or applied. For how to config this value please visit this page: https://confluence.translate5.net/display/CON/Configure+grids+and+window+state', '1') 
+ON DUPLICATE KEY UPDATE `name`='runtimeOptions.frontend.defaultState.adminUserGrid';
+
+

@@ -71,7 +71,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
 
         return array_map(function($item) use ($userConfig){
             //if the config is defatulState config, remove the prefix for the config. The frontend uses short stateId names not full blown "runtimeOptions.frontend.defaultState."
-            if(strpos($item['name'],self::DEFAULT_STATE_PREFIX)!==false){
+            if(strpos($item['name'],self::DEFAULT_STATE_PREFIX)!==false && !empty($item['value'])){
                 $item['name']=str_replace(self::DEFAULT_STATE_PREFIX,'', $item['name']);
                 $key=array_search($item['name'], array_column($userConfig, 'name'));
                 if($key!==false){

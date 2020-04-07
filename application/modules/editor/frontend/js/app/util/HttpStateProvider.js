@@ -103,18 +103,26 @@ Ext.define('Editor.util.HttpStateProvider',{
         	pos = me.store.find('name', name), 
         	row;
 
-        if (pos > -1) {
-            row = me.store.getAt(pos);
-            row.set('value', me.encodeValue(value));
-        } else {
-            me.store.add({
-                name : name,
-                value: me.encodeValue(value),
-                userGuid:Editor.data.app.user.userGuid
-            });
+        if(pos < 0){
+        	return;
         }
-
+        row = me.store.getAt(pos);
+        row.set('value', me.encodeValue(value));
         me.fireEvent('statechange', me, name, value);
+        
+//Info: for now we will disable the new record when the config is not available from the backend, this should be enable in future dev
+//        if (pos > -1) {
+//            row = me.store.getAt(pos);
+//            row.set('value', me.encodeValue(value));
+//        } else {
+//            me.store.add({
+//                name : name,
+//                value: me.encodeValue(value),
+//                userGuid:Editor.data.app.user.userGuid
+//            });
+//        }
+
+//        me.fireEvent('statechange', me, name, value);
     },
 
     /***
