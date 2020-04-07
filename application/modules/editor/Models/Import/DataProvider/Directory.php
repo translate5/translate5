@@ -50,7 +50,11 @@ class editor_Models_Import_DataProvider_Directory  extends editor_Models_Import_
      */
     public function checkAndPrepare(){
         if(!is_dir($this->importFolder)){
-        	throw new Zend_Exception('Der übergebene importRootFolder '.$this->importFolder.' existiert nicht.');
+            //DataProvider Directory: The importRootFolder "{importRoot}" does not exist!
+            throw new editor_Models_Import_DataProvider_Exception('E1248', [
+                'task' => $this->task,
+                'importRoot' => $this->importFolder,
+            ]);
         }
     }
     
@@ -70,7 +74,10 @@ class editor_Models_Import_DataProvider_Directory  extends editor_Models_Import_
             ),
         ));
         if(!$filter->filter($this->importFolder)){
-            throw new Zend_Exception('Could not create export-zip of task '.$this->taskGuid.'.');
+            //DataProvider Directory: Could not create archive-zip
+            throw new editor_Models_Import_DataProvider_Exception('E1247', [
+                'task' => $this->task,
+            ]);
         }
     }
 }

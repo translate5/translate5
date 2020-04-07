@@ -1771,6 +1771,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 {footer}</target></trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgbWl0IEZlaGxlcm4gLyBXYXJudW5nZW4gaW1wb3J0aWVydA=='><source>Translate5 - Aufgabe mit Fehlern / Warnungen importiert</source><target>Translate5 - Aufgabe mit Fehlern / Warnungen importiert</target></trans-unit>
 <trans-unit id='RGllc2VzIEZlbnN0ZXIgbmljaHQgbWVociBhdXRvbWF0aXNjaCBhbnplaWdlbi4='><source>Dieses Fenster nicht mehr automatisch anzeigen.</source><target>Dieses Fenster nicht mehr automatisch anzeigen.</target></trans-unit>
+<trans-unit id='RGFzIG7DpGNoc3RlIC8gdm9yaGVyaWdlIFNlZ21lbnQgd2lyZCBub2NoIGdlc3BlaWNoZXJ0LCBiaXR0ZSB3YXJ0ZW4uLi4='><source>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</source><target>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</target></trans-unit>
   </body>
  </file>
 </xliff>

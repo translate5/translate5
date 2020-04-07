@@ -264,16 +264,6 @@ Ext.define('Editor.model.admin.Task', {
       return this.get('state')=='end';
   },
   /**
-   * The associated data must be deleted in order to get reloaded properly on a task reload
-   */
-  load: function() {
-      var me = this;
-      Ext.Object.each(me.associations, function(key, store) {
-          delete me[store.getStoreName()];
-      })
-      me.callParent(arguments);
-  },
-  /**
    * returns the the metadata for the workflow of the task
    */
   getWorkflowMetaData: function() {
