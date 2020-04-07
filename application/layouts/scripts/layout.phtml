@@ -106,7 +106,7 @@ function renderSupporterEntry($link, $name, $image, $width, $height, $clear = FA
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <!--[if lte IE 8]><script src="<?php echo APPLICATION_RUNDIR;?>/assets/js/ie/html5shiv.js"></script><![endif]-->
-        <link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR;?>/assets/css/main.css?V=2018-08-13" />
+        <link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR;?>/assets/css/main.css?V=2020-03-25" />
         <!--[if lte IE 9]><link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR;?>/assets/css/ie9.css" /><![endif]-->
         <!--[if lte IE 8]><link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR;?>/assets/css/ie8.css" /><![endif]-->
         <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR . $config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
@@ -115,17 +115,9 @@ function renderSupporterEntry($link, $name, $image, $width, $height, $clear = FA
         <div id="wrapper">
             <!-- Header -->
             <header id="header">
-                <h5><a href="<?php echo APPLICATION_RUNDIR;?>/">translate5</a></h5>
-                <nav class="links flyout">
-                    <?php renderMenu($menu); ?>
-                </nav>
-                <nav class="main">
-                    <ul>
-                        <li class="menu">
-                            <a class="fa-bars" href="#menu">Menu</a>
-                        </li>
-                    </ul>
-                </nav>
+                <div class="logo_container">
+                    <a href="<?php echo APPLICATION_RUNDIR;?>/" class="logo"><img src="<?php echo APPLICATION_RUNDIR;?>/images/translate5-transparent.png" alt="translate5" /></a>
+                </div>
             </header>
             <!-- Menu -->
             <section id="menu">
@@ -150,11 +142,16 @@ function renderSupporterEntry($link, $name, $image, $width, $height, $clear = FA
             <section id="sidebar">
                 <!-- Intro -->
                 <section id="intro">
-                    <a href="<?php echo APPLICATION_RUNDIR;?>/" class="logo"><img src="<?php echo APPLICATION_RUNDIR;?>/images/translate5-transparent.png" alt="translate5" /></a>
                     <header>
                         <h1>Open Source translation system</h1>
                         <p>Cloud open source translation, review- and postediting system</p>
                     </header>
+                    <h2>About translate5</h2>
+                    <ul class="icons">
+                        <li><i class="fa-chevron-circle-right"></i> <a href="https://www.translate5.net/solutions/" target="_blank">Solution scenarios</a></li>
+                        <li><i class="fa-chevron-circle-right"></i> <a href="https://www.translate5.net/resources/" target="_blank">Resources</a></li>
+                        <li><i class="fa-chevron-circle-right"></i> <a href="https://www.translate5.net/who-is-behind/" target="_blank">Who is behind</a></li>
+                    </ul>
                     <ul class="icons">
                         <li><a href="https://twitter.com/translate5_marc" class="fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
                         <li><a href="https://www.facebook.com/Translate5-412951439069652/" class="fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
@@ -162,75 +159,10 @@ function renderSupporterEntry($link, $name, $image, $width, $height, $clear = FA
                     </ul>
                 </section>
                 
-                <!-- Mini Posts -->
-                <section>
-                    <div class="mini-posts">
-                        <!-- Mini Post -->
-                        <article class="mini-post">
-                            <header>
-                                <h3><a href="<?php echo APPLICATION_RUNDIR;?>/index/crowd-of-companies">Crowdfunding &amp;<br>Crowd of companies</a></h3>
-                                <a href="<?php echo APPLICATION_RUNDIR;?>/index/crowd-of-companies"><span class="published">Supporters of the development<br>Thank you very much!</span></a>
-                            </header>
-                            <div class="crowdlinks_container">
-                                <?php
-                                    echo renderSupporterEntry('https://www.beo-doc.de', 'beo Gesellschaft für Sprachen und Technologie mbH', 'beo.png', 285, 150);
-                                    echo renderSupporterEntry('https://www.itl.eu', 'itl Institut für technische Literatur AG', 'itl.png', 220, 150);
-                                    echo renderSupporterEntry('https://www.supertext.ch', 'Supertext AG', 'supertext.png', 250, 150);
-                                    echo renderSupporterEntry('https://www.oneword.de', 'oneword GmbH', 'oneword.png', 395, 150);
-                                ?>
-                                	<div style="clear:both;">
-                                <?php
-                                    echo renderSupporterEntry('https://www.worldtranslation.com', 'Worldtranslation is your professional language service provider', 'worldtranslation.png', 380, 150);
-                                    echo renderSupporterEntry('https://www.schmieder-uebersetzungen.de', 'Schmieder Übersetzungen &amp; Sprachmanagement', 'schmieder.png', 400, 150);
-                                    echo renderSupporterEntry('https://www.transline.de', 'Transline. Übersetzen. Verstehen.', 'transline.png', 370, 150);
-                                ?>
-                                	</div>
-                                <?php
-                                    
-                                    echo renderSupporterEntry('https://www.dfki.de/web', 'DFKI Deutsches Forschungszentrum für Künstliche Intelligenz GmbH', 'dfki.png', 310, 150, TRUE);
-                                    echo renderSupporterEntry('https://soluzione.de', 'soluzione Script GmbH', 'soluzione.png', 240, 150);
-                                    echo renderSupporterEntry('https://www.pangeanic.com', 'Pangeanic', 'pangeanic.png', 310, 150);
-                                    echo renderSupporterEntry('https://lexitech.com', 'Lexitech', 'lexitech.png', 290, 150);
-                                    
-                                    echo renderSupporterEntry('https://www.mt-g.eu', 'mt-g medical translation GmbH & Co. KG', 'mt-g.png', 255, 150, TRUE);
-                                    echo renderSupporterEntry('http://www.globalese-mt.com', 'Globalese MorphoLogic Localisation Ltd.', 'globalese.png', 230, 150);
-                                    echo renderSupporterEntry('http://www.lucysoftware.com', 'Lucy Software and Services GmbH', 'lucy.png', 200, 150);
-                                    echo renderSupporterEntry('https://www.locasoft.com', 'LocaSoft GmbH', 'locasoft.png', 200, 150);
-                                    echo renderSupporterEntry('http://www.iolar.com', 'Iolar', 'iolar.png', 265, 150);
-                                    
-                                    echo renderSupporterEntry('https://www.smartspokes.com', 'SMARTSPOKES AG', 'smartspokes.png', 250, 145, TRUE);
-                                    echo renderSupporterEntry('http://www.yavaway.com', 'Yavaway Translation', 'yavaway.png', 180, 145);
-                                    echo renderSupporterEntry('http://www.translationprojex.com', 'TranslationProjex', 'translationprojex.png', 210, 145);
-                                    echo renderSupporterEntry('https://www.swissglobal.ch', 'SwissGlobal Language Services AG', 'swissglobal.png', 240, 145);
-                                    echo renderSupporterEntry('https://www.textform.com', 'text&amp;form GmbH', 'textform.png', 270, 145);
-                                ?>
-                            </div>
-                       </article>
-                        
-                        <!-- Mini Post -->
-                        <article class="mini-post">
-                            <header>
-                                <h3><a href="<?php echo APPLICATION_RUNDIR;?>/index/outstanding-features">Outstanding features</a></h3>
-                                <span class="published"><a href="<?php echo APPLICATION_RUNDIR;?>/index/outstanding-features#visualReview" style="border-bottom: none;">Review in perfect layout</a><br><a href="<?php echo APPLICATION_RUNDIR;?>/index/outstanding-features#trackChanges" style="border-bottom: none;">MS-word style track changes</a><br><a href="<?php echo APPLICATION_RUNDIR;?>/index/outstanding-features#performance" style="border-bottom: none;">100.000 segments per task</a></span>
-                            </header>
-                            <a href="<?php echo APPLICATION_RUNDIR;?>/index/outstanding-features" class="image"><img src="<?php echo APPLICATION_RUNDIR;?>/images/visualReview.png" alt="translate5 visualReview" /></a>
-                        </article>
-                        
-                        <!-- Mini Post -->
-                        <article class="mini-post">
-                            <header>
-                                <h3><a href="<?php echo APPLICATION_RUNDIR;?>/index/integrate">Extremly flexible and extendable for integrations</a></h3>
-                                <span class="published"><a href="<?php echo APPLICATION_RUNDIR;?>/index/integrate" style="border-bottom: none;">REST-API for every GUI feature</a><br><a href="<?php echo APPLICATION_RUNDIR;?>/index/extend" style="border-bottom: none;">Very powerful plug-in's possible</a><br><a href="<?php echo APPLICATION_RUNDIR;?>/index/integrate" style="border-bottom: none;">Editor-only integration possible</a></span>
-                            </header>
-                            <a href="<?php echo APPLICATION_RUNDIR;?>/index/integrate" class="image"><img src="<?php echo APPLICATION_RUNDIR;?>/images/cloud-api-technology.png" alt="Cloud api technology" /></a>
-                        </article>
-                    </div>
-                </section>
-                
                 <!-- Footer -->
                 <section id="footer">
                     <p class="copyright">
-                        <a href="<?php echo APPLICATION_RUNDIR;?>/index/impressum">Imprint &amp; privacy policy</a> | <a href="mailto:support@translate5.net">Ask a question about translate5</a>
+                        <a href="https://www.translate5.net/imprint-privacy-policy/">Imprint &amp; privacy policy</a> | <a href="mailto:support@translate5.net">Ask a question about translate5</a>
                     </p>
                 </section>
             </section>

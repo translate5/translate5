@@ -1,5 +1,5 @@
 @import url(font-awesome.min.css);
-@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Raleway:400,800,900");
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700|Cuprum:400,600,800,900");
 
 /*
 	Future Imperfect by HTML5 UP
@@ -27,6 +27,7 @@
 
 	body {
 		line-height: 1;
+		font-size: 16px;
 	}
 
 	ol, ul {
@@ -1412,7 +1413,7 @@
 
 	body {
 		/*background: #f4f4f4; alte background-farbe vor MittagQI Aenderung*/
-                background: #e4efd1;
+                background: #fff;
 	}
 
 		body.is-loading *, body.is-loading *:before, body.is-loading *:after {
@@ -1430,7 +1431,7 @@
 
 	body, input, select, textarea {
 		color: #646464;
-		font-family: "Source Sans Pro", Helvetica, sans-serif;
+		font-family: Open Sans,Arial,sans-serif;
 		font-size: 14pt;
 		font-weight: 400;
 		line-height: 1.75;
@@ -1484,6 +1485,7 @@
 		border-bottom: dotted 2px rgba(160, 160, 160, 0.65);
 		color: inherit;
 		text-decoration: none;
+		font-weight: 600;
 	}
 
 		a:before {
@@ -1495,11 +1497,11 @@
 
 		a:hover {
 			border-bottom-color: transparent;
-			color: #00adef !important;
+			color: #23b4ee !important;
 		}
 
 			a:hover:before {
-				color: #00adef !important;
+				color: #23b4ee !important;
 			}
 
 	strong, b {
@@ -1517,12 +1519,10 @@
 
 	h1, h2, h3, h4, h5, h6 {
 		color: #3c3b3b;
-		font-family: "Raleway", Helvetica, sans-serif;
-		font-weight: 800;
-		letter-spacing: 0.25em;
-		line-height: 1.65;
-		margin: 0 0 1em 0;
-		text-transform: uppercase;
+		font-family: 'Cuprum',Helvetica,Arial,Lucida,sans-serif;
+		font-weight: 400;
+		line-height: 1em;
+		margin: 0 0 10px 0;
 	}
 
 		h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
@@ -1530,24 +1530,28 @@
 			border-bottom: 0;
 		}
 
-	h2 {
-		font-size: 1.1em;
+    h1 {
+        font-size: 41px;
+    }
+    
+    h2 {
+		font-size: 35px;
 	}
 
 	h3 {
-		font-size: 0.9em;
+		font-size: 32px;
 	}
 
 	h4 {
-		font-size: 0.7em;
+		font-size: 18px;
 	}
 
 	h5 {
-		font-size: 0.7em;
+		font-size: 16px;
 	}
 
 	h6 {
-		font-size: 0.7em;
+		font-size: 16px;
 	}
 
 	sub {
@@ -1634,7 +1638,7 @@
 		-ms-justify-content: -ms-flex-end;
 		justify-content: flex-end;
 		border-bottom: 0;
-		font-family: "Raleway", Helvetica, sans-serif;
+		font-family: 'Cuprum',Helvetica,Arial,Lucida,sans-serif;
 		font-size: 0.6em;
 		font-weight: 400;
 		letter-spacing: 0.25em;
@@ -1718,7 +1722,7 @@
 		color: #3c3b3b !important;
 		cursor: pointer;
 		display: inline-block;
-		font-family: "Raleway", Helvetica, sans-serif;
+		font-family: 'Cuprum',Helvetica,Arial,Lucida,sans-serif;
 		font-size: 0.6em;
 		font-weight: 800;
 		height: 4.8125em;
@@ -1736,8 +1740,8 @@
 		input[type="button"]:hover,
 		button:hover,
 		.button:hover {
-			box-shadow: inset 0 0 0 1px #00adef;
-			color: #00adef !important;
+			box-shadow: inset 0 0 0 1px #23b4ee;
+			color: #23b4ee !important;
 		}
 
 			input[type="submit"]:hover:active,
@@ -1921,8 +1925,8 @@
 		input[type="tel"]:focus,
 		select:focus,
 		textarea:focus {
-			border-color: #00adef;
-			box-shadow: inset 0 0 0 1px #00adef;
+			border-color: #23b4ee;
+			box-shadow: inset 0 0 0 1px #23b4ee;
 		}
 
 	.select-wrapper {
@@ -2036,8 +2040,8 @@
 
 		input[type="checkbox"]:focus + label:before,
 		input[type="radio"]:focus + label:before {
-			border-color: #00adef;
-			box-shadow: 0 0 0 1px #00adef;
+			border-color: #23b4ee;
+			box-shadow: 0 0 0 1px #23b4ee;
 		}
 
 	input[type="radio"] + label:before {
@@ -2233,6 +2237,11 @@
 					ul.icons li > * .label {
 						display: none;
 					}
+					
+	                ul.icons li i {
+	                    color: #23b4ee;
+	                    font-weight: 600;
+	                }
 
 		ul.actions {
 			cursor: default;
@@ -2447,7 +2456,7 @@
 
 					ul.posts article header .published {
 						display: block;
-						font-family: "Raleway", Helvetica, sans-serif;
+						font-family: 'Cuprum',Helvetica,Arial,Lucida,sans-serif;
 						font-size: 0.6em;
 						font-weight: 400;
 						letter-spacing: 0.25em;
@@ -2525,7 +2534,7 @@
 
 			.mini-post header .published {
 				display: block;
-				font-family: "Raleway", Helvetica, sans-serif;
+				font-family: 'Cuprum',Helvetica,Arial,Lucida,sans-serif;
 				font-size: 0.6em;
 				font-weight: 400;
 				letter-spacing: 0.25em;
@@ -2641,7 +2650,7 @@
 				.post > header .meta .published {
 					color: #3c3b3b;
 					display: block;
-					font-family: "Raleway", Helvetica, sans-serif;
+					font-family: 'Cuprum',Helvetica,Arial,Lucida,sans-serif;
 					font-size: 0.7em;
 					font-weight: 800;
 					letter-spacing: 0.25em;
@@ -2695,7 +2704,7 @@
 				.post > footer .stats li {
 					border-left: solid 1px rgba(160, 160, 160, 0.3);
 					display: inline-block;
-					font-family: "Raleway", Helvetica, sans-serif;
+					font-family: 'Cuprum',Helvetica,Arial,Lucida,sans-serif;
 					font-size: 0.6em;
 					font-weight: 400;
 					letter-spacing: 0.25em;
@@ -2881,11 +2890,10 @@
 	}
 
 	header p {
-		font-family: "Raleway", Helvetica, sans-serif;
+		font-family: 'Cuprum',Helvetica,Arial,Lucida,sans-serif;
 		font-size: 0.7em;
 		font-weight: 400;
 		letter-spacing: 0.25em;
-		line-height: 2.5;
 		margin-top: -1em;
 		text-transform: uppercase;
 	}
@@ -2961,7 +2969,7 @@
 /* Header */
 
 	body {
-		padding-top: 3.5em;
+		padding-top: 152px;
 	}
 
 	#header {
@@ -2973,16 +2981,26 @@
 		-webkit-justify-content: space-between;
 		-ms-justify-content: space-between;
 		justify-content: space-between;
-		background-color: #ffffff;
+        background-image: linear-gradient(to left, #fee202 10%, #ffffff 90%);
 		border-bottom: solid 1px rgba(160, 160, 160, 0.3);
-		height: 3.5em;
+		height: 152px;
 		left: 0;
-		line-height: 3.5em;
+		line-height: 152px;
 		position: fixed;
 		top: 0;
 		width: 100%;
 		z-index: 10000;
 	}
+    
+        #header .logo_container {
+            margin: 6px 0 0 35px;
+        }
+        #header .logo_container img {
+            width: 198px;
+        }
+        #header .logo_container a {
+            border-bottom: none;
+        }
 
 		#header a {
 			color: inherit;
@@ -3042,7 +3060,7 @@
 
 				#header .links ul li a {
 					border-bottom: 0;
-					font-family: "Raleway", Helvetica, sans-serif;
+					font-family: "'Cuprum',Helvetica,Arial,Lucida,sans-serif;
 					font-size: 0.7em;
 					font-weight: 400;
 					letter-spacing: 0.25em;
@@ -3273,12 +3291,11 @@
 		}
 
 	#intro header h1 {
-		font-size: 2em;
-		font-weight: 900;
+		margin-bottom: 0.7em;
 	}
 
 	#intro header p {
-		font-size: 0.8em;
+		font-size: 16px;
 	}
 
 	@media screen and (max-width: 1280px) {
@@ -3331,7 +3348,7 @@
 
 	#footer .copyright {
 		color: #3c3b3b;
-		font-family: "Raleway", Helvetica, sans-serif;
+		font-family: 'Cuprum',Helvetica,Arial,Lucida,sans-serif;
 		font-size: 0.5em;
 		font-weight: 400;
 		letter-spacing: 0.25em;
@@ -3438,7 +3455,7 @@
 					}
 
 					#menu .links > li a p {
-						font-family: "Raleway", Helvetica, sans-serif;
+						font-family: 'Cuprum',Helvetica,Arial,Lucida,sans-serif;
 						font-size: 0.6em;
 						font-weight: 400;
 						letter-spacing: 0.25em;
@@ -3448,7 +3465,7 @@
 					}
 
 					#menu .links > li a:hover h3 {
-						color: #00adef;
+						color: #23b4ee;
 					}
 
 				#menu .links > li:first-child {
