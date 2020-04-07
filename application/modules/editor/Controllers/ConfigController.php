@@ -27,9 +27,97 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Wrapper for ZfExtended_ConfigController
- * else RestRoutes, ACL authentication, etc. will not work (must be adapted for default module of each project)
  */
-class editor_ConfigController extends ZfExtended_ConfigController {
+class editor_ConfigController extends ZfExtended_RestController {
+    
+    protected $entityClass = 'editor_Models_Config';
+    
+    /**
+     * @var editor_Models_Config
+     */
+    protected $entity;
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::indexAction()
+     */
+    public function indexAction() {
+        $iniOptions = $this->getInvokeArg('bootstrap')->getApplication()->getOptions();
+        //load all zf configuration values merged with the user config and .ini values
+        $zfconfig = $this->entity->loadAll();
+        foreach($zfconfig as &$row) {
+            $this->mergeWithIni($iniOptions, explode('.', $row['name']), $row);
+        }
+        //
+        $this->view->rows = $zfconfig;
+    }
+    
+    /**
+     * Merges the ini config values into the DB result before returning by REST API
+     * @param array $root
+     * @param array $path
+     * @param array $row given as reference, the ini values are set in here
+     */
+    protected function mergeWithIni(array $root, array $path, array &$row) {
+        $row['origin'] = $row['origin'] ?? 'db';
+        $part = array_shift($path);
+        if(!isset($root[$part])) {
+            return;
+        }
+        if(!empty($path)){
+            $this->mergeWithIni($root[$part], $path, $row);
+            return;
+        }
+        $row['origin'] = 'ini';
+        $row['overwritten'] = $row['value'];
+        $row['value'] = $root[$part];
+        if($row['type'] == ZfExtended_Resource_DbConfig::TYPE_MAP || $row['type'] == ZfExtended_Resource_DbConfig::TYPE_LIST){
+            $row['value'] = json_encode($row['value'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::postAction()
+     * CRUD is currently not implemented, so BadMethod here
+     */
+    public function postAction() {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->'.__FUNCTION__);
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::putAction()
+     * CRUD is currently not implemented, so BadMethod here
+     */
+    public function putAction() {
+        $this->decodePutData();
+        $userSession = new Zend_Session_Namespace('user');
+        
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->load($userSession->data->id);
+        
+        $this->entity->updateStateConfig($user,$this->data->name, $this->data->value);
+    }
+    
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::putAction()
+     * CRUD is currently not implemented, so BadMethod here
+     */
+    public function getAction() {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->'.__FUNCTION__);
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::putAction()
+     * CRUD is currently not implemented, so BadMethod here
+     */
+    public function deleteAction() {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->'.__FUNCTION__);
+    }
     
 }

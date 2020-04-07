@@ -616,7 +616,15 @@ Ext.define('Editor.controller.Localizer', {
             deadlineDateText:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>'
         }
     });
-
+    
+    
+    Ext.define("Editor.locale.de.view.HelpWindow", {
+        override: "Editor.view.HelpWindow",
+        strings:{
+        	cbDoNotShowAgainLabel: '<?php echo $this->translate->_('Dieses Fenster nicht mehr automatisch anzeigen.');?>'
+        }
+    });
+    
     Ext.define("Editor.locale.de.view.admin.task.filter.DateFilter", {
         override: "Editor.view.admin.task.filter.DateFilter",
         strings:{

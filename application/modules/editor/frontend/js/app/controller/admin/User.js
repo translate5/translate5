@@ -137,9 +137,8 @@ Ext.define('Editor.controller.admin.User', {
    */
   handleAfterShow: function(grid) {
       this.getHeadToolBar() && this.getHeadToolBar().down('#user-admin-btn').hide();
-    //set the value used for displaying the help pages
-      Editor.data.helpSection = 'useroverview';
-      Editor.data.helpSectionTitle = grid.getTitle();
+      //fire the global event for component view change
+      Ext.fireEvent('componentViewChanged','useroverview',grid.getTitle());
   },
   /**
    * handle after hide of usergrid

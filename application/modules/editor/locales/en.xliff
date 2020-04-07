@@ -3722,6 +3722,7 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Translate5 - Aufgabe mit Fehlern / Warnungen importiert</source>
     <target>Translate5 - Task imported with errors / warnings / notices</target>
 </trans-unit>
+<trans-unit id='RGllc2VzIEZlbnN0ZXIgbmljaHQgbWVociBhdXRvbWF0aXNjaCBhbnplaWdlbi4='><source>Dieses Fenster nicht mehr automatisch anzeigen.</source><target>Do not automatically display this window again.</target></trans-unit>
 </body>
   </file>
 </xliff>

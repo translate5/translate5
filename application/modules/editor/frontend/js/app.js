@@ -65,14 +65,11 @@ Ext.ClassManager.onCreated(function(className) {
     }
 });
 
-Ext.state.Manager.setProvider(new Ext.state.CookieProvider({ 
-	expires: new Date(new Date().getTime()+(10006060247)), //7 days from now 
-}));
 
 Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
-  stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages'],
+  stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages','UserConfig'],
   requires: [
       'Editor.view.ViewPort', 
       Editor.data.app.viewport, 
@@ -80,6 +77,7 @@ Ext.application({
       'Editor.util.TaskActions',
       'Editor.util.messageBus.MessageBus',
       'Editor.util.messageBus.EventDomain',
+      'Editor.util.HttpStateProvider'
   ],
   controllers: Editor.data.app.controllers,
   appFolder : Editor.data.appFolder,
@@ -112,43 +110,57 @@ Ext.application({
       Ext.Ajax.setDefaultHeaders({
           'Accept': 'application/json'
       });
-      
       //init the plugins namespace
       Ext.ns('Editor.plugins');
-      
-      this.applyDefaultState();
       this.callParent(arguments);
       this.logoutOnWindowClose();
   },
   launch : function() {
-      var me = this,
-      viewSize = Ext.getBody().getViewSize();
-    Ext.QuickTips.init();
-    me.windowTitle = Ext.getDoc().dom.title;
-
-    me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
-    if(!Ext.isIE8m) {
-        me[Editor.data.app.initMethod]();
-    }
-    me.browserAdvice();
-    Editor.MessageBox.showInitialMessages();
+	  var me=this,
+      	provider=Ext.create('Editor.util.HttpStateProvider');
+      provider.store.on({
+    	  load:function(){
+    		  me.initViewportLunch();
+    	  }
+      })
+      Ext.state.Manager.setProvider(provider);
+	  Ext.state.Manager.getProvider().sync();
+  },
+  
+  /***
+   * Init and prepare the viewport for application lunch
+   */
+  initViewportLunch:function(){
+	  var me = this,
+    	viewSize = Ext.getBody().getViewSize();
     
-    //Logs the users userAgent and screen size for usability improvements:
-    Ext.Ajax.request({
-        url: Editor.data.pathToRunDir+'/editor/index/logbrowsertype',
-        method: 'post',
-        params: {
-            appVersion: navigator.appVersion,
-            userAgent: navigator.userAgent,
-            browserName: navigator.appName,
-            maxHeight: window.screen.availHeight,
-            maxWidth: window.screen.availWidth,
-            usedHeight: viewSize.height,
-            usedWidth: viewSize.width
-        }
-    });
-    
-    me.fireEvent('editorAppLaunched');
+	    Ext.QuickTips.init();
+	    me.windowTitle = Ext.getDoc().dom.title;
+	
+	    me.authenticatedUser = Ext.create('Editor.model.admin.User', Editor.data.app.user);
+	  if(!Ext.isIE8m) {
+	        me[Editor.data.app.initMethod]();
+	    }
+	    me.browserAdvice();
+	    Editor.MessageBox.showInitialMessages();
+	    
+	    //Logs the users userAgent and screen size for usability improvements:
+	    Ext.Ajax.request({
+	        url: Editor.data.pathToRunDir+'/editor/index/logbrowsertype',
+	        method: 'post',
+	        params: {
+	            appVersion: navigator.appVersion,
+	            userAgent: navigator.userAgent,
+	            browserName: navigator.appName,
+	            maxHeight: window.screen.availHeight,
+	            maxWidth: window.screen.availWidth,
+	            usedHeight: viewSize.height,
+	            usedWidth: viewSize.width
+	        }
+	    });
+	    
+	    me.fireEvent('editorAppLaunched');
+	  
   },
   /**
    * If configured the user is logged out on window close
@@ -277,88 +289,6 @@ Ext.application({
       initial = me.viewport.down(me.viewport.getInitialView());
       Ext.getDoc().dom.title = me.windowTitle;
       initial.fireEvent('show', initial);
-  },
-
-  /**
-   * Apply the state for each configured grid in the defaultState config variable
-   */
-  applyDefaultState:function(){
-    if(!Editor.data.frontend || !Editor.data.frontend.defaultState){
-      return;
-    }
-    var me=this,
-        states=Ext.clone(Editor.data.frontend.defaultState),
-        gridState={};
-
-    //loop over all states(states for grids), and create config object which will be applied on the component 
-    //when afterrender event is triggered
-    for (var selector in states) {
-        var configObjects = Ext.clone(states[selector]);    
-        gridState[selector]={
-            afterrender:{
-                fn:me.defaultStateHandler,
-                options:{
-                    //set lowes priority
-                    priority:-999,
-                    args:{
-                        selector:selector
-                    }
-                }   
-            }
-        };
-    }
-    me.control(gridState);
-  },
-
-  /***
-   * State handler for the controll (controls and control configs are defined in the Editor.data.frontend.defaultState variable)
-   */
-  defaultStateHandler:function(component,eOpts){
-
-        //get the config object for the current component from the configuration variable
-        var configObject=this.getDefaultStateConfigObject(eOpts.options.args.selector);
-        //apply the configuration object to the component
-        component.applyState(configObject);
-        //FIXME: Extjs bug, the header is still visible after apply state
-        //https://www.sencha.com/forum/showthread.php?306941-Apply-state-after-grid-reconfigure
-        // workaround: rehide hidden columns
-        Ext.suspendLayouts();
-        Ext.Array.forEach(component.getColumns(), function (column) {
-            if (column.hidden) {
-                column.show();
-                column.hide();
-            }
-        });
-        Ext.resumeLayouts(true);
-  },
-
-  /***
-   * Return the configuration object from the defaultState config variable.
-   * The returned value needs to be cloned because the values are modefyed by the framework 
-   */
-  getDefaultStateConfigObject:function(selector){
-      return Ext.clone(Editor.data.frontend.defaultState[selector]);
-  },
-  
-  /***
-   * Output in the console the state
-   * (see the example: http://confluence.translate5.net/display/CON/Column+configuration+for+task+overview+and+user+management ) 
-   * for all rendered grids in the application
-   */
-  getGridState:function(){
-      var grids=Ext.ComponentQuery.query('grid');
-      if(grids.length<1){
-          console.log("No grids were found (rendered in the application).")
-          return;
-      }
-      var gridState=null,
-          gridStateContainer=[];
-      grids.forEach(function(grid) {
-          gridState=grid.getState();
-          gridStateContainer.push('"#'+grid.getItemId()+'":'+JSON.stringify(gridState))
-      });
-      
-      console.log('{'+gridStateContainer.join()+'}');
   },
   
   mask: function(msg, title) {

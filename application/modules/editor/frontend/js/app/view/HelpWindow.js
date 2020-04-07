@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.HelpWindow', {
-    extend: 'Ext.window.Window',
+    extend: 'Editor.view.StatefulWindow',
     alias: 'widget.helpWindow',
     itemId: 'helpWindow',
     stateId:'helpWindow',
@@ -39,22 +39,43 @@ Ext.define('Editor.view.HelpWindow', {
     autoScroll: true,
     modal : true,
     layout:'fit',
-    viewModel: true,
+    viewModel:true,
     bind:{
     	doNotShowAgain:'{cbDoNotShowAgain.checked}'
     },
-    dockedItems: [{
-        xtype: 'toolbar',
-        dock: 'bottom',
-        items: [{
-        	xtype:'checkboxfield',
-        	boxLabel:'Do not show this window again ?',
-        	reference: 'cbDoNotShowAgain',
-            publishes: 'value',
-        	name:'cbDoNotShowAgain',
-            bind:{
-            	value:'{helpWindow.doNotShowAgain}'
-            }
-        }]
-    }]
+    strings:{
+    	cbDoNotShowAgainLabel:'#UT#Dieses Fenster nicht mehr automatisch anzeigen.'
+    		//do not automaticly show this window
+    },
+    getStateId:function(){
+    	var me=this,
+    		original=me.callParent();
+    	return original+'.'+Editor.data.helpSection;
+    },
+    
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config = {
+        		dockedItems: [{
+        	        xtype: 'toolbar',
+        	        dock: 'bottom',
+        	        items: [{
+        	        	xtype:'checkboxfield',
+        	        	boxLabel:me.strings.cbDoNotShowAgainLabel,
+        	        	reference: 'cbDoNotShowAgain',
+        	            publishes: 'value',
+        	        	name:'cbDoNotShowAgain',
+        	        	itemId:'cbDoNotShowAgain',
+        	            bind:{
+        	            	value:'{helpWindow.doNotShowAgain}'
+        	            }
+        	        }]
+        	    }]
+            };
+        
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    }
 });
