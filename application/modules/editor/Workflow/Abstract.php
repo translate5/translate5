@@ -272,6 +272,13 @@ abstract class editor_Workflow_Abstract {
      */
     protected $log = [];
     
+    
+    /***
+     * the defined steps can not be assigned as workflow step
+     * @var array
+     */
+    protected $notAssignableSteps=[self::STEP_PM_CHECK,self::STEP_NO_WORKFLOW,self::STEP_WORKFLOW_ENDED];
+    
     public function __construct() {
         $this->loadAuthenticatedUser();
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
@@ -483,6 +490,14 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
+     * Return only the assignable workflow steps.
+     * @return array 
+     */
+    public function getAssignableSteps(){
+        return array_diff($this->getFilteredConstants('STEP_'), $this->notAssignableSteps);
+    }
+    
+    /**
      * 
      * @return array of available role constants (keys are constants, valus are constant-values)
      */
@@ -604,25 +619,6 @@ abstract class editor_Workflow_Abstract {
         return self::STATE_EDIT;
     }
 
-    /**
-     * returns the TaskUserAssoc Entity to the given combination of $taskGuid and $userGuid, 
-     * returns null if nothing found
-     * @param string $taskGuid
-     * @param string $userGuid
-     * @return editor_Models_TaskUserAssoc returns null if nothing found
-     */
-    public function getTaskUserAssoc(string $taskGuid, string $userGuid) {
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        try {
-            $tua->loadByParams($userGuid, $taskGuid);
-            return $tua;
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            return null;
-        }
-    }
-    
     /**
      * checks if the given TaskUserAssoc Instance allows reading of the task according to the Workflow Definitions
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
@@ -786,11 +782,8 @@ abstract class editor_Workflow_Abstract {
     protected function commonBeforeSegmentSave(editor_Models_Segment $segmentToSave, Closure $updateStates, editor_Models_Task $task) {
         $sessionUser = new Zend_Session_Namespace('user');
         
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        
         //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
-        $tua->loadByParams($sessionUser->data->userGuid, $task->getTaskGuid());
+        $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUser->data->userGuid, $task);
         if($tua->getIsPmOverride() == 1){
             $segmentToSave->setWorkflowStepNr($task->getWorkflowStep()); //set also the number to identify in which phase the changes were done
             $segmentToSave->setWorkflowStep(self::STEP_PM_CHECK);
@@ -1207,17 +1200,12 @@ abstract class editor_Workflow_Abstract {
         }
         $this->newTask = $task;
         
-        //try to load an user assoc between current user and task 
-        $this->newTaskUserAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         try {
-            $this->newTaskUserAssoc->loadByParams($this->authenticatedUser->userGuid, $task->getTaskGuid());
-            $role = $this->newTaskUserAssoc->getRole();
-            $state = $this->newTaskUserAssoc->getState();
+            //try to load an user assoc between current user and task 
+            $this->newTaskUserAssoc =editor_Models_Loaders_Taskuserassoc::loadByTask($this->authenticatedUser->userGuid, $task);
         }
         catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->newTaskUserAssoc = null;
-            $role = null;
-            $state = null;
         }
         $this->callActions('handleDirect::'.$trigger, $task->getWorkflowStepName());
         return true;
@@ -1294,10 +1282,8 @@ abstract class editor_Workflow_Abstract {
     protected function doTaskChange() {
         $function = 'handleTaskChange';
         $this->doDebug($function);
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
         try {
-            $tua->loadByParams($this->authenticatedUser->userGuid, $this->newTask->getTaskGuid());
+            $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($this->authenticatedUser->userGuid, $this->newTask);
             $this->callActions($function, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
         }
         catch (ZfExtended_Models_Entity_NotFoundException $e) {

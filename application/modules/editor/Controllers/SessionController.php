@@ -72,7 +72,7 @@ class editor_SessionController extends ZfExtended_SessionController {
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         try {
-            $tua->loadByParams($user->data->userGuid, $taskGuid);
+            $tua->loadByParams($user->data->userGuid, $taskGuid,$workflow->getRoleOfStep($task->getWorkflowStepName()));
             $state = $workflow->getInitialUsageState($tua);
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {

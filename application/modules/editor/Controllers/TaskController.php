@@ -856,7 +856,14 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->initWorkflow();
         
         $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
-        $tua = $this->workflow->getTaskUserAssoc($taskguid, $this->user->data->userGuid);
+
+        $tua = null;
+        try {
+            $tua=editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+        }
+        
         //mayLoadAllTasks is only true, if the current "PM" is not associated to the task directly. 
         // If it is (pm override false) directly associated, the workflow must be considered it the task is openable / writeable.  
         $mayLoadAllTasks = $mayLoadAllTasks && (empty($tua) || $tua->getIsPmOverride());
@@ -1142,12 +1149,10 @@ class editor_TaskController extends ZfExtended_RestController {
         $isOpen = $this->isOpenTaskRequest();
         $isPmOverride = false;
         
-        $taskGuid = $this->entity->getTaskGuid();
-        
-        $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        $userTaskAssoc=ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userTaskAssoc editor_Models_TaskUserAssoc */
         try {
-            $userTaskAssoc->loadByParams($userGuid,$taskGuid);
+            $userTaskAssoc=editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $this->entity);
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
@@ -1161,7 +1166,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 throw $e;
             }
             $userTaskAssoc->setUserGuid($userGuid);
-            $userTaskAssoc->setTaskGuid($taskGuid);
+            $userTaskAssoc->setTaskGuid($this->entity->getTaskGuid());
             $userTaskAssoc->setRole('');
             $userTaskAssoc->setState('');
             $isPmOverride = true;

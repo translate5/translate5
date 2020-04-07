@@ -86,7 +86,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                     xtype: 'gridcolumn',
                     dataIndex: 'userGuid',
                     renderer: function(v, meta, rec) {
-                        if(v.length == 0) {
+                        if(!v) {
                             return me.strings.defaultEntry;
                         }
                         var idx = userStore.find('userGuid', v),

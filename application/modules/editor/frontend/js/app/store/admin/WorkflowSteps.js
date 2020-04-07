@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.store.admin.WorkflowSteps', {
 	extend : 'Ext.data.Store',
+	alias:'store.workflowsteps',
 	initConfig: function(instanceConfig) {
 		var me = this,
 			config={};

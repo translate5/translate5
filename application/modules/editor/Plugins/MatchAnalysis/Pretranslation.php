@@ -272,11 +272,10 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             return $this->userTaskAssoc;
         }
         
-        $this->userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
         try {
-            $this->userTaskAssoc->loadByParams($this->userGuid,$this->task->getTaskGuid());
+            $this->userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($this->userGuid, $this->task);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             $this->userTaskAssoc->setUserGuid($this->userGuid);
             $this->userTaskAssoc->setTaskGuid($this->task->getTaskGuid());
             $this->userTaskAssoc->setRole('');
