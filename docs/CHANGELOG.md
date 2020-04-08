@@ -3,6 +3,42 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.4.1] - 2020-04-08
+###Added
+TRANSLATE-1997: Show help window automatically and remember "seen" click
+  If configured the window pops up automatically and saves the "have seen" info
+TRANSLATE-2001: Support MemoQ comments for im- and export
+  Added comment support to the MemoQ im- and export
+
+###Changed
+TRANSLATE-2007: LanguageResources that cannot be used: Improve error handling
+  Improved the error handling if a chosen language-resource is not available.
+
+###Bugfixes
+TRANSLATE-2022: Prevent huge segments to be send to the termTagger
+  Huge Segments (configurable, default more then 150 words) are not send to the TermTagger anymore due performance reasons.
+TRANSLATE-1753: Import Archive for single uploads misses files and can not be reimported
+  In the import archive for single uploads some files were missing, so that the task could not be reimported with the clone button.
+TRANSLATE-2018: mysql error when date field as default value has CURRENT_TIMESTAMP
+  The problem is solved in translate5 by adding the current timestamp there
+TRANSLATE-2008: Improve TermTagger usage when TermTagger is not reachable
+  The TermTagger is not reachable in the time when it is tagging terms. So if the segments are bigger this leads to timeout messages when trying to connect to the termtagger.
+TRANSLATE-2004: send import summary mail to pm on import errors
+  Sends a summary of import errors and warnings to the PM, by default only if the PM did not start the import but via API. Can be overriden by setting always to true in the workflow notification configuration.
+TRANSLATE-1977: User can not be assigned to 2 different workflow roles of the same task
+  A user can not added multiple times in different roles to a task. For example: first as translator and additionaly as second reviewer.
+TRANSLATE-1998: Not able to edit segment in editor, segment locked
+  This was an error in the multi user backend
+TRANSLATE-2013: Not replaced relaisLanguageTranslated in task association e-mail
+  A text fragment was missing in the task association e-mail
+TRANSLATE-2012: MessageBus is not reacting to requests
+  The MessageBus-server was hanging in an endless loop in some circumstances.
+TRANSLATE-2003: Remove criticical data from error mails
+  Some critical data is removed automatically from log e-mails.
+TRANSLATE-2005: "Display tracked changes" only when TrackChanges are active for a task
+  The button to toggle TrackChanges is disabled if TrackChanges are not available due workflow reasons
+
+
 ## [3.4.0] - 2020-03-04
 
 ### VERY IMPORTANT NOTES for API users (due TRANSLATE-1455):

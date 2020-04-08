@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -40,61 +40,14 @@ END LICENSE AND COPYRIGHT
  */
 $config = Zend_Registry::get('config');
 /* @var $config Zend_Config */
-$menu = $config->runtimeOptions->content->mainMenu;
-
-
-function renderMenu ($menu, $additionalAttributes = '') {
-    if (is_null($menu) || empty($menu)) {
-        return false;
-    }
-    
-    $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-    echo '<ul '.$additionalAttributes.'>'."\n";
-    foreach ($menu as $item) {
-        $hasSubNav = (count(get_object_vars($item)) > 1);
-        foreach($item as $key => $value) {
-            if (is_array($value)) {
-                renderMenu($value);
-                echo '</li>'."\n";
-            }
-            else {
-                $class = ($key === $_SERVER['REQUEST_URI']) ? ' class="active"' : '';
-                echo '<li><a href="' .APPLICATION_RUNDIR. $key . '"' . $class . '>' . $translate->_($value) . '</a>';
-            }
-            
-            if (!$hasSubNav) {
-                echo '</li>'."\n";
-            }
-        }
-    }
-    echo '</ul>'."\n";
-};
-
-/**
- * Render a single entry of the supporters list.
- * @param string $link
- * @param string $name
- * @param string $image
- * @param integer $width
- * @param integer $height
- * @param boolean $clear
- */
-function renderSupporterEntry($link, $name, $image, $width, $height, $clear = FALSE) {
-    $template = '<a href="%s" class="crowdlink" style="width: %s; %s" target="_blank" title="%s"><img src="'.APPLICATION_RUNDIR.'/images/supporter2018/%s" width="%d" height="%d" alt="%s" /></a>'."\n";
-    $name = str_replace('"','&quot;', $name);
-    $cssWidth = round(100 * $width / 1150, 5).'%';
-    $cssClear = ($clear) ? 'clear: left;' : '';
-    
-    return sprintf($template, $link, $cssWidth, $cssClear, $name, $image, $width, $height, $name);
-};
 
 //echo $this->doctype()
 ?>
 <!DOCTYPE HTML>
 <!--
 	HTML, CSS and Javascript outside of the logged in area of translate5 is based on the "Future Imperfect" HTML5 design by HTML5 UP
-        and therefore is under CCA 3.0 license. 
-        To be able to see, what was derived from "Future Imperfect" HTML5  the original "Future Imperfect" design package 
+        and therefore is under CCA 3.0 license.
+        To be able to see, what was derived from "Future Imperfect" HTML5  the original "Future Imperfect" design package
         is added under /assets/html5up-future-imperfect.zip as a reference
         html5up.net | @ajlkn
         Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
@@ -105,7 +58,6 @@ function renderSupporterEntry($link, $name, $image, $width, $height, $clear = FA
         <meta name="description" content="Cloud open source translation, reviewing and postediting system.">
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <!--[if lte IE 8]><script src="<?php echo APPLICATION_RUNDIR;?>/assets/js/ie/html5shiv.js"></script><![endif]-->
         <link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR;?>/assets/css/main.css?V=2020-03-25" />
         <!--[if lte IE 9]><link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR;?>/assets/css/ie9.css" /><![endif]-->
         <!--[if lte IE 8]><link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR;?>/assets/css/ie8.css" /><![endif]-->
@@ -119,59 +71,16 @@ function renderSupporterEntry($link, $name, $image, $width, $height, $clear = FA
                     <a href="<?php echo APPLICATION_RUNDIR;?>/" class="logo"><img src="<?php echo APPLICATION_RUNDIR;?>/images/translate5-transparent.png" alt="translate5" /></a>
                 </div>
             </header>
-            <!-- Menu -->
-            <section id="menu">
-                <!-- Links -->
-                <section>
-                    <?php renderMenu($menu, 'class="links"'); ?>
-                </section>
-                
-                <!-- Actions -->
-                <section>
-                    <ul class="actions vertical">
-                        <li><a href="<?php echo APPLICATION_RUNDIR;?>/login" class="button big fit">Log In</a></li>
-                    </ul>
-                </section>
-            </section>
             
             <div id="main">
 <?php echo $this->layout()->content; ?>
             </div>
             
             <!-- Sidebar -->
-            <section id="sidebar">
-                <!-- Intro -->
-                <section id="intro">
-                    <header>
-                        <h1>Open Source translation system</h1>
-                        <p>Cloud open source translation, review- and postediting system</p>
-                    </header>
-                    <h2>About translate5</h2>
-                    <ul class="icons">
-                        <li><i class="fa-chevron-circle-right"></i> <a href="https://www.translate5.net/solutions/" target="_blank">Solution scenarios</a></li>
-                        <li><i class="fa-chevron-circle-right"></i> <a href="https://www.translate5.net/resources/" target="_blank">Resources</a></li>
-                        <li><i class="fa-chevron-circle-right"></i> <a href="https://www.translate5.net/who-is-behind/" target="_blank">Who is behind</a></li>
-                    </ul>
-                    <ul class="icons">
-                        <li><a href="https://twitter.com/translate5_marc" class="fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
-                        <li><a href="https://www.facebook.com/Translate5-412951439069652/" class="fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
-                        <li><a href="mailto:support@translate5.net" class="fa-envelope" target="_blank"><span class="label">Email</span></a></li>
-                    </ul>
-                </section>
-                
+<?php echo $this->render('fragments/sidebar.phtml'); ?>
                 <!-- Footer -->
-                <section id="footer">
-                    <p class="copyright">
-                        <a href="https://www.translate5.net/imprint-privacy-policy/">Imprint &amp; privacy policy</a> | <a href="mailto:support@translate5.net">Ask a question about translate5</a>
-                    </p>
-                </section>
+<?php echo $this->render('fragments/footer.phtml'); ?>
             </section>
         </div>
-        <!-- Scripts -->
-        <script src="<?php echo APPLICATION_RUNDIR;?>/js/jquery-ui/jquery-ui-1.12.1/external/jquery/jquery.js"></script>
-        <script src="<?php echo APPLICATION_RUNDIR;?>/assets/js/skel.min.js"></script>
-        <script src="<?php echo APPLICATION_RUNDIR;?>/assets/js/util.js"></script>
-        <!--[if lte IE 8]><script src="<?php echo APPLICATION_RUNDIR;?>/assets/js/ie/respond.min.js"></script><![endif]-->
-        <script src="<?php echo APPLICATION_RUNDIR;?>/assets/js/main.js"></script>
     </body>
 </html>
