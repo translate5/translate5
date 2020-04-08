@@ -10,13 +10,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -29,9 +29,9 @@ END LICENSE AND COPYRIGHT
 
 /**
      * Since long strings are hard to maintain in JSON (all in one line, no line breaks)
-     * and no comments are possible in JSON, I decided to create a PHP based generator of 
+     * and no comments are possible in JSON, I decided to create a PHP based generator of
      * the dependencies JSON. The same config structure is just build up in PHP and saved to disk as JSON in the end
-     * 
+     *
      * Assoc arrays are used instead of stdClass for better readability.
      */
 
@@ -40,11 +40,14 @@ $dep = new stdClass();
 //the idea was to provide different channes, the problem is, how to choose the channel!
 // Conclusion: the default channel can come from the dep.json, but if the user wants another this must be configured elsewhere
 $dep->channels = [
-    "RELEASE" => "http://www.translate5.net/downloads/"
+    "RELEASE" => "https://downloads.translate5.net/"
 ];
 
 //The path to the md5hashtable which is used for comparing if a package was changed on server or not
 $dep->md5hashtable = "RELEASE:md5hashtable";
+
+//The path to the version file
+$dep->versionfile = "RELEASE:version";
 
 //basic application configuration
 $dep->application = [
@@ -65,7 +68,7 @@ $dep->dependencies = [[
                                                             // without a target the whole application is getting deleted!
                                                             // that means we can provide only ZIP packages at the moment
                                                             // with version 2.5.10 this is fixed, but lazy updaters will still have the problem!
-                                                            // so in near future target will be optional, and without a target 
+                                                            // so in near future target will be optional, and without a target
                                                             // nothing will be unzipped, just downloaded
     ],[
         "name" => "horde_text_diff",                        // see above
@@ -76,8 +79,8 @@ $dep->dependencies = [[
         "licenses" => [[                                    // list of licenses to be confirmed for this package
             "uses" => "the Horde Text Diff library",        // is parsed into license title and agreement
             "license" => "LGPL",                            // is parsed into license title and agreement
-            "relpath" => "docs/third-party-licenses/Horde_Text_Diff-2.0.1.license.txt" 
-                                                            // relpath file is checked for existence, 
+            "relpath" => "docs/third-party-licenses/Horde_Text_Diff-2.0.1.license.txt"
+                                                            // relpath file is checked for existence,
                                                             //  then the path (not the content) parsed into license agreement
             // agreement   optional, overwrites default agreement (defined in ZfExtended_Models_Installer_License)
             // title       optional, overwrites default title (defined in ZfExtended_Models_Installer_License)
@@ -127,18 +130,18 @@ $dep->dependencies = [[
             "label" => "openTMS TermTagger libraries",
             "license" => "CDDL 1.1",
             "relpath" => "docs/third-party-licenses/CDDL-license.txt",
-            "agreement" => 'Grizzly project and others license agreement description: 
-  Some of the libraries openTMS TermTagger builds on are licensed 
+            "agreement" => 'Grizzly project and others license agreement description:
+  Some of the libraries openTMS TermTagger builds on are licensed
   under the CDDL license. Please read the following license agreement
-  and accept it for these libraries (like the Grizzly project and 
-  others). Which library uses which license is listed in the openTMS 
-  TermTagger installation directory which you will find in your 
+  and accept it for these libraries (like the Grizzly project and
+  others). Which library uses which license is listed in the openTMS
+  TermTagger installation directory which you will find in your
   translate5 application directory beneath
 
     application/modules/editor/ThirdParty/XliffTermTagger/
 
   after installation. You must accept the terms of this agreement for
-  these components by typing "y" before continuing with the 
+  these components by typing "y" before continuing with the
   installation.'
         ]]
     ],[
@@ -152,24 +155,24 @@ $dep->dependencies = [[
             "license" => "Eclipse Public License 1.0",
             "relpath" => "docs/third-party-licenses/OpenTM2-Community-Edition-license.txt",
             "agreement" => 'translate5 uses {USES} (version {VERSION}).
-  Please read the following license agreement and accept it for 
+  Please read the following license agreement and accept it for
   OpenTM2.
 
     {RELPATH}
 
   You must accept the terms of this agreement for {LABEL} by typing
   "y" and <ENTER> before continuing with the installation.
-  If you type "y", the translate5 installer will download {LABEL} 
-  for you. 
+  If you type "y", the translate5 installer will download {LABEL}
+  for you.
 
   !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!
     Since {LABEL} is executable only under Microsoft Windows
     Operating Systems the installer can only download it for you.
   !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!
 
-  The Installation has to be started manually! 
+  The Installation has to be started manually!
 
-  Please stop an already running {LABEL} instance before 
+  Please stop an already running {LABEL} instance before
   installing / updating it!
   The downloaded file will be located in the folder
                 
