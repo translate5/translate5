@@ -75,11 +75,14 @@ $config = Zend_Registry::get('config');
             <div id="main">
 <?php echo $this->layout()->content; ?>
             </div>
-            
-            <!-- Sidebar -->
-<?php echo $this->render('fragments/sidebar.phtml'); ?>
-                <!-- Footer -->
-<?php echo $this->render('fragments/footer.phtml'); ?>
+<?php
+if($this->getScriptPath('fragments/sidebar.phtml')) {
+    echo $this->render('fragments/sidebar.phtml');
+}
+if($this->getScriptPath('fragments/footer.phtml')) {
+    echo $this->render('fragments/footer.phtml');
+}
+?>
             </section>
         </div>
     </body>
