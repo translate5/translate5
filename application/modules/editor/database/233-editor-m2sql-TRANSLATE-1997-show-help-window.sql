@@ -56,23 +56,23 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('edit
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) 
 VALUES 
-('runtimeOptions.frontend.defaultState.helpWindow.customeroverview', '1', 'editor', 'system', '{"doNotShowAgain":false}', '', '', 'map', 'Help window default state configuration for the customeroverview panel. When doNotShowAgain is set to false, the window will appear automaticly for customeroverview panel. When setting this config to true or leave the field value as empty, the window will not apear automaticly.', '1');
+('runtimeOptions.frontend.defaultState.helpWindow.customeroverview', '1', 'editor', 'system', '', '', '', 'map', 'Help window default state configuration for the customeroverview panel. When doNotShowAgain is set to false, the window will appear automaticly for customeroverview panel. When setting this config to true or leave the field value as empty, the window will not apear automaticly.', '1');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) 
 VALUES 
-('runtimeOptions.frontend.defaultState.helpWindow.taskoverview', '1', 'editor', 'system', '{"doNotShowAgain":false}', '', '', 'map', 'Help window default state configuration for the taskoverview panel. When doNotShowAgain is set to false, the window will appear automaticly for taskoverview panel. When setting this config to true or leave the field value as empty, the window will not apear automaticly.', '1');
+('runtimeOptions.frontend.defaultState.helpWindow.taskoverview', '1', 'editor', 'system', '', '', '', 'map', 'Help window default state configuration for the taskoverview panel. When doNotShowAgain is set to false, the window will appear automaticly for taskoverview panel. When setting this config to true or leave the field value as empty, the window will not apear automaticly.', '1');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) 
 VALUES 
-('runtimeOptions.frontend.defaultState.helpWindow.useroverview', '1', 'editor', 'system', '{"doNotShowAgain":false}', '', '', 'map', 'Help window default state configuration for the useroverview panel. When doNotShowAgain is set to false, the window will appear automaticly for useroverview panel. When setting this config to true or leave the field value as empty, the window will not apear automaticly.', '1');
+('runtimeOptions.frontend.defaultState.helpWindow.useroverview', '1', 'editor', 'system', '', '', '', 'map', 'Help window default state configuration for the useroverview panel. When doNotShowAgain is set to false, the window will appear automaticly for useroverview panel. When setting this config to true or leave the field value as empty, the window will not apear automaticly.', '1');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) 
 VALUES 
-('runtimeOptions.frontend.defaultState.helpWindow.editor', '1', 'editor', 'system', '{"doNotShowAgain":false}', '', '', 'map', 'Help window default state configuration for the editor panel. When doNotShowAgain is set to false, the window will appear automaticly for editor panel. When setting this config to true or leave the field value as empty, the window will not apear automaticly.', '1');
+('runtimeOptions.frontend.defaultState.helpWindow.editor', '1', 'editor', 'system', '', '', '', 'map', 'Help window default state configuration for the editor panel. When doNotShowAgain is set to false, the window will appear automaticly for editor panel. When setting this config to true or leave the field value as empty, the window will not apear automaticly.', '1');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) 
 VALUES 
-('runtimeOptions.frontend.defaultState.helpWindow.languageresource', '1', 'editor', 'system', '{"doNotShowAgain":false}', '', '', 'map', 'Help window default state configuration for the languageresource panel. When doNotShowAgain is set to false, the window will appear automaticly for languageresource panel. When setting this config to true or leave the field value as empty, the window will not apear automaticly.', '1');
+('runtimeOptions.frontend.defaultState.helpWindow.languageresource', '1', 'editor', 'system', '', '', '', 'map', 'Help window default state configuration for the languageresource panel. When doNotShowAgain is set to false, the window will appear automaticly for languageresource panel. When setting this config to true or leave the field value as empty, the window will not apear automaticly.', '1');
 
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) 
