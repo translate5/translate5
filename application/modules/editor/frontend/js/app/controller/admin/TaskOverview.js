@@ -257,7 +257,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   handleAfterShow: function(grid) {
       this.getHeadToolBar().down('#task-admin-btn').hide();
       //fire the global event for component view change
-      Ext.fireEvent('componentViewChanged','taskoverview',grid.getTitle());
+      //TODO: refactor so that event is only fired once in a application view load function which should be created when rebuilding the main menu
+      Ext.fireEvent('applicationViewChanged','taskoverview',grid.getTitle());
   },
   /**
    * handle after hide of taskgrid

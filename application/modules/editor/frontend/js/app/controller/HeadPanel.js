@@ -109,7 +109,7 @@ Ext.define('Editor.controller.HeadPanel', {
     	  }  
       },
       global:{
-		  componentViewChanged:'onComponentViewChanged'
+    	  applicationViewChanged:'onApplicationViewChanged'
 	  }
   },
   //***********************************************************************************
@@ -225,7 +225,7 @@ Ext.define('Editor.controller.HeadPanel', {
   /***
    * On component view change event handler. This event is a global event.
    */
-  onComponentViewChanged:function(name,title){
+  onApplicationViewChanged:function(name,title){
 	  //if the helpurl is configured, add the userstate window
 	  if(Editor.data.helpUrl){
 		  Editor.data.helpSection = name;

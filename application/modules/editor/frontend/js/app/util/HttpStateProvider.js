@@ -51,10 +51,10 @@ Ext.define('Editor.util.HttpStateProvider',{
      */
     writeBuffer: 2000,
 
-    /**
-     * Callback which will be called on the first store load.
+    /***
+     * Prefix for the state record name in the store
      */
-    onFirstLoad: Ext.emptyFn,
+    DEFAULT_STATE_PREFIX:'runtimeOptions.frontend.defaultState.',
     
     constructor: function (config) {
         config = config || {};
@@ -64,16 +64,6 @@ Ext.define('Editor.util.HttpStateProvider',{
         if (!me.store) {
             me.store = Ext.create('Editor.store.UserConfig');
         }
-
-        // Have to block in order to load the store before leaving the
-        // constructor, otherwise, the first query may be against an
-        // empty store. There must be a better way...
-        var oldValue = Ext.data.Connection.prototype.async;
-        Ext.data.Connection.prototype.async = false;
-        me.store.load({
-            callback: me.onFirstLoad
-        });
-        Ext.data.Connection.prototype.async = oldValue;
         
         me.callParent(arguments);
         
@@ -100,29 +90,19 @@ Ext.define('Editor.util.HttpStateProvider',{
      */
     set: function (name, value) {
         var me = this,
-        	pos = me.store.find('name', name), 
+        	pos = me.findRecordIndex(name), 
         	row;
 
         if(pos < 0){
         	return;
         }
         row = me.store.getAt(pos);
+        //if the store value is empty, this config is disabled (the default value in zf_config is empty)
+        if(row.get('value')==""){
+        	return;
+        }
         row.set('value', me.encodeValue(value));
         me.fireEvent('statechange', me, name, value);
-        
-//Info: for now we will disable the new record when the config is not available from the backend, this should be enable in future dev
-//        if (pos > -1) {
-//            row = me.store.getAt(pos);
-//            row.set('value', me.encodeValue(value));
-//        } else {
-//            me.store.add({
-//                name : name,
-//                value: me.encodeValue(value),
-//                userGuid:Editor.data.app.user.userGuid
-//            });
-//        }
-
-//        me.fireEvent('statechange', me, name, value);
     },
 
     /***
@@ -130,7 +110,7 @@ Ext.define('Editor.util.HttpStateProvider',{
      */
     get: function (name, defaultValue) {
         var me = this,
-        	pos = me.store.findExact('name', name), 
+        	pos = me.findRecordIndex(name), 
         	row, 
         	value;
         if (pos > -1) {
@@ -146,7 +126,8 @@ Ext.define('Editor.util.HttpStateProvider',{
      * Remove state record by name
      */
     clear: function (name) {
-        var me = this, pos = me.store.find('name', name);
+        var me = this,
+        	pos = me.findRecordIndex(name);
         if (pos > -1) {
             me.store.removeAt(pos);
             me.fireEvent('statechange', me, name, null);
@@ -179,5 +160,14 @@ Ext.define('Editor.util.HttpStateProvider',{
     	}
     	return JSON.parse(value);
     },
+    
+    /***
+     * Find the record for the stateful component.
+     */
+    findRecordIndex:function(name){
+    	var me=this,
+    		originalName=me.DEFAULT_STATE_PREFIX+name;
+    	return this.store.findExact('name', originalName);
+    }
 
 });

@@ -393,6 +393,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $filter=ZfExtended_Factory::get('ZfExtended_Models_Filter_ExtJs6');
         /* @var $filter ZfExtended_Models_Filter_ExtJs6 */
         $php2js->set('app.filters.translatedOperators', $filter->getTranslatedOperators());
+        
+        $config=ZfExtended_Factory::get('editor_Models_Config');
+        /* @var $config editor_Models_Config */
+        //set frontend array from the config data
+        //the array is used as initial user config store data
+        $php2js->set('app.configData',$config->loadAllMerged());
     }
     
     protected function getAppVersion() {

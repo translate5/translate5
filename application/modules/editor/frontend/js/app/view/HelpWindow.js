@@ -84,6 +84,7 @@ Ext.define('Editor.view.HelpWindow', {
      * The component is not visible when the there is not state config for the window type
      */
     isComponentHidden:function(){
-    	return Ext.state.Manager.getProvider().get(this.getStateId())===undefined;
+    	var state=Ext.state.Manager.getProvider().get(this.getStateId());
+		return state===undefined || state==""
     }
 });

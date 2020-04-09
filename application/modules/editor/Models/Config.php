@@ -41,8 +41,6 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     const CONFIG_LEVEL_TASK=8;
     const CONFIG_LEVEL_USER=16;
     
-    const DEFAULT_STATE_PREFIX='runtimeOptions.frontend.defaultState.';
-    
     protected $configLabel=[
         self::CONFIG_LEVEL_SYSTEM=>'system',
         self::CONFIG_LEVEL_INSTANCE=>'instance',
@@ -53,13 +51,11 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     //system 1 (default), instance 2, customer 4, task 8 , user 16
     
     /***
-     * Load all zf configuration values merged with the user config values. The user config value will
-     * override the zf confuguration(default) values.
+     * Load all zf configuration values merged with the user config values and installation.ini vaues. The user config value will
+     * override the zf confuguration/ini (default) values.
      * TODO: in future implementation, the zf configuration values should be loaded by user lvl!
-     * {@inheritDoc}
-     * @see ZfExtended_Models_Entity_Abstract::loadAll()
      */
-    public function loadAll(){
+    public function loadAllMerged(){
         $user = new Zend_Session_Namespace('user');
         $aclUserLvl=$this->getFilteredConstants('CONFIG_LEVEL_');
         
@@ -68,23 +64,29 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         ->where('level IN(?)',$aclUserLvl);
         $zfconfig=$this->db->getAdapter()->fetchAll($s);
 
+        //merge the ini with zfconfig values
+        $iniOptions = Zend_Registry::get('bootstrap')->getApplication()->getOptions();
+        foreach($zfconfig as &$row) {
+            $this->mergeWithIni($iniOptions, explode('.', $row['name']), $row);
+        }
+        
         $s=$this->db->select()
         ->setIntegrityCheck(false)
         ->from('LEK_user_config',['LEK_user_config.*',new Zend_Db_Expr('"'.self::CONFIG_SOURCE_USER_CONFIG.'" as origin')])
         ->where('userGuid=?',$user->data->userGuid);
         $userConfig=$this->db->getAdapter()->fetchAll($s);
 
-        return array_map(function($item) use ($userConfig){
+        $results=array_map(function($item) use ($userConfig){
             //if the config is defatulState config, remove the prefix for the config. The frontend uses short stateId names not full blown "runtimeOptions.frontend.defaultState."
-            if(strpos($item['name'],self::DEFAULT_STATE_PREFIX)!==false && !empty($item['value'])){
-                $item['name']=str_replace(self::DEFAULT_STATE_PREFIX,'', $item['name']);
-                $key=array_search($item['name'], array_column($userConfig, 'name'));
-                if($key!==false){
-                    return $userConfig[$key];
-                }
+            $key=array_search($item['name'], array_column($userConfig, 'name'));
+            if($key!==false){
+                return $userConfig[$key];
             }
             return $item;
         }, $zfconfig);
+       
+        //reindex the array (when the indexes are not in order, the store is not working well)
+        return array_values($results);
     }
     
     /***
@@ -99,18 +101,42 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         //from the frontend, an level is required also as additional param, so the decision here can be made
         //where and for who the config will be saved
 //         if($acl->isInAllowedRoles($user->getRoles(),'stateconfig',$this->configLabel[self::CONFIG_LEVEL_SYSTEM])){
-//             //$this->update(self::DEFAULT_STATE_PREFIX.$configName, $configValue);
+//             //$this->update($configName, $configValue);
 //         }
         
         $acl = ZfExtended_Acl::getInstance();
         //update the user config if the current user is allowed
-        if($acl->isInAllowedRoles($user->getRoles(),'applicationconfig',$this->configLabel[self::CONFIG_LEVEL_USER])){
+        if($acl->isInAllowedRoles($user->getRoles(),'applicationconfigLevel',$this->configLabel[self::CONFIG_LEVEL_USER])){
             $userConfig=ZfExtended_Factory::get('editor_Models_UserConfig');
             /* @var $userConfig editor_Models_UserConfig */
             $userConfig->updateInsertConfig($user->getUserGuid(),$configName,$configValue);
         }
     }
     
+    
+    /**
+     * Merges the ini config values into the DB result
+     * @param array $root
+     * @param array $path
+     * @param array $row given as reference, the ini values are set in here
+     */
+    protected function mergeWithIni(array $root, array $path, array &$row) {
+        $row['origin'] = $row['origin'] ?? editor_Models_Config::CONFIG_SOURCE_DB;
+        $part = array_shift($path);
+        if(!isset($root[$part])) {
+            return;
+        }
+        if(!empty($path)){
+            $this->mergeWithIni($root[$part], $path, $row);
+            return;
+        }
+        $row['origin'] = editor_Models_Config::CONFIG_SOURCE_INI;
+        $row['overwritten'] = $row['value'];
+        $row['value'] = $root[$part];
+        if($row['type'] == ZfExtended_Resource_DbConfig::TYPE_MAP || $row['type'] == ZfExtended_Resource_DbConfig::TYPE_LIST){
+            $row['value'] = json_encode($row['value'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
+    }
     
     /**
      * @param string $filter
