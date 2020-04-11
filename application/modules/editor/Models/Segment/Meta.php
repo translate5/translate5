@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -55,6 +55,8 @@ END LICENSE AND COPYRIGHT
  * @method void setAutopropagated() setAutopropagated(int $autopropagated)
  * @method integer getLocked() getLocked()
  * @method void setLocked() setLocked(int $locked)
+ * @method integer getSourceWordCount() getSourceWordCount()
+ * @method void setSourceWordCount() setSourceWordCount(int $count)
  */
 class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
@@ -82,7 +84,7 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
         $data->length = [];
         $editables = $segment->getEditableFieldData();
         foreach($editables as $field => $value){
-            //the additional mrk length is added here to each field, 
+            //the additional mrk length is added here to each field,
             // so that it is available in the frontend out of the cached siblings without providing an additional data field
             // (the additional unit length is added once to the calculation in the frontend!
             $data->length[$field] = (int)$segment->textLengthByMeta($value, $this) + (int)$this->getAdditionalMrkLength();
@@ -119,5 +121,18 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
                 ->where('taskGuid = ?', $taskGuid);
         $fonts = $this->db->fetchAll($sql);
         return $fonts->toArray();
+    }
+    
+    /**
+     * Returns the word count sum of a task as calculated on import
+     * @param string $taskGuid
+     * @return int
+     */
+    public function getWordCountSum(string $taskGuid): int {
+        $s = $this->db->select()
+        ->from($this->db, 'sum(sourceWordCount) as wordCount')
+        ->where('`taskGuid` = ?', $taskGuid);
+        $result = $this->db->fetchRow($s);
+        return $result['wordCount'] ?? 0;
     }
 }

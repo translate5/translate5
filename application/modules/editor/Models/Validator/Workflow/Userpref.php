@@ -62,6 +62,7 @@ class editor_Models_Validator_Workflow_Userpref extends ZfExtended_Models_Valida
         $this->addValidator('workflow', 'inArray', array(array_keys($wfm->getWorkflows())));
         $this->addSegmentFieldValidator();
         $this->addWorkflowStepValidator();
+        $this->addValidator('taskUserAssocId', 'int',[],true);
     }
 
     /**

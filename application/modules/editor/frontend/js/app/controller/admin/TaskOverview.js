@@ -45,7 +45,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  'admin.WorkflowState',
 	  'admin.WorkflowSteps'
   ],
-  views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow'],
+  views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow','StatefulWindow'],
   refs : [{
       ref: 'headToolBar',
       selector: 'headPanel toolbar#top-menu'
@@ -256,8 +256,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleAfterShow: function(grid) {
       this.getHeadToolBar().down('#task-admin-btn').hide();
-      Editor.data.helpSection = 'taskoverview';
-      Editor.data.helpSectionTitle = grid.getTitle();
+      //fire the global event for component view change
+      Ext.fireEvent('componentViewChanged','taskoverview',grid.getTitle());
   },
   /**
    * handle after hide of taskgrid

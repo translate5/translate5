@@ -61,13 +61,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected $internalFuzzy=false;
 
-    /***
-     * Segment word count calculator
-     * 
-     * @var editor_Models_Segment_WordCount
-     */
-    protected $wordCount;
-    
     protected $connectorErrorCount = [];
     
     /**
@@ -126,15 +119,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         $taskTotalWords=0;
         //init the word count calculator
-        $this->initWordCount();
         foreach($segments as $segment) {
             /* @var $segment editor_Models_Segment */
 
-            $this->wordCount->setSegment($segment);
-            
-            //collect the total words in the task
-            $taskTotalWords+=$this->wordCount->getSourceCount();
-            
             //get the best match rate, respecting repetitions
             $bestMatchRateResult = $this->handleRepetition($segment);
             
@@ -175,11 +162,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         //remove fuzzy languageResource from opentm2
         $this->removeFuzzyResources();
-        
-        //update the task total words
-        $this->task->setWordCount($taskTotalWords);
-        $this->task->save();
-        
+
         return true;
     }
     
@@ -393,7 +376,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param mixed $matchRateResult : it can be stdClass (opentm2 match result) or int (only the matchrate)
      * @param int $languageResourceid
      */
-    public function saveAnalysis($segment,$matchRateResult,$languageResourceid){
+    protected function saveAnalysis($segment,$matchRateResult,$languageResourceid){
         $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
         /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
         $matchAnalysis->setSegmentId($segment->getId());
@@ -401,7 +384,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
         $matchAnalysis->setAnalysisId($this->analysisId);
         $matchAnalysis->setLanguageResourceid($languageResourceid);
-        $matchAnalysis->setWordCount($this->wordCount->getSourceCount());
+        $matchAnalysis->setWordCount($segment->meta()->getSourceWordCount());
         $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
 
         $isFuzzy=false;
@@ -502,21 +485,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         }
         return $this->connectors;
     }
-    
-    /***
-     * Init word counter 
-     */
-    protected function initWordCount(){
-        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        
-        $langModel->load($this->task->getSourceLang());
-        
-        $this->wordCount=ZfExtended_Factory::get('editor_Models_Segment_WordCount',[
-            $langModel->getRfc5646()
-        ]);
-    }
-    
+
     /***
      * Remove fuzzy resources from the opentm2
      */

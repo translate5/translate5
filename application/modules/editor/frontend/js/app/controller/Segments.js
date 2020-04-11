@@ -219,8 +219,8 @@ Ext.define('Editor.controller.Segments', {
       grid.lookupViewModel().set('taskIsReadonly', readOnly);
       vm && vm.editMode(readOnly);
 
-      Editor.data.helpSection = 'editor';
-      Editor.data.helpSectionTitle = grid.getTitle();
+      //fire the global event for component view change
+      Ext.fireEvent('componentViewChanged','editor',grid.getTitle());
       
       initialGridFilters = initialGridFilters && initialGridFilters.segmentgrid;
 

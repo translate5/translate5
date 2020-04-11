@@ -617,7 +617,15 @@ Ext.define('Editor.controller.Localizer', {
             deadlineDateText:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>'
         }
     });
-
+    
+    
+    Ext.define("Editor.locale.de.view.HelpWindow", {
+        override: "Editor.view.HelpWindow",
+        strings:{
+        	cbDoNotShowAgainLabel: '<?php echo $this->translate->_('Dieses Fenster nicht mehr automatisch anzeigen.');?>'
+        }
+    });
+    
     Ext.define("Editor.locale.de.view.admin.task.filter.DateFilter", {
         override: "Editor.view.admin.task.filter.DateFilter",
         strings:{
@@ -810,7 +818,10 @@ Ext.define('Editor.controller.Localizer', {
             assignmentDateLable: '<?php echo $this->translate->_('Zuweisung');?>',
             finishedDateLabel: '<?php echo $this->translate->_('Abgeschlossen');?>',
             deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>'
-        }
+        },
+        states: {
+            edit: '<?php echo $this->translate->_('in Arbeit');?>'
+        },
     });
 
     Ext.define("Editor.locale.de.view.admin.UserChooseWindow", {
@@ -1131,10 +1142,11 @@ Ext.define('Editor.controller.Localizer', {
         btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
         visShow: '<?php echo $this->translate->_('Anzeigen');?>',
         visHide: '<?php echo $this->translate->_('Ausblenden');?>',
-        visDisabled: '<?php echo $this->translate->_('nicht vorhanden');?>'
+        visDisabled: '<?php echo $this->translate->_('nicht vorhanden');?>',
+        forAll: '<?php echo $this->translate->_('für alle');?>'
     };
     
-    Editor.view.admin.task.Preferences.prototype.title = '<?php echo $this->translate->_('Einstellungen zur Ablaufplan');?>';
+    Editor.view.admin.task.Preferences.prototype.title = '<?php echo $this->translate->_('Benutzer-Spezialeinstellungen');?>';
     Editor.view.admin.task.Preferences.prototype.workflow_label = '<?php echo $this->translate->_('Workflow');?>';
     Editor.view.admin.task.Preferences.prototype.editInfo = '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>';
     

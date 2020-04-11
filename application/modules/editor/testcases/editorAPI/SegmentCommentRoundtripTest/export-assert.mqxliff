@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:mq="MQXliff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file original="test.idml" mq:id="183d93eb-fa57-4984-9592-56dd470cf8f1" mq:projectid="2c2adeab-3a81-4e4a-9526-ba7f5f8a2c77" source-language="de" target-language="en-us" datatype="x-chained">
+    <header>
+      <tool tool-id="MQ" tool-name="MemoQ" tool-version="9.0.18" tool-company="Kilgray"/>
+      <mq:export-path>\!_In\source\de-DE\eng-US\test.idml</mq:export-path>
+      <mq:docinformation mq:isabstract="isabstract" mq:hashistory="false" mq:docname="test.idml" mq:majorversion="1" mq:minorversion="6" mq:nosplitjoin="false" mq:langindepgroupid="ca8899c7-a63c-4da8-baf6-21b508a2228c" mq:multidocgroupid="0bc17457-e0cc-4e67-bfb9-7c6ba013edc9" mq:origfile="\!_In\source\de-DE\test.idml" mq:numberofwords="775" mq:filterconfigname="xxx" mq:filterconfigserverurl="" mq:changetrackingenabledstates="Off,Off,Off,Off">
+        <mq:tagdefinition alignhighlight="false" caseinsensitive="false" rawhtml="false" showitags="true" basicformat="true" supersubscript="false" xmlcommands="true">
+          <mq:tagdefelement name="uf" placeholder="false" tagrequired="Normal">
+            <mq:tagdefattribute name="ufcatid" filtered="true" required="true" translatable="false"/>
+            <mq:tagdefattribute name="f" filtered="false" required="false" translatable="false"/>
+            <mq:tagdefattribute name="fs" filtered="false" required="false" translatable="false"/>
+          </mq:tagdefelement>          
+          <mq:tagdefelement name="tab" placeholder="false" tagrequired="Normal"/>
+        </mq:tagdefinition>
+        <mq:doccomments/>
+        <mq:lqamodel><![CDATA[bla bla]]></mq:lqamodel>
+      </mq:docinformation>
+    </header>
+    <body>
+      <trans-unit id="1" mq:status="ManuallyConfirmed" mq:percent="100" mq:segmentguid="447f7528-9fa9-4b3b-90ec-77bcec6b987d" mq:translatorcommitmatchrate="100" mq:translatorcommitusername="TRA_01" mq:translatorcommittimestamp="2020-03-31T09:38:37Z" mq:lastchangedtimestamp="2020-03-31T09:38:37Z" mq:lastchanginguser="TRA_01" mq:maxlengthchars="-1" mq:nosplitjoin="false" mq:firstlabel="1" mq:lastlabel="1" mq:autosplitjoinstate="0" mq:lastmodifrole="1000" mq:multipleexactmatch="false">
+        <source xml:space="preserve" mq:segpart="1" mq:hasfollowingobject="hasfollowingobject">Das ist das Haus</source>
+        <target xml:space="preserve">That's the house</target>
+        <context-group>
+          <context context-type="x-mmq-structural-context">ImportableParagraphs / ImportableParagraph#1</context>
+        </context-group>
+        <mq:startingws xml:space="preserve"/>
+        <mq:endingws xml:space="preserve"> </mq:endingws>
+        <mq:commitinfos xmlns="MQXliff">
+          <commitinfo matchrate="100" role="1000" timestamp="2020-03-31T09:38:37Z" username="TRA_01" editingtime="0"/>
+        </mq:commitinfos>
+        <mq:nosplitjoins/>
+        <mq:originalsource edited="false"/>
+        <mq:insertedmatch matchtype="0" source="bla blub" matchrate="100" originalmatchrate="0" ambiguousexact="false" hitfororiginalsegementversion="false"/>
+        <mq:comments>
+            <mq:comment id="4a3f1dad-d417-4266-b832-6d6721e2e9bf" creatoruser="user1" time="2020-01-27T06:21:07Z" deleted="false" category="0" appliesto="Target" origin="User">Dies ist ein Kommentar.</mq:comment>
+            <mq:comment id="f7ae96cf-1e2b-4587-a16b-17a913dce70b" creatoruser="Table RTF" time="2020-01-28T09:22:33Z" deleted="false" category="0" appliesto="Row" origin="SourceFile">Dies ist noch einer. </mq:comment>
+            <mq:comment id="74d5b955-c68b-4ad3-8678-4d0af352eacb" creatoruser="Table RTF" time="2020-01-28T09:22:33Z" deleted="false" category="0" appliesto="Row" origin="SourceFile">und <b>nochmal</b> einer.</mq:comment>
+            <mq:comment id="2cf2933e-f7d6-4c33-82fd-3cc5811a0227" creatoruser="JF" time="2020-03-10T11:06:08Z" deleted="true" category="0" appliesto="Target" origin="User">Hallo Marc,</mq:comment>
+            <mq:comment id="4129e22f-406d-4ffd-bf0a-c2dc7e93ad6d" creatoruser="JF" time="2020-03-10T11:06:20Z" deleted="false" category="0" appliesto="Target" origin="User">Hallo Marc!</mq:comment>
+        <mq:comment id="NOT-TESTABLE" creatoruser="lector test" time="NOT-TESTABLE" deleted="false" category="0" appliesto="Target" origin="User">A test comment for segment 4</mq:comment></mq:comments>
+      </trans-unit>
+      <trans-unit id="2" translate="no" mq:locked="locked" mq:status="PartiallyEdited" mq:segmentguid="72c3a015-62da-4b13-a076-dc6c07055b35" mq:lastchangedtimestamp="2020-03-30T14:07:45Z" mq:lastchanginguser="TRA_02" mq:maxlengthchars="-1" mq:nosplitjoin="false" mq:firstlabel="1" mq:lastlabel="1" mq:autosplitjoinstate="0" mq:lastmodifrole="4" mq:multipleexactmatch="false">
+        <source xml:space="preserve" mq:segpart="1" mq:hasfollowingobject="hasfollowingobject">vom <bpt id="1" ctype="bold">{}</bpt><bpt id="2" rid="1">&lt;uf ufcatid="1"&gt;</bpt>Nikolaus<ept id="1">{}</ept><ept id="3" rid="1">&lt;/uf&gt;</ept></source>
+        <target xml:space="preserve">of the <bpt id="1" ctype="bold">{}</bpt><bpt id="2" rid="2">&lt;uf ufcatid="1"&gt;</bpt>Santa Clause<ept id="1">{}</ept><ept id="3" rid="2">&lt;/uf&gt;</ept></target>
+        <context-group>
+          <context context-type="x-mmq-structural-context">ImportableParagraphs / ImportableParagraph#1</context>
+        </context-group>
+        <mq:startingws xml:space="preserve"/>
+        <mq:endingws xml:space="preserve"> </mq:endingws>
+        <mq:commitinfos xmlns="MQXliff"/>
+        <mq:nosplitjoins/>
+        <mq:originalsource edited="false"/>
+        <mq:comments>
+            <mq:comment id="4a3f1dad-d417-4266-b832-6d6721e2e9bf" creatoruser="user1" time="2020-01-27T06:21:07Z" deleted="false" category="0" appliesto="Target" origin="User">Dies ist ein Kommentar.</mq:comment>
+            <mq:comment id="f7ae96cf-1e2b-4587-a16b-17a913dce70b" creatoruser="Table RTF" time="2020-01-28T09:22:33Z" deleted="false" category="0" appliesto="Row" origin="SourceFile">Dies ist noch einer. </mq:comment>
+            <mq:comment id="74d5b955-c68b-4ad3-8678-4d0af352eacb" creatoruser="Table RTF" time="2020-01-28T09:22:33Z" deleted="false" category="0" appliesto="Row" origin="SourceFile">und nochmal einer.</mq:comment>
+            <mq:comment id="2cf2933e-f7d6-4c33-82fd-3cc5811a0227" creatoruser="JF" time="2020-03-10T11:06:08Z" deleted="true" category="0" appliesto="Target" origin="User">Hallo Marc,</mq:comment>
+            <mq:comment id="4129e22f-406d-4ffd-bf0a-c2dc7e93ad6d" creatoruser="JF" time="2020-03-10T11:06:20Z" deleted="false" category="0" appliesto="Target" origin="User">Hallo Marc!</mq:comment>
+        <mq:comment id="NOT-TESTABLE" creatoruser="lector test" time="NOT-TESTABLE" deleted="false" category="0" appliesto="Target" origin="User">A test comment for segment 5</mq:comment></mq:comments>
+      </trans-unit>
+      <trans-unit id="3" mq:status="ManuallyConfirmed" mq:percent="100" mq:segmentguid="447f7528-9fa9-4b3b-90ec-77bcec6b988d" mq:translatorcommitmatchrate="100" mq:translatorcommitusername="TRA_01" mq:translatorcommittimestamp="2020-03-31T09:38:37Z" mq:lastchangedtimestamp="2020-03-31T09:38:37Z" mq:lastchanginguser="TRA_01" mq:maxlengthchars="-1" mq:nosplitjoin="false" mq:firstlabel="1" mq:lastlabel="1" mq:autosplitjoinstate="0" mq:lastmodifrole="1000" mq:multipleexactmatch="false">
+        <source xml:space="preserve" mq:segpart="1" mq:hasfollowingobject="hasfollowingobject">Neuer Kommentarblock</source>
+        <target xml:space="preserve">New comment-block</target>
+        <context-group>
+          <context context-type="x-mmq-structural-context">ImportableParagraphs / ImportableParagraph#1</context>
+        </context-group>
+        <mq:startingws xml:space="preserve"/>
+        <mq:endingws xml:space="preserve"> </mq:endingws>
+        <mq:commitinfos xmlns="MQXliff">
+          <commitinfo matchrate="100" role="1000" timestamp="2020-03-31T09:38:37Z" username="TRA_01" editingtime="0"/>
+        </mq:commitinfos>
+        <mq:nosplitjoins/>
+        <mq:originalsource edited="false"/>
+        <mq:insertedmatch matchtype="0" source="bla blub" matchrate="100" originalmatchrate="0" ambiguousexact="false" hitfororiginalsegementversion="false"/>
+      <mq:comments><mq:comment id="NOT-TESTABLE" creatoruser="lector test" time="NOT-TESTABLE" deleted="false" category="0" appliesto="Target" origin="User">A test comment for segment 6</mq:comment></mq:comments></trans-unit>
+    </body>
+  </file>
+</xliff>

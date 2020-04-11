@@ -130,10 +130,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
         $userGuid = (new Zend_Session_Namespace('user'))->data->userGuid;
-        $tua->loadByParams($userGuid, $session->taskGuid);
+        
+        $tua=editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $task);
         
         $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [
             $this->entity,

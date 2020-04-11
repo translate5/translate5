@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -26,15 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+ 
+/**#@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- * 
+ *
  */
 /**
  * Dummy Index Controller
- */ 
+ */
 class Editor_IndexController extends ZfExtended_Controllers_Action {
     /**
      * @var ZfExtended_Zendoverwrites_Translate
@@ -52,7 +52,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     /**
-     * 
+     *
      This is to be able to start a worker as a developer indepently through the browser
      
      public function startworkerAction() {
@@ -81,7 +81,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $this->view->extJsBasepath = $extJs->getHttpPath();
         $this->view->extJsVersion = $extJs->getVersion();
         
-        $this->view->buildType = 'development';
+        $this->view->buildType = ZfExtended_Utils::VERSION_DEVELOPMENT;
         
         $this->view->publicModulePath = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module');
         $this->view->locale = $this->_session->locale;
@@ -93,7 +93,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
 
         $this->view->appVersion = $this->getAppVersion();
         $this->setJsVarsInView();
-        $this->checkForUpdates();
+        $this->checkForUpdates($this->view->appVersion);
     }
     
     /**
@@ -129,7 +129,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $log->save();
     }
     
-    protected function checkForUpdates() {
+    protected function checkForUpdates(string $currentVersion) {
+        if($currentVersion == ZfExtended_Utils::VERSION_DEVELOPMENT) {
+            return;
+        }
         $downloader = ZfExtended_Factory::get('ZfExtended_Models_Installer_Downloader', array(APPLICATION_PATH.'/..'));
         /* @var $downloader ZfExtended_Models_Installer_Downloader */
         
@@ -137,21 +140,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
         
-        $isAllowed = $acl->isInAllowedRoles($userSession->data->roles,'getUpdateNotification');
-        try {
-            if(!$isAllowed || $downloader->applicationIsUptodate()) {
-                return;
-            }
+        if(!$acl->isInAllowedRoles($userSession->data->roles,'getUpdateNotification')) {
+            return;
+        }
+        $onlineVersion = $downloader->getAvailableVersion();
+            
+        if(!empty($onlineVersion) && version_compare($onlineVersion, $currentVersion)) {
             $msgBoxConf = $this->view->Php2JsVars()->get('messageBox');
             settype($msgBoxConf->initialMessages, 'array');
-            $msg = 'Eine neue Version von Translate5 ist verfügbar. Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.';
-            $msgBoxConf->initialMessages[] = $this->translate->_($msg);
-        } catch (Exception $e) {
-            $logger = Zend_Registry::get('logger');
-            /* @var $logger ZfExtended_Logger */
-            $logger->exception($e, [
-                'level' => $logger::LEVEL_INFO
-            ]);
+            $msg = 'Translate5 ist in der Version %1$s verfügbar, verwendet wird aktuell Version %2$s. <br/>Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.';
+            $msgBoxConf->initialMessages[] = sprintf($this->translate->_($msg), $onlineVersion, $currentVersion);
         }
     }
 
@@ -267,9 +265,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
           $this->view->Php2JsVars()->set('supportedBrowsers', $rop->supportedBrowsers->toArray());
       }
       
-      //default state configuration for frontend components(grid)
-      $this->view->Php2JsVars()->set('frontend.defaultState', $rop->frontend->defaultState->toArray());
-      
       //create mailto link in the task list grid pm name column
       $this->view->Php2JsVars()->set('frontend.tasklist.pmMailTo', (boolean)$rop->frontend->tasklist->pmMailTo);
       
@@ -351,15 +346,15 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         else {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
-            //FIXME TRANSLATE-55 if a taskguid remains in the session, 
+            //FIXME TRANSLATE-55 if a taskguid remains in the session,
             //the user will be caught in a zend 404 Screen instead of getting the adminpanel.
             $task->loadByTaskGuid($this->_session->taskGuid);
             $taskData = $task->getDataObject();
             unset($taskData->qmSubsegmentFlags);
             
             $php2js->set('task', $taskData);
-            $openState = $this->_session->taskOpenState ? 
-                    $this->_session->taskOpenState : 
+            $openState = $this->_session->taskOpenState ?
+                    $this->_session->taskOpenState :
                     $workflow::STATE_WAITING; //in doubt read only
             $php2js->set('app.initState', $openState);
             $php2js->set('app.initMethod', 'openEditor');
@@ -418,7 +413,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $ed = $this->config->runtimeOptions->editor;
         
-        $controllers = array('ServerException', 'ViewModes', 'Segments', 
+        $controllers = array('ServerException', 'ViewModes', 'Segments',
             'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
             'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal','JsLogger');
         
@@ -517,7 +512,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     
     public function generatesmalltagsAction() {
       set_time_limit(0);
-      $path = array(APPLICATION_PATH, '..', 'public', 
+      $path = array(APPLICATION_PATH, '..', 'public',
           $this->config->runtimeOptions->dir->tagImagesBasePath.'/');
       $path = join(DIRECTORY_SEPARATOR, $path);
 
@@ -554,7 +549,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     
     public function generateqmsubsegmenttagsAction() {
       set_time_limit(0);
-      $path = array(APPLICATION_PATH, '..', 'public', 
+      $path = array(APPLICATION_PATH, '..', 'public',
           $this->config->runtimeOptions->dir->tagImagesBasePath.'/');
       $path = join(DIRECTORY_SEPARATOR, $path);
 
@@ -616,7 +611,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $extension = pathinfo($requestedFile, PATHINFO_EXTENSION);
         
         //pluginname is alpha characters only so check this for security reasons
-        //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase! 
+        //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase!
         $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js)));
         if(empty($plugin)) {
             throw new ZfExtended_NotFoundException();

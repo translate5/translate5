@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -58,13 +58,13 @@ END LICENSE AND COPYRIGHT
  * @method void setFinishedDate() setFinishedDate(string $datetime)
  * @method string getDeadlineDate() getDeadlineDate()
  * @method void setDeadlineDate() setDeadlineDate(string $datetime)
- * 
+ *
  */
 class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TaskUserAssoc';
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserAssoc';
 
-    
+
     /**
      * returns all users to the taskGuid and role of the given TaskUserAssoc
      * @param string $taskGuid
@@ -90,7 +90,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
         return $user->db->fetchAll($s)->toArray();
     }
-    
+
     /**
      * loads all tasks to the given user guid
      * @param string $userGuid
@@ -105,7 +105,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
         return null;
     }
-    
+
     /**
      * loads a assoc by given auth hash
      * @param string $hash
@@ -124,7 +124,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->row = $row;
     }
-    
+
     /**
      * loads the assocs regardless isPmOverride is set or not
      * @param array $list
@@ -142,28 +142,21 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
         return null;
     }
-    
+
     /**
-     * loads one TaskUserAssoc Instance by given params. If params taskGuid or role are
-     * null, task is loaded regardless of taskGuid or role
-     * this method loads the assoc regardless isPmOverride is set or not
-     * 
+     * Load single task user assoc for the given task#user#role params.
      * @param string $userGuid
      * @param string $taskGuid
      * @param string $role | null
      * @param string $state | null
      * @return array
      */
-    public function loadByParams(string $userGuid, $taskGuid = null, $role = null, $state = null) {
+    public function loadByParams(string $userGuid,string $taskGuid,string $role, $state = null) {
         try {
             $s = $this->db->select()
-                ->where('userGuid = ?', $userGuid);
-            if(!is_null($taskGuid)) {
-                $s->where('taskGuid = ?', $taskGuid);
-            }
-            if(!is_null($role)) {
-                $s->where('role= ?', $role);
-            }
+                ->where('userGuid = ?', $userGuid)
+                ->where('taskGuid = ?', $taskGuid)
+                ->where('(role= ? OR isPmOverride=1)', $role);//load the given state or load pmoveride (pmoveride is when for the given task#user#role no record is found) 
             if(!is_null($state)) {
                 $s->where('state= ?', $state);
             }
@@ -172,13 +165,13 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $this->notFound('NotFound after other Error', $e);
         }
         if (!$row) {
-            $this->notFound(__CLASS__ . '#taskGuid + userGuid', $taskGuid.' + '.$userGuid);
+            $this->notFound(__CLASS__ . '#taskGuid + userGuid + role', $taskGuid.' + '.$userGuid.' + '.$role);
         }
         //load implies loading one Row, so use only the first row
         $this->row = $row;
         return $this->row->toArray();
     }
-    
+
     /**
      * Updates the stored user states of an given taskGuid (may exclude the current user if enabled by third parameter)
      * @param string $state
@@ -195,9 +188,9 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
         $this->db->update(['state' => $state], $where);
     }
-    
+
     /**
-     * returns a matrix with the usage counts for all state, 
+     * returns a matrix with the usage counts for all state,
      * role combinations of the actually loaded assoc's task (exclude pmOverrides)
      * @return array
      */
@@ -206,7 +199,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $res = $this->db->getAdapter()->query($sql, array($this->getTaskGuid()));
         return $res->fetchAll();
     }
-    
+
     /**
      * loads the TaskUserAssoc Content joined with userinfos (currently only login)
      * loads only assocs where isPmOverride not set
@@ -221,8 +214,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         ->join(array('u' => $user->db->info($db::NAME)), 'tua.userGuid = u.userGuid', array('login', 'surName', 'firstName', 'parentIds'))
         ->where('tua.isPmOverride = 0');
         //->where('tua.taskGuid = ?', $this->getTaskGuid()); kommt per filter aktuell!
-        
-        //default sort: 
+
+        //default sort:
         if(!$this->filter->hasSort()) {
             $this->filter->addSort('surName');
             $this->filter->addSort('firstName');
@@ -230,7 +223,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->loadFilterdCustom($s);
     }
-    
+
 
     /**
      * (non-PHPdoc)
@@ -242,7 +235,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $this->updateTask($taskGuid);
         return $result;
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::delete()
@@ -255,25 +248,25 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             'E1061' => 'The job can not be removed, since the user is using the task.',
             'E1062' => 'The job can not be removed, since the task is locked by the user.',
         ]);
-        
+
         if($this->isUsed()) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1061', [
                 'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.'
             ], ['job' => $this]);
         }
-        
+
         /* @var $task editor_Models_Task */
         if($task->isLocked($taskGuid, $this->getUserGuid())) {
             throw ZfExtended_Models_Entity_Conflict::createResponse('E1062', [
                 'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.'
             ], ['job' => $this]);
         }
-        
+
         $result = parent::delete();
         $this->updateTask($taskGuid);
         return $result;
     }
-    
+
     /**
      * deletes the actual loaded assoc if it is a pmOverride assoc
      */
@@ -286,14 +279,14 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         ));
         $this->init();
     }
-    
+
     /**
      * deletes all other users to a task expect the given one, optionally filtered by role.
      * Mainly needed for dealing with competitive users
      * @param string $taskGuid
      * @param string $userGuid
      * @param string $role
-     * @return boolean|array returns the deleted tuas as array or false if the tua list was modified by other users 
+     * @return boolean|array returns the deleted tuas as array or false if the tua list was modified by other users
      */
     public function deleteOtherUsers(string $taskGuid, string $userGuid, string $role = null): array {
         $delete = [
@@ -304,7 +297,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         if(!empty($role)) {
             $delete['role = ?'] = $role;
         }
-        
+
         $s = $this->db->select();
         foreach($delete as $sql => $value) {
             $s->where($sql, $value);
@@ -333,19 +326,19 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $this->delete();
         }
     }
-    
+
     /**
      * updates the task table count field
      * @todo this method is a perfect example for the usage in events!
      */
     protected function updateTask($taskGuid) {
-        $sql = 'update `LEK_task` t, (select count(*) cnt, ? taskGuid from `LEK_taskUserAssoc` where taskGuid = ? and isPmOverride = 0) tua 
+        $sql = 'update `LEK_task` t, (select count(*) cnt, ? taskGuid from `LEK_taskUserAssoc` where taskGuid = ? and isPmOverride = 0) tua
             set t.userCount = tua.cnt where t.taskGuid = tua.taskGuid';
         $db = $this->db->getAdapter();
         $sql = $db->quoteInto($sql, $taskGuid, 'string', 2);
         $db->query($sql);
     }
-    
+
     /**
      * set all associations of the given taskGuid (or for all tasks if null) to unused where the session is expired
      * sets also the state to open where allowed
@@ -372,11 +365,11 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $handler($e);
         }
     }
-    
+
     protected function _cleanupLocked($taskGuid = null, $forced = false) {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($taskGuid);
         /* @var $workflow editor_Workflow_Abstract */
-        
+
         $validSessionIds = ZfExtended_Models_Db_Session::GET_VALID_SESSIONS_SQL;
         $where = array('not usedState is null and (usedInternalSessionUniqId not in ('.$validSessionIds.') or usedInternalSessionUniqId is null)');
         if(!empty($taskGuid)) {
@@ -395,16 +388,16 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $where2['state in (?)'] = $workflow->getAllowedTransitionStates($workflow::STATE_OPEN);
             $this->db->update(array('state' => $workflow::STATE_OPEN), $where2);
         }
-        
+
         //delete all pmEditAll fake entries
         $where3 = $where;
         $where3[] = 'isPmOverride = 1';
         $this->db->delete($where3);
-        
+
         //unuse the associations where the using sessionId was expired, this update must be performed after the other!
         $this->db->update(array('usedState' => null,'usedInternalSessionUniqId' => null), $where);
     }
-    
+
     /**
      * returns true if user of the currently loaded taskUserAssoc uses the associated task
      * @return boolean
@@ -414,7 +407,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $validSessionIds .= ' AND internalSessionUniqId = ?';
         $res = $this->db->getAdapter()->query($validSessionIds, array($this->getUsedInternalSessionUniqId()));
         $validSessions = $res->fetchAll();
-        //if usedInternalSessionUniqId not exists in the session table reset it, 
+        //if usedInternalSessionUniqId not exists in the session table reset it,
         //  also the usedState value and return false
         if(empty($validSessions)){
             $this->db->update(array('usedState' => null, 'usedInternalSessionUniqId' => null), 'id = '.(int)$this->getId());
@@ -424,7 +417,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         // if usedState is set and sessionId is valid return true
         return !empty($usedState);
     }
-    
+
     /**
      * loads and returns the currently used associations of the given taskGuid
      * @param string $taskGuid
@@ -438,7 +431,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             ->where('not usedInternalSessionUniqId is null');
         return $this->db->fetchAll($s)->toArray();
     }
-    
+
     /***
      * Load the Key Point Indicators data for the given taskGuids and states
      * @param array $taskGuids
@@ -460,17 +453,14 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         ->where('finishedDate IS NOT NULL');
         return $this->db->fetchAll($s)->toArray();
     }
-    
+
     /**
      * calculates a random GUID and sets it as staticAuthHash
      */
     public function createStaticAuthHash() {
-        $guidHelper = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-            'Guid'
-        );
-        $this->setStaticAuthHash($guidHelper->create(false));
+        $this->setStaticAuthHash(ZfExtended_Utils::uuid());
     }
-    
+
     /**
      * generates a task overview statistics summary
      * @return array
@@ -479,7 +469,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $stmt = $this->db->getAdapter()->query('select state, role, usedstate, count(*) jobCount from LEK_taskUserAssoc group by state,role, usedstate');
         return $stmt->fetchAll();
     }
-    
+
     public function updateReviewersFinishDate(string $taskGuid,string $date){
         $this->db->update(['finishedDate'=>$date],
             ['taskGuid=?' => $taskGuid,'role=?' => editor_Workflow_Abstract::ROLE_REVIEWER]);

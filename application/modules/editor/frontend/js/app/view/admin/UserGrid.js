@@ -32,6 +32,8 @@ Ext.define('Editor.view.admin.UserGrid', {
   alias: 'widget.adminUserGrid',
   plugins: ['gridfilters'],
   itemId: 'adminUserGrid',
+  stateId: 'adminUserGrid',
+  stateful:true,
   cls: 'adminUserGrid',
   title: '#UT#Benutzerübersicht',
   height: '100%',

@@ -51,7 +51,12 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
      * @var editor_Models_Import_Configuration
      */
     protected $importConfig;
-    
+
+    /**
+     * @var editor_Models_Segment_WordCount
+     */
+    protected $wordCount;
+
     /**
      * @var int
      */
@@ -66,6 +71,15 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         $this->importConfig = $config;
         $this->db = Zend_Registry::get('db');
         $this->taskConf = $this->task->getAsConfig();
+
+        //init word counter
+        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        $langModel->load($task->getSourceLang());
+
+        $this->wordCount = ZfExtended_Factory::get('editor_Models_Segment_WordCount',[
+            $langModel->getRfc5646()
+        ]);
     }
 
     public function process(editor_Models_Import_FileParser $parser){
@@ -79,7 +93,7 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         
         //Segment Spezifische Daten
         $mid = $parser->getMid();
-        $seg->setMid($mid); 
+        $seg->setMid($mid);
         $seg->setFileId($this->fileId);
         
         $attributes = $parser->getSegmentAttributes($mid);
@@ -96,7 +110,7 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         
         $segmentId = $seg->save();
         $this->processSegmentMeta($seg, $attributes);
-        return $segmentId; 
+        return $segmentId;
     }
     
     /**
@@ -142,9 +156,6 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         if(!empty($attributes->locked)) {
             $meta->setLocked($attributes->locked);
         }
-        
-        //TODO: add the autopropageted, locked as new fields LEK_segments_meta
-        //and set them here
 
         //add custom meta fields
         if(!empty($attributes->customMetaAttributes)) {
@@ -152,6 +163,9 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
                 $meta->__call('set'.ucfirst($key), [$value]);
             }
         }
+
+        $this->wordCount->setSegment($seg);
+        $meta->setSourceWordCount($this->wordCount->getSourceCount());
         $meta->setSiblingData($seg);
         $meta->save();
     }

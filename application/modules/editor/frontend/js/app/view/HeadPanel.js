@@ -109,6 +109,7 @@ Ext.define('Editor.view.HeadPanel', {
                 },{
                     xtype: 'combo',
                     itemId: 'languageSwitch',
+                    cls: 'app-language-switch',
                     width:110,
                     forceSelection: true,
                     value: Editor.data.locale,
