@@ -37,6 +37,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
   ],
   alias: 'widget.adminTaskGrid',
   itemId: 'adminTaskGrid',
+  stateId: 'adminTaskGrid',
+  stateful:true,
   cls: 'adminTaskGrid',
   title: '#UT#Aufgabenübersicht',
   plugins: ['gridfilters'],

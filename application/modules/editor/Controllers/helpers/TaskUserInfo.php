@@ -9,8 +9,8 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU LESSER GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file lgpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file lgpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU LESSER GENERAL PUBLIC LICENSE version 3.0 requirements will be met:
 https://www.gnu.org/licenses/lgpl-3.0.txt
 
@@ -203,7 +203,9 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
      * Returns an array with an entry for each task, key is the taskGuid
      * @return array returns the assoc infos to the current user
      */
-    public function initUserAssocInfos(array $taskGuids) {
+    public function initUserAssocInfos(array $taskRawObjects) {
+        $taskGuids = array_column($taskRawObjects, 'taskGuid');
+        $currentWorkflowRoles = $this->getTasksCurrentWorkflowRoles($taskRawObjects);
         $this->userAssocInfos = []; //collects the assoc infos to the current user
         $userAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userAssoc editor_Models_TaskUserAssoc */
@@ -215,7 +217,14 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
             if(!isset($this->allAssocInfos[$assoc['taskGuid']])) {
                 $this->allAssocInfos[$assoc['taskGuid']] = array();
             }
-            if($userGuid == $assoc['userGuid']) {
+            //since a user can be assigned multiple times to a task,
+            // the role has also to be checked to determine the current user
+            $role = $currentWorkflowRoles[$assoc['taskGuid']] ?? '';
+            
+            //we need an info about the current user in any case, so we init the userAssocInfos with the first assoc of the current user
+            // but we override the already stored userAssocInfo if a later assoc has the matching role
+            $firstCurrentUserAssoc = empty($this->userAssocInfos[$assoc['taskGuid']]);
+            if($userGuid == $assoc['userGuid'] && ($firstCurrentUserAssoc || $role == $assoc['role'])) {
                 $this->userAssocInfos[$assoc['taskGuid']] = $assoc;
             }
             $userInfo = $this->getUserinfo($assoc['userGuid'], $assoc['taskGuid']);
@@ -243,6 +252,27 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
     }
     
     /**
+     * returns a mapping between task and the workflow role to the tasks workflow step
+     * @return array
+     */
+    protected function getTasksCurrentWorkflowRoles($taskRawObjects): array {
+        $result = [];
+        $wfRoleCache = [];
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        foreach($taskRawObjects as $taskObj) {
+            $taskObj = (object) $taskObj;
+            $key = $taskObj->workflow.'#'.$taskObj->workflowStepName;
+            if(empty($wfRoleCache[$key])) {
+                $workflow = $wfm->getCached($taskObj->workflow);
+                $wfRoleCache[$key] = $workflow->getRoleOfStep($taskObj->workflowStepName);
+            }
+            $result[$taskObj->taskGuid] = $wfRoleCache[$key];
+        }
+        return $result;
+    }
+    
+    /**
      * returns the username for the given userGuid.
      * Doing this on client side would be possible, but then it must be ensured that UsersStore is always available and loaded before TaskStore.
      * @param string $userGuid
@@ -258,7 +288,7 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
             // cache for user
             return $this->cachedUserInfo[$userGuid];
         }
-        if(empty($this->tmpUserDb)) { 
+        if(empty($this->tmpUserDb)) {
             $this->tmpUserDb = ZfExtended_Factory::get('ZfExtended_Models_Db_User');
             /* @var $this->tmpUserDb ZfExtended_Models_Db_User */
         }

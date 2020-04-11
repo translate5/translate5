@@ -1194,9 +1194,9 @@
    <trans-unit id='QXVmZ2FiZSB3dXJkZSBlcmZvbGdyZWljaCB2ZXJsYXNzZW4u'><source>Aufgabe wurde erfolgreich verlassen.</source><target>Task has been closed successfully.</target></trans-unit>
    <trans-unit id='QXVmZ2FiZSB3aXJkIGltIEVkaXRvciBnZcO2ZmZuZXQuLi4='><source>Aufgabe wird im Editor geöffnet...</source><target>Task is opening in the editor ...</target></trans-unit>
    <trans-unit id='QXVmZ2FiZSB3aXJkIHZlcmxhc3Nlbi4uLg=='><source>Aufgabe wird verlassen...</source><target>Task is closing ...</target></trans-unit>
-<trans-unit id='RWluZSBuZXVlIFZlcnNpb24gdm9uIFRyYW5zbGF0ZTUgaXN0IHZlcmbDvGdiYXIuIEJpdHRlIGJlbnV0emVuIFNpZSBkYXMgSW5zdGFsbGF0aW9ucyB1bmQgVXBkYXRlIFNjcmlwdCB1bSBkaWUgYWt0dWVsbHN0ZSBWZXJzaW9uIHp1IGluc3RhbGxpZXJlbi4='>
-  <source>Eine neue Version von Translate5 ist verfügbar. Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.</source>
-  <target>A new version of Translate5 is now available. Please use the install and update script to download and install the latest version.</target>
+<trans-unit id='VHJhbnNsYXRlNSBpc3QgaW4gZGVyIFZlcnNpb24gJTEkcyB2ZXJmw7xnYmFyLCB2ZXJ3ZW5kZXQgd2lyZCBha3R1ZWxsIFZlcnNpb24gJTIkcy4gPGJyLz5CaXR0ZSBiZW51dHplbiBTaWUgZGFzIEluc3RhbGxhdGlvbnMgdW5kIFVwZGF0ZSBTY3JpcHQgdW0gZGllIGFrdHVlbGxzdGUgVmVyc2lvbiB6dSBpbnN0YWxsaWVyZW4u'>
+  <source>Translate5 ist in der Version %1$s verfügbar, verwendet wird aktuell Version %2$s. <br/>Bitte benutzen Sie das Installations und Update Script um die aktuellste Version zu installieren.</source>
+  <target>Translate5 is now available in version %1$s, version %2$s is currently used. <br/>Please use the install and update script to download and install the latest version.</target>
 </trans-unit>
   <trans-unit id='PGI+PGk+w5xiZXJzY2hyZWliZSBaaWVsdGV4dCBtaXQ6PC9pPjwvYj4g'>
     <source><b><i>Überschreibe Zieltext mit:</i></b> </source>
@@ -3695,6 +3695,7 @@ This email is a reminder that the "Deadline" <b>{deadlineDate}</b> for task <b>"
 <trans-unit id='d2FpdGluZw=='><source>waiting</source><target>waiting</target></trans-unit>
 <trans-unit id='ZmluaXNoZWQ='><source>finished</source><target>finished</target></trans-unit>
 <trans-unit id='dW5jb25maXJtZWQ='><source>unconfirmed</source><target>unconfirmed</target></trans-unit>
+<trans-unit id='QmVudXR6ZXItU3BlemlhbGVpbnN0ZWxsdW5nZW4='><source>Benutzer-Spezialeinstellungen</source><target>User special properties</target></trans-unit>
 <trans-unit id='e2hlYWRlcn0KRGllIGZvbGdlbmRlIEF1ZmdhYmUgd3VyZGUgbWl0IEZlaGxlcm4gLyBXYXJudW5nZW4gLyBIaW53ZWlzZW4gaW1wb3J0aWVydC4gTWl0IGRlciBCaXR0ZSB1bSBCZWFjaHR1bmcuPGJyIC8+CjxiciAvPgp7dGFza0ZyYWdtZW50fQo8YnIgLz4KPGJyIC8+Cjx0YWJsZT48dHI+PHRoIHN0eWxlPSJ0ZXh0LWFsaWduOmxlZnQ7cGFkZGluZy1yaWdodDoxMHB4OyI+RGF0dW06PC90aD4KPHRoIHN0eWxlPSJ0ZXh0LWFsaWduOmxlZnQ7cGFkZGluZy1yaWdodDoxMHB4OyI+VHlwOjwvdGg+Cjx0aCBzdHlsZT0idGV4dC1hbGlnbjpsZWZ0O3BhZGRpbmctcmlnaHQ6MTBweDsiPkNvZGU6PC90aD4KPHRoIHN0eWxlPSJ0ZXh0LWFsaWduOmxlZnQ7cGFkZGluZy1yaWdodDoxMHB4OyI+TWVsZHVuZzo8L3RoPjwvdHI+Cjx0cj57bWVzc2FnZXN9PC90cj48L3RhYmxlPgp7Zm9vdGVyfQ=='><source>{header}
 Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit der Bitte um Beachtung.<br />
 <br />
@@ -3722,6 +3723,7 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Translate5 - Aufgabe mit Fehlern / Warnungen importiert</source>
     <target>Translate5 - Task imported with errors / warnings / notices</target>
 </trans-unit>
+<trans-unit id='RGllc2VzIEZlbnN0ZXIgbmljaHQgbWVociBhdXRvbWF0aXNjaCBhbnplaWdlbi4='><source>Dieses Fenster nicht mehr automatisch anzeigen.</source><target>Do not automatically display this window again.</target></trans-unit>
 <trans-unit id='RGFzIG7DpGNoc3RlIC8gdm9yaGVyaWdlIFNlZ21lbnQgd2lyZCBub2NoIGdlc3BlaWNoZXJ0LCBiaXR0ZSB3YXJ0ZW4uLi4='>
   <source>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</source>
   <target>The previous / next segment is still saving, please wait...</target>

@@ -251,10 +251,8 @@ Ext.define('Editor.controller.admin.Customer', {
      * On customer pannel show handler
      */
     onCustomerPanelShow: function(panel) {
-        //set the help button data
-        Editor.data.helpSection = 'customeroverview';
-        Editor.data.helpSectionTitle = panel.getTitle();
-
+        //fire the global event for component view change
+        Ext.fireEvent('componentViewChanged','customeroverview',panel.getTitle());
         //hide the customerOverview button
         this.setCustomerOverviewButtonHidden(true);
     },

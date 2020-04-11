@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -107,8 +107,7 @@ class editor_Models_Import_Worker_Import {
         $this->syncFileOrder();
         $this->importRelaisFiles();
         $this->task->createMaterializedView();
-        $this->calculateEmptyTargets();
-        $this->updateSegmentCount();
+        $this->calculateMetrics();
         //saving task twice is the simplest way to do this. has meta data is only available after import.
         $this->task->save();
         
@@ -155,6 +154,7 @@ class editor_Models_Import_Worker_Import {
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
             $filesProcessedAtAll++;
+            //wordcount provided by import format
             $this->countWords($parser->getWordCount());
         }
         
@@ -190,7 +190,7 @@ class editor_Models_Import_Worker_Import {
                 throw new Exception('.. invalid '.self::TASK_TEMPLATE.' detected at '.__CLASS__.' -> '.__FUNCTION__);
             }
             //WARNING: this is NOT the implementation of TRANSLATE-471!
-            // This code is just a "schmalspur" solution to enable the idea behind TRANSLATE-471 for our API testing  
+            // This code is just a "schmalspur" solution to enable the idea behind TRANSLATE-471 for our API testing
             if(isset($config->runtimeOptions)) {
                 $origConfig = Zend_Registry::get('config');
                 /* @var $origConfig Zend_Config */
@@ -204,25 +204,35 @@ class editor_Models_Import_Worker_Import {
         }
     }
     
-    protected function calculateEmptyTargets() {
+    /**
+     * Calculates and sets the task metrics emptyTargets (bool), wordCount (int) and segmentCount(int)
+     */
+    protected function calculateMetrics() {
+        $taskGuid = $this->task->getTaskGuid();
+        
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
-        $this->task->setEmptyTargets($segment->hasEmptyTargetsOnly($this->task->getTaskGuid()));
-    }
-    
-    /***
-     * Update the segment count for the task
-     */
-    protected function updateSegmentCount(){
-        $this->task->setSegmentCount($this->task->getTotalSegmentsCount($this->task->getTaskGuid()));
+        
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $meta editor_Models_Segment_Meta */
+        
+        /* @var $segment editor_Models_Segment */
+        $this->task->setEmptyTargets($segment->hasEmptyTargetsOnly($taskGuid));
+
+        //we may set the tasks wordcount only to our calculated values if there was no count given either by API or by import formats
+        if ($this->task->getWordCount() == 0) {
+            $this->task->setWordCount($meta->getWordCountSum($taskGuid));
+        }
+        
+        $this->task->setSegmentCount($segment->getTotalSegmentsCount($taskGuid));
     }
     
     /**
      * Adds up the number of words of the imported files
      * and saves this into the private variable $this->wordCount
-     * 
+     *
      * If this function is once called with "false", the addup-process will be canceled for the whole import-process
-     * 
+     *
      * @param int or bool false $count
      */
     private function countWords($count)
@@ -266,7 +276,7 @@ class editor_Models_Import_Worker_Import {
      * @param editor_Models_RelaisFoldertree $tree
      */
     protected function importRelaisFiles(){
-        if(! $this->importConfig->hasRelaisLanguage()){ 
+        if(! $this->importConfig->hasRelaisLanguage()){
             return;
         }
         
@@ -300,7 +310,7 @@ class editor_Models_Import_Worker_Import {
         return array(
             $this->importConfig->importFolder.DIRECTORY_SEPARATOR.$this->_localEncoded->encode($path),
             basename($path),
-            $fileId, 
+            $fileId,
             $this->task,
         );
     }
@@ -309,6 +319,6 @@ class editor_Models_Import_Worker_Import {
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         //dont update view here, since it is not existing yet!
-        $segment->syncFileOrderFromFiles($this->task->getTaskGuid(), true); 
+        $segment->syncFileOrderFromFiles($this->task->getTaskGuid(), true);
     }
 }

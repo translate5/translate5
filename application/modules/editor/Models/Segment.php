@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Segment Entity Object
- * 
+ *
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
  * @method int getSegmentNrInTask() getSegmentNrInTask()
@@ -73,8 +73,8 @@ END LICENSE AND COPYRIGHT
  * @method void setWorkflowStepNr() setWorkflowStepNr(int $stepNr)
  * @method string getWorkflowStep() getWorkflowStep()
  * @method void setWorkflowStep() setWorkflowStep(string $name)
- * 
- * this are just some helper for the always existing segment fields, similar named methods exists for all segment fields: 
+ *
+ * this are just some helper for the always existing segment fields, similar named methods exists for all segment fields:
  * @method string getSource() setSource()
  * @method void setSource() setSource(string $content)
  * @method void setSourceEdit() setSourceEdit(string $content)
@@ -84,7 +84,7 @@ END LICENSE AND COPYRIGHT
  * @method string getTargetEdit() getTargetEdit()
  * @method void setTargetEdit() setTargetEdit(string $content)
  * @method void setTargetMd5() setTargetMd5(string $md5hash)
- * 
+ *
  */
 class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     const PM_SAME_STEP_INCLUDED = 'sameStepIncluded';
@@ -191,7 +191,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /***
      * Search the materialized view for given search field,search string and match case.
      * Only hits in the editable fields will be returned
-     * 
+     *
      * @param array $parameters
      * @return string|array
      */
@@ -234,13 +234,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         
         /* //TODO:The idea how we can use the search limitation
-         * 
+         *
          * SELECT id,rank FROM (
-            	SELECT @rownum := @rownum + 1 AS rank, 
-            	   `id`, `segmentNrInTask`, `fileId`, `mid`, `userGuid`, `userName`, `taskGuid`, `timestamp`, 
-            	   `editable`, `pretrans`, `matchRate`, `matchRateType`, `qmId`, `stateId`, `autoStateId`, `fileOrder`, 
-            	   `comments`, `workflowStepNr`, `workflowStep`, `source`, `sourceMd5`, `sourceToSort`, `target`, 
-            	   `targetMd5`, `targetToSort`, `targetEdit`, `targetEditToSort` 
+            	SELECT @rownum := @rownum + 1 AS rank,
+            	   `id`, `segmentNrInTask`, `fileId`, `mid`, `userGuid`, `userName`, `taskGuid`, `timestamp`,
+            	   `editable`, `pretrans`, `matchRate`, `matchRateType`, `qmId`, `stateId`, `autoStateId`, `fileOrder`,
+            	   `comments`, `workflowStepNr`, `workflowStep`, `source`, `sourceMd5`, `sourceToSort`, `target`,
+            	   `targetMd5`, `targetToSort`, `targetEdit`, `targetEditToSort`
             	   FROM `LEK_segment_view_10ba195a738894769f296aee08364626`, (SELECT @rownum := 0) r
             	   ORDER BY `fileOrder` asc, `id` asc LIMIT 100 OFFSET 100000
                ) sub
@@ -252,7 +252,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Build search SQL string for given field based on the search type
-     * 
+     *
      * @param array $parameters
      * @return boolean|string
      */
@@ -348,9 +348,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function get($name) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
         if($loc !== false) {
-            //if we have a missing index here, that means, 
+            //if we have a missing index here, that means,
             //the data field ist not existing yet, since the field itself was defined by another file!
-            //so returning an empty string is OK here. 
+            //so returning an empty string is OK here.
             if(empty($this->segmentdata[$loc['field']])) {
                 return '';
             }
@@ -459,9 +459,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Get length of a segment's text according to the segment's sizeUnit. 
-     * If the sizeUnit is set to 'pixel', we use pixelMapping, otherwise 
-     * we count by characters (this is for historical reasons of this code; 
+     * Get length of a segment's text according to the segment's sizeUnit.
+     * If the sizeUnit is set to 'pixel', we use pixelMapping, otherwise
+     * we count by characters (this is for historical reasons of this code;
      * other than the XLF-specifications which are not relevant here!).
      * @param string $segmentContent
      * @param editor_Models_Segment_Meta $segmentMeta
@@ -520,6 +520,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Counts words; word boundary is used as defined in runtimeOptions.editor.export.wordBreakUpRegex
+     * @deprecated editor_Models_Segment_WordCount should be used instead
      * @param string $segmentContent
      * @return integer
      */
@@ -579,7 +580,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * strips all tags including tag description
      * FIXME WARNING do not use this method other than it is used currently
      * see therefore TRANSLATE-487
-     * 
+     *
      * @param string $segmentContent
      * @return string $segmentContent
      */
@@ -593,8 +594,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * using the find method of querypath implies to create an internal clone of the DOM node, 
-     * which then throws an duplicate id error which is completly nonsense at this place, so we filter them out. 
+     * using the find method of querypath implies to create an internal clone of the DOM node,
+     * which then throws an duplicate id error which is completly nonsense at this place, so we filter them out.
      */
     protected function collectLibXmlErrors() {
         $otherErrors = array();
@@ -641,7 +642,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $history->setSegmentId($this->getId());
 
         $fields = $history->getFieldsToUpdate();
-        //TRANSLATE-885 
+        //TRANSLATE-885
         $fields[] = 'targetMd5';
         $fields[] = 'target';
         $fields = array_merge($fields, $this->segmentFieldManager->getEditableDataIndexList());
@@ -744,10 +745,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * adds one single field content ([original => TEXT, originalMd5 => HASH]) to a given segment, 
+     * adds one single field content ([original => TEXT, originalMd5 => HASH]) to a given segment,
      * identified by MID and fileId. taskGuid MUST be given by setTaskGuid before!
      * due the internal implementation this method works only correctly before the materialized view is created!
-     * 
+     *
      * @param Zend_Db_Table_Row_Abstract $field
      * @param int $fileId
      * @param string $mid
@@ -787,7 +788,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * method to add a data hunk later on 
+     * method to add a data hunk later on
      * (edit a alternate which was defined by another file, and is therefore empty in this segment)
      * @param string $field the field name
      * @return editor_Models_Db_SegmentDataRow
@@ -818,7 +819,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function save() {
         if(!empty($this->dbWritable)) {
             if($this->dbWritable->isView()) {
-                //Unable to save the segment. The segment model tried to save to the materialized view directly. 
+                //Unable to save the segment. The segment model tried to save to the materialized view directly.
                 throw new editor_Models_Segment_Exception('E1155', [
                     'segmentId' => $this->getId(),
                     'taskGuid' => $this->getTaskGuid(),
@@ -840,7 +841,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $data->save();
         }
         //only update the mat view if the segment was already in DB (so do not save mat view on import!)
-        //same for meta data, since on import meta data is saved by the segment processor 
+        //same for meta data, since on import meta data is saved by the segment processor
         if(!empty($oldIdValue)) {
             $this->meta()->setSiblingData($this);
             $this->meta()->save();
@@ -882,7 +883,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * returns the original content of a field 
+     * returns the original content of a field
      * @param string $field Fieldname
      */
     public function getFieldOriginal($field) {
@@ -894,7 +895,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * returns the edited content of a field 
+     * returns the edited content of a field
      * @param string $field Fieldname
      */
     public function getFieldEdited($field) {
@@ -978,7 +979,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * Loads the first segment of the given taskGuid.
      * The found segment is stored internally (like load).
      * First Segment is defined as the segment with the lowest id of the task
-     * 
+     *
      * @param string $taskGuid
      * @param int $fileId optional, loads first file of given fileId in task
      * @return editor_Models_Segment
@@ -1077,7 +1078,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
         /**
          * FIXME reminder for TRANSLATE-113: Filtering out unused cols is needed for TaskManagement Feature (user dependent cols)
-         * This is a example for field filtering. 
+         * This is a example for field filtering.
          if (!$loadSourceEdited) {
             $cols = array_filter($cols, function($val) {
                         return strpos($val, 'sourceEdited') === false;
@@ -1125,7 +1126,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * adds the where taskGuid = ? statement only to the given statement,
      * if it is needed. Needed means the current table is not the mat view to the taskguid
-     * This "unneeded" where is a performance issue for big tasks. 
+     * This "unneeded" where is a performance issue for big tasks.
      */
     protected function addWhereTaskGuid(Zend_Db_Table_Select $s, $taskGuid) {
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView', array($taskGuid));
@@ -1188,7 +1189,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * returns Zend_Db_Table_Select joined with segment_user_assoc table if watchlistFilter is enabled
      * @param Zend_Db_Table_Select $s select statement to be modified with the watchlist join filter
-     * @param string $tableName optional, for special joining purposes only, per default not needed 
+     * @param string $tableName optional, for special joining purposes only, per default not needed
      * @return Zend_Db_Table_Select
      */
     public function addWatchlistJoin(Zend_Db_Table_Select $s, $tableName = null){
@@ -1209,7 +1210,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * enables the watchlist filter join, for performance issues only if the user 
+     * enables the watchlist filter join, for performance issues only if the user
      *   really wants to see the watchlist (isWatched is in the filter list)
      * @param bool $value optional, to force enable/disable watchlist
      */
@@ -1306,16 +1307,16 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * fetch the alikes of the actually loaded segment
-     * 
+     *
      * cannot handle alternate targets! can only handle source and target field! actually not refactored!
-     * 
+     *
      * @return array
      */
     public function getAlikes($taskGuid) {
         $this->segmentFieldManager->initFields($taskGuid);
         //if we are using alternates we cant use change alikes, that means we return an empty list here
         if(!$this->segmentFieldManager->isDefaultLayout()) {
-            return array(); 
+            return array();
         }
         $segmentsViewName = $this->segmentFieldManager->getView()->getName();
         $sql = $this->_getAlikesSql($segmentsViewName);
@@ -1421,9 +1422,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     protected function _getAlikesSql(string $viewName) {
         return 'select id, segmentNrInTask, source, target, sourceMd5=? sourceMatch, targetMd5=? targetMatch, matchRate, autostateId
-    from '.$viewName.' 
-    where ((sourceMd5 = ? and source != \'\' and source IS NOT NULL) 
-        or (targetMd5 = ? and target != \'\' and target IS NOT NULL)) 
+    from '.$viewName.'
+    where ((sourceMd5 = ? and source != \'\' and source IS NOT NULL)
+        or (targetMd5 = ? and target != \'\' and target IS NOT NULL))
         and taskGuid = ? and editable = 1
     order by fileOrder, id';
     }
@@ -1524,7 +1525,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         
         //subQuery to get the count of empty fields, fields as requested above
         //if empty field count equals the the count of requested fiels,
-        //that means all fields are empty and the corresponding segment has to be changed. 
+        //that means all fields are empty and the corresponding segment has to be changed.
         $subQuery  = '(select segmentId, count(*) cnt from LEK_segment_data where taskGuid = ? and ';
         $subQuery .= "edited = '' and name in ('".join("','", $affectedFieldNames)."') group by segmentId)";
         
@@ -1664,12 +1665,27 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return ((int) $x->cnt) == 0;
     }
     
+    /**
+     * Get the total segment count for given taskGuid
+     * @param string $taskGuid
+     * @return number|mixed
+     */
+    public function getTotalSegmentsCount(string $taskGuid){
+        $this->reInitDb($taskGuid);
+        $s = $this->db->select(true)
+        ->columns('count(*) as cnt')
+        ->where('`taskGuid`=?', $taskGuid);
+        
+        $result = $this->db->fetchRow($s);
+        return $result['cnt'] ?? 0;
+    }
+    
     /***
      * Get all segment IDs of segments which have a repetition
      * Segment repetitions are segments with the same sourceMd5 hash value.
      * If the segment does not have repetition, it will not be returned by this function.
      * The returned segments are ordered by segment id
-     * 
+     *
      * @param string $taskGuid
      * @return array
      */

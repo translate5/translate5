@@ -27,14 +27,63 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.HelpWindow', {
-    extend: 'Ext.window.Window',
+    extend: 'Editor.view.StatefulWindow',
     alias: 'widget.helpWindow',
     itemId: 'helpWindow',
+    stateId:'helpWindow',
+    reference: 'helpWindow',
     cls: 'helpWindow',
     minHeight : 750,
     width : 1024,
     autoHeight: true,
     autoScroll: true,
     modal : true,
-    layout:'fit'
+    layout:'fit',
+    viewModel:true,
+    bind:{
+    	doNotShowAgain:'{cbDoNotShowAgain.checked}'
+    },
+    strings:{
+    	cbDoNotShowAgainLabel:'#UT#Dieses Fenster nicht mehr automatisch anzeigen.'
+    		//do not automaticly show this window
+    },
+    getStateId:function(){
+    	var me=this,
+    		original=me.callParent();
+    	return original+'.'+Editor.data.helpSection;
+    },
+    
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config = {
+        		dockedItems: [{
+        	        xtype: 'toolbar',
+        	        dock: 'bottom',
+        	        hidden:me.isComponentHidden(),
+        	        items: [{
+        	        	xtype:'checkboxfield',
+        	        	boxLabel:me.strings.cbDoNotShowAgainLabel,
+        	        	reference: 'cbDoNotShowAgain',
+        	            publishes: 'value',
+        	        	name:'cbDoNotShowAgain',
+        	        	itemId:'cbDoNotShowAgain',
+        	            bind:{
+        	            	value:'{helpWindow.doNotShowAgain}'
+        	            }
+        	        }]
+        	    }]
+            };
+        
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    },
+    
+    /***
+     * The component is not visible when the there is not state config for the window type
+     */
+    isComponentHidden:function(){
+    	return Ext.state.Manager.getProvider().get(this.getStateId())===undefined;
+    }
 });

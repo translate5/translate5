@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -63,12 +63,12 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $filterClass = 'editor_Models_Filter_TaskSpecific';
     
     /**
-     * @var editor_Workflow_Abstract 
+     * @var editor_Workflow_Abstract
      */
     protected $workflow;
     
     /**
-     * @var editor_Workflow_Manager 
+     * @var editor_Workflow_Manager
      */
     protected $workflowManager;
     
@@ -159,7 +159,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->taskLog = ZfExtended_Factory::get('ZfExtended_Logger', [[
             'writer' => [
                 'tasklog' => $this->config->resources->ZfExtended_Resource_Logger->writer->tasklog
-            ] 
+            ]
         ]]);
         
         $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->entity]);
@@ -234,7 +234,7 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * 
+     *
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction() {
@@ -258,7 +258,7 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * For requests that get the Key Performance Indicators (KPI)
      * for the currently filtered tasks. If the tasks are not to be limited
-     * to those that are visible in the grid, the request must have set the 
+     * to those that are visible in the grid, the request must have set the
      * limit accordingly (= for all filtered tasks: no limit).
      */
     public function  kpiAction() {
@@ -338,7 +338,7 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $file editor_Models_File */
         $fileCount = $file->getFileCountPerTasks($taskGuids);
         
-        $this->_helper->TaskUserInfo->initUserAssocInfos($taskGuids);
+        $this->_helper->TaskUserInfo->initUserAssocInfos($rows);
 
         //load the task assocs
         $languageResourcemodel = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
@@ -369,7 +369,7 @@ class editor_TaskController extends ZfExtended_RestController {
             //adding QM SubSegment Infos to each Task
             $row['qmSubEnabled'] = false;
             if($this->config->runtimeOptions->editor->enableQmSubSegments &&
-                    !empty($row['qmSubsegmentFlags'])) { 
+                    !empty($row['qmSubsegmentFlags'])) {
                 $row['qmSubEnabled'] = true;
             }
             unset($row['qmSubsegmentFlags']);
@@ -444,7 +444,7 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * creates a task and starts import of the uploaded task files 
+     * creates a task and starts import of the uploaded task files
      * (non-PHPdoc)
      * @see ZfExtended_RestController::postAction()
      */
@@ -472,7 +472,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $pm->init((array)$this->user->data);
         }
         else {
-            //TODO test what happens with new error logging if PM does not exist? 
+            //TODO test what happens with new error logging if PM does not exist?
             $pm->loadByGuid($this->data['pmGuid']);
         }
         
@@ -595,8 +595,8 @@ class editor_TaskController extends ZfExtended_RestController {
                 'filename' => $tempFilename,
                 'currentUserGuid' => $this->user->data->userGuid,
             ]);
-            //TODO should be an synchronous process (queue instead run) 
-            // currently running import as direct run / synchronous process. 
+            //TODO should be an synchronous process (queue instead run)
+            // currently running import as direct run / synchronous process.
             // Reason is just the feedback for the user, which the user should get directly in the browser
             $worker->run();
             $this->log->info('E1011', 'Task re-imported from excel file and unlocked for further processing.');
@@ -810,12 +810,12 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * 
+     *
      * currently taskController accepts only 2 changes by REST
-     * - set locked: this sets the session_id implicitly and in addition the 
+     * - set locked: this sets the session_id implicitly and in addition the
      *   corresponding userGuid, if the passed locked value is set
      *   if locked = 0, task is unlocked
-     * - set finished: removes locked implictly, and sets the userGuid of the "finishers" 
+     * - set finished: removes locked implictly, and sets the userGuid of the "finishers"
      * @see ZfExtended_RestController::putAction()
      */
     public function putAction() {
@@ -856,14 +856,21 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->initWorkflow();
         
         $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
-        $tua = $this->workflow->getTaskUserAssoc($taskguid, $this->user->data->userGuid);
-        //mayLoadAllTasks is only true, if the current "PM" is not associated to the task directly. 
-        // If it is (pm override false) directly associated, the workflow must be considered it the task is openable / writeable.  
+
+        $tua = null;
+        try {
+            $tua=editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+        }
+        
+        //mayLoadAllTasks is only true, if the current "PM" is not associated to the task directly.
+        // If it is (pm override false) directly associated, the workflow must be considered it the task is openable / writeable.
         $mayLoadAllTasks = $mayLoadAllTasks && (empty($tua) || $tua->getIsPmOverride());
         $isTaskDisallowEditing = $this->isEditTaskRequest() && !$this->workflow->isWriteable($tua);
         $isTaskDisallowReading = $this->isViewTaskRequest() && !$this->workflow->isReadable($tua);
         if(!$mayLoadAllTasks && ($isTaskDisallowEditing || $isTaskDisallowReading)){
-            //if the task was already in session, we must delete it. 
+            //if the task was already in session, we must delete it.
             //If not the user will always receive an error in JS, and would not be able to do anything.
             $this->unregisterTask(); //FIXME XXX the changes in the session made by this method is not stored in the session!
             if(empty($tua)) {
@@ -917,18 +924,19 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         
         //if the totals segment count is not set, update it before the entity is saved
-        if($this->entity->getSegmentCount()==null || $this->entity->getSegmentCount()<1){
-            $this->entity->setSegmentCount($this->entity->getTotalSegmentsCount($taskguid));
+        if($this->entity->getSegmentCount() === null || $this->entity->getSegmentCount() < 1) {
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            $this->entity->setSegmentCount($segment->getTotalSegmentsCount($taskguid));
         }
         
         $this->entity->save();
         $obj = $this->entity->getDataObject();
         
-        $userAssocInfos = $this->_helper->TaskUserInfo->initUserAssocInfos([$taskguid]);
+        $userAssocInfos = $this->_helper->TaskUserInfo->initUserAssocInfos([$obj]);
         $this->invokeTaskUserTracking($taskguid, $userAssocInfos[$taskguid]['role'] ?? '');
         
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
-        $row = (array) $obj; 
+        $row = (array) $obj;
         $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
         $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll, $this->data->userState ?? null);
@@ -1071,8 +1079,8 @@ class editor_TaskController extends ZfExtended_RestController {
             $task->createMaterializedView();
             $task->registerInSession($this->data->userState);
             $this->events->trigger("afterTaskOpen", $this, array(
-                'task' => $task, 
-                'view' => $this->view, 
+                'task' => $task,
+                'view' => $this->view,
                 'openState' => $this->data->userState)
             );
             $manager = ZfExtended_Factory::get('editor_Services_Manager');
@@ -1112,7 +1120,7 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * unregisters the task from the session and close all open services 
+     * unregisters the task from the session and close all open services
      */
     protected function unregisterTask() {
         $this->entity->unregisterInSession();
@@ -1141,12 +1149,10 @@ class editor_TaskController extends ZfExtended_RestController {
         $isOpen = $this->isOpenTaskRequest();
         $isPmOverride = false;
         
-        $taskGuid = $this->entity->getTaskGuid();
-        
-        $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        $userTaskAssoc=ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userTaskAssoc editor_Models_TaskUserAssoc */
         try {
-            $userTaskAssoc->loadByParams($userGuid,$taskGuid);
+            $userTaskAssoc=editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $this->entity);
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
@@ -1160,7 +1166,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 throw $e;
             }
             $userTaskAssoc->setUserGuid($userGuid);
-            $userTaskAssoc->setTaskGuid($taskGuid);
+            $userTaskAssoc->setTaskGuid($this->entity->getTaskGuid());
             $userTaskAssoc->setRole('');
             $userTaskAssoc->setState('');
             $isPmOverride = true;
@@ -1213,7 +1219,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $qmSubFlags = $this->entity->getQmSubsegmentFlags();
         $this->view->rows->qmSubEnabled = false;
         if($this->config->runtimeOptions->editor->enableQmSubSegments &&
-                !empty($qmSubFlags)) { 
+                !empty($qmSubFlags)) {
             $this->view->rows->qmSubFlags = $this->entity->getQmSubsegmentIssuesTranslated(false);
             $this->view->rows->qmSubSeverities = $this->entity->getQmSubsegmentSeveritiesTranslated(false);
             $this->view->rows->qmSubEnabled = true;
@@ -1259,10 +1265,10 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $obj = $this->entity->getDataObject();
         
-        $this->_helper->TaskUserInfo->initUserAssocInfos([$taskguid]);
+        $this->_helper->TaskUserInfo->initUserAssocInfos([$obj]);
         
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
-        $row = (array) $obj; 
+        $row = (array) $obj;
         $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
         $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
@@ -1329,7 +1335,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 /* @var $worker editor_Models_Export_Worker */
                 $exportFolder = $worker->initExport($this->entity, $diff);
                 break;
-        }        
+        }
 
 
         $workerId = $worker->queue();
@@ -1338,11 +1344,11 @@ class editor_TaskController extends ZfExtended_RestController {
         // it is possible that we get the following in DB (implicit ordererd by ID here):
         //      Export_Worker for ExportReq1
         //      Export_Worker for ExportReq2 → overwrites the tempExportDir of ExportReq1
-        //      Export_ExportedWorker for ExportReq2 
+        //      Export_ExportedWorker for ExportReq2
         //      Export_ExportedWorker for ExportReq1 → works then with tempExportDir of ExportReq1 instead!
-        // 
-        // If we implement in future export workers which need to work on the temp export data, 
-        // we have to ensure that each export worker get its own export directory. 
+        //
+        // If we implement in future export workers which need to work on the temp export data,
+        // we have to ensure that each export worker get its own export directory.
         
         $worker = ZfExtended_Factory::get('editor_Models_Export_ExportedWorker');
         /* @var $worker editor_Models_Export_ExportedWorker */
@@ -1448,7 +1454,7 @@ class editor_TaskController extends ZfExtended_RestController {
     
     /***
      * Check if the given pmGuid(userGuid) is the same with the current logged user userGuid
-     * 
+     *
      * @param string $pmGuid
      * @return boolean
      */
@@ -1523,7 +1529,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 unset($assoc['id']);
                 if(!empty($assoc['autoCreatedOnImport'])) {
                     //do not clone such TermCollection associations, since they are recreated through the cloned import package
-                    continue; 
+                    continue;
                 }
                 $assoc['taskGuid'] = $newTaskGuid;
                 $model->init($assoc);
@@ -1547,7 +1553,7 @@ class editor_TaskController extends ZfExtended_RestController {
     
     /**
      * Warn the api users that the targetDeliveryDate field is not anymore available for the api.
-     * The task deadlines are defined for each task-user-assoc job separately, 
+     * The task deadlines are defined for each task-user-assoc job separately,
      *  for task creation we store the given date in the task meta table and use that in the jobs, so we do not break the API
      * @deprecated TODO: 11.02.2020 remove this function after all customers adopt there api calls
      * @see Editor_TaskuserassocController::setLegacyDeadlineDate
