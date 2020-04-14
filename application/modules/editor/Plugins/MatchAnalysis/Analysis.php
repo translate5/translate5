@@ -362,7 +362,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         //update the segment with custom target in fuzzy tm
         if($this->internalFuzzy && $connector->isInternalFuzzy()){
             $origTarget = $segment->getTargetEdit();
-            $segment->setTargetEdit("translate5-unique-id[".$segment->getTaskGuid()."]");
+            $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
+            $segment->setTargetEdit($dummyTargetText);
             $connector->update($segment);
             $segment->setTargetEdit($origTarget);
         }
@@ -388,9 +389,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
 
         $isFuzzy=false;
+        $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
         if(isset($matchRateResult) && is_object($matchRateResult)){
             //ignore internal fuzzy match target
-            $isFuzzy = strpos($matchRateResult->target, 'translate5-unique-id['.$segment->getTaskGuid().']') !== false;
+            $isFuzzy = strpos($matchRateResult->target, $dummyTargetText) !== false;
         }
         $matchAnalysis->setInternalFuzzy($isFuzzy  ? 1 : 0);
         $matchAnalysis->save();
