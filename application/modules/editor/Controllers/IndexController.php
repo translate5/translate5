@@ -613,6 +613,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase!
         $plugin = ucfirst(preg_replace('/[^a-zA-Z0-9]/', '', array_shift($js)));
+        
+        // DEBUG
+        // error_log("INDEXCONTROLLER: pluginpublicAction: plugin: ".$plugin." / requestedType: ".$requestedType." / requestedFile: ".$requestedFile." / extension: ".$extension);
+        
         if(empty($plugin)) {
             throw new ZfExtended_NotFoundException();
         }
