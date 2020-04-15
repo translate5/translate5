@@ -237,11 +237,14 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   initMainMenu: function() {
       var toolbar = this.getHeadToolBar(),
           insertIdx = 1,
-          logout = this.getLogoutButton()
+          logout = this.getLogoutButton(),
+          headPanel=Editor.app.getController('HeadPanel');
+      
       if(logout) {
           insertIdx = toolbar.items.indexOf(logout) + 1;
       }
-      if(Editor.data.helpUrl){
+      //is the help button visible for the current section
+      if(headPanel && headPanel.isHelpButtonVisible()){
     	  insertIdx=insertIdx+1;
       }
       toolbar.insert(insertIdx, {

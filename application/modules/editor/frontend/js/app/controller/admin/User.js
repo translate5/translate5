@@ -118,11 +118,13 @@ Ext.define('Editor.controller.admin.User', {
       var toolbar = this.getHeadToolBar(),
           insertIdx = 1,
           logout = this.getLogoutButton(),
-          grid = this.getUserGrid();
+          grid = this.getUserGrid(),
+          headPanel=Editor.app.getController('HeadPanel');
       if(logout) {
           insertIdx = toolbar.items.indexOf(logout) + 1;
       }
-      if(Editor.data.helpUrl){
+      //is the help button visible for the current section
+      if(headPanel && headPanel.isHelpButtonVisible()){
     	  insertIdx=insertIdx+1;
       }
       toolbar.insert(insertIdx, {

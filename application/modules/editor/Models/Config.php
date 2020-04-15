@@ -50,6 +50,8 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     ];
     //system 1 (default), instance 2, customer 4, task 8 , user 16
     
+    const DEFAULT_STATE_PREFIX='runtimeOptions.frontend.defaultState.';
+    
     /***
      * Load all zf configuration values merged with the user config values and installation.ini vaues. The user config value will
      * override the zf confuguration/ini (default) values.
@@ -61,7 +63,8 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         
         $s=$this->db->select()
         ->from('Zf_configuration',['Zf_configuration.*',new Zend_Db_Expr('"'.self::CONFIG_SOURCE_ZF_CONFIG.'" as origin')])
-        ->where('level IN(?)',$aclUserLvl);
+        ->where('level IN(?)',$aclUserLvl)
+        ->where('name LIKE ?',self::DEFAULT_STATE_PREFIX.'%');//TODO: remove me when the lvl load is introduced
         $zfconfig=$this->db->getAdapter()->fetchAll($s);
 
         //merge the ini with zfconfig values
@@ -84,7 +87,6 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             }
             return $item;
         }, $zfconfig);
-       
         //reindex the array (when the indexes are not in order, the store is not working well)
         return array_values($results);
     }

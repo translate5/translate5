@@ -38,16 +38,24 @@ Ext.define('Editor.view.StatefulWindow', {
      */
 	doNotShowAgain:false,
 	
+	
+    /**
+     * @cfg {string} loaderUrl
+     */
+	loaderUrl:'',
+	
     publishes: {
     	//publish this field so it is bindable
-    	doNotShowAgain: true
+    	doNotShowAgain: true,
+    	loaderUrl:''
 	},
 	
-	//the state event wich will triger the state update
-	stateEvents:['doNotShowAgainChange'],
+	//events to trigger the sataet update
+	stateEvents:['doNotShowAgainChange','loaderUrlChange'],
 
 	stateful:{
     	doNotShowAgain:true,
+    	loaderUrl:true,
     	//Info: those fields are enabled by default when a window is set to statefull
     	//we do not need them so far, since it will make the the databadse configuration dificult (more properties to handle)
     	width:false,
@@ -64,6 +72,7 @@ Ext.define('Editor.view.StatefulWindow', {
 		var me = this,
 			state = me.callParent() || {};
 		state = me.addPropertyToState(state, 'doNotShowAgain');
+		state = me.addPropertyToState(state, 'loaderUrl');
         return state;
     },
     
@@ -78,6 +87,7 @@ Ext.define('Editor.view.StatefulWindow', {
     	//if we want to save the other state props, enable call parent and remove the disabled object from stateful
     	//this.callParent(arguments)
     	this.setDoNotShowAgain(state.doNotShowAgain);
+    	this.setLoaderUrl(state.loaderUrl);
     },
     
 	setDoNotShowAgain:function(value){
@@ -93,6 +103,20 @@ Ext.define('Editor.view.StatefulWindow', {
 	
 	getDoNotShowAgain:function(){
 		return this.doNotShowAgain;
-	}
+	},
 	
+    setLoaderUrl:function(value){
+    	var me=this;
+        if (me.loaderUrl != value) {
+            me.loaderUrl = value;
+	        if (me.rendered && me.isVisible()) {
+	        	//trigger the state update
+	        	me.fireEvent('loaderUrlChange',value);
+	        }
+        }
+    },
+    
+    getLoaderUrl:function(){
+    	return this.loaderUrl;
+    }
 });

@@ -47,6 +47,13 @@ Ext.define('Editor.view.HelpWindow', {
     	cbDoNotShowAgainLabel:'#UT#Dieses Fenster nicht mehr automatisch anzeigen.'
     		//do not automaticly show this window
     },
+    statics:{
+    	//get the current window state id without creating the window
+    	getStateIdStatic:function(){
+    		return 'helpWindow.'+Editor.data.helpSection;
+    	}
+    },
+    
     getStateId:function(){
     	var me=this,
     		original=me.callParent();
@@ -55,24 +62,39 @@ Ext.define('Editor.view.HelpWindow', {
     
     initConfig: function(instanceConfig) {
         var me = this,
-            config = {
-        		dockedItems: [{
-        	        xtype: 'toolbar',
-        	        dock: 'bottom',
-        	        hidden:me.isComponentHidden(),
-        	        items: [{
-        	        	xtype:'checkboxfield',
-        	        	boxLabel:me.strings.cbDoNotShowAgainLabel,
-        	        	reference: 'cbDoNotShowAgain',
-        	            publishes: 'value',
-        	        	name:'cbDoNotShowAgain',
-        	        	itemId:'cbDoNotShowAgain',
-        	            bind:{
-        	            	value:'{helpWindow.doNotShowAgain}'
-        	            }
-        	        }]
-        	    }]
-            };
+        	url=Ext.String.format(me.getLoaderUrl(), Editor.data.helpSection, Editor.data.locale),
+        	isRemote=url.match(/^(http:\/\/|https:\/\/|ftp:\/\/|\/\/)([-a-zA-Z0-9@:%_\+.~#?&//=])+$/)!==null,
+        	config={
+	    		dockedItems: [{
+	    	        xtype: 'toolbar',
+	    	        dock: 'bottom',
+	    	        hidden:me.isComponentHidden(),
+	    	        items: [{
+	    	        	xtype:'checkboxfield',
+	    	        	boxLabel:me.strings.cbDoNotShowAgainLabel,
+	    	        	reference: 'cbDoNotShowAgain',
+	    	            publishes: 'value',
+	    	        	name:'cbDoNotShowAgain',
+	    	        	itemId:'cbDoNotShowAgain',
+	    	            bind:{
+	    	            	value:'{helpWindow.doNotShowAgain}'
+	    	            }
+	    	        }]
+	    	    }]
+	        };
+        //if the url is remote url, load the content inside an iframe
+        //also this prevents from iframe in iframe(in the views, also iframe can be defined)
+        if(isRemote){
+        	config.html='<iframe src="'+url+'" width="100%" height="100%" ></iframe>';
+        }else{
+        	//the url is not remote, set the loader configuration
+        	config.loader={
+				url:url,
+				renderer: 'html',
+				autoLoad: true,
+				scripts: true
+    		}
+        }
         
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
@@ -81,10 +103,31 @@ Ext.define('Editor.view.HelpWindow', {
     },
     
     /***
+     * Get the window state record from the state provider(this state is not the actual state of the window, it is the state record in the
+     * state provider store)
+     */
+    getProviderState:function(){
+    	return Ext.state.Manager.getProvider().get(this.self.getStateIdStatic());
+    },
+    /***
      * The component is not visible when the there is not state config for the window type
      */
     isComponentHidden:function(){
-    	var state=Ext.state.Manager.getProvider().get(this.getStateId());
+    	var state=this.getProviderState();
 		return state===undefined || state==""
-    }
+    },
+    
+    /***
+     * Override the getloader url. This will return the loaderUrl from the window provider state record.
+     * This is required, since the getLoaderUrl is used before the initial setLoaderUrl is called.
+     */
+    getLoaderUrl:function(){
+    	var me=this;
+    	if(me.loaderUrl!=""){
+    		return me.loaderUrl; 
+    	}
+    	var state=me.getProviderState();
+    	return (state && state.loaderUrl) ? state.loaderUrl : "";
+    },
+    
 });

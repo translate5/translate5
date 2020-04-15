@@ -237,8 +237,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$rop->loginUrl);
       $this->view->Php2JsVars()->set('logoutOnWindowClose', APPLICATION_RUNDIR.$rop->logoutOnWindowClose);
       
-      //inject helUrl variable used in frontend
-      $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
       $this->view->Php2JsVars()->set('errorCodesUrl',$rop->errorCodesUrl);
       
       $this->view->Php2JsVars()->set('messageBox.delayFactor', $rop->messageBox->delayFactor);
