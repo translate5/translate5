@@ -65,19 +65,21 @@ class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
         /* @var $importConfig editor_Models_Import_Configuration */
         $importConfig->workerId = $this->workerModel->getId();
         
+        // externalImport just triggers the event aferImport!
+        //@see editor_Models_Import::triggerAfterImport
+        $externalImport = ZfExtended_Factory::get('editor_Models_Import');
+        /* @var $externalImport editor_Models_Import */
+        
         try {
             $import = ZfExtended_Factory::get('editor_Models_Import_Worker_Import');
             /* @var $import editor_Models_Import_Worker_Import */
             $import->import($task, $importConfig);
             
-            // externalImport just triggers the event aferImport!
-            //@see editor_Models_Import::triggerAfterImport
-            $externalImport = ZfExtended_Factory::get('editor_Models_Import');
-            /* @var $externalImport editor_Models_Import */
             $externalImport->triggerAfterImport($task, (int) $this->workerModel->getId(), $importConfig);
             return true;
         } catch (Exception $e) {
             $task->setErroneous();
+            $externalImport->triggerAfterImportError($task, (int) $this->workerModel->getId(), $importConfig);
             throw $e; 
         }
     }
