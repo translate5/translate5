@@ -45,6 +45,8 @@ END LICENSE AND COPYRIGHT
  * @method void setUserGuid() setUserGuid(string $userGuid)
  * @method string getFields() getFields()
  * @method void setFields() setFields(string $userGuid)
+ * @method integer getTaskUserAssocId() getTaskUserAssocId()
+ * @method void setTaskUserAssocId() setTaskUserAssocId(int $taskUserAssocId)
  */
 class editor_Models_Workflow_Userpref extends ZfExtended_Models_Entity_Abstract {
     const VIS_SHOW = 'show';

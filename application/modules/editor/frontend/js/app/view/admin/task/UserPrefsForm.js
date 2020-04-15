@@ -44,7 +44,8 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
         btnCancel: '#UT#Abbrechen',
         visShow: '#UT#Anzeigen',
         visHide: '#UT#Ausblenden',
-        visDisabled: '#UT#nicht vorhanden'
+        visDisabled: '#UT#nicht vorhanden',
+        forAll: '#UT#für alle'
     },
 
     initConfig: function(instanceConfig) {
@@ -60,24 +61,45 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                     forceSelection: true,
                     editable: false,
                     queryMode: 'local',
-                    store: [['','']],//dummy entry to get correct fields
+                    reference:'workflowstep',
+                    displayField:'label',
+                    valueField:'id',
+                    store:Ext.create('Ext.data.Store', {
+                    	fields:['id', 'label','role'],
+                    }),
                     anchor: '100%',
                     fieldLabel: me.strings.fieldStep
                 },
                 {
                     xtype: 'combobox',
                     anchor: '100%',
-                    name: 'userGuid',
-                    allowBlank: false,
-                    forceSelection: true,
+                    name: 'taskUserAssocId',
+                    reference:'taskUserAssoc',
                     queryMode: 'local',
-                    store: [['','']],//dummy entry to get correct fields
+                    valueField:'id',
+                    displayTpl: '<tpl for=".">{surName}, {firstName} ({login}) ({role})</tpl>',
+                    listConfig: {
+                        itemTpl: [
+                            '<div>{surName}, {firstName} ({login}) ({role})</div>'
+                        ]
+                    },
+                    emptyText:me.strings.forAll,
+                    store: Ext.create('Ext.data.ChainedStore', {
+                    	source: "admin.TaskUserAssocs",
+                    }),
                     fieldLabel: me.strings.fieldUsername
                 },{
                     xtype: 'checkboxfield',
                     anchor: '100%',
                     name: 'notEditContent',
                     boxLabel: me.strings.fieldNotEditContent
+                },{
+                	xtype: 'hiddenfield',
+                    dataIndex: 'userGuid',
+                    name: 'userGuid',
+                    bind:{
+                    	value:'{taskUserAssoc.selection.userGuid}'
+                    }
                 },{
                     xtype: 'checkboxfield',
                     anchor: '100%',
@@ -159,28 +181,15 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
         var me = this,
             task = me.lookupViewModel().get('currentTask'),
             fields = task.segmentFields().collect('name'),
-            checked = rec.get('fields').split(','),
-            toSet = {},
             wfLabel,
             userLabel;
         this.fireEvent('beforeLoadRecord', this, rec);
-        //set the field checkboxes by the stored string
-        Ext.Array.each(fields, function(val) {
-            toSet[val] = (Ext.Array.indexOf(checked, val) >= 0);
-        });
-        me.getForm()._record = rec;
-        //manipulate the record data as needed
-        me.getForm().setValues(Ext.applyIf({
-            fields: rec.get('fields').split(','),
-            workflowStep: ''
-        }, rec.data));
-        //set the userGuid separatly since we have first to calculate the entries by setting the workflowStep again
+        me.getForm().loadRecord(rec);
         me.getForm().setValues({
-            workflowStep: rec.get('workflowStep') || FOR_ALL,
-            userGuid: rec.get('userGuid') || FOR_ALL
+        	fields: rec.get('fields').split(',')
         });
         wfLabel = me.down('combobox[name="workflowStep"]').getRawValue();
-        userLabel = me.down('combobox[name="userGuid"]').getRawValue();
+        userLabel = me.down('hiddenfield[name="userGuid"]').getRawValue();
         me.setTitle(rec.phantom ? me.title_add : Ext.String.format(me.title_edit, wfLabel, userLabel));
     }
 });

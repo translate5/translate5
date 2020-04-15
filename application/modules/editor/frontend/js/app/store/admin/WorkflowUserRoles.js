@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.store.admin.WorkflowUserRoles', {
 	extend : 'Ext.data.Store',
+	alias:'store.workflowuserroles',
 	initConfig: function(instanceConfig) {
 		var me = this,
 			config={},

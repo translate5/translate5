@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -28,9 +28,9 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Abstract Workflow Class
- * 
- * Warning: When adding new workflows, a alter script must be provided to add 
- *   a default userpref entry for that workflow for each task 
+ *
+ * Warning: When adding new workflows, a alter script must be provided to add
+ *   a default userpref entry for that workflow for each task
  */
 abstract class editor_Workflow_Abstract {
     /*
@@ -40,18 +40,18 @@ abstract class editor_Workflow_Abstract {
      * for translation, JS Task Model and workflow for programmatic usage
      */
     //the user cant access the task yet
-    const STATE_WAITING = 'waiting'; 
+    const STATE_WAITING = 'waiting';
     //the user has finished his work on this task, and cant access it anymore
-    const STATE_FINISH = 'finished'; 
-    //the user can access the task editable and writeable, 
+    const STATE_FINISH = 'finished';
+    //the user can access the task editable and writeable,
     //setting this state releases the lock if the user had locked the task
-    const STATE_OPEN = 'open'; 
+    const STATE_OPEN = 'open';
     //this state must be set on editing a task, it locks the task for the user
-    const STATE_EDIT = 'edit'; 
-    //setting this state opens the task readonly 
-    const STATE_VIEW = 'view'; 
-    //the user can access the task readable, must confirm it before usage 
-    const STATE_UNCONFIRMED = 'unconfirmed'; 
+    const STATE_EDIT = 'edit';
+    //setting this state opens the task readonly
+    const STATE_VIEW = 'view';
+    //the user can access the task readable, must confirm it before usage
+    const STATE_UNCONFIRMED = 'unconfirmed';
     
     const ROLE_TRANSLATOR = 'translator';
     const ROLE_REVIEWER = 'reviewer';
@@ -72,14 +72,14 @@ abstract class editor_Workflow_Abstract {
      * @var array
      */
     protected $labels = array(
-        'WORKFLOW_ID' => 'Standard Ablaufplan', 
-        'STATE_IMPORT' => 'import', 
-        'STATE_WAITING' => 'wartend', 
-        'STATE_UNCONFIRMED' => 'unbestätigt', 
-        'STATE_FINISH' => 'abgeschlossen', 
-        'STATE_OPEN' => 'offen', 
-        'STATE_EDIT' => 'selbst in Arbeit', 
-        'STATE_VIEW' => 'selbst geöffnet', 
+        'WORKFLOW_ID' => 'Standard Ablaufplan',
+        'STATE_IMPORT' => 'import',
+        'STATE_WAITING' => 'wartend',
+        'STATE_UNCONFIRMED' => 'unbestätigt',
+        'STATE_FINISH' => 'abgeschlossen',
+        'STATE_OPEN' => 'offen',
+        'STATE_EDIT' => 'selbst in Arbeit',
+        'STATE_VIEW' => 'selbst geöffnet',
         'ROLE_TRANSLATOR' => 'Übersetzer',
         'ROLE_REVIEWER' => 'Lektor',
         'ROLE_TRANSLATORCHECK' => 'Zweiter Lektor',
@@ -94,7 +94,7 @@ abstract class editor_Workflow_Abstract {
     
     /**
      * This part is very ugly: in the frontend we are working only with all states expect the ones listed here.
-     * The states listed here are only used in the frontend grid for rendering purposes, 
+     * The states listed here are only used in the frontend grid for rendering purposes,
      * they are not used to be activly set to a user, or to be filtered etc. pp.
      * So we define them as "pending" states, which have to be delivered in a separate matter to the frontend
      * The values are a subset of the above STATE_CONSTANTs
@@ -145,14 +145,14 @@ abstract class editor_Workflow_Abstract {
     protected $authenticatedUserModel;
     
     /**
-     * Import config, only available on workflow stuff triggerd in the context of an import 
+     * Import config, only available on workflow stuff triggerd in the context of an import
      * @var editor_Models_Import_Configuration
      */
     protected $importConfig = null;
     
     /**
      * lists all roles with read access to tasks
-     * @var array 
+     * @var array
      */
     protected $readableRoles = array(
         self::ROLE_VISITOR,
@@ -162,7 +162,7 @@ abstract class editor_Workflow_Abstract {
     );
     /**
      * lists all roles with write access to tasks
-     * @var array 
+     * @var array
      */
     protected $writeableRoles = array(
         self::ROLE_REVIEWER,
@@ -172,7 +172,7 @@ abstract class editor_Workflow_Abstract {
     /**
      * lists all states which allow read access to tasks
      * @todo readableStates and writeableStates have to be changed/extended to a modelling of state transitions
-     * @var array 
+     * @var array
      */
     protected $readableStates = array(
         self::STATE_UNCONFIRMED,
@@ -184,21 +184,21 @@ abstract class editor_Workflow_Abstract {
     );
     /**
      * lists all states which allow write access to tasks
-     * @var array 
+     * @var array
      */
     protected $writeableStates = array(
-        //although the task is readonly in state unconfirmed, we have to add the state here, 
+        //although the task is readonly in state unconfirmed, we have to add the state here,
         // to allow changing from unconfirmed to edit (which then means to confirm)
-        self::STATE_UNCONFIRMED, 
+        self::STATE_UNCONFIRMED,
         self::STATE_OPEN,
         self::STATE_EDIT,
         self::STATE_VIEW,
     );
     /**
      * roles which are part of the workflow chain (in this order)
-     * @todo currently only used in notification. For extending of workflow system 
+     * @todo currently only used in notification. For extending of workflow system
      *      or use of a workflow engine extend the use of roleChain to whereever applicable
-     * @var array 
+     * @var array
      */
     protected $stepChain = array(
         self::STEP_NO_WORKFLOW,
@@ -210,7 +210,7 @@ abstract class editor_Workflow_Abstract {
     
     
     /**
-     * Mapping between roles and workflowSteps. 
+     * Mapping between roles and workflowSteps.
      * @var array
      */
     protected $steps2Roles = array(
@@ -261,7 +261,7 @@ abstract class editor_Workflow_Abstract {
     
     protected $validDirectTrigger = [
             'notifyAllUsersAboutTaskAssociation',
-    ]; 
+    ];
     
     protected $nextStepWasSet = [];
 
@@ -271,6 +271,13 @@ abstract class editor_Workflow_Abstract {
      * @var array
      */
     protected $log = [];
+    
+    
+    /***
+     * the defined steps can not be assigned as workflow step
+     * @var array
+     */
+    protected $notAssignableSteps=[self::STEP_PM_CHECK,self::STEP_NO_WORKFLOW,self::STEP_WORKFLOW_ENDED];
     
     public function __construct() {
         $this->loadAuthenticatedUser();
@@ -459,7 +466,7 @@ abstract class editor_Workflow_Abstract {
             $userGuid = false;
         }
         $config = Zend_Registry::get('config');
-        $isCron = $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR'];
+        $isCron = $config->runtimeOptions->cronIP === ($_SERVER['REMOTE_ADDR'] ?? null);
         $isWorker = defined('ZFEXTENDED_IS_WORKER_THREAD');
         $this->authenticatedUserModel = ZfExtended_Factory::get('ZfExtended_Models_User');
         
@@ -475,7 +482,7 @@ abstract class editor_Workflow_Abstract {
         
     }
     /**
-     * 
+     *
      * @return array of available step constants (keys are constants, valus are constant-values)
      */
     public function getSteps(){
@@ -483,7 +490,15 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
-     * 
+     * Return only the assignable workflow steps.
+     * @return array
+     */
+    public function getAssignableSteps(){
+        return array_diff($this->getFilteredConstants('STEP_'), $this->notAssignableSteps);
+    }
+    
+    /**
+     *
      * @return array of available role constants (keys are constants, valus are constant-values)
      */
     public function getRoles(){
@@ -496,7 +511,7 @@ abstract class editor_Workflow_Abstract {
      */
     public function getAddableRoles(){
         $roles = $this->getRoles();
-        //FIXME instead of checking the roles a user have, 
+        //FIXME instead of checking the roles a user have,
         //this must come from ACL table analogous to setaclrole, use a setwfrole then
         // check sub classes on refactoring too!
         $user = new Zend_Session_Namespace('user');
@@ -522,7 +537,7 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
-     * 
+     *
      * @param string $role
      * @return boolean
      */
@@ -531,7 +546,7 @@ abstract class editor_Workflow_Abstract {
         return in_array($role, $roles);
     }
     /**
-     * 
+     *
      * @param string $state
      * @return boolean
      */
@@ -540,14 +555,14 @@ abstract class editor_Workflow_Abstract {
         return in_array($state, $states);
     }
     /**
-     * 
+     *
      * @return array of available state constants (keys are constants, valus are constant-values)
      */
     public function getStates(){
         return $this->getFilteredConstants('STATE_');
     }
     /**
-     * 
+     *
      * @param string $filter
      * @return array values are all constant values which names match filter
      */
@@ -571,21 +586,21 @@ abstract class editor_Workflow_Abstract {
         return $this->readableRoles;
     }
     /**
-     * 
+     *
      * @return array of state constants (keys are constants, valus are constant-values)
      */
     public function getReadableStates() {
         return $this->readableStates;
     }
     /**
-     * 
+     *
      * @return array of role constants (keys are constants, valus are constant-values)
      */
     public function getWriteableRoles() {
         return $this->writeableRoles;
     }
     /**
-     * 
+     *
      * @return array of state constants (keys are constants, valus are constant-values)
      */
     public function getWriteableStates() {
@@ -593,7 +608,7 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
-     * Returns the initial usage state to a workflow state 
+     * Returns the initial usage state to a workflow state
      * @param editor_Models_TaskUserAssoc $tua
      * @return string
      */
@@ -604,25 +619,6 @@ abstract class editor_Workflow_Abstract {
         return self::STATE_EDIT;
     }
 
-    /**
-     * returns the TaskUserAssoc Entity to the given combination of $taskGuid and $userGuid, 
-     * returns null if nothing found
-     * @param string $taskGuid
-     * @param string $userGuid
-     * @return editor_Models_TaskUserAssoc returns null if nothing found
-     */
-    public function getTaskUserAssoc(string $taskGuid, string $userGuid) {
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        try {
-            $tua->loadByParams($userGuid, $taskGuid);
-            return $tua;
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            return null;
-        }
-    }
-    
     /**
      * checks if the given TaskUserAssoc Instance allows reading of the task according to the Workflow Definitions
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
@@ -644,11 +640,11 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
-     * FIXME this is a small ugly workaround for that fact that we do not differ 
-     * between state transitions and "whats allowed" in a state. 
-     * The isWriteable and isReadable methods are only used in conjunction with state 
-     * transitions, and so cannot be used with the desired behaviour here. 
-     * Here we want to know if a task can be written in the given state (which 
+     * FIXME this is a small ugly workaround for that fact that we do not differ
+     * between state transitions and "whats allowed" in a state.
+     * The isWriteable and isReadable methods are only used in conjunction with state
+     * transitions, and so cannot be used with the desired behaviour here.
+     * Here we want to know if a task can be written in the given state (which
      * is currently only edit). See TRANSLATE-7 and TRANSLATE-18.
      * @param string $userState
      * @return boolean
@@ -674,23 +670,23 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
-     * returns true if a normal user can change the state of this assoc, false otherwise. 
+     * returns true if a normal user can change the state of this assoc, false otherwise.
      * false means that the user has finished this task already or the user is still waiting.
-     * $userAssumedStateHeHas: should be the same as $taskUserAssoc->state, but comes in via API and represents the state which the client has. 
-     *  This may differ from the state in the TUA out of DB. Basicly this means the user should refresh his data. 
-     * 
+     * $userAssumedStateHeHas: should be the same as $taskUserAssoc->state, but comes in via API and represents the state which the client has.
+     *  This may differ from the state in the TUA out of DB. Basicly this means the user should refresh his data.
+     *
      * - does not look for the state of a task, only for state of taskUserAssoc
-     * 
-     * @param editor_Models_TaskUserAssoc $taskUserAssoc 
-     * @param string $userAssumedStateHeHas 
+     *
+     * @param editor_Models_TaskUserAssoc $taskUserAssoc
+     * @param string $userAssumedStateHeHas
      * @return boolean
      */
     public function isStateChangeable(editor_Models_TaskUserAssoc $taskUserAssoc, $userAssumedStateHeHas) {
         $state = $taskUserAssoc->getState();
         //setting from unconfirmed to edit means implicitly that the user confirms the job
-        // both values TUA.state in DB and state which has the user must be unconfirmed 
-        // this prevents that a user which as an old task overview (where he is not yet in unconfirmed mode) 
-        // automatically confirms the task by opening it via edit 
+        // both values TUA.state in DB and state which has the user must be unconfirmed
+        // this prevents that a user which as an old task overview (where he is not yet in unconfirmed mode)
+        // automatically confirms the task by opening it via edit
         if($state == self::STATE_UNCONFIRMED) {
             // all other non edit states must leave the unconfirmed state
             // if the client in the GUI also was not on unconfirmed we have to leave it
@@ -712,7 +708,7 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
-     * debugging workflow 
+     * debugging workflow
      * @param string $msg
      * @param array $data optional debuggin data
      * @param bool $levelInfo optional, if true log in level info instead debug
@@ -786,11 +782,8 @@ abstract class editor_Workflow_Abstract {
     protected function commonBeforeSegmentSave(editor_Models_Segment $segmentToSave, Closure $updateStates, editor_Models_Task $task) {
         $sessionUser = new Zend_Session_Namespace('user');
         
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        
         //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
-        $tua->loadByParams($sessionUser->data->userGuid, $task->getTaskGuid());
+        $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUser->data->userGuid, $task);
         if($tua->getIsPmOverride() == 1){
             $segmentToSave->setWorkflowStepNr($task->getWorkflowStep()); //set also the number to identify in which phase the changes were done
             $segmentToSave->setWorkflowStep(self::STEP_PM_CHECK);
@@ -819,7 +812,7 @@ abstract class editor_Workflow_Abstract {
     - Anhand der Statusänderung kann auch der TaskLog Eintrag erzeugt werden
     - Hier lässt sich zukünftig auch eine Zend_Acl basierte Rechteüberprüfung integrieren, ob der Benutzer die ermittelte Aktion überhaupt durchführen darf.
     - Hier lassen sich zukünftig auch andere Änderungen am Task abfangen"	1.6		x
-     * 
+     *
      * @param editor_Models_Task $oldTask task as loaded from DB
      * @param editor_Models_Task $newTask task as going into DB (means not saved yet!)
      */
@@ -851,7 +844,7 @@ abstract class editor_Workflow_Abstract {
                 $this->events->trigger("doEnd", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
                 break;
             case $newTask::STATE_UNCONFIRMED:
-                //doing currently nothing 
+                //doing currently nothing
                 break;
         }
     }
@@ -881,7 +874,7 @@ abstract class editor_Workflow_Abstract {
         if(!empty($state)) {
             if(method_exists($this, $state)) {
                 $this->{$state}();
-            } 
+            }
             $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua, 'task' => $task));
         }
         $this->handleUserAssociationEdited();
@@ -900,12 +893,12 @@ abstract class editor_Workflow_Abstract {
         /* @var $actions editor_Models_Workflow_Action */
         $debugData = [
             'trigger' => $trigger,
-            'step' => $step, 
+            'step' => $step,
             'role' => $role,
             'state' => $state,
         ];
         if($this->isCron) {
-            //in cron calls we loop over each workflow, so we may not iterate here over the whole inheritance tree. 
+            //in cron calls we loop over each workflow, so we may not iterate here over the whole inheritance tree.
             // This would duplicate action calls.
             $workflows = [static::WORKFLOW_ID];
         }
@@ -984,7 +977,7 @@ abstract class editor_Workflow_Abstract {
     /**
      * recalculates the workflow step by the given task user assoc combinations
      * If the combination of roles and states are pointing to an specific workflow step, this step is used
-     * If the states and roles does not match any valid combination, no step is changed. 
+     * If the states and roles does not match any valid combination, no step is changed.
      * @param editor_Models_TaskUserAssoc $tua
      */
     protected function recalculateWorkflowStep(editor_Models_TaskUserAssoc $tua) {
@@ -999,7 +992,7 @@ abstract class editor_Workflow_Abstract {
         
         $taskGuid = $tua->getTaskGuid();
         
-        //if the step was recalculated due setNextStep in internal workflow calculations, 
+        //if the step was recalculated due setNextStep in internal workflow calculations,
         // we may not recalculate it here again!
         if(!empty($this->nextStepWasSet[$taskGuid])) {
             $sendNotice($this->nextStepWasSet[$taskGuid]['newStep']);
@@ -1019,7 +1012,7 @@ abstract class editor_Workflow_Abstract {
                 }
                 $hasRoleToCurrentStep = $hasRoleToCurrentStep || (($this->steps2Roles[$currentStep] ?? '') == $tua['role']);
             }
-            //we can only return true, if the Tuas contain at least one role belonging to the currentStep, 
+            //we can only return true, if the Tuas contain at least one role belonging to the currentStep,
             // in other words we can not reset the task to reviewing, if we do not have a reviewer
             return $hasRoleToCurrentStep;
         };
@@ -1047,7 +1040,7 @@ abstract class editor_Workflow_Abstract {
         }
         
         //if the current step is one of the possible steps for the tua configuration
-        // then everything is OK, 
+        // then everything is OK,
         // or if no valid configuration is found, then we also could not change the step
         if(empty($matchingSteps) || in_array($task->getWorkflowStepName(), $matchingSteps)) {
             return;
@@ -1073,9 +1066,9 @@ abstract class editor_Workflow_Abstract {
     
     /**
      * method returns the triggered state as string ready to use in events, these are mainly:
-     * doUnfinish, doView, doEdit, doFinish, doWait, doConfirm 
+     * doUnfinish, doView, doEdit, doFinish, doWait, doConfirm
      * beforeUnfinish, beforeView, beforeEdit, beforeFinish, beforeWait
-     * 
+     *
      * @param editor_Models_TaskUserAssoc $oldTua
      * @param editor_Models_TaskUserAssoc $newTua
      * @param string $prefix optional, defaults to "do"
@@ -1117,7 +1110,7 @@ abstract class editor_Workflow_Abstract {
      * @param string $stepName
      */
     protected function setNextStep(editor_Models_Task $task, $stepName) {
-        //store the nextStepWasSet per taskGuid, 
+        //store the nextStepWasSet per taskGuid,
         // so this mechanism works also when looping over different tasks with the same workflow instance
         $this->nextStepWasSet[$task->getTaskGuid()] = [
             'oldStep' => $task->getWorkflowStepName(),
@@ -1142,7 +1135,7 @@ abstract class editor_Workflow_Abstract {
     
     /*
     //DO Methods.
-     the do.. methods 
+     the do.. methods
     - are called by doWithTask and doWithTaskUserAssoc, according to the changed states
     - can contain further logic to call different "handle" Methods, can also been overwritten
      */
@@ -1183,12 +1176,12 @@ abstract class editor_Workflow_Abstract {
         $stat = $this->calculateFinish();
         $this->doDebug(__FUNCTION__. ' OriginalState: '.$originalState.'; Finish Stat: '.print_r($stat,1));
         if($wasNotFinished && $stat['roleAllFinished']) {
-            //in order to trigger the actions correctly we have to assume that the deleted one was "finished" 
+            //in order to trigger the actions correctly we have to assume that the deleted one was "finished"
             $tua->setState(self::STATE_FINISH);
             $this->handleAllFinishOfARole($stat);
         }
         if($wasNotFinished && $stat['allFinished']) {
-            //in order to trigger the actions correctly we have to assume that the deleted one was "finished" 
+            //in order to trigger the actions correctly we have to assume that the deleted one was "finished"
             $tua->setState(self::STATE_FINISH);
             $this->handleAllFinish($stat);
         }
@@ -1207,17 +1200,12 @@ abstract class editor_Workflow_Abstract {
         }
         $this->newTask = $task;
         
-        //try to load an user assoc between current user and task 
-        $this->newTaskUserAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         try {
-            $this->newTaskUserAssoc->loadByParams($this->authenticatedUser->userGuid, $task->getTaskGuid());
-            $role = $this->newTaskUserAssoc->getRole();
-            $state = $this->newTaskUserAssoc->getState();
+            //try to load an user assoc between current user and task
+            $this->newTaskUserAssoc =editor_Models_Loaders_Taskuserassoc::loadByTask($this->authenticatedUser->userGuid, $task);
         }
         catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->newTaskUserAssoc = null;
-            $role = null;
-            $state = null;
         }
         $this->callActions('handleDirect::'.$trigger, $task->getWorkflowStepName());
         return true;
@@ -1259,7 +1247,7 @@ abstract class editor_Workflow_Abstract {
     
     /**
      * is called when a user confirms his job (job was unconfirmed and is set to edit)
-     * No handler functions for confirm available, everything is handled via actions 
+     * No handler functions for confirm available, everything is handled via actions
      */
     protected function doConfirm() {
         $stat = $this->calculateConfirm();
@@ -1294,10 +1282,8 @@ abstract class editor_Workflow_Abstract {
     protected function doTaskChange() {
         $function = 'handleTaskChange';
         $this->doDebug($function);
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
         try {
-            $tua->loadByParams($this->authenticatedUser->userGuid, $this->newTask->getTaskGuid());
+            $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($this->authenticatedUser->userGuid, $this->newTask);
             $this->callActions($function, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
         }
         catch (ZfExtended_Models_Entity_NotFoundException $e) {
@@ -1320,10 +1306,10 @@ abstract class editor_Workflow_Abstract {
             $this->handleFirstFinish($stat);
         }
         if($stat['roleAllFinished']) {
-            $this->handleAllFinishOfARole($stat); 
+            $this->handleAllFinishOfARole($stat);
         }
         if($stat['allFinished']) {
-            $this->handleAllFinish($stat); 
+            $this->handleAllFinish($stat);
         }
         $this->handleFinish($stat);
     }
@@ -1370,8 +1356,8 @@ abstract class editor_Workflow_Abstract {
     /**
      * Calculates the workflow step confirmation status
      * Warning: this function may only be called in doConfirm (which is called if there was a state unconfirmed which is now set to edit)
-     *  For all other usages the calculation will not be correct, since we don't know if a state was unconfirmed before, 
-     *  we see only that all states are now not unconfirmed. 
+     *  For all other usages the calculation will not be correct, since we don't know if a state was unconfirmed before,
+     *  we see only that all states are now not unconfirmed.
      */
     protected function calculateConfirm() {
         $userTaskAssoc = $this->newTaskUserAssoc;
@@ -1398,8 +1384,8 @@ abstract class editor_Workflow_Abstract {
             'allConfirmed' => $sum > 0 && $otherSum === $sum,
             'roleAllConfirmed' => $roleUnconfirmedSum === 0,
             'roleFirstConfirmed' => $roleSum - 1 === $roleUnconfirmedSum,
-            //firstConfirmed is working only if really all other jobs are unconfirmed, what is seldom, since the other states will be waiting / finished etc. 
-            'firstConfirmed' => $otherSum === 1, 
+            //firstConfirmed is working only if really all other jobs are unconfirmed, what is seldom, since the other states will be waiting / finished etc.
+            'firstConfirmed' => $otherSum === 1,
         ];
     }
     

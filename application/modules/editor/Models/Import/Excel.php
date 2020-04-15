@@ -233,11 +233,10 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
      * @return editor_Models_TaskUserAssoc
      */
     protected function prepareTaskUserAssociation(): editor_Models_TaskUserAssoc {
-        $this->task;
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userTaskAssoc editor_Models_TaskUserAssoc */
         try {
-            $userTaskAssoc->loadByParams($this->user->getUserGuid(), $this->task->getTaskGuid());
+            $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->getUserGuid(), $this->task);
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {

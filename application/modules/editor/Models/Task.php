@@ -364,8 +364,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $loadAll = false) {
         $s = $this->db->select()
         ->from('LEK_task', $cols);
+        $defaultTable=$this->db->info($this->db::NAME);
         if(!empty($this->filter)) {
-            $this->filter->setDefaultTable('LEK_task');
+            $this->filter->setDefaultTable($defaultTable);
         }
         if($loadAll) {
             $on ='LEK_taskUserAssoc_1.taskGuid = LEK_task.taskGuid AND LEK_taskUserAssoc_1.userGuid = '.$s->getAdapter()->quote($userGuid);
