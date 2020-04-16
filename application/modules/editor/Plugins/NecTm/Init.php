@@ -77,6 +77,7 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         
         $this->eventManager->attach('editor_LanguageresourceinstanceController', 'beforeIndexAction', array($this, 'synchronizeNecTmCategories'));
         $this->eventManager->attach('Editor_CategoryController', 'afterIndexAction', array($this, 'filterToNECCategories'));
+        $this->eventManager->attach('editor_LanguageresourceinstanceController', 'beforePostAction', array($this, 'validateCategories'));
         
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
     }
@@ -156,5 +157,18 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
             return;
         }
         $worker->queue();
+    }
+    
+    /**
+     * For NEC-TMs: "We should always use tags in the data uploaded,
+     * if not, the data can't be searched by users (only by admin)."
+    * @param Zend_EventManager_Event $event
+     */
+    public function validateCategories(Zend_EventManager_Event $event) {
+        $params = $event->getParam('params','');
+        $categories = $params['categories'] ?? '';
+        if (empty($categories)) {
+            throw new editor_Plugins_NecTm_Exception('E1256');
+        }
     }
 }
