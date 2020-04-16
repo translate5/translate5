@@ -7,3 +7,6 @@ data/dummyTm_*
 .buildpath
 .project
 .settings/
+#needed for automated tests on server:
+public/scheduled-tests-trigger.php
+public/scheduled-tests/*
