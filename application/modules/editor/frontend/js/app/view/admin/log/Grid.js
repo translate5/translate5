@@ -31,6 +31,7 @@ Ext.define('Editor.view.admin.log.Grid', {
     alias: 'widget.editorAdminLogGrid',
     requires: ['Editor.view.admin.log.GridViewController'],
     controller: 'editorlogGridViewController',
+    cls: 'event-log-grid',
     strings: {
         reload: '#UT# Aktualisieren',
         level: '#UT# Typ',
