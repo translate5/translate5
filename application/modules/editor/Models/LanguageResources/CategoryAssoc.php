@@ -51,8 +51,6 @@ class editor_Models_LanguageResources_CategoryAssoc extends ZfExtended_Models_En
             return;
         }
         if (empty($data['categories'])) {
-            // trigger event and handle it according to the requirements of the LanguageResource-Services
-            $this->events->trigger('languageResourceCategoriesEmpty', $this, array('data' => $data));
             // when categories are empty, there is nothing to be saved.
             return;
         }
