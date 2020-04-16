@@ -76,6 +76,8 @@ Ext.define('Editor.plugins.NecTm.controller.Main', {
             disableCategories = (resourceId.indexOf('editor_Plugins_NecTm') === -1);
         categoriesField.setDisabled(disableCategories);
         categoriesField.setReadOnly(disableCategories);
+        // For NEC-TMs, at least one category must be assigned.
+        categoriesField.setConfig('allowBlank',false);
     },
     /**
      * After the Edit-Window for a LanguageResource has been opened,
