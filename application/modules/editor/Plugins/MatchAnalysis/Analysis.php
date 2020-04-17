@@ -117,7 +117,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         }
         $this->initRepetitions();
         
-        $taskTotalWords=0;
         //init the word count calculator
         foreach($segments as $segment) {
             /* @var $segment editor_Models_Segment */
