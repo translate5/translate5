@@ -127,7 +127,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         
         $acl = ZfExtended_Acl::getInstance();
         //update the user config if the current user is allowed
-        if($acl->isInAllowedRoles($user->getRoles(),'applicationconfigLevel',$this->configLabel[self::CONFIG_LEVEL_USER])){
+        if($acl->isInAllowedRoles($user->getRoles(),ZfExtended_Models_User::APPLICATION_CONFIG_LEVEL,$this->configLabel[self::CONFIG_LEVEL_USER])){
             $userConfig=ZfExtended_Factory::get('editor_Models_UserConfig');
             /* @var $userConfig editor_Models_UserConfig */
             $userConfig->updateInsertConfig($user->getUserGuid(),$configName,$configValue);
