@@ -42,8 +42,13 @@ class editor_ConfigController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction() {
+        $userSession = new Zend_Session_Namespace('user');
+        
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->load($userSession->data->id);
         //load all zf configuration values merged with the user config and .ini values
-        $this->view->rows = $this->entity->loadAllMerged();
+        $this->view->rows = $this->entity->loadAllMerged($user);
     }
     
     /**

@@ -392,9 +392,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $config=ZfExtended_Factory::get('editor_Models_Config');
         /* @var $config editor_Models_Config */
+        
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->load($userSession->data->id);
+        
         //set frontend array from the config data
         //the array is used as initial user config store data
-        $php2js->set('app.configData',$config->loadAllMerged());
+        $php2js->set('app.configData',$config->loadAllMerged($user));
     }
     
     protected function getAppVersion() {

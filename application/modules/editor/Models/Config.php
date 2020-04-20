@@ -41,6 +41,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     const CONFIG_LEVEL_TASK=8;
     const CONFIG_LEVEL_USER=16;
     
+    // system 1 (default), instance 2, customer 4, task 8 , user 16
     protected $configLabel=[
         self::CONFIG_LEVEL_SYSTEM=>'system',
         self::CONFIG_LEVEL_INSTANCE=>'instance',
@@ -48,23 +49,41 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         self::CONFIG_LEVEL_TASK=>'task',
         self::CONFIG_LEVEL_USER=>'user'
     ];
-    //system 1 (default), instance 2, customer 4, task 8 , user 16
     
-    const DEFAULT_STATE_PREFIX='runtimeOptions.frontend.defaultState.';
+    protected $configLabelValue=[
+        'system'=>self::CONFIG_LEVEL_SYSTEM,
+        'instance'=>self::CONFIG_LEVEL_INSTANCE,
+        'customer'=>self::CONFIG_LEVEL_CUSTOMER,
+        'task'=>self::CONFIG_LEVEL_TASK,
+        'user'=>self::CONFIG_LEVEL_USER
+    ];
     
     /***
      * Load all zf configuration values merged with the user config values and installation.ini vaues. The user config value will
      * override the zf confuguration/ini (default) values.
-     * TODO: in future implementation, the zf configuration values should be loaded by user lvl!
+     * Config level and user role map:
+     * 
+     *  CONFIG_LEVEL_SYSTEM=1;    //system configuration. 
+     *  CONFIG_LEVEL_INSTANCE=2;  //(zf_configuration properties) API and ADMIN user ↓
+     *  CONFIG_LEVEL_CUSTOMER=4;  //customer configuration
+     *  CONFIG_LEVEL_TASK=8;      //task configuration PM Users           ↓
+     *  CONFIG_LEVEL_USER=16;     //user configuration. State fields and user custom configuration. ALL other Users   ↓
+     * 
+     * @param ZfExtended_Models_User $user
+     * @return array
      */
-    public function loadAllMerged(){
-        $user = new Zend_Session_Namespace('user');
-        $aclUserLvl=$this->getFilteredConstants('CONFIG_LEVEL_');
-        
+    public function loadAllMerged(ZfExtended_Models_User $user){
+        //get all application config level for the user
+        $configLabels=$user->getApplicationConfigLevel();
+        $labelValue=$this->configLabelValue;
+        //map the values to the config label
+        $configLabelValues=array_map(function($item) use ($labelValue){
+            return $labelValue[$item] ?? [];
+        }, $configLabels);
+        $configLabelValues=array_filter($configLabelValues);
         $s=$this->db->select()
         ->from('Zf_configuration',['Zf_configuration.*',new Zend_Db_Expr('"'.self::CONFIG_SOURCE_ZF_CONFIG.'" as origin')])
-        ->where('level IN(?)',$aclUserLvl)
-        ->where('name LIKE ?',self::DEFAULT_STATE_PREFIX.'%');//TODO: remove me when the lvl load is introduced
+        ->where('level IN(?)',$configLabelValues);
         $zfconfig=$this->db->getAdapter()->fetchAll($s);
 
         //merge the ini with zfconfig values
@@ -76,7 +95,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         $s=$this->db->select()
         ->setIntegrityCheck(false)
         ->from('LEK_user_config',['LEK_user_config.*',new Zend_Db_Expr('"'.self::CONFIG_SOURCE_USER_CONFIG.'" as origin')])
-        ->where('userGuid=?',$user->data->userGuid);
+        ->where('userGuid=?',$user->getUserGuid());
         $userConfig=$this->db->getAdapter()->fetchAll($s);
 
         $results=array_map(function($item) use ($userConfig){
