@@ -636,7 +636,7 @@ Ext.define('Editor.controller.Editor', {
             //http://jira.translate5.net/browse/TRANSLATE-1086
         	//same problem with different error log under edge
         	//https://jira.translate5.net/browse/TRANSLATE-2037
-            if(!Ext.isIE || !Ext.isEdge){
+            if(!Ext.isIE && !Ext.isEdge){
                 me.generalKeyMap.destroy();
             }
             me.generalKeyMap = null;
