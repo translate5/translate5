@@ -238,6 +238,9 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     xtype: 'button',
                     iconCls:'ico-save',
                     itemId: 'save-tm-btn',
+                    listeners:{
+                        click:'onSaveAddTmWindowClick'
+                    },
                     text: me.strings.save
                 }, {
                     xtype : 'button',
