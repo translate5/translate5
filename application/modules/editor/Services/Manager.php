@@ -85,7 +85,7 @@ class editor_Services_Manager {
             $service = ZfExtended_Factory::get($service.self::CLS_SERVICE);
             /* @var $service editor_Services_ServiceAbstract */
             if (!$service->isConfigured() || empty($service->getResources())) {
-                $serviceNames[] = (object) ['name' => '['.$service->getName().']', 'serviceName' => $service->getName(), 'helppage' => $service->getHelppage()];
+                $serviceNames[] = (object) ['name' => '['.$service->getName().']', 'serviceName' => $service->getName(), 'helppage' => urldecode($service->getHelppage())];
             }
         }
         return $serviceNames;
