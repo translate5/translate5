@@ -11,6 +11,8 @@ case "$1" in
             ;;
 "--check")  CONFIG=",'updateCheck' => '1'"
             ;;
+"--zend")  CONFIG=",'zend' => '$2'"
+            ;;
 "--database")  CONFIG=",'dbOnly' => '1'"
             ;;
 "--help")  CONFIG=",'help' => '1'"

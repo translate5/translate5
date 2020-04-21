@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -61,6 +61,7 @@ class Models_Installer_PreconditionCheck {
         $this->checkPhpVersion();
         $this->checkLocale();
         $this->checkPhpExtensions();
+        
         if(!empty($this->infosEnvironment)) {
             $msg = 'Some system requirements of translate5 are not optimal: ';
             echo("\n".$msg."\n\n\n  - ".join("\n  - ", $this->infosEnvironment)."\n");
@@ -147,18 +148,56 @@ class Models_Installer_PreconditionCheck {
         $config = Zend_Registry::get('config');
         $db = Zend_Db::factory($config->resources->db);
         
+        $this->checkCharset($db);
+        $this->checkTimezones($db);
         $this->checkDbSettings($db);
         $this->checkDbTriggerCreation($db);
         
         if(!empty($this->errorsDb)) {
             $msg = 'Some Database requirements of translate5 are not met: ';
-            $msg2 = 'See http://confluence.translate5.net/display/TIU/Server+environment+-+configure+from+scratch#mysqlconfig for more information and solutions.';
+            $msg2 = 'See https://confluence.translate5.net/display/CON/Server+environment+-+configure+from+scratch#Serverenvironmentconfigurefromscratch-mysqlconfigMySQLconfiguration for more information and solutions.';
             $this->stop($msg."\n  - ".join("\n  - ", $this->errorsDb)."\n\n".$msg2."\n");
         }
     }
     
+    /**
+     * The php and the mysql timezone must be set to the same value, otherwise we will get problems, see TRANSLATE-2030
+     * @param Zend_Db_Adapter_Abstract $db
+     */
+    protected function checkTimezones(Zend_Db_Adapter_Abstract $db) {
+        $result = $db->query("SELECT TIME_FORMAT(TIMEDIFF(NOW(), utc_timestamp()), '%H:%i') gmtshift;");
+        $res = $result->fetchObject();
+        if(empty($res)) {
+            return; //should not be
+        }
+        $mysqlZone = $res->gmtshift;
+        if(strpos($mysqlZone, '-') !== 0) {
+            $mysqlZone = '+'.$mysqlZone;
+        }
+        $phpZone = date('P');
+        if($mysqlZone == $phpZone) {
+            return;
+        }
+        $msg = 'Your DB timezone (GMT '.$mysqlZone.') and your PHP timezone (GMT '.$phpZone.') differ! Please ensure that PHP (apache and CLI) timezone is set correctly and the DBs timezone is the same!';
+        $this->errorsDb[] = $msg;
+    }
+    
+    protected function checkCharset(Zend_Db_Adapter_Abstract $db) {
+        $result = $db->query("SELECT @@character_set_database charset, @@collation_database collation;");
+        $res = $result->fetchObject();
+        if(empty($res)) {
+            return; //should not be
+        }
+        if($res->charset !== 'utf8') {
+            $this->errorsDb[] = 'Your DBs charset is '.$res->charset.' but should be utf8';
+        }
+        if($res->collation !== 'utf8_general_ci') {
+            $this->errorsDb[] = 'Your DBs collation is '.$res->collation.' but should be utf8_general_ci';
+        }
+    }
+    
     protected function checkDbSettings(Zend_Db_Adapter_Abstract $db) {
-        // WARNING: if the tested variables are empty in DB, the test is positive! 
+        // WARNING: if the tested variables are empty in DB, the test is positive!
         $notAllowedSqlModes = array(
             'ONLY_FULL_GROUP_BY',
             'NO_ZERO_IN_DATE',
@@ -181,26 +220,27 @@ class Models_Installer_PreconditionCheck {
     }
     
     protected function checkDbTriggerCreation(Zend_Db_Adapter_Abstract $db) {
-            try {
-                //since SUPER checking is done before trigger existence check, we can just try to delete a non existent trigger.
-                $db->query("DROP TRIGGER updater_super_check");
-            }
-            catch(Zend_Db_Statement_Exception $e) {
-                $m = $e->getMessage();
-            }
-            if(strpos($m, 'Trigger does not exist, query was: DROP TRIGGER updater_super_check')!== false) {
-                //trigger does really not exist, so all is ok
-                return; 
-            }
-            
-            //SQLSTATE[HY000]: General error: 1419 You do not have the SUPER privilege and binary logging is enabled (you *might* want to use the less safe log_bin_trust_function_creators variable), query was: DROP TRIGGER updater_super_check
-            if(strpos($m, 'You do not have the SUPER privilege and binary logging is enabled')!== false) {
-                $this->errorsDb[] = 'Your DB user does not have the SUPER privilege and binary logging is enabled!';
-                return;
-            }
-            
-            //some other error occured
-            throw $e;
+        $m = $e = null;
+        try {
+            //since SUPER checking is done before trigger existence check, we can just try to delete a non existent trigger.
+            $db->query("DROP TRIGGER updater_super_check");
+        }
+        catch(Zend_Db_Statement_Exception $e) {
+            $m = $e->getMessage();
+        }
+        if(strpos($m, 'Trigger does not exist, query was: DROP TRIGGER updater_super_check')!== false) {
+            //trigger does really not exist, so all is ok
+            return;
+        }
+        
+        //SQLSTATE[HY000]: General error: 1419 You do not have the SUPER privilege and binary logging is enabled (you *might* want to use the less safe log_bin_trust_function_creators variable), query was: DROP TRIGGER updater_super_check
+        if(strpos($m, 'You do not have the SUPER privilege and binary logging is enabled')!== false) {
+            $this->errorsDb[] = 'Your DB user does not have the SUPER privilege and binary logging is enabled!';
+            return;
+        }
+        
+        //some other error occured
+        throw $e;
     }
     
     protected function stop($msg) {
