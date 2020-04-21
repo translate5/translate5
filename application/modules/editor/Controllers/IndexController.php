@@ -291,6 +291,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->setLanguageResourceJsVars();
       
       $this->view->Php2JsVars()->set('editor.editorBrandingSource',$rop->editor->editorBrandingSource);
+
+      $this->view->Php2JsVars()->set('customPanel.title',$this->translate->_($rop->editor->customPanel->title));
+      $this->view->Php2JsVars()->set('customPanel.url',$rop->editor->customPanel->url);
+      
       $this->setJsAppData();
     }
 
@@ -409,9 +413,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $ed = $this->config->runtimeOptions->editor;
         
-        $controllers = array('ServerException', 'ViewModes', 'Segments',
+        $controllers = ['ServerException', 'ViewModes', 'Segments',
             'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
-            'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal','JsLogger');
+            'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal','JsLogger','editor.CustomPanel'];
         
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
