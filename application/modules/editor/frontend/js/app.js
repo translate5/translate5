@@ -174,17 +174,30 @@ Ext.application({
               notRun = false;
               //use the hardcoded URL since we don't want to redirect to a custom logout page, 
               //but we just want to foirce a session destroy
-              Ext.Ajax.request({
-                  url: Editor.data.pathToRunDir+'/login/logout',
-                  method: 'get',
-                  async: false
-              });
+              try{
+            	  
+            	  if(!Ext.isIE){
+            		//send asinc request
+            		  navigator.sendBeacon(Editor.data.pathToRunDir+'/login/logout');
+            		  return;
+            	  }
+            	  //ie11 workaroun
+            	  Ext.Ajax.request({
+            		  url: Editor.data.pathToRunDir+'/login/logout',
+                      method: 'get',
+                      async: false
+                  });
+              }catch (e) {
+            	  
+              }
           };
-      Ext.EventManager.on(window, 'beforeunload', function() {
-          Editor.data.logoutOnWindowClose && notRun && logout();
-      });
-      Ext.EventManager.on(window, 'unload', function() {
-          Editor.data.logoutOnWindowClose && notRun && logout();
+      Ext.get(window).on({
+    	  beforeunload:function(){
+    		  Editor.data.logoutOnWindowClose && notRun && logout();
+    	  },
+    	  unload:function(){
+    		  Editor.data.logoutOnWindowClose && notRun && logout();
+    	  }
       });
   },
   /**
