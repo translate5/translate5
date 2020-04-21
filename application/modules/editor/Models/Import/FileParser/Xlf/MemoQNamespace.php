@@ -67,18 +67,7 @@ class editor_Models_Import_FileParser_Xlf_MemoQNamespace extends editor_Models_I
 
             $startText = $opener['openerKey'] + 1;
             $length = $key - $startText;
-            $commentText = htmlspecialchars(join($xmlparser->getChunks($startText, $length)));
-
-            $suffix = [];
-            if(!empty($attr['appliesto']) && $attr['appliesto'] != 'Target') {
-                $suffix[] = 'annotates '.$attr['appliesto'].' column';
-            }
-            if(!empty($attr['origin']) && $attr['origin'] != 'User') {
-                $suffix[] = 'from '.$attr['origin'];
-            }
-            if(!empty($suffix)) {
-                $commentText .= "\n (".join('; ',$suffix).')';
-            }
+            $commentText = join($xmlparser->getChunks($startText, $length));
 
             $comment->setComment($commentText);
 

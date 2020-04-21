@@ -9,25 +9,25 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "annotates selection \"Kommentar 2\": \nKommentar 2",
+            "comment": "annotates selection &quot;Kommentar 2&quot;: \nKommentar 2",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "annotates selection \"Kommentar 1\": \nKommentar 1",
+            "comment": "annotates selection &quot;Kommentar 1&quot;: \nKommentar 1",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "TL",
-            "comment": "(annotates source column)\nannotates selection \"keinen Kommentar\": \nSource Kommentar 2",
+            "comment": "(annotates source column)\nannotates selection &quot;keinen Kommentar&quot;: \nSource Kommentar 2",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "TL",
-            "comment": "(annotates source column)\nannotates selection \"keinen Kommentar\": \nSource Kommentar 1",
+            "comment": "(annotates source column)\nannotates selection &quot;keinen Kommentar&quot;: \nSource Kommentar 1",
             "isEditable": false
         }
     ],
@@ -55,7 +55,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "annotates selection \"HIER\": \nKommentar f\u00fcr HIER in Segment 3 (Severy level: Warning)",
+            "comment": "annotates selection &quot;HIER&quot;: \nKommentar f\u00fcr HIER in Segment 3 (Severy level: Warning)",
             "isEditable": false
         }
     ],
@@ -69,19 +69,19 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "annotates selection \"2_KOMMENTARE\": \nKommentar bei: \"2_KOMMENTARE\"",
+            "comment": "annotates selection &quot;2_KOMMENTARE&quot;: \nKommentar bei: &quot;2_KOMMENTARE&quot;",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "annotates selection \"KOMMENTAR_ 2_KOMMENTARE\": \nKommentar bei: KOMMENTAR_2_KOMMENTARE",
+            "comment": "annotates selection &quot;KOMMENTAR_ 2_KOMMENTARE&quot;: \nKommentar bei: KOMMENTAR_2_KOMMENTARE",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "annotates selection \"HIER\": \nKommentar f\u00fcr Benutzer 1 HIER in Segment 4 (Severy level: Error)",
+            "comment": "annotates selection &quot;HIER&quot;: \nKommentar f\u00fcr Benutzer 1 HIER in Segment 4 (Severy level: Error)",
             "isEditable": false
         }
     ],
@@ -95,19 +95,19 @@
         {
             "userGuid": "memoq-imported",
             "userName": "JF",
-            "comment": "Hallo Marc!",
+            "comment": "&quot;Hallo&quot; \u201eMarc\u201c!",
             "isEditable": false
         },
         {
             "userGuid": "memoq-imported",
             "userName": "Table RTF",
-            "comment": "und &lt;b&gt;nochmal&lt;\/b&gt; einer.\n (annotates Row column; from SourceFile)",
+            "comment": "und &lt;b&gt;nochmal&lt;\/b&gt; einer.",
             "isEditable": false
         },
         {
             "userGuid": "memoq-imported",
             "userName": "Table RTF",
-            "comment": "Dies ist noch einer. \n (annotates Row column; from SourceFile)",
+            "comment": "Dies ist noch einer. ",
             "isEditable": false
         },
         {
@@ -133,13 +133,13 @@
         {
             "userGuid": "memoq-imported",
             "userName": "Table RTF",
-            "comment": "und nochmal einer.\n (annotates Row column; from SourceFile)",
+            "comment": "und nochmal einer.",
             "isEditable": false
         },
         {
             "userGuid": "memoq-imported",
             "userName": "Table RTF",
-            "comment": "Dies ist noch einer. \n (annotates Row column; from SourceFile)",
+            "comment": "Dies ist noch einer. ",
             "isEditable": false
         },
         {
