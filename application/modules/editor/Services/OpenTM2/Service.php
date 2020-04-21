@@ -43,7 +43,7 @@ class editor_Services_OpenTM2_Service extends editor_Services_ServiceAbstract {
      * URL to confluence-page
      * @var string
      */
-    protected static $helpPage = "https://confluence.translate5.net/display/CON/OpenTM2+Installation";
+    protected static $helpPage = "https://confluence.translate5.net/display/BUS/OpenTM2";
     
     /**
      * {@inheritDoc}

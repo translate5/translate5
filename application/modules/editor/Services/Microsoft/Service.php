@@ -36,7 +36,7 @@ class editor_Services_Microsoft_Service extends editor_Services_ServiceAbstract 
      * URL to confluence-page
      * @var string
      */
-    protected static $helpPage = "https://confluence.translate5.net/display/CON/OpenTM2+Installation"; // TODO
+    protected static $helpPage = "https://confluence.translate5.net/display/BUS/MS+Translator+Microsoft";
     
     protected $resourceClass = 'editor_Services_Microsoft_Resource';
     

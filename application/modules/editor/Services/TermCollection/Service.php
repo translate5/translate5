@@ -36,7 +36,7 @@ class editor_Services_TermCollection_Service extends editor_Services_ServiceAbst
      * URL to confluence-page
      * @var string
      */
-    protected static $helpPage = "https://confluence.translate5.net/display/CON/OpenTM2+Installation"; // TODO
+    protected static $helpPage = "https://confluence.translate5.net/display/TAD/Term+Collection";
     
     protected $resourceClass = 'editor_Services_TermCollection_Resource';
     

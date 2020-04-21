@@ -36,7 +36,7 @@ class editor_Services_SDLLanguageCloud_Service extends editor_Services_ServiceAb
      * URL to confluence-page
      * @var string
      */
-    protected static $helpPage = "https://confluence.translate5.net/display/CON/OpenTM2+Installation"; // TODO
+    protected static $helpPage = "https://confluence.translate5.net/display/BUS/SDL+LanguageCloud";
     
     protected $resourceClass = 'editor_Services_SDLLanguageCloud_Resource';
     

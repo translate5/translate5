@@ -43,7 +43,7 @@ class editor_Plugins_NecTm_Service extends editor_Services_ServiceAbstract {
      * URL to confluence-page
      * @var string
      */
-    protected static $helpPage = "https://confluence.translate5.net/display/CON/OpenTM2+Installation";
+    protected static $helpPage = "https://confluence.translate5.net/display/CON/NEC-TM";
     
     /**
      * What translate5 uses as origin for storing categories from NEC-TM (there: "tags").

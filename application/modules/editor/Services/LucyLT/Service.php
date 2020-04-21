@@ -43,7 +43,7 @@ class editor_Services_LucyLT_Service extends editor_Services_ServiceAbstract {
      * URL to confluence-page
      * @var string
      */
-    protected static $helpPage = "https://confluence.translate5.net/display/CON/OpenTM2+Installation"; // TODO
+    protected static $helpPage = "https://confluence.translate5.net/display/BUS/Lucy";
     
     protected $resourceClass = 'editor_Services_LucyLT_Resource';
     
