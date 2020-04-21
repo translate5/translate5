@@ -84,7 +84,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         $s=$this->db->select()
         ->from('Zf_configuration',['Zf_configuration.*',new Zend_Db_Expr('"'.self::CONFIG_SOURCE_ZF_CONFIG.'" as origin')])
         ->where('level IN(?)',$configLabelValues);
-        $zfconfig=$this->db->getAdapter()->fetchAll($s);
+        $zfconfig=$this->loadFilterdCustom($s);
 
         //merge the ini with zfconfig values
         $iniOptions = Zend_Registry::get('bootstrap')->getApplication()->getOptions();
