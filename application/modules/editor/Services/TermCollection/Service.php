@@ -32,8 +32,30 @@ class editor_Services_TermCollection_Service extends editor_Services_ServiceAbst
     
     const DEFAULT_COLOR = '19737d';
     
+    /**
+     * URL to confluence-page
+     * @var string
+     */
+    protected static $helpPage = "https://confluence.translate5.net/display/CON/OpenTM2+Installation"; // TODO
     
     protected $resourceClass = 'editor_Services_TermCollection_Resource';
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::isConfigured()
+     */
+    public function isConfigured() {
+        return true;
+    }
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::embedService()
+     */
+    protected function embedService() {
+        $this->addResource([$this->getServiceNamespace(), $this->getName()]);
+    }
     
     /**
      * (non-PHPdoc)
@@ -41,10 +63,6 @@ class editor_Services_TermCollection_Service extends editor_Services_ServiceAbst
      */
     public function getName() {
         return "TermCollection";
-    }
-    
-    public function __construct(){
-        $this->addResource([$this->getServiceNamespace(), $this->getName()]);
     }
 
 }

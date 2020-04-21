@@ -29,23 +29,42 @@ END LICENSE AND COPYRIGHT
 /**
  */
 class editor_Services_SDLLanguageCloud_Service extends editor_Services_ServiceAbstract {
+    
     const DEFAULT_COLOR = 'aaffff';
+    
+    /**
+     * URL to confluence-page
+     * @var string
+     */
+    protected static $helpPage = "https://confluence.translate5.net/display/CON/OpenTM2+Installation"; // TODO
     
     protected $resourceClass = 'editor_Services_SDLLanguageCloud_Resource';
     
-    public function __construct() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->LanguageResources->sdllanguagecloud->server;
-        $urls=$urls->toArray();
-        if(empty($urls) || empty($urls[0])){
-            return;
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::isConfigured()
+     */
+    public function isConfigured() {
+        if (!isset($this->config->runtimeOptions->LanguageResources->sdllanguagecloud->server)) {
+            return false;
         }
-        $apiKey = $config->runtimeOptions->LanguageResources->sdllanguagecloud->apiKey;
-        if(empty($apiKey)){
-            return;
+        if (!isset($this->config->runtimeOptions->LanguageResources->sdllanguagecloud->apiKey)) {
+            return false;
         }
-        $this->addResourceForeachUrl('SDLLanguageCloud', $urls);
+        if (!isset($this->config->runtimeOptions->LanguageResources->sdllanguagecloud->matchrate)) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::embedService()
+     */
+    protected function embedService() {
+        $urls = $this->config->runtimeOptions->LanguageResources->sdllanguagecloud->server;
+        $this->addResourceForeachUrl($this->getName(), $urls->toArray());
     }
     
     /**

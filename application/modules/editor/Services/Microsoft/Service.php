@@ -29,26 +29,40 @@ END LICENSE AND COPYRIGHT
 /**
  */
 class editor_Services_Microsoft_Service extends editor_Services_ServiceAbstract {
+    
     const DEFAULT_COLOR = '2581f4';
+    
+    /**
+     * URL to confluence-page
+     * @var string
+     */
+    protected static $helpPage = "https://confluence.translate5.net/display/CON/OpenTM2+Installation"; // TODO
     
     protected $resourceClass = 'editor_Services_Microsoft_Resource';
     
-    public function __construct() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $microsoftConfig=isset($config->runtimeOptions->LanguageResources->microsoft) ? $config->runtimeOptions->LanguageResources->microsoft : null;
-        if(!isset($microsoftConfig)){
-            return;
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::isConfigured()
+     */
+    public function isConfigured() {
+        if (!isset($this->config->runtimeOptions->LanguageResources->microsoft->apiKey)) {
+            return false;
         }
-        $apiKey = isset($microsoftConfig->apiKey) ? $microsoftConfig->apiKey:null ;
-        if(empty($apiKey)){
-            return;
+        if (!isset($this->config->runtimeOptions->LanguageResources->microsoft->apiUrl)) {
+            return false;
         }
-        
-        $apiUrl=isset($microsoftConfig->apiUrl) ?$microsoftConfig->apiUrl:null ;
-        if(empty($apiUrl)){
-            return;
+        if (!isset($this->config->runtimeOptions->LanguageResources->microsoft->matchrate)) {
+            return false;
         }
+        return true;
+    }
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::embedService()
+     */
+    protected function embedService() {
         $this->addResource([$this->getServiceNamespace(), $this->getName()]);
     }
     

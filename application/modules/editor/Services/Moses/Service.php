@@ -36,10 +36,40 @@ END LICENSE AND COPYRIGHT
  * Moses Service Base Class
  */
 class editor_Services_Moses_Service extends editor_Services_ServiceAbstract {
+    
     const DEFAULT_COLOR = 'ffff00';
     
+    /**
+     * URL to confluence-page
+     * @var string
+     */
+    protected static $helpPage = "https://confluence.translate5.net/display/CON/OpenTM2+Installation"; // TODO
     
     protected $resourceClass = 'editor_Services_Moses_Resource';
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::isConfigured()
+     */
+    public function isConfigured() {
+        if (!isset($this->config->runtimeOptions->LanguageResources->moses->server)) {
+            return false;
+        }
+        if (!isset($this->config->runtimeOptions->LanguageResources->moses->matchrate)) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::embedService()
+     */
+    protected function embedService() {
+        $urls = $this->config->runtimeOptions->LanguageResources->moses->server;
+        $this->addResourceForeachUrl($this->getName(), $urls->toArray());
+    }
     
     /**
      * (non-PHPdoc)
@@ -47,12 +77,5 @@ class editor_Services_Moses_Service extends editor_Services_ServiceAbstract {
      */
     public function getName() {
         return "Moses";
-    }
-    
-    public function __construct() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->LanguageResources->moses->server;
-        $this->addResourceForeachUrl('Moses MT', $urls->toArray());
     }
 }

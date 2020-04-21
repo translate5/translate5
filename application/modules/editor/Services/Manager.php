@@ -61,17 +61,34 @@ class editor_Services_Manager {
     }
 
     /**
-     * Creates all configured connector resources
-     * @return [editor_Services_Connector]
+     * Creates all configured connector resources.
+     * @return array
      */
     public function getAllResources() {
         $serviceResources = array();
         foreach(self::$registeredServices as $service) {
             $service = ZfExtended_Factory::get($service.self::CLS_SERVICE);
-            /* @var $serviceResources editor_Services_ServiceAbstract */
+            /* @var $service editor_Services_ServiceAbstract */
             $serviceResources = array_merge($serviceResources, $service->getResources());
         }
         return $serviceResources;
+    }
+    
+    /**
+     * Returns all services (= their name and helppage) that are not configured 
+     * or that don't have any resources embedded.
+     * @return array
+     */
+    public function getAllUnconfiguredServices() {
+        $serviceNames = [];
+        foreach(self::$registeredServices as $service) {
+            $service = ZfExtended_Factory::get($service.self::CLS_SERVICE);
+            /* @var $service editor_Services_ServiceAbstract */
+            if (!$service->isConfigured() || empty($service->getResources())) {
+                $serviceNames[] = (object) ['name' => $service->getName(), 'serviceName' => $service->getName(), 'helppage' => $service->getHelppage()];
+            }
+        }
+        return $serviceNames;
     }
     
     /**
@@ -117,7 +134,7 @@ class editor_Services_Manager {
      * @param string $serviceType
      * @throws ZfExtended_Exception
      */
-    protected function checkService(string $serviceType) {
+    protected function checkService(string $serviceType) { // TODO is similar to isConfigured(), and why here in manager?
         if(!$this->hasService($serviceType)) {
             //Given Language-Resource-Service "{serviceType}." is not registered in the Language-Resource-Service-Manager!
             throw new editor_Services_NoServiceException('E1106', [
