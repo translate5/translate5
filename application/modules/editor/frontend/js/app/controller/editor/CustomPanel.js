@@ -26,15 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * Die Einstellungen werden in einem Cookie gespeichert
- * @class Editor.controller.HeadPanel
+ * Adds a custom accordion panel to the file panel on the left, if configured.
+ * @class Editor.controller.editor.CustomPanel
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.controller.editor.CustomPanel', {
