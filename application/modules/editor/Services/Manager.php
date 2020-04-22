@@ -92,6 +92,33 @@ class editor_Services_Manager {
     }
     
     /**
+     * Returns all services (= their name and helppage) that are available
+     * as a plug-in, but the plug-ins are not installed (except for GroupShare).
+     * @return array
+     */
+    public function getAllUninstalledPluginServices() {
+        $serviceNames = [];
+        $pluginServices = [
+            'editor_Plugins_DeepL_Init' => (object) ['name' => '[DeepL]',
+                                                     'serviceName' => '[DeepL]',
+                                                     'helppage' => urldecode('https://confluence.translate5.net/display/CON/DeepL')],
+            'editor_Plugins_NecTm_Init' => (object) ['name' => '[NEC-TM]',
+                                                     'serviceName' => '[NEC-TM]',
+                                                     'helppage' => urldecode('https://confluence.translate5.net/display/CON/NEC-TM')],
+        ];
+        // The (plug-in-)services that the user is supposed to see are by default activated on installation.
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $activePlugins = $config->runtimeOptions->plugins->active->toArray();
+        foreach ($pluginServices as $key => $value) {
+            if (!in_array($key, $activePlugins)) {
+                $serviceNames[] = $value;
+            }
+        }
+        return $serviceNames;
+    }
+    
+    /**
      * gets the reosurce to the given languageResource
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
      * @return editor_Models_LanguageResources_Resource

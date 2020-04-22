@@ -70,6 +70,12 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
             $result[] = $unconfiguredService;
         }
         
+        // (3)  the services from plug-ins that are not installed
+        $allUninstalledPluginServices = $serviceManager->getAllUninstalledPluginServices();
+        foreach ($allUninstalledPluginServices as $uninstalledService) {
+            $result[] = $uninstalledService;
+        }
+        
         //sort the results alphabetically by name
         $customSort = function($a,$b){
             if ($a->name == $b->name){
