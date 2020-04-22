@@ -32,7 +32,7 @@ Ext.define('Editor.model.UserConfig', {
     {name: 'id', type: 'int'},
     {name: 'userGuid', type: 'string'},
     {name: 'name', type: 'string'},
-    {name: 'value', type: 'string'},
+    {name: 'value', type: 'string'}
   ],
   idProperty: 'name',
   proxy : {
