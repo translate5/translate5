@@ -61,7 +61,6 @@ Ext.define('Editor.controller.admin.User', {
       confirmResetPwTitle: '#UT#Passwort zurücksetzen?',
       confirmResetPwMsg: '#UT#Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.',
       userSaved: '#UT#Der Änderungen an Benutzer "{0}" wurden erfolgreich gespeichert.',
-      openUserAdminBtn: "#UT#Benutzerverwaltung",
       userAdded: '#UT#Der Benutzer "{0}" wurde erfolgreich erstellt.'
   },
   //***********************************************************************************
@@ -80,15 +79,8 @@ Ext.define('Editor.controller.admin.User', {
       
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('adminViewportClosed', me.clearUsers, me);
-      Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
       
       me.control({
-          'headPanel toolbar#top-menu' : {
-              beforerender: me.initMainMenu
-          },
-          'button#user-admin-btn': {
-              click: me.openUserGrid
-          },
           '#adminUserGrid #reload-user-btn': {
               click: me.handleUserReload
           },
@@ -102,8 +94,6 @@ Ext.define('Editor.controller.admin.User', {
               click: me.handleUserCancel
           },
           '#adminUserGrid': {
-              hide: me.handleAfterHide,
-              show: me.handleAfterShow,
               celldblclick: me.handleUserEdit 
           },
           '#adminUserGrid actioncolumn': {
@@ -111,65 +101,17 @@ Ext.define('Editor.controller.admin.User', {
           }
       });
   },
-  /**
-   * injects the user menu into the main menu
-   */
-  initMainMenu: function() {
-      var toolbar = this.getHeadToolBar(),
-          insertIdx = 1,
-          logout = this.getLogoutButton(),
-          grid = this.getUserGrid();
-      if(logout) {
-          insertIdx = toolbar.items.indexOf(logout) + 1;
-      }
-      if(Editor.data.helpUrl){
-    	  insertIdx=insertIdx+1;
-      }
-      toolbar.insert(insertIdx, {
-          itemId: 'user-admin-btn',
-          xtype: 'button',
-          hidden: grid && grid.isVisible(),
-          text: this.strings.openUserAdminBtn
-      });
+  
+  routes: {
+      'user': 'onUserRoute'
   },
-  /**
-   * handle after show of usergrid
-   */
-  handleAfterShow: function(grid) {
-      this.getHeadToolBar() && this.getHeadToolBar().down('#user-admin-btn').hide();
-      //fire the global event for component view change
-      Ext.fireEvent('componentViewChanged','useroverview',grid.getTitle());
+  
+  onUserRoute: function() {
+      var view = this.getUserGrid();
+      console.log("user routing", view);
+      //view.up('tabpanel').setActiveTab(view);
   },
-  /**
-   * handle after hide of usergrid
-   */
-  handleAfterHide: function() {
-      this.getHeadToolBar() && this.getHeadToolBar().down('#user-admin-btn').show();
-  },
-  /**
-   * opens the task grid, hides all other
-   */
-  openUserGrid: function() {
-      var me = this, 
-          grid = me.getUserGrid();
-      
-      me.getCenterRegion().items.each(function(item){
-          item.hide();
-      });
-      
-      if(grid) {
-          grid.show();
-      }
-      else {
-          grid = me.getCenterRegion().add({
-              xtype: 'adminUserGrid'
-          });
-          me.handleAfterShow(grid);
-      }
-  },
-  handleInitEditor: function() {
-      this.getHeadToolBar() && this.getHeadToolBar().down('#user-admin-btn').hide();
-  },
+  
   /**
    * Handles the different user action on the action column
    * @param {Ext.grid.View} view

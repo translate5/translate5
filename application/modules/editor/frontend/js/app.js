@@ -299,9 +299,7 @@ Ext.application({
       me.fireEvent('adminViewportOpened');
       
       //set the value used for displaying the help pages
-      initial = me.viewport.down(me.viewport.getInitialView());
       Ext.getDoc().dom.title = me.windowTitle;
-      initial.fireEvent('show', initial);
   },
   
   mask: function(msg, title) {

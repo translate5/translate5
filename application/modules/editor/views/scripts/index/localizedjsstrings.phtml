@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -100,7 +100,7 @@ Ext.define('Editor.controller.Localizer', {
         //handling application name separatly, since used in different applications
         $app = $this->translate->_('translate5');
         //for better readability with line breaks
-        $disclaimer = 'Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.<br /> 
+        $disclaimer = 'Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.<br />
     Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:
     <ul>
         <li>Google Chrome ab Version 48</li>
@@ -108,15 +108,15 @@ Ext.define('Editor.controller.Localizer', {
         <li>Apple Safari ab Version 9</li>
         <li>Microsoft Edge ab Version 80</li>
     </ul>
-    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren. 
-    Hier kann es aber zu unvorhergesehenen Fehlern kommen. 
+    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.
+    Hier kann es aber zu unvorhergesehenen Fehlern kommen.
     Potentiell können auch manche Features komplett nicht funktionieren.';
         
         //for translated strings without without line breaks:
         $disclaimer = str_replace("\n", '', $disclaimer);
     
         $disclaimer = $this->translate->_($disclaimer);
-        $disclaimer = sprintf($disclaimer, $app); //replacing application name placeholders 
+        $disclaimer = sprintf($disclaimer, $app); //replacing application name placeholders
     ?>
     
     Ext.app.Application.prototype.browserAdviceTextTitle = '<?php echo $this->translate->_('Nicht unterstützte Browser-Version');?>';
@@ -229,7 +229,7 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.column.Comments.prototype.text_morecomment = '<?php echo $this->translate->_('({0} weiterer Kommentar)');?>';
   	Editor.view.segments.column.Comments.prototype.text_tooltip_icon = '<?php echo $this->translate->_('Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)');?>';
 
-	Editor.view.segments.column.SegmentNrInTask.prototype.text = '<?php echo $this->translate->_('Nr.');?>';  	
+	Editor.view.segments.column.SegmentNrInTask.prototype.text = '<?php echo $this->translate->_('Nr.');?>';
     
     Ext.define("Editor.locale.de.controller.ViewModes", {
         override: "Editor.controller.ViewModes",
@@ -842,7 +842,7 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
             forcedReadOnly: '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
-            confirmFinish: '<?php echo $this->translate->_('Aufgabe abschließen?');?>', 
+            confirmFinish: '<?php echo $this->translate->_('Aufgabe abschließen?');?>',
             confirmFinishMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>',
             taskClosed: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich verlassen.');?>',
             taskConfirmed: '<?php echo $this->translate->_('Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.');?>',
@@ -866,17 +866,17 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.task.ConfirmationWindow", {
         override: "Editor.view.task.ConfirmationWindow",
         strings: {
-            title: '<?php echo $this->translate->_('Aufgabe bestätigen?');?>', 
-            confirmMsg: '<?php echo $this->translate->_('Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.');?>', 
+            title: '<?php echo $this->translate->_('Aufgabe bestätigen?');?>',
+            confirmMsg: '<?php echo $this->translate->_('Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.');?>',
             confirmCompetitive: '<?php echo $this->translate->_('<br/><br/>Allen anderen Benutzern wird die Aufgabe entzogen<br/> und sie wird ausschließlich in Ihrer Verantwortung liegen.');?>',
-            confirmBtn: '<?php echo $this->translate->_('bestätigen');?>' 
+            confirmBtn: '<?php echo $this->translate->_('bestätigen');?>'
         }
     });
     
     Ext.define("Editor.locale.de.view.ReferenceFilesInfoMessage", {
         override: "Editor.view.ReferenceFilesInfoMessage",
         strings: {
-            windowTitle: '<?php echo $this->translate->_('Referenz-Dateien');?>', 
+            windowTitle: '<?php echo $this->translate->_('Referenz-Dateien');?>',
             windowInfoMessage: '<?php echo $this->translate->_('Referenzdateien vorhanden');?>',
             buttonText: '<?php echo $this->translate->_('Liste öffnen');?>',
         }
@@ -977,7 +977,7 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.controller.HeadPanel", {
         override: "Editor.controller.HeadPanel",
         helpBtn: '<?php echo $this->translate->_('Hilfe');?>'
-    }); 
+    });
 
     Editor.view.HeadPanel.prototype.strings = {
         task: '<?php echo $this->translate->_('Aufgabe');?>',
@@ -1023,7 +1023,7 @@ Ext.define('Editor.controller.Localizer', {
     };
 <?php
     }//END if $this->hasFrontendController('Editor.controller.UserPreferences')
-    if($hasFrontendController('Editor.controller.admin.User')){ 
+    if($hasFrontendController('Editor.controller.admin.User')){
 ?>
     Editor.controller.admin.User.prototype.strings = {
         confirmDeleteTitle: '<?php echo $this->translate->_('Benutzer endgültig löschen?');?>',
@@ -1031,10 +1031,9 @@ Ext.define('Editor.controller.Localizer', {
         confirmResetPwTitle: '<?php echo $this->translate->_('Passwort zurücksetzen?');?>',
         confirmResetPwMsg: '<?php echo $this->translate->_('Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.');?>',
         userSaved: '<?php echo $this->translate->_('Der Änderungen an Benutzer "{0}" wurden erfolgreich gespeichert.');?>',
-        openUserAdminBtn: "<?php echo $this->translate->_('Benutzerverwaltung');?>",
         userAdded: '<?php echo $this->translate->_('Der Benutzer "{0}" wurde erfolgreich erstellt.');?>'
     };
-    Editor.view.admin.UserGrid.prototype.title = '<?php echo $this->translate->_('Benutzerübersicht');?>';
+    Editor.view.admin.UserGrid.prototype.title = '<?php echo $this->translate->_('Benutzerverwaltung');?>';
     Editor.view.admin.UserGrid.prototype.text_cols = {
         login: '<?php echo $this->translate->_('Login');?>',
         firstName: '<?php echo $this->translate->_('Vorname');?>',
@@ -1159,7 +1158,7 @@ Ext.define('Editor.controller.Localizer', {
       customerTip: '<?php echo $this->translate->_('Kunde der Aufgabe (Angabe notwendig)');?>',
       customerLabel: '<?php echo $this->translate->_('Kunde');?>'
     };
-<?php 
+<?php
     }; //if($hasFrontendController('Editor.controller.admin.TaskPreferences')){
     
     if($hasFrontendController('Editor.controller.admin.Customer')){
@@ -1216,7 +1215,7 @@ Ext.define('Editor.controller.Localizer', {
         fieldLabel:'<?php echo $this->translate->_("Endkunde");?>'
     });
     
-<?php 
+<?php
     }; //END if($hasFrontendController('Editor.controller.admin.Customer')){
     if($hasFrontendController('Editor.controller.LanguageResources')){
 ?>
@@ -1298,7 +1297,7 @@ Ext.define('Editor.controller.Localizer', {
             title: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
         }
     });
-<?php 
+<?php
     }; //END if($hasFrontendController('Editor.controller.LanguageResources')){
     if($hasFrontendController('Editor.controller.LanguageResourcesTaskassoc')){
 ?>
@@ -1326,10 +1325,10 @@ Ext.define('Editor.controller.Localizer', {
             target: '<?php echo $this->translate->_('Zielsprache');?>'
         }
     });
-<?php 
+<?php
     }; //END if($hasFrontendController('Editor.controller.LanguageResourcesTaskassoc')){
     if($hasFrontendController('Editor.controller.TmOverview')){
-?>    
+?>
     Ext.define("Editor.locale.controller.TmOverview", {
         override: "Editor.controller.TmOverview",
         strings: {
@@ -1492,7 +1491,7 @@ Ext.define('Editor.controller.Localizer', {
             reimportTooltip: '<?php echo $this->translate->_('Ausgewählte Aufgaben erneut ins aktuelle TM importieren');?>'
         }
     });
-<?php 
+<?php
     }; //END if($hasFrontendController('Editor.controller.TmOverview')){
 ?>
 

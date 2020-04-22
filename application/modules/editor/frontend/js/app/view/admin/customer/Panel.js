@@ -36,7 +36,6 @@ Ext.define('Editor.view.admin.customer.Panel', {
     ],
 
     stores:['Editor.stores.admin.Customers'],
-
     controller: 'customerPanel',
     viewModel: {
         type: 'customerPanel'
@@ -84,6 +83,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
     layout: 'border',
     collapsed: false,
     title: '#UT#Kundenübersicht',
+    glyph: 'xf1ad@FontAwesome',
     defaultListenerScope: true,
     defaultButton: 'saveButton',
     referenceHolder: true,

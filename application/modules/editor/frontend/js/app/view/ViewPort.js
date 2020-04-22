@@ -32,7 +32,13 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.ViewPort', {
     extend: 'Ext.container.Viewport',
-    requires: ['Editor.view.MaintenancePanel'],
+    requires: [
+        'Editor.view.MaintenancePanel',
+        'Editor.view.admin.UserGrid',
+        'Editor.view.admin.TaskGrid',
+        'Editor.view.admin.customer.Panel',
+        'Editor.view.LanguageResources.TmOverviewPanel'
+    ],
     layout: 'border',
     initComponent: function() {
         var me = this,
@@ -41,25 +47,70 @@ Ext.define('Editor.view.ViewPort', {
                 region: 'north'
             },{
                 region: 'center',
-                xtype: 'container',
+                xtype: 'tabpanel',
+                
+                //ui: 'navigation', → eigene UI benötigt eigenes CSS! Im Beispiel ist das ja SCSS was noch gerendert werden müsste!
+                tabBar: {
+                    // turn off borders for classic theme.  neptune and crisp don't need this
+                    // because they are borderless by default
+                    border: false
+                },
+
+                defaults: {
+                    iconAlign: 'left',
+                },
+                
                 layout: {
                     type: 'fit'
                 },
                 items: [{
-                    xtype: me.getInitialView()
+                    xtype: 'adminTaskGrid'
+                },{
+                    xtype: 'adminUserGrid'
+                },{
+                    xtype: 'customerPanel'
+                },{
+                    xtype: 'tmOverviewPanel'
+                },{
+                    //FIXME HERE: 
+                    /*
+ Nächste Schritte: 
+- das muss adaptiert werden
+      Ext.fireEvent('componentViewChanged','useroverview',grid.getTitle());
+- Plan für die Routes machen! und die verwenden
+- Button Strings aufräumen! → Die für die titles verwenden und dann die titles aufräumen
+- admin panel rund machen
+- Testen!
+                     */
+                    xtype: 'tabpanel',
+                    defaults: {
+                        iconAlign: 'left',
+                        textAlign: 'left'
+                    },
+                    tabPosition: 'left',
+                    tabRotation: 0,
+                    title: 'Preferences',
+                    glyph: 'xf085@FontAwesome',
+                    items: [{
+                        xtype: 'panel',
+                        title: 'My Preferences',
+                        glyph: 'xf007@FontAwesome',
+                        //glyph: 'xf4fe@FontAwesome', to old fontawesome!
+                    },{
+                        xtype: 'panel',
+                        title: 'System',
+                        glyph: 'xf013@FontAwesome',
+                    },{
+                        xtype: 'panel',
+                        title: 'Axels Fonts',
+                        glyph: 'xf031@FontAwesome',
+                    }]
                 }]
             }];
         Ext.applyIf(me, {
             items: items
         });
         me.callParent(arguments);
-    },
-    getInitialView: function() {
-        var hash = window.location.hash,
-            found = hash.match('initialView/([a-zA-Z0-9]+)');
-        if(found && found[1]) {
-            return found[1];
-        }
-        return 'adminTaskGrid';
+        console.log("ViewPort init");
     }
   });

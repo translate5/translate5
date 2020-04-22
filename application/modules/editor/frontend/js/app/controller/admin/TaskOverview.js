@@ -124,7 +124,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskEnding: '#UT#Aufgabe wird beendet...',
       taskDestroy: '#UT#Aufgabe wird gelöscht...',
       taskNotDestroyed : '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
-      openTaskAdminBtn: "#UT#Aufgabenübersicht",
       loadingWindowMessage:"#UT#Dateien werden hochgeladen",
       loading:'#UT#Laden',
       importTaskMessage:"#UT#Hochladen beendet. Import und Vorbereitung laufen.",
@@ -150,15 +149,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
       },
       component: {
-          'headPanel toolbar#top-menu' : {
-              beforerender: 'initMainMenu'
-          },
-          'button#task-admin-btn': {
-              click: 'openTaskGrid'
-          },
           '#adminTaskGrid': {
               hide: 'handleAfterHide',
-              show: 'handleAfterShow',
               celldblclick: 'handleGridClick', 
               cellclick: 'handleGridClick',
               filterchange:'onAdminTaskGridFilterChange'
@@ -232,65 +224,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     //End Events
     //***********************************************************************************
   /**
-   * injects the task menu into the main menu
-   */
-  initMainMenu: function() {
-      var toolbar = this.getHeadToolBar(),
-          insertIdx = 1,
-          logout = this.getLogoutButton()
-      if(logout) {
-          insertIdx = toolbar.items.indexOf(logout) + 1;
-      }
-      if(Editor.data.helpUrl){
-    	  insertIdx=insertIdx+1;
-      }
-      toolbar.insert(insertIdx, {
-          itemId: 'task-admin-btn',
-          xtype: 'button',
-          hidden: true,
-          text: this.strings.openTaskAdminBtn
-      });
-  },
-  /**
-   * handle after show of taskgrid
-   */
-  handleAfterShow: function(grid) {
-      this.getHeadToolBar().down('#task-admin-btn').hide();
-      //fire the global event for component view change
-      Ext.fireEvent('componentViewChanged','taskoverview',grid.getTitle());
-  },
-  /**
    * handle after hide of taskgrid
    */
   handleAfterHide: function() {
-      this.getHeadToolBar().down('#task-admin-btn').show();
       this.closeAdvancedFilterWindow();
   },
-  /**
-   * opens the task grid, hides all other
-   */
-  openTaskGrid: function() {
-      var me = this, 
-          grid = me.getTaskGrid();
-
-      me.getCenterRegion().items.each(function(item){
-          item.hide();
-      });
-      
-      if(grid) {
-          //set the value used for displaying the help pages
-          grid.show();
-      }
-      else {
-          grid = me.getCenterRegion().add({
-              xtype: 'adminTaskGrid',
-              height: '100%'
-          });
-          me.handleAfterShow(grid);
-      }
-  },
   handleInitEditor: function() {
-      this.getHeadToolBar() && this.getHeadToolBar().down('#task-admin-btn').hide();
       this.closeAdvancedFilterWindow();
   },
   clearTasks: function() {
