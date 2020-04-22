@@ -3,7 +3,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "annotates selection \"Kommentar 2\": \nKommentar 2",
+            "comment": "annotates selection &quot;Kommentar 2&quot;: \nKommentar 2",
             "created": "2019-08-27 17:44:48",
             "modified": "2019-08-27 17:44:48",
             "isEditable": false
@@ -11,7 +11,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "annotates selection \"Kommentar 1\": \nKommentar 1",
+            "comment": "annotates selection &quot;Kommentar 1&quot;: \nKommentar 1",
             "created": "2019-08-27 17:44:36",
             "modified": "2019-08-27 17:44:36",
             "isEditable": false
@@ -19,7 +19,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "TL",
-            "comment": "(annotates source column)\nannotates selection \"keinen Kommentar\": \nSource Kommentar 2",
+            "comment": "(annotates source column)\nannotates selection &quot;keinen Kommentar&quot;: \nSource Kommentar 2",
             "created": "2019-08-27 17:44:48",
             "modified": "2019-08-27 17:44:48",
             "isEditable": false
@@ -27,7 +27,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "TL",
-            "comment": "(annotates source column)\nannotates selection \"keinen Kommentar\": \nSource Kommentar 1",
+            "comment": "(annotates source column)\nannotates selection &quot;keinen Kommentar&quot;: \nSource Kommentar 1",
             "created": "2019-08-27 17:44:48",
             "modified": "2019-08-27 17:44:48",
             "isEditable": false
@@ -47,7 +47,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "annotates selection \"HIER\": \nKommentar f\u00fcr HIER in Segment 3 (Severy level: Warning)",
+            "comment": "annotates selection &quot;HIER&quot;: \nKommentar f\u00fcr HIER in Segment 3 (Severy level: Warning)",
             "created": "2019-08-21 11:59:31",
             "modified": "2019-08-21 11:59:31",
             "isEditable": false
@@ -57,7 +57,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "annotates selection \"2_KOMMENTARE\": \nKommentar bei: \"2_KOMMENTARE\"",
+            "comment": "annotates selection &quot;2_KOMMENTARE&quot;: \nKommentar bei: &quot;2_KOMMENTARE&quot;",
             "created": "2019-08-27 17:48:27",
             "modified": "2019-08-27 17:48:27",
             "isEditable": false
@@ -65,7 +65,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "annotates selection \"KOMMENTAR_ 2_KOMMENTARE\": \nKommentar bei: KOMMENTAR_2_KOMMENTARE",
+            "comment": "annotates selection &quot;KOMMENTAR_ 2_KOMMENTARE&quot;: \nKommentar bei: KOMMENTAR_2_KOMMENTARE",
             "created": "2019-08-27 17:48:01",
             "modified": "2019-08-27 17:48:01",
             "isEditable": false
@@ -73,7 +73,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "annotates selection \"HIER\": \nKommentar f\u00fcr Benutzer 1 HIER in Segment 4 (Severy level: Error)",
+            "comment": "annotates selection &quot;HIER&quot;: \nKommentar f\u00fcr Benutzer 1 HIER in Segment 4 (Severy level: Error)",
             "created": "2019-08-21 12:00:24",
             "modified": "2019-08-21 12:00:24",
             "isEditable": false
@@ -83,7 +83,7 @@
         {
             "userGuid": "memoq-imported",
             "userName": "JF",
-            "comment": "Hallo Marc!",
+            "comment": "&quot;Hallo&quot; \u201eMarc\u201c!",
             "created": "2020-03-10 12:06:20",
             "modified": "2020-03-10 12:06:20",
             "isEditable": false
@@ -91,7 +91,7 @@
         {
             "userGuid": "memoq-imported",
             "userName": "Table RTF",
-            "comment": "und &lt;b&gt;nochmal&lt;\/b&gt; einer.\n (annotates Row column; from SourceFile)",
+            "comment": "und &lt;b&gt;nochmal&lt;\/b&gt; einer.",
             "created": "2020-01-28 10:22:33",
             "modified": "2020-01-28 10:22:33",
             "isEditable": false
@@ -99,7 +99,7 @@
         {
             "userGuid": "memoq-imported",
             "userName": "Table RTF",
-            "comment": "Dies ist noch einer. \n (annotates Row column; from SourceFile)",
+            "comment": "Dies ist noch einer. ",
             "created": "2020-01-28 10:22:33",
             "modified": "2020-01-28 10:22:33",
             "isEditable": false
@@ -125,7 +125,7 @@
         {
             "userGuid": "memoq-imported",
             "userName": "Table RTF",
-            "comment": "und nochmal einer.\n (annotates Row column; from SourceFile)",
+            "comment": "und nochmal einer.",
             "created": "2020-01-28 10:22:33",
             "modified": "2020-01-28 10:22:33",
             "isEditable": false
@@ -133,7 +133,7 @@
         {
             "userGuid": "memoq-imported",
             "userName": "Table RTF",
-            "comment": "Dies ist noch einer. \n (annotates Row column; from SourceFile)",
+            "comment": "Dies ist noch einer. ",
             "created": "2020-01-28 10:22:33",
             "modified": "2020-01-28 10:22:33",
             "isEditable": false

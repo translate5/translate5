@@ -156,7 +156,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             $s = $this->db->select()
                 ->where('userGuid = ?', $userGuid)
                 ->where('taskGuid = ?', $taskGuid)
-                ->where('(role= ? OR isPmOverride=1)', $role);//load the given state or load pmoveride (pmoveride is when for the given task#user#role no record is found) 
+                ->where('(role= ? OR isPmOverride=1)', $role);//load the given state or load pmoveride (pmoveride is when for the given task#user#role no record is found)
             if(!is_null($state)) {
                 $s->where('state= ?', $state);
             }
@@ -346,23 +346,18 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @param string $forced optional, default false. if true cleanup also taskUserAssocs with validSessionsIds, only usable with given taskGuid!
      */
     public function cleanupLocked($taskGuid = null, $forced = false) {
-        $handler = function($e) {
-            if(strpos($e->getMessage(), 'Serialization failure: 1213 Deadlock found when trying to get lock;') !== false) {
-                $log = new ZfExtended_Log();
-                $msg = 'Notice: SQL Deadlock detected in taskUserAssoc cleanupLocked method';
-                $log->logError($msg, (string) $e);
-                return;
-            }
-            throw $e;
-        };
         try {
             $this->_cleanupLocked($taskGuid, $forced);
         }
-        catch (PDOException $e) {
-            $handler($e);
-        }
-        catch (Zend_Db_Statement_Exception $e) {
-            $handler($e);
+        catch (PDOException | Zend_Db_Statement_Exception $e) {
+            if(strpos($e->getMessage(), 'Serialization failure: 1213 Deadlock found when trying to get lock;') === false) {
+                throw $e;
+            }
+            $log = Zend_Registry::get('logger');
+            /* @var $log ZfExtended_Logger */
+            //since a deadlock is not critical here but can happen, we just log it as info
+            $log->exception($e, ['level' => $log::LEVEL_INFO]);
+            return;
         }
     }
 

@@ -50,6 +50,10 @@ class editor_Models_LanguageResources_CategoryAssoc extends ZfExtended_Models_En
         if (!$this->checkUpdateSaveData($data)) {
             return;
         }
+        if (empty($data['categories'])) {
+            // when categories are empty, there is nothing to be saved.
+            return;
+        }
         $categories = json_decode($data['categories']);
         if (json_last_error() != JSON_ERROR_NONE) {
             $logger = Zend_Registry::get('logger');

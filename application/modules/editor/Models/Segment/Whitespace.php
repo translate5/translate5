@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -60,6 +60,7 @@ class editor_Models_Segment_Whitespace {
         //we do not escape that any more - mssql not in use '"\x{201E}"u', //Hex UTF-8 bytes 	E2 80 9E //von mssql nicht vertragen
         //we do not escape that any more - mssql not in use '"\x{201C}"u' //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
         '/\x{0003}/u', //Hex UTF-8 bytes or codepoint of END OF TEXT //TS-240
+        '/\x{0008}/u', //Hex UTF-8 bytes or codepoint of backspace
         '/\x{0009}/u', //Hex UTF-8 bytes or codepoint of horizontal tab
         '/\x{000B}/u', //Hex UTF-8 bytes or codepoint of vertical tab
         '/\x{000C}/u', //Hex UTF-8 bytes or codepoint of page feed
@@ -103,7 +104,7 @@ class editor_Models_Segment_Whitespace {
             return $this->maskSpecialContent('tab', $match[2], strlen($match[2]));
         }, $textNode);
             
-        //in XML based import formats we have to extend the list about some HTML entities representing some none printable characters in UTF8 
+        //in XML based import formats we have to extend the list about some HTML entities representing some none printable characters in UTF8
         if($xmlBased) {
             //see https://stackoverflow.com/questions/9587751/decoding-numeric-html-entities-via-php
             // and https://caves.org.uk/charset_test.html  Section: Another Problem with PHP's htmlentities()
@@ -134,7 +135,7 @@ class editor_Models_Segment_Whitespace {
             '<hardReturn />',
             '<softReturn />',
             '<macReturn />',
-            //the string "EFBBBF" "ZERO WIDTH NO-BREAK SPACE" BOM can be savly removed, since it was inserted by the frontend as internal marker which was not removed properly 
+            //the string "EFBBBF" "ZERO WIDTH NO-BREAK SPACE" BOM can be savly removed, since it was inserted by the frontend as internal marker which was not removed properly
             chr(0xEF).chr(0xBB).chr(0xBF),
         );
         $replace = array(

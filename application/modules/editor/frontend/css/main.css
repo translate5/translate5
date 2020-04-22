@@ -31,7 +31,7 @@ div.x-container.x-container-default {position: initial;}
 
 
 #changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
-.editorAdminTaskLogGrid .x-grid-row .x-grid-cell .x-grid-cell-inner,
+.event-log-grid .x-grid-row .x-grid-cell .x-grid-cell-inner,
 #segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
 	color:#000000;
   	white-space: normal;

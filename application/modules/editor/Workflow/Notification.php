@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -74,9 +74,9 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      */
     protected function getStepSegments(string $step) {
         $task = $this->config->task;
-        //attention, in context of increasing the stepNr, the current task from config always contains the old stepNr! 
+        //attention, in context of increasing the stepNr, the current task from config always contains the old stepNr!
         // The new one must be loaded from DB!
-        $stepNr = $task->getWorkflowStep(); 
+        $stepNr = $task->getWorkflowStep();
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         return $segment->loadByWorkflowStep($task->getTaskGuid(), $step, $stepNr);
@@ -305,7 +305,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     
     /**
      * Sends a notification to users which are removed automatically from the task
-     * The Users to be notified must be given in the parameter array key 'deleted' 
+     * The Users to be notified must be given in the parameter array key 'deleted'
      */
     public function notifyCompetitiveDeleted(array $parameter) {
         $triggerConfig = $this->initTriggerConfig([$parameter]);
@@ -317,7 +317,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         }
         else {
             $params = [
-                //we do not pass the whole userObject to keep data private 
+                //we do not pass the whole userObject to keep data private
                 'responsibleUser' => [
                     'surName' => $triggerConfig->currentUser->surName,
                     'firstName' => $triggerConfig->currentUser->firstName,
@@ -486,7 +486,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $logEntries = $taskLog->loadByTaskGuid($task->getTaskGuid());
 
         //if there is no or only the one default info log, we send no mail
-        if(empty($logEntries) || count($logEntries) == 1 && reset($logEntries)->level == ZfExtended_Logger::LEVEL_INFO) {
+        if(empty($logEntries) || count($logEntries) == 1 && ((object) reset($logEntries))->level == ZfExtended_Logger::LEVEL_INFO) {
             return;
         }
         
@@ -602,7 +602,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
                     'task' => $this->config->task
                 ]);
                 $this->log->exception($e, ['level' => $this->log::LEVEL_WARN]);
-                //if file saving is enabled we save the file with the debug content 
+                //if file saving is enabled we save the file with the debug content
                 $this->xmlCache[$segmentHash] = $xliff = $msg;
                 //but we disable attaching it to the mail:
                 $xlfAttachment = false;
@@ -759,7 +759,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     
     /***
      * Deadline notifier. It will send notification to the configured user assocs days before or after the current day (days +/- can be defined in config default to 1)
-     * 
+     *
      * @param string $triggerConfig
      * @param string $template: template to be used for the mail
      * @param bool $isApproaching: default will notify daysOffset before deadline

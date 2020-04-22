@@ -67,9 +67,6 @@ class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_
             if(!empty($currentComment->across_title)) {
                 $title .= 'Title: '.$currentComment->across_title.'';
             }
-            if(!empty($currentComment->across_annotates) && $currentComment->across_annotates != 'Target') {
-                $title .= ' (annotates '.$currentComment->across_annotates.' column)';
-            }
             if(!empty($title)) {
                 $title .= "\n";
             }
