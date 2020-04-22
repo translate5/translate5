@@ -220,7 +220,8 @@ Ext.define('Editor.controller.Segments', {
       vm && vm.editMode(readOnly);
 
       //fire the global event for component view change
-      Ext.fireEvent('componentViewChanged','editor',grid.getTitle());
+      //TODO: refactor so that event is only fired once in a application view load function which should be created when rebuilding the main menu
+      Ext.fireEvent('applicationViewChanged','editor',grid.getTitle());
       
       initialGridFilters = initialGridFilters && initialGridFilters.segmentgrid;
 

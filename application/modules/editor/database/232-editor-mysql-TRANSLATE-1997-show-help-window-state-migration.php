@@ -67,9 +67,10 @@ try {
     /* @var $configModel ZfExtended_Models_Config */
     
     $defaultState=$defaultState->toArray();
+    $prefix='runtimeOptions.frontend.defaultState.';
     foreach ($defaultState as $key=>$value){
         $key=str_replace('#','',$key);
-        $configModel->setName(editor_Models_Config::DEFAULT_STATE_PREFIX.$key);
+        $configModel->setName($prefix.$key);
         $configModel->setConfirmed(1);
         $configModel->setModule('editor');
         $configModel->setCategory('system');

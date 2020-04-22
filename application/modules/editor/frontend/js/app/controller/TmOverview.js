@@ -189,7 +189,8 @@ Ext.define('Editor.controller.TmOverview', {
     handleAfterShow: function(panel) {
         this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
         //fire the global event for component view change
-        Ext.fireEvent('componentViewChanged','languageresource',panel.getTitle());
+        //TODO: refactor so that event is only fired once in a application view load function which should be created when rebuilding the main menu
+        Ext.fireEvent('applicationViewChanged','languageresource',panel.getTitle());
     },
     handleAfterHide: function() {
         this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').show();

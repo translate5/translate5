@@ -112,19 +112,19 @@ Ext.application({
       });
       //init the plugins namespace
       Ext.ns('Editor.plugins');
+      
+      //create and set the application state provider
+      var provider=Ext.create('Editor.util.HttpStateProvider');
+      //load the store data directly. With this no initial store load is required (the app state can be applied directly)
+      provider.store.loadRawData(Editor.data.app.configData ? Editor.data.app.configData : []);
+      Ext.state.Manager.setProvider(provider);
+      
       this.callParent(arguments);
       this.logoutOnWindowClose();
   },
   launch : function() {
-	  var me=this,
-      	provider=Ext.create('Editor.util.HttpStateProvider');
-      provider.store.on({
-    	  load:function(){
-    		  me.initViewportLaunch();
-    	  }
-      })
-      Ext.state.Manager.setProvider(provider);
-	  Ext.state.Manager.getProvider().sync();
+	  var me=this;
+	  me.initViewportLaunch();
   },
   
   /***
@@ -160,7 +160,6 @@ Ext.application({
 	    });
 	    
 	    me.fireEvent('editorAppLaunched');
-	  
   },
   /**
    * If configured the user is logged out on window close
