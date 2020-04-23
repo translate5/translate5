@@ -119,6 +119,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
 
     const INITIAL_TASKTYPE_DEFAULT = 'default';
     const INITIAL_TASKTYPE_PROJECT = 'project';
+
     /**
      * All tasktypes that editor_Models_Validator_Task will consider as valid.
      * @var array
