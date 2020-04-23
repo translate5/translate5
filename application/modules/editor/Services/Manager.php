@@ -76,7 +76,8 @@ class editor_Services_Manager {
     
     /**
      * Returns all services (= their name and helppage) that are not configured 
-     * or that don't have any resources embedded.
+     * or that don't have any resources embedded. (If the configuration is set,
+     * but wrong, then no resources might be embedded although the service is configured.)
      * @return array
      */
     public function getAllUnconfiguredServices() {
