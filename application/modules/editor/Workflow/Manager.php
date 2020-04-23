@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -73,7 +73,8 @@ class editor_Workflow_Manager {
     public function getIdToClass($className) {
         $flipped = array_flip(self::$workflowList);
         if(empty($flipped[$className])) {
-            throw new ZfExtended_Exception('Workflow to class "'.$className.'" not found!');
+            // 'Workflow to class "{className}" not found!',
+            throw new ZfExtended_Exception('E1251', ['className' => $className]);
         }
         return $flipped[$className];
     }
@@ -85,7 +86,8 @@ class editor_Workflow_Manager {
      */
     public function get($wfId) {
         if(empty(self::$workflowList[$wfId])) {
-            throw new ZfExtended_Exception('Workflow with ID "'.$wfId.'" not found!');
+            //Workflow with ID "{workflowId}" not found!
+            throw new ZfExtended_Exception('E1252', ['workflowId' => $wfId]);
         }
         return ZfExtended_Factory::get(self::$workflowList[$wfId]);
     }
@@ -124,7 +126,7 @@ class editor_Workflow_Manager {
      * returns all workflow metadata (roles, steps, etc) as array of objects
      * Warning: in backend states are ment to be all states including the pending states
      *          in frontend states are ment to be the states WITHOUT the pending states.
-     *          Since this method ist the bridge between frontend and backend, 
+     *          Since this method ist the bridge between frontend and backend,
      *          the states returned in the states field here are without the pending states!
      * @return array
      */
@@ -135,7 +137,8 @@ class editor_Workflow_Manager {
             ksort($usedLabels);
             ksort($data);
             if(count($data) !== count($usedLabels)) {
-                throw new ZfExtended_Exception($cls.'::$labels has to much / or missing labels!');
+                 // {className}::$labels has to much / or missing labels!',
+                 throw new editor_Workflow_Exception('E1253', ['className' => $cls]);
             }
             return array_combine($data, $usedLabels);
         };
@@ -158,6 +161,7 @@ class editor_Workflow_Manager {
             $data->states = $labelize(array_diff($allStates, $pendingStates), $cls);
             $data->pendingStates = $labelize($pendingStates, $cls);
             $data->steps = $labelize($wf->getSteps(), $cls);
+            $data->assignableSteps = $labelize($wf->getAssignableSteps(), $cls);
             $data->steps2roles = $wf->getSteps2Roles();
             $data->stepChain = $wf->getStepChain();
             $data->stepsWithFilter = $wf->getStepsWithFilter();
@@ -180,7 +184,7 @@ class editor_Workflow_Manager {
             }
             return $this->get($this->getIdToClass($config->runtimeOptions->import->taskWorkflow));
         }
-        //process given task instead guid 
+        //process given task instead guid
         if($taskOrGuid instanceof editor_Models_Task) {
             $task = $taskOrGuid;
             $taskGuid = $task->getTaskGuid();
@@ -240,8 +244,8 @@ editor/Workflow/Manager.php	getWorkflowData	"- returns a dynamically PHP array /
 
 resulting structure in PHP
 [{
-  name: 'defaultWorkflow', 
-  label: 'Default Workflow', 
+  name: 'defaultWorkflow',
+  label: 'Default Workflow',
   anonymousFieldLabel: true | false, comes from app.ini not from wf class
   roles: {'reviewer' => 'Lector' → current utRoles},
   states: { current utStates }
@@ -251,5 +255,5 @@ resulting structure in PHP
     pmCheck=""PM Prüfung""
   },
   stepChain:[""reviewing"", ""translatorCheck""]
-}, {...}]"			0.5				
+}, {...}]"			0.5
 }*/

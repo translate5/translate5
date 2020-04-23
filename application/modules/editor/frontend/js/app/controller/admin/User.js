@@ -118,11 +118,13 @@ Ext.define('Editor.controller.admin.User', {
       var toolbar = this.getHeadToolBar(),
           insertIdx = 1,
           logout = this.getLogoutButton(),
-          grid = this.getUserGrid();
+          grid = this.getUserGrid(),
+          headPanel=Editor.app.getController('HeadPanel');
       if(logout) {
           insertIdx = toolbar.items.indexOf(logout) + 1;
       }
-      if(Editor.data.helpUrl){
+      //is the help button visible for the current section
+      if(headPanel && headPanel.isHelpButtonVisible()){
     	  insertIdx=insertIdx+1;
       }
       toolbar.insert(insertIdx, {
@@ -137,9 +139,9 @@ Ext.define('Editor.controller.admin.User', {
    */
   handleAfterShow: function(grid) {
       this.getHeadToolBar() && this.getHeadToolBar().down('#user-admin-btn').hide();
-    //set the value used for displaying the help pages
-      Editor.data.helpSection = 'useroverview';
-      Editor.data.helpSectionTitle = grid.getTitle();
+      //fire the global event for component view change
+      //TODO: refactor so that event is only fired once in a application view load function which should be created when rebuilding the main menu
+      Ext.fireEvent('applicationViewChanged','useroverview',grid.getTitle());
   },
   /**
    * handle after hide of usergrid

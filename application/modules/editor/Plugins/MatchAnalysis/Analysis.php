@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -27,17 +27,17 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * After importing a task a match analysis will be created based on the assigned TM based MatchRessources. 
- * To get the analysis results, each segment is send to the assigned MatchRessources. For each queried Sprachressource the received best match rate is stored in a separate DB table. 
- * Out of this table all desired analysis are calculated. 
+ * After importing a task a match analysis will be created based on the assigned TM based MatchRessources.
+ * To get the analysis results, each segment is send to the assigned MatchRessources. For each queried Sprachressource the received best match rate is stored in a separate DB table.
+ * Out of this table all desired analysis are calculated.
  *
  */
 class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis_Pretranslation {
     const MAX_ERROR_PER_CONNECTOR = 2;
     
     /***
-     * Analysis id 
-     * 
+     * Analysis id
+     *
      * @var mixed
      */
     protected $analysisId;
@@ -61,13 +61,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected $internalFuzzy=false;
 
-    /***
-     * Segment word count calculator
-     * 
-     * @var editor_Models_Segment_WordCount
-     */
-    protected $wordCount;
-    
     protected $connectorErrorCount = [];
     
     /**
@@ -126,15 +119,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         $taskTotalWords=0;
         //init the word count calculator
-        $this->initWordCount();
         foreach($segments as $segment) {
             /* @var $segment editor_Models_Segment */
 
-            $this->wordCount->setSegment($segment);
-            
-            //collect the total words in the task
-            $taskTotalWords+=$this->wordCount->getSourceCount();
-            
             //get the best match rate, respecting repetitions
             $bestMatchRateResult = $this->handleRepetition($segment);
             
@@ -175,16 +162,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         //remove fuzzy languageResource from opentm2
         $this->removeFuzzyResources();
-        
-        //update the task total words
-        $this->task->setWordCount($taskTotalWords);
-        $this->task->save();
-        
+
         return true;
     }
     
     /**
-     * Checks for segment repetititons and handles them if needed 
+     * Checks for segment repetititons and handles them if needed
      * @param editor_Models_Segment $segment
      * @return stdClass
      */
@@ -211,11 +194,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             //the first segment of multiple repetitions is always stored as master
             $this->repetitionMasterSegments[$segmentHash] = clone $segment;
             //store the found match for repetition reusage
-            return $this->repetitionByHash[$segmentHash] = $bestResult; 
+            return $this->repetitionByHash[$segmentHash] = $bestResult;
         }
         $masterHasResult = !empty($this->repetitionByHash[$segmentHash]);
         if($masterHasResult && !$this->repetitionUpdater->updateRepetition($this->repetitionMasterSegments[$segmentHash], $segment)) {
-            //if repetition could not be updated, handle segment as it is a segment without repetitions, 
+            //if repetition could not be updated, handle segment as it is a segment without repetitions,
             // we may not update the repetitionHash, this would interfer with the other repetitions
             return $this->getBestResult($segment,true);
         }
@@ -243,7 +226,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     /**
      * Get best result (best matchrate) for the segment. If $saveAnalysis is provided, for each best match rate for the tm,
      * one analysis will be saved
-     * 
+     *
      * @param editor_Models_Segment $segment
      * @param bool $saveAnalysis
      * @return NULL|stdClass
@@ -388,12 +371,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     
     /***
      * Save match analysis to the database
-     * 
+     *
      * @param editor_Models_Segment $segment
      * @param mixed $matchRateResult : it can be stdClass (opentm2 match result) or int (only the matchrate)
      * @param int $languageResourceid
      */
-    public function saveAnalysis($segment,$matchRateResult,$languageResourceid){
+    protected function saveAnalysis($segment,$matchRateResult,$languageResourceid){
         $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
         /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
         $matchAnalysis->setSegmentId($segment->getId());
@@ -401,7 +384,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
         $matchAnalysis->setAnalysisId($this->analysisId);
         $matchAnalysis->setLanguageResourceid($languageResourceid);
-        $matchAnalysis->setWordCount($this->wordCount->getSourceCount());
+        $matchAnalysis->setWordCount($segment->meta()->getSourceWordCount());
         $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
 
         $isFuzzy=false;
@@ -427,7 +410,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     
     /***
      * Init the languageResource connectiors
-     * 
+     *
      * @return array
      */
     protected function initConnectors(){
@@ -456,10 +439,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
                 $moreInfo='';
                 //throw a worning if the language resource is not available
-                if($connector->getStatus($moreInfo)!=editor_Services_Connector_Abstract::STATUS_AVAILABLE){
+                $status = $connector->getStatus($moreInfo);
+                if($status != editor_Services_Connector_Abstract::STATUS_AVAILABLE){
                     $this->log->warn('E1239','MatchAnalysis Plug-In: The associated language resource "{name}" is not available for match analysis and pre-translations.',[
                         'task' => $this->task,
                         'name' => $languageresource->getName(),
+                        'status' => $status,
+                        'moreInfo' => $moreInfo,
                         'languageResource' => $languageresource,
                     ]);
                     continue;
@@ -502,21 +488,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         }
         return $this->connectors;
     }
-    
-    /***
-     * Init word counter 
-     */
-    protected function initWordCount(){
-        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        
-        $langModel->load($this->task->getSourceLang());
-        
-        $this->wordCount=ZfExtended_Factory::get('editor_Models_Segment_WordCount',[
-            $langModel->getRfc5646()
-        ]);
-    }
-    
+
     /***
      * Remove fuzzy resources from the opentm2
      */

@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -60,11 +60,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     const SOURCE = 'source';
     const TARGET = 'target';
     const USERGUID = 'sdlxliff-imported';
-    
+
     use editor_Models_Import_FileParser_TagTrait {
         getTagParams as protected traitGetTagParams;
     }
-    
+
     /**
      * @var array mappt alle Tag-Referenzen im Header der sdlxliff-Datei innerhalb von
      *      <tag-defs><tag></tag></tag-defs> auf die Tags in Segmenten des sdlxliff
@@ -75,14 +75,14 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      *      berücksichtigt werden
      */
     protected $_tagDefMapping = array(
-        'bpt' => 'g', 
-        'ph' => 'x', 
-        'st' => 'x', 
+        'bpt' => 'g',
+        'ph' => 'x',
+        'st' => 'x',
         'mrk' => 'mrk',
         );
-    
+
     /**
-     * defines the GUI representation of internal used tags  
+     * defines the GUI representation of internal used tags
      * @var array
      */
     protected $_tagMapping = [];
@@ -91,13 +91,13 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @var editor_Models_Import_FileParser_Sdlxliff_TransunitParser
      */
     protected $transunitParser;
-    
+
     /**
      * contains the collected comments out of tag cmt-defs
      * @var array
      */
     protected $comments;
-    
+
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
@@ -105,7 +105,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     public static function getFileExtensions() {
         return ['sdlxliff'];
     }
-    
+
     /**
      * Initiert Tagmapping
      */
@@ -118,9 +118,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->checkForSdlChangeMarker();
         $this->prepareTagMapping();
         $this->transunitParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_TransunitParser');
-        
-        //here would be the right place to set the import map, 
-        // since our values base on sdlxliff values, 
+
+        //here would be the right place to set the import map,
+        // since our values base on sdlxliff values,
         // nothing has to be done here at the moment
         //$this->matchRateType->setImportMap($map);
     }
@@ -160,9 +160,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->_tagMapping['mrkSingle'] = array('text' => '&lt;InternalReference/&gt;');
         $this->_tagMapping['mrkPaired'] = array('text' => '&lt;InternalReference&gt;','eptName'=>'ept','eptText'=>'&lt;/InternalReference&gt;','imgEptText'  => '</InternalReference>');
     }
-    
+
     /**
-     * Checks, if there are any change-markers in the sdlxliff. 
+     * Checks, if there are any change-markers in the sdlxliff.
      * If import is allowed do nothing, if not and change marks are contained: triggers an error
      */
     protected function checkForSdlChangeMarker() {
@@ -180,7 +180,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             ]);
         }
     }
-    
+
     /**
      * Setzt $this->_tagMapping[$tagId]['text']
      * bei Tags, die auf einen gesperrten Text verweisen
@@ -219,7 +219,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         }
         $this->_tagMapping[$tagId]['text'] = $text;
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::parse()
@@ -285,7 +285,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             //erhöhe groupLevel um eins, da jetzt die nächste Gruppe drankommt
             $groupLevel++;
         }
-        
+
         if ($counterTrans === 0) {
             error_log('Die Datei ' . $this->_fileName . ' enthielt keine übersetzungsrelevanten Segmente!');
         }
@@ -300,7 +300,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     protected function parseSegmentAttributes($transunit) {
         $start = strpos($transunit, '<sdl:seg-defs');
         $end = strpos($transunit, '</sdl:seg-defs>') + 15; //set end after the end tag
-        
+
         if ($start === false || $end === false) {
             //<sdl:seg-defs was not found in the current transunit
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1005', [
@@ -309,7 +309,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 'transunit' => $transunit,
             ]);
         }
-        
+
         $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
         $xmlparser->registerElement('sdl:seg', function($tag, $tagAttributes) use ($xmlparser){
@@ -324,7 +324,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 //set original value here, conversion to translate5 syntax is done later
                 $attributes->matchRateType = $origin;
             }
-            
+
             $attributes->autopropagated = $origin === 'auto-propagated';
             $attributes->locked = (bool) $xmlparser->getAttribute($tagAttributes, 'locked');
         });
@@ -396,10 +396,10 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             }
         }
     }
-    
+
     /**
-     * parse the given transunit and saves the segments 
-     * 
+     * parse the given transunit and saves the segments
+     *
      * @param string $transUnit
      * @return string contains the teplacement-Tags <lekTargetSeg id=""/> instead the content, where id is the DB segment ID
      */
@@ -415,11 +415,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $this->saveComments($segmentId, $comments);
             return $this->getFieldPlaceholder($segmentId, $targetName);
         });
-        
+
         // add leading <trans-unit for parsing, then strip it again (we got the $transUnit without it, so we return it without it)
         return substr($result, 11);
     }
-    
+
     /**
      * Save the found comments to the DB
      * @param int $segmentId
@@ -445,13 +445,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                     $cmtDef['comment'] = "(annotates source column)\n".$cmtDef['comment'];
                 }
                 $comment->setComment($cmtDef['comment']);
-    //FIXME DATE_ISO8601 should not be used for mysql!
-                //[date] => 2019-08-21T11:59:31.1203327+02:00
-                $date = date(DATE_ISO8601, strtotime($cmtDef['date']));
+                $date = date('Y-m-d H:i:s', strtotime($cmtDef['date']));
                 $comment->setCreated($date);
                 $comment->setModified($date);
                 $comment->save();
-                
+
                 $meta = $comment->meta();
                 $meta->setOriginalId($mrkId);
                 $meta->setAffectedField($mrkCommentMarker['field']);
@@ -545,11 +543,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         }
         return implode('', $data->segment);
     }
-    
+
     /**
      * For reason look at TRANSLATE-781 "different white space inside of internal tags leads to failures in relais import"
      * http://jira.translate5.net/browse/TRANSLATE-781
-     * 
+     *
      * @param string $segment
      * @return string
      */
@@ -600,11 +598,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $data->openTags[$data->openCounter]['tagName'] = $tagName;
         $data->openTags[$data->openCounter]['tagId'] = $tagId;
         $data->openTags[$data->openCounter]['nr'] = $data->j;
-        
+
         //ersetzte gegen Tag für die Anzeige
         $p = $this->getTagParams($tag, $shortTagIdent, $tagId, $this->_tagMapping[$tagId]['text']);
         $tag = $this->_leftTag->getHtmlTag($p);
-        
+
         $data->j++;
         return $data;
     }
@@ -627,11 +625,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         }
         $openTag = $data->openTags[$data->openCounter];
         $mappedTag = $this->_tagMapping[$openTag['tagId']];
-        
+
         //generate the html tag for the editor
         $p = $this->getTagParams($data->segment[$data->i], $openTag['nr'], $openTag['tagId'], $mappedTag['eptText']);
         $data->segment[$data->i] = $this->_rightTag->getHtmlTag($p);
-        
+
         $data->openCounter--;
         return $data;
     }
@@ -645,7 +643,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     protected function parseSingleTag($data) {
         $tag = &$data->segment[$data->i];
         $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
-                
+
         $whitespaceTags = ['hardReturn' , 'softReturn', 'macReturn', 'space', 'char', 'tab'];
         if (in_array($tagName, $whitespaceTags)) {
             //tagtrait is working with shortTagIdent internally, so we have to feed it here
@@ -662,7 +660,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $shortTagIdent = 'locked' . $data->j;
             $locked = true;
         }
-        
+
         //generate the html tag for the editor
         $p = $this->getTagParams($tag, $shortTagIdent, $tagId, $this->_tagMapping[$tagId]['text']);
         $tag = $this->_singleTag->getHtmlTag($p);
@@ -670,7 +668,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $data->j++;
         return $data;
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getTagParams()
@@ -680,9 +678,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $data['text'] = $this->encodeTagsForDisplay($data['text']);
         return $data;
     }
-    
+
     protected function extractComments() {
-        $startComments = strpos($this->_origFile, '<cmt-defs'); 
+        $startComments = strpos($this->_origFile, '<cmt-defs');
         $endComments = strpos($this->_origFile, '</cmt-defs>') + 11; //add the length of the end tag
         if($startComments === false || $startComments >= $endComments){
             return;
@@ -691,9 +689,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if(empty($comments)){
             return;
         }
-        
+
         $this->_origFile = substr_replace($this->_origFile, '', $startComments, $endComments - $startComments);
-        
+
         //if import disabled we log a warning and remove all comments
         if(! $this->config->runtimeOptions->import->sdlxliff->importComments) {
             $logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.sdlxliff');
@@ -704,7 +702,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             ]);
             return;
         }
-        
+
         $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
         $xmlparser->registerElement('comment', null, function($tag, $key, $opener) use ($xmlparser){
@@ -722,13 +720,13 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         });
         $xmlparser->parse($comments);
     }
-    
+
     /**
      * Removes the rev-def(s) tags from the sdlxliff
      */
     protected function removeRevDefs() {
-        //checkForSdlChangeMarker throws an exception if import change mark feature is disabled in config 
-        $startComments = strpos($this->_origFile, '<rev-defs'); 
+        //checkForSdlChangeMarker throws an exception if import change mark feature is disabled in config
+        $startComments = strpos($this->_origFile, '<rev-defs');
         $endComments = strpos($this->_origFile, '</rev-defs>') + 11; //add the length of the end tag
         if($startComments === false || $startComments >= $endComments){
             return;

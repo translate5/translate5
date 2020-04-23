@@ -38,6 +38,7 @@ class editor_Plugins_NecTm_Exception extends ZfExtended_ErrorCodeException {
     static protected $localErrorCodes = [
         'E1162' => 'NEC-TM Plug-In: Exception',
         'E1182' => 'NEC-TM Plug-In: The languages for the Nec-TM-LanguageResource differ from the languages of the segment.',
-        'E1183' => 'NEC-TM Plug-In: Could not save segment to TM'
+        'E1183' => 'NEC-TM Plug-In: Could not save segment to TM',
+        'E1256' => 'NEC-TM Plug-In: A new NEC-TM-LanguageResource must have at least one category assigned.'
     ];
 }

@@ -1016,8 +1016,9 @@ class editor_TaskController extends ZfExtended_RestController {
         }
 
         //if the totals segment count is not set, update it before the entity is saved
-        if($this->entity->getSegmentCount()==null || $this->entity->getSegmentCount()<1){
-            $this->entity->setSegmentCount($this->entity->getTotalSegmentsCount($taskguid));
+        if($this->entity->getSegmentCount() === null || $this->entity->getSegmentCount() < 1) {
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            $this->entity->setSegmentCount($segment->getTotalSegmentsCount($taskguid));
         }
 
         $this->entity->save();
@@ -1244,7 +1245,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userTaskAssoc editor_Models_TaskUserAssoc */
         try {
-            $userTaskAssoc->loadByParams($userGuid,$taskGuid);
+            $userTaskAssoc=editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $this->entity);
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
@@ -1258,7 +1259,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 throw $e;
             }
             $userTaskAssoc->setUserGuid($userGuid);
-            $userTaskAssoc->setTaskGuid($taskGuid);
+            $userTaskAssoc->setTaskGuid($this->entity->getTaskGuid());
             $userTaskAssoc->setRole('');
             $userTaskAssoc->setState('');
             $isPmOverride = true;
