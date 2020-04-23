@@ -471,15 +471,17 @@ function fillTranslation() {
 function renderSingleMatchAndResources (translateTextResponse) {
     var translationHtml = '',
         resultHtml = '',
-        resultData;
-    resultData = {'languageResourceHeadline': Editor.data.languageresource.translatedStrings['translationBasedOn'] + ' ' + translateTextResponse.usedResources,
+        resultData,
+        translationText = translateTextResponse.translationForSegmentedText,
+        usedResources = translateTextResponse.usedResources;
+    resultData = {'languageResourceHeadline': Editor.data.languageresource.translatedStrings['translationBasedOn'] + ' ' + usedResources,
                   'languageResourceId': '',
                   'languageResourceType': '',
                   'fuzzyMatch': '',
                   'infoText': '',
                   'term': '',
                   'termStatus': '',
-                  'translationText': translateTextResponse.translationForSegmentedText,
+                  'translationText': translationText.replace(/(\r\n|\n|\r)/gm, '<br>'),
                   'processStatusAttribute':'',
                   'processStatusAttributeValue':'',
                   'languageRfc':'',
