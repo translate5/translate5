@@ -1,0 +1,160 @@
+[
+    [
+        {
+            "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
+            "userName": "lector test",
+            "comment": "A test comment for segment 0",
+            "isEditable": true
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "sl",
+            "comment": "annotates selection &quot;Kommentar 2&quot;: \nKommentar 2",
+            "isEditable": false
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "sl",
+            "comment": "annotates selection &quot;Kommentar 1&quot;: \nKommentar 1",
+            "isEditable": false
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "TL",
+            "comment": "(annotates source column)\nannotates selection &quot;keinen Kommentar&quot;: \nSource Kommentar 2",
+            "isEditable": false
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "TL",
+            "comment": "(annotates source column)\nannotates selection &quot;keinen Kommentar&quot;: \nSource Kommentar 1",
+            "isEditable": false
+        }
+    ],
+    [
+        {
+            "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
+            "userName": "lector test",
+            "comment": "A test comment for segment 1",
+            "isEditable": true
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "User1",
+            "comment": "Kommentar f\u00fcr Segment 2 (Severy level: For your information)",
+            "isEditable": false
+        }
+    ],
+    [
+        {
+            "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
+            "userName": "lector test",
+            "comment": "A test comment for segment 2",
+            "isEditable": true
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "User1",
+            "comment": "annotates selection &quot;HIER&quot;: \nKommentar f\u00fcr HIER in Segment 3 (Severy level: Warning)",
+            "isEditable": false
+        }
+    ],
+    [
+        {
+            "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
+            "userName": "lector test",
+            "comment": "A test comment for segment 3",
+            "isEditable": true
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "sl",
+            "comment": "annotates selection &quot;2_KOMMENTARE&quot;: \nKommentar bei: &quot;2_KOMMENTARE&quot;",
+            "isEditable": false
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "sl",
+            "comment": "annotates selection &quot;KOMMENTAR_ 2_KOMMENTARE&quot;: \nKommentar bei: KOMMENTAR_2_KOMMENTARE",
+            "isEditable": false
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "User1",
+            "comment": "annotates selection &quot;HIER&quot;: \nKommentar f\u00fcr Benutzer 1 HIER in Segment 4 (Severy level: Error)",
+            "isEditable": false
+        }
+    ],
+    [
+        {
+            "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
+            "userName": "lector test",
+            "comment": "A test comment for segment 4",
+            "isEditable": true
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "JF",
+            "comment": "&quot;Hallo&quot; \u201eMarc\u201c!",
+            "isEditable": false
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "Table RTF",
+            "comment": "und &lt;b&gt;nochmal&lt;\/b&gt; einer.",
+            "isEditable": false
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "Table RTF",
+            "comment": "Dies ist noch einer. ",
+            "isEditable": false
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "user1",
+            "comment": "Dies ist ein Kommentar.",
+            "isEditable": false
+        }
+    ],
+    [
+        {
+            "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
+            "userName": "lector test",
+            "comment": "A test comment for segment 5",
+            "isEditable": true
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "JF",
+            "comment": "Hallo Marc!",
+            "isEditable": false
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "Table RTF",
+            "comment": "und nochmal einer.",
+            "isEditable": false
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "Table RTF",
+            "comment": "Dies ist noch einer. ",
+            "isEditable": false
+        },
+        {
+            "userGuid": "memoq-imported",
+            "userName": "user1",
+            "comment": "Dies ist ein Kommentar.",
+            "isEditable": false
+        }
+    ],
+    [
+        {
+            "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
+            "userName": "lector test",
+            "comment": "A test comment for segment 6",
+            "isEditable": true
+        }
+    ]
+]

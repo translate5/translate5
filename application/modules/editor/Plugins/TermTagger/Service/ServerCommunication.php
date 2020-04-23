@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -41,32 +41,27 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
     
     public $sourceLang = NULL;
     public $targetLang = NULL;
-    public $segments = NULL;
     
     /**
-     * @var editor_Models_Task
+     * {
+     *    "id": "123",
+     *    "field": "target",
+     *    "source": "SOURCE TEXT",
+     *    "target": "TARGET TEXT"
+     * },
+     * { ... MORE SEGMENTS ... }
+     * ],
+     * @var array
      */
-    public $task = NULL;
-    
-    /*
-    {
-        "id": "123",
-        "field": "target",
-        "source": "SOURCE TEXT",
-        "target": "TARGET TEXT"
-    },
-    { ... MORE SEGMENTS ... }
-    ],
-    */
+    public $segments = NULL;
     
     /**
      * If $task is sumbitted, ServerCommunication is initialized with all required fields,
      * so after that all there has to be done is addSegment()
-     * 
+     *
      * @param editor_Models_Task $task
      */
     public function __construct(editor_Models_Task $task) {
-        $this->task = $task;
         $config = Zend_Registry::get('config');
         $taggerConfig = $config->runtimeOptions->termTagger;
         $this->debug = (integer)$taggerConfig->debug;
@@ -88,17 +83,17 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
         $langModel->load($task->getTargetLang());
         $this->targetLang = $langModel->getRfc5646();
         $this->targetStringMatch = (int) in_array($this->targetLang, $taggerConfig->targetStringMatch->toArray(), true);
-    } 
+    }
     
     /**
      * Adds a segment to the server-communication.
-     * 
+     *
      * @param string $id
      * @param string $field
      * @param string $source
      * @param string $target
      */
-    public function addSegment ($id, $field = 'target',  $source, $target) {
+    public function addSegment ($id, $field, $source, $target) {
         $segment = new stdClass();
         $segment->id = (string) $id;
         $segment->field = $field;

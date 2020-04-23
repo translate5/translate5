@@ -123,6 +123,20 @@ class editor_Models_Import {
     }
     
     /**
+     * Using this proxy method for triggering the event to keep the legacy code bound to this class instead to the new worker class
+     * @param editor_Models_Task $task
+     * @param int $parentWorkerId
+     * @param editor_Models_Import_Configuration $importConfig
+     */
+    public function triggerAfterImportError(editor_Models_Task $task, int $parentWorkerId, editor_Models_Import_Configuration $importConfig) {
+        $this->events->trigger('afterImportError', $this, [
+            'task' => $task,
+            'parentWorkerId' => $parentWorkerId,
+            'importConfig' => $importConfig
+        ]);
+    }
+    
+    /**
      * sets the info/data to the user
      * @param string $userguid
      * @param string $username

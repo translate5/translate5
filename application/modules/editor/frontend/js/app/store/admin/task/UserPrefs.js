@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.store.admin.task.UserPrefs', {
   extend : 'Ext.data.Store',
   model: 'Editor.model.admin.task.UserPref',
+  alias:'store.taskUserPrefs',
   remoteSort: false,
   autoLoad: false,
   pageSize: 20,

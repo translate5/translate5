@@ -59,6 +59,9 @@ Ext.define('Editor.controller.HeadPanel', {
   },{
 	  ref:'applicationInfoPanel',
 	  selector:'#applicationInfoPanel'
+  },{
+	  ref:'mainHelpButton',
+	  selector:'#mainHelpButton'
   }],
   listen: {
       controller: {
@@ -102,8 +105,15 @@ Ext.define('Editor.controller.HeadPanel', {
                   delay: 700
               }
           }
-      }
-          
+      },
+      store:{
+    	  '#UserConfig':{
+    		  load:'onUserConfigLoad'
+    	  }  
+      },
+      global:{
+    	  applicationViewChanged:'onApplicationViewChanged'
+	  }
   },
   //***********************************************************************************
   //Begin Events
@@ -192,29 +202,83 @@ Ext.define('Editor.controller.HeadPanel', {
           menu.down('#finishBtn').setVisible(user.isAllowed('editorFinishTask', task));
       }
   },
+  
   mainHelpButtonClick:function(){
-	  var me=this,
-	      url = Ext.String.format(Editor.data.helpUrl, Editor.data.helpSection, Editor.data.locale),
-	      win = Ext.widget('helpWindow',{
-	          title: me.helpBtn + ' - ' + Editor.data.helpSectionTitle,
-	          loader:{
-	              url: url,
-	              renderer: 'html',
-	              autoLoad: true,
-	              scripts: true
-	          }
-	      });
-      win.show();
+	  this.showHelpWindow();
   },
-  headPanelToolbarBeforeRender:function(toolbar){
-      var me=this;
-	  if(!Editor.data.helpUrl){
+  
+  /***
+   * Show the help window 
+   */
+  showHelpWindow:function(){
+	  var me=this,
+		  win = Ext.widget('helpWindow');
+	  win.setTitle(me.helpBtn + ' - ' + Editor.data.helpSectionTitle)
+	  win.show();
+  },
+  
+  /***
+   * On component view change event handler. This event is a global event.
+   */
+  onApplicationViewChanged:function(name,title){
+	  //TODO:refactor this when the menu is implemented
+	  Editor.data.helpSection = name;
+	  Editor.data.helpSectionTitle = title;
+	  
+	  var me=this,
+	  	isHelpButtonVisible=me.isHelpButtonVisible(),
+	  	helpButton=me.getMainHelpButton();
+	  
+	  if(!helpButton){
 		  return;
 	  }
+	  //the button is not visible when there is not url defined for the section
+	  helpButton.setHidden(!isHelpButtonVisible);
+	  
+	  if(!isHelpButtonVisible){
+		  return;
+	  }
+	  //the help button exist, call the show help window function
+	  this.showUserStateHelpWindow();
+  },
+  
+  /***
+   * On user config load
+   */
+  onUserConfigLoad:function(){
+	  //after config load, check if the helpwindow should be displayed
+	  this.showUserStateHelpWindow();
+  },
+  
+  /***
+   * Show the help window only it is alowed for the curent userstate
+   */
+  showUserStateHelpWindow:function(){
+	  var provider=Ext.state.Manager.getProvider(),
+	      helpWindowState=provider.get(Editor.view.HelpWindow.getStateIdStatic());
+	  //is the doNotShowAgain userstate enabled
+	  if(!helpWindowState || helpWindowState.doNotShowAgain){
+		  return;
+	  }
+	  
+	  this.showHelpWindow();
+  },
+  
+  headPanelToolbarBeforeRender:function(toolbar){
+      var me=this;
       toolbar.insert(2, {
-      	xtype:'button',
-      	itemId:'mainHelpButton',
-      	text:me.helpBtn
-      });
+    	  xtype:'button',
+    	  itemId:'mainHelpButton',
+    	  text:me.helpBtn,
+    	  hidden:true
+       });
+  },
+  /**
+   * The help button is visible when for the helpwindow there is loaderUrl configured
+   */
+  isHelpButtonVisible:function(){
+	  var provider=Ext.state.Manager.getProvider(),
+	      state=provider.get(Editor.view.HelpWindow.getStateIdStatic());
+	  return state && state.loaderUrl!=="";
   }
 });

@@ -45,7 +45,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  'admin.WorkflowState',
 	  'admin.WorkflowSteps'
   ],
-  views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow'],
+  views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow','StatefulWindow'],
   refs : [{
       ref: 'headToolBar',
       selector: 'headPanel toolbar#top-menu'
@@ -237,11 +237,14 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   initMainMenu: function() {
       var toolbar = this.getHeadToolBar(),
           insertIdx = 1,
-          logout = this.getLogoutButton()
+          logout = this.getLogoutButton(),
+          headPanel=Editor.app.getController('HeadPanel');
+      
       if(logout) {
           insertIdx = toolbar.items.indexOf(logout) + 1;
       }
-      if(Editor.data.helpUrl){
+      //is the help button visible for the current section
+      if(headPanel && headPanel.isHelpButtonVisible()){
     	  insertIdx=insertIdx+1;
       }
       toolbar.insert(insertIdx, {
@@ -256,8 +259,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleAfterShow: function(grid) {
       this.getHeadToolBar().down('#task-admin-btn').hide();
-      Editor.data.helpSection = 'taskoverview';
-      Editor.data.helpSectionTitle = grid.getTitle();
+      //fire the global event for component view change
+      //TODO: refactor so that event is only fired once in a application view load function which should be created when rebuilding the main menu
+      Ext.fireEvent('applicationViewChanged','taskoverview',grid.getTitle());
   },
   /**
    * handle after hide of taskgrid

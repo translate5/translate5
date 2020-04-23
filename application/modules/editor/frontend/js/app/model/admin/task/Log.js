@@ -53,7 +53,15 @@ Ext.define('Editor.model.admin.task.Log', {
             if(!val || val===""){
                 return null;
             }
-            return Ext.JSON.decode(val);
+            try {
+                return Ext.JSON.decode(val);
+            }
+            catch(e) {
+                console.log(e);
+                return {
+                    'jsonError': 'JSON could not be decoded, probably to much logged data!'
+                };
+            }
         }},
         {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT}
     ],

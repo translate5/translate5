@@ -219,8 +219,9 @@ Ext.define('Editor.controller.Segments', {
       grid.lookupViewModel().set('taskIsReadonly', readOnly);
       vm && vm.editMode(readOnly);
 
-      Editor.data.helpSection = 'editor';
-      Editor.data.helpSectionTitle = grid.getTitle();
+      //fire the global event for component view change
+      //TODO: refactor so that event is only fired once in a application view load function which should be created when rebuilding the main menu
+      Ext.fireEvent('applicationViewChanged','editor',grid.getTitle());
       
       initialGridFilters = initialGridFilters && initialGridFilters.segmentgrid;
 

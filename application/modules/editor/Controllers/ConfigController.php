@@ -27,9 +27,72 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Wrapper for ZfExtended_ConfigController
- * else RestRoutes, ACL authentication, etc. will not work (must be adapted for default module of each project)
  */
-class editor_ConfigController extends ZfExtended_ConfigController {
+class editor_ConfigController extends ZfExtended_RestController {
+    
+    protected $entityClass = 'editor_Models_Config';
+    
+    /**
+     * @var editor_Models_Config
+     */
+    protected $entity;
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::indexAction()
+     */
+    public function indexAction() {
+        $userSession = new Zend_Session_Namespace('user');
+        
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->load($userSession->data->id);
+        //load all zf configuration values merged with the user config and .ini values
+        $this->view->rows = $this->entity->loadAllMerged($user);
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::postAction()
+     * CRUD is currently not implemented, so BadMethod here
+     */
+    public function postAction() {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->'.__FUNCTION__);
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::putAction()
+     * CRUD is currently not implemented, so BadMethod here
+     */
+    public function putAction() {
+        $this->decodePutData();
+        $userSession = new Zend_Session_Namespace('user');
+        
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->load($userSession->data->id);
+        
+        $this->entity->updateConfig($user,$this->data->name, $this->data->value);
+    }
+    
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::putAction()
+     * CRUD is currently not implemented, so BadMethod here
+     */
+    public function getAction() {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->'.__FUNCTION__);
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::putAction()
+     * CRUD is currently not implemented, so BadMethod here
+     */
+    public function deleteAction() {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->'.__FUNCTION__);
+    }
     
 }

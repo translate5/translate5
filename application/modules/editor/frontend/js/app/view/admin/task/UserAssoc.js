@@ -83,6 +83,19 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   anchor: '100%',
                   xtype: 'combo',
                   allowBlank: false,
+                  editable: false,
+                  forceSelection: true,
+                  queryMode: 'local',
+                  name: 'role',
+                  fieldLabel: me.strings.fieldRole,
+                  valueField: 'id',
+                  bind: {
+                      store: '{roles}'
+                  }
+              },{
+                  anchor: '100%',
+                  xtype: 'combo',
+                  allowBlank: false,
                   listConfig: {
                       loadMask: false
                   },
@@ -96,19 +109,6 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   displayField: 'longUserName',
                   valueField: 'userGuid',
                   fieldLabel: me.strings.fieldUser
-              },{
-                  anchor: '100%',
-                  xtype: 'combo',
-                  allowBlank: false,
-                  editable: false,
-                  forceSelection: true,
-                  queryMode: 'local',
-                  name: 'role',
-                  fieldLabel: me.strings.fieldRole,
-                  valueField: 'id',
-                  bind: {
-                      store: '{roles}'
-                  }
               },{
                   anchor: '100%',
                   xtype: 'combo',
@@ -183,16 +183,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
           user = me.down('combo[name="userGuid"]'),
       store = user.store;
       store.clearFilter(true);
-      if(!me.excludeLogins || me.excludeLogins.length == 0) {
-          store.load();
-      }
-      else {
-          store.load({
-              params: {
-                  defaultFilter: '[{"property":"login","operator":"notInList","value":["'+me.excludeLogins.join('","')+'"]}]'
-              }
-          });
-      }
+      store.load();
   },
   /**
    * loads the given record into the userAssoc form

@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -40,7 +40,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
     //'Sonderbehandlung' => 'LEK_segment_views
     
     //  → mysqldump mit --where zur Einschränkung, im Where Statement kann ein subselect verwendet werden, allerdings nur mit --single-transaction, z.B.:
-    //mysqldump -h mittagqi -u root -p icorrectT5 LEK_segments2terms --single-transaction --where="segmentId in (select id from LEK_segments where taskGuid = '{35f7268b-6cc1-4dd6-9a76-46e1b81dbd40}')" 
+    //mysqldump -h mittagqi -u root -p icorrectT5 LEK_segments2terms --single-transaction --where="segmentId in (select id from LEK_segments where taskGuid = '{35f7268b-6cc1-4dd6-9a76-46e1b81dbd40}')"
     
     /**
      * Here are defined all Editor tables, and how to deal with them on using the archiver:
@@ -62,7 +62,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_file_filter' => 'taskGuid',
             'LEK_foldertree' => 'taskGuid',
             'LEK_languages' => false,
-            // languageresources tables disabled for archiving, since task data is not depending from them, and existence of languageresources does not depend on the existence of the task 
+            // languageresources tables disabled for archiving, since task data is not depending from them, and existence of languageresources does not depend on the existence of the task
             'LEK_languageresources_customerassoc' => false,
             'LEK_languageresources_languages' => false,
             'LEK_languageresources_log' => false,
@@ -101,6 +101,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_term_history'=>false,
             'LEK_term_proposal'=>false,
             'LEK_user_changelog_info' => false,
+            'LEK_user_config' => false,
             'LEK_user_meta' => false,
             'LEK_visualreview_files' => 'taskGuid',
             'LEK_visualreview_segmentmapping' => 'taskGuid',
@@ -154,9 +155,9 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
     
     /**
      * Used to init the translate5 eco system
-     * 
+     *
      * @TODO for futural tests integrated in build this method should be placed more reusable
-     * 
+     *
      * @param string $projectRoot path to the project installation directory
      * @param string $zendLib path to the zend library
      */
@@ -180,7 +181,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
     }
     
     /**
-     * returns an array with table names and 
+     * returns an array with table names and
      * @param string $taskGuid
      * @return multitype:string mixed
      */
