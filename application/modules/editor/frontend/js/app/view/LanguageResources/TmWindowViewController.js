@@ -87,7 +87,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
             vm=view.getViewModel(),
             sdlEngineCombo=view.down('#sdlEngine');
         
-        if (!me.validateService(serviceName, helppage)) {
+        if (!me.isValidService(serviceName, helppage)) {
             return false;
         }
         
@@ -109,22 +109,11 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         }
     },
     
-    onSaveAddTmWindowClick:function(){
-        var me = this,
-            view = me.getView(),
-            resourceField = view.down('combo[name="resourceId"]'),
-            serviceName = resourceField.getSelection() && resourceField.getSelection().get('serviceName'),
-            helppage = resourceField.getSelection() && resourceField.getSelection().get('helppage');
-        if (!me.validateService(serviceName, helppage)) {
-            return false;
-        }
-    },
-    
     /**
      * Check if the selected service is valid to be used. If not, the user gets a message shown.
      * @returns boolean
      */
-    validateService: function (serviceName, helppage) {
+    isValidService: function (serviceName, helppage) {
         var me = this;
         // The resource combo now also includes unconfigured services.
         // Other than resources, the objects for these items only have a name, serviceName and helppage.
