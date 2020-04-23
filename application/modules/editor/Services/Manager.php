@@ -101,10 +101,10 @@ class editor_Services_Manager {
         $serviceNames = [];
         $pluginServices = [
             'editor_Plugins_DeepL_Init' => (object) ['name' => '[DeepL]',
-                                                     'serviceName' => '[DeepL]',
+                                                     'serviceName' => 'DeepL',
                                                      'helppage' => urldecode('https://confluence.translate5.net/display/CON/DeepL')],
             'editor_Plugins_NecTm_Init' => (object) ['name' => '[NEC-TM]',
-                                                     'serviceName' => '[NEC-TM]',
+                                                     'serviceName' => 'NEC-TM',
                                                      'helppage' => urldecode('https://confluence.translate5.net/display/CON/NEC-TM')],
         ];
         // The (plug-in-)services that the user is supposed to see are by default activated on installation.
