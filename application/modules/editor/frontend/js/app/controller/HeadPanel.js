@@ -229,6 +229,9 @@ Ext.define('Editor.controller.HeadPanel', {
 	  	isHelpButtonVisible=me.isHelpButtonVisible(),
 	  	helpButton=me.getMainHelpButton();
 	  
+	  if(!helpButton){
+		  return;
+	  }
 	  //the button is not visible when there is not url defined for the section
 	  helpButton.setHidden(!isHelpButtonVisible);
 	  
@@ -278,5 +281,4 @@ Ext.define('Editor.controller.HeadPanel', {
 	      state=provider.get(Editor.view.HelpWindow.getStateIdStatic());
 	  return state && state.loaderUrl!=="";
   }
-  
 });
