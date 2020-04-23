@@ -15,21 +15,26 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.admin.Customers', {
-    extend : 'Ext.data.Store',
-    pageSize: 0,
-    model: 'Editor.model.admin.Customer',
-    autoLoad: true,
-    storeId:'customersStore'
+Ext.define('Editor.view.admin.preferences.OverviewPanelViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.preferencesOverviewPanel',
+    
+    routes: {
+        'preferences': 'onPreferencesRoute'
+    },
+    onPreferencesRoute: function() {
+        Editor.app.openAdministrationSection(this.getView(), 'preferences');
+    }
 });

@@ -27,44 +27,17 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Store for Editor.model.admin.User
- * @class Editor.store.admin.Users
- * @extends Ext.data.Store
+ * @class Editor.view.admin.TaskGridViewController
+ * @extends Ext.app.ViewController
  */
-Ext.define('Editor.store.admin.Users', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.admin.User',
-  autoLoad: false,
-  remoteFilter: true,
-  remoteSort: true,
-  pageSize: 0,
-  userGuidName: {},
-  /**
-   * returns the Username either by id or by guid
-   * getting by guid caches the association guid => username internally
-   */
-  getUserName: function(id) {
-      var me = this, 
-          user = null,
-          idx = -1;
-
-      if(Ext.isString(id)){
-          if(me.userGuidName[id]) {
-              return me.userGuidName[id].getUserName();
-          }
-          idx = me.find('userGuid', id);
-          if(idx < 0) {
-              return '';
-          }
-          user = me.getAt(idx);
-          me.userGuidName[id] = user;
-      }
-      else if(Ext.isNumeric(id)) {
-          user = me.getById(id);
-      }
-      if(user) {
-          return user.getUserName(); 
-      }
-      return '';
-  }
+Ext.define('Editor.view.admin.TaskGridViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.taskGrid',
+    routes: {
+        'task': 'onTaskRoute'
+    },
+    
+    onTaskRoute: function() {
+        Editor.app.openAdministrationSection(this.getView(), 'task');
+    },
 });

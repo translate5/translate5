@@ -105,6 +105,13 @@ Ext.application({
     //***********************************************************************************
     //End Events
     //***********************************************************************************
+  listen: {
+      component: {
+          'viewport > #adminMainSection': {
+              tabchange: 'onAdminMainSectionChange'
+          }
+      }
+  },
   init: function() {
       //enable json in our REST interface
       Ext.Ajax.setDefaultHeaders({
@@ -269,8 +276,7 @@ Ext.application({
    * firing the editorViewportClosed event
    */
   openAdministration: function() {
-      var me = this,
-          initial;
+      var me = this;
       if(!Editor.controller.admin || ! Editor.controller.admin.TaskOverview) {
           return;
       }
@@ -300,7 +306,40 @@ Ext.application({
       //set the value used for displaying the help pages
       Ext.getDoc().dom.title = me.windowTitle;
   },
-  
+  /**
+   * requests the application to open the desired application section, and redirects the route to the given one
+   */
+  openAdministrationSection: function(panel, redirectRoute) {
+      var me = this,
+          mainTabs = me.viewport.down('> #adminMainSection');
+
+      //if we are already active we do nothing
+      if(mainTabs.getActiveTab() === panel) {
+      	  return;
+      }
+
+      //what  happens if panel does not belong to the tabpanel?
+      mainTabs.setActiveTab(panel);
+      me.redirectTo(redirectRoute);
+      
+      //if we are in a task, we have to stop routing, leave it, and resume routing after the task was closed (a new one was loaded, for routing open tasks)
+  },
+  /**
+   * If the main tab panel changes, we have to update the hash route for it
+   * The first route in a panel is defined as the main route where the redirect should go
+   * @param {Ext.tab.Panel} tabpanel
+   * @param {Ext.Component} activatedPanel
+   */
+  onAdminMainSectionChange: function(tabpanel, activatedPanel) {
+      var me = this,
+          ctrl = activatedPanel.getController(),
+          conf = ctrl && ctrl.defaultConfig,
+	      mainRoute = conf && conf.routes && Object.keys(conf.routes)[0];
+      me.fireEvent('adminSectionChanged', activatedPanel);
+      if(mainRoute) {
+          me.redirectTo(mainRoute);
+      }
+  },
   mask: function(msg, title) {
       if(!this.appMask) {
           this.appMask = Ext.widget('messagebox');

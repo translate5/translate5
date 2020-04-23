@@ -67,7 +67,8 @@ Ext.define('Editor.controller.HeadPanel', {
       controller: {
           '#Editor.$application': {
               editorViewportOpened: 'handleInitEditor',
-              adminViewportOpened: 'handleInitAdmin'
+              adminViewportOpened: 'handleInitAdmin',
+              adminSectionChanged:'onApplicationSectionChanged'
           }
       },
       component: {
@@ -109,10 +110,7 @@ Ext.define('Editor.controller.HeadPanel', {
       store:{
     	  '#UserConfig':{
     		  load:'onUserConfigLoad'
-    	  }  
-      },
-      global:{
-    	  applicationViewChanged:'onApplicationViewChanged'
+    	  }
 	  }
   },
   //***********************************************************************************
@@ -220,17 +218,16 @@ Ext.define('Editor.controller.HeadPanel', {
   /***
    * On component view change event handler. This event is a global event.
    */
-  onApplicationViewChanged:function(name,title){
-	  //TODO:refactor this when the menu is implemented
-	  Editor.data.helpSection = name;
-	  Editor.data.helpSectionTitle = title;
+  onApplicationSectionChanged:function(panel){
+	  Editor.data.helpSection = panel.helpSection || panel.xtype;
+	  Editor.data.helpSectionTitle = panel.getTitle();
 	  
 	  var me=this,
 	  	isHelpButtonVisible=me.isHelpButtonVisible(),
 	  	helpButton=me.getMainHelpButton();
 	  
 	  //the button is not visible when there is not url defined for the section
-	  helpButton.setHidden(!isHelpButtonVisible);
+	  helpButton && helpButton.setHidden(!isHelpButtonVisible);
 	  
 	  if(!isHelpButtonVisible){
 		  return;

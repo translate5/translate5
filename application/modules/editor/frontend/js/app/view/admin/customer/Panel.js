@@ -84,6 +84,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
     collapsed: false,
     title: '#UT#Kundenübersicht',
     glyph: 'xf1ad@FontAwesome',
+    helpSection: 'customeroverview',
     defaultListenerScope: true,
     defaultButton: 'saveButton',
     referenceHolder: true,

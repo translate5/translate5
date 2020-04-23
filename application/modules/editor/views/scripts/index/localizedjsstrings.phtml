@@ -458,7 +458,6 @@ Ext.define('Editor.controller.Localizer', {
             taskEnding: '<?php echo $this->translate->_('Aufgabe wird beendet...');?>',
             taskDestroy: '<?php echo $this->translate->_('Aufgabe wird gelöscht...');?>',
             taskNotDestroyed: '<?php echo $this->translate->_('Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!');?>',
-            openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>',
             loadingWindowMessage: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>',
             loading: '<?php echo $this->translate->_('Laden');?>',
             importTaskMessage:'<?php echo $this->translate->_('Hochladen beendet. Import und Vorbereitung laufen.');?>',
@@ -994,120 +993,131 @@ Ext.define('Editor.controller.Localizer', {
     };
 <?php
     }//END if($hasFrontendController('Editor.controller.HeadPanel'))
-    if($hasFrontendController('Editor.controller.UserPreferences')) {
 ?>
-    
-    
-    Editor.controller.UserPreferences.prototype.strings = {
-        settings: '<?php echo $this->translate->_('Meine Einstellungen');?>',
-        pwSave: '<?php echo $this->translate->_('Passwort erfolgreich gespeichert!');?>'
-    };
-    
-    Editor.controller.UserPreferences.prototype.strings = {
-        settings: '<?php echo $this->translate->_('Meine Einstellungen');?>',
-        pwSave: '<?php echo $this->translate->_('Passwort erfolgreich gespeichert!');?>'
-    };
-    
-    Ext.define("Editor.locale.de.preferences.UserWindow", {
-        override: "Editor.view.preferences.UserWindow",
-        title: '<?php echo $this->translate->_('Meine Einstellungen');?>'
+
+    Ext.define("Editor.locale.de.admin.preferences.OverviewPanel", {
+        override: "Editor.view.admin.preferences.OverviewPanel",
+        title: '<?php echo $this->translate->_('Einstellungen');?>'
+    });
+
+    Ext.define("Editor.locale.de.admin.preferences.UserViewController", {
+        override: "Editor.view.admin.preferences.UserViewController",
+        strings: {
+            settings: '<?php echo $this->translate->_('Meine Einstellungen');?>',
+            pwSave: '<?php echo $this->translate->_('Passwort erfolgreich gespeichert!');?>'
+        }
     });
     
-    Editor.view.preferences.UserWindow.prototype.strings = {
-        editPassword: '<?php echo $this->translate->_('Passwort ändern');?>',
-        password: '<?php echo $this->translate->_('Passwort');?>',
-        password_check: '<?php echo $this->translate->_('Passwort Kontrolle');?>',
-        passwordMisMatch: '<?php echo $this->translate->_('Die Passwörter stimmern nicht überein!');?>',
-        saveBtn: '<?php echo $this->translate->_('Speichern');?>',
-        cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
-    };
-<?php
-    }//END if $this->hasFrontendController('Editor.controller.UserPreferences')
-    if($hasFrontendController('Editor.controller.admin.User')){
-?>
-    Editor.controller.admin.User.prototype.strings = {
-        confirmDeleteTitle: '<?php echo $this->translate->_('Benutzer endgültig löschen?');?>',
-        confirmDeleteMsg: '<?php echo $this->translate->_('Soll der gewählte Benutzer "{0}" wirklich endgültig gelöscht werden?');?>',
-        confirmResetPwTitle: '<?php echo $this->translate->_('Passwort zurücksetzen?');?>',
-        confirmResetPwMsg: '<?php echo $this->translate->_('Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.');?>',
-        userSaved: '<?php echo $this->translate->_('Der Änderungen an Benutzer "{0}" wurden erfolgreich gespeichert.');?>',
-        userAdded: '<?php echo $this->translate->_('Der Benutzer "{0}" wurde erfolgreich erstellt.');?>'
-    };
-    Editor.view.admin.UserGrid.prototype.title = '<?php echo $this->translate->_('Benutzerverwaltung');?>';
-    Editor.view.admin.UserGrid.prototype.text_cols = {
-        login: '<?php echo $this->translate->_('Login');?>',
-        firstName: '<?php echo $this->translate->_('Vorname');?>',
-        surName: '<?php echo $this->translate->_('Nachname');?>',
-        gender: '<?php echo $this->translate->_('Anrede');?>',
-        email: '<?php echo $this->translate->_('E-Mail');?>',
-        locale: '<?php echo $this->translate->_('Sprache');?>',
-        roles: '<?php echo $this->translate->_('Systemrollen');?>',
-        openIdIssuer: '<?php echo $this->translate->_('OpenId Emitten');?>'
-    };
-    Editor.view.admin.UserGrid.prototype.strings = {
-        addUser: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
-        addUserTip: '<?php echo $this->translate->_('Einen neuen Benutzer hinzufügen.');?>',
-        actionEdit: '<?php echo $this->translate->_('Benutzer bearbeiten');?>',
-        actionDelete: '<?php echo $this->translate->_('Benutzer löschen');?>',
-        actionResetPw: '<?php echo $this->translate->_('Passwort des Benutzers zurücksetzen');?>',
-        gender_female: '<?php echo $this->translate->_('Frau');?>',
-        gender_male: '<?php echo $this->translate->_('Herr');?>',
-        gender_neutral: '<?php echo $this->translate->_('keine Angabe');?>',
-        reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
-        reloadBtnTip: '<?php echo $this->translate->_('Benutzerliste vom Server aktualisieren.');?>',
-        sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
-        sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
-        targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
-        targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
-        localeTooltip: '<?php echo $this->translate->_('Benutzersprache');?>'
-    };
+    Ext.define("Editor.locale.de.admin.preferences.User", {
+        override: "Editor.view.admin.preferences.User",
+        title: '<?php echo $this->translate->_('Meine Einstellungen');?>',
+        strings: {
+            editPassword: '<?php echo $this->translate->_('Passwort ändern');?>',
+            password: '<?php echo $this->translate->_('Passwort');?>',
+            password_check: '<?php echo $this->translate->_('Passwort Kontrolle');?>',
+            passwordMisMatch: '<?php echo $this->translate->_('Die Passwörter stimmern nicht überein!');?>',
+            saveBtn: '<?php echo $this->translate->_('Speichern');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
     
-    Editor.view.admin.UserAddWindow.prototype.title = '<?php echo $this->translate->_('Benutzer erstellen');?>';
-    Editor.view.admin.UserAddWindow.prototype.titleEdit = '<?php echo $this->translate->_('Benutzer bearbeiten');?>';
-    Editor.view.admin.UserAddWindow.prototype.strings = {
-        userInfo: '<?php echo $this->translate->_('Benutzerinformationen');?>',
-        loginInfo: '<?php echo $this->translate->_('Anmeldeinformationen');?>',
-        nameTip: '<?php echo $this->translate->_('Name (Angabe notwendig)');?>',
-        nameLabel: '<?php echo $this->translate->_('Name¹');?>',
-        firstNameTip: '<?php echo $this->translate->_('Vorname (Angabe notwendig)');?>',
-        firstNameLabel: '<?php echo $this->translate->_('Vorname¹');?>',
-        surNameTip: '<?php echo $this->translate->_('Nachname (Angabe notwendig)');?>',
-        surNameLabel: '<?php echo $this->translate->_('Nachname¹');?>',
-        genderLabel: '<?php echo $this->translate->_('Anrede');?>',
-        genderMale: '<?php echo $this->translate->_('Herr');?>',
-        genderFemale: '<?php echo $this->translate->_('Frau');?>',
-        genderNeutral: '<?php echo $this->translate->_('Ohne');?>',
-        loginTip: '<?php echo $this->translate->_('Anmeldename (Angabe notwendig)');?>',
-        loginLabel: '<?php echo $this->translate->_('Anmeldename¹');?>',
-        emailTip: '<?php echo $this->translate->_('E-Mail Adresse (Angabe notwendig)');?>',
-        emailLabel: '<?php echo $this->translate->_('E-Mail Adresse¹');?>',
-        rolesLabel: '<?php echo $this->translate->_('Systemrollen²');?>',
-        setPassword: '<?php echo $this->translate->_('Passwort setzen³');?>',
-        editPassword: '<?php echo $this->translate->_('Passwort ändern');?>',
-        password: '<?php echo $this->translate->_('Passwort');?>',
-        password_check: '<?php echo $this->translate->_('Passwort Kontrolle');?>',
-        passwordMisMatch: '<?php echo $this->translate->_('Die Passwörter stimmern nicht überein!');?>',
-        bottomInfo: '<?php echo $this->translate->_(' ¹ Diese Angaben werden zwingend benötigt.');?>',
-        bottomRoleInfo: '<?php echo $this->translate->_(' ² Systemrollen bestimmen darüber, welche Rechte im System ein Nutzer hat. Die Rolle Editor darf auf alle Komponenten des Editors zugreifen, sowie auf die Komponenten der Aufgabenübersicht, die für das Editieren von Aufgaben nötig sind. Die Rolle PM darf Benutzer verwalten und Benutzer Aufgaben im Workflow zuweisen oder entziehen. Achtung: Systemrollen dürfen nicht mit Workflowrollen wie Lektor oder Übersetzer verwechselt werden. Benutzer die im Workflow Aufgaben übernehmen sollen müssen mindestens die Systemrolle Editor erhalten.');?>',
-        bottomPwInfo: '<?php echo $this->translate->_(' ³ Wird kein Passwort gesetzt bekommt der Benutzer automatisch eine E-Mail zur Erstellung eines Passworts.');?>',
-        feedbackText: "<?php echo $this->translate->_(' Fehler beim Speichern!');?>",
-        feedbackTip: '<?php echo $this->translate->_('Fehler beim Speichern des Benutzers: Bitte wenden Sie sich an den Support!');?>',
-        addBtn: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
-        saveBtn: '<?php echo $this->translate->_('Benutzer speichern');?>',
-        cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
-        languagesLabel: '<?php echo $this->translate->_('Automatische Zuweisung');?>',
-        sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
-        sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
-        targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
-        targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
-        languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>',
-        localeLabel: '<?php echo $this->translate->_('Benutzersprache');?>',
-        parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>',
-        bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.');?>'
-    };
-<?php
-    } //END if $this->hasFrontendController('Editor.controller.admin.User')
+    Ext.define("Editor.locale.de.view.admin.user.GridViewController", {
+        override: "Editor.view.admin.user.GridViewController",
+        strings: {
+            confirmDeleteTitle: '<?php echo $this->translate->_('Benutzer endgültig löschen?');?>',
+            confirmDeleteMsg: '<?php echo $this->translate->_('Soll der gewählte Benutzer "{0}" wirklich endgültig gelöscht werden?');?>',
+            confirmResetPwTitle: '<?php echo $this->translate->_('Passwort zurücksetzen?');?>',
+            confirmResetPwMsg: '<?php echo $this->translate->_('Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.');?>'
+        }
+    });
     
+    Ext.define("Editor.locale.de.view.admin.user.Grid", {
+        override: "Editor.view.admin.user.Grid",
+        title: '<?php echo $this->translate->_('Benutzerverwaltung');?>',
+        text_cols: {
+            login: '<?php echo $this->translate->_('Login');?>',
+            firstName: '<?php echo $this->translate->_('Vorname');?>',
+            surName: '<?php echo $this->translate->_('Nachname');?>',
+            gender: '<?php echo $this->translate->_('Anrede');?>',
+            email: '<?php echo $this->translate->_('E-Mail');?>',
+            locale: '<?php echo $this->translate->_('Sprache');?>',
+            roles: '<?php echo $this->translate->_('Systemrollen');?>',
+            openIdIssuer: '<?php echo $this->translate->_('OpenId Emitten');?>'
+        },
+        strings: {
+            addUser: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
+            addUserTip: '<?php echo $this->translate->_('Einen neuen Benutzer hinzufügen.');?>',
+            actionEdit: '<?php echo $this->translate->_('Benutzer bearbeiten');?>',
+            actionDelete: '<?php echo $this->translate->_('Benutzer löschen');?>',
+            actionResetPw: '<?php echo $this->translate->_('Passwort des Benutzers zurücksetzen');?>',
+            gender_female: '<?php echo $this->translate->_('Frau');?>',
+            gender_male: '<?php echo $this->translate->_('Herr');?>',
+            gender_neutral: '<?php echo $this->translate->_('keine Angabe');?>',
+            reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
+            reloadBtnTip: '<?php echo $this->translate->_('Benutzerliste vom Server aktualisieren.');?>',
+            sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+            sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+            targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+            targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+            localeTooltip: '<?php echo $this->translate->_('Benutzersprache');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.user.AddWindowViewController", {
+        override: "Editor.view.admin.user.AddWindowViewController",
+        strings: {
+            userSaved: '<?php echo $this->translate->_('Der Änderungen an Benutzer "{0}" wurden erfolgreich gespeichert.');?>',
+            userAdded: '<?php echo $this->translate->_('Der Benutzer "{0}" wurde erfolgreich erstellt.');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.user.AddWindow", {
+        override: "Editor.view.admin.user.AddWindow",
+        title: '<?php echo $this->translate->_('Benutzer erstellen');?>',
+        titleEdit: '<?php echo $this->translate->_('Benutzer bearbeiten');?>',
+        strings: {
+            userInfo: '<?php echo $this->translate->_('Benutzerinformationen');?>',
+            loginInfo: '<?php echo $this->translate->_('Anmeldeinformationen');?>',
+            nameTip: '<?php echo $this->translate->_('Name (Angabe notwendig)');?>',
+            nameLabel: '<?php echo $this->translate->_('Name¹');?>',
+            firstNameTip: '<?php echo $this->translate->_('Vorname (Angabe notwendig)');?>',
+            firstNameLabel: '<?php echo $this->translate->_('Vorname¹');?>',
+            surNameTip: '<?php echo $this->translate->_('Nachname (Angabe notwendig)');?>',
+            surNameLabel: '<?php echo $this->translate->_('Nachname¹');?>',
+            genderLabel: '<?php echo $this->translate->_('Anrede');?>',
+            genderMale: '<?php echo $this->translate->_('Herr');?>',
+            genderFemale: '<?php echo $this->translate->_('Frau');?>',
+            genderNeutral: '<?php echo $this->translate->_('Ohne');?>',
+            loginTip: '<?php echo $this->translate->_('Anmeldename (Angabe notwendig)');?>',
+            loginLabel: '<?php echo $this->translate->_('Anmeldename¹');?>',
+            emailTip: '<?php echo $this->translate->_('E-Mail Adresse (Angabe notwendig)');?>',
+            emailLabel: '<?php echo $this->translate->_('E-Mail Adresse¹');?>',
+            rolesLabel: '<?php echo $this->translate->_('Systemrollen²');?>',
+            setPassword: '<?php echo $this->translate->_('Passwort setzen³');?>',
+            editPassword: '<?php echo $this->translate->_('Passwort ändern');?>',
+            password: '<?php echo $this->translate->_('Passwort');?>',
+            password_check: '<?php echo $this->translate->_('Passwort Kontrolle');?>',
+            passwordMisMatch: '<?php echo $this->translate->_('Die Passwörter stimmern nicht überein!');?>',
+            bottomInfo: '<?php echo $this->translate->_(' ¹ Diese Angaben werden zwingend benötigt.');?>',
+            bottomRoleInfo: '<?php echo $this->translate->_(' ² Systemrollen bestimmen darüber, welche Rechte im System ein Nutzer hat. Die Rolle Editor darf auf alle Komponenten des Editors zugreifen, sowie auf die Komponenten der Aufgabenübersicht, die für das Editieren von Aufgaben nötig sind. Die Rolle PM darf Benutzer verwalten und Benutzer Aufgaben im Workflow zuweisen oder entziehen. Achtung: Systemrollen dürfen nicht mit Workflowrollen wie Lektor oder Übersetzer verwechselt werden. Benutzer die im Workflow Aufgaben übernehmen sollen müssen mindestens die Systemrolle Editor erhalten.');?>',
+            bottomPwInfo: '<?php echo $this->translate->_(' ³ Wird kein Passwort gesetzt bekommt der Benutzer automatisch eine E-Mail zur Erstellung eines Passworts.');?>',
+            feedbackText: "<?php echo $this->translate->_(' Fehler beim Speichern!');?>",
+            feedbackTip: '<?php echo $this->translate->_('Fehler beim Speichern des Benutzers: Bitte wenden Sie sich an den Support!');?>',
+            addBtn: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
+            saveBtn: '<?php echo $this->translate->_('Benutzer speichern');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+            languagesLabel: '<?php echo $this->translate->_('Automatische Zuweisung');?>',
+            sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+            sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+            targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+            targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+            languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>',
+            localeLabel: '<?php echo $this->translate->_('Benutzersprache');?>',
+            parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>',
+            bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.');?>'
+        }
+    });
+<?php
     if($hasFrontendController('Editor.controller.admin.TaskPreferences')){
 ?>
     Editor.view.admin.task.UserPrefsGrid.prototype.strings = {
@@ -1332,7 +1342,6 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.controller.TmOverview", {
         override: "Editor.controller.TmOverview",
         strings: {
-            languageresource: '<?php echo $this->translate->_('Sprach-Resourcen');?>',
             deleteConfirm: '<?php echo $this->translate->_('Sprachressource endgültig löschen?');?>',
             deleteConfirmText: '<?php echo $this->translate->_('Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?');?>',
             deleteConfirmLocal: '<?php echo $this->translate->_('Sprachressource löschen?');?>',

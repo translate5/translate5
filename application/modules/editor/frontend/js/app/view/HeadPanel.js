@@ -78,10 +78,6 @@ Ext.define('Editor.view.HeadPanel', {
                     xtype: 'tbfill'
                 },{
                     xtype: 'button',
-                    itemId: 'logoutSingle',
-                    text: me.strings.logout
-                },{
-                    xtype: 'button',
                     text: me.strings.tasks,
                     itemId: 'tasksMenu',
                     hidden: isEditor,
@@ -116,6 +112,10 @@ Ext.define('Editor.view.HeadPanel', {
                     editable: false,
                     store: translations,
                     queryMode: 'local'
+                },{
+                    xtype: 'button',
+                    itemId: 'logoutSingle',
+                    text: me.strings.logout
                 }]
             }]
         };

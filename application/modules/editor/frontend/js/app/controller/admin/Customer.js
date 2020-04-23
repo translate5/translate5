@@ -104,6 +104,8 @@ Ext.define('Editor.controller.admin.Customer', {
     // Multitenancy: filtering
     handleFiltering: true,
     
+    helpSection: 'customeroverview',
+    
     /**
      * On head panel after render handler
      */

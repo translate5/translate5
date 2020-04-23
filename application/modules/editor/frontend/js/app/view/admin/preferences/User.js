@@ -30,13 +30,17 @@ END LICENSE AND COPYRIGHT
  * @class Editor.view.preferences.UserWindow
  * @extends Ext.window.Window
  */
-Ext.define('Editor.view.preferences.UserWindow', {
-    extend: 'Ext.window.Window',
-    height: 274,
+Ext.define('Editor.view.admin.preferences.User', {
+    extend: 'Ext.panel.Panel',
     itemId: 'preferencesUserWindow',
-    width: 460,
+    requires: [
+        'Editor.view.admin.preferences.UserViewController'
+    ],
+    controller: 'preferencesUser',
+    alias: 'widget.preferencesUser',
     title: '#UT#Meine Einstellungen',
-    modal: true,
+    glyph: 'xf007@FontAwesome',
+    //glyph: 'xf4fe@FontAwesome', to old fontawesome!
     strings: {
         editPassword: '#UT#Passwort ändern',
         password: '#UT#Passwort',
@@ -45,7 +49,7 @@ Ext.define('Editor.view.preferences.UserWindow', {
         saveBtn: '#UT#speichern',
         cancelBtn: '#UT#Abbrechen'
     },
-    layout: 'fit',
+    //layout: 'fit',
 
     initConfig: function(instanceConfig) {
         var me = this,
@@ -54,6 +58,7 @@ Ext.define('Editor.view.preferences.UserWindow', {
                 items: [{
                     xtype: 'form',
                     frame: true,
+                    width: 400,
                     ui: 'default-framed',
                     bodyPadding: 10,
                     items:[{
@@ -65,7 +70,7 @@ Ext.define('Editor.view.preferences.UserWindow', {
                             inputType: 'password',
                             minLength: 8,
                             allowBlank: false,
-                            anchor: '100%'
+                            //anchor: '100%'
                         },
                         items: [{
                             name: 'passwd',
@@ -78,26 +83,26 @@ Ext.define('Editor.view.preferences.UserWindow', {
                             },
                             fieldLabel: me.strings.password_check
                         }]
-                    }]
-                }],
-                dockedItems: [{
-                    xtype: 'toolbar',
-                    ui: 'footer',
-                    dock: 'bottom',
-                    layout: {
-                        pack: 'end',
-                        type: 'hbox'
-                    },
-                    items: [{
-                        xtype: 'button',
-                        itemId: 'saveBtn',
-                        iconCls: 'ico-setting-save',
-                        text: me.strings.saveBtn
-                    },{
-                        xtype: 'button',
-                        itemId: 'cancelBtn',
-                        iconCls: 'ico-cancel',
-                        text: me.strings.cancelBtn
+                    }],
+                    dockedItems: [{
+                        xtype: 'toolbar',
+                        ui: 'footer',
+                        dock: 'bottom',
+                        layout: {
+                            pack: 'end',
+                            type: 'hbox'
+                        },
+                        items: [{
+                            xtype: 'button',
+                            itemId: 'saveBtn',
+                            iconCls: 'ico-setting-save',
+                            text: me.strings.saveBtn
+                        },{
+                            xtype: 'button',
+                            itemId: 'cancelBtn',
+                            iconCls: 'ico-cancel',
+                            text: me.strings.cancelBtn
+                        }]
                     }]
                 }]
             };

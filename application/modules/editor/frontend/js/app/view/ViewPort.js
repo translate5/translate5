@@ -34,10 +34,11 @@ Ext.define('Editor.view.ViewPort', {
     extend: 'Ext.container.Viewport',
     requires: [
         'Editor.view.MaintenancePanel',
-        'Editor.view.admin.UserGrid',
+        'Editor.view.admin.user.Grid',
         'Editor.view.admin.TaskGrid',
         'Editor.view.admin.customer.Panel',
-        'Editor.view.LanguageResources.TmOverviewPanel'
+        'Editor.view.LanguageResources.TmOverviewPanel',
+        'Editor.view.admin.preferences.OverviewPanel'
     ],
     layout: 'border',
     initComponent: function() {
@@ -48,6 +49,7 @@ Ext.define('Editor.view.ViewPort', {
             },{
                 region: 'center',
                 xtype: 'tabpanel',
+                itemId: 'adminMainSection',
                 
                 //ui: 'navigation', → eigene UI benötigt eigenes CSS! Im Beispiel ist das ja SCSS was noch gerendert werden müsste!
                 tabBar: {
@@ -82,35 +84,12 @@ Ext.define('Editor.view.ViewPort', {
 - admin panel rund machen
 - Testen!
                      */
-                    xtype: 'tabpanel',
-                    defaults: {
-                        iconAlign: 'left',
-                        textAlign: 'left'
-                    },
-                    tabPosition: 'left',
-                    tabRotation: 0,
-                    title: 'Preferences',
-                    glyph: 'xf085@FontAwesome',
-                    items: [{
-                        xtype: 'panel',
-                        title: 'My Preferences',
-                        glyph: 'xf007@FontAwesome',
-                        //glyph: 'xf4fe@FontAwesome', to old fontawesome!
-                    },{
-                        xtype: 'panel',
-                        title: 'System',
-                        glyph: 'xf013@FontAwesome',
-                    },{
-                        xtype: 'panel',
-                        title: 'Axels Fonts',
-                        glyph: 'xf031@FontAwesome',
-                    }]
+                    xtype: 'preferencesOverviewPanel'
                 }]
             }];
         Ext.applyIf(me, {
             items: items
         });
         me.callParent(arguments);
-        console.log("ViewPort init");
     }
   });
