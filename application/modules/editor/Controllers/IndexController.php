@@ -235,8 +235,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$rop->loginUrl);
       $this->view->Php2JsVars()->set('logoutOnWindowClose', APPLICATION_RUNDIR.$rop->logoutOnWindowClose);
       
-      //inject helUrl variable used in frontend
-      $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
       $this->view->Php2JsVars()->set('errorCodesUrl',$rop->errorCodesUrl);
       
       $this->view->Php2JsVars()->set('messageBox.delayFactor', $rop->messageBox->delayFactor);
@@ -395,6 +393,17 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $filter=ZfExtended_Factory::get('ZfExtended_Models_Filter_ExtJs6');
         /* @var $filter ZfExtended_Models_Filter_ExtJs6 */
         $php2js->set('app.filters.translatedOperators', $filter->getTranslatedOperators());
+        
+        $config=ZfExtended_Factory::get('editor_Models_Config');
+        /* @var $config editor_Models_Config */
+        
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->load($userSession->data->id);
+        
+        //set frontend array from the config data
+        //the array is used as initial user config store data
+        $php2js->set('app.configData',$config->loadAllMerged($user));
     }
     
     protected function getAppVersion() {

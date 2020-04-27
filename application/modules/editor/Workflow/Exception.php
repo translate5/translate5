@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -27,18 +27,17 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * NEC-TM Exception
+ * Workflow Manager Exceptions
  */
-class editor_Plugins_NecTm_Exception extends ZfExtended_ErrorCodeException {
+class editor_Workflow_Exception extends ZfExtended_ErrorCodeException {
     /**
      * @var string
      */
-    protected $domain = 'plugin.nectm';
+    protected $domain = 'editor.workflow.manager';
     
     static protected $localErrorCodes = [
-        'E1162' => 'NEC-TM Plug-In: Exception',
-        'E1182' => 'NEC-TM Plug-In: The languages for the Nec-TM-LanguageResource differ from the languages of the segment.',
-        'E1183' => 'NEC-TM Plug-In: Could not save segment to TM',
-        'E1256' => 'NEC-TM Plug-In: A new NEC-TM-LanguageResource must have at least one category assigned.'
+        'E1251' => 'Workflow to class "{className}" not found!',
+        'E1252' => 'Workflow with ID "{workflowId}" not found!',
+        'E1253' => '{className}::$labels has to much / or missing labels!',
     ];
 }

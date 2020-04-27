@@ -29,6 +29,5 @@ Ext.define('Editor.view.LanguageResources.log.LogGrid', {
     extend: 'Editor.view.admin.log.Grid',
     alias: 'widget.languageResourcesLogLogGrid',
     store: 'Editor.store.LanguageResources.Logs',
-    cls: 'languageResourcesLogLogGrid',
     entityUrlPart: 'languageresourceinstance'
 });
