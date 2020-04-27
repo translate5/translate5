@@ -42,38 +42,13 @@ class editor_ConfigController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction() {
-        $iniOptions = $this->getInvokeArg('bootstrap')->getApplication()->getOptions();
+        $userSession = new Zend_Session_Namespace('user');
+        
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->load($userSession->data->id);
         //load all zf configuration values merged with the user config and .ini values
-        $zfconfig = $this->entity->loadAll();
-        foreach($zfconfig as &$row) {
-            $this->mergeWithIni($iniOptions, explode('.', $row['name']), $row);
-        }
-        //
-        $this->view->rows = $zfconfig;
-    }
-    
-    /**
-     * Merges the ini config values into the DB result before returning by REST API
-     * @param array $root
-     * @param array $path
-     * @param array $row given as reference, the ini values are set in here
-     */
-    protected function mergeWithIni(array $root, array $path, array &$row) {
-        $row['origin'] = $row['origin'] ?? editor_Models_Config::CONFIG_SOURCE_DB;
-        $part = array_shift($path);
-        if(!isset($root[$part])) {
-            return;
-        }
-        if(!empty($path)){
-            $this->mergeWithIni($root[$part], $path, $row);
-            return;
-        }
-        $row['origin'] = editor_Models_Config::CONFIG_SOURCE_INI;
-        $row['overwritten'] = $row['value'];
-        $row['value'] = $root[$part];
-        if($row['type'] == ZfExtended_Resource_DbConfig::TYPE_MAP || $row['type'] == ZfExtended_Resource_DbConfig::TYPE_LIST){
-            $row['value'] = json_encode($row['value'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        }
+        $this->view->rows = $this->entity->loadAllMerged($user);
     }
     
     /**

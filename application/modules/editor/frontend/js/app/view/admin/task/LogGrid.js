@@ -31,6 +31,5 @@ Ext.define('Editor.view.admin.task.LogGrid', {
     requires: ['Editor.view.admin.log.Grid'],
     alias: 'widget.editorAdminTaskLogGrid',
     store: 'admin.task.Logs',
-    cls: 'editorAdminTaskLogGrid',
     entityUrlPart: 'task'
 });

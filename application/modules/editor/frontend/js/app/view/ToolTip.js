@@ -264,12 +264,12 @@ Ext.define('Editor.view.ToolTip', {
             
             //FIXME: Fix for the bug in internet explorer
             //http://jira.translate5.net/browse/TRANSLATE-1086
-            if(Ext.isIE){
-                me.targetListeners=null;
-            }else{
-                me.targetListeners.destroy();
-                me.targetListeners=null;
+        	//same problem with different error log under edge
+        	//https://jira.translate5.net/browse/TRANSLATE-2037
+            if(!Ext.isIE && !Ext.isEdge){
+            	me.targetListeners.destroy();
             }
+            me.targetListeners=null;
         }
  
         if (target) {

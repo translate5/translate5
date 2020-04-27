@@ -112,7 +112,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
                 success: function(response){
                     me.consoleLog('runSpellCheckWithTool (LanguageTool) done.');
                     resultLT = Ext.util.JSON.decode(response.responseText);
-                    if (resultLT.rows.matches) {
+                    //check if the response contains result(matches)
+                    if (resultLT && resultLT.rows && resultLT.rows.matches) {
                         me.allMatchesOfTool = resultLT.rows.matches;
                         me.applySpellCheck(spellCheckProcessID);
                     } else {
