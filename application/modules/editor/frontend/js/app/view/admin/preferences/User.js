@@ -57,9 +57,9 @@ Ext.define('Editor.view.admin.preferences.User', {
                 title: me.title, //see EXT6UPD-9
                 items: [{
                     xtype: 'form',
-                    frame: true,
+                    //frame: true,
                     width: 400,
-                    ui: 'default-framed',
+                    //ui: 'default-framed',
                     bodyPadding: 10,
                     items:[{
                         xtype: 'fieldset',

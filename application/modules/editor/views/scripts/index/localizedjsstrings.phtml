@@ -127,11 +127,20 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_(' - [LESEMODUS]');?>';
   	Editor.view.segments.Grid.prototype.title_addition_unconfirmed = '<?php echo $this->translate->_(' - [AUFGABE UNBESTÄTIGT]');?>';
   	Editor.view.segments.Grid.prototype.target_original = ' <?php echo $this->translate->_('(zur Importzeit)');?>';
-  	Editor.view.segments.Grid.prototype.item_logoutheaderbtn = '<?php echo $this->translate->_('Ausloggen');?>';
-  	Editor.view.segments.Grid.prototype.item_leavetaskheaderbtn = '<?php echo $this->translate->_('Aufgabe verlassen');?>';
-  	Editor.view.segments.Grid.prototype.item_progresbar_finished = '<?php echo $this->translate->_('abgeschlossen');?>';
-	Editor.view.segments.Grid.prototype.item_progresbar_currentWorkflowStepProgressTooltip = '<?php echo $this->translate->_('% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt');?>';
 
+    Ext.define("Editor.locale.view.segments.grid.Header", {
+        override: "Editor.view.segments.grid.Header",
+        strings: {
+            progressTooltip: '<?php echo $this->translate->_('% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt');?>',
+            leaveBtn: '<?php echo $this->translate->_('Aufgabe verlassen');?>',
+            logoutBtn: '<?php echo $this->translate->_('Ausloggen');?>',
+            leaveTaskWindowTitle: '<?php echo $this->translate->_('Zurück zur Aufgabeliste');?>',
+            leaveTaskWindowMessage: '<?php echo $this->translate->_('Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?');?>',
+            leaveTaskWindowFinishBtn: '<?php echo $this->translate->_('Fertig und Aufgabe beenden');?>',
+            leaveTaskWindowCancelBtn: '<?php echo $this->translate->_('Aufgabe später weiterbearbeiten');?>'
+        }
+    });
+  	
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
   	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansicht');?>';
   	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Details (nur Lesemodus)');?>';
@@ -233,13 +242,7 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.controller.ViewModes", {
         override: "Editor.controller.ViewModes",
-        messageIsViewMode: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.');?>',
-        strings:{
-            leaveTaskWindowTitle: '<?php echo $this->translate->_('Zurück zur Aufgabeliste');?>',
-            leaveTaskWindowMessage: '<?php echo $this->translate->_('Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?');?>',
-            leaveTaskWindowFinishBtn: '<?php echo $this->translate->_('Fertig und Aufgabe beenden');?>',
-            leaveTaskWindowCancelBtn: '<?php echo $this->translate->_('Aufgabe später weiterbearbeiten');?>'
-        }
+        messageIsViewMode: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.');?>'
     });
   	
   	Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
@@ -618,8 +621,8 @@ Ext.define('Editor.controller.Localizer', {
     });
     
     
-    Ext.define("Editor.locale.de.view.HelpWindow", {
-        override: "Editor.view.HelpWindow",
+    Ext.define("Editor.locale.de.view.help.HelpWindow", {
+        override: "Editor.view.help.HelpWindow",
         strings:{
         	cbDoNotShowAgainLabel: '<?php echo $this->translate->_('Dieses Fenster nicht mehr automatisch anzeigen.');?>'
         }
@@ -970,30 +973,18 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
-<?php
-    if($hasFrontendController('Editor.controller.HeadPanel')){
-?>
-    Ext.define("Editor.locale.de.controller.HeadPanel", {
-        override: "Editor.controller.HeadPanel",
-        helpBtn: '<?php echo $this->translate->_('Hilfe');?>'
+    Ext.define("Editor.locale.de.view.help.HelpButton", {
+        override: "Editor.view.help.HelpButton",
+        text: '<?php echo $this->translate->_('Hilfe');?>'
     });
 
-    Editor.view.HeadPanel.prototype.strings = {
-        task: '<?php echo $this->translate->_('Aufgabe');?>',
-        logout: '<?php echo $this->translate->_('Abmelden');?>',
-        tasks: '<?php echo $this->translate->_('Aufgaben');?>',
-        settings: '<?php echo $this->translate->_('Meine Einstellungen');?>',
-        loggedinAs: '<?php echo $this->translate->_('Eingeloggter Benutzer');?>',
-        loginName: '<?php echo $this->translate->_('Loginname');?>',
-        back: '<?php echo $this->translate->_('zurück zur Aufgabenliste');?>',
-        finishBtn: '<?php echo $this->translate->_('Aufgabe abschließen');?>',
-        endBtn: '<?php echo $this->translate->_('Aufgabe beenden');?>',
-        readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>',
-        help: '<?php echo $this->translate->_('Hilfe');?>',
-    };
-<?php
-    }//END if($hasFrontendController('Editor.controller.HeadPanel'))
-?>
+    Ext.define("Editor.locale.de.view.HeadPanel", {
+        override: "Editor.view.HeadPanel",
+        strings: {
+            logout: '<?php echo $this->translate->_('Abmelden');?>',
+            readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
+        }
+    });
 
     Ext.define("Editor.locale.de.admin.preferences.OverviewPanel", {
         override: "Editor.view.admin.preferences.OverviewPanel",

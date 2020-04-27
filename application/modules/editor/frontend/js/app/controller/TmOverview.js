@@ -74,12 +74,6 @@ Ext.define('Editor.controller.TmOverview', {
         ref: 'tmOverviewPanel',
         selector: '#tmOverviewPanel'
     },{
-        ref: 'centerRegion',
-        selector: 'viewport container[region="center"]'
-    },{
-        ref: 'headToolBar',
-        selector: 'headPanel toolbar#top-menu'
-    },{
         ref: 'AddTmForm',
         selector: '#addTmWindow form'
     },{

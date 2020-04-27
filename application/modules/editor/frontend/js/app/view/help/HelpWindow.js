@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.HelpWindow', {
+Ext.define('Editor.view.help.HelpWindow', {
     extend: 'Editor.view.StatefulWindow',
     alias: 'widget.helpWindow',
     itemId: 'helpWindow',

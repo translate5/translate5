@@ -43,15 +43,6 @@ Ext.define('Editor.controller.admin.Customer', {
     stores:['Editor.store.admin.Customers','Editor.store.admin.UserCustomers'],
 
     refs:[{
-        ref: 'customerPanel',
-        selector: 'customerPanel'
-    },{
-        ref: 'centerRegion',
-        selector: 'viewport container[region="center"]'
-    },{
-        ref: 'headToolBar',
-        selector: 'headPanel toolbar#top-menu'
-    },{
         ref: 'customerSwitch',
         selector: '#customerSwitch'
     }],

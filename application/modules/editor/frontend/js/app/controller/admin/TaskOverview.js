@@ -47,12 +47,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   ],
   views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow','StatefulWindow'],
   refs : [{
-      ref: 'headToolBar',
-      selector: 'headPanel toolbar#top-menu'
-  },{
-      ref: 'logoutButton',
-      selector: 'headPanel toolbar#top-menu #logoutSingle'
-  },{
       ref: 'taskAddForm',
       selector: '#adminTaskAddWindow form'
   },{
@@ -238,7 +232,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   loadTasks: function() {
       this.getAdminTasksStore().load();
   },
-  startCheckImportStates: function(store) {
+  startCheckImportStates: function(store, records) {
       if(!this.checkImportStateTask) {
           this.checkImportStateTask = {
                   run: this.checkImportState,

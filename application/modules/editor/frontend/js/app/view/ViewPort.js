@@ -36,6 +36,7 @@ Ext.define('Editor.view.ViewPort', {
         'Editor.view.MaintenancePanel',
         'Editor.view.admin.user.Grid',
         'Editor.view.admin.TaskGrid',
+        'Editor.view.HeadPanel',
         'Editor.view.admin.customer.Panel',
         'Editor.view.LanguageResources.TmOverviewPanel',
         'Editor.view.admin.preferences.OverviewPanel'
@@ -68,11 +69,11 @@ Ext.define('Editor.view.ViewPort', {
                 items: [{
                     xtype: 'adminTaskGrid'
                 },{
+                    xtype: 'tmOverviewPanel'
+                },{
                     xtype: 'adminUserGrid'
                 },{
                     xtype: 'customerPanel'
-                },{
-                    xtype: 'tmOverviewPanel'
                 },{
                     //FIXME HERE: 
                     /*
