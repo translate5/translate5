@@ -26,10 +26,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) 
-VALUES 
-('runtimeOptions.frontend.defaultState.helpWindow.segmentsGrid', '1', 'editor', 'system', '{"doNotShowAgain":false,"loaderUrl":"\/help\/{0}"}', '', '', 'map', 'Help window default state configuration for the Segment Grid. When doNotShowAgain is set to false, the window will appear automaticly for the segment grid. When setting this config to true or leave the field value as empty, the window will not apear automaticly.', '1');
-
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) 
-VALUES 
-('runtimeOptions.frontend.defaultState.segmentsGrid', '1', 'editor', 'system', '', '', '', 'map', 'Segment grid default state configuration. When this config is empty, the task grid state will not be saved or applied. For how to config this value please visit this page: https://confluence.translate5.net/display/CON/Configure+grids+and+window+state', '1');
+UPDATE `Zf_acl_rules` SET `resource` = 'frontend', `right` = 'taskOverviewFrontendController' WHERE `resource` = 'taskOverviewFrontendController';
+UPDATE `Zf_acl_rules` SET `resource` = 'frontend', `right` = 'userPrefFrontendController' WHERE `resource` = 'userPrefFrontendController';
+UPDATE `Zf_acl_rules` SET `resource` = 'frontend', `right` = 'adminUserFrontendController' WHERE `resource` = 'adminUserFrontendController';

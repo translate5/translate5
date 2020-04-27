@@ -71,15 +71,16 @@ Ext.application({
   models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
   stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages','UserConfig'],
   requires: [
-      'Editor.view.ViewPort', 
-      Editor.data.app.viewport, 
+      'Editor.view.ViewPort',
+      'Editor.view.ViewPortEditor',
+      'Editor.view.ViewPortSingle',
       'Editor.model.ModelOverride', 
       'Editor.util.TaskActions',
       'Editor.util.messageBus.MessageBus',
       'Editor.util.messageBus.EventDomain',
       'Editor.util.HttpStateProvider'
-  ],
-  controllers: Editor.data.app.controllers,
+  ].concat(Editor.data.app.controllers.require),
+  controllers: Editor.data.app.controllers.active,
   appFolder : Editor.data.appFolder,
   windowTitle: '',
   viewport: null,
@@ -276,7 +277,7 @@ Ext.application({
    * firing the editorViewportClosed event
    */
   openAdministration: function() {
-      var me = this;
+      var me = this, tabPanel;
       if(!Editor.controller.admin || ! Editor.controller.admin.TaskOverview) {
           return;
       }
@@ -302,6 +303,10 @@ Ext.application({
       //disable logout split button
       //enable logout normal Button
       me.fireEvent('adminViewportOpened');
+      tabPanel = me.viewport.down('#adminMainSection');
+
+      // on intial load we have to trigger the change manually
+      me.onAdminMainSectionChange(tabPanel, tabPanel.getActiveTab());
       
       //set the value used for displaying the help pages
       Ext.getDoc().dom.title = me.windowTitle;

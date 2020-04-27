@@ -30,7 +30,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.preferences.OverviewPanelViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.preferencesOverviewPanel',
-    
     routes: {
         'preferences': 'onPreferencesRoute'
     },

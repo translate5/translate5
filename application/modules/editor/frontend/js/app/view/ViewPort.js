@@ -44,6 +44,8 @@ Ext.define('Editor.view.ViewPort', {
     layout: 'border',
     initComponent: function() {
         var me = this,
+            user = Editor.app.authenticatedUser,
+            mainSections = [],
             items = [{
                 xtype: 'headPanel',
                 region: 'north'
@@ -66,28 +68,26 @@ Ext.define('Editor.view.ViewPort', {
                 layout: {
                     type: 'fit'
                 },
-                items: [{
-                    xtype: 'adminTaskGrid'
-                },{
-                    xtype: 'tmOverviewPanel'
-                },{
-                    xtype: 'adminUserGrid'
-                },{
-                    xtype: 'customerPanel'
-                },{
-                    //FIXME HERE: 
-                    /*
- Nächste Schritte: 
-- das muss adaptiert werden
-      Ext.fireEvent('componentViewChanged','useroverview',grid.getTitle());
-- Plan für die Routes machen! und die verwenden
-- Button Strings aufräumen! → Die für die titles verwenden und dann die titles aufräumen
-- admin panel rund machen
-- Testen!
-                     */
-                    xtype: 'preferencesOverviewPanel'
-                }]
+                items: mainSections
             }];
+        
+        if(user.isAllowed('taskOverviewFrontendController')) {
+            mainSections.push({xtype: 'adminTaskGrid'});
+        }
+        if(user.isAllowed('languageResourcesOverview')) {
+            mainSections.push({xtype: 'tmOverviewPanel'});
+        }
+        if(user.isAllowed('adminUserFrontendController')) {
+            mainSections.push({xtype: 'adminUserGrid'});
+        }
+        if(user.isAllowed('customerAdministration')) {
+            mainSections.push({xtype: 'customerPanel'});
+        }
+        //the preferences panel is responsible for itself if it is visible or not!
+        mainSections.push({xtype: 'preferencesOverviewPanel'});
+
+
+        
         Ext.applyIf(me, {
             items: items
         });

@@ -45,26 +45,42 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
     tabPosition: 'left',
     tabRotation: 0,
     glyph: 'xf085@FontAwesome',
-    items: [{
-        xtype: 'preferencesUser'
-//  },{
-//      xtype: 'panel',
-//      title: 'System',
-//      glyph: 'xf013@FontAwesome',
-//  },{
-//      xtype: 'panel',
-//      title: 'Axels Fonts',
-//      glyph: 'xf031@FontAwesome',
-    }],
-
     initConfig: function(instanceConfig) {
         var me = this,
+            user = Editor.app.authenticatedUser,
+            configSections = [],
             config = {
-                title: me.title //see EXT6UPD-9
+                title: me.title, //see EXT6UPD-9
+                items: configSections,
+                hidden: true //is enabled if there are children
             };
+        
+        if(user.isAllowed('userPrefFrontendController')) {
+            configSections.push({xtype: 'preferencesUser'});
+        }
+        
+        /**
+         * Other planned config sections:
+         * [{
+            //  },{
+//                  xtype: 'panel',
+//                  title: 'System',
+//                  glyph: 'xf013@FontAwesome',
+            //  },{
+//                  xtype: 'panel',
+//                  title: 'Axels Fonts',
+//                  glyph: 'xf031@FontAwesome',
+                }]
+         */
+        
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+    initComponent: function() {
+        var me = this;
+        me.callParent(arguments);
+        this.setVisible(this.items.length > 0); //if there are any sub modules
     }
 });

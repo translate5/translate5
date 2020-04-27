@@ -36,11 +36,6 @@ $this->translate->setJsonEncode(true);
   $yes = $this->translate->_('Ja');
   $no  = $this->translate->_('Nein');
   
-  $fcList = $this->frontendControllers;
-  $hasFrontendController = function($controller) use($fcList) {
-      $controller = str_replace('Editor.controller.', '', $controller);
-      return in_array($controller, $fcList);
-  };
   $config = Zend_Registry::get('config');
 ?>
 /*
@@ -1108,9 +1103,6 @@ Ext.define('Editor.controller.Localizer', {
             bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.');?>'
         }
     });
-<?php
-    if($hasFrontendController('Editor.controller.admin.TaskPreferences')){
-?>
     Editor.view.admin.task.UserPrefsGrid.prototype.strings = {
         defaultEntry: '<?php echo $this->translate->_('Standard Eintrag');?>',
         confirmDeleteTitle: '<?php echo $this->translate->_('Eintrag löschen?');?>',
@@ -1159,11 +1151,6 @@ Ext.define('Editor.controller.Localizer', {
       customerTip: '<?php echo $this->translate->_('Kunde der Aufgabe (Angabe notwendig)');?>',
       customerLabel: '<?php echo $this->translate->_('Kunde');?>'
     };
-<?php
-    }; //if($hasFrontendController('Editor.controller.admin.TaskPreferences')){
-    
-    if($hasFrontendController('Editor.controller.admin.Customer')){
-?>
 	Ext.define("Editor.locale.controller.admin.Customer", {
 		override: "Editor.controller.admin.Customer",
         strings: {
@@ -1216,10 +1203,6 @@ Ext.define('Editor.controller.Localizer', {
         fieldLabel:'<?php echo $this->translate->_("Endkunde");?>'
     });
     
-<?php
-    }; //END if($hasFrontendController('Editor.controller.admin.Customer')){
-    if($hasFrontendController('Editor.controller.LanguageResources')){
-?>
     Ext.define("Editor.locale.controller.LanguageResources", {
         override: "Editor.controller.LanguageResources",
         strings: {
@@ -1298,10 +1281,6 @@ Ext.define('Editor.controller.Localizer', {
             title: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
         }
     });
-<?php
-    }; //END if($hasFrontendController('Editor.controller.LanguageResources')){
-    if($hasFrontendController('Editor.controller.LanguageResourcesTaskassoc')){
-?>
     Ext.define("Editor.locale.controller.TaskAssoc", {
         override: "Editor.controller.LanguageResourcesTaskassoc",
         strings: {
@@ -1326,10 +1305,6 @@ Ext.define('Editor.controller.Localizer', {
             target: '<?php echo $this->translate->_('Zielsprache');?>'
         }
     });
-<?php
-    }; //END if($hasFrontendController('Editor.controller.LanguageResourcesTaskassoc')){
-    if($hasFrontendController('Editor.controller.TmOverview')){
-?>
     Ext.define("Editor.locale.controller.TmOverview", {
         override: "Editor.controller.TmOverview",
         strings: {
@@ -1491,9 +1466,6 @@ Ext.define('Editor.controller.Localizer', {
             reimportTooltip: '<?php echo $this->translate->_('Ausgewählte Aufgaben erneut ins aktuelle TM importieren');?>'
         }
     });
-<?php
-    }; //END if($hasFrontendController('Editor.controller.TmOverview')){
-?>
 
     Ext.define("Editor.locale.de.view.MaintenancePanel", {
         override: "Editor.view.MaintenancePanel",
