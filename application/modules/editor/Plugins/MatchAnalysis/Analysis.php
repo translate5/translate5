@@ -261,9 +261,34 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $matchRateInternal->matchrate=null;
             //for each match, find the best match rate, and save it
             foreach ($matchResults as $match){
-                if($matchRateInternal->matchrate >= $match->matchrate){
+                if($matchRateInternal->matchrate > $match->matchrate){
                     continue;
                 }
+                
+                // If the matchrate is the same, we only check for a new best match if it is from a termcollection
+                if ($matchRateInternal->matchrate == $match->matchrate && $match->languageResourceType != 'termcollection') {
+                    continue;
+                }
+                
+                if ($match->languageResourceType == 'termcollection') {
+                    // - preferred terms > permitted terms
+                    // - if multiple permitted terms: take the first
+                    if (!is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == 'termcollection') {
+                        $bestMatchMetaData = $bestMatchRateResult->metaData;
+                        $bestMatchIsPreferredTerm = editor_Models_Term::isPreferredTerm($bestMatchMetaData['status']);
+                        if ($bestMatchIsPreferredTerm) {
+                            continue;
+                        }
+                    }
+                    // - only allow preferred and permitted terms for best matches
+                    $metaData = $match->metaData;
+                    $matchIsPreferredTerm = editor_Models_Term::isPreferredTerm($metaData['status']);
+                    $matchIsPermittedTerm = editor_Models_Term::isPermittedTerm($metaData['status']);
+                    if (!$matchIsPreferredTerm && !$matchIsPermittedTerm) {
+                        continue;
+                    }
+                }
+                
                 $matchRateInternal=$match;
                 
                 //store best match rate results(do not compare agains the mt results)
