@@ -33,7 +33,9 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tmwindowviewcontroller',
-
+    messages: {
+        notConfigured: '#UT#Die Sprachresource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}',
+    },
     listen: {
         component: {
             'languagecombo': {
@@ -81,8 +83,13 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
             view=me.getView(),
             uploadField=view.down('filefield[name="tmUpload"]'),
             serviceName=field.getSelection() && field.getSelection().get('serviceName'),
+            helppage = field.getSelection() && field.getSelection().get('helppage'),
             vm=view.getViewModel(),
             sdlEngineCombo=view.down('#sdlEngine');
+        
+        if (!me.isValidService(serviceName, helppage)) {
+            return false;
+        }
         
         vm.set('serviceName',serviceName);
 
@@ -100,6 +107,22 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         if(isSdl){
             sdlEngineCombo.getStore().clearFilter();
         }
+    },
+    
+    /**
+     * Check if the selected service is valid to be used. If not, the user gets a message shown.
+     * @returns boolean
+     */
+    isValidService: function (serviceName, helppage) {
+        var me = this;
+        // The resource combo now also includes unconfigured services.
+        // Other than resources, the objects for these items only have a name, serviceName and helppage.
+        // After "Cancel" (= helppage is null), no message is needed.
+        if (helppage !== undefined && helppage !== null) {
+            Editor.MessageBox.addError(Ext.String.format(me.messages.notConfigured, serviceName, helppage));
+            return false;
+        }
+        return true;
     },
 
     /**

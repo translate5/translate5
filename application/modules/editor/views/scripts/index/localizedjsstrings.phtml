@@ -1343,6 +1343,13 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
+    Ext.define("Editor.view.LanguageResources.TmWindowViewController", {
+        override: "Editor.view.LanguageResources.TmWindowViewController",
+        messages: {
+            notConfigured: '<?php echo $this->translate->_('Die Sprachresource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}');?>'
+        }
+    });
+    
     Ext.define("Editor.locale.view.LanguageResources.EditTmWindow", {
         override: "Editor.view.LanguageResources.EditTmWindow",
         strings: {

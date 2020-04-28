@@ -619,8 +619,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         /* @var $terms editor_Models_Term */
         $this->view->publicModulePath = APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module');
         $this->view->termGroups = $terms->getByTaskGuidAndSegment($session->taskGuid, (int) $this->_getParam('id'));
-        $config = Zend_Registry::get('config');
-        $this->view->termStatMap = $config->runtimeOptions->tbx->termLabelMap->toArray();
+        $this->view->termStatMap = editor_Models_Term::getTermStatusMap();
         $this->view->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
     

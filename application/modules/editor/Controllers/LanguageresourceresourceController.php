@@ -45,7 +45,6 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
     public function indexAction() {
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
-        $resources = $serviceManager->getAllResources();
         $result = array();
         
         $userSession = new Zend_Session_Namespace('user');
@@ -54,12 +53,27 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
         
         $isAllowedFilebased = $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesAddFilebased');
         $isAllowedNonFilebased = $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesAddNonFilebased');
+        
+        // (1) the resources of the configured services 
+        $resources = $serviceManager->getAllResources();
         foreach($resources as $resource) {
             /* @var $resource editor_Models_LanguageResources_Resource */
             $isFilebased = $resource->getFilebased();
             if($isFilebased && $isAllowedFilebased || !$isFilebased && $isAllowedNonFilebased) {
                 $result[] = $resource->getDataObject();
             }
+        }
+        
+        // (2)  the unconfigured services 
+        $allUnconfiguredServices = $serviceManager->getAllUnconfiguredServices();
+        foreach ($allUnconfiguredServices as $unconfiguredService) {
+            $result[] = $unconfiguredService;
+        }
+        
+        // (3)  the services from plug-ins that are not installed
+        $allUninstalledPluginServices = $serviceManager->getAllUninstalledPluginServices();
+        foreach ($allUninstalledPluginServices as $uninstalledService) {
+            $result[] = $uninstalledService;
         }
         
         //sort the results alphabetically by name

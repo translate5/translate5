@@ -1529,4 +1529,40 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             }
         }
     }
+    
+    /**
+     * Returns the configured mapping of term-statuses
+     * (= which statuses are allowed etc).
+     * @return array
+     */
+    static public function getTermStatusMap() {
+        $config = Zend_Registry::get('config');
+        return $config->runtimeOptions->tbx->termLabelMap->toArray();
+    }
+    
+    /**
+     * Is the term a "preferred" term according to the given status?
+     * @param string $termstatus
+     * @return boolean
+     */
+    static public function isPreferredTerm($termstatus) {
+        $termStatusMap = self::getTermStatusMap();
+        if(!array_key_exists($termstatus, $termStatusMap)) {
+            return false;
+        }
+        return $termStatusMap[$termstatus] == 'preferred';
+    }
+    
+    /**
+     * Is the term a "permitted" term according to the given status?
+     * @param string $termstatus
+     * @return boolean
+     */
+    static public function isPermittedTerm($termstatus) {
+        $termStatusMap = self::getTermStatusMap();
+        if(!array_key_exists($termstatus, $termStatusMap)) {
+            return false;
+        }
+        return $termStatusMap[$termstatus] == 'permitted';
+    }
 }

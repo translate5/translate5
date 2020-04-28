@@ -442,6 +442,56 @@ function translateText(textToTranslate,translationInProgressID){
 }
 
 function fillTranslation() {
+    var translationHtml = '';
+    
+    //reset the additional translations
+    additionalTranslationsHtmlContainer='';
+    
+    // 
+    if (translateTextResponse.hasOwnProperty('translationForSegmentedText')) {
+        translationHtml = renderSingleMatchAndResources(translateTextResponse);
+    } else {
+        translationHtml = renderMatchesByResource(translateTextResponse);
+    }
+    
+    if (translationHtml == '') {
+        showTargetError(Editor.data.languageresource.translatedStrings['noResultsFound']);
+    }
+    //when there is aditional translations, display them at the end
+    if(additionalTranslationsHtmlContainer!=''){
+    	translationHtml+=additionalTranslationsHtmlContainer;
+    }
+    $('#translations').html(translationHtml);
+    showTranslations();
+
+    // open TermPortal for proposing new term?
+    checkTermPortalIntegration();
+}
+
+function renderSingleMatchAndResources (translateTextResponse) {
+    var translationHtml = '',
+        resultHtml = '',
+        resultData,
+        translationText = translateTextResponse.translationForSegmentedText,
+        usedResources = translateTextResponse.usedResources;
+    resultData = {'languageResourceHeadline': Editor.data.languageresource.translatedStrings['translationBasedOn'] + ' ' + usedResources,
+                  'languageResourceId': '',
+                  'languageResourceType': '',
+                  'fuzzyMatch': '',
+                  'infoText': '',
+                  'term': '',
+                  'termStatus': '',
+                  'translationText': translationText.replace(/(\r\n|\n|\r)/gm, '<br>'),
+                  'processStatusAttribute':'',
+                  'processStatusAttributeValue':'',
+                  'languageRfc':'',
+                  'alternativeTranslations':''
+                  };
+    resultHtml += renderTranslationContainer(resultData);
+    return resultHtml;
+}
+
+function renderMatchesByResource (translateTextResponse) {
     var translationHtml = '',
         resultHtml = '',
         fuzzyMatch,
@@ -452,9 +502,6 @@ function fillTranslation() {
         resultData,
         languageRfc,
         alternativeTranslations;
-    
-    //reset the additional translations
-    additionalTranslationsHtmlContainer='';
     $.each(translateTextResponse, function(serviceName, resource){
         resultHtml = '';
         $.each(resource, function(resourceName, allResults){
@@ -499,19 +546,18 @@ function fillTranslation() {
                         	alternativeTranslations = metaData['alternativeTranslations'];
                         }
                     }
-                    resultData = {'languageResourceId': result['languageResourceid'],
+                    resultData = {'languageResourceHeadline' : resourceName + ' (' + serviceName + ')',
+                                  'languageResourceId': result['languageResourceid'],
                                   'languageResourceType': result['languageResourceType'],
                                   'fuzzyMatch': fuzzyMatch,
                                   'infoText': infoText.join('<br/>'),
-                                  'resourceName': resourceName,
-                                  'serviceName': serviceName,
                                   'term': term,
                                   'termStatus': termStatus,
                                   'translationText': result['target'],
-                    			  'processStatusAttribute':processStatusAttribute,
-                    			  'processStatusAttributeValue':processStatusAttributeValue,
-                    			  'languageRfc':languageRfc,
-                    			  'alternativeTranslations':alternativeTranslations
+                                  'processStatusAttribute':processStatusAttribute,
+                                  'processStatusAttributeValue':processStatusAttributeValue,
+                                  'languageRfc':languageRfc,
+                                  'alternativeTranslations':alternativeTranslations
                                   };
                     resultHtml += renderTranslationContainer(resultData);
                 }
@@ -521,25 +567,14 @@ function fillTranslation() {
             translationHtml += resultHtml;
         }
     });
-    if (translationHtml == '') {
-        showTargetError(Editor.data.languageresource.translatedStrings['noResultsFound']);
-    }
-    //when there is aditional translations, display them at the end
-    if(additionalTranslationsHtmlContainer!=''){
-    	translationHtml+=additionalTranslationsHtmlContainer;
-    }
-    $('#translations').html(translationHtml);
-    showTranslations();
-
-    // open TermPortal for proposing new term?
-    checkTermPortalIntegration();
+    return translationHtml;
 }
 
 function renderTranslationContainer(resultData) {
     var translationsContainer = '';
     
     translationsContainer += '<h4>';
-    translationsContainer += resultData.resourceName + ' (' + resultData.serviceName + ')';
+    translationsContainer += resultData.languageResourceHeadline;
     translationsContainer += '<span class="loadingSpinnerIndicator"><img src="'+Editor.data.publicModulePath+'images/loading-spinner.gif"/></span>';
     translationsContainer += '</h4>';
     
