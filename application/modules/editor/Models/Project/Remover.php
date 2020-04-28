@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,10 +26,32 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.LanguageResources.TaskAssocStore', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.LanguageResources.TaskAssoc',
-  //groupField: 'serviceName',
-  autoLoad: false,
-  pageSize: 0
-});
+/**
+ * Remove all tasks to a given project. The class will use the task remover to clean the 
+ * project files on the disk to
+ */
+class editor_Models_Project_Remover {
+    
+    /***
+     * 
+     * @var int
+     */
+    protected $projectId;
+    
+    public function __construct(int $projectId) {
+        $this->projectId = $projectId;
+    }
+    
+    public function remove($forced = false) {
+        $model=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $model editor_Models_Task */
+        $tasks=$model->loadProjectTasks($this->projectId);
+        
+        foreach ($tasks as $task){
+            /* @var $task editor_Models_Task */
+            $remover=ZfExtended_Factory::get('editor_Models_Task_Remover',[$task]);
+            /* @var $remover editor_Models_Task_Remover */
+            $remover->remove();
+        }
+    }
+}

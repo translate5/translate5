@@ -26,10 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.LanguageResources.TaskAssocStore', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.LanguageResources.TaskAssoc',
-  //groupField: 'serviceName',
-  autoLoad: false,
-  pageSize: 0
+Ext.define('Editor.store.admin.Project', {
+	extend : 'Ext.data.Store',
+	model: 'Editor.model.admin.Project',
+	alias: 'store.project',
+	remoteSort: true,
+	remoteFilter: true,
+	autoLoad: true,
+	pageSize: false
 });

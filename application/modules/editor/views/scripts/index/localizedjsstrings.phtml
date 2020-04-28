@@ -725,6 +725,28 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
+    Ext.define("Editor.locale.de.view.admin.ProjectGrid", {
+        override: "Editor.view.admin.ProjectGrid",
+        strings: {
+            actionDelete: '<?php echo $this->translate->_('Projekt komplett löschen');?>',
+            columnProjectAction: '<?php echo $this->translate->_('Aktionen');?>',
+            columnProjectName: '<?php echo $this->translate->_('Projektname');?>',
+            columnProjectTaskName: '<?php echo $this->translate->_('Aufgabenname-Projekt');?>'
+        }
+    });
+    
+     Ext.define("Editor.locale.de.view.admin.ProjectGridViewController", {
+        override: "Editor.view.admin.ProjectGridViewController",
+        strings: {
+            deleteProjectDialogTitle: '<?php echo $this->translate->_('Projekt komplett löschen?');?>',
+            deleteProjectDialogMessage: '<?php echo $this->translate->_('Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?');?>',
+            projectDeleteButtonText: '<?php echo $this->translate->_('Projekt löschen');?>',
+            projectCanceltButtonText: '<?php echo $this->translate->_('Nein');?>',
+            projectRemovedMessage: '<?php echo $this->translate->_('Das Projekt wurde erfolgreich entfernt!');?>'
+        }
+    });
+    
+    
     Ext.define("Editor.locale.de.view.admin.ExportMenu", {
         override: "Editor.view.admin.ExportMenu",
         messages: {

@@ -76,8 +76,9 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     id: 'group',
                     ftype: 'grouping',
                     groupHeaderTpl: me.strings.groupHeader,
-                    hideGroupedHeader: true,
-                    enableGroupingMenu: false
+                    hideGroupedHeader: false,
+                    enableGroupingMenu: true,
+                    groupers:[{property:'serviceName'},{property:'targetLang'}]
                 } ],
                 columns : [ {
                     xtype : 'checkcolumn',
@@ -107,6 +108,12 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     sortable : true,
                     flex : 50 / 100
                 }, {
+                	xtype : 'gridcolumn',
+                	text:'ServiceName',
+                    dataIndex : 'serviceName',
+                    sortable : true,
+                    flex : 25 / 100,
+                },{
                     xtype : 'gridcolumn',
                     tooltip : me.strings.source,
                     cls : 'source-lang',

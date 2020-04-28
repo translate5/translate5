@@ -25,11 +25,23 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-Ext.define('Editor.store.LanguageResources.TaskAssocStore', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.LanguageResources.TaskAssoc',
-  //groupField: 'serviceName',
-  autoLoad: false,
-  pageSize: 0
+Ext.define('Editor.model.admin.ProjectTask', {
+	extend:'Editor.model.admin.Task',
+	//override the proxy, so default extra params can be set
+	proxy : {
+	    type : 'rest',
+	    url: Editor.data.restpath+'task',
+	    reader : {
+	      rootProperty: 'rows',
+	      type : 'json'
+	    },
+	    writer: {
+	      encode: true,
+	      rootProperty: 'data',
+	      writeAllFields: false
+	    },
+	    extraParams:{
+	    	projectsOnly:false
+	    }
+	}
 });

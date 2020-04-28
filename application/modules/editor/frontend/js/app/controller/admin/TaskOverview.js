@@ -39,6 +39,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  'admin.Users',
 	  'admin.UsersList',
 	  'admin.Tasks',
+	  'admin.Project',
+	  'admin.ProjectTasks',
 	  'admin.Languages', 
 	  'admin.task.Logs', 
 	  'admin.WorkflowUserRoles',
@@ -358,7 +360,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           customer = this.getTaskAddForm().down('combo[name=customerId]'),
           idx,
           langs = val.match(/-([a-zA-Z]{2,5})-([a-zA-Z]{2,5})\.[^.]+$/);
-      if(name.getValue() == '') {
+      if(name && name.getValue() == '') {
           name.setValue(val.replace(/\.[^.]+$/, '').replace(/^C:\\fakepath\\/,''));
       }
       //simple algorithmus to get the language from the filename

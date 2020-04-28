@@ -290,8 +290,9 @@ class editor_TaskController extends ZfExtended_RestController {
      * loads all tasks according to the set filters
      * @return array
      */
-    public function loadAll()
-    {
+    public function loadAll(){
+        
+        $this->handleProjectRequest();
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
         $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
         //set the default table to lek_task
@@ -497,21 +498,30 @@ class editor_TaskController extends ZfExtended_RestController {
 
             //PROJECT with multiple target languages
             if($this->entity->isProject()) {
-                $this->entity->save();
+                $entityId=$this->entity->save();
                 $this->entity->initTaskDataDirectory();
                 $dp->checkAndPrepare($this->entity);
 
                 //for projects this have to be done once before the single tasks are imported
                 $dp->archiveImportedData();
 
+                $this->entity->setProjectId($entityId);
+                
+                $languages=ZfExtended_Factory::get('editor_Models_Languages');
+                /* @var $languages editor_Models_Languages */
+                $languages=$languages->loadAllKeyValueCustom('id','rfc5646');
+                
                 foreach($this->data['targetLang'] as $target) {
                     $task = clone $this->entity;
+                    $task->setProjectId($entityId);
                     $task->setTaskType($task->getDefaultTasktype());
                     $task->setTargetLang($target);
+                    $task->setTaskName($this->entity->getTaskName().' - '.$languages[$task->getSourceLang()].' / '.$languages[$task->getTargetLang()]);
                     $this->processUploadedFile($task, $dpFactory->createFromTask($this->entity));
                     $this->addDefaultLanguageResources($task);
                     
-                    if($this->data['autoStartImport']) {
+                    //TODO: without this the import is not triggered. something wrong with the workers
+                    if(true || $this->data['autoStartImport']) {
                         $this->startImportWorkers($task);
                     }
                 }
@@ -537,7 +547,8 @@ class editor_TaskController extends ZfExtended_RestController {
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
 
-            if($this->data['autoStartImport']) {
+            //TODO: without this the import is not triggered. something wrong with the workers
+            if(true || $this->data['autoStartImport']) {
                 $this->startImportWorkers();
             }
 
@@ -1608,6 +1619,29 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->view->validTrigger = $this->workflow->getDirectTrigger();
         $this->handleValidateException($e);
     }
+    
+    
+    /**
+     * Removes all tasks belonging to the given project
+     * @throws BadMethodCallException
+     */
+    public function deleteprojectAction() {
+        if(!$this->_request->isPost()) {
+            throw new BadMethodCallException('Only HTTP method POST allowed!');
+        }
+        $projectId=$this->getRequest()->getParam('projectId',null);
+        if(empty($projectId)){
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1258' => 'The project id was not provided.'
+            ], 'editor.task');
+            throw new ZfExtended_UnprocessableEntity('E1258');
+        }
+        $remover=ZfExtended_Factory::get('editor_Models_Project_Remover',[
+            $projectId
+        ]);
+        /* @var $remover  editor_Models_Project_Remover */
+        $remover->remove($projectId);
+    }
 
     /***
      * Clone existing language resources from oldTaskGuid for newTaskGuid.
@@ -1681,5 +1715,38 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function addDefaultSort(){
         $f = $this->entity->getFilter();
         $f->hasSort() || $f->addSort('orderdate', true);
+    }
+    
+    /***
+     * Handle the project/task load request.
+     */
+    protected function handleProjectRequest(){
+        $projectOnly=$this->getRequest()->getParam('projectsOnly',null);
+        $filterValues=[];
+        
+        //the flag is null when the request is from the task store
+        if(is_null($projectOnly)){
+            $filterValues=[$this->entity->getDefaultTasktype()];
+        }else{
+            $projectOnly = strtolower($projectOnly) == 'true' ? true : false;
+        }
+        //is true when the request is from the project store
+        if($projectOnly===true){
+            $filterValues=[$this->entity::INITIAL_TASKTYPE_PROJECT];
+        }
+        
+        //is the request from the projecttask store
+        if($projectOnly===false && $this->entity->getFilter()->hasFilter('projectId')){
+            $filterValues=[$this->entity->getDefaultTasktype()];
+        }
+        
+        if(!empty($filterValues)){
+            $this->entity->getFilter()->addFilter((object)[
+                'field' => 'taskType',
+                'value' =>$filterValues,
+                'type' => 'list',
+                'comparison' => 'in'
+            ]);
+        }
     }
 }

@@ -3728,6 +3728,12 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</source>
   <target>The previous / next segment is still saving, please wait...</target>
 </trans-unit>
+<trans-unit id='UHJvamVrdCBrb21wbGV0dCBsw7ZzY2hlbg=='><source>Projekt komplett löschen</source><target>Delete project completely?</target></trans-unit>
+<trans-unit id='UHJvamVrdCBrb21wbGV0dCBsw7ZzY2hlbj8='><source>Projekt komplett löschen?</source><target>Delete project completely?</target></trans-unit>
+<trans-unit id='U29sbHRlbiBkYXMgUHJvamVrdCB1bmQgYWxsZSBpbSBQcm9qZWt0IGVudGhhbHRlbmVuIEF1ZmdhYmVuIGdlbMO2c2NodCB3ZXJkZW4/'><source>Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?</source><target>Should the project and all tasks included in the project be deleted?</target></trans-unit>
+<trans-unit id='UHJvamVrdCBsw7ZzY2hlbg=='><source>Projekt löschen</source><target>Delete project</target></trans-unit>
+<trans-unit id='RGFzIFByb2pla3Qgd3VyZGUgZXJmb2xncmVpY2ggZW50ZmVybnQh'><source>Das Projekt wurde erfolgreich entfernt!</source><target>The project was successfully removed!</target></trans-unit>
+<trans-unit id='QXVmZ2FiZW5uYW1lLVByb2pla3Q='><source>Aufgabenname-Projekt</source><target>Task-name</target></trans-unit>
 </body>
   </file>
 </xliff>

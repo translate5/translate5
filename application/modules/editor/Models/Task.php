@@ -100,6 +100,8 @@ END LICENSE AND COPYRIGHT
  * @method void setSegmentFinishCount() setSegmentFinishCount(int $segmentFinishCount)
  * @method string getTaskType() getTaskType()
  * @method void setTaskType() setTaskType(string $taskType)
+ * @method int getProjectId() getProjectId()
+ * @method void setProjectId() setProjectId(int $projectId)
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
@@ -1348,7 +1350,18 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         /* @var $wfm editor_Workflow_Manager */
         return $wfm->getActive($taskGuid);
     }
-
+    
+    /***
+     * 
+     * @param int $projectId
+     * @return Zend_Db_Table_Rowset_Abstract
+     */
+    public function loadProjectTasks(int $projectId) : Zend_Db_Table_Rowset_Abstract{
+        $s=$this->db->select()
+        ->where('projectId=?',$projectId);
+        return $this->db->fetchAll($s);
+    }
+    
     /**
      * Returns the matching of col-names as set in Editor.view.admin.TaskGrid.
      * @return array
