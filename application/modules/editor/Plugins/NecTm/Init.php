@@ -166,6 +166,9 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
      */
     public function validateCategories(Zend_EventManager_Event $event) {
         $params = $event->getParam('params','');
+        if ($params['serviceType'] != $this->service->getServiceNamespace()) {
+            return;
+        }
         $categories = $params['categories'] ?? '';
         if (empty($categories)) {
             throw new editor_Plugins_NecTm_Exception('E1256');

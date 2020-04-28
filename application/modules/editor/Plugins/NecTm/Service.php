@@ -36,7 +36,14 @@ END LICENSE AND COPYRIGHT
  * NEC-TM Service Base Class
  */
 class editor_Plugins_NecTm_Service extends editor_Services_ServiceAbstract {
+    
     const DEFAULT_COLOR = '#61BDAA';
+    
+    /**
+     * URL to confluence-page
+     * @var string
+     */
+    protected static $helpPage = "https://confluence.translate5.net/display/CON/NEC-TM";
     
     /**
      * What translate5 uses as origin for storing categories from NEC-TM (there: "tags").
@@ -44,11 +51,31 @@ class editor_Plugins_NecTm_Service extends editor_Services_ServiceAbstract {
      */
     const CATEGORY_ORIGIN = 'NEC';
     
-    public function __construct() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->plugins->NecTm->server->toArray();
-        $this->addResourceForeachUrl($this->getName(), $urls);
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::isConfigured()
+     */
+    public function isConfigured() {
+        if (!isset($this->config->runtimeOptions->plugins->NecTm->server)) {
+            return false;
+        }
+        if (!isset($this->config->runtimeOptions->plugins->NecTm->credentials)) {
+            return false;
+        }
+        if (!isset($this->config->runtimeOptions->plugins->NecTm->topLevelCategoriesIds)) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::embedService()
+     */
+    protected function embedService() {
+        $urls = $this->config->runtimeOptions->plugins->NecTm->server;
+        $this->addResourceForeachUrl($this->getName(), $urls->toArray());
     }
     
     /**
@@ -57,14 +84,6 @@ class editor_Plugins_NecTm_Service extends editor_Services_ServiceAbstract {
      */
     public function getName() {
         return "NEC-TM";
-    }
-    
-    /**
-     * Get the DEFAULT_COLOR
-     * @return string
-     */
-    public function getDefaultColor() {
-        return self::DEFAULT_COLOR;
     }
     
     /**

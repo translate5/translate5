@@ -150,6 +150,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @see editor_Services_Connector_Abstract::translate()
      */
     public function translate(string $searchString){
+        $this->tagsWereStripped = false;
         return $this->queryCollectionResults($searchString);
     }
     

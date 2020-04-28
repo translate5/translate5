@@ -264,7 +264,12 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
             $taskObj = (object) $taskObj;
             $key = $taskObj->workflow.'#'.$taskObj->workflowStepName;
             if(empty($wfRoleCache[$key])) {
-                $workflow = $wfm->getCached($taskObj->workflow);
+                try {
+                    $workflow = $wfm->getCached($taskObj->workflow);
+                }
+                catch(editor_Workflow_Exception $e) {
+                    continue;
+                }
                 $wfRoleCache[$key] = $workflow->getRoleOfStep($taskObj->workflowStepName);
             }
             $result[$taskObj->taskGuid] = $wfRoleCache[$key];

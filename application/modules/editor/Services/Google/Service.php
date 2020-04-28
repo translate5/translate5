@@ -29,26 +29,40 @@ END LICENSE AND COPYRIGHT
 /**
  */
 class editor_Services_Google_Service extends editor_Services_ServiceAbstract {
+    
     const DEFAULT_COLOR = '4584f4';
+    
+    /**
+     * URL to confluence-page
+     * @var string
+     */
+    protected static $helpPage = "https://confluence.translate5.net/display/BUS/Google";
     
     protected $resourceClass = 'editor_Services_Google_Resource';
     
-    public function __construct() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $googleConfig = $config->runtimeOptions->LanguageResources->google ?? null;
-        if(!isset($googleConfig)){
-            return;
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::isConfigured()
+     */
+    public function isConfigured() {
+        if (!isset($this->config->runtimeOptions->LanguageResources->google->apiKey)) {
+            return false;
         }
-        $apiKey = $googleConfig->apiKey ?? null ;
-        if(empty($apiKey)){
-            return;
+        if (!isset($this->config->runtimeOptions->LanguageResources->google->projectId)) {
+            return false;
         }
-        
-        $projectId = $googleConfig->projectId ?? null ;
-        if(empty($projectId)){
-            return;
+        if (!isset($this->config->runtimeOptions->LanguageResources->google->matchrate)) {
+            return false;
         }
+        return true;
+    }
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::embedService()
+     */
+    protected function embedService() {
         $this->addResource([$this->getServiceNamespace(), $this->getName()]);
     }
     
