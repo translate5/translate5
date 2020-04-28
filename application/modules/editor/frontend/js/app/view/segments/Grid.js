@@ -61,7 +61,7 @@ Ext.define('Editor.view.segments.Grid', {
     ],
     plugins: ['gridfilters'],
     alias: 'widget.segments.grid',
-    helpSection: 'segmentsGrid',
+    helpSection: 'editor',
     stateId: 'segmentsGrid',
     stateful: true,
     id: 'segment-grid',
