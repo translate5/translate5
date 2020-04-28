@@ -29,18 +29,22 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.TaskGrid', {
   extend: 'Ext.grid.Panel',
   requires: [
-	  'Editor.view.admin.TaskActionColumn',
-	  'Editor.view.CheckColumn',
-	  'Editor.view.admin.customer.CustomerFilter',
-	  'Editor.view.admin.task.filter.AdvancedFilter',
-	  'Editor.view.admin.task.filter.PercentFilter'
+      'Editor.view.admin.TaskActionColumn',
+      'Editor.view.CheckColumn',
+      'Editor.view.admin.customer.CustomerFilter',
+      'Editor.view.admin.task.filter.AdvancedFilter',
+      'Editor.view.admin.task.filter.PercentFilter',
+      'Editor.view.admin.TaskGridViewController'
   ],
+  controller: 'taskGrid',
   alias: 'widget.adminTaskGrid',
   itemId: 'adminTaskGrid',
   stateId: 'adminTaskGrid',
   stateful:true,
   cls: 'adminTaskGrid',
   title: '#UT#Aufgabenübersicht',
+  helpSection: 'taskoverview',
+  glyph: 'xf03a@FontAwesome',
   plugins: ['gridfilters'],
   layout: {
       type: 'fit'

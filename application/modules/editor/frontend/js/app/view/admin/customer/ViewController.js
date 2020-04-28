@@ -31,6 +31,14 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.customerPanel',
     
+    routes: {
+        'client': 'onClientRoute'
+    },
+    
+    onClientRoute: function() {
+        Editor.app.openAdministrationSection(this.getView(), 'client');
+    },
+    
     /**
      * Set record for editing
      */

@@ -39,13 +39,44 @@ END LICENSE AND COPYRIGHT
 abstract class editor_Services_ServiceAbstract {
     const DEFAULT_COLOR = 'ff0000';
     
+    /**
+     * URL to confluence-page
+     * @var string
+     */
+    protected static $helpPage = "https://confluence.translate5.net/display/BUS/Language+resources+-+TermCollection%2C+Translation+Memory%2C+Machine+Translation";
+    
+    /**
+     * @var Zend_Config
+     */
+    protected $config;
+    
     protected $resourceClass = 'editor_Models_LanguageResources_Resource';
     protected $resources = array();
     
     /**
-     * To be overwritten
+     * translate5 lists all services that translate5 can handle, no matter if they are
+     * already configured or not. 
+     * - If an unconfigured service is chosen, the user gets the info that more action is needed.
+     * - If the service is configured, we embed it according to the service's embedService()-method.
      */
-    abstract public function __construct();
+    public function __construct() {
+        $this->config = Zend_Registry::get('config');
+        if($this->isConfigured()) {
+            $this->embedService();
+        }
+    }
+    
+    /**
+     * Is everything that the service needs configured?
+     * (Does NOT check if the service is running = if the user-data is correct etc.)
+     * @return bool
+     */
+    abstract public function isConfigured();
+    
+    /**
+     * Embed the service.
+     */
+    abstract protected function embedService();
     
     /**
      * returns the name of this resources / service
@@ -109,5 +140,20 @@ abstract class editor_Services_ServiceAbstract {
         $className = get_class($this);
         $pos = strrpos($className, '_');
         return substr($className, 0, $pos);
+    }
+    
+    /**
+     * Get the DEFAULT_COLOR
+     */
+    public function getDefaultColor() {
+        return self::DEFAULT_COLOR;
+    }
+    
+    /**
+     * returns the URL to the help-page
+     * @return string
+     */
+    public function getHelppage() {
+        return self::$helpPage;
     }
 }

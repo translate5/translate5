@@ -49,12 +49,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   ],
   views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow', 'admin.task.KpiWindow','StatefulWindow'],
   refs : [{
-      ref: 'headToolBar',
-      selector: 'headPanel toolbar#top-menu'
-  },{
-      ref: 'logoutButton',
-      selector: 'headPanel toolbar#top-menu #logoutSingle'
-  },{
       ref: 'taskAddForm',
       selector: '#adminTaskAddWindow form'
   },{
@@ -126,7 +120,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskEnding: '#UT#Aufgabe wird beendet...',
       taskDestroy: '#UT#Aufgabe wird gelöscht...',
       taskNotDestroyed : '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
-      openTaskAdminBtn: "#UT#Aufgabenübersicht",
       loadingWindowMessage:"#UT#Dateien werden hochgeladen",
       loading:'#UT#Laden',
       importTaskMessage:"#UT#Hochladen beendet. Import und Vorbereitung laufen.",
@@ -152,15 +145,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
       },
       component: {
-          'headPanel toolbar#top-menu' : {
-              beforerender: 'initMainMenu'
-          },
-          'button#task-admin-btn': {
-              click: 'openTaskGrid'
-          },
           '#adminTaskGrid': {
               hide: 'handleAfterHide',
-              show: 'handleAfterShow',
               celldblclick: 'handleGridClick', 
               cellclick: 'handleGridClick',
               filterchange:'onAdminTaskGridFilterChange'
@@ -234,69 +220,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
     //End Events
     //***********************************************************************************
   /**
-   * injects the task menu into the main menu
-   */
-  initMainMenu: function() {
-      var toolbar = this.getHeadToolBar(),
-          insertIdx = 1,
-          logout = this.getLogoutButton(),
-          headPanel=Editor.app.getController('HeadPanel');
-      
-      if(logout) {
-          insertIdx = toolbar.items.indexOf(logout) + 1;
-      }
-      //is the help button visible for the current section
-      if(headPanel && headPanel.isHelpButtonVisible()){
-    	  insertIdx=insertIdx+1;
-      }
-      toolbar.insert(insertIdx, {
-          itemId: 'task-admin-btn',
-          xtype: 'button',
-          hidden: true,
-          text: this.strings.openTaskAdminBtn
-      });
-  },
-  /**
-   * handle after show of taskgrid
-   */
-  handleAfterShow: function(grid) {
-      this.getHeadToolBar().down('#task-admin-btn').hide();
-      //fire the global event for component view change
-      //TODO: refactor so that event is only fired once in a application view load function which should be created when rebuilding the main menu
-      Ext.fireEvent('applicationViewChanged','taskoverview',grid.getTitle());
-  },
-  /**
    * handle after hide of taskgrid
    */
   handleAfterHide: function() {
-      this.getHeadToolBar().down('#task-admin-btn').show();
       this.closeAdvancedFilterWindow();
   },
-  /**
-   * opens the task grid, hides all other
-   */
-  openTaskGrid: function() {
-      var me = this, 
-          grid = me.getTaskGrid();
-
-      me.getCenterRegion().items.each(function(item){
-          item.hide();
-      });
-      
-      if(grid) {
-          //set the value used for displaying the help pages
-          grid.show();
-      }
-      else {
-          grid = me.getCenterRegion().add({
-              xtype: 'adminTaskGrid',
-              height: '100%'
-          });
-          me.handleAfterShow(grid);
-      }
-  },
   handleInitEditor: function() {
-      this.getHeadToolBar() && this.getHeadToolBar().down('#task-admin-btn').hide();
       this.closeAdvancedFilterWindow();
   },
   clearTasks: function() {
@@ -305,7 +234,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   loadTasks: function() {
       this.getAdminTasksStore().load();
   },
-  startCheckImportStates: function(store) {
+  startCheckImportStates: function(store, records) {
       if(!this.checkImportStateTask) {
           this.checkImportStateTask = {
                   run: this.checkImportState,

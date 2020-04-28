@@ -33,24 +33,14 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.Termportal', {
     extend : 'Ext.app.Controller',
-    
-    refs:[{
-        ref: 'headToolBar',
-        selector: 'headPanel toolbar#top-menu'
-    }],
 
     listen: {
         component: {
-            'headPanel toolbar#top-menu': {
-                afterrender: 'onHeadPanelAfterRender'
+            'viewport > #adminMainSection > tabbar': {
+                afterrender: 'onMainSectionAfterRender'
             },
-            'viewport container[region="center"] panel':{
-                hide:'onCentarPanelComponentAfterLayout'
-            }
-        },
-        controller:{
-            '#Editor.$application': {
-                editorViewportOpen: 'onEditorViewportOpen'
+            '#adminMainSection #btnTermPortal': {
+                click: 'onTermPortalButtonClick'
             }
         }
     },
@@ -58,38 +48,23 @@ Ext.define('Editor.controller.Termportal', {
     strings:{
         termPortal:'#UT#Terminologieportal'
     },
-    
-    /***
-     * hide the termportal button when editor is opened
-     */
-    onEditorViewportOpen:function(){
-        this.getHeadToolBar() && this.getHeadToolBar().down('#btnTermPortal').setHidden(true);
-    },
 
     /**
      * On head panel after render handler
      */
-    onHeadPanelAfterRender: function(toolbar) {
-        //if we are in edit task mode, do not add the portal button
-        if(Ext.ComponentQuery.query('#segmentgrid')[0]){
-            return;
-        }
+    onMainSectionAfterRender: function(tabbar) {
         var me=this;
-        
-        if(!me.isTermportalAllowed()){
+        //if we are in edit task mode or are not allow to use the termportal, we do not add the portal button
+        if(Ext.ComponentQuery.query('#segmentgrid')[0] || !me.isTermportalAllowed()){
             return;
         }
-        var pos = toolbar.items.length - 2;
-        toolbar.insert(pos, {
-            xtype: 'button',
+        
+        tabbar.add({
+            xtype: 'tab',
+            closable: false,
             itemId: 'btnTermPortal',
-            text:me.strings.termPortal,
-            listeners:{
-                click:{
-                    fn:'onTermPortalButtonClick',
-                    scope:me
-                }
-            }
+            glyph: 'xf002@FontAwesome',
+            text:me.strings.termPortal
         });
     },
 
@@ -112,27 +87,6 @@ Ext.define('Editor.controller.Termportal', {
             // - "It may fail due to user settings and the window isn't guaranteed to be frontmost before this method returns." 
             //   (https://developer.mozilla.org/en-US/docs/Web/API/Window/focus)
         }  
-    },
-    
-    /***
-     * Fires when the components in this container are arranged by the associated layout manager.
-     */
-    onCentarPanelComponentAfterLayout:function(){
-        if(!this.isTermportalAllowed()){
-            return;
-        }
-        //set the component to visible on each centar panel element hide
-        this.setTermportalButtonHidden(false);
-    },
-
-    /**
-     * Set the term portal button hidden property
-     */
-    setTermportalButtonHidden:function(isHidden){
-        if(!this.getHeadToolBar() || !this.getHeadToolBar().down('#btnTermPortal')){
-            return;
-        }
-        this.getHeadToolBar().down('#btnTermPortal').setHidden(isHidden);
     },
 
     /**

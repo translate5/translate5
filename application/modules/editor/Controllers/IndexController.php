@@ -46,6 +46,35 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
      */
     protected $config;
     
+    /**
+     * Main Definition of core frontend controllers, each controller is required (for js compiling) but only the required ones are activated.
+     * @var array
+     */
+    protected $frontendEndControllers = [
+        'ServerException' => true,
+        'ViewModes' => true,
+        'Segments' => true,
+        'Preferences' => true,
+        'MetaPanel' => true,
+        'Editor' => true,
+        'Fileorder' => true,
+        'ChangeAlike' => true,
+        'Comments' => true,
+        'SearchReplace' => true,
+        'SnapshotHistory' => true,
+        'Termportal' => true,
+        'JsLogger' => true,
+        'QmSubSegments' => false,                //disabled by default, controlled by ACL
+        'admin.TaskOverview' => false,           //disabled by default, controlled by ACL
+        'admin.TaskPreferences' => false,        //disabled by default, controlled by ACL
+        'admin.TaskUserAssoc' => false,          //disabled by default, controlled by ACL
+        'admin.Customer' => false,               //disabled by default, controlled by ACL
+        'LanguageResourcesTaskassoc' => false,   //disabled by default, controlled by ACL
+        'LanguageResources' => false,            //disabled by default, controlled by ACL
+        'TmOverview' => false,                   //disabled by default, controlled by ACL
+        'Localizer' => true,
+    ];
+    
     public function init() {
         parent::init();
         $this->config = Zend_Registry::get('config');
@@ -329,7 +358,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $ed = $this->config->runtimeOptions->editor;
         
         $php2js = $this->view->Php2JsVars();
-        $php2js->set('app.controllers', $this->getFrontendControllers());
+        
+        //the list of frontend controllers to be required for JS compiling (values should be static, so not influenced by ACLs or Plugins)
+        $php2js->set('app.controllers.require', array_map(function($item){
+            return 'Editor.controller.'.$item;
+        }, array_keys($this->frontendEndControllers)));
+        // the list of active controllers: is dynamic, contains only the controllers to be launched
+        $php2js->set('app.controllers.active', $this->getActiveFrontendControllers());
         
         if(empty($this->_session->taskGuid)) {
             $php2js->set('app.initMethod', 'openAdministration');
@@ -407,7 +442,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
      * returns a list with used JS frontend controllers
      * @return array
      */
-    protected function getFrontendControllers() {
+    protected function getActiveFrontendControllers() {
         $userSession = new Zend_Session_Namespace('user');
         
         $acl = ZfExtended_Acl::getInstance();
@@ -415,55 +450,49 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $ed = $this->config->runtimeOptions->editor;
         
-        $controllers = array('ServerException', 'ViewModes', 'Segments',
-            'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
-            'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal','JsLogger');
+        if($ed->enableQmSubSegments){
+            $this->frontendEndControllers['QmSubSegments'] = true;
+        }
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','taskOverviewFrontendController')){
+            $this->frontendEndControllers['admin.TaskOverview'] = true;
+            $this->frontendEndControllers['admin.TaskPreferences'] = true;
+        }
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','adminUserFrontendController')){
+            $this->frontendEndControllers['admin.TaskUserAssoc'] = true;
+        }
+        
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','customerAdministration')){
+            $this->frontendEndControllers['admin.Customer'] = true;
+        }
+
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesTaskassoc')){
+            $this->frontendEndControllers['LanguageResourcesTaskassoc'] = true;
+        }
+        
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesMatchQuery') || $acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesSearchQuery')){
+            $this->frontendEndControllers['LanguageResources'] = true;
+        }
+        
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesOverview')){
+            $this->frontendEndControllers['TmOverview'] = true;
+        }
+
+        //ensure Localizer beeing the last one, so we remove it and add it later to be at the arrays end
+        unset($this->frontendEndControllers['Localizer']);
+        
+        //get only the active controller names
+        $activeControllers = array_keys(array_filter($this->frontendEndControllers));
         
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
         $pluginFrontendControllers = $pm->getActiveFrontendControllers();
         if(!empty($pluginFrontendControllers)) {
-            $controllers = array_merge($controllers, $pluginFrontendControllers);
+            $activeControllers = array_merge($activeControllers, $pluginFrontendControllers);
         }
         
-        if($acl->isInAllowedRoles($userSession->data->roles,'headPanelFrontendController')){
-            $controllers[] = 'HeadPanel';
-        }
-        if($acl->isInAllowedRoles($userSession->data->roles,'userPrefFrontendController')){
-            $controllers[] = 'UserPreferences';
-        }
-        
-        if($ed->enableQmSubSegments){
-            $controllers[] = 'QmSubSegments';
-        }
-        if($acl->isInAllowedRoles($userSession->data->roles,'taskOverviewFrontendController')){
-            $controllers[] = 'admin.TaskOverview';
-            $controllers[] = 'admin.TaskPreferences'; //FIXME add a own role?
-        }
-        if($acl->isInAllowedRoles($userSession->data->roles,'adminUserFrontendController')){
-            $controllers[] = 'admin.TaskUserAssoc';
-            $controllers[] = 'admin.User';
-        }
-        
-        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','customerAdministration')){
-            $controllers[] = 'admin.Customer';
-        }
-
-        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesTaskassoc')){
-            $controllers[] = 'LanguageResourcesTaskassoc';
-        }
-        
-        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesMatchQuery') || $acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesSearchQuery')){
-            $controllers[] = 'LanguageResources';
-        }
-        
-        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesOverview')){
-            $controllers[] = 'TmOverview';
-        }
-        
-        //Localizer must be the last one!
-        $controllers[] = 'Localizer';
-        return $controllers;
+        //Localizer must be the last in the list!
+        $activeControllers[] = 'Localizer';
+        return $activeControllers;
     }
     
     /**
@@ -575,10 +604,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     
     public function localizedjsstringsAction() {
       $this->getResponse()->setHeader('Content-Type', 'text/javascript', TRUE);
-      
-      $this->view->frontendControllers = $this->getFrontendControllers();
-      
-      $this->view->appViewport = $this->config->runtimeOptions->editor->initialViewPort;
       $this->_helper->layout->disableLayout();
     }
     
