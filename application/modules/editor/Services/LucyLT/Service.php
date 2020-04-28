@@ -36,24 +36,42 @@ END LICENSE AND COPYRIGHT
  * Lucy LT Service Base Class
  */
 class editor_Services_LucyLT_Service extends editor_Services_ServiceAbstract {
+    
     const DEFAULT_COLOR = '1f962e';
     
+    /**
+     * URL to confluence-page
+     * @var string
+     */
+    protected static $helpPage = "https://confluence.translate5.net/display/BUS/Lucy";
     
     protected $resourceClass = 'editor_Services_LucyLT_Resource';
     
     /**
-     * (non-PHPdoc)
-     * @see editor_Services_ServiceAbstract::getName()
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::isConfigured()
      */
-    public function getName() {
-        return "Lucy LT";
+    public function isConfigured() {
+        if (!isset($this->config->runtimeOptions->LanguageResources->lucylt->server)) {
+            return false;
+        }
+        if (!isset($this->config->runtimeOptions->LanguageResources->lucylt->credentials)) {
+            return false;
+        }
+        if (!isset($this->config->runtimeOptions->LanguageResources->lucylt->matchrate)) {
+            return false;
+        }
+        return true;
     }
     
-    public function __construct() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->LanguageResources->lucylt->server->toArray();
-        $credentials = $config->runtimeOptions->LanguageResources->lucylt->credentials->toArray();
+    /**
+     *
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::embedService()
+     */
+    protected function embedService() {
+        $urls = $this->config->runtimeOptions->LanguageResources->lucylt->server->toArray();
+        $credentials = $this->config->runtimeOptions->LanguageResources->lucylt->credentials->toArray();
         
         $i = 1;
         $service = $this->getServiceNamespace();
@@ -63,7 +81,15 @@ class editor_Services_LucyLT_Service extends editor_Services_ServiceAbstract {
                 continue;
             }
             $id = $service.'_'.$i++;
-            $this->addResource([$id, 'Lucy LT', $url, $credentials[$idx]]);
+            $this->addResource([$id, $this->getName(), $url, $credentials[$idx]]);
         }
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Services_ServiceAbstract::getName()
+     */
+    public function getName() {
+        return "Lucy LT";
     }
 }

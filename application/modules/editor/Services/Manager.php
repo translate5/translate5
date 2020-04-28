@@ -61,17 +61,62 @@ class editor_Services_Manager {
     }
 
     /**
-     * Creates all configured connector resources
-     * @return [editor_Services_Connector]
+     * Creates all configured connector resources.
+     * @return array
      */
     public function getAllResources() {
         $serviceResources = array();
         foreach(self::$registeredServices as $service) {
             $service = ZfExtended_Factory::get($service.self::CLS_SERVICE);
-            /* @var $serviceResources editor_Services_ServiceAbstract */
+            /* @var $service editor_Services_ServiceAbstract */
             $serviceResources = array_merge($serviceResources, $service->getResources());
         }
         return $serviceResources;
+    }
+    
+    /**
+     * Returns all services (= their name and helppage) that are not configured 
+     * or that don't have any resources embedded. (If the configuration is set,
+     * but wrong, then no resources might be embedded although the service is configured.)
+     * @return array
+     */
+    public function getAllUnconfiguredServices() {
+        $serviceNames = [];
+        foreach(self::$registeredServices as $service) {
+            $service = ZfExtended_Factory::get($service.self::CLS_SERVICE);
+            /* @var $service editor_Services_ServiceAbstract */
+            if (!$service->isConfigured() || empty($service->getResources())) {
+                $serviceNames[] = (object) ['name' => '['.$service->getName().']', 'serviceName' => $service->getName(), 'helppage' => urldecode($service->getHelppage())];
+            }
+        }
+        return $serviceNames;
+    }
+    
+    /**
+     * Returns all services (= their name and helppage) that are available
+     * as a plug-in, but the plug-ins are not installed (except for GroupShare).
+     * @return array
+     */
+    public function getAllUninstalledPluginServices() {
+        $serviceNames = [];
+        $pluginServices = [
+            'editor_Plugins_DeepL_Init' => (object) ['name' => '[DeepL]',
+                                                     'serviceName' => 'DeepL',
+                                                     'helppage' => urldecode('https://confluence.translate5.net/display/CON/DeepL')],
+            'editor_Plugins_NecTm_Init' => (object) ['name' => '[NEC-TM]',
+                                                     'serviceName' => 'NEC-TM',
+                                                     'helppage' => urldecode('https://confluence.translate5.net/display/CON/NEC-TM')],
+        ];
+        // The (plug-in-)services that the user is supposed to see are by default activated on installation.
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $activePlugins = $config->runtimeOptions->plugins->active->toArray();
+        foreach ($pluginServices as $key => $value) {
+            if (!in_array($key, $activePlugins)) {
+                $serviceNames[] = $value;
+            }
+        }
+        return $serviceNames;
     }
     
     /**
@@ -117,7 +162,7 @@ class editor_Services_Manager {
      * @param string $serviceType
      * @throws ZfExtended_Exception
      */
-    protected function checkService(string $serviceType) {
+    protected function checkService(string $serviceType) { // TODO is similar to isConfigured(), and why here in manager?
         if(!$this->hasService($serviceType)) {
             //Given Language-Resource-Service "{serviceType}." is not registered in the Language-Resource-Service-Manager!
             throw new editor_Services_NoServiceException('E1106', [

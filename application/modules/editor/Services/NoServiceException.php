@@ -44,5 +44,6 @@ class editor_Services_NoServiceException extends ZfExtended_ErrorCodeException {
     
     static protected $localErrorCodes = [
         'E1106' => 'Given Language-Resource-Service "{serviceType}." is not registered in the Language-Resource-Service-Manager!',
+        'E1257' => 'The LanguageResource-Service "{service}" is not configured. Please check this confluence-page for more details: "{helpPage}"',
     ];
 }
