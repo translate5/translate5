@@ -2619,7 +2619,7 @@
 				-ms-flex-grow: 1;
 				flex-grow: 1;
 				-ms-flex: 1;
-				padding: 3.75em 3em 3.3em 3em;
+				padding: 1em;
 			}
 
 				.post > header .title h2 {
@@ -3296,6 +3296,7 @@
 
 	#intro header p {
 		font-size: 16px;
+		margin-bottom: 0.7em;
 	}
 
 	@media screen and (max-width: 1280px) {
