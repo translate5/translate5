@@ -41,6 +41,8 @@ END LICENSE AND COPYRIGHT
  * @method void setMinWidth() setMinWidth(int $width)
  * @method integer getMaxWidth() getMaxWidth()
  * @method void setMaxWidth() setMaxWidth(int $width)
+ * @method integer getMaxNumberOfLines() getMaxNumberOfLines()
+ * @method void setMaxNumberOfLines() setMaxNumberOfLines(int $maxNumberOfLines)
  * @method string getSizeUnit() getSizeUnit()
  * @method void setSizeUnit() setSizeUnit(string $sizeUnit)
  * @method string getFont() getFont()

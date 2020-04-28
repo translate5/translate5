@@ -39,7 +39,7 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
      * Container for the lengthRestriction default values
      * @var array
      */
-    protected $lengthRestrictionDefaults = ['size-unit' => null, 'minWidth' => null, 'maxWidth' => null, 'font' => null, 'fontSize' => null];
+    protected $lengthRestrictionDefaults = ['size-unit' => null, 'minWidth' => null, 'maxWidth' => null, 'maxNumberOfLines' => null, 'font' => null, 'fontSize' => null];
     
     public function __construct() {
         $this->pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
@@ -47,19 +47,34 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
     }
     
     /**
-     * overwrite default values for length-Restriction-Attributes from task template (sizeUnit, font, fontSize, minWidth, maxWidth):
+     * overwrite default values for length-Restriction-Attributes from task template (sizeUnit, minWidth, maxWidth, maxNumberOfLines, font, fontSize):
      */
     protected function initLengthRestrictionAttributes () {
         if(!Zend_Registry::isRegistered('taskTemplate')) {
             return;
         }
         $keys = array_keys($this->lengthRestrictionDefaults);
-        $taskConfig = Zend_Registry::get('taskTemplate');
+        $taskTemplate = Zend_Registry::get('taskTemplate');
+        $taskTemplateConf = $taskTemplate->lengthRestriction;
+        $config = Zend_Registry::get('config');
+        $configConf = $config->runtimeOptions->lengthRestriction;
         foreach($keys as $key) {
-            if(empty($taskConfig->pixelmapping->$key)) {
+            switch ($key) {
+                case 'font':
+                case 'fontSize':
+                    $conf = $taskTemplateConf->pixelmapping->$key ?? null;
+                    break;
+                case 'maxNumberOfLines':
+                    $conf = $taskTemplateConf->$key ?? $configConf->$key;
+                    break;
+                default:
+                    $conf = $taskTemplateConf->$key ?? null;
+                    break;
+            }
+            if(is_null($conf)) {
                 continue;
             }
-            $conf = trim($taskConfig->pixelmapping->$key);
+            $conf = trim($conf);
             if(empty($conf)) {
                 continue;
             }
