@@ -86,8 +86,6 @@ Ext.define('Editor.view.ViewPort', {
         //the preferences panel is responsible for itself if it is visible or not!
         mainSections.push({xtype: 'preferencesOverviewPanel'});
 
-
-        
         Ext.applyIf(me, {
             items: items
         });
