@@ -34,7 +34,28 @@ Ext.define('Editor.view.ApplicationInfoPanel', {
     alias: 'widget.applicationInfoPanel',
     cls: 'head-panel-info-panel',
     itemId: 'applicationInfoPanel',
-    tpl:Editor.util.Constants.appInfoTpl,
+    tpl: [
+        '<div class="info-line"><span class="user-label">{userLabel}:</span> <span class="user-name">{user.firstName} {user.surName}</span></div>',
+        '<div class="info-line"><span class="login-label">{loginLabel}:</span> <span class="user-login">{user.login}</span></div>',
+        '<tpl if="task">',
+        '<div class="info-line"><span class="task-label">{taskLabel}:</span> <span class="task-name">{task.taskName}</span>',
+        '</tpl>',
+        '<tpl if="isReadonly">',
+        '<span class="task-readonly">{readonlyLabel}</span>',
+        '</tpl>',
+        '<tpl if="task">',
+        '</div>',
+        '</tpl>',
+        '<tpl if="task && showTaskGuid">',
+        '<div class="info-line"><span class="task-label">TaskGuid:</span> <span class="task-name">{task.taskGuid}</span></div>',
+        '</tpl>',
+        '<tpl if="version">',
+        '<div class="info-line"><span class="task-label">Version:</span> <span class="task-name">{version}</span></div>',
+        '</tpl>',
+        '<tpl if="browser">',
+        '<div class="info-line"><span class="task-label">Browser:</span> <span class="task-name">{browser}</span></div>',
+        '</tpl>'
+    ],
     strings: {
         task: '#UT#Aufgabe',
         loggedinAs: '#UT# Eingeloggter Benutzer',
@@ -58,6 +79,12 @@ Ext.define('Editor.view.ApplicationInfoPanel', {
             readonlyLabel: me.strings.readonly,
             isReadonly: Editor.data.task.isReadOnly()
         };
+    },
+    /**
+     * renders the application info as text (for activated editor)
+     */
+    renderEditorText: function() {
+        return (new Ext.XTemplate(this.tpl)).applyTemplate(this.getEditorTplData());
     },
     
     /***

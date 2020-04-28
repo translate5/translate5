@@ -26,13 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.UserAddWindow', {
+Ext.define('Editor.view.admin.user.AddWindow', {
     extend : 'Ext.window.Window',
     alias : 'widget.adminUserAddWindow',
     itemId : 'adminUserAddWindow',
     cls : 'adminUserAddWindow',
     title : '#UT#Benutzer erstellen',
     titleEdit : '#UT#Benutzer bearbeiten',
+    requires: [
+        'Editor.view.admin.user.AddWindowViewController'
+    ],
+    controller: 'adminUserAddWindow',
     strings: {
         userInfo: '#UT#Benutzerinformationen',
         loginInfo: '#UT#Anmeldeinformationen',
