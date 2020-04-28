@@ -235,10 +235,18 @@ Ext.define('Editor.controller.TmOverview', {
     },
     handleSaveAddClick:function(button){
         var me = this,
-            window = button.up('window');
-            form = window.down('form');
-
+            window = me.getTmWindow(),
+            windowViewController = window.getController(),
+            form = window.down('form'),
+            resourceField = form.down('combo[name="resourceId"]'),
+            serviceName = resourceField.getSelection() && resourceField.getSelection().get('serviceName'),
+            helppage = resourceField.getSelection() && resourceField.getSelection().get('helppage');
+        
         if(!form.isValid()) {
+            return;
+        }
+        
+        if (!windowViewController.isValidService(serviceName, helppage)) {
             return;
         }
 
