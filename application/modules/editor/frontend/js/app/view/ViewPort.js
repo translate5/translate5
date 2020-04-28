@@ -32,34 +32,63 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.ViewPort', {
     extend: 'Ext.container.Viewport',
-    requires: ['Editor.view.MaintenancePanel'],
+    requires: [
+        'Editor.view.MaintenancePanel',
+        'Editor.view.admin.user.Grid',
+        'Editor.view.admin.TaskGrid',
+        'Editor.view.HeadPanel',
+        'Editor.view.admin.customer.Panel',
+        'Editor.view.LanguageResources.TmOverviewPanel',
+        'Editor.view.admin.preferences.OverviewPanel'
+    ],
     layout: 'border',
     initComponent: function() {
         var me = this,
+            user = Editor.app.authenticatedUser,
+            mainSections = [],
             items = [{
                 xtype: 'headPanel',
                 region: 'north'
             },{
                 region: 'center',
-                xtype: 'container',
+                xtype: 'tabpanel',
+                itemId: 'adminMainSection',
+                
+                //ui: 'navigation', → eigene UI benötigt eigenes CSS! Im Beispiel ist das ja SCSS was noch gerendert werden müsste!
+                tabBar: {
+                    // turn off borders for classic theme.  neptune and crisp don't need this
+                    // because they are borderless by default
+                    border: false
+                },
+
+                defaults: {
+                    iconAlign: 'left',
+                },
+                
                 layout: {
                     type: 'fit'
                 },
-                items: [{
-                    xtype: me.getInitialView()
-                }]
+                items: mainSections
             }];
+        
+        if(user.isAllowed('taskOverviewFrontendController')) {
+            mainSections.push({xtype: 'adminTaskGrid'});
+        }
+        if(user.isAllowed('languageResourcesOverview')) {
+            mainSections.push({xtype: 'tmOverviewPanel'});
+        }
+        if(user.isAllowed('adminUserFrontendController')) {
+            mainSections.push({xtype: 'adminUserGrid'});
+        }
+        if(user.isAllowed('customerAdministration')) {
+            mainSections.push({xtype: 'customerPanel'});
+        }
+        //the preferences panel is responsible for itself if it is visible or not!
+        mainSections.push({xtype: 'preferencesOverviewPanel'});
+
         Ext.applyIf(me, {
             items: items
         });
         me.callParent(arguments);
-    },
-    getInitialView: function() {
-        var hash = window.location.hash,
-            found = hash.match('initialView/([a-zA-Z0-9]+)');
-        if(found && found[1]) {
-            return found[1];
-        }
-        return 'adminTaskGrid';
     }
   });

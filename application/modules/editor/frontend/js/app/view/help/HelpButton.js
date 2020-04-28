@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,24 +26,29 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-
 /**
- * is thrown if a service is accessed, which does not exist any more, or where the corresponding plug-in was disabled.
+ * @class Editor.view.HeadPanel
+ * @extends Ext.Container
  */
-class editor_Services_NoServiceException extends ZfExtended_ErrorCodeException {
-    /**
-     * @var string
-     */
-    protected $domain = 'editor.languageresource.service';
-    
-    static protected $localErrorCodes = [
-        'E1106' => 'Given Language-Resource-Service "{serviceType}." is not registered in the Language-Resource-Service-Manager!',
-        'E1257' => 'The LanguageResource-Service "{service}" is not configured. Please check this confluence-page for more details: "{helpPage}"',
-    ];
-}
+Ext.define('Editor.view.help.HelpButton', {
+    extend: 'Ext.button.Button',
+    requires: [
+        'Editor.view.help.HelpButtonViewController',
+        'Editor.view.help.HelpWindow'
+    ],
+    alias: 'widget.helpButton',
+    controller: 'helpButton',
+    itemId: 'mainHelpButton',
+    text: '#UT#Hilfe',
+    hidden: true,
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config = {
+                text: me.text //see EXT6UPD-9
+            };
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    }
+});

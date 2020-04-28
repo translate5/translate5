@@ -58,7 +58,6 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.store.LanguageResources.Logs'
     ],
     strings: {
-        languageresource: '#UT#Sprach-Resourcen',
         deleteConfirm: '#UT#Sprachressource endgültig löschen?',
         deleteConfirmText: '#UT#Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?',
         deleteConfirmLocal: '#UT#Sprachressource löschen?',
@@ -75,12 +74,6 @@ Ext.define('Editor.controller.TmOverview', {
         ref: 'tmOverviewPanel',
         selector: '#tmOverviewPanel'
     },{
-        ref: 'centerRegion',
-        selector: 'viewport container[region="center"]'
-    },{
-        ref: 'headToolBar',
-        selector: 'headPanel toolbar#top-menu'
-    },{
         ref: 'AddTmForm',
         selector: '#addTmWindow form'
     },{
@@ -88,21 +81,8 @@ Ext.define('Editor.controller.TmOverview', {
         selector: '#addTmWindow'
     }],
     listen: {
-        controller: {
-            '#Editor.$application': {
-                editorViewportClosed: 'showButtonTmOverview'
-            },
-            '#Editor.$application':{
-                editorViewportOpened:'hideButtonTmOverview'
-            }
-        },
         component: {
-            '#btnTmOverviewWindow': {
-                click: 'handleOnButtonClick'
-            },
             '#tmOverviewPanel':{
-                hide: 'handleAfterHide',
-                show: 'handleAfterShow',
                 celldblclick: 'handleEditTm'
             },
             '#btnAddTm':{
@@ -132,9 +112,6 @@ Ext.define('Editor.controller.TmOverview', {
             },
             '#tmOverviewPanel #btnRefresh':{
                 click:'handleButtonRefreshClick'
-            },
-            'headPanel toolbar#top-menu': {
-                afterrender: 'handleRenderHeadPanel'
             },
             '#adminTaskGrid': {
                 beforerender:'injectTaskassocColumn'
@@ -186,45 +163,6 @@ Ext.define('Editor.controller.TmOverview', {
             interval: 5000
         });
     },
-    handleAfterShow: function(panel) {
-        this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
-        //fire the global event for component view change
-        //TODO: refactor so that event is only fired once in a application view load function which should be created when rebuilding the main menu
-        Ext.fireEvent('applicationViewChanged','languageresource',panel.getTitle());
-    },
-    handleAfterHide: function() {
-        this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').show();
-    },
-    hideButtonTmOverview : function(){
-        this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').hide();
-    },
-    showButtonTmOverview : function(){
-        this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').show();
-    },
-    handleRenderHeadPanel: function(toolbar) {
-        var pos = toolbar.items.length - 2;
-        toolbar.insert(pos, {
-            xtype: 'button',
-            itemId: 'btnTmOverviewWindow',
-            text: this.strings.languageresource
-        });
-    },
-    handleOnButtonClick: function(window) {
-        var me = this,
-            panel = me.getTmOverviewPanel();
-        me.actualTask = window.actualTask;
-      
-        me.getCenterRegion().items.each(function(item){
-            item.hide();
-        });
-
-        if(panel) {
-            panel.show();
-        } else {
-            panel = me.getCenterRegion().add({xtype: 'tmOverviewPanel'}).show();
-            me.handleAfterShow(panel);
-        }
-    },
     handleOnAddTmClick : function(){
         var win = Ext.widget('addTmWindow');
         win.show();
@@ -235,10 +173,18 @@ Ext.define('Editor.controller.TmOverview', {
     },
     handleSaveAddClick:function(button){
         var me = this,
-            window = button.up('window');
-            form = window.down('form');
-
+            window = me.getTmWindow(),
+            windowViewController = window.getController(),
+            form = window.down('form'),
+            resourceField = form.down('combo[name="resourceId"]'),
+            serviceName = resourceField.getSelection() && resourceField.getSelection().get('serviceName'),
+            helppage = resourceField.getSelection() && resourceField.getSelection().get('helppage');
+        
         if(!form.isValid()) {
+            return;
+        }
+        
+        if (!windowViewController.isValidService(serviceName, helppage)) {
             return;
         }
 

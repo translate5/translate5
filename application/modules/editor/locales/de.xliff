@@ -1327,6 +1327,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='U3ByYWNocmVzc291cmNlIGdlbMO2c2NodC4='><source>Sprachressource gelöscht.</source><target>Sprachressource gelöscht.</target></trans-unit>
 <trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSAiezB9IiB3dXJkZSBlcmZvbGdyZWljaCBnZcOkbmRlcnQu'><source>Die Sprachressource "{0}" wurde erfolgreich geändert.</source><target>Die Sprachressource "{0}" wurde erfolgreich geändert.</target></trans-unit>
 <trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSAiezB9IiB3dXJkZSBlcmZvbGdyZWljaCBlcnN0ZWxsdC4='><source>Die Sprachressource "{0}" wurde erfolgreich erstellt.</source><target>Die Sprachressource "{0}" wurde erfolgreich erstellt.</target></trans-unit>
+<trans-unit id='RGllIFNwcmFjaHJlc291cmNlICJ7MH0iIG11c3MgZXJzdCBrb25maWd1cmllcnQgd2VyZGVuLiBXZWl0ZXJlIEluZm9zOiB7MX0='><source>Die Sprachresource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}</source><target>Die Sprachresource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}</target></trans-unit>
 <trans-unit id='d2lyZCBnZWxhZGVuLi4u'><source>wird geladen...</source><target>wird geladen...</target></trans-unit>
 <trans-unit id='RXMgd3VyZGVuIGtlaW5lIEVyZ2Vibmlzc2UgZ2VmdW5kZW4u'><source>Es wurden keine Ergebnisse gefunden.</source><target>Es wurden keine Ergebnisse gefunden.</target></trans-unit>
 <trans-unit id='RGllIEFuZnJhZ2UgYW4gZGllIFNwcmFjaHJlc3NvdXJjZSBkYXVlcnRlIHp1IGxhbmdlLg=='><source>Die Anfrage an die Sprachressource dauerte zu lange.</source><target>Die Anfrage an die Sprachressource dauerte zu lange.</target></trans-unit>
@@ -1773,6 +1774,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgbWl0IEZlaGxlcm4gLyBXYXJudW5nZW4gaW1wb3J0aWVydA=='><source>Translate5 - Aufgabe mit Fehlern / Warnungen importiert</source><target>Translate5 - Aufgabe mit Fehlern / Warnungen importiert</target></trans-unit>
 <trans-unit id='RGllc2VzIEZlbnN0ZXIgbmljaHQgbWVociBhdXRvbWF0aXNjaCBhbnplaWdlbi4='><source>Dieses Fenster nicht mehr automatisch anzeigen.</source><target>Dieses Fenster nicht mehr automatisch anzeigen.</target></trans-unit>
 <trans-unit id='RGFzIG7DpGNoc3RlIC8gdm9yaGVyaWdlIFNlZ21lbnQgd2lyZCBub2NoIGdlc3BlaWNoZXJ0LCBiaXR0ZSB3YXJ0ZW4uLi4='><source>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</source><target>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</target></trans-unit>
+<trans-unit id='RGllc2UgUXVlbGxzcHJhY2hlIHdpcmQgdm9uIGRlciBSZXNzb3VyY2UgbmljaHQgdW50ZXJzdMO8dHp0IQ=='><source>Diese Quellsprache wird von der Ressource nicht unterstützt!</source><target>Diese Quellsprache wird von der Ressource nicht unterstützt!</target></trans-unit>
+<trans-unit id='RGllc2UgWmllbHNwcmFjaGUgd2lyZCB2b24gZGVyIFJlc3NvdXJjZSBuaWNodCB1bnRlcnN0w7x0enQh'><source>Diese Zielsprache wird von der Ressource nicht unterstützt!</source><target>Diese Zielsprache wird von der Ressource nicht unterstützt!</target></trans-unit>
   </body>
  </file>
 </xliff>
