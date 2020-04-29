@@ -97,6 +97,7 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
                 if($key == 'size-unit') {
                     continue;
                 }
+                // TODO: $key is ['translate5:maxNumberOfLines'], not just ['maxNumberOfLines']
                 $segmentAttributes->$key = $xmlparser->getAttribute($unitAttributes, $key, $value);
             }
         }
