@@ -62,15 +62,10 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
         /**
          * Other planned config sections:
          * [{
-            //  },{
-//                  xtype: 'panel',
-//                  title: 'System',
-//                  glyph: 'xf013@FontAwesome',
-            //  },{
-//                  xtype: 'panel',
-//                  title: 'Axels Fonts',
-//                  glyph: 'xf031@FontAwesome',
-                }]
+				xtype: 'panel',
+				title: 'System',
+				glyph: 'xf013@FontAwesome',
+			}]
          */
         
         if (instanceConfig) {
