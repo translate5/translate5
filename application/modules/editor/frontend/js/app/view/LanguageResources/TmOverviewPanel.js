@@ -38,10 +38,16 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     extend : 'Ext.grid.Panel',
-    requires: ['Editor.view.admin.customer.CustomerFilter'],
+    requires: [
+        'Editor.view.admin.customer.CustomerFilter',
+        'Editor.view.LanguageResources.TmOverviewViewController'
+    ],
     alias: 'widget.tmOverviewPanel',
+    controller: 'tmOverviewPanel',
     itemId: 'tmOverviewPanel',
     title:'#UT#Sprach-Resourcen',
+    helpSection: 'languageresource',
+    glyph: 'xf1c0@FontAwesome',
     strings: {
         name: '#UT#Name',
         edit: '#UT#Bearbeiten',

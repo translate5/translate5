@@ -160,6 +160,10 @@
         <source>Aufgaben&#xFC;bersicht</source>
         <target>Task Overview</target>
       </trans-unit>
+      <trans-unit id="RWluc3RlbGx1bmdlbg==">
+        <source>Einstellungen</source>
+        <target>Preferences</target>
+      </trans-unit>
       <trans-unit id="QXVmZ2FiZSB3dXJkZSBlcmZvbGdyZWljaCB2ZXJsYXNzZW4u">
         <source>Aufgabe wurde erfolgreich verlassen.</source>
         <target>task left successfully.</target>

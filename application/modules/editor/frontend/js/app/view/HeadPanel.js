@@ -32,7 +32,12 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.HeadPanel', {
     extend: 'Ext.container.Container',
+    requires: [
+        'Editor.view.HeadPanelViewController',
+        'Editor.view.help.HelpButton'
+    ],
     alias: 'widget.headPanel',
+    controller: 'headPanel',
     region: 'north',
     id: 'head-panel',
     height: 150,
@@ -40,29 +45,20 @@ Ext.define('Editor.view.HeadPanel', {
         type: 'fit'
     },
     strings: {
-        task: '#UT#Aufgabe',
         logout: '#UT# Abmelden',
-        tasks: '#UT#Aufgaben',
-        loggedinAs: '#UT# Eingeloggter Benutzer',
-        loginName: '#UT# Loginname',
-        back: '#UT#zurück zur Aufgabenliste',
-        finishBtn: '#UT#Aufgabe abschließen',
-        endBtn: '#UT#Aufgabe beenden',
-        readonly: '#UT# - [LESEMODUS]',
-        help: '#UT#Hilfe'
+        readonly: '#UT# - [LESEMODUS]'
     },
     
     initConfig: function(instanceConfig) {
-    	var me = this,
-	        isEditor = false, //FIXME Thomas initial value differs for example for ITL
-	        translations = [];
-	        
-	    Ext.Object.each(Editor.data.translations, function(i, n) {
-	        translations.push([i, n]);
-	    });
-	    
+        var me = this,
+            translations = [];
+        
+        Ext.Object.each(Editor.data.translations, function(i, n) {
+            translations.push([i, n]);
+        });
+
         var config = {
-    		items: [{
+            items: [{
                 xtype: 'container',
                 cls: 'head-panel-brand',
                 html: Editor.data.app.branding,
@@ -77,35 +73,7 @@ Ext.define('Editor.view.HeadPanel', {
                 items: [{
                     xtype: 'tbfill'
                 },{
-                    xtype: 'button',
-                    itemId: 'logoutSingle',
-                    text: me.strings.logout
-                },{
-                    xtype: 'button',
-                    text: me.strings.tasks,
-                    itemId: 'tasksMenu',
-                    hidden: isEditor,
-                    menu: {
-                        xtype: 'menu',
-                        items: [{
-                            xtype: 'menuitem',
-                            iconCls: 'ico-task-back',
-                            itemId: 'backBtn',
-                            text: me.strings.back
-                        },{
-                            xtype: 'menuitem',
-                            iconCls: 'ico-task-finish',
-                            hidden: true,
-                            itemId: 'finishBtn',
-                            text: me.strings.finishBtn
-                        },{
-                            xtype: 'menuitem',
-                            hidden: true,
-                            iconCls: 'ico-task-end',
-                            itemId: 'closeBtn',
-                            text: me.strings.endBtn
-                        }]
-                    }
+                    xtype: 'helpButton'
                 },{
                     xtype: 'combo',
                     itemId: 'languageSwitch',
@@ -116,6 +84,10 @@ Ext.define('Editor.view.HeadPanel', {
                     editable: false,
                     store: translations,
                     queryMode: 'local'
+                },{
+                    xtype: 'button',
+                    itemId: 'logoutSingle',
+                    text: me.strings.logout
                 }]
             }]
         };
