@@ -1287,7 +1287,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
 
-        $this->view->rows->workflowProgressSummary=$this->entity->getWorkflowProgressSummary();
+        
+        $this->view->rows->workflowProgressSummary = $this->_helper->TaskStatistics->getWorkflowProgressSummary($this->entity);
     }
     
     public function deleteAction() {
