@@ -1782,6 +1782,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QXVmZ2FiZW5uYW1lLVByb2pla3Q='><source>Aufgabenname-Projekt</source><target>Aufgabenname</target></trans-unit>
 <trans-unit id='RGllc2UgUXVlbGxzcHJhY2hlIHdpcmQgdm9uIGRlciBSZXNzb3VyY2UgbmljaHQgdW50ZXJzdMO8dHp0IQ=='><source>Diese Quellsprache wird von der Ressource nicht unterstützt!</source><target>Diese Quellsprache wird von der Ressource nicht unterstützt!</target></trans-unit>
 <trans-unit id='RGllc2UgWmllbHNwcmFjaGUgd2lyZCB2b24gZGVyIFJlc3NvdXJjZSBuaWNodCB1bnRlcnN0w7x0enQh'><source>Diese Zielsprache wird von der Ressource nicht unterstützt!</source><target>Diese Zielsprache wird von der Ressource nicht unterstützt!</target></trans-unit>
+<trans-unit id='UHJvamVrdMO8YmVyc2ljaHQ='><source>Projektübersicht</source><target>Projektübersicht</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -3742,6 +3742,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UHJvamVrdCBsw7ZzY2hlbg=='><source>Projekt löschen</source><target>Delete project</target></trans-unit>
 <trans-unit id='RGFzIFByb2pla3Qgd3VyZGUgZXJmb2xncmVpY2ggZW50ZmVybnQh'><source>Das Projekt wurde erfolgreich entfernt!</source><target>The project was successfully removed!</target></trans-unit>
 <trans-unit id='QXVmZ2FiZW5uYW1lLVByb2pla3Q='><source>Aufgabenname-Projekt</source><target>Task-name</target></trans-unit>
+<trans-unit id='UHJvamVrdMO8YmVyc2ljaHQ='><source>Projektübersicht</source><target>Project Overview</target></trans-unit>
 </body>
   </file>
 </xliff>

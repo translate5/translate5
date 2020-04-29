@@ -29,6 +29,17 @@ Ext.define('Editor.view.admin.ProjectGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.projectTaskGrid',
     
+    routes: {
+    	'project': 'onProjectRoute'
+	},
+	
+	
+	onProjectRoute:function() {
+		var me=this;
+		Editor.app.openAdministrationSection(me.getView(), 'project');
+		me.reloadProjects();
+	},
+    	
 	strings: {
 		deleteProjectDialogTitle:'#UT#Projekt komplett löschen?',
 		deleteProjectDialogMessage:'#UT#Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?',

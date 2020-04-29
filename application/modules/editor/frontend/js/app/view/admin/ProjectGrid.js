@@ -34,11 +34,11 @@ Ext.define('Editor.view.admin.ProjectGrid', {
 	],
 	controller:'projectTaskGrid',
 	itemId: 'projectTaskGrid',
-	title: '#UT#Projektenübersicht',
+	title: '#UT#Projektübersicht',
 	layout: {
 		type: 'fit'
 	},
-	
+	glyph: 'xf0e8@FontAwesome',
 	strings: {
 		actionDelete: '#UT#Projekt komplett löschen',
 		columnProjectAction:'#UT#Aktionen',
@@ -54,6 +54,7 @@ Ext.define('Editor.view.admin.ProjectGrid', {
     initConfig: function(instanceConfig) {
         var me = this,
         	config={
+        		title:me.title,
         		columns: [{
         	        text: 'Id',
         	        dataIndex: 'id'
