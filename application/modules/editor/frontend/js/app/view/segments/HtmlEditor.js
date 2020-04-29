@@ -48,6 +48,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   idPrefix: 'tag-image-',
   requires: [
       'Editor.view.segments.HtmlEditorLayout',
+      'Editor.view.segments.MinMaxLength',
       'Editor.view.segments.PixelMapping',
       'Editor.view.segments.StatusStrip'
   ],
@@ -1072,8 +1073,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       var me = this,
           length,
           metaCache = me.currentSegment && me.currentSegment.get('metaCache'),
-          minWidth = metaCache && metaCache.minWidth ? metaCache.minWidth : 0,
-          maxWidth = metaCache && metaCache.maxWidth ? metaCache.maxWidth : Number.MAX_SAFE_INTEGER;
+          minMaxLengthComp = Editor.view.segments.MinMaxLength,
+          minWidth = minMaxLengthComp.getMinWidth(metaCache),
+          maxWidth = minMaxLengthComp.getMaxWidth(metaCache);
       
       me.segmentLengthStatus = 0;
       

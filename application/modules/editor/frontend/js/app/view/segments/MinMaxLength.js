@@ -43,6 +43,59 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         maxText:'#UT# von {maxWidth}',
         siblingSegments: '#UT#Seg.: {siblings}'
     },
+    statics: {
+        /**
+         * Is the min/max width active according to the meta-data?
+         * @returns bool
+         */
+        useMinMaxWidth: function(meta) {
+            return meta && (meta.minWidth !== null || meta.maxWidth !== null);
+        },
+        /**
+         * Is the maximum number of lines to be considered according to the meta-data?
+         * @returns bool
+         */
+        useMaxNumberOfLines: function(meta) {
+            return meta && meta.maxNumberOfLines && (meta.maxNumberOfLines > 1);
+        },
+        /**
+         * Returns the minWidth according to the meta-data.
+         * @returns integer
+         */
+        getMinWidth: function(meta) {
+            // don't add messageSizeUnit here, will be used for calculating...
+            return meta && meta.minWidth ? meta.minWidth : 0;
+        },
+        /**
+         * Returns the total maxWidth according to the meta-data.
+         * @returns integer
+         */
+        getMaxWidth: function(meta) {
+            // don't add messageSizeUnit here, will be used for calculating...
+            var me = this,
+                maxWidth = me.getMaxWidthPerLine(meta),
+                useMaxNumberOfLines = me.useMaxNumberOfLines(meta);
+            if (useMaxNumberOfLines) {
+                maxWidth = meta.maxNumberOfLines * meta.maxWidth;
+            }
+            return maxWidth;
+        },
+        /**
+         * Returns the maxWidth for a single line according to the meta-data.
+         * @returns integer
+         */
+        getMaxWidthPerLine: function(meta) {
+            // don't add messageSizeUnit here, will be used for calculating...
+            return meta && meta.maxWidth ? meta.maxWidth : Number.MAX_SAFE_INTEGER;
+        },
+        /**
+         * Returns the size-unit according to the meta-data.
+         * @returns integer
+         */
+        getSizeUnit: function(meta) {
+            return (meta.sizeUnit === Editor.view.segments.PixelMapping.SIZE_UNIT_FOR_PIXELMAPPING) ? 'px' : '';
+        }
+    },
     /***
      * Segment model record
      */
@@ -108,10 +161,48 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * Handler for html editor text change
      */
     onHtmlEditorChange:function(htmlEditor,newValue,oldValue,eOpts){
-        var me=this;
+        var me=this,
+            record,
+            segmentLength;
         if(me.isVisible()){
-            me.updateLabel(me.segmentRecord,htmlEditor.getTransunitLength(newValue));
+            record = me.segmentRecord;
+            segmentLength = htmlEditor.getTransunitLength(newValue);
+            me.handleMaxNumberOfLines(htmlEditor, record, segmentLength, newValue, oldValue);
+            me.updateLabel(record, segmentLength);
         }
+    },
+    
+    /**
+     * If max. number of lines are to be considered, we add line-breaks automatically. 
+     */
+    handleMaxNumberOfLines: function (htmlEditor, record, segmentLength, newValue, oldValue) {
+        var meta = record.get('metaCache'),
+            minMaxLengthComp = Editor.view.segments.MinMaxLength,
+            useMaxNumberOfLines = minMaxLengthComp.useMaxNumberOfLines(meta),
+            oldSegmentLength,
+            maxWidthPerLine,
+            newValueWithLinebreaks,
+            editorBody;
+        if (!useMaxNumberOfLines) {
+            return;
+        }
+        oldSegmentLength = htmlEditor.getTransunitLength(oldValue);
+        if (segmentLength <= oldSegmentLength) {
+            // We don't check after content has been removed.
+            return;
+        }
+        maxWidthPerLine = minMaxLengthComp.getMaxWidthPerLine(meta);
+        
+        // TODO:
+        // check how to do this for multibyte / use ranges instead?:
+        // newValue.substring(0, maxWidthPerLine) + ' XXX ' + newValue.substring(maxWidthPerLine);
+        
+        // TODO: 
+        // - check for each existing line if it is within the maxWidthPerLine
+        // - if not: check where the maxLength (pixel!) is in the content of the line (= html!)
+        // - add the line-break there (eg. in front of the last word before the line ends)
+        // - recalculate the other lines?
+        // - change content in Editor without running into the whole process again
     },
 
     /***
@@ -150,7 +241,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             htmlEditor = me.up('segmentsHtmleditor'),
             fields = Editor.data.task.segmentFields(),
             field = fields.getAt(fields.findExact('name', fieldname.replace(/Edit$/, ''))),
-            enabled = field && field.isTarget() && (metaCache && (metaCache.minWidth !== null || metaCache.maxWidth !== null));
+            enabled = field && field.isTarget() && Editor.view.segments.MinMaxLength.useMinMaxWidth(metaCache);
         
         me.setVisible(enabled);
         me.segmentRecord = null;
@@ -167,12 +258,14 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     updateLabel: function(record, segmentLength){
         var me=this,
             meta=record.get('metaCache'),
-            messageSizeUnit = (meta.sizeUnit === Editor.view.segments.PixelMapping.SIZE_UNIT_FOR_PIXELMAPPING) ? 'px' : '',
+            minMaxLengthComp = Editor.view.segments.MinMaxLength,
+            useMaxNumberOfLines = minMaxLengthComp.useMaxNumberOfLines(meta),
+            messageSizeUnit = minMaxLengthComp.getSizeUnit(meta),
             msgs = me.up('segmentsHtmleditor').strings,
             labelData = {
                 length: segmentLength + messageSizeUnit,
-                minWidth: meta && meta.minWidth ? meta.minWidth : 0, // don't add messageSizeUnit here, will be used for calculating...
-                maxWidth: meta && meta.maxWidth ? meta.maxWidth : Number.MAX_SAFE_INTEGER, // don't add messageSizeUnit here, will be used for calculating...
+                minWidth: minMaxLengthComp.getMinWidth(meta),
+                maxWidth: minMaxLengthComp.getMaxWidth(meta),
                 siblings: null
             },
             tplData = {
@@ -195,6 +288,11 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             if(nrs.length > 1) {
                 labelData.siblings = nrs.join(', ');
             }
+        }
+
+        if (useMaxNumberOfLines) {
+            // for message
+            labelData.maxWidth = meta.maxNumberOfLines + '*' + meta.maxWidth;
         }
         
         tplData.text = me.labelTpl.apply(labelData);
