@@ -41,6 +41,14 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
      */
     protected $lengthRestrictionDefaults = ['size-unit' => null, 'minWidth' => null, 'maxWidth' => null, 'maxNumberOfLines' => null, 'font' => null, 'fontSize' => null];
     
+    /**
+     * Some of the keys in $lengthRestrictionDefaults are not standard xliff-Attributes, but named differently in the trans-units and our SegmentAttributes.
+     * @var array
+     */
+    protected static $nonStandardXliffAttributes = ['size-unit' =>        ['inUnit' => 'size-unit',                   'inSegmentAttr' => 'sizeUnit'],
+                                                    'maxNumberOfLines' => ['inUnit' => 'translate5:maxNumberOfLines', 'inSegmentAttr' => 'maxNumberOfLines'] ];
+    
+    
     public function __construct() {
         $this->pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
         $this->initLengthRestrictionAttributes();
@@ -92,13 +100,18 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
         // Length-Restriction-Attributes (as set in xliff's trans-unit; fallback: task-template); optional
         $unit = $xmlparser->getAttribute($unitAttributes, 'size-unit', $this->lengthRestrictionDefaults['size-unit']);
         if($unit == 'char' || $unit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING) {
-            $segmentAttributes->sizeUnit = $unit;
-            foreach ($this->lengthRestrictionDefaults as $key => $value) {
-                if($key == 'size-unit') {
-                    continue;
+            foreach ($this->lengthRestrictionDefaults as $key => $defaultValue) {
+                if(array_key_exists($key, self::$nonStandardXliffAttributes)) {
+                    // non-standard xliff-attributes:
+                    $nonStandardKeys = self::$nonStandardXliffAttributes[$key];
+                    $keyInUnitAttributes = $nonStandardKeys['inUnit'];
+                    $keyInSegmentAttributes = $nonStandardKeys['inSegmentAttr'];
+                } else {
+                    // standard xliff-attributes:
+                    $keyInUnitAttributes = $key;
+                    $keyInSegmentAttributes = $key;
                 }
-                // TODO: $key is ['translate5:maxNumberOfLines'], not just ['maxNumberOfLines']
-                $segmentAttributes->$key = $xmlparser->getAttribute($unitAttributes, $key, $value);
+                $segmentAttributes->$keyInSegmentAttributes = $xmlparser->getAttribute($unitAttributes, $keyInUnitAttributes, $defaultValue);
             }
         }
         
