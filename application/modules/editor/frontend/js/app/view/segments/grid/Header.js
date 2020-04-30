@@ -1,0 +1,103 @@
+
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/**#@++
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
+/**
+ * @class Editor.view.segments.grid.Toolbar
+ * @extends Ext.toolbar.Toolbar
+ * @initalGenerated
+ */
+Ext.define('Editor.view.segments.grid.Header', {
+    extend: 'Ext.panel.Header',
+    alias: 'widget.segmentsHeader',
+    requires: [
+        'Editor.view.segments.grid.HeaderViewController',
+        'Editor.view.ApplicationInfoPanel',
+        'Editor.view.help.HelpButton'
+    ],
+    controller: 'segmentsHeader',
+    strings: {
+        progressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt',
+        leaveBtn: '#UT#Aufgabe verlassen',
+        logoutBtn: '#UT#Ausloggen',
+        leaveTaskWindowTitle:'#UT#Zurück zur Aufgabeliste',
+        leaveTaskWindowMessage:'#UT#Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?',
+        leaveTaskWindowFinishBtn:'#UT#Fertig und Aufgabe beenden',
+        leaveTaskWindowCancelBtn:'#UT#Aufgabe später weiterbearbeiten'
+    },
+    initConfig: function(instanceConfig) {
+        var me = this,
+            infoPanel = Ext.create('Editor.view.ApplicationInfoPanel'),
+            config = {
+                padding:'8 8 8 8', // the default padding spreads up the height of the header
+                defaults: {
+                    margin:'0 0 0 4'
+                },
+                items: [{
+                    xtype: 'helpButton'
+                },{
+                    xtype: 'button',
+                    itemId:'toolbarInfoButton',
+                    icon: Editor.data.moduleFolder+'images/information-white.png',
+                    tooltip: infoPanel.renderEditorText()
+                },{
+                    xtype: 'progressbar',
+                    itemId: 'segmentFinishCount',
+                    width:150,
+                    autoEl: {
+                        'data-qtip': me.strings.progressTooltip
+                    },
+                    bind:{
+                        value:'{segmentFinishCountPercent}'
+                    }
+                },{
+                    xtype: 'button',
+                    itemId: 'leaveTaskHeaderBtn',
+                    icon: Editor.data.moduleFolder+'images/table_back.png',
+                    text: me.strings.leaveBtn,
+                    hidden: Editor.data.editor.toolbar.hideLeaveTaskButton //FIXME für ITL auf false setzen!
+                },{
+                    xtype: 'button',
+                    itemId:'logoutHeaderBtn',
+                    icon: Editor.data.moduleFolder+'images/door_out.png',
+                    text: me.strings.logoutBtn,
+                    hidden: Editor.data.editor.toolbar.hideLogoutButton //FIXME für ITL auf false setzen!
+                }]
+            };
+        
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([ config ]);
+    }
+});

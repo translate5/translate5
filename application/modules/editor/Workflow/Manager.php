@@ -74,7 +74,7 @@ class editor_Workflow_Manager {
         $flipped = array_flip(self::$workflowList);
         if(empty($flipped[$className])) {
             // 'Workflow to class "{className}" not found!',
-            throw new ZfExtended_Exception('E1251', ['className' => $className]);
+            throw new editor_Workflow_Exception('E1251', ['className' => $className]);
         }
         return $flipped[$className];
     }
@@ -87,7 +87,7 @@ class editor_Workflow_Manager {
     public function get($wfId) {
         if(empty(self::$workflowList[$wfId])) {
             //Workflow with ID "{workflowId}" not found!
-            throw new ZfExtended_Exception('E1252', ['workflowId' => $wfId]);
+            throw new editor_Workflow_Exception('E1252', ['workflowId' => $wfId]);
         }
         return ZfExtended_Factory::get(self::$workflowList[$wfId]);
     }

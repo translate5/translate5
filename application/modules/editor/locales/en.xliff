@@ -160,6 +160,10 @@
         <source>Aufgaben&#xFC;bersicht</source>
         <target>Task Overview</target>
       </trans-unit>
+      <trans-unit id="RWluc3RlbGx1bmdlbg==">
+        <source>Einstellungen</source>
+        <target>Preferences</target>
+      </trans-unit>
       <trans-unit id="QXVmZ2FiZSB3dXJkZSBlcmZvbGdyZWljaCB2ZXJsYXNzZW4u">
         <source>Aufgabe wurde erfolgreich verlassen.</source>
         <target>task left successfully.</target>
@@ -2719,6 +2723,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSAiezB9IiB3dXJkZSBlcmZvbGdyZWljaCBlcnN0ZWxsdC4='>
   <source>Die Sprachressource "{0}" wurde erfolgreich erstellt.</source>
   <target>The language resource &quot;{0}&quot; was successfully created.</target>
+</trans-unit>
+<trans-unit id='RGllIFNwcmFjaHJlc291cmNlICJ7MH0iIG11c3MgZXJzdCBrb25maWd1cmllcnQgd2VyZGVuLiBXZWl0ZXJlIEluZm9zOiB7MX0='>
+  <source>Die Sprachresource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}</source>
+  <target>The language resource &quot;{0}&quot; needs to be configured first. Further information: {1}</target>
 </trans-unit>
 <trans-unit id='d2lyZCBnZWxhZGVuLi4u'>
   <source>wird geladen...</source>

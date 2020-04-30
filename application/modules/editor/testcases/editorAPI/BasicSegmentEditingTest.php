@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -42,8 +42,8 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         );
         
         $appState = self::assertTermTagger();
-        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig may not be activated for this test case!');
-        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology may not be activated for this test case!');
+        self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
+        self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
@@ -148,6 +148,9 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals(13, $lastSegment->mid);
     }
     
+    /**
+     * @depends testBasicSegmentValuesAfterImport
+     */
     public function testSegmentEditing() {
         //get segment list
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
@@ -235,6 +238,17 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
     }
     
     /**
+     * @depends testSegmentEditing
+     */
+    public function testTaskStatistics() {
+        $this->api()->reloadTask();
+        $task = $this->api()->getTask();
+        $stat = $task->workflowProgressSummary;
+        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/BasicSegmentEditingTest/expected-task-stat-new.json", json_encode($stat,JSON_PRETTY_PRINT));
+        $this->assertEquals(self::$api->getFileContent('expected-task-stat.json'), $stat, 'Imported segments are not as expected!');
+    }
+    
+    /**
      * tests the export results
      * @depends testSegmentEditing
      * @param stdClass $task
@@ -244,7 +258,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
     public function testExport() {
         self::$api->login('testmanager');
         $task = $this->api()->getTask();
-        //start task export 
+        //start task export
         
         $this->api()->request('editor/task/export/id/'.$task->id);
         //$fileToCompare;

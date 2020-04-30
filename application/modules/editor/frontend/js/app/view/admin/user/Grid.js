@@ -26,16 +26,23 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.UserGrid', {
+Ext.define('Editor.view.admin.user.Grid', {
   extend: 'Ext.grid.Panel',
-  requires: 'Editor.view.CheckColumn',
+  requires: [
+      'Editor.view.CheckColumn',
+      'Editor.view.admin.user.GridViewController',
+      'Editor.view.admin.user.AddWindow'
+  ],
   alias: 'widget.adminUserGrid',
   plugins: ['gridfilters'],
   itemId: 'adminUserGrid',
+  controller: 'adminUserGrid',
   stateId: 'adminUserGrid',
-  stateful:true,
+  stateful: true,
   cls: 'adminUserGrid',
-  title: '#UT#Benutzerübersicht',
+  title: '#UT#Benutzerverwaltung',
+  helpSection: 'useroverview',
+  glyph: 'xf0c0@FontAwesome',
   height: '100%',
   layout: {
       type: 'fit'
@@ -230,11 +237,6 @@ Ext.define('Editor.view.admin.UserGrid', {
               hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddUser'), 
               tooltip: me.strings.addUserTip
           }]
-      },{
-          xtype: 'pagingtoolbar',
-          store: 'admin.Users',
-          dock: 'bottom',
-          displayInfo: true
       }]
     };
 

@@ -43,15 +43,6 @@ Ext.define('Editor.controller.admin.Customer', {
     stores:['Editor.store.admin.Customers','Editor.store.admin.UserCustomers'],
 
     refs:[{
-        ref: 'customerPanel',
-        selector: 'customerPanel'
-    },{
-        ref: 'centerRegion',
-        selector: 'viewport container[region="center"]'
-    },{
-        ref: 'headToolBar',
-        selector: 'headPanel toolbar#top-menu'
-    },{
         ref: 'customerSwitch',
         selector: '#customerSwitch'
     }],
@@ -60,15 +51,6 @@ Ext.define('Editor.controller.admin.Customer', {
         component: {
             'headPanel toolbar#top-menu': {
                 afterrender: 'onHeadPanelAfterRender'
-            },
-            '#btnCustomerOverviewWindow': {
-                click: 'onCustomerOverviewClick'
-            },
-            'customerPanel':{
-                show: 'onCustomerPanelShow'
-            },
-            'viewport container[region="center"] panel':{
-                hide:'onCentarPanelComponentAfterLayout'
             },
             '#adminUserAddWindow':{
                 afterrender:'onAdminUserAddWindowAfterRender'
@@ -93,11 +75,6 @@ Ext.define('Editor.controller.admin.Customer', {
         global: {
             resetCustomerSwitch: 'resetCustomerSwitch'                      // Multitenancy
         },
-        controller:{
-            '#Editor.$application': {
-                editorViewportOpen: 'onEditorViewportOpen'
-            }
-        },
         store:{
             '#admin.Users':{
                 load:'onUserStoreLoad'
@@ -118,69 +95,18 @@ Ext.define('Editor.controller.admin.Customer', {
     // Multitenancy: filtering
     handleFiltering: true,
     
-    /***
-     * hide the customers button when editor is opened
-     */
-    onEditorViewportOpen:function(){
-        this.getHeadToolBar() && this.getHeadToolBar().down('#btnCustomerOverviewWindow').setHidden(true);
-    },
-
+    helpSection: 'customeroverview',
+    
     /**
      * On head panel after render handler
      */
     onHeadPanelAfterRender: function(toolbar) {
-        //if we are in edit task mode, do not add the customer button
-        if(Ext.ComponentQuery.query('#segmentgrid')[0]){
+        //if we are in edit task mode, do not add the multitenancy button
+        if(Ext.ComponentQuery.query('#segmentgrid')[0] || !this.isCustomerOverviewAllowed()){
             return;
         }
-        
-        if(!this.isCustomerOverviewAllowed()){
-            return;
-        }
-        var pos = toolbar.items.length - 2;
-        toolbar.insert(pos, {
-            xtype: 'button',
-            itemId: 'btnCustomerOverviewWindow',
-            text:this.strings.customer
-        });
-        
         // multitenancy: add the drop-down "Switch client"
         this.addCustomerSwitch(toolbar);
-    },
-
-    /***
-     * Fires when the components in this container are arranged by the associated layout manager.
-     */
-    onCentarPanelComponentAfterLayout:function(component){
-        if(!this.isCustomerOverviewAllowed()){
-            return;
-        }
-        //set the component to visible on each centar panel element hide
-        this.setCustomerOverviewButtonHidden(false);
-    },
-
-    /**
-     * Customer overview button click handler
-     */
-    onCustomerOverviewClick: function(window) {
-        var me = this,
-            panel = me.getCustomerPanel();
-        
-        me.actualTask = window.actualTask;
-        
-        //hide all components in the cennter region
-        me.getCenterRegion().items.each(function(item){
-            item.hide();
-        });
-
-        if(!panel) {
-            //add the customer panel to the center region
-            panel = me.getCenterRegion().add({xtype: 'customerPanel'});
-        }
-
-        panel.show();
-
-        me.onCustomerPanelShow(panel);
     },
 
     /**
@@ -245,26 +171,6 @@ Ext.define('Editor.controller.admin.Customer', {
         //insert the column after the locale column
         grid.headerCt.insert((grid.down('gridcolumn[dataIndex=locale]').fullColumnIndex + 1), column);
         grid.getView().refresh();
-    },
-
-    /***
-     * On customer pannel show handler
-     */
-    onCustomerPanelShow: function(panel) {
-        //fire the global event for component view change
-        Ext.fireEvent('componentViewChanged','customeroverview',panel.getTitle());
-        //hide the customerOverview button
-        this.setCustomerOverviewButtonHidden(true);
-    },
-
-    /**
-     * Set the customer overview button hidden property
-     */
-    setCustomerOverviewButtonHidden:function(isHidden){
-        if(!this.getHeadToolBar() || !this.getHeadToolBar().down('#btnCustomerOverviewWindow')){
-            return;
-        }
-        this.getHeadToolBar().down('#btnCustomerOverviewWindow').setHidden(isHidden);
     },
 
     /**
@@ -550,7 +456,7 @@ Ext.define('Editor.controller.admin.Customer', {
             customerColumnName = me.getCustomerColumnNameInStore(store),
             customerColumn = grid.columnManager.getHeaderByDataIndex(customerColumnName),
             val = '';
-        if (customerColumn.filter && customerColumn.filter.filter && customerColumn.filter.filter.getValue() != undefined) {
+        if (customerColumn && customerColumn.filter && customerColumn.filter.filter && customerColumn.filter.filter.getValue() != undefined) {
             val = customerColumn.filter.filter.getValue();
         }
         return val;
