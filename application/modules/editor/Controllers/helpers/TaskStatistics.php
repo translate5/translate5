@@ -38,6 +38,11 @@ class Editor_Controller_Helper_TaskStatistics extends Zend_Controller_Action_Hel
      */
     public function getWorkflowProgressSummary(editor_Models_Task $task): array {
         $workflowProgress = [];
+        //when we are in import we may not produce statistics, the statistic creation would start to fill up the MV,
+        // which is not possible since the import is running in a different worker and they would lock each other.
+        if($task->isImporting()) {
+            return $workflowProgress;
+        }
         
         $autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $autoStates editor_Models_Segment_AutoStates */
