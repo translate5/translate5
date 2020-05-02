@@ -64,6 +64,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         'SnapshotHistory' => true,
         'Termportal' => true,
         'JsLogger' => true,
+        'editor.CustomPanel' => true,
         'QmSubSegments' => false,                //disabled by default, controlled by ACL
         'admin.TaskOverview' => false,           //disabled by default, controlled by ACL
         'admin.TaskPreferences' => false,        //disabled by default, controlled by ACL
@@ -318,9 +319,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->setLanguageResourceJsVars();
       
       $this->view->Php2JsVars()->set('editor.editorBrandingSource',$rop->editor->editorBrandingSource);
-      
-      // sets the timeout the editor generally delays the capturing of deferred change events in msec. TODO: make runtime option ??
-      $this->view->Php2JsVars()->set('editor.deferredChangeTimeout', 250);
+
+      $this->view->Php2JsVars()->set('customPanel.title',$this->translate->_($rop->editor->customPanel->title));
+      $this->view->Php2JsVars()->set('customPanel.url',$rop->editor->customPanel->url);
       
       $this->setJsAppData();
     }
@@ -456,7 +457,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         /* @var $acl ZfExtended_Acl */
         
         $ed = $this->config->runtimeOptions->editor;
-        
+
         if($ed->enableQmSubSegments){
             $this->frontendEndControllers['QmSubSegments'] = true;
         }
