@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -29,16 +29,16 @@ END LICENSE AND COPYRIGHT
 /**
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
- * 
+ *
  * @method integer getLanguageResourceId getLanguageResourceId()
  * @method void setLanguageResourceId() setLanguageResourceId(int $languageResourceId)
- * 
+ *
  * @method integer getCustomerId() getCustomerId()
  * @method void setCustomerId() setCustomerId(int $customerId)
- * 
+ *
  * @method integer getUseAsDefault() getUseAsDefault()
  * @method void setUseAsDefault() setUseAsDefault(int $useAsDefault)
- * 
+ *
  */
 class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_Entity_Abstract {
     
@@ -49,16 +49,11 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * Save customer assoc from the request parametars for the given language resource.
      * A language resource that is saved must have at least one customer assigned
      * (if none is given, we use the defaultcustomer).
-     * @param mixed $data
+     * @param int $id
+     * @param array $customers
+     * @param array $useAsDefault
      */
-    public function saveAssocRequest($data){
-        if(!$this->checkUpdateSaveData($data)){
-            return;
-        }
-        
-        //the data is in json
-        $customers=json_decode($data['resourcesCustomersHidden']);
-        
+    public function saveAssocRequest(int $id, array $customers, array $useAsDefault){
         // Check if (at least one) customer is set and use the 'defaultcustomer' if not
         if (empty($customers)) {
             $customer = ZfExtended_Factory::get('editor_Models_Customer');
@@ -67,24 +62,23 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
             $customers[] = $customer->getId();
         }
         
-        $this->addAssocs($customers, $data['id']);
+        //ensure that only useAsDefault customers are used, which are added also as ccustomers
+        $useAsDefault = array_intersect($useAsDefault, $customers);
+        $this->addAssocs($id, $customers, $useAsDefault);
     }
     
-    /***
+    /**
      * Update customer assoc from the request parametars.
-     * @param mixed $data
+     * @param int $id
+     * @param array $customers
+     * @param array $useAsDefault
      */
-    public function updateAssocRequest($data){
-        if(!$this->checkUpdateSaveData($data)){
-            return;
-        }
+    public function updateAssocRequest(int $id, array $customers, array $useAsDefault){
         //remove old assocs for the curen languageResourceId
-        $deleteParams=array();
-        $deleteParams['languageResourceId IN (?)'] = $data['id'];
-        $this->db->delete($deleteParams);
+        $this->db->delete(['languageResourceId IN (?)' => $id]);
         
         //save the new data
-        $this->saveAssocRequest($data);
+        $this->saveAssocRequest($id, $customers, $useAsDefault);
     }
     
     /***
@@ -92,28 +86,15 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * @param mixed $customers
      * @param int $languageResourceId
      */
-    public function addAssocs($customers,$languageResourceId){
-        foreach ($customers as $customer){
-            $model=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+    public function addAssocs($languageResourceId, array $customers, array $useAsDefault = []){
+        foreach ($customers as $id){
+            $model = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
             /* @var $model editor_Models_LanguageResources_CustomerAssoc */
-            $model->setCustomerId($customer->customerId ?? $customer);
+            $model->setCustomerId($id);
             $model->setLanguageResourceId($languageResourceId);
-            $model->setUseAsDefault($customer->useAsDefault ?? 0);
+            $model->setUseAsDefault(in_array($id, $useAsDefault));
             $model->save();
         }
-    }
-    /***
-     * Check if the update or save data is valid.
-     * 
-     * @param mixed $data
-     * @return boolean
-     */
-    private function checkUpdateSaveData(&$data){
-        //convert the data to array if it is of object type
-        if(is_object($data)){
-            $data=json_decode(json_encode($data), true);
-        }
-        return isset($data['resourcesCustomersHidden']) && isset($data['id']);
     }
     
     /***
