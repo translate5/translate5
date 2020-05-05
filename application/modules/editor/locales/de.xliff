@@ -1789,6 +1789,32 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U2NocmlmdGFydGVubGlzdGUgdm9tIFNlcnZlciBha3R1YWxpc2llcmVu'><source>Schriftartenliste vom Server aktualisieren</source><target>Schriftartenliste vom Server aktualisieren</target></trans-unit>
 <trans-unit id='QWxsZQ=='><source>Alle</source><target>Alle</target></trans-unit>
 <trans-unit id='QWxsZSBTY2hyaWZ0c8OkdHplIGFuemVpZ2Vu'><source>Alle Schriftsätze anzeigen</source><target>Alle Schriftsätze anzeigen</target></trans-unit>
+<trans-unit id='Vm9yaGFuZGVu'><source>Vorhanden</source><target>Vorhanden</target></trans-unit>
+<trans-unit id='QW56YWhsIFRhc2tz'><source>Anzahl Tasks</source><target>Anzahl Tasks</target></trans-unit>
+<trans-unit id='R2V3aWNodA=='><source>Gewicht</source><target>Gewicht</target></trans-unit>
+<trans-unit id='U2NocmlmdHNhdHogbMO2c2NoZW4='><source>Schriftsatz löschen</source><target>Schriftsatz löschen</target></trans-unit>
+<trans-unit id='Vm9yaGFuZGVuZQ=='><source>Vorhandene</source><target>Vorhandene</target></trans-unit>
+<trans-unit id='TnVyIHZvcmhhbmRlbmUgU2NocmlmdHPDpHR6ZSBhbnplaWdlbg=='><source>Nur vorhandene Schriftsätze anzeigen</source><target>Nur vorhandene Schriftsätze anzeigen</target></trans-unit>
+<trans-unit id='TmljaHQgdm9yaGFuZGVuZQ=='><source>Nicht vorhandene</source><target>Nicht vorhandene</target></trans-unit>
+<trans-unit id='TnVyIG5pY2h0IHZvcmhhbmRlbmUgc2NocmlmdHPDpHR6ZSBhbnplaWdlbg=='><source>Nur nicht vorhandene schriftsätze anzeigen</source><target>Nur nicht vorhandene schriftsätze anzeigen</target></trans-unit>
+<trans-unit id='RGVyIFNjaHJpZnRzYXR6IHd1cmRlIGdlbMO2c2NodC4='><source>Der Schriftsatz wurde gelöscht.</source><target>Der Schriftsatz wurde gelöscht.</target></trans-unit>
+<trans-unit id='U2NocmlmdHNhdHogd2lya2xpY2ggbMO2c2NoZW4/'><source>Schriftsatz wirklich löschen?</source><target>Schriftsatz wirklich löschen?</target></trans-unit>
+<trans-unit id='U2NocmlmdGFydCBiZWFyYmVpdGVu'><source>Schriftart bearbeiten</source><target>Schriftart bearbeiten</target></trans-unit>
+<trans-unit id='TGFkZSBEZXRhaWxz'><source>Lade Details</source><target>Lade Details</target></trans-unit>
+<trans-unit id='VGFza3MsIHdlbGNoZSBkaWVzZSBTY2hyaWZ0IHZlcndlbmRlbg=='><source>Tasks, welche diese Schrift verwenden</source><target>Tasks, welche diese Schrift verwenden</target></trans-unit>
+<trans-unit id='TmFtZSBkZXMgVGFza3M='><source>Name des Tasks</source><target>Name des Tasks</target></trans-unit>
+<trans-unit id='R1VJRA=='><source>GUID</source><target>GUID</target></trans-unit>
+<trans-unit id='V2ViIE9wZW4gRm9udCBGb3JtYXQgMS4wICgqLndvZmYp'><source>Web Open Font Format 1.0 (*.woff)</source><target>Web Open Font Format 1.0 (*.woff)</target></trans-unit>
+<trans-unit id='VHJ1ZVR5cGUgRm9udCAoKi50dGYp'><source>TrueType Font (*.ttf)</source><target>TrueType Font (*.ttf)</target></trans-unit>
+<trans-unit id='RGFzIERhdGVpZm9ybWF0IGRlciBhdXNnZXfDpGhsdGVuIFNjaHJpZnRhcnRlbi1EYXRlaSBpc3QgbmljaHQgcmljaHRpZy4='><source>Das Dateiformat der ausgewählten Schriftarten-Datei ist nicht richtig.</source><target>Das Dateiformat der ausgewählten Schriftarten-Datei ist nicht richtig.</target></trans-unit>
+<trans-unit id='V8OkaGxlbiBTaWUgZWluZSBXZWIgU2NocmlmdGFydGVuLURhdGVpIG1pdCBkZXIgRGF0ZWllbmR1bmcgezB9'><source>Wählen Sie eine Web Schriftarten-Datei mit der Dateiendung {0}</source><target>Wählen Sie eine Web Schriftarten-Datei mit der Dateiendung {0}</target></trans-unit>
+<trans-unit id='U2NocmlmdGFydGVuLUZvcm1hdGU='><source>Schriftarten-Formate</source><target>Schriftarten-Formate</target></trans-unit>
+<trans-unit id='SG9jaGxhZGVu'><source>Hochladen</source><target>Hochladen</target></trans-unit>
+<trans-unit id='TGFkZSBTY2hyaWZ0ZW4gaG9jaC4uLg=='><source>Lade Schriften hoch...</source><target>Lade Schriften hoch...</target></trans-unit>
+<trans-unit id='RGllIFNjaHJpZnRlbiB3dXJkZW4gZXJmb2xncmVpY2ggaG9jaGdlbGFkZW4='><source>Die Schriften wurden erfolgreich hochgeladen</source><target>Die Schriften wurden erfolgreich hochgeladen</target></trans-unit>
+<trans-unit id='RXJmb2xn'><source>Erfolg</source><target>Erfolg</target></trans-unit>
+<trans-unit id='U2llIG3DvHNzZW4gbWluZGVzdGVucyBlaW5lIFNjaHJpZnRhcnRlbi1EYXRlaSBob2NobGFkZW4='><source>Sie müssen mindestens eine Schriftarten-Datei hochladen</source><target>Sie müssen mindestens eine Schriftarten-Datei hochladen</target></trans-unit>
+<trans-unit id='UHJvYmxlbQ=='><source>Problem</source><target>Problem</target></trans-unit>
   </body>
  </file>
 </xliff>
