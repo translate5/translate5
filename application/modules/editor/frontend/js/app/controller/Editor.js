@@ -135,6 +135,9 @@ Ext.define('Editor.controller.Editor', {
             },
             '#naviToolbar #btnInsertWhitespaceTab': {
                 click: 'insertWhitespaceTab'
+            },
+            '#segmentMinMaxLength': {
+                insertNewline: 'insertWhitespaceNewline'
             }
         }
     },
@@ -1382,6 +1385,10 @@ Ext.define('Editor.controller.Editor', {
         plug = me.getEditPlugin();
         editor = plug.editor.mainEditor;
         editor.insertWhitespaceInEditor(whitespaceType, tagNr);
+        if (e === undefined) { // we can use insertWhitespace by firing an event, too
+            me.fireEvent('afterInsertWhitespace');
+            return;
+        }
         if (e.delegatedTarget.nodeName.toLowerCase() === 'a') {
             editor.focus();
         }

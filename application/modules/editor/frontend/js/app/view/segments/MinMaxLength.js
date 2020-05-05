@@ -38,11 +38,14 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     cls: 'segment-min-max',
     tpl: '<div class="{cls}" data-qtip="{tip}">{text}</div>',
     hidden:true,
+    mixins: ['Editor.util.Range'],
     strings: {
         minText:'#UT#Min. {minWidth}',
         maxText:'#UT# von {maxWidth}',
         siblingSegments: '#UT#Seg.: {siblings}'
     },
+    editor: null,
+    bookmarkForCaret: null,
     statics: {
         /**
          * Is the min/max width active according to the meta-data?
@@ -140,6 +143,13 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         var me=this,
             config = {};
         me.htmlEditor=instanceConfig.htmlEditor;
+        
+        Editor.app.getController('Editor').on({
+            afterInsertWhitespace:{
+                fn:me.handleAfterInsertWhitespace,
+                scope:me
+            }
+        });
 
         me.htmlEditor.on({
             change:{
@@ -176,33 +186,123 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * If max. number of lines are to be considered, we add line-breaks automatically. 
      */
     handleMaxNumberOfLines: function (htmlEditor, record, segmentLength, newValue, oldValue) {
-        var meta = record.get('metaCache'),
+        var me = this,
+            meta = record.get('metaCache'),
             minMaxLengthComp = Editor.view.segments.MinMaxLength,
             useMaxNumberOfLines = minMaxLengthComp.useMaxNumberOfLines(meta),
             oldSegmentLength,
             maxWidthPerLine,
-            newValueWithLinebreaks,
-            editorBody;
+            editorBody,
+            i,
+            range = rangy.createRange(),
+            linebreakNodes,
+            textInLine;
+        
         if (!useMaxNumberOfLines) {
             return;
         }
+        
         oldSegmentLength = htmlEditor.getTransunitLength(oldValue);
         if (segmentLength <= oldSegmentLength) {
-            // We don't check after content has been removed.
+            // We don't check after characters have been deleted.
             return;
         }
+        
         maxWidthPerLine = minMaxLengthComp.getMaxWidthPerLine(meta);
+        editorBody = htmlEditor.getEditorBody();
         
-        // TODO:
-        // check how to do this for multibyte / use ranges instead?:
-        // newValue.substring(0, maxWidthPerLine) + ' XXX ' + newValue.substring(maxWidthPerLine);
+        range.selectNodeContents(editorBody);
+        linebreakNodes = range.getNodes([1], function(node) {
+            return node.alt === "↵";
+        });
+        if (linebreakNodes.length === 0) {
+            linebreakNodes = [editorBody];
+        }
+
+        for (i = 0; i < linebreakNodes.length; i++) {
+            switch(true) {
+              case (i===0 && linebreakNodes.length===1 && linebreakNodes[i].isSameNode(editorBody)):
+                // = one single line only
+                range.selectNodeContents(editorBody);
+                break;
+              case (i===0):
+                // = first line
+                range.selectNodeContents(editorBody);
+                range.setEndBefore(linebreakNodes[i]);
+                break;
+              case (i===linebreakNodes.length-1): 
+                // = last line
+                range.selectNodeContents(editorBody);
+                range.setStartAfter(linebreakNodes[i]);
+                break;
+              default:
+                range.setStartAfter(linebreakNodes[i-1]);
+                range.setEndBefore(linebreakNodes[i]);
+            } 
+            textInLine = range.toString();
+            me.handleMaxLengthForLine(textInLine, maxWidthPerLine, htmlEditor);
+        }
+    },
+    
+    /**
+     * Add a line-break if the text is longer than allowed. 
+     */
+    handleMaxLengthForLine: function (textInLine, maxWidthPerLine, htmlEditor) {
+        var me = this,
+            editorBody,
+            textInLineWidth,
+            range,
+            wordsInLine,
+            i,
+            textToCheck = '',
+            textToCheckWidth,
+            textForLine = '',
+            options,
+            sel;
         
-        // TODO: 
-        // - check for each existing line if it is within the maxWidthPerLine
-        // - if not: check where the maxLength (pixel!) is in the content of the line (= html!)
-        // - add the line-break there (eg. in front of the last word before the line ends)
-        // - recalculate the other lines?
-        // - change content in Editor without running into the whole process again
+        textInLineWidth = htmlEditor.getTransunitLength(textInLine);
+        console.log(textInLineWidth + ': ' + textInLine);
+        if (textInLineWidth <= maxWidthPerLine) {
+            console.log('=> return');
+            return;
+        }
+        
+        editorBody = htmlEditor.getEditorBody();
+        range = rangy.createRange();
+        range.selectNodeContents(editorBody);
+        options = {
+                wholeWordsOnly: false,
+                withinRange: range
+        };
+        
+        wordsInLine = textInLine.split(' ');
+        for (i = 0; i < wordsInLine.length; i++) {
+            if (i>0) {
+                textToCheck += ' ';
+            }
+            textToCheck += wordsInLine[i];
+            textToCheckWidth = htmlEditor.getTransunitLength(textToCheck);
+            if (textToCheckWidth <= maxWidthPerLine) {
+                textForLine = textToCheck;
+            } else {
+                me.editor = htmlEditor;
+                me.bookmarkForCaret = me.getPositionOfCaret();
+                range.findText(textForLine, options);
+                range.collapse(false);
+                sel = rangy.getSelection(editorBody);
+                sel.setSingleRange(range);
+                this.fireEvent('insertNewline');
+                return;
+            }
+        }
+    },
+
+    /**
+     * After the new line is added, we need to restore where the user was currently typing.
+     */
+    handleAfterInsertWhitespace: function() {
+        var me = this;
+        me.setPositionOfCaret(me.bookmarkForCaret);
     },
 
     /***
