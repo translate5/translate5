@@ -718,7 +718,8 @@ Ext.define('Editor.controller.Localizer', {
             taskPrefs: '<?php echo $this->translate->_('Aufgabenspezifische Einstellungen');?>',
             actionReOpen: '<?php echo $this->translate->_('beendete Aufgabe wieder öffnen');?>',
             exp: '<?php echo $this->translate->_('Exportoptionen');?>',
-            actionExcelReimport: '<?php echo $this->translate->_('Excel Re-Importieren');?>'
+            actionExcelReimport: '<?php echo $this->translate->_('Excel Re-Importieren');?>',
+            projectOverview: '<?php echo $this->translate->_('zum Projekt springen');?>'
         }
     });
     
@@ -727,10 +728,17 @@ Ext.define('Editor.controller.Localizer', {
         title:'<?php echo $this->translate->_('Projektübersicht');?>',
         strings: {
             actionDelete: '<?php echo $this->translate->_('Projekt komplett löschen');?>',
-            columnProjectAction: '<?php echo $this->translate->_('Aktionen');?>',
-            columnProjectName: '<?php echo $this->translate->_('Projektname');?>',
-            columnProjectTaskName: '<?php echo $this->translate->_('Aufgabenname-Projekt');?>'
+            reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
+            reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren.');?>',
+            expandAllBtn: '<?php echo $this->translate->_('Alle Erweitern');?>',
+            expandAllBtnTip: '<?php echo $this->translate->_('Alle Projekte Erweitern');?>',
+            collapseAllBtn: '<?php echo $this->translate->_('Alle Reduziern');?>',
+            collapseAllBtnTip: '<?php echo $this->translate->_('Alle Projekte Reduziern');?>'
+        },
+        text_cols:{
+        	taskName: '<?php echo $this->translate->_('Projektname');?>'
         }
+        
     });
     
      Ext.define("Editor.locale.de.view.admin.ProjectGridViewController", {
@@ -1320,7 +1328,7 @@ Ext.define('Editor.controller.Localizer', {
             reload: '<?php echo $this->translate->_('Aktualisieren');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
             empty: '<?php echo $this->translate->_('Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.');?>',
-            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
+            groupHeader: '<?php echo $this->translate->_('Aufgabe: {[values.rows[0].data.taskName]}');?>',
             checked: '<?php echo $this->translate->_('Ressource in Aufgabe verwenden');?>',
             name: '<?php echo $this->translate->_('Name');?>',
             segmentsUpdateable: '<?php echo $this->translate->_('Segmente zurückspeichern');?>',

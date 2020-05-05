@@ -26,11 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Store for Editor.model.admin.Task
- * @class Editor.store.admin.Tasks
- * @extends Ext.data.Store
- */
 Ext.define('Editor.store.admin.ProjectTasks', {
 	extend : 'Ext.data.Store',
 	model: 'Editor.model.admin.ProjectTask',

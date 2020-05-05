@@ -188,6 +188,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
           if(task.get('userCount') == 0) {
               res.push('no-users');
           }
+          if(!task.get('projectId') || task.get('projectId')<1){
+        	  res=Ext.Array.remove(res,'editorProjectTask');
+          }
           return res.join(' ');
       }
   },
@@ -290,6 +293,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
     me.userStore = Ext.getStore('admin.Users');
     me.callParent(arguments);
     actions = me.down('taskActionColumn');
+    
     if(actions && actions.items.length > 0) {
         me.availableActions = Ext.Array.map(actions.items, function(item) {
             return item.isAllowedFor;
@@ -818,8 +822,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
       });
   },
   onDestroy: function() {
-      this.tooltip.destroy();
-      this.callParent(arguments);
+  	if(this.tooltip){
+  		this.tooltip.destroy();
+	}
+	this.callParent(arguments);
   },
   
   /***

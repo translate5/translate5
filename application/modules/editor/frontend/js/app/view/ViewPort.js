@@ -75,7 +75,7 @@ Ext.define('Editor.view.ViewPort', {
         if(user.isAllowed('taskOverviewFrontendController')) {
             mainSections.push({xtype: 'adminTaskGrid'});
         }
-        if(user.isAllowed('projectOverview')) {
+        if(user.isAllowed('editorProjectTask')) {
             mainSections.push({xtype: 'projectTaskGrid'});
         }
         if(user.isAllowed('languageResourcesOverview')) {

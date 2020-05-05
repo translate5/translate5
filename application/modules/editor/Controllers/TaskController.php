@@ -514,7 +514,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 foreach($this->data['targetLang'] as $target) {
                     $task = clone $this->entity;
                     $task->setProjectId($entityId);
-                    $task->setTaskType($task->getDefaultTasktype());
+                    $task->setTaskType($task::INITIAL_TASKTYPE_PROJECT_TASK);
                     $task->setTargetLang($target);
                     $task->setTaskName($this->entity->getTaskName().' - '.$languages[$task->getSourceLang()].' / '.$languages[$task->getTargetLang()]);
                     $this->processUploadedFile($task, $dpFactory->createFromTask($this->entity));
@@ -1721,8 +1721,33 @@ class editor_TaskController extends ZfExtended_RestController {
      * Handle the project/task load request.
      */
     protected function handleProjectRequest(){
-        $projectOnly=$this->getRequest()->getParam('projectsOnly',null);
-        $filterValues=[];
+        $projectOnly=$this->getRequest()->getParam('projectsOnly',null) ?? false;
+        $projectOnly=strtolower($projectOnly) == 'true' ?? false;
+        
+        if(!$this->entity->getFilter()->hasFilter('projectId')){
+            $filterValues=[editor_Models_Task::INITIAL_TASKTYPE_DEFAULT];
+        }
+        
+        if($projectOnly){
+            $filterValues[]=editor_Models_Task::INITIAL_TASKTYPE_PROJECT;
+        }else{
+            $filterValues[]=editor_Models_Task::INITIAL_TASKTYPE_PROJECT_TASK;
+        }
+        
+        if(!empty($filterValues)){
+            $this->entity->getFilter()->addFilter((object)[
+                'field' => 'taskType',
+                'value' =>$filterValues,
+                'type' => 'list',
+                'comparison' => 'in'
+            ]);
+        }
+        
+        return;
+        
+        
+        //TODO: is this okay ?
+        //$projectOnly=$projectOnly ?? (strtolower($projectOnly) == 'true');
         
         //the flag is null when the request is from the task store
         if(is_null($projectOnly)){

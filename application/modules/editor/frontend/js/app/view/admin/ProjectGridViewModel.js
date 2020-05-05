@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,33 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Remove all tasks to a given project. The class will use the task remover to clean the 
- * project files on the disk to
- */
-class editor_Models_Project_Remover {
+Ext.define('Editor.view.admin.ProjectGridViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.projectTaskGrid',
     
-    /***
-     * 
-     * @var int
-     */
-    protected $projectId;
-    
-    public function __construct(int $projectId) {
-        $this->projectId = $projectId;
-    }
-    
-    public function remove($forced = false) {
-        $model=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $model editor_Models_Task */
-        $tasks=$model->loadProjectTasks($this->projectId);
-        
-        foreach ($tasks as $task){
-            /* @var $task editor_Models_Task */
-            $model->load($task['id']);
-            $remover=ZfExtended_Factory::get('editor_Models_Task_Remover',[$model]);
-            /* @var $remover editor_Models_Task_Remover */
-            $remover->remove(true);
-        }
-    }
-}
+	expandCollapseIconCls:null,
+	expandCollapseText:null,
+	expandCollapseTip:null
+
+});

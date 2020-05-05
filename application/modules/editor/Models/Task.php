@@ -121,12 +121,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
 
     const INITIAL_TASKTYPE_DEFAULT = 'default';
     const INITIAL_TASKTYPE_PROJECT = 'project';
+    const INITIAL_TASKTYPE_PROJECT_TASK = 'projectTask';
 
     /**
      * All tasktypes that editor_Models_Validator_Task will consider as valid.
      * @var array
      */
-    public static $validTaskTypes = [self::INITIAL_TASKTYPE_DEFAULT, self::INITIAL_TASKTYPE_PROJECT];
+    public static $validTaskTypes = [self::INITIAL_TASKTYPE_DEFAULT, self::INITIAL_TASKTYPE_PROJECT, self::INITIAL_TASKTYPE_PROJECT_TASK];
 
     /**
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
@@ -1352,14 +1353,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
+     * Load all tasks of a given project. If taskOnly is true, in the result array, the master(project) task
+     * will not be included
      * 
      * @param int $projectId
-     * @return Zend_Db_Table_Rowset_Abstract
+     * @param bool $tasksOnly
+     * @return array
      */
-    public function loadProjectTasks(int $projectId) : Zend_Db_Table_Rowset_Abstract{
-        $s=$this->db->select()
-        ->where('projectId=?',$projectId);
-        return $this->db->fetchAll($s);
+    public function loadProjectTasks(int $projectId,bool $tasksOnly=false) : array{
+        $s=$this->db->select();
+        if($tasksOnly){
+            $s->where('taskType=?',$this->getDefaultTasktype());
+        }
+        $s->where('projectId=?',$projectId);
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /**

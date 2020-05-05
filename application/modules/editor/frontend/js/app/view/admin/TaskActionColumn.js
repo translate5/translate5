@@ -49,7 +49,8 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
       actionLog: '#UT# Ereignis-Protokoll',
       taskPrefs: '#UT# Aufgabenspezifische Einstellungen',
       exp: '#UT# Aufgabe exportieren',
-      actionExcelReimport: '#UT# Excel Re-Importieren'
+      actionExcelReimport: '#UT# Excel Re-Importieren',
+      projectOverview:'#UT#zum Projekt springen'
   },
   
   /**
@@ -134,6 +135,11 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
                 isAllowedFor: 'editorLogTask',
                 iconCls: 'ico-task-log',
                 sortIndex:13,
+            },{
+                tooltip: me.messages.projectOverview,
+                isAllowedFor: 'editorProjectTask',
+                iconCls: 'ico-task-project',
+                sortIndex:14
             }]
     };
 

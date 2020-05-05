@@ -30,14 +30,20 @@ Ext.define('Editor.view.admin.ProjectGridViewController', {
     alias: 'controller.projectTaskGrid',
     
     routes: {
-    	'project': 'onProjectRoute'
+    	'project': 'onProjectRoute',
+    	'project/:id' : 'onProjectRoute'
 	},
 	
 	
-	onProjectRoute:function() {
-		var me=this;
-		Editor.app.openAdministrationSection(me.getView(), 'project');
-		me.reloadProjects();
+	onProjectRoute:function(projectId) {
+		var me=this,
+			route=!projectId ? 'project' : ('project/'+projectId);
+		Editor.app.openAdministrationSection(me.getView(), route);
+		me.reloadProjects().then(function(records) {
+			projectId && me.onProjectFocus(projectId)
+		}, function(operation) {
+			Editor.app.getController('ServerException').handleException(operation.error.response);
+		});
 	},
     	
 	strings: {
@@ -48,22 +54,10 @@ Ext.define('Editor.view.admin.ProjectGridViewController', {
 		projectRemovedMessage:'#UT#Das Projekt wurde erfolgreich entfernt!'
 	},
 	
-    onProjectExpandBody:function (rowNode, record, expandRow, grid) {
-    	
-    	var loader=Ext.create('Editor.store.admin.ProjectTasks',{
-    		filters:[{
-    			property: 'projectId',
-        		operator:"eq",
-        		value: record.get('projectId')	
-    		}]
-    	});
-    	//load only the tasks foor the record project
-    	//TODO: check if store exist, reload it ?
-    	loader.load({
-    		callback: function(records, operation, success) {
-    			grid.setStore(loader);
-    	    }
-    	});
+    onProjectFocus:function(projectId){
+    	var me=this,
+    		record=me.getView().getStore().getById(projectId);
+    	me.getView().expandRow(record);
     },
     
     onDeleteProjectClick:function(grid, rowIndex, colIndex){
@@ -107,8 +101,30 @@ Ext.define('Editor.view.admin.ProjectGridViewController', {
         });
     },
     
-    reloadProjects:function(){
-    	this.getView().getStore().reload();
+    reloadProjects:function(reloadCallback){
+    	 var store = this.getView().getStore();
+         return new Ext.Promise(function (resolve, reject) {
+        	 store.load({
+                 callback: function(records, operation, success) {
+                	 success ? resolve(records) : reject(operation); 
+                 }
+             });
+         });
+    },
+    
+    onExpandCollapseAllBtnClick:function(btn){
+    	this.handleAllExpandCollapse(btn.pressed);
+    },
+    
+    handleAllExpandCollapse:function(btnPressed){
+    	var me=this,
+			view=me.getView(),
+			vm=view.getViewModel(),
+			strings=view.strings;
+		vm.set('expandCollapseIconCls',btnPressed ? 'ico-toggle' : 'ico-toggle-expand');
+		vm.set('expandCollapseText',btnPressed ? strings.collapseAllBtn : strings.expandAllBtn);
+		vm.set('expandCollapseTip',btnPressed ? strings.collapseAllBtnTip : strings.expandAllBtnTip);
+		view.handleExpandCollapseAll(btnPressed);
     }
 });
 

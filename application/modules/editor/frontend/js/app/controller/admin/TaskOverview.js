@@ -863,7 +863,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   handleTaskChangeUserAssoc: function(task) {
       this.fireEvent('handleTaskChangeUserAssoc', task);
   },
-
+  
+  /**
+   * Redirects the user to the task project in the project overview
+   * @param {Editor.model.admin.Task} task
+   */
+  handleTaskProject: function(task) {
+	  this.redirectTo('project/'+task.get('projectId'));
+  },
+  
   /**
    * On admin add task window show handler
    */

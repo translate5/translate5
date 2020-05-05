@@ -82,6 +82,8 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
           }
       }
   },
+  //TODO: remove the request counter stuff it is not used anymore
+  
   requestsCount:0,
   /**
    * inject the plugin tab and load the task meta data set
@@ -163,8 +165,8 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
           method = 'DELETE',
           url = Editor.data.restpath+'languageresourcetaskassoc',
           checkedData = Ext.JSON.encode({
-              languageResourceId: record.get('id'),
-              taskGuid: me.actualTask.get('taskGuid'),
+              languageResourceId: record.get('languageResourceId'),
+              taskGuid: record.get('taskGuid'),
               segmentsUpdateable: record.get('segmentsUpdateable')
           });
 
@@ -184,7 +186,7 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
               me.requestsCount--;
               if(record.data.checked){
                   var resp = Ext.util.JSON.decode(response.responseText),
-                      newId = resp.rows['id'];
+                      newId = resp.rows['languageResourceId'];
                   record.set('taskassocid', newId);
                   Editor.MessageBox.addSuccess(str.assocSave);
               }

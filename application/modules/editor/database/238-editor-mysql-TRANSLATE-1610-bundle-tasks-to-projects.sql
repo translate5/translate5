@@ -30,4 +30,4 @@ ALTER TABLE `LEK_task`
 ADD COLUMN `projectId` INT(11) NULL AFTER `taskType`;
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'editorDeleteProject');
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'basic', 'frontend', 'projectOverview');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'editorProjectTask');

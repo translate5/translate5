@@ -413,6 +413,8 @@ body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid
 .ico-loading {background-image: url("../images/loading_ico.gif");}
 .autoState-999 {background-position: center;background-repeat: no-repeat;}
 .ico-refresh {background-image: url("../images/arrow_refresh_small.png");}
+.ico-toggle {background-image: url("../images/toggle.png");}
+.ico-toggle-expand {background-image: url("../images/toggle_expand.png");}
 .ico-notify-user {background-image: url("../images/email_go.png");}
 .autoState-998 {
 	background-image: url(../images/typing.gif);
@@ -548,6 +550,7 @@ tr.customState td div {font-style: italic;}
 .ico-task-showexportmenu {background-image: url("../images/database_go.png");}
 .ico-task-clone {background-image: url("../images/page_copy.png");}
 .ico-task-excelreimport {background-image: url("../images/table_back.png");}
+.ico-task-project {background-image: url("../images/document_tree.png");}
 
 /* Key Performance Indicators (KPI) */
 .ico-kpi {background-image: url("../images/page_gear.png");}
@@ -580,6 +583,7 @@ tr.customState td div {font-style: italic;}
 .adminTaskGrid tr.editorShowexportmenuTask.customState.state-ExcelExported .ico-task-showexportmenu,
 .adminTaskGrid tr.editorShowexportmenuTask.customState.state-ExcelExported .ico-task-excelreimport,
 .adminTaskGrid tr.editorShowexportmenuTask .ico-task-showexportmenu {display: inline-block;}
+.adminTaskGrid tr.editorProjectTask .ico-task-project {display:inline-block;}
 .adminTaskGrid tr.pending .x-action-col-icon {display:none !important;}
 .adminTaskGrid tr.pending td.state div {background: url("../images/loading_ico.gif") no-repeat 6px center;}
 

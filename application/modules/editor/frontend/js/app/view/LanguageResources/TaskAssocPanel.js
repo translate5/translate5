@@ -53,7 +53,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
         reload: '#UT#Aktualisieren',
         save: '#UT#Speichern',
         empty: '#UT#Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.',
-        groupHeader: '#UT#Ressource: {name}',
+        groupHeader: '#UT#Aufgabe: {[values.rows[0].data.taskName]}',
         checked: '#UT#Ressource in Aufgabe verwenden',
         name: '#UT#Name',
         segmentsUpdateable: '#UT#Segmente zurückspeichern',
