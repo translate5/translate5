@@ -525,31 +525,18 @@ Ext.define('Editor.controller.TmOverview', {
         }
     },
 
-    /***
+    /**
      * Merge customer field values as comma separated values
      */
     mergeCustomerFieldIds:function(form){
-        var form=form.getForm(),
-            record = form.getRecord(),
-            resourcesCustomers=form.findField('resourcesCustomers'),
-            resourcesCustomersHidden=form.findField('resourcesCustomersHidden'),
-            useAsDefault=form.findField('useAsDefault'),
-            defaultCustomers=useAsDefault.getValue(),
-            customers=resourcesCustomers.getValue(),
-            customersData=[];
+        
+        //ensure that resourcesCustomers also contains the useAsDefault values!
+        
+        var customers = form.down('tagfield#resourcesCustomers'),
+            useAsDefault = form.down('tagfield#useAsDefault'),
+            customersToSet = Ext.Array.unique(useAsDefault.getValue().concat(customers.getValue()));
 
-        Ext.each(customers, function (item) {
-            customersData.push({
-                customerId:item,
-                useAsDefault:Ext.Array.contains(defaultCustomers, item) ? 1 :0
-            });
-        });
-
-        resourcesCustomersHidden.setValue(Ext.encode(customersData));
-        //if record exist(editTm) -> set it
-        if(record){
-            record.set('resourcesCustomersHidden',Ext.encode(customersData));
-        }
+        customers.setValue(customersToSet);
     },
 
     /**

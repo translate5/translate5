@@ -32,71 +32,71 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
     requires: [
         'Editor.view.admin.task.filter.FilterWindowViewController',
         'Editor.view.admin.task.filter.DateFilter'
-	],
+    ],
     controller: 'editorAdminTaskFilterFilterWindow',
     itemId: 'editorAdminTaskFilterFilterWindow',
     strings: {
-    	workflowStateFilterLabel:'#UT#Workflow-Status',
-    	workflowUserRoleLabel:'#UT#Zugewiesene Benutzer-Rolle/n',
-    	userNameLabel:'#UT#Zugewiesene/r Benutzer',
-    	applyBtn:'#UT#Anwenden',
-    	cancelBtn:'#UT#Abbrechen',
-    	title: '#UT#Erweiterte Filter',
-    	anonymizedUsersInfo:'#UT#Anonymisierte Benutzer nicht auswählbar',
+        workflowStateFilterLabel:'#UT#Workflow-Status',
+        workflowUserRoleLabel:'#UT#Zugewiesene Benutzer-Rolle/n',
+        userNameLabel:'#UT#Zugewiesene/r Benutzer',
+        applyBtn:'#UT#Anwenden',
+        cancelBtn:'#UT#Abbrechen',
+        title: '#UT#Erweiterte Filter',
+        anonymizedUsersInfo:'#UT#Anonymisierte Benutzer nicht auswählbar',
         gridFiltersInfo:'#UT#Weitere Filter im Kopf jeder Spalte',
         assignmentDateText:'#UT#Benutzer-Zuweisungsdatum',
         finishedDateText:'#UT#Benutzer-Abschlussdatum',
         deadlineDateText:'#UT#Benutzer-Deadline/s'
     },
     listeners:{
-    	render:'onFilterWindowRender'
+        render:'onFilterWindowRender'
     },
     bodyPadding: 20,
     layout: 'hbox',
     border:false,
     width:800,
-    height:400,
+    height:440,
     bodyStyle: {
-    	borderWidth:0,
+        borderWidth:0,
     },
-    
+
     initConfig: function(instanceConfig) {
-    	var me = this,
-    		config = {
-    			title:me.strings.title,
-    			scrollable: true,
-    			defaults:{
-    				xtype: 'container',
-			        flex: 1,
-			        margin: '0 5 0 0',
-			        autoSize: true
-    			},
-				items: [{
-			        
-			        items: [{
-			            xtype: 'tagfield',
-				        name:'userName',
-				        itemId:'userName',
-				        typeAhead: true,
-				        queryMode: 'local',
-				        displayField: 'longUserName',
-				        valueField: 'userGuid',
-				        store:'admin.UsersList',
-				        fieldLabel:me.strings.userNameLabel+'¹',
-				        labelWidth:'100%',
-				        filter:{
-				        	operator: 'in',
-				    		property:'userName',
-					        type:'list',
-					        textLabel:me.strings.userNameLabel
-				        }
-				    },{
-						xtype:'editorAdminTaskFilterDateFilter',
-						filterLabel:me.strings.assignmentDateText,
-						filterProperty:'assignmentDate',
-						itemId:'assignmentDate',
-						title:me.strings.assignmentDateText
-				    }]
+        var me = this,
+            config = {
+                title: me.strings.title,
+                scrollable: true,
+                defaults: {
+                    xtype: 'container',
+                    flex: 1,
+                    margin: '0 5 0 0',
+                    autoSize: true
+                },
+                items: [{
+                    items: [{
+                        xtype: 'tagfield',
+                        name:'userName',
+                        itemId:'userName',
+                        typeAhead: true,
+                        queryMode: 'local',
+                        displayField: 'longUserName',
+                        valueField: 'userGuid',
+                        store:'admin.UsersList',
+                        fieldLabel:me.strings.userNameLabel+'¹',
+                        labelAlign: 'top',
+                        labelWidth:'100%',
+                        filter: {
+                            operator: 'in',
+                            property:'userName',
+                            type:'list',
+                            textLabel:me.strings.userNameLabel
+                        }
+                    },{
+                        xtype:'editorAdminTaskFilterDateFilter',
+                        filterLabel:me.strings.assignmentDateText,
+                        filterProperty:'assignmentDate',
+                        itemId:'assignmentDate',
+                        title:me.strings.assignmentDateText
+                    }]
 			    }, {
 			        items: [{
 				        xtype: 'tagfield',
@@ -108,6 +108,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
 				        displayField: 'label',
 				        store:'admin.WorkflowState',
 				        fieldLabel: me.strings.workflowStateFilterLabel,
+				        labelAlign: 'top',
 				        labelWidth:'100%',
 				        filter:{
 				        	operator: 'in',
@@ -134,6 +135,7 @@ Ext.define('Editor.view.admin.task.filter.FilterWindow', {
 				        store:'admin.WorkflowUserRoles',
 				        fieldLabel: me.strings.workflowUserRoleLabel,
 				        labelWidth:'100%',
+				        labelAlign: 'top',
 				        filter:{
 				        	operator: 'in',
 				        	property:'workflowUserRole',
