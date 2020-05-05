@@ -66,7 +66,7 @@ class NecTmLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
     protected $languageResourceParams;
 
     /**
-     * 
+     *
      */
     public static function setUpBeforeClass(): void {
         self::markTestIncomplete("Still in progress!");
@@ -103,10 +103,10 @@ class NecTmLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
     }
 
     /**
-     * 
+     *
      */
     private function createLanguageResource($doImportFile) {
-        /*          
+        /*
                     [module] => editor
                     [controller] => languageresourceinstance
                     [action] => post
@@ -115,19 +115,19 @@ class NecTmLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
                     [name] => Test
                     [sourceLang] => 4
                     [targetLang] => 5
-                    [resourcesCustomers] => 1
-                    [resourcesCustomersHidden] => [{"customerId":1,"useAsDefault":0}]
-                    [tagfield-2178-inputEl] => 
+                    [customerIds] => Array
+                    customerUseAsDefaultIds => Array
+                    [tagfield-2178-inputEl] =>
                     [serviceType] => editor_Plugins_NecTm
                     [serviceName] => NEC-TM
-                    [specificData] => 
+                    [specificData] =>
                     [color] => 61bdaa
                     [categories] => [9]
                     [tmUpload] => Array
                         (
-                            [name] => 
-                            [type] => 
-                            [tmp_name] => 
+                            [name] =>
+                            [type] =>
+                            [tmp_name] =>
                             [error] => 4
                             [size] => 0
                         )
@@ -155,7 +155,7 @@ class NecTmLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
     }
 
     /**
-     * 
+     *
      */
     public static function tearDownAfterClass(): void {
         self::$api->login('testmanager');

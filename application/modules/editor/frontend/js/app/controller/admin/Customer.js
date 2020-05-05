@@ -294,13 +294,11 @@ Ext.define('Editor.controller.admin.Customer', {
      */
     setFilteredCustomerForLanguageResourceAdd: function(addTmWindow) {
         var me = this,
-            customerId = this.getCustomerSwitchValue(),
-            resourcesCustomersField;
+            customerId = this.getCustomerSwitchValue();
         if (customerId == me.customerSwitchAllClientsValue) {
             return;
         }
-        resourcesCustomersField = addTmWindow.down('#resourcesCustomers');
-        resourcesCustomersField.setValue(customerId);
+        addTmWindow.down('#resourcesCustomers').setValue(customerId);
     },
     
     /**
@@ -443,7 +441,7 @@ Ext.define('Editor.controller.admin.Customer', {
                 return 'customers';
                 break;
             case 'Editor.store.LanguageResources.LanguageResource':
-                return 'resourcesCustomers';
+                return 'customerIds';
                 break;
         }
     },
