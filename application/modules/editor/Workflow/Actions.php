@@ -96,7 +96,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         }
         $userGuid = $this->currentUser()->getUserGuid();
         if(empty($this->config->newTua)) {
-            $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid,$task);
+            $tua =editor_Models_Loaders_Taskuserassoc::loadByTaskSmart($userGuid,$task);
         }
         else {
             $tua = $this->config->newTua;
@@ -115,7 +115,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         
         $userGuid = $this->currentUser()->getUserGuid();
         if(empty($this->config->newTua)) {
-            $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid,$task);
+            $tua =editor_Models_Loaders_Taskuserassoc::loadByTaskSmart($userGuid,$task);
         }
         else {
             $tua = $this->config->newTua;

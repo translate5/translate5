@@ -236,7 +236,16 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
         $userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $userTaskAssoc editor_Models_TaskUserAssoc */
         try {
-            $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->getUserGuid(), $this->task);
+            $acl=ZfExtended_Acl::getInstance();
+            $isUserPm=$this->task->getPmGuid()==$this->user->getUserGuid();
+            $isEditAllAllowed=$acl->isInAllowedRoles($this->user->getRoles(), 'backend', 'editAllTasks');
+            $isEditAllTasks = $isEditAllAllowed || $isUserPm;
+            //if the user is allowe to load all, use the default loader
+            if($isEditAllTasks){
+                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->getUserGuid(), $this->task);
+            }else{
+                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskSmart($this->user->getUserGuid(), $this->task);
+            }
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
@@ -343,4 +352,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
     public function getSegmentErrors() : array {
         return $this->segmentError;
     }
+    
+    protected function isEditAllTasks
+    
 }

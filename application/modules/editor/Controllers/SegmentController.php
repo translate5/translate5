@@ -157,7 +157,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     protected function getUsersAutoStateIds() {
         $sessionUser = new Zend_Session_Namespace('user');
         
-        $taskUserAssoc=editor_Models_Loaders_Taskuserassoc::loadByTaskGuid($sessionUser->data->userGuid,$this->session->taskGuid);
+        $taskUserAssoc=editor_Models_Loaders_Taskuserassoc::loadByTaskGuidSmart($sessionUser->data->userGuid,$this->session->taskGuid);
         
         if($taskUserAssoc->getIsPmOverride()) {
             $userRole = 'pm';
