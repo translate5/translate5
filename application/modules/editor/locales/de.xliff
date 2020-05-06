@@ -1815,6 +1815,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RXJmb2xn'><source>Erfolg</source><target>Erfolg</target></trans-unit>
 <trans-unit id='U2llIG3DvHNzZW4gbWluZGVzdGVucyBlaW5lIFNjaHJpZnRhcnRlbi1EYXRlaSBob2NobGFkZW4='><source>Sie müssen mindestens eine Schriftarten-Datei hochladen</source><target>Sie müssen mindestens eine Schriftarten-Datei hochladen</target></trans-unit>
 <trans-unit id='UHJvYmxlbQ=='><source>Problem</source><target>Problem</target></trans-unit>
+<trans-unit id='Vm9yaGFuZGVuZSBEYXRlaWVu'><source>Vorhandene Dateien</source><target>Vorhandene Dateien</target></trans-unit>
   </body>
  </file>
 </xliff>
