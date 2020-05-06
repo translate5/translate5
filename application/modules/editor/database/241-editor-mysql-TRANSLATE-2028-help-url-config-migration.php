@@ -9,8 +9,8 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
@@ -27,18 +27,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/** 
+/**
  * Removes the loaderUrl from the section state object to separate loaderUrl config for the section
  */
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
-$this->doNotSavePhpForDebugging = false;
+//$this->doNotSavePhpForDebugging = false;
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
 /**
- * define database credential variables 
+ * define database credential variables
  */
 $argc = count($argv);
 if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
