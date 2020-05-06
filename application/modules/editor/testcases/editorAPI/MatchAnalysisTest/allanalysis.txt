@@ -1,1 +1,2828 @@
-[{"segmentNrInTask":"1","internalFuzzy":"0","matchRate":"101","wordCount":"3"},{"segmentNrInTask":"1","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"1","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"2","internalFuzzy":"0","matchRate":"100","wordCount":"4"},{"segmentNrInTask":"2","internalFuzzy":"0","matchRate":"100","wordCount":"4"},{"segmentNrInTask":"2","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"3","internalFuzzy":"0","matchRate":"100","wordCount":"20"},{"segmentNrInTask":"3","internalFuzzy":"0","matchRate":"100","wordCount":"20"},{"segmentNrInTask":"3","internalFuzzy":"0","matchRate":"0","wordCount":"20"},{"segmentNrInTask":"4","internalFuzzy":"0","matchRate":"100","wordCount":"29"},{"segmentNrInTask":"4","internalFuzzy":"0","matchRate":"100","wordCount":"29"},{"segmentNrInTask":"4","internalFuzzy":"0","matchRate":"0","wordCount":"29"},{"segmentNrInTask":"5","internalFuzzy":"0","matchRate":"100","wordCount":"26"},{"segmentNrInTask":"5","internalFuzzy":"0","matchRate":"100","wordCount":"26"},{"segmentNrInTask":"5","internalFuzzy":"0","matchRate":"0","wordCount":"26"},{"segmentNrInTask":"6","internalFuzzy":"0","matchRate":"90","wordCount":"26"},{"segmentNrInTask":"6","internalFuzzy":"0","matchRate":"90","wordCount":"26"},{"segmentNrInTask":"6","internalFuzzy":"0","matchRate":"0","wordCount":"26"},{"segmentNrInTask":"7","internalFuzzy":"0","matchRate":"100","wordCount":"28"},{"segmentNrInTask":"7","internalFuzzy":"0","matchRate":"100","wordCount":"28"},{"segmentNrInTask":"7","internalFuzzy":"0","matchRate":"0","wordCount":"28"},{"segmentNrInTask":"8","internalFuzzy":"0","matchRate":"100","wordCount":"16"},{"segmentNrInTask":"8","internalFuzzy":"0","matchRate":"100","wordCount":"16"},{"segmentNrInTask":"8","internalFuzzy":"0","matchRate":"0","wordCount":"16"},{"segmentNrInTask":"9","internalFuzzy":"0","matchRate":"88","wordCount":"21"},{"segmentNrInTask":"9","internalFuzzy":"0","matchRate":"88","wordCount":"21"},{"segmentNrInTask":"9","internalFuzzy":"0","matchRate":"0","wordCount":"21"},{"segmentNrInTask":"10","internalFuzzy":"0","matchRate":"88","wordCount":"15"},{"segmentNrInTask":"10","internalFuzzy":"0","matchRate":"88","wordCount":"15"},{"segmentNrInTask":"10","internalFuzzy":"0","matchRate":"0","wordCount":"15"},{"segmentNrInTask":"11","internalFuzzy":"0","matchRate":"100","wordCount":"13"},{"segmentNrInTask":"11","internalFuzzy":"0","matchRate":"100","wordCount":"13"},{"segmentNrInTask":"11","internalFuzzy":"0","matchRate":"0","wordCount":"13"},{"segmentNrInTask":"12","internalFuzzy":"0","matchRate":"90","wordCount":"30"},{"segmentNrInTask":"12","internalFuzzy":"0","matchRate":"90","wordCount":"30"},{"segmentNrInTask":"12","internalFuzzy":"0","matchRate":"0","wordCount":"30"},{"segmentNrInTask":"13","internalFuzzy":"0","matchRate":"39","wordCount":"8"},{"segmentNrInTask":"13","internalFuzzy":"0","matchRate":"39","wordCount":"8"},{"segmentNrInTask":"13","internalFuzzy":"0","matchRate":"0","wordCount":"8"},{"segmentNrInTask":"14","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"14","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"14","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"15","internalFuzzy":"0","matchRate":"0","wordCount":"18"},{"segmentNrInTask":"15","internalFuzzy":"0","matchRate":"0","wordCount":"18"},{"segmentNrInTask":"15","internalFuzzy":"0","matchRate":"0","wordCount":"18"},{"segmentNrInTask":"16","internalFuzzy":"0","matchRate":"0","wordCount":"15"},{"segmentNrInTask":"16","internalFuzzy":"0","matchRate":"0","wordCount":"15"},{"segmentNrInTask":"16","internalFuzzy":"0","matchRate":"0","wordCount":"15"},{"segmentNrInTask":"17","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"17","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"17","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"18","internalFuzzy":"0","matchRate":"0","wordCount":"10"},{"segmentNrInTask":"18","internalFuzzy":"0","matchRate":"0","wordCount":"10"},{"segmentNrInTask":"18","internalFuzzy":"0","matchRate":"0","wordCount":"10"},{"segmentNrInTask":"19","internalFuzzy":"0","matchRate":"0","wordCount":"13"},{"segmentNrInTask":"19","internalFuzzy":"0","matchRate":"0","wordCount":"13"},{"segmentNrInTask":"19","internalFuzzy":"0","matchRate":"0","wordCount":"13"},{"segmentNrInTask":"20","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"20","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"20","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"21","internalFuzzy":"0","matchRate":"0","wordCount":"21"},{"segmentNrInTask":"21","internalFuzzy":"0","matchRate":"0","wordCount":"21"},{"segmentNrInTask":"21","internalFuzzy":"0","matchRate":"0","wordCount":"21"},{"segmentNrInTask":"22","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"22","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"22","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"23","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"23","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"23","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"24","internalFuzzy":"0","matchRate":"100","wordCount":"17"},{"segmentNrInTask":"24","internalFuzzy":"0","matchRate":"100","wordCount":"17"},{"segmentNrInTask":"24","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"25","internalFuzzy":"0","matchRate":"63","wordCount":"20"},{"segmentNrInTask":"25","internalFuzzy":"0","matchRate":"63","wordCount":"20"},{"segmentNrInTask":"25","internalFuzzy":"0","matchRate":"0","wordCount":"20"},{"segmentNrInTask":"26","internalFuzzy":"0","matchRate":"68","wordCount":"22"},{"segmentNrInTask":"26","internalFuzzy":"0","matchRate":"68","wordCount":"22"},{"segmentNrInTask":"26","internalFuzzy":"0","matchRate":"0","wordCount":"22"},{"segmentNrInTask":"27","internalFuzzy":"0","matchRate":"100","wordCount":"6"},{"segmentNrInTask":"27","internalFuzzy":"0","matchRate":"100","wordCount":"6"},{"segmentNrInTask":"27","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"28","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"28","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"28","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"29","internalFuzzy":"1","matchRate":"101","wordCount":"3"},{"segmentNrInTask":"29","internalFuzzy":"1","matchRate":"101","wordCount":"3"},{"segmentNrInTask":"29","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"30","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"30","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"30","internalFuzzy":"0","matchRate":"99","wordCount":"3"},{"segmentNrInTask":"31","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"31","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"31","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"32","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"32","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"32","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"33","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"33","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"33","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"34","internalFuzzy":"1","matchRate":"46","wordCount":"10"},{"segmentNrInTask":"34","internalFuzzy":"1","matchRate":"46","wordCount":"10"},{"segmentNrInTask":"34","internalFuzzy":"0","matchRate":"0","wordCount":"10"},{"segmentNrInTask":"35","internalFuzzy":"0","matchRate":"57","wordCount":"4"},{"segmentNrInTask":"35","internalFuzzy":"0","matchRate":"57","wordCount":"4"},{"segmentNrInTask":"35","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"36","internalFuzzy":"0","matchRate":"34","wordCount":"3"},{"segmentNrInTask":"36","internalFuzzy":"0","matchRate":"34","wordCount":"3"},{"segmentNrInTask":"36","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"37","internalFuzzy":"0","matchRate":"66","wordCount":"3"},{"segmentNrInTask":"37","internalFuzzy":"0","matchRate":"66","wordCount":"3"},{"segmentNrInTask":"37","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"38","internalFuzzy":"1","matchRate":"46","wordCount":"7"},{"segmentNrInTask":"38","internalFuzzy":"1","matchRate":"46","wordCount":"7"},{"segmentNrInTask":"38","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"39","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"39","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"39","internalFuzzy":"0","matchRate":"104","wordCount":"3"},{"segmentNrInTask":"40","internalFuzzy":"0","matchRate":"100","wordCount":"18"},{"segmentNrInTask":"40","internalFuzzy":"0","matchRate":"100","wordCount":"18"},{"segmentNrInTask":"40","internalFuzzy":"0","matchRate":"0","wordCount":"18"},{"segmentNrInTask":"41","internalFuzzy":"0","matchRate":"100","wordCount":"27"},{"segmentNrInTask":"41","internalFuzzy":"0","matchRate":"100","wordCount":"27"},{"segmentNrInTask":"41","internalFuzzy":"0","matchRate":"0","wordCount":"27"},{"segmentNrInTask":"42","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"42","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"42","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"43","internalFuzzy":"0","matchRate":"90","wordCount":"8"},{"segmentNrInTask":"43","internalFuzzy":"0","matchRate":"90","wordCount":"8"},{"segmentNrInTask":"43","internalFuzzy":"0","matchRate":"0","wordCount":"8"},{"segmentNrInTask":"44","internalFuzzy":"0","matchRate":"92","wordCount":"19"},{"segmentNrInTask":"44","internalFuzzy":"0","matchRate":"92","wordCount":"19"},{"segmentNrInTask":"44","internalFuzzy":"0","matchRate":"0","wordCount":"19"},{"segmentNrInTask":"45","internalFuzzy":"0","matchRate":"100","wordCount":"17"},{"segmentNrInTask":"45","internalFuzzy":"0","matchRate":"100","wordCount":"17"},{"segmentNrInTask":"45","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"46","internalFuzzy":"0","matchRate":"90","wordCount":"7"},{"segmentNrInTask":"46","internalFuzzy":"0","matchRate":"90","wordCount":"7"},{"segmentNrInTask":"46","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"47","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"47","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"47","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"48","internalFuzzy":"0","matchRate":"88","wordCount":"18"},{"segmentNrInTask":"48","internalFuzzy":"0","matchRate":"88","wordCount":"18"},{"segmentNrInTask":"48","internalFuzzy":"0","matchRate":"0","wordCount":"18"},{"segmentNrInTask":"49","internalFuzzy":"0","matchRate":"100","wordCount":"4"},{"segmentNrInTask":"49","internalFuzzy":"0","matchRate":"100","wordCount":"4"},{"segmentNrInTask":"49","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"50","internalFuzzy":"0","matchRate":"86","wordCount":"16"},{"segmentNrInTask":"50","internalFuzzy":"0","matchRate":"86","wordCount":"16"},{"segmentNrInTask":"50","internalFuzzy":"0","matchRate":"0","wordCount":"16"},{"segmentNrInTask":"51","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"51","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"51","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"52","internalFuzzy":"0","matchRate":"78","wordCount":"11"},{"segmentNrInTask":"52","internalFuzzy":"0","matchRate":"78","wordCount":"11"},{"segmentNrInTask":"52","internalFuzzy":"0","matchRate":"0","wordCount":"11"},{"segmentNrInTask":"53","internalFuzzy":"0","matchRate":"101","wordCount":"7"},{"segmentNrInTask":"53","internalFuzzy":"0","matchRate":"100","wordCount":"7"},{"segmentNrInTask":"53","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"54","internalFuzzy":"0","matchRate":"102","wordCount":"7"},{"segmentNrInTask":"55","internalFuzzy":"0","matchRate":"100","wordCount":"8"},{"segmentNrInTask":"55","internalFuzzy":"0","matchRate":"100","wordCount":"8"},{"segmentNrInTask":"55","internalFuzzy":"0","matchRate":"0","wordCount":"8"},{"segmentNrInTask":"56","internalFuzzy":"0","matchRate":"100","wordCount":"4"},{"segmentNrInTask":"56","internalFuzzy":"0","matchRate":"100","wordCount":"4"},{"segmentNrInTask":"56","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"57","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"57","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"57","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"58","internalFuzzy":"0","matchRate":"90","wordCount":"10"},{"segmentNrInTask":"58","internalFuzzy":"0","matchRate":"90","wordCount":"10"},{"segmentNrInTask":"58","internalFuzzy":"0","matchRate":"0","wordCount":"10"},{"segmentNrInTask":"59","internalFuzzy":"0","matchRate":"0","wordCount":"21"},{"segmentNrInTask":"59","internalFuzzy":"0","matchRate":"0","wordCount":"21"},{"segmentNrInTask":"59","internalFuzzy":"0","matchRate":"0","wordCount":"21"},{"segmentNrInTask":"60","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"60","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"60","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"61","internalFuzzy":"0","matchRate":"66","wordCount":"16"},{"segmentNrInTask":"61","internalFuzzy":"0","matchRate":"66","wordCount":"16"},{"segmentNrInTask":"61","internalFuzzy":"0","matchRate":"0","wordCount":"16"},{"segmentNrInTask":"62","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"62","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"62","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"63","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"63","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"63","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"64","internalFuzzy":"1","matchRate":"52","wordCount":"5"},{"segmentNrInTask":"64","internalFuzzy":"1","matchRate":"52","wordCount":"5"},{"segmentNrInTask":"64","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"65","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"65","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"65","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"66","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"66","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"66","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"67","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"67","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"67","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"68","internalFuzzy":"0","matchRate":"28","wordCount":"6"},{"segmentNrInTask":"68","internalFuzzy":"0","matchRate":"28","wordCount":"6"},{"segmentNrInTask":"68","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"69","internalFuzzy":"1","matchRate":"101","wordCount":"3"},{"segmentNrInTask":"69","internalFuzzy":"1","matchRate":"101","wordCount":"3"},{"segmentNrInTask":"69","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"70","internalFuzzy":"0","matchRate":"57","wordCount":"5"},{"segmentNrInTask":"70","internalFuzzy":"0","matchRate":"57","wordCount":"5"},{"segmentNrInTask":"70","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"71","internalFuzzy":"0","matchRate":"100","wordCount":"21"},{"segmentNrInTask":"71","internalFuzzy":"0","matchRate":"100","wordCount":"21"},{"segmentNrInTask":"71","internalFuzzy":"0","matchRate":"0","wordCount":"21"},{"segmentNrInTask":"72","internalFuzzy":"0","matchRate":"100","wordCount":"24"},{"segmentNrInTask":"72","internalFuzzy":"0","matchRate":"100","wordCount":"24"},{"segmentNrInTask":"72","internalFuzzy":"0","matchRate":"0","wordCount":"24"},{"segmentNrInTask":"73","internalFuzzy":"0","matchRate":"92","wordCount":"36"},{"segmentNrInTask":"73","internalFuzzy":"0","matchRate":"92","wordCount":"36"},{"segmentNrInTask":"73","internalFuzzy":"0","matchRate":"0","wordCount":"36"},{"segmentNrInTask":"74","internalFuzzy":"0","matchRate":"102","wordCount":"3"},{"segmentNrInTask":"75","internalFuzzy":"1","matchRate":"77","wordCount":"4"},{"segmentNrInTask":"75","internalFuzzy":"1","matchRate":"77","wordCount":"4"},{"segmentNrInTask":"75","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"76","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"76","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"76","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"77","internalFuzzy":"0","matchRate":"42","wordCount":"3"},{"segmentNrInTask":"77","internalFuzzy":"0","matchRate":"42","wordCount":"3"},{"segmentNrInTask":"77","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"78","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"78","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"78","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"79","internalFuzzy":"0","matchRate":"102","wordCount":"1"},{"segmentNrInTask":"80","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"80","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"80","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"81","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"81","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"81","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"82","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"82","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"82","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"83","internalFuzzy":"0","matchRate":"102","wordCount":"5"},{"segmentNrInTask":"84","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"84","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"84","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"85","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"85","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"85","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"86","internalFuzzy":"0","matchRate":"102","wordCount":"6"},{"segmentNrInTask":"87","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"87","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"87","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"88","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"88","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"88","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"89","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"89","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"89","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"90","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"90","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"90","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"91","internalFuzzy":"0","matchRate":"100","wordCount":"4"},{"segmentNrInTask":"91","internalFuzzy":"0","matchRate":"100","wordCount":"4"},{"segmentNrInTask":"91","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"92","internalFuzzy":"0","matchRate":"102","wordCount":"2"},{"segmentNrInTask":"93","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"93","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"93","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"94","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"94","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"94","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"95","internalFuzzy":"0","matchRate":"102","wordCount":"3"},{"segmentNrInTask":"96","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"96","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"96","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"97","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"97","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"97","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"98","internalFuzzy":"1","matchRate":"63","wordCount":"2"},{"segmentNrInTask":"98","internalFuzzy":"1","matchRate":"63","wordCount":"2"},{"segmentNrInTask":"98","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"99","internalFuzzy":"1","matchRate":"57","wordCount":"4"},{"segmentNrInTask":"99","internalFuzzy":"1","matchRate":"57","wordCount":"4"},{"segmentNrInTask":"99","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"100","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"100","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"100","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"101","internalFuzzy":"0","matchRate":"104","wordCount":"3"},{"segmentNrInTask":"102","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"102","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"102","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"103","internalFuzzy":"0","matchRate":"102","wordCount":"2"},{"segmentNrInTask":"104","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"104","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"104","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"105","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"105","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"105","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"106","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"106","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"106","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"107","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"107","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"107","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"108","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"108","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"108","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"109","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"109","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"109","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"110","internalFuzzy":"0","matchRate":"101","wordCount":"1"},{"segmentNrInTask":"110","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"110","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"111","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"111","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"111","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"112","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"112","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"112","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"113","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"113","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"113","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"114","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"114","internalFuzzy":"0","matchRate":"100","wordCount":"1"},{"segmentNrInTask":"114","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"115","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"115","internalFuzzy":"0","matchRate":"100","wordCount":"2"},{"segmentNrInTask":"115","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"116","internalFuzzy":"0","matchRate":"100","wordCount":"9"},{"segmentNrInTask":"116","internalFuzzy":"0","matchRate":"100","wordCount":"9"},{"segmentNrInTask":"116","internalFuzzy":"0","matchRate":"0","wordCount":"9"},{"segmentNrInTask":"117","internalFuzzy":"0","matchRate":"100","wordCount":"11"},{"segmentNrInTask":"117","internalFuzzy":"0","matchRate":"100","wordCount":"11"},{"segmentNrInTask":"117","internalFuzzy":"0","matchRate":"0","wordCount":"11"},{"segmentNrInTask":"118","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"118","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"118","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"119","internalFuzzy":"0","matchRate":"100","wordCount":"19"},{"segmentNrInTask":"119","internalFuzzy":"0","matchRate":"100","wordCount":"19"},{"segmentNrInTask":"119","internalFuzzy":"0","matchRate":"0","wordCount":"19"},{"segmentNrInTask":"120","internalFuzzy":"0","matchRate":"92","wordCount":"19"},{"segmentNrInTask":"120","internalFuzzy":"0","matchRate":"92","wordCount":"19"},{"segmentNrInTask":"120","internalFuzzy":"0","matchRate":"0","wordCount":"19"},{"segmentNrInTask":"121","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"121","internalFuzzy":"0","matchRate":"100","wordCount":"3"},{"segmentNrInTask":"121","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"122","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"122","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"122","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"123","internalFuzzy":"0","matchRate":"11","wordCount":"6"},{"segmentNrInTask":"123","internalFuzzy":"0","matchRate":"11","wordCount":"6"},{"segmentNrInTask":"123","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"124","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"124","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"124","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"125","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"125","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"125","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"126","internalFuzzy":"1","matchRate":"77","wordCount":"3"},{"segmentNrInTask":"126","internalFuzzy":"1","matchRate":"77","wordCount":"3"},{"segmentNrInTask":"126","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"127","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"127","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"127","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"128","internalFuzzy":"0","matchRate":"0","wordCount":"19"},{"segmentNrInTask":"128","internalFuzzy":"0","matchRate":"0","wordCount":"19"},{"segmentNrInTask":"128","internalFuzzy":"0","matchRate":"0","wordCount":"19"},{"segmentNrInTask":"129","internalFuzzy":"1","matchRate":"85","wordCount":"6"},{"segmentNrInTask":"129","internalFuzzy":"1","matchRate":"85","wordCount":"6"},{"segmentNrInTask":"129","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"130","internalFuzzy":"0","matchRate":"0","wordCount":"14"},{"segmentNrInTask":"130","internalFuzzy":"0","matchRate":"0","wordCount":"14"},{"segmentNrInTask":"130","internalFuzzy":"0","matchRate":"0","wordCount":"14"},{"segmentNrInTask":"131","internalFuzzy":"0","matchRate":"0","wordCount":"13"},{"segmentNrInTask":"131","internalFuzzy":"0","matchRate":"0","wordCount":"13"},{"segmentNrInTask":"131","internalFuzzy":"0","matchRate":"0","wordCount":"13"},{"segmentNrInTask":"132","internalFuzzy":"0","matchRate":"47","wordCount":"3"},{"segmentNrInTask":"132","internalFuzzy":"0","matchRate":"47","wordCount":"3"},{"segmentNrInTask":"132","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"133","internalFuzzy":"0","matchRate":"22","wordCount":"3"},{"segmentNrInTask":"133","internalFuzzy":"0","matchRate":"22","wordCount":"3"},{"segmentNrInTask":"133","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"134","internalFuzzy":"1","matchRate":"54","wordCount":"5"},{"segmentNrInTask":"134","internalFuzzy":"1","matchRate":"54","wordCount":"5"},{"segmentNrInTask":"134","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"135","internalFuzzy":"1","matchRate":"46","wordCount":"6"},{"segmentNrInTask":"135","internalFuzzy":"1","matchRate":"46","wordCount":"6"},{"segmentNrInTask":"135","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"136","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"136","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"136","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"137","internalFuzzy":"0","matchRate":"0","wordCount":"8"},{"segmentNrInTask":"137","internalFuzzy":"0","matchRate":"0","wordCount":"8"},{"segmentNrInTask":"137","internalFuzzy":"0","matchRate":"0","wordCount":"8"},{"segmentNrInTask":"138","internalFuzzy":"1","matchRate":"27","wordCount":"7"},{"segmentNrInTask":"138","internalFuzzy":"1","matchRate":"27","wordCount":"7"},{"segmentNrInTask":"138","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"139","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"139","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"139","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"140","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"140","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"140","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"141","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"141","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"141","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"142","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"142","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"142","internalFuzzy":"0","matchRate":"0","wordCount":"17"},{"segmentNrInTask":"143","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"143","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"143","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"144","internalFuzzy":"0","matchRate":"0","wordCount":"14"},{"segmentNrInTask":"144","internalFuzzy":"0","matchRate":"0","wordCount":"14"},{"segmentNrInTask":"144","internalFuzzy":"0","matchRate":"0","wordCount":"14"},{"segmentNrInTask":"145","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"145","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"145","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"146","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"146","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"146","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"147","internalFuzzy":"0","matchRate":"0","wordCount":"10"},{"segmentNrInTask":"147","internalFuzzy":"0","matchRate":"0","wordCount":"10"},{"segmentNrInTask":"147","internalFuzzy":"0","matchRate":"0","wordCount":"10"},{"segmentNrInTask":"148","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"148","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"148","internalFuzzy":"0","matchRate":"0","wordCount":"7"},{"segmentNrInTask":"149","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"149","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"149","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"150","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"150","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"150","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"151","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"151","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"151","internalFuzzy":"0","matchRate":"0","wordCount":"4"},{"segmentNrInTask":"152","internalFuzzy":"0","matchRate":"0","wordCount":"11"},{"segmentNrInTask":"152","internalFuzzy":"0","matchRate":"0","wordCount":"11"},{"segmentNrInTask":"152","internalFuzzy":"0","matchRate":"0","wordCount":"11"},{"segmentNrInTask":"153","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"153","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"153","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"154","internalFuzzy":"0","matchRate":"0","wordCount":"14"},{"segmentNrInTask":"154","internalFuzzy":"0","matchRate":"0","wordCount":"14"},{"segmentNrInTask":"154","internalFuzzy":"0","matchRate":"0","wordCount":"14"},{"segmentNrInTask":"155","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"155","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"155","internalFuzzy":"0","matchRate":"0","wordCount":"3"},{"segmentNrInTask":"156","internalFuzzy":"1","matchRate":"75","wordCount":"5"},{"segmentNrInTask":"156","internalFuzzy":"1","matchRate":"75","wordCount":"5"},{"segmentNrInTask":"156","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"157","internalFuzzy":"1","matchRate":"60","wordCount":"5"},{"segmentNrInTask":"157","internalFuzzy":"1","matchRate":"60","wordCount":"5"},{"segmentNrInTask":"157","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"158","internalFuzzy":"1","matchRate":"77","wordCount":"6"},{"segmentNrInTask":"158","internalFuzzy":"1","matchRate":"77","wordCount":"6"},{"segmentNrInTask":"158","internalFuzzy":"0","matchRate":"0","wordCount":"6"},{"segmentNrInTask":"159","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"159","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"159","internalFuzzy":"0","matchRate":"0","wordCount":"2"},{"segmentNrInTask":"160","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"160","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"160","internalFuzzy":"0","matchRate":"0","wordCount":"1"},{"segmentNrInTask":"161","internalFuzzy":"1","matchRate":"80","wordCount":"12"},{"segmentNrInTask":"161","internalFuzzy":"1","matchRate":"80","wordCount":"12"},{"segmentNrInTask":"161","internalFuzzy":"0","matchRate":"0","wordCount":"12"},{"segmentNrInTask":"162","internalFuzzy":"1","matchRate":"50","wordCount":"5"},{"segmentNrInTask":"162","internalFuzzy":"1","matchRate":"50","wordCount":"5"},{"segmentNrInTask":"162","internalFuzzy":"0","matchRate":"0","wordCount":"5"},{"segmentNrInTask":"163","internalFuzzy":"1","matchRate":"63","wordCount":"8"},{"segmentNrInTask":"163","internalFuzzy":"1","matchRate":"63","wordCount":"8"},{"segmentNrInTask":"163","internalFuzzy":"0","matchRate":"0","wordCount":"8"}]
+[
+    {
+        "segmentNrInTask": "1",
+        "internalFuzzy": "0",
+        "matchRate": "101",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "1",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "1",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "2",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "2",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "2",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "3",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "20"
+    },
+    {
+        "segmentNrInTask": "3",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "20"
+    },
+    {
+        "segmentNrInTask": "3",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "20"
+    },
+    {
+        "segmentNrInTask": "4",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "29"
+    },
+    {
+        "segmentNrInTask": "4",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "29"
+    },
+    {
+        "segmentNrInTask": "4",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "29"
+    },
+    {
+        "segmentNrInTask": "5",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "26"
+    },
+    {
+        "segmentNrInTask": "5",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "26"
+    },
+    {
+        "segmentNrInTask": "5",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "26"
+    },
+    {
+        "segmentNrInTask": "6",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "26"
+    },
+    {
+        "segmentNrInTask": "6",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "26"
+    },
+    {
+        "segmentNrInTask": "6",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "26"
+    },
+    {
+        "segmentNrInTask": "7",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "28"
+    },
+    {
+        "segmentNrInTask": "7",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "28"
+    },
+    {
+        "segmentNrInTask": "7",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "28"
+    },
+    {
+        "segmentNrInTask": "8",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "16"
+    },
+    {
+        "segmentNrInTask": "8",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "16"
+    },
+    {
+        "segmentNrInTask": "8",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "16"
+    },
+    {
+        "segmentNrInTask": "9",
+        "internalFuzzy": "0",
+        "matchRate": "88",
+        "wordCount": "21"
+    },
+    {
+        "segmentNrInTask": "9",
+        "internalFuzzy": "0",
+        "matchRate": "88",
+        "wordCount": "21"
+    },
+    {
+        "segmentNrInTask": "9",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21"
+    },
+    {
+        "segmentNrInTask": "10",
+        "internalFuzzy": "0",
+        "matchRate": "88",
+        "wordCount": "15"
+    },
+    {
+        "segmentNrInTask": "10",
+        "internalFuzzy": "0",
+        "matchRate": "88",
+        "wordCount": "15"
+    },
+    {
+        "segmentNrInTask": "10",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "15"
+    },
+    {
+        "segmentNrInTask": "11",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "13"
+    },
+    {
+        "segmentNrInTask": "11",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "13"
+    },
+    {
+        "segmentNrInTask": "11",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13"
+    },
+    {
+        "segmentNrInTask": "12",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "30"
+    },
+    {
+        "segmentNrInTask": "12",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "30"
+    },
+    {
+        "segmentNrInTask": "12",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "30"
+    },
+    {
+        "segmentNrInTask": "13",
+        "internalFuzzy": "0",
+        "matchRate": "39",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "13",
+        "internalFuzzy": "0",
+        "matchRate": "39",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "13",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "14",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "14",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "14",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "15",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "18"
+    },
+    {
+        "segmentNrInTask": "15",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "18"
+    },
+    {
+        "segmentNrInTask": "15",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "18"
+    },
+    {
+        "segmentNrInTask": "16",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "15"
+    },
+    {
+        "segmentNrInTask": "16",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "15"
+    },
+    {
+        "segmentNrInTask": "16",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "15"
+    },
+    {
+        "segmentNrInTask": "17",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "17",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "17",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "18",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10"
+    },
+    {
+        "segmentNrInTask": "18",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10"
+    },
+    {
+        "segmentNrInTask": "18",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10"
+    },
+    {
+        "segmentNrInTask": "19",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13"
+    },
+    {
+        "segmentNrInTask": "19",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13"
+    },
+    {
+        "segmentNrInTask": "19",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13"
+    },
+    {
+        "segmentNrInTask": "20",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "20",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "20",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "21",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21"
+    },
+    {
+        "segmentNrInTask": "21",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21"
+    },
+    {
+        "segmentNrInTask": "21",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21"
+    },
+    {
+        "segmentNrInTask": "22",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "22",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "22",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "23",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "23",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "23",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "24",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "24",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "24",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "25",
+        "internalFuzzy": "0",
+        "matchRate": "63",
+        "wordCount": "20"
+    },
+    {
+        "segmentNrInTask": "25",
+        "internalFuzzy": "0",
+        "matchRate": "63",
+        "wordCount": "20"
+    },
+    {
+        "segmentNrInTask": "25",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "20"
+    },
+    {
+        "segmentNrInTask": "26",
+        "internalFuzzy": "0",
+        "matchRate": "68",
+        "wordCount": "22"
+    },
+    {
+        "segmentNrInTask": "26",
+        "internalFuzzy": "0",
+        "matchRate": "68",
+        "wordCount": "22"
+    },
+    {
+        "segmentNrInTask": "26",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "22"
+    },
+    {
+        "segmentNrInTask": "27",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "27",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "27",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "28",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "28",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "28",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "29",
+        "internalFuzzy": "1",
+        "matchRate": "101",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "29",
+        "internalFuzzy": "1",
+        "matchRate": "101",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "29",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "30",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "30",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "30",
+        "internalFuzzy": "0",
+        "matchRate": "99",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "31",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "31",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "31",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "32",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "32",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "32",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "33",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "33",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "33",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "34",
+        "internalFuzzy": "1",
+        "matchRate": "46",
+        "wordCount": "10"
+    },
+    {
+        "segmentNrInTask": "34",
+        "internalFuzzy": "1",
+        "matchRate": "46",
+        "wordCount": "10"
+    },
+    {
+        "segmentNrInTask": "34",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10"
+    },
+    {
+        "segmentNrInTask": "35",
+        "internalFuzzy": "0",
+        "matchRate": "57",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "35",
+        "internalFuzzy": "0",
+        "matchRate": "57",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "35",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "36",
+        "internalFuzzy": "0",
+        "matchRate": "34",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "36",
+        "internalFuzzy": "0",
+        "matchRate": "34",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "36",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "37",
+        "internalFuzzy": "0",
+        "matchRate": "66",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "37",
+        "internalFuzzy": "0",
+        "matchRate": "66",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "37",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "38",
+        "internalFuzzy": "1",
+        "matchRate": "46",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "38",
+        "internalFuzzy": "1",
+        "matchRate": "46",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "38",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "39",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "39",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "39",
+        "internalFuzzy": "0",
+        "matchRate": "104",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "40",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "18"
+    },
+    {
+        "segmentNrInTask": "40",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "18"
+    },
+    {
+        "segmentNrInTask": "40",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "18"
+    },
+    {
+        "segmentNrInTask": "41",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "27"
+    },
+    {
+        "segmentNrInTask": "41",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "27"
+    },
+    {
+        "segmentNrInTask": "41",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "27"
+    },
+    {
+        "segmentNrInTask": "42",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "42",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "42",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "43",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "43",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "43",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "44",
+        "internalFuzzy": "0",
+        "matchRate": "92",
+        "wordCount": "19"
+    },
+    {
+        "segmentNrInTask": "44",
+        "internalFuzzy": "0",
+        "matchRate": "92",
+        "wordCount": "19"
+    },
+    {
+        "segmentNrInTask": "44",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "19"
+    },
+    {
+        "segmentNrInTask": "45",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "45",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "45",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "46",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "46",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "46",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "47",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "47",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "47",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "48",
+        "internalFuzzy": "0",
+        "matchRate": "88",
+        "wordCount": "18"
+    },
+    {
+        "segmentNrInTask": "48",
+        "internalFuzzy": "0",
+        "matchRate": "88",
+        "wordCount": "18"
+    },
+    {
+        "segmentNrInTask": "48",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "18"
+    },
+    {
+        "segmentNrInTask": "49",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "49",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "49",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "50",
+        "internalFuzzy": "0",
+        "matchRate": "86",
+        "wordCount": "16"
+    },
+    {
+        "segmentNrInTask": "50",
+        "internalFuzzy": "0",
+        "matchRate": "86",
+        "wordCount": "16"
+    },
+    {
+        "segmentNrInTask": "50",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "16"
+    },
+    {
+        "segmentNrInTask": "51",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "51",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "51",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "52",
+        "internalFuzzy": "0",
+        "matchRate": "78",
+        "wordCount": "11"
+    },
+    {
+        "segmentNrInTask": "52",
+        "internalFuzzy": "0",
+        "matchRate": "78",
+        "wordCount": "11"
+    },
+    {
+        "segmentNrInTask": "52",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "11"
+    },
+    {
+        "segmentNrInTask": "53",
+        "internalFuzzy": "0",
+        "matchRate": "101",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "53",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "53",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "54",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "55",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "55",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "55",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "56",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "56",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "56",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "57",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "57",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "57",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "58",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "10"
+    },
+    {
+        "segmentNrInTask": "58",
+        "internalFuzzy": "0",
+        "matchRate": "90",
+        "wordCount": "10"
+    },
+    {
+        "segmentNrInTask": "58",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10"
+    },
+    {
+        "segmentNrInTask": "59",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21"
+    },
+    {
+        "segmentNrInTask": "59",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21"
+    },
+    {
+        "segmentNrInTask": "59",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21"
+    },
+    {
+        "segmentNrInTask": "60",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "60",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "60",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "61",
+        "internalFuzzy": "0",
+        "matchRate": "66",
+        "wordCount": "16"
+    },
+    {
+        "segmentNrInTask": "61",
+        "internalFuzzy": "0",
+        "matchRate": "66",
+        "wordCount": "16"
+    },
+    {
+        "segmentNrInTask": "61",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "16"
+    },
+    {
+        "segmentNrInTask": "62",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "62",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "62",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "63",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "63",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "63",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "64",
+        "internalFuzzy": "1",
+        "matchRate": "52",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "64",
+        "internalFuzzy": "1",
+        "matchRate": "52",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "64",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "65",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "65",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "65",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "66",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "66",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "66",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "67",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "67",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "67",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "68",
+        "internalFuzzy": "0",
+        "matchRate": "28",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "68",
+        "internalFuzzy": "0",
+        "matchRate": "28",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "68",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "69",
+        "internalFuzzy": "1",
+        "matchRate": "101",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "69",
+        "internalFuzzy": "1",
+        "matchRate": "101",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "69",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "70",
+        "internalFuzzy": "0",
+        "matchRate": "57",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "70",
+        "internalFuzzy": "0",
+        "matchRate": "57",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "70",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "71",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "21"
+    },
+    {
+        "segmentNrInTask": "71",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "21"
+    },
+    {
+        "segmentNrInTask": "71",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "21"
+    },
+    {
+        "segmentNrInTask": "72",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "24"
+    },
+    {
+        "segmentNrInTask": "72",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "24"
+    },
+    {
+        "segmentNrInTask": "72",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "24"
+    },
+    {
+        "segmentNrInTask": "73",
+        "internalFuzzy": "0",
+        "matchRate": "92",
+        "wordCount": "36"
+    },
+    {
+        "segmentNrInTask": "73",
+        "internalFuzzy": "0",
+        "matchRate": "92",
+        "wordCount": "36"
+    },
+    {
+        "segmentNrInTask": "73",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "36"
+    },
+    {
+        "segmentNrInTask": "74",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "75",
+        "internalFuzzy": "1",
+        "matchRate": "77",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "75",
+        "internalFuzzy": "1",
+        "matchRate": "77",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "75",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "76",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "76",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "76",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "77",
+        "internalFuzzy": "0",
+        "matchRate": "42",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "77",
+        "internalFuzzy": "0",
+        "matchRate": "42",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "77",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "78",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "78",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "78",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "79",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "80",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "80",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "80",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "81",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "81",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "81",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "82",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "82",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "82",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "83",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "84",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "84",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "84",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "85",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "85",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "85",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "86",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "87",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "87",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "87",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "88",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "88",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "88",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "89",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "89",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "89",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "90",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "90",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "90",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "91",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "91",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "91",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "92",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "93",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "93",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "93",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "94",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "94",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "94",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "95",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "96",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "96",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "96",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "97",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "97",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "97",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "98",
+        "internalFuzzy": "1",
+        "matchRate": "63",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "98",
+        "internalFuzzy": "1",
+        "matchRate": "63",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "98",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "99",
+        "internalFuzzy": "1",
+        "matchRate": "57",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "99",
+        "internalFuzzy": "1",
+        "matchRate": "57",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "99",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "100",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "100",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "100",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "101",
+        "internalFuzzy": "0",
+        "matchRate": "104",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "102",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "102",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "102",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "103",
+        "internalFuzzy": "0",
+        "matchRate": "102",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "104",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "104",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "104",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "105",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "105",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "105",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "106",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "106",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "106",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "107",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "107",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "107",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "108",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "108",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "108",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "109",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "109",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "109",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "110",
+        "internalFuzzy": "0",
+        "matchRate": "101",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "110",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "110",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "111",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "111",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "111",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "112",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "112",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "112",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "113",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "113",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "113",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "114",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "114",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "114",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "115",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "115",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "115",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "116",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "9"
+    },
+    {
+        "segmentNrInTask": "116",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "9"
+    },
+    {
+        "segmentNrInTask": "116",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "9"
+    },
+    {
+        "segmentNrInTask": "117",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "11"
+    },
+    {
+        "segmentNrInTask": "117",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "11"
+    },
+    {
+        "segmentNrInTask": "117",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "11"
+    },
+    {
+        "segmentNrInTask": "118",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "118",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "118",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "119",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "19"
+    },
+    {
+        "segmentNrInTask": "119",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "19"
+    },
+    {
+        "segmentNrInTask": "119",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "19"
+    },
+    {
+        "segmentNrInTask": "120",
+        "internalFuzzy": "0",
+        "matchRate": "92",
+        "wordCount": "19"
+    },
+    {
+        "segmentNrInTask": "120",
+        "internalFuzzy": "0",
+        "matchRate": "92",
+        "wordCount": "19"
+    },
+    {
+        "segmentNrInTask": "120",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "19"
+    },
+    {
+        "segmentNrInTask": "121",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "121",
+        "internalFuzzy": "0",
+        "matchRate": "100",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "121",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "122",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "122",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "122",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "123",
+        "internalFuzzy": "0",
+        "matchRate": "11",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "123",
+        "internalFuzzy": "0",
+        "matchRate": "11",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "123",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "124",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "124",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "124",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "125",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "125",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "125",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "126",
+        "internalFuzzy": "1",
+        "matchRate": "77",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "126",
+        "internalFuzzy": "1",
+        "matchRate": "77",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "126",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "127",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "127",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "127",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "128",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "19"
+    },
+    {
+        "segmentNrInTask": "128",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "19"
+    },
+    {
+        "segmentNrInTask": "128",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "19"
+    },
+    {
+        "segmentNrInTask": "129",
+        "internalFuzzy": "1",
+        "matchRate": "85",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "129",
+        "internalFuzzy": "1",
+        "matchRate": "85",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "129",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "130",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14"
+    },
+    {
+        "segmentNrInTask": "130",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14"
+    },
+    {
+        "segmentNrInTask": "130",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14"
+    },
+    {
+        "segmentNrInTask": "131",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13"
+    },
+    {
+        "segmentNrInTask": "131",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13"
+    },
+    {
+        "segmentNrInTask": "131",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "13"
+    },
+    {
+        "segmentNrInTask": "132",
+        "internalFuzzy": "0",
+        "matchRate": "47",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "132",
+        "internalFuzzy": "0",
+        "matchRate": "47",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "132",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "133",
+        "internalFuzzy": "0",
+        "matchRate": "22",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "133",
+        "internalFuzzy": "0",
+        "matchRate": "22",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "133",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "134",
+        "internalFuzzy": "1",
+        "matchRate": "54",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "134",
+        "internalFuzzy": "1",
+        "matchRate": "54",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "134",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "135",
+        "internalFuzzy": "1",
+        "matchRate": "46",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "135",
+        "internalFuzzy": "1",
+        "matchRate": "46",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "135",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "136",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "136",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "136",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "137",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "137",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "137",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "138",
+        "internalFuzzy": "1",
+        "matchRate": "27",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "138",
+        "internalFuzzy": "1",
+        "matchRate": "27",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "138",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "139",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "139",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "139",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "140",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "140",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "140",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "141",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "141",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "141",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "142",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "142",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "142",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "17"
+    },
+    {
+        "segmentNrInTask": "143",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "143",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "143",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "144",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14"
+    },
+    {
+        "segmentNrInTask": "144",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14"
+    },
+    {
+        "segmentNrInTask": "144",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14"
+    },
+    {
+        "segmentNrInTask": "145",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "145",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "145",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "146",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "146",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "146",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "147",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10"
+    },
+    {
+        "segmentNrInTask": "147",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10"
+    },
+    {
+        "segmentNrInTask": "147",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "10"
+    },
+    {
+        "segmentNrInTask": "148",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "148",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "148",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "7"
+    },
+    {
+        "segmentNrInTask": "149",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "149",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "149",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "150",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "150",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "150",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "151",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "151",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "151",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "4"
+    },
+    {
+        "segmentNrInTask": "152",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "11"
+    },
+    {
+        "segmentNrInTask": "152",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "11"
+    },
+    {
+        "segmentNrInTask": "152",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "11"
+    },
+    {
+        "segmentNrInTask": "153",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "153",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "153",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "154",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14"
+    },
+    {
+        "segmentNrInTask": "154",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14"
+    },
+    {
+        "segmentNrInTask": "154",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "14"
+    },
+    {
+        "segmentNrInTask": "155",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "155",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "155",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "3"
+    },
+    {
+        "segmentNrInTask": "156",
+        "internalFuzzy": "1",
+        "matchRate": "75",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "156",
+        "internalFuzzy": "1",
+        "matchRate": "75",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "156",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "157",
+        "internalFuzzy": "1",
+        "matchRate": "60",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "157",
+        "internalFuzzy": "1",
+        "matchRate": "60",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "157",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "158",
+        "internalFuzzy": "1",
+        "matchRate": "77",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "158",
+        "internalFuzzy": "1",
+        "matchRate": "77",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "158",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "6"
+    },
+    {
+        "segmentNrInTask": "159",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "159",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "159",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "2"
+    },
+    {
+        "segmentNrInTask": "160",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "160",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "160",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "1"
+    },
+    {
+        "segmentNrInTask": "161",
+        "internalFuzzy": "1",
+        "matchRate": "80",
+        "wordCount": "12"
+    },
+    {
+        "segmentNrInTask": "161",
+        "internalFuzzy": "1",
+        "matchRate": "80",
+        "wordCount": "12"
+    },
+    {
+        "segmentNrInTask": "161",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "12"
+    },
+    {
+        "segmentNrInTask": "162",
+        "internalFuzzy": "1",
+        "matchRate": "50",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "162",
+        "internalFuzzy": "1",
+        "matchRate": "50",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "162",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "5"
+    },
+    {
+        "segmentNrInTask": "163",
+        "internalFuzzy": "1",
+        "matchRate": "63",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "163",
+        "internalFuzzy": "1",
+        "matchRate": "63",
+        "wordCount": "8"
+    },
+    {
+        "segmentNrInTask": "163",
+        "internalFuzzy": "0",
+        "matchRate": "0",
+        "wordCount": "8"
+    }
+]
