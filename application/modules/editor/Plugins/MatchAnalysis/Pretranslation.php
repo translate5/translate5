@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -33,31 +33,31 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     use ZfExtended_Logger_DebugTrait;
     
     /***
-     * 
+     *
      * @var editor_Models_Task
      */
     protected $task;
     
     /***
-     * 
+     *
      * @var editor_Models_SegmentFieldManager
      */
     protected $sfm;
     
     /***
-     * 
+     *
      * @var editor_Models_TaskUserAssoc
      */
     protected $userTaskAssoc;
     
     /***
-     * 
+     *
      * @var string
      */
     protected $userGuid;
     
     /***
-     * 
+     *
      * @var string
      */
     protected $userName;
@@ -120,8 +120,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     /***
      * Use the given TM analyse (or MT if analyse was empty) result to update the segment
-     * Update the segment only if it is not TRANSLATED  
-     * 
+     * Update the segment only if it is not TRANSLATED
+     *
      * @param editor_Models_Segment $segment
      * @param stdClass $result - match resources result
      */
@@ -234,7 +234,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             return;
         }
         
-        //if a user pretranslates an already imported task, we set the autostate and workflow step to values fitting to the user 
+        //if a user pretranslates an already imported task, we set the autostate and workflow step to values fitting to the user
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
         $activeWorkflow=$wfm->getActive($this->task->getTaskGuid());
@@ -273,7 +273,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         }
         
         try {
-            $this->userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($this->userGuid, $this->task);
+            $this->userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($this->userGuid, $this->task);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             $this->userTaskAssoc->setUserGuid($this->userGuid);
@@ -328,7 +328,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     }
     
     /***
-     * Save the segment(set the duration and the timestamp) and the segmenthistory 
+     * Save the segment(set the duration and the timestamp) and the segmenthistory
      * @param editor_Models_Segment $segment
      * @param editor_Models_SegmentHistory $history
      */

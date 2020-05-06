@@ -64,6 +64,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         'SnapshotHistory' => true,
         'Termportal' => true,
         'JsLogger' => true,
+        'editor.CustomPanel' => true,
         'QmSubSegments' => false,                //disabled by default, controlled by ACL
         'admin.TaskOverview' => false,           //disabled by default, controlled by ACL
         'admin.TaskPreferences' => false,        //disabled by default, controlled by ACL
@@ -315,6 +316,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->setLanguageResourceJsVars();
       
       $this->view->Php2JsVars()->set('editor.editorBrandingSource',$rop->editor->editorBrandingSource);
+
+      $this->view->Php2JsVars()->set('customPanel.title',$this->translate->_($rop->editor->customPanel->title));
+      $this->view->Php2JsVars()->set('customPanel.url',$rop->editor->customPanel->url);
+      
+      //helpWindow config config values for each section (loaderUrl)
+      $this->view->Php2JsVars()->set('frontend.helpWindow',$rop->frontend->helpWindow->toArray());
+      
       $this->setJsAppData();
     }
 
@@ -449,7 +457,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         /* @var $acl ZfExtended_Acl */
         
         $ed = $this->config->runtimeOptions->editor;
-        
+
         if($ed->enableQmSubSegments){
             $this->frontendEndControllers['QmSubSegments'] = true;
         }

@@ -439,10 +439,15 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @return array
      */
     protected function initConnectors(){
-        
         $languageResources=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
         $assocs=$languageResources->loadByAssociatedTaskGuid($this->task->getTaskGuid());
+        
+        $availableConnectorStatus = [
+            editor_Services_Connector_Abstract::STATUS_AVAILABLE,
+            //NOT_LOADED must be also considered as AVAILABLE, since OpenTM2 Tms are basically not loaded and therefore we can not decide if they are usable or not
+            editor_Services_Connector_FilebasedAbstract::STATUS_NOT_LOADED
+        ];
         
         if(empty($assocs)){
             return array();
@@ -465,7 +470,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $moreInfo='';
                 //throw a worning if the language resource is not available
                 $status = $connector->getStatus($moreInfo);
-                if($status != editor_Services_Connector_Abstract::STATUS_AVAILABLE){
+                if(!in_array($status, $availableConnectorStatus)){
                     $this->log->warn('E1239','MatchAnalysis Plug-In: The associated language resource "{name}" is not available for match analysis and pre-translations.',[
                         'task' => $this->task,
                         'name' => $languageresource->getName(),

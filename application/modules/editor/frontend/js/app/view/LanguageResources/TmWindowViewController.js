@@ -200,7 +200,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
             selectedValues=[];
         
         if(!asDefaultSelection || asDefaultSelection.length<1 && record){
-            asDefaultSelection=record.get('useAsDefault');
+            asDefaultSelection=record.get('customerUseAsDefaultIds');
         }
         //INFO: bevause of extjs bug, unable to use the selected records from the customers as model data to the defaultCustomers store
         //https://www.sencha.com/forum/showthread.php?304305-Uncaught-TypeError-Cannot-read-property-internalId-of-undefined
