@@ -262,7 +262,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             linebreakNodes = [editorBody];
         }
         
-        for (i = 0; i < linebreakNodes.length; i++) {
+        for (i = 0; i <= linebreakNodes.length; i++) {
             switch(true) {
               case (i===0 && linebreakNodes.length===1 && linebreakNodes[i].isSameNode(editorBody)):
                 // = one single line only
@@ -273,10 +273,10 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 range.selectNodeContents(editorBody);
                 range.setEndBefore(linebreakNodes[i]);
                 break;
-              case (i===linebreakNodes.length-1): 
+              case (i===linebreakNodes.length): 
                 // = last line
                 range.selectNodeContents(editorBody);
-                range.setStartAfter(linebreakNodes[i]);
+                range.setStartAfter(linebreakNodes[i-1]);
                 break;
               default:
                 range.setStartAfter(linebreakNodes[i-1]);
@@ -317,7 +317,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         
         allLines = me.getLinesAndLength();
         
-        if (allLines.length >= meta.maxNumberOfLines) {
+        if (allLines.length >= (meta.maxNumberOfLines-1)) {
             return;
         }
         
