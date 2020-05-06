@@ -90,6 +90,22 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     }
     
     /**
+     * Get all "lines" in the segment as indicated by newline-tags (= "hardReturn").
+     * @param string $segment
+     * @return array
+     */
+    public function getLinesAccordingToNewlineTags(string $segment) {
+        $replacer = function($match) {
+            if (in_array('hardReturn', $match)) {
+                return '<hardReturn/>';
+            }
+            return implode($match);
+        };
+        $segmentWithHardReturns = preg_replace_callback(self::REGEX_INTERNAL_TAGS, $replacer, $segment);
+        return explode('<hardReturn/>',$segmentWithHardReturns);
+    }
+    
+    /**
      * returns the stored length of the given tag node
      * @param string $tag the tag as div/span construct
      * @return integer returns the length of the tag or -1 of no length configured

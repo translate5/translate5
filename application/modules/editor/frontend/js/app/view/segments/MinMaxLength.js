@@ -254,6 +254,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         var me = this,
             editorBody = me.editor.getEditorBody(),
             linebreakNodes,
+            i,
             lines = [],
             textInLine,
             lineWidth,
@@ -261,37 +262,36 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         
         range.selectNodeContents(editorBody);
         linebreakNodes = range.getNodes([1], function(node) {
-            return node.alt === "↵";
+            return node.alt === "↵"; // TODO: stattdessen auf css newline abfragen
         });
         if (linebreakNodes.length === 0) {
-            linebreakNodes = [editorBody];
-        }
-        
-        for (i = 0; i <= linebreakNodes.length; i++) {
-            switch(true) {
-              case (i===0 && linebreakNodes.length===1 && linebreakNodes[i].isSameNode(editorBody)):
-                // = one single line only
-                range.selectNodeContents(editorBody);
-                break;
-              case (i===0):
-                // = first line
-                range.selectNodeContents(editorBody);
-                range.setEndBefore(linebreakNodes[i]);
-                break;
-              case (i===linebreakNodes.length): 
-                // = last line
-                range.selectNodeContents(editorBody);
-                range.setStartAfter(linebreakNodes[i-1]);
-                break;
-              default:
-                range.setStartAfter(linebreakNodes[i-1]);
-                range.setEndBefore(linebreakNodes[i]);
-            } 
+            // = one single line only
             textInLine = range.toString();
             lineWidth = me.editor.getTransunitLength(textInLine);
             lines.push({textInLine:textInLine, lineWidth:lineWidth});
+        } else {
+            for (i = 0; i <= linebreakNodes.length; i++) {
+                switch(true) {
+                  case (i===0):
+                    // = first line
+                    range.selectNodeContents(editorBody);
+                    range.setEndBefore(linebreakNodes[i]);
+                    break;
+                  case (i===linebreakNodes.length): 
+                    // = last line
+                    range.selectNodeContents(editorBody);
+                    range.setStartAfter(linebreakNodes[i-1]);
+                    break;
+                  default:
+                    range.setStartAfter(linebreakNodes[i-1]);
+                    range.setEndBefore(linebreakNodes[i]);
+                } 
+                textInLine = range.toString();
+                lineWidth = me.editor.getTransunitLength(textInLine);
+                lines.push({textInLine:textInLine, lineWidth:lineWidth});
+            }
         }
-        
+        console.dir(lines);
         return lines;
     },
     
@@ -322,7 +322,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         
         allLines = me.getLinesAndLength();
         
-        if (allLines.length >= (meta.maxNumberOfLines-1)) {
+        if (allLines.length >= (meta.maxNumberOfLines)) {
             return;
         }
         

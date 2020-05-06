@@ -202,6 +202,11 @@ class editor_Models_Segment_PixelLength {
         $charsNotSet = array();
         $charsNotSetMsg = '';
         
+        // TODO: check lines or segment?
+        $tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        /* @var $tagHelper editor_Models_Segment_InternalTag */
+        $test = $tagHelper->getLinesAccordingToNewlineTags($segmentContent);
+        
         // prepare string for counting
         $segmentContent = $this->segment->prepareForPixelBasedLengthCount($segmentContent);
         
