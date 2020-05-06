@@ -259,7 +259,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->reloadTask();
         error_log('Task status:'.$this->api()->getTask()->state);
         $counter=0;
-        $limitCheck=20;
+        $limitCheck = 25;
         while ($this->api()->getTask()->state!='open'){
             if($this->api()->getTask()->state=='error'){
                 break;
@@ -274,7 +274,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             $counter++;
         }
         
-        $this->assertEquals('open',$this->api()->getTask()->state,'Pretranslation stopped. Task has state '.$this->api()->getTask()->state);
+        $this->assertEquals('open',$this->api()->getTask()->state,'Pretranslation stopped. Task has state '.$this->api()->getTask()->state.' instead of open.');
     }
     
     /***

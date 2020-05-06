@@ -505,20 +505,8 @@
     },
     {
         "segmentNrInTask": "29",
-        "internalFuzzy": "1",
-        "matchRate": "101",
-        "wordCount": "3"
-    },
-    {
-        "segmentNrInTask": "29",
-        "internalFuzzy": "1",
-        "matchRate": "101",
-        "wordCount": "3"
-    },
-    {
-        "segmentNrInTask": "29",
         "internalFuzzy": "0",
-        "matchRate": "0",
+        "matchRate": "102",
         "wordCount": "3"
     },
     {
@@ -536,7 +524,7 @@
     {
         "segmentNrInTask": "30",
         "internalFuzzy": "0",
-        "matchRate": "99",
+        "matchRate": "104",
         "wordCount": "3"
     },
     {
@@ -596,13 +584,13 @@
     {
         "segmentNrInTask": "34",
         "internalFuzzy": "1",
-        "matchRate": "46",
+        "matchRate": "38",
         "wordCount": "10"
     },
     {
         "segmentNrInTask": "34",
         "internalFuzzy": "1",
-        "matchRate": "46",
+        "matchRate": "38",
         "wordCount": "10"
     },
     {
@@ -667,14 +655,14 @@
     },
     {
         "segmentNrInTask": "38",
-        "internalFuzzy": "1",
-        "matchRate": "46",
+        "internalFuzzy": "0",
+        "matchRate": "44",
         "wordCount": "7"
     },
     {
         "segmentNrInTask": "38",
-        "internalFuzzy": "1",
-        "matchRate": "46",
+        "internalFuzzy": "0",
+        "matchRate": "44",
         "wordCount": "7"
     },
     {
@@ -682,18 +670,6 @@
         "internalFuzzy": "0",
         "matchRate": "0",
         "wordCount": "7"
-    },
-    {
-        "segmentNrInTask": "39",
-        "internalFuzzy": "0",
-        "matchRate": "100",
-        "wordCount": "3"
-    },
-    {
-        "segmentNrInTask": "39",
-        "internalFuzzy": "0",
-        "matchRate": "100",
-        "wordCount": "3"
     },
     {
         "segmentNrInTask": "39",
@@ -1123,20 +1099,8 @@
     },
     {
         "segmentNrInTask": "64",
-        "internalFuzzy": "1",
-        "matchRate": "52",
-        "wordCount": "5"
-    },
-    {
-        "segmentNrInTask": "64",
-        "internalFuzzy": "1",
-        "matchRate": "52",
-        "wordCount": "5"
-    },
-    {
-        "segmentNrInTask": "64",
         "internalFuzzy": "0",
-        "matchRate": "0",
+        "matchRate": "102",
         "wordCount": "5"
     },
     {
@@ -2270,13 +2234,13 @@
     {
         "segmentNrInTask": "133",
         "internalFuzzy": "0",
-        "matchRate": "22",
+        "matchRate": "33",
         "wordCount": "3"
     },
     {
         "segmentNrInTask": "133",
         "internalFuzzy": "0",
-        "matchRate": "22",
+        "matchRate": "33",
         "wordCount": "3"
     },
     {
@@ -2288,13 +2252,13 @@
     {
         "segmentNrInTask": "134",
         "internalFuzzy": "1",
-        "matchRate": "54",
+        "matchRate": "28",
         "wordCount": "5"
     },
     {
         "segmentNrInTask": "134",
         "internalFuzzy": "1",
-        "matchRate": "54",
+        "matchRate": "28",
         "wordCount": "5"
     },
     {
@@ -2306,13 +2270,13 @@
     {
         "segmentNrInTask": "135",
         "internalFuzzy": "1",
-        "matchRate": "46",
+        "matchRate": "66",
         "wordCount": "6"
     },
     {
         "segmentNrInTask": "135",
         "internalFuzzy": "1",
-        "matchRate": "46",
+        "matchRate": "66",
         "wordCount": "6"
     },
     {
@@ -2360,13 +2324,13 @@
     {
         "segmentNrInTask": "138",
         "internalFuzzy": "1",
-        "matchRate": "27",
+        "matchRate": "33",
         "wordCount": "7"
     },
     {
         "segmentNrInTask": "138",
         "internalFuzzy": "1",
-        "matchRate": "27",
+        "matchRate": "33",
         "wordCount": "7"
     },
     {
@@ -2684,13 +2648,13 @@
     {
         "segmentNrInTask": "156",
         "internalFuzzy": "1",
-        "matchRate": "75",
+        "matchRate": "87",
         "wordCount": "5"
     },
     {
         "segmentNrInTask": "156",
         "internalFuzzy": "1",
-        "matchRate": "75",
+        "matchRate": "87",
         "wordCount": "5"
     },
     {
@@ -2701,38 +2665,14 @@
     },
     {
         "segmentNrInTask": "157",
-        "internalFuzzy": "1",
-        "matchRate": "60",
-        "wordCount": "5"
-    },
-    {
-        "segmentNrInTask": "157",
-        "internalFuzzy": "1",
-        "matchRate": "60",
-        "wordCount": "5"
-    },
-    {
-        "segmentNrInTask": "157",
         "internalFuzzy": "0",
-        "matchRate": "0",
+        "matchRate": "102",
         "wordCount": "5"
-    },
-    {
-        "segmentNrInTask": "158",
-        "internalFuzzy": "1",
-        "matchRate": "77",
-        "wordCount": "6"
-    },
-    {
-        "segmentNrInTask": "158",
-        "internalFuzzy": "1",
-        "matchRate": "77",
-        "wordCount": "6"
     },
     {
         "segmentNrInTask": "158",
         "internalFuzzy": "0",
-        "matchRate": "0",
+        "matchRate": "102",
         "wordCount": "6"
     },
     {
@@ -2792,13 +2732,13 @@
     {
         "segmentNrInTask": "162",
         "internalFuzzy": "1",
-        "matchRate": "50",
+        "matchRate": "83",
         "wordCount": "5"
     },
     {
         "segmentNrInTask": "162",
         "internalFuzzy": "1",
-        "matchRate": "50",
+        "matchRate": "83",
         "wordCount": "5"
     },
     {
@@ -2809,20 +2749,8 @@
     },
     {
         "segmentNrInTask": "163",
-        "internalFuzzy": "1",
-        "matchRate": "63",
-        "wordCount": "8"
-    },
-    {
-        "segmentNrInTask": "163",
-        "internalFuzzy": "1",
-        "matchRate": "63",
-        "wordCount": "8"
-    },
-    {
-        "segmentNrInTask": "163",
         "internalFuzzy": "0",
-        "matchRate": "0",
+        "matchRate": "102",
         "wordCount": "8"
     }
 ]
