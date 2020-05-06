@@ -1816,6 +1816,13 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U2llIG3DvHNzZW4gbWluZGVzdGVucyBlaW5lIFNjaHJpZnRhcnRlbi1EYXRlaSBob2NobGFkZW4='><source>Sie müssen mindestens eine Schriftarten-Datei hochladen</source><target>Sie müssen mindestens eine Schriftarten-Datei hochladen</target></trans-unit>
 <trans-unit id='UHJvYmxlbQ=='><source>Problem</source><target>Problem</target></trans-unit>
 <trans-unit id='Vm9yaGFuZGVuZSBEYXRlaWVu'><source>Vorhandene Dateien</source><target>Vorhandene Dateien</target></trans-unit>
+<trans-unit id='SW4tQ29udGV4dCBTY2hyaWZ0ZW4='><source>In-Context Schriften</source><target>In-Context Schriften</target></trans-unit>
+<trans-unit id='QW56YWhsIEF1ZmdhYmVu'><source>Anzahl Aufgaben</source><target>Anzahl Aufgaben</target></trans-unit>
+<trans-unit id='QXVmZ2FiZW4sIHdlbGNoZSBkaWVzZSBTY2hyaWZ0IHZlcndlbmRlbg=='><source>Aufgaben, welche diese Schrift verwenden</source><target>Aufgaben, welche diese Schrift verwenden</target></trans-unit>
+<trans-unit id='TmFtZSBkZXIgQXVmZ2FiZQ=='><source>Name der Aufgabe</source><target>Name der Aufgabe</target></trans-unit>
+<trans-unit id='V2ViIE9wZW4gRm9udCBGb3JtYXQgMS4wICgqLndvZmYpIG9kZXIgVHJ1ZVR5cGUgRm9udCAoKi50dGYp'><source>Web Open Font Format 1.0 (*.woff) oder TrueType Font (*.ttf)</source><target>Web Open Font Format 1.0 (*.woff) oder TrueType Font (*.ttf)</target></trans-unit>
+<trans-unit id='V2ViIE9wZW4gRm9udCBGb3JtYXQgMS4wICgqLndvZmYpIG9kZXIgPGJyLz5UcnVlVHlwZSBGb250ICgqLnR0Zik='><source>Web Open Font Format 1.0 (*.woff) oder <br/>TrueType Font (*.ttf)</source><target>Web Open Font Format 1.0 (*.woff) oder <br/>TrueType Font (*.ttf)</target></trans-unit>
+<trans-unit id='U2NocmlmdGFydCBEYXRlaQ=='><source>Schriftart Datei</source><target>Schriftart Datei</target></trans-unit>
   </body>
  </file>
 </xliff>
