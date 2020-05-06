@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -64,7 +64,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
     /**
      * A list of segment-numbers and notices about the segment (e.g. invalid tag-structure in segment).
      * This list is shown after the reimport with the hint that the user has to check the here notet segments.
-     * 
+     *
      * @var array
      */
     protected $segmentError = [];
@@ -242,9 +242,9 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
             $isEditAllTasks = $isEditAllAllowed || $isUserPm;
             //if the user is allowe to load all, use the default loader
             if($isEditAllTasks){
-                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->getUserGuid(), $this->task);
+                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($this->user->getUserGuid(), $this->task);
             }else{
-                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTaskSmart($this->user->getUserGuid(), $this->task);
+                $userTaskAssoc = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->getUserGuid(), $this->task);
             }
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
         }
@@ -294,7 +294,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
      * - compare the task-guid<br/>
      * - compare the number of segments<br/>
      * - compare all segments if an empty segment in excel was not-empty in task<br/>
-     * 
+     *
      * @throws editor_Models_Excel_ExImportException
      */
     protected function formalCheck() {
@@ -352,7 +352,4 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
     public function getSegmentErrors() : array {
         return $this->segmentError;
     }
-    
-    protected function isEditAllTasks
-    
 }

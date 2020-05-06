@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -52,7 +52,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     /***
      * Number to divide the segment duration
-     * 
+     *
      * @var integer
      */
     protected $durationsDivisor=1;
@@ -152,12 +152,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     /**
      * returns a list of autoStateIds, belonging to the users role in the currently loaded task
-     * is neede for the autostate filter in the frontend 
+     * is neede for the autostate filter in the frontend
      */
     protected function getUsersAutoStateIds() {
         $sessionUser = new Zend_Session_Namespace('user');
         
-        $taskUserAssoc=editor_Models_Loaders_Taskuserassoc::loadByTaskGuidSmart($sessionUser->data->userGuid,$this->session->taskGuid);
+        $taskUserAssoc=editor_Models_Loaders_Taskuserassoc::loadByTaskGuid($sessionUser->data->userGuid,$this->session->taskGuid);
         
         if($taskUserAssoc->getIsPmOverride()) {
             $userRole = 'pm';
@@ -198,7 +198,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * Adds the first editable segments rowindex for f2 usage in the frontend
      */
     protected function addFirstEditable() {
-        //needed only on first page and if we have rows 
+        //needed only on first page and if we have rows
         if($this->offset > 0 || empty($this->view->rows)) {
             return;
         }
@@ -218,9 +218,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     /**
      * For performance Reasons we are calculating the isWatched info this way.
-     * A table join is only done if we are filtering for isWatched, 
+     * A table join is only done if we are filtering for isWatched,
      * since the this join is very expensive on large data tasks
-     * 
+     *
      * Since the segment_user_assoc contains currently only the isWatched info,
      * we merge only the data if isWatched is true.
      */
@@ -260,7 +260,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $task = $this->checkTaskState();
         /* @var $task editor_Models_Task */
         $wfh = $this->_helper->workflow;
-        /* @var $wfh ZfExtended_Controller_Helper_Workflow */
+        /* @var $wfh Editor_Controller_Helper_Workflow */
         $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->data->userGuid);
 
         //the history entry must be created before the original entity is modified
@@ -498,9 +498,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         /* @var $log ZfExtended_Log */
         
         $logText = 'Error on saving a segment!!! Parts of the content in the PUT request ';
-        $logText .= 'delivered the following segmentId(s) and fieldName(s):'."\n"; 
+        $logText .= 'delivered the following segmentId(s) and fieldName(s):'."\n";
         $logText .= print_r($error, 1)."\n";
-        $logText .= 'but the request was for segmentId '.$this->entity->getId(); 
+        $logText .= 'but the request was for segmentId '.$this->entity->getId();
         $logText .= ' (compare also the above fieldnames!).'."\n";
         $logText .= 'Therefore the segment has not been saved!'."\n";
         $logText .= 'Actually saved Segment PUT data and data to be saved in DB:'."\n";
@@ -580,9 +580,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     public function getAction() {
         $this->entity->load($this->_getParam('id'));
-        // the following editable value is not intended to be saved, 
+        // the following editable value is not intended to be saved,
         // its only to reuse the taskcheck of checkTaskGuidAndEditable regardless of the editable state
-        $this->entity->setEditable(true); 
+        $this->entity->setEditable(true);
         $this->checkTaskGuidAndEditable();
         $this->view->rows = $this->entity->getDataObject();
     }
@@ -624,7 +624,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
     
     /**
-     * generates a list of available matchratetypes in this task. Mainly for frontend filtering. 
+     * generates a list of available matchratetypes in this task. Mainly for frontend filtering.
      */
     public function matchratetypesAction() {
         $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
@@ -670,7 +670,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     /**
      * Check if the required search parameters are provided
-     * 
+     *
      * @param array $parameters
      * @throws ZfExtended_ValidateException
      */

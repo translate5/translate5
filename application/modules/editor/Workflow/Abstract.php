@@ -783,7 +783,7 @@ abstract class editor_Workflow_Abstract {
         $sessionUser = new Zend_Session_Namespace('user');
         
         //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
-        $tua =editor_Models_Loaders_Taskuserassoc::loadByTaskSmart($sessionUser->data->userGuid, $task);
+        $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUser->data->userGuid, $task);
         if($tua->getIsPmOverride() == 1){
             $segmentToSave->setWorkflowStepNr($task->getWorkflowStep()); //set also the number to identify in which phase the changes were done
             $segmentToSave->setWorkflowStep(self::STEP_PM_CHECK);
@@ -1202,7 +1202,7 @@ abstract class editor_Workflow_Abstract {
         
         try {
             //try to load an user assoc between current user and task
-            $this->newTaskUserAssoc =editor_Models_Loaders_Taskuserassoc::loadByTaskSmart($this->authenticatedUser->userGuid, $task);
+            $this->newTaskUserAssoc =editor_Models_Loaders_Taskuserassoc::loadByTask($this->authenticatedUser->userGuid, $task);
         }
         catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $this->newTaskUserAssoc = null;
@@ -1283,7 +1283,7 @@ abstract class editor_Workflow_Abstract {
         $function = 'handleTaskChange';
         $this->doDebug($function);
         try {
-            $tua =editor_Models_Loaders_Taskuserassoc::loadByTaskSmart($this->authenticatedUser->userGuid, $this->newTask);
+            $tua =editor_Models_Loaders_Taskuserassoc::loadByTask($this->authenticatedUser->userGuid, $this->newTask);
             $this->callActions($function, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
         }
         catch (ZfExtended_Models_Entity_NotFoundException $e) {

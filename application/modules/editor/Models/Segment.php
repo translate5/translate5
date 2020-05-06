@@ -723,7 +723,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         if(empty($this->row)){
             $this->notFound('#loadByFileidMid ', $fileId.'#'.$mid);
         }
-        $this->segmentFieldManager->initFields($this->getTaskGuid());
+        $this->segmentFieldManager->initFields($taskGuid);
         $this->initData($this->getId());
     }
     

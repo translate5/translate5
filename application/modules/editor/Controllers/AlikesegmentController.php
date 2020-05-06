@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -27,13 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Editor_AlikeSegmentController 
+ * Editor_AlikeSegmentController
  * Stellt PUT und GET Methoden zur Verarbeitung der Alike Segmente bereit.
  * Ist nicht zu 100% REST konform:
  *  - ein GET auf die Ressource liefert eine Liste mit den Daten für die Anzeige im Alike Editor zurück.
- *  - ein PUT muss eine Liste mit IDs beinhalten, diese IDs werden dann bearbeitet. 
+ *  - ein PUT muss eine Liste mit IDs beinhalten, diese IDs werden dann bearbeitet.
  *  - Der PUT liefert eine Liste "rows" mit bearbeiteten, kompletten Segment Daten zu den gegebenen IDs zurück.
- *  - Eine Verortung unter der URL /segment/ID/alikes anstatt alikesegment/ID/ wäre imho sauberer, aber mit Zend REST nicht machbar    
+ *  - Eine Verortung unter der URL /segment/ID/alikes anstatt alikesegment/ID/ wäre imho sauberer, aber mit Zend REST nicht machbar
  */
 class Editor_AlikesegmentController extends editor_Controllers_EditorrestController {
 
@@ -79,7 +79,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
 
     /**
      * Speichert die Daten des Zielsegments (ID in der URL) in die AlikeSegmente. Die IDs der zu bearbeitenden Alike Segmente werden als Array per PUT übergeben.
-     * Die Daten der erfolgreich bearbeiteten Segmente werden vollständig gesammelt und als Array an die View übergeben.    
+     * Die Daten der erfolgreich bearbeiteten Segmente werden vollständig gesammelt und als Array an die View übergeben.
      * @see ZfExtended_RestController::putAction()
      */
     public function putAction() {
@@ -87,7 +87,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $editedSegmentId = (int)$this->_getParam('id');
 
         $wfh = $this->_helper->workflow;
-        /* @var $wfh ZfExtended_Controller_Helper_Workflow */
+        /* @var $wfh Editor_Controller_Helper_Workflow */
         $wfh->checkWorkflowWriteable();
 
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($session->taskGuid);
@@ -132,8 +132,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         
         $userGuid = (new Zend_Session_Namespace('user'))->data->userGuid;
         
-        //todo: smartloading active
-        $tua=editor_Models_Loaders_Taskuserassoc::loadByTaskSmart($userGuid, $task);
+        $tua=editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $task);
         
         $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [
             $this->entity,
@@ -215,11 +214,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
             }
             catch (Exception $e) {
                 /**
-                 * Jeglicher Fehler im Zusammenhang mit dem Speichervorgang kann applikationsseitig ignoriert werden, 
-                 * das Segment darf lediglich nicht in der Rückgabe an den Browser mit auftauchen. Somit erscheint das 
+                 * Jeglicher Fehler im Zusammenhang mit dem Speichervorgang kann applikationsseitig ignoriert werden,
+                 * das Segment darf lediglich nicht in der Rückgabe an den Browser mit auftauchen. Somit erscheint das
                  * Segment dem Benutzer als unlektoriert und kann es dann bei Bedarf von Hand lektorieren.
                  * Fürs Debugging wirds geloggt. (if debugs are active)
-                 */  
+                 */
                 $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.repetition');
                 /* @var $logger ZfExtended_Logger */
                 $data = [
@@ -259,7 +258,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      */
     protected function getHasher(editor_Models_Task $task) {
         //TODO: also a check is missing, if task has alternate targets or not.
-        // With alternates no recalc is needed at all, since no repetition editor can be used 
+        // With alternates no recalc is needed at all, since no repetition editor can be used
         if($task->getWorkflowStep() == 1 && (bool) $task->getEmptyTargets()){
             return ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$task]);
         }
@@ -279,10 +278,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     }
     
     /**
-     * checks if the chosen segment may be modified 
-     * if targetMd5 hashes are recalculated on editing, we have to consider also the hashes in the histor of the master segment. 
+     * checks if the chosen segment may be modified
+     * if targetMd5 hashes are recalculated on editing, we have to consider also the hashes in the histor of the master segment.
      * See TRANSLATE-885 for details!
-     * 
+     *
      * @param editor_Models_Segment $entity
      * @param int $editedSegmentId
      * @param editor_Models_Segment_RepetitionHash $hasher
@@ -314,10 +313,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     }
     
     /**
-     * Applies the given Closure for each editable segment field 
+     * Applies the given Closure for each editable segment field
      * (currently only source and target! Since ChangeAlikes are deactivated for alternatives)
      * Closure Parameters: $field, $editField, $getter, $setter → 'target', 'targetEdit', 'getTargetEdit', 'setTargetEdit'
-     * 
+     *
      * @param Callable $callback
      * @return array
      */

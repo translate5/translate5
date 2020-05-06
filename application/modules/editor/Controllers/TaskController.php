@@ -862,7 +862,7 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $tua = null;
         try {
-            $tua=editor_Models_Loaders_Taskuserassoc::loadByTaskSmart($this->user->data->userGuid, $this->entity);
+            $tua=editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
         }
@@ -1157,9 +1157,9 @@ class editor_TaskController extends ZfExtended_RestController {
         try {
             
             if($isEditAllTasks){
-                $userTaskAssoc=editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $this->entity);
+                $userTaskAssoc=editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($userGuid, $this->entity);
             }else{
-                $userTaskAssoc=editor_Models_Loaders_Taskuserassoc::loadByTaskSmart($userGuid, $this->entity);
+                $userTaskAssoc=editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $this->entity);
             }
             
             $isPmOverride = (boolean) $userTaskAssoc->getIsPmOverride();
