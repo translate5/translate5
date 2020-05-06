@@ -88,9 +88,9 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         }
         
         //this is to recreate the file from the api response
-        //file_put_contents($this->api()->getFile('analysis.txt', null, false), json_encode($analysis));
+        //file_put_contents($this->api()->getFile('analysis.txt', null, false), json_encode($analysis, JSON_PRETTY_PRINT));
         $expected=$this->api()->getFileContent('analysis.txt');
-        $actual=json_encode($analysis);
+        $actual=json_encode($analysis, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file an the result file does not match.");
         
@@ -110,9 +110,9 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             unset($a->languageResourceid);
         }
         
-        //file_put_contents($this->api()->getFile('allanalysis.txt', null, false), json_encode($analysis));
+        //file_put_contents($this->api()->getFile('allanalysis.txt', null, false), json_encode($analysis, JSON_PRETTY_PRINT));
         $expected=$this->api()->getFileContent('allanalysis.txt');
-        $actual=json_encode($analysis);
+        $actual=json_encode($analysis, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file(allanalysis) an the result file does not match.");
         
@@ -259,7 +259,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->reloadTask();
         error_log('Task status:'.$this->api()->getTask()->state);
         $counter=0;
-        $limitCheck=20;
+        $limitCheck = 25;
         while ($this->api()->getTask()->state!='open'){
             if($this->api()->getTask()->state=='error'){
                 break;
@@ -274,7 +274,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             $counter++;
         }
         
-        $this->assertEquals('open',$this->api()->getTask()->state,'Pretranslation stopped. Task has state '.$this->api()->getTask()->state);
+        $this->assertEquals('open',$this->api()->getTask()->state,'Pretranslation stopped. Task has state '.$this->api()->getTask()->state.' instead of open.');
     }
     
     /***
