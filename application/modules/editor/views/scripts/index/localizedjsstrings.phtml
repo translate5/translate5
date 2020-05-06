@@ -723,9 +723,14 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
-    Ext.define("Editor.locale.de.view.admin.ProjectGrid", {
+  	Ext.define("Editor.locale.de.view.admin.ProjectPanel", {
         override: "Editor.view.admin.ProjectGrid",
         title:'<?php echo $this->translate->_('Projektübersicht');?>',
+    });
+    
+    
+    Ext.define("Editor.locale.de.view.admin.ProjectGrid", {
+        override: "Editor.view.admin.ProjectGrid",
         strings: {
             actionDelete: '<?php echo $this->translate->_('Projekt komplett löschen');?>',
             reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',

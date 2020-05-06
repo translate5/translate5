@@ -38,8 +38,6 @@ Ext.define('Editor.view.admin.ProjectGrid', {
         type: 'projectTaskGrid'
     },
 	itemId: 'projectTaskGrid',
-	title: '#UT#Projektübersicht',
-	glyph: 'xf0e8@FontAwesome',
 	strings: {
 		actionDelete: '#UT#Projekt komplett löschen',
 		reloadBtn: '#UT#Aktualisieren',
@@ -110,8 +108,6 @@ Ext.define('Editor.view.admin.ProjectGrid', {
     initConfig: function(instanceConfig) {
         var me = this,
         	config={
-        		title: me.title, //see EXT6UPD-9
-        		text_cols:me.text_cols,
         		dockedItems: [{
         	        xtype: 'toolbar',
         	        dock: 'top',
@@ -163,40 +159,42 @@ Ext.define('Editor.view.admin.ProjectGrid', {
 //        	        dataIndex: 'taskName',
 //        	        width: 220
 //        	    }],
-        		plugins: [
-        	    	Ext.create('Ext.grid.plugin.RowWidget', {
-        	    		pluginId:'projectTasksPlugin',
-        	    		getHeaderConfig: function () {
-        	    			//hide the expand/collapse button for non project records
-        	    			var defaultConfig=this.superclass.getHeaderConfig.apply(this, arguments);
-        	    			defaultConfig.renderer = function (value, gridcell, record) {
-        	    				if (record.get('taskType')=='project') {//TODO: get me from config
-        	    					return '<div class="' + Ext.baseCSSPrefix + 'grid-row-expander" role="presentation" tabIndex="0"></div>';
-    	    					}
-        	    		    }
-        	    		    return defaultConfig;
-    	    		    },
-        		    	widget: {
-        		    		xtype:'adminTaskGrid',
-        		    		store:null,//INFO: with this the original store reference is removed
-        		    		header:false,
-        		    		dockedItems:false,
-    		    			bind:{
-    		    				store:{
-    		    					model:'Editor.model.admin.ProjectTask',
-    		    					remoteSort: true,
-    		    					remoteFilter: true,
-    		    					pageSize: false,
-    		    					filters:{
-    		    		    			property: 'projectId',
-    		    		        		operator:"eq",
-    		    		        		value:'{record.id}'
-    		    					}
-    		    				}
-    		    			},
-        		        }
-        	    })
-        	]
+        		
+//        		plugins: [
+//        	    	Ext.create('Ext.grid.plugin.RowWidget', {
+//        	    		pluginId:'projectTasksPlugin',
+//        	    		getHeaderConfig: function () {
+//        	    			//hide the expand/collapse button for non project records
+//        	    			var defaultConfig=this.superclass.getHeaderConfig.apply(this, arguments);
+//        	    			defaultConfig.renderer = function (value, gridcell, record) {
+//        	    				if (record.get('taskType')=='project') {//TODO: get me from config
+//        	    					return '<div class="' + Ext.baseCSSPrefix + 'grid-row-expander" role="presentation" tabIndex="0"></div>';
+//    	    					}
+//        	    		    }
+//        	    		    return defaultConfig;
+//    	    		    },
+//        		    	widget: {
+//        		    		xtype:'adminTaskGrid',
+//        		    		store:null,//INFO: with this the original store reference is removed
+//        		    		header:false,
+//        		    		dockedItems:false,
+//    		    			bind:{
+//    		    				store:{
+//    		    					model:'Editor.model.admin.ProjectTask',
+//    		    					remoteSort: true,
+//    		    					remoteFilter: true,
+//    		    					pageSize: false,
+//    		    					filters:{
+//    		    		    			property: 'projectId',
+//    		    		        		operator:"eq",
+//    		    		        		value:'{record.id}'
+//    		    					}
+//    		    				}
+//    		    			},
+//        		        }
+//        	    })
+//        	]
+        		
         };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);

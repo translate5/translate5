@@ -40,7 +40,7 @@ Ext.define('Editor.view.ViewPort', {
         'Editor.view.admin.customer.Panel',
         'Editor.view.LanguageResources.TmOverviewPanel',
         'Editor.view.admin.preferences.OverviewPanel',
-        'Editor.view.admin.ProjectGrid'
+        'Editor.view.admin.ProjectPanel'
     ],
     layout: 'border',
     initComponent: function() {
@@ -72,11 +72,11 @@ Ext.define('Editor.view.ViewPort', {
                 items: mainSections
             }];
         
+        if(user.isAllowed('editorProjectTask')) {
+            mainSections.push({xtype: 'projectPanel'});
+        }
         if(user.isAllowed('taskOverviewFrontendController')) {
             mainSections.push({xtype: 'adminTaskGrid'});
-        }
-        if(user.isAllowed('editorProjectTask')) {
-            mainSections.push({xtype: 'projectTaskGrid'});
         }
         if(user.isAllowed('languageResourcesOverview')) {
             mainSections.push({xtype: 'tmOverviewPanel'});
