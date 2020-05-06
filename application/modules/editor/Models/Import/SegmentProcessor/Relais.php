@@ -121,8 +121,6 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         try {
             //try loading via fileId and Mid
             $this->segment->loadByFileidMid($this->fileId, $mid);
-        //} catch(Zend_Db_Statement_Exception $e) {
-            //xdebug_break();
         } catch(ZfExtended_Models_Entity_NotFoundException $e) {
             //if above was not successful, load via segmentNrInTask
             $loadBySegmentNr = $this->loadSegmentByNrInTask($parser->getMid());
