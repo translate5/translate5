@@ -6,20 +6,20 @@ START LICENSE AND COPYRIGHT
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
- This file is part of a plug-in for translate5. 
+ This file is part of a plug-in for translate5.
  translate5 can be optained via the instructions that are linked at http://www.translate5.net
  For the license of translate5 itself please see http://www.translate5.net/license.txt
  For the license of this plug-in, please see below.
  
  This file is part of a plug-in for translate5 and may be used under the terms of the
- GNU GENERAL PUBLIC LICENSE version 3 as published by the Free Software Foundation and 
+ GNU GENERAL PUBLIC LICENSE version 3 as published by the Free Software Foundation and
  appearing in the file gpl3-license.txt included in the packaging of the translate5 plug-in
- to which this file belongs. Please review the following information to ensure the 
+ to which this file belongs. Please review the following information to ensure the
  GNU GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/gpl.html
    
- There is a plugin exception available for use with this release of translate5 for 
- translate5 plug-ins that are distributed under GNU GENERAL PUBLIC LICENSE version 3: 
+ There is a plugin exception available for use with this release of translate5 for
+ translate5 plug-ins that are distributed under GNU GENERAL PUBLIC LICENSE version 3:
  Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the
  root folder of translate5.
   
@@ -124,7 +124,7 @@ class editor_Plugins_TermImport_Services_Import {
     
     /***
      * Config key for deletes all proposals older then deleteProposalsLastTouchedOlderThan date.
-     * 
+     *
      * @var string
      */
     CONST DELETE_PROPOSALS_OLDER_THAN_KEY="deleteProposalsLastTouchedOlderThan";
@@ -132,7 +132,7 @@ class editor_Plugins_TermImport_Services_Import {
     
     /***
      * Config key form delete all proposals older than the NOW_ISO
-     * 
+     *
      * @var string
      */
     CONST DELETE_PROPOSALS_OLDER_THAN_IMPORT_KEY="deleteProposalsOlderThanCurrentImport";
@@ -239,7 +239,7 @@ class editor_Plugins_TermImport_Services_Import {
     /***
      * Import the tbx files into the term collection from the across via the across api.
      * The files will be imported in the configured collection in the crossapi config file
-     * 
+     *
      * @return string[]
      */
     public function handleAccrossApiImport(){
@@ -422,7 +422,7 @@ class editor_Plugins_TermImport_Services_Import {
             if(!in_array($customerId, $customers)){
                 $customers[]=$customerId;
                 //add the customer to the assoc table for the term collection
-                $customerAssoc->addAssocs([$customerId], $tc['id']);
+                $customerAssoc->addAssocs($tc['id'], [$customerId]);
             }
             return ['collectionId'=>$tc['id'],'customerIds'=>$customers,'mergeTerms'=>true,'collectionName'=>$tc['name']];
         }
@@ -482,7 +482,7 @@ class editor_Plugins_TermImport_Services_Import {
     
     /***
      * Remove terms older than current date: NOW_ISO
-     * 
+     *
      * @param int $collectionId
      */
     private function removeTermsOlderThenImport($collectionId){
@@ -501,7 +501,7 @@ class editor_Plugins_TermImport_Services_Import {
     
     /***
      * Delete all proposals older than deleteProposalsLastTouchedOlderThan date.
-     * 
+     *
      * @param int $collectionId
      */
     private function removeProposalsOlderThan($collectionId){
@@ -515,7 +515,7 @@ class editor_Plugins_TermImport_Services_Import {
     }
     
     /***
-     * Remove proposals older than curent import 
+     * Remove proposals older than curent import
      * @param array $collectionIds
      */
     private function removeProposalsOlderThenImport(array $collectionIds){
@@ -530,7 +530,7 @@ class editor_Plugins_TermImport_Services_Import {
     /***
      * Remove empty term entries (term entries without any term in it).
      * Only the empty term entries from the same term collection will be removed.
-     *  
+     *
      * @param array $collectionIds
      */
     protected function removeEmptyTermEntries(array $collectionIds) {
@@ -543,7 +543,7 @@ class editor_Plugins_TermImport_Services_Import {
     
     /***
      * Remove proposals for given collection and where the last change for the proposal is older than $olderThan date
-     * 
+     *
      * @param array $collectionIds
      * @param string $olderThan
      */

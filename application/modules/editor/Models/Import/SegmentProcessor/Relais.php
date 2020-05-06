@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Stellt Methoden zur Verarbeitung der vom Parser ermittelteten Segment Daten bereit
- * speichert die ermittelten Segment Daten in die Relais Spalte des entsprechenden Segments 
+ * speichert die ermittelten Segment Daten in die Relais Spalte des entsprechenden Segments
  */
 class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_SegmentProcessor {
     /**
@@ -92,10 +92,9 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         $this->relaisField = $sfm->getByName($relais);
         $this->sfm = $sfm;
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
-        $this->segment->setTaskGuid($task->getTaskGuid());
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         
-        // preset configured 
+        // preset configured
         $config = Zend_Registry::get('config');
         $modes = $config->runtimeOptions->import->relaisCompareMode;
         foreach($modes as $mode) {
@@ -108,6 +107,9 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
      * @see editor_Models_Import_SegmentProcessor::process()
      */
     public function process(editor_Models_Import_FileParser $parser){
+        //the segment internal taskGuid is reset to null if loadByFileidMid fails,
+        // so we just set it on each process call
+        $this->segment->init(['taskGuid' => $this->taskGuid]);
         $data = $parser->getFieldContents();
         $source = $this->sfm->getFirstSourceName();
         $target = $this->sfm->getFirstTargetName();
@@ -137,7 +139,7 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
             $contentIsEqual = $this->isContentEqual($this->segment->getFieldOriginal($source), $data[$source]["original"]);
         }
         
-        //if source and relais content is finally not equal, we log that and ignore the segment 
+        //if source and relais content is finally not equal, we log that and ignore the segment
         if(!$contentIsEqual){
             $this->errors['source-different'][] = 'mid: '.$parser->getMid().' / Source content of translated file: '.$this->segment->getFieldOriginal($source).' / Source content of relais file: '.$data[$source]["original"];
             return false;
@@ -183,10 +185,10 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
 
     /**
      * The given segment content is normalized for source / relais source comparsion
-     * Currently all tags are removed (means ignored). To keep word boundaries the tags 
+     * Currently all tags are removed (means ignored). To keep word boundaries the tags
      * are replaced with whitespace, multiple whitespaces are replaced to a single one
-     * HTML Entities are decoded to enable comparsion of " and &quot; 
-     *  
+     * HTML Entities are decoded to enable comparsion of " and &quot;
+     *
      * @param string $segmentContent
      * @return string
      */

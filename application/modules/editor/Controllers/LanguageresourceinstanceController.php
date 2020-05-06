@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -66,13 +66,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->_filterTypeMap = [
             'sourceLang' => ['string' => 'list'],
             'targetLang' => ['string' => 'list'],
-            'resourcesCustomers' => [
+            'customerIds' => [
                 'string' => new ZfExtended_Models_Filter_JoinAssoc('LEK_languageresources_customerassoc', $finalTableForAssoc, 'languageResourceId', 'id')
             ]
         ];
         
         //set same join for sorting!
-        $this->_sortColMap['resourcesCustomers'] = $this->_filterTypeMap['resourcesCustomers']['string'];
+        $this->_sortColMap['customerIds'] = $this->_filterTypeMap['customerIds']['string'];
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->categories = ZfExtended_Factory::get('editor_Models_Categories');
         parent::init();
@@ -151,8 +151,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $id = $languageresource['id'];
             
             //add customer assocs
-            $languageresource['resourcesCustomers'] = $this->getCustassoc($custAssoc, 'customerId', $id);
-            $languageresource['useAsDefault'] = $this->getCustassocDefault($custAssoc, 'useAsDefault', $id);
+            $languageresource['customerIds'] = $this->getCustassoc($custAssoc, 'customerId', $id);
+            $languageresource['customerUseAsDefaultIds'] = $this->getCustassocDefault($custAssoc, 'useAsDefault', $id);
             
             $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
@@ -172,7 +172,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * Retrieves specific language from the given language container
      * @param array $data
      * @param string $index the datafield to get
-     * @param int $id the language resource id 
+     * @param int $id the language resource id
      * @return array
      */
     protected function getLanguage(array $languages, $index, $id) {
@@ -186,7 +186,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * Retrieves specific data from the given data container
      * @param array $data
      * @param string $index the datafield to get
-     * @param int $id the language resource id 
+     * @param int $id the language resource id
      * @return array
      */
     protected function getCustassoc(array $data, $index, $id) {
@@ -216,7 +216,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * Retrives the useAsDefault customers for the given language resource
      * @param array $data
      * @param string $index the datafield to get
-     * @param int $id the language resource id 
+     * @param int $id the language resource id
      * @return array
      */
     protected function getCustassocDefault(array $data, $index, $id){
@@ -236,7 +236,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * Renders the label of a category with details (currently: original Id).
      * @param integer $categoryId
-     * @return string 
+     * @return string
      */
     protected function renderCategoryCustomLabel($categoryId) {
         $this->categories->load($categoryId);
@@ -253,45 +253,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
         
-        $this->prepareTaskInfo([$this->entity->getId()]);
-        $this->view->rows->taskList = $this->getTaskInfos($this->entity->getId());
-
-        //load associated customers to the resource
-        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
-        
-        $customerAssocs=$customerAssoc->loadByLanguageResourceId($this->entity->getId());
-        
-        $default=[];
-        $customers=[];
-        //get the customers and the default customers
-        foreach ($customerAssocs as $value) {
-            if(!empty($value['useAsDefault'])){
-                $default[]=$value['customerId'];
-            }
-            if(!empty($value['customerId'])){
-                $customers[]=$value['customerId'];
-            }
-        }
-        $this->view->rows->resourcesCustomers=$customers;
-        $this->view->rows->useAsDefault=$default;
-        
-        // categories that are assigned to the resource
-        $categoryIds = [];
-        $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
-        /* @var $categoryAssoc editor_Models_LanguageResources_CategoryAssoc */
-        $categoryAssocs = $categoryAssoc->loadByLanguageResourceId($this->entity->getId());
-        foreach ($categoryAssocs as $value) {
-            if(!empty($value['categoryId'])){
-                $categoryIds[] = $value['categoryId'];
-            }
-        }
-        // for the moment: just display labels for info
-        $categoryLabels = [];
-        foreach ($categoryIds as $categoryId) {
-            $categoryLabels[] = $this->renderCategoryCustomLabel($categoryId);
-        }
-        $this->view->rows->categories = $categoryLabels;
+        $this->addAssocData();
         
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $t ZfExtended_Zendoverwrites_Translate */
@@ -319,8 +281,39 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->statusInfo = $t->_($moreInfo);
     }
     
+    /**
+     * Adds associated data to the result object
+     */
+    protected function addAssocData() {
+        $this->prepareTaskInfo([$this->entity->getId()]);
+        $this->view->rows->taskList = $this->getTaskInfos($this->entity->getId());
+        
+        //load associated customers to the resource
+        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
+        
+        $customerAssocs = $customerAssoc->loadByLanguageResourceId($this->entity->getId());
+        $customerAssocs = array_column($customerAssocs,'useAsDefault','customerId');
+        
+        $this->view->rows->customerIds = array_keys($customerAssocs);
+        $this->view->rows->customerUseAsDefaultIds = array_keys(array_filter($customerAssocs));
+        
+        // categories that are assigned to the resource
+        $categoryIds = [];
+        $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
+        /* @var $categoryAssoc editor_Models_LanguageResources_CategoryAssoc */
+        $categoryAssocs = $categoryAssoc->loadByLanguageResourceId($this->entity->getId());
+        $categoryIds = array_column($categoryAssocs,'categoryId');
+        // for the moment: just display labels for info
+        $categoryLabels = [];
+        foreach ($categoryIds as $categoryId) {
+            $categoryLabels[] = $this->renderCategoryCustomLabel($categoryId);
+        }
+        $this->view->rows->categories = $categoryLabels;
+    }
+    
     /***
-     * Handle custom filtering in source,target,taskList and resourcesCustomers.
+     * Handle custom filtering in source,target,taskList and customerIds.
      * The filters are extended so thay can filter using string values.
      */
     protected function handleFilterCustom(){
@@ -332,7 +325,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->getFilter()->hasFilter('sourceLang',$sourceFilter);
         $this->entity->getFilter()->hasFilter('targetLang',$targetFilter);
         
-        $this->entity->getFilter()->hasFilter('useAsDefault',$useAsDefault);
+        $this->entity->getFilter()->hasFilter('customerUseAsDefaultIds',$useAsDefault);
         $this->entity->getFilter()->hasFilter('taskList',$taskList);
         
         //search the model for the filter value and set the filter value with the found matches(ids)
@@ -482,7 +475,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     /***
-     * return array with task info (taskName's) for the given languageResourceids 
+     * return array with task info (taskName's) for the given languageResourceids
      */
     private function getTaskInfos($languageResourceid){
         if(empty($this->groupedTaskInfo[$languageResourceid])) {
@@ -493,8 +486,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     
     /**
      * provides the uploaded file in a filebased TM as download
-     * 
-     * This method is very opentm2 specific. If we want more generalization: 
+     *
+     * This method is very opentm2 specific. If we want more generalization:
      *  - JS needs to know about the valid export types of the requested TM system
      *  - The Connector must be able to decide if a given type can be exported or not
      */
@@ -536,6 +529,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function postAction(){
         $this->entity->init();
         $this->data = $this->getAllParams(); //since its a fileupload, this is a normal POST
+        $this->convertAndWarnOldData();
         $this->setDataInEntity($this->postBlacklist);
         
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
@@ -554,12 +548,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         //save first to generate the languageResource id
         $this->data['id']=$this->entity->save();
+        settype($this->data['customerIds'], 'array');
+        settype($this->data['customerUseAsDefaultIds'], 'array');
 
         //check and save customer assoc db entry
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         try {
-            $customerAssoc->saveAssocRequest($this->data);
+            $customerAssoc->saveAssocRequest($this->entity->getId(), $this->data['customerIds'], $this->data['customerUseAsDefaultIds']);
         }
         catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             $this->entity->delete();
@@ -599,12 +595,49 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     
     public function putAction() {
         $this->decodePutData();
+        $this->convertAndWarnOldData();
+        parent::putAction();
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
-        $customerAssoc->updateAssocRequest($this->data);
-        parent::putAction();
+        settype($this->data->customerIds, 'array');
+        settype($this->data->customerUseAsDefaultIds, 'array');
+        $customerAssoc->updateAssocRequest($this->entity->getId(), $this->data->customerIds, $this->data->customerUseAsDefaultIds);
+        $this->addAssocData();
     }
 
+    /**
+     * API changed in a more usable manner
+     * @deprecated TODO: 30.4.2020 remove this function after all customers adopt there api calls
+     * @see Editor_TaskuserassocController::setLegacyDeadlineDate
+     */
+    protected function convertAndWarnOldData() {
+        $oldCustomers = false;
+        if(is_array($this->data) && isset($this->data['resourcesCustomersHidden'])){
+            $oldCustomers = $this->data['resourcesCustomersHidden'];
+        }
+        if(is_object($this->data) && isset($this->data->resourcesCustomersHidden)){
+            $oldCustomers = $this->data->resourcesCustomersHidden;
+        }
+        $oldCustomers = json_decode($oldCustomers);
+        if(empty($oldCustomers)){
+            return;
+        }
+        
+        $customerIds = array_column($oldCustomers, 'customerId');
+        $useAsDefault = array_keys(array_filter(array_column($oldCustomers, 'useAsDefault', 'customerId')));
+        
+        if(is_array($this->data)) {
+            $this->data['customerIds'] = $customerIds;
+            $this->data['customerUseAsDefaultIds'] = $useAsDefault;
+        }
+        else {
+            $this->data->customerIds = $customerIds;
+            $this->data->customerUseAsDefaultIds = $useAsDefault;
+        }
+        
+        $this->log->warn('E9999','The resourcesCustomersHidden field is deprecated! See https://confluence.translate5.net/display/TAD/LanguageResources%3A+Instance');
+    }
+    
     /**
      * Imports an additional file which is transfered to the desired languageResource
      */
@@ -647,7 +680,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
 
     /***
-     * This is used for the tests. It will return the proposals for the current date and for the 
+     * This is used for the tests. It will return the proposals for the current date and for the
      * assigned collections of the customers of the authenticated user
      */
     public function testexportAction() {
@@ -674,7 +707,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
                     /* @var $worker editor_Models_LanguageResources_Worker */
             
                     // init worker and queue it
-                    // Since it has to be done in a none worker request to have session access, we have to insert the worker before the taskPost 
+                    // Since it has to be done in a none worker request to have session access, we have to insert the worker before the taskPost
                     if (!$worker->init($taskGuid, ['languageResourceId' => $this->entity->getId()])) {
                         throw new ZfExtended_Exception('LanguageResource ReImport Error on worker init()');
                     }
@@ -693,7 +726,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     
     /**
      * Validates if choosen languages can be used by the choosen resource
-     * Validates also the existence of the languages in the Lang DB 
+     * Validates also the existence of the languages in the Lang DB
      * @param editor_Models_LanguageResources_Resource $resource
      * @param mixed $sourceLang
      * @param mixed $targetLang
@@ -740,8 +773,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $importInfo = $this->handleFileUpload($connector);
         
         //currently the initial upload is optional
-        // if this will be depending on the resource, 
-        // here would be a good place to implement the check with 
+        // if this will be depending on the resource,
+        // here would be a good place to implement the check with
         //if(!$importInfo && $resource file is mandatory) {
             //$this->uploadErrors = "dadada"
         //}
@@ -780,7 +813,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     
     /**
      * handles the fileupload
-     * @return array|boolean meta data about the upload or false when there was no file 
+     * @return array|boolean meta data about the upload or false when there was no file
      */
     protected function handleFileUpload(editor_Services_Connector $connector) {
         $upload = new Zend_File_Transfer_Adapter_Http();
@@ -946,7 +979,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entityLoad();
         $this->processClientReferenceVersion();
         
-        //encapsulate the deletion in a transaction to rollback if for example the real file based resource can not be deleted 
+        //encapsulate the deletion in a transaction to rollback if for example the real file based resource can not be deleted
         $this->entity->db->getAdapter()->beginTransaction();
         try {
             $entity = clone $this->entity;
@@ -965,7 +998,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             /* @var $manager editor_Services_Manager */
             $connector = $manager->getConnector($entity);
             $deleteInResource = !$this->getParam('deleteLocally', false);
-            //try to delete the resource via the connector 
+            //try to delete the resource via the connector
             $deleteInResource && $connector->delete();
             //if this is successfull we commit the DB delete
             $this->entity->db->getAdapter()->commit();
@@ -1011,7 +1044,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * performs a languageResource search
      * example URL /editor/languageResource/14/search
-     * additional POST Parameters: 
+     * additional POST Parameters:
      *  query: querystring
      *  field: source or target
      *  offset: the offset from where the next search should start
@@ -1100,7 +1133,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         $results=$result->getResult();
         foreach ($results as &$res) {
-            $tags = []; 
+            $tags = [];
             //replace the internal tags before diff
             $res->source = $this->protectTags($res->source, $tags);
             
@@ -1117,7 +1150,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @param string $segment
      * @param array $tags
      */
-    protected function protectTags($segment, array &$tags) { 
+    protected function protectTags($segment, array &$tags) {
         $tag = $this->internalTag;
         return $tag->replace($segment, function($match) use (&$tags, $tag) {
             $submatch = null;
@@ -1130,7 +1163,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             elseif(preg_match($tag::REGEX_SINGLETAG, $match[0], $submatch)) {
                 $id = $match[3];
                 if(in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
-                    //for diffing the content of the whitespace tags is important not the number on it! 
+                    //for diffing the content of the whitespace tags is important not the number on it!
                     $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, $id.'-'.$tag->getLength($match[0]));
                 }
                 else {

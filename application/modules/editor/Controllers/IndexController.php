@@ -323,6 +323,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('customPanel.title',$this->translate->_($rop->editor->customPanel->title));
       $this->view->Php2JsVars()->set('customPanel.url',$rop->editor->customPanel->url);
       
+      //helpWindow config config values for each section (loaderUrl)
+      $this->view->Php2JsVars()->set('frontend.helpWindow',$rop->frontend->helpWindow->toArray());
+      
       $this->setJsAppData();
     }
 

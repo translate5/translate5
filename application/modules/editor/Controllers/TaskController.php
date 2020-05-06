@@ -120,14 +120,17 @@ class editor_TaskController extends ZfExtended_RestController {
             'userState' => [
                 'list' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'state', 'taskGuid', 'taskGuid')
             ],
+            'orderdate' => [
+                'numeric' => 'date',
+            ],
             'assignmentDate' => [
-                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'assignmentDate', 'taskGuid', 'taskGuid')
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'assignmentDate', 'taskGuid', 'taskGuid', 'date')
             ],
             'finishedDate' => [
-                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'finishedDate', 'taskGuid', 'taskGuid')
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'finishedDate', 'taskGuid', 'taskGuid', 'date')
             ],
             'deadlineDate' => [
-                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'deadlineDate', 'taskGuid', 'taskGuid')
+                'numeric' => new ZfExtended_Models_Filter_Join('LEK_taskUserAssoc', 'deadlineDate', 'taskGuid', 'taskGuid', 'date')
             ]
         ];
         

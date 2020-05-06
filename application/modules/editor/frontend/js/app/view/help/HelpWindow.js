@@ -118,16 +118,11 @@ Ext.define('Editor.view.help.HelpWindow', {
     },
     
     /***
-     * Override the getloader url. This will return the loaderUrl from the window provider state record.
-     * This is required, since the getLoaderUrl is used before the initial setLoaderUrl is called.
+     * Get the loader url from the configuration
      */
     getLoaderUrl:function(){
-    	var me=this;
-    	if(me.loaderUrl!=""){
-    		return me.loaderUrl; 
-    	}
-    	var state=me.getProviderState();
-    	return (state && state.loaderUrl) ? state.loaderUrl : "";
-    },
+    	var sectionConfig=Editor.data.frontend.helpWindow[Editor.data.helpSection];
+    	return sectionConfig.loaderUrl;
+    }
     
 });

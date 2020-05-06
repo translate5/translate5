@@ -132,18 +132,15 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         change:'onCustomersTagFieldChange'
                     },
                     itemId:'resourcesCustomers',
-                    name:'resourcesCustomers',
-                    dataIndex:'resourcesCustomers',
+                    name:'customerIds',
+                    dataIndex:'customerIds',
                     store:Ext.create('Ext.data.Store', {
                         model:'Editor.model.admin.Customer',
                         autoLoad:true
                     })
                 },{
-                    xtype:'hiddenfield',
-                    name:'resourcesCustomersHidden'
-                },{
                     xtype:'tagfield',
-                    name:'useAsDefault',
+                    name:'customerUseAsDefaultIds',
                     itemId:'useAsDefault',
                     fieldLabel:me.strings.useAsDefault,
                     store:Ext.create('Ext.data.Store', {
@@ -152,7 +149,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     displayField: 'name', 
                     valueField: 'id', 
                     queryMode: 'local', 
-                    dataIndex:'useAsDefault'
+                    dataIndex:'customerUseAsDefaultIds'
                 },{
                     xtype: 'colorfield',
                     fieldLabel: me.strings.color,
