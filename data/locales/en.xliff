@@ -270,10 +270,6 @@
                 <source>Tag-Vollansicht</source>
                 <target>Full tag view</target>
             </trans-unit>
-            <trans-unit id="RWluc3RlbGx1bmdlbg==">
-                <source>Einstellungen</source>
-                <target>Settings</target>
-            </trans-unit>
             <trans-unit id="UU0=">
                 <source>QM</source>
                 <target>QM</target>
