@@ -44,8 +44,6 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         maxText:'#UT# von {maxWidth}',
         siblingSegments: '#UT#Seg.: {siblings}'
     },
-    editor: null,
-    bookmarkForCaret: null,
     statics: {
         /**
          * Is the min/max width active according to the meta-data?
@@ -105,6 +103,16 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     segmentRecord:null,
     
     /**
+     * {Editor.view.segments.HtmlEditor}
+     */
+    editor: null,
+    
+    /**
+     * @var {Object} bookmarkForCaret
+     */
+    bookmarkForCaret: null,
+    
+    /**
      * 
      */
     initComponent : function() {
@@ -142,16 +150,20 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     initConfig : function(instanceConfig) {
         var me=this,
             config = {};
-        me.htmlEditor=instanceConfig.htmlEditor;
+        me.editor=instanceConfig.htmlEditor;
         
         Editor.app.getController('Editor').on({
             afterInsertWhitespace:{
                 fn:me.handleAfterInsertWhitespace,
                 scope:me
+            },
+            afterDragEnd: {
+                fn:me.onHtmlEditorDragEnd,
+                scope:me
             }
         });
 
-        me.htmlEditor.on({
+        me.editor.on({
             change:{
                 fn:me.onHtmlEditorChange,
                 scope:me
@@ -167,49 +179,80 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         return me.callParent([config]);
     },
 
+    /***
+     * Handler for html editor initializer, the function is called after the iframe is initialized
+     * FIXME testme
+     */
+    onHtmlEditorInitialize:function(htmlEditor,eOpts){
+        var me=this,
+            metaCache;
+        
+        if(me.isVisible()){
+            metaCache = me.segmentRecord.get('metaCache');
+            me.updateLabel(metaCache,me.editor.getTransunitLength());
+        }
+
+        if(!Editor.controller.SearchReplace){
+            return;
+        }
+
+        var searchReplace=Editor.app.getController('SearchReplace');
+
+        //listen to the editorTextReplaced evend from search and replace
+        //so the character count is triggered when text is replaced with search and replace
+        searchReplace.on({
+            editorTextReplaced:function(newInnerHtml){
+                me.onHtmlEditorChange(null,newInnerHtml);
+            }
+        });
+    },
+
     /**
      * Handler for html editor text change
+     * @param {Editor.view.segments.HtmlEditor} htmlEditor
+     * @param {String} newValue
+     * @param {String} oldValue (optional)
      */
-    onHtmlEditorChange:function(htmlEditor,newValue,oldValue,eOpts){
+    onHtmlEditorChange:function(htmlEditor,newValue,oldValue = ''){
         var me=this,
             record,
-            segmentLength;
+            metaCache;
         if(me.isVisible()){
             record = me.segmentRecord;
-            segmentLength = htmlEditor.getTransunitLength(newValue);
-            me.handleMaxNumberOfLines(htmlEditor, record, segmentLength, newValue, oldValue);
-            me.updateLabel(record, segmentLength);
+            metaCache = record.get('metaCache');
+            me.handleMaxNumberOfLines(metaCache, newValue, oldValue);
+            me.updateLabel(metaCache, me.editor.getTransunitLength(newValue));
+        }
+    },
+
+    /**
+     * Handler for html editor drag and drop change
+     * @param {Editor.view.segments.HtmlEditor} htmlEditor
+     * @param {String} newValue
+     */
+    onHtmlEditorDragEnd:function(htmlEditor,newValue){
+        var me=this,
+            record,
+            metaCache;
+        if(me.isVisible()){
+            record = me.segmentRecord;
+            metaCache = record.get('metaCache');
+            me.updateLabel(metaCache, me.editor.getTransunitLength(newValue));
         }
     },
     
     /**
-     * If max. number of lines are to be considered, we add line-breaks automatically. 
+     * Returns the lines (= objects with their text and length).
+     * @Returns {Array}
      */
-    handleMaxNumberOfLines: function (htmlEditor, record, segmentLength, newValue, oldValue) {
+    getLinesAndLength: function () {
         var me = this,
-            meta = record.get('metaCache'),
-            minMaxLengthComp = Editor.view.segments.MinMaxLength,
-            useMaxNumberOfLines = minMaxLengthComp.useMaxNumberOfLines(meta),
-            oldSegmentLength,
-            maxWidthPerLine,
-            editorBody,
-            i,
-            range = rangy.createRange(),
+            editorBody = me.editor.getEditorBody(),
             linebreakNodes,
-            textInLine;
-        
-        if (!useMaxNumberOfLines) {
-            return;
-        }
-        
-        oldSegmentLength = htmlEditor.getTransunitLength(oldValue);
-        if (segmentLength <= oldSegmentLength) {
-            // We don't check after characters have been deleted.
-            return;
-        }
-        
-        maxWidthPerLine = minMaxLengthComp.getMaxWidthPerLine(meta);
-        editorBody = htmlEditor.getEditorBody();
+            lines = [],
+            textInLine,
+            lineWidth,
+            range = rangy.createRange();
         
         range.selectNodeContents(editorBody);
         linebreakNodes = range.getNodes([1], function(node) {
@@ -218,7 +261,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         if (linebreakNodes.length === 0) {
             linebreakNodes = [editorBody];
         }
-
+        
         for (i = 0; i < linebreakNodes.length; i++) {
             switch(true) {
               case (i===0 && linebreakNodes.length===1 && linebreakNodes[i].isSameNode(editorBody)):
@@ -240,17 +283,62 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 range.setEndBefore(linebreakNodes[i]);
             } 
             textInLine = range.toString();
-            me.handleMaxLengthForLine(textInLine, maxWidthPerLine, htmlEditor);
+            lineWidth = me.editor.getTransunitLength(textInLine);
+            lines.push({textInLine:textInLine, lineWidth:lineWidth});
+        }
+        
+        return lines;
+    },
+    
+    /**
+     * If max. number of lines are to be considered, we add line-breaks automatically. 
+     */
+    handleMaxNumberOfLines: function (metaCache, newValue, oldValue = '') {
+        var me = this,
+            meta = metaCache,
+            minMaxLengthComp = Editor.view.segments.MinMaxLength,
+            useMaxNumberOfLines = minMaxLengthComp.useMaxNumberOfLines(meta),
+            newSegmentLength,
+            oldSegmentLength,
+            maxWidthPerLine,
+            i,
+            allLines,
+            line;
+        
+        if (!useMaxNumberOfLines) {
+            return;
+        }
+        
+        newSegmentLength = me.editor.getTransunitLength(newValue);
+        oldSegmentLength = me.editor.getTransunitLength(oldValue);
+        if (newSegmentLength <= oldSegmentLength) {
+            return;
+        }
+        
+        allLines = me.getLinesAndLength();
+        
+        if (allLines.length >= meta.maxNumberOfLines) {
+            return;
+        }
+        
+        maxWidthPerLine = minMaxLengthComp.getMaxWidthPerLine(meta);
+        
+        for (i = 0; i < allLines.length; i++) {
+            line = allLines[i];
+            me.handleMaxLengthForLine(line.textInLine, line.lineWidth, maxWidthPerLine);
         }
     },
     
     /**
-     * Add a line-break if the text is longer than allowed. 
+     * If the text is longer than allowed: Add a line-break.
+     * @param {String} textInLine
+     * @param {Integer} lineWidth
+     * @param {Integer} maxWidthPerLine
+     * 
      */
-    handleMaxLengthForLine: function (textInLine, maxWidthPerLine, htmlEditor) {
+    handleMaxLengthForLine: function (textInLine, lineWidth, maxWidthPerLine) {
         var me = this,
             editorBody,
-            textInLineWidth,
             range,
             wordsInLine,
             i,
@@ -260,14 +348,11 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             options,
             sel;
         
-        textInLineWidth = htmlEditor.getTransunitLength(textInLine);
-        console.log(textInLineWidth + ': ' + textInLine);
-        if (textInLineWidth <= maxWidthPerLine) {
-            console.log('=> return');
+        if (lineWidth <= maxWidthPerLine) {
             return;
         }
         
-        editorBody = htmlEditor.getEditorBody();
+        editorBody = me.editor.getEditorBody();
         range = rangy.createRange();
         range.selectNodeContents(editorBody);
         options = {
@@ -281,17 +366,16 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 textToCheck += ' ';
             }
             textToCheck += wordsInLine[i];
-            textToCheckWidth = htmlEditor.getTransunitLength(textToCheck);
+            textToCheckWidth = me.editor.getTransunitLength(textToCheck);
             if (textToCheckWidth <= maxWidthPerLine) {
                 textForLine = textToCheck;
             } else {
-                me.editor = htmlEditor;
                 me.bookmarkForCaret = me.getPositionOfCaret();
                 range.findText(textForLine, options);
                 range.collapse(false);
                 sel = rangy.getSelection(editorBody);
                 sel.setSingleRange(range);
-                this.fireEvent('insertNewline');
+                me.fireEvent('insertNewline');
                 return;
             }
         }
@@ -305,40 +389,12 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         me.setPositionOfCaret(me.bookmarkForCaret);
     },
 
-    /***
-     * Handler for html editor initializer, the function is called after the iframe is initialized
-     * FIXME testme
-     */
-    onHtmlEditorInitialize:function(htmlEditor,eOpts){
-        var me=this,
-            editorBody=htmlEditor.getEditorBody();
-        
-        if(me.isVisible()){
-            me.updateLabel(me.segmentRecord,htmlEditor.getTransunitLength());
-        }
-
-        if(!Editor.controller.SearchReplace){
-            return;
-        }
-
-        var searchReplace=Editor.app.getController('SearchReplace');
-
-        //listen to the editorTextReplaced evend from search and replace
-        //so the character count is triggered when text is replaced with search and replace
-        searchReplace.on({
-            editorTextReplaced:function(newInnerHtml){
-                me.onHtmlEditorChange(null,newInnerHtml);
-            }
-        });
-    },
-
     /**
      * Return true or false if the minmax status strip should be visible
      */
     updateSegment: function(record, fieldname){
         var me=this,
             metaCache = record.get('metaCache'),
-            htmlEditor = me.up('segmentsHtmleditor'),
             fields = Editor.data.task.segmentFields(),
             field = fields.getAt(fields.findExact('name', fieldname.replace(/Edit$/, ''))),
             enabled = field && field.isTarget() && Editor.view.segments.MinMaxLength.useMinMaxWidth(metaCache);
@@ -347,7 +403,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         me.segmentRecord = null;
         if(enabled){
             me.segmentRecord = record;
-            me.updateLabel(me.segmentRecord, htmlEditor.getTransunitLength());
+            me.updateLabel(metaCache, me.editor.getTransunitLength());
         }
         return enabled;
     },
@@ -355,9 +411,9 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     /**
      * Update the minmax status strip label
      */
-    updateLabel: function(record, segmentLength){
+    updateLabel: function(metaCache, segmentLength){
         var me=this,
-            meta=record.get('metaCache'),
+            meta = metaCache,
             minMaxLengthComp = Editor.view.segments.MinMaxLength,
             useMaxNumberOfLines = minMaxLengthComp.useMaxNumberOfLines(meta),
             messageSizeUnit = minMaxLengthComp.getSizeUnit(meta),
@@ -370,7 +426,12 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             },
             tplData = {
                 cls: 'invalid-length'
-            };
+            },
+            allLines,
+            line,
+            i,
+            errors = [],
+            errorMsg;
 
         if(labelData.minWidth <= segmentLength && segmentLength <= labelData.maxWidth) {
             tplData.cls = 'valid-length';
@@ -391,8 +452,18 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         }
 
         if (useMaxNumberOfLines) {
+            // for status
+            allLines = me.getLinesAndLength();
+            for (i = 0; i < allLines.length; i++) {
+                line = allLines[i];
+                if (line.lineWidth > meta.maxWidth) {
+                    tplData.cls = 'invalid-length';
+                    errors.push((i+1) + ': ' + line.lineWidth);
+                }
+            }
             // for message
-            labelData.maxWidth = meta.maxNumberOfLines + '*' + meta.maxWidth;
+            errorMsg = (errors.length === 0) ? '' : ('; ' + errors.join('; '));
+            labelData.maxWidth = meta.maxNumberOfLines + '*' + meta.maxWidth + errorMsg;
         }
         
         tplData.text = me.labelTpl.apply(labelData);

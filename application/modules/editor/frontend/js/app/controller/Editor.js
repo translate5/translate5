@@ -498,6 +498,13 @@ Ext.define('Editor.controller.Editor', {
         editor.DEC_DIGITS = me.DEC_DIGITS;
         
         docEl.on({
+            dragend:{
+                delegated: false,
+                priority: 9999,
+                fn: me.handleDragEnd,
+                scope: this,
+                preventDefault: false
+            },
             keyup:{
                 delegated: false,
                 priority: 9999,
@@ -723,6 +730,15 @@ Ext.define('Editor.controller.Editor', {
         me.consoleLog('Editor: handleMouseUp');
         me.handleAfterCursorMove();
     },
+    /**
+     * 
+     */
+    handleDragEnd: function() {
+        var me = this;
+        me.consoleLog('Editor: handleDragEnd');
+        me.fireEvent('afterDragEnd');
+    },
+    
     /**
      * Special Universal preparation Handler for pressing DIGIT keys
      * A preparation keyboard shortcut can be defined, for example ALT-S. 
