@@ -171,6 +171,10 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             initialize:{
                 fn:me.onHtmlEditorInitialize,
                 scope:me
+            },
+            afterInsertMarkup:{
+                fn:me.onHtmlEditorChange,
+                scope:me
             }
         });
         if (instanceConfig) {
@@ -214,6 +218,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * @param {String} oldValue (optional)
      */
     onHtmlEditorChange:function(htmlEditor,newValue,oldValue = ''){
+        console.log('onHtmlEditorChange');
         var me=this,
             record,
             metaCache;
