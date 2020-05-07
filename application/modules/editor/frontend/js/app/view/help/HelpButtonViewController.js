@@ -99,9 +99,8 @@ Ext.define('Editor.view.help.HelpButtonViewController', {
    * The help button is visible when for the helpwindow there is loaderUrl configured
    */
   isHelpButtonVisible:function(){
-	  var provider=Ext.state.Manager.getProvider(),
-	      state=provider.get(Editor.view.help.HelpWindow.getStateIdStatic());
-	  return state && state.loaderUrl!=="";
+	  var sectionConfig=Editor.data.frontend.helpWindow[Editor.data.helpSection];
+	  return sectionConfig && sectionConfig.loaderUrl!=="";
   }
   
 });

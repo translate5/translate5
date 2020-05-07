@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Match analysis tests.
  * The test will check if the current codebase provides a valid matchanalysis test results.
  * The valid test results are counted by hand and thay are correct.
- * 
+ *
  */
 class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
     
@@ -88,9 +88,9 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         }
         
         //this is to recreate the file from the api response
-        //file_put_contents($this->api()->getFile('analysis.txt', null, false), json_encode($analysis));
+        //file_put_contents($this->api()->getFile('analysis.txt', null, false), json_encode($analysis, JSON_PRETTY_PRINT));
         $expected=$this->api()->getFileContent('analysis.txt');
-        $actual=json_encode($analysis);
+        $actual=json_encode($analysis, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file an the result file does not match.");
         
@@ -110,9 +110,9 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             unset($a->languageResourceid);
         }
         
-        //file_put_contents($this->api()->getFile('allanalysis.txt', null, false), json_encode($analysis));
+        //file_put_contents($this->api()->getFile('allanalysis.txt', null, false), json_encode($analysis, JSON_PRETTY_PRINT));
         $expected=$this->api()->getFileContent('allanalysis.txt');
-        $actual=json_encode($analysis);
+        $actual=json_encode($analysis, JSON_PRETTY_PRINT);
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual, "The expected file(allanalysis) an the result file does not match.");
         
@@ -141,19 +141,12 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $name
      */
     protected function addTm(string $fileName,string $name){
-        $customer = self::api()->getCustomer();
-        $customerParamObj = new stdClass();
-        $customerParamObj->customerId = $customer->id;
-        $customerParamObj->useAsDefault = 0;
-        $customerParamArray = [];
-        $customerParamArray[] = $customerParamObj;
-        
         $params=[
             'resourceId'=>'editor_Services_OpenTM2_1',
             'sourceLang' => self::$sourceLangRfc,
             'targetLang' => self::$targetLangRfc,
-            'resourcesCustomers' => $this->api()->getCustomer()->id,
-            'resourcesCustomersHidden' =>json_encode($customerParamArray),
+            'customerIds' => [$this->api()->getCustomer()->id],
+            'customerUseAsDefaultIds' => [],
             'serviceType' => 'editor_Services_OpenTM2',
             'serviceName'=> 'OpenTM2'
         ];
@@ -196,19 +189,14 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      */
     protected function addTermCollection(string $fileName,string $name) {
         $customer = self::api()->getCustomer();
-        $customerParamObj = new stdClass();
-        $customerParamObj->customerId = $customer->id;
-        $customerParamObj->useAsDefault = 0;
-        $customerParamArray = [];
-        $customerParamArray[] = $customerParamObj;
         
         $params=[];
         //create the resource 3 and import the file
         $params['name']=$name;
         $params['resourceId']='editor_Services_TermCollection';
         $params['serviceType']='editor_Services_TermCollection';
-        $params['resourcesCustomers']=$customer->id;
-        $params['resourcesCustomersHidden']=json_encode($customerParamArray);
+        $params['customerIds'] = [$customer->id];
+        $params['customerUseAsDefaultIds'] = [];
         $params['serviceName']='TermCollection';
         $params['mergeTerms']=false;
         //create and import the term collection languageresource
@@ -271,7 +259,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->reloadTask();
         error_log('Task status:'.$this->api()->getTask()->state);
         $counter=0;
-        $limitCheck=20;
+        $limitCheck = 25;
         while ($this->api()->getTask()->state!='open'){
             if($this->api()->getTask()->state=='error'){
                 break;
@@ -286,7 +274,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             $counter++;
         }
         
-        $this->assertEquals('open',$this->api()->getTask()->state,'Pretranslation stopped. Task has state '.$this->api()->getTask()->state);
+        $this->assertEquals('open',$this->api()->getTask()->state,'Pretranslation stopped. Task has state '.$this->api()->getTask()->state.' instead of open.');
     }
     
     /***

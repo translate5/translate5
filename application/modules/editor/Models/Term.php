@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Term Instance
  * TODO refactor this class, so that code to deal with the term mark up will be moved in editor_Models_Segment_TermTag
- * 
+ *
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
  * @method string getTerm() getTerm()
@@ -135,7 +135,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * returns for a termId the associated termentries by group 
+     * returns for a termId the associated termentries by group
      * @param array $collectionIds associated collections to the task
      * @param string $termId
      * @param int $langId
@@ -180,7 +180,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /**
      * Returns term-informations for $segmentId in $taskGuid.
      * Includes assoziated terms corresponding to the tagged terms
-     * 
+     *
      * @param string $taskGuid
      * @param int $segmentId
      * @return array
@@ -225,10 +225,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /**
      * Returns term-informations for $segmentId in termCollection.
      * Includes assoziated terms corresponding to the tagged terms
-     * 
+     *
      * @param array $collectionIds
      * @param string $mid
-     * @param array $languageIds 1-dim array with languageIds|default empty array; 
+     * @param array $languageIds 1-dim array with languageIds|default empty array;
      *          if passed only terms with the passed languageIds are returned
      * @return 2-dim array (get term of first row like return[0]['term'])
      */
@@ -249,10 +249,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Returns term-informations for a given group id
-     * 
+     *
      * @param array $collectionIds
      * @param string $groupid
-     * @param array $languageIds 1-dim array with languageIds|default empty array; 
+     * @param array $languageIds 1-dim array with languageIds|default empty array;
      *          if passed only terms with the passed languageIds are returned
      * @return 2-dim array (get term of first row like return[0]['term'])
      */
@@ -269,7 +269,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * check if the term with the same termEntry,collection but different termId exist
-     * 
+     *
      * @return Zend_Db_Table_Rowset_Abstract
      */
     public function getRestTermsOfGroup($groupId, $mid, $collectionId){
@@ -284,7 +284,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * returns all term mids of the given segment in a multidimensional array.
      * First level contains source or target (the fieldname)
      * Second level contains a list of arrays with the found mids and div tags,
-     *   the div tag is needed for transfound check 
+     *   the div tag is needed for transfound check
      * @param editor_Models_Task $task
      * @param editor_Models_Segment $segment
      * @return array
@@ -344,31 +344,26 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * Returns a multidimensional array.
      * 1. level: keys: groupId, values: array of terms grouped by groupId
      * 2. level: terms of group groupId
-     * 
+     *
      * !! TODO: Sortierung der Gruppen in der Reihenfolge wie sie im Segment auftauchen (order by seg2term.id sollte hinreichend sein)
-     * 
+     *
      * @param array $collectionIds term collections associated to the task
      * @param array $termIds as 2-dimensional array('source' => array(), 'target' => array())
      * @param $sourceLang
      * @param $sourceLang
-     * 
+     *
      * @return array
      */
-    protected function getSortedTermGroups(array $collectionIds, array $termIds, $sourceLang,$targetLang) {
-        $sourceIds = array();
-        $targetIds = array();
-        $transFoundSearch = array();
-        foreach ($termIds['source'] as $termId) {
-            $sourceIds[] = $termId[1];
-            $transFoundSearch[$termId[1]] = $termId[0];
-        }
-        foreach ($termIds['target'] as $termId) {
-            $targetIds[] = $termId[1];
-            $transFoundSearch[$termId[1]] = $termId[0];
-        }
-        
+    protected function getSortedTermGroups(array $collectionIds, array $termIds, $sourceLang, $targetLang) {
+        $lang = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $lang editor_Models_Languages */
+        $sourceLanguages = $lang->getFuzzyLanguages($sourceLang);
+        $targetLanguages = $lang->getFuzzyLanguages($targetLang);
+        $allLanguages = array_unique(array_merge($sourceLanguages, $targetLanguages));
+        $sourceIds = array_column($termIds['source'], 1);
+        $targetIds = array_column($termIds['target'], 1);
+        $transFoundSearch = array_column($termIds['source'], 0, 1) + array_column($termIds['target'], 0, 1);
         $allIds = array_merge($sourceIds, $targetIds);
-        $serialIds = '"'.implode('", "', $allIds).'"';
         
         $sql = $this->db->getAdapter()->select()
                 ->from(array('t1' =>'LEK_terms'), array('t2.*'))
@@ -377,9 +372,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 ->join(array('l' =>'LEK_languages'), 't2.language = l.id', 'rtl')
                 ->where('t1.collectionId IN(?)', $collectionIds)
                 //->where('t2.collectionId IN(?)', $collectionIds)
-                ->where('t1.mid IN('.$serialIds.')')
-                ->where('t1.language IN (?)',array($sourceLang,$targetLang))
-                ->where('t2.language IN (?)',array($sourceLang,$targetLang));
+                ->where('t1.mid IN(?)', $allIds)
+                ->where('t1.language IN (?)', $allLanguages)
+                ->where('t2.language IN (?)', $allLanguages);
         
         $terms = $this->db->getAdapter()->fetchAll($sql);
         
@@ -390,7 +385,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             settype($termGroups[$term->groupId], 'array');
             
             $term->used = in_array($term->mid, $allIds);
-            $term->isSource = in_array($term->language, array($sourceLang));
+            $term->isSource = in_array($term->language, $sourceLanguages);
             $term->transFound = false;
             if ($term->used) {
                 $term->transFound = preg_match('/class="[^"]*transFound[^"]*"/', $transFoundSearch[$term->mid]);
@@ -403,7 +398,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * 
+     *
      * @param string $mid
      * @param array $collectionIds
      * @return Zend_Db_Table_Row_Abstract | null
@@ -515,7 +510,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * exports all terms of all termCollections associated to the task in the task's languages.  
+     * exports all terms of all termCollections associated to the task in the task's languages.
      * @param editor_Models_Task $task
      */
     public function exportForTagging(editor_Models_Task $task) {
@@ -527,8 +522,8 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $collectionIds=$assoc->getCollectionsForTask($task->getTaskGuid());
         
         if(empty($collectionIds)) {
-            //No term collection assigned to task although tasks terminology flag is true. 
-            // This is normally not possible, since the terminology flag in the task is maintained on TC task assoc changes via API 
+            //No term collection assigned to task although tasks terminology flag is true.
+            // This is normally not possible, since the terminology flag in the task is maintained on TC task assoc changes via API
             throw new editor_Models_Term_TbxCreationException('E1113', [
                 'task' => $task
             ]);
@@ -546,7 +541,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $data=$this->loadSortedByCollectionAndLanguages($collectionIds, $langs);
         if(!$data) {
             //The associated collections don't contain terms in the languages of the task.
-            // Should not be, should be checked already on assignment of collection to task. 
+            // Should not be, should be checked already on assignment of collection to task.
             // Colud happen when all terms of a language are removed from a TermCollection via term import after associating that term collection to a task.
             throw new editor_Models_Term_TbxCreationException('E1114', [
                 'task' => $task,
@@ -573,7 +568,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /***
      * Export term and term attribute proposals in excel file.
      * When no path is provided, redirect the output to a client's web browser (Excel)
-     * 
+     *
      * @param array $rows
      * @param string $path: the path where the excel document will be saved
      */
@@ -692,8 +687,8 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         			LEK_terms t
         			LEFT OUTER JOIN
         			LEK_term_proposal tp ON tp.termId = t.id
-        			INNER JOIN LEK_languages l ON t.language=l.id 
-                where t.collectionId IN(?)".$termYoungerSql." 
+        			INNER JOIN LEK_languages l ON t.language=l.id
+                where t.collectionId IN(?)".$termYoungerSql."
         		and (tp.term is not null or t.processStatus='unprocessed')
         		order by t.groupId,t.term";
         
@@ -727,9 +722,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             		FROM LEK_term_attributes ta
                 		LEFT OUTER JOIN LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
                         LEFT OUTER JOIN LEK_terms t on ta.termId=t.id
-                        LEFT OUTER JOIN LEK_term_proposal tp on tp.termId=t.id 
-                        LEFT OUTER JOIN LEK_languages l ON t.language=l.id 
-                	where ta.collectionId IN(?)".$attrYoungerSql." 
+                        LEFT OUTER JOIN LEK_term_proposal tp on tp.termId=t.id
+                        LEFT OUTER JOIN LEK_languages l ON t.language=l.id
+                	where ta.collectionId IN(?)".$attrYoungerSql."
                 	and (tap.value is not null or ta.processStatus='unprocessed')
                 	order by ta.termEntryId,ta.termId";
         
@@ -747,7 +742,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Load terms in given collection and languages. The returned data will be sorted by groupId,language and id
-     * 
+     *
      * @param array $collectionIds
      * @param array $langs
      * @return NULL|Zend_Db_Table_Rowset_Abstract
@@ -770,7 +765,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Get term by collection, language and term
-     * 
+     *
      * @param mixed $collectionId
      * @param mixed $languageId
      * @param mixed $termValue
@@ -785,7 +780,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Returns all terms of the given $searchTerms that don't exist in 
+     * Returns all terms of the given $searchTerms that don't exist in
      * any of the given collections.
      * @param array $searchTerms with objects {'text':'abc', 'id':123}
      * @param array $collectionIds
@@ -826,7 +821,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Check if the term should be updated for the term collection
-     * 
+     *
      * @param mixed $termEntry
      * @param mixed $termId
      * @param mixed $collectionId
@@ -857,13 +852,13 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Search terms in the term collection with the given search string and languages.
-     * 
+     *
      * @param string $queryString
      * @param array $languages
      * @param array $collectionIds
      * @param mixed $limit
      * @param array $processStats
-     * 
+     *
      * @return array
      */
     public function searchTermByLanguage($queryString,$languages,$collectionIds,$limit=null,$processStats){
@@ -920,7 +915,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Find term attributes in the given term entry (lek_terms groupId)
-     * 
+     *
      * @param string $termEntryId
      * @param array $collectionIds
      * @return array
@@ -951,7 +946,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Remove terms where the updated date is older than the given one.
-     * 
+     *
      * @param array $collectionIds
      * @param string $olderThan
      * @return boolean
@@ -1085,7 +1080,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Get all definitions in the given entryIds. The end results will be grouped by $entryIds as a key. 
+     * Get all definitions in the given entryIds. The end results will be grouped by $entryIds as a key.
      * @param array $entryIds
      * @return array
      */
@@ -1162,7 +1157,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Check if the term modification attribute date is after $date 
+     * Check if the term modification attribute date is after $date
      * @param int $termId
      * @param mixed $date
      */
@@ -1250,7 +1245,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Get term search select. It the user is proposal allowed, the term and attribute proposals will be joined.
-     * 
+     *
      * @return Zend_Db_Select
      */
     protected function getSearchTermSelect(){

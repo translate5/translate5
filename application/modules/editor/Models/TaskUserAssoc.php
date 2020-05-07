@@ -171,6 +171,35 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $this->row = $row;
         return $this->row->toArray();
     }
+    
+    /**
+     * Returns the task user assoc matching a role, or if nothing found the one with the most useful state.
+     * The state loading order is: edit, view, unconfirmed, open, waiting, finished
+     * @param string $userGuid
+     * @param string $taskGuid
+     * @param string $role
+     * @return array
+     */
+    public function loadByRoleOrSortedState(string $userGuid, string $taskGuid, string $role): array {
+        
+        //order first by matching role, then by the states as defined
+        $order = $this->db->getAdapter()->quoteInto('role=? DESC, state="edit" DESC,state="view" DESC,state="unconfirmed" DESC,state="open" DESC,state="waiting" DESC,state="finished" DESC', $role);
+        
+        $s =$this->db->select()
+        ->where('userGuid = ?', $userGuid)
+        ->where('taskGuid = ?', $taskGuid)
+        ->order(new Zend_Db_Expr($order));
+        
+        $row = $this->db->fetchRow($s);
+        //no assocs, throw entity not found exception
+        if(empty($row)){
+            $this->notFound(__CLASS__ . '#taskGuid + userGuid', $taskGuid.' + '.$userGuid);
+        }
+
+        //load implies loading one Row, so use only the first row
+        $this->row = $row;
+        return $this->row->toArray();
+    }
 
     /**
      * Updates the stored user states of an given taskGuid (may exclude the current user if enabled by third parameter)

@@ -88,12 +88,12 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
      * @var array
      */
     protected static $expectedTranslationsForInstantTranslate = [
-        '[<i>Datum:</i>] PHP Handbuch' => '[<i>date:</i>] PHP manual',
-        'Das Haus ist <b>blau</b>.' => 'The house is <b>blue</b>.'
+        '[<i>Datum</i>] PHP Handbuch' => '[<i>date</i>] PHP manual',
+        'Das Haus ist <b>blau</b>' => 'The house is <b>blue</b>'
     ];
     
     /**
-     * 
+     *
      */
     public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
@@ -131,11 +131,6 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testCreateLanguageResource() {
         $customer = self::api()->getCustomer();
-        $customerParamObj = new stdClass();
-        $customerParamObj->customerId = $customer->id;
-        $customerParamObj->useAsDefault = 0;
-        $customerParamArray = [];
-        $customerParamArray[] = $customerParamObj;
         
         $params = [];
         $params['resourceId']  = static::RESOURCE_ID;
@@ -144,7 +139,9 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
         $params['targetLang'] = static::TARGET_LANG_CODE;
         $params['serviceType'] = static::SERVICE_TYPE;
         $params['serviceName'] = static::SERVICE_NAME;
-        $params['resourcesCustomersHidden'] = json_encode($customerParamArray);
+        $params['customerIds'] = [$customer->id];
+        $params['customerUseAsDefaultIds'] = [];
+        
         $this->api()->requestJson('editor/languageresourceinstance', 'POST', [], $params);
         $responseBody = json_decode($this->api()->getLastResponse()->getBody());
         $this->assertObjectHasAttribute('rows', $responseBody, 'Creating a DeepL-LanguageResource failed. Check configured runtimeOptions for DeepL.');
@@ -220,7 +217,7 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
     }
 
     /**
-     * 
+     *
      */
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();

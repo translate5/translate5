@@ -217,7 +217,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 },{
                     xtype: 'gridcolumn',
                     width: 100,
-                    dataIndex:'resourcesCustomers',
+                    dataIndex:'customerIds',
                     filter: {
                         type: 'customer' // [Multitenancy]
                     },
@@ -226,7 +226,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 },{
                     xtype: 'gridcolumn',
                     width: 270,
-                    dataIndex:'useAsDefault',
+                    dataIndex:'customerUseAsDefaultIds',
                     filter: {
                         type: 'string'
                     },
