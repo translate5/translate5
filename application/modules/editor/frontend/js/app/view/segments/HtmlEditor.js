@@ -82,7 +82,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
       cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.',
       segmentToShort:'#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
-      segmentToLong:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.'
+      segmentToLong:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.',
+      segmentTooManyLines: '#UT#Der Segmentinhalt enthält zu viele Zeilenumbrüche; maximal {0} Zeilen sind erlaubt.',
+      segmentLinesTooLong: '#UT#Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).',
   },
   
   //***********************************************************************************

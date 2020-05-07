@@ -218,7 +218,6 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * @param {String} oldValue (optional)
      */
     onHtmlEditorChange:function(htmlEditor,newValue,oldValue = ''){
-        console.log('onHtmlEditorChange');
         var me=this,
             record,
             metaCache;
@@ -291,7 +290,6 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 lines.push({textInLine:textInLine, lineWidth:lineWidth});
             }
         }
-        console.dir(lines);
         return lines;
     },
     
@@ -323,6 +321,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         allLines = me.getLinesAndLength();
         
         if (allLines.length >= (meta.maxNumberOfLines)) {
+            // Don't add further line-breaks when maxNumberOfLines has been reached already.
             return;
         }
         
@@ -371,10 +370,19 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 textToCheck += ' ';
             }
             textToCheck += wordsInLine[i];
+            if (textToCheck === '') {
+                continue;
+            }
             textToCheckWidth = me.editor.getTransunitLength(textToCheck);
             if (textToCheckWidth <= maxWidthPerLine) {
                 textForLine = textToCheck;
             } else {
+                if (!textForLine.replace(/\s/g, '').length) {
+                    textForLine = textInLine;
+                }
+                if(me.editor.getTransunitLength(textForLine) > maxWidthPerLine) {
+                    return;
+                }
                 me.bookmarkForCaret = me.getPositionOfCaret();
                 range.findText(textForLine, options);
                 range.collapse(false);

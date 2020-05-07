@@ -53,9 +53,13 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $messages = $this->getMessages();
         $errorCode = 'E1065';
         foreach($messages as $errors){
+            //if the segment length is invalid we have to provide a separate error code for separate error level
             if(array_key_exists('segmentToShort', $errors) || array_key_exists('segmentToLong', $errors)){
-                //if the segment length is invalid we have to provide a separate error code for separate error level
                 $errorCode = 'E1066';
+                break;
+            }
+            if(array_key_exists('segmentTooManyLines', $errors) || array_key_exists('segmentLinesTooLong', $errors)){
+                $errorCode = 'E1259';
                 break;
             }
         }
@@ -133,12 +137,79 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
   }
   
   /**
-   * validates the given value of the given field with the sibling length agains the min and max values of the transunit
+   * validates the given value of the given field with the values of the transunit,
+   * - either by checking the segment and its siblings,
+   * - or by checking the width and number of the lines in the segment
    * @param string $value
    * @param string $field
    * @return boolean
    */
   protected function validateLength($value, $field){
+      $data = $this->entity->getDataObject();
+      if(!property_exists($data, 'metaCache') || empty($data->metaCache)) {
+          return true;
+      }
+      $meta = json_decode($data->metaCache, true);
+      $sizeUnit = empty($meta['sizeUnit']) ? editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT : $meta['sizeUnit'];
+      $isPixelBased = ($sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING);
+      
+      if ($isPixelBased && array_key_exists('maxNumberOfLines',$meta) && $meta['maxNumberOfLines'] > 1) {
+          return $this->validateLengthForLines($value, $field);
+      } else {
+          return $this->validateLengthForSegmentAndSiblings($value, $field);
+      }
+  }
+  
+  /**
+   * validates the given value of the given field against the max number and length of lines of the transunit
+   * @param string $value
+   * @param string $field
+   * @return boolean
+   */
+  protected function validateLengthForLines($value, $field){
+      $data = $this->entity->getDataObject();
+      if(!property_exists($data, 'metaCache') || empty($data->metaCache)) {
+          return true;
+      }
+      $meta = json_decode($data->metaCache, true);
+      
+      // Validation if $isPixelBased and if isset($meta['maxNumberOfLines'] has been done already,
+      // otherwise we wouldn't be here.
+      if(!array_key_exists('maxWidth', $meta) || empty($meta['maxWidth'])) {
+          return false;
+      }
+            
+      $tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+      /* @var $tagHelper editor_Models_Segment_InternalTag */
+      $allLines = $tagHelper->getLinesAccordingToNewlineTags($value);
+      
+      if(count($allLines) > $meta['maxNumberOfLines']) {
+          $this->addMessage($field, 'segmentTooManyLines', 'There are '.count($allLines).' lines in the segment, but only '.$meta['maxNumberOfLines'] . ' lines are allowed.');
+          return false;
+      }
+      
+      foreach ($allLines as $key => $line) {
+          $errors = [];
+          $length = (int)$this->entity->textLengthByMeta($line, $this->entity->meta());
+          if ($length > $meta['maxWidth']) {
+              $errors[] = ($key+1) . ': ' . $length;
+          }
+          if (count($errors) > 0) {
+              $this->addMessage($field, 'segmentLinesTooLong', 'Not all lines in the segment match the given maximal length: ' . implode('; ', $errors));
+              return false;
+          }
+      }
+      
+      return true;
+  }
+  
+  /**
+   * validates the given value of the given field with the sibling length agains the min and max values of the transunit
+   * @param string $value
+   * @param string $field
+   * @return boolean
+   */
+  protected function validateLengthForSegmentAndSiblings($value, $field){
       $data = $this->entity->getDataObject();
       if(!property_exists($data, 'metaCache') || empty($data->metaCache)) {
           return true;

@@ -336,7 +336,9 @@ Ext.define('Editor.controller.Localizer', {
             tagRemovedText: '<?php echo $this->translate->_('Es wurden Tags mit fehlendem Partner entfernt!');?>',
             cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.');?>',
             segmentToShort: '<?php echo $this->translate->_('Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.');?>',
-            segmentToLong: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>'
+            segmentToLong: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>',
+            segmentTooManyLines: '<?php echo $this->translate->_('Der Segmentinhalt enthält zu viele Zeilenumbrüche; maximal {0} Zeilen sind erlaubt.');?>',
+      		segmentLinesTooLong: '<?php echo $this->translate->_('Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).');?>'
         }
     });
     
