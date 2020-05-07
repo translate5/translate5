@@ -1272,7 +1272,6 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='QWxsZXMgZXJzZXR6ZW4='><source>Alles ersetzen</source><target>Alles ersetzen</target></trans-unit>
 <trans-unit id='QmVudXR6ZXJzcHJhY2hl'><source>Benutzersprache</source><target>Benutzersprache</target></trans-unit>
 <trans-unit id='ezB9IChNaW4uIHsxfSk='><source>{0} (Min. {1})</source><target>{0} (Min. {1})</target></trans-unit>
-<trans-unit id='TWVocmZhY2ggcmVmZXJlbnppZXJ0ZXMgU2VnbWVudDogSW0gTGF5b3V0IG1laHJmYWNoIHZvcmhhbmRlbiwgaW4gZGVyIExpc3RlIGRlciBTZWdtZW50ZSBudXIgZWlubWFsLg=='><source>Mehrfach referenziertes Segment: Im Layout mehrfach vorhanden, in der Liste der Segmente nur einmal.</source><target>Mehrfach referenziertes Segment: Im Layout mehrfach vorhanden, in der Liste der Segmente nur einmal.</target></trans-unit>
 <trans-unit id='bmljaHQgYmVzdMOkdGlndA=='><source>nicht bestätigt</source><target>nicht bestätigt</target></trans-unit>
 <trans-unit id='IC0gW0FVRkdBQkUgVU5CRVNUw4RUSUdUXQ=='><source> - [AUFGABE UNBESTÄTIGT]</source><target> - [AUFGABE UNBESTÄTIGT]</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB3dXJkZSBiZXN0w6R0aWd0IHVuZCB6dW0gQmVhcmJlaXRlbiBmcmVpZ2VnZWJlbi4='><source>Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.</source><target>Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.</target></trans-unit>
