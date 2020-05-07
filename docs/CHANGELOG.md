@@ -3,6 +3,60 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.4.2] - 2020-05-07
+###Added
+TRANSLATE-1999: Optional custom content can be displayed in the file area of the editor
+  See configuration runtimeOptions.editor.customPanel.url and runtimeOptions.editor.customPanel.title
+TRANSLATE-2028: Change how help window urls are defined in Zf_configuration
+  See https://confluence.translate5.net/display/CON/Database+based+configuration
+TRANSLATE-2039: InstantTranslate: Translate text area segmented against TM and MT and Terminology
+  InstantTranslate can deal now with multiple sentences
+TRANSLATE-2048: Provide segment auto-state summary via API
+  A segment auto-state summary is now provided via API
+
+###Changed
+TRANSLATE-2044: Change Edge browser support version
+  Minimum Edge Version is now: Version 80.0.361.50: 11. Februar or higher
+TRANSLATE-2042: Introduce a tab panel used for the administrative main components
+  The administration main menu was improved
+TRANSLATE-1926: Add LanguageResources: show all services that translate5 can handle
+  On adding LanguageResources also the not configured resources are shown (disabled, but the user knows now that it does exist)
+TRANSLATE-2031: NEC-TM: Categeries are mandatory
+  On the creation and usage of NEC-TM categeries are now mandatory
+
+###Bugfixes
+TRANSLATE-1769: Fuzzy-Matching of languages in TermTagging does not work, when a TermCollection is added after task import
+  If choosing a language with out a sublanguage in translate5 (just "de" for example) the termtagger should also tag terms in the language de_DE. This was not working anymore.
+TRANSLATE-2024: InstantTranslate file translation: Segments stay empty, if no translation is provided
+  If for a segment no translation could be find, the source text remains.
+TRANSLATE-2029: NEC-TM Error in GUI: Save category assocs
+  A JS error occured on saving NEC-TMs
+TRANSLATE-2030: Garbage Collector produces DB DeadLocks due wrong timezone configuration
+  The problem was fixed internally, although it should be ensured, that the DB and PHP run in the same timezone.
+TRANSLATE-2033: JS error when leaving the application
+  The JS error "Sync XHR not allowed in page dismissal" was solved
+TRANSLATE-2034: In Chinese languages some ^h characters are added which prevents export then due invalid XML 
+  The characters are masked now as special character, which prevents the XML getting scrambled.
+TRANSLATE-2036: Handle empty response from the spell check
+  The Editor may handle empty spell check results now
+TRANSLATE-2037: VisualReview: Leaving a task leads to an error in Microsoft Edge
+  Is fixed now, was reproduced on Microsoft Edge: 44.18362.449.0
+TRANSLATE-2050: Change Language Resource API so that it is understandable
+  Especially the handling of the associated clients and the default clients was improved
+TRANSLATE-2051: TaskGrid advanced datefilter is not working
+  Especially the date at was not working
+TRANSLATE-2055: Switch okapi import to tags, that show tag markup to translators
+  Instead of g and x tags Okapi produces know ph, it, bpt and ept tags, which in the end shows the real tag content to the user in the Editor.
+TRANSLATE-2056: Finished task can not be opened readonly
+  Tasks finished in the workflow could not be opened anymore read-only by the finishing user
+TRANSLATE-2057: Disable term tagging in read only segments
+  This can be changed in the configuration, so that terms of non editable segments can be tagged if needed
+TRANSLATE-2059: Relais import fails with DB error message
+  This is fixed now.
+TRANSLATE-2023: InstantTranslate - Filetranslation: Remove associations to LanguageResources after translation
+  On using the file translation in InstantTranslate some automatically used language resources are now removed again
+
+
 ## [3.4.1] - 2020-04-08
 ###Added
 TRANSLATE-1997: Show help window automatically and remember "seen" click
