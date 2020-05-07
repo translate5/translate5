@@ -1776,53 +1776,6 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RGFzIG7DpGNoc3RlIC8gdm9yaGVyaWdlIFNlZ21lbnQgd2lyZCBub2NoIGdlc3BlaWNoZXJ0LCBiaXR0ZSB3YXJ0ZW4uLi4='><source>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</source><target>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</target></trans-unit>
 <trans-unit id='RGllc2UgUXVlbGxzcHJhY2hlIHdpcmQgdm9uIGRlciBSZXNzb3VyY2UgbmljaHQgdW50ZXJzdMO8dHp0IQ=='><source>Diese Quellsprache wird von der Ressource nicht unterstützt!</source><target>Diese Quellsprache wird von der Ressource nicht unterstützt!</target></trans-unit>
 <trans-unit id='RGllc2UgWmllbHNwcmFjaGUgd2lyZCB2b24gZGVyIFJlc3NvdXJjZSBuaWNodCB1bnRlcnN0w7x0enQh'><source>Diese Zielsprache wird von der Ressource nicht unterstützt!</source><target>Diese Zielsprache wird von der Ressource nicht unterstützt!</target></trans-unit>
-<trans-unit id='SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiAlMSRzIG5pY2h0IG9mZml6aWVsbCB1bnRlcnN0w7x0enQuPGJyIC8+ICAgIERpZSBBbndlbmR1bmcgd3VyZGUgaGluc2ljaHRsaWNoIEZ1bmt0aW9uYWxpdMOkdCB1bmQgUGVyZm9ybWFuY2UgaW4gZGVuIGZvbGdlbmRlbiBCcm93c2VyIG9mZml6aWVsbCBnZXRlc3RldDogICAgPHVsPiAgICAgICAgPGxpPkdvb2dsZSBDaHJvbWUgYWIgVmVyc2lvbiA0ODwvbGk+ICAgICAgICA8bGk+TW96aWxsYSBGaXJlZm94IGFiIFZlcnNpb24gNDQ8L2xpPiAgICAgICAgPGxpPkFwcGxlIFNhZmFyaSBhYiBWZXJzaW9uIDk8L2xpPiAgICAgICAgPGxpPk1pY3Jvc29mdCBFZGdlIGFiIFZlcnNpb24gODA8L2xpPiAgICA8L3VsPiAgICBQcmluemlwaWVsbCBrYW5uICUxJHMgYXVjaCBtaXQgYW5kZXJlbiBCcm93c2VybiBiencuIMOkbHRlcmVuIFZlcnNpb25lbiBmdW5rdGlvbmllcmVuLiAgICBIaWVyIGthbm4gZXMgYWJlciB6dSB1bnZvcmhlcmdlc2VoZW5lbiBGZWhsZXJuIGtvbW1lbi4gICAgUG90ZW50aWVsbCBrw7ZubmVuIGF1Y2ggbWFuY2hlIEZlYXR1cmVzIGtvbXBsZXR0IG5pY2h0IGZ1bmt0aW9uaWVyZW4u'><source>Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.<br />    Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:    <ul>        <li>Google Chrome ab Version 48</li>        <li>Mozilla Firefox ab Version 44</li>        <li>Apple Safari ab Version 9</li>        <li>Microsoft Edge ab Version 80</li>    </ul>    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.    Hier kann es aber zu unvorhergesehenen Fehlern kommen.    Potentiell können auch manche Features komplett nicht funktionieren.</source><target>Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.<br />    Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:    <ul>        <li>Google Chrome ab Version 48</li>        <li>Mozilla Firefox ab Version 44</li>        <li>Apple Safari ab Version 9</li>        <li>Microsoft Edge ab Version 80</li>    </ul>    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.    Hier kann es aber zu unvorhergesehenen Fehlern kommen.    Potentiell können auch manche Features komplett nicht funktionieren.</target></trans-unit>
-<trans-unit id='VVJMIGbDvHIgVmlzdWFsIFJldmlldyBIVE1M'><source>URL für Visual Review HTML</source><target>URL für Visual Review HTML</target></trans-unit>
-<trans-unit id='UmV2aWV3IFNjaHJpZnRlbg=='><source>Review Schriften</source><target>Review Schriften</target></trans-unit>
-<trans-unit id='U2NocmlmdG5hbWU='><source>Schriftname</source><target>Schriftname</target></trans-unit>
-<trans-unit id='RGF0ZWluYW1l'><source>Dateiname</source><target>Dateiname</target></trans-unit>
-<trans-unit id='U2NocmlmdHNhdHogYmVhcmJlaXRlbg=='><source>Schriftsatz bearbeiten</source><target>Schriftsatz bearbeiten</target></trans-unit>
-<trans-unit id='VmVyZsO8Z2JhcmU='><source>Verfügbare</source><target>Verfügbare</target></trans-unit>
-<trans-unit id='TnVyIHZlcmbDvGdiYXJlIFNjaHJpZnRzw6R0emUgYW56ZWlnZW4='><source>Nur verfügbare Schriftsätze anzeigen</source><target>Nur verfügbare Schriftsätze anzeigen</target></trans-unit>
-<trans-unit id='TmljaHQgdmVyZsO8Z2JhcmU='><source>Nicht verfügbare</source><target>Nicht verfügbare</target></trans-unit>
-<trans-unit id='TnVyIG5pY2h0IHZlcmbDvGdiYXJlIHNjaHJpZnRzw6R0emUgYW56ZWlnZW4='><source>Nur nicht verfügbare schriftsätze anzeigen</source><target>Nur nicht verfügbare schriftsätze anzeigen</target></trans-unit>
-<trans-unit id='U2NocmlmdGFydGVubGlzdGUgdm9tIFNlcnZlciBha3R1YWxpc2llcmVu'><source>Schriftartenliste vom Server aktualisieren</source><target>Schriftartenliste vom Server aktualisieren</target></trans-unit>
-<trans-unit id='QWxsZQ=='><source>Alle</source><target>Alle</target></trans-unit>
-<trans-unit id='QWxsZSBTY2hyaWZ0c8OkdHplIGFuemVpZ2Vu'><source>Alle Schriftsätze anzeigen</source><target>Alle Schriftsätze anzeigen</target></trans-unit>
-<trans-unit id='Vm9yaGFuZGVu'><source>Vorhanden</source><target>Vorhanden</target></trans-unit>
-<trans-unit id='QW56YWhsIFRhc2tz'><source>Anzahl Tasks</source><target>Anzahl Tasks</target></trans-unit>
-<trans-unit id='R2V3aWNodA=='><source>Gewicht</source><target>Gewicht</target></trans-unit>
-<trans-unit id='U2NocmlmdHNhdHogbMO2c2NoZW4='><source>Schriftsatz löschen</source><target>Schriftsatz löschen</target></trans-unit>
-<trans-unit id='Vm9yaGFuZGVuZQ=='><source>Vorhandene</source><target>Vorhandene</target></trans-unit>
-<trans-unit id='TnVyIHZvcmhhbmRlbmUgU2NocmlmdHPDpHR6ZSBhbnplaWdlbg=='><source>Nur vorhandene Schriftsätze anzeigen</source><target>Nur vorhandene Schriftsätze anzeigen</target></trans-unit>
-<trans-unit id='TmljaHQgdm9yaGFuZGVuZQ=='><source>Nicht vorhandene</source><target>Nicht vorhandene</target></trans-unit>
-<trans-unit id='TnVyIG5pY2h0IHZvcmhhbmRlbmUgc2NocmlmdHPDpHR6ZSBhbnplaWdlbg=='><source>Nur nicht vorhandene schriftsätze anzeigen</source><target>Nur nicht vorhandene schriftsätze anzeigen</target></trans-unit>
-<trans-unit id='RGVyIFNjaHJpZnRzYXR6IHd1cmRlIGdlbMO2c2NodC4='><source>Der Schriftsatz wurde gelöscht.</source><target>Der Schriftsatz wurde gelöscht.</target></trans-unit>
-<trans-unit id='U2NocmlmdHNhdHogd2lya2xpY2ggbMO2c2NoZW4/'><source>Schriftsatz wirklich löschen?</source><target>Schriftsatz wirklich löschen?</target></trans-unit>
-<trans-unit id='U2NocmlmdGFydCBiZWFyYmVpdGVu'><source>Schriftart bearbeiten</source><target>Schriftart bearbeiten</target></trans-unit>
-<trans-unit id='TGFkZSBEZXRhaWxz'><source>Lade Details</source><target>Lade Details</target></trans-unit>
-<trans-unit id='VGFza3MsIHdlbGNoZSBkaWVzZSBTY2hyaWZ0IHZlcndlbmRlbg=='><source>Tasks, welche diese Schrift verwenden</source><target>Tasks, welche diese Schrift verwenden</target></trans-unit>
-<trans-unit id='TmFtZSBkZXMgVGFza3M='><source>Name des Tasks</source><target>Name des Tasks</target></trans-unit>
-<trans-unit id='R1VJRA=='><source>GUID</source><target>GUID</target></trans-unit>
-<trans-unit id='V2ViIE9wZW4gRm9udCBGb3JtYXQgMS4wICgqLndvZmYp'><source>Web Open Font Format 1.0 (*.woff)</source><target>Web Open Font Format 1.0 (*.woff)</target></trans-unit>
-<trans-unit id='VHJ1ZVR5cGUgRm9udCAoKi50dGYp'><source>TrueType Font (*.ttf)</source><target>TrueType Font (*.ttf)</target></trans-unit>
-<trans-unit id='RGFzIERhdGVpZm9ybWF0IGRlciBhdXNnZXfDpGhsdGVuIFNjaHJpZnRhcnRlbi1EYXRlaSBpc3QgbmljaHQgcmljaHRpZy4='><source>Das Dateiformat der ausgewählten Schriftarten-Datei ist nicht richtig.</source><target>Das Dateiformat der ausgewählten Schriftarten-Datei ist nicht richtig.</target></trans-unit>
-<trans-unit id='V8OkaGxlbiBTaWUgZWluZSBXZWIgU2NocmlmdGFydGVuLURhdGVpIG1pdCBkZXIgRGF0ZWllbmR1bmcgezB9'><source>Wählen Sie eine Web Schriftarten-Datei mit der Dateiendung {0}</source><target>Wählen Sie eine Web Schriftarten-Datei mit der Dateiendung {0}</target></trans-unit>
-<trans-unit id='U2NocmlmdGFydGVuLUZvcm1hdGU='><source>Schriftarten-Formate</source><target>Schriftarten-Formate</target></trans-unit>
-<trans-unit id='SG9jaGxhZGVu'><source>Hochladen</source><target>Hochladen</target></trans-unit>
-<trans-unit id='TGFkZSBTY2hyaWZ0ZW4gaG9jaC4uLg=='><source>Lade Schriften hoch...</source><target>Lade Schriften hoch...</target></trans-unit>
-<trans-unit id='RGllIFNjaHJpZnRlbiB3dXJkZW4gZXJmb2xncmVpY2ggaG9jaGdlbGFkZW4='><source>Die Schriften wurden erfolgreich hochgeladen</source><target>Die Schriften wurden erfolgreich hochgeladen</target></trans-unit>
-<trans-unit id='RXJmb2xn'><source>Erfolg</source><target>Erfolg</target></trans-unit>
-<trans-unit id='U2llIG3DvHNzZW4gbWluZGVzdGVucyBlaW5lIFNjaHJpZnRhcnRlbi1EYXRlaSBob2NobGFkZW4='><source>Sie müssen mindestens eine Schriftarten-Datei hochladen</source><target>Sie müssen mindestens eine Schriftarten-Datei hochladen</target></trans-unit>
-<trans-unit id='UHJvYmxlbQ=='><source>Problem</source><target>Problem</target></trans-unit>
-<trans-unit id='Vm9yaGFuZGVuZSBEYXRlaWVu'><source>Vorhandene Dateien</source><target>Vorhandene Dateien</target></trans-unit>
-<trans-unit id='SW4tQ29udGV4dCBTY2hyaWZ0ZW4='><source>In-Context Schriften</source><target>In-Context Schriften</target></trans-unit>
-<trans-unit id='QW56YWhsIEF1ZmdhYmVu'><source>Anzahl Aufgaben</source><target>Anzahl Aufgaben</target></trans-unit>
-<trans-unit id='QXVmZ2FiZW4sIHdlbGNoZSBkaWVzZSBTY2hyaWZ0IHZlcndlbmRlbg=='><source>Aufgaben, welche diese Schrift verwenden</source><target>Aufgaben, welche diese Schrift verwenden</target></trans-unit>
-<trans-unit id='TmFtZSBkZXIgQXVmZ2FiZQ=='><source>Name der Aufgabe</source><target>Name der Aufgabe</target></trans-unit>
-<trans-unit id='V2ViIE9wZW4gRm9udCBGb3JtYXQgMS4wICgqLndvZmYpIG9kZXIgVHJ1ZVR5cGUgRm9udCAoKi50dGYp'><source>Web Open Font Format 1.0 (*.woff) oder TrueType Font (*.ttf)</source><target>Web Open Font Format 1.0 (*.woff) oder TrueType Font (*.ttf)</target></trans-unit>
-<trans-unit id='V2ViIE9wZW4gRm9udCBGb3JtYXQgMS4wICgqLndvZmYpIG9kZXIgPGJyLz5UcnVlVHlwZSBGb250ICgqLnR0Zik='><source>Web Open Font Format 1.0 (*.woff) oder <br/>TrueType Font (*.ttf)</source><target>Web Open Font Format 1.0 (*.woff) oder <br/>TrueType Font (*.ttf)</target></trans-unit>
-<trans-unit id='U2NocmlmdGFydCBEYXRlaQ=='><source>Schriftart Datei</source><target>Schriftart Datei</target></trans-unit>
   </body>
  </file>
 </xliff>
