@@ -262,7 +262,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         
         range.selectNodeContents(editorBody);
         linebreakNodes = range.getNodes([1], function(node) {
-            return node.alt === "↵"; // TODO: stattdessen auf css newline abfragen
+            return /newline/.test(node.className);
         });
         if (linebreakNodes.length === 0) {
             // = one single line only

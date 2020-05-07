@@ -555,7 +555,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       data.shortTag = '&lt;'+data.shortTag+'&gt;';
       data.whitespaceTag = /nbsp|tab|space|newline/.test(className);
       if(data.whitespaceTag) {
-          data.type += ' whitespace'; // TODO: für newline auch "newline" in css-Klasse übernehmen
+          data.type += ' whitespace';
+          if (/newline/.test(className)) {
+              data.type += ' newline';
+          }
           data.key = 'whitespace'+data.nr;
       }
       else {
