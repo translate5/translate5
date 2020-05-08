@@ -50,7 +50,8 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
       taskPrefs: '#UT# Aufgabenspezifische Einstellungen',
       exp: '#UT# Aufgabe exportieren',
       actionExcelReimport: '#UT# Excel Re-Importieren',
-      projectOverview:'#UT#zum Projekt springen'
+      projectOverview:'#UT#zum Projekt springen',
+      actionDeleteProject: '#UT#Projekt komplett löschen'
   },
   
   /**
@@ -140,6 +141,12 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
                 isAllowedFor: 'editorProjectTask',
                 iconCls: 'ico-task-project',
                 sortIndex:14
+            },{
+	            tooltip: me.messages.actionDeleteProject,
+	            isProjectActionIcon:true,
+	            isAllowedFor: 'editorDeleteProject',
+	            iconCls: 'ico-project-delete',
+	            sortIndex:15
             }]
     };
 

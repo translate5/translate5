@@ -31,15 +31,40 @@ Ext.define('Editor.view.admin.ProjectPanel', {
 	alias: 'widget.projectPanel',
     requires:[
     	'Editor.view.admin.ProjectGrid',
+    	'Editor.view.admin.ProjectTaskGrid',
+    	'Editor.view.admin.ProjectPanelViewController'
 	],
 	itemId: 'projectPanel',
+	controller:'projectPanel',
 	title: '#UT#Projektübersicht',
 	glyph: 'xf0e8@FontAwesome',
+	layout: 'border',
+    collapsed: false,
+    viewModel:{
+    	formulas:{
+    		selection:{
+    			bind:{
+    				bindTo:'{projectGrid.selection}',
+    				deep:true
+    			},
+    			get:function(sel){
+    				return sel;
+    			}
+    		}
+
+    	}
+    },
+	
+    strings:{
+    	projectTasksTitle:'#UT#Aufgaben für das Projekt: {selection.taskName}'
+    },
     initConfig: function(instanceConfig) {
         var me = this,
         	config={
+        		title:me.title,
         		items:[{
-        			xtype:'projectTaskGrid',
+        			xtype:'projectGrid',
+        			reference:'projectGrid',
         			header:false,
         			region: 'center',
         			split: true,
@@ -55,12 +80,23 @@ Ext.define('Editor.view.admin.ProjectPanel', {
                         animate: true
                     },
                     bodyBorder: true,
-                    width:'90%',
+                    width:'75%',
                     items: [{
-                    	xtype:'panel',
-                    	items:[{
-                    		xtype: 'projectTaskGrid'
-                    	}]
+                    	xtype: 'projectTaskGrid',
+                    	bind:{
+                    		title:me.strings.projectTasksTitle,
+		    				store:{
+		    					model:'Editor.model.admin.ProjectTask',
+		    					remoteSort: true,
+		    					remoteFilter: true,
+		    					pageSize: false,
+		    					filters:{
+		    		    			property: 'projectId',
+		    		        		operator:"eq",
+		    		        		value:'{selection.projectId}'
+		    					}
+		    				}
+		    			}
                     }]
         		}]
         };

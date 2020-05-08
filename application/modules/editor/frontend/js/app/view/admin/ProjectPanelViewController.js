@@ -25,13 +25,30 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-Ext.define('Editor.view.admin.ProjectGridViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.projectTaskGrid',
+Ext.define('Editor.view.admin.ProjectPanelViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.projectPanel',
     
-	expandCollapseIconCls:null,
-	expandCollapseText:null,
-	expandCollapseTip:null
-
+    routes: {
+    	'project': 'onProjectRoute',
+    	'project/:id' : 'onProjectRoute'
+	},
+	
+	onProjectRoute:function(id){
+		var me=this,
+			view=me.getView(),
+			route='project',
+			controller=view.down('#projectGrid').getController();
+		
+		if(id){
+			route=route+'/'+id
+		}
+		
+		Editor.app.openAdministrationSection(this.getView(), route);
+		controller.reloadProjects().then(function(records) {
+			controller.onProjectFocus(id)
+		}, function(operation) {
+			Editor.app.getController('ServerException').handleException(operation.error.response);
+		});
+	}
 });

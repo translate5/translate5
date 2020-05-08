@@ -28,83 +28,92 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.ProjectGrid', {
 	extend: 'Editor.view.admin.TaskGrid',
-	alias: 'widget.projectTaskGrid',
+	alias: 'widget.projectGrid',
     requires:[
     	'Editor.view.admin.ProjectGridViewController',
-    	'Editor.view.admin.ProjectGridViewModel'
 	],
-	controller:'projectTaskGrid',
-    viewModel: {
-        type: 'projectTaskGrid'
-    },
-	itemId: 'projectTaskGrid',
+	controller:'projectGrid',
+	itemId: 'projectGrid',
 	strings: {
-		actionDelete: '#UT#Projekt komplett löschen',
+		addProject:'#UT#Projekt hinzufügen',
+		addProjectTip:'#UT#Neues Projekt hinzufügen',
 		reloadBtn: '#UT#Aktualisieren',
-		reloadBtnTip: '#UT#Projektliste vom Server aktualisieren.',
-		expandAllBtn:'#UT#Alle Erweitern',
-		expandAllBtnTip:'#UT#Alle Projekte Erweitern',
-		collapseAllBtn:'#UT#Alle Reduziern',
-		collapseAllBtnTip:'#UT#Alle Projekte Reduziern'
+		reloadBtnTip: '#UT#Projektliste vom Server aktualisieren.'
 	},
 	
-	text_cols: {
+	visibleColumns:[
+		'id',
+		'taskGridActionColumn',
+		'taskName',
+		'customerId',
+		'pmName',
+		'orderdate',
+		'emptyTargets',
+		'enableSourceEditing'
+	],
+	
+	text_cols: { // in case of any changes, pls also update getTaskGridTextCols() in editor_Models_Task
+	      // sorted by appearance
+		workflow: '#UT#Workflow',
+		taskActions: '#UT#Aktionen',
+		state: '#UT#Aufgabenstatus',
+		customerId: '#UT#Endkunde',
 		taskName: '#UT#Projektname',
+		taskNr: '#UT#Auftragsnr.',
+		wordCount: '#UT#Wörter',
+		wordCountTT: '#UT#Anzahl Wörter',
+		fileCount: '#UT#Dateien',
+		sourceLang: '#UT#Quellsprache',
+		relaisLang: '#UT#Relaissprache',
+		targetLang: '#UT#Zielsprache',
+		referenceFiles: '#UT#Referenzdateien',
+		terminologie: '#UT#Terminologie',
+		userCount: '#UT#Zahl zugewiesener Benutzer',
+		users: '#UT#Benutzer',
+		taskassocs: '#UT#Anzahl zugewiesene Sprachresourcen',
+		pmName: '#UT#Projektmanager',
+		pmGuid: '#UT#Projektmanager',
+		orderdate: '#UT#Bestelldatum',
+		edit100PercentMatch: '#UT#100%-Treffer editierbar',
+		fullMatchEdit: '#UT#100% Matches sind editierbar',
+		emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
+		lockLocked: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
+		enableSourceEditing: '#UT#Quellsprache bearbeitbar',
+		workflowState:'#UT#Workflow-Status',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+		workflowUserRole:'#UT#Benutzer-Rolle',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+		userName:'#UT#Benutzer',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+		segmentCount:'#UT#Segmentanzahl',
+		segmentFinishCount:'#UT#% abgeschlossen',
+		id:'#UT#Id',
+		taskGuid:'#UT#Task-Guid',
+		workflowStepName:'#UT#Aktueller Workflow-Schritt',
+		userState:'#UT#Mein Job-Status',
+		userJobDeadline:'#UT#Meine Deadline',
+		assignmentDate:'#UT#Benutzer-Zuweisungsdatum',
+		finishedDate:'#UT#Benutzer-Abschlussdatum',
+		deadlineDate:'#UT#Benutzer-Deadline/s',
+		assignmentDateHeader:'#UT#Zuweisungsdatum',
+		finishedDateHeader:'#UT#Abschlussdatum',
+		deadlineDateHeader:'#UT#Deadline Datum',
 	},
 	
 	store: 'admin.Project',
 	autoLoad: false,
 	bufferedRenderer:false,//info: this will stop the store filter binding.
 
-	/***
-	 * Expand or collapse all rowwidget rows
-	 * TODO: move rowwidget in separate class 
-	 */
-	handleExpandCollapseAll:function(expand){
-		var me = this,
-			data = me.getStore().getRange();
-		data.forEach(function(record){
-			me.toggleRow(record,expand)
-		});
+	viewConfig: {
+	      getRowClass: function(task) {
+	          var res = [],
+	              user = Editor.app.authenticatedUser,
+	              actions = this.panel.availableActions;
+	          Ext.Array.each(actions, function(action) {
+	              if(user.isAllowed(action, task)) {
+	                  res.push(action);
+	              }
+	          });
+	          return res.join(' ');
+	      }
 	},
-	
-    collapseAll:function(){
-    	this.handleExpandCollapseAll(false);
-    },
-    
-    expandAll:function(){
-    	this.handleExpandCollapseAll(true);
-    },
-    
-    expandRow:function(record){
-    	this.toggleRow(record,true);
-    },
-    
-    collapseRow:function(record){
-    	this.toggleRow(record,false);
-    },
-    
-    toggleRow:function(record,expand){
-    	var me = this,
-			view = me.getView(),
-			rowWidget = me.getPlugin('projectTasksPlugin');
-		
-		if (!me.rendered || !rowWidget || !record || record.get('taskType')!=='project') {//TODO: get me from constant
-		    return;
-		}
-        // If we are handling a lockable assembly,
-        // handle the normal view first
-        var view = rowWidget.normalView || rowWidget.view,
-        	index=view.indexOf(view.getRow(record)),
-	        rowNode = view.getNode(index),
-	        normalRow = Ext.fly(rowNode),
-	        isCollapsed = normalRow.hasCls(rowWidget.rowCollapsedCls);
-        
-        if(expand==isCollapsed){
-        	rowWidget.toggleRow(index, record);
-        }
-	},
-    
     initConfig: function(instanceConfig) {
         var me = this,
         	config={
@@ -114,91 +123,46 @@ Ext.define('Editor.view.admin.ProjectGrid', {
         	        items: [{
         	            xtype: 'button',
         	            iconCls: 'ico-refresh',
-        	            itemId: 'reload-task-btn',
+        	            itemId: 'reloadProjectbtn',
         	            text: me.strings.reloadBtn,
-        	            tooltip: me.strings.reloadBtnTip
+        	            tooltip: me.strings.reloadBtnTip,
+        	            handler:'onReloadProjectClick'
         	        },{
         	            xtype: 'button',
         	            iconCls: 'ico-task-add',
-        	            itemId: 'add-task-btn',
-        	            text: me.strings.addTask,
+        	            itemId: 'add-project-btn',
+        	            text: me.strings.addProject,
         	            hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),
-        	            tooltip: me.strings.addTaskTip
-        	        },{
-        	            xtype: 'button',
-        	            enableToggle:true,
-        	            itemId: 'expandCollapseAllBtn',
-        	            iconCls: 'ico-toggle-expand',
-        	            text: me.strings.expandAllBtn,
-        	            tooltip: me.strings.expandAllBtnTip,
-        	            bind:{
-        	            	iconCls:'{expandCollapseIconCls}',
-        	            	text:'{expandCollapseText}',
-        	            	tooltip:'{expandCollapseTip}',
-        	            },
-        	            listeners:{
-        	            	click:'onExpandCollapseAllBtnClick'
-        	            }
+        	            tooltip: me.strings.addProjectTip
         	        }]
-        		}],
-//        		columns: [{
-//        	        text: 'Id',
-//        	        dataIndex: 'id'
-//        	    },{
-//        	    	xtype:'actioncolumn',
-//        	    	text:me.strings.columnProjectAction,
-//        	        items: [{
-//        	        	scope:'controller',
-//        	            tooltip: me.strings.actionDelete,
-//        	            hidden:!Editor.app.authenticatedUser.isAllowed('editorDeleteProject'),
-//        	            iconCls: 'ico-task-delete',
-//        	            handler:'onDeleteProjectClick'
-//        	        }]
-//        	    },{
-//        	        text:me.strings.columnProjectName,
-//        	        dataIndex: 'taskName',
-//        	        width: 220
-//        	    }],
-        		
-//        		plugins: [
-//        	    	Ext.create('Ext.grid.plugin.RowWidget', {
-//        	    		pluginId:'projectTasksPlugin',
-//        	    		getHeaderConfig: function () {
-//        	    			//hide the expand/collapse button for non project records
-//        	    			var defaultConfig=this.superclass.getHeaderConfig.apply(this, arguments);
-//        	    			defaultConfig.renderer = function (value, gridcell, record) {
-//        	    				if (record.get('taskType')=='project') {//TODO: get me from config
-//        	    					return '<div class="' + Ext.baseCSSPrefix + 'grid-row-expander" role="presentation" tabIndex="0"></div>';
-//    	    					}
-//        	    		    }
-//        	    		    return defaultConfig;
-//    	    		    },
-//        		    	widget: {
-//        		    		xtype:'adminTaskGrid',
-//        		    		store:null,//INFO: with this the original store reference is removed
-//        		    		header:false,
-//        		    		dockedItems:false,
-//    		    			bind:{
-//    		    				store:{
-//    		    					model:'Editor.model.admin.ProjectTask',
-//    		    					remoteSort: true,
-//    		    					remoteFilter: true,
-//    		    					pageSize: false,
-//    		    					filters:{
-//    		    		    			property: 'projectId',
-//    		    		        		operator:"eq",
-//    		    		        		value:'{record.id}'
-//    		    					}
-//    		    				}
-//    		    			},
-//        		        }
-//        	    })
-//        	]
-        		
+        		}]
         };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
-    }
+    },
+    
+    initComponent:function(){
+    	var me=this;
+    	me.callParent();
+    	me.configureActionColumn();
+    },
+    
+    /***
+     * Configure the project action columns 
+     */
+    configureActionColumn:function(){
+    	var me=this,
+			actions = me.down('taskActionColumn');
+
+    	actions.setWidth(90);
+    	actions.on({
+    		click:{
+    			fn:'projectActionDispatcher',
+    			scope:me.getController()
+    		}
+    	});
+	    me.availableActions = ['editorDeleteProject'];
+    },
 });

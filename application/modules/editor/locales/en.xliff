@@ -3750,6 +3750,9 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id="QWxsZSBQcm9qZWt0ZSBFcndlaXRlcm4="><source>Alle Projekte Erweitern</source><target>Expand all projects</target></trans-unit>
 <trans-unit id="QWxsZSBSZWR1emllcm4="><source>Alle Reduziern</source><target>Collapse all</target></trans-unit>
 <trans-unit id="QWxsZSBQcm9qZWt0ZSBSZWR1emllcm4="><source>Alle Projekte Reduziern</source><target>Collapse all projects</target></trans-unit>
+<trans-unit id='UHJvamVrdCBoaW56dWbDvGdlbg=='><source>Projekt hinzufügen</source><target>Add project</target></trans-unit>
+<trans-unit id='TmV1ZXMgUHJvamVrdCBoaW56dWbDvGdlbg=='><source>Neues Projekt hinzufügen</source><target>Add new project</target></trans-unit>
+<trans-unit id='QXVmZ2FiZW4gZsO8ciBkYXMgUHJvamVrdDoge3NlbGVjdGlvbi50YXNrTmFtZX0='><source>Aufgaben für das Projekt: {selection.taskName}</source><target>Tasks for the project: {selection.taskName}</target></trans-unit>
 </body>
   </file>
 </xliff>

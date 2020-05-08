@@ -31,3 +31,6 @@ ADD COLUMN `projectId` INT(11) NULL AFTER `taskType`;
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'editorDeleteProject');
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'editorProjectTask');
+
+#single task projects
+UPDATE LEK_task set projectId=id WHERE projectId IS NULL;

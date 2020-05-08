@@ -27,43 +27,41 @@ END LICENSE AND COPYRIGHT
 */
 Ext.define('Editor.view.admin.ProjectGridViewController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.projectTaskGrid',
-    
-    routes: {
-    	'project': 'onProjectRoute',
-    	'project/:id' : 'onProjectRoute'
-	},
-	
-	
-	onProjectRoute:function(projectId) {
-		var me=this,
-			route=!projectId ? 'project' : ('project/'+projectId);
-		Editor.app.openAdministrationSection(me.getView(), route);
-		me.reloadProjects().then(function(records) {
-			projectId && me.onProjectFocus(projectId)
-		}, function(operation) {
-			Editor.app.getController('ServerException').handleException(operation.error.response);
-		});
-	},
-    	
-	strings: {
-		deleteProjectDialogTitle:'#UT#Projekt komplett löschen?',
-		deleteProjectDialogMessage:'#UT#Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?',
-		projectDeleteButtonText:'#UT#Projekt löschen',
-		projectCanceltButtonText:'#UT#Nein',
-		projectRemovedMessage:'#UT#Das Projekt wurde erfolgreich entfernt!'
-	},
-	
-    onProjectFocus:function(projectId){
-    	var me=this,
-    		record=me.getView().getStore().getById(projectId);
-    	me.getView().expandRow(record);
+    alias: 'controller.projectGrid',
+    strings: {
+    	deleteProjectDialogTitle:'#UT#Projekt komplett löschen?',
+    	deleteProjectDialogMessage:'#UT#Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?',
+    	projectDeleteButtonText:'#UT#Projekt löschen',
+    	projectCanceltButtonText:'#UT#Nein',
+    	projectRemovedMessage:'#UT#Das Projekt wurde erfolgreich entfernt!'
     },
     
-    onDeleteProjectClick:function(grid, rowIndex, colIndex){
+    /***
+     * Focus project row by given projectId
+     */
+    onProjectFocus:function(projectId){
     	var me=this,
-    		rec = grid.getStore().getAt(rowIndex);
-        
+    		store=me.getView().getStore()
+    		record=store.getById(projectId);
+    	if(!record){
+    		record=store.getAt(0);
+    	}
+    	me.getView().setSelection(record);
+    },
+
+    /***
+     * Reload project button handler
+     */
+    onReloadProjectClick:function(){
+    	this.reloadProjects();
+    	this.onProjectFocus();
+    },
+    
+    /***
+     * Delete project button handler
+     */
+    handleProjectDelete:function(project,event){
+    	var me=this;
         Ext.Msg.show({
             title:me.strings.deleteProjectDialogTitle,
             message: me.strings.deleteProjectDialogMessage,
@@ -76,10 +74,42 @@ Ext.define('Editor.view.admin.ProjectGridViewController', {
             },
             fn: function(btn) {
                 if (btn === 'yes') {
-                	me.deleteProject(rec.get('projectId'));
+                	me.deleteProject(project.get('projectId'));
                 }
             }
           });
+    },
+
+    /**
+     * Find the action icon click handler
+     */
+    projectActionDispatcher: function(view, cell, row, col, ev, evObj) {
+        var me = this,
+            t = ev.getTarget(),
+            f = t.className.match(/ico-project-([^ ]+)/),
+            camelRe = /(-[a-z])/gi,
+            camelFn = function(m, a) {
+                return a.charAt(1).toUpperCase();
+            },
+            actionIdx = ((f && f[1]) ? f[1] : "not-existing"),
+            //build camelized action out of icon css class:
+            action = ('handleProject-'+actionIdx).replace(camelRe, camelFn),
+            right = action.replace(/^handleProject/, 'editor')+'Project',
+            project = view.getStore().getAt(row),
+            confirm;
+
+        if(! Editor.app.authenticatedUser.isAllowed(right)){
+            return;
+        }
+        
+        if(! me[action] || ! Ext.isFunction(me[action])){
+            return;
+        }
+        me[action](project, ev)
+    },
+    
+    onActionIconClick:function(grid,row,rowIndex, colIndex,event,record) {
+    	this.deleteProject(record.get('projectId'));
     },
     
     deleteProject:function(taskProjectId){
@@ -101,7 +131,7 @@ Ext.define('Editor.view.admin.ProjectGridViewController', {
         });
     },
     
-    reloadProjects:function(reloadCallback){
+    reloadProjects:function(){
     	 var store = this.getView().getStore();
          return new Ext.Promise(function (resolve, reject) {
         	 store.load({

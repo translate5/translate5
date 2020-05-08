@@ -216,15 +216,11 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         
         $result = $this->loadByAssociatedTaskAndLanguage($taskGuid);
         
-        //TODO: change this in the frontend so the id is not used as primary key or sometinh like this.
-        $counter=1;
         foreach($result as &$languageresource) {
             $resource =$getResource($languageresource['serviceType'], $languageresource['resourceId']);
             if(!empty($resource)) {
                 $languageresource = array_merge($languageresource, $resource->getMetaData());
             }
-            $languageresource['id']=$counter;
-            $counter++;
         }
         
         return $result;

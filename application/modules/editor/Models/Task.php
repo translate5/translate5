@@ -905,11 +905,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * returns true if current task is a default task
+     * returns true if current task is a default task or project task
      * @return boolean
      */
     public function isTask(): bool {
-        return $this->getTaskType() == $this->getDefaultTasktype();
+        return $this->getTaskType() == $this->getDefaultTasktype() || $this->getTaskType()==self::INITIAL_TASKTYPE_PROJECT_TASK;
     }
     
     /**
@@ -1281,7 +1281,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function loadProjectTasks(int $projectId,bool $tasksOnly=false) : array{
         $s=$this->db->select();
         if($tasksOnly){
-            $s->where('taskType=?',$this->getDefaultTasktype());
+            $s->where('taskType NOT IN(?)',self::INITIAL_TASKTYPE_PROJECT);
         }
         $s->where('projectId=?',$projectId);
         return $this->db->fetchAll($s)->toArray();

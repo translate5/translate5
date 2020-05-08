@@ -547,11 +547,14 @@ class editor_TaskController extends ZfExtended_RestController {
             //warn the api user for the targetDeliveryDate ussage
             $this->targetDeliveryDateWarning();
 
+            //update the entity projectId
+            $this->entity->setProjectId($this->entity->getId());
+            $this->entity->save();
+            
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
 
-            //TODO: without this the import is not triggered. something wrong with the workers
-            if(true || $this->data['autoStartImport']) {
+            if($this->data['autoStartImport']) {
                 $this->startImportWorkers();
             }
 
@@ -1731,12 +1734,20 @@ class editor_TaskController extends ZfExtended_RestController {
      * Handle the project/task load request.
      */
     protected function handleProjectRequest(){
-        $projectOnly=$this->getRequest()->getParam('projectsOnly',null) ?? false;
-        $projectOnly=strtolower($projectOnly) == 'true' ?? false;
-        
-        if(!$this->entity->getFilter()->hasFilter('projectId')){
-            $filterValues=[editor_Models_Task::INITIAL_TASKTYPE_DEFAULT];
+        $projectOnly=filter_var($this->getRequest()->getParam('projectsOnly',false),FILTER_VALIDATE_BOOLEAN);
+        $filter=$this->entity->getFilter();
+        if($filter->hasFilter('projectId') && !$projectOnly){
+            //filter for all tasks in the project(return also the single task projects)
+            $filter->addFilter((object)[
+                'field' => 'taskType',
+                'value' =>[editor_Models_Task::INITIAL_TASKTYPE_PROJECT],
+                'type' => 'notInList',
+                'comparison' => 'in'
+            ]);
+            return;
         }
+        
+        $filterValues=[editor_Models_Task::INITIAL_TASKTYPE_DEFAULT];
         
         if($projectOnly){
             $filterValues[]=editor_Models_Task::INITIAL_TASKTYPE_PROJECT;
@@ -1744,44 +1755,11 @@ class editor_TaskController extends ZfExtended_RestController {
             $filterValues[]=editor_Models_Task::INITIAL_TASKTYPE_PROJECT_TASK;
         }
         
-        if(!empty($filterValues)){
-            $this->entity->getFilter()->addFilter((object)[
-                'field' => 'taskType',
-                'value' =>$filterValues,
-                'type' => 'list',
-                'comparison' => 'in'
-            ]);
-        }
-        
-        return;
-        
-        
-        //TODO: is this okay ?
-        //$projectOnly=$projectOnly ?? (strtolower($projectOnly) == 'true');
-        
-        //the flag is null when the request is from the task store
-        if(is_null($projectOnly)){
-            $filterValues=[$this->entity->getDefaultTasktype()];
-        }else{
-            $projectOnly = strtolower($projectOnly) == 'true' ? true : false;
-        }
-        //is true when the request is from the project store
-        if($projectOnly===true){
-            $filterValues=[$this->entity::INITIAL_TASKTYPE_PROJECT];
-        }
-        
-        //is the request from the projecttask store
-        if($projectOnly===false && $this->entity->getFilter()->hasFilter('projectId')){
-            $filterValues=[$this->entity->getDefaultTasktype()];
-        }
-        
-        if(!empty($filterValues)){
-            $this->entity->getFilter()->addFilter((object)[
-                'field' => 'taskType',
-                'value' =>$filterValues,
-                'type' => 'list',
-                'comparison' => 'in'
-            ]);
-        }
+        $filter->addFilter((object)[
+            'field' => 'taskType',
+            'value' =>$filterValues,
+            'type' => 'list',
+            'comparison' => 'in'
+        ]);
     }
 }

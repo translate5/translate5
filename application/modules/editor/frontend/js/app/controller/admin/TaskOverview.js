@@ -78,6 +78,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },{
       ref: 'filterHolder',
       selector: '#filterHolder'
+  },{
+	  ref:'adminMainSection',
+	  selector:'#adminMainSection'
   }],
   alias: 'controller.taskOverviewController',
   
@@ -157,7 +160,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           '#adminTaskGrid taskActionColumn': {
               click: 'taskActionDispatcher'
           },
-          '#adminTaskGrid #add-task-btn': {
+          '#projectTaskGrid taskActionColumn': {
+              click: 'taskActionDispatcher'
+          },
+          '#adminTaskGrid #add-project-btn': {
+              click: 'handleTaskAddShow'
+          },
+          '#projectGrid #add-project-btn': {
               click: 'handleTaskAddShow'
           },
           '#adminTaskGrid #export-meta-data-btn': {
@@ -869,7 +878,19 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * @param {Editor.model.admin.Task} task
    */
   handleTaskProject: function(task) {
-	  this.redirectTo('project/'+task.get('projectId'));
+	  var me=this,
+	      menu=me.getAdminMainSection(),
+	      activeTab=menu.getActiveTab().xtype,
+	      recirectTo='project/'+task.get('projectId');
+	  if(activeTab=='projectPanel'){
+		  recirectTo='task';
+		  me.onAdvancedFilterChange({
+  			property: 'id',
+    		operator:"eq",
+    		value:task.get('id')
+		  });
+	  }
+	  me.redirectTo(recirectTo);
   },
   
   /**

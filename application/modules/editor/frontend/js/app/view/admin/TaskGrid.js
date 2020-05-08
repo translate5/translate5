@@ -103,8 +103,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       lockedBy: '#UT#Bearbeitet und Gesperrt durch {0}',
       lockedMultiUser: '#UT#In Bearbeitung durch:',
       lockedSystem: '#UT#Durch das System gesperrt mit dem Status \'{0}\'',
-      addTask: '#UT#Aufgabe hinzufügen',
-      addTaskTip: '#UT#Eine neue Aufgabe hinzufügen.',
+      addProject:'#UT#Projekt hinzufügen',
+      addProjectTip:'#UT#Neues Projekt hinzufügen',
       exportMetaDataBtn: '#UT#Meta-Daten exportieren',
       exportMetaDataBtnTip: '#UT#Meta-Daten für alle gefilterten Aufgaben exportieren.',
       showKPIBtn: '#UT#Auswertungen anzeigen',
@@ -129,6 +129,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
       forMe: '#UT#für mich '
   },
   store: 'admin.Tasks',
+  
+  visibleColumns:[],//The configured columns will be visible by default (use itemId or stateId to define the visible column)
+  
   viewConfig: {
       /**
        * returns a specific row css class
@@ -187,9 +190,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
           }
           if(task.get('userCount') == 0) {
               res.push('no-users');
-          }
-          if(!task.get('projectId') || task.get('projectId')<1){
-        	  res=Ext.Array.remove(res,'editorProjectTask');
           }
           return res.join(' ');
       }
@@ -293,18 +293,20 @@ Ext.define('Editor.view.admin.TaskGrid', {
     me.userStore = Ext.getStore('admin.Users');
     me.callParent(arguments);
     actions = me.down('taskActionColumn');
-    
+
+    me.availableActions = [];
     if(actions && actions.items.length > 0) {
-        me.availableActions = Ext.Array.map(actions.items, function(item) {
-            return item.isAllowedFor;
-        });
-    }
-    else {
-        me.availableActions = [];
+    	Ext.Array.each(actions.items, function(item) {
+    		if(!item.isProjectActionIcon){
+    			me.availableActions=Ext.Array.push(me.availableActions,item.isAllowedFor);
+    		}
+    	});
     }
     this.view.on('afterrender', function(){
         me.tooltip = me.createToolTip();
     });
+    
+    me.setVisibleColumns();
   },
   initConfig: function(instanceConfig) {
       var me = this,
@@ -702,10 +704,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
               },{
                   xtype: 'button',
                   iconCls: 'ico-task-add',
-                  itemId: 'add-task-btn',
-                  text: me.strings.addTask,
+                  itemId: 'add-project-btn',
+                  text: me.strings.addProject,
                   hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),
-                  tooltip: me.strings.addTaskTip
+                  tooltip: me.strings.addProjectTip
               },{
 	  			  xtype:'button',
 	  			  itemId:'addAdvanceFilterBtn',
@@ -776,10 +778,33 @@ Ext.define('Editor.view.admin.TaskGrid', {
             });
         }
         if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
+        	config=me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
   },
+  
+  /***
+   * Set the configured visible columns
+   */
+  setVisibleColumns:function(){
+  	var me=this,
+		cols = me.getColumns(),
+		colIndex=null;
+	
+  	if(me.visibleColumns.length==0){
+  		return;
+  	}
+	Ext.each(cols, function(col) {
+		colIndex=col.dataIndex ? col.dataIndex : col.stateId;
+		if(!colIndex){
+			return true;
+		}
+		if(!Ext.Array.contains(me.visibleColumns, colIndex)){
+			col.setVisible(false);
+		}
+	});  
+  },
+  
   /**
    * prepares (merges) the states, and cache it internally
    * @param wfMeta

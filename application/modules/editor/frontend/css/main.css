@@ -413,8 +413,6 @@ body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid
 .ico-loading {background-image: url("../images/loading_ico.gif");}
 .autoState-999 {background-position: center;background-repeat: no-repeat;}
 .ico-refresh {background-image: url("../images/arrow_refresh_small.png");}
-.ico-toggle {background-image: url("../images/toggle.png");}
-.ico-toggle-expand {background-image: url("../images/toggle_expand.png");}
 .ico-notify-user {background-image: url("../images/email_go.png");}
 .autoState-998 {
 	background-image: url(../images/typing.gif);
@@ -551,6 +549,7 @@ tr.customState td div {font-style: italic;}
 .ico-task-clone {background-image: url("../images/page_copy.png");}
 .ico-task-excelreimport {background-image: url("../images/table_back.png");}
 .ico-task-project {background-image: url("../images/document_tree.png");}
+.ico-project-delete {background-image: url("../images/page_delete.png");}
 
 /* Key Performance Indicators (KPI) */
 .ico-kpi {background-image: url("../images/page_gear.png");}
@@ -586,7 +585,8 @@ tr.customState td div {font-style: italic;}
 .adminTaskGrid tr.editorProjectTask .ico-task-project {display:inline-block;}
 .adminTaskGrid tr.pending .x-action-col-icon {display:none !important;}
 .adminTaskGrid tr.pending td.state div {background: url("../images/loading_ico.gif") no-repeat 6px center;}
-
+.adminTaskGrid tr.editorDeleteProject.error .ico-project-delete,
+.adminTaskGrid tr.editorDeleteProject .ico-project-delete {display:inline-block;}
 
 /* User Admin */
 .gender-male {background: url("../images/user.png") no-repeat 6px center;}
