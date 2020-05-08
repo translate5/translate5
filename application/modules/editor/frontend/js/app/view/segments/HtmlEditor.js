@@ -1079,8 +1079,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           length,
           metaCache = me.currentSegment && me.currentSegment.get('metaCache'),
           minMaxLengthComp = Editor.view.segments.MinMaxLength,
-          minWidth = minMaxLengthComp.getMinWidth(metaCache),
-          maxWidth = minMaxLengthComp.getMaxWidth(metaCache);
+          minWidth = minMaxLengthComp.getMinWidthForSegment(metaCache),
+          maxWidth = minMaxLengthComp.getMaxWidthForSegment(metaCache);
       
       me.segmentLengthStatus = 0;
       
@@ -1158,11 +1158,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * Return the text's length either based on pixelMapping or as the number of code units in the text.
    * @return {Integer}
    */
-  getLength: function (text, meta, div) {
+  getLength: function (text, meta, div=null) {
       var me = this, 
           pixelMapping = Editor.view.segments.PixelMapping,
           isPixel = (meta && meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING),
           length;
+      if (div === null) {
+          div = document.createElement("div");      
+          div.innerHTML = text;
+      }
       text = div.textContent || div.innerText || "";
       //remove characters with 0 length:
       text = text.replace(/\u200B|\uFEFF/g, '');

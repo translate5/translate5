@@ -44,6 +44,13 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         maxText:'#UT# von {maxWidth}',
         siblingSegments: '#UT#Seg.: {siblings}'
     },
+    lengthstatus: {
+        segmentLengthValid: 'segmentLengthValid',
+        segmentToShort: 'segmentToShort',
+        segmentToLong: 'segmentToLong',
+        segmentTooManyLines: 'segmentTooManyLines',
+        segmentLinesTooLong: 'segmentLinesTooLong',
+    },
     statics: {
         /**
          * Is the min/max width active according to the meta-data?
@@ -63,18 +70,19 @@ Ext.define('Editor.view.segments.MinMaxLength', {
          * Returns the minWidth according to the meta-data.
          * @returns integer
          */
-        getMinWidth: function(meta) {
+        getMinWidthForSegment: function(meta) {
             // don't add messageSizeUnit here, will be used for calculating...
             return meta && meta.minWidth ? meta.minWidth : 0;
         },
         /**
-         * Returns the total maxWidth according to the meta-data.
+         * Returns the total maxWidth according to the meta-data
+         * (and according to the number of lines, if set).
          * @returns integer
          */
-        getMaxWidth: function(meta) {
+        getMaxWidthForSegment: function(meta) {
             // don't add messageSizeUnit here, will be used for calculating...
             var me = this,
-                maxWidth = me.getMaxWidthPerLine(meta),
+                maxWidth = me.getMaxWidthForSingleLine(meta),
                 useMaxNumberOfLines = me.useMaxNumberOfLines(meta);
             if (useMaxNumberOfLines) {
                 maxWidth = meta.maxNumberOfLines * meta.maxWidth;
@@ -85,7 +93,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
          * Returns the maxWidth for a single line according to the meta-data.
          * @returns integer
          */
-        getMaxWidthPerLine: function(meta) {
+        getMaxWidthForSingleLine: function(meta) {
             // don't add messageSizeUnit here, will be used for calculating...
             return meta && meta.maxWidth ? meta.maxWidth : Number.MAX_SAFE_INTEGER;
         },
@@ -246,12 +254,13 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     },
     
     /**
-     * Returns the lines (= objects with their text and length).
+     * Returns the lines (= objects with their text and length) of the given text.
+     * @param {String} segmentText
      * @Returns {Array}
      */
-    getLinesAndLength: function () {
+    getLinesAndLength: function (segmentText, meta) {
         var me = this,
-            editorBody = me.editor.getEditorBody(),
+            rangeWrapper,
             linebreakNodes,
             i,
             lines = [],
@@ -259,26 +268,27 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             lineWidth,
             range = rangy.createRange();
         
-        range.selectNodeContents(editorBody);
+        rangeWrapper = Ext.dom.Helper.createDom('<div>'+segmentText+'</div>');
+        range.selectNodeContents(rangeWrapper);
         linebreakNodes = range.getNodes([1], function(node) {
             return /newline/.test(node.className);
         });
         if (linebreakNodes.length === 0) {
             // = one single line only
             textInLine = range.toString();
-            lineWidth = me.editor.getTransunitLength(textInLine);
+            lineWidth = me.editor.getLength(textInLine, meta);
             lines.push({textInLine:textInLine, lineWidth:lineWidth});
         } else {
             for (i = 0; i <= linebreakNodes.length; i++) {
                 switch(true) {
                   case (i===0):
                     // = first line
-                    range.selectNodeContents(editorBody);
+                    range.selectNodeContents(rangeWrapper);
                     range.setEndBefore(linebreakNodes[i]);
                     break;
                   case (i===linebreakNodes.length): 
                     // = last line
-                    range.selectNodeContents(editorBody);
+                    range.selectNodeContents(rangeWrapper);
                     range.setStartAfter(linebreakNodes[i-1]);
                     break;
                   default:
@@ -286,7 +296,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                     range.setEndBefore(linebreakNodes[i]);
                 } 
                 textInLine = range.toString();
-                lineWidth = me.editor.getTransunitLength(textInLine);
+                lineWidth = me.editor.getLength(textInLine, meta);
                 lines.push({textInLine:textInLine, lineWidth:lineWidth});
             }
         }
@@ -318,14 +328,14 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             return;
         }
         
-        allLines = me.getLinesAndLength();
+        allLines = me.getLinesAndLength(newValue, meta);
         
         if (allLines.length >= (meta.maxNumberOfLines)) {
             // Don't add further line-breaks when maxNumberOfLines has been reached already.
             return;
         }
         
-        maxWidthPerLine = minMaxLengthComp.getMaxWidthPerLine(meta);
+        maxWidthPerLine = minMaxLengthComp.getMaxWidthForSingleLine(meta);
         
         for (i = 0; i < allLines.length; i++) {
             line = allLines[i];
@@ -334,7 +344,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     },
     
     /**
-     * If the text is longer than allowed: Add a line-break.
+     * If the text is longer than allowed: Add a line-break before (if possible).
      * @param {String} textInLine
      * @param {Integer} lineWidth
      * @param {Integer} maxWidthPerLine
@@ -420,38 +430,146 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         }
         return enabled;
     },
+    
+    /**
+     * @param {String} segmentText
+     * @returns {String} segmentLengthValid|segmentToShort|segmentToLong|segmentTooManyLines|segmentLinesTooLong
+     */
+    getMinMaxLengthStatus: function(segmentText) {
+        var me = this,
+            meta = me.segmentRecord && me.segmentRecord.get('metaCache'),
+            minMaxLengthComp = Editor.view.segments.MinMaxLength,
+            useMaxNumberOfLines = minMaxLengthComp.useMaxNumberOfLines(meta);
+        if (useMaxNumberOfLines) {
+            return me.getMinMaxLengthStatusForLines(segmentText);
+        } else {
+            return me.getMinMaxLengthStatusForSegment(segmentText);
+        }
+    },
+    
+    /**
+     * @param {String} segmentText
+     * @returns {String} segmentToShort|segmentToLong|segmentLengthValid
+     */
+    getMinMaxLengthStatusForSegment: function(segmentText) {
+        var me = this,
+            transunitLength,
+            meta = me.segmentRecord && me.segmentRecord.get('metaCache'),
+            minMaxLengthComp = Editor.view.segments.MinMaxLength,
+            minWidth = minMaxLengthComp.getMinWidthForSegment(meta),
+            maxWidth = minMaxLengthComp.getMaxWidthForSegment(meta);
+        
+        // The segment might be part of a trans-unit that has been
+        // split to multiple segments. This will be considered here:
+        transunitLength = me.getTransunitLength(segmentText);
+        
+        if(transunitLength < minWidth) {
+            return me.lengthstatus.segmentToShort;
+        }
+        
+        if(transunitLength > maxWidth) {
+            return me.lengthstatus.segmentToLong;
+        }
+        
+        return me.lengthstatus.segmentLengthValid;
+    },
+    
+    /**
+     * @param {String} segmentText
+     * @returns {String} segmentTooManyLines|segmentLinesTooLong|segmentLengthValid
+     */
+    getMinMaxLengthStatusForLines: function(segmentText) {
+        var me = this,
+            allLines,
+            i,
+            line,
+            meta = me.segmentRecord && me.segmentRecord.get('metaCache'),
+            minMaxLengthComp = Editor.view.segments.MinMaxLength,
+            maxWidth = minMaxLengthComp.getMaxWidthForSingleLine(meta);
+        
+        allLines = me.getLinesAndLength(segmentText, meta);
+        
+        if (allLines.length > meta.maxNumberOfLines) {
+            return me.lengthstatus.segmentTooManyLines;
+        }
+        
+        for (i = 0; i < allLines.length; i++) {
+            line = allLines[i];
+            if (line.lineWidth > maxWidth) {
+                return me.lengthstatus.segmentLinesTooLong;
+            }
+        }
+        
+        return me.lengthstatus.segmentLengthValid;
+    },
 
     /**
      * Update the minmax status strip label
      */
-    updateLabel: function(metaCache, segmentLength){
+    updateLabel: function(meta, segmentLength){
         var me=this,
-            meta = metaCache,
+            segmentLengthStatus,
             minMaxLengthComp = Editor.view.segments.MinMaxLength,
-            useMaxNumberOfLines = minMaxLengthComp.useMaxNumberOfLines(meta),
             messageSizeUnit = minMaxLengthComp.getSizeUnit(meta),
+            minWidthForSegment = minMaxLengthComp.getMinWidthForSegment(meta),
+            maxWidthForSegment = minMaxLengthComp.getMaxWidthForSegment(meta),
+            maxWidthForLine = minMaxLengthComp.getMaxWidthForSingleLine(meta),
             msgs = me.up('segmentsHtmleditor').strings,
             labelData = {
                 length: segmentLength + messageSizeUnit,
-                minWidth: minMaxLengthComp.getMinWidth(meta),
-                maxWidth: minMaxLengthComp.getMaxWidth(meta),
+                minWidth: minWidthForSegment,
+                maxWidth: maxWidthForSegment,
                 siblings: null
             },
             tplData = {
                 cls: 'invalid-length'
             },
+            editorBody = me.editor.getEditorBody(),
             allLines,
             line,
             i,
             errors = [],
             errorMsg;
-
-        if(labelData.minWidth <= segmentLength && segmentLength <= labelData.maxWidth) {
-            tplData.cls = 'valid-length';
+        
+        segmentLengthStatus = me.getMinMaxLengthStatus(editorBody.innerHTML);
+        
+        if (segmentLengthStatus === me.lengthstatus.segmentLinesTooLong) {
+            allLines = me.getLinesAndLength(editorBody.innerHTML, meta);
+            for (i = 0; i < allLines.length; i++) {
+                line = allLines[i];
+                if (line.lineWidth > maxWidthForLine) {
+                    errors.push((i+1) + ': ' + line.lineWidth);
+                }
+            }
+            errorMsg = (errors.length === 0) ? '' : ('; ' + errors.join('; '));
         }
-        else {
-            tplData.tip = segmentLength > labelData.maxWidth ? msgs.segmentToLong : msgs.segmentToShort;
-            tplData.tip = Ext.String.format(tplData.tip, segmentLength > labelData.maxWidth ? labelData.maxWidth : labelData.minWidth);
+        
+        if (segmentLengthStatus === me.lengthstatus.segmentTooManyLines) {
+            allLines = me.getLinesAndLength(editorBody.innerHTML, meta);
+            errorMsg = '; ' + allLines.length + ' lines'; // TODO Übersetzung
+        }
+        
+        switch(segmentLengthStatus) {
+            case me.lengthstatus.segmentToShort:
+                tplData.cls = 'invalid-length';
+                tplData.tip = Ext.String.format(msgs.segmentToShort, minWidthForSegment);
+              break;
+            case me.lengthstatus.segmentToLong:
+                tplData.cls = 'invalid-length';
+                tplData.tip = Ext.String.format(msgs.segmentToLong, maxWidthForSegment);
+              break;
+            case me.lengthstatus.segmentTooManyLines:
+                tplData.cls = 'invalid-length';
+                tplData.tip = Ext.String.format(msgs.segmentTooManyLines, meta.maxNumberOfLines);
+                labelData.maxWidth = maxWidthForSegment + errorMsg;
+              break;
+            case me.lengthstatus.segmentLinesTooLong:
+                tplData.cls = 'invalid-length';
+                tplData.tip = Ext.String.format(msgs.segmentLinesTooLong, maxWidthForLine);
+                labelData.maxWidth = maxWidthForSegment + errorMsg;
+              break;
+            default: // = segmentLengthValid
+                tplData.cls = 'valid-length';
         }
         
         if(meta && meta.siblingData) {
@@ -462,21 +580,6 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             if(nrs.length > 1) {
                 labelData.siblings = nrs.join(', ');
             }
-        }
-
-        if (useMaxNumberOfLines) {
-            // for status
-            allLines = me.getLinesAndLength();
-            for (i = 0; i < allLines.length; i++) {
-                line = allLines[i];
-                if (line.lineWidth > meta.maxWidth) {
-                    tplData.cls = 'invalid-length';
-                    errors.push((i+1) + ': ' + line.lineWidth);
-                }
-            }
-            // for message
-            errorMsg = (errors.length === 0) ? '' : ('; ' + errors.join('; '));
-            labelData.maxWidth = meta.maxNumberOfLines + '*' + meta.maxWidth + errorMsg;
         }
         
         tplData.text = me.labelTpl.apply(labelData);
