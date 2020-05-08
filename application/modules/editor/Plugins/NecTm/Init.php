@@ -101,15 +101,15 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         $logger = Zend_Registry::get('logger');
         /* @var $logger ZfExtended_Logger */
         if(empty($config)) {
-            $logger->error('E1180', 'NEC-TM: No config given');
+            //$logger->error('E1180', 'NEC-TM: No config given');
             return false;
         }
         if(empty($config['server'])) {
-            $logger->error('E1180', 'NEC-TM: No server config given');
+            //$logger->error('E1180', 'NEC-TM: No server config given');
             return false;
         }
         if(empty($config['credentials']) || !is_array($config['credentials'])) {
-            $logger->error('E1180', 'NEC-TM: No credentials config given or is no array');
+            //$logger->error('E1180', 'NEC-TM: No credentials config given or is no array');
             return false;
         }
         return true;
@@ -166,6 +166,9 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
      */
     public function validateCategories(Zend_EventManager_Event $event) {
         $params = $event->getParam('params','');
+        if ($params['serviceType'] != $this->service->getServiceNamespace()) {
+            return;
+        }
         $categories = $params['categories'] ?? '';
         if (empty($categories)) {
             throw new editor_Plugins_NecTm_Exception('E1256');

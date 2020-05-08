@@ -182,7 +182,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $this->view->langProposal = $this->_getParam('langProposal', '');
         $this->view->isTermProposalFromInstantTranslate = $this->_getParam('isTermProposalFromInstantTranslate', false);
         
-        $this->view->Php2JsVars()->set('termStatusMap', $config->runtimeOptions->tbx->termLabelMap->toArray());
+        $this->view->Php2JsVars()->set('termStatusMap', editor_Models_Term::getTermStatusMap());
         $this->view->Php2JsVars()->set('termStatusLabel', [
             'permitted' => $this->translate->_('erlaubte Benennung'),
             'forbidden' => $this->translate->_('verbotene Benennung'),

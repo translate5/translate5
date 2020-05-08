@@ -83,7 +83,7 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $this->checkUserGuid();
         $this->checkEditable();
         $wfh = $this->_helper->workflow;
-        /* @var $wfh ZfExtended_Controller_Helper_Workflow */
+        /* @var $wfh Editor_Controller_Helper_Workflow */
         $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $this->entity->getUserGuid());
 
         $this->decodePutData();
@@ -106,7 +106,7 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $this->checkUserGuid();
         $this->checkEditable();
         $wfh = $this->_helper->workflow;
-        /* @var $wfh ZfExtended_Controller_Helper_Workflow */
+        /* @var $wfh Editor_Controller_Helper_Workflow */
         $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $this->entity->getUserGuid());
         $id = (int)$this->entity->getSegmentId();
         $this->entity->delete();
@@ -118,7 +118,7 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $sessionUser = new Zend_Session_Namespace('user');
         $userGuid = $sessionUser->data->userGuid;
         $wfh = $this->_helper->workflow;
-        /* @var $wfh ZfExtended_Controller_Helper_Workflow */
+        /* @var $wfh Editor_Controller_Helper_Workflow */
         $wfh->checkWorkflowWriteable($taskGuid, $userGuid);
         $now = date('Y-m-d H:i:s');
         $this->entity->init();

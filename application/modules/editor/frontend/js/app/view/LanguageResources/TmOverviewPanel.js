@@ -38,10 +38,16 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     extend : 'Ext.grid.Panel',
-    requires: ['Editor.view.admin.customer.CustomerFilter'],
+    requires: [
+        'Editor.view.admin.customer.CustomerFilter',
+        'Editor.view.LanguageResources.TmOverviewViewController'
+    ],
     alias: 'widget.tmOverviewPanel',
+    controller: 'tmOverviewPanel',
     itemId: 'tmOverviewPanel',
     title:'#UT#Sprach-Resourcen',
+    helpSection: 'languageresource',
+    glyph: 'xf1c0@FontAwesome',
     strings: {
         name: '#UT#Name',
         edit: '#UT#Bearbeiten',
@@ -211,7 +217,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 },{
                     xtype: 'gridcolumn',
                     width: 100,
-                    dataIndex:'resourcesCustomers',
+                    dataIndex:'customerIds',
                     filter: {
                         type: 'customer' // [Multitenancy]
                     },
@@ -220,7 +226,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 },{
                     xtype: 'gridcolumn',
                     width: 270,
-                    dataIndex:'useAsDefault',
+                    dataIndex:'customerUseAsDefaultIds',
                     filter: {
                         type: 'string'
                     },

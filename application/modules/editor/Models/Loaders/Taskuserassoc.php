@@ -31,37 +31,91 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Loaders_Taskuserassoc{
     
-    /***
-     * Loads single assoc for given userGuid and task.
+    /**
+     * Loads single assoc for given userGuid and task, forced to the role matching the workflow step
      * The function will throw ZfExtended_Models_Entity_NotFoundException when the taskuserassoc entity does not exist.
      * @param string $userGuid
      * @param editor_Models_Task $task
      * @return editor_Models_TaskUserAssoc
      */
-    public static function loadByTask(string $userGuid, editor_Models_Task $task) {
+    public static function loadByTaskForceWorkflowRole(string $userGuid, editor_Models_Task $task) {
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
-        
-        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wfm editor_Workflow_Manager */
-        $workflow = $wfm->getByTask($task);
-        $role=$workflow->getRoleOfStep($task->getWorkflowStepName());
         //load the user assoc of the curent available workflow role
-        $tua->loadByParams($userGuid, $task->getTaskGuid(), $role);
+        $tua->loadByParams($userGuid, $task->getTaskGuid(), self::getRole($task));
         return $tua;
     }
     
-    /***
-     * Load single assoc for given userGuid and taskGuid
+    /**
+     * Load single assoc for given userGuid and taskGuid, forced to the role matching the workflow step
      * @param string $userGuid
      * @param string $taskGuid
      * @return editor_Models_TaskUserAssoc
      */
-    public static function loadByTaskGuid(string $userGuid,string $taskGuid) {
+    public static function loadByTaskGuidForceWorkflowRole(string $userGuid,string $taskGuid) {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        
+        return self::loadByTaskForceWorkflowRole($userGuid, $task);
+    }
+    
+    /***
+     * Return the most appropriate task user assoc result
+     * Highest rated result is the user job of the current task workflow step.
+     * If no matching workflow job is found, the first next user job for this task will be returned.
+     * The result state order(when no workflow job is found) id:
+     *   edit
+     *   view
+     *   unconfirmed
+     *   open
+     *   waiting
+     *   finished
+     * @param string $userGuid
+     * @param editor_Models_Task $task
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @return editor_Models_TaskUserAssoc
+     */
+    public static function loadByTask(string $userGuid, editor_Models_Task $task){
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $tua->loadByRoleOrSortedState($userGuid, $task->getTaskGuid(), self::getRole($task));
+        
+        return $tua;
+    }
+    
+    /**
+     * Return the most appropriate task user assoc result
+     * Highest rated result is the user job of the current task workflow step.
+     * If no matching workflow job is found, the first next user job for this task will be returned.
+     * The result state order(when no workflow job is found) id:
+     *   edit
+     *   view
+     *   unconfirmed
+     *   open
+     *   waiting
+     *   finished
+     * @param string $userGuid
+     * @param string $taskGuid
+     * @return editor_Models_TaskUserAssoc
+     */
+    public static function loadByTaskGuid(string $userGuid,string $taskGuid){
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
         
         return self::loadByTask($userGuid, $task);
+    }
+    
+    /**
+     * returns the role to the current workflow step
+     * @param editor_Models_Task $task
+     * @return string
+     */
+    protected static function getRole(editor_Models_Task $task): string {
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $workflow = $wfm->getByTask($task);
+        return $workflow->getRoleOfStep($task->getWorkflowStepName());
     }
 }

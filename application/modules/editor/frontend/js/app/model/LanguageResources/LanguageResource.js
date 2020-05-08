@@ -53,6 +53,8 @@ Ext.define('Editor.model.LanguageResources.LanguageResource', {
     {name: 'name', type: 'string'},
     {name: 'color', type: 'string'},
     {name: 'resourceId', type: 'string'},
+    {name: 'customerUseAsDefaultIds'},
+    {name: 'customerIds'},
     {name: 'status', type: 'string', persist: false},
     {name: 'statusInfo', type: 'string', persist: false},
     {name: 'serviceName', type: 'string'},

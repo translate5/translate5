@@ -61,6 +61,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         
         // event-listeners
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),100);
+        $this->eventManager->attach('editor_Models_Import_SegmentProcessor_Review', 'process', array($this, 'handleSegmentImportProcess'));
         $this->eventManager->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
         $this->eventManager->attach('editor_Models_Segment_Updater', 'beforeSegmentUpdate', array($this, 'handleBeforeSegmentUpdate'));
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
@@ -74,6 +75,20 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         
         //checks if the term taggers are available.
         $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', array($this, 'handleTermTaggerCheck'));
+    }
+    
+    /**
+     * By default read only segments are not tagged, can be disabled via config
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleSegmentImportProcess(Zend_EventManager_Event $event) {
+        $attributes = $event->getParam('segmentAttributes');
+        $config = Zend_Registry::get('config');
+        
+        /* @var $attributes editor_Models_Import_FileParser_SegmentAttributes */
+        if(!$attributes->editable && !$config->runtimeOptions->termTagger->tagReadonlySegments) {
+            $attributes->customMetaAttributes['termtagState'] = editor_Plugins_TermTagger_Worker_Abstract::SEGMENT_STATE_IGNORE;
+        }
     }
     
     /**

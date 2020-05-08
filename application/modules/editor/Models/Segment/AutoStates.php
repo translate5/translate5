@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Segment Auto States Helper Class
  * This class contains all autoState definitions and all autoState transitions, available by api
- * 
+ *
  * Warning: On changing/adding autostates, change also frontend hardcoded list Editor.data.segments.autoStates
  *          filled in Editor.controller.Editor::init()
  */
@@ -166,7 +166,7 @@ class editor_Models_Segment_AutoStates {
         $states = $this->states;
 
         //only needed in frontend:
-        $states[self::PENDING] = 'wird ermittelt...'; 
+        $states[self::PENDING] = 'wird ermittelt...';
         $states[self::EDITING_BY_USER] = 'In Bearbeitung';
         
         return array_map(function($value) use ($translate) {
@@ -198,7 +198,7 @@ class editor_Models_Segment_AutoStates {
             self::TRANSLATED,
             self::TRANSLATED_AUTO,
           ],
-            editor_Workflow_Abstract::ROLE_REVIEWER => array(
+          editor_Workflow_Abstract::ROLE_REVIEWER => array(
             self::REVIEWED,
             self::REVIEWED_AUTO,
             self::REVIEWED_UNTOUCHED,
@@ -213,8 +213,21 @@ class editor_Models_Segment_AutoStates {
     }
     
     /**
+     * returns a list of states, which means that the segment was just "confirmed" but was not edited by the user.
+     */
+    public function getNotEditedStates() {
+        return [
+            self::REVIEWED_UNTOUCHED,
+            self::REVIEWED_UNCHANGED,
+            self::REVIEWED_UNCHANGED_AUTO,
+            self::REVIEWED_PM_UNCHANGED,
+            self::REVIEWED_PM_UNCHANGED_AUTO,
+        ];
+    }
+    
+    /**
      * returns the state to use for Alikesegments
-     * 
+     *
      * @param editor_Models_Segment $segment
      * @param editor_Models_TaskUserAssoc $tua
      * @return integer
@@ -285,12 +298,12 @@ class editor_Models_Segment_AutoStates {
         }
         
         //if no role match, return old value
-        return $segment->getAutoStateId(); 
+        return $segment->getAutoStateId();
     }
     
     /**
      * sets the untouched state for a given taskGuid
-     * 
+     *
      * @param string $taskGuid
      */
     public function setUntouchedState(string $taskGuid, ZfExtended_Models_User $user) {
@@ -315,7 +328,7 @@ class editor_Models_Segment_AutoStates {
     
     /**
      * sets the untouched state for a given taskGuid back to the initial states
-     * 
+     *
      * @param string $taskGuid
      */
     public function setInitialStates(string $taskGuid) {
@@ -357,8 +370,9 @@ class editor_Models_Segment_AutoStates {
     /**
      * Returns a map with counts of each state in a task
      * @param string $taskGuid
+     * @return array
      */
-    public function getStatistics(string $taskGuid) {
+    public function getStatistics(string $taskGuid): array {
         $seg = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $seg editor_Models_Segment */
         $stats = $seg->getAutoStateCount($taskGuid);

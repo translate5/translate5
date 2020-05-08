@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -30,7 +30,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
     /***
      * Import the tbx files in the term collection
-     * 
+     *
      * @param array $filePath
      * @param array $params
      * @return void|boolean
@@ -56,7 +56,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * Create new term collection and return the id.
      * @param string $name
      * @param array $customers
-     * 
+     *
      * @return editor_Models_TermCollection_TermCollection
      */
     public function create(string $name,array $customers){
@@ -67,7 +67,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
         //since for termcollections there are no service resources we don't have to deal with them.
         // normally the service resource provides the serviceType, here we use the Namespace as "shortcut"
-        $serviceType = $service->getServiceNamespace(); 
+        $serviceType = $service->getServiceNamespace();
         $this->setResourceId($serviceType);
         $this->setServiceType($serviceType);
         $this->setServiceName($service->getName());
@@ -78,7 +78,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         if(!empty($customers)){
             $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
             /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
-            $customerAssoc->addAssocs($customers, $resourceId);
+            $customerAssoc->addAssocs($resourceId, $customers);
         }
         return $this;
     }
@@ -86,7 +86,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     /***
      * Search from term matches the current term collections with the given query string.
      * All fuzzy languages will be included in the search.('en' as search language will result with search using 'en','en-US','en-GB' etc)
-     * 
+     *
      * @param string $queryString
      * @param integer $sourceLang
      * @param integer $targetLang
@@ -155,7 +155,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     
     /***
      * Get all collection associated with the task
-     * 
+     *
      * @param string $taskGuid
      * @return array
      */
@@ -179,13 +179,13 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     
     /***
      * Get all TermCollections ids assigned to the given customers.
-     * 
+     *
      * @param array $customerIds
      */
     public function getCollectionsIdsForCustomer($customerIds){
         $service = ZfExtended_Factory::get('editor_Services_TermCollection_Service');
         /* @var $service editor_Services_TermCollection_Service */
-        $serviceType = $service->getServiceNamespace(); 
+        $serviceType = $service->getServiceNamespace();
         $s=$this->db->select()
         ->setIntegrityCheck(false)
         ->from(array('lr'=>'LEK_languageresources'))
@@ -203,7 +203,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     
     /***
      * Get the attribute count for the collection
-     * The return array will be in format: 
+     * The return array will be in format:
      *  [
      *      'termsCount'=>number,
      *      'termsAtributeCount'=>number,
@@ -225,7 +225,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     
     /***
      * Associate termCollection to taskGuid (warning, sets autoCreatedOnImport = true)
-     * 
+     *
      * @param mixed $collectionId
      * @param string $taskGuid
      */
@@ -241,7 +241,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     
     /***
      * Get all existing languages in the term collections
-     * 
+     *
      * @param array $collectionIds
      * @return array
      */
@@ -377,7 +377,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     
     /***
      * Remove collection tbx files from the tbx-imprt directory where the file modification date is older than the given one
-     * 
+     *
      * @param int $collectionId
      * @param int $olderThan: this is unix timestamp
      */

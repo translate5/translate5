@@ -56,15 +56,18 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.Editable',
         'Editor.view.segments.column.IsWatched',
         'Editor.util.SegmentContent',
-        'Editor.view.segments.GridViewModel'
+        'Editor.view.segments.GridViewModel',
+        'Editor.view.segments.grid.Header'
     ],
     plugins: ['gridfilters'],
     alias: 'widget.segments.grid',
+    helpSection: 'editor',
+    stateId: 'segmentsGrid',
+    stateful: true,
     id: 'segment-grid',
     viewModel: {
         type:'segmentsGrid'
     },
-    stateful: false,
     store: 'Segments',
     title: '#UT#Segmentliste und Editor',
     title_readonly: '#UT# - [LESEMODUS]',
@@ -72,10 +75,6 @@ Ext.define('Editor.view.segments.Grid', {
     column_edited: '#UT#bearbeibar',    
     target_original: '#UT# (zur Importzeit)',    
     column_edited_icon: '{0} <img src="{1}" class="icon-editable" alt="{2}" title="{3}">',
-    item_logoutheaderbtn:'#UT#Ausloggen',
-    item_leavetaskheaderbtn:'#UT#Aufgabe verlassen',
-    item_progresbar_finished:'#UT#abgeschlossen',
-    item_progresbar_currentWorkflowStepProgressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt',
     columnMap:{},
     hasRelaisColumn: false,
     stateData: {},
@@ -260,43 +259,15 @@ Ext.define('Editor.view.segments.Grid', {
         *
         * listeners: {'reconfigure': Ext.bind(this.onReconfigure, this)},
         */
-        	listeners:{
-    		  beforerender:function(grid){
-    			  //Disable the sorting on column click in editor : TRANSLATE-1295
-    			  grid.down('headercontainer').sortOnClick=false;
-    		  }
-    		},
-    		header: {
-    			padding:'8 8 8 8',//align the buttons with the toolbar buttons
-    	        items: [{
-                	xtype: 'button',
-                    itemId:'toolbarInfoButton',
-                    icon: Editor.data.moduleFolder+'images/information-white.png',
-                    tooltip: me.addToolbarInfoButtonTpl()
-    	        },{
-    	        	xtype: 'progressbar',
-                    itemId: 'segmentFinishCount',
-                    width:150,
-                    autoEl: {
-                        'data-qtip':me.item_progresbar_currentWorkflowStepProgressTooltip
-                    },
-                    bind:{
-                    	value:'{segmentFinishCountPercent}'
-                    }
-    	        },{
-    	        	xtype: 'button',
-    	            itemId: 'leaveTaskHeaderBtn',
-    	            icon: Editor.data.moduleFolder+'images/table_back.png',
-    	            text:me.item_leavetaskheaderbtn,
-    	            hidden: !Editor.controller.HeadPanel || Editor.data.editor.toolbar.hideLeaveTaskButton
-    	        },{
-    	        	xtype: 'button',
-    	        	itemId:'logoutHeaderBtn',
-    	        	icon: Editor.data.moduleFolder+'images/door_out.png',
-    	        	text:me.item_logoutheaderbtn,
-    	        	hidden: !Editor.controller.HeadPanel || Editor.data.editor.toolbar.hideLogoutButton
-    	        }]
-    	    },
+            listeners:{
+                beforerender:function(grid){
+                    //Disable the sorting on column click in editor : TRANSLATE-1295
+                    grid.down('headercontainer').sortOnClick = false;
+                }
+            },
+            header: {
+                xtype: 'segmentsHeader',
+            },
             columns: columns
         });
 
@@ -464,14 +435,5 @@ Ext.define('Editor.view.segments.Grid', {
             top:top,
             bottom:bottom,
         };
-    },
-    
-    /***
-     * Add the toolbarinfo button tooltip
-     */
-    addToolbarInfoButtonTpl:function(){
-        var tpl = new Ext.XTemplate(Editor.util.Constants.appInfoTpl),
-        	infoPanel=Ext.create('Editor.view.ApplicationInfoPanel');
-        return tpl.applyTemplate(infoPanel.getEditorTplData());
     }
 });

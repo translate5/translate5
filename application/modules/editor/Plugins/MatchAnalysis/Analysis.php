@@ -260,9 +260,34 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $matchRateInternal->matchrate=null;
             //for each match, find the best match rate, and save it
             foreach ($matchResults as $match){
-                if($matchRateInternal->matchrate >= $match->matchrate){
+                if($matchRateInternal->matchrate > $match->matchrate){
                     continue;
                 }
+                
+                // If the matchrate is the same, we only check for a new best match if it is from a termcollection
+                if ($matchRateInternal->matchrate == $match->matchrate && $match->languageResourceType != 'termcollection') {
+                    continue;
+                }
+                
+                if ($match->languageResourceType == 'termcollection') {
+                    // - preferred terms > permitted terms
+                    // - if multiple permitted terms: take the first
+                    if (!is_null($bestMatchRateResult) && $bestMatchRateResult->languageResourceType == 'termcollection') {
+                        $bestMatchMetaData = $bestMatchRateResult->metaData;
+                        $bestMatchIsPreferredTerm = editor_Models_Term::isPreferredTerm($bestMatchMetaData['status']);
+                        if ($bestMatchIsPreferredTerm) {
+                            continue;
+                        }
+                    }
+                    // - only allow preferred and permitted terms for best matches
+                    $metaData = $match->metaData;
+                    $matchIsPreferredTerm = editor_Models_Term::isPreferredTerm($metaData['status']);
+                    $matchIsPermittedTerm = editor_Models_Term::isPermittedTerm($metaData['status']);
+                    if (!$matchIsPreferredTerm && !$matchIsPermittedTerm) {
+                        continue;
+                    }
+                }
+                
                 $matchRateInternal=$match;
                 
                 //store best match rate results(do not compare agains the mt results)
@@ -415,10 +440,15 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @return array
      */
     protected function initConnectors(){
-        
         $languageResources=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
         $assocs=$languageResources->loadByAssociatedTaskGuid($this->task->getTaskGuid());
+        
+        $availableConnectorStatus = [
+            editor_Services_Connector_Abstract::STATUS_AVAILABLE,
+            //NOT_LOADED must be also considered as AVAILABLE, since OpenTM2 Tms are basically not loaded and therefore we can not decide if they are usable or not
+            editor_Services_Connector_FilebasedAbstract::STATUS_NOT_LOADED
+        ];
         
         if(empty($assocs)){
             return array();
@@ -441,7 +471,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $moreInfo='';
                 //throw a worning if the language resource is not available
                 $status = $connector->getStatus($moreInfo);
-                if($status != editor_Services_Connector_Abstract::STATUS_AVAILABLE){
+                if(!in_array($status, $availableConnectorStatus)){
                     $this->log->warn('E1239','MatchAnalysis Plug-In: The associated language resource "{name}" is not available for match analysis and pre-translations.',[
                         'task' => $this->task,
                         'name' => $languageresource->getName(),

@@ -37,7 +37,7 @@ Ext.define('Editor.store.admin.Users', {
   autoLoad: false,
   remoteFilter: true,
   remoteSort: true,
-  pageSize: 20,
+  pageSize: 0,
   userGuidName: {},
   /**
    * returns the Username either by id or by guid

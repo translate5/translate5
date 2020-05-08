@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.HelpWindow', {
+Ext.define('Editor.view.help.HelpWindow', {
     extend: 'Editor.view.StatefulWindow',
     alias: 'widget.helpWindow',
     itemId: 'helpWindow',
@@ -118,16 +118,11 @@ Ext.define('Editor.view.HelpWindow', {
     },
     
     /***
-     * Override the getloader url. This will return the loaderUrl from the window provider state record.
-     * This is required, since the getLoaderUrl is used before the initial setLoaderUrl is called.
+     * Get the loader url from the configuration
      */
     getLoaderUrl:function(){
-    	var me=this;
-    	if(me.loaderUrl!=""){
-    		return me.loaderUrl; 
-    	}
-    	var state=me.getProviderState();
-    	return (state && state.loaderUrl) ? state.loaderUrl : "";
-    },
+    	var sectionConfig=Editor.data.frontend.helpWindow[Editor.data.helpSection];
+    	return sectionConfig.loaderUrl;
+    }
     
 });

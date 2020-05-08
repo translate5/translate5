@@ -72,6 +72,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
     const SEGMENT_STATE_DEFECT = 'defect';
     const SEGMENT_STATE_RETAG = 'retag';
     const SEGMENT_STATE_OVERSIZE = 'oversized';
+    const SEGMENT_STATE_IGNORE = 'ignore';
     //const SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
     
     /**

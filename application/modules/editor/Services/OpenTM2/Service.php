@@ -36,13 +36,40 @@ END LICENSE AND COPYRIGHT
  * OpenTM2 Service Base Class
  */
 class editor_Services_OpenTM2_Service extends editor_Services_ServiceAbstract {
+    
     const DEFAULT_COLOR = 'aaff7f';
     
-    public function __construct() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->LanguageResources->opentm2->server;
-        $this->addResourceForeachUrl('OpenTM2', $urls->toArray());
+    /**
+     * URL to confluence-page
+     * @var string
+     */
+    protected static $helpPage = "https://confluence.translate5.net/display/BUS/OpenTM2";
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::isConfigured()
+     */
+    public function isConfigured() {
+        if (!isset($this->config->runtimeOptions->LanguageResources->opentm2->server)) {
+            return false;
+        }
+        if (!isset($this->config->runtimeOptions->LanguageResources->opentm2->tmprefix)) {
+            return false;
+        }
+        if (!isset($this->config->runtimeOptions->LanguageResources->opentm2->showMultiple100PercentMatches)) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     *
+     * {@inheritDoc}
+     * @see editor_Services_ServiceAbstract::embedService()
+     */
+    protected function embedService() {
+        $urls = $this->config->runtimeOptions->LanguageResources->opentm2->server;
+        $this->addResourceForeachUrl($this->getName(), $urls->toArray());
     }
     
     /**
