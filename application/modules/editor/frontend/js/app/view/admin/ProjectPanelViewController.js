@@ -43,10 +43,9 @@ Ext.define('Editor.view.admin.ProjectPanelViewController', {
 		if(id){
 			route=route+'/'+id
 		}
-		
 		Editor.app.openAdministrationSection(this.getView(), route);
 		controller.reloadProjects().then(function(records) {
-			controller.onProjectFocus(id)
+			controller.onProjectFocus(id);
 		}, function(operation) {
 			Editor.app.getController('ServerException').handleException(operation.error.response);
 		});

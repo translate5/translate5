@@ -51,6 +51,7 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
       exp: '#UT# Aufgabe exportieren',
       actionExcelReimport: '#UT# Excel Re-Importieren',
       projectOverview:'#UT#zum Projekt springen',
+      taskOverview:'#UT#zur Aufgabe springen',
       actionDeleteProject: '#UT#Projekt komplett löschen'
   },
   
@@ -137,7 +138,12 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
                 iconCls: 'ico-task-log',
                 sortIndex:13,
             },{
-                tooltip: me.messages.projectOverview,
+                getTip:function(v,meta,record,row,col,store,table){
+                	if(table.ownerGrid.getXType()=='projectTaskGrid'){
+                		return me.messages.taskOverview;
+                	}
+                	return me.messages.projectOverview;
+                },
                 isAllowedFor: 'editorProjectTask',
                 iconCls: 'ico-task-project',
                 sortIndex:14

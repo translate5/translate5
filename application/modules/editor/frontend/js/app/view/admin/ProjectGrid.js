@@ -47,9 +47,9 @@ Ext.define('Editor.view.admin.ProjectGrid', {
 		'taskName',
 		'customerId',
 		'pmName',
-		'orderdate',
-		'emptyTargets',
-		'enableSourceEditing'
+		'sourceLang',
+		'taskNr',
+		'orderdate'
 	],
 	
 	text_cols: { // in case of any changes, pls also update getTaskGridTextCols() in editor_Models_Task
@@ -98,7 +98,6 @@ Ext.define('Editor.view.admin.ProjectGrid', {
 	},
 	
 	store: 'admin.Project',
-	autoLoad: false,
 	bufferedRenderer:false,//info: this will stop the store filter binding.
 
 	viewConfig: {

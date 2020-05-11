@@ -32,7 +32,8 @@ Ext.define('Editor.view.admin.ProjectPanel', {
     requires:[
     	'Editor.view.admin.ProjectGrid',
     	'Editor.view.admin.ProjectTaskGrid',
-    	'Editor.view.admin.ProjectPanelViewController'
+    	'Editor.view.admin.ProjectPanelViewController',
+    	'Editor.view.admin.task.UserAssoc'
 	],
 	itemId: 'projectPanel',
 	controller:'projectPanel',
@@ -42,9 +43,19 @@ Ext.define('Editor.view.admin.ProjectPanel', {
     collapsed: false,
     viewModel:{
     	formulas:{
-    		selection:{
+    		//TODO: separate vm ?
+    		projectSelection:{
     			bind:{
     				bindTo:'{projectGrid.selection}',
+    				deep:true
+    			},
+    			get:function(sel){
+    				return sel;
+    			}
+    		},
+    		projectTaskSelection:{
+    			bind:{
+    				bindTo:'{projectTaskGrid.selection}',
     				deep:true
     			},
     			get:function(sel){
@@ -83,21 +94,30 @@ Ext.define('Editor.view.admin.ProjectPanel', {
                     width:'75%',
                     items: [{
                     	xtype: 'projectTaskGrid',
+                    	reference:'projectTaskGrid',
                     	bind:{
                     		title:me.strings.projectTasksTitle,
 		    				store:{
-		    					model:'Editor.model.admin.ProjectTask',
+		    					model:'Editor.model.admin.Task',
 		    					remoteSort: true,
 		    					remoteFilter: true,
 		    					pageSize: false,
 		    					filters:{
 		    		    			property: 'projectId',
 		    		        		operator:"eq",
-		    		        		value:'{selection.projectId}'
+		    		        		value:'{projectSelection.projectId}'
 		    					}
 		    				}
 		    			}
-                    }]
+                    }
+                    //TODO: next step. Move the PreferencesWindow content in here
+//                    ,{
+//                    	xtype:'adminTaskUserAssoc',
+//                    	bind:{
+//                    		task:'{projectTaskSelection}'
+//                    	}
+//                    }
+                    ]
         		}]
         };
         if (instanceConfig) {

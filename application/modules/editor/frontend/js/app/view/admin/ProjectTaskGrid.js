@@ -32,7 +32,6 @@ Ext.define('Editor.view.admin.ProjectTaskGrid', {
     requires:[
 	],
 	itemId: 'projectTaskGrid',
-	strings: {},
 	
 	visibleColumns:[
 		'id',
@@ -40,16 +39,11 @@ Ext.define('Editor.view.admin.ProjectTaskGrid', {
 		'state',
 		'workflowStepName',
 		'segmentFinishCount',
-		'segmentCount',
+		'wordCount',
 		'taskName',
-		'taskNr',
-		'sourceLang',
 		'relaisLang',
 		'targetLang',
 		'userCount',
-		'pmName',
-		'orderdate',
-		'emptyTargets'
 	],
 	
 	store: null,

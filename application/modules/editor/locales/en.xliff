@@ -3753,6 +3753,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UHJvamVrdCBoaW56dWbDvGdlbg=='><source>Projekt hinzufügen</source><target>Add project</target></trans-unit>
 <trans-unit id='TmV1ZXMgUHJvamVrdCBoaW56dWbDvGdlbg=='><source>Neues Projekt hinzufügen</source><target>Add new project</target></trans-unit>
 <trans-unit id='QXVmZ2FiZW4gZsO8ciBkYXMgUHJvamVrdDoge3NlbGVjdGlvbi50YXNrTmFtZX0='><source>Aufgaben für das Projekt: {selection.taskName}</source><target>Tasks for the project: {selection.taskName}</target></trans-unit>
+<trans-unit id='enVyIEF1ZmdhYmUgc3ByaW5nZW4='><source>zur Aufgabe springen</source><target>jump to task</target></trans-unit>
 </body>
   </file>
 </xliff>

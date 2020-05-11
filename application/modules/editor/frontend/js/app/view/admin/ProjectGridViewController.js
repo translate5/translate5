@@ -41,12 +41,16 @@ Ext.define('Editor.view.admin.ProjectGridViewController', {
      */
     onProjectFocus:function(projectId){
     	var me=this,
-    		store=me.getView().getStore()
-    		record=store.getById(projectId);
+    		sellection=me.getView().getSelectionModel().getSelection()[0],
+    		store=me.getView().getStore(),
+    		record=projectId ? store.getById(projectId) : sellection,
+    		view=me.getView();
+    	
     	if(!record){
     		record=store.getAt(0);
     	}
-    	me.getView().setSelection(record);
+    	view.setSelection(record);
+    	view.getView().focusRow(record);
     },
 
     /***
@@ -140,21 +144,6 @@ Ext.define('Editor.view.admin.ProjectGridViewController', {
                  }
              });
          });
-    },
-    
-    onExpandCollapseAllBtnClick:function(btn){
-    	this.handleAllExpandCollapse(btn.pressed);
-    },
-    
-    handleAllExpandCollapse:function(btnPressed){
-    	var me=this,
-			view=me.getView(),
-			vm=view.getViewModel(),
-			strings=view.strings;
-		vm.set('expandCollapseIconCls',btnPressed ? 'ico-toggle' : 'ico-toggle-expand');
-		vm.set('expandCollapseText',btnPressed ? strings.collapseAllBtn : strings.expandAllBtn);
-		vm.set('expandCollapseTip',btnPressed ? strings.collapseAllBtnTip : strings.expandAllBtnTip);
-		view.handleExpandCollapseAll(btnPressed);
     }
 });
 

@@ -158,6 +158,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      */
     protected function handleOperation(Zend_EventManager_Event $event, $pretranslate = false){
         $task = $event->getParam('entity');
+        /* @var $task editor_Models_Task */
         $params = $event->getParam('params');
         
         settype($params['internalFuzzy'], 'boolean');
@@ -169,7 +170,18 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         
         $params['pretranslate'] = $pretranslate;
         
-        $this->queueAnalysis($task->getTaskGuid(),$params);
+        $taskGuids=[$task->getTaskGuid()];
+        //if the requested operation is from project, queue analysis for each project task
+        if($task->isProject()){
+            $projects=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $projects editor_Models_Task */
+            $projects=$projects->loadProjectTasks($task->getProjectId(),true);
+            $taskGuids=array_column($projects, 'taskGuid');
+        }
+        
+        foreach ($taskGuids as $taskGuid){
+            $this->queueAnalysis($taskGuid,$params);
+        }
     }
 
     /***

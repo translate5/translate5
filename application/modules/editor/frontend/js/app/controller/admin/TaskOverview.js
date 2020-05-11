@@ -40,7 +40,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  'admin.UsersList',
 	  'admin.Tasks',
 	  'admin.Project',
-	  'admin.ProjectTasks',
 	  'admin.Languages', 
 	  'admin.task.Logs', 
 	  'admin.WorkflowUserRoles',
@@ -148,7 +147,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
       },
       component: {
-          '#adminTaskGrid': {
+          '#adminTaskGrid,#projectTaskGrid': {
               hide: 'handleAfterHide',
               celldblclick: 'handleGridClick', 
               cellclick: 'handleGridClick',
@@ -157,16 +156,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           '#adminTaskGrid #reload-task-btn': {
               click: 'handleTaskReload'
           },
-          '#adminTaskGrid taskActionColumn': {
+          '#adminTaskGrid taskActionColumn,#projectTaskGrid taskActionColumn': {
               click: 'taskActionDispatcher'
           },
-          '#projectTaskGrid taskActionColumn': {
-              click: 'taskActionDispatcher'
-          },
-          '#adminTaskGrid #add-project-btn': {
-              click: 'handleTaskAddShow'
-          },
-          '#projectGrid #add-project-btn': {
+          '#adminTaskGrid #add-project-btn,#projectTaskGrid #add-project-btn': {
               click: 'handleTaskAddShow'
           },
           '#adminTaskGrid #export-meta-data-btn': {
