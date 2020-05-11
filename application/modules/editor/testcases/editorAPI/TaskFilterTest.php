@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -67,7 +67,7 @@ class TaskFilterTest extends \ZfExtended_Test_ApiTestcase {
     public function testTaskUserAssocFilters() {
         //test the assigment date of the task
         $return = $this->api()->requestJson('editor/task', 'GET',[
-            'filter' => '[{"operator":"gt","value":"'.date("Y-m-d 00:00:00", strtotime("now")).'","property":"assignmentDate"},{"operator":"eq","value":'.self::$api->getTask()->id.',"property":"id"}]',
+            'filter' => '[{"operator":"eq","value":"'.date("Y-m-d 00:00:00", strtotime("now")).'","property":"assignmentDate"},{"operator":"eq","value":'.self::$api->getTask()->id.',"property":"id"}]',
         ]);
         $this->assertCount(2, $return);
         

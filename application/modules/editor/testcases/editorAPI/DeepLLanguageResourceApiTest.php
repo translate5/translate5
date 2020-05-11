@@ -88,8 +88,8 @@ class DeepLLanguageResourceApiTest extends \ZfExtended_Test_ApiTestcase {
      * @var array
      */
     protected static $expectedTranslationsForInstantTranslate = [
-        '[<i>Datum:</i>] PHP Handbuch' => '[<i>date:</i>] PHP manual',
-        'Das Haus ist <b>blau</b>.' => 'The house is <b>blue</b>.'
+        '[<i>Datum</i>] PHP Handbuch' => '[<i>date</i>] PHP manual',
+        'Das Haus ist <b>blau</b>' => 'The house is <b>blue</b>'
     ];
     
     /**
