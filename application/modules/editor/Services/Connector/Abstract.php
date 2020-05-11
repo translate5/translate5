@@ -232,7 +232,7 @@ abstract class editor_Services_Connector_Abstract {
      * @param string $contentString
      * @return string $preparedString
      */
-    public function prepareSegmentContent(string $contentString) {
+    protected function prepareSegmentContent(string $contentString) {
         $preparedString = $contentString;
         // removeTrackChanges
         $preparedString = $this->trackChange->removeTrackChanges($preparedString);
