@@ -231,20 +231,27 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             return $row;
         };
         
-        $openTm2=ZfExtended_Factory::get('editor_Services_OpenTM2_Service');
-        /* @var $openTm2 editor_Services_OpenTM2_Service */
-        $serviceName=$openTm2->getName();
         $initGroups=[];
+        
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        
+        $resourceCache=[];
         foreach ($result as $res){
             $lr=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
             /* @var $lr editor_Models_LanguageResources_LanguageResource */
-            $lr->load($res['languageResourceId']);
+            if(!isset($resourceCache[$res['languageResourceId']])){
+                $lr->load($res['languageResourceId']);
+                $resourceCache[$res['languageResourceId']]=$lr;
+            }
+            $lr=$resourceCache[$res['languageResourceId']];
             
             //init the group
             $initGroups=$initGroups+$initRow($lr->getId(),$lr->getName(),$lr->getColor());
             
-            //if internal fuzzy is activated, and the curent language resource is opentm2, add additional row for the internal fuzzy
-            if($internalFuzzy && $lr->getServiceName()==$serviceName){
+            //if internal fuzzy is activated, and the langage resource is of type tm, add aditional internal fuzzy row
+            if($internalFuzzy && $lr->getResourceType()==editor_Models_Segment_MatchRateType::TYPE_TM){
                 //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
                 //for each internal fuzzy, additional row is displayed
                 $initGroups=$initGroups+$initRow(($lr->getId().'fuzzy'),($lr->getName().' - internal Fuzzies'),$lr->getColor());
