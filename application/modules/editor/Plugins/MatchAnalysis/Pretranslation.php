@@ -118,6 +118,13 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
     }
     
+    /**
+     * Use this for internal fuzzy match target that will be ignored.
+     */
+    public static function renderDummyTargetText($taskGuid) {
+        return "translate5-unique-id[".$taskGuid."]";
+    }
+    
     /***
      * Use the given TM analyse (or MT if analyse was empty) result to update the segment
      * Update the segment only if it is not TRANSLATED
@@ -156,7 +163,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $type = $languageResource->getServiceName().' - '.$languageResource->getName();
         
         //ignore internal fuzzy match target
-        if (strpos($targetResult, 'translate5-unique-id['.$segment->getTaskGuid().']') !== false){
+        $dummyTargetText = self::renderDummyTargetText($segment->getTaskGuid());
+        if (strpos($targetResult, $dummyTargetText) !== false){
             //set the internal fuzzy available matchrate type
             $matchrateType->initPretranslated(editor_Models_Segment_MatchRateType::TYPE_INTERNAL_FUZZY_AVAILABLE,$type);
             $segment->setMatchRateType((string) $matchrateType);
