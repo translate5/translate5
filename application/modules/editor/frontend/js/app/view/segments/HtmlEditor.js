@@ -69,8 +69,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   duplicatedContentTags: [],
   contentEdited: false, //is set to true if text content or content tags were modified
   disableErrorCheck: false,
-  //0: segment length is OK, -1 segment is to short (shorter as minLength), 1 segment is to long (longer as maxLength)
-  segmentLengthStatus:0,
+  segmentLengthStatus: 'segmentLengthValid', // see Editor.view.segments.MinMaxLength.lengthstatus
   lastSegmentLength:null,
   currentSegment: null,
   statusStrip: null,
@@ -81,10 +80,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       tagDuplicatedText: '#UT#Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:{0}',
       tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
       cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.',
-      segmentToShort:'#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
-      segmentToLong:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.',
-      segmentTooManyLines: '#UT#Der Segmentinhalt enthält zu viele Zeilenumbrüche; maximal {0} Zeilen sind erlaubt.',
-      segmentLinesTooLong: '#UT#Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).',
   },
   
   //***********************************************************************************
@@ -742,17 +737,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @return {Boolean}
    */
   hasAndDisplayErrors: function() {
-      var me = this, msg, meta = me.currentSegment.get('metaCache');
+      var me = this, 
+          msg,
+          meta = me.currentSegment.get('metaCache');
       
       //if the segment length is not in the defined range, add an error message - not disableable, so before disableErrorCheck
-      if(Editor.data.segments.enableCountSegmentLength && me.segmentLengthStatus != 0) {
+      if(Editor.data.segments.enableCountSegmentLength && me.segmentLengthStatus !== 'segmentLengthValid') { // see Editor.view.segments.MinMaxLength.lengthstatus
           //fire the event, and get the message from the segmentminmaxlength component
-          if(me.segmentLengthStatus > 0) {
-              msg = Ext.String.format(me.strings.segmentToLong, meta.maxLength);
-          }
-          else {
-              msg = Ext.String.format(me.strings.segmentToShort, meta.minLength);
-          }
+          msg = Ext.ComponentQuery.query('#segmentMinMaxLength')[0].renderErrorMessage(meta, me.segmentLengthStatus);
           me.fireEvent('contentErrors', me, msg);
           return true;
       }
@@ -1072,27 +1064,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   
   /**
    * Check if the segment character number is within the defined borders
+   * and set the segment's length status accordingly.
    * @param {String} segmentText
    */
   checkSegmentLength: function(segmentText){
       var me = this,
-          length,
-          metaCache = me.currentSegment && me.currentSegment.get('metaCache'),
-          minMaxLengthComp = Editor.view.segments.MinMaxLength,
-          minWidth = minMaxLengthComp.getMinWidthForSegment(metaCache),
-          maxWidth = minMaxLengthComp.getMaxWidthForSegment(metaCache);
-      
-      me.segmentLengthStatus = 0;
-      
-      //get the characters length and is segment saveable
-      length = me.getTransunitLength(segmentText);
-      
-      if(length < minWidth) {
-          me.segmentLengthStatus = -1;
-      }
-      else if(length > maxWidth) {
-          me.segmentLengthStatus = 1;
-      }
+          meta = me.currentSegment && me.currentSegment.get('metaCache');
+      me.segmentLengthStatus = Ext.ComponentQuery.query('#segmentMinMaxLength')[0].getMinMaxLengthStatus(meta, segmentText);
   },
   
   /**

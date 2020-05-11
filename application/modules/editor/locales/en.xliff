@@ -1976,6 +1976,10 @@
     <source>Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).</source>
     <target>Not all lines in the segment content match the allowed length ({0}).</target>
   </trans-unit>
+  <trans-unit id='WmVpbGVu'>
+    <source>Zeilen</source>
+    <target>lines</target>
+  </trans-unit>
   <trans-unit id='U3ByYWNoZQ=='>
       <source>Sprache</source>
       <target>Language</target>
