@@ -941,8 +941,9 @@ Ext.define('Editor.controller.Editor', {
     /**
      * @param {Editor.view.segments.HtmlEditor} editor
      * @param {String} msg
+     * @param {Bool} isTagError (optional; default: true)
      */
-    handleSaveWithErrors: function(editor, msg){
+    handleSaveWithErrors: function(editor, msg, isTagError = true){
         var me = this,
             msgBox;
         
@@ -958,7 +959,8 @@ Ext.define('Editor.controller.Editor', {
                 no: me.messages.saveAnyway
             }
         });
-        if(Editor.data.segments.userCanIgnoreTagValidation) {
+        // tag-errors: check if user is allowed to save anyway
+        if(isTagError && Editor.data.segments.userCanIgnoreTagValidation) {
             msgBox.confirm(me.messages.errorTitle, msg, function(btn) {
                 if(btn === 'no') {
                     me.saveAndIgnoreContentErrors();

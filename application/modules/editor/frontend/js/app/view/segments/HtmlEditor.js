@@ -91,6 +91,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @param {String} error message
    * Fires if the content contains tag errors, the result of the handler must be boolean, 
    * true if saving should be processed, false if not.
+   * @param {Bool} isTagError For tag-errors there is a config-item that allows to ignore the validation.
+   * For historical reasons, the default assumes that an error is a tag-error unless set otherwise.
    */
   //***********************************************************************************
   //End Events
@@ -745,14 +747,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(Editor.data.segments.enableCountSegmentLength && me.segmentLengthStatus !== 'segmentLengthValid') { // see Editor.view.segments.MinMaxLength.lengthstatus
           //fire the event, and get the message from the segmentminmaxlength component
           msg = Ext.ComponentQuery.query('#segmentMinMaxLength')[0].renderErrorMessage(meta, me.segmentLengthStatus);
-          me.fireEvent('contentErrors', me, msg);
+          me.fireEvent('contentErrors', me, msg, false);
           return true;
       }
       
       //if we are running a second time into this method triggered by callback, 
       //  the callback can disable a second error check
       if(me.disableErrorCheck){
-          me.fireEvent('contentErrors', me, null);
+          me.fireEvent('contentErrors', me, null, true);
           me.disableErrorCheck = false;
           return false;
       }
@@ -780,14 +782,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                   msg += '<br /><br />';
               }
           }
-          me.fireEvent('contentErrors', me, msg);
+          me.fireEvent('contentErrors', me, msg, true);
           return true;
       }
       if(!me.isTagOrderClean){
-          me.fireEvent('contentErrors', me, me.strings.tagOrderErrorText);
+          me.fireEvent('contentErrors', me, me.strings.tagOrderErrorText, true);
           return true;
       }
-      me.fireEvent('contentErrors', me, null);
+      me.fireEvent('contentErrors', me, null, true);
       return false;
   },
   /**
