@@ -69,7 +69,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
          * @returns bool
          */
         useMaxNumberOfLines: function(meta) {
-            return meta && meta.maxNumberOfLines && (meta.maxNumberOfLines > 1);
+            return meta && meta.maxNumberOfLines;
         },
         /**
          * Returns the minWidth according to the meta-data.
@@ -362,6 +362,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      */
     handleMaxWidthForLine: function (textInLine, lineWidth, maxWidthPerLine) {
         var me = this,
+            meta,
             editorBody,
             range,
             wordsInLine,
@@ -376,34 +377,35 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             return;
         }
         
-        editorBody = me.editor.getEditorBody();
-        range = rangy.createRange();
-        range.selectNodeContents(editorBody);
-        options = {
-                wholeWordsOnly: false,
-                withinRange: range
-        };
+        meta = me.segmentRecord && me.segmentRecord.get('metaCache');
         
         wordsInLine = textInLine.split(' ');
         for (i = 0; i < wordsInLine.length; i++) {
-            if (i>0) {
+            if (i>0 && textToCheck.replace(/\s/g, '').length) {
                 textToCheck += ' ';
             }
             textToCheck += wordsInLine[i];
             if (textToCheck === '') {
                 continue;
             }
-            textToCheckWidth = me.editor.getLength(textToCheck);
+            textToCheckWidth = me.editor.getLength(textToCheck, meta);
             if (textToCheckWidth <= maxWidthPerLine) {
                 textForLine = textToCheck;
             } else {
                 if (!textForLine.replace(/\s/g, '').length) {
                     textForLine = textInLine;
                 }
-                if(me.editor.getLength(textForLine) > maxWidthPerLine) {
+                if(me.editor.getLength(textForLine, meta) > maxWidthPerLine) {
                     return;
                 }
                 me.bookmarkForCaret = me.getPositionOfCaret();
+                editorBody = me.editor.getEditorBody();
+                range = rangy.createRange();
+                range.selectNodeContents(editorBody);
+                options = {
+                        wholeWordsOnly: false,
+                        withinRange: range
+                };
                 range.findText(textForLine, options);
                 range.collapse(false);
                 sel = rangy.getSelection(editorBody);
