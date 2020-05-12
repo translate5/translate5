@@ -518,6 +518,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         var me=this,
             segmentLengthStatus,
             minMaxLengthComp = Editor.view.segments.MinMaxLength,
+            useMaxNumberOfLines = minMaxLengthComp.useMaxNumberOfLines(meta),
             messageSizeUnit = minMaxLengthComp.getSizeUnit(meta),
             minWidthForSegment = minMaxLengthComp.getMinWidthForSegment(meta),
             maxWidthForSegment = minMaxLengthComp.getMaxWidthForSegment(meta),
@@ -540,30 +541,37 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         
         segmentLengthStatus = me.getMinMaxLengthStatus(meta, editorBody.innerHTML);
         
+        // tplData
         if (segmentLengthStatus === me.lengthstatus.segmentLengthValid) {
             tplData.cls = 'valid-length';
         }
         
-        if (segmentLengthStatus === me.lengthstatus.segmentLinesTooLong) {
+        // labelData 
+        if (useMaxNumberOfLines) {
             allLines = me.getLinesAndLength(editorBody.innerHTML, meta);
-            for (i = 0; i < allLines.length; i++) {
-                line = allLines[i];
-                if (line.lineWidth > maxWidthForLine) {
-                    errors.push((i+1) + ': ' + line.lineWidth);
+            maxWidthForSegment = meta.maxNumberOfLines + '*' + maxWidthForLine;
+            if (segmentLengthStatus === me.lengthstatus.segmentLinesTooLong) {
+                for (i = 0; i < allLines.length; i++) {
+                    line = allLines[i];
+                    if (line.lineWidth > maxWidthForLine) {
+                        errors.push((i+1) + ': ' + line.lineWidth);
+                    }
                 }
+                errorMsg = (errors.length === 0) ? '' : ('; ' + errors.join('; '));
+                labelData.maxWidth = maxWidthForSegment + errorMsg;
             }
-            errorMsg = (errors.length === 0) ? '' : ('; ' + errors.join('; '));
-            labelData.maxWidth = maxWidthForSegment + errorMsg;
+            if (segmentLengthStatus === me.lengthstatus.segmentTooManyLines) {
+                allLines = me.getLinesAndLength(editorBody.innerHTML, meta);
+                errorMsg = '; ' + allLines.length + ' ' + me.strings.lines;
+                labelData.maxWidth = maxWidthForSegment + errorMsg;
+            }
         }
         
-        if (segmentLengthStatus === me.lengthstatus.segmentTooManyLines) {
-            allLines = me.getLinesAndLength(editorBody.innerHTML, meta);
-            errorMsg = '; ' + allLines.length + ' ' + me.strings.lines;
-            labelData.maxWidth = maxWidthForSegment + errorMsg;
-        }
-        
+        // tooltip
         tplData.tip = me.renderErrorMessage(meta, segmentLengthStatus);
         
+        
+        // siblings
         if(meta && meta.siblingData) {
             var nrs = Ext.Object.getValues(meta.siblingData).map(function(item){
                 return item.nr;
