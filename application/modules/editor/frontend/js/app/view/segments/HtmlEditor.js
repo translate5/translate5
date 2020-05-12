@@ -982,14 +982,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     	Editor.MessageBox.addInfo(this.strings.tagRemovedText);
     }
   },
-  /**
-   * returns img tags contained in the currently edited field as img nodelist
-   */
-  getTags: function(compareList) {
-      var me = this,
-          body = me.getEditorBody();
-      return node.getElementsByTagName('img');
-  },
   showShortTags: function() {
     this.rendered && this.setImagePath('shortPath');
   },
