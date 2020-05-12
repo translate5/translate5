@@ -1136,6 +1136,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   
   /**
    * Return the text's length either based on pixelMapping or as the number of code units in the text.
+   * @param {String} text
+   * @param {Object} meta
+   * @param {HTMLDivElement} div (optional; can be created here: div with the innerHTML or the segment, including the images for internal tags)
    * @return {Integer}
    */
   getLength: function (text, meta, div=null) {
@@ -1144,7 +1147,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           isPixel = (meta && meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING),
           length;
       if (div === null) {
-          div = document.createElement("div");      
+          div = document.createElement('div');
           div.innerHTML = text;
       }
       text = div.textContent || div.innerText || "";

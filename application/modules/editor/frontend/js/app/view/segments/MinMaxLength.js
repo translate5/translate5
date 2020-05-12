@@ -206,7 +206,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         
         if(me.isVisible()){
             metaCache = me.segmentRecord.get('metaCache');
-            me.updateLabel(metaCache,me.editor.getTransunitLength());
+            me.updateLabel(metaCache,me.editor.getTransunitLength(me.segmentRecord.get('targetEdit')));
         }
 
         if(!Editor.controller.SearchReplace){
@@ -219,27 +219,32 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         //so the character count is triggered when text is replaced with search and replace
         searchReplace.on({
             editorTextReplaced:function(newInnerHtml){
-                me.onHtmlEditorChange(null,newInnerHtml);
+                me.onHtmlEditorChange(null,newInnerHtml); // TODOO test
             }
         });
     },
 
     /**
-     * Handler for html editor text change
+     * Handler for html editor text change and afterInsertMarkup
      * @param {Editor.view.segments.HtmlEditor} htmlEditor
-     * @param {String} newValue
+     * @param {String|Object} newValue
      * @param {String} oldValue (optional)
      */
     onHtmlEditorChange:function(htmlEditor,newValue,oldValue = ''){
         var me=this,
-            record,
-            metaCache;
-        if(me.isVisible()){
-            record = me.segmentRecord;
-            metaCache = record.get('metaCache');
-            me.handleMaxNumberOfLines(metaCache, newValue, oldValue);
-            me.updateLabel(metaCache, me.editor.getTransunitLength(newValue));
+            metaCache,
+            newValueIsString = (typeof newValue === 'string' || newValue instanceof String),
+            editorBody;
+        if(!me.isVisible()){
+            return;
         }
+        if (!newValueIsString) { // = afterInsertMarkup 
+            editorBody = me.editor.getEditorBody();
+            newValue = editorBody.innerHTML;
+        }
+        metaCache = me.segmentRecord.get('metaCache');
+        me.handleMaxNumberOfLines(metaCache, newValue, oldValue);
+        me.updateLabel(metaCache, me.editor.getTransunitLength(newValue));
     },
 
     /**
@@ -249,11 +254,9 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      */
     onHtmlEditorDragEnd:function(htmlEditor,newValue){
         var me=this,
-            record,
             metaCache;
         if(me.isVisible()){
-            record = me.segmentRecord;
-            metaCache = record.get('metaCache');
+            metaCache = me.segmentRecord.get('metaCache');
             me.updateLabel(metaCache, me.editor.getTransunitLength(newValue));
         }
     },
@@ -280,7 +283,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         });
         if (linebreakNodes.length === 0) {
             // = one single line only
-            textInLine = range.toString();
+            textInLine = range.toHtml();
             lineWidth = me.editor.getLength(textInLine, meta);
             lines.push({textInLine:textInLine, lineWidth:lineWidth});
         } else {
@@ -302,7 +305,6 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 } 
                 textInLine = range.toString();
                 lineWidth = me.editor.getLength(textInLine, meta);
-                console.log(lineWidth +': '+textInLine);
                 lines.push({textInLine:textInLine, lineWidth:lineWidth});
             }
         }
@@ -317,8 +319,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             meta = metaCache,
             minMaxLengthComp = Editor.view.segments.MinMaxLength,
             useMaxNumberOfLines = minMaxLengthComp.useMaxNumberOfLines(meta),
-            newSegmentLength,
-            oldSegmentLength,
+            newSegmentLengthTotal,
+            oldSegmentLengthTotal,
             maxWidthPerLine,
             i,
             allLines,
@@ -328,9 +330,9 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             return;
         }
         
-        newSegmentLength = me.editor.getTransunitLength(newValue);
-        oldSegmentLength = me.editor.getTransunitLength(oldValue);
-        if (newSegmentLength <= oldSegmentLength) {
+        newSegmentLengthTotal = me.editor.getTransunitLength(newValue);
+        oldSegmentLengthTotal = me.editor.getTransunitLength(oldValue);
+        if (newSegmentLengthTotal <= oldSegmentLengthTotal) {
             return;
         }
         
@@ -389,14 +391,14 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             if (textToCheck === '') {
                 continue;
             }
-            textToCheckWidth = me.editor.getTransunitLength(textToCheck);
+            textToCheckWidth = me.editor.getLength(textToCheck);
             if (textToCheckWidth <= maxWidthPerLine) {
                 textForLine = textToCheck;
             } else {
                 if (!textForLine.replace(/\s/g, '').length) {
                     textForLine = textInLine;
                 }
-                if(me.editor.getTransunitLength(textForLine) > maxWidthPerLine) {
+                if(me.editor.getLength(textForLine) > maxWidthPerLine) {
                     return;
                 }
                 me.bookmarkForCaret = me.getPositionOfCaret();
@@ -432,7 +434,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         me.segmentRecord = null;
         if(enabled){
             me.segmentRecord = record;
-            me.updateLabel(metaCache, me.editor.getTransunitLength());
+            me.updateLabel(metaCache, me.editor.getTransunitLength(me.segmentRecord.get('targetEdit')));
         }
         return enabled;
     },
@@ -467,7 +469,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         
         // The segment might be part of a trans-unit that has been
         // split to multiple segments. This will be considered here:
-        transunitLength = me.getTransunitLength(segmentText);
+        transunitLength = me.editor.getTransunitLength(segmentText);
         
         if(transunitLength < minWidth) {
             return me.lengthstatus.segmentToShort;
@@ -512,7 +514,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     /**
      * Update the minmax status strip label
      */
-    updateLabel: function(meta, segmentLength){
+    updateLabel: function(meta, segmentLengthTotal){
         var me=this,
             segmentLengthStatus,
             minMaxLengthComp = Editor.view.segments.MinMaxLength,
@@ -521,7 +523,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             maxWidthForSegment = minMaxLengthComp.getMaxWidthForSegment(meta),
             maxWidthForLine = minMaxLengthComp.getMaxWidthForSingleLine(meta),
             labelData = {
-                length: segmentLength + messageSizeUnit,
+                length: segmentLengthTotal + messageSizeUnit,
                 minWidth: minWidthForSegment,
                 maxWidth: maxWidthForSegment,
                 siblings: null
