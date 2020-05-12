@@ -219,7 +219,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         //so the character count is triggered when text is replaced with search and replace
         searchReplace.on({
             editorTextReplaced:function(newInnerHtml){
-                me.onHtmlEditorChange(null,newInnerHtml); // TODOO test
+                me.onHtmlEditorChange(null,newInnerHtml);
             }
         });
     },
