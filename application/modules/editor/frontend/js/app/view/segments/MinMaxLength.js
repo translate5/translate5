@@ -308,6 +308,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 lines.push({textInLine:textInLine, lineWidth:lineWidth});
             }
         }
+        // additionalUnitLength and additionalMrkLength are not considered here because
+        // maxNumberOfLines should onlybe used without <mrk... in the trans-unit
         return lines;
     },
     
@@ -501,6 +503,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             return me.lengthstatus.segmentTooManyLines;
         }
         
+        // The user will see this problem only if there are not segmentTooManyLines,
+        // but so what.
         for (i = 0; i < allLines.length; i++) {
             line = allLines[i];
             if (line.lineWidth > maxWidth) {
