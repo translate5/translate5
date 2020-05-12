@@ -558,7 +558,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         
         if (segmentLengthStatus === me.lengthstatus.segmentTooManyLines) {
             allLines = me.getLinesAndLength(editorBody.innerHTML, meta);
-            errorMsg = '; ' + allLines.length + me.strings.lines;
+            errorMsg = '; ' + allLines.length + ' ' + me.strings.lines;
             labelData.maxWidth = maxWidthForSegment + errorMsg;
         }
         
