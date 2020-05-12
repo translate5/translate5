@@ -492,6 +492,7 @@ Ext.define('Editor.controller.Editor', {
                 // insert whitespace key events
                 'ctrl-shift-space': [Ext.EventObjectImpl.SPACE,{ctrl: true, alt: false, shift: true}, me.insertWhitespaceNbsp, true],
                 'shift-enter': [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: true}, me.insertWhitespaceNewline, true],
+                'enter': [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: false}, me.insertWhitespaceNewline, true],
                 'tab': [Ext.EventObjectImpl.TAB,{ctrl: false, alt: false}, me.insertWhitespaceTab, true]
             })
         });
