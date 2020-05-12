@@ -303,7 +303,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                     range.setStartAfter(linebreakNodes[i-1]);
                     range.setEndBefore(linebreakNodes[i]);
                 } 
-                textInLine = range.toString();
+                textInLine = range.toHtml();
                 lineWidth = me.editor.getLength(textInLine, meta);
                 lines.push({textInLine:textInLine, lineWidth:lineWidth});
             }
