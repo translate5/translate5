@@ -82,7 +82,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
     shrinkWrap: 0,
     layout: 'border',
     collapsed: false,
-    title: '#UT#Kundenübersicht',
+    title: '#UT#Kunden',
     glyph: 'xf1ad@FontAwesome',
     helpSection: 'customeroverview',
     defaultListenerScope: true,

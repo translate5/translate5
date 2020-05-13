@@ -90,8 +90,7 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
    */
   onParentRender: function(window) {
       var me = this;
-      me.actualTask = window.actualTask;
-      me.getTaskTabs().insert(1,{xtype: 'languageResourceTaskAssocPanel', actualTask: me.actualTask});
+      me.getTaskTabs().insert(1,{xtype: 'languageResourceTaskAssocPanel'});
   },
   handleLoadPreferences: function(controller,task){
       var me = this,
@@ -215,7 +214,7 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
           return;
       }
       if(me.requestsCount <= 0){
-          var task = me.getAdminTaskWindow().actualTask;
+          var task = me.getAdminTaskWindow().getCurrentTask();
           me.getAdminTaskWindow().setLoading(false);
           task.load();
       }

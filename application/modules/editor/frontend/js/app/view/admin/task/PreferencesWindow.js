@@ -26,8 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+//TODO: remove the window from the name(controller and vm to) and update all references
 Ext.define('Editor.view.admin.task.PreferencesWindow', {
-    extend: 'Ext.window.Window',
+    extend: 'Ext.panel.Panel',
     alias: 'widget.adminTaskPreferencesWindow',
     controller: 'editortaskPreferencesWindowController',
     requires: [
@@ -40,7 +41,8 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
        'Editor.view.admin.task.LogWindow'
     ],
     itemId: 'adminTaskPreferencesWindow',
-    title: '#UT#Einstellungen zu Aufgabe "{0}"',
+    //title: '#UT#Einstellungen zu Aufgabe "{currentTask.taskName}"',
+    header:false,
     strings: {
         close: '#UT#Fenster schließen',
         events: '#UT#Ereignisse',
@@ -49,16 +51,8 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         userNotifySuccess:'#UT#Benutzer wurden erfolgreich per E-Mail benachrichtigt'
     },
     layout: 'fit',
-    modal: true,
     viewModel: {
         type: 'taskpreferences'
-    },
-    autoScroll: true,
-    initComponent: function() {
-        var me = this,
-            vm = me.lookupViewModel();
-        vm.set('currentTask', me.actualTask);
-        me.callParent(arguments);
     },
     initConfig: function(instanceConfig) {
         var me = this,
@@ -93,16 +87,16 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 title: this.strings.events,
                 listeners: {
                     show: function() {
-                        this.load(me.actualTask.getId());
+                        this.load(me.getViewModel().get('currentTask').getId());
                     }
                 }
             });
         }
         
         config = {
-            height: Math.min(800, parseInt(Ext.getBody().getViewSize().height * 0.8)),
-            width: 1000,
-            title: Ext.String.format(me.title, task.get('taskName')),
+//            bind:{
+//            	title:me.title
+//            },
             items : [{
                 xtype: 'tabpanel',
                 activeTab: 0,
@@ -115,4 +109,14 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         }
         return me.callParent([config]);
     },
+    
+    setCurrentTask:function(task){
+        var me = this,
+        	vm = me.getViewModel();
+        vm.set('currentTask',task);
+    },
+
+    getCurrentTask:function(){
+        return this.getViewModel().get('currentTask');
+    }
 });

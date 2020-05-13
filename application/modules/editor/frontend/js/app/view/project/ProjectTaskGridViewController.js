@@ -25,39 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-Ext.define('Editor.view.admin.ProjectTaskGrid', {
-	extend: 'Editor.view.admin.TaskGrid',
-	alias: 'widget.projectTaskGrid',
-    requires:[
-	],
-	itemId: 'projectTaskGrid',
-	
-	visibleColumns:[
-		'id',
-		'taskGridActionColumn',
-		'state',
-		'workflowStepName',
-		'segmentFinishCount',
-		'wordCount',
-		'taskName',
-		'relaisLang',
-		'targetLang',
-		'userCount',
-	],
-	
-	store: null,
-	autoLoad: false,
-	bufferedRenderer:false,//info: this will stop the store filter binding.
-
-    initConfig: function(instanceConfig) {
-        var me = this,
-        	config={
-        		dockedItems: [{}]
-        	};
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
-        }
-        return me.callParent([config]);
-    }
+Ext.define('Editor.view.project.ProjectTaskGridViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.projectTaskGrid'
 });

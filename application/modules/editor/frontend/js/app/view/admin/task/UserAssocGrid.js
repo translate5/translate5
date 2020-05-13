@@ -56,18 +56,6 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
   },
   store: 'admin.TaskUserAssocs',
   plugins: ['gridfilters'],
-  //***********************************************************************************
-  //Begin Events
-  //***********************************************************************************
-  /**
-   * @event confirmDelete
-   * @param {Ext.form.Panel} grid
-   * @param {Editor.model.admin.task.UserPref[]} toDelete
-   * @param {Ext.button.Button} btn
-   */
-  //***********************************************************************************
-  //End Events
-  //***********************************************************************************
   initConfig: function(instanceConfig) {
     var me = this,
         config;

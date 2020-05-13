@@ -256,6 +256,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    * @param  activeTab: the tab in the window which will be focused
    */
   handleTaskPreferences: function(task,activeTab) {
+	  //TODO: this can be triggered when the menu is implemented
       this.actualTask = task;
       var win = Ext.widget('adminTaskPreferencesWindow',{
           actualTask: task
@@ -401,6 +402,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    */
   changeWorkflow: function(combo, val) {
       var me = this;
+      if(!val){
+        return;
+      }
       me.updatePrefsFilter(val);
       if(combo.eventsSuspended) {
           return;

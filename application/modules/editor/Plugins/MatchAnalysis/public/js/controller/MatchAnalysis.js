@@ -97,7 +97,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             '#languageResourcesWizardPanel':{
             	startMatchAnalysis:'onStartMatchAnalysis'
             },
-            'taskActionColumn': {
+            'taskActionMenu': {
                 itemsinitialized: 'onTaskActionColumnItemsInitialized'
             }
         },
@@ -106,7 +106,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         		taskCreated:'onTaskCreated',
                 taskUnhandledAction: 'onTaskActionColumnNoHandler',
                 periodicalTaskReloadIgnore: 'ignoreTaskForReload',
-                importStateCheckFinished:'onImportStateCheckFinished'
+                importStateCheckFinished:'onImportStateCheckFinished',
+                handleTaskPreferences:'onHandleTaskPreferences'
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -124,10 +125,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     onTaskActionColumnItemsInitialized: function(items) {
         items.push({
-            tooltip:this.strings.taskGridIconTooltip,
+            text:this.strings.taskGridIconTooltip,
             iconCls: 'ico-task-analysis',
-            isAllowedFor: 'editorAnalysisTask'   ,
-            sortIndex:8,   
+            isAllowedFor: 'editorAnalysisTask',
+            sortIndex:8
         });
     },
     /**
@@ -152,19 +153,15 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * On task preferences window tabpanel render
      */
     onTaskPreferencesWindowPanelRender:function(panel){
-        var prefWindow = panel.up('window');
-        
         //add the matchanalysis panel in the tabpanel
         panel.insert(2,{
-           xtype:'matchAnalysisPanel',
-           task:prefWindow.actualTask
+           xtype:'matchAnalysisPanel'
         });
     },
 
     onLanguageResourcesPanelRender:function(panel){
     	var me=this,
-    		win=panel.up('window'),
-    		task=win.actualTask,
+    		task=panel.lookupViewModel().get('currentTask'),
     		storeData=[], buttons = [];
     	
     	//init the pretranslate matchrate options (from 0-103)
@@ -336,10 +333,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     matchAnalysisButtonHandler:function(button){
     	var me=this,
-            win=button.up('window'),
+            win=button.up('#adminTaskPreferencesWindow'),
             tmAndTermChecked=me.getComponentByItemId('pretranslateTmAndTerm').checked,
             mTChecked=me.getComponentByItemId('pretranslateMt').checked,
-			task=win.actualTask,
+			task=win.getCurrentTask(),
 			operation=(mTChecked || tmAndTermChecked) ? "pretranslation" : "analysis";
     	
     	me.startAnalysis(task.get('id'),operation);
@@ -445,13 +442,17 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	if(!taskWindow){
     		return;
     	}
-    	if(record.get('taskGuid')==taskWindow.actualTask.get('taskGuid')){
+    	if(record.get('taskGuid')==taskWindow.getCurrentTask().get('taskGuid')){
     		me.removeLoadingMask(true);
     	}
     },
+    
+    onHandleTaskPreferences:function(task){
+    	this.getMatchAnalysisPanel().reloadAnalysisStore(task);
+    },
 
     /***
-     * Add loadin mask in match analysis panel and in the task assoc panel
+     * Add loading mask in match analysis panel and in the task assoc panel
      */
     addLoadingMask:function(){
         var me=this,

@@ -26,11 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.ProjectGrid', {
+Ext.define('Editor.view.project.ProjectGrid', {
 	extend: 'Editor.view.admin.TaskGrid',
 	alias: 'widget.projectGrid',
     requires:[
-    	'Editor.view.admin.ProjectGridViewController',
+    	'Editor.view.project.ProjectGridViewController',
 	],
 	controller:'projectGrid',
 	itemId: 'projectGrid',
@@ -39,8 +39,8 @@ Ext.define('Editor.view.admin.ProjectGrid', {
 		addProjectTip:'#UT#Neues Projekt hinzufügen',
 		reloadBtn: '#UT#Aktualisieren',
 		reloadBtnTip: '#UT#Projektliste vom Server aktualisieren.'
+		
 	},
-	
 	visibleColumns:[
 		'id',
 		'taskGridActionColumn',
@@ -52,52 +52,7 @@ Ext.define('Editor.view.admin.ProjectGrid', {
 		'orderdate'
 	],
 	
-	text_cols: { // in case of any changes, pls also update getTaskGridTextCols() in editor_Models_Task
-	      // sorted by appearance
-		workflow: '#UT#Workflow',
-		taskActions: '#UT#Aktionen',
-		state: '#UT#Aufgabenstatus',
-		customerId: '#UT#Endkunde',
-		taskName: '#UT#Projektname',
-		taskNr: '#UT#Auftragsnr.',
-		wordCount: '#UT#Wörter',
-		wordCountTT: '#UT#Anzahl Wörter',
-		fileCount: '#UT#Dateien',
-		sourceLang: '#UT#Quellsprache',
-		relaisLang: '#UT#Relaissprache',
-		targetLang: '#UT#Zielsprache',
-		referenceFiles: '#UT#Referenzdateien',
-		terminologie: '#UT#Terminologie',
-		userCount: '#UT#Zahl zugewiesener Benutzer',
-		users: '#UT#Benutzer',
-		taskassocs: '#UT#Anzahl zugewiesene Sprachresourcen',
-		pmName: '#UT#Projektmanager',
-		pmGuid: '#UT#Projektmanager',
-		orderdate: '#UT#Bestelldatum',
-		edit100PercentMatch: '#UT#100%-Treffer editierbar',
-		fullMatchEdit: '#UT#100% Matches sind editierbar',
-		emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
-		lockLocked: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
-		enableSourceEditing: '#UT#Quellsprache bearbeitbar',
-		workflowState:'#UT#Workflow-Status',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
-		workflowUserRole:'#UT#Benutzer-Rolle',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
-		userName:'#UT#Benutzer',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
-		segmentCount:'#UT#Segmentanzahl',
-		segmentFinishCount:'#UT#% abgeschlossen',
-		id:'#UT#Id',
-		taskGuid:'#UT#Task-Guid',
-		workflowStepName:'#UT#Aktueller Workflow-Schritt',
-		userState:'#UT#Mein Job-Status',
-		userJobDeadline:'#UT#Meine Deadline',
-		assignmentDate:'#UT#Benutzer-Zuweisungsdatum',
-		finishedDate:'#UT#Benutzer-Abschlussdatum',
-		deadlineDate:'#UT#Benutzer-Deadline/s',
-		assignmentDateHeader:'#UT#Zuweisungsdatum',
-		finishedDateHeader:'#UT#Abschlussdatum',
-		deadlineDateHeader:'#UT#Deadline Datum',
-	},
-	
-	store: 'admin.Project',
+	store: 'project.Project',
 	bufferedRenderer:false,//info: this will stop the store filter binding.
 
 	viewConfig: {

@@ -45,5 +45,30 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
         roles: {
             data: '{rolesData}'
         }
+    },
+    
+    formulas: {
+    	statesData: {
+            get: function (get) {
+            	var task=get('currentTask'),
+                	states = [],
+                	metaData = task ? task.getWorkflowMetaData() : [];
+	            Ext.Object.each(metaData.states, function(key, state) {
+	                states.push({id: key, text: state});
+	            });
+                return states;
+            }
+        },
+        rolesData: {
+            get: function (get) {
+            	var task=get('currentTask'),
+            		roles = [],
+                	metaData = task ? task.getWorkflowMetaData() : [];
+            	Ext.Object.each(metaData.editableRoles, function(key, role) {
+                    roles.push({id: key, text: role});
+                });
+                return roles;
+            }
+        }
     }
 });

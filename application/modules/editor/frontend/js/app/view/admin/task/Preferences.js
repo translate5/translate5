@@ -46,8 +46,8 @@ Ext.define('Editor.view.admin.task.Preferences', {
     //defaultListenerScope:true,
     initComponent: function() {
         var me = this,
-            workflows = [],
-            task = me.lookupViewModel().get('currentTask');
+            workflows = [];
+            //task = me.lookupViewModel().get('currentTask');
         
         Ext.Object.each(Editor.data.app.workflows, function(key, item) {
             workflows.push([item.id, item.label]);
@@ -67,7 +67,10 @@ Ext.define('Editor.view.admin.task.Preferences', {
                     forceSelection: true,
                     editable: false,
                     fieldLabel: me.workflow_label,
-                    value: task.get('workflow'),
+                    //value:task.get('workflow'),
+                    bind:{
+                    	value:'{currentTask.workflow}'
+                    },
                     store: workflows
                 }]
             },{

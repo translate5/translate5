@@ -61,7 +61,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
 	  matchRate:"#UT#Match-Rate"
     },
     
-    layout:'fit',
+    //layout:'fit',
     
     taskGuid:null,
     defaultListenerScope:true,
@@ -84,14 +84,16 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                     itemId:'matchAnalysisGrid',
                     cls: 'matchAnalysisGrid',
                     emptyText:me.strings.noAnalysis,
-                    store : Ext.create('Editor.plugins.MatchAnalysis.store.MatchAnalysis',[{
-                    	params: {
-                    		taskGuid:instanceConfig.task.get('taskGuid')
-                    	},
-                    	callback:me.onAnalysisRecordLoad,
-                    	scope:me
-                    }
-                    ]),
+                    //TODO: filter binding here
+                    store : Ext.create('Editor.plugins.MatchAnalysis.store.MatchAnalysis'),
+                    // store : Ext.create('Editor.plugins.MatchAnalysis.store.MatchAnalysis',[{
+                    // 	params: {
+                    // 		taskGuid:instanceConfig.task.get('taskGuid')
+                    // 	},
+                    // 	callback:me.onAnalysisRecordLoad,
+                    // 	scope:me
+                    // }
+                    // ]),
                     features: [{
                         ftype: 'summary'
                     }],
@@ -236,8 +238,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                             text:me.strings.exportAnalysis,
                             listeners:{
                                 click:function(){
-                                    var params = {};
-                                    params["taskGuid"] = me.task.get('taskGuid');
+                                    var params = {},
+                                        task= me.lookupViewModel().get('currentTask');
+                                    params["taskGuid"] = task.get('taskGuid');
                                     window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
                                 }
                             }
@@ -264,7 +267,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                 }]
         };
         
-        me.taskGuid=instanceConfig.task.get('taskGuid');
+        //me.taskGuid=instanceConfig.task.get('taskGuid');
         
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
@@ -276,9 +279,11 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
      * On match analysis record is loaded in the store
      */
     onAnalysisRecordLoad:function(records, operation, success) {
-    	var me=this;
-    	if(!records || records.length<1){
-    		me.down('#exportExcel').setDisabled(true);
+        var me=this,
+            noRecords=!records || records.length<1;
+        
+        me.down('#exportExcel').setDisabled(noRecords);
+    	if(noRecords){
     		return;
     	}
     	
@@ -288,15 +293,20 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     },
     
     onMatchAnalysisPanelActivate:function(panel){
-    	var me=this,
-    		matchAnalysisGrid=panel.down('#matchAnalysisGrid');
+        this.reloadAnalysisStore();
+    },
+
+    reloadAnalysisStore:function(projectTask){
+        var me=this,
+            matchAnalysisGrid=me.down('#matchAnalysisGrid'),
+            task=projectTask ? projectTask : me.lookupViewModel().get('currentTask');
     	
 		matchAnalysisGrid.getStore().load({
 			 params: {
-                 taskGuid:me.taskGuid
+                 taskGuid:task.get('taskGuid')
              },
              callback:me.onAnalysisRecordLoad,
              scope:me
 		});
-}
+    }
 });

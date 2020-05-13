@@ -40,7 +40,7 @@ Ext.define('Editor.view.ViewPort', {
         'Editor.view.admin.customer.Panel',
         'Editor.view.LanguageResources.TmOverviewPanel',
         'Editor.view.admin.preferences.OverviewPanel',
-        'Editor.view.admin.ProjectPanel'
+        'Editor.view.project.ProjectPanel'
     ],
     layout: 'border',
     initComponent: function() {

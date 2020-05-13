@@ -284,9 +284,9 @@
         <source>Der &#xC4;nderungen an Benutzer "{0}" wurden erfolgreich gespeichert.</source>
         <target>Changes at user "{0}" were successfully saved.</target>
       </trans-unit>
-      <trans-unit id="QmVudXR6ZXJ2ZXJ3YWx0dW5n">
-        <source>Benutzerverwaltung</source>
-        <target>User Administration</target>
+      <trans-unit id='QmVudXR6ZXI='>
+        <source>Benutzer</source>
+        <target>Users</target>
       </trans-unit>
       <trans-unit id="RGVyIEJlbnV0emVyICJ7MH0iIHd1cmRlIGVyZm9sZ3JlaWNoIGVyc3RlbGx0Lg==">
         <source>Der Benutzer "{0}" wurde erfolgreich erstellt.</source>
@@ -841,9 +841,9 @@
         <source>Aufgabenspezifische Einstellungen</source>
         <target>Task properties</target>
       </trans-unit>
-      <trans-unit id='RWluc3RlbGx1bmdlbiB6dSBBdWZnYWJlICJ7MH0i'>
-        <source>Einstellungen zu Aufgabe "{0}"</source>
-        <target>Properties to task "{0}"</target>
+      <trans-unit id='RWluc3RlbGx1bmdlbiB6dSBBdWZnYWJlICJ7Y3VycmVudFRhc2sudGFza05hbWV9Ig=='>
+        <source>Einstellungen zu Aufgabe "{currentTask.taskName}"</source>
+        <target>Properties to task "{currentTask.taskName}"</target>
       </trans-unit>
       <trans-unit id='QmVudXR6ZXIgenUgQXVmZ2FiZSB6dW9yZG5lbg=='>
         <source>Benutzer zu Aufgabe zuordnen</source>
@@ -1190,8 +1190,9 @@
   <source>Ein spezieller Dank geht an <a href="http://www.logrus.ru/" target="_blank">Logrus International</a> für die fortwährende Förderung von Open Source Software in der Übersetzungsbranche.</source>
   <target>A special thank you to <a href="http://www.logrus.ru/" target="_blank">Logrus International</a> for their ongoing promotion of Open Source Software in the Language Industry.</target>
 </trans-unit>
-<trans-unit id='Qml0dGUgc3RhcnRlbiBTaWUgenVuw6RjaHN0IGRlbiBvcGVuVE1TdGVybVRhZ2dlciB2aWEgdHJhbnNsYXRlNSBXaW5kb3dzIFN0YXJ0IE1lbsO8LiBTb25zdCB3aXJkIGRpZSAoYWt0aXZpZXJ0ZSkgQXVzemVpY2hudW5nIHZvbiBUZXJtaW5vbG9naWUgbmljaHQgZnVua3Rpb25pZXJlbiB1bmQgenUgRmVobGVybiBmw7xocmVuLg=='><source>Bitte starten Sie zunächst den openTMStermTagger via Windows Start Menü. Sonst wird die (aktivierte) Auszeichnung von Terminologie nicht funktionieren und zu Fehlern führen.</source><target>Please start openTMStermTagger via Windows Start Menu. Otherwise the activated tagging of terminology will lead to errors.</target></trans-unit><trans-unit id='QXVmZ2FiZW7DvGJlcnNpY2h0'><source>Aufgabenübersicht</source><target>Task overview</target></trans-unit>
- <trans-unit id='QmVudXR6ZXJ2ZXJ3YWx0dW5n'><source>Benutzerverwaltung</source><target>User management</target></trans-unit>
+<trans-unit id='Qml0dGUgc3RhcnRlbiBTaWUgenVuw6RjaHN0IGRlbiBvcGVuVE1TdGVybVRhZ2dlciB2aWEgdHJhbnNsYXRlNSBXaW5kb3dzIFN0YXJ0IE1lbsO8LiBTb25zdCB3aXJkIGRpZSAoYWt0aXZpZXJ0ZSkgQXVzemVpY2hudW5nIHZvbiBUZXJtaW5vbG9naWUgbmljaHQgZnVua3Rpb25pZXJlbiB1bmQgenUgRmVobGVybiBmw7xocmVuLg=='><source>Bitte starten Sie zunächst den openTMStermTagger via Windows Start Menü. Sonst wird die (aktivierte) Auszeichnung von Terminologie nicht funktionieren und zu Fehlern führen.</source><target>Please start openTMStermTagger via Windows Start Menu. Otherwise the activated tagging of terminology will lead to errors.</target></trans-unit>
+<trans-unit id='QXVmZ2FiZW4='><source>Aufgaben</source><target>Tasks</target></trans-unit>
+<trans-unit id='QmVudXR6ZXI='><source>Benutzer</source><target>Users</target></trans-unit>
  <trans-unit id='RWluZ2Vsb2dndGVyIEJlbnV0emVy'><source>Eingeloggter Benutzer</source><target>Current user</target></trans-unit>
  <trans-unit id='TWVpbmUgRWluc3RlbGx1bmdlbg=='><source>Meine Einstellungen</source><target>My preferences</target></trans-unit>
    <trans-unit id='QXVmZ2FiZW4='><source>Aufgaben</source><target>Tasks</target></trans-unit>   
@@ -2539,9 +2540,9 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Clients</target>
 </trans-unit>
 
-<trans-unit id='S3VuZGVuw7xiZXJzaWNodA=='>
-    <source>Kundenübersicht</source>
-    <target>Clients overview</target>
+<trans-unit id='S3VuZGVu'>
+    <source>Kunden</source>
+    <target>Clients</target>
 </trans-unit>
 
 <trans-unit id="QWxsZSBLdW5kZW4=">
@@ -3742,7 +3743,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UHJvamVrdCBsw7ZzY2hlbg=='><source>Projekt löschen</source><target>Delete project</target></trans-unit>
 <trans-unit id='RGFzIFByb2pla3Qgd3VyZGUgZXJmb2xncmVpY2ggZW50ZmVybnQh'><source>Das Projekt wurde erfolgreich entfernt!</source><target>The project was successfully removed!</target></trans-unit>
 <trans-unit id='QXVmZ2FiZW5uYW1lLVByb2pla3Q='><source>Aufgabenname-Projekt</source><target>Task-name</target></trans-unit>
-<trans-unit id='UHJvamVrdMO8YmVyc2ljaHQ='><source>Projektübersicht</source><target>Project Overview</target></trans-unit>
+<trans-unit id='UHJvamVrdGU='><source>Projekte</source><target>Projects</target></trans-unit>
 <trans-unit id='enVtIFByb2pla3Qgc3ByaW5nZW4='><source>zum Projekt springen</source><target>jump to project</target></trans-unit>
 <trans-unit id='UHJvamVrdGxpc3RlIHZvbSBTZXJ2ZXIgYWt0dWFsaXNpZXJlbi4='><source>Projektliste vom Server aktualisieren.</source><target>Refresh project list from the server.</target></trans-unit>
 <trans-unit id="QXVmZ2FiZW5saXN0ZSB2b20gU2VydmVyIGFrdHVhbGlzaWVyZW4u"><source>Aufgabenliste vom Server aktualisieren.</source><target>Refresh task list from the server.</target></trans-unit>
@@ -3752,8 +3753,11 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id="QWxsZSBQcm9qZWt0ZSBSZWR1emllcm4="><source>Alle Projekte Reduziern</source><target>Collapse all projects</target></trans-unit>
 <trans-unit id='UHJvamVrdCBoaW56dWbDvGdlbg=='><source>Projekt hinzufügen</source><target>Add project</target></trans-unit>
 <trans-unit id='TmV1ZXMgUHJvamVrdCBoaW56dWbDvGdlbg=='><source>Neues Projekt hinzufügen</source><target>Add new project</target></trans-unit>
-<trans-unit id='QXVmZ2FiZW4gZsO8ciBkYXMgUHJvamVrdDoge3NlbGVjdGlvbi50YXNrTmFtZX0='><source>Aufgaben für das Projekt: {selection.taskName}</source><target>Tasks for the project: {selection.taskName}</target></trans-unit>
+<trans-unit id='QXVmZ2FiZW4gZsO8ciBkYXMgUHJvamVrdDoge3Byb2plY3RTZWxlY3Rpb24udGFza05hbWV9'><source>Aufgaben für das Projekt: {projectSelection.taskName}</source><target>Tasks for the project: {projectSelection.taskName}</target></trans-unit>
 <trans-unit id='enVyIEF1ZmdhYmUgc3ByaW5nZW4='><source>zur Aufgabe springen</source><target>jump to task</target></trans-unit>
+<trans-unit id='QXVmZ2FiZW5tZW7DvCBhbnplaWdlbg=='><source>Aufgabenmenü anzeigen</source><target>Show task menu</target></trans-unit>
+<trans-unit id='UHJvamVrdCBlcnN0ZWxsZW4='><source>Projekt erstellen</source><target>Create project</target></trans-unit>
+<trans-unit id='UHJvamVrdG5hbWXCuQ=='><source>Projektname¹</source><target>Project name</target></trans-unit>
 </body>
   </file>
 </xliff>

@@ -26,18 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.PreferencesWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.taskpreferences',
-    data: {
-        userAssocDirty: false,
-        currentTask:null
-    },
-    formulas: {
-        workflowMetadata: {
-            get: function(get) {
-                return this.get('currentTask') && this.get('currentTask').getWorkflowMetaData();
-            }
-        }
-    }
+Ext.define('Editor.store.project.Project', {
+	extend : 'Ext.data.Store',
+	model: 'Editor.model.project.Project',
+	alias: 'store.project',
+	remoteSort: true,
+	remoteFilter: true,
+	autoLoad: true,
+	pageSize: false
 });

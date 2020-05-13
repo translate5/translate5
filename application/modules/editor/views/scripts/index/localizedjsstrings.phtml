@@ -481,7 +481,7 @@ Ext.define('Editor.controller.Localizer', {
 
     Ext.define("Editor.locale.de.view.admin.TaskGrid", {
         override: "Editor.view.admin.TaskGrid",
-        title: '<?php echo $this->translate->_('Aufgabenübersicht');?>',
+        title: '<?php echo $this->translate->_('Aufgaben');?>',
         states: {
             open: '<?php echo $this->translate->_('offen');?>',
             locked: '<?php echo $this->translate->_('in Arbeit');?>',
@@ -520,7 +520,7 @@ Ext.define('Editor.controller.Localizer', {
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
-            taskName: '<?php echo $this->translate->_('Aufgabenname');?>',
+            taskName: '<?php echo $this->translate->_('Name');?>',
             taskActions: '<?php echo $this->translate->_('Aktionen');?>',
             sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
             relaisLang: '<?php echo $this->translate->_('Relaissprache');?>',
@@ -661,7 +661,7 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.view.admin.TaskAddWindow", {
         override: "Editor.view.admin.TaskAddWindow",
-        title: '<?php echo $this->translate->_('Aufgabe erstellen');?>',
+        title: '<?php echo $this->translate->_('Projekt erstellen');?>',
         strings: {
             importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (Angabe notwendig)');?>',
             importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
@@ -721,71 +721,32 @@ Ext.define('Editor.controller.Localizer', {
             actionExcelReimport: '<?php echo $this->translate->_('Excel Re-Importieren');?>',
             projectOverview: '<?php echo $this->translate->_('zum Projekt springen');?>',
             actionDeleteProject: '<?php echo $this->translate->_('Projekt komplett löschen');?>',
-            taskOverview: '<?php echo $this->translate->_('zur Aufgabe springen');?>'
+            taskOverview: '<?php echo $this->translate->_('zur Aufgabe springen');?>',
+            taskActionMenu: '<?php echo $this->translate->_('Aufgabenmenü anzeigen');?>'
         }
     });
     
-  	Ext.define("Editor.locale.de.view.admin.ProjectPanel", {
-        override: "Editor.view.admin.ProjectPanel",
-        title:'<?php echo $this->translate->_('Projektübersicht');?>',
+  	Ext.define("Editor.locale.de.view.project.ProjectPanel", {
+        override: "Editor.view.project.ProjectPanel",
+        title:'<?php echo $this->translate->_('Projekte');?>',
         strings:{
-        	projectTasksTitle:'<?php echo $this->translate->_('Aufgaben für das Projekt: {selection.taskName}');?>'
+        	projectTasksTitle:'<?php echo $this->translate->_('Aufgaben für das Projekt: {projectSelection.taskName}');?>'
         }
     });
     
     
-    Ext.define("Editor.locale.de.view.admin.ProjectGrid", {
-        override: "Editor.view.admin.ProjectGrid",
+    Ext.define("Editor.locale.de.view.project.ProjectGrid", {
+        override: "Editor.view.project.ProjectGrid",
         strings: {
             addProject: '<?php echo $this->translate->_('Projekt hinzufügen');?>',
             addProjectTip: '<?php echo $this->translate->_('Neues Projekt hinzufügen');?>',
             reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
             reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren.');?>'
-        },
-        text_cols: {
-            taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
-            taskName: '<?php echo $this->translate->_('Projektname');?>',
-            taskActions: '<?php echo $this->translate->_('Aktionen');?>',
-            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
-            relaisLang: '<?php echo $this->translate->_('Relaissprache');?>',
-            targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
-            state: '<?php echo $this->translate->_('Aufgabenstatus');?>',
-            customerId: '<?php echo $this->translate->_('Endkunde');?>',
-            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
-            users: '<?php echo $this->translate->_('Benutzer');?>',
-            wordCount: '<?php echo $this->translate->_('Wörter');?>',
-            wordCountTT: '<?php echo $this->translate->_('Anzahl Wörter');?>',
-            fileCount: '<?php echo $this->translate->_('Dateien');?>',
-            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
-            referenceFiles: '<?php echo $this->translate->_('Referenzdateien');?>',
-            terminologie: '<?php echo $this->translate->_('Terminologie');?>',
-            fullMatchEdit: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
-            lockLocked: '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>',
-            enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>',
-            emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>',
-            segmentCount: '<?php echo $this->translate->_('Segmentanzahl');?>',
-            segmentFinishCount: '<?php echo $this->translate->_('% abgeschlossen');?>',
-            workflowState: '<?php echo $this->translate->_('Workflow-Status');?>',
-            workflowUserRole: '<?php echo $this->translate->_('Benutzer-Rolle');?>',
-            userName: '<?php echo $this->translate->_('Benutzer');?>',
-            id: '<?php echo $this->translate->_('Id');?>',
-            taskGuid: '<?php echo $this->translate->_('Task-Guid');?>',
-            workflow: '<?php echo $this->translate->_('Workflow');?>',
-            taskassocs: '<?php echo $this->translate->_('Zugewiesene Sprach-Resourcen');?>',
-            pmName: '<?php echo $this->translate->_('Projektmanager');?>',
-            edit100PercentMatch: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
-            userCount: '<?php echo $this->translate->_('Zahl zugewiesener Benutzer');?>',
-            workflowStepName: '<?php echo $this->translate->_('Aktueller Workflow-Schritt');?>',
-            userState: '<?php echo $this->translate->_('Mein Job-Status');?>',
-            userJobDeadline: '<?php echo $this->translate->_('Meine Deadline');?>',
-            assignmentDate:'<?php echo $this->translate->_('Benutzer-Zuweisungsdatum');?>',
-            finishedDate:'<?php echo $this->translate->_('Benutzer-Abschlussdatum');?>',
-            deadlineDate:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>'
         }
     });
     
-     Ext.define("Editor.locale.de.view.admin.ProjectGridViewController", {
-        override: "Editor.view.admin.ProjectGridViewController",
+     Ext.define("Editor.locale.de.view.project.ProjectGridViewController", {
+        override: "Editor.view.project.ProjectGridViewController",
         strings: {
             deleteProjectDialogTitle: '<?php echo $this->translate->_('Projekt komplett löschen?');?>',
             deleteProjectDialogMessage: '<?php echo $this->translate->_('Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?');?>',
@@ -808,6 +769,30 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
+    Ext.define("Editor.locale.de.view.admin.TaskActionMenu", {
+        override: "Editor.view.admin.TaskActionMenu",
+        messages: {
+            actionOpen: '<?php echo $this->translate->_('Aufgabe öffnen (nur Lesemodus)');?>',
+            actionEdit: '<?php echo $this->translate->_('Aufgabe bearbeiten');?>',
+            actionClone: '<?php echo $this->translate->_('Aufgabe klonen');?>',
+            actionFinish: '<?php echo $this->translate->_('Aufgabe abschließen');?>',
+            actionUnFinish: '<?php echo $this->translate->_('Aufgabe wieder öffnen');?>',
+            actionFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer abschließen');?>',
+            actionUnFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer wieder öffnen');?>',
+            actionEnd: '<?php echo $this->translate->_('Aufgabe komplett beenden');?>',
+            actionDelete: '<?php echo $this->translate->_('Aufgabe komplett löschen');?>',
+            actionLog: '<?php echo $this->translate->_('Ereignis-Protokoll');?>',
+            assocUser: '<?php echo $this->translate->_('Benutzer der Aufgabe zuweisen');?>', //FIXME remove me!
+            taskPrefs: '<?php echo $this->translate->_('Aufgabenspezifische Einstellungen');?>',
+            actionReOpen: '<?php echo $this->translate->_('beendete Aufgabe wieder öffnen');?>',
+            exp: '<?php echo $this->translate->_('Exportoptionen');?>',
+            actionExcelReimport: '<?php echo $this->translate->_('Excel Re-Importieren');?>',
+            projectOverview: '<?php echo $this->translate->_('zum Projekt springen');?>',
+            actionDeleteProject: '<?php echo $this->translate->_('Projekt komplett löschen');?>',
+            taskOverview: '<?php echo $this->translate->_('zur Aufgabe springen');?>'
+        }
+    });
+    
     Ext.define("Editor.locale.de.view.admin.task.ExcelReimportWindow", {
         override: "Editor.view.admin.task.ExcelReimportWindow",
         title: '<?php echo $this->translate->_('Excel reimportieren');?>',
@@ -824,7 +809,7 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.view.admin.task.PreferencesWindow", {
         override: "Editor.view.admin.task.PreferencesWindow",
-        title: '<?php echo $this->translate->_('Einstellungen zu Aufgabe "{0}"');?>',
+        title: '<?php echo $this->translate->_('Einstellungen zu Aufgabe: {currentTask.taskName}');?>',
         strings: {
             close: '<?php echo $this->translate->_('Fenster schließen');?>',
             events: '<?php echo $this->translate->_('Ereignisse');?>',
@@ -1093,7 +1078,7 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.view.admin.user.Grid", {
         override: "Editor.view.admin.user.Grid",
-        title: '<?php echo $this->translate->_('Benutzerverwaltung');?>',
+        title: '<?php echo $this->translate->_('Benutzer');?>',
         text_cols: {
             login: '<?php echo $this->translate->_('Login');?>',
             firstName: '<?php echo $this->translate->_('Vorname');?>',
@@ -1235,7 +1220,7 @@ Ext.define('Editor.controller.Localizer', {
 
     Ext.define("Editor.locale.view.admin.customer.Panel", {
     	override: "Editor.view.admin.customer.Panel",
-        title:'<?php echo $this->translate->_("Kundenübersicht");?>',
+        title:'<?php echo $this->translate->_("Kunden");?>',
         strings: {
             reload:'<?php echo $this->translate->_("Aktualisieren");?>',
             customerName:'<?php echo $this->translate->_("Kundenname");?>',

@@ -134,7 +134,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   handleAddUser: function(btn){
       var me = this,
           assoc = me.getAdminTaskUserAssocsStore(),
-          task = me.getPrefWindow().actualTask,
+          task = me.getPrefWindow().getCurrentTask(),
           meta = task.getWorkflowMetaData(),
           role = meta.steps2roles[task.get('workflowStepName')] || Ext.Object.getKeys(meta.roles)[0],
           state = Ext.Object.getKeys(meta.states)[0],
@@ -191,7 +191,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    */
   handleDeleteConfirmClick: function(grid, toDelete, btn) {
       var me = this,
-          task = me.getPrefWindow().actualTask,
+          task = me.getPrefWindow().getCurrentTask(),
           assoc = me.getAdminTaskUserAssocsStore();
       
       Ext.Array.each(toDelete, function(toDel){
@@ -221,7 +221,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   handleSaveAssoc: function (btn) {
       var me = this,
           form = me.getUserAssocForm(),
-          task = me.getPrefWindow().actualTask,
+          task = me.getPrefWindow().getCurrentTask(),
           store = me.getUserAssocGrid().store,
           rec = form.getRecord();
       form.getForm().updateRecord(rec);
@@ -260,7 +260,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   initState: function(roleCombo, newValue, oldValue) {
       var me = this,
           form = me.getUserAssocForm(),
-          task = me.getPrefWindow().actualTask,
+          task = me.getPrefWindow().getCurrentTask(),
           stateCombo = form.down('combo[name="state"]'),
           isCompetitive = task.get('usageMode') == task.USAGE_MODE_COMPETITIVE,
           newState = task.USER_STATE_OPEN,

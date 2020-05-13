@@ -26,12 +26,39 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.admin.Project', {
-	extend : 'Ext.data.Store',
-	model: 'Editor.model.admin.Project',
-	alias: 'store.project',
-	remoteSort: true,
-	remoteFilter: true,
-	autoLoad: true,
-	pageSize: false
+Ext.define('Editor.view.project.ProjectTaskGrid', {
+	extend: 'Editor.view.admin.TaskGrid',
+	alias: 'widget.projectTaskGrid',
+    requires:[
+    	'Editor.view.project.ProjectTaskGridViewController'
+	],
+	itemId: 'projectTaskGrid',
+	controller:'projectTaskGrid',
+	visibleColumns:[
+		'id',
+		'taskGridActionColumn',
+		'state',
+		'workflowStepName',
+		'segmentFinishCount',
+		'wordCount',
+		'taskName',
+		'relaisLang',
+		'targetLang',
+		'userCount',
+	],
+	height:200,
+	store: null,
+	autoLoad: false,
+	bufferedRenderer:false,//info: this will stop the store filter binding.
+
+    initConfig: function(instanceConfig) {
+        var me = this,
+        	config={
+        		dockedItems: [{}]
+        	};
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    }
 });

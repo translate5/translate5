@@ -40,7 +40,7 @@ Ext.define('Editor.view.admin.user.Grid', {
   stateId: 'adminUserGrid',
   stateful: true,
   cls: 'adminUserGrid',
-  title: '#UT#Benutzerverwaltung',
+  title: '#UT#Benutzer',
   helpSection: 'useroverview',
   glyph: 'xf0c0@FontAwesome',
   height: '100%',

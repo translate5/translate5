@@ -52,7 +52,8 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
       actionExcelReimport: '#UT# Excel Re-Importieren',
       projectOverview:'#UT#zum Projekt springen',
       taskOverview:'#UT#zur Aufgabe springen',
-      actionDeleteProject: '#UT#Projekt komplett löschen'
+      actionDeleteProject: '#UT#Projekt komplett löschen',
+      taskActionMenu:'#UT#Aufgabenmenü anzeigen'
   },
   
   /**
@@ -69,100 +70,29 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
             return Editor.app.authenticatedUser.isAllowed(item.isAllowedFor);
         },
         items:[{
-                // - öffnen
-                tooltip: me.messages.actionOpen,
-                isAllowedFor: 'editorOpenTask',
-                iconCls: 'ico-task-open',
-                sortIndex:1,//define the sort index (this is no extjs property, it is internaly used for sorting)
-            },{
-                // - read only öffnen
-                tooltip: me.messages.actionEdit,
-                isAllowedFor: 'editorEditTask',
-                iconCls: 'ico-task-edit',
-                sortIndex:2,
-            },{
-                // - abschließen (Recht editorFinishTask benötigt, setzt den TaskUser Status des aktuellen Users auf finish)
-                tooltip: me.messages.actionFinish,
-                isAllowedFor: 'editorFinishTask',
-                iconCls: 'ico-task-finish',
-                sortIndex:3,
-            },{
-                // - wieder öffnen (Recht editorUnFinishTask benötigt, setzt den TaskUser Status des aktuellen Users auf open, aktuell nicht gefordert)
-                tooltip: me.messages.actionUnFinish,
-                isAllowedFor: 'editorUnfinishTask',
-                iconCls: 'ico-task-unfinish',
-                sortIndex:4,
-            },{
-                // - beenden (Recht editorEndTask benötigt, setzt den Task auf Status ""end"")
-                tooltip: me.messages.actionEnd,
-                isAllowedFor: 'editorEndTask',
-                iconCls: 'ico-task-end',
-                sortIndex:5,
-            },{
-                // - wieder öffnen (Recht editorReOpenTask benötigt, setzt den Task auf Status ""open"")
-                tooltip: me.messages.actionReOpen,
-                isAllowedFor: 'editorReopenTask',
-                iconCls: 'ico-task-reopen',
-                sortIndex:6,
-            },{
-                tooltip: me.messages.taskPrefs,
-                isAllowedFor: 'editorPreferencesTask',
-                iconCls: 'ico-task-preferences',
-                sortIndex:7,
-            },{
-                tooltip: me.messages.actionClone,
-                isAllowedFor: 'editorCloneTask',
-                iconCls: 'ico-task-clone',
-                sortIndex:9,
-            },{
-                // - Export Icon, bei Klick darauf öffnet sich ein Menü mit den verschiedenen Export Möglichkeiten. 
-                // Die einzelnen Menüpunkte ebenfalls per isAllowed abfragen. 
-                tooltip: me.messages.exp,
-                isAllowedFor: 'editorShowexportmenuTask',
-                iconCls: 'ico-task-showexportmenu',
-                sortIndex:10,
-            },{
-                // - Excel Reimport Icon, bei Klick darauf öffnet sich der Datei-Upload-Dialog zum Reimport der Excel-Datei
-                tooltip: me.messages.actionExcelReimport,
-                isAllowedFor: 'editorExcelreimportTask',
-                iconCls: 'ico-task-excelreimport',
-                sortIndex:11,
-            },{
-                tooltip: me.messages.actionDelete,
-                isAllowedFor: 'editorDeleteTask',
-                iconCls: 'ico-task-delete',
-                sortIndex:12,
-            },{
-                tooltip: me.messages.actionLog,
-                isAllowedFor: 'editorLogTask',
-                iconCls: 'ico-task-log',
-                sortIndex:13,
-            },{
-                getTip:function(v,meta,record,row,col,store,table){
-                	if(table.ownerGrid.getXType()=='projectTaskGrid'){
-                		return me.messages.taskOverview;
-                	}
-                	return me.messages.projectOverview;
-                },
-                isAllowedFor: 'editorProjectTask',
-                iconCls: 'ico-task-project',
-                sortIndex:14
-            },{
-	            tooltip: me.messages.actionDeleteProject,
-	            isProjectActionIcon:true,
-	            isAllowedFor: 'editorDeleteProject',
-	            iconCls: 'ico-project-delete',
-	            sortIndex:15
-            }]
+        	tooltip: me.messages.taskActionMenu,
+            isAllowedFor: 'editorMenuTask',
+            iconCls: 'ico-task-menu',
+            sortIndex:1
+        },{
+          getTip:function(v,meta,record,row,col,store,table){
+	        	if(table.ownerGrid.getXType()=='projectTaskGrid'){
+	        		return me.messages.taskOverview;
+	        	}
+	        	return me.messages.projectOverview;
+	        },
+	        isAllowedFor: 'editorProjectTask',
+	        iconCls: 'ico-task-project',
+	        sortIndex:2
+        },{
+        	tooltip: me.messages.actionDeleteProject,
+            isProjectActionIcon:true,
+            isAllowedFor: 'editorDeleteProject',
+            iconCls: 'ico-project-delete',
+            sortIndex:3
+        }]
     };
 
-    //workaroud for fireevent (the component is not created yet so fake the event)
-    me.hasListeners={};
-    me.hasListeners['itemsinitialized']=true;
-    
-    //fire the event, so another action columns can be added from outside
-    me.fireEvent('itemsinitialized',config.items);
-    
     config.items=Ext.Array.sort(config.items,function(a,b){
         return a.sortIndex - b.sortIndex;
     });
@@ -181,4 +111,5 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
         items: config.items
     }, config)]);
   },
+  
 });

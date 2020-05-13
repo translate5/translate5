@@ -26,48 +26,26 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.ProjectPanel', {
+Ext.define('Editor.view.project.ProjectPanel', {
 	extend: 'Ext.panel.Panel',
 	alias: 'widget.projectPanel',
     requires:[
-    	'Editor.view.admin.ProjectGrid',
-    	'Editor.view.admin.ProjectTaskGrid',
-    	'Editor.view.admin.ProjectPanelViewController',
-    	'Editor.view.admin.task.UserAssoc'
+    	'Editor.view.project.ProjectGrid',
+    	'Editor.view.project.ProjectTaskGrid',
+    	'Editor.view.project.ProjectPanelViewController',
+    	'Editor.view.project.ProjectPanelViewModel',
+    	'Editor.view.admin.task.PreferencesWindow'
 	],
 	itemId: 'projectPanel',
 	controller:'projectPanel',
-	title: '#UT#Projektübersicht',
+	title: '#UT#Projekte',
 	glyph: 'xf0e8@FontAwesome',
 	layout: 'border',
-    collapsed: false,
     viewModel:{
-    	formulas:{
-    		//TODO: separate vm ?
-    		projectSelection:{
-    			bind:{
-    				bindTo:'{projectGrid.selection}',
-    				deep:true
-    			},
-    			get:function(sel){
-    				return sel;
-    			}
-    		},
-    		projectTaskSelection:{
-    			bind:{
-    				bindTo:'{projectTaskGrid.selection}',
-    				deep:true
-    			},
-    			get:function(sel){
-    				return sel;
-    			}
-    		}
-
-    	}
+    	type: 'projectPanel'
     },
-	
     strings:{
-    	projectTasksTitle:'#UT#Aufgaben für das Projekt: {selection.taskName}'
+    	projectTasksTitle:'#UT#Aufgaben für das Projekt: {projectSelection.taskName}'
     },
     initConfig: function(instanceConfig) {
         var me = this,
@@ -86,38 +64,30 @@ Ext.define('Editor.view.admin.ProjectPanel', {
                     region: 'east',
                     split: true,
                     resizable: true,
-                    layout: {
-                        type: 'accordion',
-                        animate: true
-                    },
-                    bodyBorder: true,
                     width:'75%',
+                    layout: {
+                        type: 'vbox',
+                        pack: 'start',
+                        align: 'stretch'
+                    },
                     items: [{
                     	xtype: 'projectTaskGrid',
                     	reference:'projectTaskGrid',
+                    	scrollable: true,
+                    	flex:0.3,
                     	bind:{
                     		title:me.strings.projectTasksTitle,
-		    				store:{
-		    					model:'Editor.model.admin.Task',
-		    					remoteSort: true,
-		    					remoteFilter: true,
-		    					pageSize: false,
-		    					filters:{
-		    		    			property: 'projectId',
-		    		        		operator:"eq",
-		    		        		value:'{projectSelection.projectId}'
-		    					}
-		    				}
+                    		store:'{projectTasks}'
 		    			}
-                    }
-                    //TODO: next step. Move the PreferencesWindow content in here
-//                    ,{
-//                    	xtype:'adminTaskUserAssoc',
-//                    	bind:{
-//                    		task:'{projectTaskSelection}'
-//                    	}
-//                    }
-                    ]
+                    },{
+                    	xtype:'adminTaskPreferencesWindow',
+                    	scrollable: true,
+                    	flex:0.7,
+                    	bind:{
+                    		disabled:'{!projectTaskSelection}',
+                    		currentTask:'{projectTaskSelection}'
+                    	}
+                    }]
         		}]
         };
         if (instanceConfig) {

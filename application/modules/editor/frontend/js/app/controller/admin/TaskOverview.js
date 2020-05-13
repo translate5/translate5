@@ -33,13 +33,13 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.admin.TaskOverview', {
   extend : 'Ext.app.Controller',
-  requires: ['Editor.view.admin.ExportMenu'],
+  requires: ['Editor.view.admin.ExportMenu','Editor.view.admin.TaskActionMenu'],
   models: ['admin.Task', 'admin.task.Log'],
   stores: [
 	  'admin.Users',
 	  'admin.UsersList',
 	  'admin.Tasks',
-	  'admin.Project',
+	  'project.Project',
 	  'admin.Languages', 
 	  'admin.task.Logs', 
 	  'admin.WorkflowUserRoles',
@@ -151,6 +151,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               hide: 'handleAfterHide',
               celldblclick: 'handleGridClick', 
               cellclick: 'handleGridClick',
+          },
+          '#adminTaskGrid': {
               filterchange:'onAdminTaskGridFilterChange'
           },
           '#adminTaskGrid #reload-task-btn': {
@@ -159,7 +161,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           '#adminTaskGrid taskActionColumn,#projectTaskGrid taskActionColumn': {
               click: 'taskActionDispatcher'
           },
-          '#adminTaskGrid #add-project-btn,#projectTaskGrid #add-project-btn': {
+          '#adminTaskGrid #add-project-btn,#projectGrid #add-project-btn': {
               click: 'handleTaskAddShow'
           },
           '#adminTaskGrid #export-meta-data-btn': {
@@ -196,6 +198,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
           'editorAdminTaskFilterFilterWindow':{
         	  advancedFilterChange:'onAdvancedFilterChange'
+          },
+          '#projectTaskGrid':{
+        	  selectionchange:'onProjectTaskGridSelectionChange'
+          },
+          '#taskActionMenu':{
+        	  click:'onTaskActionMenuClick'
           }
       }
   },
@@ -626,6 +634,66 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	 toolbar.loadFilters(taskStore.getFilters(false));
   },
   
+  /***
+   * On project task grid sellection.
+   * TODO: move this to separate project controller ?
+   */
+  onProjectTaskGridSelectionChange:function(grid,selection){
+	  var me=this;
+	  	  task=selection ? selection[0] : null;
+	  	  
+  	  if(!task){
+  		  return;
+  	  }
+  	  me.handleTaskPreferences(task);
+  },
+  
+  //TODO: merge me in one fucntion
+  onTaskActionMenuClick:function(com,item,ev){
+      var me = this,
+	      t =item,
+	      f = t.iconCls.match(/ico-task-([^ ]+)/),
+	      camelRe = /(-[a-z])/gi,
+	      camelFn = function(m, a) {
+	          return a.charAt(1).toUpperCase();
+	      },
+	      actionIdx = ((f && f[1]) ? f[1] : "not-existing"),
+	      //build camelized action out of icon css class:
+	      action = ('handleTask-'+actionIdx).replace(camelRe, camelFn),
+	      right = action.replace(/^handleTask/, 'editor')+'Task',
+	      task = com.task,
+	      confirm;
+	      
+	      if(! me.isAllowed(right)){
+	          return;
+	      }
+	      
+	      if(! me[action] || ! Ext.isFunction(me[action])){
+	          //fire event if no handler function for the action button is defined
+	          me.fireEvent('taskUnhandledAction', action, t, task);
+	          return;
+	      }
+
+	      if(!this.fireEvent('beforeTaskActionConfirm', action, task, function(){
+	          me[action](task, ev);
+	      })) {
+	          return;
+	      }
+	      
+	      //if NO confirmation string exists, we call the action unconfirmed. 
+	      if(! me.confirmStrings[actionIdx]) {
+	          me[action](task, ev);
+	          return; 
+	      }
+
+	      confirm = me.confirmStrings[actionIdx];
+	      Ext.Msg.confirm(confirm.title, confirm.msg, function(btn){
+	          if(btn == 'yes') {
+	              me[action](task, ev);
+	          }
+	      });
+  },
+  
   /**
    * calls local task handler, dispatching is done by the icon CSS class of the clicked img
    * the css class ico-task-foo-bar is transformed to the method handleTaskFooBar
@@ -835,6 +903,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       menu.showAt(event.getXY());
   },
   
+  
+  handleTaskMenu: function(task, event) {
+      var me = this,
+          menu;
+      menu = Ext.widget('taskActionMenu',{
+    	  task:task
+      });
+      menu.showAt(event.getXY());
+  },
+  
+  
   /**
    * displays the excel re-import fileupload dialog
    * @param {Editor.model.admin.Task} task
@@ -874,7 +953,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  var me=this,
 	      menu=me.getAdminMainSection(),
 	      activeTab=menu.getActiveTab().xtype,
-	      recirectTo='project/'+task.get('projectId');
+	      recirectTo='project/'+task.get('projectId')+'/'+task.get('id');
 	  if(activeTab=='projectPanel'){
 		  recirectTo='task';
 		  me.onAdvancedFilterChange({

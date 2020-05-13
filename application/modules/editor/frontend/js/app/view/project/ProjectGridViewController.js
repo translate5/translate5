@@ -25,7 +25,7 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-Ext.define('Editor.view.admin.ProjectGridViewController', {
+Ext.define('Editor.view.project.ProjectGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.projectGrid',
     strings: {
@@ -37,28 +37,10 @@ Ext.define('Editor.view.admin.ProjectGridViewController', {
     },
     
     /***
-     * Focus project row by given projectId
-     */
-    onProjectFocus:function(projectId){
-    	var me=this,
-    		sellection=me.getView().getSelectionModel().getSelection()[0],
-    		store=me.getView().getStore(),
-    		record=projectId ? store.getById(projectId) : sellection,
-    		view=me.getView();
-    	
-    	if(!record){
-    		record=store.getAt(0);
-    	}
-    	view.setSelection(record);
-    	view.getView().focusRow(record);
-    },
-
-    /***
      * Reload project button handler
      */
     onReloadProjectClick:function(){
     	this.reloadProjects();
-    	this.onProjectFocus();
     },
     
     /***
@@ -126,7 +108,7 @@ Ext.define('Editor.view.admin.ProjectGridViewController', {
             	projectId:taskProjectId
             },
             success: function(response){
-            	me.reloadProjects();
+            	me.handleProjectReload();
             	Editor.MessageBox.addSuccess(me.strings.projectRemovedMessage,2);
             },
             failure: function(response) {
@@ -144,21 +126,15 @@ Ext.define('Editor.view.admin.ProjectGridViewController', {
                  }
              });
          });
+    },
+    
+    handleProjectReload:function(){
+    	var me=this,
+    		projectPanel=me.getView().up('#projectPanel');
+    	me.reloadProjects().then(function(records) {
+    		projectPanel.getController().focusGridRecord(me.getView());
+		}, function(operation) {
+			Editor.app.getController('ServerException').handleException(operation.error.response);
+		});
     }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

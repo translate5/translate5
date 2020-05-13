@@ -25,29 +25,28 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-Ext.define('Editor.view.admin.ProjectPanelViewController', {
-    extend: 'Ext.app.ViewController',
-    alias: 'controller.projectPanel',
-    
-    routes: {
-    	'project': 'onProjectRoute',
-    	'project/:id' : 'onProjectRoute'
-	},
-	
-	onProjectRoute:function(id){
-		var me=this,
-			view=me.getView(),
-			route='project',
-			controller=view.down('#projectGrid').getController();
-		
-		if(id){
-			route=route+'/'+id
-		}
-		Editor.app.openAdministrationSection(this.getView(), route);
-		controller.reloadProjects().then(function(records) {
-			controller.onProjectFocus(id);
-		}, function(operation) {
-			Editor.app.getController('ServerException').handleException(operation.error.response);
-		});
+
+/**
+ * @class Editor.model.admin.Task
+ * @extends Ext.data.Model
+ */
+Ext.define('Editor.model.project.Project', {
+	extend: 'Editor.model.admin.Task',
+	//override the proxy, so default extra params can be set
+	proxy : {
+	    type : 'rest',
+	    url: Editor.data.restpath+'task',
+	    reader : {
+	      rootProperty: 'rows',
+	      type : 'json'
+	    },
+	    writer: {
+	      encode: true,
+	      rootProperty: 'data',
+	      writeAllFields: false
+	    },
+	    extraParams:{
+	    	projectsOnly:true
+	    }
 	}
 });

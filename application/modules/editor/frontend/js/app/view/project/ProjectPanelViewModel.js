@@ -25,28 +25,45 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+Ext.define('Editor.view.project.ProjectPanelViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.projectPanel',
+    formulas:{
+		projectSelection:{
+			bind:{
+				bindTo:'{projectGrid.selection}',
+				deep:true
+			},
+			get:function(sel){
+				return sel;
+			}
+		},
+		projectTaskSelection:{
+			bind:{
+				bindTo:'{projectTaskGrid.selection}',
+				deep:true
+			},
+			get:function(sel){
+				return sel;
+			}
+		}
 
-/**
- * @class Editor.model.admin.Task
- * @extends Ext.data.Model
- */
-Ext.define('Editor.model.admin.Project', {
-	extend: 'Editor.model.admin.Task',
-	//override the proxy, so default extra params can be set
-	proxy : {
-	    type : 'rest',
-	    url: Editor.data.restpath+'task',
-	    reader : {
-	      rootProperty: 'rows',
-	      type : 'json'
-	    },
-	    writer: {
-	      encode: true,
-	      rootProperty: 'data',
-	      writeAllFields: false
-	    },
-	    extraParams:{
-	    	projectsOnly:true
-	    }
-	}
+	},
+	stores: {
+		//this store is defined here because the reference filter binding is required
+		projectTasks: {
+			model:'Editor.model.admin.Task',
+			remoteSort: true,
+			remoteFilter: true,
+			pageSize: false,
+			listeners:{
+				endupdate:'onProjectTasksEndUpdate'
+			},
+			filters:{
+    			property: 'projectId',
+        		operator:"eq",
+        		value:'{projectSelection.projectId}'
+			}
+		}
+    }
 });

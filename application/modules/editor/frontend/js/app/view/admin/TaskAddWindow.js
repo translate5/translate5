@@ -43,7 +43,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     viewModel: {
         type: 'adminTaskAddWindow'
     },
-    title: '#UT#Aufgabe erstellen',
+    title: '#UT#Projekt erstellen',
     strings: {
         importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (Angabe notwendig)',
         importUploadLabel: '#UT#Import Datei¹',

@@ -44,11 +44,8 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   viewModel: {
       type: 'taskuserassoc'
   },
-  layout: {
-      type: 'border'
-  },
   title: '#UT#Benutzer-Plural',
-  
+  layout:'border',
   initConfig: function(instanceConfig) {
     var me = this,
         config;
@@ -157,23 +154,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
     }
     return me.callParent([config]);
   },
-  initComponent: function() {
-      var me = this,
-          vm = me.lookupViewModel(),
-          states = [],
-          roles = [],
-          metaData = vm.get('currentTask').getWorkflowMetaData();
-      
-      Ext.Object.each(metaData.states, function(key, state) {
-          states.push({id: key, text: state});
-      });
-      Ext.Object.each(metaData.editableRoles, function(key, role) {
-          roles.push({id: key, text: role});
-      });
-      vm.set('statesData', states);
-      vm.set('rolesData', roles);
-      me.callParent(arguments);
-  },
+  
   /**
    * loads all or all available users into the dropdown, the store is reused to get the username to userguids
    * @param {Boolean} edit true if edit an assoc, false if add a new one
