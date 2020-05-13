@@ -96,7 +96,7 @@ class editor_Models_Import {
             
             $this->events->trigger('beforeImport', $this, array(
                     'task' => $this->task,
-                    'importFolder'=>$this->importConfig->importFolder
+                    'importFolder' => $this->importConfig->importFolder
             ));
         }
         catch (Exception $e) {
