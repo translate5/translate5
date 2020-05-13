@@ -99,7 +99,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             if (in_array('hardReturn', $match)) {
                 return '<hardReturn/>';
             }
-            return implode($match);
+            return $match[0];
         };
         $segmentWithHardReturns = preg_replace_callback(self::REGEX_INTERNAL_TAGS, $replacer, $segment);
         return explode('<hardReturn/>',$segmentWithHardReturns);
