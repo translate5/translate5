@@ -5,8 +5,8 @@
 <body>
 
 <trans-unit id="3">
-<source>Dies ist ein einfacher Satz (aus task-template: maxWidth 70,  maxNumberOfLines 3, size-unit pixel).</source>
-<target>Dies ist ein einfacher Satz (aus task-template: maxWidth 70,  maxNumberOfLines 3, size-unit pixel).</target>
+<source>Dies ist ein einfacher Satz (aus task-template: maxWidth 200,  maxNumberOfLines 3, size-unit pixel).</source>
+<target>Dies ist ein einfacher Satz (aus task-template: maxWidth 200,  maxNumberOfLines 3, size-unit pixel).</target>
 </trans-unit>
 
 <trans-unit id="4">
@@ -14,14 +14,14 @@
 <target>Dasselbe in kurz.</target>
 </trans-unit>
 
-<trans-unit id="5" translate5:maxNumberOfLines="1" maxwidth="600" size-unit="pixel">
+<trans-unit id="5" translate5:maxNumberOfLines="1" maxwidth="600">
 <source> Dies ist ein Satz zum Testen für maximal 1 Zeile und maxWidth 600.    </source>
 <target> Dies ist ein Satz zum Testen für maximal 1 Zeile und maxWidth 600.    </target>
 </trans-unit>
 
-<trans-unit id="6" translate5:maxNumberOfLines="2" minwidth="20" maxwidth="300" size-unit="pixel">
-<source> Dies ist ein Satz zum Testen für maximal 2 Zeilen, minwidth 20, maxWidth 300.    </source>
-<target> Dies ist ein Satz zum Testen für maximal 2 Zeilen, minwidth 20, maxWidth 300.    </target>
+<trans-unit id="6" translate5:maxNumberOfLines="2" minwidth="100" maxwidth="300" size-unit="pixel">
+<source> Dies ist ein Satz zum Testen für maximal 2 Zeilen, minwidth 100, maxWidth 300.    </source>
+<target> Dies ist ein Satz zum Testen für maximal 2 Zeilen, minwidth 100, maxWidth 300.    </target>
 </trans-unit>
 
 <trans-unit id="7" translate5:maxNumberOfLines="2" maxwidth="600" size-unit="pixel">
