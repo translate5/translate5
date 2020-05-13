@@ -408,12 +408,14 @@ body.segment-size-6 .segment-font-sizable {font-size: 19pt !important;line-heigh
 body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.add, 
 body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.edit {display:none;}
 
-
 .autoState-999,
 .ico-loading {background-image: url("../images/loading_ico.gif");}
 .autoState-999 {background-position: center;background-repeat: no-repeat;}
 .ico-refresh {background-image: url("../images/arrow_refresh_small.png");}
 .ico-notify-user {background-image: url("../images/email_go.png");}
+.ico-available {background-image: url("../images/finalized.png");}
+.ico-unavailable {background-image: url("../images/do_not_use.png");}
+
 .autoState-998 {
 	background-image: url(../images/typing.gif);
 	background-size: contain;

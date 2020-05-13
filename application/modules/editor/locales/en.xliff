@@ -3758,6 +3758,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QXVmZ2FiZW5tZW7DvCBhbnplaWdlbg=='><source>Aufgabenmenü anzeigen</source><target>Show task menu</target></trans-unit>
 <trans-unit id='UHJvamVrdCBlcnN0ZWxsZW4='><source>Projekt erstellen</source><target>Create project</target></trans-unit>
 <trans-unit id='UHJvamVrdG5hbWXCuQ=='><source>Projektname¹</source><target>Project name</target></trans-unit>
+<trans-unit id='SGluenVnZWbDvGd0'><source>Hinzugefügt</source><target>Added</target></trans-unit>
 </body>
   </file>
 </xliff>
