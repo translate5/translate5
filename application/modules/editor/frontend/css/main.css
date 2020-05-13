@@ -559,6 +559,9 @@ tr.customState td div {font-style: italic;}
 /* Key Performance Indicators (KPI) */
 .ico-kpi {background-image: url("../images/page_gear.png");}
 
+.x-action-col-icon{
+	margin-right:5px;
+}
 /* Display */
 .adminTaskGrid tr .x-action-col-icon,
 .adminTaskGrid tr.customState td .x-action-col-icon,
