@@ -57,76 +57,86 @@ Ext.define('Editor.view.admin.TaskActionMenu', {
 	            return Editor.app.authenticatedUser.isAllowed(item.isAllowedFor);
 	        },
 	        items:[{
-		    	itemId: 'editorOpenTask',
 		        // - öffnen
 		        text: me.messages.actionOpen,
 		        isAllowedFor: 'editorOpenTask',
-		        iconCls: 'ico-task-open',
+		        glyph: 'f06e@FontAwesome5FreeSolid',
+		        itemId: 'ico-task-open',
 		        sortIndex:1,//define the sort index (this is no extjs property, it is internaly used for sorting)
 		    },{
 		        // - read only öffnen
 		        text: me.messages.actionEdit,
-		        itemId: 'editorEditTask',
 		        isAllowedFor: 'editorEditTask',
-		        iconCls: 'ico-task-edit',
+		        glyph: 'f044@FontAwesome5FreeSolid',
+		        itemId: 'ico-task-edit',
 		        sortIndex:2,
 		    },{
 		        // - abschließen (Recht editorFinishTask benötigt, setzt den TaskUser Status des aktuellen Users auf finish)
 		        text: me.messages.actionFinish,
 		        isAllowedFor: 'editorFinishTask',
-		        iconCls: 'ico-task-finish',
+		        glyph: 'f00c@FontAwesome5FreeSolid',
+		        itemId: 'ico-task-finish',
 		        sortIndex:3,
 		    },{
 		        // - wieder öffnen (Recht editorUnFinishTask benötigt, setzt den TaskUser Status des aktuellen Users auf open, aktuell nicht gefordert)
 		        text: me.messages.actionUnFinish,
 		        isAllowedFor: 'editorUnfinishTask',
-		        iconCls: 'ico-task-unfinish',
+		        glyph: 'f28d@FontAwesome5FreeSolid',
+		        itemId: 'ico-task-unfinish',
 		        sortIndex:4,
 		    },{
 		        // - beenden (Recht editorEndTask benötigt, setzt den Task auf Status ""end"")
 		        text: me.messages.actionEnd,
 		        isAllowedFor: 'editorEndTask',
-		        iconCls: 'ico-task-end',
+		        glyph: 'f28d@FontAwesome5FreeSolid',
+		        itemId: 'ico-task-end',
 		        sortIndex:5,
 		    },{
 		        // - wieder öffnen (Recht editorReOpenTask benötigt, setzt den Task auf Status ""open"")
 		        text: me.messages.actionReOpen,
 		        isAllowedFor: 'editorReopenTask',
-		        iconCls: 'ico-task-reopen',
+		        glyph: 'f100@FontAwesome5FreeSolid',
+		        itemId: 'ico-task-reopen',
 		        sortIndex:6,
 		    },{
 		        text: me.messages.taskPrefs,
 		        isAllowedFor: 'editorPreferencesTask',
-		        iconCls: 'ico-task-preferences',
+		        glyph: 'f085@FontAwesome5FreeSolid',
+		        itemId: 'ico-task-preferences',
 		        sortIndex:7,
 		    },{
 		        text: me.messages.actionClone,
 		        isAllowedFor: 'editorCloneTask',
-		        iconCls: 'ico-task-clone',
+		        glyph: 'f24d@FontAwesome5FreeSolid',
+		        itemId: 'ico-task-clone',
 		        sortIndex:9,
 		    },{
 		        // - Export Icon, bei Klick darauf öffnet sich ein Menü mit den verschiedenen Export Möglichkeiten. 
 		        // Die einzelnen Menüpunkte ebenfalls per isAllowed abfragen. 
 		        text: me.messages.exp,
 		        isAllowedFor: 'editorShowexportmenuTask',
-		        iconCls: 'ico-task-showexportmenu',
+		        itemId: 'ico-task-showexportmenu',
+		        glyph: 'f56e@FontAwesome5FreeSolid',
 		        sortIndex:10,
 		        menu:me.getExportTaskOptionsMenu(instanceConfig.task)
 		    },{
 		        // - Excel Reimport Icon, bei Klick darauf öffnet sich der Datei-Upload-Dialog zum Reimport der Excel-Datei
 		        text: me.messages.actionExcelReimport,
 		        isAllowedFor: 'editorExcelreimportTask',
-		        iconCls: 'ico-task-excelreimport',
+		        glyph: 'f1c3@FontAwesome5FreeSolid',
+		        itemId: 'ico-task-excelreimport',
 		        sortIndex:11,
 		    },{
 		        text: me.messages.actionDelete,
 		        isAllowedFor: 'editorDeleteTask',
-		        iconCls: 'ico-task-delete',
+		        glyph: 'f014@FontAwesome',
+		        itemId: 'ico-task-delete',
 		        sortIndex:12,
 		    },{
 		        text: me.messages.actionLog,
 		        isAllowedFor: 'editorLogTask',
-		        iconCls: 'ico-task-log',
+		        glyph: 'f1da@FontAwesome5FreeSolid',
+		        itemId: 'ico-task-log',
 		        sortIndex:13,
 		    }]
 	    };

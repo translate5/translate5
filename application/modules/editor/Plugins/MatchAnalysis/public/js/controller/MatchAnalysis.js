@@ -126,7 +126,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     onTaskActionColumnItemsInitialized: function(items) {
         items.push({
             text:this.strings.taskGridIconTooltip,
-            iconCls: 'ico-task-analysis',
+            itemId: 'ico-task-analysis',
+            glyph: 'f200@FontAwesome5FreeSolid',
             isAllowedFor: 'editorAnalysisTask',
             sortIndex:8
         });

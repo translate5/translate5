@@ -385,6 +385,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       if(!me.isAllowed('editorOpenTask', task) && !me.isAllowed('editorEditTask', task)){
           return;
       }
+      //TODO: task route. And on task leave focus the task in project overview
+      me.redirectTo('');
       Editor.util.TaskActions.openTask(task, readonly);
   },
   handleTaskLog: function(task) {
@@ -652,7 +654,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   onTaskActionMenuClick:function(com,item,ev){
       var me = this,
 	      t =item,
-	      f = t.iconCls.match(/ico-task-([^ ]+)/),
+	      f = t.itemId.match(/ico-task-([^ ]+)/),
 	      camelRe = /(-[a-z])/gi,
 	      camelFn = function(m, a) {
 	          return a.charAt(1).toUpperCase();
