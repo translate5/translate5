@@ -1228,10 +1228,6 @@ E-Mail: service@MittagQI.com</pre>
                     <b> QM sub-segment markers </b> are currently only exported for the file-type CSV.
                 </target>
             </trans-unit>
-            <trans-unit id="UHJvamVrdMO8YmVyc2ljaHQ=">
-                <source>Projektübersicht</source>
-                <target>Task Overview</target>
-            </trans-unit>
             <trans-unit id="dHJhbnNsYXRlNSAtIE9wZW4tU291cmNlLUxla3RvcmF0IGbDvHIgZGVuIEJyb3dzZXI=">
                 <source>translate5 - Open-Source-Lektorat für den Browser</source>
                 <target>translate5 - open source reviewing environment for the browser</target>
@@ -1386,7 +1382,6 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id="UmVmZXJlbnpkYXRlaWVu"><source>Referenzdateien</source><target>Reference files</target></trans-unit>
 <trans-unit id="YmVzdGVsbHQ="><source>bestellt</source><target>Ordered</target></trans-unit>
 <trans-unit id="U291cmNlZWRpdGluZw=="><source>Sourceediting</source><target>Sourceediting</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSBlcnN0ZWxsZW4="><source>Aufgabe erstellen</source><target>Create task</target></trans-unit>
 <trans-unit id="V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTVjsgQW5nYWJlIG5vdHdlbmRpZyk="><source>Wählen Sie die zu importierenden Daten (ZIP, CSV; Angabe notwendig)</source><target>Select the data to be imported (ZIP, CSV, specifying required)</target></trans-unit>
 <trans-unit id="SW1wb3J0IERhdGVpwrk="><source>Import Datei¹</source><target>Import file¹</target></trans-unit>
 <trans-unit id="QXVmdHJhZ3NudW1tZXI="><source>Auftragsnummer</source><target>Order number</target></trans-unit>
