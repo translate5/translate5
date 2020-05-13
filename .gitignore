@@ -10,3 +10,5 @@ data/dummyTm_*
 #needed for automated tests on server:
 public/scheduled-tests-trigger.php
 public/scheduled-tests/*
+/vendor
+/composer.lock
