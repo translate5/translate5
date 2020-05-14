@@ -26,19 +26,6 @@
 -- */
 
 
--- (1) new: max. number of lines for segments
-
--- additions for segment's meta
-ALTER TABLE `LEK_segments_meta`
-ADD `maxNumberOfLines` INT(3) DEFAULT NULL COMMENT 'max. number of lines in pixel-based length check' AFTER `maxWidth`;
-
--- default value for number of lines
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES 
-('runtimeOptions.lengthRestriction.maxNumberOfLines', '1', 'editor', 'system', '1', '1', '', 'integer', 'Default max. number of  lines in pixel-based length check.');
-
--- Migration-script
-UPDATE `LEK_segments_meta` SET `maxNumberOfLines` = 1 WHERE `sizeUnit` = 'pixel';
-
--- (2) restructure config according to structure of task-templates
+-- restructure config according to structure of task-templates (tbc)
 
 UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.lengthRestriction.pixelMapping' WHERE `name` = 'runtimeOptions.pixelMapping.pixelWidths';

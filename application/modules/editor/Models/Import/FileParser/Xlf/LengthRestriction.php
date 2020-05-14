@@ -73,7 +73,7 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
                     $conf = $taskTemplateConf->pixelmapping->$key ?? null;
                     break;
                 case 'maxNumberOfLines':
-                    $conf = $taskTemplateConf->$key ?? $configConf->$key;
+                    $conf = $taskTemplateConf->$key ?? null;
                     break;
                 default:
                     $conf = $taskTemplateConf->$key ?? null;

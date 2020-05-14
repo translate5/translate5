@@ -58,7 +58,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
                 $errorCode = 'E1066';
                 break;
             }
-            if(array_key_exists('segmentTooManyLines', $errors) || array_key_exists('segmentLinesTooLong', $errors)){
+            if(array_key_exists('segmentTooManyLines', $errors) || array_key_exists('segmentLinesTooLong', $errors) || array_key_exists('segmentLinesTooShort', $errors)){
                 $errorCode = 'E1259';
                 break;
             }
@@ -153,7 +153,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
       $sizeUnit = empty($meta['sizeUnit']) ? editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT : $meta['sizeUnit'];
       $isPixelBased = ($sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING);
       
-      if ($isPixelBased && array_key_exists('maxNumberOfLines',$meta) && $meta['maxNumberOfLines'] > 1) {
+      if ($isPixelBased && array_key_exists('maxNumberOfLines',$meta)) {
           return $this->validateLengthForLines($value, $field);
       } else {
           return $this->validateLengthForSegmentAndSiblings($value, $field);
@@ -173,34 +173,41 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
       }
       $meta = json_decode($data->metaCache, true);
       
-      // Validation if $isPixelBased and if isset($meta['maxNumberOfLines'] has been done already,
-      // otherwise we wouldn't be here.
-      if(!array_key_exists('maxWidth', $meta) || empty($meta['maxWidth'])) {
-          return false;
-      }
+      $isValid = true;
             
       $tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
       /* @var $tagHelper editor_Models_Segment_InternalTag */
       $allLines = $tagHelper->getLinesAccordingToNewlineTags($value);
-      
       if(count($allLines) > $meta['maxNumberOfLines']) {
           $this->addMessage($field, 'segmentTooManyLines', 'There are '.count($allLines).' lines in the segment, but only '.$meta['maxNumberOfLines'] . ' lines are allowed.');
-          return false;
+          $isValid = false;
       }
       
-      foreach ($allLines as $key => $line) {
-          $errors = [];
-          $length = (int)$this->entity->textLengthByMeta($line, $this->entity->meta());
-          if ($length > $meta['maxWidth']) {
-              $errors[] = ($key+1) . ': ' . $length;
+      $checkMaxWidth = (array_key_exists('maxWidth', $meta) && !empty($meta['maxWidth']));
+      $checkMinWidth = (array_key_exists('minWidth', $meta) && !empty($meta['minWidth']));
+      if ($checkMinWidth || $checkMaxWidth) {
+          $errorsMaxWidth = [];
+          $errorsMinWidth = [];
+          foreach ($allLines as $key => $line) {
+              $length = (int)$this->entity->textLengthByMeta($line, $this->entity->meta());
+              if ($checkMaxWidth && $length > $meta['maxWidth']) {
+                  $errorsMaxWidth[] = ($key+1) . ': ' . $length;
+              }
+              if ($checkMinWidth && $length < $meta['minWidth']) {
+                  $errorsMinWidth[] = ($key+1) . ': ' . $length;
+              }
           }
-          if (count($errors) > 0) {
-              $this->addMessage($field, 'segmentLinesTooLong', 'Not all lines in the segment match the given maximal length: ' . implode('; ', $errors));
-              return false;
+          if (count($errorsMaxWidth) > 0) {
+              $this->addMessage($field, 'segmentLinesTooLong', 'Not all lines in the segment match the given maximal length: ' . implode('; ', $errorsMaxWidth));
+              $isValid = false;
+          }
+          if (count($errorsMinWidth) > 0) {
+              $this->addMessage($field, 'segmentLinesTooShort', 'Not all lines in the segment match the given minimal length: ' . implode('; ', $errorsMinWidth));
+              $isValid = false;
           }
       }
       
-      return true;
+      return $isValid;
   }
   
   /**

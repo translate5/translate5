@@ -69,7 +69,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   duplicatedContentTags: [],
   contentEdited: false, //is set to true if text content or content tags were modified
   disableErrorCheck: false,
-  segmentLengthStatus: 'segmentLengthValid', // see Editor.view.segments.MinMaxLength.lengthstatus
+  segmentLengthStatus: ['segmentLengthValid'], // see Editor.view.segments.MinMaxLength.lengthstatus
   lastSegmentLength:null,
   currentSegment: null,
   statusStrip: null,
@@ -744,7 +744,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           meta = me.currentSegment.get('metaCache');
       
       //if the segment length is not in the defined range, add an error message - not disableable, so before disableErrorCheck
-      if(Editor.data.segments.enableCountSegmentLength && me.segmentLengthStatus !== 'segmentLengthValid') { // see Editor.view.segments.MinMaxLength.lengthstatus
+      if(Editor.data.segments.enableCountSegmentLength && !me.segmentLengthStatus.includes('segmentLengthValid')) { // see Editor.view.segments.MinMaxLength.lengthstatus
           //fire the event, and get the message from the segmentminmaxlength component
           msg = Ext.ComponentQuery.query('#segmentMinMaxLength')[0].renderErrorMessage(meta, me.segmentLengthStatus);
           me.fireEvent('contentErrors', me, msg, false);
