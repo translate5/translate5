@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -87,7 +87,7 @@ class editor_Models_Segment_RepetitionHash {
     
     /**
      * Creates the segment value hash for the repetition editor
-     * 
+     *
      * @param string $value
      * @param string $additionalValue
      * @return string
@@ -95,7 +95,7 @@ class editor_Models_Segment_RepetitionHash {
     protected function generateHash($value, $additionalValue) {
         $value = $this->tagHelper->replace($value, function($match) {
             //whitespace tags and real tags can not replaced by each other, so they must be different in the hash,
-            // so: "Das<x>Haus" may not be a repetition anymore of "DasTABHaus", even TAB and <x> are both replaced with an internal tag  
+            // so: "Das<x>Haus" may not be a repetition anymore of "DasTABHaus", even TAB and <x> are both replaced with an internal tag
             if(in_array($match[3], editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
                 return '<internal-ws-tag>';
             }
@@ -116,7 +116,7 @@ class editor_Models_Segment_RepetitionHash {
      * @return mixed
      */
     protected function getCountSourceEditing($segmentValue, $targetValue) {
-        //if target is empty, the source count must be ignored, to generate equal hashes for empty targets 
+        //if target is empty, the source count must be ignored, to generate equal hashes for empty targets
         // otherwise the translation task recognition is not working properly
         if(!$this->isSourceEditing || empty($targetValue)) {
             return '';
