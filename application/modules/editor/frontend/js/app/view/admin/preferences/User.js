@@ -39,8 +39,8 @@ Ext.define('Editor.view.admin.preferences.User', {
     controller: 'preferencesUser',
     alias: 'widget.preferencesUser',
     title: '#UT#Meine Einstellungen',
-    glyph: 'xf007@FontAwesome',
-    //glyph: 'xf4fe@FontAwesome', to old fontawesome!
+    //glyph: 'xf007@FontAwesome',
+    glyph: 'xf4fe@FontAwesome5FreeSolid',
     strings: {
         editPassword: '#UT#Passwort ändern',
         password: '#UT#Passwort',
