@@ -578,6 +578,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
 
         $this->_helper->Api->convertLanguageParameters($this->data['sourceLang']);
+        $this->entity->setSourceLang($this->data['sourceLang']);
 
         //with projects multiple targets are supported:
         foreach($this->data['targetLang'] as &$target) {
@@ -595,6 +596,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
 
         $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
+        $this->entity->setRelaisLang($this->data['relaisLang']);
     }
 
     /**
