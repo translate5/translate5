@@ -47,6 +47,10 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 		if(!record){
 			record=store.getAt(0);
 		}
+		
+		if(!record){
+			return;
+		}
 		grid.setSelection(record);
 		grid.getView().focusRow(record);
     },
@@ -72,6 +76,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 			me.focusGridRecord(projectGrid,id);
 			//reload the projectTaskGrid store
 			//this will also trigger the selection
+			projectTaskGrid.getStore().removeAll(true);
 			projectTaskGrid.getStore().load();
 		}, function(operation) {
 			Editor.app.getController('ServerException').handleException(operation.error.response);

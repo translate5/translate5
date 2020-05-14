@@ -396,13 +396,17 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     updateTaskAssocPanelViewModel:function(assocStore){
         var me=this,
-            pnl=me.getLanguageResourceTaskAssocPanel(),
+        	panels=Ext.ComponentQuery.query('languageResourceTaskAssocPanel'),
             store=assocStore ? assocStore : (me.getTaskAssocGrid() ? me.getTaskAssocGrid() : null);
-        if(!pnl || !store){
+        if(!panels || panels.length<1 || !store){
             return;
         }
-        //set the view model items variable
-        pnl.getViewModel().set('items',(store.getData().getSource() || store.getData()).getRange());
+        for(var i=0;i<panels.length;i++){
+        	var pnl=panels[i],
+        		vm=pnl.getViewModel();
+    		//set the view model items variable
+    		vm && vm.set('items',(store.getData().getSource() || store.getData()).getRange());
+        }
     },
     
     /***
@@ -439,11 +443,12 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     onImportStateCheckFinished:function(taskOverview,record){
     	var me=this,
-    		taskWindow=me.getAdminTaskPreferencesWindow();
-    	if(!taskWindow){
+    		taskWindow=me.getAdminTaskPreferencesWindow(),
+    		currentTask=taskWindow.getCurrentTask();
+    	if(!taskWindow || !currentTask){
     		return;
     	}
-    	if(record.get('taskGuid')==taskWindow.getCurrentTask().get('taskGuid')){
+    	if(record.get('taskGuid')==currentTask.get('taskGuid')){
     		me.removeLoadingMask(true);
     	}
     },
