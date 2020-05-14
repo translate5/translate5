@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -131,7 +131,7 @@ abstract class editor_ImageTag {
     }
     
     /**
-     * returns the Html Tag used in the editor for this tag type. 
+     * returns the Html Tag used in the editor for this tag type.
      * The Tag template can contain "{varnames}" in curly braces (like in ExtJS)
      * These {varnames} are replaced by the content of the given assoc array.
      * @param array $parameters an assoc array; keys => varnames WITHOUT curly braces, value => value to replace the varname
@@ -142,7 +142,7 @@ abstract class editor_ImageTag {
             $parameters['length'] = -1;
         }
         if(! isset($parameters['title'])) {
-            $parameters['title'] = $parameters['text'];
+            $parameters['title'] = htmlspecialchars($parameters['text'], ENT_COMPAT, null, false);
         }
         $keys = array_map(function($k){
             return '{'.$k.'}';

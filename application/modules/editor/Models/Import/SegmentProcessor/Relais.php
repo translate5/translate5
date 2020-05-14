@@ -122,7 +122,7 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
             //try loading via fileId and Mid
             $this->segment->loadByFileidMid($this->fileId, $mid);
         } catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            //if above was not successful, load via segmentNrInTask
+            //if above was not successful, load via segmentNrInTask (the mid is only for logging!)
             $loadBySegmentNr = $this->loadSegmentByNrInTask($parser->getMid());
             if(!$loadBySegmentNr) {
                 //if no segment was found via segmentNr, we ignore it
@@ -133,6 +133,7 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         
         //if content is not equal, but was loaded with mid, try to load with segment nr and compare again
         if(!$contentIsEqual && !$loadBySegmentNr){
+            //load via segmentNrInTask (the mid is only for logging!)
             if(!$this->loadSegmentByNrInTask($parser->getMid())) {
                 return false;
             }
