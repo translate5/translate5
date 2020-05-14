@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -46,16 +46,16 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
         // for a better implementation see Export Namespaces
         if (strpos($xliff, editor_Models_Import_FileParser_Xlf_TmgrNamespace::IBM_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['ibm'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_TmgrNamespace');
-        } 
+        }
         if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Translate5Namespace::TRANSLATE5_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['translate5'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_Translate5Namespace');
-        } 
+        }
         if (strpos($xliff, editor_Models_Import_FileParser_Xlf_AcrossNamespace::ACROSS_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['across'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_AcrossNamespace');
-        } 
+        }
         if (strpos($xliff, editor_Models_Import_FileParser_Xlf_MemoQNamespace::MEMOQ_XLIFF_NAMESPACE) !== false) {
             $this->namespaces['memoq'] = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_MemoQNamespace');
-        } 
+        }
     }
     
     /**
@@ -68,7 +68,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
     }
     
     /**
-     * 
+     *
      * @param array $attributes
      * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes
      */
@@ -105,7 +105,8 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
      * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::useTagContentOnly()
      */
     public function useTagContentOnly(){
-        return $this->call(__FUNCTION__, func_get_args());
+        //using null as default value should trigger further investigation if the tag content should be used or not
+        return $this->call(__FUNCTION__, func_get_args(), null);
     }
     
     /**
@@ -116,8 +117,14 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
         return $this->call(__FUNCTION__, func_get_args());
     }
     
-    protected function call($function, $arguments) {
-        $result = false;
+    /**
+     * calls the function in each namespace object, passes the arguments
+     * @param string $function
+     * @param array $arguments
+     * @param boolean $result optional, the default result if no namespace was found
+     * @return string|mixed
+     */
+    protected function call(string $function, array $arguments, $result = false) {
         foreach ($this->namespaces as $namespace){
             $result = call_user_func_array([$namespace, $function], $arguments);
             //if one of the callen namespace handlers produces a result, we return this and end the loop
