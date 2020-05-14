@@ -64,7 +64,7 @@ Ext.define('Editor.view.project.ProjectPanel', {
                     region: 'east',
                     split: true,
                     resizable: true,
-                    width:'75%',
+                    width:'50%',
                     layout: {
                         type: 'vbox',
                         pack: 'start',

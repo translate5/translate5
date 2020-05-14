@@ -66,6 +66,11 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'adminTaskUserAssoc'
             });
         }
+        
+        tabs.push({
+        	xtype: 'languageResourceTaskAssocPanel'
+        });
+        
         if(auth.isAllowed('editorWorkflowPrefsTask')) {
             tabs.push({
                 xtype: 'editorAdminTaskPreferences'

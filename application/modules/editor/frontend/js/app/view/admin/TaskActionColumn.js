@@ -85,7 +85,8 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
 	        iconCls: 'ico-task-project',
 	        sortIndex:2
         },{
-        	tooltip: me.messages.actionDeleteProject,
+        	//tooltip: me.messages.actionDeleteProject,
+        	tooltip: me.messages.taskActionMenu,//TODO: for the demo show the menu icon in the project dropdown.
             isProjectActionIcon:true,
             isAllowedFor: 'editorDeleteProject',
             iconCls: 'ico-project-delete',

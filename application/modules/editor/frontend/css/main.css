@@ -554,7 +554,7 @@ tr.customState td div {font-style: italic;}
 .ico-task-excelreimport {background-image: url("../images/table_back.png");}
 */
 .ico-task-project:before {font-family: FontAwesome5FreeSolid;content: "\f35d";}
-.ico-project-delete:before {font-family: FontAwesome;content: "\f014";}
+.ico-project-delete:before {font-family: FontAwesome;content: "\f0c9";}
 
 /* Key Performance Indicators (KPI) */
 .ico-kpi {background-image: url("../images/page_gear.png");}
