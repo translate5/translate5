@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -154,7 +154,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     protected function createTag($rid, $tag, $originalContent, $text = null) {
         if($this->removeTags){
-            return ''; 
+            return '';
         }
         switch ($tag) {
             case 'x':
@@ -170,7 +170,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
                 $rid = md5(preg_replace('#<sub>.*</sub>#','<sub/>',$originalContent));
                 break;
             case 'bpt':
-                //the tagNr depends here on the existence of an entry with the same RID 
+                //the tagNr depends here on the existence of an entry with the same RID
                 // if yes, take this value
                 // if no, increase and set the new value as new tagNr to that RID
                 // for g tags: RID = 'g-'.$openerKey;
@@ -179,14 +179,14 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
                 break;
             case 'g-close':
                 //g-close tag is just a hack to distinguish between open and close
-                $tag = 'g'; 
+                $tag = 'g';
             case 'ept':
                 $type = '_rightTag';
                 break;
             default:
                 return '<b>Programming Error! invalid tag type used!</b>';
         }
-        if(empty($text)&&$text!=="0") {
+        if(strlen($text) === 0) {
             $text = htmlentities($originalContent);
         }
         $tagNr = $this->getShortTagNumber($rid);
@@ -208,7 +208,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             return $id;
         }
         //according to the spec all tags must have an ID, so if we get here,
-        // this is invalid and we have to fake an identifier. 
+        // this is invalid and we have to fake an identifier.
         // tagnumbering may then not be correct!
         if(empty($openerMeta['fakedRid'])){
             $openerMeta['fakedRid'] = $openerMeta['tag'].'-'.$openerMeta['openerKey'];
@@ -218,9 +218,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     
     /**
      * returns the short tag number to the given rid or creates one
-     * rid can be given as tag attribute, if nothing found the ID is used as fallback. 
-     * A rid should always be given, since it is also needed to map the tags in source to target, 
-     *  so that same tagNr are used for same tags there 
+     * rid can be given as tag attribute, if nothing found the ID is used as fallback.
+     * A rid should always be given, since it is also needed to map the tags in source to target,
+     *  so that same tagNr are used for same tags there
      * @param string $rid
      * @return number
      */
@@ -236,7 +236,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     }
     
     /**
-     * returns true if the tag content should only be used as text for the internal tags. 
+     * returns true if the tag content should only be used as text for the internal tags.
      * On false the surrounding tags (ph, ept, bpt, it) are also displayed.
      * @param string $tag
      * @param int $key
@@ -266,7 +266,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     /**
      * parses the given chunks containing segment source, seg-source or target content, or their child elements content like sub or mrk mtype="seg"
      * the result is not returned as string but as array for post processing of the generated chunks
-     * 
+     *
      * @param array|string $chunks can be either an array of chunks or a string which then will be parsed
      * @param bool $source
      * @param bool $preserveWhitespace defines if the whitespace in the XML nodes should be preserved or not
@@ -285,7 +285,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $this->shortTagIdent = empty($this->shortTagNumbers) ? 1 : (max($this->shortTagNumbers) + 1);
         }
         $this->source = $source;
-        //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content 
+        //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content
         $this->preserveWhitespace = $preserveWhitespace;
         if(is_array($chunks)) {
             $this->xmlparser->parseList($chunks);
@@ -310,9 +310,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     public function removeXlfTags($content) {
         $this->result = [];
         //by setting removeTags to false, currently all side effects related to $this->shortTag* fields are prevented.
-        // Keep in mind if changing getShortTagNumber code or usage, 
+        // Keep in mind if changing getShortTagNumber code or usage,
         // since this is the only place manipulating the fields - and which deacticated with remove tags implicitly.
-        $this->removeTags = true; 
+        $this->removeTags = true;
         $this->preserveWhitespace = false;
         $this->xmlparser->parse($content);
         return $this->xmlparser->join($this->result);
@@ -339,8 +339,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             }
         }
         //we have to decode entities here, otherwise our generated XLF wont be valid
-        // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters, 
-        // we have to protect them here 
+        // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters,
+        // we have to protect them here
         $text = $this->whitespaceHelper->protectWhitespace($text);
         $text = $this->whitespaceTagReplacer($text);
         $this->result[] = $text;
@@ -367,9 +367,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $this->result[] = $single;
             return;
         }
-        //hack so that we can replace original tags with <x> tag internally 
-        // and here we restore then the original content to be visible in the frontend  
-        // (<ph>orig</ph> tag would be correcter instead <x>, but can not be used due index shifting of the xml chunks then) 
+        //hack so that we can replace original tags with <x> tag internally
+        // and here we restore then the original content to be visible in the frontend
+        // (<ph>orig</ph> tag would be correcter instead <x>, but can not be used due index shifting of the xml chunks then)
         if($originalTagData = $this->xmlparser->getAttribute($opener['attributes'], 'translate5OriginalContent')) {
             $chunk = htmlspecialchars_decode($originalTagData);
         }
@@ -418,12 +418,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param string $tag
      */
     public function handleUnknown($tag) {
-        //below tags are given to the content converter, 
+        //below tags are given to the content converter,
         // they are known so far, just not handled by the converter
         // or they are not intended to be handled since the main action happens in the closer handler not in the opener handler
         switch ($tag) {
-            case 'x':  
-            case 'g': 
+            case 'x':
+            case 'g':
             case 'bx':
             case 'ex':
             return;
