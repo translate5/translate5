@@ -116,7 +116,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 return false;
             }
             // don't add messageSizeUnit here, will be used for calculating...
-            return meta && meta.minWidth ? meta.minWidth : Number.MAX_SAFE_INTEGER;
+            return meta && meta.minWidth ? meta.minWidth : 0;
         },
         /**
          * Returns the size-unit according to the meta-data.
@@ -529,11 +529,11 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 break;
             }
             line = allLines[i];
-            if (line.lineWidth > maxWidth && !lengthstatus.includes(me.lengthstatus.segmentLinesTooLong)) {
+            if (maxWidth && line.lineWidth > maxWidth && !lengthstatus.includes(me.lengthstatus.segmentLinesTooLong)) {
                 lengthstatus.push(me.lengthstatus.segmentLinesTooLong);
                 continue;
             }
-            if (line.lineWidth < minWidth && !lengthstatus.includes(me.lengthstatus.segmentLinesTooShort)) {
+            if (minWidth && line.lineWidth < minWidth && !lengthstatus.includes(me.lengthstatus.segmentLinesTooShort)) {
                 lengthstatus.push(me.lengthstatus.segmentLinesTooShort);
                 continue;
             }
