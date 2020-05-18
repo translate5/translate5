@@ -63,9 +63,7 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
         }
         $keys = array_keys($this->lengthRestrictionDefaults);
         $taskTemplate = Zend_Registry::get('taskTemplate');
-        $taskTemplateConf = $taskTemplate->lengthRestriction;
-        $config = Zend_Registry::get('config');
-        $configConf = $config->runtimeOptions->lengthRestriction;
+        $taskTemplateConf = $taskTemplate->lengthRestriction ?? null;
         foreach($keys as $key) {
             switch ($key) {
                 case 'font':
