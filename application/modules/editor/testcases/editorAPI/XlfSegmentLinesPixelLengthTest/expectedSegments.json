@@ -1,7 +1,7 @@
 [
     {
         "segmentNrInTask": "1",
-        "mid": "3_1",
+        "mid": "1_1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -28,7 +28,7 @@
     },
     {
         "segmentNrInTask": "2",
-        "mid": "4_2",
+        "mid": "2_2",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -55,7 +55,7 @@
     },
     {
         "segmentNrInTask": "3",
-        "mid": "5_3",
+        "mid": "3_3",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -82,7 +82,7 @@
     },
     {
         "segmentNrInTask": "4",
-        "mid": "6_4",
+        "mid": "4_4",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -109,7 +109,34 @@
     },
     {
         "segmentNrInTask": "5",
-        "mid": "7_5",
+        "mid": "5_5",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "matchRateType": "import;none",
+        "qmId": null,
+        "stateId": "0",
+        "autoStateId": "0",
+        "fileOrder": "0",
+        "comments": null,
+        "workflowStepNr": "0",
+        "workflowStep": null,
+        "source": " Dies ist ein Satz zum Testen f\u00fcr maximal 2 Zeilen, minwidth 100, maxWidth 300. <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>",
+        "sourceMd5": "210994e3abaa4e39cd136b470cdd0f8d",
+        "sourceToSort": " Dies ist ein Satz zum Testen f\u00fcr maximal 2 Zeilen, minwidth 100, maxWidth 300. ",
+        "target": " Dies ist ein Satz zum Testen f\u00fcr maximal 2 Zeilen, minwidth 100, maxWidth 300. <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>",
+        "targetMd5": "210994e3abaa4e39cd136b470cdd0f8d",
+        "targetToSort": " Dies ist ein Satz zum Testen f\u00fcr maximal 2 Zeilen, minwidth 100, maxWidth 300. ",
+        "targetEdit": " Dies ist ein Satz zum Testen f\u00fcr maximal 2 Zeilen, minwidth 100, maxWidth 300. <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>",
+        "targetEditToSort": " Dies ist ein Satz zum Testen f\u00fcr maximal 2 Zeilen, minwidth 100, maxWidth 300. ",
+        "metaCache": "{\"minWidth\":100,\"maxWidth\":300,\"maxNumberOfLines\":2,\"sizeUnit\":\"pixel\",\"font\":\"Arial\",\"fontSize\":13,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":995}}}}",
+        "isWatched": false
+    },
+    {
+        "segmentNrInTask": "6",
+        "mid": "6_6",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -131,12 +158,12 @@
         "targetToSort": " Dies ist ein Satz zum Testen f\u00fcr maximal 2 Zeilen und maxWidth 600. ",
         "targetEdit": " Dies ist ein Satz zum Testen f\u00fcr maximal 2 Zeilen und maxWidth 600. <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>",
         "targetEditToSort": " Dies ist ein Satz zum Testen f\u00fcr maximal 2 Zeilen und maxWidth 600. ",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":600,\"maxNumberOfLines\":2,\"sizeUnit\":\"pixel\",\"font\":\"Arial\",\"fontSize\":13,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":863}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":600,\"maxNumberOfLines\":2,\"sizeUnit\":\"pixel\",\"font\":\"Arial\",\"fontSize\":13,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":863}}}}",
         "isWatched": false
     },
     {
-        "segmentNrInTask": "6",
-        "mid": "8_6",
+        "segmentNrInTask": "7",
+        "mid": "7_7",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -158,12 +185,12 @@
         "targetToSort": " Dies ist ein Satz zum Testen f\u00fcr maximal 3 Zeilen und maxWidth 600. ",
         "targetEdit": " Dies ist ein Satz zum Testen f\u00fcr maximal 3 Zeilen und maxWidth 600. <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>",
         "targetEditToSort": " Dies ist ein Satz zum Testen f\u00fcr maximal 3 Zeilen und maxWidth 600. ",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":600,\"maxNumberOfLines\":3,\"sizeUnit\":\"pixel\",\"font\":\"Arial\",\"fontSize\":13,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":863}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":600,\"maxNumberOfLines\":3,\"sizeUnit\":\"pixel\",\"font\":\"Arial\",\"fontSize\":13,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":863}}}}",
         "isWatched": false
     },
     {
-        "segmentNrInTask": "7",
-        "mid": "9_7",
+        "segmentNrInTask": "8",
+        "mid": "8_8",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -185,7 +212,7 @@
         "targetToSort": " Dies ist ein Satz zum Testen f\u00fcr maxWidth 600 und size-unit char. ",
         "targetEdit": " Dies ist ein Satz zum Testen f\u00fcr maxWidth 600 und size-unit char. <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>",
         "targetEditToSort": " Dies ist ein Satz zum Testen f\u00fcr maxWidth 600 und size-unit char. ",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":600,\"maxNumberOfLines\":3,\"sizeUnit\":\"char\",\"font\":\"Arial\",\"fontSize\":13,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":70}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":600,\"maxNumberOfLines\":3,\"sizeUnit\":\"char\",\"font\":\"Arial\",\"fontSize\":13,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":70}}}}",
         "isWatched": false
     }
 ]

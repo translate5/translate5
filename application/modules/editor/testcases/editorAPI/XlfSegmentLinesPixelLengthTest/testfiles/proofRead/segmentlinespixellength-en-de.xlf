@@ -4,37 +4,42 @@
 <file original="simple-en-de.sdlxliff" source-language="en" target-language="de" xml:space="preserve" datatype="x-translate5">
 <body>
 
-<trans-unit id="3">
+<trans-unit id="1">
 <source>Dies ist ein einfacher Satz (aus task-template: maxWidth 200,  maxNumberOfLines 3, size-unit pixel).</source>
 <target>Dies ist ein einfacher Satz (aus task-template: maxWidth 200,  maxNumberOfLines 3, size-unit pixel).</target>
 </trans-unit>
 
-<trans-unit id="4">
+<trans-unit id="2">
 <source>Dasselbe in kurz.</source>
 <target>Dasselbe in kurz.</target>
 </trans-unit>
 
-<trans-unit id="5" translate5:maxNumberOfLines="1" maxwidth="600">
+<trans-unit id="3" translate5:maxNumberOfLines="1" maxwidth="600">
 <source> Dies ist ein Satz zum Testen für maximal 1 Zeile und maxWidth 600.    </source>
 <target> Dies ist ein Satz zum Testen für maximal 1 Zeile und maxWidth 600.    </target>
 </trans-unit>
 
-<trans-unit id="6" translate5:maxNumberOfLines="2" minwidth="100" maxwidth="300" size-unit="pixel">
+<trans-unit id="4" translate5:maxNumberOfLines="2" minwidth="100" maxwidth="300" size-unit="pixel">
 <source> Dies ist ein Satz zum Testen für maximal 2 Zeilen, minwidth 100, maxWidth 300.    </source>
 <target> Dies ist ein Satz zum Testen für maximal 2 Zeilen, minwidth 100, maxWidth 300.    </target>
 </trans-unit>
 
-<trans-unit id="7" translate5:maxNumberOfLines="2" maxwidth="600" size-unit="pixel">
+<trans-unit id="5" translate5:maxNumberOfLines="2" minwidth="100" maxwidth="300" size-unit="pixel">
+<source> Dies ist ein Satz zum Testen für maximal 2 Zeilen, minwidth 100, maxWidth 300.    </source>
+<target> Dies ist ein Satz zum Testen für maximal 2 Zeilen, minwidth 100, maxWidth 300.    </target>
+</trans-unit>
+
+<trans-unit id="6" translate5:maxNumberOfLines="2" maxwidth="600" size-unit="pixel">
 <source> Dies ist ein Satz zum Testen für maximal 2 Zeilen und maxWidth 600.    </source>
 <target> Dies ist ein Satz zum Testen für maximal 2 Zeilen und maxWidth 600.    </target>
 </trans-unit>
 
-<trans-unit id="8" translate5:maxNumberOfLines="3" maxwidth="600" size-unit="pixel">
+<trans-unit id="7" translate5:maxNumberOfLines="3" maxwidth="600" size-unit="pixel">
 <source> Dies ist ein Satz zum Testen für maximal 3 Zeilen und maxWidth 600.    </source>
 <target> Dies ist ein Satz zum Testen für maximal 3 Zeilen und maxWidth 600.    </target>
 </trans-unit>
 
-<trans-unit id="9" maxwidth="600" size-unit="char">
+<trans-unit id="8" maxwidth="600" size-unit="char">
 <source> Dies ist ein Satz zum Testen für maxWidth 600 und size-unit char.    </source>
 <target> Dies ist ein Satz zum Testen für maxWidth 600 und size-unit char.    </target>
 </trans-unit>

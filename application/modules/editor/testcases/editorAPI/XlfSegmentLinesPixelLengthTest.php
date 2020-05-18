@@ -88,7 +88,7 @@ class XlfSegmentLinesPixelLengthTest extends \ZfExtended_Test_ApiTestcase {
         require_once 'Models/Segment/TagAbstract.php';
         require_once 'Models/Segment/InternalTag.php';
         
-        foreach($segments as $idx => $segToEdit) {
+        foreach($segments as $segToEdit) {
             if(empty($segToEdit->editable)) {
                 continue;
             }
@@ -98,19 +98,58 @@ class XlfSegmentLinesPixelLengthTest extends \ZfExtended_Test_ApiTestcase {
             else {
                 $contentToUse = $segToEdit->targetEdit;
             }
-            $editedData = $contentToUse.' - edited'.$segToEdit->segmentNrInTask;
+            $editedData = $this->getEditedData($contentToUse, $segToEdit->segmentNrInTask);
             $segmentData = $this->api()->prepareSegmentPut('targetEdit', $editedData, $segToEdit->id);
             $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
         }
         
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        file_put_contents("/var/www/html/translate5/application/modules/editor/testcases/editorAPI/XlfSegmentLinesPixelLengthTest/expectedSegmentsEdited-new.json", json_encode($data,JSON_PRETTY_PRINT));
-        //$this->assertEquals(self::$api->getFileContent('expectedSegmentsEdited.json'), $data, 'Edited segments are not as expected!');
+        //file_put_contents("/var/www/html/translate5/application/modules/editor/testcases/editorAPI/XlfSegmentLinesPixelLengthTest/expectedSegmentsEdited-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        $this->assertEquals(self::$api->getFileContent('expectedSegmentsEdited.json'), $data, 'Edited segments are not as expected!');
         
         $task = $this->api()->getTask();
         //start task export 
-        //$this->checkExport($task, 'editor/task/export/id/'.$task->id, 'mrkothercontentlength-en-de.xlf', 'expected-export.xlf');
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'segmentlinespixellength-en-de.xlf', 'expected-export.xlf');
+    }
+    
+    /**
+     * returns the "edited" data for testing
+     * @param string $contentToUse
+     * @param int $segmentNrInTask
+     * @return string
+     */
+    protected function getEditedData (string $contentToUse, int $segmentNrInTask): string {
+        switch ($segmentNrInTask) {
+            case 1: // = not ok: segmentTooManyLines, segmentLinesTooLong
+                $contentEdited = "Edited: Dies ist ein <div class=\"single 6861726452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2/&gt;: Newline\" class=\"short\">&lt;2/&gt;</span><span data-originalid=\"hardReturn\" data-length=\"1\" class=\"full\">\u21b5</span></div>einfacher Satz <div class=\"single 6861726452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;3/&gt;: Newline\" class=\"short\">&lt;3/&gt;</span><span data-originalid=\"hardReturn\" data-length=\"1\" class=\"full\">\u21b5</span></div>(aus task-template: maxWidth 200,<div class=\"single 6861726452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;4/&gt;: Newline\" class=\"short\">&lt;4/&gt;</span><span data-originalid=\"hardReturn\" data-length=\"1\" class=\"full\">\u21b5</span></div> <div class=\"single 73706163652074733d22323022206c656e6774683d2231222f space internal-tag ownttip\"><span title=\"&lt;1/&gt;: 1 whitespace character\" class=\"short\">&lt;1/&gt;</span><span data-originalid=\"space\" data-length=\"1\" class=\"full\">\u00b7</span></div>maxNumberOfLines 3, size-unit pixel).";
+                break;
+            case 2: // = ok: segmentLengthValid
+                $contentEdited = "Edited: Dasselbe<div class=\"single 6861726452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;3/&gt;: Newline\" class=\"short\">&lt;3/&gt;</span><span data-originalid=\"hardReturn\" data-length=\"1\" class=\"full\">\u21b5</span></div>in<div class=\"single 6861726452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2/&gt;: Newline\" class=\"short\">&lt;2/&gt;</span><span data-originalid=\"hardReturn\" data-length=\"1\" class=\"full\">\u21b5</span></div>kurz.";
+                break;
+            case 3: // = not ok: segmentLinesTooLong
+                $contentEdited = "Edited: Dies ist ein Satz zum Testen f\u00fcr maximal 1 Zeile und maxWidth 600. <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1/&gt;: 3 whitespace characters\" class=\"short\">&lt;1/&gt;</span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7</span></div>";
+                break;
+            case 4: // = not ok: segmentLinesTooShort, segmentLinesTooLong
+                $contentEdited = "Edited:<div class=\"single 6861726452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2/&gt;: Newline\" class=\"short\">&lt;2/&gt;</span><span data-originalid=\"hardReturn\" data-length=\"1\" class=\"full\">\u21b5</span></div>Dies\u00a0ist\u00a0ein Satz zum\u00a0Testen f\u00fcr maximal 2 Zeilen, minwidth 100, maxWidth 300. <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1/&gt;: 3 whitespace characters\" class=\"short\">&lt;1/&gt;</span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7</span></div>";
+                break;
+            case 5: // = not ok: segmentLinesTooLong
+                $contentEdited = "Edited: Dies ist ein Satz<div class=\"single 6861726452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2/&gt;: Newline\" class=\"short\">&lt;2/&gt;</span><span data-originalid=\"hardReturn\" data-length=\"1\" class=\"full\">\u21b5</span></div>\u00a0zum\u00a0Testen f\u00fcr maximal 2 Zeilen, minwidth 100, maxWidth 300. <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1/&gt;: 3 whitespace characters\" class=\"short\">&lt;1/&gt;</span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7</span></div>";
+                break;
+            case 6: // ok: segmentLengthValid
+                $contentEdited = "Edited: Dies ist ein Satz zum Testen f\u00fcr<div class=\"single 6861726452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2/&gt;: Newline\" class=\"short\">&lt;2/&gt;</span><span data-originalid=\"hardReturn\" data-length=\"1\" class=\"full\">\u21b5</span></div>maximal 2 Zeilen\u00a0und maxWidth 600. <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1/&gt;: 3 whitespace characters\" class=\"short\">&lt;1/&gt;</span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7</span></div>";
+                break;
+            case 7: // ok: segmentLengthValid
+                $contentEdited = "Edited: Dies ist ein Satz zum Testen f\u00fcr<div class=\"single 6861726452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;3/&gt;: Newline\" class=\"short\">&lt;3/&gt;</span><span data-originalid=\"hardReturn\" data-length=\"1\" class=\"full\">\u21b5</span></div>maximal 3 Zeilen<div class=\"single 6861726452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2/&gt;: Newline\" class=\"short\">&lt;2/&gt;</span><span data-originalid=\"hardReturn\" data-length=\"1\" class=\"full\">\u21b5</span></div> und maxWidth 600. <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1/&gt;: 3 whitespace characters\" class=\"short\">&lt;1/&gt;</span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7</span></div>";
+                break;
+            case 8: // ok: segmentLengthValid
+                $contentEdited = "Edited: Dies ist ein Satz zum Testen<div class=\"single 6861726452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2/&gt;: Newline\" class=\"short\">&lt;2/&gt;</span><span data-originalid=\"hardReturn\" data-length=\"1\" class=\"full\">\u21b5</span></div>f\u00fcr maxWidth 600 und size-unit char. <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1/&gt;: 3 whitespace characters\" class=\"short\">&lt;1/&gt;</span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7</span></div>";
+                break;
+            default:
+                $contentEdited = 'Edited: ' . $contentToUse;
+                break;
+        }
+        return $contentEdited;
     }
     
     /**
@@ -120,7 +159,7 @@ class XlfSegmentLinesPixelLengthTest extends \ZfExtended_Test_ApiTestcase {
      * @param string $fileToExport
      * @param string $fileToCompare
      */
-    protected function XcheckExport(stdClass $task, $exportUrl, $fileToExport, $fileToCompare) {
+    protected function checkExport(stdClass $task, $exportUrl, $fileToExport, $fileToCompare) {
         $this->api()->login('testmanager');
         $this->api()->request($exportUrl);
 
