@@ -357,14 +357,17 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * @param {Integer} maxWidthPerLine
      * 
      */
-    handleMaxWidthForLineInEditor: function (textInLine, lineWidth, maxWidthPerLine) {
+    handleMaxWidthForLineInEditor: function (htmlInLine, lineWidth, maxWidthPerLine) {
         var me = this,
+            allLines,
+            div,
+            textInLine,
             editorBody,
             range,
             wordsInLine,
             i,
-            htmlToCheck = '',
-            htmlToCheckWidth,
+            textToCheck = '',
+            textToCheckWidth,
             textForLine = '',
             options,
             sel;
@@ -372,28 +375,31 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         if (lineWidth <= maxWidthPerLine) {
             return;
         }
-        
-        wordsInLine = textInLine.split(' ');
+
+        editorBody = me.editor.getEditorBody();
+        allLines = me.getLinesAndLength(editorBody.innerHTML, me.segmentMeta);
+        if (allLines.length >= (me.segmentMeta.maxNumberOfLines)) {
+            return;
+        }
+
+        div = document.createElement('div');
+        div.innerHTML = htmlInLine;
+        textInLine = div.textContent || div.innerText || "";
+        wordsInLine = textInLine.split(/(\s+)/);
         for (i = 0; i < wordsInLine.length; i++) {
-            if (i>0 && htmlToCheck.replace(/\s/g, '').length) {
-                htmlToCheck += ' ';
-            }
-            htmlToCheck += wordsInLine[i];
-            if (htmlToCheck === '') {
-                continue;
-            }
-            htmlToCheckWidth = me.editor.getLength(htmlToCheck, me.segmentMeta);
-            if (htmlToCheckWidth <= maxWidthPerLine) {
-                textForLine = htmlToCheck;
+            textToCheck += wordsInLine[i];
+            textToCheckWidth = me.editor.getLength(textToCheck, me.segmentMeta);
+            if (textToCheckWidth <= maxWidthPerLine) {
+                textForLine = textToCheck;
             } else {
                 if (!textForLine.replace(/\s/g, '').length) {
                     textForLine = textInLine;
                 }
                 if(me.editor.getLength(textForLine, me.segmentMeta) > maxWidthPerLine) {
+                    // eg if the single word in the line is too long
                     return;
                 }
                 me.bookmarkForCaret = me.getPositionOfCaret();
-                editorBody = me.editor.getEditorBody();
                 range = rangy.createRange();
                 range.selectNodeContents(editorBody);
                 options = {
@@ -401,6 +407,16 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                         withinRange: range
                 };
                 range.findText(textForLine, options);
+                if (textForLine !== range.toString()) {
+                    // textForLine: " Dies ist..."
+                    // editorBody Html: " Dies ist..."
+                    // editorBody Text: "Dies ist..."
+                    // => try again without the whitespace at the beginning:
+                    range.findText(textForLine.trim(), options);
+                    if (textForLine.trim() !== range.toString()) {
+                        return;
+                    }
+                }
                 range.collapse(false);
                 sel = rangy.getSelection(editorBody);
                 sel.setSingleRange(range);
