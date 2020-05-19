@@ -119,7 +119,8 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
     public function getDefaultPixelWidth($fontSize) {
         if (!isset($this->defaultPixelWidths)) {
             $config = Zend_Registry::get('config');
-            $this->defaultPixelWidths = $config->runtimeOptions->lengthRestriction->pixelMapping->toArray();
+            $pixelMapping = $config->runtimeOptions->lengthRestriction->pixelMapping ?? null;
+            $this->defaultPixelWidths = (is_null($pixelMapping)) ?  [] : $pixelMapping->toArray();
         }
         if (array_key_exists($fontSize, $this->defaultPixelWidths)) {
             return $this->defaultPixelWidths[$fontSize];
