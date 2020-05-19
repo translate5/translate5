@@ -33,4 +33,4 @@ ADD `maxNumberOfLines` INT(3) DEFAULT NULL COMMENT 'max. number of lines in pixe
 
 -- (2) restructure config according to structure of task-templates (tbc)
 
-UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.lengthRestriction.pixelMapping' WHERE `name` = 'runtimeOptions.pixelMapping.pixelWidths';
+UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.lengthRestriction.pixelMapping' WHERE `name` = 'runtimeOptions.pixelMapping.defaultPixelWidths';
