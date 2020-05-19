@@ -1074,7 +1074,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getTransunitLength: function(text){
       var me = this,
-          div = document.createElement("div"),
           additionalLength = 0,
           meta = me.currentSegment.get('metaCache'),
           field = me.dataIndex,
@@ -1087,15 +1086,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(!Ext.isString(text)) {
           text = "";
       }
-      //FIXME: improve that clean del tag by reuse methods from track changes
-      text = text.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
-      
-      div.innerHTML = text;
       
       //add the length of the text itself 
-      textLength = me.getLength(text, meta, div);
-      
-      div = null;
+      textLength = me.getLength(text, meta);
       
       //only the segment length + the tag lengths:
       me.lastSegmentLength = additionalLength + textLength;
@@ -1130,18 +1123,20 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * Return the text's length either based on pixelMapping or as the number of code units in the text.
    * @param {String} text
    * @param {Object} meta
-   * @param {HTMLDivElement} div (optional; can be created here: div with the innerHTML or the segment, including the images for internal tags)
    * @return {Integer}
    */
-  getLength: function (text, meta, div=null) {
+  getLength: function (text, meta) {
       var me = this, 
+          div = document.createElement('div'),
           pixelMapping = Editor.view.segments.PixelMapping,
           isPixel = (meta && meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING),
           length;
-      if (div === null) {
-          div = document.createElement('div');
-          div.innerHTML = text;
-      }
+	  //clean del tag
+	  text = text.replace(/<del[^>]*>.*?<\/del>/ig,''); //FIXME: improve that clean del tag by reuse methods from track changes
+      // use div, then (1) retrieve "text" only without html-tags and (2) add the lengths of tags (= img)
+      div.innerHTML = text;
+
+      // (1) text
       text = div.textContent || div.innerText || "";
       //remove characters with 0 length:
       text = text.replace(/\u200B|\uFEFF/g, '');
@@ -1154,7 +1149,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           length = text.length;
       }
       
-      //add the length stored in each img tag 
+      // (2) add the length stored in each img tag 
       Ext.fly(div).select('img').each(function(item){
           //for performance reasons the pixellength is precalculated on converting the div span to img tags 
           var attr = (isPixel ? 'data-pixellength' : 'data-length'),
@@ -1165,6 +1160,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           }
       });
       
+      div = null;
       return length;
   },
   
