@@ -1,5 +1,7 @@
 {
 	"require" : {
-		"fortawesome/font-awesome": "^5.13"
+		"fortawesome/font-awesome" : "^5.13",
+		"phpoffice/phpspreadsheet" : "~1.12",
+		"hearst-digital/horde-text-diff" : "dev-master"
 	}
 }
