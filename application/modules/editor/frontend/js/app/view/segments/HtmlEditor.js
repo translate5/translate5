@@ -241,7 +241,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     	result, length,
     	body = me.getEditorBody();
     me.checkTags(body);
-    me.checkSegmentLength(body.innerHTML || "");
+    if(Editor.data.segments.enableCountSegmentLength){
+        me.checkSegmentLength(body.innerHTML || "");
+    }
     result = me.unMarkup(body);
     me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
     return result;
