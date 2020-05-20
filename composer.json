@@ -1,7 +1,28 @@
 {
 	"require" : {
-		"fortawesome/font-awesome" : "^5.13",
-		"phpoffice/phpspreadsheet" : "~1.12",
-		"hearst-digital/horde-text-diff" : "dev-master"
-	}
+		"wikimedia/composer-merge-plugin" : "~1.4"
+	},
+	"extra" : {
+		"merge-plugin" : {
+			"include" : [
+				"application/modules/*/composer.local.json",
+				"application/modules/*/composer.local.json"
+			]
+		}
+	},
+	"name" : "mittagqi/translate5",
+	"description" : "Open Source Translation System\nCloud translation, review, post-editing and terminology platform",
+	"homepage" : "https://www.translate5.net",
+	"support" : {
+		"email" : "support@translate5.net",
+		"issues" : "https://jira.translate5.net/",
+		"wiki" : "https://confluence.translate5.net/",
+		"forum" : "https://confluence.translate5.net/questions"
+	},
+	"keywords" : [
+		"translation",
+		"review",
+		"post-editing"
+	],
+	"license" : "AGPL-3.0-only"
 }
