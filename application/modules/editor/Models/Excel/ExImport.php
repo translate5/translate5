@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -37,10 +37,6 @@ END LICENSE AND COPYRIGHT
  * Will be used by the models under ../Export/Excel.php respectively ../Import/Excel.php
  * TODO: refactor (= implement with ZfExtended_Models_Entity_ExcelExport)
  */
-
-require_once APPLICATION_PATH.'/../library/PhpSpreadsheet/vendor/autoload.php';
-
-
 class editor_Models_Excel_ExImport {
     
     /**
@@ -176,7 +172,7 @@ class editor_Models_Excel_ExImport {
     /**
      * Load an excel from a file
      * @TODO
-     * 
+     *
      * @param string $filename
      * @return editor_Models_Excel_ExImport
      */
@@ -226,7 +222,7 @@ class editor_Models_Excel_ExImport {
     /**
      * Read all segments in the excel and return the informations as a list of
      * excelExImportSegmentContainer objects
-     * 
+     *
      * @return [excelExImportSegmentContainer]
      */
     public function getSegments() : array {
@@ -352,7 +348,7 @@ class editor_Models_Excel_ExImport {
 }
 
 /**
- * Helper class to define a structure for the segment data stored in the excel 
+ * Helper class to define a structure for the segment data stored in the excel
  */
 class excelExImportSegmentContainer {
     public $nr;

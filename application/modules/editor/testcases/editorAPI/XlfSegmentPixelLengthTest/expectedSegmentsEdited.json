@@ -185,7 +185,7 @@
         "targetToSort": "",
         "targetEdit": "Satz 1. - edited7",
         "targetEditToSort": "Satz 1. - edited7",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":837,\"maxNumberOfLines\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"pixel\",\"font\":\"Arial\",\"fontSize\":13,\"additionalUnitLength\":12,\"additionalMrkLength\":24,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":227}},\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":239}},\"fakeSegId_9\":{\"nr\":\"9\",\"length\":{\"targetEdit\":359}}}}",
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":837,\"maxNumberOfLines\":null,\"sizeUnit\":\"pixel\",\"font\":\"Arial\",\"fontSize\":13,\"additionalUnitLength\":12,\"additionalMrkLength\":24,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":227}},\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":239}},\"fakeSegId_9\":{\"nr\":\"9\",\"length\":{\"targetEdit\":359}}}}",
         "isWatched": false
     },
     {
@@ -212,7 +212,7 @@
         "targetToSort": "",
         "targetEdit": "Satz 2. - edited8",
         "targetEditToSort": "Satz 2. - edited8",
-        "metaCache": "{\"minWidth\":20,\"maxWidth\":837,\"maxNumberOfLines\":null,\"maxNumberOfLines\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"pixel\",\"font\":\"Arial\",\"fontSize\":13,\"additionalUnitLength\":12,\"additionalMrkLength\":36,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":227}},\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":239}},\"fakeSegId_9\":{\"nr\":\"9\",\"length\":{\"targetEdit\":359}}}}",
+        "metaCache": "{\"minWidth\":20,\"maxWidth\":837,\"maxNumberOfLines\":null,\"sizeUnit\":\"pixel\",\"font\":\"Arial\",\"fontSize\":13,\"additionalUnitLength\":12,\"additionalMrkLength\":36,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":227}},\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":239}},\"fakeSegId_9\":{\"nr\":\"9\",\"length\":{\"targetEdit\":359}}}}",
         "isWatched": false
     },
     {

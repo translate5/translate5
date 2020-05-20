@@ -150,10 +150,15 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           return true;
       }
       $meta = json_decode($data->metaCache, true);
+      
+      if (is_null($meta['minWidth']) && is_null($meta['maxWidth']) && is_null($meta['maxNumberOfLines'])) {
+          return true;
+      }
+      
       $sizeUnit = empty($meta['sizeUnit']) ? editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT : $meta['sizeUnit'];
       $isPixelBased = ($sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING);
       
-      if ($isPixelBased && array_key_exists('maxNumberOfLines',$meta)) {
+      if ($isPixelBased && array_key_exists('maxNumberOfLines',$meta) && !is_null($meta['maxNumberOfLines'])) {
           return $this->validateLengthForLines($value, $field);
       } else {
           return $this->validateLengthForSegmentAndSiblings($value, $field);
@@ -173,6 +178,10 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
       }
       $meta = json_decode($data->metaCache, true);
       
+      if (is_null($meta['maxNumberOfLines'])) {
+          return true;
+      }
+      
       $isValid = true;
             
       $tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
@@ -183,8 +192,8 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           $isValid = false;
       }
       
-      $checkMaxWidth = (array_key_exists('maxWidth', $meta) && !empty($meta['maxWidth']));
-      $checkMinWidth = (array_key_exists('minWidth', $meta) && !empty($meta['minWidth']));
+      $checkMinWidth = (array_key_exists('minWidth', $meta) && !is_null($meta['minWidth']));
+      $checkMaxWidth = (array_key_exists('maxWidth', $meta) && !is_null($meta['maxWidth']));
       if ($checkMinWidth || $checkMaxWidth) {
           $errorsMaxWidth = [];
           $errorsMinWidth = [];
@@ -197,12 +206,12 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
                   $errorsMinWidth[] = ($key+1) . ': ' . $length;
               }
           }
-          if (count($errorsMaxWidth) > 0) {
-              $this->addMessage($field, 'segmentLinesTooLong', 'Not all lines in the segment match the given maximal length: ' . implode('; ', $errorsMaxWidth));
-              $isValid = false;
-          }
           if (count($errorsMinWidth) > 0) {
               $this->addMessage($field, 'segmentLinesTooShort', 'Not all lines in the segment match the given minimal length: ' . implode('; ', $errorsMinWidth));
+              $isValid = false;
+          }
+          if (count($errorsMaxWidth) > 0) {
+              $this->addMessage($field, 'segmentLinesTooLong', 'Not all lines in the segment match the given maximal length: ' . implode('; ', $errorsMaxWidth));
               $isValid = false;
           }
       }
@@ -252,12 +261,15 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
       settype($meta['additionalMrkLength'], 'integer');
       $length += $meta['additionalMrkLength'];
       
+      $checkMinWidth = (array_key_exists('minWidth', $meta) && !is_null($meta['minWidth']));
+      $checkMaxWidth = (array_key_exists('maxWidth', $meta) && !is_null($meta['maxWidth']));
+      
       $messageSizeUnit = ($isPixelBased) ? 'px' : '';
-      if(array_key_exists('minWidth', $meta) && $length < $meta['minWidth']) {
+      if($checkMinWidth && $length < $meta['minWidth']) {
           $this->addMessage($field, 'segmentToShort', 'Transunit length is '.$length.$messageSizeUnit.' minWidth is '.$meta['minWidth'].$messageSizeUnit);
           return false;
       }
-      if(array_key_exists('maxWidth', $meta)&& !empty($meta['maxWidth']) && $length > $meta['maxWidth']) {
+      if($checkMaxWidth && $length > $meta['maxWidth']) {
           $this->addMessage($field, 'segmentToLong', 'Transunit length is '.$length.$messageSizeUnit.' maxWidth is '.$meta['maxWidth'].$messageSizeUnit);
           return false;
       }
