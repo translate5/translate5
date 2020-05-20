@@ -48,6 +48,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   idPrefix: 'tag-image-',
   requires: [
       'Editor.view.segments.HtmlEditorLayout',
+      'Editor.view.segments.MinMaxLength',
       'Editor.view.segments.PixelMapping',
       'Editor.view.segments.StatusStrip'
   ],
@@ -71,8 +72,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   duplicatedContentTags: [],
   contentEdited: false, //is set to true if text content or content tags were modified
   disableErrorCheck: false,
-  //0: segment length is OK, -1 segment is to short (shorter as minLength), 1 segment is to long (longer as maxLength)
-  segmentLengthStatus:0,
+  segmentLengthStatus: ['segmentLengthValid'], // see Editor.view.segments.MinMaxLength.lengthstatus
   lastSegmentLength:null,
   currentSegment: null,
   statusStrip: null,
@@ -83,8 +83,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       tagDuplicatedText: '#UT#Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:{0}',
       tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
       cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.',
-      segmentToShort:'#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
-      segmentToLong:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.'
   },
   
   //***********************************************************************************
@@ -96,6 +94,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @param {String} error message
    * Fires if the content contains tag errors, the result of the handler must be boolean, 
    * true if saving should be processed, false if not.
+   * @param {Bool} isTagError For tag-errors there is a config-item that allows to ignore the validation.
+   * For historical reasons, the default assumes that an error is a tag-error unless set otherwise.
    */
   //***********************************************************************************
   //End Events
@@ -232,21 +232,20 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
   },
   
-	/**
-	 * Holt Daten aus dem HtmlEditor und entfernt das markup
-	 * @return String
-	*/
-	getValueAndUnMarkup: function(){
-		var me = this,
-			result, length,
-			body = me.getEditorBody();
-		me.checkTags(body);
-		me.checkSegmentLength(body.innerHTML || "");
-		result = me.unMarkup(body);
-		me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
-		return result;
-	},
-
+  /**
+   * Holt Daten aus dem HtmlEditor und entfernt das markup
+   * @return String
+   */
+  getValueAndUnMarkup: function(){
+    var me = this,
+    	result, length,
+    	body = me.getEditorBody();
+    me.checkTags(body);
+    me.checkSegmentLength(body.innerHTML || "");
+    result = me.unMarkup(body);
+    me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
+    return result;
+  },
   /**
    * - replaces div/span to images
    * - prepares content to be edited
@@ -559,6 +558,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       data.whitespaceTag = /nbsp|tab|space|newline/.test(className);
       if(data.whitespaceTag) {
           data.type += ' whitespace';
+          if (/newline/.test(className)) {
+              data.type += ' newline';
+          }
           data.key = 'whitespace'+data.nr;
       }
       else {
@@ -740,25 +742,22 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @return {Boolean}
    */
   hasAndDisplayErrors: function() {
-      var me = this, msg, meta = me.currentSegment.get('metaCache');
+      var me = this, 
+          msg,
+          meta = me.currentSegment.get('metaCache');
       
       //if the segment length is not in the defined range, add an error message - not disableable, so before disableErrorCheck
-      if(Editor.data.segments.enableCountSegmentLength && me.segmentLengthStatus != 0) {
+      if(Editor.data.segments.enableCountSegmentLength && !me.segmentLengthStatus.includes('segmentLengthValid')) { // see Editor.view.segments.MinMaxLength.lengthstatus
           //fire the event, and get the message from the segmentminmaxlength component
-          if(me.segmentLengthStatus > 0) {
-              msg = Ext.String.format(me.strings.segmentToLong, meta.maxLength);
-          }
-          else {
-              msg = Ext.String.format(me.strings.segmentToShort, meta.minLength);
-          }
-          me.fireEvent('contentErrors', me, msg);
+          msg = Ext.ComponentQuery.query('#segmentMinMaxLength')[0].renderErrorMessage(meta, me.segmentLengthStatus);
+          me.fireEvent('contentErrors', me, msg, false);
           return true;
       }
       
       //if we are running a second time into this method triggered by callback, 
       //  the callback can disable a second error check
       if(me.disableErrorCheck){
-          me.fireEvent('contentErrors', me, null);
+          me.fireEvent('contentErrors', me, null, true);
           me.disableErrorCheck = false;
           return false;
       }
@@ -786,14 +785,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
                   msg += '<br /><br />';
               }
           }
-          me.fireEvent('contentErrors', me, msg);
+          me.fireEvent('contentErrors', me, msg, true);
           return true;
       }
       if(!me.isTagOrderClean){
-          me.fireEvent('contentErrors', me, me.strings.tagOrderErrorText);
+          me.fireEvent('contentErrors', me, me.strings.tagOrderErrorText, true);
           return true;
       }
-      me.fireEvent('contentErrors', me, null);
+      me.fireEvent('contentErrors', me, null, true);
       return false;
   },
   /**
@@ -986,14 +985,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     	Editor.MessageBox.addInfo(this.strings.tagRemovedText);
     }
   },
-  /**
-   * returns img tags contained in the currently edited field as img nodelist
-   */
-  getTags: function(compareList) {
-      var me = this,
-          body = me.getEditorBody();
-      return node.getElementsByTagName('img');
-  },
   showShortTags: function() {
     this.rendered && this.setImagePath('shortPath');
   },
@@ -1070,26 +1061,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   
   /**
    * Check if the segment character number is within the defined borders
+   * and set the segment's length status accordingly.
    * @param {String} segmentText
    */
   checkSegmentLength: function(segmentText){
       var me = this,
-          length,
-          metaCache = me.currentSegment && me.currentSegment.get('metaCache'),
-          minWidth = metaCache && metaCache.minWidth ? metaCache.minWidth : 0,
-          maxWidth = metaCache && metaCache.maxWidth ? metaCache.maxWidth : Number.MAX_SAFE_INTEGER;
-      
-      me.segmentLengthStatus = 0;
-      
-      //get the characters length and is segment saveable
-      length = me.getTransunitLength(segmentText);
-      
-      if(length < minWidth) {
-          me.segmentLengthStatus = -1;
-      }
-      else if(length > maxWidth) {
-          me.segmentLengthStatus = 1;
-      }
+          meta = me.currentSegment && me.currentSegment.get('metaCache');
+      me.segmentLengthStatus = Ext.ComponentQuery.query('#segmentMinMaxLength')[0].getMinMaxLengthStatus(segmentText, meta);
   },
   
   /**
@@ -1099,7 +1077,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getTransunitLength: function(text){
       var me = this,
-          div = document.createElement("div"),
           additionalLength = 0,
           meta = me.currentSegment.get('metaCache'),
           field = me.dataIndex,
@@ -1112,15 +1089,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(!Ext.isString(text)) {
           text = "";
       }
-
-      text = me.cleanDeleteTags(text);//clean del tag
-      
-      div.innerHTML = text;
       
       //add the length of the text itself 
-      textLength = me.getLength(text, meta, div);
-      
-      div = null;
+      textLength = me.getLength(text, meta);
       
       //only the segment length + the tag lengths:
       me.lastSegmentLength = additionalLength + textLength;
@@ -1153,13 +1124,22 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   
   /**
    * Return the text's length either based on pixelMapping or as the number of code units in the text.
+   * @param {String} text
+   * @param {Object} meta
    * @return {Integer}
    */
-  getLength: function (text, meta, div) {
+  getLength: function (text, meta) {
       var me = this, 
+          div = document.createElement('div'),
           pixelMapping = Editor.view.segments.PixelMapping,
           isPixel = (meta && meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING),
           length;
+	  //clean del tag
+	  text = text.replace(/<del[^>]*>.*?<\/del>/ig,''); //FIXME: improve that clean del tag by reuse methods from track changes
+      // use div, then (1) retrieve "text" only without html-tags and (2) add the lengths of tags (= img)
+      div.innerHTML = text;
+
+      // (1) text
       text = div.textContent || div.innerText || "";
       //remove characters with 0 length:
       text = text.replace(/\u200B|\uFEFF/g, '');
@@ -1172,7 +1152,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           length = text.length;
       }
       
-      //add the length stored in each img tag 
+      // (2) add the length stored in each img tag 
       Ext.fly(div).select('img').each(function(item){
           //for performance reasons the pixellength is precalculated on converting the div span to img tags 
           var attr = (isPixel ? 'data-pixellength' : 'data-length'),
@@ -1183,6 +1163,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           }
       });
       
+      div = null;
       return length;
   },
   

@@ -107,6 +107,12 @@ class editor_Models_Import_FileParser_SegmentAttributes {
     public $maxWidth = null;
     
     /**
+     * Max. number of lines in a segment (used for pixel-based length check only)
+     * @var integer
+     */
+    public $maxNumberOfLines = null;
+    
+    /**
      * Size-unit of a segment (size-unit="char" or "pixel"; default if nothing is set: "pixel")
      * - http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#size-unit
      * - http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#maxwidth

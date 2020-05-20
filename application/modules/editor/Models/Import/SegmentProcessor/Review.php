@@ -126,6 +126,9 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
      */
     protected function processSegmentMeta(editor_Models_Segment $seg, editor_Models_Import_FileParser_SegmentAttributes $attributes) {
         $meta = $seg->meta();
+        if(!empty($attributes->maxNumberOfLines) && !is_null($attributes->maxNumberOfLines)) {
+            $meta->setMaxNumberOfLines($attributes->maxNumberOfLines);
+        }
         if(!empty($attributes->maxWidth) && !is_null($attributes->maxWidth)) {
             $meta->setMaxWidth($attributes->maxWidth);
         }

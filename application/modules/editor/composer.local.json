@@ -1,0 +1,19 @@
+{
+	"require" : {
+		"fortawesome/font-awesome" : "^5.13",
+		"phpoffice/phpspreadsheet" : "~1.12",
+		"hearst-digital/horde-text-diff" : "dev-master",
+		"querypath/querypath" : "~3.0",
+		"google/cloud-translate" : "~1.7",
+		"wikimedia/composer-merge-plugin" : "~1.4"
+	},
+	"extra" : {
+		"merge-plugin" : {
+			"include" : [
+				"Plugins/*/composer.local.json"
+			]
+		}
+	},
+	"name" : "mittagqi/translate5-editor-requirements",
+	"description" : "Meta Package containing the requirements for the editor module"
+}
