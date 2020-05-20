@@ -39,7 +39,9 @@
         <!-- tag "size-unit" is optional; valid values: "pixel" (= default if nothing is set) or "char" (can be overwritten in xliff's trans-unit) -->
         <size-unit>pixel</size-unit>
         <!-- tag "maxWidth" is optional and contains a default max. length, e.g. "70" (can be overwritten in xliff's trans-unit) -->
-        <maxWidth>70</maxWidth>
+        <maxWidth>200</maxWidth>
+        <!-- tag "maxNumberOfLines" is optional and contains how many lines the text in segment can have (can be overwritten in xliff's trans-unit) -->
+        <maxNumberOfLines>3</maxNumberOfLines>
         <!-- tag "pixelmapping" is optional -->
         <pixelmapping>
             <!-- tag "font" is optional and contains the name of a default font-family, e.g. "Arial" or "Times New Roman" (can be overwritten in xliff's trans-unit) -->

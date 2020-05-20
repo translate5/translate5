@@ -260,7 +260,7 @@ class editor_Models_Segment_MaterializedView {
         //integer cast is also save, no need for binding
         $segmentId = (int)$segmentId;
         $selectSql = '';
-        $selectSql .= ' CONCAT(\'{"minWidth":\', ifnull(m.minWidth, \'null\'), \',"maxWidth":\', ifnull(m.maxWidth, \'null\'), ';
+        $selectSql .= ' CONCAT(\'{"minWidth":\', ifnull(m.minWidth, \'null\'), \',"maxWidth":\', ifnull(m.maxWidth, \'null\'), \',"maxNumberOfLines":\', ifnull(m.maxNumberOfLines, \'null\'), ';
         $selectSql .= '\',"sizeUnit":"\', m.sizeUnit, \'","font":"\', m.font, \'","fontSize":\', m.fontSize, ';
         $selectSql .= '\',"additionalUnitLength":\', m.additionalUnitLength, \',"additionalMrkLength":\', m.additionalMrkLength, ';
         $selectSql .= '\',"siblingData":{\', ifnull(siblings.siblingData,\'\'), \'}}\') metaCache';
