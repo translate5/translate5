@@ -56,26 +56,17 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Insert or update PixelMapping for Unicode-Character as given in pixel-mapping.xlsx or in xlf-file.
-     * The order of columns must not be changed; see example in Confluence:
-     * https://confluence.translate5.net/display/BUS/Length+Restrictions+and+Pixel-Mapping
      * @param array $values
      */
-    public function insertPixelMappingRowFromSpreadsheet($values) {
-        $values = array_slice($values, 0, 5);
-        $dataToBind = array_combine(['taskGuid', 'font', 'fontsize', 'unicodeChar', 'pixelWidth'], $values);
-        $dataToBind['font'] = strtolower($dataToBind['font']);
-        
-        $sql= 'INSERT INTO LEK_pixel_mapping (`taskGuid`,`font`,`fontsize`,`unicodeChar`,`pixelWidth`)
-                                VALUES (:taskGuid, :font, :fontsize, :unicodeChar, :pixelWidth)
-                                ON DUPLICATE KEY UPDATE
-                                    `taskGuid` = :taskGuid,
-                                    `font` = :font,
-                                    `fontsize` = :fontsize,
-                                    `unicodeChar` = :unicodeChar,
-                                    `pixelWidth` = :pixelWidth';
-        
+    public function insertPixelMappingRow($values) {
+        $sql= 'INSERT INTO LEK_pixel_mapping (`taskGuid`,`fileId`,`font`,`fontsize`,`unicodeChar`,`pixelWidth`)
+               VALUES (?,?,?,?,?,?)
+               ON DUPLICATE KEY UPDATE `taskGuid` = ?,`fileId` = ?,`font` = ?,`fontsize` = ?,`unicodeChar` = ?,`pixelWidth` = ?';
+        $values['font'] = strtolower($values['font']);
+        $bindings = array($values['taskGuid'], $values['fileId'], $values['font'], $values['fontsize'], $values['unicodeChar'], $values['pixelWidth'],
+                          $values['taskGuid'], $values['fileId'], $values['font'], $values['fontsize'], $values['unicodeChar'], $values['pixelWidth']);
         try {
-            $this->db->getAdapter()->query($sql, $dataToBind);
+            $this->db->getAdapter()->query($sql, $bindings);
             return;
         }
         catch(Zend_Db_Statement_Exception $e) {
