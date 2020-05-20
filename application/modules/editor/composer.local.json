@@ -5,7 +5,9 @@
 		"hearst-digital/horde-text-diff" : "dev-master",
 		"querypath/querypath" : "~3.0",
 		"google/cloud-translate" : "~1.7",
-		"wikimedia/composer-merge-plugin" : "~1.4"
+		"wikimedia/composer-merge-plugin" : "~1.4",
+		"phenx/php-font-lib" : "^0.5.1.0",
+        "infostars/headless-chromium-php" : "^0.6.2.0"
 	},
 	"extra" : {
 		"merge-plugin" : {
