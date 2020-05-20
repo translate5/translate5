@@ -37,8 +37,10 @@
 /**
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
- * @method integer getCustomerId() getCustomerId()
- * @method void setCustomerId() setCustomerId(int $customerId)
+ * @method void getTaskGuid() getTaskGuid()
+ * @method void setTaskGuid() setTaskGuid(void $taskGuid)
+ * @method integer getFileId() getFileId()
+ * @method void setFileId() setFileId(int $fileId)
  * @method string getFont() getFont()
  * @method void setFont() setFont(string $font)
  * @method integer getFontsize() getFontsize()
@@ -53,63 +55,32 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass   = 'editor_Models_Validator_PixelMapping';
     
     /**
-     * Just an customer instance to load the missing customer IDs
-     * @var editor_Models_Customer
-     */
-    protected $bareCustomerInstance = null;
-    
-    /**
-     * Cache for 
-     * @var array
-     */
-    protected $cachedCustomers = [];
-    
-    public function __construct() {
-        parent::__construct();
-        $this->bareCustomerInstance = ZfExtended_Factory::get('editor_Models_Customer');
-    }
-    
-    /**
-     * insert or update PixelMapping for Unicode-Character as given in pixel-mapping.xlsx
-     * (order of columns must not be changed; see Confluence!).
+     * Insert or update PixelMapping for Unicode-Character as given in pixel-mapping.xlsx or in xlf-file.
+     * The order of columns must not be changed; see example in Confluence:
+     * https://confluence.translate5.net/display/BUS/Length+Restrictions+and+Pixel-Mapping
      * @param array $values
      */
-    public function insertPixelMappingRow($values) {
+    public function insertPixelMappingRowFromSpreadsheet($values) {
         $values = array_slice($values, 0, 5);
-        $dataToBind = array_combine(['customerId', 'font', 'fontsize', 'unicodeChar', 'pixelWidth'], $values);
+        $dataToBind = array_combine(['taskGuid', 'font', 'fontsize', 'unicodeChar', 'pixelWidth'], $values);
         $dataToBind['font'] = strtolower($dataToBind['font']);
         
-        $sql= 'INSERT INTO LEK_pixel_mapping (`customerId`,`font`,`fontsize`,`unicodeChar`,`pixelWidth`)
-                                VALUES (:customerId, :font, :fontsize, :unicodeChar, :pixelWidth)
+        $sql= 'INSERT INTO LEK_pixel_mapping (`taskGuid`,`font`,`fontsize`,`unicodeChar`,`pixelWidth`)
+                                VALUES (:taskGuid, :font, :fontsize, :unicodeChar, :pixelWidth)
                                 ON DUPLICATE KEY UPDATE
-                                    `customerId` = :customerId,
+                                    `taskGuid` = :taskGuid,
                                     `font` = :font,
                                     `fontsize` = :fontsize,
                                     `unicodeChar` = :unicodeChar,
                                     `pixelWidth` = :pixelWidth';
         
         try {
-            //customerId is filled with the customer number first:
-            $dataToBind['customerId'] = $this->getCustomerId($dataToBind['customerId']);
-            
             $this->db->getAdapter()->query($sql, $dataToBind);
             return;
         }
         catch(Zend_Db_Statement_Exception $e) {
             $this->handleIntegrityConstraintException($e);
         }
-    }
-    
-    /**
-     * Gets the customer id to a customer number (in a cached way)
-     * @param string $customerNumber
-     */
-    protected function getCustomerId($customerNumber) {
-        if(empty($this->cachedCustomers[$customerNumber])) {
-            $this->bareCustomerInstance->loadByNumber($customerNumber);
-            $this->cachedCustomers[$customerNumber] = $this->bareCustomerInstance->getId();
-        }
-        return $this->cachedCustomers[$customerNumber];
     }
     
     /**
@@ -131,20 +102,21 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Returns the pixelMapping-data from the database by customer, font-family and fontSize.
+     * Returns the pixelMapping-data from the database by taskGuid, font-family and fontSize.
      * [unicodeChar] => length
-     * @param int $customerId
+     * @param string $taskGuid
      * @param string $fontFamily
      * @param int $fontSize
      * @return array
      */
-    public function getPixelMappingByFont(int $customerId, string $fontFamily, int $fontSize) {
+    public function getPixelMappingByFont(string $taskGuid, string $fontFamily, int $fontSize) {
         $pixelMappingForFont = array();
         $sql = $this->db->select()
         ->from($this->db, array('unicodeChar','pixelWidth'))
-        ->where('customerId = ?', $customerId)
+        ->where('taskGuid = ?', $taskGuid)
         ->where('font LIKE ?', $fontFamily)
         ->where('fontSize = ?', $fontSize);
+        // TODO handle files!
         $allPixelMappingRows = $this->db->fetchAll($sql);
         foreach ($allPixelMappingRows->toArray() as $row) {
             $pixelMappingForFont[$row['unicodeChar']] = $row['pixelWidth'];
@@ -153,19 +125,20 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Return all pixelMapping-data as set for the customer for all fonts used in a task.
-     * @param int $customerId
+     * Return all pixelMapping-data as set for all fonts used in a task considering different files if given.
+     * @param string $taskGuid
      * @param array $allFontsInTask
      * @return array
      */
-    public function getPixelMappingForTask(int $customerId, array $allFontsInTask) {
+    public function getPixelMappingForTask(string $taskGuid, array $allFontsInTask) {
         $pixelMappingForTask = array();
         foreach ($allFontsInTask as $font) {
             $fontFamily = strtolower($font['font']);
             $fontSize = intval($font['fontSize']);
-            $pixelMappingForTask[$fontFamily][$fontSize] = $this->getPixelMappingByFont($customerId, $fontFamily, $fontSize);
+            $pixelMappingForTask[$fontFamily][$fontSize] = $this->getPixelMappingByFont($taskGuid, $fontFamily, $fontSize);
             $pixelMappingForTask[$fontFamily][$fontSize]['default'] = $this->getDefaultPixelWidth($fontSize);
         }
+        // TODO handle files!
         return $pixelMappingForTask;
         /*
          Array

@@ -979,11 +979,14 @@ class editor_TaskController extends ZfExtended_RestController {
         ]);
     }
     
+    /**
+     * Add pixelMapping-data to the view (= for the fonts used in the task).
+     */
     protected function addPixelMapping() {
         $pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
         /* @var $pixelMapping editor_Models_PixelMapping */
         try {
-            $pixelMappingForTask = $pixelMapping->getPixelMappingForTask(intval($this->entity->getCustomerId()), $this->entity->getAllFontsInTask());
+            $pixelMappingForTask = $pixelMapping->getPixelMappingForTask($this->entity->getTaskGuid(), $this->entity->getAllFontsInTask());
         }
         catch(ZfExtended_Exception $e) {
             $pixelMappingForTask = [];

@@ -41,7 +41,7 @@ class editor_Models_Import_MetaData_Exception extends editor_Models_Import_Excep
         
         static protected $localErrorCodes = [
             'E1052' => 'Some of the tasks metaData can not be imported, previous error message: {previousMessage}',
-            'E1053' => 'Pixel-Mapping: Import failed due not found customer specified by customer number in excel - client nr: {lastClientNr}',
+            'E1053' => 'Pixel-Mapping: Import failed due not found customer specified by customer number in excel - client nr: {lastClientNr}', // old
             'E1054' => 'Pixel-Mapping: missing default-values for pixel-width for font-size {fontSize}. Add the missing values to the config.',
         ];
 }

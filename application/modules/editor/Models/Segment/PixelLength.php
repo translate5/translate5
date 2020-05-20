@@ -104,7 +104,7 @@ class editor_Models_Segment_PixelLength {
         $this->customerId = intval($this->task->getCustomerId());
         $this->pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
         /* @var $pixelMapping editor_Models_PixelMapping */
-        $this->pixelMappingForTask = $this->pixelMapping->getPixelMappingForTask(intval($this->task->getCustomerId()), $this->task->getAllFontsInTask());
+        $this->pixelMappingForTask = $this->pixelMapping->getPixelMappingForTask($this->task->getTaskGuid(), $this->task->getAllFontsInTask());
     }
     
     public function __destruct() {
@@ -119,7 +119,7 @@ class editor_Models_Segment_PixelLength {
         $customer = ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $customer editor_Models_Customer */
         $customer->load($this->customerId);
-        return; // !!!!!!!!!!!!!!!!!!!!!!!!!!
+        
         $logger->warn('E0000', $logMsg, [
             'affectedCharacters' => $this->logMissingData,
             'task' => $this->task,
@@ -234,7 +234,7 @@ class editor_Models_Segment_PixelLength {
             //error_log('[' . $key . '] ' . $char . ' ('. $unicodeCharNumeric . '): '.$charWidth. ') => length now: ' . $pixelLength);
         }
         
-        if (false && !empty($charsNotSet)) { // !!!!!!!!!!!!!!!!!!!!!!!1
+        if (!empty($charsNotSet)) {
             sort($charsNotSet);
             
             $logData = new stdClass();

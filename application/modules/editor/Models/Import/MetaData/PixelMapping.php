@@ -68,8 +68,6 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
      */
     protected $ignoredLines = [];
     
-    protected $lastCustomerId;
-    
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_MetaData_IMetaDataImporter::import()
@@ -85,23 +83,9 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
      * if exist update table LEK_pixel_mapping
      */
     public function importFromSpreadsheet() {
-        try {
-            $e = null;
-            $this->loadSpreadsheet();
-            $this->updateDb();
-            $this->logIgnoredLines();
-            return;
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            //no customer to the number found, proceed with the below Exception
-        }
-        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
-            //no customer to the number found, proceed with the below Exception
-        }
-        throw new editor_Models_Import_MetaData_Exception('E1053',[
-            'task' => $this->task,
-            'lastClientNr' => $this->lastCustomerId
-        ], $e);
+        $this->loadSpreadsheet();
+        $this->updateDb();
+        $this->logIgnoredLines();
     }
     
     /**
@@ -123,6 +107,7 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
         if (is_null($this->spreadsheet)) {
             return;
         }
+        $taskGuid = $this->task->getTaskGuid();
         $worksheet = $this->spreadsheet->getActiveSheet();
         $highestRow = $worksheet->getHighestRow();
         if ($highestRow == 1) {
@@ -132,6 +117,7 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
         /* @var $pixelMappingModel editor_Models_PixelMapping */
         for ($row = 2; $row <= $highestRow; ++$row) { // first row: headlines only
             $values = [];
+            $values[] = $taskGuid;
             $oneColWasEmpty = false;
             for ($col = 1; $col <= self::PIXEL_MAPPING_MAXCOL; ++$col) {
                 $values[] = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
@@ -142,8 +128,7 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
                 $this->ignoredLines[] = join(', ', $values);
                 continue;
             }
-            $this->lastCustomerId = $values[0];
-            $pixelMappingModel->insertPixelMappingRow($values);
+            $pixelMappingModel->insertPixelMappingRowFromSpreadsheet($values);
         }
     }
     
