@@ -71,15 +71,15 @@ $dep->dependencies = [[
                                                             // so in near future target will be optional, and without a target
                                                             // nothing will be unzipped, just downloaded
     ],[
-        "name" => "horde_text_diff",                        // see above
-        "label" => "Horde Text Diff",                       // see above
-        "url" => "RELEASE:Horde_Text_Diff-2.2.0.zip",       // see above
-        "version" => "2.2.0",                               // currently not used, just for the sake of completeness
-        "target" => "library/Horde_Text_Diff/",             // unzip target, see above
+        "name" => "third-party-dependencies",               // see above
+        "label" => "Third Party Dependencies pulled in by PHP composer",    // see above
+        "url" => "RELEASE:third-party-dependencies.zip",       // see above
+        "version" => "-na-",                                // currently not used, just for the sake of completeness
+        "target" => "vendor/",                              // unzip target, see above
         "licenses" => [[                                    // list of licenses to be confirmed for this package
-            "uses" => "the Horde Text Diff library",        // is parsed into license title and agreement
-            "license" => "LGPL",                            // is parsed into license title and agreement
-            "relpath" => "docs/third-party-licenses/Horde_Text_Diff-2.0.1.license.txt"
+            "uses" => "several dependent libraries",        // is parsed into license title and agreement
+            "license" => "several, see third-party-dependency-licenses.md",                            // is parsed into license title and agreement
+            "relpath" => "docs/third-party-licenses/third-party-dependency-licenses.md"
                                                             // relpath file is checked for existence,
                                                             //  then the path (not the content) parsed into license agreement
             // agreement   optional, overwrites default agreement (defined in ZfExtended_Models_Installer_License)
@@ -95,17 +95,6 @@ $dep->dependencies = [[
             "uses" => "z1-php7.3 (a fork of PHP Zend 1)",
             "license" => "BSD-3-Clause",
             "relpath" => "docs/third-party-licenses/Zend-license.txt"
-        ]]
-    ],[
-        "name" => "querypath",
-        "label" => "QueryPath",
-        "url" => "RELEASE:querypath-3.0.3-p1.zip",
-        "version" => "3.0.3-p1",
-        "target" => "library/querypath/",
-        "licenses" => [[
-            "uses" => "the QueryPath library",
-            "license" => "LGPL",
-            "relpath" => "docs/third-party-licenses/querypath-3.0.3.license.txt"
         ]]
     ],[
         "name" => "Open_Sans",
@@ -248,99 +237,6 @@ $dep->dependencies = [[
             "uses" => "Icons for jQuery-UI",
             "license" => "CC BY-SA 3.0",
             "relpath" => "docs/third-party-licenses/jquery-ui-iconfont-README.md"
-        ]]
-    ],[
-        "name" => "phpppreadsheet",
-        "label" => "PhpSpreadsheet",
-        "version" => "1.6",
-        "url" => "RELEASE:PhpSpreadsheet-and-dependencies.zip",
-        "target" => "library/PhpSpreadsheet/",
-        "licenses" => [[
-            "uses" => "Composer",
-            "license" => "Expat",
-            "relpath" => "docs/third-party-licenses/Composer-license.txt"
-        ],[
-            "uses" => "Composer File Util/TlsHelper.php",
-            "license" => "Expat and BSD-2-Clause",
-            "relpath" => "docs/third-party-licenses/Composer-license.txt"
-        ],[
-            "uses" => "PHPComplex",
-            "license" => "MIT",
-            "relpath" => "docs/third-party-licenses/MarkBaker-PHPComplex-license.md"
-        ],[
-            "uses" => "PHPMatrix",
-            "license" => "MIT",
-            "relpath" => "docs/third-party-licenses/MarkBaker-PHPMatrix-license.md"
-        ],[
-            "uses" => "PhpSpreadsheet",
-            "license" => "LGPL",
-            "relpath" => "docs/third-party-licenses/PhpSpreadsheet-license.txt"
-        ],[
-            "uses" => "PHP FIG Simple Cache PSR",
-            "license" => "MIT",
-            "relpath" => "docs/third-party-licenses/Simple-Cache-license.md"
-        ]]
-    ],[
-        "name" => "google-cloud-translate",
-        "label" => "Google Cloud Translation for PHP",
-        "version" => "1.2.6",
-        "url" => "RELEASE:GoogleCloudTranslation-and-dependencies.zip",
-        "target" => "library/google-translate-api/",
-        "licenses" => [[
-            "uses" => "Composer",
-            "license" => "Expat",
-            "relpath" => "docs/third-party-licenses/byGoogleTranslate/Composer-license.txt"
-        ],[
-            "uses" => "Firebase",
-            "license" => "BSD-3-Clause",
-            "relpath" => "docs/third-party-licenses/byGoogleTranslate/Firebase-license.txt"
-        ],[
-            "uses" => "Google Auth Library for PHP",
-            "license" => "Apache License 2.0",
-            "relpath" => "docs/third-party-licenses/byGoogleTranslate/GoogleAuth-license.txt"
-        ],[
-            "uses" => "Google Cloud Core for PHP",
-            "license" => "Apache License 2.0",
-            "relpath" => "docs/third-party-licenses/byGoogleTranslate/GoogleCloudCore-license.txt"
-        ],[
-            "uses" => "Google Cloud Translation for PHP",
-            "license" => "Apache License 2.0",
-            "relpath" => "docs/third-party-licenses/byGoogleTranslate/GoogleCloudTranslate-license.txt"
-        ],[
-            "uses" => "Guzzle HTTP PHP client library",
-            "license" => "MIT",
-            "relpath" => "docs/third-party-licenses/byGoogleTranslate/GuzzleHttp-license.txt"
-        ],[
-            "uses" => "Monolog logger library",
-            "license" => "MIT",
-            "relpath" => "docs/third-party-licenses/byGoogleTranslate/Monolog-license.txt"
-        ],[
-            "uses" => "PSR Cache, PSR HTTP Message and PSR Log library",
-            "license" => "MIT",
-            "relpath" => "docs/third-party-licenses/byGoogleTranslate/PSR-libraries-license.txt"
-        ],[
-            "uses" => "rize PHP URI Template",
-            "license" => "MIT",
-            "relpath" => "docs/third-party-licenses/byGoogleTranslate/rize-license.txt"
-        ]]
-    ],[
-        "name" => "OpenID-Connect-PHP",
-        "label" => "OpenID-Connect-PHP",
-        "version" => "0.8.0",
-        "url" => "RELEASE:OpenID-Connect-PHP.zip",
-        "target" => "library/OpenID-Connect-PHP/",
-        "licenses" => [[
-            "uses" => "Composer",
-            "license" => "Expat",
-            "relpath" => "docs/third-party-licenses/OpenID-Connect-PHP-Composer-license.txt"
-        ],[
-            "uses" => "OpenID Connect PHP",
-            "license" => "Apache License 2.0",
-            "relpath" => "docs/third-party-licenses/OpenID-Connect-PHP-license.txt"
-        ],[
-            "uses" => "phpseclib - PHP Secure Communications Library",
-            "license" => "MIT",
-            "relpath" => "docs/third-party-licenses/OpenID-Connect-PHP-phpseclib-license.txt"
         ]]
     ]
 ];

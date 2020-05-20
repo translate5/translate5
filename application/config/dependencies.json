@@ -17,16 +17,16 @@
             "target": "dbinit\/"
         },
         {
-            "name": "horde_text_diff",
-            "label": "Horde Text Diff",
-            "url": "RELEASE:Horde_Text_Diff-2.2.0.zip",
-            "version": "2.2.0",
-            "target": "library\/Horde_Text_Diff\/",
+            "name": "third-party-dependencies",
+            "label": "Third Party Dependencies pulled in by PHP composer",
+            "url": "RELEASE:third-party-dependencies.zip",
+            "version": "-na-",
+            "target": "vendor\/",
             "licenses": [
                 {
-                    "uses": "the Horde Text Diff library",
-                    "license": "LGPL",
-                    "relpath": "docs\/third-party-licenses\/Horde_Text_Diff-2.0.1.license.txt"
+                    "uses": "several dependent libraries",
+                    "license": "several, see third-party-dependency-licenses.md",
+                    "relpath": "docs\/third-party-licenses\/third-party-dependency-licenses.md"
                 }
             ]
         },
@@ -41,20 +41,6 @@
                     "uses": "z1-php7.3 (a fork of PHP Zend 1)",
                     "license": "BSD-3-Clause",
                     "relpath": "docs\/third-party-licenses\/Zend-license.txt"
-                }
-            ]
-        },
-        {
-            "name": "querypath",
-            "label": "QueryPath",
-            "url": "RELEASE:querypath-3.0.3-p1.zip",
-            "version": "3.0.3-p1",
-            "target": "library\/querypath\/",
-            "licenses": [
-                {
-                    "uses": "the QueryPath library",
-                    "license": "LGPL",
-                    "relpath": "docs\/third-party-licenses\/querypath-3.0.3.license.txt"
                 }
             ]
         },
@@ -86,7 +72,7 @@
                     "label": "openTMS TermTagger libraries",
                     "license": "CDDL 1.1",
                     "relpath": "docs\/third-party-licenses\/CDDL-license.txt",
-                    "agreement": "Grizzly project and others license agreement description: \n  Some of the libraries openTMS TermTagger builds on are licensed \n  under the CDDL license. Please read the following license agreement\n  and accept it for these libraries (like the Grizzly project and \n  others). Which library uses which license is listed in the openTMS \n  TermTagger installation directory which you will find in your \n  translate5 application directory beneath\n\n    application\/modules\/editor\/ThirdParty\/XliffTermTagger\/\n\n  after installation. You must accept the terms of this agreement for\n  these components by typing \"y\" before continuing with the \n  installation."
+                    "agreement": "Grizzly project and others license agreement description:\n  Some of the libraries openTMS TermTagger builds on are licensed\n  under the CDDL license. Please read the following license agreement\n  and accept it for these libraries (like the Grizzly project and\n  others). Which library uses which license is listed in the openTMS\n  TermTagger installation directory which you will find in your\n  translate5 application directory beneath\n\n    application\/modules\/editor\/ThirdParty\/XliffTermTagger\/\n\n  after installation. You must accept the terms of this agreement for\n  these components by typing \"y\" before continuing with the\n  installation."
                 }
             ]
         },
@@ -101,7 +87,7 @@
                     "uses": "OpenTM2 Community Edition",
                     "license": "Eclipse Public License 1.0",
                     "relpath": "docs\/third-party-licenses\/OpenTM2-Community-Edition-license.txt",
-                    "agreement": "translate5 uses {USES} (version {VERSION}).\n  Please read the following license agreement and accept it for \n  OpenTM2.\n\n    {RELPATH}\n\n  You must accept the terms of this agreement for {LABEL} by typing\n  \"y\" and <ENTER> before continuing with the installation.\n  If you type \"y\", the translate5 installer will download {LABEL} \n  for you. \n\n  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!\n    Since {LABEL} is executable only under Microsoft Windows\n    Operating Systems the installer can only download it for you.\n  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!\n\n  The Installation has to be started manually! \n\n  Please stop an already running {LABEL} instance before \n  installing \/ updating it!\n  The downloaded file will be located in the folder\n                \n    \"OpenTM2-Installer\/\"\n\n  {SUFFIX}"
+                    "agreement": "translate5 uses {USES} (version {VERSION}).\n  Please read the following license agreement and accept it for\n  OpenTM2.\n\n    {RELPATH}\n\n  You must accept the terms of this agreement for {LABEL} by typing\n  \"y\" and <ENTER> before continuing with the installation.\n  If you type \"y\", the translate5 installer will download {LABEL}\n  for you.\n\n  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!\n    Since {LABEL} is executable only under Microsoft Windows\n    Operating Systems the installer can only download it for you.\n  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!\n\n  The Installation has to be started manually!\n\n  Please stop an already running {LABEL} instance before\n  installing \/ updating it!\n  The downloaded file will be located in the folder\n                \n    \"OpenTM2-Installer\/\"\n\n  {SUFFIX}"
                 }
             ]
         },
@@ -189,123 +175,6 @@
                     "uses": "Icons for jQuery-UI",
                     "license": "CC BY-SA 3.0",
                     "relpath": "docs\/third-party-licenses\/jquery-ui-iconfont-README.md"
-                }
-            ]
-        },
-        {
-            "name": "phpppreadsheet",
-            "label": "PhpSpreadsheet",
-            "version": "1.6",
-            "url": "RELEASE:PhpSpreadsheet-and-dependencies.zip",
-            "target": "library\/PhpSpreadsheet\/",
-            "licenses": [
-                {
-                    "uses": "Composer",
-                    "license": "Expat",
-                    "relpath": "docs\/third-party-licenses\/Composer-license.txt"
-                },
-                {
-                    "uses": "Composer File Util\/TlsHelper.php",
-                    "license": "Expat and BSD-2-Clause",
-                    "relpath": "docs\/third-party-licenses\/Composer-license.txt"
-                },
-                {
-                    "uses": "PHPComplex",
-                    "license": "MIT",
-                    "relpath": "docs\/third-party-licenses\/MarkBaker-PHPComplex-license.md"
-                },
-                {
-                    "uses": "PHPMatrix",
-                    "license": "MIT",
-                    "relpath": "docs\/third-party-licenses\/MarkBaker-PHPMatrix-license.md"
-                },
-                {
-                    "uses": "PhpSpreadsheet",
-                    "license": "LGPL",
-                    "relpath": "docs\/third-party-licenses\/PhpSpreadsheet-license.txt"
-                },
-                {
-                    "uses": "PHP FIG Simple Cache PSR",
-                    "license": "MIT",
-                    "relpath": "docs\/third-party-licenses\/Simple-Cache-license.md"
-                }
-            ]
-        },
-        {
-            "name": "google-cloud-translate",
-            "label": "Google Cloud Translation for PHP",
-            "version": "1.2.6",
-            "url": "RELEASE:GoogleCloudTranslation-and-dependencies.zip",
-            "target": "library\/google-translate-api\/",
-            "licenses": [
-                {
-                    "uses": "Composer",
-                    "license": "Expat",
-                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/Composer-license.txt"
-                },
-                {
-                    "uses": "Firebase",
-                    "license": "BSD-3-Clause",
-                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/Firebase-license.txt"
-                },
-                {
-                    "uses": "Google Auth Library for PHP",
-                    "license": "Apache License 2.0",
-                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/GoogleAuth-license.txt"
-                },
-                {
-                    "uses": "Google Cloud Core for PHP",
-                    "license": "Apache License 2.0",
-                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/GoogleCloudCore-license.txt"
-                },
-                {
-                    "uses": "Google Cloud Translation for PHP",
-                    "license": "Apache License 2.0",
-                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/GoogleCloudTranslate-license.txt"
-                },
-                {
-                    "uses": "Guzzle HTTP PHP client library",
-                    "license": "MIT",
-                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/GuzzleHttp-license.txt"
-                },
-                {
-                    "uses": "Monolog logger library",
-                    "license": "MIT",
-                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/Monolog-license.txt"
-                },
-                {
-                    "uses": "PSR Cache, PSR HTTP Message and PSR Log library",
-                    "license": "MIT",
-                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/PSR-libraries-license.txt"
-                },
-                {
-                    "uses": "rize PHP URI Template",
-                    "license": "MIT",
-                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/rize-license.txt"
-                }
-            ]
-        },
-        {
-            "name": "OpenID-Connect-PHP",
-            "label": "OpenID-Connect-PHP",
-            "version": "0.8.0",
-            "url": "RELEASE:OpenID-Connect-PHP.zip",
-            "target": "library\/OpenID-Connect-PHP\/",
-            "licenses": [
-                {
-                    "uses": "Composer",
-                    "license": "Expat",
-                    "relpath": "docs\/third-party-licenses\/OpenID-Connect-PHP-Composer-license.txt"
-                },
-                {
-                    "uses": "OpenID Connect PHP",
-                    "license": "Apache License 2.0",
-                    "relpath": "docs\/third-party-licenses\/OpenID-Connect-PHP-license.txt"
-                },
-                {
-                    "uses": "phpseclib - PHP Secure Communications Library",
-                    "license": "MIT",
-                    "relpath": "docs\/third-party-licenses\/OpenID-Connect-PHP-phpseclib-license.txt"
                 }
             ]
         }
