@@ -1968,6 +1968,22 @@
     <source>Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.</source>
     <target>The segment content is too long! Maximum {0} characters are allowed.</target>
   </trans-unit>
+  <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgZW50aMOkbHQgenUgdmllbGUgWmVpbGVudW1icsO8Y2hlOyBtYXhpbWFsIHswfSBaZWlsZW4gc2luZCBlcmxhdWJ0Lg=='>
+    <source>Der Segmentinhalt enthält zu viele Zeilenumbrüche; maximal {0} Zeilen sind erlaubt.</source>
+    <target>There are too many line breaks in the segment content; maximum {0} lines are allowed.</target>
+  </trans-unit>
+  <trans-unit id='TmljaHQgYWxsZSBaZWlsZW4gaW0gU2VnbWVudGluaGFsdCBzaW5kIHVudGVyIGRlciBtYXhpbWFsIGVybGF1YnRlbiBMw6RuZ2UgKHswfSku'>
+    <source>Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).</source>
+    <target>Not all lines in the segment content match the allowed length ({0}).</target>
+  </trans-unit>
+  <trans-unit id='TmljaHQgYWxsZSBaZWlsZW4gaW0gU2VnbWVudGluaGFsdCBlcnJlaWNoZW4gZGllIG1pbmltYWwgZXJmb3JkZXJ0ZSBMw6RuZ2UgKHswfSku'>
+    <source>Nicht alle Zeilen im Segmentinhalt erreichen die minimal erforderte Länge ({0}).</source>
+    <target>Not all lines in the segment content match the required length ({0}).</target>
+  </trans-unit>
+  <trans-unit id='WmVpbGVu'>
+    <source>Zeilen</source>
+    <target>lines</target>
+  </trans-unit>
   <trans-unit id='U3ByYWNoZQ=='>
       <source>Sprache</source>
       <target>Language</target>
@@ -2095,16 +2111,7 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
   <trans-unit id='ezB9IHZvbiB7MX0='>
     <source>{0} von {1}</source>
     <target>{0} of {1}</target>
-  </trans-unit>
- <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGt1cnohIE1pbmRlc3RlbnMgezB9IFplaWNoZW4gbcO8c3NlbiB2b3JoYW5kZW4gc2Vpbi4='>
-    <source>Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.</source>
-    <target>The segment content is too short! At least {0} characters must exist.</target>
-  </trans-unit>
-  <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGxhbmchIE1heGltYWwgezB9IFplaWNoZW4gc2luZCBlcmxhdWJ0Lg=='>
-    <source>Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.</source>
-    <target>The segment content is too long! Maximum {0} characters are allowed.</target>
-  </trans-unit>
-  
+  </trans-unit>  
   <trans-unit id='PGI+UmVsYWlzc3ByYWNoZTo8L2I+IHtyZWxhaXNMYW5ndWFnZVRyYW5zbGF0ZWR9PGJyIC8+'>
       <source><b>Relaissprache:</b> {relaisLanguageTranslated}<br /></source>
       <target><b>relay language:</b> {relaisLanguageTranslated}<br /></target>

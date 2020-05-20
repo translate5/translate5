@@ -52,6 +52,8 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace extends editor_Mod
     public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
         //TODO parse:
         //trans-unit id="7" translate5:autostateId="4" translate5:autostateText="not_translated">
+        settype($attributes['translate5:maxNumberOfLines'], 'integer');
+        $segmentAttributes->maxNumberOfLines = $attributes['translate5:maxNumberOfLines'];
     }
     
     /**

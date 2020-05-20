@@ -34,15 +34,18 @@
 		</fileparser>
 	</import>
 	
-	<!-- tag "pixelmapping" is optional -->
-	<pixelmapping>
-		<!-- tag "size-unit" is optional; valid values: "pixel" (= default if nothing is set) or "char" (can be overwritten in xliff's trans-unit) -->
-		<size-unit>pixel</size-unit>
-		<!-- tag "font" is optional and contains the name of a default font-family, e.g. "Arial" or "Times New Roman" (can be overwritten in xliff's trans-unit) -->
-		<font>Arial</font>
-		<!-- tag "fontSize" is optional and contains a default font-size, e.g. "12" (can be overwritten in xliff's trans-unit) -->
-		<fontSize>13</fontSize>
-		<!-- tag "maxWidth" is optional and contains a default max. length, e.g. "70" (can be overwritten in xliff's trans-unit) -->
-		<maxWidth>70</maxWidth>
-	</pixelmapping>
+    <!-- tag "lengthRestriction" is optional -->
+    <lengthRestriction>
+        <!-- tag "size-unit" is optional; valid values: "pixel" (= default if nothing is set) or "char" (can be overwritten in xliff's trans-unit) -->
+        <size-unit>pixel</size-unit>
+        <!-- tag "maxWidth" is optional and contains a default max. length, e.g. "70" (can be overwritten in xliff's trans-unit) -->
+        <maxWidth>70</maxWidth>
+        <!-- tag "pixelmapping" is optional -->
+        <pixelmapping>
+            <!-- tag "font" is optional and contains the name of a default font-family, e.g. "Arial" or "Times New Roman" (can be overwritten in xliff's trans-unit) -->
+            <font>Arial</font>
+            <!-- tag "fontSize" is optional and contains a default font-size, e.g. "12" (can be overwritten in xliff's trans-unit) -->
+            <fontSize>13</fontSize>
+        </pixelmapping>
+    </lengthRestriction>
 </task>
