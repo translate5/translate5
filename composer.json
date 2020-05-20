@@ -1,12 +1,13 @@
 {
 	"require" : {
-		"wikimedia/composer-merge-plugin" : "~1.4"
+		"wikimedia/composer-merge-plugin" : "~1.4",
+		"comcast/php-legal-licenses" : "~1.1"
 	},
 	"extra" : {
 		"merge-plugin" : {
 			"include" : [
 				"application/modules/*/composer.local.json",
-				"application/modules/*/composer.local.json"
+				"library/*/composer.local.json"
 			]
 		}
 	},
