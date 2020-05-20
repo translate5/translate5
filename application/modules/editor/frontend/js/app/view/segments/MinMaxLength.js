@@ -476,7 +476,10 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             tplData.cls = 'valid-length';
         }
         
-        // labelData 
+        // labelData
+        if (maxWidthForSegment === Number.MAX_SAFE_INTEGER) {
+            labelData.maxWidth = ''; // = not set; lines can be "endless" (= which is MAX_SAFE_INTEGER)
+        }
         if (useMaxNumberOfLines) {
             allLines = me.getLinesAndLength(editorContent, me.segmentMeta);
             labelData.maxWidth = me.segmentMeta.maxNumberOfLines + '*' + maxWidthForLine;
