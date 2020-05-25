@@ -69,6 +69,17 @@ Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
         }
         return me.callParent([ config ]);
     },
+    
+    initComponent:function(){
+    	var me=this;
+    	me.callParent([arguments]);
+    	//the languageResourceTaskAssocPanel component is used in 2 different contexts (import,and projectTask properties)
+    	//in the import wizard, no auto binding is required, just normal store
+    	var assocGrid=me.down('#languageResourcesTaskAssocGrid');
+    	assocGrid.setBind(null);
+    	assocGrid.setStore('Editor.store.LanguageResources.TaskAssocStore');
+    },
+    
     //called when next button is clicked
     triggerNextCard:function(activeItem){
         this.getController().handleNextCardClick();

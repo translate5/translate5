@@ -53,8 +53,6 @@ Ext.define('Editor.view.project.ProjectGrid', {
 	],
 	
 	store: 'project.Project',
-	bufferedRenderer:false,//info: this will stop the store filter binding.
-
 	viewConfig: {
 	      getRowClass: function(task) {
 	          var res = [],
@@ -107,16 +105,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
      * Configure the project action columns 
      */
     configureActionColumn:function(){
-    	var me=this,
-			actions = me.down('taskActionColumn');
-
-    	actions.setWidth(90);
-    	actions.on({
-    		click:{
-    			fn:'projectActionDispatcher',
-    			scope:me.getController()
-    		}
-    	});
-	    me.availableActions = ['editorDeleteProject'];
-    },
+    	var me=this;
+	    me.availableActions = ['editorMenuProject'];
+    }
 });

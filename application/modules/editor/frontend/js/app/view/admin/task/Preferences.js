@@ -27,14 +27,20 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.admin.task.Preferences', {
-    extend: 'Ext.panel.Panel',
+    extend: 'Ext.window.Window',
     alias: 'widget.editorAdminTaskPreferences',
 
     requires: [
         'Editor.view.admin.task.UserPrefsGrid',
-        'Editor.view.admin.task.UserPrefsForm'
+        'Editor.view.admin.task.UserPrefsForm',
+        'Editor.view.admin.task.PreferencesViewModel'
     ],
-
+    viewModel:{
+    	type:'editorAdminTaskPreferences',
+    },
+    modal:true,
+    width:600,
+    height:350,
     layout: {
         type: 'border'
     },
@@ -47,12 +53,11 @@ Ext.define('Editor.view.admin.task.Preferences', {
     initComponent: function() {
         var me = this,
             workflows = [];
-            //task = me.lookupViewModel().get('currentTask');
         
         Ext.Object.each(Editor.data.app.workflows, function(key, item) {
             workflows.push([item.id, item.label]);
         });
-            
+        
         me.items = [{
                 xtype: 'editorAdminTaskUserPrefsGrid',
                 region: 'center'
@@ -67,10 +72,7 @@ Ext.define('Editor.view.admin.task.Preferences', {
                     forceSelection: true,
                     editable: false,
                     fieldLabel: me.workflow_label,
-                    //value:task.get('workflow'),
-                    bind:{
-                    	value:'{currentTask.workflow}'
-                    },
+                    value:me.task.get('workflow'),
                     store: workflows
                 }]
             },{
@@ -95,11 +97,14 @@ Ext.define('Editor.view.admin.task.Preferences', {
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
-                title: me.title //see EXT6UPD-9
+                title: me.title, //see EXT6UPD-9
+                task:instanceConfig.task
             };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
-        return me.callParent([config]);
+        var cmpConfig=me.callParent([config]);
+        me.getViewModel().set('currentTask',me.task);
+        return cmpConfig;
     }
 });

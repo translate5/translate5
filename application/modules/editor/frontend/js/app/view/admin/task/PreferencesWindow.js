@@ -41,7 +41,6 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
        'Editor.view.admin.task.LogWindow'
     ],
     itemId: 'adminTaskPreferencesWindow',
-    //title: '#UT#Einstellungen zu Aufgabe "{currentTask.taskName}"',
     header:false,
     strings: {
         close: '#UT#Fenster schließen',
@@ -63,20 +62,16 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         
         if(auth.isAllowed('editorChangeUserAssocTask')) {
             tabs.push({
-                xtype: 'adminTaskUserAssoc'
+                xtype: 'adminTaskUserAssoc',
             });
         }
         
-        tabs.push({
-        	xtype: 'languageResourceTaskAssocPanel'
-        });
-        
-        if(auth.isAllowed('editorWorkflowPrefsTask')) {
-            tabs.push({
-                xtype: 'editorAdminTaskPreferences'
-            });
+        if(auth.isAllowed('languageResourcesTaskassoc')) {
+	        tabs.push({
+	        	xtype: 'languageResourceTaskAssocPanel'
+	        });
         }
-
+        
         if(auth.isAllowed('editorEditTaskPm') || 
             auth.isAllowed('editorEditTaskOrderDate') ||
             auth.isAllowed('editorEditTaskTaskName')||
@@ -90,18 +85,13 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             tabs.push({
                 xtype: 'editorAdminTaskLogGrid',
                 title: this.strings.events,
-                listeners: {
-                    show: function() {
-                        this.load(me.getViewModel().get('currentTask').getId());
-                    }
+                bind:{
+                	task:'{currentTask}'
                 }
             });
         }
         
         config = {
-//            bind:{
-//            	title:me.title
-//            },
             items : [{
                 xtype: 'tabpanel',
                 activeTab: 0,

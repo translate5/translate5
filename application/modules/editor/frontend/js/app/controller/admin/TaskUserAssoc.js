@@ -108,7 +108,13 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           },
           'adminTaskUserAssoc #cancel-assoc-btn': {
               click: me.handleCancel
-          }
+          },
+          'adminTaskUserAssoc #userSpecialPropertiesBtn':{
+        	  click:me.onUserSpecialPropertiesBtnClick
+          },
+          '#adminTaskUserAssocGrid #reload-btn': {
+              click: me.reloadTaskUserAssocGrid
+          },
       });
   },
   /**
@@ -247,6 +253,21 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           }
       });
   },
+  
+  reloadTaskUserAssocGrid:function(){
+      var me = this,
+      	store = me.getUserAssocGrid().getStore();
+      store.load();
+  },
+  
+  onUserSpecialPropertiesBtnClick:function(){
+	  var me=this,
+	  	preferences=Ext.create('Editor.view.admin.task.Preferences',{
+	  		task:me.getPrefWindow().getViewModel().get('currentTask')
+	  	});
+	  preferences.show();
+  },
+  
   clearStores: function() {
       this.getAdminTaskUserAssocsStore().removeAll();
   },
@@ -299,11 +320,10 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
 	  	tuaUsers=[];
 	  
 	  //collect all userGuids for the current role
-      userAssocGrid.getStore().filterBy(function(rec){
+      userAssocGrid.getStore().each(function(rec){
           if(rec.get('role')==userRole){
             tuaUsers.push(rec.get('userGuid'));
           }
-        return true;
       });
       
       //filter out all current assoc users from the usersStore

@@ -66,6 +66,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   },{
       ref: 'taskWorkflow',
       selector: 'editorAdminTaskPreferences #taskWorkflow'
+  },{
+      ref: 'userAssocGrid',
+      selector: 'adminTaskUserAssocGrid'
   }],
   strings: {
       taskWorkflowSaved: '#UT#Änderung des Workflows der Aufgabe gespeichert!',
@@ -87,17 +90,8 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   },
   
   init : function() {
-      var me = this,
-          toc = me.application.getController('admin.TaskOverview'),
-          tua;
+      var me = this;
       
-      //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
-      if(Editor.controller.admin.TaskUserAssoc && me.getPrefForm()){
-          tua = me.application.getController('admin.TaskUserAssoc');
-          tua.on('addUserAssoc', me.calculateAvailableCombinations, me);
-          tua.on('removeUserAssoc', me.handleReload, me);
-      }
-      toc.on('handleTaskPreferences', me.handleTaskPreferences, me);
       Editor.app.on('adminViewportClosed', me.clearStores, me);
 
       me.control({
@@ -117,7 +111,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           'editorAdminTaskUserPrefsGrid #userPrefReload': {
               click: me.handleReload
           },
-          '#adminTaskUserAssocGrid #reload-btn': {
+          '#XXXadminTaskUserAssocGrid #reload-btn': {
               click: me.handleReload
           },
           'editorAdminTaskUserPrefsGrid #userPrefAdd': {
@@ -136,10 +130,10 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    */
   calculateAvailableCombinations: function() {
       var me = this,
-          workflow = me.actualTask.get('workflow'),
-          steps = Ext.apply({}, me.actualTask.getWorkflowMetaData().assignableSteps),
-          steps2roles = Ext.apply({}, me.actualTask.getWorkflowMetaData().steps2roles),
-          tuas = me.getAdminTaskUserAssocsStore(),
+          workflow = me.getActualTask().get('workflow'),
+          steps = Ext.apply({}, me.getActualTask().getWorkflowMetaData().assignableSteps),
+          steps2roles = Ext.apply({}, me.getActualTask().getWorkflowMetaData().steps2roles),
+          tuas = me.getUserAssocGrid().getStore(),
           prefs = me.getAdminTaskUserPrefsStore(),
           used = {},
           cnt = 0,
@@ -213,8 +207,8 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    */
   loadAllPreferences: function(task) {
       var me = this,
-          userPrefs = me.getAdminTaskUserPrefsStore(),
-          userAssocs = me.getAdminTaskUserAssocsStore(),
+          userAssocs = me.getUserAssocGrid().getStore(),
+          userPrefs = me.getPrefGrid().getStore(),
           //wenn die Stores echte Filter bekommt muss der Wert hier miteingebaut werden!
           tuaParams = {
               params: {
@@ -222,7 +216,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               }
           };
       
-      me.actualTask = task;
       me.getPrefWindow().setLoading(true);
 
       //workflowPrefs must be loaded after userAssocs, 
@@ -249,32 +242,13 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       userAssocs.load(tuaParams);
       me.fireEvent('loadPreferences', this, task, me.getPrefWindow());
   },
-  /**
-   * Opens the Preferences to the choosen Task
-   * triggerd by click on the Task Preferences Button / (Cell also => @todo)
-   * @param {Editor.model.admin.Task} task
-   * @param  activeTab: the tab in the window which will be focused
-   */
-  handleTaskPreferences: function(task,activeTab) {
-	  //TODO: this can be triggered when the menu is implemented
-      this.actualTask = task;
-      var win = Ext.widget('adminTaskPreferencesWindow',{
-          actualTask: task
-      });
-      win.show();
-      win.setLoading(true);
-      this.loadAllPreferences(task);
-      
-      if(activeTab){
-          win.down('tabpanel').setActiveTab(activeTab);
-      }
-  },
+  
   /**
    * adds a new userpref entry
    */
   handleAddClick: function() {
       var me = this,
-          task = me.actualTask,
+          task = me.getActualTask(),
           fields = task.segmentFields().collect('name'),
           rec,
           firstStep = me.updateWorkflowSteps(),
@@ -304,7 +278,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    */
   handleDeleteConfirmClick: function(grid, records) {
       var me = this,
-          task = me.actualTask;
+          task = me.getActualTask();
       Ext.Array.each(records, function(rec){
           me.getPrefWindow().setLoading(true);
           rec.eraseVersioned(task, {
@@ -338,7 +312,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    */
   updateWorkflowSteps: function(rec) {
       var me = this,
-          data = me.actualTask.getWorkflowMetaData(),
+          data = me.getActualTask().getWorkflowMetaData(),
           wfStepCombo=me.getWfStepCombo(),
           steps = [];
       Ext.Object.each(data.steps, function(key, val) {
@@ -363,7 +337,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    */
   updateUsers: function(rec) {
       var me = this,
-          tuas = me.getAdminTaskUserAssocsStore(),
+          tuas = me.getUserAssocGrid().getStore(),
           step = me.getWfStepCombo().getValue(),
           userCombo = me.getUsersCombo(),
           value = userCombo.getValue(),
@@ -409,9 +383,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       if(combo.eventsSuspended) {
           return;
       }
-      me.actualTask.set('workflow', val);
+      me.getActualTask().set('workflow', val);
       me.getPrefWindow().setLoading(true);
-      me.actualTask.save({
+      me.getActualTask().save({
           success: function(rec, op) {
               Editor.MessageBox.addInfo(me.strings.taskWorkflowSaved);
               me.calculateAvailableCombinations();
@@ -435,7 +409,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    * @param {Ext.form.CheckboxGroup} checkboxGroup
    */
   prepareAlternates: function(checkboxGroup) {
-      this.actualTask.segmentFields().each(function(field){
+      this.getActualTask().segmentFields().each(function(field){
           checkboxGroup.add({
               xtype: 'checkbox',
               boxLabel: field.get('label'),
@@ -466,6 +440,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       }
       form.down('combobox[name="workflowStep"]').setDisabled(rec.isDefault());
       me.getUsersCombo().setDisabled(rec.isDefault());
+      me.calculateAvailableCombinations();
       me.updateWorkflowSteps(rec);
       me.updateUsers(rec);
       form.loadRecord(rec, me.FOR_ALL);
@@ -496,7 +471,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       }
       rec.set('workflow', me.getTaskWorkflow().getValue());
       me.getPrefWindow().setLoading(true);
-      rec.saveVersioned(me.actualTask, {
+      rec.saveVersioned(me.getActualTask(), {
           success: function() {
               me.clickCancel();
               if(!rec.store) {
@@ -525,21 +500,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    */
   handleReload: function() {
       var me = this;
-      me.actualTask.load({
-          success: function(rec) {
-              var combo = me.getTaskWorkflow(),
-                  wf = rec.get('workflow');
-                  if(!combo){
-                      return;
-                  }
-              combo.suspendEvents();
-              combo.setValue(wf);
-              combo.resetOriginalValue();
-              combo.resumeEvents();
-              me.updatePrefsFilter(wf);
-          }
-      });
-      me.loadAllPreferences(me.actualTask);
+      me.loadAllPreferences(me.getActualTask());
   },
   
   /**
@@ -571,5 +532,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
               fieldLabel: me.strings.customerLabel + '¹'
           });
       }
+  },
+  
+  getActualTask:function(){
+	  return this.getPrefWindow().getCurrentTask();
   }
 });

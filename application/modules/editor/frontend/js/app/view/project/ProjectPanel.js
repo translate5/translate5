@@ -84,8 +84,8 @@ Ext.define('Editor.view.project.ProjectPanel', {
                     	scrollable: true,
                     	flex:0.7,
                     	bind:{
-                    		disabled:'{!projectTaskSelection}',
-                    		currentTask:'{projectTaskSelection}'
+                    		currentTask:'{projectTaskSelection}',
+                    		disabled:'{!projectTaskSelection}'
                     	}
                     }]
         		}]

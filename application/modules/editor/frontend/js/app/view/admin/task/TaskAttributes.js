@@ -28,9 +28,9 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.task.TaskAttributes', {
     extend: 'Ext.form.Panel',
-    //requires: ['Editor.view.admin.task.TaskAttributesViewController'],
     requires: [
         'Editor.view.admin.task.TaskAttributesViewController',
+        'Editor.view.admin.task.TaskAttributesViewModel'
     ],
     alias: 'widget.taskattributes',
     strings: {
@@ -58,6 +58,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
     },
     itemId:'taskAttributesPanel',
     controller:'taskattributesviewcontroller',
+    viewModel:{
+    	type:'taskattributes'
+    },
     title: '#UT#Eigenschaften',
     initConfig: function(instanceConfig) {
         var me = this,
@@ -122,7 +125,6 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         }
         return me.callParent([config]);
     },
-
     /***
      * Return the allowed fields in the task attributes tab. If the field is not allowed for the current logged user,
      * the component type will be displayfield(the value will be noneditable)
@@ -139,6 +141,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             xtype: 'displayfield',
             fieldLabel: me.strings.customerName,
             name: 'customerId',
+            bind:'{currentTask.customerId}',
             renderer: me.customerRenderer
         });
         
@@ -148,6 +151,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         items.push({
             xtype: auth.isAllowed('editorEditTaskTaskName') ? 'textfield' : 'displayfield',
             fieldLabel: me.strings.taskName,
+            bind:'{currentTask.taskName}',
             name:'taskName',
             itemId:'taskName'
         });
@@ -157,6 +161,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         items.push(me.applyIfNotAllowed({
             xtype: 'datefield',
             fieldLabel: me.strings.orderDate,
+            bind:'{currentTask.orderdate}',
             name:'orderdate',
             itemId:'orderdate'
         },'editorEditTaskOrderDate',{
@@ -168,6 +173,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         items.push(me.applyIfNotAllowed({
             xtype: 'checkbox',
             fieldLabel:me.strings.fullMatchLabel,
+            bind:'{currentTask.edit100PercentMatch}',
             name:'edit100PercentMatch',
             itemId:'edit100PercentMatch',
             listeners:{
@@ -212,22 +218,27 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             return;
         }
         items.push({
-            xtype      : 'radiogroup',
+        	xtype: 'displayfield',
+        	value: me.strings.usageModeInfo
+        },{
+        	xtype: 'component',
+        	html: me.strings.usageModeDisabled,
+        	bind: {
+        		hidden:'{!disableUsageMode}'
+        	}
+        },{
+            xtype: 'radiogroup',
+            radioName:'usageMode',
+            bind : {
+            	value:{
+            		usageMode:'{taskUsageModel}'
+            	}
+            },
             fieldLabel : me.strings.usageModeTitle,
             columns: 1,
             anchor: '100%',
             items: [
                 {
-                    xtype: 'component', 
-                    html: me.strings.usageModeInfo, 
-                    cls:'x-form-check-group-label'
-                },{
-                    xtype: 'component', 
-                    html: me.strings.usageModeDisabled,
-                    bind: {
-                        hidden:'{!disableUsageMode}'
-                    }
-                },{
                     boxLabel  : infoTpl.apply([me.strings.usageModeSimultaneous, me.strings.usageModeSimultaneousInfo]),
                     name      : 'usageMode',
                     inputValue: 'simultaneous',
@@ -259,12 +270,14 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             return {
                 xtype: 'displayfield',
                 name: 'pmGuid',
+                bind:'{currentTask.pmGuid}',
                 fieldLabel: me.strings.pmGuid
             };
         }
         return {
             xtype: 'combo',
             fieldLabel: me.strings.pmGuid,
+            bind:'{currentTask.pmGuid}',
             allowBlank: false,
             typeAhead: false,
             forceSelection: true,

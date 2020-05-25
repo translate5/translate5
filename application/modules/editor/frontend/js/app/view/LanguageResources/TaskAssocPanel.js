@@ -67,10 +67,12 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
         config = {
             title: me.title, //see EXT6UPD-9
             dockedItems : [],
-            items : [ {
+            items : [{
                 xtype : 'grid',
                 itemId : 'languageResourcesTaskAssocGrid',
-                store : 'Editor.store.LanguageResources.TaskAssocStore',
+            	bind:{
+            		store:'{taskAssoc}'
+    			},
                 emptyText: me.strings.empty,
                 features : [ {
                     id: 'group',
@@ -130,7 +132,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     flex : 25 / 100,
                     sortable : true
                 } ]
-            } ],// end of items
+            }],// end of items
         };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);

@@ -469,16 +469,16 @@ Ext.define('Editor.controller.Localizer', {
             averageProcessingTimeSecondTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit zweiter Lektor');?>',
         },
         confirmStrings: {
-            "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
-            "unfinish":     {title: "<?php echo $this->translate->_('Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich wieder öffnen?');?>"},
-            "finish-all":   {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?');?>"},
-            "unfinish-all": {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?');?>"},
-            "end":          {title: "<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>"},
-            "reopen":       {title: "<?php echo $this->translate->_('Beendete Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die beendete Aufgabe wirklich wieder öffnen?');?>"},
-            "delete":       {title: "<?php echo $this->translate->_('Aufgabe komplett löschen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
+            "editorFinishTask":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
+            "editorUnfinishTask":     {title: "<?php echo $this->translate->_('Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich wieder öffnen?');?>"},
+            "editorFinishAllTask":    {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?');?>"},
+            "editorUnfinishAllTask":  {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?');?>"},
+            "editorEndTask":          {title: "<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>"},
+            "editorReopenTask":       {title: "<?php echo $this->translate->_('Beendete Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die beendete Aufgabe wirklich wieder öffnen?');?>"},
+            "editorDeleteTask":       {title: "<?php echo $this->translate->_('Aufgabe komplett löschen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
         }
     });
-
+    
     Ext.define("Editor.locale.de.view.admin.TaskGrid", {
         override: "Editor.view.admin.TaskGrid",
         title: '<?php echo $this->translate->_('Aufgaben');?>',
@@ -525,7 +525,7 @@ Ext.define('Editor.controller.Localizer', {
             sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
             relaisLang: '<?php echo $this->translate->_('Relaissprache');?>',
             targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
-            state: '<?php echo $this->translate->_('Aufgabenstatus');?>',
+            state: '<?php echo $this->translate->_('Status (Aufgbe)');?>',
             customerId: '<?php echo $this->translate->_('Endkunde');?>',
             pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
             users: '<?php echo $this->translate->_('Benutzer');?>',
@@ -704,25 +704,10 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.admin.TaskActionColumn", {
         override: "Editor.view.admin.TaskActionColumn",
         messages: {
-            actionOpen: '<?php echo $this->translate->_('Aufgabe öffnen (nur Lesemodus)');?>',
-            actionEdit: '<?php echo $this->translate->_('Aufgabe bearbeiten');?>',
-            actionClone: '<?php echo $this->translate->_('Aufgabe klonen');?>',
-            actionFinish: '<?php echo $this->translate->_('Aufgabe abschließen');?>',
-            actionUnFinish: '<?php echo $this->translate->_('Aufgabe wieder öffnen');?>',
-            actionFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer abschließen');?>',
-            actionUnFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer wieder öffnen');?>',
-            actionEnd: '<?php echo $this->translate->_('Aufgabe komplett beenden');?>',
-            actionDelete: '<?php echo $this->translate->_('Aufgabe komplett löschen');?>',
-            actionLog: '<?php echo $this->translate->_('Ereignis-Protokoll');?>',
-            assocUser: '<?php echo $this->translate->_('Benutzer der Aufgabe zuweisen');?>', //FIXME remove me!
-            taskPrefs: '<?php echo $this->translate->_('Aufgabenspezifische Einstellungen');?>',
-            actionReOpen: '<?php echo $this->translate->_('beendete Aufgabe wieder öffnen');?>',
-            exp: '<?php echo $this->translate->_('Exportoptionen');?>',
-            actionExcelReimport: '<?php echo $this->translate->_('Excel Re-Importieren');?>',
             projectOverview: '<?php echo $this->translate->_('zum Projekt springen');?>',
-            actionDeleteProject: '<?php echo $this->translate->_('Projekt komplett löschen');?>',
             taskOverview: '<?php echo $this->translate->_('zur Aufgabe springen');?>',
-            taskActionMenu: '<?php echo $this->translate->_('Aufgabenmenü anzeigen');?>'
+            taskActionMenu: '<?php echo $this->translate->_('Aufgabenmenü anzeigen');?>',
+            projectActionMenu: '<?php echo $this->translate->_('Projektmenü anzeigen');?>'
         }
     });
     
@@ -769,10 +754,10 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
-    Ext.define("Editor.locale.de.view.admin.TaskActionMenu", {
-        override: "Editor.view.admin.TaskActionMenu",
+    Ext.define("Editor.locale.de.view.admin.task.menu.TaskActionMenu", {
+        override: "Editor.view.admin.task.menu.TaskActionMenu",
         messages: {
-            actionOpen: '<?php echo $this->translate->_('Aufgabe öffnen (nur Lesemodus)');?>',
+            actionOpen: '<?php echo $this->translate->_('Aufgabe öffnen (schreibgeschützt)');?>',
             actionEdit: '<?php echo $this->translate->_('Aufgabe bearbeiten');?>',
             actionClone: '<?php echo $this->translate->_('Aufgabe klonen');?>',
             actionFinish: '<?php echo $this->translate->_('Aufgabe abschließen');?>',
@@ -788,8 +773,15 @@ Ext.define('Editor.controller.Localizer', {
             exp: '<?php echo $this->translate->_('Exportoptionen');?>',
             actionExcelReimport: '<?php echo $this->translate->_('Excel Re-Importieren');?>',
             projectOverview: '<?php echo $this->translate->_('zum Projekt springen');?>',
-            actionDeleteProject: '<?php echo $this->translate->_('Projekt komplett löschen');?>',
             taskOverview: '<?php echo $this->translate->_('zur Aufgabe springen');?>'
+        }
+    });
+    
+    
+    Ext.define("Editor.locale.de.view.project.ProjectActionMenu", {
+        override: "Editor.view.project.ProjectActionMenu",
+        messages: {
+            actionDeleteProject: '<?php echo $this->translate->_('Projekt komplett löschen');?>'
         }
     });
     
@@ -873,7 +865,9 @@ Ext.define('Editor.controller.Localizer', {
             cancel: '<?php echo $this->translate->_('Abbrechen');?>',
             assignmentDateLable: '<?php echo $this->translate->_('Zuweisung');?>',
             finishedDateLabel: '<?php echo $this->translate->_('Abgeschlossen');?>',
-            deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>'
+            deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
+            deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
+            userSpecialProperties:'<?php echo $this->translate->_('Benutzer-Spezialeinstellungen');?>'
         },
         states: {
             edit: '<?php echo $this->translate->_('in Arbeit');?>'
