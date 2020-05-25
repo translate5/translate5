@@ -342,7 +342,7 @@ abstract class editor_Models_Export_FileParser {
         //count length after removing removeTrackChanges and removeTermTags 
         // so that the same remove must not be done again inside of textLength
         //also add additionalMrkLength to the segment length for final length calculation 
-        $this->lastSegmentLength = $segment->textLengthByMeta($edited,$segmentMeta) + $segmentMeta->getAdditionalMrkLength();
+        $this->lastSegmentLength = $segment->textLengthByMeta($edited,$segmentMeta,$segment->getFileId()) + $segmentMeta->getAdditionalMrkLength();
         
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);

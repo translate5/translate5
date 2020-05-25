@@ -126,8 +126,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
         foreach ($allFontsInTask as $font) {
             $fontFamily = strtolower($font['font']);
             $fontSize = intval($font['fontSize']);
-            $pixelMappingForTask[$fontFamily][$fontSize] = $this->getPixelMappingByFont($taskGuid, $fontFamily, $fontSize);
-            $pixelMappingForTask[$fontFamily][$fontSize]['default'] = $this->getDefaultPixelWidth($fontSize);
+            $this->addPixelMappingForFont($taskGuid, $pixelMappingForTask, $fontFamily, $fontSize);
         }
         return $pixelMappingForTask;
         /*
@@ -154,4 +153,131 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
             )
          */
     }
+    
+    /**
+     * Add the pixelMapping for a specific font to the given pixelMappingForTask.
+     * @param string $taskGuid
+     * @param array $pixelMappingForTask
+     * @param string $fontFamily
+     * @param int $fontSize
+     * @return array $pixelMappingForTask
+     */
+    protected function addPixelMappingForFont(string $taskGuid, array &$pixelMappingForTask, string $fontFamily, int $fontSize) {
+        $fontFamily = strtolower($fontFamily);
+        settype($pixelMappingForTask[$fontFamily], 'array');
+        settype($pixelMappingForTask[$fontFamily][$fontSize], 'array');
+        // If there is anything set in the database, add it:
+        $pixelMappingForFont = $this->getPixelMappingByFont($taskGuid, $fontFamily, $fontSize);
+        if (!empty($pixelMappingForFont)) {
+            $pixelMappingForTask[$fontFamily][$fontSize] = $pixelMappingForFont;
+        }
+        // If a default value is set (and not already set for this font-size), add it, too:
+        if (!array_key_exists('default',$pixelMappingForTask[$fontFamily][$fontSize])) {
+            $defaultPixelWidthForFont = $this->getDefaultPixelWidth($fontSize);
+            if (!empty($defaultPixelWidthForFont)) {
+                $pixelMappingForTask[$fontFamily][$fontSize]['default'] = $defaultPixelWidthForFont;
+            }
+        }
+    }
+    
+    /**
+     * Return the pixelMapping for the font and font-size as already loaded for the task
+     * (= the item from the array with all fonts for the task that matches the segment's
+     * font-family and font-size; don't start db-selects again!).
+     * @param string $taskGuid
+     * @param array $pixelMappingForTask
+     * @param string $fontFamily
+     * @param int $fontSize
+     * @return array
+     */
+    public function getPixelMappingForFontAndSize($taskGuid, array &$pixelMappingForTask, string $fontFamily, int $fontSize) {
+        $fontFamily = strtolower($fontFamily);
+        if (!isset($pixelMappingForTask[$fontFamily][$fontSize])) {
+            // eg on import, the task's font as set in the segment's are unknown (= the segments don't exist yet).
+            // In this case we check the pixelMapping for the missing combination of font-family and font-size and add it (if found).
+            $this->addPixelMappingForFont($taskGuid, $pixelMappingForTask, $fontFamily, $fontSize);
+        }
+        return $pixelMappingForTask[$fontFamily][$fontSize] ?? [];
+    }
+    
+    /**
+     * Returns the width to be used for the character according to the given pixel-mapping-data.
+     * If a character has no specific pixel-mapping set and the general default must be used,
+     * it gets added to the list of characters that are not set.
+     * @param string $char
+     * @param array $pixelMappingForSegment
+     * @param int $fileId
+     * @param array $charsNotSet
+     * @param string $charsNotSetMsg
+     * @return int|NULL
+     */
+    public function getCharWidth ($char, $pixelMappingForSegment, $fileId, &$charsNotSet, &$charsNotSetMsg) {
+        $unicodeCharNumeric = $this->getNumericValueOfUnicodeChar($char);
+        if (array_key_exists($unicodeCharNumeric, $pixelMappingForSegment)) {
+            $pixelMappingForCharacter = $pixelMappingForSegment[$unicodeCharNumeric];
+            if (array_key_exists($fileId, $pixelMappingForCharacter)) {
+                return $pixelMappingForCharacter[$fileId];
+            }
+            if (array_key_exists('default', $pixelMappingForCharacter)) {
+                return $pixelMappingForCharacter['default'];
+            }
+        }
+        $charsNotSet[] = $char;
+        $charsNotSetMsg .= '- ' . $unicodeCharNumeric . ' (' . $char. ')'."\n";
+        if (array_key_exists('default', $pixelMappingForSegment)) {
+            return $pixelMappingForSegment['default'];
+        }
+        return null;
+    }
+    
+    // ---------------------------------------------------------------------------------------
+    // Unicode-Helpers
+    // ---------------------------------------------------------------------------------------
+    
+    /**
+     * Returns the numeric value of the given unicode-character.
+     * @param string $char
+     * @return mixed
+     */
+    public function getNumericValueOfUnicodeChar($char) {
+        // PHP >= 7.2.0
+        if (version_compare(PHP_VERSION, '7.2.0') >= 0) {
+            return mb_ord($char, "utf8");
+        }
+        // PHP 5 etc.
+        return unpack('V', iconv('UTF-8', 'UCS-4LE', $char))[1]; // https://stackoverflow.com/a/27444149
+    }
+    
+    /*
+     * ---------------------------------------------------------------------
+     * |     UNICODE-TABLE     |                RESULTS             | $char
+     * ---------------------------------------------------------------------
+     * | DECIMAL   HEXADECIMAL |  [1]      [2]       [3]      [4]   |
+     * | NUMERIC   CODE POINT  |                                    |
+     * ---------------------------------------------------------------------
+     * |    &#80;      U+0050  |   80  |   &#80;  |    80  |        |  P
+     * |  &#1593;      U+0639  | 1593  | &#1593;  |  1593  |        |  ع
+     * | &#12103;      U+2F47  | 12103 | &#12103; | 12103  |  12103 |  ⽇
+     * ---------------------------------------------------------------------
+     *
+     * UNICODE-TABLE
+     * - https://www.utf8-zeichentabelle.de/unicode-utf8-table.pl
+     *   (see also: http://unicode.scarfboy.com/?s=U%2B0639)
+     *
+     * RESULTS:
+     * [1] https://stackoverflow.com/a/9361531:
+     *     getUniord($char)
+     * [2] http://php.net/manual/de/function.mb-encode-numericentity.php#88586:
+     *     mb_encode_numericentity ($char, array (0x0, 0xffff, 0, 0xffff), 'UTF-8')
+     * [3] https://stackoverflow.com/a/27444149
+     *     unpack('V', iconv('UTF-8', 'UCS-4LE', $char))[1]
+     * [4] https://stackoverflow.com/a/49097906
+     *     mb_ord("⽇", "utf8"); // 12103
+     *
+     * MORE INFOS:
+     * "The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)":
+     * https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/
+     *
+     *
+     */
 }
