@@ -138,6 +138,9 @@ Ext.define('Editor.controller.Editor', {
             },
             '#naviToolbar #btnInsertWhitespaceTab': {
                 click: 'insertWhitespaceTab'
+            },
+            '#segmentMinMaxLength': {
+                insertNewline: 'insertWhitespaceNewline'
             }
         }
     },
@@ -493,12 +496,20 @@ Ext.define('Editor.controller.Editor', {
                 // insert whitespace key events
                 'ctrl-shift-space': [Ext.EventObjectImpl.SPACE,{ctrl: true, alt: false, shift: true}, me.insertWhitespaceNbsp, true],
                 'shift-enter': [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: true}, me.insertWhitespaceNewline, true],
+                'enter': [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: false}, me.insertWhitespaceNewline, true],
                 'tab': [Ext.EventObjectImpl.TAB,{ctrl: false, alt: false}, me.insertWhitespaceTab, true]
             })
         });
         editor.DEC_DIGITS = me.DEC_DIGITS;
         
         docEl.on({
+            dragend:{
+                delegated: false,
+                priority: 9999,
+                fn: me.handleDragEnd,
+                scope: this,
+                preventDefault: false
+            },
             keyup:{
                 delegated: false,
                 priority: 9999,
@@ -742,6 +753,15 @@ Ext.define('Editor.controller.Editor', {
         me.handleAfterCursorMove();
     },
     /**
+     * 
+     */
+    handleDragEnd: function() {
+        var me = this;
+        me.consoleLog('Editor: handleDragEnd');
+        me.fireEvent('afterDragEnd');
+    },
+    
+    /**
      * Special Universal preparation Handler for pressing DIGIT keys
      * A preparation keyboard shortcut can be defined, for example ALT-S. 
      * If ALT-S is pressed, then if the next key is a DIGIT the given 
@@ -942,8 +962,9 @@ Ext.define('Editor.controller.Editor', {
     /**
      * @param {Editor.view.segments.HtmlEditor} editor
      * @param {String} msg
+     * @param {Bool} isTagError (optional; default: true)
      */
-    handleSaveWithErrors: function(editor, msg){
+    handleSaveWithErrors: function(editor, msg, isTagError = true){
         var me = this,
             msgBox;
         
@@ -959,7 +980,8 @@ Ext.define('Editor.controller.Editor', {
                 no: me.messages.saveAnyway
             }
         });
-        if(Editor.data.segments.userCanIgnoreTagValidation) {
+        // tag-errors: check if user is allowed to save anyway
+        if(isTagError && Editor.data.segments.userCanIgnoreTagValidation) {
             msgBox.confirm(me.messages.errorTitle, msg, function(btn) {
                 if(btn === 'no') {
                     me.saveAndIgnoreContentErrors();
@@ -1403,6 +1425,10 @@ Ext.define('Editor.controller.Editor', {
         plug = me.getEditPlugin();
         editor = plug.editor.mainEditor;
         editor.insertWhitespaceInEditor(whitespaceType, tagNr);
+        if (e === undefined) { // we can use insertWhitespace by firing an event, too
+            me.fireEvent('afterInsertWhitespace');
+            return;
+        }
         if (e.delegatedTarget.nodeName.toLowerCase() === 'a') {
             editor.focus();
         }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- WARNING: newlines are CRLF (Windowslineendings, therefore for counting that are two characters, not only one!  -->
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd" xmlns:translate5="http://www.translate5.net/" translate5:taskname="C:\fakepath\simple-en-de" translate5:taskguid="{86b10bf5-02f3-4f0c-b264-f3877aa15d96}">
+<file original="simple-en-de.sdlxliff" source-language="en" target-language="de" xml:space="preserve" datatype="x-translate5">
+<body>
+
+<trans-unit id="1">
+<source>Dies ist ein einfacher Satz (aus task-template: maxWidth 200,  maxNumberOfLines 3, size-unit pixel).</source>
+<target>Dies ist ein einfacher Satz (aus task-template: maxWidth 200,  maxNumberOfLines 3, size-unit pixel).</target>
+</trans-unit>
+
+<trans-unit id="2">
+<source>Dasselbe in kurz.</source>
+<target>Edited: Dasselbe
+in
+kurz.</target>
+</trans-unit>
+
+<trans-unit id="3" translate5:maxNumberOfLines="1" maxwidth="600">
+<source> Dies ist ein Satz zum Testen für maximal 1 Zeile und maxWidth 600.    </source>
+<target> Dies ist ein Satz zum Testen für maximal 1 Zeile und maxWidth 600.    </target>
+</trans-unit>
+
+<trans-unit id="4" translate5:maxNumberOfLines="2" minwidth="100" maxwidth="300" size-unit="pixel">
+<source> Dies ist ein Satz zum Testen für maximal 2 Zeilen, minwidth 100, maxWidth 300.    </source>
+<target> Dies ist ein Satz zum Testen für maximal 2 Zeilen, minwidth 100, maxWidth 300.    </target>
+</trans-unit>
+
+<trans-unit id="5" translate5:maxNumberOfLines="2" minwidth="100" maxwidth="300" size-unit="pixel">
+<source> Dies ist ein Satz zum Testen für maximal 2 Zeilen, minwidth 100, maxWidth 300.    </source>
+<target> Dies ist ein Satz zum Testen für maximal 2 Zeilen, minwidth 100, maxWidth 300.    </target>
+</trans-unit>
+
+<trans-unit id="6" translate5:maxNumberOfLines="2" maxwidth="600" size-unit="pixel">
+<source> Dies ist ein Satz zum Testen für maximal 2 Zeilen und maxWidth 600.    </source>
+<target>Edited: Dies ist ein Satz zum Testen f\u00fcr
+maximal 2 Zeilen\u00a0und maxWidth 600.    </target>
+</trans-unit>
+
+<trans-unit id="7" translate5:maxNumberOfLines="3" maxwidth="600" size-unit="pixel">
+<source> Dies ist ein Satz zum Testen für maximal 3 Zeilen und maxWidth 600.    </source>
+<target>Edited: Dies ist ein Satz zum Testen f\u00fcr
+maximal 3 Zeilen
+ und maxWidth 600.    </target>
+</trans-unit>
+
+<trans-unit id="8" maxwidth="600" size-unit="char">
+<source> Dies ist ein Satz zum Testen für maxWidth 600 und size-unit char.    </source>
+<target>Edited: Dies ist ein Satz zum Testen
+f\u00fcr maxWidth 600 und size-unit char.    </target>
+</trans-unit>
+
+</body>
+</file>
+</xliff>

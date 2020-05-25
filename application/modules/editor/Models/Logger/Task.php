@@ -122,14 +122,20 @@ class editor_Models_Logger_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      *
      * @param string $taskGuid
-     * @param string $eventCode
-     * @return array: a single row turned to array
+     * @param array $eventCodes
+     * @return array: a single row as assoc array
      */
-    public function getLastByTaskGuidAndEventCode($taskGuid, $eventCode) {
+    public function getLastByTaskGuidAndEventCodes($taskGuid, $eventCodes) {
         $s = $this->db->select()
-            ->where('taskGuid = ?', $taskGuid)
-            ->where('eventCode = ?', $eventCode)
-            ->order('created DESC');
+            ->where('taskGuid = ?', $taskGuid);
+        if(count($eventCodes) == 0){
+            $s->where('1 = 2');
+        } else if(count($eventCodes) == 1){
+            $s->where('eventCode = ?', $eventCodes[0]);
+        } else {
+            $s->where('eventCode IN (?)', $eventCodes);
+        }
+        $s->order('created DESC');
         $row = $this->db->fetchRow($s);
         if(empty($row)){
             return null;

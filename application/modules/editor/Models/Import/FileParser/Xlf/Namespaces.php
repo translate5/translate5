@@ -105,7 +105,7 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
      * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::useTagContentOnly()
      */
     public function useTagContentOnly(){
-        //using null as default value should trigger further investigation if the tag content should be used or not
+        //using null as default value should trigger further investigation if the tag content should be used or not (if the namespace did not provide information about it)
         return $this->call(__FUNCTION__, func_get_args(), null);
     }
     
@@ -128,10 +128,11 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
         foreach ($this->namespaces as $namespace){
             $result = call_user_func_array([$namespace, $function], $arguments);
             //if one of the callen namespace handlers produces a result, we return this and end the loop
-            if(!empty($result)) {
+            if(!is_null($result)) {
                 return $result;
             }
         }
-        return $result; //for falsy values we return the last value only
+        //if no namespace was defined, we return the default result, by default false
+        return $result;
     }
 }
