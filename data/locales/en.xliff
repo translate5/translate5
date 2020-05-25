@@ -1397,7 +1397,7 @@ E-Mail: service@MittagQI.com</pre>
 <trans-unit id="wrkgRGllc2UgQW5nYWJlbiAvIERhdGVuIHdlcmRlbiBmw7xyIGRlbiBJbXBvcnQgendpbmdlbmQgYmVuw7Z0aWd0Lg=="><source>¹ Diese Angaben / Daten werden für den Import zwingend benötigt.</source><target>¹ This information / data is mandatory for the import needs.</target></trans-unit>
 <trans-unit id="RmVobGVyIGJlaW0gSW1wb3J0IQ=="><source>Fehler beim Import!</source><target>Import Error!</target></trans-unit>
 <trans-unit id="RmVobGVyIGJlaW0gSW1wb3J0OiBCaXR0ZSB3ZW5kZW4gU2llIHNpY2ggYW4gZGVuIFN1cHBvcnQh"><source>Fehler beim Import: Bitte wenden Sie sich an den Support!</source><target>Import Error: Please contact the support!</target></trans-unit>
-<trans-unit id="QXVmZ2FiZSDDtmZmbmVuIChudXIgTGVzZW1vZHVzKQ=="><source>Aufgabe öffnen (nur Lesemodus)</source><target>Open task (read-only mode)</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSDDtmZmbmVuIChzY2hyZWliZ2VzY2jDvHR6dCk='><source>Aufgabe öffnen (schreibgeschützt)</source><target>Open task (read-only)</target></trans-unit>
 <trans-unit id="QXVmZ2FiZSBiZWFyYmVpdGVu"><source>Aufgabe bearbeiten</source><target>Edit task</target></trans-unit>
 <trans-unit id="QXVmZ2FiZSBhYnNjaGxpZcOfZW4="><source>Aufgabe abschließen</source><target>Finish task</target></trans-unit>
 <trans-unit id="QXVmZ2FiZSB3aWVkZXIgw7ZmZm5lbg=="><source>Aufgabe wieder öffnen</source><target>Reopen task</target></trans-unit>
