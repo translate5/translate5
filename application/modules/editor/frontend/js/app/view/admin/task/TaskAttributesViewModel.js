@@ -26,11 +26,20 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.project.Project', {
-	extend : 'Ext.data.BufferedStore',
-	model: 'Editor.model.project.Project',
-	alias: 'store.project',
-	remoteSort: true,
-	remoteFilter: true,
-	autoLoad: true
+Ext.define('Editor.view.admin.task.TaskAttributesViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.taskattributes',
+    formulas: {
+    	disableUsageMode: {
+            get: function(get) {
+            	var currentTask=get('currentTask');
+                return Ext.getStore('admin.TaskUserAssocs').getCount() > 0;
+            }
+        },
+        taskUsageModel:{
+        	get: function(get) {
+                return get('currentTask').get('usageMode');
+            }
+        }
+    }
 });

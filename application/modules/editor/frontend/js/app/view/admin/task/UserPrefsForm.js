@@ -85,7 +85,7 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                     },
                     emptyText:me.strings.forAll,
                     store: Ext.create('Ext.data.ChainedStore', {
-                    	source: "admin.TaskUserAssocs",
+                    	source: "admin.TaskUserAssocs"
                     }),
                     fieldLabel: me.strings.fieldUsername
                 },{

@@ -46,15 +46,27 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       cancel: '#UT#Abbrechen',
       assignmentDateLable:'#UT#Zuweisung',
       finishedDateLabel:'#UT#Abgeschlossen',
-      deadlineDateLable:'#UT#Deadline'
+      deadlineDateLable:'#UT#Deadline',
+      userSpecialProperties:'#UT#Benutzer-Spezialeinstellungen'
   },
   states: {
       edit: '#UT#in Arbeit',
   },
-  viewConfig: {
-      loadMask: false
+  bind:{
+	  //INFO: this will load only the users of the task when projectTaskGrid selection is changed
+	  //override the store binding in the place where the component is used/defined
+	  //the default usage is in the task properties panel
+  	  store:{
+  		  model:'Editor.model.admin.TaskUserAssoc',
+  		  remoteFilter: true,
+  		  pageSize: false,
+  		  filters:{
+  			  property: 'taskGuid',
+  			  operator:"eq",
+  			  value:'{projectTaskSelection.taskGuid}'
+  		  }  
+  	  }
   },
-  store: 'admin.TaskUserAssocs',
   plugins: ['gridfilters'],
   initConfig: function(instanceConfig) {
     var me = this,
@@ -79,9 +91,8 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           xtype: 'gridcolumn',
           width: 100,
           dataIndex: 'role',
-          renderer: function(v) {
-              var vm = this.lookupViewModel(),
-              	vfm=vm.get('workflowMetadata'),
+          renderer: function(v,meta,rec) {
+              var vfm=rec.get('workflowMetadata'),
               	role=(vfm && vfm.roles && vfm.roles[v]) || v;
               return role;
           },
@@ -90,13 +101,12 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           xtype: 'gridcolumn',
           width: 90,
           dataIndex: 'state',
-          renderer: function(v) {
+          renderer: function(v,meta,rec) {
         	  //is custom state translation needed
         	  if(me.states[v]){
         		  return me.states[v];
         	  }
-              var vm = this.lookupViewModel(),
-            	vfm=vm.get('workflowMetadata'),
+              var vfm=rec.get('workflowMetadata'),
             	state=(vfm && vfm.mergedStates && vfm.mergedStates[v]) || v;
               return state;
           },
@@ -146,6 +156,12 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               itemId: 'reload-btn',
               iconCls: 'ico-refresh',
               text: me.strings.reload
+          },{
+              xtype: 'button',
+              hidden:!Editor.app.authenticatedUser.isAllowed('editorWorkflowPrefsTask'),
+              itemId: 'userSpecialPropertiesBtn',
+              glyph: 'f509@FontAwesome5FreeSolid',
+              text: me.strings.userSpecialProperties
           }]
         }]
     };

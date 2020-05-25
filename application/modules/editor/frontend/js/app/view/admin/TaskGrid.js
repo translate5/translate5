@@ -53,7 +53,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       // sorted by appearance
       workflow: '#UT#Workflow',
       taskActions: '#UT#Aktionen',
-      state: '#UT#Aufgabenstatus',
+      state: '#UT#Status (Aufgbe)',
       customerId: '#UT#Endkunde',
       taskName: '#UT#Name',
       taskNr: '#UT#Auftragsnr.',
@@ -297,9 +297,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
     me.availableActions = [];
     if(actions && actions.items.length > 0) {
     	Ext.Array.each(actions.items, function(item) {
-    		if(!item.isProjectActionIcon){
-    			me.availableActions=Ext.Array.push(me.availableActions,item.isAllowedFor);
-    		}
+			me.availableActions=Ext.Array.push(me.availableActions,item.isAllowedFor);
     	});
     }
     this.view.on('afterrender', function(){

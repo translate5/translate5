@@ -104,7 +104,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         controller:{
         	'#admin.TaskOverview':{
         		taskCreated:'onTaskCreated',
-                taskUnhandledAction: 'onTaskActionColumnNoHandler',
                 periodicalTaskReloadIgnore: 'ignoreTaskForReload',
                 importStateCheckFinished:'onImportStateCheckFinished',
                 handleTaskPreferences:'onHandleTaskPreferences'
@@ -124,11 +123,17 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * Task action column items initialized event handler.
      */
     onTaskActionColumnItemsInitialized: function(items) {
+    	var me=this;
         items.push({
             text:this.strings.taskGridIconTooltip,
-            itemId: 'ico-task-analysis',
             glyph: 'f200@FontAwesome5FreeSolid',
-            isAllowedFor: 'editorAnalysisTask',
+            action: 'editorAnalysisTask',
+            hidden:true,
+	        bind:{
+	        	hidden:'{!isNotErrorImportPendingCustom}'
+	        },
+	        scope:me,
+	        handler:me.onMatchAnalysisMenuClick,
             sortIndex:8
         });
     },
@@ -284,20 +289,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },
     
     /***
-     * When action column click with no click handler is found
-     */
-    onTaskActionColumnNoHandler:function(action, column, task){
-        if(action != 'handleTaskAnalysis' || this.getAdminTaskPreferencesWindow()){
-            return;
-        }
-        var me=this,
-            taskPref = me.application.getController('admin.TaskPreferences');
-        
-        //display the task preferences window with focus on matchanalysis panel
-        taskPref.handleTaskPreferences(task,'matchAnalysisPanel');
-    },
-    
-    /***
      * Event handler after a task was successfully created
      */
     onTaskCreated:function(task){
@@ -310,6 +301,14 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	}
     	var me=this;
     	me.loadTaskAssoc(panel.task);
+    },
+    
+    onMatchAnalysisMenuClick:function(item){
+    	var me=this,
+    		task=item.lookupViewModel(true).get('task');
+    	me.redirectTo('project/'+task.get('projectId')+'/'+task.get('id')+'/focus');
+        me.getAdminTaskPreferencesWindow().down('tabpanel').setActiveTab('matchAnalysisPanel');
+        me.onHandleTaskPreferences(task);
     },
     
     /***

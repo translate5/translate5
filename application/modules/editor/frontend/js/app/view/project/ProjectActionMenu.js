@@ -25,12 +25,38 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+Ext.define('Editor.view.project.ProjectActionMenu', {
+  extend: 'Ext.menu.Menu',
+  itemId: 'projectActionMenu',
+  requires: ['Editor.view.project.ProjectActionMenuViewModel'],
+  viewModel:{
+	  type:'projectActionMenu'
+  },
+  messages: {
+      actionDeleteProject: '#UT#Projekt komplett löschen'
+  },
+  alias: 'widget.projectActionMenu',
 
-Ext.define('Editor.store.project.Project', {
-	extend : 'Ext.data.BufferedStore',
-	model: 'Editor.model.project.Project',
-	alias: 'store.project',
-	remoteSort: true,
-	remoteFilter: true,
-	autoLoad: true
+  constructor: function(instanceConfig) {
+	    var me = this,
+	    config = {
+	        items:[,{
+		        text: me.messages.actionDeleteProject,
+		        action: 'editorDeleteProject',
+		        glyph: 'f014@FontAwesome',
+		        hidden:true,
+		        bind:{
+		        	hidden:'{!isEditorDeleteProject}'
+		        },
+		        sortIndex:1
+		    }]
+	    };
+	    if (instanceConfig) {
+	        me.self.getConfigurator().merge(me, config, instanceConfig);
+	    }
+	    
+	    me.callParent([Ext.apply({
+	        items: config.items
+	    }, config)]);
+	}
 });

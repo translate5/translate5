@@ -48,8 +48,19 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
         vis_hide: '#UT#ausblenden',
         vis_disable: '#UT#nicht vorhanden'
     },
-    viewConfig: {
-        loadMask: false
+    bind:{
+    	store:{
+    		model:'Editor.model.admin.task.UserPref',
+			remoteSort: true,
+			remoteFilter: true,
+			pageSize: false,
+			autoLoad:true,
+			filters:{
+    			property: 'taskGuid',
+        		operator:"eq",
+        		value:'{currentTask.taskGuid}'
+			}
+    	}
     },
     //***********************************************************************************
     //Begin Events
@@ -75,7 +86,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                     dataIndex: 'workflowStep',
                     text: me.strings.colStep,
                     renderer: function(v, meta, rec) {
-                        var meta = this.lookupViewModel().get('workflowMetadata');
+                        var meta = this.lookupViewModel(true).get('currentTask').getWorkflowMetaData();
                         if(v.length == 0) {
                             return me.strings.defaultEntry;
                         }
@@ -104,7 +115,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                         var fields = value.split(','),
                             cnt = 0,
                             result = [],
-                            task = this.lookupViewModel().get('currentTask'),
+                            task = this.lookupViewModel(true).get('currentTask'),
                             visible = 0;
                         
                         task.segmentFields().each(function(field){

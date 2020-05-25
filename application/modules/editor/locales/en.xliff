@@ -841,10 +841,6 @@
         <source>Aufgabenspezifische Einstellungen</source>
         <target>Task properties</target>
       </trans-unit>
-      <trans-unit id='RWluc3RlbGx1bmdlbiB6dSBBdWZnYWJlICJ7Y3VycmVudFRhc2sudGFza05hbWV9Ig=='>
-        <source>Einstellungen zu Aufgabe "{currentTask.taskName}"</source>
-        <target>Properties to task "{currentTask.taskName}"</target>
-      </trans-unit>
       <trans-unit id='QmVudXR6ZXIgenUgQXVmZ2FiZSB6dW9yZG5lbg=='>
         <source>Benutzer zu Aufgabe zuordnen</source>
         <target>Associate users to task</target>
@@ -3667,7 +3663,7 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 </trans-unit>
 <trans-unit id='U2VnbWVudGFuemFobA=='><source>Segmentanzahl</source><target>Segment count</target></trans-unit>
 <trans-unit id='WndlaXRlcyBMZWt0b3JhdA=='><source>Zweites Lektorat</source><target>Second Review</target></trans-unit>
-<trans-unit id='QXVmZ2FiZW5zdGF0dXM='><source>Aufgabenstatus</source><target>Task status</target></trans-unit>
+<trans-unit id='U3RhdHVzIChBdWZnYmUp'><source>Status (Aufgbe)</source><target>Status (task)</target></trans-unit>
 <trans-unit id='TWVpbiBKb2ItU3RhdHVz'><source>Mein Job-Status</source><target>My job status</target></trans-unit>
 <trans-unit id='WnV3ZWlzdW5n'><source>Zuweisung</source><target>Assignment</target></trans-unit>
 <trans-unit id='QWJnZXNjaGxvc3Nlbg=='><source>Abgeschlossen</source><target>Finished</target></trans-unit>
@@ -3759,6 +3755,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UHJvamVrdCBlcnN0ZWxsZW4='><source>Projekt erstellen</source><target>Create project</target></trans-unit>
 <trans-unit id='UHJvamVrdG5hbWXCuQ=='><source>Projektname¹</source><target>Project name</target></trans-unit>
 <trans-unit id='SGluenVnZWbDvGd0'><source>Hinzugefügt</source><target>Added</target></trans-unit>
+<trans-unit id='UHJvamVrdG1lbsO8IGFuemVpZ2Vu'><source>Projektmenü anzeigen</source><target>Show project menu</target></trans-unit>
 </body>
   </file>
 </xliff>

@@ -30,6 +30,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   extend: 'Ext.panel.Panel',
   requires: ['Editor.view.admin.task.UserAssocGrid','Editor.view.admin.task.UserAssocViewModel'],
   alias: 'widget.adminTaskUserAssoc',
+  itemId:'adminTaskUserAssoc',
   strings: {
       fieldRole: '#UT#Rolle',
       fieldState: '#UT#Status',

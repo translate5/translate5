@@ -25,12 +25,18 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-Ext.define('Editor.store.project.Project', {
-	extend : 'Ext.data.BufferedStore',
-	model: 'Editor.model.project.Project',
-	alias: 'store.project',
-	remoteSort: true,
-	remoteFilter: true,
-	autoLoad: true
+Ext.define('Editor.view.project.ProjectActionMenuViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.projectActionMenu',
+    data: {
+        task: false
+    },
+    formulas: {
+    	isEditorDeleteProject:{
+    		get: function(get) {
+    			return Editor.app.authenticatedUser.isAllowed('editorDeleteProject',this.get('task'));
+            },
+            bind: '{task}'
+    	}
+    }
 });

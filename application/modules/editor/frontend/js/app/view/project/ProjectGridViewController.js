@@ -40,7 +40,13 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
      * Reload project button handler
      */
     onReloadProjectClick:function(){
-    	this.reloadProjects();
+    	var me=this,
+    		projectTaskGrid=me.getView().up('#projectPanel').down('#projectTaskGrid');
+    	me.reloadProjects().then(function(records) {
+    		projectTaskGrid & projectTaskGrid.getStore().load();
+		}, function(operation) {
+			Editor.app.getController('ServerException').handleException(operation.error.response);
+		});
     },
     
     /***
@@ -94,10 +100,10 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
         me[action](project, ev)
     },
     
-    onActionIconClick:function(grid,row,rowIndex, colIndex,event,record) {
-    	this.deleteProject(record.get('projectId'));
-    },
     
+    /***
+     * Delete project by givent projectId
+     */
     deleteProject:function(taskProjectId){
     	var me=this;
     	Ext.Ajax.request({
@@ -108,15 +114,19 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
             	projectId:taskProjectId
             },
             success: function(response){
-            	me.handleProjectReload();
+            	me.reloadProjects();
             	Editor.MessageBox.addSuccess(me.strings.projectRemovedMessage,2);
             },
             failure: function(response) {
+            	me.reloadProjects();
                 Editor.app.getController('ServerException').handleException(response);
             }
         });
     },
     
+    /***
+     * Reload the project store. Return promisse after the store is loaded
+     */
     reloadProjects:function(){
     	 var store = this.getView().getStore();
          return new Ext.Promise(function (resolve, reject) {
@@ -126,15 +136,5 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
                  }
              });
          });
-    },
-    
-    handleProjectReload:function(){
-    	var me=this,
-    		projectPanel=me.getView().up('#projectPanel');
-    	me.reloadProjects().then(function(records) {
-    		projectPanel.getController().focusGridRecord(me.getView());
-		}, function(operation) {
-			Editor.app.getController('ServerException').handleException(operation.error.response);
-		});
     }
 });

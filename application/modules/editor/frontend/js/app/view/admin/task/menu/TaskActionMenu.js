@@ -25,11 +25,16 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-Ext.define('Editor.view.admin.TaskActionMenu', {
+Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
   extend: 'Ext.menu.Menu',
   itemId: 'taskActionMenu',
+  alias: 'widget.taskActionMenu',
+  viewModel:{
+	  type:'taskActionMenu'
+  },
+  requires: ['Editor.view.admin.task.menu.TaskActionMenuViewModel'],
   messages: {
-      actionOpen: '#UT# Aufgabe öffnen (nur Lesemodus)',
+      actionOpen: '#UT# Aufgabe öffnen (schreibgeschützt)',
       actionEdit: '#UT# Aufgabe bearbeiten',
       actionClone: '#UT# Aufgabe klonen',
       actionFinish: '#UT# Aufgabe abschließen',
@@ -47,97 +52,172 @@ Ext.define('Editor.view.admin.TaskActionMenu', {
       taskOverview:'#UT#zur Aufgabe springen',
       actionDeleteProject: '#UT#Projekt komplett löschen'
   },
-  alias: 'widget.taskActionMenu',
-
+  
   constructor: function(instanceConfig) {
 	    var me = this,
 	    config = {
-	        itemFilter:function(item){
-	            //this filters only by systemrights. taskrights must be implemented by css
-	            return Editor.app.authenticatedUser.isAllowed(item.isAllowedFor);
-	        },
+	        //Info: all items should be hidden by default, with this we reduce the "blinking" component behaviour
 	        items:[{
-		        // - öffnen
-		        text: me.messages.actionOpen,
-		        isAllowedFor: 'editorOpenTask',
-		        glyph: 'f06e@FontAwesome5FreeSolid',
-		        itemId: 'ico-task-open',
-		        sortIndex:1,//define the sort index (this is no extjs property, it is internaly used for sorting)
-		    },{
 		        // - read only öffnen
 		        text: me.messages.actionEdit,
-		        isAllowedFor: 'editorEditTask',
+		        action: 'editorEditTask',
+		        hidden:true,
+		        bind:{
+		        	hidden:'{!isEditorEditTask}'
+		        },
 		        glyph: 'f044@FontAwesome5FreeSolid',
-		        itemId: 'ico-task-edit',
-		        sortIndex:2,
+		        sortIndex:1,
+		    },{
+		        // - öffnen
+		        text: me.messages.actionOpen,
+		        action: 'editorOpenTask',
+		        hidden:true,
+		        glyph: 'f06e@FontAwesome5FreeSolid',
+		        bind:{
+		        	hidden:'{!isEditorOpenTask}'
+		        },
+		        sortIndex:2,//define the sort index (this is no extjs property, it is internaly used for sorting)
+		    },{
+		    	xtype:'menuseparator',
+		    	hidden:true,
+		        bind:{
+		        	hidden:'{!isMenuGroupVisible}'
+		        },
+		    	sortIndex:3
 		    },{
 		        // - abschließen (Recht editorFinishTask benötigt, setzt den TaskUser Status des aktuellen Users auf finish)
 		        text: me.messages.actionFinish,
-		        isAllowedFor: 'editorFinishTask',
+		        action: 'editorFinishTask',
+		        hidden:true,
+		        bind:{
+		        	hidden:'{!isEditorFinishTask}'
+		        },
 		        glyph: 'f00c@FontAwesome5FreeSolid',
-		        itemId: 'ico-task-finish',
-		        sortIndex:3,
+		        sortIndex:4,
 		    },{
 		        // - wieder öffnen (Recht editorUnFinishTask benötigt, setzt den TaskUser Status des aktuellen Users auf open, aktuell nicht gefordert)
 		        text: me.messages.actionUnFinish,
-		        isAllowedFor: 'editorUnfinishTask',
+		        action: 'editorUnfinishTask',
+		        hidden:true,
+		        bind:{
+		        	hidden:'{!isEditorUnfinishTask}'
+		        },
 		        glyph: 'f28d@FontAwesome5FreeSolid',
-		        itemId: 'ico-task-unfinish',
-		        sortIndex:4,
+		        sortIndex:5,
 		    },{
 		        // - beenden (Recht editorEndTask benötigt, setzt den Task auf Status ""end"")
 		        text: me.messages.actionEnd,
-		        isAllowedFor: 'editorEndTask',
+		        action: 'editorEndTask',
+		        hidden:true,
+		        bind:{
+		        	hidden:'{!isEditorEndTask}'
+		        },
 		        glyph: 'f28d@FontAwesome5FreeSolid',
-		        itemId: 'ico-task-end',
-		        sortIndex:5,
+		        sortIndex:6,
 		    },{
 		        // - wieder öffnen (Recht editorReOpenTask benötigt, setzt den Task auf Status ""open"")
 		        text: me.messages.actionReOpen,
-		        isAllowedFor: 'editorReopenTask',
+		        action: 'editorReopenTask',
+		        hidden:true,
+		        bind:{
+		        	hidden:'{!isEditorReopenTask}'
+		        },
 		        glyph: 'f100@FontAwesome5FreeSolid',
-		        itemId: 'ico-task-reopen',
-		        sortIndex:6,
-		    },{
-		        text: me.messages.taskPrefs,
-		        isAllowedFor: 'editorPreferencesTask',
-		        glyph: 'f085@FontAwesome5FreeSolid',
-		        itemId: 'ico-task-preferences',
 		        sortIndex:7,
 		    },{
-		        text: me.messages.actionClone,
-		        isAllowedFor: 'editorCloneTask',
-		        glyph: 'f24d@FontAwesome5FreeSolid',
-		        itemId: 'ico-task-clone',
+		    	xtype:'menuseparator',
+		    	hidden:true,
+		        bind:{
+		        	hidden:'{!isMenuGroupVisible}'
+		        },
+		    	sortIndex:8
+		    },{
+		        text: me.messages.taskPrefs,
+		        action: 'editorPreferencesTask',
+		        hidden:true,
+		        bind:{
+		        	hidden:'{!isEditorPreferencesTask}'
+		        },
+		        glyph: 'f085@FontAwesome5FreeSolid',
 		        sortIndex:9,
+		    },{
+		    	xtype: 'menuseparator',
+		    	hidden:true,
+		        bind:{
+		        	hidden:'{!isMenuGroupVisible}'
+		        },
+		    	sortIndex:10
+		    },{
+		        text: me.messages.actionClone,
+		        action: 'editorCloneTask',
+		        hidden:true,
+		        bind:{
+		        	hidden:'{!isEditorCloneTask}'
+		        },
+		        glyph: 'f24d@FontAwesome5FreeSolid',
+		        sortIndex:11,
+		    },{
+		    	xtype:'menuseparator',
+		    	hidden:true,
+		    	bind:{
+		    		hidden:'{!isMenuGroupVisible}'
+    			},
+		    	sortIndex:12
 		    },{
 		        // - Export Icon, bei Klick darauf öffnet sich ein Menü mit den verschiedenen Export Möglichkeiten. 
 		        // Die einzelnen Menüpunkte ebenfalls per isAllowed abfragen. 
 		        text: me.messages.exp,
-		        isAllowedFor: 'editorShowexportmenuTask',
-		        itemId: 'ico-task-showexportmenu',
+		        action: 'editorShowexportmenuTask',
+		        hidden:true,
+		        bind:{
+		        	hidden:'{!isEditorShowexportmenuTask}'
+		        },
 		        glyph: 'f56e@FontAwesome5FreeSolid',
-		        sortIndex:10,
+		        sortIndex:13,
 		        menu:me.getExportTaskOptionsMenu(instanceConfig.task)
 		    },{
 		        // - Excel Reimport Icon, bei Klick darauf öffnet sich der Datei-Upload-Dialog zum Reimport der Excel-Datei
 		        text: me.messages.actionExcelReimport,
-		        isAllowedFor: 'editorExcelreimportTask',
+		        action: 'editorExcelreimportTask',
+		        hidden:true,
+		        bind:{
+		        	hidden:'{!isEditorExcelreimportTask}'
+		        },
 		        glyph: 'f1c3@FontAwesome5FreeSolid',
-		        itemId: 'ico-task-excelreimport',
-		        sortIndex:11,
+		        sortIndex:14,
+		    },{
+		    	xtype:'menuseparator',
+		    	hidden:true,
+		    	bind:{
+		    		hidden:'{!isMenuGroupVisible}'
+		        		
+		        },
+		    	sortIndex:15
 		    },{
 		        text: me.messages.actionDelete,
-		        isAllowedFor: 'editorDeleteTask',
+		        action: 'editorDeleteTask',
+		        hidden:true,
+		        bind:{
+		        	hidden:'{!isEditorDeleteTask}'
+		        },
 		        glyph: 'f014@FontAwesome',
-		        itemId: 'ico-task-delete',
-		        sortIndex:12,
+		        sortIndex:16,
+		    },{
+		    	xtype:'menuseparator',
+		    	hidden:true,
+		    	bind:{
+		    		hidden:'{!isMenuGroupVisible}'
+		        },
+		    	sortIndex:17
 		    },{
 		        text: me.messages.actionLog,
-		        isAllowedFor: 'editorLogTask',
+		        action: 'editorLogTask',
+		        hidden:true,
+		        bind:{
+		        	hidden:'{!isEditorLogTask}'
+		        },
 		        glyph: 'f1da@FontAwesome5FreeSolid',
-		        itemId: 'ico-task-log',
-		        sortIndex:13,
+		        sortIndex:18
 		    }]
 	    };
 
@@ -152,7 +232,6 @@ Ext.define('Editor.view.admin.TaskActionMenu', {
 	        return a.sortIndex - b.sortIndex;
 	    });
 
-	    config.items= Ext.Array.filter(config.items,config.itemFilter);
 	    if (instanceConfig) {
 	        me.self.getConfigurator().merge(me, config, instanceConfig);
 	    }
@@ -162,6 +241,11 @@ Ext.define('Editor.view.admin.TaskActionMenu', {
 	    }, config)]);
 	},
 	
+    /**
+     * displays the export menu
+     * @param {Editor.model.admin.Task} task
+     * @param {Ext.EventObjectImpl} event
+    */
 	getExportTaskOptionsMenu:function(task){
 	      var me = this,
           hasQm = task.hasQmSub(),

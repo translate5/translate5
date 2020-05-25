@@ -28,41 +28,47 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.project.ProjectPanelViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.projectPanel',
-    formulas:{
-		projectSelection:{
-			bind:{
-				bindTo:'{projectGrid.selection}',
-				deep:true
-			},
-			get:function(sel){
-				return sel;
-			}
-		},
-		projectTaskSelection:{
-			bind:{
-				bindTo:'{projectTaskGrid.selection}',
-				deep:true
-			},
-			get:function(sel){
-				return sel;
-			}
-		}
-
-	},
+    
+    data:{
+    	projectSelection:null,
+    	projectTaskSelection:null
+    },
+//    formulas:{
+//		projectSelection:{
+//			bind:{
+//				bindTo:'{projectGrid.selection}',
+//				deep:true
+//			},
+//			get:function(sel){
+//				return sel;
+//			}
+//		},
+//		projectTaskSelection:{
+//			bind:{
+//				bindTo:'{projectTaskGrid.selection}',
+//				deep:true
+//			},
+//			get:function(sel){
+//				return sel;
+//			}
+//		}
+//
+//	},
 	stores: {
 		//this store is defined here because the reference filter binding is required
 		projectTasks: {
 			model:'Editor.model.admin.Task',
+			storeId:'projectTasks',
 			remoteSort: true,
 			remoteFilter: true,
 			pageSize: false,
 			listeners:{
-				endupdate:'onProjectTasksEndUpdate'
+				load:'onProjectTaskLoad'
 			},
 			filters:{
-    			property: 'projectId',
-        		operator:"eq",
-        		value:'{projectSelection.projectId}'
+				property: 'projectId',
+				operator:"eq",
+				value:'{projectSelection.projectId}'
 			}
 		}
     }

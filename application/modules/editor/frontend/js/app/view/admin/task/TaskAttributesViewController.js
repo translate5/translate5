@@ -42,33 +42,15 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
 
     listen: {
         component: {
-            'taskattributes': {
-                show: 'loadTask'
-            },
             'radio[name="usageMode"]': {
                 change: 'onUsageModeChange'
             }
         }
     },
     
-    loadTask: function() {
-        var vm = this.getView().lookupViewModel();
-        vm.set('disableUsageMode', Ext.getStore('admin.TaskUserAssocs').getCount() > 0);
-        this.getView().loadRecord(vm.get('currentTask'));
-    },
-    
     onSaveTaskAttributesClick:function(){
-        var me=this,
-            currentTask=me.getView().lookupViewModel().get('currentTask');
- 
-        me.getView().updateRecord();
-        //check if the model record is changed
-        if(!currentTask.dirty){
-            return;
-        }
-        me.getView().getEl().mask("Loading...");
-        
-        currentTask.save({
+        var me=this;
+        me.getCurrentTask().save({
             failure: function(record, operation) {
                 me.getView().getEl().unmask();
                 Editor.app.getController('ServerException').handleException(operation.error.response);
@@ -82,24 +64,25 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
     
     onReloadTaskAttributesClick:function(){
         //Reload the task
-        var me = this,
-            task = me.getView().lookupViewModel().get('currentTask');
-        task.load({
-            success: function(rec) {
-                Editor.app.getController('Editor.controller.admin.TaskPreferences').loadAllPreferences(rec);
-                me.loadTask();
-            }
-        });
+        this.getCurrentTask().load();
     },
     
     onCancelTaskAttributesClick:function(){
-        this.getView().up('window').destroy();
+    	//reject the changes
+    	this.getCurrentTask().reject();
     },
     
     onUsageModeChange: function(field, newVal) {
         if(field.config.inputValue == 'simultaneous' && newVal && !Editor.plugins.FrontEndMessageBus) {
             Editor.MessageBox.addError('In order to use that mode the FrontEndMessageBus plug-in must be active!');
         }
+    },
+    
+    /***
+     * Get the current loaded task from the view model
+     */
+    getCurrentTask:function(){
+    	return this.getView().lookupViewModel().get('currentTask');
     }
 
 });

@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -15,8 +14,9 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -26,11 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.project.Project', {
-	extend : 'Ext.data.BufferedStore',
-	model: 'Editor.model.project.Project',
-	alias: 'store.project',
-	remoteSort: true,
-	remoteFilter: true,
-	autoLoad: true
-});
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES 
+('editor', 'api', 'initial_tasktype', 'projectTask'),
+('editor', 'pm', 'initial_tasktype', 'projectTask');
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'editorMenuProject');

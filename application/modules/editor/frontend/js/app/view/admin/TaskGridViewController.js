@@ -34,10 +34,23 @@ Ext.define('Editor.view.admin.TaskGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.taskGrid',
     routes: {
-        'task': 'onTaskRoute'
+    	//INFO: this route will filter the task in the task grid
+    	//add another route for open task for editing
+    	'task': 'onTaskRoute',
+        'task/:id/focus': 'onTaskRoute'
     },
     
-    onTaskRoute: function() {
-        Editor.app.openAdministrationSection(this.getView(), 'task');
+    onTaskRoute: function(id) {
+    	var me=this,
+    		rute='task';
+    	if(id){
+    		rute=rute+'/'+id;
+    		Editor.app.getController('admin.TaskOverview').addAdvancedFilter({
+      			property: 'id',
+        		operator:"eq",
+        		value:id
+    		});
+    	}
+        Editor.app.openAdministrationSection(this.getView(), rute);
     },
 });

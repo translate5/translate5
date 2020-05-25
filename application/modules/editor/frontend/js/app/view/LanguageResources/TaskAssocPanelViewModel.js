@@ -42,6 +42,20 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
     data: {
         items: null
     },
+	stores: {
+		taskAssoc: {
+	  		  model:'Editor.model.LanguageResources.TaskAssoc',
+	  		  remoteFilter: true,
+	  		  pageSize: false,
+	  		  autoLoad:true,
+	  		  filters:{
+	  			  property: 'taskGuid',
+	  			  operator:"eq",
+	  			  value:'{currentTask.taskGuid}'
+	  		  }  
+		}
+    },
+    
     formulas:{
         hasTmOrCollection:function(get){
             return this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TM)||this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TERM_COLLECTION) ;
@@ -53,7 +67,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
             return this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TERM_COLLECTION);
         }
     },
-
+    
     checkResourceType:function(items,resourceType){
         var hasType=false;
         if(!items){

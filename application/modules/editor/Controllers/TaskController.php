@@ -522,11 +522,6 @@ class editor_TaskController extends ZfExtended_RestController {
                     $task->setTaskName($this->entity->getTaskName().' - '.$languages[$task->getSourceLang()].' / '.$languages[$task->getTargetLang()]);
                     $this->processUploadedFile($task, $dpFactory->createFromTask($this->entity));
                     $this->addDefaultLanguageResources($task);
-                    
-                    //TODO: without this the import is not triggered. something wrong with the workers
-                    if(true || $this->data['autoStartImport']) {
-                        $this->startImportWorkers($task);
-                    }
                 }
                 
                 $this->entity->setState($this->entity::INITIAL_TASKTYPE_PROJECT);
@@ -765,24 +760,39 @@ class editor_TaskController extends ZfExtended_RestController {
             $task = $this->entity;
         }
 
+        $tasks=[];
+        //if it is a project, start the import workers for each task project
         if($task->isProject()) {
-            return;
+            $tasks=$task->loadProjectTasks($task->getProjectId(),true);
+        }else{
+            $tasks[]=$task;
         }
 
-        //import workers can only be started for tasks
-        if(!$task->isTask()) {
-            return;
-        }
-
-        $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $workerModel ZfExtended_Models_Worker */
-        try {
-            $workerModel->loadFirstOf('editor_Models_Import_Worker', $task->getTaskGuid());
-            $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
-            $worker && $worker->schedulePrepared();
-        }
-        catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            //if there is no worker, nothing can be done
+        $model=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $model editor_Models_Task */
+        foreach ($tasks as $task){
+            
+            if(is_array($task)){
+                $model->load($task['id']);
+            }else{
+                $model=$task;
+            }
+            
+            //import workers can only be started for tasks
+            if(!$model->isTask()) {
+                continue;
+            }
+    
+            $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+            /* @var $workerModel ZfExtended_Models_Worker */
+            try {
+                $workerModel->loadFirstOf('editor_Models_Import_Worker', $model->getTaskGuid());
+                $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
+                $worker && $worker->schedulePrepared();
+            }
+            catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                //if there is no worker, nothing can be done
+            }
         }
     }
 
@@ -883,6 +893,7 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($data['workflowStep']);
         unset($data['locked']);
         unset($data['lockingUser']);
+        unset($data['userCount']);
         $data['state'] = 'import';
         $this->entity->init($data);
         $this->entity->createTaskGuidIfNeeded();
@@ -1656,6 +1667,22 @@ class editor_TaskController extends ZfExtended_RestController {
         ]);
         /* @var $remover  editor_Models_Project_Remover */
         $remover->remove($projectId);
+    }
+    
+    
+    /**
+     * Search the task id position in the current filter
+     */
+    public function positionAction() {
+        //TODO: single sql ?
+        $this->indexAction();
+        $id = (int) $this->_getParam('id');
+        $index=array_search($id, array_column($this->view->rows, 'id'));
+        if($index===false){
+            $index=-1;
+        }
+        $this->view->index = $index;
+        unset($this->view->rows);
     }
 
     /***
