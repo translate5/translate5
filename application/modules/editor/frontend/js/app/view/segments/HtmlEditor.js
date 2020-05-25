@@ -504,7 +504,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
       //if it is a whitespace tag we have to precalculate the pixel width of the tag (if possible)
       if(data.whitespaceTag) {
-          data.pixellength = Editor.view.segments.PixelMapping.getPixelLengthFromTag(item, me.currentSegment.get('metaCache'));
+          data.pixellength = Editor.view.segments.PixelMapping.getPixelLengthFromTag(item, me.currentSegment.get('metaCache'), me.currentSegment.get('fileId'));
       }
       else {
           data.pixellength = 0;
@@ -1090,7 +1090,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
       
       //add the length of the text itself 
-      textLength = me.getLength(text, meta);
+      textLength = me.getLength(text, meta, me.currentSegment.get('fileId'));
       
       //only the segment length + the tag lengths:
       me.lastSegmentLength = additionalLength + textLength;
@@ -1125,9 +1125,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * Return the text's length either based on pixelMapping or as the number of code units in the text.
    * @param {String} text
    * @param {Object} meta
+   * @param {Integer} fileId
    * @return {Integer}
    */
-  getLength: function (text, meta) {
+  getLength: function (text, meta, fileId) {
       var me = this, 
           div = document.createElement('div'),
           pixelMapping = Editor.view.segments.PixelMapping,
@@ -1144,7 +1145,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       text = text.replace(/\u200B|\uFEFF/g, '');
       if (isPixel) {
           // ----------- pixel-based -------------
-          length = pixelMapping.getPixelLength(text, meta);
+          length = pixelMapping.getPixelLength(text, meta, fileId);
       } 
       else {
           // ----------- char-based -------------

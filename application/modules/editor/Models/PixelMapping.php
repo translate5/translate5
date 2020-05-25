@@ -101,16 +101,16 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function getPixelMappingByFont(string $taskGuid, string $fontFamily, int $fontSize) {
-        $pixelMappingForFont = array();
+        $pixelMappingForFont = [];
         $sql = $this->db->select()
-        ->from($this->db, array('unicodeChar','pixelWidth'))
+        ->from($this->db, array('fileId','unicodeChar','pixelWidth'))
         ->where('taskGuid = ?', $taskGuid)
         ->where('font LIKE ?', $fontFamily)
         ->where('fontSize = ?', $fontSize);
-        // TODO handle files!
         $allPixelMappingRows = $this->db->fetchAll($sql);
         foreach ($allPixelMappingRows->toArray() as $row) {
-            $pixelMappingForFont[$row['unicodeChar']] = $row['pixelWidth'];
+            $fileId = $row['fileId'] ?? 'default';
+            $pixelMappingForFont[$row['unicodeChar']][$fileId] = $row['pixelWidth'];
         }
         return $pixelMappingForFont;
     }
@@ -129,21 +129,28 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
             $pixelMappingForTask[$fontFamily][$fontSize] = $this->getPixelMappingByFont($taskGuid, $fontFamily, $fontSize);
             $pixelMappingForTask[$fontFamily][$fontSize]['default'] = $this->getDefaultPixelWidth($fontSize);
         }
-        // TODO handle files!
         return $pixelMappingForTask;
         /*
          Array
             (
-                [verdana] => Array
+                [arial] => Array
                     (
                         [13] => Array
                             (
-                                [1593] => 12
-                                [default] => 4
+                                [80] => Array
+                                    (
+                                        [default] => 11  // = no fileId given => from pixel-mapping.xls
+                                        [918] => 18      // = as set in import-file with fileId 918
+                                    )
+                                [83] => Array
+                                    (
+                                        [default] => 11
+                                    )
+            
+                                [default] => 12
                             )
             
                     )
-            
             )
          */
     }

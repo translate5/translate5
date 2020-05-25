@@ -42,14 +42,29 @@ Ext.define('Editor.view.segments.PixelMapping', {
          * What's the length of the text according to the pixelMapping?
          * @param {String} text
          * @param {Object} segmentMeta (from currentSegment.get('metaCache'))
+         * @param {Integer} segmentFileId (from currentSegment.get('fileId'))
          * @return {Integer}
          */
-        getPixelLength: function (text, segmentMeta) {
+        getPixelLength: function (text, segmentMeta, segmentFileId) {
             var me = this,
                 pixelLength = 0,
                 allCharsInText = me.stringToArray(text),
                 pixelMapping = me.getPixelMappingForSegment(segmentMeta),
-                charWidth;
+                unicodeCharNumeric,
+                pixelMappingForCharacter,
+                charWidth,
+                getCharWidth = function(unicodeCharNumeric) {
+                    if (pixelMapping[unicodeCharNumeric] !== undefined) {
+                        pixelMappingForCharacter = pixelMapping[unicodeCharNumeric];
+                        if (pixelMappingForCharacter[segmentFileId] !== undefined) {
+                            return pixelMappingForCharacter[segmentFileId];
+                        }
+                        if (pixelMappingForCharacter['default'] !== undefined) {
+                            return pixelMappingForCharacter['default'];
+                        }
+                    }
+                    return pixelMapping['default'];
+                };
             
            //console.dir(pixelMapping);
            //console.log(text);
@@ -57,11 +72,7 @@ Ext.define('Editor.view.segments.PixelMapping', {
            var key = 0;
            Ext.each(allCharsInText, function(char){
                unicodeCharNumeric = char.codePointAt(0);
-               if (pixelMapping[unicodeCharNumeric] !== undefined) {
-                   charWidth = pixelMapping[unicodeCharNumeric];
-               } else {
-                   charWidth = pixelMapping['default'];
-               }
+               charWidth = getCharWidth(unicodeCharNumeric);
                key++;
                pixelLength += parseInt(charWidth);
                //console.log('['+key+'] ' + char + ' ('+ unicodeCharNumeric + '): ' + charWidth + ' => pixelLength: ' + pixelLength);
@@ -74,10 +85,11 @@ Ext.define('Editor.view.segments.PixelMapping', {
          * What's the length of the given internal tag according to the pixelMapping?
          * @param {String} tagHtml
          * @param {Object} segmentMeta (from currentSegment.get('metaCache'))
+         * @param {Integer} segmentFileId (from currentSegment.get('fileId'))
          * @return {Integer}
          */
-        getPixelLengthFromTag: function (tagNode, segmentMeta) {
-            if(!Editor.data.task.get('pixelMapping') || (segmentMeta &&  segmentMeta.sizeUnit != this.SIZE_UNIT_FOR_PIXELMAPPING)) {
+        getPixelLengthFromTag: function (tagNode, segmentMeta, segmentFileId) {
+            if(!Editor.data.task.get('pixelMapping') || (segmentMeta &&  segmentMeta.sizeUnit !== this.SIZE_UNIT_FOR_PIXELMAPPING)) {
                 return 0;
             }
             
@@ -97,7 +109,7 @@ Ext.define('Editor.view.segments.PixelMapping', {
             plainTag = tag.replace(/[^a-zA-Z]*$/, '');
             //if it is a return, use the hardcoded replacements
             if(returns[plainTag]){
-                return me.getPixelLength(returns[plainTag], segmentMeta);
+                return me.getPixelLength(returns[plainTag], segmentMeta, segmentFileId);
             }
             //get the real payload from the tag
             if(!(tag = tag.match(/ ts="([^"]+)"/))) {
@@ -105,7 +117,7 @@ Ext.define('Editor.view.segments.PixelMapping', {
             }
             
             //count the length of the real payload
-            return me.getPixelLength(me.hexStreamToString(tag[1]), segmentMeta);
+            return me.getPixelLength(me.hexStreamToString(tag[1]), segmentMeta, segmentFileId);
         },
         
         /**
