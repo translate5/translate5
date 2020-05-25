@@ -39,7 +39,15 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
      * Container for the lengthRestriction default values
      * @var array
      */
-    protected $lengthRestrictionDefaults = ['size-unit' => null, 'minWidth' => null, 'maxWidth' => null, 'font' => null, 'fontSize' => null];
+    protected $lengthRestrictionDefaults = ['size-unit' => null, 'minWidth' => null, 'maxWidth' => null, 'maxNumberOfLines' => null, 'font' => null, 'fontSize' => null];
+    
+    /**
+     * Some of the keys in $lengthRestrictionDefaults are not standard xliff-Attributes, but named differently in the trans-units and our SegmentAttributes.
+     * @var array
+     */
+    protected static $nonStandardXliffAttributes = ['size-unit' =>        ['inUnit' => 'size-unit',                   'inSegmentAttr' => 'sizeUnit'],
+                                                    'maxNumberOfLines' => ['inUnit' => 'translate5:maxNumberOfLines', 'inSegmentAttr' => 'maxNumberOfLines'] ];
+    
     
     public function __construct() {
         $this->pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
@@ -47,19 +55,32 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
     }
     
     /**
-     * overwrite default values for length-Restriction-Attributes from task template (sizeUnit, font, fontSize, minWidth, maxWidth):
+     * overwrite default values for length-Restriction-Attributes from task template (sizeUnit, minWidth, maxWidth, maxNumberOfLines, font, fontSize):
      */
     protected function initLengthRestrictionAttributes () {
         if(!Zend_Registry::isRegistered('taskTemplate')) {
             return;
         }
         $keys = array_keys($this->lengthRestrictionDefaults);
-        $taskConfig = Zend_Registry::get('taskTemplate');
+        $taskTemplate = Zend_Registry::get('taskTemplate');
+        $taskTemplateConf = $taskTemplate->lengthRestriction ?? null;
         foreach($keys as $key) {
-            if(empty($taskConfig->pixelmapping->$key)) {
+            switch ($key) {
+                case 'font':
+                case 'fontSize':
+                    $conf = $taskTemplateConf->pixelmapping->$key ?? null;
+                    break;
+                case 'maxNumberOfLines':
+                    $conf = $taskTemplateConf->$key ?? null;
+                    break;
+                default:
+                    $conf = $taskTemplateConf->$key ?? null;
+                    break;
+            }
+            if(is_null($conf)) {
                 continue;
             }
-            $conf = trim($taskConfig->pixelmapping->$key);
+            $conf = trim($conf);
             if(empty($conf)) {
                 continue;
             }
@@ -77,12 +98,18 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
         // Length-Restriction-Attributes (as set in xliff's trans-unit; fallback: task-template); optional
         $unit = $xmlparser->getAttribute($unitAttributes, 'size-unit', $this->lengthRestrictionDefaults['size-unit']);
         if($unit == 'char' || $unit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING) {
-            $segmentAttributes->sizeUnit = $unit;
-            foreach ($this->lengthRestrictionDefaults as $key => $value) {
-                if($key == 'size-unit') {
-                    continue;
+            foreach ($this->lengthRestrictionDefaults as $key => $defaultValue) {
+                if(array_key_exists($key, self::$nonStandardXliffAttributes)) {
+                    // non-standard xliff-attributes:
+                    $nonStandardKeys = self::$nonStandardXliffAttributes[$key];
+                    $keyInUnitAttributes = $nonStandardKeys['inUnit'];
+                    $keyInSegmentAttributes = $nonStandardKeys['inSegmentAttr'];
+                } else {
+                    // standard xliff-attributes:
+                    $keyInUnitAttributes = $key;
+                    $keyInSegmentAttributes = $key;
                 }
-                $segmentAttributes->$key = $xmlparser->getAttribute($unitAttributes, $key, $value);
+                $segmentAttributes->$keyInSegmentAttributes = $xmlparser->getAttribute($unitAttributes, $keyInUnitAttributes, $defaultValue);
             }
         }
         

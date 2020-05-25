@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -75,7 +75,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
     public function testSegmentValuesAfterImport() {
         
         //FIXME: This test is to be considered incomplete!!!
-        // it must be continued on continuing the XLF import. 
+        // it must be continued on continuing the XLF import.
         
         //FIXME get task and test wordcount!!!
         //get segment list (just the ones of the first file for that tests)
@@ -159,7 +159,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals(self::$api->getFileContent('expectedSegmentsPreserveWhitespaceAfterEdit.json'), $data, 'Imported segments are not as expected!');
         
         $task = $this->api()->getTask();
-        //start task export 
+        //start task export
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, '01-ibm-opentm2.xlf', 'ibm-opentm2-export-normal.xlf');
         //start task export with diff
         // diff export will be disabled for XLF!
@@ -172,7 +172,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testMissingMrks() {
         $task = $this->api()->getTask();
-        //start task export 
+        //start task export
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, '04-segmentation.xlf', 'export-segmentation.xlf');
     }
 
@@ -192,7 +192,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testPreserveContentBetweenMrk() {
         $task = $this->api()->getTask();
-        //start task export 
+        //start task export
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, '02-preserveWhitespace.xlf', 'preserveWhitespace-exporttest.xlf');
     }
     
@@ -202,7 +202,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testIssueExports() {
         $task = $this->api()->getTask();
-        //start task export 
+        //start task export
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, '05-Translate1971-de-en.xlf', 'Translate1971-exporttest.xlf');
     }
     
