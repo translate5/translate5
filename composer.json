@@ -8,7 +8,8 @@
 			"include" : [
 				"application/modules/*/composer.local.json",
 				"library/*/composer.local.json"
-			]
+			],
+			"recurse": true
 		}
 	},
 	"name" : "mittagqi/translate5",
