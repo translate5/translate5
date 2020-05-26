@@ -37,7 +37,7 @@ const SERVER_VERSION = '1.0';
 //errors should go to stderr only!
 ini_set('display_errors', "stderr");
 
-require __DIR__ . '/bus-server/vendor/autoload.php';
+require __DIR__ . '/../../../../../vendor/autoload.php';
 /**
  * For development: use eclipse external tools for running / restart
  */
@@ -74,5 +74,5 @@ if(!empty($config->bootMailReceiver)) {
 }
 
 $app = new \Ratchet\App($host, $port, $listen, $loop);
-$app->route($config->socketServer->route, $bus, ['*']); 
+$app->route($config->socketServer->route, $bus, ['*']);
 $app->run();
