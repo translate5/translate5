@@ -105,8 +105,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         	'#admin.TaskOverview':{
         		taskCreated:'onTaskCreated',
                 periodicalTaskReloadIgnore: 'ignoreTaskForReload',
-                importStateCheckFinished:'onImportStateCheckFinished',
-                handleTaskPreferences:'onHandleTaskPreferences'
+                importStateCheckFinished:'onImportStateCheckFinished'
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -308,7 +307,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		task=item.lookupViewModel(true).get('task');
     	me.redirectTo('project/'+task.get('projectId')+'/'+task.get('id')+'/focus');
         me.getAdminTaskPreferencesWindow().down('tabpanel').setActiveTab('matchAnalysisPanel');
-        me.onHandleTaskPreferences(task);
     },
     
     /***
@@ -452,10 +450,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	}
     },
     
-    onHandleTaskPreferences:function(task){
-    	this.getMatchAnalysisPanel().reloadAnalysisStore(task);
-    },
-
     /***
      * Add loading mask in match analysis panel and in the task assoc panel
      */
