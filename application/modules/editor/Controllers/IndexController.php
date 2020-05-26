@@ -553,43 +553,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         }
     }
     
-    public function generatesmalltagsAction() {
-      set_time_limit(0);
-      $path = array(APPLICATION_PATH, '..', 'public',
-          $this->config->runtimeOptions->dir->tagImagesBasePath.'/');
-      $path = join(DIRECTORY_SEPARATOR, $path);
-
-      /* @var $single editor_ImageTag_Single */
-      $single = ZfExtended_Factory::get('editor_ImageTag_Single');
-      $single->setSaveBasePath($path);
-      
-      $singleLocked = ZfExtended_Factory::get('editor_ImageTag_Single');
-      /* @var $singleLocked editor_ImageTag_Single */
-      $singleLocked->setSaveBasePath($path);
-      
-      /* @var $left editor_ImageTag_Left */
-      $left = ZfExtended_Factory::get('editor_ImageTag_Left');
-      $left->setSaveBasePath($path);
-      
-      /* @var $right editor_ImageTag_Right */
-      $right = ZfExtended_Factory::get('editor_ImageTag_Right');
-      $right->setSaveBasePath($path);
-      
-      for($i = 1; $i <= 100; $i++) {
-        $single->create('<'.$i.'/>');
-        $singleLocked->create('<locked'.$i.'/>');
-        $left->create('<'.$i.'>');
-        $right->create('</'.$i.'>');
-        
-        $single->save($i);
-        $singleLocked->save('locked'.$i);
-        $left->save($i);
-        $right->save($i);
-      }
-      
-      exit;
-    }
-    
     public function generateqmsubsegmenttagsAction() {
       set_time_limit(0);
       $path = array(APPLICATION_PATH, '..', 'public',
