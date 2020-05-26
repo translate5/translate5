@@ -776,36 +776,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 }
             }
             
-            //reset start/end shift count.
-            // the counts are set by hasSameStartAndEndTags to > 0,
-            // then the start/end offset where the placeHolder is placed is shifted
-            // to exclude tags leading and trailing tags in the segment
-            $this->startShiftCount = 0;
-            $this->endShiftCount = 0;
-            //if preserveWhitespace is enabled, hasSameStartAndEndTags should not hide tags,
-            // since potential whitespace tags does matter then in the content
-            //since we are calling the leading/trailing tag stuff on the already fetched source segments,
-            // we have no ability here to conserve content outside the mrk tags - which also should not be on preserveWhitespace
-            if(!$this->hasSameStartAndEndTags($preserveWhitespace, $sourceChunks, $targetChunks)) {
-                //if there is just leading/trailing whitespace but no tags we reset the counter
-                // since then we dont want to cut off something
-                //if there is whitespace between or before the leading / after the trailing tags,
-                // this whitespace is ignored depending the preserveWhitespace setting.
-                // above $sourceChunks $targetChunks does not contain any irrelevant whitespace (only empty chunks)
-                $this->startShiftCount = 0;
-                $this->endShiftCount = 0;
-            }
-            
-            //we get and store the leading target tags for later insertion
-            $leadingTags = $this->internalTag->restore($this->xmlparser->join(array_slice($targetChunks, 0, $this->startShiftCount)));
-            
-            //we get and store the trailing target tags for later insertion
-            if($this->endShiftCount > 0) {
-                $trailingTags = $this->internalTag->restore($this->xmlparser->join(array_slice($targetChunks, -$this->endShiftCount)));
-            }
-            else {
-                $trailingTags = '';
-            }
+            $surroundingTags = $this->calculateSurroundingTags($preserveWhitespace, $sourceChunks, $targetChunks);
             
             //store already converted and uncut chunks
             $sourceChunksUncut = $sourceChunks;
@@ -860,7 +831,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             if($currentTarget !== self::MISSING_MRK) {
                 //we add a placeholder if it is a real segment, not just a placeholder for a missing mrk
-                $placeHolders[$mid] = $leadingTags.$this->getFieldPlaceholder($segmentId, $targetName).$trailingTags;
+                $placeHolders[$mid] = $surroundingTags['before'].$this->getFieldPlaceholder($segmentId, $targetName).$surroundingTags['after'];
             }
         }
         
@@ -924,6 +895,51 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 return $placeHolder.$oldChunk;
             });
         }
+    }
+    
+    protected function calculateSurroundingTags($preserveWhitespace, array $sourceChunks, array $targetChunks) {
+        $surroundingTags = [
+            'before' => '',
+            'after' => '',
+        ];
+        
+        //if target is empty, we assume the target = source so that the feature can be used at all
+        // 1. it checks for same tags in source and target
+        // 2. we need the tags from source to be added as leading / trailing in target
+        if(empty($targetChunks) || (count($targetChunks) === 1 && empty($targetChunks[0]))) {
+            $targetChunks = $sourceChunks;
+        }
+        
+        //reset start/end shift count.
+        // the counts are set by hasSameStartAndEndTags to > 0,
+        // then the start/end offset where the placeHolder is placed is shifted
+        // to exclude tags leading and trailing tags in the segment
+        $this->startShiftCount = 0;
+        $this->endShiftCount = 0;
+        //if preserveWhitespace is enabled, hasSameStartAndEndTags should not hide tags,
+        // since potential whitespace tags does matter then in the content
+        //since we are calling the leading/trailing tag stuff on the already fetched source segments,
+        // we have no ability here to conserve content outside the mrk tags - which also should not be on preserveWhitespace
+        if(!$this->hasSameStartAndEndTags($preserveWhitespace, $sourceChunks, $targetChunks)) {
+            //if there is just leading/trailing whitespace but no tags we reset the counter
+            // since then we dont want to cut off something
+            //if there is whitespace between or before the leading / after the trailing tags,
+            // this whitespace is ignored depending the preserveWhitespace setting.
+            // above $sourceChunks $targetChunks does not contain any irrelevant whitespace (only empty chunks)
+            $this->startShiftCount = 0;
+            $this->endShiftCount = 0;
+            
+            return $surroundingTags;
+        }
+        
+        //we get and store the leading target tags for later insertion
+        $surroundingTags['before'] = $this->internalTag->restore($this->xmlparser->join(array_slice($targetChunks, 0, $this->startShiftCount)));
+        
+        //we get and store the trailing target tags for later insertion
+        if($this->endShiftCount > 0) {
+            $surroundingTags['after'] = $this->internalTag->restore($this->xmlparser->join(array_slice($targetChunks, -$this->endShiftCount)));
+        }
+        return $surroundingTags;
     }
     
     /**
@@ -1083,11 +1099,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * @return boolean returns false if there are no matching leading/trailing tags at all
      */
     protected function hasSameStartAndEndTags($preserveWhitespace, array $source, array $target, $foundTag = false) {
-        //if target is empty, we assume the target = source so that the feature can be used at all, since it checks for same tags in source and target
-        if(empty($target)) {
-            $target = $source;
-        }
-        
         //source and target must have at least a start tag, text content, and an end tag, that means at least 3 chunks:
         // if the feature is disabled no framing tags are ignored
         if(!$this->config->runtimeOptions->import->xlf->ignoreFramingTags || count($source) < 4 || count($target) < 4){
