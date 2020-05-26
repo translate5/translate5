@@ -904,9 +904,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         ];
         
         //if target is empty, we assume the target = source so that the feature can be used at all
-        // 1. it checks for same tags in source and target
-        // 2. we need the tags from source to be added as leading / trailing in target
-        if(empty($targetChunks) || (count($targetChunks) === 1 && empty($targetChunks[0]))) {
+        // 1. because it checks for same tags in source and target
+        // 2. because we need the tags from source to be added as leading / trailing in target
+        $target = $this->xmlparser->join($targetChunks);
+        if(empty($target)) {
             $targetChunks = $sourceChunks;
         }
         
