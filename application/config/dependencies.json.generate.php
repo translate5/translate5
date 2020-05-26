@@ -77,9 +77,18 @@ $dep->dependencies = [[
         "version" => "-na-",                                // currently not used, just for the sake of completeness
         "target" => "vendor/",                              // unzip target, see above
         "licenses" => [[                                    // list of licenses to be confirmed for this package
-            "uses" => "several dependent libraries",        // is parsed into license title and agreement
-            "license" => "several, see third-party-dependency-licenses.md",                            // is parsed into license title and agreement
-            "relpath" => "docs/third-party-licenses/third-party-dependency-licenses.md"
+            //"uses" => "several dependent libraries",        // is parsed into license title and agreement
+            "usesFile"  => "docs/third-party-licenses/third-party-dependency-license-overview.txt", //loads the content from the given filename, and places the content in the "uses" variable
+            "relpath"   => "docs/third-party-licenses/third-party-dependency-licenses.md",
+            "title"     => "License agreement for third party dependencies pulled in by PHP composer. Dependencies to be pulled:",
+            "agreement" => '{USES}
+
+  Please read the following license agreement and accept it for the third party dependencies.
+                
+  {RELPATH}
+                
+  You must accept the terms of this agreement for {LABEL} by typing "y" and <ENTER> before continuing with the installation.
+  If you type "y", the translate5 installer will download and install the dependencies for you.{SUFFIX}'
                                                             // relpath file is checked for existence,
                                                             //  then the path (not the content) parsed into license agreement
             // agreement   optional, overwrites default agreement (defined in ZfExtended_Models_Installer_License)
