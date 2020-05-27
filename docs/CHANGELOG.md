@@ -3,6 +3,15 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.4.4] - 2020-05-27
+###Changed
+TRANSLATE-2043: Use Composer to manage all the PHP dependencies in development
+  All PHP third party code libraries are now delivered as one third-party package. In development composer is used now to manage all the PHP dependencies.
+
+###Bugfixes
+TRANSLATE-2082: Missing surrounding tags on export of translation tags
+  For better usability surrounding tags of a segment are not imported. In translation task this tags are not added anymore on export. For review tasks everything was working.
+
 ## [3.4.3] - 2020-05-11
 ###Added
 TRANSLATE-1661: MatchAnalysis: GroupShare TMs support now also count of internal fuzzies
