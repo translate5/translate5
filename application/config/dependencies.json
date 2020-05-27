@@ -27,15 +27,15 @@
                     "usesFile": "docs\/third-party-licenses\/third-party-dependency-license-overview.txt",
                     "relpath": "docs\/third-party-licenses\/third-party-dependency-licenses.md",
                     "title": "License agreement for third party dependencies pulled in by PHP composer. Dependencies to be pulled:",
-                    "agreement": "  {USES}\n\n  Please read the following license agreement and accept it for the third party dependencies.\n                \n  {RELPATH}\n                \n  You must accept the terms of this agreement for {LABEL} by typing \"y\" and <ENTER> before continuing with the installation.\n  If you type \"y\", the translate5 installer will download and install the dependencies for you.{SUFFIX}"
+                    "agreement": "{USES}\n\n  Please read the following license agreement and accept it for the third party dependencies.\n                \n  {RELPATH}\n                \n  You must accept the terms of this agreement for {LABEL} by typing \"y\" and <ENTER> before continuing with the installation.\n  If you type \"y\", the translate5 installer will download and install the dependencies for you.{SUFFIX}"
                 }
             ]
         },
         {
             "name": "z1-php7.3",
             "label": "PHP Zend (z1-php7.3)",
-            "url": "RELEASE:Zend-z1-php7.3-1.13.2-p1.zip",
-            "version": "1.13.2-p1",
+            "url": "RELEASE:Zend-z1-php7.3-1.13.2-p2.zip",
+            "version": "1.13.2-p2",
             "target": "library\/zend\/",
             "licenses": [
                 {
