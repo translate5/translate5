@@ -257,7 +257,7 @@
       
       <trans-unit id="12" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
           <source><bpt id="1" rid="1" />f2-12 - tag encapsulated content should be imported with tags - since target is empty!<ept id="2" rid="1" /></source>
-        <target/>
+        <target><bpt id="1" rid="1" /><ept id="2" rid="1" /></target>
         <count-group name="word count">
           <count count-type="word count" unit="word">24</count>
         </count-group>
