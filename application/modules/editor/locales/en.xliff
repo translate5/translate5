@@ -3743,6 +3743,7 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</source>
   <target>The previous / next segment is still saving, please wait...</target>
 </trans-unit>
+<trans-unit id='SGluenVnZWbDvGd0'><source>Hinzugefügt</source><target>Added</target></trans-unit>
 </body>
   </file>
 </xliff>

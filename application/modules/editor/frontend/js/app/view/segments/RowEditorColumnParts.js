@@ -35,7 +35,9 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.segments.RowEditorColumnParts', {
     override: 'Editor.view.segments.RowEditor',
-
+    mixins: [
+        'Editor.util.HtmlCleanup'
+    ],
     columnToEdit: null,
     previousRecord: null,
     timeTrackingData: null,
@@ -328,12 +330,9 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
     saveMainEditorContent: function(record) {
         var me = this,
             plug = me.editingPlugin,
-            //der replace aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
+            //der cleanInvisibleCharacters aufruf entfernt vom Editor automatisch hinzugefügte unsichtbare Zeichen, 
             //und verhindert so, dass der Record nicht als modified markiert wird, wenn am Inhalt eigentlich nichts verändert wurde
-            //newValue = Ext.String.trim(me.mainEditor.getValueAndUnMarkup()).replace(/\u200B/g, '');
-            newValue = me.mainEditor.getValueAndUnMarkup().replace(/\u200B|\uFEFF/g, ''),
-            cleanValue = newValue.replace(/<img[^>]* class="duplicatesavecheck"[^>]*>/,''),
-            
+            newValue = me.cleanInvisibleCharacters(me.mainEditor.getValueAndUnMarkup()),            
             title, msg, meta;
             
         //check, if the context delivers really the correct record, because through some issues in reallive data 
@@ -350,11 +349,8 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             return false;
         }
         
-        // In case of TrackChanges:
-        // (1) remove DEL-Tags and their content
-        cleanValue = cleanValue.replace(/<del[^>]*>.*?<\/del>/ig,'');
-        // (2) remove INS-Tags and keep their content:
-        cleanValue = cleanValue.replace(/<ins[^>]*>/ig, '').replace(/<\/ins>/ig, '');
+        // Remove all TrackChanges Markup
+        var cleanValue = me.cleanForSaveEditorContent(newValue);
         
         if(cleanValue.length == 0 && record.get(me.columnToEdit).length > 0) {
             Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);
