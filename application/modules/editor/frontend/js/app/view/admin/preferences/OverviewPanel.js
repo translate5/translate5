@@ -45,6 +45,32 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
     tabPosition: 'left',
     tabRotation: 0,
     glyph: 'xf085@FontAwesome',
+    listeners:{
+        beforeshow: function(view, opts){
+            this.forwardActiveTabEvent('beforeshow');
+        },
+        show: function(view, opts){
+            this.forwardActiveTabEvent('show');
+        },
+        activate: function(view, opts){
+            this.forwardActiveTabEvent('activate');
+        },
+        beforehide: function(view, opts){
+            this.forwardActiveTabEvent('beforehide');
+        },
+        hide: function(view, opts){
+            this.forwardActiveTabEvent('hide');
+        },
+        deactivate: function(view, opts){
+            this.forwardActiveTabEvent('deactivate');
+        }
+    },
+    forwardActiveTabEvent: function(name){
+        var at = this.getActiveTab();
+        if(at){
+            at.fireEvent('tab'+name, at);
+        }
+    },
     initConfig: function(instanceConfig) {
         var me = this,
             user = Editor.app.authenticatedUser,
@@ -62,15 +88,10 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
         /**
          * Other planned config sections:
          * [{
-            //  },{
-//                  xtype: 'panel',
-//                  title: 'System',
-//                  glyph: 'xf013@FontAwesome',
-            //  },{
-//                  xtype: 'panel',
-//                  title: 'Axels Fonts',
-//                  glyph: 'xf031@FontAwesome',
-                }]
+				xtype: 'panel',
+				title: 'System',
+				glyph: 'xf013@FontAwesome',
+			}]
          */
         
         if (instanceConfig) {

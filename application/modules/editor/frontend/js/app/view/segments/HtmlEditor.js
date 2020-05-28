@@ -52,6 +52,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       'Editor.view.segments.PixelMapping',
       'Editor.view.segments.StatusStrip'
   ],
+  mixins: [
+      'Editor.util.HtmlCleanup'
+  ],
   componentLayout: 'htmleditorlayout',
   cls: 'x-selectable', //TRANSLATE-1021
   
@@ -1134,7 +1137,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           isPixel = (meta && meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING),
           length;
 	  //clean del tag
-	  text = text.replace(/<del[^>]*>.*?<\/del>/ig,''); //FIXME: improve that clean del tag by reuse methods from track changes
+      text = me.cleanDeleteTags(text);
       // use div, then (1) retrieve "text" only without html-tags and (2) add the lengths of tags (= img)
       div.innerHTML = text;
 
