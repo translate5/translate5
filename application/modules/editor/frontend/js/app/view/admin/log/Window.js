@@ -58,7 +58,7 @@ Ext.define('Editor.view.admin.log.Window', {
                         {
                             xtype: 'button',
                             itemId: 'closeBtn',
-                            iconCls : 'ico-cancel',
+                            glyph: 'f00d@FontAwesome5FreeSolid',
                             text: me.strings.close
                         }
                     ]

@@ -62,6 +62,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },{
         ref: 'taskAssocGrid',
         selector: '#languageResourcesTaskAssocGrid'
+    },{
+	  ref:'projectPanel',
+	  selector:'#projectPanel'
     }],
     TASK_STATE_ANALYSIS: 'matchanalysis',
     strings:{
@@ -305,7 +308,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     onMatchAnalysisMenuClick:function(item){
     	var me=this,
     		task=item.lookupViewModel(true).get('task');
-    	me.redirectTo('project/'+task.get('projectId')+'/'+task.get('id')+'/focus');
+    	me.getProjectPanel().getController().redirectFocus(task,true);
         me.getAdminTaskPreferencesWindow().down('tabpanel').setActiveTab('matchAnalysisPanel');
     },
     

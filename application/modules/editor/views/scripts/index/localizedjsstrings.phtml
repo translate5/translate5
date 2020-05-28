@@ -723,6 +723,13 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
+    Ext.define("Editor.locale.de.view.project.ProjectPanelViewController", {
+        override: "Editor.view.project.ProjectPanelViewController",
+        strings:{
+        	noProjectMessage:'<?php echo $this->translate->_('Das angeforderte Projekt existiert nicht');?>',
+        	noProjectTaskMessage:'<?php echo $this->translate->_('Die angeforderte Projektaufgabe existiert nicht');?>'
+        }
+    });
     
     Ext.define("Editor.locale.de.view.project.ProjectGrid", {
         override: "Editor.view.project.ProjectGrid",
@@ -1359,7 +1366,8 @@ Ext.define('Editor.controller.Localizer', {
             name: '<?php echo $this->translate->_('Name');?>',
             segmentsUpdateable: '<?php echo $this->translate->_('Segmente zurückspeichern');?>',
             source: '<?php echo $this->translate->_('Quellsprache');?>',
-            target: '<?php echo $this->translate->_('Zielsprache');?>'
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            serviceName: '<?php echo $this->translate->_('Ressource');?>'
         }
     });
     Ext.define("Editor.locale.controller.TmOverview", {

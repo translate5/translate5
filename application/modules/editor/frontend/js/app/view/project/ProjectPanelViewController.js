@@ -29,54 +29,49 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.projectPanel',
     
+    strings:{
+        noProjectMessage:'#UT#Das angeforderte Projekt existiert nicht',
+        noProjectTaskMessage:'#UT#Die angeforderte Projektaufgabe existiert nicht'
+    },
+    rootRoute:'#project',
+    
     routes:{
-    	'project': {
-    		before : 'beforeProjectRoute',
-            action : 'onProjectRoute'
-        },
-    	'project/:id/focus' :{
-    		before : 'beforeProjectFocusRoute',
-    		action : 'onProjectFocusRoute'
-    	},
-    	'project/:id/:taskId/focus' :{
-    		before : 'beforeProjectTaskFocusRoute',
-    		action:'onProjectTaskFocusRoute'
-    	} 
+    	'project':'onProjectRoute',
+    	'project/:id/focus' :'onProjectFocusRoute',
+    	'project/:id/:taskId/focus' :'onProjectTaskFocusRoute' 
     },
     
     /***
-     * Handle project rute action. Stop the action to cancel the rute action call
+     * Redirect to project focus route route
      */
-    handleBeforeProjectRute:function(action){
+    redirectFocus:function(record,includeTask){
     	var me=this,
-			view=me.getView(),
-			grid=view.down('#projectGrid');
-		
-    	//update the route when it is triggered from different view
-    	Editor.app.openAdministrationSection(view,window.location.hash);
+    		action='focus',
+    		route=['project',record.get('projectId')];
+    	
+    	if(includeTask){
+    		route.push(record.get('id'));
+    	}
+    	
+    	route.push(action);
+    	route=route.join('/');
+    	
+    	Editor.app.openAdministrationSection(me.getView(),route);
+    	me.redirectTo(route);
+    },
 
-    	action.resume();
-    },
-    
-    /***
-     * Before project rute
-     */
-    beforeProjectRoute:function(action){
-    	this.handleBeforeProjectRute(action);
-    },
-    
     /***
      * On project rute
      */
     onProjectRoute:function(){
+    	var me=this;
+    	//if it is the default route, update the hash from the selected records
+    	if(window.location.hash==me.rootRoute){
+    		var rec=me.getViewModel().get('projectTaskSelection');
+    		rec && me.redirectFocus(rec,true)
+    	}
     },
     
-    /***
-     * Before Project Focus rute
-     */
-    beforeProjectFocusRoute:function(id,action){
-    	this.handleBeforeProjectRute(action);
-    },
     
     /***
      * On Project Focus rute
@@ -86,13 +81,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 		me.selectProjectRecord(id);
     },
     
-    /***
-     * Before ProjectTask rute
-     */
-    beforeProjectTaskFocusRoute:function(id,taskId,action){
-    	this.handleBeforeProjectRute(action);
-    },
-
     /***
      * On ProjectTask rute
      */
@@ -111,8 +99,9 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 		var me=this,
 			rute=window.location.hash,
 			rute=rute.split('/'),
+			isFocus=(rute.length==4 && rute[3]=='focus'),
 			rec=null;
-		if(rute.length==4){
+		if(isFocus){
 			rec=parseInt(rute[2]);
 		}
 		me.selectProjectTaskRecord(rec,true);
@@ -126,44 +115,38 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 	},
 	
 	
+	/***
+	 * Select project record in the projectGrid. This will also search for the record index if the record is not loaded in the buffered grid
+	 */
 	selectProjectRecord:function(id){
 		var me=this,
 			view=me.getView(),
 			grid=view.down('#projectGrid'),
 			record=null;
 		
-		grid.setLoading(true);
-
 		//serch for the task store record index
 		me.searchIndex(id,grid).then(function(index){
 			grid.bufferedRenderer.scrollTo(index,{
 				callback:function(){
 					if(index===undefined || index<0){
-						//TODO: translate me
-						Editor.MessageBox.addInfo("The requested project does not exist");
+						Editor.MessageBox.addInfo(me.strings.noProjectMessage);
 						grid.setLoading(false);
 						return;
 					}
 					
 					record=grid.getStore().getById(parseInt(id));
-					var focusAndSelect=function(){
-						grid.suspendEvent('selectionchange');
-						record=grid.getStore().getById(parseInt(id));
-						grid.setSelection(record);
-						me.getViewModel().set('projectSelection',record);
-						grid.getView().focusRow(record);
-						
-						grid.resumeEvent('selectionchange');
-						grid.setLoading(false);
-					};
 					if(record){
-						focusAndSelect();
+						me.focusRecordSilent(grid,record,'projectSelection');
 						return;
 					}
-					grid.getController().reloadProjects().then(focusAndSelect);
+					grid.getController().reloadProjects().then(function(){
+						record=grid.getStore().getById(parseInt(id));
+						me.focusRecordSilent(grid,record,'projectSelection');
+					});
 				}
 			});
 		}, function(err) {
+			//the exception is handled in the searchIndex
 			grid.setLoading(false);
 		});
 	},
@@ -177,19 +160,24 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 		var me=this,
 			view=me.getView(),
 			grid=view.down('#projectTaskGrid'),
+			projectGrid=view.down('#projectGrid'),
 			store=grid.getStore(),
 			record= (id === null) ? store.getAt(0) : store.getById(parseInt(id));
 		
 		if(!record){
 			//display info message when the flag showNoRecordMessage is set 
-			showNoRecordMessage && Editor.MessageBox.addInfo("The requested project task does not exist");
+			showNoRecordMessage && Editor.MessageBox.addInfo(me.strings.noProjectTaskMessage);
+			projectGrid.setLoading(false);
 			return;
 		}
-		grid.suspendEvent('selectionchange');
-		me.getViewModel().set('projectTaskSelection',record);
-		grid.setSelection(record);
-		grid.getView().focusRow(record);
-		grid.resumeEvent('selectionchange');
+		
+		//update the location hash
+		me.redirectFocus(record,true);
+
+		//focus and select the record
+		me.focusRecordSilent(grid,record,'projectTaskSelection');
+		
+		projectGrid.setLoading(false);
 	},
 	
 	/***
@@ -221,7 +209,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 	            params: params,
 	            scope: me,
 	            success: function(response){
-	            	//TODO: handle the fail messages and so
 	            	 var responseData = Ext.JSON.decode(response.responseText);
 	                 if(!responseData){
 	                	 resolve(-1)
@@ -236,5 +223,18 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 	        });
         });
     },
+    
+    /***
+     * Focus and select grid record without fiering the selectionchange event.
+     * This will also update the viw model variable name with the record
+     */
+    focusRecordSilent:function(grid,record,name){
+    	var me=this;
+		grid.suspendEvent('selectionchange');
+		me.getViewModel().set(name,record);
+		grid.setSelection(record);
+		grid.getView().focusRow(record);
+		grid.resumeEvent('selectionchange');
+    }
 	
 });

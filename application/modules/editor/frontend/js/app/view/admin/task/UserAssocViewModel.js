@@ -33,6 +33,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
        'Ext.data.Store',
        'Editor.model.admin.User'
     ],
+    
     stores: {
         users: {
             model: 'Editor.model.admin.User',

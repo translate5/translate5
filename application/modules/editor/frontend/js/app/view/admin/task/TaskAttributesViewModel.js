@@ -35,11 +35,6 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewModel', {
             	var currentTask=get('currentTask');
                 return Ext.getStore('admin.TaskUserAssocs').getCount() > 0;
             }
-        },
-        taskUsageModel:{
-        	get: function(get) {
-                return get('currentTask').get('usageMode');
-            }
         }
     }
 });

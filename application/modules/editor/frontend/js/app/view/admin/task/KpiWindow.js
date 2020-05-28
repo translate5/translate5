@@ -86,7 +86,7 @@ Ext.define('Editor.view.admin.task.KpiWindow', {
                       xtype: 'tbfill'
                   },{
                       xtype: 'button',
-                      iconCls : 'ico-cancel',
+                      glyph: 'f00d@FontAwesome5FreeSolid',
                       text: me.strings.closeBtn,
                       listeners:{
                           click:function(){

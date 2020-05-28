@@ -136,13 +136,13 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   },{
                       xtype: 'button',
                       itemId: 'save-assoc-btn',
-                      iconCls : 'ico-save',
+                      glyph: 'f00c@FontAwesome5FreeSolid',
                       text: me.strings.btnSave
                   },
                   {
                       xtype: 'button',
+                      glyph: 'f00d@FontAwesome5FreeSolid',
                       itemId: 'cancel-assoc-btn',
-                      iconCls : 'ico-cancel',
                       text: me.strings.btnCancel
                   }]
               }]

@@ -77,10 +77,9 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
     }
     
     /**
-     * TODO: update the description for projects
-     * 
      * returns a list of all available languageResource's for one language combination
      * The language combination is determined from the task given by taskGuid
+     * If the requested task is a project, all available resources for the project tasks will be returned.
      * If a filter "checked" is set, then only the associated languageResource's to the given task are listed
      * If the "checked" filter is omitted, all available languageResource's for the language are listed,
      *      the boolean field checked provides the info if the languageResource is associated to the task or not
@@ -96,6 +95,7 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         $task->loadByTaskGuid((string) $taskGuid);
         
         if($task->isProject()){
+            //get all project tasks and get the resources for each task
             $projectGuids=array_column($task->loadProjectTasks($task->getProjectId(),true), 'taskGuid');
             $result=[];
             foreach ($projectGuids as $pg){

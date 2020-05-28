@@ -229,7 +229,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                             dock : 'bottom'
                         },{ 
                             xtype: 'button',
-                            iconCls:'icon-excel-export',
+                            glyph: 'f1c3@FontAwesome5FreeSolid',
                             itemId:'exportExcel',
                             text:me.strings.exportAnalysis,
                             listeners:{

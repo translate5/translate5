@@ -31,7 +31,13 @@ Ext.define('Editor.view.admin.task.PreferencesViewModel', {
     alias: 'viewmodel.editorAdminTaskPreferences',
     data: {
         userAssocDirty: false,
+        userAssocStoreData:[],
         currentTask:null
+    },
+    stores:{
+    	UserAssocStore:{
+    		data:'{userAssocStoreData}'
+    	}
     },
     formulas: {
         workflowMetadata: {

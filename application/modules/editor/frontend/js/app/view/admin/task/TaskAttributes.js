@@ -92,7 +92,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                         {
                             xtype: 'button',
                             itemId: 'cancelTaskAttributes',
-                            iconCls : 'ico-cancel',
+                            glyph: 'f00d@FontAwesome5FreeSolid',
                             listeners:{
                                 click:'onCancelTaskAttributesClick'
                             },
@@ -101,7 +101,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                         {
                             xtype: 'button',
                             itemId: 'reloadTaskAttributes',
-                            iconCls: 'ico-refresh',
+                            glyph: 'f2f1@FontAwesome5FreeSolid',
                             listeners:{
                                 click:'onReloadTaskAttributesClick'
                             },
@@ -109,7 +109,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                         },{
                             xtype: 'button',
                             itemId: 'saveTaskAttributes',
-                            iconCls : 'ico-save',
+                            glyph: 'f00c@FontAwesome5FreeSolid',
                             listeners:{
                                 click:'onSaveTaskAttributesClick'
                             },
@@ -228,12 +228,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         	}
         },{
             xtype: 'radiogroup',
-            radioName:'usageMode',
-            bind : {
-            	value:{
-            		usageMode:'{taskUsageModel}'
-            	}
-            },
+            name:'usageMode',
+            simpleValue:true,
+            bind :'{currentTask.usageMode}',
             fieldLabel : me.strings.usageModeTitle,
             columns: 1,
             anchor: '100%',

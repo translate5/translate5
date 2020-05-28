@@ -39,8 +39,8 @@ Ext.define('Editor.view.admin.task.Preferences', {
     	type:'editorAdminTaskPreferences',
     },
     modal:true,
-    width:600,
-    height:350,
+    width:800,
+    height:500,
     layout: {
         type: 'border'
     },
@@ -104,6 +104,7 @@ Ext.define('Editor.view.admin.task.Preferences', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         var cmpConfig=me.callParent([config]);
+        //set the currentTask o
         me.getViewModel().set('currentTask',me.task);
         return cmpConfig;
     }
