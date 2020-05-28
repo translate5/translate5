@@ -74,14 +74,14 @@ Ext.define('Editor.view.project.ProjectGrid', {
         	        dock: 'top',
         	        items: [{
         	            xtype: 'button',
-        	            iconCls: 'ico-refresh',
+        	            glyph: 'f2f1@FontAwesome5FreeSolid',
         	            itemId: 'reloadProjectbtn',
         	            text: me.strings.reloadBtn,
         	            tooltip: me.strings.reloadBtnTip,
         	            handler:'onReloadProjectClick'
         	        },{
         	            xtype: 'button',
-        	            iconCls: 'ico-task-add',
+        	            glyph: 'f067@FontAwesome5FreeSolid',
         	            itemId: 'add-project-btn',
         	            text: me.strings.addProject,
         	            hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),

@@ -89,6 +89,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },{
 	  ref:'projectTaskGrid',
 	  selector:'#projectTaskGrid'
+  },{
+	  ref:'projectPanel',
+	  selector:'#projectPanel'
   }],
   alias: 'controller.taskOverviewController',
   
@@ -396,7 +399,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       if(!me.isAllowed('editorOpenTask', task) && !me.isAllowed('editorEditTask', task)){
           return;
       }
-      //TODO: task route. And on task leave focus the task in project overview
+      //reset the route
       me.redirectTo('');
       Editor.util.TaskActions.openTask(task, readonly);
   },
@@ -413,7 +416,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   
   editorPreferencesTask:function(task){
 	var me=this;
-    me.redirectTo('project/'+task.get('projectId')+'/'+task.get('id')+'/focus');
+    me.getProjectPanel().getController().redirectFocus(task,true);
     me.getAdminTaskPreferencesWindow().down('tabpanel').setActiveTab('adminTaskUserAssoc');
 	me.fireEvent('handleTaskPreferences', task);
   },
@@ -674,7 +677,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   	  if(!task){
   		  return;
   	  }
-  	  me.redirectTo('project/'+task.get('projectId')+'/'+task.get('id')+'/focus');
+  	  me.getProjectPanel().getController().redirectFocus(task,true);
   },
   
   /**
@@ -686,7 +689,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  if(!task){
 		  return;
 	  }
-      me.redirectTo('project/'+task.get('projectId')+'/focus');
+	  me.getProjectGrid().setLoading(true);
+	  me.getProjectPanel().getController().redirectFocus(task,false);
   },
   
   /***
@@ -698,7 +702,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  if(!task){
 		  return;
 	  }
-	  me.redirectTo('project/'+task.get('projectId')+'/focus');
+	  me.getProjectPanel().getController().redirectFocus(task,false);
   },
   
   /***
@@ -934,17 +938,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   
   showActionMenu:function(selectedTask,event){
 	  var me = this,
-	      menuXtype=selectedTask.get('taskType')=='project' ? 'projectActionMenu' : 'taskActionMenu';
-	  var menu=me.menuCache[menuXtype];
-	      //create fresh menu instance
-      if(!menu){
+	      menuXtype=selectedTask.get('taskType')=='project' ? 'projectActionMenu' : 'taskActionMenu',
+          menu=me.menuCache[menuXtype],
+          vm=null;
+
+	  if(!menu){
+    	  //create fresh menu instance
     	  me.menuCache[menuXtype]=menu=Ext.widget(menuXtype,{task:selectedTask});
 	  }
-      var vm=menu.getViewModel();
-      if(vm){
-    	  menu.getViewModel().set('task',selectedTask);
-    	  menu.getViewModel().notify();
-      }
+      vm=menu.getViewModel();
+	  vm && vm.set('task',selectedTask);
+	  vm && vm.notify();
 	  menu.showAt(event.getXY());
   },
   
@@ -969,9 +973,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   handleTaskProject: function(task) {
 	  var me=this,
 	      menu=me.getAdminMainSection(),
-	      activeTab=menu.getActiveTab().xtype,
-	      rute=activeTab=='projectPanel' ? ('task/'+task.get('id')): ('project/'+task.get('projectId')+'/'+task.get('id'));
-	  me.redirectTo(rute+'/focus');
+	      activeTab=menu.getActiveTab().xtype;
+	      
+      if(activeTab=='projectPanel'){
+    	  me.redirectTo('task/'+task.get('id')+'/filter');
+      }else{
+    	  me.getProjectPanel().getController().redirectFocus(task,true);
+      }
   },
   
   /**
@@ -1176,6 +1184,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  if(activeTab.xtype!='projectPanel'){
 		  return
 	  }
-	  me.redirectTo('project/'+task.get('projectId')+'/focus');
+	  activeTab.getController().redirectFocus(task,false);
   }
 });

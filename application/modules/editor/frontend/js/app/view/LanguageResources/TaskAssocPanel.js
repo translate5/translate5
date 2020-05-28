@@ -58,7 +58,8 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
         name: '#UT#Name',
         segmentsUpdateable: '#UT#Segmente zurückspeichern',
         source: '#UT#Quellsprache',
-        target: '#UT#Zielsprache'
+        target: '#UT#Zielsprache',
+        serviceName: '#UT#Ressource'
     },
     padding: 0,
     layout:'fit',
@@ -111,7 +112,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     flex : 50 / 100
                 }, {
                 	xtype : 'gridcolumn',
-                	text:'ServiceName',
+                	text: me.strings.serviceName,
                     dataIndex : 'serviceName',
                     sortable : true,
                     flex : 25 / 100,

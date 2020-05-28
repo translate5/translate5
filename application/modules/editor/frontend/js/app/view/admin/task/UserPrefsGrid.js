@@ -55,11 +55,24 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
 			remoteFilter: true,
 			pageSize: false,
 			autoLoad:true,
-			filters:{
+			getDefaultFor: function(workflow) {
+		      var idx = this.findBy(function(rec){
+		          return (rec.get('workflow') == workflow && rec.isDefault());
+		      });
+		      if(idx >= 0) {
+		          return this.getAt(idx);
+		      }
+		      return null;
+			},
+			filters:[{
     			property: 'taskGuid',
         		operator:"eq",
         		value:'{currentTask.taskGuid}'
-			}
+			},{
+				property: 'workflow',
+        		operator:"eq",
+        		value:'{currentTask.workflow}'
+			}]
     	}
     },
     //***********************************************************************************
@@ -77,7 +90,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
     initConfig: function(instanceConfig) {
         var me = this,
             config,
-            userStore = Ext.StoreMgr.get('admin.TaskUserAssocs');
+            userStore = Ext.StoreMgr.get('admin.Users');
             
         config = {
             columns: [
@@ -162,19 +175,19 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                         {
                             xtype: 'button',
                             itemId: 'userPrefReload',
-                            iconCls: 'ico-refresh',
+                            glyph: 'f2f1@FontAwesome5FreeSolid',
                             text: me.strings.reload
                         },
                         {
                             xtype: 'button',
                             itemId: 'userPrefAdd',
-                            iconCls: 'ico-add',
+                            glyph: 'f00c@FontAwesome5FreeSolid',
                             text: me.strings.add
                         },
                         {
                             xtype: 'button',
                             itemId: 'userPrefDelete',
-                            iconCls: 'ico-del',
+                            glyph: 'f00d@FontAwesome5FreeSolid',
                             disabled: true,
                             handler: function() {
                                 Ext.Msg.confirm(me.strings.confirmDeleteTitle, me.strings.confirmDelete, function(btn){

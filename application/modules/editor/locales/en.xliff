@@ -3763,6 +3763,8 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UHJvamVrdG5hbWXCuQ=='><source>Projektname¹</source><target>Project name</target></trans-unit>
 <trans-unit id='SGluenVnZWbDvGd0'><source>Hinzugefügt</source><target>Added</target></trans-unit>
 <trans-unit id='UHJvamVrdG1lbsO8IGFuemVpZ2Vu'><source>Projektmenü anzeigen</source><target>Show project menu</target></trans-unit>
+<trans-unit id='RGFzIGFuZ2Vmb3JkZXJ0ZSBQcm9qZWt0IGV4aXN0aWVydCBuaWNodA=='><source>Das angeforderte Projekt existiert nicht</source><target>The requested project does not exist</target></trans-unit>
+<trans-unit id='RGllIGFuZ2Vmb3JkZXJ0ZSBQcm9qZWt0YXVmZ2FiZSBleGlzdGllcnQgbmljaHQ='><source>Die angeforderte Projektaufgabe existiert nicht</source><target>The requested project task does not exist</target></trans-unit>
 </body>
   </file>
 </xliff>

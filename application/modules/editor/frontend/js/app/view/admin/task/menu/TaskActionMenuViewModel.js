@@ -38,19 +38,19 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
             	// !error && !import && !pending && !customState
             	return this.get('task').isNotErrorImportPendingCustom();
             },
-            bind: '{task}'
+            bind:{bindTo:'{task}',deep:true}
     	},
     	isNotImportPendingCustom:{
     		get: function(get) {
             	return this.get('task').isNotImportPendingCustom();
             },
-            bind: '{task}'
+            bind:{bindTo:'{task}',deep:true}
     	},
     	isEditorEditTask:{
     		get: function(get) {
             	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorEditTask',this.get('task'));
             },
-            bind: '{task}'
+            bind:{bindTo:'{task}',deep:true}
     	},
         isEditorOpenTask: {
             get: function(get) {
@@ -58,31 +58,31 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
             	//!error && !import && !pending && (!customState || customState == ExcelExported)
             	return this.isMenuAllowed('editorOpenTask',task) && task.isNotErrorImportPending() && (!task.isCustomState() || task.get('state') == 'ExcelExported');
             },
-            bind: '{task}'
+            bind:{bindTo:'{task}',deep:true}
         },
         isEditorFinishTask:{
     		get: function(get) {
             	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorFinishTask',this.get('task'));
             },
-            bind: '{task}'
+            bind:{bindTo:'{task}',deep:true}
         },
         isEditorUnfinishTask:{
     		get: function(get) {
             	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorUnfinishTask',this.get('task'));
             },
-            bind: '{task}'
+            bind:{bindTo:'{task}',deep:true}
         },
         isEditorEndTask:{
     		get: function(get) {
             	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorEndTask',this.get('task'));
             },
-            bind: '{task}'
+            bind:{bindTo:'{task}',deep:true}
         },
         isEditorReopenTask:{
     		get: function(get) {
             	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorReopenTask',this.get('task'));
             },
-            bind: '{task}'
+            bind:{bindTo:'{task}',deep:true}
         },
         isEditorPreferencesTask:{
     		get: function(get) {

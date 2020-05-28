@@ -324,7 +324,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     xtype: 'tbfill'
                 },{
                     xtype : 'button',
-                    iconCls : 'ico-next-wizard',
+                    glyph: 'f051@FontAwesome5FreeSolid',
                     itemId : 'continue-wizard-btn',
                     bind:{
                         disabled:'{disableContinueButton}',
@@ -333,7 +333,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     text : me.strings.btnNextWizard
                 },{
                     xtype : 'button',
-                    iconCls : 'ico-skip-wizard',
+                    glyph: 'f04e@FontAwesome5FreeSolid',
                     itemId : 'skip-wizard-btn',
                     bind:{
                         disabled:'{disableSkipButton}',
@@ -342,7 +342,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     text : me.strings.btnSkip
                 },{
                     xtype : 'button',
-                    iconCls : 'ico-task-add',
+                    glyph: 'f00c@FontAwesome5FreeSolid',
                     itemId : 'add-task-btn',
                     bind:{
                       disabled:'{disableAddButton}',
@@ -351,7 +351,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     text : me.strings.addBtn
                 }, {
                     xtype : 'button',
-                    iconCls : 'ico-cancel',
+                    glyph: 'f00d@FontAwesome5FreeSolid',
                     itemId : 'cancel-task-btn',
                     bind:{
                         disabled:'{disableCancelButton}',

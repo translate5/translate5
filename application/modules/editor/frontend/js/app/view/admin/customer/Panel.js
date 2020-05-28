@@ -448,7 +448,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         items: [
                             {
                                 xtype: 'button',
-                                iconCls: 'ico-refresh',
+                                glyph: 'f2f1@FontAwesome5FreeSolid',
                                 text: me.strings.reload,
                                 listeners: {
                                     click: {
@@ -459,7 +459,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                             },
                             {
                                 xtype: 'button',
-                                iconCls: 'ico-user-add',
+                                glyph: 'f067@FontAwesome5FreeSolid',
                                 text: me.strings.addCustomerTitle,
                                 listeners: {
                                     click: {

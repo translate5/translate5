@@ -132,13 +132,13 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           dock: 'top',
           items: [{
               xtype: 'button',
-              iconCls: 'ico-user-add',
+              glyph: 'f234@FontAwesome5FreeSolid',
               itemId: 'add-user-btn',
               text: me.strings.addUser,
               tooltip: me.strings.addUserTip
           },{
               xtype: 'button',
-              iconCls: 'ico-user-del',
+              glyph: 'f503@FontAwesome5FreeSolid',
               disabled: true,
               itemId: 'remove-user-btn',
               handler: function() {
@@ -154,7 +154,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           },{
               xtype: 'button',
               itemId: 'reload-btn',
-              iconCls: 'ico-refresh',
+              glyph: 'f2f1@FontAwesome5FreeSolid',
               text: me.strings.reload
           },{
               xtype: 'button',
