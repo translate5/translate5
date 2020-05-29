@@ -33,27 +33,6 @@ Ext.define('Editor.view.project.ProjectPanelViewModel', {
     	projectSelection:null,
     	projectTaskSelection:null
     },
-//    formulas:{
-//		projectSelection:{
-//			bind:{
-//				bindTo:'{projectGrid.selection}',
-//				deep:true
-//			},
-//			get:function(sel){
-//				return sel;
-//			}
-//		},
-//		projectTaskSelection:{
-//			bind:{
-//				bindTo:'{projectTaskGrid.selection}',
-//				deep:true
-//			},
-//			get:function(sel){
-//				return sel;
-//			}
-//		}
-//
-//	},
 	stores: {
 		//this store is defined here because the reference filter binding is required
 		projectTasks: {
@@ -64,6 +43,12 @@ Ext.define('Editor.view.project.ProjectPanelViewModel', {
 			pageSize: false,
 			listeners:{
 				load:'onProjectTaskLoad'
+			},
+		    setFilters:function(filters){
+				if(filters && !filters.value){
+					filters=[];
+				}
+				this.superclass.superclass.setFilters.apply(this, [filters]);
 			},
 			filters:{
 				property: 'projectId',

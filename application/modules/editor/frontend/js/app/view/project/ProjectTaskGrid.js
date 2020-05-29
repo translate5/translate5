@@ -33,6 +33,7 @@ Ext.define('Editor.view.project.ProjectTaskGrid', {
     	'Editor.view.project.ProjectTaskGridViewController'
 	],
 	itemId: 'projectTaskGrid',
+	stateful:false,
 	controller:'projectTaskGrid',
 	visibleColumns:[
 		'id',

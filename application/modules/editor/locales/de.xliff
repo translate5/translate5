@@ -1800,6 +1800,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='UHJvamVrdG1lbsO8IGFuemVpZ2Vu'><source>Projektmenü anzeigen</source><target>Projektmenü anzeigen</target></trans-unit>
 <trans-unit id='RGFzIGFuZ2Vmb3JkZXJ0ZSBQcm9qZWt0IGV4aXN0aWVydCBuaWNodA=='><source>Das angeforderte Projekt existiert nicht</source><target>Das angeforderte Projekt existiert nicht</target></trans-unit>
 <trans-unit id='RGllIGFuZ2Vmb3JkZXJ0ZSBQcm9qZWt0YXVmZ2FiZSBleGlzdGllcnQgbmljaHQ='><source>Die angeforderte Projektaufgabe existiert nicht</source><target>Die angeforderte Projektaufgabe existiert nicht</target></trans-unit>
+<trans-unit id='UHJvamVrdCBpbSBha3R1ZWxsZW4gRmlsdGVyIG5pY2h0IGdlZnVuZGVu'><source>Projekt im aktuellen Filter nicht gefunden</source><target>Projekt im aktuellen Filter nicht gefunden</target></trans-unit>
   </body>
  </file>
 </xliff>

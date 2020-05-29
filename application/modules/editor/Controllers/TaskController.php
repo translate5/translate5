@@ -1646,30 +1646,6 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->handleValidateException($e);
     }
     
-    
-    /**
-     * Removes all tasks belonging to the given project
-     * @throws BadMethodCallException
-     */
-    public function deleteprojectAction() {
-        if(!$this->_request->isPost()) {
-            throw new BadMethodCallException('Only HTTP method POST allowed!');
-        }
-        $projectId=$this->getRequest()->getParam('projectId',null);
-        if(empty($projectId)){
-            ZfExtended_UnprocessableEntity::addCodes([
-                'E1258' => 'The project id was not provided.'
-            ], 'editor.task');
-            throw new ZfExtended_UnprocessableEntity('E1258');
-        }
-        $remover=ZfExtended_Factory::get('editor_Models_Project_Remover',[
-            $projectId
-        ]);
-        /* @var $remover  editor_Models_Project_Remover */
-        $remover->remove($projectId);
-    }
-    
-    
     /**
      * Search the task id position in the current filter
      */

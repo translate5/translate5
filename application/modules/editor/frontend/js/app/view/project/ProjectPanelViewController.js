@@ -31,7 +31,8 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     
     strings:{
         noProjectMessage:'#UT#Das angeforderte Projekt existiert nicht',
-        noProjectTaskMessage:'#UT#Die angeforderte Projektaufgabe existiert nicht'
+        noProjectTaskMessage:'#UT#Die angeforderte Projektaufgabe existiert nicht',
+        noProjectInFilter:'#UT#Projekt im aktuellen Filter nicht gefunden'
     },
     rootRoute:'#project',
     
@@ -104,14 +105,15 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 		if(isFocus){
 			rec=parseInt(rute[2]);
 		}
-		me.selectProjectTaskRecord(rec,true);
+		me.selectProjectTaskRecord(rec);
 	},
 	
 	/***
 	 * After project task store is loaded
 	 */
-	onProjectTaskLoad:function(){
-		this.focusProjectTask();
+	onProjectTaskLoad:function(store){
+		var me=this;
+		me.focusProjectTask();
 	},
 	
 	
@@ -126,9 +128,18 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 		
 		//serch for the task store record index
 		me.searchIndex(id,grid).then(function(index){
+			//do not scroll on empty store
+			if(grid.getStore().getTotalCount()==0){
+				Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
+				grid.setLoading(false);
+				return;
+			}
 			grid.bufferedRenderer.scrollTo(index,{
 				callback:function(){
+					//no db index if found
 					if(index===undefined || index<0){
+						me.getViewModel().set('projectSelection',null);
+						me.getViewModel().set('projectTaskSelection',null);
 						Editor.MessageBox.addInfo(me.strings.noProjectMessage);
 						grid.setLoading(false);
 						return;
@@ -143,6 +154,10 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 						record=grid.getStore().getById(parseInt(id));
 						me.focusRecordSilent(grid,record,'projectSelection');
 					});
+				},
+				notScrollCallback:function(){
+					Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
+					grid.setLoading(false);
 				}
 			});
 		}, function(err) {
@@ -167,6 +182,8 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 		if(!record){
 			//display info message when the flag showNoRecordMessage is set 
 			showNoRecordMessage && Editor.MessageBox.addInfo(me.strings.noProjectTaskMessage);
+			//update the record view model
+			me.getViewModel().set('projectTaskSelection',record);
 			projectGrid.setLoading(false);
 			return;
 		}

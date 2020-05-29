@@ -46,8 +46,10 @@ class editor_Models_Import_DataProvider_Factory {
     public function createFromTask(editor_Models_Task $task): editor_Models_Import_DataProvider_Abstract {
         $oldTaskPath = new SplFileInfo($task->getAbsoluteTaskDataPath().'/'.editor_Models_Import_DataProvider_Abstract::TASK_ARCHIV_ZIP_NAME);
         if(!$oldTaskPath->isFile()){
-//FIXME change exception
-            throw new ZfExtended_Exception('The task to be cloned does not have a import archive zip! Path: '.$oldTaskPath);
+            throw new editor_Models_Import_DataProvider_Exception('1265', [
+                'task' => $task,
+                'path' =>$oldTaskPath,
+            ]);
         }
         $copy = tempnam(sys_get_temp_dir(), 'taskclone');
         copy($oldTaskPath, $copy);

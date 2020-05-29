@@ -66,7 +66,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
             },
             fn: function(btn) {
                 if (btn === 'yes') {
-                	me.deleteProject(project.get('projectId'));
+                	me.deleteProject(project);
                 }
             }
           });
@@ -104,22 +104,21 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     /***
      * Delete project by givent projectId
      */
-    deleteProject:function(taskProjectId){
+    deleteProject:function(project){
     	var me=this;
-    	Ext.Ajax.request({
-            url: Editor.data.restpath+'task/deleteproject',
-            method: 'post',
-            scope: me,
-            params:{
-            	projectId:taskProjectId
+    	project.dropped = true; //doing the drop / erase manually
+    	project.save({
+            //prevent default ServerException handling
+            preventDefaultHandler: true,
+            callback: function(rec, op) {
+                Editor.MessageBox.addByOperation(op);
             },
-            success: function(response){
+            success: function() {
             	me.reloadProjects();
             	Editor.MessageBox.addSuccess(me.strings.projectRemovedMessage,2);
             },
-            failure: function(response) {
-            	me.reloadProjects();
-                Editor.app.getController('ServerException').handleException(response);
+            failure: function(records, op){
+            	Editor.app.getController('ServerException').handleException(op.error.response);
             }
         });
     },
