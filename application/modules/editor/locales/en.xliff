@@ -3740,7 +3740,7 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Das nächste / vorherige Segment wird noch gespeichert, bitte warten...</source>
   <target>The previous / next segment is still saving, please wait...</target>
 </trans-unit>
-<trans-unit id='UHJvamVrdCBrb21wbGV0dCBsw7ZzY2hlbg=='><source>Projekt komplett löschen</source><target>Delete project completely?</target></trans-unit>
+<trans-unit id='UHJvamVrdCBrb21wbGV0dCBsw7ZzY2hlbg=='><source>Projekt komplett löschen</source><target>Delete project completely</target></trans-unit>
 <trans-unit id='UHJvamVrdCBrb21wbGV0dCBsw7ZzY2hlbj8='><source>Projekt komplett löschen?</source><target>Delete project completely?</target></trans-unit>
 <trans-unit id='U29sbHRlbiBkYXMgUHJvamVrdCB1bmQgYWxsZSBpbSBQcm9qZWt0IGVudGhhbHRlbmVuIEF1ZmdhYmVuIGdlbMO2c2NodCB3ZXJkZW4/'><source>Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?</source><target>Should the project and all tasks included in the project be deleted?</target></trans-unit>
 <trans-unit id='UHJvamVrdCBsw7ZzY2hlbg=='><source>Projekt löschen</source><target>Delete project</target></trans-unit>
@@ -3765,6 +3765,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UHJvamVrdG1lbsO8IGFuemVpZ2Vu'><source>Projektmenü anzeigen</source><target>Show project menu</target></trans-unit>
 <trans-unit id='RGFzIGFuZ2Vmb3JkZXJ0ZSBQcm9qZWt0IGV4aXN0aWVydCBuaWNodA=='><source>Das angeforderte Projekt existiert nicht</source><target>The requested project does not exist</target></trans-unit>
 <trans-unit id='RGllIGFuZ2Vmb3JkZXJ0ZSBQcm9qZWt0YXVmZ2FiZSBleGlzdGllcnQgbmljaHQ='><source>Die angeforderte Projektaufgabe existiert nicht</source><target>The requested project task does not exist</target></trans-unit>
+<trans-unit id='UHJvamVrdCBpbSBha3R1ZWxsZW4gRmlsdGVyIG5pY2h0IGdlZnVuZGVu'><source>Projekt im aktuellen Filter nicht gefunden</source><target>Project not found in the current filter</target></trans-unit>
 </body>
   </file>
 </xliff>

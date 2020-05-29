@@ -65,6 +65,9 @@ Ext.define('Editor.view.project.ProjectPanel', {
                     split: true,
                     resizable: true,
                     width:'50%',
+                    bind:{
+                		disabled:'{!projectTaskSelection}'
+                	},
                     layout: {
                         type: 'vbox',
                         pack: 'start',

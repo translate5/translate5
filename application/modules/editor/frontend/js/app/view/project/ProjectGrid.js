@@ -27,10 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.project.ProjectGrid', {
-	extend: 'Editor.view.admin.TaskGrid',
+	extend: 'Ext.grid.Panel',
 	alias: 'widget.projectGrid',
     requires:[
-    	'Editor.view.project.ProjectGridViewController',
+    	'Editor.view.project.ProjectGridViewController'
 	],
 	controller:'projectGrid',
 	itemId: 'projectGrid',
@@ -41,17 +41,19 @@ Ext.define('Editor.view.project.ProjectGrid', {
 		reloadBtnTip: '#UT#Projektliste vom Server aktualisieren.'
 		
 	},
-	visibleColumns:[
-		'id',
-		'taskGridActionColumn',
-		'taskName',
-		'customerId',
-		'pmName',
-		'sourceLang',
-		'taskNr',
-		'orderdate'
-	],
-	
+	text_cols: {
+	      taskActions: '#UT#Aktionen',
+	      customerId: '#UT#Endkunde',
+	      taskName: '#UT#Name',
+	      taskNr: '#UT#Auftragsnr.',
+	      sourceLang: '#UT#Quellsprache',
+	      pmGuid: '#UT#Projektmanager',
+	      orderdate: '#UT#Bestelldatum',
+		  id:'#UT#Id',
+		  notFound: '#UT#nicht gefunden'
+	},
+	stateful:false,
+	plugins: ['gridfilters'],
 	store: 'project.Project',
 	viewConfig: {
 	      getRowClass: function(task) {
@@ -69,6 +71,95 @@ Ext.define('Editor.view.project.ProjectGrid', {
     initConfig: function(instanceConfig) {
         var me = this,
         	config={
+        		languageStore: Ext.StoreMgr.get('admin.Languages'),
+        		columns:[{
+        			xtype: 'gridcolumn',
+        			width: 60,
+        			dataIndex: 'id',
+	                filter: {
+	                    type: 'numeric'
+	                },
+	                text: 'id'
+        		},{
+                    text: me.text_cols.taskActions,
+                    menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
+                    xtype: 'taskActionColumn',
+                    stateId:'taskGridActionColumn',
+                    sortable: false
+        		},{
+        			xtype: 'gridcolumn',
+                    width: 220,
+                    dataIndex: 'taskName',
+                    stateId:'taskName',
+                    filter: {
+                        type: 'string'
+                    },
+                    text: me.text_cols.taskName
+        		},{
+        			xtype: 'gridcolumn',
+                    width: 135,
+                    renderer: me.customerRenderer,
+                    dataIndex: 'customerId',
+                    stateId: 'customerId',
+                    filter: {
+                        type: 'customer' // [Multitenancy]
+                    },
+                    text: me.text_cols.customerId
+        		},{
+        			xtype: 'gridcolumn',
+                    width: 135,
+                    dataIndex: 'pmName',
+                    stateId: 'pmName',
+                    filter: {
+                        type: 'string'
+                    },
+                    renderer: function(v, meta,rec) {
+                  	  var tooltip=v,
+                  	  	  ret=v;
+                  	  if(Editor.data.frontend.tasklist.pmMailTo){
+                  		  tooltip=rec.get('pmMail');
+                  		  ret='<a alt="'+tooltip+'" href="mailto:'+tooltip+'">'+v+'</a>';
+                  		  meta.tdAttr = 'data-qtip="'+tooltip+'"';
+                  	  }
+                        return ret;
+                    },
+                    text: me.text_cols.pmGuid
+        		},{
+                    xtype: 'gridcolumn',
+                    width: 110,
+                    cls: 'source-lang',
+                    renderer: me.langRenderer,
+                    dataIndex: 'sourceLang',
+                    stateId: 'sourceLang',
+                    filter: {
+                        type: 'list',
+                        options: Editor.data.languages,
+                        phpMode: false
+                    },
+                    tooltip: me.text_cols.sourceLang,
+                    text: me.text_cols.sourceLang,
+                    sortable: false
+        		},{
+                    xtype: 'gridcolumn',
+                    width: 110,
+                    dataIndex: 'taskNr',
+                    stateId: 'taskNr',
+                    filter: {
+                        type: 'string'
+                    },
+                    tdCls: 'taskNr',
+                    text: me.text_cols.taskNr
+        		},{
+                    xtype: 'datecolumn',
+                    width: 100,
+                    dataIndex: 'orderdate',
+                    stateId: 'orderdate',
+                    filter: {
+                        type: 'date',
+                        dateFormat: Editor.DATE_ISO_FORMAT
+                    },
+                    text: me.text_cols.orderdate
+        		}],
         		dockedItems: [{
         	        xtype: 'toolbar',
         	        dock: 'top',
@@ -99,6 +190,40 @@ Ext.define('Editor.view.project.ProjectGrid', {
     	var me=this;
     	me.callParent();
     	me.configureActionColumn();
+    },
+    
+    /**
+     * renders the value (= names) of the customer column
+     * @param {String} val
+     * @returns {String}
+     */
+    customerRenderer: function(val, md, record) {
+        var customer = record.get('customerName');
+        if(customer){
+            md.tdAttr = 'data-qtip="' + customer + ' (id: ' + val + ')"';
+            return customer;
+        }
+        return this.strings.notFound;
+    },
+    
+    /**
+     * renders the value of the language columns
+     * @param {String} val
+     * @returns {String}
+     */
+    langRenderer: function(val, md) {
+        var me = this,
+            lang = me.languageStore.getById(val), 
+            label;
+        if(lang){
+            label = lang.get('label');
+            md.tdAttr = 'data-qtip="' + label + '"';
+            return label;
+        }
+        if (!val || val == "0") {
+            return '';
+        }
+        return me.strings.notFound;
     },
     
     /***

@@ -41,9 +41,8 @@ Ext.define('Editor.view.admin.TaskGridViewController', {
     },
     
     onTaskRoute:function(){
-    	var me=this,
-    		route=['task'];
-    	Editor.app.openAdministrationSection(me.getView(), route.join('/'));
+    	var me=this;
+    	Editor.app.openAdministrationSection(me.getView(), 'task');
     },
     
     onTaskFilterRoute: function(id) {

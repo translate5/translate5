@@ -727,7 +727,8 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.project.ProjectPanelViewController",
         strings:{
         	noProjectMessage:'<?php echo $this->translate->_('Das angeforderte Projekt existiert nicht');?>',
-        	noProjectTaskMessage:'<?php echo $this->translate->_('Die angeforderte Projektaufgabe existiert nicht');?>'
+        	noProjectTaskMessage:'<?php echo $this->translate->_('Die angeforderte Projektaufgabe existiert nicht');?>',
+        	noProjectInFilter:'<?php echo $this->translate->_('Projekt im aktuellen Filter nicht gefunden');?>'
         }
     });
     
@@ -737,7 +738,18 @@ Ext.define('Editor.controller.Localizer', {
             addProject: '<?php echo $this->translate->_('Projekt hinzufügen');?>',
             addProjectTip: '<?php echo $this->translate->_('Neues Projekt hinzufügen');?>',
             reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
-            reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren.');?>'
+            reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren.');?>',
+            notFound: '<?php echo $this->translate->_('nicht gefunden');?>'
+        },
+        text_cols: {
+            taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
+            taskName: '<?php echo $this->translate->_('Name');?>',
+            taskActions: '<?php echo $this->translate->_('Aktionen');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            customerId: '<?php echo $this->translate->_('Endkunde');?>',
+            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            id: '<?php echo $this->translate->_('Id');?>',
+            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>'
         }
     });
     

@@ -45,6 +45,22 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
         },
         roles: {
             data: '{rolesData}'
+        },
+        userAssoc:{
+        	  model:'Editor.model.admin.TaskUserAssoc',
+	 		  remoteFilter: true,
+	 		  pageSize: false,
+			  setFilters:function(filters){
+				if(filters && !filters.value){
+					filters=[];
+				}
+				this.superclass.superclass.setFilters.apply(this, [filters]);
+			  },
+	 		  filters:{
+	 			  property: 'taskGuid',
+	 			  operator:"eq",
+	 			  value:'{projectTaskSelection.taskGuid}'
+	 		  }
         }
     },
     

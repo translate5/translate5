@@ -790,15 +790,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
   	if(me.visibleColumns.length==0){
   		return;
   	}
+  	
 	Ext.each(cols, function(col) {
 		colIndex=col.dataIndex ? col.dataIndex : col.stateId;
 		if(!colIndex){
 			return true;
 		}
-		if(!Ext.Array.contains(me.visibleColumns, colIndex)){
-			col.setVisible(false);
-		}
-	});  
+		col.setVisible(Ext.Array.contains(me.visibleColumns, colIndex));
+	});
   },
   
   /**

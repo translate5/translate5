@@ -177,8 +177,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           '#adminTaskGrid #reload-task-btn': {
               click: 'handleTaskReload'
           },
-          '#adminTaskGrid taskActionColumn,#projectTaskGrid taskActionColumn,#projectGrid taskActionColumn': {
+          '#adminTaskGrid taskActionColumn,#projectTaskGrid taskActionColumn': {
               click: 'taskActionDispatcher'
+          },
+          '#projectGrid taskActionColumn': {
+              click: 'projectActionDispatcher'
           },
           '#adminTaskGrid #add-project-btn,#projectGrid #add-project-btn': {
               click: 'handleTaskAddShow'
@@ -222,7 +225,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         	  selectionchange:'onProjectTaskGridSelectionChange'
           },
           '#projectGrid':{
-        	  selectionchange:'onProjectGridSelectionChange'
+        	  selectionchange:'onProjectGridSelectionChange',
+        	  filterchange:'onProjectGridFilterChange'
           },
           '#taskActionMenu,#projectActionMenu':{
         	  click:'onTaskActionMenuClick'
@@ -693,16 +697,27 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  me.getProjectPanel().getController().redirectFocus(task,false);
   },
   
+  onProjectGridFilterChange:function(){},
+  
   /***
    * On project store load
    */
   onProjectStoreLoad:function(store){
 	  var me=this;
-	  	task=store.getAt(0);
+	  	panel=me.getProjectPanel(),
+	    record=panel.getViewModel().get('projectSelection');
+	  	task=null;
+	  
+	  if(record){
+		  task=store.getById(record.get('id'));
+	  }
+	  if(!task){
+		  task=store.getAt(0);
+	  }
 	  if(!task){
 		  return;
 	  }
-	  me.getProjectPanel().getController().redirectFocus(task,false);
+	  panel.getController().redirectFocus(task,false);
   },
   
   /***
@@ -712,7 +727,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   onTaskActionMenuClick:function(com,item,ev){
 	  var me = this,
 	      task=com.lookupViewModel().get('task'),
-	      action=item.action;
+	      action=item && item.action;
 	      
       if(! me.isAllowed(action)){
           return;
@@ -751,42 +766,64 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   
   /**
-   * calls local task handler, dispatching is done by the icon CSS class of the clicked img
-   * the css class ico-task-foo-bar is transformed to the method handleTaskFooBar
-   * if this controller contains this method, it'll be called. 
-   * First Parameter is the task record.
+   * Task grid action icon click handler
    * 
    * @param {Ext.grid.View} view
    * @param {DOMElement} cell
    * @param {Integer} row
    * @param {Integer} col
    * @param {Ext.Event} ev
-   * @param {Object} evObj
+   * @param {Object} record
    */
-  taskActionDispatcher: function(view, cell, row, col, ev, evObj) {
+  taskActionDispatcher: function(view, cell, row, col, ev, record) {
+      this.callMenuAction('Task',record,ev)
+  },
+  
+  /**
+   * Project grid action icon click handler
+   * 
+   * @param {Ext.grid.View} view
+   * @param {DOMElement} cell
+   * @param {Integer} row
+   * @param {Integer} col
+   * @param {Ext.Event} ev
+   * @param {Object} record
+   */
+  projectActionDispatcher:function(view, cell, row, col, ev, record) {
+	  this.callMenuAction('Project',record,ev)
+  },
+  
+  /***
+   * calls local action handler, dispatching is done by the icon CSS class of the clicked img
+   * the css class ico-task-foo-bar is transformed to the method handleTaskFooBar
+   * if this controller contains this method, it'll be called. 
+   * 
+   * @param {String} menuParrent : menu source view
+   * @param {Object} record
+   * @param {Ext.Event} event
+   */
+  callMenuAction:function(menuParrent,task,event){
       var me = this,
-          task =evObj,
-          menuParrent=(task.get('taskType')=='project') ? 'Project' : 'Task',
-          t = ev.getTarget(),
-          f = t.className.match(/ico-task-([^ ]+)/),
-          camelRe = /(-[a-z])/gi,
-          camelFn = function(m, a) {
-              return a.charAt(1).toUpperCase();
-          },
-          actionIdx = ((f && f[1]) ? f[1] : "not-existing"),
-          //build camelized action out of icon css class:
-          action = ('handle'+menuParrent+'-'+actionIdx).replace(camelRe, camelFn),
-          right = action.replace(new RegExp('handle'+menuParrent), 'editor')+menuParrent,
-          confirm;
-
-      if(! me.isAllowed(right)){
-          return;
-      }
-      
-      if(! me[action] || ! Ext.isFunction(me[action])){
-          return;
-      }
-      me[action](task, ev);
+	      t = event.getTarget(),
+	      f = t.className.match(/ico-task-([^ ]+)/),
+	      camelRe = /(-[a-z])/gi,
+	      camelFn = function(m, a) {
+	          return a.charAt(1).toUpperCase();
+	      },
+	      actionIdx = ((f && f[1]) ? f[1] : "not-existing"),
+	      //build camelized action out of icon css class:
+	      action = ('handle'+menuParrent+'-'+actionIdx).replace(camelRe, camelFn),
+	      right = action.replace(new RegExp('handle'+menuParrent), 'editor')+menuParrent,
+	      confirm;
+	
+	  if(! me.isAllowed(right)){
+	      return;
+	  }
+	  
+	  if(! me[action] || ! Ext.isFunction(me[action])){
+	      return;
+	  }
+	  me[action](task, event);
   },
   
   /**
@@ -889,7 +926,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               Editor.MessageBox.addByOperation(op);
           },
           success: function() {
-              store.load();
+              store.load({
+            	  callback:function(){
+            		  console.log(arguments);
+            	  }
+              });
               app.unmask();
           },
           failure: function(records, op){
@@ -926,19 +967,21 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Task action menu click handler
    */
   handleTaskMenu: function(selectedTask, event) {
-      this.showActionMenu(selectedTask, event)
+      this.showActionMenu(selectedTask, event,'taskActionMenu')
   },
   
   /***
    * Project action menu click handler
    */
   handleProjectMenu: function(selectedTask, event) {
-	  this.showActionMenu(selectedTask, event)
+	  this.showActionMenu(selectedTask, event,'projectActionMenu')
   },
   
-  showActionMenu:function(selectedTask,event){
+  /***
+   * Show action menu by given menu xtype
+   */
+  showActionMenu:function(selectedTask,event,menuXtype){
 	  var me = this,
-	      menuXtype=selectedTask.get('taskType')=='project' ? 'projectActionMenu' : 'taskActionMenu',
           menu=me.menuCache[menuXtype],
           vm=null;
 

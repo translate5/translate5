@@ -56,16 +56,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
 	  //INFO: this will load only the users of the task when projectTaskGrid selection is changed
 	  //override the store binding in the place where the component is used/defined
 	  //the default usage is in the task properties panel
-  	  store:{
-  		  model:'Editor.model.admin.TaskUserAssoc',
-  		  remoteFilter: true,
-  		  pageSize: false,
-  		  filters:{
-  			  property: 'taskGuid',
-  			  operator:"eq",
-  			  value:'{projectTaskSelection.taskGuid}'
-  		  }  
-  	  }
+  	  store:'{userAssoc}'
   },
   plugins: ['gridfilters'],
   initConfig: function(instanceConfig) {
