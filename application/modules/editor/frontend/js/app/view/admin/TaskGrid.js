@@ -749,7 +749,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 filter: {
                     type: 'numeric'
                 },
-                text: 'id'
+                text: 'id',
+                text: me.text_cols.id
             },{
                 xtype: 'gridcolumn',
                 width: 140,

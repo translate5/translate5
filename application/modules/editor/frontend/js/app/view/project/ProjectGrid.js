@@ -79,7 +79,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
 	                filter: {
 	                    type: 'numeric'
 	                },
-	                text: 'id'
+	                text: me.text_cols.id
         		},{
                     text: me.text_cols.taskActions,
                     menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
