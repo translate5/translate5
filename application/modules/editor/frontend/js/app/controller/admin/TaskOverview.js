@@ -150,6 +150,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       averageProcessingTimeTranslatorLabel: '#UT#Ø Bearbeitungszeit Übersetzer',
       averageProcessingTimeSecondTranslatorLabel: '#UT#Ø Bearbeitungszeit zweiter Lektor'
   },
+  listeners:{
+	  afterTaskDelete:'onAfterTaskDeleteEventHandler'  
+  },
   listen: {
       store: {
           '#admin.Tasks': {
@@ -225,8 +228,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         	  selectionchange:'onProjectTaskGridSelectionChange'
           },
           '#projectGrid':{
-        	  selectionchange:'onProjectGridSelectionChange',
-        	  filterchange:'onProjectGridFilterChange'
+        	  selectionchange:'onProjectGridSelectionChange'
           },
           '#taskActionMenu,#projectActionMenu':{
         	  click:'onTaskActionMenuClick'
@@ -697,25 +699,30 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  me.getProjectPanel().getController().redirectFocus(task,false);
   },
   
-  onProjectGridFilterChange:function(){},
   
   /***
    * On project store load
    */
   onProjectStoreLoad:function(store){
 	  var me=this;
+	    activeTab=me.isProjectPanelActive();
 	  	panel=me.getProjectPanel(),
-	    record=panel.getViewModel().get('projectSelection');
+	  	vm=panel.getViewModel(),
+	    record=vm.get('projectSelection');
 	  	task=null;
 	  
+	  //if the project panel is not active, ignore the redirect,
+	  //when we redirect, the component focus is changed
+	  if(!activeTab){
+		  return;
+	  }
+	  //if selected record already exist, use it
 	  if(record){
 		  task=store.getById(record.get('id'));
 	  }
+	  //no selected record is found, use the first in the store
 	  if(!task){
 		  task=store.getAt(0);
-	  }
-	  if(!task){
-		  return;
 	  }
 	  panel.getController().redirectFocus(task,false);
   },
@@ -926,12 +933,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               Editor.MessageBox.addByOperation(op);
           },
           success: function() {
-              store.load({
-            	  callback:function(){
-            		  console.log(arguments);
-            	  }
-              });
+              store.load();
               app.unmask();
+              me.fireEvent('afterTaskDelete',task);
           },
           failure: function(records, op){
               task.reject();
@@ -1220,13 +1224,37 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleProjectAfterImport:function(task){
 	  var me=this,
-	      menu=me.getAdminMainSection(),
-	      activeTab=menu.getActiveTab(),
-	      grid=me.getProjectGrid();
-		  
-	  if(activeTab.xtype!='projectPanel'){
-		  return
+	     activeTab=me.isProjectPanelActive();
+	  if(!activeTab){
+		  return;
 	  }
 	  activeTab.getController().redirectFocus(task,false);
+  },
+  
+  /***
+   * Check if the project panel is active. If the project panel is active, the project panel component is returned
+   */
+  isProjectPanelActive:function(){
+	  var me=this,
+	      menu=me.getAdminMainSection(),
+	      activeTab=menu.getActiveTab();
+		  
+	  if(activeTab.xtype!='projectPanel'){
+		  return null;
+	  }
+	  return activeTab;
+  },
+  
+  /***
+   * After the task is removed event handler
+   */
+  onAfterTaskDeleteEventHandler:function(task){
+	  var me=this,
+	      grid=me.getProjectGrid();
+	  
+	  if(!grid){
+		  return;
+	  }
+	  grid.getController().onReloadProjectClick();
   }
 });

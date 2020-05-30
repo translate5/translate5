@@ -45,6 +45,7 @@ Ext.define('Editor.view.project.ProjectPanelViewModel', {
 				load:'onProjectTaskLoad'
 			},
 		    setFilters:function(filters){
+		    	//the binding is triggered wiht empty values to, we do not want to filter for empty projectId
 				if(filters && !filters.value){
 					filters=[];
 				}
