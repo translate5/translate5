@@ -46,8 +46,12 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      * Redirect to project focus route route
      */
     redirectFocus:function(record,includeTask){
-    	var me=this,
-    		action='focus',
+    	var me=this;
+    	if(!record){
+    		me.resetRoute();
+        	return;
+    	}
+    	var action='focus',
     		route=['project',record.get('projectId')];
     	
     	if(includeTask){
@@ -138,8 +142,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 				callback:function(){
 					//no db index if found
 					if(index===undefined || index<0){
-						me.getViewModel().set('projectSelection',null);
-						me.getViewModel().set('projectTaskSelection',null);
 						Editor.MessageBox.addInfo(me.strings.noProjectMessage);
 						grid.setLoading(false);
 						return;
@@ -182,9 +184,11 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 		if(!record){
 			//display info message when the flag showNoRecordMessage is set 
 			showNoRecordMessage && Editor.MessageBox.addInfo(me.strings.noProjectTaskMessage);
-			//update the record view model
-			me.getViewModel().set('projectTaskSelection',record);
 			projectGrid.setLoading(false);
+			//reset the selection and with this disable the projectTask panel
+			if(store.getTotalCount()==0){
+				me.getViewModel().set('projectTaskSelection',null);
+			}
 			return;
 		}
 		
@@ -252,6 +256,21 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 		grid.setSelection(record);
 		grid.getView().focusRow(record);
 		grid.resumeEvent('selectionchange');
+    },
+    
+    /***
+     * Reset the route and all route view model properties
+     */
+    resetRoute:function(){
+		var me=this,
+			projectTaskGrid=me.getView().down('#projectTaskGrid');
+		//no record is provided, reset everything
+		projectTaskGrid.getStore().removeAll(true);
+		projectTaskGrid.view.refresh();
+	    me.getViewModel().set('projectSelection',null);
+	    me.getViewModel().set('projectTaskSelection',null);
+		Editor.app.openAdministrationSection(me.getView(),me.rootRoute);
+    	me.redirectTo(me.rootRoute);
     }
 	
 });

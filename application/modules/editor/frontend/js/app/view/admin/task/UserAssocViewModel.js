@@ -51,6 +51,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
 	 		  remoteFilter: true,
 	 		  pageSize: false,
 			  setFilters:function(filters){
+				//the binding is triggered wiht empty values to, we do not want to filter for empty taskGuid
 				if(filters && !filters.value){
 					filters=[];
 				}
