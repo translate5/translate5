@@ -266,12 +266,14 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               return;
           }
           task.load({
+              // param is needed to identify the get request as a part of the import-process.
+              params: { importStateCheck: 1 },
               success: taskReloaded,
               failure: function(records, op){
                   //handle 404, so the user does not receive error messages
-                if(op.getError().status != '404') {
-                    Editor.app.getController('ServerException').handleException(op.error.response);
-                }
+                  if(op.getError().status != '404') {
+                      Editor.app.getController('ServerException').handleException(op.error.response);
+                  }
             }
           });
           foundImporting++;

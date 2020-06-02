@@ -494,7 +494,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         
-        //if the visual review mapping type is set, se the task meta data
+        //if the visual review mapping type is set, set the task meta data
         if(isset($this->data['mappingType'])){
             $meta = $this->entity->meta();
             $meta->setMappingType($this->data['mappingType']);

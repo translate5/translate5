@@ -72,7 +72,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         cancelBtn: '#UT#Abbrechen',
         btnSkip:'#UT#Importieren (weitere überspringen)',
     },
-    height : 500,
+    height : 550,
     width : 1000,
     modal : true,
     layout: 'anchor',

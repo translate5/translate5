@@ -42,7 +42,8 @@ Ext.define('Editor.controller.Editor', {
     requires: [
         'Editor.view.segments.EditorKeyMap',
         'Editor.controller.editor.PrevNextSegment',
-        'Editor.view.task.ConfirmationWindow'
+        'Editor.view.task.ConfirmationWindow',
+        'Editor.view.ReferenceFilesInfoMessage'
     ],
     mixins: ['Editor.util.Event',
         	 'Editor.util.Range'
@@ -76,6 +77,7 @@ Ext.define('Editor.controller.Editor', {
     }],
     registeredTooltips: [],
     isEditing: false,
+    isCapturingChange: false,
     keyMapConfig: null,
     editorKeyMap: null,
     generalKeyMap: null,
@@ -85,6 +87,7 @@ Ext.define('Editor.controller.Editor', {
     lastCopiedSelectionWithTagHandling: '',
     copiedSelectionWithTagHandling: null,
     resetSegmentValueForEditor: null,
+    htmlEditor: null,
     listen: {
         controller: {
             '#Editor.$application': {
@@ -481,6 +484,7 @@ Ext.define('Editor.controller.Editor', {
     initEditor: function(editor){
         var me = this,
             docEl = Ext.get(editor.getDoc());
+        this.htmlEditor = editor;
         
         if(me.editorKeyMap) {
             me.editorKeyMap.destroy();
@@ -671,7 +675,7 @@ Ext.define('Editor.controller.Editor', {
         me.prevNextSegment.reset();
 
         me.fireEvent('saveUnsavedComments');
-        if(me.isEditing &&rec && rec.get('editable')) {
+        if(me.isEditing && rec && rec.get('editable')) {
             me.fireEvent('prepareTrackChangesForSaving');
             me.fireEvent('saveSegment');
         }
@@ -693,6 +697,12 @@ Ext.define('Editor.controller.Editor', {
      */
     handleAfterContentChange: function() {
     	this.fireEvent('saveSnapshot'); // see SnapshotHistory
+    	// trigger deferred change handler
+    	if(!this.isCapturingChange){
+    		var me = this;
+    		this.isCapturingChange = true;
+    		setTimeout(function(){ me.handleDelayedChange(); }, Editor.data.editor.deferredChangeTimeout);
+    	}
     },
     /**
      * handleAfterCursorMove: save new position of cursor if necessary.
@@ -700,6 +710,17 @@ Ext.define('Editor.controller.Editor', {
     handleAfterCursorMove: function() {
     	this.fireEvent('updateSnapshotBookmark'); // see SnapshotHistory
     },
+    
+    /**
+     * handleAfterCursorMove: fire deferred change event if still changing
+     */    
+    handleDelayedChange: function(){
+    	if(this.isEditing) {
+    		this.fireEvent('clockedchange', this.htmlEditor, this.getEditPlugin().context); 
+        }
+    	this.isCapturingChange = false;
+    },
+
     /**
      * After keyboard-event: handle changes if event is not to be ignored.
      * ('change'-event from segmentsHtmleditor does not work; is not really envoked when we need it!)
