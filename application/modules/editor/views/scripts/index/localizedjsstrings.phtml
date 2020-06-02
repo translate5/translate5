@@ -473,19 +473,19 @@ Ext.define('Editor.controller.Localizer', {
             averageProcessingTimeSecondTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit zweiter Lektor');?>',
         },
         confirmStrings: {
-            "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
-            "unfinish":     {title: "<?php echo $this->translate->_('Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich wieder öffnen?');?>"},
-            "finish-all":   {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?');?>"},
-            "unfinish-all": {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?');?>"},
-            "end":          {title: "<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>"},
-            "reopen":       {title: "<?php echo $this->translate->_('Beendete Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die beendete Aufgabe wirklich wieder öffnen?');?>"},
-            "delete":       {title: "<?php echo $this->translate->_('Aufgabe komplett löschen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
+            "editorFinishTask":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
+            "editorUnfinishTask":     {title: "<?php echo $this->translate->_('Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich wieder öffnen?');?>"},
+            "editorFinishAllTask":    {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?');?>"},
+            "editorUnfinishAllTask":  {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?');?>"},
+            "editorEndTask":          {title: "<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>"},
+            "editorReopenTask":       {title: "<?php echo $this->translate->_('Beendete Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die beendete Aufgabe wirklich wieder öffnen?');?>"},
+            "editorDeleteTask":       {title: "<?php echo $this->translate->_('Aufgabe komplett löschen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
         }
     });
-
+    
     Ext.define("Editor.locale.de.view.admin.TaskGrid", {
         override: "Editor.view.admin.TaskGrid",
-        title: '<?php echo $this->translate->_('Aufgabenübersicht');?>',
+        title: '<?php echo $this->translate->_('Aufgaben');?>',
         states: {
             open: '<?php echo $this->translate->_('offen');?>',
             locked: '<?php echo $this->translate->_('in Arbeit');?>',
@@ -505,8 +505,8 @@ Ext.define('Editor.controller.Localizer', {
             lockedBy: '<?php echo $this->translate->_('Bearbeitet und Gesperrt durch {0}');?>',
             lockedMultiUser: '<?php echo $this->translate->_('In Bearbeitung durch:');?>',
             lockedSystem: '<?php echo $this->translate->_('Durch das System gesperrt mit dem Status \'{0}\'');?>',
-            addTask: '<?php echo $this->translate->_('Aufgabe hinzufügen');?>',
-            addTaskTip: '<?php echo $this->translate->_('Eine neue Aufgabe hinzufügen.');?>',
+            addProject: '<?php echo $this->translate->_('Projekt hinzufügen');?>',
+            addProjectTip: '<?php echo $this->translate->_('Neues Projekt hinzufügen');?>',
             exportMetaDataBtn: '<?php echo $this->translate->_('Meta-Daten exportieren');?>',
             exportMetaDataBtnTip: '<?php echo $this->translate->_('Meta-Daten für alle gefilterten Aufgaben exportieren.');?>',
             showKPIBtn: '<?php echo $this->translate->_('Auswertungen anzeigen');?>',
@@ -524,12 +524,12 @@ Ext.define('Editor.controller.Localizer', {
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
-            taskName: '<?php echo $this->translate->_('Aufgabenname');?>',
+            taskName: '<?php echo $this->translate->_('Name');?>',
             taskActions: '<?php echo $this->translate->_('Aktionen');?>',
             sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
             relaisLang: '<?php echo $this->translate->_('Relaissprache');?>',
             targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
-            state: '<?php echo $this->translate->_('Aufgabenstatus');?>',
+            state: '<?php echo $this->translate->_('Status (Aufgbe)');?>',
             customerId: '<?php echo $this->translate->_('Endkunde');?>',
             pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
             users: '<?php echo $this->translate->_('Benutzer');?>',
@@ -665,7 +665,7 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.view.admin.TaskAddWindow", {
         override: "Editor.view.admin.TaskAddWindow",
-        title: '<?php echo $this->translate->_('Aufgabe erstellen');?>',
+        title: '<?php echo $this->translate->_('Projekt erstellen');?>',
         strings: {
             importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (Angabe notwendig)');?>',
             importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
@@ -708,7 +708,79 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.admin.TaskActionColumn", {
         override: "Editor.view.admin.TaskActionColumn",
         messages: {
-            actionOpen: '<?php echo $this->translate->_('Aufgabe öffnen (nur Lesemodus)');?>',
+            projectOverview: '<?php echo $this->translate->_('zum Projekt springen');?>',
+            taskOverview: '<?php echo $this->translate->_('zur Aufgabe springen');?>',
+            taskActionMenu: '<?php echo $this->translate->_('Aufgabenmenü anzeigen');?>',
+            projectActionMenu: '<?php echo $this->translate->_('Projektmenü anzeigen');?>'
+        }
+    });
+    
+  	Ext.define("Editor.locale.de.view.project.ProjectPanel", {
+        override: "Editor.view.project.ProjectPanel",
+        title:'<?php echo $this->translate->_('Projekte');?>',
+        strings:{
+        	projectTasksTitle:'<?php echo $this->translate->_('Aufgaben für das Projekt: {projectSelection.taskName}');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.project.ProjectPanelViewController", {
+        override: "Editor.view.project.ProjectPanelViewController",
+        strings:{
+        	noProjectMessage:'<?php echo $this->translate->_('Das angeforderte Projekt existiert nicht');?>',
+        	noProjectTaskMessage:'<?php echo $this->translate->_('Die angeforderte Projektaufgabe existiert nicht');?>',
+        	noProjectInFilter:'<?php echo $this->translate->_('Projekt im aktuellen Filter nicht gefunden');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.project.ProjectGrid", {
+        override: "Editor.view.project.ProjectGrid",
+        strings: {
+            addProject: '<?php echo $this->translate->_('Projekt hinzufügen');?>',
+            addProjectTip: '<?php echo $this->translate->_('Neues Projekt hinzufügen');?>',
+            reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
+            reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren.');?>',
+            notFound: '<?php echo $this->translate->_('nicht gefunden');?>'
+        },
+        text_cols: {
+            taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
+            taskName: '<?php echo $this->translate->_('Name');?>',
+            taskActions: '<?php echo $this->translate->_('Aktionen');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            customerId: '<?php echo $this->translate->_('Endkunde');?>',
+            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            id: '<?php echo $this->translate->_('Id');?>',
+            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>'
+        }
+    });
+    
+     Ext.define("Editor.locale.de.view.project.ProjectGridViewController", {
+        override: "Editor.view.project.ProjectGridViewController",
+        strings: {
+            deleteProjectDialogTitle: '<?php echo $this->translate->_('Projekt komplett löschen?');?>',
+            deleteProjectDialogMessage: '<?php echo $this->translate->_('Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?');?>',
+            projectDeleteButtonText: '<?php echo $this->translate->_('Projekt löschen');?>',
+            projectCanceltButtonText: '<?php echo $this->translate->_('Nein');?>',
+            projectRemovedMessage: '<?php echo $this->translate->_('Das Projekt wurde erfolgreich entfernt!');?>'
+        }
+    });
+    
+    
+    Ext.define("Editor.locale.de.view.admin.ExportMenu", {
+        override: "Editor.view.admin.ExportMenu",
+        messages: {
+            exportDef: '<?php echo $this->translate->_('exportieren (Orginalformat)');?>',
+            exportDiff: '<?php echo $this->translate->_('exportieren (Orginalformat mit Änderungshistorie)');?>',
+            export2Def: '<?php echo $this->translate->_('exportieren (XLIFF 2.1)');?>',
+            exportQmField: '<?php echo $this->translate->_('Export QM-Statistik (XML) für Feld: {0}');?>',
+            exportExcel: '<?php echo $this->translate->_('exportieren (Excel)');?>',
+            downloadImportArchive: '<?php echo $this->translate->_('Importarchiv herunterladen');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.menu.TaskActionMenu", {
+        override: "Editor.view.admin.task.menu.TaskActionMenu",
+        messages: {
+            actionOpen: '<?php echo $this->translate->_('Aufgabe öffnen (schreibgeschützt)');?>',
             actionEdit: '<?php echo $this->translate->_('Aufgabe bearbeiten');?>',
             actionClone: '<?php echo $this->translate->_('Aufgabe klonen');?>',
             actionFinish: '<?php echo $this->translate->_('Aufgabe abschließen');?>',
@@ -722,19 +794,17 @@ Ext.define('Editor.controller.Localizer', {
             taskPrefs: '<?php echo $this->translate->_('Aufgabenspezifische Einstellungen');?>',
             actionReOpen: '<?php echo $this->translate->_('beendete Aufgabe wieder öffnen');?>',
             exp: '<?php echo $this->translate->_('Exportoptionen');?>',
-            actionExcelReimport: '<?php echo $this->translate->_('Excel Re-Importieren');?>'
+            actionExcelReimport: '<?php echo $this->translate->_('Excel Re-Importieren');?>',
+            projectOverview: '<?php echo $this->translate->_('zum Projekt springen');?>',
+            taskOverview: '<?php echo $this->translate->_('zur Aufgabe springen');?>'
         }
     });
     
-    Ext.define("Editor.locale.de.view.admin.ExportMenu", {
-        override: "Editor.view.admin.ExportMenu",
+    
+    Ext.define("Editor.locale.de.view.project.ProjectActionMenu", {
+        override: "Editor.view.project.ProjectActionMenu",
         messages: {
-            exportDef: '<?php echo $this->translate->_('exportieren (Orginalformat)');?>',
-            exportDiff: '<?php echo $this->translate->_('exportieren (Orginalformat mit Änderungshistorie)');?>',
-            export2Def: '<?php echo $this->translate->_('exportieren (XLIFF 2.1)');?>',
-            exportQmField: '<?php echo $this->translate->_('Export QM-Statistik (XML) für Feld: {0}');?>',
-            exportExcel: '<?php echo $this->translate->_('exportieren (Excel)');?>',
-            downloadImportArchive: '<?php echo $this->translate->_('Importarchiv herunterladen');?>'
+            actionDeleteProject: '<?php echo $this->translate->_('Projekt komplett löschen');?>'
         }
     });
     
@@ -754,7 +824,7 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.view.admin.task.PreferencesWindow", {
         override: "Editor.view.admin.task.PreferencesWindow",
-        title: '<?php echo $this->translate->_('Einstellungen zu Aufgabe "{0}"');?>',
+        title: '<?php echo $this->translate->_('Einstellungen zu Aufgabe: {currentTask.taskName}');?>',
         strings: {
             close: '<?php echo $this->translate->_('Fenster schließen');?>',
             events: '<?php echo $this->translate->_('Ereignisse');?>',
@@ -818,7 +888,9 @@ Ext.define('Editor.controller.Localizer', {
             cancel: '<?php echo $this->translate->_('Abbrechen');?>',
             assignmentDateLable: '<?php echo $this->translate->_('Zuweisung');?>',
             finishedDateLabel: '<?php echo $this->translate->_('Abgeschlossen');?>',
-            deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>'
+            deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
+            deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
+            userSpecialProperties:'<?php echo $this->translate->_('Benutzer-Spezialeinstellungen');?>'
         },
         states: {
             edit: '<?php echo $this->translate->_('in Arbeit');?>'
@@ -1023,7 +1095,7 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.view.admin.user.Grid", {
         override: "Editor.view.admin.user.Grid",
-        title: '<?php echo $this->translate->_('Benutzerverwaltung');?>',
+        title: '<?php echo $this->translate->_('Benutzer');?>',
         text_cols: {
             login: '<?php echo $this->translate->_('Login');?>',
             firstName: '<?php echo $this->translate->_('Vorname');?>',
@@ -1165,7 +1237,7 @@ Ext.define('Editor.controller.Localizer', {
 
     Ext.define("Editor.locale.view.admin.customer.Panel", {
     	override: "Editor.view.admin.customer.Panel",
-        title:'<?php echo $this->translate->_("Kundenübersicht");?>',
+        title:'<?php echo $this->translate->_("Kunden");?>',
         strings: {
             reload:'<?php echo $this->translate->_("Aktualisieren");?>',
             customerName:'<?php echo $this->translate->_("Kundenname");?>',
@@ -1301,12 +1373,13 @@ Ext.define('Editor.controller.Localizer', {
             reload: '<?php echo $this->translate->_('Aktualisieren');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
             empty: '<?php echo $this->translate->_('Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.');?>',
-            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
+            groupHeader: '<?php echo $this->translate->_('Aufgabe: {[values.rows[0].data.taskName]}');?>',
             checked: '<?php echo $this->translate->_('Ressource in Aufgabe verwenden');?>',
             name: '<?php echo $this->translate->_('Name');?>',
             segmentsUpdateable: '<?php echo $this->translate->_('Segmente zurückspeichern');?>',
             source: '<?php echo $this->translate->_('Quellsprache');?>',
-            target: '<?php echo $this->translate->_('Zielsprache');?>'
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            serviceName: '<?php echo $this->translate->_('Ressource');?>'
         }
     });
     Ext.define("Editor.locale.controller.TmOverview", {

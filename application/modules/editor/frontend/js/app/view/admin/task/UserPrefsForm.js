@@ -64,6 +64,7 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                     reference:'workflowstep',
                     displayField:'label',
                     valueField:'id',
+                    publishes:'value',
                     store:Ext.create('Ext.data.Store', {
                     	fields:['id', 'label','role'],
                     }),
@@ -84,9 +85,9 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                         ]
                     },
                     emptyText:me.strings.forAll,
-                    store: Ext.create('Ext.data.ChainedStore', {
-                    	source: "admin.TaskUserAssocs",
-                    }),
+                    bind:{
+                    	store:'{UserAssocStore}'
+                    },
                     fieldLabel: me.strings.fieldUsername
                 },{
                     xtype: 'checkboxfield',
@@ -104,6 +105,8 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                     xtype: 'checkboxfield',
                     anchor: '100%',
                     name: 'anonymousCols',
+                    inputValue: 1,
+                    uncheckedValue: 0,
                     boxLabel: me.strings.fieldAnonymous
                 },{
                     xtype: 'fieldset',
@@ -153,13 +156,13 @@ Ext.define('Editor.view.admin.task.UserPrefsForm', {
                         {
                             xtype: 'button',
                             itemId: 'saveBtn',
-                            iconCls : 'ico-save',
+                            glyph: 'f00c@FontAwesome5FreeSolid',
                             text: me.strings.btnSave
                         },
                         {
                             xtype: 'button',
                             itemId: 'cancelBtn',
-                            iconCls : 'ico-cancel',
+                            glyph: 'f00d@FontAwesome5FreeSolid',
                             text: me.strings.btnCancel
                         }
                     ]

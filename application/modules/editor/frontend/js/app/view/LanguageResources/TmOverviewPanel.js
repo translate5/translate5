@@ -303,13 +303,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     dock: 'top',
                     items: [{
                         xtype: 'button',
-                        iconCls: 'ico-refresh',
+                        glyph: 'f2f1@FontAwesome5FreeSolid',
                         itemId: 'btnRefresh',
                         text: me.strings.refresh,
                         tooltip: me.strings.refresh
                     },{
                         xtype: 'button',
-                        iconCls: 'ico-tm-add',
+                        glyph: 'f067@FontAwesome5FreeSolid',
                         itemId: 'btnAddTm',
                         text: me.strings.addResource,
                         tooltip: me.strings.addResource

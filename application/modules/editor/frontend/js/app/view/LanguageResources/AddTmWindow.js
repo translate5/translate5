@@ -233,12 +233,12 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     xtype: 'tbfill'
                 },{
                     xtype: 'button',
-                    iconCls:'ico-save',
+                    glyph: 'f00c@FontAwesome5FreeSolid',
                     itemId: 'save-tm-btn',
                     text: me.strings.save
                 }, {
                     xtype : 'button',
-                    iconCls : 'ico-cancel',
+                    glyph: 'f00d@FontAwesome5FreeSolid',
                     itemId : 'cancel-tm-btn',
                     text : me.strings.cancel
                 }]

@@ -121,13 +121,13 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindow', {
                     {
                         xtype: 'button',
                         itemId: 'uploadBtn',
-                        iconCls : 'ico-task-excelreimport',
+                        glyph: 'f56f@FontAwesome5FreeSolid',
                         text: me.strings.uploadBtn
                     },
                     {
                         xtype: 'button',
                         itemId: 'cancelBtn',
-                        iconCls : 'ico-cancel',
+                        glyph: 'f00d@FontAwesome5FreeSolid',
                         text: me.strings.cancelBtn
                     },
                 ]

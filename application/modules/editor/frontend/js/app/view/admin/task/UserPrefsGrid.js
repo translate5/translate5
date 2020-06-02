@@ -48,8 +48,32 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
         vis_hide: '#UT#ausblenden',
         vis_disable: '#UT#nicht vorhanden'
     },
-    viewConfig: {
-        loadMask: false
+    bind:{
+    	store:{
+    		model:'Editor.model.admin.task.UserPref',
+			remoteSort: true,
+			remoteFilter: true,
+			pageSize: false,
+			autoLoad:true,
+			getDefaultFor: function(workflow) {
+		      var idx = this.findBy(function(rec){
+		          return (rec.get('workflow') == workflow && rec.isDefault());
+		      });
+		      if(idx >= 0) {
+		          return this.getAt(idx);
+		      }
+		      return null;
+			},
+			filters:[{
+    			property: 'taskGuid',
+        		operator:"eq",
+        		value:'{currentTask.taskGuid}'
+			},{
+				property: 'workflow',
+        		operator:"eq",
+        		value:'{currentTask.workflow}'
+			}]
+    	}
     },
     //***********************************************************************************
     //Begin Events
@@ -66,7 +90,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
     initConfig: function(instanceConfig) {
         var me = this,
             config,
-            userStore = Ext.StoreMgr.get('admin.TaskUserAssocs');
+            userStore = Ext.StoreMgr.get('admin.Users');
             
         config = {
             columns: [
@@ -75,7 +99,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                     dataIndex: 'workflowStep',
                     text: me.strings.colStep,
                     renderer: function(v, meta, rec) {
-                        var meta = this.lookupViewModel().get('workflowMetadata');
+                        var meta = this.lookupViewModel(true).get('currentTask').getWorkflowMetaData();
                         if(v.length == 0) {
                             return me.strings.defaultEntry;
                         }
@@ -104,7 +128,7 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                         var fields = value.split(','),
                             cnt = 0,
                             result = [],
-                            task = this.lookupViewModel().get('currentTask'),
+                            task = this.lookupViewModel(true).get('currentTask'),
                             visible = 0;
                         
                         task.segmentFields().each(function(field){
@@ -151,19 +175,19 @@ Ext.define('Editor.view.admin.task.UserPrefsGrid', {
                         {
                             xtype: 'button',
                             itemId: 'userPrefReload',
-                            iconCls: 'ico-refresh',
+                            glyph: 'f2f1@FontAwesome5FreeSolid',
                             text: me.strings.reload
                         },
                         {
                             xtype: 'button',
                             itemId: 'userPrefAdd',
-                            iconCls: 'ico-add',
+                            glyph: 'f00c@FontAwesome5FreeSolid',
                             text: me.strings.add
                         },
                         {
                             xtype: 'button',
                             itemId: 'userPrefDelete',
-                            iconCls: 'ico-del',
+                            glyph: 'f00d@FontAwesome5FreeSolid',
                             disabled: true,
                             handler: function() {
                                 Ext.Msg.confirm(me.strings.confirmDeleteTitle, me.strings.confirmDelete, function(btn){

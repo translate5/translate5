@@ -121,7 +121,7 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
                             xtype: 'button',
                             text: me.strings.close,
                             itemId:'btnCloseWindow',
-                            iconCls: 'ico-cancel'
+                            glyph: 'f00d@FontAwesome5FreeSolid'
                     }]
                 },{
                     xtype: 'pagingtoolbar',

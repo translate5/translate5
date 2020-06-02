@@ -42,6 +42,27 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
     data: {
         items: null
     },
+	stores: {
+		taskAssoc: {
+	  		  model:'Editor.model.LanguageResources.TaskAssoc',
+	  		  remoteFilter: true,
+	  		  pageSize: false,
+	  		  autoLoad:true,
+	  		  setFilters:function(filters){
+				//the binding is triggered wiht empty values to, we do not want to filter for empty taskGuid
+				if(filters && !filters.value){
+					filters=[];
+				}
+				this.superclass.superclass.setFilters.apply(this, [filters]);
+			  },
+	  		  filters:{
+	  			  property: 'taskGuid',
+	  			  operator:"eq",
+	  			  value:'{currentTask.taskGuid}'
+	  		  }  
+		}
+    },
+    
     formulas:{
         hasTmOrCollection:function(get){
             return this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TM)||this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TERM_COLLECTION) ;
@@ -53,7 +74,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
             return this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TERM_COLLECTION);
         }
     },
-
+    
     checkResourceType:function(items,resourceType){
         var hasType=false;
         if(!items){
