@@ -175,12 +175,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             fieldLabel:me.strings.fullMatchLabel,
             bind:'{currentTask.edit100PercentMatch}',
             name:'edit100PercentMatch',
-            itemId:'edit100PercentMatch',
-            listeners:{
-            	change:function(cb, newValue, oldValue, eOpts ){
-            		 me.lookupViewModel().get('currentTask').set('edit100PercentMatch',newValue);
-            	} 
-            }
+            itemId:'edit100PercentMatch'
         },'editorEditTaskEdit100PercentMatch',{
             xtype: 'displayfield',
             renderer: function(value, displayField) {
