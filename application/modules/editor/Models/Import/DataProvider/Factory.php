@@ -46,7 +46,7 @@ class editor_Models_Import_DataProvider_Factory {
     public function createFromTask(editor_Models_Task $task): editor_Models_Import_DataProvider_Abstract {
         $oldTaskPath = new SplFileInfo($task->getAbsoluteTaskDataPath().'/'.editor_Models_Import_DataProvider_Abstract::TASK_ARCHIV_ZIP_NAME);
         if(!$oldTaskPath->isFile()){
-            throw new editor_Models_Import_DataProvider_Exception('1265', [
+            throw new editor_Models_Import_DataProvider_Exception('E1265', [
                 'task' => $task,
                 'path' =>$oldTaskPath,
             ]);
