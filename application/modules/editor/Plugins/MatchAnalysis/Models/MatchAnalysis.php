@@ -153,7 +153,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         //init the language reources group array
-        $groupedResults=$this->initResultArray($analysisAssoc['taskGuid'],$analysisAssoc['internalFuzzy']=='1');
+        $groupedResults=$this->initResultArray($analysisAssoc);
         foreach ($results as $res){
             
             //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
@@ -193,26 +193,27 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             if(!$resultFound){
                 $groupedResults[$rowKey]['noMatch']+=$res['wordCount'];
             }
-            
-            $groupedResults[$rowKey]['created']=$analysisAssoc['created'];
-            $groupedResults[$rowKey]['internalFuzzy']=filter_var($analysisAssoc['internalFuzzy'], FILTER_VALIDATE_BOOLEAN) ? $translate->_("Ja"): $translate->_("Nein");
         }
         return array_values($groupedResults);
     }
     
     /***
-     * Init match analysis result array. Fore each assoc language resource one row will be created.
-     * @param string $taskGuid
-     * @param bool $internalFuzzy
+     * Init match analysis result array. For each assoc language resource one row will be created.
+     * @param array $analysisData
      * @return array|number
      */
-    protected function initResultArray($taskGuid,$internalFuzzy){
+    //protected function initResultArray($taskGuid,$internalFuzzy){
+    protected function initResultArray(array $analysisData){
         $taskAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
         /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
-        $result=$taskAssoc->loadByTaskGuids([$taskGuid]);
+        $result=$taskAssoc->loadByTaskGuids([$analysisData['taskGuid']]);
+        
+        $isInternalFuzzy=$analysisData['internalFuzzy']=='1';
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $fuzzyString=$isInternalFuzzy ? $translate->_("Ja"): $translate->_("Nein");
         
         //create empty group for given key,name and color
-        $initRow=function($key,$name,$color){
+        $initRow=function($key,$name,$color) use($analysisData,$fuzzyString){
             $row=[];
             $row[$key]=[];
             $row[$key]['resourceName']="";
@@ -221,6 +222,9 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             //if the resource is internal fuzzy, change the name
             $row[$key]['resourceName']=$name;
             $row[$key]['resourceColor']=$color;
+            
+            $row[$key]['created']=$analysisData['created'];
+            $row[$key]['internalFuzzy']=$fuzzyString;
             
             //init the result borders
             foreach ($this->groupBorder as $border=>$value){
@@ -235,7 +239,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         
         $task=ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
+        $task->loadByTaskGuid($analysisData['taskGuid']);
         
         $resourceCache=[];
         foreach ($result as $res){
@@ -251,7 +255,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             $initGroups=$initGroups+$initRow($lr->getId(),$lr->getName(),$lr->getColor());
             
             //if internal fuzzy is activated, and the langage resource is of type tm, add aditional internal fuzzy row
-            if($internalFuzzy && $lr->getResourceType()==editor_Models_Segment_MatchRateType::TYPE_TM){
+            if($isInternalFuzzy && $lr->getResourceType()==editor_Models_Segment_MatchRateType::TYPE_TM){
                 //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
                 //for each internal fuzzy, additional row is displayed
                 $initGroups=$initGroups+$initRow(($lr->getId().'fuzzy'),($lr->getName().' - internal Fuzzies'),$lr->getColor());

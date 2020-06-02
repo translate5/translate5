@@ -117,13 +117,13 @@ Ext.define('Editor.view.preferences.Window', {
             items: [
               {
                 xtype: 'button',
-                iconCls: 'ico-setting-save',
+                glyph: 'f00c@FontAwesome5FreeSolid',
                 itemId: 'saveBtn',
                 text: this.item_saveBtn
               },
               {
                 xtype: 'button',
-                iconCls: 'ico-cancel',
+                glyph: 'f00d@FontAwesome5FreeSolid',
                 itemId: 'cancelBtn',
                 text: this.item_cancelBtn
               }

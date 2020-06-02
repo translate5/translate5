@@ -93,7 +93,7 @@ class editor_Models_Task_Excel_Metadata extends ZfExtended_Models_Entity_ExcelEx
         $this->excelExport = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
         $this->excelExport->initDefaultFormat();
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $this->sheetNameTaskOverview = $this->translate->_('Aufgabenübersicht');
+        $this->sheetNameTaskOverview = $this->translate->_('Aufgaben');
         $this->sheetNameMetadata = $this->translate->_('Meta-Daten');
     }
     

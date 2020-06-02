@@ -39,6 +39,7 @@ class Editor_Controller_Helper_Api extends Zend_Controller_Action_Helper_Abstrac
         $language = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $language editor_Models_Languages */
         try {
+            //if empty a notFound is triggered
             if(empty($languageParameter) || (int)$languageParameter > 0) {
                 $language->load($languageParameter);
                 return $language;

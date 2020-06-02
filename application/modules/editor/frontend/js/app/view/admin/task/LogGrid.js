@@ -31,5 +31,16 @@ Ext.define('Editor.view.admin.task.LogGrid', {
     requires: ['Editor.view.admin.log.Grid'],
     alias: 'widget.editorAdminTaskLogGrid',
     store: 'admin.task.Logs',
-    entityUrlPart: 'task'
+    entityUrlPart: 'task',
+    /***
+     * This method will also load the grid store with new data.
+     */
+    setTask:function(newTask){
+    	if(!newTask){
+    		return;
+    	}
+    	var me=this;
+    	me.task=newTask;
+    	me.load(newTask.getId());
+    }
 });

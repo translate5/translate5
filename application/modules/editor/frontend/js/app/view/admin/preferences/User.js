@@ -95,12 +95,12 @@ Ext.define('Editor.view.admin.preferences.User', {
                         items: [{
                             xtype: 'button',
                             itemId: 'saveBtn',
-                            iconCls: 'ico-setting-save',
+                            glyph: 'f0c7@FontAwesome5FreeSolid',
                             text: me.strings.saveBtn
                         },{
                             xtype: 'button',
                             itemId: 'cancelBtn',
-                            iconCls: 'ico-cancel',
+                            glyph: 'f00d@FontAwesome5FreeSolid',
                             text: me.strings.cancelBtn
                         }]
                     }]

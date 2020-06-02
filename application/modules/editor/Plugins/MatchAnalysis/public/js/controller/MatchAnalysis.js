@@ -62,6 +62,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },{
         ref: 'taskAssocGrid',
         selector: '#languageResourcesTaskAssocGrid'
+    },{
+	  ref:'projectPanel',
+	  selector:'#projectPanel'
     }],
     TASK_STATE_ANALYSIS: 'matchanalysis',
     strings:{
@@ -97,14 +100,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             '#languageResourcesWizardPanel':{
             	startMatchAnalysis:'onStartMatchAnalysis'
             },
-            'taskActionColumn': {
+            'taskActionMenu': {
                 itemsinitialized: 'onTaskActionColumnItemsInitialized'
             }
         },
         controller:{
         	'#admin.TaskOverview':{
         		taskCreated:'onTaskCreated',
-                taskUnhandledAction: 'onTaskActionColumnNoHandler',
                 periodicalTaskReloadIgnore: 'ignoreTaskForReload',
                 importStateCheckFinished:'onImportStateCheckFinished'
             },
@@ -123,11 +125,18 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * Task action column items initialized event handler.
      */
     onTaskActionColumnItemsInitialized: function(items) {
+    	var me=this;
         items.push({
-            tooltip:this.strings.taskGridIconTooltip,
-            iconCls: 'ico-task-analysis',
-            isAllowedFor: 'editorAnalysisTask'   ,
-            sortIndex:8,   
+            text:this.strings.taskGridIconTooltip,
+            glyph: 'f200@FontAwesome5FreeSolid',
+            action: 'editorAnalysisTask',
+            hidden:true,
+	        bind:{
+	        	hidden:'{!isNotErrorImportPendingCustom}'
+	        },
+	        scope:me,
+	        handler:me.onMatchAnalysisMenuClick,
+            sortIndex:8
         });
     },
     /**
@@ -152,19 +161,15 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * On task preferences window tabpanel render
      */
     onTaskPreferencesWindowPanelRender:function(panel){
-        var prefWindow = panel.up('window');
-        
         //add the matchanalysis panel in the tabpanel
         panel.insert(2,{
-           xtype:'matchAnalysisPanel',
-           task:prefWindow.actualTask
+           xtype:'matchAnalysisPanel'
         });
     },
 
     onLanguageResourcesPanelRender:function(panel){
     	var me=this,
-    		win=panel.up('window'),
-    		task=win.actualTask,
+    		task=panel.lookupViewModel().get('currentTask'),
     		storeData=[], buttons = [];
     	
     	//init the pretranslate matchrate options (from 0-103)
@@ -286,20 +291,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },
     
     /***
-     * When action column click with no click handler is found
-     */
-    onTaskActionColumnNoHandler:function(action, column, task){
-        if(action != 'handleTaskAnalysis' || this.getAdminTaskPreferencesWindow()){
-            return;
-        }
-        var me=this,
-            taskPref = me.application.getController('admin.TaskPreferences');
-        
-        //display the task preferences window with focus on matchanalysis panel
-        taskPref.handleTaskPreferences(task,'matchAnalysisPanel');
-    },
-    
-    /***
      * Event handler after a task was successfully created
      */
     onTaskCreated:function(task){
@@ -312,6 +303,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	}
     	var me=this;
     	me.loadTaskAssoc(panel.task);
+    },
+    
+    onMatchAnalysisMenuClick:function(item){
+    	var me=this,
+    		task=item.lookupViewModel(true).get('task');
+    	me.getProjectPanel().getController().redirectFocus(task,true);
+        me.getAdminTaskPreferencesWindow().down('tabpanel').setActiveTab('matchAnalysisPanel');
     },
     
     /***
@@ -336,10 +334,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     matchAnalysisButtonHandler:function(button){
     	var me=this,
-            win=button.up('window'),
+            win=button.up('#adminTaskPreferencesWindow'),
             tmAndTermChecked=me.getComponentByItemId('pretranslateTmAndTerm').checked,
             mTChecked=me.getComponentByItemId('pretranslateMt').checked,
-			task=win.actualTask,
+			task=win.getCurrentTask(),
 			operation=(mTChecked || tmAndTermChecked) ? "pretranslation" : "analysis";
     	
     	me.startAnalysis(task.get('id'),operation);
@@ -398,13 +396,17 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     updateTaskAssocPanelViewModel:function(assocStore){
         var me=this,
-            pnl=me.getLanguageResourceTaskAssocPanel(),
+        	panels=Ext.ComponentQuery.query('languageResourceTaskAssocPanel'),
             store=assocStore ? assocStore : (me.getTaskAssocGrid() ? me.getTaskAssocGrid() : null);
-        if(!pnl || !store){
+        if(!panels || panels.length<1 || !store){
             return;
         }
-        //set the view model items variable
-        pnl.getViewModel().set('items',(store.getData().getSource() || store.getData()).getRange());
+        for(var i=0;i<panels.length;i++){
+        	var pnl=panels[i],
+        		vm=pnl.getViewModel();
+    		//set the view model items variable
+    		vm && vm.set('items',(store.getData().getSource() || store.getData()).getRange());
+        }
     },
     
     /***
@@ -441,17 +443,18 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     onImportStateCheckFinished:function(taskOverview,record){
     	var me=this,
-    		taskWindow=me.getAdminTaskPreferencesWindow();
-    	if(!taskWindow){
+    		taskWindow=me.getAdminTaskPreferencesWindow(),
+    		currentTask=taskWindow.getCurrentTask();
+    	if(!taskWindow || !currentTask){
     		return;
     	}
-    	if(record.get('taskGuid')==taskWindow.actualTask.get('taskGuid')){
+    	if(record.get('taskGuid')==currentTask.get('taskGuid')){
     		me.removeLoadingMask(true);
     	}
     },
-
+    
     /***
-     * Add loadin mask in match analysis panel and in the task assoc panel
+     * Add loading mask in match analysis panel and in the task assoc panel
      */
     addLoadingMask:function(){
         var me=this,

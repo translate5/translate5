@@ -199,11 +199,13 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
         return 0;
     }
     
-    /***
-     * Load by default customer.
+    /**
+     * Load the default customer and return it
+     * @return editor_Models_Customer
      */
-    public function loadByDefaultCustomer(){
+    public function loadByDefaultCustomer(): editor_Models_Customer {
         $this->loadRow('number=?',self::DEFAULTCUSTOMER_NUMBER);
+        return $this;
     }
     
     /***

@@ -33,12 +33,13 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.admin.TaskOverview', {
   extend : 'Ext.app.Controller',
-  requires: ['Editor.view.admin.ExportMenu'],
+  requires: ['Editor.view.admin.ExportMenu','Editor.view.admin.task.menu.TaskActionMenu','Editor.view.project.ProjectActionMenu'],
   models: ['admin.Task', 'admin.task.Log'],
   stores: [
 	  'admin.Users',
 	  'admin.UsersList',
 	  'admin.Tasks',
+	  'project.Project',
 	  'admin.Languages', 
 	  'admin.task.Logs', 
 	  'admin.WorkflowUserRoles',
@@ -76,6 +77,21 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },{
       ref: 'filterHolder',
       selector: '#filterHolder'
+  },{
+	  ref:'adminMainSection',
+	  selector:'#adminMainSection'
+  },{
+	  ref:'adminTaskPreferencesWindow',
+	  selector:'#adminTaskPreferencesWindow'
+  },{
+	  ref:'projectGrid',
+	  selector:'#projectGrid'
+  },{
+	  ref:'projectTaskGrid',
+	  selector:'#projectTaskGrid'
+  },{
+	  ref:'projectPanel',
+	  selector:'#projectPanel'
   }],
   alias: 'controller.taskOverviewController',
   
@@ -96,18 +112,22 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   advancedFilterWindow:null,
   
+  /***
+   * Action menu cache component
+   */
+  menuCache:[],
   /**
    * Container for translated task handler confirmation strings
    * Deletion of an entry means to disable confirmation.
    */
   confirmStrings: {
-      "finish":       {title: "#UT#Aufgabe abschließen?", msg: "#UT#Wollen Sie die Aufgabe wirklich abschließen?"},
-      "unfinish":     {title: "#UT#Aufgabe wieder öffnen?", msg: "#UT#Wollen Sie die Aufgabe wirklich wieder öffnen?"},
-      "finish-all":   {title: "#UT#Aufgabe für alle Nutzer abschließen?", msg: "#UT#Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?"},
-      "unfinish-all": {title: "#UT#Aufgabe für alle Nutzer wieder öffnen?", msg: "#UT#Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?"},
-      "end":          {title: "#UT#Aufgabe endgültig beenden?", msg: "#UT#Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?"},
-      "reopen":       {title: "#UT#Beendete Aufgabe wieder öffnen?", msg: "#UT#Wollen Sie die beendete Aufgabe wirklich wieder öffnen?"},
-      "delete":       {title: "#UT#Aufgabe komplett löschen?", msg: "#UT#Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?"}
+      "editorFinishTask":       {title: "#UT#Aufgabe abschließen?", msg: "#UT#Wollen Sie die Aufgabe wirklich abschließen?"},
+      "editorUnfinishTask":     {title: "#UT#Aufgabe wieder öffnen?", msg: "#UT#Wollen Sie die Aufgabe wirklich wieder öffnen?"},
+      "editorFinishAllTask":   {title: "#UT#Aufgabe für alle Nutzer abschließen?", msg: "#UT#Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?"},
+      "editorUnfinishAllTask": {title: "#UT#Aufgabe für alle Nutzer wieder öffnen?", msg: "#UT#Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?"},
+      "editorEndTask":          {title: "#UT#Aufgabe endgültig beenden?", msg: "#UT#Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?"},
+      "editorReopenTask":       {title: "#UT#Beendete Aufgabe wieder öffnen?", msg: "#UT#Wollen Sie die beendete Aufgabe wirklich wieder öffnen?"},
+      "editorDeleteTask":       {title: "#UT#Aufgabe komplett löschen?", msg: "#UT#Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?"}
   },
   strings: {
       taskImported: '#UT#Aufgabe "{0}" bereit.',
@@ -130,10 +150,16 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       averageProcessingTimeTranslatorLabel: '#UT#Ø Bearbeitungszeit Übersetzer',
       averageProcessingTimeSecondTranslatorLabel: '#UT#Ø Bearbeitungszeit zweiter Lektor'
   },
+  listeners:{
+	  afterTaskDelete:'onAfterTaskDeleteEventHandler'  
+  },
   listen: {
       store: {
           '#admin.Tasks': {
               load: 'startCheckImportStates'
+          },
+          '#project.Project':{
+        	  load:'onProjectStoreLoad'
           }
       },
       controller: {
@@ -143,19 +169,24 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
       },
       component: {
-          '#adminTaskGrid': {
+          '#adminTaskGrid,#projectTaskGrid': {
               hide: 'handleAfterHide',
               celldblclick: 'handleGridClick', 
               cellclick: 'handleGridClick',
+          },
+          '#adminTaskGrid': {
               filterchange:'onAdminTaskGridFilterChange'
           },
           '#adminTaskGrid #reload-task-btn': {
               click: 'handleTaskReload'
           },
-          '#adminTaskGrid taskActionColumn': {
+          '#adminTaskGrid taskActionColumn,#projectTaskGrid taskActionColumn': {
               click: 'taskActionDispatcher'
           },
-          '#adminTaskGrid #add-task-btn': {
+          '#projectGrid taskActionColumn': {
+              click: 'projectActionDispatcher'
+          },
+          '#adminTaskGrid #add-project-btn,#projectGrid #add-project-btn': {
               click: 'handleTaskAddShow'
           },
           '#adminTaskGrid #export-meta-data-btn': {
@@ -192,6 +223,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
           'editorAdminTaskFilterFilterWindow':{
         	  advancedFilterChange:'onAdvancedFilterChange'
+          },
+          '#projectTaskGrid':{
+        	  selectionchange:'onProjectTaskGridSelectionChange'
+          },
+          '#projectGrid':{
+        	  selectionchange:'onProjectGridSelectionChange'
+          },
+          '#taskActionMenu,#projectActionMenu':{
+        	  click:'onTaskActionMenuClick'
           }
       }
   },
@@ -203,16 +243,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
      * @param {Ext.form.Panel} form
      * @param {Ext.action.Submit} submit
      * Fires after a task has successfully created
-     */
-    /**
-     * @event handleTaskPreferences
-     * @param {Editor.model.admin.Task} task
-     * Fires after the User has clicked on the icon to edit the Task Preferences
-     */
-    /**
-     * @event handleTaskChangeUserAssoc
-     * @param {Editor.model.admin.Task} task
-     * Fires after the User has clicked on the button / cell to edit the Task User Assoc
      */
     //***********************************************************************************
     //End Events
@@ -246,9 +276,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Checks if all currently loaded tasks are imported or available completly. 
    * If there are locked tasks with a state which needs periodical reload, reload them
    */
-  checkImportState: function() {
-      var me = this, 
-          tasks = me.getAdminTasksStore(),
+  checkImportState: function(store) {
+      var me = this,
+          tasks =me.getAdminTasksStore(),
           foundImporting = 0,
           taskReloaded = function(rec) {
               if(rec.isErroneous()) {
@@ -285,9 +315,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   handleChangeImportFile: function(field, val){
       var name = this.getTaskAddForm().down('textfield[name=taskName]'),
           srcLang = this.getTaskAddForm().down('combo[name=sourceLang]'),
-          targetLang = this.getTaskAddForm().down('combo[name=targetLang]'),
+          targetLang = this.getTaskAddForm().down('tagfield[name^=targetLang]'),
+          customer = this.getTaskAddForm().down('combo[name=customerId]'),
+          idx,
           langs = val.match(/-([a-zA-Z]{2,5})-([a-zA-Z]{2,5})\.[^.]+$/);
-      if(name.getValue() == '') {
+      if(name && name.getValue() == '') {
           name.setValue(val.replace(/\.[^.]+$/, '').replace(/^C:\\fakepath\\/,''));
       }
       //simple algorithmus to get the language from the filename
@@ -311,6 +343,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           }
           if(targetIdx >= 0) {
               targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
+          }
+          //if we set a language automatically we also assume the default customer
+          idx = customer.store.findExact('name', 'defaultcustomer');
+          if(idx >= 0) {
+              customer.setValue(customer.store.getAt(idx).get('id'));
           }
       }
   },
@@ -343,7 +380,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           dbl = e.type == 'dblclick'; 
       if(rec.isErroneous() || rec.isImporting()) {
           if(isState || dbl) {
-              this.handleTaskLog(rec);
+              this.editorLogTask(rec);
           }
           return;
       }
@@ -368,9 +405,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       if(!me.isAllowed('editorOpenTask', task) && !me.isAllowed('editorEditTask', task)){
           return;
       }
+      //reset the route
+      me.redirectTo('');
       Editor.util.TaskActions.openTask(task, readonly);
   },
-  handleTaskLog: function(task) {
+  editorLogTask: function(task) {
       if(!this.isAllowed('editorTaskLog')){
           return;
       }
@@ -380,6 +419,14 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       win.show();
       win.load();
   },
+  
+  editorPreferencesTask:function(task){
+	var me=this;
+    me.getProjectPanel().getController().redirectFocus(task,true);
+    me.getAdminTaskPreferencesWindow().down('tabpanel').setActiveTab('adminTaskUserAssoc');
+	me.fireEvent('handleTaskPreferences', task);
+  },
+  
   handleTaskCancel: function() {
 	  var me=this;
 	  if(!me.getTaskAddForm()){
@@ -602,78 +649,190 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Filter is applied in the advanced filter window
    */
   onAdvancedFilterChange:function(filter){
+	  this.addAdvancedFilter(filter);
+  },
+  
+  /***
+   * Add filter to the advanced filter collection. This will also trigger the filtering and set an
+   * active record in the advanced filter component.
+   * @param {Object} filter
+   */
+  addAdvancedFilter:function(filter){
 	  var me=this,
 	  	  toolbar=me.getAdvancedFilterToolbar(),
 	  	  taskGrid=me.getTaskGrid(),
 	  	  taskStore=taskGrid.getStore(),
 	  	  filtersarray=toolbar.getController().filterActiveFilters(filter),
 	  	  addFilter=filtersarray && filtersarray.length>0;
-
+	
 	 //clear the taskGrid store from the filters
-  	 taskStore.clearFilter(addFilter);
-  	 //add the custom filtering where the filterchange event will be suspended
+	 taskStore.clearFilter(addFilter);
+	 //add the custom filtering where the filterchange event will be suspended
 	 taskGrid.activateGridColumnFilter(filtersarray,true);
 	 //load the filters into the filter holder tagfield
 	 toolbar.loadFilters(taskStore.getFilters(false));
   },
   
+  /***
+   * On project task grid selection.
+   * TODO: move this to separate project controller ?
+   */
+  onProjectTaskGridSelectionChange:function(grid,selection){
+	  var me=this;
+	  	  task=selection ? selection[0] : null;
+  	  if(!task){
+  		  return;
+  	  }
+  	  me.getProjectPanel().getController().redirectFocus(task,true);
+  },
+  
   /**
-   * calls local task handler, dispatching is done by the icon CSS class of the clicked img
-   * the css class ico-task-foo-bar is transformed to the method handleTaskFooBar
-   * if this controller contains this method, it'll be called. 
-   * First Parameter is the task record.
+   * On projectTask grid selection change
+   */
+  onProjectGridSelectionChange:function(grid,selection){
+	  var me=this;
+  	  	task=selection ? selection[0] : null;
+	  if(!task){
+		  return;
+	  }
+	  me.getProjectGrid().setLoading(true);
+	  me.getProjectPanel().getController().redirectFocus(task,false);
+  },
+  
+  
+  /***
+   * On project store load
+   */
+  onProjectStoreLoad:function(store){
+	  var me=this;
+	    activeTab=me.isProjectPanelActive();
+	  	panel=me.getProjectPanel(),
+	  	vm=panel.getViewModel(),
+	    record=vm.get('projectSelection');
+	  	task=null;
+	  
+	  //if the project panel is not active, ignore the redirect,
+	  //when we redirect, the component focus is changed
+	  if(!activeTab){
+		  return;
+	  }
+	  //if selected record already exist, use it
+	  if(record){
+		  task=store.getById(record.get('id'));
+	  }
+	  //no selected record is found, use the first in the store
+	  if(!task){
+		  task=store.getAt(0);
+	  }
+	  panel.getController().redirectFocus(task,false);
+  },
+  
+  /***
+   * Task menu item click handler. Here it will be proven if the action exist and if the user is allowed for the action.
+   * 
+   */
+  onTaskActionMenuClick:function(com,item,ev){
+	  var me = this,
+	      task=com.lookupViewModel().get('task'),
+	      action=item && item.action;
+	      
+      if(! me.isAllowed(action)){
+          return;
+      }
+      
+      if(!me[action] || ! Ext.isFunction(me[action])){
+          return;
+      }
+
+      if(!this.fireEvent('beforeTaskActionConfirm', action, task, function(){
+    	  me[action](task, ev);
+	  })) {
+	      return;
+	  }
+	  
+	  //if NO confirmation string exists, we call the action unconfirmed. 
+	  if(! me.confirmStrings[action]) {
+	      me[action](task, ev);
+	      return; 
+	  }
+	
+	  confirm = me.confirmStrings[action];
+	  Ext.Msg.confirm(confirm.title, confirm.msg, function(btn){
+	      if(btn == 'yes') {
+	          me[action](task, ev);
+	      }
+	  });
+  },
+  
+  /***
+   * Delete project action menu handler
+   * TODO: move this to separate project controller ?
+   */
+  editorDeleteProject:function(task,ev){
+	  this.getProjectGrid().getController().handleProjectDelete(task,ev);
+  },
+  
+  /**
+   * Task grid action icon click handler
    * 
    * @param {Ext.grid.View} view
    * @param {DOMElement} cell
    * @param {Integer} row
    * @param {Integer} col
    * @param {Ext.Event} ev
-   * @param {Object} evObj
+   * @param {Object} record
    */
-  taskActionDispatcher: function(view, cell, row, col, ev, evObj) {
-      var me = this,
-          t = ev.getTarget(),
-          f = t.className.match(/ico-task-([^ ]+)/),
-          camelRe = /(-[a-z])/gi,
-          camelFn = function(m, a) {
-              return a.charAt(1).toUpperCase();
-          },
-          actionIdx = ((f && f[1]) ? f[1] : "not-existing"),
-          //build camelized action out of icon css class:
-          action = ('handleTask-'+actionIdx).replace(camelRe, camelFn),
-          right = action.replace(/^handleTask/, 'editor')+'Task',
-          task = view.getStore().getAt(row),
-          confirm;
-
-      if(! me.isAllowed(right)){
-          return;
-      }
-      
-      if(! me[action] || ! Ext.isFunction(me[action])){
-          //fire event if no handler function for the action button is defined
-          me.fireEvent('taskUnhandledAction', action, t, task);
-          return;
-      }
-
-      if(!this.fireEvent('beforeTaskActionConfirm', action, task, function(){
-          me[action](task, ev);
-      })) {
-          return;
-      }
-      
-      //if NO confirmation string exists, we call the action unconfirmed. 
-      if(! me.confirmStrings[actionIdx]) {
-          me[action](task, ev);
-          return; 
-      }
-
-      confirm = me.confirmStrings[actionIdx];
-      Ext.Msg.confirm(confirm.title, confirm.msg, function(btn){
-          if(btn == 'yes') {
-              me[action](task, ev);
-          }
-      });
+  taskActionDispatcher: function(view, cell, row, col, ev, record) {
+      this.callMenuAction('Task',record,ev)
   },
+  
+  /**
+   * Project grid action icon click handler
+   * 
+   * @param {Ext.grid.View} view
+   * @param {DOMElement} cell
+   * @param {Integer} row
+   * @param {Integer} col
+   * @param {Ext.Event} ev
+   * @param {Object} record
+   */
+  projectActionDispatcher:function(view, cell, row, col, ev, record) {
+	  this.callMenuAction('Project',record,ev)
+  },
+  
+  /***
+   * calls local action handler, dispatching is done by the icon CSS class of the clicked img
+   * the css class ico-task-foo-bar is transformed to the method handleTaskFooBar
+   * if this controller contains this method, it'll be called. 
+   * 
+   * @param {String} menuParrent : menu source view
+   * @param {Object} record
+   * @param {Ext.Event} event
+   */
+  callMenuAction:function(menuParrent,task,event){
+      var me = this,
+	      t = event.getTarget(),
+	      f = t.className.match(/ico-task-([^ ]+)/),
+	      camelRe = /(-[a-z])/gi,
+	      camelFn = function(m, a) {
+	          return a.charAt(1).toUpperCase();
+	      },
+	      actionIdx = ((f && f[1]) ? f[1] : "not-existing"),
+	      //build camelized action out of icon css class:
+	      action = ('handle'+menuParrent+'-'+actionIdx).replace(camelRe, camelFn),
+	      right = action.replace(new RegExp('handle'+menuParrent), 'editor')+menuParrent,
+	      confirm;
+	
+	  if(! me.isAllowed(right)){
+	      return;
+	  }
+	  
+	  if(! me[action] || ! Ext.isFunction(me[action])){
+	      return;
+	  }
+	  me[action](task, event);
+  },
+  
   /**
    * Shorthand method to get the default task save handlers
    * @return {Object}
@@ -702,7 +861,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Opens the task readonly
    * @param {Editor.model.admin.Task} task
    */
-  handleTaskOpen: function(task) {
+  editorOpenTask: function(task) {
       this.openTaskRequest(task, true);
   },
   
@@ -710,7 +869,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Opens the task in normal (edit) mode (does internal a readonly check by task)
    * @param {Editor.model.admin.Task} task
    */
-  handleTaskEdit: function(task) {
+  editorEditTask: function(task) {
       this.openTaskRequest(task);
   },
   
@@ -718,7 +877,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Finish the task for the logged in user
    * @param {Editor.model.admin.Task} task
    */
-  handleTaskFinish: function(task) {
+  editorFinishTask: function(task) {
       var me = this;
       Editor.app.mask(me.strings.taskFinishing, task.get('taskName'));
       task.set('userState', task.USER_STATE_FINISH);
@@ -729,7 +888,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Un Finish the task for the logged in user
    * @param {Editor.model.admin.Task} task
    */
-  handleTaskUnfinish: function(task) {
+  editorUnfinishTask: function(task) {
       var me = this;
       Editor.app.mask(me.strings.taskUnFinishing, task.get('taskName'));
       task.set('userState', task.USER_STATE_OPEN);
@@ -740,7 +899,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Un Finish the task for the logged in user
    * @param {Editor.model.admin.Task} task
    */
-  handleTaskEnd: function(task) {
+  editorEndTask: function(task) {
       var me = this;
       Editor.app.mask(me.strings.taskEnding, task.get('taskName'));
       task.set('state', 'end');
@@ -751,7 +910,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Un Finish the task for the logged in user
    * @param {Editor.model.admin.Task} task
    */
-  handleTaskReopen: function(task) {
+  editorReopenTask: function(task) {
       var me = this;
       Editor.app.mask(me.strings.taskReopen, task.get('taskName'));
       task.set('state', 'open');
@@ -761,7 +920,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * delete the task
    * @param {Editor.model.admin.Task} task
    */
-  handleTaskDelete: function(task) {
+  editorDeleteTask: function(task) {
       var me = this,
           store = task.store,
           app = Editor.app;
@@ -776,6 +935,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           success: function() {
               store.load();
               app.unmask();
+              me.fireEvent('afterTaskDelete',task);
           },
           failure: function(records, op){
               task.reject();
@@ -793,7 +953,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Clones the task
    * @param {Editor.model.admin.Task} task
    */
-  handleTaskClone: function(task) {
+  editorCloneTask: function(task) {
       Ext.Ajax.request({
           url: Editor.data.pathToRunDir+'/editor/task/'+task.getId()+'/clone',
           method: 'post',
@@ -806,32 +966,46 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           }
       });
   },
-  /**
-   * displays the export menu
-   * @param {Editor.model.admin.Task} task
-   * @param {Ext.EventObjectImpl} event
+
+  /***
+   * Task action menu click handler
    */
-  handleTaskShowexportmenu: function(task, event) {
-      var me = this,
-          hasQm = task.hasQmSub(),
-          exportAllowed = me.isAllowed('editorExportTask', task),
-          menu;
-      
-      menu = Ext.widget('adminExportMenu', {
-          task: task,
-          fields: hasQm ? task.segmentFields() : false
-      });
-      menu.down('#exportItem') && menu.down('#exportItem').setVisible(exportAllowed);
-      menu.down('#exportDiffItem') && menu.down('#exportDiffItem').setVisible(exportAllowed);
-      menu.showAt(event.getXY());
+  handleTaskMenu: function(selectedTask, event) {
+      this.showActionMenu(selectedTask, event,'taskActionMenu')
   },
+  
+  /***
+   * Project action menu click handler
+   */
+  handleProjectMenu: function(selectedTask, event) {
+	  this.showActionMenu(selectedTask, event,'projectActionMenu')
+  },
+  
+  /***
+   * Show action menu by given menu xtype
+   */
+  showActionMenu:function(selectedTask,event,menuXtype){
+	  var me = this,
+          menu=me.menuCache[menuXtype],
+          vm=null;
+
+	  if(!menu){
+    	  //create fresh menu instance
+    	  me.menuCache[menuXtype]=menu=Ext.widget(menuXtype,{task:selectedTask});
+	  }
+      vm=menu.getViewModel();
+	  vm && vm.set('task',selectedTask);
+	  vm && vm.notify();
+	  menu.showAt(event.getXY());
+  },
+  
   
   /**
    * displays the excel re-import fileupload dialog
    * @param {Editor.model.admin.Task} task
    * @param {Ext.EventObjectImpl} event
    */
-  handleTaskExcelreimport: function(task, event) {
+  editorExcelreimportTask: function(task, event) {
       if(!this.isAllowed('editorExcelreimportTask')){
           return;
       }
@@ -840,23 +1014,21 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   
   /**
-   * triggerd by click on the Task Preferences Icon
-   * fires only an event to allow flexible handling of this click
+   * Redirects the user to the task project in the project overview or in task overview (depending from where the action is triggered)
    * @param {Editor.model.admin.Task} task
    */
-  handleTaskPreferences: function(task) {
-      this.fireEvent('handleTaskPreferences', task);
+  handleTaskProject: function(task) {
+	  var me=this,
+	      menu=me.getAdminMainSection(),
+	      activeTab=menu.getActiveTab().xtype;
+	      
+      if(activeTab=='projectPanel'){
+    	  me.redirectTo('task/'+task.get('id')+'/filter');
+      }else{
+    	  me.getProjectPanel().getController().redirectFocus(task,true);
+      }
   },
   
-  /**
-   * triggerd by click on the Change Task User Assoc Button / (Cell also => @todo)
-   * fires only an event to allow flexible handling of this click
-   * @param {Editor.model.admin.Task} task
-   */
-  handleTaskChangeUserAssoc: function(task) {
-      this.fireEvent('handleTaskChangeUserAssoc', task);
-  },
-
   /**
    * On admin add task window show handler
    */
@@ -890,7 +1062,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                 //yes -> the task will be deleted
                 //no  -> the task will be imported
                 if (btn === 'yes') {
-                	me.handleTaskDelete(task);
+                	me.editorDeleteTask(task);
                 } else if (btn === 'no') {
                     me.startImport(task);
                 }
@@ -946,6 +1118,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               me.fireEvent('taskCreated', task);
               win.setLoading(false);
               me.getAdminTasksStore().load();
+              
+              me.handleProjectAfterImport(task);
               
               //set the store reference to the model(it is missing), it is used later when the task is deleted
               task.store=me.getAdminTasksStore();
@@ -1043,5 +1217,44 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   closeAdvancedFilterWindow:function(){
 	  this.advancedFilterWindow && this.advancedFilterWindow.hide();
+  },
+
+  /***
+   * After import reload the project store and focus the import
+   */
+  handleProjectAfterImport:function(task){
+	  var me=this,
+	     activeTab=me.isProjectPanelActive();
+	  if(!activeTab){
+		  return;
+	  }
+	  activeTab.getController().redirectFocus(task,false);
+  },
+  
+  /***
+   * Check if the project panel is active. If the project panel is active, the project panel component is returned
+   */
+  isProjectPanelActive:function(){
+	  var me=this,
+	      menu=me.getAdminMainSection(),
+	      activeTab=menu.getActiveTab();
+		  
+	  if(activeTab.xtype!='projectPanel'){
+		  return null;
+	  }
+	  return activeTab;
+  },
+  
+  /***
+   * After the task is removed event handler
+   */
+  onAfterTaskDeleteEventHandler:function(task){
+	  var me=this,
+	      grid=me.getProjectGrid();
+	  
+	  if(!grid){
+		  return;
+	  }
+	  grid.getController().onReloadProjectClick();
   }
 });
