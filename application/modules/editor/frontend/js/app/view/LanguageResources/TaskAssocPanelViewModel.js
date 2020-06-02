@@ -48,6 +48,13 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
 	  		  remoteFilter: true,
 	  		  pageSize: false,
 	  		  autoLoad:true,
+	  		  setFilters:function(filters){
+				//the binding is triggered wiht empty values to, we do not want to filter for empty taskGuid
+				if(filters && !filters.value){
+					filters=[];
+				}
+				this.superclass.superclass.setFilters.apply(this, [filters]);
+			  },
 	  		  filters:{
 	  			  property: 'taskGuid',
 	  			  operator:"eq",
