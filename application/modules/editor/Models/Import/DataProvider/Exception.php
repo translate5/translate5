@@ -43,5 +43,6 @@ class editor_Models_Import_DataProvider_Exception extends editor_Models_Import_E
             'E1248' => 'DataProvider Directory: The importRootFolder "{importRoot}" does not exist!',
             'E1249' => 'DataProvider ZippedUrl: fetched file can not be saved to path {path}',
             'E1250' => 'DataProvider ZippedUrl: ZIP file could not be fetched from URL {url}',
+            'E1265' => 'DataProvider Factory: The task to be cloned does not have a import archive zip! Path: {path}'
         ];
 }

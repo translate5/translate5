@@ -43,7 +43,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     viewModel: {
         type: 'adminTaskAddWindow'
     },
-    title: '#UT#Aufgabe erstellen',
+    title: '#UT#Projekt erstellen',
     strings: {
         importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (Angabe notwendig)',
         importUploadLabel: '#UT#Import Datei¹',
@@ -192,10 +192,20 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     toolTip: me.strings.sourceLangTip,
                                     fieldLabel: me.strings.sourceLangLabel
                                 },{
-                                    xtype: 'languagecombo',
-                                    name: 'targetLang',
+                                    xtype:'tagfield',
+                                    name:'targetLang[]',
                                     toolTip: me.strings.targetLangTip,
-                                    fieldLabel: me.strings.targetLangLabel
+                                    fieldLabel: me.strings.targetLangLabel,
+                                    //each combo needs its own store instance, see EXT6UPD-8
+                                    store: Ext.create(Editor.store.admin.Languages),
+                                    typeAhead: false,
+                                    displayField: 'label',
+                                    forceSelection: true,
+                                    //encodeSubmitValue: true, // → as JSON
+                                    //anyMatch: true,
+                                    queryMode: 'local',
+                                    valueField: 'id',
+                                    allowBlank: false
                                 },{
                                     xtype: 'languagecombo',
                                     name: 'relaisLang',
@@ -223,6 +233,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                 // (added dynamically by Editor.controller.admin.TaskPreferences)
                             },{
                                 xtype: 'container',
+                                itemId: 'taskSecondCardContainer',
                                 flex: 1,
                                 layout: 'anchor',
                                 defaults: {
@@ -313,7 +324,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     xtype: 'tbfill'
                 },{
                     xtype : 'button',
-                    iconCls : 'ico-next-wizard',
+                    glyph: 'f051@FontAwesome5FreeSolid',
                     itemId : 'continue-wizard-btn',
                     bind:{
                         disabled:'{disableContinueButton}',
@@ -322,7 +333,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     text : me.strings.btnNextWizard
                 },{
                     xtype : 'button',
-                    iconCls : 'ico-skip-wizard',
+                    glyph: 'f04e@FontAwesome5FreeSolid',
                     itemId : 'skip-wizard-btn',
                     bind:{
                         disabled:'{disableSkipButton}',
@@ -331,7 +342,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     text : me.strings.btnSkip
                 },{
                     xtype : 'button',
-                    iconCls : 'ico-task-add',
+                    glyph: 'f00c@FontAwesome5FreeSolid',
                     itemId : 'add-task-btn',
                     bind:{
                       disabled:'{disableAddButton}',
@@ -340,7 +351,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     text : me.strings.addBtn
                 }, {
                     xtype : 'button',
-                    iconCls : 'ico-cancel',
+                    glyph: 'f00d@FontAwesome5FreeSolid',
                     itemId : 'cancel-task-btn',
                     bind:{
                         disabled:'{disableCancelButton}',
