@@ -190,7 +190,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
         $this->lengthRestriction = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_LengthRestriction');
         $this->otherContent = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_OtherContent', [
-            $this->contentConverter, $this->segmentBareInstance, $this->task
+            $this->contentConverter, $this->segmentBareInstance, $this->task, $fileId
         ]);
     }
     
