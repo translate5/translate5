@@ -27,5 +27,24 @@ END LICENSE AND COPYRIGHT
 */
 Ext.define('Editor.view.project.ProjectTaskGridViewController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.projectTaskGrid'
+    alias: 'controller.projectTaskGrid',
+    listen: {
+        messagebus: {
+            '#translate5 task': {
+                triggerReload: 'onTriggerTaskReload'
+            }
+        }
+    },
+    onTriggerTaskReload: function(params) {
+        var store = this.getView().getStore(),
+            task;
+        if(params.taskId) {
+            task = store.getById(params.taskId);
+        }
+        else {
+            task = store.findExact('taskGuid', params.taskGuid);
+        }
+console.log('Project task grid', params, task);
+        task && task.load();
+    }
 });

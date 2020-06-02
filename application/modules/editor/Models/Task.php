@@ -758,8 +758,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'lockedInternalSessionUniqId' => NULL,
             'lockingUser' => NULL,
         );
+        $success = $this->db->update($data, $where) !== 0;
         //check how many rows are updated
-        return $this->db->update($data, $where) !== 0;
+        $this->events->trigger('unlock', $this, [
+            'task' => $this,
+            'success' => $success,
+        ]);
+        return $success;
     }
 
     /**
@@ -1273,7 +1278,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /***
      * Load all tasks of a given project. If taskOnly is true, in the result array, the master(project) task
      * will not be included
-     * 
+     *
      * @param int $projectId
      * @param bool $tasksOnly
      * @return array
