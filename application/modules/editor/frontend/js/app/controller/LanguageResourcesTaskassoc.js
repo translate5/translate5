@@ -55,6 +55,9 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
   },{
       ref: 'adminTaskWindow',
       selector: 'adminTaskPreferencesWindow'
+  },{
+	  ref:'adminTaskAddWindow',
+	  selector: '#adminTaskAddWindow'
   }],
   
   listen: {
@@ -64,16 +67,6 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
           }
       },
       component: {
-          'adminTaskPreferencesWindow': {
-              render: 'onParentRender',
-              beforeclose:function(panel,eOpts){
-                  var me=this;
-                  if(me.requestsCount>0){
-                      return false;
-                  }
-                  panel.setLoading(false);
-              }
-          },
           '#languageResourcesTaskAssocGrid checkcolumn[dataIndex="segmentsUpdateable"]': {
               checkchange: 'handleSegmentsUpdateableChange'
           },
@@ -82,15 +75,7 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
           }
       }
   },
-  requestsCount:0,
-  /**
-   * inject the plugin tab and load the task meta data set
-   */
-  onParentRender: function(window) {
-      var me = this;
-      me.actualTask = window.actualTask;
-      me.getTaskTabs().insert(1,{xtype: 'languageResourceTaskAssocPanel', actualTask: me.actualTask});
-  },
+  
   handleLoadPreferences: function(controller,task){
       var me = this,
           languageResourceparams = {
@@ -100,36 +85,30 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
           };
       //set the actual task
       me.actualTask = task;
-      me.getGrid().store.removeAll();
-      me.getGrid().store.load(languageResourceparams);
+      me.getLanguageResourcesTaskAssocGrid().getStore().removeAll();
+      me.getLanguageResourcesTaskAssocGrid().store.load(languageResourceparams);
   },
   
   /***
    * Save each assoc if if it is changed
    */
-  saveTmAssoc: function(window) {
+  saveTmAssoc: function(cmp) {
       var me = this,
-          tmpStore = me.getGrid().store;
+          tmpStore = me.getLanguageResourcesTaskAssocGrid().store;
 
       if(me.getAdminTaskWindow()){
           me.getAdminTaskWindow().setLoading(true);
       }
       
-      me.requestsCount = tmpStore.getCount();
-
       tmpStore.each(me.saveOneAssocRecord, me);
   },
   
-  handleOnReload: function(window) {
-      var me = this;
-      me.getGrid().store.reload();
-  },
   /**
    * uncheck segmentsUpdateable when uncheck whole row, restore segmentsUpdateable if recheck row
    */
   handleCheckedChange: function(column, rowIdx, checked){
       var me = this,
-          record = me.getGrid().store.getAt(rowIdx),
+          record = me.getLanguageResourcesTaskAssocGrid().store.getAt(rowIdx),
           oldValue = record.isModified('segmentsUpdateable') && record.getModified('segmentsUpdateable');
       record.set('segmentsUpdateable', checked && oldValue);
       
@@ -140,7 +119,7 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
    */
   handleSegmentsUpdateableChange: function(column, rowIdx, checked) {
       var me = this,
-          record = me.getGrid().store.getAt(rowIdx);
+          record = me.getLanguageResourcesTaskAssocGrid().store.getAt(rowIdx);
       if(checked && !record.get('checked')) {
           record.set('checked', true);
       }
@@ -154,7 +133,6 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
   saveOneAssocRecord: function(record){
       var me = this;
       if(!record.dirty){
-          me.requestsCount--;
           me.hideLoadingMask();
           return;
       }
@@ -163,8 +141,8 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
           method = 'DELETE',
           url = Editor.data.restpath+'languageresourcetaskassoc',
           checkedData = Ext.JSON.encode({
-              languageResourceId: record.get('id'),
-              taskGuid: me.actualTask.get('taskGuid'),
+              languageResourceId: record.get('languageResourceId'),
+              taskGuid: record.get('taskGuid'),
               segmentsUpdateable: record.get('segmentsUpdateable')
           });
 
@@ -181,10 +159,9 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
           method: method,
           params: params,
           success: function(response){
-              me.requestsCount--;
               if(record.data.checked){
                   var resp = Ext.util.JSON.decode(response.responseText),
-                      newId = resp.rows['id'];
+                      newId = resp.rows['languageResourceId'];
                   record.set('taskassocid', newId);
                   Editor.MessageBox.addSuccess(str.assocSave);
               }
@@ -196,26 +173,34 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
               me.hideLoadingMask();
 
               //fire the event when all active requests are finished
-              if(me.requestsCount<1){
-            	  me.fireEvent('taskAssocSavingFinished',record,me.getGrid().getStore());
-              }
+        	  me.fireEvent('taskAssocSavingFinished',record,me.getLanguageResourcesTaskAssocGrid().getStore());
           },
           failure: function(response){
-              me.requestsCount--;
               Editor.app.getController('ServerException').handleException(response);
               me.hideLoadingMask();
           } 
       });
   },
+  
   hideLoadingMask:function(){
       var me=this;
       if(!me.getAdminTaskWindow()){
           return;
       }
-      if(me.requestsCount <= 0){
-          var task = me.getAdminTaskWindow().actualTask;
-          me.getAdminTaskWindow().setLoading(false);
-          task.load();
-      }
+      var task = me.getAdminTaskWindow().getCurrentTask();
+      me.getAdminTaskWindow().setLoading(false);
+      task && task.load();
+  },
+  
+  /**
+   * Get the right language resources task assoc gid
+   */
+  getLanguageResourcesTaskAssocGrid:function(){
+	  var me=this,
+	  	addTaskWindow=me.getAdminTaskAddWindow();
+	  if(addTaskWindow){
+		  return addTaskWindow.down('#languageResourcesTaskAssocGrid');
+	  }
+	  return me.getAdminTaskWindow().down('#languageResourcesTaskAssocGrid');
   }
 });

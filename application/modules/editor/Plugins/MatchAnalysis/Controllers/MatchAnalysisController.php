@@ -39,6 +39,11 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
     
     public function indexAction(){
         $taskGuid = $this->getParam('taskGuid', false);
+        if(empty($taskGuid)){
+            //check if the taskGuid is provided via filter
+            $this->entity->getFilter()->hasFilter('taskGuid',$taskGuid);
+            $taskGuid=$taskGuid->value ?? null;
+        }
         if(empty($taskGuid)) {
             // MatchAnalysis Plug-In: tried to load analysis data without providing a valid taskGuid
             // Reason is unfixed: TRANSLATE-1637: MatchAnalysis: Errors in Frontend when analysing multiple tasks

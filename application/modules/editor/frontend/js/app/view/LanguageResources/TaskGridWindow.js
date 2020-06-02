@@ -122,13 +122,13 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
                   xtype: 'tbfill'
               },{
                   xtype : 'button',
-                  iconCls : 'ico-add',
+                  glyph: 'f067@FontAwesome5FreeSolid',
                   itemId : 'import-task-tm-btn',
                   tooltip: me.strings.reimportTooltip,
                   text : me.strings.reimport
               },{
                   xtype : 'button',
-                  iconCls : 'ico-cancel',
+                  glyph: 'f00d@FontAwesome5FreeSolid',
                   itemId : 'cancel',
                   text : me.strings.close
               }]
