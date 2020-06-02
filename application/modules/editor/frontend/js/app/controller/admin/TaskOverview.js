@@ -263,6 +263,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       this.getAdminTasksStore().load();
   },
   startCheckImportStates: function(store, records) {
+  console.log("OLD startCheckImportStates called");
+  return;
       if(!this.checkImportStateTask) {
           this.checkImportStateTask = {
                   run: this.checkImportState,

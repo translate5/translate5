@@ -75,7 +75,7 @@ class Task extends Channel {
         //release other segment(s) of this session/connection
         $this->releaseLocalSegment($request->conn->openedSegmentId ?? 0);
         
-        //if the segment is here already in use, we send a NAK 
+        //if the segment is here already in use, we send a NAK
         if(!empty($this->editedSegments[$answer->segmentId]) && $this->editedSegments[$answer->segmentId] !== $request->conn) {
             $answer->segmentOpenNak();
             return;
@@ -120,7 +120,7 @@ class Task extends Channel {
                 //session of that connection or whole connection is gone
                 continue;
             }
-            $result->trackingId = $this->getUserTrackingId($result->taskGuid, $userGuid); 
+            $result->trackingId = $this->getUserTrackingId($result->taskGuid, $userGuid);
             $result->segmentId = $segmentId;
             $result->connectionId = $conn->connectionId; //send back the locking connection id
             $result->send();
@@ -134,7 +134,7 @@ class Task extends Channel {
      * @param string $affectedSessionId
      * @param string $taskGuid
      * @param bool $online true if the triggering user is online, false otherwise
-     * 
+     *
      */
     protected function updateOnlineUsers(string $affectedSessionId, string $taskGuid, bool $online) {
         //update online users in task
@@ -241,8 +241,8 @@ class Task extends Channel {
                 //ignore myself and ignore all other connections not belonging to that task
                 continue;
             }
-            //must be logged explicitly, since we directly call send on the connection here 
-            $result->logSend(); 
+            //must be logged explicitly, since we directly call send on the connection here
+            $result->logSend();
             //and send the message
             $conn->send((string) $result);
         }
@@ -320,7 +320,7 @@ class Task extends Channel {
         }
         //if we have segments to be released, we also have an answer to send to the GUIs
         if(!empty($toRelease)) {
-            //leaveAlikes can be used to release multiple segments 
+            //leaveAlikes can be used to release multiple segments
             $this->leaveAlikes($answer, $toRelease);
         }
     }
@@ -347,7 +347,7 @@ class Task extends Channel {
         //get remaining sessions associated to tasks
         $this->leaveSegmentsFromGarbageSessions();
 
-        //we return here only the taskGuids, really having a session 
+        //we return here only the taskGuids, really having a session
         return ['usedTaskGuids' => array_keys($this->taskToSessionMap)];
     }
     
@@ -429,20 +429,20 @@ class Task extends Channel {
     
     /*************************
      * Backend Methods
-     * 
-     * WARNING: integer IDs must be explicitly converted to INT in the backend methods before sending to the frontend! 
+     *
+     * WARNING: integer IDs must be explicitly converted to INT in the backend methods before sending to the frontend!
      *************************/
     
     /**
-     * handles a segment save (PUT) in translate5. 
-     * Segment saving can not be handled on websocket level, since if the segmentsave is triggered via websockets, the segment data is not yet in the DB. 
-     * To solve that we would have to invoke in one of the frontend final save callbacks - or as it is done now just on the segment PUT in translate5 backend.  
+     * handles a segment save (PUT) in translate5.
+     * Segment saving can not be handled on websocket level, since if the segmentsave is triggered via websockets, the segment data is not yet in the DB.
+     * To solve that we would have to invoke in one of the frontend final save callbacks - or as it is done now just on the segment PUT in translate5 backend.
      * @param string $connectionId
      * @param array $segment
      * @param string $sessionId
      */
     public function segmentSave(string $connectionId, array $segment, string $sessionId) {
-        //if the segment was a master segment of a changealike request, 
+        //if the segment was a master segment of a changealike request,
         // we may not process save now, but when change alikes were processed!
         if(!empty($this->alikeSegments[$segment['id']])) {
             return;
@@ -496,7 +496,7 @@ class Task extends Channel {
     /**
      * is invoked when the alike segments of a requested master segment are loaded.
      * Triggers locking of the alike segments in the browsers!
-     *  
+     *
      * @param string $connectionId
      * @param array $masterSegment
      * @param string $sessionId
@@ -657,10 +657,31 @@ class Task extends Channel {
     }
     
     /**
+     * FIXME replace old triggerReload method before release (also on calling places!)
+     * Triggers a reload of the active task in the GUI
+     * @param int $taskGuid
+     * @param int $taskId optional, since not always given in Backend. Since the frontend uses IDs, we also should send the id here where possible, so the lookup in the GUI is faster
+     * @param string $excludeConnection optional, a connectionid which should be ignored (mostly the initiator, since he has already the latest task). defaults to null
+     * @param int $recordId
+     */
+    public function triggerReloadNEW(string $taskGuid, int $taskId = 0, string $excludeConnection = null) {
+        $msg = FrontendMsg::create(self::CHANNEL_NAME, 'triggerReload', [
+            'taskGuid' =>  $taskGuid,
+            'taskId' =>  $taskId,
+        ]);
+        $msg->logSend();
+        foreach($this->instance->getConnections() as $conn) {
+            if(empty($excludeConnection) || $excludeConnection !== $conn->connectionId) {
+                $conn->send((string) $msg);
+            }
+        }
+    }
+    
+    /**
      * Updates the user tracking data for the given taskGuid
      * @param string $taskGuid
      * @param array $userTracking
-     * @param string $sessionId optional, if omitted the frontend online state is not updated 
+     * @param string $sessionId optional, if omitted the frontend online state is not updated
      */
     public function updateUserTracking(string $taskGuid, array $userTracking, string $sessionId = '') {
         $userTracking = array_combine(array_column($userTracking, 'userGuid'), $userTracking);

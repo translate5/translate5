@@ -161,7 +161,7 @@ class MessageBus implements MessageComponentInterface
     }
     
     /**
-     * Shortcut function to show debug data of all instances on localhost call 
+     * Shortcut function to show debug data of all instances on localhost call
      * @return \React\Http\Response
      */
     protected function debugResponse() {

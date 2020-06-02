@@ -35,7 +35,25 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     	projectCanceltButtonText:'#UT#Nein',
     	projectRemovedMessage:'#UT#Das Projekt wurde erfolgreich entfernt!'
     },
-    
+    listen: {
+        messagebus: {
+            '#translate5 task': {
+                triggerReload: 'onTriggerTaskReload'
+            }
+        }
+    },
+    onTriggerTaskReload: function(params) {
+        var store = this.getView().getStore(),
+            project;
+        if(params.taskId) {
+            project = store.getById(params.taskId);
+        }
+        else {
+            project = store.findExact('taskGuid', params.taskGuid);
+        }
+console.log('Project grid', params, project);
+        project && project.load();
+    },
     /***
      * Reload project button handler
      */
