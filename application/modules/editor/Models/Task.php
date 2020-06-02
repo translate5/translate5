@@ -941,7 +941,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function getSummary() {
-        $stmt = $this->db->getAdapter()->query('select state, count(*) taskCount, sum(wordCount) wordCountSum from LEK_task group by state');
+        $stmt = $this->db->getAdapter()->query('select taskType, state, count(*) taskCount, sum(wordCount) wordCountSum, sum(segmentCount) segmentCountSum from LEK_task group by taskType, state');
         return $stmt->fetchAll();
     }
 

@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -35,6 +35,7 @@ END LICENSE AND COPYRIGHT
  * @method void ping() ping()
  * @method void resyncDone() resyncDone(string $connectionId)
  * @method void garbageCollection() garbageCollection(array $existingSessionIds)
+ * @method void updateMetrics() updateMetrics(array $metrics)
  */
 class editor_Plugins_FrontEndMessageBus_Bus {
     const CHANNEL = 'instance';
@@ -64,9 +65,9 @@ class editor_Plugins_FrontEndMessageBus_Bus {
         }
     }
     
-    //here methods could be implemented if more logic is needed as just passing the arguments directly to the MessageBus via __call 
-    // this could be for example necessary to convert entities like editor_Models_Task to native stdClass / array data. 
-    // Since only the latter ones can be send to the MessageBus 
+    //here methods could be implemented if more logic is needed as just passing the arguments directly to the MessageBus via __call
+    // this could be for example necessary to convert entities like editor_Models_Task to native stdClass / array data.
+    // Since only the latter ones can be send to the MessageBus
     
     /**
      * By default pass all functions directly to the MessageBus
@@ -95,7 +96,7 @@ class editor_Plugins_FrontEndMessageBus_Bus {
         $http->setParameterPost('command', $command);
         $http->setParameterPost('payload', json_encode($data));
         
-        if($channel == self::CHANNEL && $command == 'garbageCollection') {
+        if($channel == self::CHANNEL && ($command == 'garbageCollection' || $command == 'updateMetrics')) {
             $http->setParameterPost('debug', ' ... to much data for debug ... ');
         }
         else {
@@ -120,7 +121,7 @@ class editor_Plugins_FrontEndMessageBus_Bus {
     
     /**
      * Parses and processes the response
-     * 
+     *
      * @param Zend_Http_Response $response
      * @return mixed
      */

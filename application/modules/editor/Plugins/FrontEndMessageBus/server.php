@@ -37,7 +37,9 @@ const SERVER_VERSION = '1.0';
 //errors should go to stderr only!
 ini_set('display_errors', "stderr");
 
+//WARNING: the next line is automatically changed on our productive server, so do not change it unless you know what you do!
 require __DIR__ . '/../../../../../vendor/autoload.php';
+
 /**
  * For development: use eclipse external tools for running / restart
  */
