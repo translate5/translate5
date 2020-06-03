@@ -86,10 +86,6 @@ Ext.define('Editor.view.admin.ExportMenu', {
           text: me.messages.exportExcel,
           handler: function() {
               task.set('state', 'ExcelExported');
-              var controller = Editor.app.getController('Editor.controller.admin.TaskOverview');
-              controller.startCheckImportStates();
-              // executes after 5 seconds:
-              Ext.defer(controller.startCheckImportStates, 5000, controller);
           }
       });
   },

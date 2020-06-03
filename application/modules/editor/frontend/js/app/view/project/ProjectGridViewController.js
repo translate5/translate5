@@ -51,7 +51,6 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
         else {
             project = store.findExact('taskGuid', params.taskGuid);
         }
-console.log('Project grid', params, project);
         project && project.load();
     },
     /***

@@ -657,7 +657,7 @@ class Task extends Channel {
     }
     
     /**
-     * FIXME replace old triggerReload method before release (also on calling places!)
+* FIXME replace old triggerReload method before release (also on calling places!)
      * Triggers a reload of the active task in the GUI
      * @param int $taskGuid
      * @param int $taskId optional, since not always given in Backend. Since the frontend uses IDs, we also should send the id here where possible, so the lookup in the GUI is faster

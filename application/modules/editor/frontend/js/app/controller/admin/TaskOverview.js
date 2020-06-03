@@ -155,9 +155,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   listen: {
       store: {
-          '#admin.Tasks': {
-              load: 'startCheckImportStates'
-          },
           '#project.Project':{
         	  load:'onProjectStoreLoad'
           }
@@ -261,58 +258,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   loadTasks: function() {
       this.getAdminTasksStore().load();
-  },
-  startCheckImportStates: function(store, records) {
-  console.log("OLD startCheckImportStates called");
-  return;
-      if(!this.checkImportStateTask) {
-          this.checkImportStateTask = {
-                  run: this.checkImportState,
-                  scope: this,
-                  interval: 10000
-          };
-      }
-      Ext.TaskManager.start(this.checkImportStateTask);
-  },
-  /**
-   * Checks if all currently loaded tasks are imported or available completly. 
-   * If there are locked tasks with a state which needs periodical reload, reload them
-   */
-  checkImportState: function(store) {
-      var me = this,
-          tasks =me.getAdminTasksStore(),
-          foundImporting = 0,
-          taskReloaded = function(rec) {
-              if(rec.isErroneous()) {
-                  Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskError, rec.get('taskName')));
-                  me.fireEvent('importStateCheckFinished',me,rec);
-                  return;
-              }
-              if(!me.isImportingCheck(rec)) {
-                  Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskImported, rec.get('taskName')));
-                  me.fireEvent('importStateCheckFinished',me,rec);
-              }
-          };
-      tasks.each(function(task){
-          if(!me.isImportingCheck(task) || task.dropped){
-              return;
-          }
-          task.load({
-              // param is needed to identify the get request as a part of the import-process.
-              params: { importStateCheck: 1 },
-              success: taskReloaded,
-              failure: function(records, op){
-                  //handle 404, so the user does not receive error messages
-                  if(op.getError().status != '404') {
-                      Editor.app.getController('ServerException').handleException(op.error.response);
-                  }
-            }
-          });
-          foundImporting++;
-      });
-      if(foundImporting == 0) {
-          Ext.TaskManager.stop(this.checkImportStateTask);
-      }
   },
   handleChangeImportFile: function(field, val){
       var name = this.getTaskAddForm().down('textfield[name=taskName]'),
@@ -680,25 +625,25 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * TODO: move this to separate project controller ?
    */
   onProjectTaskGridSelectionChange:function(grid,selection){
-	  var me=this;
-	  	  task=selection ? selection[0] : null;
-  	  if(!task){
-  		  return;
-  	  }
-  	  me.getProjectPanel().getController().redirectFocus(task,true);
+      var me = this,
+          task = selection ? selection[0] : null;
+      if(!task){
+          return;
+      }
+      me.getProjectPanel().getController().redirectFocus(task, true);
   },
   
   /**
    * On projectTask grid selection change
    */
   onProjectGridSelectionChange:function(grid,selection){
-	  var me=this;
-  	  	task=selection ? selection[0] : null;
-	  if(!task){
-		  return;
-	  }
-	  me.getProjectGrid().setLoading(true);
-	  me.getProjectPanel().getController().redirectFocus(task,false);
+      var me = this,
+      task = selection ? selection[0] : null;
+      if(!task){
+          return;
+      }
+      me.getProjectGrid().setLoading(true);
+      me.getProjectPanel().getController().redirectFocus(task,false);
   },
   
   
@@ -706,27 +651,27 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * On project store load
    */
   onProjectStoreLoad:function(store){
-	  var me=this;
-	    activeTab=me.isProjectPanelActive();
-	  	panel=me.getProjectPanel(),
-	  	vm=panel.getViewModel(),
-	    record=vm.get('projectSelection');
-	  	task=null;
-	  
-	  //if the project panel is not active, ignore the redirect,
-	  //when we redirect, the component focus is changed
-	  if(!activeTab){
-		  return;
-	  }
-	  //if selected record already exist, use it
-	  if(record){
-		  task=store.getById(record.get('id'));
-	  }
-	  //no selected record is found, use the first in the store
-	  if(!task){
-		  task=store.getAt(0);
-	  }
-	  panel.getController().redirectFocus(task,false);
+      var me = this,
+          activeTab = me.isProjectPanelActive(),
+          panel = me.getProjectPanel(),
+          vm = panel.getViewModel(),
+          record = vm.get('projectSelection'),
+          task = null;
+
+      //if the project panel is not active, ignore the redirect,
+      //when we redirect, the component focus is changed
+      if(!activeTab){
+          return;
+      }
+      //if selected record already exist, use it
+      if(record){
+          task = store.getById(record.get('id'));
+      }
+      //no selected record is found, use the first in the store
+      if(!task){
+          task = store.getAt(0);
+      }
+      panel.getController().redirectFocus(task,false);
   },
   
   /***
@@ -822,8 +767,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	      actionIdx = ((f && f[1]) ? f[1] : "not-existing"),
 	      //build camelized action out of icon css class:
 	      action = ('handle'+menuParrent+'-'+actionIdx).replace(camelRe, camelFn),
-	      right = action.replace(new RegExp('handle'+menuParrent), 'editor')+menuParrent,
-	      confirm;
+	      right = action.replace(new RegExp('handle'+menuParrent), 'editor')+menuParrent;
 	
 	  if(! me.isAllowed(right)){
 	      return;

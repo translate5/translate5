@@ -1650,7 +1650,10 @@ class editor_TaskController extends ZfExtended_RestController {
      * Search the task id position in the current filter
      */
     public function positionAction() {
-        //TODO: single sql ?
+        //FIXME
+        // Did you try that function in an environment with thousand tasks? The indexAction is very expensive, since there is done a lot of stuff. This is done right now with all tasks / projects not only with a few. Example: the indexAction with 409 tasks need 2,6 seconds in a client instance. Another client with ~720 tasks will need 5 seconds.
+        // The only way to implement this, is like similar to the segment::positionAction in a general way so that it is usable for all entities.
+        
         $this->indexAction();
         $id = (int) $this->_getParam('id');
         $index=array_search($id, array_column($this->view->rows, 'id'));

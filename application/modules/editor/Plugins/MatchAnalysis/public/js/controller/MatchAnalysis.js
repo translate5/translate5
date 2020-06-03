@@ -106,9 +106,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         },
         controller:{
         	'#admin.TaskOverview':{
-        		taskCreated:'onTaskCreated',
-                periodicalTaskReloadIgnore: 'ignoreTaskForReload',
-                importStateCheckFinished:'onImportStateCheckFinished'
+        		taskCreated:'onTaskCreated'
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -373,9 +371,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },
             scope: this,
             success: function(response){
-                var controller=Editor.app.getController('Editor.controller.admin.TaskOverview');
-                //start task state checker loop
-                controller.startCheckImportStates();
+//FIXME does the task have got the matchanalysis state in the GUI?
             }, 
             failure: function(response){
                 me.removeLoadingMask();
@@ -429,28 +425,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             return 0;
         }
         return component.checked ? 1 : 0;
-    },
-
-    /**
-     * if task must be reloaded periodically we have to return false here
-     */
-    ignoreTaskForReload: function(task) {
-        return task.get('state') !== this.TASK_STATE_ANALYSIS;
-    },
-
-    /***
-     * Import state check state finished event handler. This event is fired from Task overview controller.
-     */
-    onImportStateCheckFinished:function(taskOverview,record){
-    	var me=this,
-    		taskWindow=me.getAdminTaskPreferencesWindow(),
-    		currentTask=taskWindow.getCurrentTask();
-    	if(!taskWindow || !currentTask){
-    		return;
-    	}
-    	if(record.get('taskGuid')==currentTask.get('taskGuid')){
-    		me.removeLoadingMask(true);
-    	}
     },
     
     /***
