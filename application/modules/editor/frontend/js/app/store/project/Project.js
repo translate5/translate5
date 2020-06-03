@@ -32,6 +32,5 @@ Ext.define('Editor.store.project.Project', {
     alias: 'store.project',
     remoteSort: true,
     remoteFilter: true,
-    autoLoad: true,
     leadingBufferZone: 100
 });
