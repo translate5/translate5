@@ -48,6 +48,9 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
   }],
   listen: {
       component:{
+        '#adminMainSection':{
+            render:'showPopup'
+        },
     	'#adminTaskGrid #pageingtoolbar':{
     		render:'addButtonToTaskOverviewToolbar'
     	},
@@ -64,26 +67,23 @@ Ext.define('Editor.plugins.ChangeLog.controller.Changelog', {
       var me = this;
       me.callParent(arguments);
   },
-  addButtonToTaskOverviewToolbar:function(pageingToolbar,event){
-      var me = this,
-          changelogfilter,
-          lastSeen = Editor.data.plugins.ChangeLog.lastSeenChangelogId;
-      
-      pageingToolbar.add(['-',{
-          xtype:'button',
-          itemId:'changelogbutton',
-          text: me.btnText+Editor.data.app.version
-      }]);
-      
-      
+  showPopup: function() {
+      var lastSeen = Editor.data.plugins.ChangeLog.lastSeenChangelogId;
       // show all changelogs with id bigger than given in last seen
       // lastSeen > 0 show the bigger (newer) ones
       // lastSeen < 0 (-1) User opens the application the first time, and gets a list of all changes
       if(lastSeen !== 0){
           //when id filter is set, the highest found id is stored as last seen
-          me.loadChangelogStore(lastSeen);
+          this.loadChangelogStore(lastSeen);
       }
       //lastSeen == 0: User has already seen all available changelogs
+  },
+  addButtonToTaskOverviewToolbar:function(pageingToolbar,event){
+      pageingToolbar.add(['-',{
+          xtype:'button',
+          itemId:'changelogbutton',
+          text: this.btnText+Editor.data.app.version
+      }]);
   },
   changeLogButtonClick:function(){
       var me=this;
