@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -53,7 +53,7 @@ class Models_Installer_Standalone {
      * Increase this value to force a restart of the updater while updating
      * @var integer
      */
-    const INSTALLER_VERSION = 11;
+    const INSTALLER_VERSION = 12;
     
     /**
      * @var string
@@ -83,7 +83,7 @@ class Models_Installer_Standalone {
     /**
      * Stores the md5 hash of this file before downloading the update.
      * If the hash is changing after downloading the translate5 package this means
-     * updates in the updater itself, so that it has to be restarted! 
+     * updates in the updater itself, so that it has to be restarted!
      * @var string
      */
     protected $installerHash;
@@ -100,7 +100,7 @@ class Models_Installer_Standalone {
     protected $preconditonChecker;
     
     /**
-     * Options: 
+     * Options:
      * mysql_bin => path to mysql binary
      * @param array $options
      */
@@ -115,7 +115,7 @@ class Models_Installer_Standalone {
         $saInstaller->initApplication();
         $saInstaller->postInstallation();
         $saInstaller->checkDb();
-        $saInstaller->updateDb();
+        $saInstaller->updateDb(); //this does also cache cleaning!
         $saInstaller->done();
     }
     
@@ -200,12 +200,12 @@ class Models_Installer_Standalone {
         echo "    --help                          shows this help text\n";
         echo "    --database                      just applies all available database updates\n";
         echo "                                    Does not fetch any updates and does not apply any file change!\n";
-        echo "    --check                         shows some status information about the current installation,\n"; 
+        echo "    --check                         shows some status information about the current installation,\n";
         echo "                                    to decide if maintenance mode is needed or not\n";
-        echo "    --maintenance                   shows maintance mode status\n"; 
-        echo "    --maintenance TIME              time in format 00:00, sets start of maintenance to TODAY TIME \n"; 
-        echo "    --maintenance TIME \"message\"  optionally a message can be provided \n"; 
-        echo "    --maintenance off               disables maintenance, must be used after maintenance since\n"; 
+        echo "    --maintenance                   shows maintance mode status\n";
+        echo "    --maintenance TIME              time in format 00:00, sets start of maintenance to TODAY TIME \n";
+        echo "    --maintenance TIME \"message\"  optionally a message can be provided \n";
+        echo "    --maintenance off               disables maintenance, must be used after maintenance since\n";
         echo "                                    there is no automatic maintenance stop functionality!\n\n";
         echo "    --announceMaintenance TIME \"message\"  Sends an email to specific users (by default the admin users)\n";
         echo "                                    to announce the maintence mode at the given TIME with the additional MESSAGE.\n";
@@ -299,7 +299,7 @@ class Models_Installer_Standalone {
     }
     
     /**
-     * Our ZIP based installation and update process can't deal with file deletions, 
+     * Our ZIP based installation and update process can't deal with file deletions,
      * so this has currently to be done manually in this method.
      * See this as a workaround and not as a final solution.
      */
@@ -459,7 +459,7 @@ class Models_Installer_Standalone {
             return false;
         }
         echo $message;
-        $ret = 
+        $ret =
             $hidden
             ? exec(
                 PHP_OS === 'WINNT' || PHP_OS === 'WIN32'
@@ -629,7 +629,7 @@ class Models_Installer_Standalone {
     
     /**
      * @deprecated moved into abstract modules
-     * generates a Zend Application like environment with all needed registry entries filled  
+     * generates a Zend Application like environment with all needed registry entries filled
      */
     protected function initApplication() {
         $_SERVER['REQUEST_URI'] = '/database/forceimportall';
