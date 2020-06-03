@@ -33,6 +33,12 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
     protected $cachedUserInfo = array();
     
     /**
+     * Cached UserTracking
+     * @var array
+     */
+    protected $cachedUserTracking = [];
+    
+    /**
      * @var editor_Models_SegmentFieldManager
      */
     protected $segmentFieldManager;
@@ -166,8 +172,13 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
      */
     protected function handleUserTracking(array &$row) {
         $taskGuid = $row['taskGuid'];
-        /* @var $userTracking editor_Models_TaskUserTracking */
-        $row['userTracking'] = $this->userTracking->getByTaskGuid($taskGuid);
+        
+        if(array_key_exists($taskGuid, $this->cachedUserTracking)) {
+            $row['userTracking'] = $this->cachedUserTracking[$taskGuid];
+        }
+        else {
+            $row['userTracking'] = $this->userTracking->getByTaskGuid($taskGuid);
+        }
         
         
         if($this->task->getTaskGuid() != $taskGuid){
@@ -209,6 +220,9 @@ class Editor_Controller_Helper_TaskUserInfo extends Zend_Controller_Action_Helpe
         $userGuid = $user->data->userGuid;
         $assocs = $userAssoc->loadByTaskGuidList($taskGuids);
         $this->allAssocInfos = [];
+        
+        $this->cachedUserTracking = $this->userTracking->loadGroupedByTaskGuid($taskGuids);
+        
         foreach($assocs as $assoc) {
             if(!isset($this->allAssocInfos[$assoc['taskGuid']])) {
                 $this->allAssocInfos[$assoc['taskGuid']] = array();
