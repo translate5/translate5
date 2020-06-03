@@ -1064,8 +1064,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               me.fireEvent('taskCreated', task);
               win.setLoading(false);
               me.getAdminTasksStore().load();
-              
-              me.handleProjectAfterImport(task);
+              me.getProjectGrid().getController().reloadProjects(function(){
+              	  me.handleProjectAfterImport(task);
+              });
               
               //set the store reference to the model(it is missing), it is used later when the task is deleted
               task.store=me.getAdminTasksStore();

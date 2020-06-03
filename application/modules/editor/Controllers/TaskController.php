@@ -1666,9 +1666,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->handleProjectRequest();
         $this->loadAll();
         $id = (int) $this->_getParam('id');
-        $index=array_search($id, array_column($this->view->rows, 'id'));
-        if($index===false){
-            $index=-1;
+        $index = false;
+        if(!empty($this->view->rows)) {
+            $index = array_search($id, array_column($this->view->rows, 'id'));
+        }
+        if($index === false){
+            $index = -1;
         }
         $this->view->index = $index;
         unset($this->view->rows);
