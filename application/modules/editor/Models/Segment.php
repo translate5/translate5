@@ -455,7 +455,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function stripTags($segmentContent) {
         $segmentContent = $this->trackChangesTagHelper->removeTrackChanges($segmentContent);
-        return strip_tags(preg_replace('#<span[^>]*>[^<]*<\/span>#','',$segmentContent));
+        $segmentContent = $this->tagHelper->restore($segmentContent, true);
+        return strip_tags(preg_replace('#<span[^>]*>[^<]*<\/span>#', '', $segmentContent));
     }
     
     /**
