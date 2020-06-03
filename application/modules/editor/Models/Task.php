@@ -810,8 +810,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'lockingUser' => NULL
         ];
         $where = array('taskGuid = ?'=>$this->getTaskGuid());
+        $success = $this->db->update($data, $where) !== 0;
         //check how many rows are updated
-        return $this->db->update($data, $where) !== 0;
+        //since the task is also unlocked here, we have to fire the according event too!
+        $this->events->trigger('unlock', $this, [
+            'task' => $this,
+            'success' => $success,
+        ]);
+        return $success;
     }
 
     /**
