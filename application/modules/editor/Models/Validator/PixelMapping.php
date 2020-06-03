@@ -42,8 +42,10 @@ class editor_Models_Validator_PixelMapping extends ZfExtended_Models_Validator_A
     protected function defineValidators() {
         // `id` int(11) AUTO_INCREMENT,
         $this->addValidator('id', 'int');
-        // `customerId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_customer',
-        $this->addValidator('customerId', 'int');
+        // `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
+        $this->addValidator('taskGuid', 'guid');
+        // `fileId` int (11) NULL DEFAULT NULL COMMENT 'Foreign Key to LEK_files',
+        $this->addValidator('fileId', 'int');
         // `font` VARCHAR (255) NOT NULL,
         $this->addValidator('font', 'stringLength', array('min' => 0, 'max' => 255));
         // `fontsize` int (3) NOT NULL,

@@ -136,6 +136,11 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * @var {Object}
      */
     segmentMeta: null,
+
+    /**
+     * @var {Integer}
+     */
+    segmentFileId: null,
     
     /**
      * {Editor.view.segments.HtmlEditor}
@@ -258,6 +263,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         var me = this;
         me.segmentRecord = record;
         me.segmentMeta = record.get('metaCache');
+        me.segmentFileId = record.get('fileId');
     },    
 
     /**
@@ -267,6 +273,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         var me = this;
         me.segmentRecord = null;
         me.segmentMeta = null;
+        me.segmentFileId = null;
     },
 
     /**
@@ -335,7 +342,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         }
         
         editorBody = me.editor.getEditorBody();
-        allLines = me.getLinesAndLength(editorBody.innerHTML, me.segmentMeta);
+        allLines = me.getLinesAndLength(editorBody.innerHTML, me.segmentMeta, me.segmentFileId);
         
         if (allLines.length >= (me.segmentMeta.maxNumberOfLines)) {
             // Don't add further line-breaks when maxNumberOfLines has been reached already.
@@ -388,14 +395,14 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         wordsInLine = textInLine.split(/(\s+)/);
         for (i = 0; i < wordsInLine.length; i++) {
             textToCheck += wordsInLine[i];
-            textToCheckWidth = me.editor.getLength(textToCheck, me.segmentMeta);
+            textToCheckWidth = me.editor.getLength(textToCheck, me.segmentMeta, me.segmentFileId);
             if (textToCheckWidth <= maxWidthPerLine) {
                 textForLine = textToCheck;
             } else {
                 if (!textForLine.replace(/\s/g, '').length) {
                     textForLine = textInLine;
                 }
-                if(me.editor.getLength(textForLine, me.segmentMeta) > maxWidthPerLine) {
+                if(me.editor.getLength(textForLine, me.segmentMeta, me.segmentFileId) > maxWidthPerLine) {
                     // eg if the single word in the line is too long
                     return;
                 }
@@ -621,9 +628,10 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * Returns the lines (= objects with their text and length) for the given content and meta.
      * @param {String} htmlToCheck
      * @param {Object} meta
+     * @param {Integer} fileId
      * @Returns {Array}
      */
-    getLinesAndLength: function (htmlToCheck, meta) {
+    getLinesAndLength: function (htmlToCheck, meta, fileId) {
         var me = this,
             rangeWrapper,
             linebreakNodes,
@@ -641,7 +649,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         if (linebreakNodes.length === 0) {
             // = one single line only
             textInLine = range.toHtml();
-            lineWidth = me.editor.getLength(textInLine, meta);
+            lineWidth = me.editor.getLength(textInLine, meta, fileId);
             lines.push({textInLine:textInLine, lineWidth:lineWidth});
         } else {
             for (i = 0; i <= linebreakNodes.length; i++) {
@@ -661,7 +669,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                     range.setEndBefore(linebreakNodes[i]);
                 } 
                 textInLine = range.toHtml();
-                lineWidth = me.editor.getLength(textInLine, meta);
+                lineWidth = me.editor.getLength(textInLine, meta, fileId);
                 lines.push({textInLine:textInLine, lineWidth:lineWidth});
             }
         }

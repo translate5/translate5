@@ -547,8 +547,11 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
             }
         });
     },
-    onTriggerTaskReload: function() {
-        Editor.data.task && Editor.data.task.load();
+    onTriggerTaskReload: function(data) {
+        //reloads the currently opened task
+        if(Editor.data.task && Editor.data.task.get('taskGuid') == data.taskGuid) {
+            Editor.data.task.load();
+        }
     },
     onTriggerReload: function() {
         //idea is to reload the store given as storeid, and optionally reload only one record of the store, given by id as optional second parameter.

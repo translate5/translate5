@@ -42,7 +42,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
   stateId: 'adminTaskGrid',
   stateful:true,
   cls: 'adminTaskGrid',
-  title: '#UT#Aufgabenübersicht',
+  title: '#UT#Aufgaben',
   helpSection: 'taskoverview',
   glyph: 'xf03a@FontAwesome',
   plugins: ['gridfilters'],
@@ -53,9 +53,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
       // sorted by appearance
       workflow: '#UT#Workflow',
       taskActions: '#UT#Aktionen',
-      state: '#UT#Aufgabenstatus',
+      state: '#UT#Status (Aufgbe)',
       customerId: '#UT#Endkunde',
-      taskName: '#UT#Aufgabenname',
+      taskName: '#UT#Name',
       taskNr: '#UT#Auftragsnr.',
       wordCount: '#UT#Wörter',
       wordCountTT: '#UT#Anzahl Wörter',
@@ -103,8 +103,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       lockedBy: '#UT#Bearbeitet und Gesperrt durch {0}',
       lockedMultiUser: '#UT#In Bearbeitung durch:',
       lockedSystem: '#UT#Durch das System gesperrt mit dem Status \'{0}\'',
-      addTask: '#UT#Aufgabe hinzufügen',
-      addTaskTip: '#UT#Eine neue Aufgabe hinzufügen.',
+      addProject:'#UT#Projekt hinzufügen',
+      addProjectTip:'#UT#Neues Projekt hinzufügen',
       exportMetaDataBtn: '#UT#Meta-Daten exportieren',
       exportMetaDataBtnTip: '#UT#Meta-Daten für alle gefilterten Aufgaben exportieren.',
       showKPIBtn: '#UT#Auswertungen anzeigen',
@@ -129,6 +129,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
       forMe: '#UT#für mich '
   },
   store: 'admin.Tasks',
+  
+  visibleColumns:[],//The configured columns will be visible by default (use itemId or stateId to define the visible column)
+  
   viewConfig: {
       /**
        * returns a specific row css class
@@ -157,7 +160,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               res.push('locked');
           }
           if(task.isErroneous()) {
-              if(Editor.data.import.createArchivZip && user.isAllowed('downloadImportArchive', task)){
+              if(user.isAllowed('downloadImportArchive', task)){
                   res.push('downloadable');
               }
               res.push('error');
@@ -290,17 +293,18 @@ Ext.define('Editor.view.admin.TaskGrid', {
     me.userStore = Ext.getStore('admin.Users');
     me.callParent(arguments);
     actions = me.down('taskActionColumn');
+
+    me.availableActions = [];
     if(actions && actions.items.length > 0) {
-        me.availableActions = Ext.Array.map(actions.items, function(item) {
-            return item.isAllowedFor;
-        });
-    }
-    else {
-        me.availableActions = [];
+    	Ext.Array.each(actions.items, function(item) {
+			me.availableActions=Ext.Array.push(me.availableActions,item.isAllowedFor);
+    	});
     }
     this.view.on('afterrender', function(){
         me.tooltip = me.createToolTip();
     });
+    
+    me.setVisibleColumns();
   },
   initConfig: function(instanceConfig) {
       var me = this,
@@ -691,33 +695,31 @@ Ext.define('Editor.view.admin.TaskGrid', {
               dock: 'top',
               items: [{
                   xtype: 'button',
-                  iconCls: 'ico-refresh',
+                  glyph: 'f2f1@FontAwesome5FreeSolid',
                   itemId: 'reload-task-btn',
                   text: me.strings.reloadBtn,
                   tooltip: me.strings.reloadBtnTip
               },{
                   xtype: 'button',
-                  iconCls: 'ico-task-add',
-                  itemId: 'add-task-btn',
-                  text: me.strings.addTask,
+                  glyph: 'f067@FontAwesome5FreeSolid',
+                  itemId: 'add-project-btn',
+                  text: me.strings.addProject,
                   hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),
-                  tooltip: me.strings.addTaskTip
+                  tooltip: me.strings.addProjectTip
               },{
 	  			  xtype:'button',
 	  			  itemId:'addAdvanceFilterBtn',
-				  iconCls : 'ico-add-filter',
+	  			  glyph: 'f0b0@FontAwesome5FreeSolid',
 				  text:me.strings.addFilterText,
 				  tooltip:me.strings.addFilterText
               },{
                   xtype: 'button',
-                  iconCls: 'ico-export',
-                  itemId: 'export-meta-data-btn',
+                  glyph: 'f56e@FontAwesome5FreeSolid',
                   text: me.strings.exportMetaDataBtn,
                   tooltip: me.strings.exportMetaDataBtnTip
               },{
                   xtype: 'button',
-                  iconCls: 'ico-kpi',
-                  itemId: 'show-kpi-btn',
+                  glyph: 'f46d@FontAwesome5FreeSolid',
                   text: me.strings.showKPIBtn,
                   tooltip: me.strings.showKPIBtnTip
               }]
@@ -747,7 +749,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 filter: {
                     type: 'numeric'
                 },
-                text: 'id'
+                text: 'id',
+                text: me.text_cols.id
             },{
                 xtype: 'gridcolumn',
                 width: 140,
@@ -772,10 +775,32 @@ Ext.define('Editor.view.admin.TaskGrid', {
             });
         }
         if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
+        	config=me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
   },
+  
+  /***
+   * Set the configured visible columns
+   */
+  setVisibleColumns:function(){
+  	var me=this,
+		cols = me.getColumns(),
+		colIndex=null;
+	
+  	if(me.visibleColumns.length==0){
+  		return;
+  	}
+  	
+	Ext.each(cols, function(col) {
+		colIndex=col.dataIndex ? col.dataIndex : col.stateId;
+		if(!colIndex){
+			return true;
+		}
+		col.setVisible(Ext.Array.contains(me.visibleColumns, colIndex));
+	});
+  },
+  
   /**
    * prepares (merges) the states, and cache it internally
    * @param wfMeta
@@ -818,8 +843,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
       });
   },
   onDestroy: function() {
-      this.tooltip.destroy();
-      this.callParent(arguments);
+  	if(this.tooltip){
+  		this.tooltip.destroy();
+	}
+	this.callParent(arguments);
   },
   
   /***

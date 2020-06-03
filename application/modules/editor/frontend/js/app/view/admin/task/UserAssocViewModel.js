@@ -33,6 +33,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
        'Ext.data.Store',
        'Editor.model.admin.User'
     ],
+    
     stores: {
         users: {
             model: 'Editor.model.admin.User',
@@ -44,6 +45,48 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
         },
         roles: {
             data: '{rolesData}'
+        },
+        userAssoc:{
+        	  model:'Editor.model.admin.TaskUserAssoc',
+	 		  remoteFilter: true,
+	 		  pageSize: false,
+			  setFilters:function(filters){
+				//the binding is triggered wiht empty values to, we do not want to filter for empty taskGuid
+				if(filters && !filters.value){
+					filters=[];
+				}
+				this.superclass.superclass.setFilters.apply(this, [filters]);
+			  },
+	 		  filters:{
+	 			  property: 'taskGuid',
+	 			  operator:"eq",
+	 			  value:'{projectTaskSelection.taskGuid}'
+	 		  }
+        }
+    },
+    
+    formulas: {
+    	statesData: {
+            get: function (get) {
+            	var task=get('currentTask'),
+                	states = [],
+                	metaData = task ? task.getWorkflowMetaData() : [];
+	            Ext.Object.each(metaData.states, function(key, state) {
+	                states.push({id: key, text: state});
+	            });
+                return states;
+            }
+        },
+        rolesData: {
+            get: function (get) {
+            	var task=get('currentTask'),
+            		roles = [],
+                	metaData = task ? task.getWorkflowMetaData() : [];
+            	Ext.Object.each(metaData.editableRoles, function(key, role) {
+                    roles.push({id: key, text: role});
+                });
+                return roles;
+            }
         }
     }
 });

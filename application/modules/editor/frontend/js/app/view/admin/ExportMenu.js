@@ -59,7 +59,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
     }
     
     //add download archive link if allowed
-    if(Editor.data.import.createArchivZip && Editor.app.authenticatedUser.isAllowed('downloadImportArchive', this.initialConfig.task)) {
+    if(Editor.app.authenticatedUser.isAllowed('downloadImportArchive', this.initialConfig.task)) {
         me.items.length == 0 || me.items.push("-");
         me.items.push({
             itemId: 'exportItemImportArchive',
@@ -86,10 +86,6 @@ Ext.define('Editor.view.admin.ExportMenu', {
           text: me.messages.exportExcel,
           handler: function() {
               task.set('state', 'ExcelExported');
-              var controller = Editor.app.getController('Editor.controller.admin.TaskOverview');
-              controller.startCheckImportStates();
-              // executes after 5 seconds:
-              Ext.defer(controller.startCheckImportStates, 5000, controller);
           }
       });
   },

@@ -40,7 +40,7 @@ Ext.define('Editor.view.admin.user.Grid', {
   stateId: 'adminUserGrid',
   stateful: true,
   cls: 'adminUserGrid',
-  title: '#UT#Benutzerverwaltung',
+  title: '#UT#Benutzer',
   helpSection: 'useroverview',
   glyph: 'xf0c0@FontAwesome',
   height: '100%',
@@ -225,13 +225,13 @@ Ext.define('Editor.view.admin.user.Grid', {
           dock: 'top',
           items: [{
               xtype: 'button',
-              iconCls: 'ico-refresh',
+              glyph: 'f2f1@FontAwesome5FreeSolid',
               itemId: 'reload-user-btn',
               text: me.strings.reloadBtn,
               tooltip: me.strings.reloadBtnTip
           },{
               xtype: 'button',
-              iconCls: 'ico-user-add',
+              glyph: 'f234@FontAwesome5FreeSolid',
               itemId: 'add-user-btn',
               text: me.strings.addUser,
               hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddUser'), 
