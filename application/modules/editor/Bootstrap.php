@@ -205,15 +205,6 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'userlist'
         ]));
         
-        $this->front->getRouter()->addRoute('editorDeleteProject', new ZfExtended_Controller_RestLikeRoute(
-            'editor/task/deleteproject',
-            array(
-                'module' => 'editor',
-                'controller' => 'task',
-                'action' => 'deleteproject'
-            )
-        ));
-        
         $this->front->getRouter()->addRoute('editorTaskPosition', new ZfExtended_Controller_RestLikeRoute(
             'editor/task/:id/position',
             array(
