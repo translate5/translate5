@@ -87,6 +87,11 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },
     
     listen:{
+        messagebus: {
+            '#translate5 task': {
+                triggerReload: 'onTriggerTaskReload'
+            }
+        },
         component:{
             '#adminTaskPreferencesWindow tabpanel':{
                 render:'onTaskPreferencesWindowPanelRender'
@@ -317,6 +322,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         var taskAssoc=Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc');
 	    //load the task assoc store
 	    taskAssoc.handleLoadPreferences(taskAssoc,task);
+	    
     },
     
     /***
@@ -348,13 +354,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      *    'pretranslation' -> runs match analysis with pretranslation
      */
     startAnalysis:function(taskId,operation){
-    	//'editor/:entity/:id/operation/:operation',
-        var me=this,
-        	store=Ext.StoreManager.get('admin.Tasks'),
-        	record=store ? store.getById(taskId) : null;
+        //'editor/:entity/:id/operation/:operation',
+        var me = this,
+            store = Ext.StoreManager.get('admin.Tasks'),
+            record = store ? store.getById(taskId) : null;
         
         if(record){
-        	record.set('state','matchanalysis');
+            record.set('state','matchanalysis');
         }
         
         me.addLoadingMask();
@@ -370,14 +376,24 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0
             },
             scope: this,
-            success: function(response){
-//FIXME does the task have got the matchanalysis state in the GUI?
-            }, 
             failure: function(response){
                 me.removeLoadingMask();
             	Editor.app.getController('ServerException').handleException(response);
             }
         })
+    },
+    
+    /**
+     * Would be better in the ViewController, but here are all the masking functions.
+     * Should be moved in the future. 
+     */
+    onTriggerTaskReload: function(data) {
+        var me = this, 
+            assocPanel = me.getLanguageResourceTaskAssocPanel(),
+            loadedTask = assocPanel && assocPanel.lookupViewModel().get('currentTask');
+        if(loadedTask && loadedTask.get('taskGuid') == data.taskGuid) {
+            me.removeLoadingMask();
+        }
     },
 
     /***
