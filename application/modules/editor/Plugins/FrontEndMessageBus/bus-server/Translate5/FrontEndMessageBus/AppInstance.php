@@ -84,7 +84,7 @@ class AppInstance {
     
     /**
      * Contains the metrics of the current instance
-     * @var unknown
+     * @var array
      */
     protected $metrics;
     
