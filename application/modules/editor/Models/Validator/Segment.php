@@ -198,7 +198,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           $errorsMaxWidth = [];
           $errorsMinWidth = [];
           foreach ($allLines as $key => $line) {
-              $length = (int)$this->entity->textLengthByMeta($line, $this->entity->meta());
+              $length = (int)$this->entity->textLengthByMeta($line, $this->entity->meta(), $this->entity->getFileId());
               if ($checkMaxWidth && $length > $meta['maxWidth']) {
                   $errorsMaxWidth[] = ($key+1) . ': ' . $length;
               }
@@ -246,7 +246,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           }
           if($id == $this->entity->getId()) {
               //if the found sibling is the segment itself, use the length of the value to be stored
-              $length += (int)$this->entity->textLengthByMeta($value, $this->entity->meta());
+              $length += (int)$this->entity->textLengthByMeta($value, $this->entity->meta(), $this->entity->getFileId());
               //normally, the length of one segment contains also the additionalMrkLength, 
               //for the current segment this is added below, the siblings in the next line contain their additionalMrk data already
           }
