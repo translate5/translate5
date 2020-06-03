@@ -55,19 +55,38 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
      * @return boolean
      */
     public function handleOnPretranslationOperation(Zend_EventManager_Event $event){
-        $task = $event->getParam('entity');
-        /* @var $task editor_Models_Task*/
+        $model = $event->getParam('entity');
+        /* @var $model editor_Models_Task*/
         
+        $tasks=[$model];
+        if($model->isProject()){
+            $taskModel=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $taskModel editor_Models_Task */
+            $tasks=$taskModel->loadProjectTasks($model->getProjectId(),true);
+        }
+        
+        foreach ($tasks as $task){
+            $this->queueWorker(is_array($task) ? $task['taskGuid'] : $task->getTaskGuid());
+        }
+    }
+    
+    /***
+     * Queue ModelFront worker for given $taskGuid
+     * 
+     * @param string $taskGuid
+     * @return boolean
+     */
+    protected function queueWorker(string $taskGuid){
         $worker = ZfExtended_Factory::get('editor_Plugins_ModelFront_Worker');
         /* @var $worker editor_Plugins_ModelFront_Worker */
         // init worker and queue it
-        if (!$worker->init($task->getTaskGuid(), [])) {
+        if (!$worker->init($taskGuid, [])) {
             error_log('ModelFront-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
         $parent=ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $parent ZfExtended_Models_Worker */
-        $result=$parent->loadByState("editor_Models_Import_Worker", ZfExtended_Models_Worker::STATE_PREPARE,$task->getTaskGuid());
+        $result=$parent->loadByState("editor_Plugins_MatchAnalysis_Worker", ZfExtended_Models_Worker::STATE_PREPARE,$taskGuid);
         $parentWorkerId=null;
         if(!empty($result)){
             $parentWorkerId=$result[0]['id'];
