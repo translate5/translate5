@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -34,15 +34,15 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * TaskUserTracking Object Instance as needed in the application.
- * 
+ *
  * The TaskController invokes the tracking everytime a task is opened,
  * no matter if the workflow-users of the task are to be anonymized or not.
  * Hence, the anonymizing of a task can be switched on and off at any time.
- * 
+ *
  * However, there might correctly not exist any data for a user of a task; e.g.
  * - if a task has been imported and opened before TaskUserTracking has been implemented
  * - if a user is assigned to a task, but has never opened the task so far
- * 
+ *
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
  * @method string getTaskGuid() getTaskGuid()
@@ -59,7 +59,7 @@ END LICENSE AND COPYRIGHT
  * @method void setUserName() setUserName(string $guid)
  * @method string getRole() getRole()
  * @method void setRole() setRole(string $guid)
- * 
+ *
  */
 class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TaskUserTracking';
@@ -115,6 +115,25 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * gets all TaskUserTracking-data for the given taskGuid
+     * @param array $taskGuidList
+     * @return array
+     */
+    public function loadGroupedByTaskGuid(array $taskGuidList) {
+        try {
+            $result = array_fill_keys($taskGuidList, []);
+            $s = $this->db->select()->where('taskGuid in (?)', $taskGuidList);
+            $res = $this->db->fetchAll($s)->toArray();
+            foreach($res as $row) {
+                $result[$row['taskGuid']][] = $row;
+            }
+            return $result;
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+    
+    /**
      * returns the taskOpenerNumber of the currently loaded entry or null (we might not have a TaskUserTracking-entry loaded; that's ok).
      * @return NULL|number
      */
@@ -153,12 +172,12 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
         $userName = $user->getUserName();
         // TODO: is this SQL-statement safe regarding  race conditions? (see https://stackoverflow.com/a/5360154)
         $sql= 'INSERT INTO LEK_taskUserTracking (`taskGuid`, `userGuid`, `taskOpenerNumber`, `firstName`, `surName`, `userName`, `role`)
-               VALUES (?, ?, 
-                       (SELECT coalesce(MAX(`taskOpenerNumber`), 0) FROM LEK_taskUserTracking t2 WHERE t2.taskGuid = ?) + 1, 
+               VALUES (?, ?,
+                       (SELECT coalesce(MAX(`taskOpenerNumber`), 0) FROM LEK_taskUserTracking t2 WHERE t2.taskGuid = ?) + 1,
                        ?, ?, ?, ?)
                ON DUPLICATE KEY UPDATE `firstName` = ?,`surName` = ?,`userName` = ?,`role` = ?';
         $bindings = array(
-            $taskGuid, $userGuid, $taskGuid, $firstName, $surName, $userName, $role, 
+            $taskGuid, $userGuid, $taskGuid, $firstName, $surName, $userName, $role,
             $firstName, $surName, $userName, $role
         );
         $stmt = $this->db->getAdapter()->query($sql, $bindings);
@@ -166,8 +185,8 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
         if($stmt->rowCount() > 0) {
             //we trigger the event only, if really something was changed.
             $this->events->trigger('afterUserTrackingInsert', $this, [
-                'taskGuid' => $taskGuid, 
-                'userGuid' => $userGuid, 
+                'taskGuid' => $taskGuid,
+                'userGuid' => $userGuid,
                 'role' => $role
             ]);
         }
