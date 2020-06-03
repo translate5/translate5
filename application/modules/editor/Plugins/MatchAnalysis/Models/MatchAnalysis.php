@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -28,34 +28,34 @@ END LICENSE AND COPYRIGHT
 
 /**
  * MatchAnalysis Entity Object
- * 
+ *
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
- * 
+ *
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
- * 
+ *
  * @method integer getSegmentId() getSegmentId()
  * @method void setSegmentId() setSegmentId(int $segmentId)
- * 
+ *
  * @method integer getSegmentNrInTask() getSegmentNrInTask()
  * @method void setSegmentNrInTask() setSegmentNrInTask(int $segmentNrInTask)
- * 
+ *
  * @method integer getLanguageResourceid() getLanguageResourceid()
  * @method void setLanguageResourceid() setLanguageResourceid(int $languageResourceid)
- * 
+ *
  * @method integer getMatchRate() getMatchRate()
  * @method void setMatchRate() setMatchRate(int $matchrate)
- * 
+ *
  * @method integer getWordCount() getWordCount()
  * @method void setWordCount() setWordCount(int $wordCount)
- * 
+ *
  * @method integer getAnalysisId() getAnalysisId()
  * @method void setAnalysisId() setAnalysisId(int $analysisId)
- * 
+ *
  * @method integer getInternalFuzzy() getInternalFuzzy()
  * @method void setInternalFuzzy() setInternalFuzzy(int $internalFuzzy)
- * 
+ *
  */
 class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_MatchAnalysis';
@@ -63,18 +63,18 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     
     /***
      * Match analysis groups and calculation borders
-     * 
+     *
      * 104%, 103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
-     */ 
+     */
     protected $groupBorder=['103'=>'104','102'=>'103','101'=>'102','100'=>'101','99'=>'100','89'=>'99','79'=>'89','69'=>'79','59'=>'69','50'=>'59','noMatch'=>'noMatch'];
     
     /***
      * Load the result by best match rate. The results will be grouped in the followed groups:
      * Real groups:        103%, 102%, 101%, 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
      * Group result index: 103,  102,  101,  100,  99,      89,      79,      69,      59,      noMatch
-     * 
-     * Ex: group index 99 is every matchrate between 90 and 99 
-     * 
+     *
+     * Ex: group index 99 is every matchrate between 90 and 99
+     *
      * @param string $taskGuid
      * @param bool $isExport: is the data requested for export
      * @return array
@@ -84,7 +84,11 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc=$analysisAssoc->loadNewestByTaskGuid($taskGuid);
+        if(empty($analysisAssoc)) {
+            return [];
+        }
         
+        /*
         $sqlV1='SELECT wordCount,languageResourceid,matchRate,analysisId,internalFuzzy,segmentId FROM (
                 SELECT SUM(o.wordCount) wordCount,o.languageResourceid,o.matchRate,o.analysisId,o.internalFuzzy,o.segmentId
                 FROM LEK_match_analysis o
@@ -99,29 +103,30 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 SELECT t1.*
                 FROM LEK_match_analysis AS t1
                 LEFT OUTER JOIN LEK_match_analysis AS t2
-                ON t1.segmentId = t2.segmentId 
+                ON t1.segmentId = t2.segmentId
                         AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.internalFuzzy = 0 AND t2.analysisId = ?
                 WHERE t2.segmentId IS NULL AND t1.analysisId = ? AND t1.internalFuzzy = 0
                 UNION
                 SELECT t1.*
                 FROM LEK_match_analysis AS t1
                 LEFT OUTER JOIN LEK_match_analysis AS t2
-                ON t1.segmentId = t2.segmentId 
+                ON t1.segmentId = t2.segmentId
                         AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.internalFuzzy = 1 AND t2.analysisId = ?
                 WHERE t2.segmentId IS NULL AND t1.analysisId = ? AND t1.internalFuzzy = 1
             ) bestRates GROUP BY bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate;';
+        */
         $sqlV3='SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.wordCount) wordCount  FROM (
                 SELECT t1.*
                 	FROM LEK_match_analysis AS t1
                 	LEFT OUTER JOIN LEK_match_analysis AS t2
-                	ON t1.segmentId = t2.segmentId 
+                	ON t1.segmentId = t2.segmentId
                 			AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.analysisId =?
                 	WHERE t2.segmentId IS NULL AND t1.analysisId = ?) bestRates GROUP BY bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate;';
         //$resultArray=$this->db->getAdapter()->query($sqlV2,[$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id']])->fetchAll();
         //$resultArray=$this->db->getAdapter()->query($sqlV1,[$analysisAssoc['id']])->fetchAll();
         $resultArray=$this->db->getAdapter()->query($sqlV3,[$analysisAssoc['id'],$analysisAssoc['id']])->fetchAll();
         if(empty($resultArray)){
-            return array();
+            return [];
         }
         return $this->groupByMatchrate($resultArray,$analysisAssoc);
     }
