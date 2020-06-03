@@ -60,7 +60,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     	var me=this,
     		projectTaskGrid=me.getView().up('#projectPanel').down('#projectTaskGrid');
     	me.reloadProjects().then(function(records) {
-    		projectTaskGrid & projectTaskGrid.getStore().load();
+    		projectTaskGrid && projectTaskGrid.getStore().load();
 		}, function(operation) {
 			Editor.app.getController('ServerException').handleException(operation.error.response);
 		});

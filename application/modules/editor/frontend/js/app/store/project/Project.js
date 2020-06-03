@@ -27,10 +27,11 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.store.project.Project', {
-	extend : 'Ext.data.BufferedStore',
-	model: 'Editor.model.project.Project',
-	alias: 'store.project',
-	remoteSort: true,
-	remoteFilter: true,
-	autoLoad: true
+    extend : 'Ext.data.BufferedStore',
+    model: 'Editor.model.project.Project',
+    alias: 'store.project',
+    remoteSort: true,
+    remoteFilter: true,
+    autoLoad: true,
+    leadingBufferZone: 100
 });
