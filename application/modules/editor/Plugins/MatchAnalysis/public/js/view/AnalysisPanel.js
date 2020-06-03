@@ -41,9 +41,15 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     alias : 'widget.matchAnalysisPanel',
     
     requires: [
-        'Editor.util.LanguageResources'
+        'Editor.util.LanguageResources',
+        'Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel',
+        'Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController'
     ],
-
+    controller: 'matchAnalysisPanel',
+    viewModel:{
+    	type: 'matchAnalysisPanel'
+    },
+    
     itemId:'matchAnalysisPanel',
 
     strings:{
@@ -61,13 +67,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
 	  matchRate:"#UT#Match-Rate"
     },
     
-    layout:'fit',
-    
-    taskGuid:null,
-    defaultListenerScope:true,
     listeners:{
     	activate:'onMatchAnalysisPanelActivate'
-    },    
+    }, 
+    
     initConfig: function(instanceConfig) {
         var me = this,
             columnRenderer=function(val, meta, record) {
@@ -84,14 +87,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                     itemId:'matchAnalysisGrid',
                     cls: 'matchAnalysisGrid',
                     emptyText:me.strings.noAnalysis,
-                    store : Ext.create('Editor.plugins.MatchAnalysis.store.MatchAnalysis',[{
-                    	params: {
-                    		taskGuid:instanceConfig.task.get('taskGuid')
-                    	},
-                    	callback:me.onAnalysisRecordLoad,
-                    	scope:me
-                    }
-                    ]),
+                    bind:{
+                    	store:'{analysisStore}'
+                    },
                     features: [{
                         ftype: 'summary'
                     }],
@@ -231,15 +229,11 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                             dock : 'bottom'
                         },{ 
                             xtype: 'button',
-                            iconCls:'icon-excel-export',
+                            glyph: 'f1c3@FontAwesome5FreeSolid',
                             itemId:'exportExcel',
                             text:me.strings.exportAnalysis,
                             listeners:{
-                                click:function(){
-                                    var params = {};
-                                    params["taskGuid"] = me.task.get('taskGuid');
-                                    window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
-                                }
+                                click:'onExcelExportClick'
                             }
                         }]
                     },{
@@ -264,39 +258,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                 }]
         };
         
-        me.taskGuid=instanceConfig.task.get('taskGuid');
-        
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
-    },
-    
-    /***
-     * On match analysis record is loaded in the store
-     */
-    onAnalysisRecordLoad:function(records, operation, success) {
-    	var me=this;
-    	if(!records || records.length<1){
-    		me.down('#exportExcel').setDisabled(true);
-    		return;
-    	}
-    	
-		var rec=records[0];
-		me.down('#analysisDatum').setValue(rec.get('created'));
-		me.down('#internalFuzzy').setValue(rec.get('internalFuzzy'));
-    },
-    
-    onMatchAnalysisPanelActivate:function(panel){
-    	var me=this,
-    		matchAnalysisGrid=panel.down('#matchAnalysisGrid');
-    	
-		matchAnalysisGrid.getStore().load({
-			 params: {
-                 taskGuid:me.taskGuid
-             },
-             callback:me.onAnalysisRecordLoad,
-             scope:me
-		});
-}
+    }
 });

@@ -48,8 +48,14 @@ class MessageBus implements MessageComponentInterface
      */
     protected $logger;
     
+    /**
+     * @var Metrics
+     */
+    protected $metrics;
+    
     public function __construct() {
         $this->logger = Logger::getInstance();
+        $this->metrics = new Metrics();
     }
 
     public function onOpen(ConnectionInterface $conn) {
@@ -119,6 +125,10 @@ class MessageBus implements MessageComponentInterface
      * process the given message coming from translate5 server
      */
     public function processServerRequest(ServerRequestInterface $request) {
+        $path = $request->getUri()->getPath();
+        if ($path === '/metrics') {
+            return $this->metrics();
+        }
         $body = $request->getParsedBody();
         if(empty($body)){
             return $this->debugResponse();
@@ -151,7 +161,7 @@ class MessageBus implements MessageComponentInterface
     }
     
     /**
-     * Shortcut function to show debug data of all instances on localhost call 
+     * Shortcut function to show debug data of all instances on localhost call
      * @return \React\Http\Response
      */
     protected function debugResponse() {
@@ -160,6 +170,11 @@ class MessageBus implements MessageComponentInterface
             $data['instances'][] = $instance->debug();
         }
         return new Response(200, ['Content-Type' => 'application/json'], json_encode($data));
+    }
+    
+    protected function metrics() {
+        $this->metrics->collect($this->instances);
+        return new Response(200, ['Content-Type' => 'text/plain'], $this->metrics->__toString());
     }
     
     /**

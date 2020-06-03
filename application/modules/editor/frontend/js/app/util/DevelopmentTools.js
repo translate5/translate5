@@ -58,6 +58,32 @@ Ext.define('Editor.util.DevelopmentTools', {
         if (me.USE_CONSOLE) {
             console.clear();
         }
+    },
+    statics:{
+    	/***
+    	 * print all events in the console fired from extjs component.
+    	 * The cmp is without # 
+    	 * Usage example:
+    	 * Editor.util.DevelopmentTools.captureComponentEvents('projectTaskGrid')
+    	 */
+    	captureComponentEvents:function(cmp){
+    		if(Ext.isString(cmp)){
+    			var cmp=Ext.ComponentQuery.query('#'+cmp)[0];
+    		}
+    		Ext.util.Observable.capture(cmp, function(evname) {console.log(evname, arguments);})
+    	},
+    	
+    	/***
+    	 * relese the event capture by component itemId. The itemId is without #
+    	 * Usage example:  
+    	 * releaseCapture('projectTaskGrid')
+    	 */
+    	releaseCapture:function(cmp){
+    		if(Ext.isString(cmp)){
+    			var cmp=Ext.ComponentQuery.query('#'+cmp)[0];
+    		}
+    		Ext.util.Observable.releaseCapture(cmp);
+    	}
     }
     
 });

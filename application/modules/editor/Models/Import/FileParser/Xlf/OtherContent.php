@@ -81,6 +81,11 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
     protected $task;
     
     /**
+     * @var int
+     */
+    protected $fileId;
+    
+    /**
      * @var editor_Models_Import_FileParser_XmlParser
      */
     protected $xmlparser;
@@ -96,12 +101,14 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
      * @param editor_Models_Import_FileParser_Xlf_ContentConverter $converter
      * @param editor_Models_Segment $segment
      * @param editor_Models_Task $task
+     * @param int $fileId
      */
-    public function __construct(editor_Models_Import_FileParser_Xlf_ContentConverter $converter, editor_Models_Segment $segment, editor_Models_Task $task) {
+    public function __construct(editor_Models_Import_FileParser_Xlf_ContentConverter $converter, editor_Models_Segment $segment, editor_Models_Task $task, int $fileId) {
         $this->task = $task;
         $this->contentConverter = $converter;
         $this->segmentBareInstance = $segment;
         $this->segmentMetaBareInstance = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        $this->fileId = $fileId;
     }
     
     /**
@@ -195,7 +202,7 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
      */
     public function addIgnoredSegmentLength(array $content, editor_Models_Import_FileParser_SegmentAttributes $attributes) {
         //we have to convert the ignored content to translate5 content, otherwise the length would not be correct (for example content in <ph> tags would be counted then too)
-        $contentLength = $this->segmentBareInstance->textLengthByImportattributes($this->xmlparser->join($content), $attributes, $this->task->getTaskGuid());
+        $contentLength = $this->segmentBareInstance->textLengthByImportattributes($this->xmlparser->join($content), $attributes, $this->task->getTaskGuid(), $this->fileId);
         $this->additionalUnitLength += $contentLength;
         
         //we add the additional mrk length of the ignored segment to the additionalUnitLength
@@ -261,7 +268,7 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
             }
         }
         //the other lengths are stored per affected segment (and is already added to the length stored in metaCache per segment)
-        $attributes->additionalMrkLength = $this->segmentBareInstance->textLengthByImportattributes($content, $attributes, $this->task->getTaskGuid());
+        $attributes->additionalMrkLength = $this->segmentBareInstance->textLengthByImportattributes($content, $attributes, $this->task->getTaskGuid(), $this->fileId);
     }
     
     /**
@@ -284,7 +291,7 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
         //by definition the first otherContent belongs to the whole transunit - this value is stored in each segment
         // only of preserveWhitespace is true
         if($this->preserveWhitespace && !empty($otherContent[0])) {
-            $this->additionalUnitLength += $this->segmentBareInstance->textLengthByImportattributes($this->convertText($otherContent[0]), $attributes, $this->task->getTaskGuid());
+            $this->additionalUnitLength += $this->segmentBareInstance->textLengthByImportattributes($this->convertText($otherContent[0]), $attributes, $this->task->getTaskGuid(), $this->fileId);
         }
         
         if($this->additionalUnitLength > 0) {

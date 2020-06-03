@@ -166,7 +166,7 @@ Ext.define('Editor.view.admin.log.Grid', {
                     items: [{
                         xtype: 'button',
                         itemId: 'userPrefReload',
-                        iconCls: 'ico-refresh',
+                        glyph: 'f2f1@FontAwesome5FreeSolid',
                         text: me.strings.reload,
                         handler: function() {
                             me.down('gridpanel').store.reload();
@@ -199,7 +199,7 @@ Ext.define('Editor.view.admin.log.Grid', {
                             {
                                 xtype: 'button',
                                 itemId: 'cancelBtn',
-                                iconCls : 'ico-cancel',
+                                glyph: 'f00d@FontAwesome5FreeSolid',
                                 text: me.strings.btnBack
                             }
                         ]

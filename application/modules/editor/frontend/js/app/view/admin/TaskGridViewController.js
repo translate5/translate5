@@ -34,10 +34,44 @@ Ext.define('Editor.view.admin.TaskGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.taskGrid',
     routes: {
-        'task': 'onTaskRoute'
+    	//INFO: this route will filter the task in the task grid
+    	//add another route for open task for editing
+    	'task': 'onTaskRoute',
+        'task/:id/filter': 'onTaskFilterRoute'
     },
     
-    onTaskRoute: function() {
-        Editor.app.openAdministrationSection(this.getView(), 'task');
+    listen: {
+        messagebus: {
+            '#translate5 task': {
+                triggerReload: 'onTriggerTaskReload'
+            }
+        }
+    },
+    onTriggerTaskReload: function(params) {
+        var store = this.getView().getStore(),
+            task;
+        if(params.taskId) {
+            task = store.getById(params.taskId);
+        }
+        else {
+            task = store.findExact('taskGuid', params.taskGuid);
+        }
+        task && task.load();
+    },
+    
+    onTaskRoute:function(){
+    	var me=this;
+    	Editor.app.openAdministrationSection(me.getView(), 'task');
+    },
+    
+    onTaskFilterRoute: function(id) {
+    	var me=this,
+    		route=['task',id,'filter'];
+		Editor.app.getController('admin.TaskOverview').addAdvancedFilter({
+  			property: 'id',
+    		operator:"eq",
+    		value:id
+		});
+        Editor.app.openAdministrationSection(me.getView(), route.join('/'));
     },
 });

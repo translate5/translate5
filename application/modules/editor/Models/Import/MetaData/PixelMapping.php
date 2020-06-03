@@ -40,10 +40,11 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
     const PIXEL_MAPPING_XLSX = 'pixel-mapping.xlsx';
     
     /**
-     * Highest column to get content from, see default XLSX Layout
-     * @var integer
+     * @var array
+     * The order of columns in the spreadsheet must not be changed!
+     * (Example: https://confluence.translate5.net/display/BUS/Length+Restrictions+and+Pixel-Mapping)
      */
-    const PIXEL_MAPPING_MAXCOL = 5;
+    protected $colsNamesAndOrder = ['font', 'fontsize', 'unicodeChar', 'pixelWidth'];
     
     /**
      * @var string
@@ -66,8 +67,6 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
      */
     protected $ignoredLines = [];
     
-    protected $lastCustomerId;
-    
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_MetaData_IMetaDataImporter::import()
@@ -83,23 +82,9 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
      * if exist update table LEK_pixel_mapping
      */
     public function importFromSpreadsheet() {
-        try {
-            $e = null;
-            $this->loadSpreadsheet();
-            $this->updateDb();
-            $this->logIgnoredLines();
-            return;
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            //no customer to the number found, proceed with the below Exception
-        }
-        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
-            //no customer to the number found, proceed with the below Exception
-        }
-        throw new editor_Models_Import_MetaData_Exception('E1053',[
-            'task' => $this->task,
-            'lastClientNr' => $this->lastCustomerId
-        ], $e);
+        $this->loadSpreadsheet();
+        $this->updateDb();
+        $this->logIgnoredLines();
     }
     
     /**
@@ -121,6 +106,7 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
         if (is_null($this->spreadsheet)) {
             return;
         }
+        $taskGuid = $this->task->getTaskGuid();
         $worksheet = $this->spreadsheet->getActiveSheet();
         $highestRow = $worksheet->getHighestRow();
         if ($highestRow == 1) {
@@ -130,17 +116,20 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
         /* @var $pixelMappingModel editor_Models_PixelMapping */
         for ($row = 2; $row <= $highestRow; ++$row) { // first row: headlines only
             $values = [];
+            $values['taskGuid'] = $taskGuid;
+            $values['fileId']   = null;
             $oneColWasEmpty = false;
-            for ($col = 1; $col <= self::PIXEL_MAPPING_MAXCOL; ++$col) {
-                $values[] = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
-                $oneColWasEmpty = $oneColWasEmpty || (strlen(end($values)) == 0);
+            $col = 1;
+            foreach ($this->colsNamesAndOrder as $colName) {
+                $values[$colName] = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+                $oneColWasEmpty = $oneColWasEmpty || (strlen($values[$colName]) == 0);
+                $col++;
             }
             if($oneColWasEmpty) {
                 array_unshift($values, $row);
                 $this->ignoredLines[] = join(', ', $values);
                 continue;
             }
-            $this->lastCustomerId = $values[0];
             $pixelMappingModel->insertPixelMappingRow($values);
         }
     }

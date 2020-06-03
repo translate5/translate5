@@ -41,6 +41,7 @@ Ext.define('Editor.model.LanguageResources.TaskAssoc', {
   fields: [
     {name: 'id', type: 'int'},
     {name: 'name', type: 'string'},
+    {name: 'taskGuid', type: 'string'},
     {name: 'sourceLang', type: 'string'},
     {name: 'targetLang', type: 'string'},
     {name: 'color', type: 'string'},

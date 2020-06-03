@@ -372,12 +372,12 @@ Ext.define('Editor.view.admin.user.AddWindow', {
                     xtype: 'tbfill'
                 },{
                     xtype : 'button',
-                    iconCls : instanceConfig.editMode ? 'ico-user-save' : 'ico-user-add',
+                    glyph:instanceConfig.editMode ?  'f0c7@FontAwesome5FreeSolid' :  'f234@FontAwesome5FreeSolid',
                     itemId : 'save-user-btn',
                     text : instanceConfig.editMode ? me.strings.saveBtn : me.strings.addBtn
                 }, {
                     xtype : 'button',
-                    iconCls : 'ico-cancel',
+                    glyph: 'f00d@FontAwesome5FreeSolid',
                     itemId : 'cancel-user-btn',
                     text : me.strings.cancelBtn
                 }]

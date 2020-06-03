@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.store.LanguageResources.TaskAssocStore', {
   extend : 'Ext.data.Store',
   model: 'Editor.model.LanguageResources.TaskAssoc',
-  groupField: 'serviceName',
+  groupField: 'taskGuid',
   autoLoad: false,
   pageSize: 0
 });

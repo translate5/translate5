@@ -31,11 +31,12 @@ Ext.define('Editor.view.admin.task.PreferencesWindowViewModel', {
     alias: 'viewmodel.taskpreferences',
     data: {
         userAssocDirty: false,
+        currentTask:null
     },
     formulas: {
         workflowMetadata: {
             get: function(get) {
-                return this.get('currentTask').getWorkflowMetaData();
+                return this.get('currentTask') && this.get('currentTask').getWorkflowMetaData();
             }
         }
     }

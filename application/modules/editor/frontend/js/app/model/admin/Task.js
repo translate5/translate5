@@ -263,6 +263,30 @@ Ext.define('Editor.model.admin.Task', {
   isEnded: function(){
       return this.get('state')=='end';
   },
+  /***
+   * Is the task not in importing,pending or custom state
+   * @returns {Boolean}
+   */
+  isNotImportPendingCustom:function(){
+      return !this.isImporting() && !this.isPending() && !this.isCustomState();
+  },
+
+  /***
+   * Is the task not in error,import,pending
+   * @returns {Boolean}
+   */
+  isNotErrorImportPending:function(){
+    return !this.isErroneous() && !this.isImporting() && !this.isPending();
+  },
+
+  /***
+   * Is the task not in error,import,pending and custom state
+   * @returns {Boolean}
+   */
+  isNotErrorImportPendingCustom:function(){
+      return this.isNotErrorImportPending() && !this.isCustomState();
+  },
+
   /**
    * returns the the metadata for the workflow of the task
    */

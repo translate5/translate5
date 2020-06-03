@@ -108,7 +108,13 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           },
           'adminTaskUserAssoc #cancel-assoc-btn': {
               click: me.handleCancel
-          }
+          },
+          'adminTaskUserAssoc #userSpecialPropertiesBtn':{
+        	  click:me.onUserSpecialPropertiesBtnClick
+          },
+          '#adminTaskUserAssocGrid #reload-btn': {
+              click: me.reloadTaskUserAssocGrid
+          },
       });
   },
   /**
@@ -134,7 +140,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   handleAddUser: function(btn){
       var me = this,
           assoc = me.getAdminTaskUserAssocsStore(),
-          task = me.getPrefWindow().actualTask,
+          task = me.getPrefWindow().getCurrentTask(),
           meta = task.getWorkflowMetaData(),
           role = meta.steps2roles[task.get('workflowStepName')] || Ext.Object.getKeys(meta.roles)[0],
           state = Ext.Object.getKeys(meta.states)[0],
@@ -191,7 +197,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    */
   handleDeleteConfirmClick: function(grid, toDelete, btn) {
       var me = this,
-          task = me.getPrefWindow().actualTask,
+          task = me.getPrefWindow().getCurrentTask(),
           assoc = me.getAdminTaskUserAssocsStore();
       
       Ext.Array.each(toDelete, function(toDel){
@@ -221,7 +227,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   handleSaveAssoc: function (btn) {
       var me = this,
           form = me.getUserAssocForm(),
-          task = me.getPrefWindow().actualTask,
+          task = me.getPrefWindow().getCurrentTask(),
           store = me.getUserAssocGrid().store,
           rec = form.getRecord();
       form.getForm().updateRecord(rec);
@@ -247,6 +253,21 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           }
       });
   },
+  
+  reloadTaskUserAssocGrid:function(){
+      var me = this,
+      	store = me.getUserAssocGrid().getStore();
+      store.load();
+  },
+  
+  onUserSpecialPropertiesBtnClick:function(){
+	  var me=this,
+	  	preferences=Ext.create('Editor.view.admin.task.Preferences',{
+	  		task:me.getPrefWindow().getViewModel().get('currentTask')
+	  	});
+	  preferences.show();
+  },
+  
   clearStores: function() {
       this.getAdminTaskUserAssocsStore().removeAll();
   },
@@ -260,7 +281,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   initState: function(roleCombo, newValue, oldValue) {
       var me = this,
           form = me.getUserAssocForm(),
-          task = me.getPrefWindow().actualTask,
+          task = me.getPrefWindow().getCurrentTask(),
           stateCombo = form.down('combo[name="state"]'),
           isCompetitive = task.get('usageMode') == task.USAGE_MODE_COMPETITIVE,
           newState = task.USER_STATE_OPEN,
@@ -299,11 +320,10 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
 	  	tuaUsers=[];
 	  
 	  //collect all userGuids for the current role
-      userAssocGrid.getStore().filterBy(function(rec){
+      userAssocGrid.getStore().each(function(rec){
           if(rec.get('role')==userRole){
             tuaUsers.push(rec.get('userGuid'));
           }
-        return true;
       });
       
       //filter out all current assoc users from the usersStore

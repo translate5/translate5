@@ -57,7 +57,7 @@ class AppInstance {
     protected $connectionIdMap = [];
     
     /**
-     * Contains all not yet verified connectionIds 
+     * Contains all not yet verified connectionIds
      * @var array
      */
     protected $unverifiedConnections = [];
@@ -81,6 +81,12 @@ class AppInstance {
      * @var string
      */
     protected $serverName = 'not set yet';
+    
+    /**
+     * Contains the metrics of the current instance
+     * @var array
+     */
+    protected $metrics;
     
     protected $lastAccess = null;
     
@@ -109,7 +115,7 @@ class AppInstance {
     }
     
     /**
-     * sets the instance name - to identify the instance 
+     * sets the instance name - to identify the instance
      * @param string $name
      */
     public function setInstanceName(string $name) {
@@ -141,8 +147,8 @@ class AppInstance {
     }
     
     /**
-     * Returns the user array to the given sessionId, or null if not found. 
-     * If the optional $field is given, the valueof the user array with same name is returned.   
+     * Returns the user array to the given sessionId, or null if not found.
+     * If the optional $field is given, the valueof the user array with same name is returned.
      * @param string $sessionId
      * @param string  $field optional, if given return this field of the stored user array instead the user array itself
      * @return mixed
@@ -212,7 +218,7 @@ class AppInstance {
         $this->updateLastAccess();
         //INFO: this is the handler for all messages comming from the t5 backend
         settype($msg->payload, 'array');
-        //for security reasons messages to the instance may only come from the Backend! 
+        //for security reasons messages to the instance may only come from the Backend!
         if($msg->channel !== self::CHANNEL_INSTANCE) {
             //in the backend the payload is a numerc array, which we can pass directly as parameters (as result the vars are named in the function then)
             return call_user_func_array([$this->getChannel($msg->channel), $msg->command], $msg->payload);
@@ -268,7 +274,7 @@ class AppInstance {
      * @param string $connectionId
      * @return ConnectionInterface|NULL
      */
-    public function getConnection($connectionId): ?ConnectionInterface { 
+    public function getConnection($connectionId): ?ConnectionInterface {
         return $this->connectionIdMap[$connectionId] ?? null;
     }
     
@@ -291,7 +297,7 @@ class AppInstance {
     }
     
     /************************
-     * Instance Backend Methods: 
+     * Instance Backend Methods:
      ************************/
     
     /**
@@ -336,7 +342,7 @@ class AppInstance {
             return;
         }
         
-        //we have to decouple the messageQueue from the connection and process it independantly, 
+        //we have to decouple the messageQueue from the connection and process it independantly,
         // otherwise we may stuck in an endless loop here, when the dequeued message is directly queued again in passFrontendMessage
         $queue = $conn->messageQueue;
         /* @var $queue \SplQueue */
@@ -359,7 +365,7 @@ class AppInstance {
             if($this->lastAccess - $timestamp < 10) {
                 continue;
             }
-            //if the unverifiedConnection does not resync with in 10 Seconds we assume a malicious one and we close the connection 
+            //if the unverifiedConnection does not resync with in 10 Seconds we assume a malicious one and we close the connection
             $conn = $this->connectionIdMap[$connectionId] ?? null;
             if($conn) {
                 $this->logger->warn('Connection '.$connectionId.' closed since not resynced in 10 seconds');
@@ -376,7 +382,7 @@ class AppInstance {
      */
     protected function triggerReload(string $storeId, int $recordId = null) {
         $msg = FrontendMsg::create(self::CHANNEL_INSTANCE, 'triggerReload',[
-            'storeId' => $storeId, 
+            'storeId' => $storeId,
             'recordId' => $recordId,
         ]);
         $msg->logSend();
@@ -397,10 +403,10 @@ class AppInstance {
     }
     
     public function debug(): array {
-$this->sessions = [];
         $data = [
             'instance' => $this->serverId,
             'instanceName' => $this->serverName,
+            'metrics' => $this->metrics,
             'lastAccess' => $this->lastAccess,
             'channels' => [],
             'sessions' => $this->sessions,
@@ -418,6 +424,31 @@ $this->sessions = [];
         }
         $data['connectionCount'] = count($this->connections);
         return $data;
+    }
+    
+    /**
+     * Updates the metrics from PHP backend and sets instance infos
+     * @param array $metrics
+     */
+    public function updateMetrics(array $metrics) {
+        foreach($metrics as &$metric) {
+            $metric = (object) $metric;
+            if(is_object($metric) && is_array($metric->data)) {
+                foreach($metric->data as &$data) {
+                    $info = [
+                        'serverId' => $this->serverId,
+                        'serverName' => $this->serverName,
+                    ];
+                    if(is_array($data['tags'])) {
+                        $data['tags'] = array_merge($data['tags'], $info);
+                    }
+                    else {
+                        $data['tags'] = $info;
+                    }
+                }
+            }
+        }
+        $this->metrics = $metrics;
     }
     
     public function garbageCollection(array $existingSessions) {

@@ -53,31 +53,35 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
         reload: '#UT#Aktualisieren',
         save: '#UT#Speichern',
         empty: '#UT#Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.',
-        groupHeader: '#UT#Ressource: {name}',
+        groupHeader: '#UT#Aufgabe: {[values.rows[0].data.taskName]}',
         checked: '#UT#Ressource in Aufgabe verwenden',
         name: '#UT#Name',
         segmentsUpdateable: '#UT#Segmente zurückspeichern',
         source: '#UT#Quellsprache',
-        target: '#UT#Zielsprache'
+        target: '#UT#Zielsprache',
+        serviceName: '#UT#Ressource'
     },
     padding: 0,
-    layout: 'fit',
+    layout:'fit',
     initConfig : function(instanceConfig) {
         var me = this,
         config = {
             title: me.title, //see EXT6UPD-9
             dockedItems : [],
-            items : [ {
+            items : [{
                 xtype : 'grid',
                 itemId : 'languageResourcesTaskAssocGrid',
-                store : 'Editor.store.LanguageResources.TaskAssocStore',
+            	bind:{
+            		store:'{taskAssoc}'
+    			},
                 emptyText: me.strings.empty,
                 features : [ {
                     id: 'group',
                     ftype: 'grouping',
                     groupHeaderTpl: me.strings.groupHeader,
-                    hideGroupedHeader: true,
-                    enableGroupingMenu: false
+                    hideGroupedHeader: false,
+                    enableGroupingMenu: true,
+                    groupers:[{property:'serviceName'},{property:'targetLang'}]
                 } ],
                 columns : [ {
                     xtype : 'checkcolumn',
@@ -107,6 +111,12 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     sortable : true,
                     flex : 50 / 100
                 }, {
+                	xtype : 'gridcolumn',
+                	text: me.strings.serviceName,
+                    dataIndex : 'serviceName',
+                    sortable : true,
+                    flex : 25 / 100,
+                },{
                     xtype : 'gridcolumn',
                     tooltip : me.strings.source,
                     cls : 'source-lang',
@@ -123,7 +133,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     flex : 25 / 100,
                     sortable : true
                 } ]
-            } ],// end of items
+            }],// end of items
         };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);

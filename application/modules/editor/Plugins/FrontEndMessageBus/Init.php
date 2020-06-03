@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -56,6 +56,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
         $this->eventManager->attach('editor_Models_TaskUserTracking', 'afterUserTrackingInsert', array($this, 'handleUpdateUserTracking'));
+        $this->eventManager->attach('editor_Models_Task', 'unlock', array($this, 'reloadTask'));
         $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handlePing'));
         $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleSegmentSave'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'afterGetAction', array($this, 'handleAlikeLoad'));
@@ -112,10 +113,10 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
         /* @var $view Zend_View_Interface */
-        //the configured socket server 
+        //the configured socket server
         $view->Php2JsVars()->set('plugins.FrontEndMessageBus.socketServer', $this->getConfig()->socketServer);
         
-        //a random connectionId. calculating a random value on server side is more reliable as in frontend: 
+        //a random connectionId. calculating a random value on server side is more reliable as in frontend:
         // see https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
         $view->Php2JsVars()->set('plugins.FrontEndMessageBus.connectionId', bin2hex(random_bytes(16)));
 
@@ -248,6 +249,18 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     }
     
     /**
+     * triggers a task reload in the GUI
+     * @param Zend_EventManager_Event $event
+     */
+    public function reloadTask(Zend_EventManager_Event $event) {
+        //reload the task instance in the GUI
+        $this->bus->notify(self::CHANNEL_TASK, 'triggerReloadNEW', [
+            'taskGuid' => $event->getParam('task')->getTaskGuid(),
+            'taskId' => $event->getParam('task')->getId(),
+        ]);
+    }
+    
+    /**
      * @param Zend_EventManager_Event $event
      */
     public function handleUpdateUserTracking(Zend_EventManager_Event $event) {
@@ -275,7 +288,6 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     }
     
     public function handleGarbageCollection() {
-
         $sessions = ZfExtended_Factory::get('ZfExtended_Models_Db_Session');
         /* @var $sessions ZfExtended_Models_Db_Session */
         $existingSessionIds = $sessions->fetchAll($sessions->select()->reset()->from($sessions, ['session_id']));
@@ -283,6 +295,11 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         
         //instance garbage collection
         $this->bus->garbageCollection($existingSessionIds);
+        
+        $metrics = ZfExtended_Factory::get('editor_Models_Metrics');
+        /* @var $sessions editor_Models_Metrics */
+        $metrics->collect();
+        $this->bus->updateMetrics($metrics->get());
     }
     
     /**

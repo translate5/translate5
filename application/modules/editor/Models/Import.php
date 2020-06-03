@@ -72,8 +72,7 @@ class editor_Models_Import {
         
         //pre import methods:
         try {
-            $dataProvider->setTask($this->task);
-            $dataProvider->checkAndPrepare();
+            $dataProvider->checkAndPrepare($this->task);
             $dataProvider->archiveImportedData();
             $this->importConfig->importFolder = $dataProvider->getAbsImportPath();
             
@@ -192,12 +191,7 @@ class editor_Models_Import {
         //Task based Source Editing can only be enabled if its allowed in the whole editor instance 
         $enableSourceEditing = (bool) $config->runtimeOptions->import->enableSourceEditing;
         $task->setEnableSourceEditing((int) (! empty($params->enableSourceEditing) && $enableSourceEditing));
-        
-        if(empty($params->customerId)){
-            $task->setDefaultCustomerId();
-        } else {
-            $task->setCustomerId($params->customerId);
-        }
+        $task->setCustomerId($params->customerId ?? ZfExtended_Factory::get('editor_Models_Customer')->loadByDefaultCustomer()->getId());
         
         $task->validate();
         $this->setTask($task);

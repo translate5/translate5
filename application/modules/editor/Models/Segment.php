@@ -465,12 +465,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * other than the XLF-specifications which are not relevant here!).
      * @param string $segmentContent
      * @param editor_Models_Segment_Meta $segmentMeta
+     * @param integer $segmentFileId
      * @return integer
      */
-    public function textLengthByMeta($segmentContent, editor_Models_Segment_Meta $segmentMeta) {
+    public function textLengthByMeta($segmentContent, editor_Models_Segment_Meta $segmentMeta, $segmentFileId) {
         $isPixelBased = ($segmentMeta->getSizeUnit() == editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT);
         if ($isPixelBased) {
-            return $this->textLengthByPixel($segmentContent, $segmentMeta->getTaskGuid(), $segmentMeta->getFont(), $segmentMeta->getFontSize());
+            return $this->textLengthByPixel($segmentContent, $segmentMeta->getTaskGuid(), $segmentMeta->getFont(), $segmentMeta->getFontSize(), $segmentFileId);
         }
         return $this->textLengthByChar($segmentContent);
     }
@@ -481,12 +482,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $content
      * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
      * @param string $taskGuid (other than in $segmentMeta, the $attributes don't have a taskGuid)
+     * @param int $fileId
      * @return integer
      */
-    public function textLengthByImportattributes($content, editor_Models_Import_FileParser_SegmentAttributes $attributes, $taskGuid) {
+    public function textLengthByImportattributes($content, editor_Models_Import_FileParser_SegmentAttributes $attributes, $taskGuid, $fileId) {
         $isPixelBased = ($attributes->sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT);
         if ($isPixelBased) {
-            return $this->textLengthByPixel($content, $taskGuid, $attributes->font, $attributes->fontSize);
+            return $this->textLengthByPixel($content, $taskGuid, $attributes->font, $attributes->fontSize, $fileId);
         }
         return $this->textLengthByChar($content);
     }
@@ -497,11 +499,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $taskGuid
      * @param string $font
      * @param string $fontSize
+     * @param integer $fileId
      * @return integer
      */
-    public function textLengthByPixel($segmentContent, $taskGuid, $font, $fontSize) {
+    public function textLengthByPixel($segmentContent, $taskGuid, $font, $fontSize, $fileId) {
         $pixelLength = $this->getPixelLength($taskGuid); // make sure that the pixelLength we use is that for the segment's task!
-        return $pixelLength->textLengthByPixel($segmentContent, $font, intval($fontSize));
+        return $pixelLength->textLengthByPixel($segmentContent, $font, intval($fontSize), $fileId);
     }
     
     
