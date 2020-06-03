@@ -543,6 +543,7 @@ tr.customState td div {font-style: italic;}
 /* Task Grid Actions */
 /* Icons */
 .ico-task-menu:before {font-family: FontAwesome5FreeSolid;content: "\f0c9";}
+.ico-task-edit:before {font-family: FontAwesome5FreeSolid;content: "\f044";}
 .ico-task-project:before {font-family: FontAwesome5FreeSolid;content: "\f35d";}
 .ico-project-menu:before {font-family: FontAwesome;content: "\f0c9";}
 

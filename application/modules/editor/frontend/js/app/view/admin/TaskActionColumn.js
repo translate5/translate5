@@ -39,7 +39,8 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
       projectOverview:'#UT#zum Projekt springen',
       taskOverview:'#UT#zur Aufgabe springen',
       taskActionMenu:'#UT#Aufgabenmenü anzeigen',
-      projectActionMenu:'#UT#Projektmenü anzeigen'
+      projectActionMenu:'#UT#Projektmenü anzeigen',
+      actionEdit: '#UT# Aufgabe bearbeiten'
   },
   
   /**
@@ -57,16 +58,29 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
 	        },
 	        items:[{
 	            getTip:function(v,meta,record,row,col,store,table){
-	            	var ownerGrid=table.ownerGrid.getXType();
-		        	if(ownerGrid=='projectTaskGrid' || ownerGrid=='adminTaskGrid'){
-		        		return me.messages.taskActionMenu;
-		        	}
-		        	return me.messages.projectActionMenu;
-		        },
-	            isAllowedFor: 'editorMenuTask',
-	            iconCls: 'ico-task-menu',
-	            sortIndex:1
-	        },{
+	                var ownerGrid=table.ownerGrid.getXType();
+	                if(ownerGrid=='projectTaskGrid' || ownerGrid=='adminTaskGrid'){
+		                return me.messages.taskActionMenu;
+                    }
+                    return me.messages.projectActionMenu;
+                },
+                isAllowedFor: 'editorMenuTask',
+                iconCls: 'ico-task-menu',
+                sortIndex:1
+            },{
+                tooltip: me.messages.actionEdit,
+                isDisabled: function(view, rowIndex, colIndex, item, record) {
+                    //do not show the icon for project grid
+                    if(view.grid.xtype=='projectGrid'){
+                        item.iconCls='';
+                        return true;
+                    }
+                    return false;
+                },
+                isAllowedFor: 'editorEditTask',
+                iconCls: 'ico-task-edit',
+                sortIndex:1,
+            },{
 	            getTip:function(v,meta,record,row,col,store,table){
 		        	if(table.ownerGrid.getXType()=='projectTaskGrid'){
 		        		return me.messages.taskOverview;
