@@ -786,7 +786,7 @@ class editor_TaskController extends ZfExtended_RestController {
             }
             
             //import workers can only be started for tasks
-            if(!$model->isTask()) {
+            if($model->isProject()) {
                 continue;
             }
     

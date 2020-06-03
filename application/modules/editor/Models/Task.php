@@ -914,14 +914,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function isHiddenTask() {
         return $this->getTaskType() != $this->getDefaultTasktype();
     }
-
-    /**
-     * returns true if current task is a default task or project task
-     * @return boolean
-     */
-    public function isTask(): bool {
-        return $this->getTaskType() == $this->getDefaultTasktype() || $this->getTaskType()==self::INITIAL_TASKTYPE_PROJECT_TASK;
-    }
     
     /**
      * returns true if current task is a project
