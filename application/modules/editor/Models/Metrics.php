@@ -57,8 +57,7 @@ class editor_Models_Metrics {
         $this->worker();
         $this->tasks();
         $this->jobs();
-        
-        //FIXME errorLog summary hier noch mit reinnehmen!
+        $this->eventlogs();
     }
     
     protected function jobs() {
@@ -99,6 +98,34 @@ class editor_Models_Metrics {
         }
     }
     
+    protected function eventlogs() {
+        $db = ZfExtended_Factory::get('ZfExtended_Models_Db_ErrorLog');
+        /* @var $db ZfExtended_Models_Db_ErrorLog */
+
+        $logger = Zend_Registry::get('logger');
+        /* @var $logger ZfExtended_Logger */
+        
+        $s = $db->select()
+        ->from($db, ['cnt' => 'count(*)', 'level'])
+        ->group('level');
+        
+        $res = $db->fetchAll($s);
+        if(empty($res)) {
+            return;
+        }
+        
+        $this->addMeta('event_log_count', 'Current amount of event log entries', self::TYPE_GAUGE);
+        foreach ($res as $count) {
+            $this->addMetric('event_log_count', (int) $count['cnt'], ['level' => $logger->getLevelName($count['level'])]);
+        }
+    }
+    
+    /**
+     * Adds the meta information like help and type string
+     * @param string $name
+     * @param string $help
+     * @param string $type
+     */
     protected function addMeta(string $name, string $help, string $type = self::TYPE_COUNTER) {
         // # HELP node_cpu_scaling_frequency_hertz Current scaled cpu thread frequency in hertz.
         // # TYPE node_cpu_scaling_frequency_hertz gauge
