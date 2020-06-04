@@ -711,7 +711,8 @@ Ext.define('Editor.controller.Localizer', {
             projectOverview: '<?php echo $this->translate->_('zum Projekt springen');?>',
             taskOverview: '<?php echo $this->translate->_('zur Aufgabe springen');?>',
             taskActionMenu: '<?php echo $this->translate->_('Aufgabenmenü anzeigen');?>',
-            projectActionMenu: '<?php echo $this->translate->_('Projektmenü anzeigen');?>'
+            projectActionMenu: '<?php echo $this->translate->_('Projektmenü anzeigen');?>',
+            actionEdit: '<?php echo $this->translate->_('Aufgabe bearbeiten');?>'
         }
     });
     
@@ -827,10 +828,7 @@ Ext.define('Editor.controller.Localizer', {
         title: '<?php echo $this->translate->_('Einstellungen zu Aufgabe: {currentTask.taskName}');?>',
         strings: {
             close: '<?php echo $this->translate->_('Fenster schließen');?>',
-            events: '<?php echo $this->translate->_('Ereignisse');?>',
-            notifyUsersTitle: '<?php echo $this->translate->_('Zugewiesene Benutzer benachrichtigen?');?>',
-            notifyUsersMsg: '<?php echo $this->translate->_('Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtigt werden?');?>',
-            userNotifySuccess: '<?php echo $this->translate->_('Benutzer wurden erfolgreich per E-Mail benachrichtigt');?>'
+            events: '<?php echo $this->translate->_('Ereignisse');?>'
         }
     });
     
@@ -890,7 +888,12 @@ Ext.define('Editor.controller.Localizer', {
             finishedDateLabel: '<?php echo $this->translate->_('Abgeschlossen');?>',
             deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
             deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
-            userSpecialProperties:'<?php echo $this->translate->_('Benutzer-Spezialeinstellungen');?>'
+            userSpecialProperties:'<?php echo $this->translate->_('Benutzer-Spezialeinstellungen');?>',
+            notifyUsersTitle: '<?php echo $this->translate->_('Zugewiesene Benutzer benachrichtigen?');?>',
+            notifyUsersMsg: '<?php echo $this->translate->_('Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtigt werden?');?>',
+            userNotifySuccess: '<?php echo $this->translate->_('Benutzer wurden erfolgreich per E-Mail benachrichtigt');?>',
+            notifyButtonText: '<?php echo $this->translate->_('Benutzer benachrichtigen');?>',
+            notifyButtonTooltip: '<?php echo $this->translate->_('Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen');?>'
         },
         states: {
             edit: '<?php echo $this->translate->_('in Arbeit');?>'
@@ -1373,13 +1376,13 @@ Ext.define('Editor.controller.Localizer', {
             reload: '<?php echo $this->translate->_('Aktualisieren');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
             empty: '<?php echo $this->translate->_('Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.');?>',
-            groupHeader: '<?php echo $this->translate->_('Aufgabe: {[values.rows[0].data.taskName]}');?>',
             checked: '<?php echo $this->translate->_('Ressource in Aufgabe verwenden');?>',
             name: '<?php echo $this->translate->_('Name');?>',
             segmentsUpdateable: '<?php echo $this->translate->_('Segmente zurückspeichern');?>',
             source: '<?php echo $this->translate->_('Quellsprache');?>',
             target: '<?php echo $this->translate->_('Zielsprache');?>',
-            serviceName: '<?php echo $this->translate->_('Ressource');?>'
+            serviceName: '<?php echo $this->translate->_('Ressource');?>',
+            taskGuid: '<?php echo $this->translate->_('Aufgabenname');?>'
         }
     });
     Ext.define("Editor.locale.controller.TmOverview", {
