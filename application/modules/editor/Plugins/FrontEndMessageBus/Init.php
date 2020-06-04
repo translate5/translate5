@@ -254,7 +254,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      */
     public function reloadTask(Zend_EventManager_Event $event) {
         //reload the task instance in the GUI
-        $this->bus->notify(self::CHANNEL_TASK, 'triggerReloadNEW', [
+        $this->bus->notify(self::CHANNEL_TASK, 'triggerReload', [
             'taskGuid' => $event->getParam('task')->getTaskGuid(),
             'taskId' => $event->getParam('task')->getId(),
         ]);

@@ -664,7 +664,7 @@ class Task extends Channel {
      * @param string $excludeConnection optional, a connectionid which should be ignored (mostly the initiator, since he has already the latest task). defaults to null
      * @param int $recordId
      */
-    public function triggerReloadNEW(string $taskGuid, int $taskId = 0, string $excludeConnection = null) {
+    public function triggerReload(string $taskGuid, int $taskId = 0, string $excludeConnection = null) {
         $msg = FrontendMsg::create(self::CHANNEL_NAME, 'triggerReload', [
             'taskGuid' =>  $taskGuid,
             'taskId' =>  $taskId,
