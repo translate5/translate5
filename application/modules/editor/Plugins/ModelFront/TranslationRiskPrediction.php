@@ -81,9 +81,11 @@ class editor_Plugins_ModelFront_TranslationRiskPrediction {
         $errors=[];
         //TODO: split the calculate logic so it can be called for segment set from outside
         foreach ($segments as $chunk){
+            $sourceData=$chunk['sourceEditToSort'] ?? $chunk['sourceToSort'];
+            $targetData=$chunk['targetEditToSort'] ?? $chunk['targetToSort'];
             $data=[
-                'original'=>$chunk['sourceEditToSort'],
-                'translation'=>$chunk['targetEditToSort']
+                'original'=>$sourceData,
+                'translation'=>$targetData
             ];
             
             $this->api->predictRisk($data);
