@@ -3,6 +3,30 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [5.0.0] - 2020-06-04
+###Added
+TRANSLATE-1610: Bundle tasks to projects
+  Several tasks with same content and same source language can now be bundled to projects. A completely new project overview was created therefore.
+TRANSLATE-1901: Support lines in pixel-based length check
+  If configured the width of each new-line in target content is calculated and checked separately.
+
+  
+TRANSLATE-2086: Integrate ModelFront (MT risk prediction)
+  ModelFront risk prediction for MT matches is integrated.
+TRANSLATE-2087: VisualTranslation: Highlight pre-translated segments of bad quality / missing translations
+  Highlight pre-translated segments of bad quality / missing translations in visual translation 
+TRANSLATE-1929: VisualTranslation: HTML files can import directly
+  HTML files can be used directly as import file in VisualTranslation
+
+###Changed
+TRANSLATE-2072: move character pixel definition from customer to file level
+  The definition of character pixel widths is move from customer to file level
+TRANSLATE-2084: Disable possiblity to delete tags by default
+  The possibility to save a segment with tag errors and ignore the warn message is disabled now. This can be re-enabled as described in https://jira.translate5.net/browse/TRANSLATE-2084. Whitespace tags can still be deleted. 
+TRANSLATE-2085: InstantTranslate: handling of single segments with dot
+  Translating one sentence with a trailing dot was recognized as multiple sentences instead only one.
+
+
 ## [3.4.4] - 2020-05-27
 ###Changed
 TRANSLATE-2043: Use Composer to manage all the PHP dependencies in development
