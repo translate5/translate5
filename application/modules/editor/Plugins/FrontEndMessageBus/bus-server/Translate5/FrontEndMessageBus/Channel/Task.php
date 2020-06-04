@@ -640,25 +640,6 @@ class Task extends Channel {
     
     /**
      * Triggers a reload of the active task in the GUI
-     * @param string $storeId
-     * @param string $excludeConnection optional, a connectionid which should be ignored (mostly the initiator, since he has already the latest task). defaults to null
-     * @param int $recordId
-     */
-    public function triggerReload(string $taskGuid, string $excludeConnection = null) {
-        $sessionsForTask = $this->taskToSessionMap[$taskGuid] ?? [];
-        $msg = FrontendMsg::create(self::CHANNEL_NAME, 'triggerReload');
-        $msg->logSend();
-        foreach($this->instance->getConnections() as $conn) {
-            $include = empty($excludeConnection) || $excludeConnection !== $conn->connectionId;
-            if(in_array($conn->sessionId, $sessionsForTask) && $include) {
-                $conn->send((string) $msg);
-            }
-        }
-    }
-    
-    /**
-* FIXME replace old triggerReload method before release (also on calling places!)
-     * Triggers a reload of the active task in the GUI
      * @param int $taskGuid
      * @param int $taskId optional, since not always given in Backend. Since the frontend uses IDs, we also should send the id here where possible, so the lookup in the GUI is faster
      * @param string $excludeConnection optional, a connectionid which should be ignored (mostly the initiator, since he has already the latest task). defaults to null
