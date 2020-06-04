@@ -191,6 +191,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
     initComponent:function(){
     	var me=this;
     	me.callParent();
+    	me.store.load();
     	me.configureActionColumn();
     },
     

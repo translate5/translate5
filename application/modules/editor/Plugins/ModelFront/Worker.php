@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,11 +26,37 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.project.Project', {
-    extend : 'Ext.data.BufferedStore',
-    model: 'Editor.model.project.Project',
-    alias: 'store.project',
-    remoteSort: true,
-    remoteFilter: true,
-    leadingBufferZone: 100
-});
+class editor_Plugins_ModelFront_Worker extends ZfExtended_Worker_Abstract {
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::validateParameters()
+     */
+    protected function validateParameters($parameters = array()) {
+        return true;
+    }
+    /**
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::work()
+     */
+    public function work() {
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->taskGuid);
+        
+        $logger = Zend_Registry::get('logger')->cloneMe('plugin.modelfront');
+        
+        $risk=ZfExtended_Factory::get('editor_Plugins_ModelFront_TranslationRiskPrediction',[
+            $task
+        ]);
+        /* @var $risk editor_Plugins_ModelFront_TranslationRiskPrediction */
+        try {
+            $risk->riskToMatchrate();
+        } catch (Exception $e) {
+            $logger->exception($e, [
+                'level' => $logger::LEVEL_WARN
+            ]);
+        }
+        return true;
+    }
+}

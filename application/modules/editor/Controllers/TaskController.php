@@ -91,6 +91,11 @@ class editor_TaskController extends ZfExtended_RestController {
      *  @var editor_Logger_Workflow
      */
     protected $log = false;
+    
+    /**
+     * Flag if current indexAction request should deliver tasks or projects
+     */
+    protected $projectRequest = false;
 
     public function init() {
 
@@ -237,8 +242,12 @@ class editor_TaskController extends ZfExtended_RestController {
     public function indexAction() {
         //set default sort
         $this->addDefaultSort();
-        $rows = $this->loadAllWithUserData();
-        $this->view->rows = $rows;
+        if($this->handleProjectRequest()) {
+            $this->view->rows = $this->loadAllForProjectOverview();
+        }
+        else {
+            $this->view->rows = $this->loadAllForTaskOverview();
+        }
         $this->view->total = $this->totalCount;
     }
 
@@ -293,9 +302,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * loads all tasks according to the set filters
      * @return array
      */
-    public function loadAll(){
-        
-        $this->handleProjectRequest();
+    protected function loadAll(){
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
         $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks');
         //set the default table to lek_task
@@ -316,7 +323,21 @@ class editor_TaskController extends ZfExtended_RestController {
      * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
      * set qmSubEnabled for all rows
      */
-    public function loadAllWithUserData() {
+    protected function loadAllForProjectOverview() {
+        $rows = $this->loadAll();
+        $customerData = $this->getCustomersForRendering($rows);
+        foreach ($rows as &$row) {
+            $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
+        }
+        return $rows;
+    }
+    
+    /**
+     * returns all (filtered) tasks with added user data
+     * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
+     * set qmSubEnabled for all rows
+     */
+    protected function loadAllForTaskOverview() {
         $rows = $this->loadAll();
         $taskGuids = array_map(function($item){
             return $item['taskGuid'];
@@ -779,7 +800,7 @@ class editor_TaskController extends ZfExtended_RestController {
             }
             
             //import workers can only be started for tasks
-            if(!$model->isTask()) {
+            if($model->isProject()) {
                 continue;
             }
     
@@ -1658,15 +1679,17 @@ class editor_TaskController extends ZfExtended_RestController {
      * Search the task id position in the current filter
      */
     public function positionAction() {
-        //FIXME
-        // Did you try that function in an environment with thousand tasks? The indexAction is very expensive, since there is done a lot of stuff. This is done right now with all tasks / projects not only with a few. Example: the indexAction with 409 tasks need 2,6 seconds in a client instance. Another client with ~720 tasks will need 5 seconds.
-        // The only way to implement this, is like similar to the segment::positionAction in a general way so that it is usable for all entities.
+        //TODO The optimal way to implement this, is like similar to the segment::positionAction in a general way so that it is usable for all entities.
         
-        $this->indexAction();
+        $this->handleProjectRequest();
+        $this->loadAll();
         $id = (int) $this->_getParam('id');
-        $index=array_search($id, array_column($this->view->rows, 'id'));
-        if($index===false){
-            $index=-1;
+        $index = false;
+        if(!empty($this->view->rows)) {
+            $index = array_search($id, array_column($this->view->rows, 'id'));
+        }
+        if($index === false){
+            $index = -1;
         }
         $this->view->index = $index;
         unset($this->view->rows);
@@ -1746,11 +1769,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $f->hasSort() || $f->addSort('orderdate', true);
     }
     
-    /***
+    /**
      * Handle the project/task load request.
+     * @return boolean true if loading projects, or false if tasks only
      */
-    protected function handleProjectRequest(){
-        $projectOnly=filter_var($this->getRequest()->getParam('projectsOnly',false),FILTER_VALIDATE_BOOLEAN);
+    protected function handleProjectRequest(): bool{
+        $projectOnly = (bool) $this->getRequest()->getParam('projectsOnly', false);
         $filter=$this->entity->getFilter();
         if($filter->hasFilter('projectId') && !$projectOnly){
             //filter for all tasks in the project(return also the single task projects)
@@ -1760,10 +1784,10 @@ class editor_TaskController extends ZfExtended_RestController {
                 'type' => 'notInList',
                 'comparison' => 'in'
             ]);
-            return;
+            return false;
         }
         
-        $filterValues=[editor_Models_Task::INITIAL_TASKTYPE_DEFAULT];
+        $filterValues = [editor_Models_Task::INITIAL_TASKTYPE_DEFAULT];
         
         if($projectOnly){
             $filterValues[]=editor_Models_Task::INITIAL_TASKTYPE_PROJECT;
@@ -1777,5 +1801,6 @@ class editor_TaskController extends ZfExtended_RestController {
             'type' => 'list',
             'comparison' => 'in'
         ]);
+        return $projectOnly;
     }
 }
