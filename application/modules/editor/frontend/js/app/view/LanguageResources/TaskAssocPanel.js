@@ -53,13 +53,13 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
         reload: '#UT#Aktualisieren',
         save: '#UT#Speichern',
         empty: '#UT#Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.',
-        groupHeader: '#UT#Aufgabe: {[values.rows[0].data.taskName]}',
         checked: '#UT#Ressource in Aufgabe verwenden',
         name: '#UT#Name',
         segmentsUpdateable: '#UT#Segmente zurückspeichern',
         source: '#UT#Quellsprache',
         target: '#UT#Zielsprache',
-        serviceName: '#UT#Ressource'
+        serviceName: '#UT#Ressource',
+        taskGuid:'#UT#Aufgabename'
     },
     padding: 0,
     layout:'fit',
@@ -78,7 +78,20 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                 features : [ {
                     id: 'group',
                     ftype: 'grouping',
-                    groupHeaderTpl: me.strings.groupHeader,
+                    groupHeaderTpl: Ext.create('Ext.XTemplate',
+                            '{columnName}: {[this.formatValue(values)]}',
+                            {
+                                formatValue: function(values) {
+                                    var ret=values.name;
+                                    if(values.groupField=='taskGuid'){
+                                        //when taskGuid is active as grouping, render the task name as group value
+                                        var data=values.rows && values.rows[0];
+                                        return data ? data.get('taskName') : ret;
+                                    }
+                                    return ret;
+                                }
+                            }
+                    ),
                     hideGroupedHeader: false,
                     enableGroupingMenu: true,
                     groupers:[{property:'serviceName'},{property:'targetLang'}]
@@ -93,6 +106,14 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     cls: 'taskAssocChecked',
                     width:60,
                 }, {
+                    xtype : 'gridcolumn',
+                    tooltip : me.strings.taskGuid,
+                    text : me.strings.taskGuid,
+                    dataIndex : 'taskGuid',
+                    sortable : true,
+                    hidden:true,
+                    width:60,
+                },{
                     xtype : 'checkcolumn',
                     tooltip : me.strings.segmentsUpdateable,
                     text : me.strings.segmentsUpdateable,

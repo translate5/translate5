@@ -31,6 +31,10 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
   alias: 'widget.adminTaskUserAssocGrid',
   cls: 'task-user-assoc-grid',
   itemId: 'adminTaskUserAssocGrid',
+  controller: 'adminTaskUserAssocGrid',
+  requires:[
+      'Editor.view.admin.task.UserAssocGridWindowController'
+  ],
   strings: {
       confirmDeleteTitle: '#UT#Eintrag löschen?',
       confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
@@ -47,7 +51,12 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       assignmentDateLable:'#UT#Zuweisung',
       finishedDateLabel:'#UT#Abgeschlossen',
       deadlineDateLable:'#UT#Deadline',
-      userSpecialProperties:'#UT#Benutzer-Spezialeinstellungen'
+      userSpecialProperties:'#UT#Benutzer-Spezialeinstellungen',
+      notifyUsersTitle: '#UT#Zugewiesene Benutzer benachrichtigen?',
+      notifyUsersMsg: '#UT#Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtigt werden?',
+      userNotifySuccess:'#UT#Benutzer wurden erfolgreich per E-Mail benachrichtigt',
+      notifyButtonText:'#UT#Benutzer benachrichtigen',
+      notifyButtonTooltip:'#UT#Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen',
   },
   states: {
       edit: '#UT#in Arbeit',
@@ -83,7 +92,8 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           width: 100,
           dataIndex: 'role',
           renderer: function(v,meta,rec) {
-              var vfm=rec.get('workflowMetadata'),
+              var task=me.lookupViewModel().get('currentTask'),
+                vfm=task && task.getWorkflowMetaData(),
               	role=(vfm && vfm.roles && vfm.roles[v]) || v;
               return role;
           },
@@ -97,8 +107,9 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
         	  if(me.states[v]){
         		  return me.states[v];
         	  }
-              var vfm=rec.get('workflowMetadata'),
-            	state=(vfm && vfm.mergedStates && vfm.mergedStates[v]) || v;
+        	  var task=me.lookupViewModel().get('currentTask'),
+                  vfm=task && task.getWorkflowMetaData(),
+                  state=(vfm && vfm.mergedStates && vfm.mergedStates[v]) || v;
               return state;
           },
           text: me.strings.stateCol
@@ -153,6 +164,12 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               itemId: 'userSpecialPropertiesBtn',
               glyph: 'f509@FontAwesome5FreeSolid',
               text: me.strings.userSpecialProperties
+          },'-',{
+              xtype: 'button',
+              itemId: 'notifyAssociatedUsersBtn',
+              glyph: 'f674@FontAwesome5FreeSolid',
+              text: me.strings.notifyButtonText,
+              tooltip: me.strings.notifyButtonTooltip,
           }]
         }]
     };

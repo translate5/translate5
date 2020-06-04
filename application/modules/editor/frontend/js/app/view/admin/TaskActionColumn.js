@@ -63,20 +63,22 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
 	            isAllowedFor: 'editorMenuTask',
 	            iconCls: 'ico-task-menu',
 	            sortIndex:1
-	        },{
-                tooltip: me.messages.actionEdit,
-                isDisabled: function(view, rowIndex, colIndex, item, record) {
-                    var isProjectDisabled=me.isProjectGridDisabled(view);
-                    if(isProjectDisabled){
-                        //do not show the icon for project grid
-                        item.iconCls='';
-                    }
-                    return isProjectDisabled;
-                },
-                isAllowedFor: 'editorEditTask',
-                iconCls: 'ico-task-edit',
-                sortIndex:1,
-	        },{
+	        }
+//	        ,{
+//                tooltip: me.messages.actionEdit,
+//                isDisabled: function(view, rowIndex, colIndex, item, record) {
+//                    var isProjectDisabled=me.isProjectGridDisabled(view);
+//                    if(isProjectDisabled){
+//                        //do not show the icon for project grid
+//                        item.iconCls='';
+//                    }
+//                    return isProjectDisabled;
+//                },
+//                isAllowedFor: 'editorEditTask',
+//                iconCls: 'ico-task-edit',
+//                sortIndex:1,
+//	        },
+	        ,{
 	            getTip:function(v,meta,record,row,col,store,table){
 		        	if(table.ownerGrid.getXType()=='projectTaskGrid'){
 		        		return me.messages.taskOverview;
