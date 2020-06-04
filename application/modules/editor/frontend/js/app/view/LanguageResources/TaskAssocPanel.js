@@ -87,6 +87,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     xtype : 'checkcolumn',
                     text : '',
                     tooltip : me.strings.checked,
+                    text : me.strings.checked,
                     dataIndex : 'checked',
                     sortable : true,
                     cls: 'taskAssocChecked',
@@ -94,6 +95,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                 }, {
                     xtype : 'checkcolumn',
                     tooltip : me.strings.segmentsUpdateable,
+                    text : me.strings.segmentsUpdateable,
                     cls: 'segmentsUpdateable',
                     dataIndex : 'segmentsUpdateable',
                     sortable : true,
@@ -119,6 +121,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                 },{
                     xtype : 'gridcolumn',
                     tooltip : me.strings.source,
+                    text : me.strings.source,
                     cls : 'source-lang',
                     dataIndex : 'sourceLang',
                     renderer : me.langRenderer,
@@ -127,6 +130,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                 }, {
                     xtype : 'gridcolumn',
                     tooltip : me.strings.target,
+                    text : me.strings.target,
                     cls : 'target-lang',
                     dataIndex : 'targetLang',
                     renderer : me.langRenderer,

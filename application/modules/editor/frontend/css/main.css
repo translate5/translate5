@@ -495,6 +495,8 @@ div.loading div#loading-indicator-text {
 .adminTaskGrid .x-grid-header-ct .target-lang.ux-filtered-column span,
 .adminTaskGrid .x-grid-header-ct .source-lang.ux-filtered-column span {background:url("../images/funnel-small.png") no-repeat 33px 0px;}
 
+.adminTaskGrid .x-grid-header-ct .segmentsUpdateable span.x-column-header-text-inner,
+.adminTaskGrid .x-grid-header-ct .taskAssocChecked span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .task-users span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .ref-files span.x-column-header-text-inner,
 .adminTaskGrid .x-grid-header-ct .terminologie span.x-column-header-text-inner,
@@ -543,11 +545,21 @@ tr.customState td div {font-style: italic;}
 /* Task Grid Actions */
 /* Icons */
 .ico-task-menu:before {font-family: FontAwesome5FreeSolid;content: "\f0c9";}
+.ico-task-edit:before {font-family: FontAwesome5FreeSolid;content: "\f044";}
 .ico-task-project:before {font-family: FontAwesome5FreeSolid;content: "\f35d";}
 .ico-project-menu:before {font-family: FontAwesome;content: "\f0c9";}
 
 /* Key Performance Indicators (KPI) */
 .ico-kpi {background-image: url("../images/page_gear.png");}
+
+.adminTaskGrid tr .x-action-col-icon,
+.adminTaskGrid tr.customState td .x-action-col-icon,
+.adminTaskGrid tr.error td .x-action-col-icon,
+.adminTaskGrid tr.import td .x-action-col-icon {display:none; background-repeat: no-repeat; background-position: center;}
+
+.adminTaskGrid tr.editorMenuTask .ico-task-menu {display:inline-block;}
+.adminTaskGrid tr.editorProjectTask .ico-task-project {display:inline-block;}
+.adminTaskGrid tr.editorEditTask .ico-task-edit {display:inline-block;}
 
 /* space between action icons */
 .x-action-col-icon{
@@ -764,6 +776,9 @@ a.x-btn span.task-confirmation {
 .tmOverviewPanel .x-grid-header-ct .taskList > div {background:url(../images/share.png) no-repeat 10px 9px;}
 
 .adminTaskGrid .x-grid-header-ct .taskassocs span.x-column-header-text-inner,
+
+.tmOverviewPanel .x-grid-header-ct .segmentsUpdateable span.x-column-header-text-inner,
+.tmOverviewPanel .x-grid-header-ct .taskAssocChecked span.x-column-header-text-inner,
 .tmOverviewPanel .x-grid-header-ct .source-lang span.x-column-header-text-inner,
 .tmOverviewPanel .x-grid-header-ct .target-lang span.x-column-header-text-inner,
 .tmOverviewPanel .x-grid-header-ct .taskList span.x-column-header-text-inner{
