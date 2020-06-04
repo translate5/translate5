@@ -242,12 +242,8 @@ class editor_TaskController extends ZfExtended_RestController {
     public function indexAction() {
         //set default sort
         $this->addDefaultSort();
-        if($this->handleProjectRequest()) {
-            $this->view->rows = $this->loadAll();
-        }
-        else {
-            $this->view->rows = $this->loadAllWithUserData();
-        }
+        $this->handleProjectRequest();
+        $this->view->rows = $this->loadAllWithUserData();
         $this->view->total = $this->totalCount;
     }
 
