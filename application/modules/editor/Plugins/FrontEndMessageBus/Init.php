@@ -57,7 +57,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
         $this->eventManager->attach('editor_Models_TaskUserTracking', 'afterUserTrackingInsert', array($this, 'handleUpdateUserTracking'));
         $this->eventManager->attach('editor_Models_Task', 'unlock', array($this, 'reloadTask'));
-        $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handlePing'));
+        //$this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handlePing'));
         $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleSegmentSave'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'afterGetAction', array($this, 'handleAlikeLoad'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'afterPutAction', array($this, 'handleAlikeSave'));
@@ -284,7 +284,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      */
     public function handlePing(Zend_EventManager_Event $event) {
         $this->bus->ping();
-        $this->handleGarbageCollection();
+        //$this->handleGarbageCollection();
     }
     
     public function handleGarbageCollection() {
