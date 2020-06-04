@@ -242,8 +242,12 @@ class editor_TaskController extends ZfExtended_RestController {
     public function indexAction() {
         //set default sort
         $this->addDefaultSort();
-        $this->handleProjectRequest();
-        $this->view->rows = $this->loadAllWithUserData();
+        if($this->handleProjectRequest()) {
+            $this->view->rows = $this->loadAllForProjectOverview();
+        }
+        else {
+            $this->view->rows = $this->loadAllForTaskOverview();
+        }
         $this->view->total = $this->totalCount;
     }
 
@@ -319,7 +323,21 @@ class editor_TaskController extends ZfExtended_RestController {
      * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
      * set qmSubEnabled for all rows
      */
-    protected function loadAllWithUserData() {
+    protected function loadAllForProjectOverview() {
+        $rows = $this->loadAll();
+        $customerData = $this->getCustomersForRendering($rows);
+        foreach ($rows as &$row) {
+            $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
+        }
+        return $rows;
+    }
+    
+    /**
+     * returns all (filtered) tasks with added user data
+     * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
+     * set qmSubEnabled for all rows
+     */
+    protected function loadAllForTaskOverview() {
         $rows = $this->loadAll();
         $taskGuids = array_map(function($item){
             return $item['taskGuid'];
