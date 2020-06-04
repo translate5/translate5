@@ -121,10 +121,10 @@ class Metrics {
         }
         foreach($instance['metrics'] as $key => $metric) {
             if(empty($this->metrics[$key])) {
-                $this->metrics[$key] = $metric;
+                $this->metrics[$key] = clone $metric;
             }
             else {
-                $this->metrics[$key]->data = array_merge($this->metrics[$key]->data, $metric['data']);
+                $this->metrics[$key]->data = array_merge($this->metrics[$key]->data, $metric->data);
             }
         }
     }
