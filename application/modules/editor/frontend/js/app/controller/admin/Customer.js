@@ -360,12 +360,14 @@ Ext.define('Editor.controller.admin.Customer', {
             // grids
             tasksGrid = Ext.ComponentQuery.query('#adminTaskGrid')[0],
             usersGrid = Ext.ComponentQuery.query('#adminUserGrid')[0],
-            languageResourcesGrid = Ext.ComponentQuery.query('#tmOverviewPanel')[0];
+            languageResourcesGrid = Ext.ComponentQuery.query('#tmOverviewPanel')[0],
+            projectGrid = Ext.ComponentQuery.query('#projectGrid')[0];
         me.consoleLog('=> OK, setCustomerFilterForAllGrids mit val: ' + val + ' / from: ' + from);
         me.beforeStoreFiltering();
         me.setGridFilter(tasksGrid,val);
         me.setGridFilter(usersGrid,val);
         me.setGridFilter(languageResourcesGrid,val);
+        me.setGridFilter(projectGrid,val);
         me.afterStoreFiltering();
     },
 
@@ -435,6 +437,7 @@ Ext.define('Editor.controller.admin.Customer', {
             storeId = store.getStoreId();
         switch(storeId) {
             case 'admin.Tasks':
+            case 'project.Project':
                 return 'customerId';
                 break;
             case 'admin.Users':
