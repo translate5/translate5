@@ -575,6 +575,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * reloads the Task Grid, will also be called from other controllers
    */
   handleTaskReload: function () {
+      
       this.getAdminTasksStore().load();
   },
   
@@ -676,7 +677,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   
   /***
    * Task menu item click handler. Here it will be proven if the action exist and if the user is allowed for the action.
-   * 
    */
   onTaskActionMenuClick:function(com,item,ev){
 	  var me = this,
@@ -899,13 +899,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Clones the task
    * @param {Editor.model.admin.Task} task
    */
-  editorCloneTask: function(task) {
+  editorCloneTask: function(task,event) {
+      var me=this;
       Ext.Ajax.request({
           url: Editor.data.pathToRunDir+'/editor/task/'+task.getId()+'/clone',
           method: 'post',
           scope: this,
           success: function(response){
-              this.handleTaskReload();
+              if(me.isProjectPanelActive()){
+                  me.getProjectTaskGrid().getStore().load();
+              }
+              me.handleTaskReload();
           },
           failure: function(response) {
               Editor.app.getController('ServerException').handleException(response);

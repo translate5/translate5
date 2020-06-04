@@ -26,32 +26,20 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * @class Editor.view.admin.log.GridViewController
- * @extends Ext.app.ViewController
- */
-Ext.define('Editor.view.admin.task.PreferencesWindowController', {
+Ext.define('Editor.view.admin.task.UserAssocGridWindowController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.editortaskPreferencesWindowController',
+    alias: 'controller.adminTaskUserAssocGrid',
     listen: {
         component: {
-            'adminTaskPreferencesWindow': {
-                beforeclose: 'handleClose'
+            '#notifyAssociatedUsersBtn': {
+                click: 'onNotifyAssociatedUsersBtnClick'
             }
         }
     },
-    handleClose: function() {
+    
+    onNotifyAssociatedUsersBtnClick: function() {
         var view = this.getView(),
             vm = view.lookupViewModel();
-        if(!vm.get('userAssocDirty')) {
-            return;
-        }
         Ext.Msg.show({
             title: view.strings.notifyUsersTitle,
             message: view.strings.notifyUsersMsg,
@@ -61,10 +49,11 @@ Ext.define('Editor.view.admin.task.PreferencesWindowController', {
             fn: this.notifyUsers(vm.get('currentTask'), view.strings)
         });
     },
+    
+    /***
+     * Confirm window button click handler
+     */
     notifyUsers: function(task, strings) {
-        //since when this function is called, the window is closed already, 
-        // we will not have direct access to the viewModel with the currentTask
-        // therefore we have to pass it that way
         var me = this;
         return function(btn) {
             if (btn !== 'yes') {

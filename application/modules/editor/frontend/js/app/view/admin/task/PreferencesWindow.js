@@ -30,9 +30,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.task.PreferencesWindow', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.adminTaskPreferencesWindow',
-    controller: 'editortaskPreferencesWindowController',
     requires: [
-       'Editor.view.admin.task.PreferencesWindowController',
        'Editor.view.admin.task.PreferencesWindowViewModel',
        'Editor.view.admin.task.UserAssoc',
        'Editor.view.admin.task.Preferences',
@@ -44,10 +42,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     header:false,
     strings: {
         close: '#UT#Fenster schließen',
-        events: '#UT#Ereignisse',
-        notifyUsersTitle: '#UT#Zugewiesene Benutzer benachrichtigen?',
-        notifyUsersMsg: '#UT#Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtigt werden?',
-        userNotifySuccess:'#UT#Benutzer wurden erfolgreich per E-Mail benachrichtigt'
+        events: '#UT#Ereignisse'
     },
     layout: 'fit',
     viewModel: {
