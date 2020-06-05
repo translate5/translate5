@@ -66,7 +66,13 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
     },
     
     formulas: {
-    	statesData: {
+        enablePanel:{
+            get: function (task) {
+                return task && (task.isUnconfirmed() || task.isOpen());
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
+        statesData: {
             get: function (get) {
             	var task=get('currentTask'),
                 	states = [],

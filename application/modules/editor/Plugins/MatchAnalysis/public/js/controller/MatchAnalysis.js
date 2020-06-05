@@ -183,23 +183,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		});
     	}
     	
-    	if(task && !task.isImporting()){
-        	buttons = [{
-                xtype:'button',
-                text:this.strings.analysis,
-                itemId:'btnAnalysis',
-                width:150,
-                dock:'bottom',
-                //TODO icon
-                listeners:{
-                    click:{
-                        fn:this.matchAnalysisButtonHandler,
-                        scope:this
-                    }
-                }
-            }];
-    	}
-    	
     	//the task exist->add buttons in the task assoc panel
     	panel.addDocked([{
             xtype : 'toolbar',
@@ -209,11 +192,30 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 type: 'hbox',
                 pack: 'start'
             },
-            items: buttons
+            items: [{
+                xtype:'button',
+                text:this.strings.analysis,
+                itemId:'btnAnalysis',
+                width:150,
+                dock:'bottom',
+                glyph: 'f200@FontAwesome5FreeSolid',
+                bind:{
+                    disabled:'{!enableDockedToolbar}'
+                },
+                listeners:{
+                    click:{
+                        fn:this.matchAnalysisButtonHandler,
+                        scope:this
+                    }
+                }
+            }]
         },{
             xtype : 'toolbar',
             dock : 'bottom',
             ui: 'footer',
+            bind:{
+                disabled:'{!enableDockedToolbar}'
+            },
             layout: {
                 type: 'vbox',
                 align: 'left'

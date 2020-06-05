@@ -72,7 +72,8 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                 xtype : 'grid',
                 itemId : 'languageResourcesTaskAssocGrid',
             	bind:{
-            		store:'{taskAssoc}'
+            		store:'{taskAssoc}',
+            		disabled:'{!enablePanel}'
     			},
                 emptyText: me.strings.empty,
                 features : [ {

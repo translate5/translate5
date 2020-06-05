@@ -229,6 +229,13 @@ Ext.define('Editor.model.admin.Task', {
       return this.get('state') == this.states.ERROR;
   },
   /**
+   * Is the current task state open
+   * @returns {Boolean}
+   */
+  isOpen:function(){
+      return this.get('state') == this.states.OPEN;
+  },
+  /**
    * returns if task is openable
    * @returns {Boolean}
    */
@@ -261,7 +268,7 @@ Ext.define('Editor.model.admin.Task', {
    * @returns {Boolean}
    */
   isEnded: function(){
-      return this.get('state')=='end';
+      return this.get('state')==this.states.END;
   },
   /***
    * Is the task not in importing,pending or custom state
