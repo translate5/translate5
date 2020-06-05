@@ -62,8 +62,19 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
 	  		  }  
 		}
     },
-    
     formulas:{
+        enablePanel:{
+            get: function (task) {
+                return task && (task.isUnconfirmed() || task.isOpen());
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
+        enableDockedToolbar:{
+            get: function (task) {
+                return task && (!task.isErroneous() && !task.isImporting());
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
         hasTmOrCollection:function(get){
             return this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TM)||this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TERM_COLLECTION) ;
         },
