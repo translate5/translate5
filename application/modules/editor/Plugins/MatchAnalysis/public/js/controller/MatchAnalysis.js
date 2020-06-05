@@ -172,8 +172,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
 
     onLanguageResourcesPanelRender:function(panel){
     	var me=this,
-    		task=panel.lookupViewModel().get('currentTask'),
-    		storeData=[], buttons = [];
+    		storeData=[];
     	
     	//init the pretranslate matchrate options (from 0-103)
     	for(var i=0;i<=103;i++){
@@ -183,7 +182,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		});
     	}
     	
-    	//the task exist->add buttons in the task assoc panel
     	panel.addDocked([{
             xtype : 'toolbar',
             dock : 'bottom',
@@ -200,7 +198,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 dock:'bottom',
                 glyph: 'f200@FontAwesome5FreeSolid',
                 bind:{
-                    disabled:'{!enableDockedToolbar}'
+                    disabled:'{!enableDockedToolbar}',
+                    hidden:'{isAnalysisButtonHidden}'
                 },
                 listeners:{
                     click:{
