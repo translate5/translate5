@@ -1149,6 +1149,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  	  win = me.getTaskAddWindow(),
 	  	  items=win.items.items;
 	  
+	  win.getViewModel().set('currentTask',task);
+	  //TODO: use the current task in all other cards
 	  items.forEach(function(item){
 		  item.task=task;
 	  });
