@@ -932,6 +932,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   
   /***
+   * Edit task action icon handler
+   */
+  handleTaskEdit: function(selectedTask, event) {
+      this.editorEditTask(selectedTask, event)
+  },
+  
+  /***
    * Show action menu by given menu xtype
    */
   showActionMenu:function(selectedTask,event,menuXtype){
