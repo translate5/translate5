@@ -75,7 +75,7 @@ class editor_Plugins_PangeaMt_HttpApi {
     public function getEngines() {
         $method = 'POST';
         $endpointPath = 'corp/engines';
-        if($this->PangeaMtRequest($method, $endpointPath)) {
+        if($this->pangeaMtRequest($method, $endpointPath)) {
             $this->result = $this->result->engines;
             return true;
         }
@@ -160,7 +160,7 @@ class editor_Plugins_PangeaMt_HttpApi {
      * @param array $queryParams (optional)
      * @return boolean
      */
-    protected function PangeaMtRequest($method, $endpointPath = '', $data = [], $queryParams = []) {
+    protected function pangeaMtRequest($method, $endpointPath = '', $data = [], $queryParams = []) {
         $http = $this->getHttp($method, $endpointPath);
         $http->setParameterGet($queryParams);
         $data[] = ["apikey" => $this->apiKey];
