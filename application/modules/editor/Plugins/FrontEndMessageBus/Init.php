@@ -267,6 +267,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         //reload the task instance in the GUI
         $this->bus->notify(self::CHANNEL_TASK, 'triggerReload', [
             'taskGuid' => $event->getParam('taskGuid'),
+            'taskId' => 0,
             'excludeConnection' => $this->getHeaderConnId(),
         ]);
 
