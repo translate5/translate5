@@ -30,6 +30,12 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.taskattributes',
     formulas: {
+        enablePanel:{
+            get: function (task) {
+                return task && (task.isUnconfirmed() || task.isOpen());
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
     	disableUsageMode: {
             get: function(get) {
             	var currentTask=get('currentTask');

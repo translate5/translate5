@@ -47,6 +47,9 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   },
   title: '#UT#Benutzer-Plural',
   layout:'border',
+  bind:{
+      disabled:'{!enablePanel}'
+  },
   initConfig: function(instanceConfig) {
     var me = this,
         config;

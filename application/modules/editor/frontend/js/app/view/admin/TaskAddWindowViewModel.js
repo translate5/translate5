@@ -33,7 +33,9 @@ Ext.define('Editor.view.admin.TaskAddWindowViewModel', {
     requires: [
         'Ext.app.bind.Formula'
     ],
-    
+    data:{
+        currentTask : null
+    },
     activeItem: null,
     
     formulas: {
