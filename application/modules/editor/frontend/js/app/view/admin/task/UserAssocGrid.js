@@ -41,9 +41,9 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       userGuidCol: '#UT#Benutzer',
       roleCol: '#UT#Rolle',
       stateCol: '#UT#Status',
-      addUser: '#UT#Benutzer hinzufügen',
+      addUser: '#UT#Hinzufügen',
       addUserTip: '#UT#Einen Benutzer dieser Aufgabe zuordnen.',
-      removeUser: '#UT#Benutzer entfernen',
+      removeUser: '#UT#Entfernen',
       removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
       save: '#UT#Änderungen speichern',
       reload: '#UT#Aktualisieren',
@@ -51,7 +51,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       assignmentDateLable:'#UT#Zuweisung',
       finishedDateLabel:'#UT#Abgeschlossen',
       deadlineDateLable:'#UT#Deadline',
-      userSpecialProperties:'#UT#Benutzer-Spezialeinstellungen',
+      userSpecialProperties:'#UT#Spezial',
       notifyUsersTitle: '#UT#Zugewiesene Benutzer benachrichtigen?',
       notifyUsersMsg: '#UT#Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtigt werden?',
       userNotifySuccess:'#UT#Benutzer wurden erfolgreich per E-Mail benachrichtigt',
@@ -158,18 +158,18 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               itemId: 'reload-btn',
               glyph: 'f2f1@FontAwesome5FreeSolid',
               text: me.strings.reload
-          },{
-              xtype: 'button',
-              hidden:!Editor.app.authenticatedUser.isAllowed('editorWorkflowPrefsTask'),
-              itemId: 'userSpecialPropertiesBtn',
-              glyph: 'f509@FontAwesome5FreeSolid',
-              text: me.strings.userSpecialProperties
           },'-',{
               xtype: 'button',
               itemId: 'notifyAssociatedUsersBtn',
               glyph: 'f674@FontAwesome5FreeSolid',
               text: me.strings.notifyButtonText,
               tooltip: me.strings.notifyButtonTooltip,
+          },'->',{
+              xtype: 'button',
+              hidden:!Editor.app.authenticatedUser.isAllowed('editorWorkflowPrefsTask'),
+              itemId: 'userSpecialPropertiesBtn',
+              glyph: 'f509@FontAwesome5FreeSolid',
+              text: me.strings.userSpecialProperties
           }]
         }]
     };

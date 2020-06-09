@@ -87,5 +87,12 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
             }
         }
         return hasType;
-    }
+    },
+    
+    isLoadingActive:{
+        get: function(task) {
+            return task && task.isAnalysis();
+        },
+        bind:{bindTo:'{currentTask}',deep:true}
+    },
 });

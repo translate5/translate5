@@ -104,8 +104,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
             //build camelized action out of icon css class:
             action = ('handleProject-'+actionIdx).replace(camelRe, camelFn),
             right = action.replace(/^handleProject/, 'editor')+'Project',
-            project = view.getStore().getAt(row),
-            confirm;
+            project = view.getStore().getAt(row);
 
         if(! Editor.app.authenticatedUser.isAllowed(right)){
             return;
@@ -114,7 +113,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
         if(! me[action] || ! Ext.isFunction(me[action])){
             return;
         }
-        me[action](project, ev)
+        me[action](project, ev);
     },
     
     
@@ -132,6 +131,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
             },
             success: function() {
             	me.reloadProjects();
+            	Ext.StoreManager.get('admin.Tasks').reload();
             	Editor.MessageBox.addSuccess(me.strings.projectRemovedMessage,2);
             },
             failure: function(records, op){
@@ -144,9 +144,9 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
      * Reload the project store. Return promisse after the store is loaded
      */
     reloadProjects:function(){
-    	 var store = this.getView().getStore();
+         var store = this.getView().getStore();
          return new Ext.Promise(function (resolve, reject) {
-        	 store.load({
+             store.load({
                  callback: function(records, operation, success) {
                 	 success ? resolve(records) : reject(operation); 
                  }
