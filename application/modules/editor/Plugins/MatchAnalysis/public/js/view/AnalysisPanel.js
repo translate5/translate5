@@ -70,7 +70,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     listeners:{
     	activate:'onMatchAnalysisPanelActivate'
     }, 
-    
+    bind:{
+        loading:'{isAnalysisRunning}'
+    },
     initConfig: function(instanceConfig) {
         var me = this,
             columnRenderer=function(val, meta, record) {

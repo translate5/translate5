@@ -63,6 +63,9 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
     },
     padding: 0,
     layout:'fit',
+    bind:{
+        loading:'{isLoadingActive}'
+    },
     initConfig : function(instanceConfig) {
         var me = this,
         config = {

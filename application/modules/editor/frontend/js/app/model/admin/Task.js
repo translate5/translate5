@@ -228,6 +228,11 @@ Ext.define('Editor.model.admin.Task', {
   isErroneous: function() {
       return this.get('state') == this.states.ERROR;
   },
+  
+  isAnalysis: function() {
+      return this.get('state') == 'matchanalysis';
+  },
+  
   /**
    * returns if task is openable
    * @returns {Boolean}

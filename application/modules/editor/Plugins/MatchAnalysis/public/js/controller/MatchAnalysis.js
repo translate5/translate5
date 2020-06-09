@@ -65,6 +65,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },{
 	  ref:'projectPanel',
 	  selector:'#projectPanel'
+    },{
+        ref:'projectTaskGrid',
+        selector:'#projectTaskGrid'
     }],
     TASK_STATE_ANALYSIS: 'matchanalysis',
     strings:{
@@ -86,6 +89,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         analysisLoadingMsg:'#UT#Analyse läuft'
     },
     
+    listeners:{
+        beforeStartAnalysis:'onBeforeStartAnalysis'  
+    },
     listen:{
         messagebus: {
             '#translate5 task': {
@@ -124,6 +130,27 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         }
     },
 
+    /***
+     * Before analysis event handler
+     */
+    onBeforeStartAnalysis:function(taskId,operation){
+        var me = this,
+            assocPanel = me.getLanguageResourceTaskAssocPanel(),
+            loadedTask = assocPanel && assocPanel.lookupViewModel().get('currentTask');
+            setAnalysisRecordState=function(store,taskId){
+                var record = store ? store.getById(taskId) : null;
+                if(!record){
+                    return;
+                }
+                record.set('state','matchanalysis');
+                if(loadedTask && loadedTask.get('taskGuid') == record) {
+                    assocPanel.lookupViewModel().set('currentTask',record)
+                }
+            };
+        setAnalysisRecordState(Ext.StoreManager.get('admin.Tasks'));
+        setAnalysisRecordState(me.getProjectTaskGrid().getStore());
+    },
+    
     /**
      * Task action column items initialized event handler.
      */
@@ -355,15 +382,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     startAnalysis:function(taskId,operation){
         //'editor/:entity/:id/operation/:operation',
-        var me = this,
-            store = Ext.StoreManager.get('admin.Tasks'),
-            record = store ? store.getById(taskId) : null;
+        var me = this;
         
-        if(record){
-            record.set('state','matchanalysis');
-        }
-        
-        me.addLoadingMask();
+        me.fireEvent('beforeStartAnalysis',taskId,operation);
+
         Ext.Ajax.request({
             url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
             method: "PUT",
@@ -377,7 +399,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },
             scope: this,
             failure: function(response){
-                me.removeLoadingMask();
             	Editor.app.getController('ServerException').handleException(response);
             }
         })
@@ -392,7 +413,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             assocPanel = me.getLanguageResourceTaskAssocPanel(),
             loadedTask = assocPanel && assocPanel.lookupViewModel().get('currentTask');
         if(loadedTask && loadedTask.get('taskGuid') == data.taskGuid) {
-            me.removeLoadingMask();
         }
     },
 
@@ -441,42 +461,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             return 0;
         }
         return component.checked ? 1 : 0;
-    },
-    
-    /***
-     * Add loading mask in match analysis panel and in the task assoc panel
-     */
-    addLoadingMask:function(){
-        var me=this,
-            loadedTask,
-            assocPanel = me.getLanguageResourceTaskAssocPanel(),
-            matchAnalysisPanel = me.getMatchAnalysisPanel();
-        
-        assocPanel && assocPanel.setLoading(me.strings.analysisLoadingMsg);
-        
-        if(matchAnalysisPanel){
-            loadedTask = matchAnalysisPanel.lookupViewModel().get('currentTask');
-            loadedTask.set('state', me.TASK_STATE_ANALYSIS);
-            matchAnalysisPanel.setLoading(me.strings.analysisLoadingMsg);
-        }
-    },
-
-    /***
-     * Remove loading mask from task assoc panel and match analysis panel.
-     * If the reloadStore is set, the analysis panel will be reloaded
-     */
-    removeLoadingMask:function(reloadStore){
-        var me=this,
-            assocPanel = me.getLanguageResourceTaskAssocPanel(),
-            matchAnalysisPanel = me.getMatchAnalysisPanel(),
-            matchAnalysisGrid = me.getComponentByItemId('matchAnalysisGrid'),
-            store = matchAnalysisGrid && matchAnalysisGrid.getStore();
-        
-        assocPanel && assocPanel.setLoading(false);
-        matchAnalysisPanel && matchAnalysisPanel.setLoading(false);
-        if(matchAnalysisGrid && reloadStore && store.isLoaded()){
-            store.reload();
-        }
     }
 
 });
