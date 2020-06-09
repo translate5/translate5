@@ -169,12 +169,23 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
 		        text: me.messages.exp,
 		        action: 'editorShowexportmenuTask',
 		        hidden:true,
+		        exportMenu:null,//Custom bindable menu property.
 		        bind:{
-		        	hidden:'{!isEditorShowexportmenuTask}'
+		        	hidden:'{!isEditorShowexportmenuTask}',
+		        	exportMenu:'{exportMenuConfig}'
 		        },
 		        glyph: 'f56e@FontAwesome5FreeSolid',
 		        sortIndex:13,
-		        menu:me.getExportTaskOptionsMenu(instanceConfig.task)
+		        publishes: {
+		            exportMenu: true
+		        },
+		        //INFO: initialize the menu, it is hidden and configured via view model
+		        menu:{
+		        },
+		        setExportMenu:function(newMenu){
+		            var me=this;
+		            me.setMenu(newMenu, true);
+		        }
 		    },{
 		        // - Excel Reimport Icon, bei Klick darauf öffnet sich der Datei-Upload-Dialog zum Reimport der Excel-Datei
 		        text: me.messages.actionExcelReimport,
@@ -239,25 +250,5 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
 	    me.callParent([Ext.apply({
 	        items: config.items
 	    }, config)]);
-	},
-	
-    /**
-     * displays the export menu
-     * @param {Editor.model.admin.Task} task
-     * @param {Ext.EventObjectImpl} event
-    */
-	getExportTaskOptionsMenu:function(task){
-	      var me = this,
-          hasQm = task.hasQmSub(),
-          exportAllowed =Editor.app.authenticatedUser.isAllowed('editorExportTask', task),
-          menu;
-      
-      menu = Ext.widget('adminExportMenu', {
-          task: task,
-          fields: hasQm ? task.segmentFields() : false
-      });
-      menu.down('#exportItem') && menu.down('#exportItem').setVisible(exportAllowed);
-      menu.down('#exportDiffItem') && menu.down('#exportDiffItem').setVisible(exportAllowed);
-      return menu;
 	}
 });

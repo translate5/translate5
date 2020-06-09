@@ -28,8 +28,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.matchAnalysisPanel',
-    
-    
+
     formulas: {
         isAnalysisRunning:{
             get: function(task) {
@@ -37,6 +36,13 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel', {
             },
             bind:{bindTo:'{currentTask}',deep:true}
         },
+        enablePanel:{
+            get: function (task) {
+                //if import status error disabled
+                return task && (!task.isErroneous() && !task.isImporting());
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        }
     },
 
 	stores: {

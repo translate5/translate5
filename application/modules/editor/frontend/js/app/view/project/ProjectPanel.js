@@ -65,9 +65,6 @@ Ext.define('Editor.view.project.ProjectPanel', {
                     split: true,
                     resizable: true,
                     width:'50%',
-                    bind:{
-                		disabled:'{!projectTaskSelection}'
-                	},
                     layout: {
                         type: 'vbox',
                         pack: 'start',
@@ -87,8 +84,7 @@ Ext.define('Editor.view.project.ProjectPanel', {
                     	scrollable: true,
                     	flex:0.7,
                     	bind:{
-                    		currentTask:'{projectTaskSelection}',
-                    		disabled:'{!projectTaskSelection}'
+                    		currentTask:'{projectTaskSelection}'
                     	}
                     }]
         		}]
