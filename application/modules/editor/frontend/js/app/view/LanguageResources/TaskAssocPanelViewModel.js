@@ -64,6 +64,15 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
     },
     formulas:{
         /***
+         * Is the assoc panel loading active. It is active when the currentTask state is analysis
+         */
+        isLoadingActive:{
+            get: function(task) {
+                return task && task.isAnalysis();
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
+        /***
          * Is the task assoc panel/grid enabled. Add languageresource assoc only when the task is unconfirmed or open
          */
         enablePanel:{
@@ -123,12 +132,5 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
             }
         }
         return hasType;
-    },
-    
-    isLoadingActive:{
-        get: function(task) {
-            return task && task.isAnalysis();
-        },
-        bind:{bindTo:'{currentTask}',deep:true}
-    },
+    }
 });

@@ -57,13 +57,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
      * Reload project button handler
      */
     onReloadProjectClick:function(){
-    	var me=this,
-    		projectTaskGrid=me.getView().up('#projectPanel').down('#projectTaskGrid');
-    	me.reloadProjects().then(function(records) {
-    		projectTaskGrid && projectTaskGrid.getStore().load();
-		}, function(operation) {
-			Editor.app.getController('ServerException').handleException(operation.error.response);
-		});
+        this.reloadProjectAndProjectTasks();
     },
     
     /***
@@ -152,5 +146,36 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
                  }
              });
          });
+    },
+    
+    /***
+     * Reload project and projectTask stores
+     * 
+     * @param {Boolean} {silentProjectTasks}: when true projectTask load event will not be fired
+     */
+    reloadProjectAndProjectTasks:function(silentProjectTasks){
+        var me = this,
+            projectTaskGrid = me.getView().up('#projectPanel').down('#projectTaskGrid'),
+            projectTaskStore = projectTaskGrid && projectTaskGrid.getStore();
+        
+        me.reloadProjects().then(function(records) {
+            if(!projectTaskStore){
+                return;
+            }
+            //suspend the event if set
+            if(silentProjectTasks){
+                projectTaskStore.suspendEvent('load');
+            }
+            projectTaskStore.load({
+                callback:function(){
+                    //after load resume the load event
+                    if(silentProjectTasks){
+                        projectTaskStore.resumeEvent('load');
+                    }
+                }
+            })
+        }, function(operation) {
+            Editor.app.getController('ServerException').handleException(operation.error.response);
+        });
     }
 });
