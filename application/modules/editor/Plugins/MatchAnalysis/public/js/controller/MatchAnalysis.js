@@ -93,11 +93,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         beforeStartAnalysis:'onBeforeStartAnalysis'  
     },
     listen:{
-        messagebus: {
-            '#translate5 task': {
-                triggerReload: 'onTriggerTaskReload'
-            }
-        },
         component:{
             '#adminTaskPreferencesWindow tabpanel':{
                 render:'onTaskPreferencesWindowPanelRender'
@@ -135,20 +130,18 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     onBeforeStartAnalysis:function(taskId,operation){
         var me = this,
-            assocPanel = me.getLanguageResourceTaskAssocPanel(),
-            loadedTask = assocPanel && assocPanel.lookupViewModel().get('currentTask');
             setAnalysisRecordState=function(store,taskId){
                 var record = store ? store.getById(taskId) : null;
                 if(!record){
                     return;
                 }
                 record.set('state','matchanalysis');
-                if(loadedTask && loadedTask.get('taskGuid') == record) {
-                    assocPanel.lookupViewModel().set('currentTask',record)
-                }
             };
-        setAnalysisRecordState(Ext.StoreManager.get('admin.Tasks'));
-        setAnalysisRecordState(me.getProjectTaskGrid().getStore());
+        //before the analysis is started, set the task state to 'matchanalysis'
+        //the matchanalysis and languageresourcesassoc panel loading masks are binded 
+        //to the task status. Changing the status to analysis will automaticly apply the loading masks for those panels
+        setAnalysisRecordState(Ext.StoreManager.get('admin.Tasks'),taskId);
+        setAnalysisRecordState(me.getProjectTaskGrid().getStore(),taskId);
     },
     
     /**
@@ -405,18 +398,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         })
     },
     
-    /**
-     * Would be better in the ViewController, but here are all the masking functions.
-     * Should be moved in the future. 
-     */
-    onTriggerTaskReload: function(data) {
-        var me = this, 
-            assocPanel = me.getLanguageResourceTaskAssocPanel(),
-            loadedTask = assocPanel && assocPanel.lookupViewModel().get('currentTask');
-        if(loadedTask && loadedTask.get('taskGuid') == data.taskGuid) {
-        }
-    },
-
     /***
      * Language resource to task assoc after save event handler
      */

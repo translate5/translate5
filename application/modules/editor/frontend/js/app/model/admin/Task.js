@@ -107,7 +107,8 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'notEditContent', type: 'boolean'},
     {name: 'usageMode', type: 'string'},
     {name: 'segmentCount', type: 'int', persist: false},
-    {name: 'segmentFinishCount', type: 'int', persist: false}
+    {name: 'segmentFinishCount', type: 'int', persist: false},
+    {name: 'isSdlxliffFileParser', type: 'boolean'}
   ],
   hasMany: [{
       model: 'Editor.model.segment.Field',
@@ -229,6 +230,9 @@ Ext.define('Editor.model.admin.Task', {
       return this.get('state') == this.states.ERROR;
   },
   
+  /***
+   * Is the task state matchanalysis
+   */
   isAnalysis: function() {
       return this.get('state') == 'matchanalysis';
   },

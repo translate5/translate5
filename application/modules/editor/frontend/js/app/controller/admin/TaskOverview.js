@@ -1215,6 +1215,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  if(!grid){
 		  return;
 	  }
-	  grid.getController().onReloadProjectClick();
+	  grid.getController().reloadProjectAndProjectTasks(true);
   }
 });
