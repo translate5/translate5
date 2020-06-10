@@ -49,7 +49,7 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
             project = store.getById(params.taskId);
         }
         else {
-            project = store.findExact('taskGuid', params.taskGuid);
+            project = store.findRecord( 'taskGuid', params.taskGuid, 0, false, true, true);
         }
         project && project.load();
     },
