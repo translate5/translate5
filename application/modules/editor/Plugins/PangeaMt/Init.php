@@ -49,8 +49,19 @@ class editor_Plugins_PangeaMt_Init extends ZfExtended_Plugin_Abstract {
      */
     protected $serviceColor;
     
+    /**
+     * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
+     * @var array
+     */
+    protected $frontendControllers = array(
+        'pluginPangeaMtMain' => 'Editor.plugins.PangeaMt.controller.Main',
+    );
+    
     public function init() {
-        $this->validateConfig(); // provide user with infos in case the plugin is not configured completely
+        if(!$this->validateConfig()) { // also provides user with infos in case the plugin is not configured completely
+            $this->frontendControllers = []; //disable frontend stuff if no valid config
+            return;
+        }
         
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
@@ -58,6 +69,29 @@ class editor_Plugins_PangeaMt_Init extends ZfExtended_Plugin_Abstract {
         
         $this->service = ZfExtended_Factory::get('editor_Plugins_PangeaMt_Service');
         /* @var $service editor_Plugins_PangeaMt_Service */
+        
+        $this->initEvents();
+    }
+    
+    /**
+     * define all event listener
+     */
+    protected function initEvents() {
+        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
+    }
+    
+    public function injectFrontendConfig(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        /* @var $view Zend_View_Interface */
+        //set the available engines to a frontend variable
+        $engineModel = ZfExtended_Factory::get('editor_Plugins_PangeaMt_Models_Engines');
+        /* @var $engineModel editor_Plugins_PangeaMt_Models_Engines */
+        try {
+            $view->Php2JsVars()->set('LanguageResources.pangeaMtEngines', $engineModel->getAllEngines());
+        }
+        catch(Exception $e) {
+            $view->Php2JsVars()->set('LanguageResources.pangeaMtEngines', []);
+        }
     }
     
     /**
@@ -90,7 +124,7 @@ class editor_Plugins_PangeaMt_Init extends ZfExtended_Plugin_Abstract {
             //$logger->error('E1271', 'PangeaMt Plug-In: API-Server is not defined.');
             return false;
         }
-        if(empty($config['apiKey'])) {
+        if(empty($config['apikey'])) {
             //$logger->error('E1272', 'PangeaMt Plug-In: Apikey is not defined.');
             return false;
         }
