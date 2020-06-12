@@ -113,7 +113,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     },
                     allowBlank: false,
                     listeners:{
-                        change:'onSdlEngineComboChange'
+                        change:'onEngineComboChange'
                     }
                 },{
                     xtype: 'textfield',

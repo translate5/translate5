@@ -126,9 +126,9 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     },
 
     /**
-     * Sdl engine combo change handler
+     * Engine combo change handler
      */
-    onSdlEngineComboChange:function(combo,newVal,oldVal,eOpts){
+    onEngineComboChange:function(combo,newVal,oldVal,eOpts){
         var me=this,
             view=me.getView(),
             selection=combo.getSelection(),
