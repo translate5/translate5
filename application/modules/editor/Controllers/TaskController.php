@@ -915,6 +915,10 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($data['locked']);
         unset($data['lockingUser']);
         unset($data['userCount']);
+        //is the source task a single project task
+        if($this->entity->getId()==$this->entity->getProjectId()){
+            $data['taskType'] = $this->entity::INITIAL_TASKTYPE_PROJECT_TASK;
+        }
         $data['state'] = 'import';
         $this->entity->init($data);
         $this->entity->createTaskGuidIfNeeded();
