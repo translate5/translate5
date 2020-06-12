@@ -44,16 +44,18 @@ Ext.define('Editor.plugins.PangeaMt.controller.Main', {
     ],
     stores:['Editor.plugins.PangeaMt.store.LanguageResources.PangeaMtEngine'],
     listen:{
+        controller:{
+            '#TmOverview':{
+                engineSelect:'handleEngineSelect'
+            }
+        },
         component: {
             '#addTmWindow': {
                 afterrender: 'onTmWindowRender', 
             },
             '#addTmWindow combo[name="resourceId"]': {
                 select: 'handleResourceChanged'
-            },
-            '#editTmWindow':{
-                afterrender: 'onTmWindowRender', 
-            },
+            }
         }
     },
     init: function() {
@@ -89,6 +91,7 @@ Ext.define('Editor.plugins.PangeaMt.controller.Main', {
     },
     /**
      * When a new PangeaMT-LanguageResource is created, we show the engines.
+     * Otherwise we hide and reset the engines.
      */
     handleResourceChanged: function(combo, record, index) {
         var form = combo.up('form'),
@@ -97,6 +100,20 @@ Ext.define('Editor.plugins.PangeaMt.controller.Main', {
             disablePangeaMtEngines = (resourceId.indexOf('editor_Plugins_PangeaMt') === -1);
         pangeaMtEnginesField.setDisabled(disablePangeaMtEngines);
         pangeaMtEnginesField.setHidden(disablePangeaMtEngines);
+        if (disablePangeaMtEngines) {
+            pangeaMtEnginesField.reset();
+        }
+    },
+    /**
+     * Set the specificData
+     */
+    handleEngineSelect:function(form){
+        var pangeaMtEngine = form.down('#pangeaMtEngine').getSelection(); // = null after reset()
+        if (pangeaMtEngine){
+            form.getForm().findField('specificData').setValue(JSON.stringify({
+                engineId:pangeaMtEngine.get('engineId')
+            }));
+        }
     }
 
 });

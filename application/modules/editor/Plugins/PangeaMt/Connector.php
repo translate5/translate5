@@ -35,11 +35,6 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
      * @var editor_Plugins_PangeaMt_HttpApi
      */
     protected $api;
-    
-    /**
-     * @var boolean
-     */
-    protected $isInstantTranslate;
 
     /**
      * {@inheritDoc}
@@ -55,49 +50,10 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
     
     /**
      * (non-PHPdoc)
-     * @see editor_Services_Connector_Abstract::query()
+     * @see editor_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $this->isInstantTranslate = false;
-        
-        // For matches and pretranslation, we use PangeaMt with tag_handling = "xml".
-        // In order to handle proper xml, we use xliff and implement a similar procedure as in OpenTM2:
-        
-        $queryString = $this->getQueryString($segment);
-        
-        //Although we take the source fields from the LanguageResource answer below
-        // we have to set the default source here to fill the be added internal tags
-        $this->resultList->setDefaultSource($queryString);
-        
-        $queryString = $this->restoreWhitespaceForQuery($queryString);
-        
-        //$map is set by reference
-        $map = [];
-        $queryString = $this->internalTag->toXliffPaired($queryString, true, $map);
-        $mapCount = count($map);
-        
-        //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
-        $xmlParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $xmlParser editor_Models_Import_FileParser_XmlParser */
-        
-        $this->shortTagIdent = $mapCount + 1;
-        $xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
-            //for communication with the LanguageResource we assume that the segment content is XML/XLIFF therefore we assume xmlBased here
-            $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true);
-            $textNode = $this->whitespaceTagReplacer($textNode);
-            $xmlParser->replaceChunk($key, $textNode);
-        });
-        
-        if ($this->queryPangeaMtApi($queryString)) {
-            $found = $this->api->getResult();
-            //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied,
-            // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
-            $target = $xmlParser->parse($found->text);
-            $target = $this->internalTag->reapply2dMap($target, $map);
-            $this->resultList->addResult($target, $this->defaultMatchRate);
-            
-        }
-        return $this->resultList;
+        return $this->queryPangeaMtApi($this->prepareDefaultQueryString($segment), true);
     }
     
     /**
@@ -113,13 +69,7 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
      * @see editor_Services_Connector_Abstract::translate()
      */
     public function translate(string $searchString){
-        $this->isInstantTranslate = true;
-        if ($this->queryPangeaMtApi($searchString)){
-            $result = $this->api->getResult();
-            $translation = $result->text ?? "";
-            $this->resultList->addResult($translation, $this->defaultMatchRate);
-        }
-        return $this->resultList;
+        return $this->queryPangeaMtApi($searchString);
     }
     
     /***
@@ -129,7 +79,35 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
      * @return boolean
      */
     protected function queryPangeaMtApi($searchString, $reimportWhitespace = false){
-        return false;
+        if(empty($searchString)) {
+            return $this->resultList;
+        }
+        $allResults = null;
+        $sourceLang = $this->languageResource->getSourceLangRfc5646(); // = e.g. "de", TODO: validate against $this->sourceLang (e.g. 4)
+        $targetLang = $this->languageResource->getTargetLangRfc5646();// = e.g. "en"; TODO: validate against $this->targetLang (e.g. 5)
+        $engineId = $this->languageResource->getSpecificData('engineId');
+        if($this->api->search($searchString, $sourceLang, $targetLang, $engineId)){
+            $allResults = $this->api->getResult();
+        }
+        /*
+         *   if($this->api->search($searchString, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
+            $result = $this->api->getResult();
+        }
+         */
+        
+        if(empty($allResults)) {
+            return $this->resultList;
+        }
+        
+        foreach ($allResults as $result) {
+            $result = $result[0];
+            $translation = $result->tgt ?? "";
+            if($reimportWhitespace) {
+                $translation = $this->importWhitespaceFromTagLessQuery($translation);
+            }
+            $this->resultList->addResult($translation,$this->defaultMatchRate);
+        }
+        return $this->resultList;
     }
     
     /**
