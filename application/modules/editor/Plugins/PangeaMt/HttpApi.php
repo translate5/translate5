@@ -88,12 +88,24 @@ class editor_Plugins_PangeaMt_HttpApi {
      * @param string $text
      * @param string $sourceLang
      * @param string $targetLang
-     * @param boolean $isInstantTranslate (optional; default: false)
+     * @param int $engineId
      * @return boolean
      */
-    public function search($queryString,$sourceLang,$targetLang,$isInstantTranslate = false) {
-        // TODO
-        return false;
+    public function search($queryString,$sourceLang,$targetLang,$engineId) {
+        $method = 'POST';
+        $endpointPath = 'translate';
+        $data = [];
+        $data = array('src'    => $sourceLang,
+                      'tgt'    => $targetLang,
+                      'engine' => (string)$engineId,
+                      'text'   => [$queryString]);
+        /* PangeaMT can also handle multiple parts:
+              "text": [
+                "¿Cómo estás?",
+                "Mi perro es negro"
+              ]
+         */
+        return $this->pangeaMtRequest($method, $endpointPath, $data);
     }
     
     /** Check the api status

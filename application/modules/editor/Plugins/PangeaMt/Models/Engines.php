@@ -103,6 +103,7 @@ class editor_Plugins_PangeaMt_Models_Engines {
                 'name' => $engine->descr,
                 'source' =>  $engine->src,
                 'target' =>  $engine->tgt,
+                'engineId' => $engine->id,
                 'domainCode' => $engine->domain,
                 'characterLimit' => $getCharacterLimit([$customerLimit,$engineLimit]),
                 'fileUpload'=> false,

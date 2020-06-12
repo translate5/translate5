@@ -32,7 +32,8 @@ Ext.define('Editor.plugins.PangeaMt.store.LanguageResources.PangeaMtEngine', {
       {name: 'id', type: 'string'},
       {name: 'name', type: 'string'},
       {name: 'source', type: 'string'},
-      {name: 'target', type: 'string'}
+      {name: 'target', type: 'string'},
+      {name: 'engineId', type: 'string'}
   ],
   storeId:'pangeaMtEngine'
 });
