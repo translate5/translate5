@@ -39,7 +39,8 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
       projectOverview:'#UT#zum Projekt springen',
       taskOverview:'#UT#zur Aufgabe springen',
       taskActionMenu:'#UT#Aufgabenmenü anzeigen',
-      projectActionMenu:'#UT#Projektmenü anzeigen'
+      projectActionMenu:'#UT#Projektmenü anzeigen',
+      actionEdit: '#UT# Aufgabe bearbeiten'
   },
   
   /**
@@ -51,10 +52,6 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
   constructor: function(instanceConfig) {
     var me = this,
 	    config = {
-	        itemFilter:function(item){
-	            //this filters only by systemrights. taskrights must be implemented by css
-	            return Editor.app.authenticatedUser.isAllowed(item.isAllowedFor);
-	        },
 	        items:[{
 	            getTip:function(v,meta,record,row,col,store,table){
 	            	var ownerGrid=table.ownerGrid.getXType();
@@ -66,7 +63,22 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
 	            isAllowedFor: 'editorMenuTask',
 	            iconCls: 'ico-task-menu',
 	            sortIndex:1
-	        },{
+	        }
+//	        ,{
+//                tooltip: me.messages.actionEdit,
+//                isDisabled: function(view, rowIndex, colIndex, item, record) {
+//                    var isProjectDisabled=me.isProjectGridDisabled(view);
+//                    if(isProjectDisabled){
+//                        //do not show the icon for project grid
+//                        item.iconCls='';
+//                    }
+//                    return isProjectDisabled;
+//                },
+//                isAllowedFor: 'editorEditTask',
+//                iconCls: 'ico-task-edit',
+//                sortIndex:1,
+//	        },
+	        ,{
 	            getTip:function(v,meta,record,row,col,store,table){
 		        	if(table.ownerGrid.getXType()=='projectTaskGrid'){
 		        		return me.messages.taskOverview;
@@ -74,12 +86,12 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
 		        	return me.messages.projectOverview;
 		        },
 	            isDisabled: function(view, rowIndex, colIndex, item, record) {
-	            	//do not show the icon for project grid
-	            	if(view.grid.xtype=='projectGrid'){
-	            		item.iconCls='';
-	            		return true;
-	            	}
-	                return false;
+	                var isProjectDisabled=me.isProjectGridDisabled(view);
+	                if(isProjectDisabled){
+	                    //do not show the icon for project grid
+	                    item.iconCls='';
+	                }
+	                return isProjectDisabled;
 	            },
 		        isAllowedFor: 'editorProjectTask',
 		        iconCls: 'ico-task-project',
@@ -91,7 +103,7 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
         return a.sortIndex - b.sortIndex;
     });
 
-    config.items= Ext.Array.filter(config.items,config.itemFilter);
+    config.items= Ext.Array.filter(config.items,me.itemFilter);
     config.width = config.items.length * 18;
 
     //dynamic column width with configured minWith
@@ -105,5 +117,20 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
         items: config.items
     }, config)]);
   },
+  
+  /***
+   * Is the user alowed to see the action item
+   */
+  itemFilter:function(item){
+      //this filters only by systemrights. taskrights must be implemented by css
+      return Editor.app.authenticatedUser.isAllowed(item.isAllowedFor);
+  },
+  
+  /***
+   * Is the action item disable for the project grid
+   */
+  isProjectGridDisabled:function(view){
+      return view.grid.xtype=='projectGrid'
+  }
   
 });
