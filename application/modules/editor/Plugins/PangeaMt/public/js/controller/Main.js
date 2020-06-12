@@ -62,43 +62,41 @@ Ext.define('Editor.plugins.PangeaMt.controller.Main', {
     /**
      * On add new tm window render handler
      */
-    onTmWindowRender:function(editTmWindow){
+    onTmWindowRender:function(addTmWindow){
         var pangeaMtStore = Ext.StoreManager.get('pangeaMtEngine'),
             form,
-            engineItem,
-            isPangeaMtResource = true; // TODO
+            engineItem;
         if (pangeaMtStore) {
             // fill store
             pangeaMtStore.setData(Editor.data.LanguageResources.pangeaMtEngines);
             // add select for engines
-            form = editTmWindow.down('form');
+            form = addTmWindow.down('form');
             engineItem = {
                     xtype: 'pangeamtenginecombo',
                     itemId: 'pangeaMtEngine',
-                    displayField: 'name', // TODO. render source and target, too?
+                    displayField: 'name',
                     bind:{
-                        hidden: false,
-                        disabled: false
+                        hidden: true,
+                        disabled: true
                     },
                     allowBlank: false,
                     listeners:{
-                        change: 'onPangeaMtEngineComboChange'
+                        change: 'onEngineComboChange'
                     }
             };
             form.insert(1, engineItem);
         }
     },
-    
-
-    onPangeMtEngineComboChange:function(combo,newVal,oldVal,eOpts){
-        // TODO
-    },
-    
     /**
      * When a new PangeaMT-LanguageResource is created, we show the engines.
      */
     handleResourceChanged: function(combo, record, index) {
-        // TODO
-    },
+        var form = combo.up('form'),
+            resourceId = form.down('combo[name="resourceId"]').getValue(),
+            pangeaMtEnginesField = form.queryById('pangeaMtEngine'),
+            disablePangeaMtEngines = (resourceId.indexOf('editor_Plugins_PangeaMt') === -1);
+        pangeaMtEnginesField.setDisabled(disablePangeaMtEngines);
+        pangeaMtEnginesField.setHidden(disablePangeaMtEngines);
+    }
 
 });
