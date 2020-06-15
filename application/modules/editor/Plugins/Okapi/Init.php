@@ -295,11 +295,17 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         if(!$fileinfo->isFile()){
             return false;
         }
-
-        $isXml = $extension == 'xml';
-        if($isXml && editor_Models_Import_FileParser_Xml::isParsable(file_get_contents($fileinfo))) {
-            //Okapi supports XML, but if it is XLIFF in the XML file we don't need Okapi:
-            return false;
+        
+        $infoMsg = '';
+        $parsers = $this->fileTypes->getParser($extension);
+        // loop over all registered parsers by the given extension
+        $fileObject = $fileinfo->openFile('r', false);
+        $fileHead = $fileObject->fread(512);
+        foreach($parsers as $parser) {
+            if($parser::isParsable($fileHead, $infoMsg)) {
+                // if one of the registered parsers may parse the file, then we don't need Okapi
+                return false;
+            }
         }
 
         //if there is a custom bconf, this bconf can contain "new" allowed file types.

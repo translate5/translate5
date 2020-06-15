@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
 
 
 /**
- * Fileparsing for import of IBM-XLIFF files
+ * Fileparsing for import of XLIFF 1.1 and 1.2 files
  */
 class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser {
     const PREFIX_MRK = 'mrk-';
@@ -1005,14 +1005,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         if($this->processSegment && !empty($attributes['count-type']) && $attributes['count-type'] == 'word count') {
             $this->wordCount += trim($this->xmlparser->getNextChunk());
         }
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see editor_Models_Import_FileParser::parseSegment()
-     */
-    protected function parseSegment($segment, $isSource) {
-        //is abstract so must be defined empty since not used!
     }
     
     /**
