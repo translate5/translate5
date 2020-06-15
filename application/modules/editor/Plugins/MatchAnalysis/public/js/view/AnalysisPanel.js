@@ -71,6 +71,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     	activate:'onMatchAnalysisPanelActivate'
     }, 
     
+    bind:{
+        disabled:'{!enablePanel}'
+    },
+    
     initConfig: function(instanceConfig) {
         var me = this,
             columnRenderer=function(val, meta, record) {
