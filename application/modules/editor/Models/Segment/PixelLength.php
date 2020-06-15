@@ -9,15 +9,15 @@
  Contact:  http://www.MittagQI.com/  /  service (ÄTT) MittagQI.com
 
  This file may be used under the terms of the GNU General Public License version 3.0
- as published by the Free Software Foundation and appearing in the file gpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file gpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU General Public License version 3.0 requirements will be met:
  http://www.gnu.org/copyleft/gpl.html.
 
- For this file you are allowed to make use of the same FLOSS exceptions to the GNU 
- General Public License version 3.0 as specified by Sencha for Ext Js. 
- Please be aware, that Marc Mittag / MittagQI take no warranty  for any legal issue, 
- that may arise, if you use these FLOSS exceptions and recommend  to stick to GPL 3. 
+ For this file you are allowed to make use of the same FLOSS exceptions to the GNU
+ General Public License version 3.0 as specified by Sencha for Ext Js.
+ Please be aware, that Marc Mittag / MittagQI take no warranty  for any legal issue,
+ that may arise, if you use these FLOSS exceptions and recommend  to stick to GPL 3.
  For further information regarding this topic please see the attached license.txt
  of this software package.
  
@@ -31,7 +31,7 @@
  @license    GNU General Public License version 3.0 http://www.gnu.org/copyleft/gpl.html
              with FLOSS exceptions (see floss-exception.txt and ux-exception.txt at the root level)
  
- END LICENSE AND COPYRIGHT 
+ END LICENSE AND COPYRIGHT
  */
 
 /**
@@ -101,7 +101,10 @@ class editor_Models_Segment_PixelLength {
     }
     
     public function __destruct() {
-        $logMsg = 'Segment length calculation: missing pixel width'; 
+        if(empty($this->logMissingData)) {
+            return;
+        }
+        $logMsg = 'Segment length calculation: missing pixel width';
         $logMsg .= 'No pixel-width set for several characters.'."\n";
         $logMsg .= 'Default width is used. See affected characters in extra data.';
         
@@ -109,7 +112,7 @@ class editor_Models_Segment_PixelLength {
         /* @var $logger ZfExtended_Logger */
         $logger = $logger->cloneMe('editor.segment.pixellength');
         
-        $logger->warn('E0000', $logMsg, [
+        $logger->warn('E1278', $logMsg, [
             'affectedCharacters' => $this->logMissingData,
             'task' => $this->task,
         ]);
@@ -135,20 +138,21 @@ class editor_Models_Segment_PixelLength {
         $pixelLength = 0;
         $fontFamily = strtolower($fontFamily);
         $pixelMappingForFontAndSize = $this->pixelMapping->getPixelMappingForFontAndSize($this->taskGuid, $this->pixelMappingForTask, $fontFamily, $fontSize);
-        $charsNotSet = array();
-        $charsNotSetMsg = '';
+        $charsNotSet = [];
         
         // prepare string for counting
         $segmentContent = $this->segment->prepareForPixelBasedLengthCount($segmentContent);
         
         // get length for string by adding each character's length
         $allCharsInSegment = $this->segmentContentAsCharacters($segmentContent);
-        foreach ($allCharsInSegment as $key => $char) {
-            $charWidth = $this->pixelMapping->getCharWidth($char, $pixelMappingForFontAndSize, $fileId, $charsNotSet, $charsNotSetMsg);
+        foreach ($allCharsInSegment as $char) {
+            $charWidth = $this->pixelMapping->getCharWidth($char, $pixelMappingForFontAndSize, $fileId, $charsNotSet);
             
             if (is_null($charWidth)) {
                 //textlength by pixel failed; most probably data about the pixelWidth is missing
-                throw new editor_Models_Segment_Exception('E10', [
+                throw new editor_Models_Segment_Exception('E1081', [
+                    'char' => $char,
+                    'charCode' => $this->pixelMapping->getNumericValueOfUnicodeChar($char),
                     'fontFamily' => $fontFamily,
                     'fontSize' => $fontSize,
                 ]);
@@ -159,14 +163,20 @@ class editor_Models_Segment_PixelLength {
         }
         
         if (!empty($charsNotSet)) {
-            sort($charsNotSet);
-            
-            $logData = new stdClass();
-            $logData->fontFamily = $fontFamily;
-            $logData->fontSize = $fontSize;
-            $logData->default = $pixelMappingForFontAndSize['default'];
-            $logData->affectedCharacters = $charsNotSetMsg;
-            $this->logMissingData[] = $logData;
+            $logKey = $fontFamily.'#'.$fontSize;
+            if(array_key_exists($logKey, $this->logMissingData)) {
+                $logData = $this->logMissingData[$logKey];
+                $logData->affectedCharacters = array_merge($logData->affectedCharacters, $charsNotSet);
+            }else {
+                $logData = new stdClass();
+                $logData->fontFamily = $fontFamily;
+                $logData->fontSize = $fontSize;
+                $logData->default = $pixelMappingForFontAndSize['default'];
+                $logData->affectedCharacters = $charsNotSet;
+                $this->logMissingData[$logKey] = $logData;
+            }
+            $logData->affectedCharacters = array_unique($logData->affectedCharacters);
+            sort($logData->affectedCharacters);
         }
         
         return $pixelLength;

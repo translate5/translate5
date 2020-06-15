@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -29,9 +29,9 @@ END LICENSE AND COPYRIGHT
 /**
  * Segment Internal Tag Helper Class
  * This class contains the regex definition and related helper methods to internal tags of translate5
- * 
+ *
  * TO BE COMPLETED: There are several more places in translate5 which can make use of this class
- * 
+ *
  */
 class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstract {
     
@@ -41,7 +41,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * match 2: the packed data
      * match 3: the original id
      * match 4: the rest of the generated id
-     * 
+     *
      * @var string
      */
     const REGEX_INTERNAL_TAGS = '#<div\s*class="([a-z]*)\s+([gxA-Fa-f0-9]*)[^"]*"\s*.*?(?!</div>)<span[^>]*data-originalid="([^"]*).*?(?!</div>).</div>#s';
@@ -59,9 +59,9 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     const IGNORE_CLASS = 'ignoreInEditor';
     const IGNORE_ID_PREFIX = 'toignore-';
     
-    public function __construct(){
-        $this->replacerRegex=self::REGEX_INTERNAL_TAGS;
-        $this->placeholderTemplate=self::PLACEHOLDER_TEMPLATE;
+    public function __construct($replacerTemplate = null){
+        $this->replacerRegex = self::REGEX_INTERNAL_TAGS;
+        $this->placeholderTemplate = $replacerTemplate ?? self::PLACEHOLDER_TEMPLATE;
     }
     
     /**
@@ -137,7 +137,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      *     [tag] => 2           → the content contains 2 normal tags
      *     [all] => 3           → the content contains 3 internal tags at all (equals to count method)
      * )
-     * 
+     *
      * @param string $segment
      * @return array
      */
@@ -191,11 +191,11 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     /**
      * restores the original escaped tag
      * @param string $segment
-     * @param bool $whitespaceOnly optional, if true restore whitespace tags only 
+     * @param bool $whitespaceOnly optional, if true restore whitespace tags only
      * @return mixed
      */
     public function restore(string $segment, $whitespaceOnly = false) {
-        //TODO extend $whitespaceOnly filter so that we can filter for one ore more of the CSS classes (nbsp, newline, tab, space) 
+        //TODO extend $whitespaceOnly filter so that we can filter for one ore more of the CSS classes (nbsp, newline, tab, space)
         return $this->replace($segment, function($match) use ($whitespaceOnly) {
             $id = $match[3];
             
@@ -224,16 +224,16 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             $replace = array('hardReturn/','softReturn/','macReturn/');
             $result = str_replace($search, $replace, $result);
             
-            //the original data is without <> 
+            //the original data is without <>
             return '<' . $result .'>';
         });
     }
     
     /**
      * converts the given string (mainly the internal tags in the string) into valid xliff tags without content
-     * The third parameter $replaceMap can be used to return a mapping between the inserted xliff tags 
+     * The third parameter $replaceMap can be used to return a mapping between the inserted xliff tags
      *  and the replaced original tags. Warning: it is no usual key => value map, to be compatible with toXliffPaired (details see there)
-     *  
+     *
      * @param string $segment
      * @param bool $removeOther optional, removes per default all other tags (mqm, terms, etc)
      * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
@@ -253,16 +253,16 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             //original id coming from import format
             $id = $match[3];
             $type = $match[1];
-            $tag = ['open' => 'bx', 'close' => 'ex', 'single' => 'x']; 
+            $tag = ['open' => 'bx', 'close' => 'ex', 'single' => 'x'];
             //xliff tags:
             // bpt ept → begin and end tag as standalone tags in one segment
             // bx ex → start and end tag of tag pairs where the tags are distributed to different segments
-            // g tag → direct representation of a tag pair, 
+            // g tag → direct representation of a tag pair,
             //  disadvantage: the closing g tag contains no information about semantic, so for reappling our internal tags a XML parser would be necessary
             
             //as tag id the here generated newid must be used,
-            // since the original $id is coming from imported data, it can happen 
-            // that not unique tags are produced (multiple space tags for example) 
+            // since the original $id is coming from imported data, it can happen
+            // that not unique tags are produced (multiple space tags for example)
             // not unique tags are bad for the replaceMap
             if($type == 'single') {
                 $result = sprintf('<x id="%s"/>', $newid++);
@@ -290,10 +290,10 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * because <123> are no real tags, the function uses an "internal tag" <excel 123>. So first all tags are converted to <excel 123> tags.
      * this "real" tags can be used to exclude them from beeing removed by function strip_tags if $removeOther is true.
      * After this a simple str_replace is used to convert the internal <excel 123> to the wanted <123> tags
-     * 
-     * The third parameter $replaceMap can be used to return a mapping between the inserted xliff tags 
+     *
+     * The third parameter $replaceMap can be used to return a mapping between the inserted xliff tags
      * and the replaced original tags. Warning: it is no usual key => value map, to be compatible with toXliffPaired (details see there)
-     *  
+     *
      * @param string $segment
      * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
      * @return string segment with excel pseudo tags
@@ -369,7 +369,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         $origTags = [];
         $openTagIds = [];
         $closeTags = [];
-        //loop over the found internal tags, replace them with the XLIFF2 tags 
+        //loop over the found internal tags, replace them with the XLIFF2 tags
         foreach($this->originalTags as $key => $tag) {
             //use replace on the single tag to replace the internal tag with the xliff2 tag
             $this->originalTags[$key] = $this->replace($tag, function($match) use ($key, &$newid, &$origTags, &$openTagIds, &$closeTags){
@@ -417,10 +417,10 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
 
     /**
      * converts the given string (mainly the internal tags in the string) into valid xliff tags without content
-     * The third parameter $replaceMap can be used to return a mapping between the inserted xliff tags 
+     * The third parameter $replaceMap can be used to return a mapping between the inserted xliff tags
      *  and the replaced original tags. Warning: it is no usual key => value map, since keys can be duplicated (</g>) tags
-     *  There fore the map is a 2d array: [[</g>, replacement 1],[</g>, replacement 2]] 
-     *  
+     *  There fore the map is a 2d array: [[</g>, replacement 1],[</g>, replacement 2]]
+     *
      * @param string $segment
      * @param bool $removeOther optional, removes per default all other tags (mqm, terms, etc)
      * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
@@ -470,10 +470,10 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     
     /**
      * restores the internal tags into the given string by the given 2d map
-     * Warning: the reapplying is currently position based! 
-     * That means if the original xliff contained 
+     * Warning: the reapplying is currently position based!
+     * That means if the original xliff contained
      * → Discuss with Marc!!!!
-     * 
+     *
      * @param string $segment
      * @param array $map not a a key:value map, but a 2d array, since keys can exist multiple times
      */
@@ -493,7 +493,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     /**
      * Compares the internal tag differences of two strings containing internal tags
      * The diff is done by the whole tag
-     * 
+     *
      * @param string $segment1 The string to compare from
      * @param string $segment2 A string to compare against
      * @return array an array containing all the internal tags from $segment1 that are not present in $segment2
@@ -505,9 +505,9 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     /**
      * Compares the internal tag differences of two strings containing internal tags
      * The diff is done by the whole tag
-     * Same as self::diff, just working on tag arrays instead segment strings 
+     * Same as self::diff, just working on tag arrays instead segment strings
      * @see self::diff
-     * 
+     *
      * @param array $segment1Tags The ones segment tags
      * @param array $segment2Tags The others segment tags
      * @return array an array containing all the internal tags from $segment1Tags that are not present in $segment2Tags
@@ -519,11 +519,11 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         $segment1Tags = array_values($segment1Tags);
         $segment2Tags = array_values($segment2Tags);
         
-        //Problem: the fulltag content of a tag may contain special characters like umlauts. 
+        //Problem: the fulltag content of a tag may contain special characters like umlauts.
         //After Import they are in HTML entity notation: &auml; after saving from browser they are stored as their plain character ä
         //Example encoded:       <div class="single 123 internal-tag ownttip"><span title="&lt;ph ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte, Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;" class="short">&lt;1/&gt;</span><span data-originalid="6f18ea87a8e0306f7c809cb4f06842eb" data-length="-1" class="full">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;</span></div>
         //Example from Browser:  <div class="single 123 internal-tag ownttip"><span title="&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Ger&auml;te, Detailma&szlig; A&amp;lt;/variable&amp;gt;&lt;/ph&gt;" class="short">&lt;1/&gt;</span><span data-originalid="6f18ea87a8e0306f7c809cb4f06842eb" data-length="-1" class="full">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Ger&auml;te, Detailma&szlig; A&amp;lt;/variable&amp;gt;&lt;/ph&gt;</span></div>
-        //This is so far no problem, only for comparing the tags. 
+        //This is so far no problem, only for comparing the tags.
         //For that reason we have to compare tags without their full text content. The information of content equality is contained in the payload in the css class.
         
         $segment1TagsSanitized = preg_replace('#span title="[^"]*|class="full">[^<]*<\/#', '', $segment1Tags);
@@ -552,7 +552,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     public function makeAdditionalHtmlTag(int $shortTag) {
         if(empty($this->singleTag)) {
-            //lazy and anonymous instantiation, since only needed here 
+            //lazy and anonymous instantiation, since only needed here
             $this->singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
         }
         /* @var $this->singleTag editor_ImageTag_Single */
