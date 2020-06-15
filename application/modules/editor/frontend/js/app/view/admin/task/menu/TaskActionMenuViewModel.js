@@ -145,15 +145,12 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
                 //the old menu will be destroyed by the owner component
                 var me = this,
                     hasQm = task.hasQmSub(),
-                    exportAllowed =Editor.app.authenticatedUser.isAllowed('editorExportTask', task),
                     menu;
                 
                 menu = Ext.widget('adminExportMenu', {
                     task: task,
                     fields: hasQm ? task.segmentFields() : false
                 });
-                menu.down('#exportItem') && menu.down('#exportItem').setVisible(exportAllowed);
-                menu.down('#exportDiffItem') && menu.down('#exportDiffItem').setVisible(exportAllowed);
                 return menu;
             },
             bind: '{task}'
