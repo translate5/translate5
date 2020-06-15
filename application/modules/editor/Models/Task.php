@@ -102,6 +102,9 @@ END LICENSE AND COPYRIGHT
  * @method void setTaskType() setTaskType(string $taskType)
  * @method int getProjectId() getProjectId()
  * @method void setProjectId() setProjectId(int $projectId)
+ * @method boolean getIsSdlxliffFileParser() getIsSdlxliffFileParser()
+ * @method void setIsSdlxliffFileParser() setIsSdlxliffFileParser(bool $flag)
+ * 
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
