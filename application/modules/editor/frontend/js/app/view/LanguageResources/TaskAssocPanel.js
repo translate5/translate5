@@ -63,6 +63,9 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
     },
     padding: 0,
     layout:'fit',
+    bind:{
+        loading:'{isLoadingActive}'
+    },
     initConfig : function(instanceConfig) {
         var me = this,
         config = {
@@ -72,7 +75,8 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                 xtype : 'grid',
                 itemId : 'languageResourcesTaskAssocGrid',
             	bind:{
-            		store:'{taskAssoc}'
+            		store:'{taskAssoc}',
+            		disabled:'{!enablePanel}'
     			},
                 emptyText: me.strings.empty,
                 features : [ {

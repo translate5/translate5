@@ -54,7 +54,7 @@ Ext.define('Editor.view.admin.TaskGridViewController', {
             task = store.getById(params.taskId);
         }
         else {
-            task = store.findExact('taskGuid', params.taskGuid);
+            task = store.findRecord( 'taskGuid', params.taskGuid, 0, false, true, true);
         }
         task && task.load();
     },

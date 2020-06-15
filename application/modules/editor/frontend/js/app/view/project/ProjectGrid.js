@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.project.ProjectGrid', {
 	extend: 'Ext.grid.Panel',
 	alias: 'widget.projectGrid',
+	cls:'projectGrid',
     requires:[
     	'Editor.view.project.ProjectGridViewController'
 	],

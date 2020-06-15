@@ -107,7 +107,8 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'notEditContent', type: 'boolean'},
     {name: 'usageMode', type: 'string'},
     {name: 'segmentCount', type: 'int', persist: false},
-    {name: 'segmentFinishCount', type: 'int', persist: false}
+    {name: 'segmentFinishCount', type: 'int', persist: false},
+    {name: 'isSdlxliffFileParser', type: 'boolean'}
   ],
   hasMany: [{
       model: 'Editor.model.segment.Field',
@@ -228,6 +229,21 @@ Ext.define('Editor.model.admin.Task', {
   isErroneous: function() {
       return this.get('state') == this.states.ERROR;
   },
+  
+  /***
+   * Is the task state matchanalysis
+   */
+  isAnalysis: function() {
+      return this.get('state') == 'matchanalysis';
+  },
+  
+  /**
+   * Is the current task state open
+   * @returns {Boolean}
+   */
+  isOpen:function(){
+      return this.get('state') == this.states.OPEN;
+  },
   /**
    * returns if task is openable
    * @returns {Boolean}
@@ -261,7 +277,7 @@ Ext.define('Editor.model.admin.Task', {
    * @returns {Boolean}
    */
   isEnded: function(){
-      return this.get('state')=='end';
+      return this.get('state')==this.states.END;
   },
   /***
    * Is the task not in importing,pending or custom state
