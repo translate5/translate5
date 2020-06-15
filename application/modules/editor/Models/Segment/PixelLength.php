@@ -104,7 +104,7 @@ class editor_Models_Segment_PixelLength {
         if(empty($this->logMissingData)) {
             return;
         }
-        $logMsg = 'Segment length calculation: missing pixel width';
+        $logMsg = 'Segment length calculation: ';
         $logMsg .= 'No pixel-width set for several characters.'."\n";
         $logMsg .= 'Default width is used. See affected characters in extra data.';
         

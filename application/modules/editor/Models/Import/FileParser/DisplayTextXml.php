@@ -265,15 +265,25 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
         
         $this->xmlparser->registerElement('*', function($tag) {
             switch ($tag) {
-                
                 case 'comment':
                 case 'xml-comment':
                     
                 //handeld or known:
+                case '?xml':
+                case '?xml-stylesheet':
+                case '!doctype':
+                case 'book':
+                case 'timestamp':
+                case 'errordb':
+                case 'languagepart':
+                case 'fonts':
                 case 'token':
+                case 'lengths':
                 case 'Len':
+                case 'insets':
                 case 'textid':
                 case 'linefeed':
+                case 'displaytexts':
                 case 'displaymessage':
                 case 'translockdt':
                 case 'string':
