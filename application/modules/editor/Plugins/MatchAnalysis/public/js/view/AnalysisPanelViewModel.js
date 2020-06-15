@@ -28,7 +28,23 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.matchAnalysisPanel',
-    
+
+    formulas: {
+        isAnalysisRunning:{
+            get: function(task) {
+                return task && task.isAnalysis();
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
+        enablePanel:{
+            get: function (task) {
+                //if import status error disabled
+                return task && (!task.isErroneous() && !task.isImporting());
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        }
+    },
+
 	stores: {
 		//this store is defined here because the reference filter binding is required
 		analysisStore: {

@@ -102,7 +102,10 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
             	var task=this.get('task'),
             		downloadable=task.isErroneous() && Editor.app.authenticatedUser.isAllowed('downloadImportArchive'),
             		allowed=this.isMenuAllowed('editorShowexportmenuTask',task);
-            	return allowed && (!task.isErroneous() || downloadable) && !task.isImporting() && !task.isPending() && (!task.isCustomState() || task.get('state') == 'ExcelExported');
+            	if(downloadable && allowed){
+            	    return true;
+            	}
+            	return allowed && !task.isImporting() && !task.isPending() && (!task.isCustomState() || task.get('state') == 'ExcelExported');
             },
             bind: '{task}'
         },
@@ -130,6 +133,25 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
         isMenuGroupVisible:{
         	get: function(get) {
         		return this.get('isEditorPreferencesTask');
+            },
+            bind: '{task}'
+        },
+        
+        /***
+         * On task change, reconfigure the export menu
+         */
+        exportMenuConfig:{
+            get: function(task) {
+                //the old menu will be destroyed by the owner component
+                var me = this,
+                    hasQm = task.hasQmSub(),
+                    menu;
+                
+                menu = Ext.widget('adminExportMenu', {
+                    task: task,
+                    fields: hasQm ? task.segmentFields() : false
+                });
+                return menu;
             },
             bind: '{task}'
         }
