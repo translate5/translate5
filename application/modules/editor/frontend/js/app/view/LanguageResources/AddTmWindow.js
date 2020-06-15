@@ -107,6 +107,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                 },{
                     xtype:'sdlenginecombo',
                     itemId:'sdlEngine',
+                    name: 'engines',
                     bind:{
                         hidden:'{!isSdlResource}',
                         disabled:'{!isSdlResource}'

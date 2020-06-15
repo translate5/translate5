@@ -72,6 +72,7 @@ Ext.define('Editor.plugins.PangeaMt.controller.Main', {
             engineItem = {
                     xtype: 'pangeamtenginecombo',
                     itemId: 'pangeaMtEngine',
+                    name: 'engines',
                     displayField: 'name',
                     bind:{
                         hidden: true,
