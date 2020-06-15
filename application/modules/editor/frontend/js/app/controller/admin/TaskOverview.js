@@ -932,6 +932,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   
   /***
+   * Edit task action icon handler
+   */
+  handleTaskEdit: function(selectedTask, event) {
+      this.editorEditTask(selectedTask, event)
+  },
+  
+  /***
    * Show action menu by given menu xtype
    */
   showActionMenu:function(selectedTask,event,menuXtype){
@@ -1142,6 +1149,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  	  win = me.getTaskAddWindow(),
 	  	  items=win.items.items;
 	  
+	  win.getViewModel().set('currentTask',task);
+	  //TODO: use the current task in all other cards
 	  items.forEach(function(item){
 		  item.task=task;
 	  });

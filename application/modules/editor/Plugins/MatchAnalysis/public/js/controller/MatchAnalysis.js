@@ -172,8 +172,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
 
     onLanguageResourcesPanelRender:function(panel){
     	var me=this,
-    		task=panel.lookupViewModel().get('currentTask'),
-    		storeData=[], buttons = [];
+    		storeData=[];
     	
     	//init the pretranslate matchrate options (from 0-103)
     	for(var i=0;i<=103;i++){
@@ -183,24 +182,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		});
     	}
     	
-    	if(task && !task.isImporting()){
-        	buttons = [{
-                xtype:'button',
-                text:this.strings.analysis,
-                itemId:'btnAnalysis',
-                width:150,
-                dock:'bottom',
-                //TODO icon
-                listeners:{
-                    click:{
-                        fn:this.matchAnalysisButtonHandler,
-                        scope:this
-                    }
-                }
-            }];
-    	}
-    	
-    	//the task exist->add buttons in the task assoc panel
     	panel.addDocked([{
             xtype : 'toolbar',
             dock : 'bottom',
@@ -209,11 +190,31 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 type: 'hbox',
                 pack: 'start'
             },
-            items: buttons
+            items: [{
+                xtype:'button',
+                text:this.strings.analysis,
+                itemId:'btnAnalysis',
+                width:150,
+                dock:'bottom',
+                glyph: 'f200@FontAwesome5FreeSolid',
+                bind:{
+                    disabled:'{!enableDockedToolbar}',
+                    hidden:'{isAnalysisButtonHidden}'
+                },
+                listeners:{
+                    click:{
+                        fn:this.matchAnalysisButtonHandler,
+                        scope:this
+                    }
+                }
+            }]
         },{
             xtype : 'toolbar',
             dock : 'bottom',
             ui: 'footer',
+            bind:{
+                disabled:'{!enableDockedToolbar}'
+            },
             layout: {
                 type: 'vbox',
                 align: 'left'

@@ -552,16 +552,22 @@ tr.customState td div {font-style: italic;}
 /* Key Performance Indicators (KPI) */
 .ico-kpi {background-image: url("../images/page_gear.png");}
 
-/* For the edit icon this is required, TODO: show the menu on error
-.adminTaskGrid tr .x-action-col-icon,
-.adminTaskGrid tr.customState td .x-action-col-icon,
-.adminTaskGrid tr.error td .x-action-col-icon,
-.adminTaskGrid tr.import td .x-action-col-icon {display:none; background-repeat: no-repeat; background-position: center;}
 
+/* hide all actioncolumn icons by default, also hide them when customState,error or import state*/
+.adminTaskGrid tr .x-action-col-icon,
+.adminTaskGrid tr.customState div.x-action-col-icon.ico-task-edit,
+.adminTaskGrid tr.error div.x-action-col-icon.ico-task-edit,
+.adminTaskGrid tr.import div.x-action-col-icon.ico-task-edit {display:none; background-repeat: no-repeat; background-position: center;}
+
+/* display the actionicons when thay are enabled with class */
 .adminTaskGrid tr.editorMenuTask .ico-task-menu {display:inline-block;}
 .adminTaskGrid tr.editorProjectTask .ico-task-project {display:inline-block;}
 .adminTaskGrid tr.editorEditTask .ico-task-edit {display:inline-block;}
-*/
+
+/* hide the edit and jump icon in project grid */
+.projectGrid .ico-task-edit {display:none; background-repeat: no-repeat; background-position: center;}
+.projectGrid .ico-task-project {display:none; background-repeat: no-repeat; background-position: center;}
+
 /* space between action icons */
 .x-action-col-icon{
 	margin-right:5px;
