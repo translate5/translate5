@@ -39,12 +39,5 @@ class editor_Models_Import_FileParser_DisplayTextXml_Exception extends editor_Mo
         'E1274' => 'The DisplayText XML file "{fileName} (id {fileId})" does not contain any translation relevant segments.',
         'E1275' => 'Element "Inset" with ID {id} has the invalid type {type}, only type "pixel" is supported!',
         'E1276' => 'Element "Len" with ID {id} has the invalid type {type}, only type "pixel" is supported!',
-        
-        //ins confluence, aber hier raus:
-        'E1277' => 'Unknown XML tags "{tag}" discovered in file "{fileName} (id {fileId})"!',
-        //'E1278' =>
-        //$logMsg = 'Segment length calculation: missing pixel width';
-        //$logMsg .= 'No pixel-width set for several characters.'."\n";
-        //$logMsg .= 'Default width is used. See affected characters in extra data.';
     ];
 }
