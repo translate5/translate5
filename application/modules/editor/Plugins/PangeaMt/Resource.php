@@ -29,13 +29,13 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_PangeaMt_Resource extends editor_Models_LanguageResources_Resource {
     
     /**
-     * All supported source-languages (language-codes) of the PangeaMt-API.
-     * PangeaMt-Engines can also handle "auto" for the source.
+     * All supported source-languages (language-codes) of the PangeaMT-API.
+     * PangeaMT-Engines can also handle "auto" for the source.
      * @var array
      */
     protected $supportedSourceLangs;
     /**
-     * All supported target-languages (language-codes) of the PangeaMt-API.
+     * All supported target-languages (language-codes) of the PangeaMT-API.
      * @var array
      */
     protected $supportedTargetLangs;
@@ -75,7 +75,7 @@ class editor_Plugins_PangeaMt_Resource extends editor_Models_LanguageResources_R
     }
     
     /**
-     * Get the languages that the PangeaMt-API supports and store their language-codes.
+     * Get the languages that the PangeaMT-API supports and store their language-codes.
      */
     protected function setSupportedLanguages() {
         $api = ZfExtended_Factory::get('editor_Plugins_PangeaMt_HttpApi');
@@ -102,7 +102,7 @@ class editor_Plugins_PangeaMt_Resource extends editor_Models_LanguageResources_R
     
     /**
      * Returns the first part of the Rfc5646 language name,
-     * since PangeaMt only knows "de", but not "de-DE" etc.
+     * since PangeaMT only knows "de", but not "de-DE" etc.
      * @param string $langKey as defined in RFC5646
      * @return string
      */

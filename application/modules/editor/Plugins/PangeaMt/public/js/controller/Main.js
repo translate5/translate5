@@ -39,7 +39,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.PangeaMt.controller.Main', {
     extend: 'Ext.app.Controller',
     requires: [
-        'Editor.plugins.PangeaMt.view.LanguageResources.services.PangeaMt',
         'Editor.plugins.PangeaMt.view.LanguageResources.EngineCombo',
     ],
     stores:['Editor.plugins.PangeaMt.store.LanguageResources.PangeaMtEngine'],
@@ -57,9 +56,6 @@ Ext.define('Editor.plugins.PangeaMt.controller.Main', {
                 select: 'handleResourceChanged'
             }
         }
-    },
-    init: function() {
-        Editor.util.LanguageResources.addService(Ext.create('Editor.plugins.PangeaMt.view.LanguageResources.services.PangeaMt'));
     },
     /**
      * On add new tm window render handler
