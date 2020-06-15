@@ -61,7 +61,7 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
      * @see editor_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
-        throw new BadMethodCallException("The PangeaMt Translation Connector does not support search requests");
+        throw new BadMethodCallException("The PangeaMT Translation Connector does not support search requests");
     }
     
     /***
@@ -73,7 +73,7 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
     }
     
     /***
-     * Query the PangeaMt cloud api for the search string
+     * Query the PangeaMT cloud api for the search string
      * @param string $searchString
      * @param bool $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @return boolean

@@ -65,12 +65,12 @@ class editor_Plugins_PangeaMt_HttpApi {
         $logger = Zend_Registry::get('logger');
         $this->apiKey = $config->runtimeOptions->plugins->PangeaMt->apikey ?? null ;
         if(empty($this->apiKey)){
-            $logger->error('E1272', 'PangeaMt Plug-In: Apikey is not defined.');
+            $logger->error('E1272', 'PangeaMT Plug-In: Apikey is not defined.');
         }
     }
     
     /**
-     * Search the api for the engines that PangeaMt offers for us.
+     * Search the api for the engines that PangeaMT offers for us.
      */
     public function getEngines() {
         $method = 'POST';
@@ -125,15 +125,15 @@ class editor_Plugins_PangeaMt_HttpApi {
      * @return string
      */
     protected function getApiUrl(): string {
-        if (!$this->apiUrl) {
-            $config = Zend_Registry::get('config');
-            /* @var $config Zend_Config */
-            $urls = $config->runtimeOptions->plugins->PangeaMt->server->toArray();
-            if (empty($urls) || empty($urls[0])) {
-                $this->throwBadGateway();
-            }
-            $this->apiUrl = $urls[0];
+        $service = ZfExtended_Factory::get('editor_Plugins_PangeaMt_Service');
+        /* @var $service editor_Plugins_PangeaMt_Service */
+        if(!$service->isConfigured()) {
+            $this->throwBadGateway();
         }
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $urls = $config->runtimeOptions->plugins->PangeaMt->server->toArray();
+        $this->apiUrl = $urls[0];
         return $this->apiUrl;
     }
     
@@ -165,7 +165,7 @@ class editor_Plugins_PangeaMt_HttpApi {
     }
     
     /**
-     * Sends a request to PangeaMt's Api Service.
+     * Sends a request to PangeaMT's Api Service.
      * @param string $method
      * @param string $endpointPath
      * @param array $data (optional)
@@ -219,8 +219,8 @@ class editor_Plugins_PangeaMt_HttpApi {
      * @throws ZfExtended_BadGateway
      */
     protected function throwBadGateway() {
-        $e = new ZfExtended_BadGateway('PangeaMt-Api: The request returned an error.');
-        $e->setDomain('PangeaMt-Api');
+        $e = new ZfExtended_BadGateway('PangeaMT-Api: The request returned an error.');
+        $e->setDomain('PangeaMT-Api');
         $errors = $this->getErrors();
         $errors[] = $this->result; //add real result to error data
         $e->setErrors($errors);
@@ -228,7 +228,7 @@ class editor_Plugins_PangeaMt_HttpApi {
     }
     
     /**
-     * parses and processes the response of PangeaMt-Api, and handles the errors
+     * parses and processes the response of PangeaMT-Api, and handles the errors
      * @param Zend_Http_Response $response
      * @return boolean
      */

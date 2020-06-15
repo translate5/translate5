@@ -33,9 +33,9 @@ VALUES ('editor', 'editor', 'frontend', 'pluginPangeaMt'),
 ('editor', 'pm', 'frontend', 'pluginPangeaMt');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.PangeaMt.server', 1, 'editor', 'plugins', '["http://prod.pangeamt.com:8080"]', '[]', '', 'list', 'PangeaMt Api Server; format: ["SCHEME://HOST:PORT"]'),
-('runtimeOptions.plugins.PangeaMt.apikey', 1, 'editor', 'plugins', '', '', '', 'string', 'The apikey as given from PangeaMt'),
-('runtimeOptions.plugins.PangeaMt.matchrate', '1', 'editor', 'editor', '70', '70', '', 'integer', 'PangeaMt penalty value, used as default matchrate since in MT no matchrate is available');
+('runtimeOptions.plugins.PangeaMt.server', 1, 'editor', 'plugins', '["http://prod.pangeamt.com:8080"]', '[]', '', 'list', 'PangeaMT Api Server; format: ["SCHEME://HOST:PORT"]'),
+('runtimeOptions.plugins.PangeaMt.apikey', 1, 'editor', 'plugins', '', '(put your api key here)', '', 'string', 'The apikey as given from PangeaMT'),
+('runtimeOptions.plugins.PangeaMt.matchrate', '1', 'editor', 'editor', '70', '70', '', 'integer', 'PangeaMT penalty value, used as default matchrate since in MT no matchrate is available');
 
 -- add the plugin into an existing plugin config
 UPDATE  `Zf_configuration`

@@ -36,7 +36,7 @@ class editor_Plugins_PangeaMt_Service extends editor_Services_ServiceAbstract {
      * URL to confluence-page
      * @var string
      */
-    protected static $helpPage = "https://confluence.translate5.net/display/CON/PangeaMt";
+    protected static $helpPage = "https://confluence.translate5.net/display/CON/PangeaMT";
     
     protected $resourceClass = 'editor_Plugins_PangeaMt_Resource';
     
@@ -52,6 +52,17 @@ class editor_Plugins_PangeaMt_Service extends editor_Services_ServiceAbstract {
             return false;
         }
         if (!isset($this->config->runtimeOptions->plugins->PangeaMt->matchrate)) {
+            return false;
+        }
+        // server and apikey must be not just configured, but configured correctly!
+        // getEngines() will already need them. If they are NOT set correctly,
+        // PangeaMT must not be offered when adding LanguageResources.
+        $urls = $this->config->runtimeOptions->plugins->PangeaMt->server->toArray() ?? null;
+        if (empty($urls) || empty($urls[0])) {
+            return false;
+        }
+        $apiKey = $this->config->runtimeOptions->plugins->PangeaMt->apikey ?? null ;
+        if (empty($apiKey)) {
             return false;
         }
         return true;
@@ -72,6 +83,6 @@ class editor_Plugins_PangeaMt_Service extends editor_Services_ServiceAbstract {
      * @see editor_Services_ServiceAbstract::getName()
      */
     public function getName() {
-        return "PangeaMt";
+        return "PangeaMT";
     }
 }

@@ -58,10 +58,7 @@ class editor_Plugins_PangeaMt_Init extends ZfExtended_Plugin_Abstract {
     );
     
     public function init() {
-        if(!$this->validateConfig()) { // also provides user with infos in case the plugin is not configured completely
-            $this->frontendControllers = []; //disable frontend stuff if no valid config
-            return;
-        }
+        $this->validateConfig(); // provide user with infos in case the plugin is not configured completely
         
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
@@ -70,7 +67,9 @@ class editor_Plugins_PangeaMt_Init extends ZfExtended_Plugin_Abstract {
         $this->service = ZfExtended_Factory::get('editor_Plugins_PangeaMt_Service');
         /* @var $service editor_Plugins_PangeaMt_Service */
         
-        $this->initEvents();
+        if ($this->validateConfig()) {
+            $this->initEvents();
+        }
     }
     
     /**
@@ -117,15 +116,15 @@ class editor_Plugins_PangeaMt_Init extends ZfExtended_Plugin_Abstract {
         }
         $logger = Zend_Registry::get('logger');
         if(empty($config)) {
-            //$logger->error('E1270', 'PangeaMt Plug-In: No config given.');
+            //$logger->error('E1270', 'PangeaMT Plug-In: No config given.');
             return false;
         }
         if(empty($config['server'])) {
-            //$logger->error('E1271', 'PangeaMt Plug-In: API-Server is not defined.');
+            //$logger->error('E1271', 'PangeaMT Plug-In: API-Server is not defined.');
             return false;
         }
         if(empty($config['apikey'])) {
-            //$logger->error('E1272', 'PangeaMt Plug-In: Apikey is not defined.');
+            //$logger->error('E1272', 'PangeaMT Plug-In: Apikey is not defined.');
             return false;
         }
         return true;
