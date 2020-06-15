@@ -106,9 +106,9 @@ class editor_Services_Manager {
             'editor_Plugins_NecTm_Init' => (object) ['name' => '[NEC-TM]',
                                                      'serviceName' => 'NEC-TM',
                                                      'helppage' => urldecode('https://confluence.translate5.net/display/CON/NEC-TM')],
-            'editor_Plugins_PangeaMt_Init' => (object) ['name' => '[PangeaMt]',
-                                                     'serviceName' => 'PangeaMt',
-                                                     'helppage' => urldecode('https://confluence.translate5.net/display/CON/PangeaMt')],
+            'editor_Plugins_PangeaMt_Init' => (object) ['name' => '[PangeaMT]',
+                                                     'serviceName' => 'PangeaMT',
+                                                     'helppage' => urldecode('https://confluence.translate5.net/display/CON/PangeaMT')],
         ];
         // The (plug-in-)services that the user is supposed to see are by default activated on installation.
         $config = Zend_Registry::get('config');
