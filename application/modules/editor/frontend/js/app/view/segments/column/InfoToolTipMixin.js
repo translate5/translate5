@@ -91,6 +91,7 @@ Ext.define('Editor.view.segments.column.InfoToolTipMixin', {
 
             data.push(obj);
         });
+        data.push({name: 'MID', value: record.get('mid')});
         return Ext.String.htmlEncode(me.tableTpl.apply(data));
     }
 });

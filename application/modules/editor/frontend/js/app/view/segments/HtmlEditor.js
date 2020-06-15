@@ -609,10 +609,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               data.length = '1';
               data.text = '⎵';
               break;
+          //previously here was a hardReturn which makes mostly no sense, since just a \n (called here softreturn) is used in most data formats
           case 'newline':
-              classNameForTagType = 'single 6861726452657475726e2f newline';
+              classNameForTagType = 'single 736f667452657475726e2f newline';
               data.title = '&lt;'+data.nr+'/&gt;: Newline';
-              data.id = 'hardReturn';
+              data.id = 'softReturn';
               data.length = '1';
               data.text = '↵';
               break;
