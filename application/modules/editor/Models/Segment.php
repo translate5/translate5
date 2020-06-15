@@ -1778,4 +1778,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return $this->db->fetchAll($s)->toArray();
     }
     
+    /**
+     * loads segment by task-guid, file-id and the trans-unit id part of the mid
+     * No further data will be loaded and this api just returns the underlying zend-entry
+     * @param string $taskGuid
+     * @param int $fileId
+     * @param string $mid
+     * @return Zend_Db_Table_Row_Abstract|NULL
+     */
+    public function findByTaskGuidFileIdTransUnitId(string $taskGuid, int $fileId, string $transUnitId): Zend_Db_Table_Row_Abstract {
+        $s = $this->db->select()
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('fileId = ?', $fileId)
+            ->where('mid LIKE ?', $transUnitId.'_%');
+        return $this->db->fetchRow($s);
+    }
 }

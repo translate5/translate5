@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
+    
     const TYPE_IMPORT = 'import';
     const TYPE_EXPORT = 'export';
     const OKAPI_REL_DATA_DIR = 'okapi-data';
@@ -41,6 +42,37 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      */
     const ORIGINAL_FILE = 'original-%s.%s';
     
+    /**
+     * Api for accessing the saved Manifest file from other contexts
+     * @param string $absoluteTaskDataPath
+     * @param string $fileId
+     * @return string
+     */
+    public static function createManifestFilePath($absoluteTaskDataPath, $fileId){
+        return $absoluteTaskDataPath.'/'.self::OKAPI_REL_DATA_DIR.'/'.sprintf(self::MANIFEST_FILE, $fileId);
+    }
+    /**
+     * Api for accessing the saved original file from other contexts
+     * @param string $absoluteTaskDataPath
+     * @param string $fileId
+     * @param string $extension
+     * @return string
+     */
+    public static function createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension){
+        return $absoluteTaskDataPath.'/'.self::OKAPI_REL_DATA_DIR.'/'.sprintf(self::ORIGINAL_FILE, $fileId, $extension);
+    }
+    /**
+     * Api for accessing the saved  converted file from other contexts
+     * @param string $absoluteTaskDataPath
+     * @param string $fileId
+     * @param string $extension
+     * @return string
+     */
+    public static function createConvertedFilePath($absoluteTaskDataPath, $fileId, $extension){
+        $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+        /* @var $api editor_Plugins_Okapi_Connector */
+        return self::createOriginalFilePath($absoluteTaskDataPath, $fileId, $extension).$api::OUTPUT_FILE_EXTENSION;
+    }
     /**
      * @var ZfExtended_Logger
      */
@@ -140,6 +172,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         $plugin = $pm->get($pm->classToName(get_class($this)));
         
         $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+        /* @var $api editor_Plugins_Okapi_Connector */
         
         $language = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $language editor_Models_Languages */
