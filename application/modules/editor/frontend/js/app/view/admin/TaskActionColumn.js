@@ -63,36 +63,18 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
 	            isAllowedFor: 'editorMenuTask',
 	            iconCls: 'ico-task-menu',
 	            sortIndex:1
-	        }
-//	        ,{
-//                tooltip: me.messages.actionEdit,
-//                isDisabled: function(view, rowIndex, colIndex, item, record) {
-//                    var isProjectDisabled=me.isProjectGridDisabled(view);
-//                    if(isProjectDisabled){
-//                        //do not show the icon for project grid
-//                        item.iconCls='';
-//                    }
-//                    return isProjectDisabled;
-//                },
-//                isAllowedFor: 'editorEditTask',
-//                iconCls: 'ico-task-edit',
-//                sortIndex:1,
-//	        },
-	        ,{
+	        },{
+                tooltip: me.messages.actionEdit,
+                isAllowedFor: 'editorEditTask',
+                iconCls: 'ico-task-edit',
+                sortIndex:1,
+	        },{
 	            getTip:function(v,meta,record,row,col,store,table){
 		        	if(table.ownerGrid.getXType()=='projectTaskGrid'){
 		        		return me.messages.taskOverview;
 		        	}
 		        	return me.messages.projectOverview;
 		        },
-	            isDisabled: function(view, rowIndex, colIndex, item, record) {
-	                var isProjectDisabled=me.isProjectGridDisabled(view);
-	                if(isProjectDisabled){
-	                    //do not show the icon for project grid
-	                    item.iconCls='';
-	                }
-	                return isProjectDisabled;
-	            },
 		        isAllowedFor: 'editorProjectTask',
 		        iconCls: 'ico-task-project',
 		        sortIndex:2
@@ -124,13 +106,6 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
   itemFilter:function(item){
       //this filters only by systemrights. taskrights must be implemented by css
       return Editor.app.authenticatedUser.isAllowed(item.isAllowedFor);
-  },
-  
-  /***
-   * Is the action item disable for the project grid
-   */
-  isProjectGridDisabled:function(view){
-      return view.grid.xtype=='projectGrid'
   }
   
 });

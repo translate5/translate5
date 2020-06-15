@@ -32,16 +32,19 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.admin.ExportMenu', {
   extend: 'Ext.menu.Menu',
+  alias: 'widget.adminExportMenu',
   itemId: 'exportMenu',
   messages: {
-      exportDef: '#UT#exportieren (Orginalformat)',
-      exportDiff: '#UT#exportieren (Orginalformat mit Änderungshistorie)',
-      export2Def: '#UT#exportieren (XLIFF 2.1)',
+      exportDef: '#UT#Originalformat, {0}',
+      exportTranslation: '#UT#übersetzt',
+      exportReview: '#UT#lektoriert',
+      exportDiff: '#UT#SDLXLIFF mit Änderungsmarkierungen',
+      export2Def: '#UT#XLIFF 2.1',
       exportQmField: '#UT#Export QM-Statistik (XML) für Feld: {0}',
-      exportExcel: '#UT#exportieren (Excel)',
+      exportExcel: '#UT#Externe Bearbeitung als Excel',
       downloadImportArchive: '#UT#Importarchiv herunterladen'
   },
-  alias: 'widget.adminExportMenu',
+  
   makePath: function(path, field) {
       var task = this.initialConfig.task;
       return Editor.data.restpath+Ext.String.format(path, task.get('id'), task.get('taskGuid'), field);
@@ -95,15 +98,19 @@ Ext.define('Editor.view.admin.ExportMenu', {
   initExportOptions: function() {
       var me = this,
           fields = this.initialConfig.fields,
+          exportAllowed =Editor.app.authenticatedUser.isAllowed('editorExportTask', me.task),
+          exportDiffString=me.task.get('emptyTargets') ? me.messages.exportTranslation : me.messages.exportReview,
           result = [{
               itemId: 'exportItem',
+              hidden:!exportAllowed,
               hrefTarget: '_blank',
               href: me.makePath('task/export/id/{0}'),
-              text: me.messages.exportDef
+              text : Ext.String.format(me.messages.exportDef,exportDiffString)
           },{
               itemId: 'exportDiffItem',
               hrefTarget: '_blank',
               href: me.makePath('task/export/id/{0}/diff/1'),
+              hidden:!exportAllowed || !me.task.get('isSdlxliffFileParser'),
               text : me.messages.exportDiff
           },{
               itemId: 'exportItemXliff2',

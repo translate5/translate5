@@ -61,6 +61,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
     viewModel:{
     	type:'taskattributes'
     },
+    bind:{
+        disabled:'{!enablePanel}'
+    },
     title: '#UT#Eigenschaften',
     initConfig: function(instanceConfig) {
         var me = this,
