@@ -74,6 +74,23 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
     protected $lengthDefinitions = [];
     
     /**
+     * The comments of the current segment
+     * @var array
+     */
+    protected $currentComments = [];
+    
+    /**
+     * The segmentId of the current saved segment
+     * @var integer
+     */
+    protected $currentSegmentId = null;
+    
+    /**
+     * @var integer
+     */
+    protected $segmentCount = 0;
+    
+    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
      */
@@ -232,11 +249,29 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
      */
     protected function registerContent() {
         $this->xmlparser->registerElement('string', null, function($tag, $key, $opener) {
+            //<Comment Language="german"> Allgemeiner Anzeigetext<Linefeed/> <Linefeed/>Nähere Erklärung: 'Dashes will be shown for the invalid data' </Comment>
+            if(!empty($this->currentComments)) {
+                foreach($this->currentComments as $comment) {
+                    /* @var $comment editor_Models_Comment */
+                    $comment->setTaskGuid($this->task->getTaskGuid());
+                    $comment->setSegmentId($this->currentSegmentId);
+                    $comment->save();
+                }
+                //if there was at least one processed comment, we have to sync the comment contents to the segment
+                if(!empty($comment)){
+                    $segment = ZfExtended_Factory::get('editor_Models_Segment');
+                    /* @var $segment editor_Models_Segment */
+                    $segment->load($this->currentSegmentId);
+                    $comment->updateSegment($segment, $this->task->getTaskGuid());
+                }
+            }
             //save comments, reset segmentId
+            $this->currentSegmentId = null;
+            $this->currentComments = [];
         });
         
         //we just replace the linefeed tags with a raw newline. So it is replaced as new line tag then
-        $this->xmlparser->registerElement('displaymessage linefeed', function($tag, $attributes, $key) {
+        $this->xmlparser->registerElement('comment linefeed, displaymessage linefeed', function($tag, $attributes, $key) {
             $this->xmlparser->replaceChunk($key, "\n");
         });
         
@@ -254,6 +289,15 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
             $this->extractSegment($opener, $key);
         });
         
+        $this->xmlparser->registerElement('comment', null, function($tag, $key, $opener) {
+            $this->currentComments[] = $currentComment = ZfExtended_Factory::get('editor_Models_Comment');
+            /* @var $currentComment editor_Models_Comment */
+            //$currentComment->
+            $currentComment->setUserName($this->xmlparser->getAttribute($opener['attributes'], 'language'),);
+            $currentComment->setUserGuid('imported');
+            $currentComment->setComment($this->xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true));
+        });
+        
         $this->xmlparser->registerElement('displaymessage inset', null, function($tag, $key, $opener) {
             //we get the whole inset tag
             $chunk = $this->xmlparser->getRange($opener['openerKey'], $key, true);
@@ -265,8 +309,6 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
         
         $this->xmlparser->registerElement('*', function($tag) {
             switch ($tag) {
-                case 'comment':
-                case 'xml-comment':
                     
                 //handeld or known:
                 case '?xml':
@@ -282,6 +324,8 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
                 case 'Len':
                 case 'insets':
                 case 'textid':
+                case 'comment':
+                case 'xml-comment':
                 case 'linefeed':
                 case 'displaytexts':
                 case 'displaymessage':
@@ -355,10 +399,13 @@ The German and the English Comment tag of the string must be imported as comment
         );
         $this->segmentData[$targetName] = array(
             'original' => '',
+//FIXME remove me, just for test export!
+'original' => $segment
         );
             
         $this->parseSegmentAttributes($textId, $lengthId);
-        $segmentId = $this->setAndSaveSegmentValues();
+        $this->currentSegmentId = $this->setAndSaveSegmentValues();
+        $this->segmentCount++;
         
         //If segment is readonly, we do not place placeholders, so that no reconversion is needed here
         if($this->currentIsReadOnly) {
@@ -373,7 +420,7 @@ The German and the English Comment tag of the string must be imported as comment
         $this->xmlparser->replaceChunk($start, '', $length);
         
         //add placeholder
-        $this->xmlparser->replaceChunk($start, $this->getFieldPlaceholder($segmentId, $targetName));
+        $this->xmlparser->replaceChunk($start, $this->getFieldPlaceholder($this->currentSegmentId, $targetName));
     }
     
     /**
