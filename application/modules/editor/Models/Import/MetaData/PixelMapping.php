@@ -130,7 +130,7 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
                 $this->ignoredLines[] = join(', ', $values);
                 continue;
             }
-            $pixelMappingModel->insertPixelMappingRow($values);
+            $pixelMappingModel->insertPixelMappingRow($taskGuid, null, $values['font'], $values['fontsize'], $values['unicodeChar'], $values['pixelWidth']);
         }
     }
     

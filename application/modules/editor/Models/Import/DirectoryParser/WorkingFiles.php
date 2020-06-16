@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -26,11 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+ 
+/**#@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
- * 
+ *
  */
 /**
  * Klasse zum Parsen und Importieren von Dateistrukturen
@@ -106,9 +106,6 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    */
   protected function iterateThrough(StdClass $rootNode, string $directoryPath){
     $this->rootNode = $rootNode;
-    $localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-            'LocalEncoded'
-        );
     $filenames = [];
     $directories = [];
     $iterator = new DirectoryIterator($directoryPath);
@@ -117,7 +114,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
       if($this->isIgnored($fileinfo, $directoryPath)) {
           continue;
       }
-      $fileName = $localEncoded->decode($fileinfo->getFilename());
+      $fileName = ZfExtended_Utils::filesystemDecode($fileinfo->getFilename());
       if($fileinfo->isFile()) {
           if(!self::$filesFound){
               self::$filesFound = true;
@@ -150,7 +147,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
   /**
    * checks if the given File/Directory should be ignored
    * @param DirectoryIterator $file
-   * @return boolean 
+   * @return boolean
    */
   protected function isIgnored(DirectoryIterator $file,string $directoryPath){
       if($file->isDot() || in_array($file->getFilename(), $this->ignoreList)){
@@ -161,7 +158,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
       }
       //no extension filter set: pass all files
       if(empty($this->supportedFiles)){
-          return false; 
+          return false;
       }
       $extensions = $this->supportedFiles->getRegisteredExtensions();
       foreach ($extensions as $ext) {
@@ -212,8 +209,8 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
   protected function getDirectoryNodeAndIterate($directory, $path) {
     $node = $this->getDirectoryNode($directory);
     
-    //we init the iteration instance always with false, 
-    // but we set the supportedFiles instance afterwards directly (so we don't create multiple instances) 
+    //we init the iteration instance always with false,
+    // but we set the supportedFiles instance afterwards directly (so we don't create multiple instances)
     $iteration = new static(false);
     $iteration->supportedFiles = $this->supportedFiles;
     

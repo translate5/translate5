@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Contains Methods for Fileparsing on the Import
- * 
+ *
  * - Child Classes must implement and use the abstract methods
  */
 abstract class editor_Models_Import_FileParser {
@@ -89,7 +89,7 @@ abstract class editor_Models_Import_FileParser {
     protected $segmentProcessor = array();
     
     /**
-     * all files with extensions listet here are converted to utf8. For details see method convert2utf8
+     * all files with extensions listed here are converted to utf8. For details see method convert2utf8
      * @var array
      */
     protected $_convert2utf8 = array('csv');
@@ -121,10 +121,25 @@ abstract class editor_Models_Import_FileParser {
     protected $config;
     
     /**
-     * contains the classname of the used parser
-     * @var string
+     * returns the file extensions (in lower case) parsable by this fileparser
+     * @return array;
      */
-    protected $usedParser;
+    public static function getFileExtensions() {
+        throw new ZfExtended_Exception('Method must be overwritten in subclass!'); //with strict standards statics may not abstract!
+    }
+    
+    /**
+     * Basically we assume that each Parser is able to parse its exceptions, so this functions defaults to return true.
+     * If this not the case forexample due multi purpose extensions like XML, the isParsable must be calculated in the
+     *  concrete file parser.
+     * @param string $fileHead the first 512 bytes of the file to be imported
+     * @param string $errorMsg returning by reference a reason why its not parsable
+     * @return boolean
+     */
+    public static function isParsable(string $fileHead, string &$errorMsg): bool {
+        $errorMsg = '';
+        return true;
+    }
     
     /**
      * FIXME change first Parameter to SplFileInfo!
@@ -143,24 +158,12 @@ abstract class editor_Models_Import_FileParser {
         $this->_taskGuid = $task->getTaskGuid();
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         $this->matchRateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
-        $this->usedParser = get_class($this); //this value changes if another file parser is used dynamically
-    }
-    
-    /**
-     * This function returns the parser which should be used by parsing
-     * Therefore the content of LEK_file must be saved after chaining, so this method and its overrides has to call updateFile()
-     * normally this is $this (means the current parser)
-     * The chaining gives us the possibility to parse a XML, find out the real file type and return the correct file parser here
-     * @return editor_Models_Import_FileParser
-     */
-    public function getChainedParser() {
-        $this->updateFile();
-        return $this;
+        $this->updateFile(get_class($this));
     }
     
     /**
      * Prototyp-function for getting word-count while import process.
-     * This function is (or is not) overwritten by typ-specific import-parser 
+     * This function is (or is not) overwritten by typ-specific import-parser
      */
     public function getWordCount()
     {
@@ -200,7 +203,7 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
-     * Gibt den Inhalt das erzeugte Skeleton File zurück 
+     * Gibt den Inhalt das erzeugte Skeleton File zurück
      * @return string
      */
     public function getSkeletonFile() {
@@ -225,7 +228,7 @@ abstract class editor_Models_Import_FileParser {
     
     /**
      * Does the fileparsing
-     * FIXME replace the pre and post parse handlers with events 
+     * FIXME replace the pre and post parse handlers with events
      */
     public function parseFile() {
         foreach($this->segmentProcessor as $p) {
@@ -240,7 +243,7 @@ abstract class editor_Models_Import_FileParser {
     
     /**
      * Speichert das Segment in die Datenbank
-     * FIXME replace the post process handlers with events 
+     * FIXME replace the post process handlers with events
      *
      * @param mixed transunit
      * @return integer segmentId
@@ -289,7 +292,7 @@ abstract class editor_Models_Import_FileParser {
      * @return editor_Models_Import_FileParser_SegmentAttributes
      */
     public function getSegmentAttributes($forMid) {
-        //just call the create call, since it does what we want, 
+        //just call the create call, since it does what we want,
         //  but the method name is misleading here
         return $this->createSegmentAttributes($forMid);
     }
@@ -306,13 +309,14 @@ abstract class editor_Models_Import_FileParser {
     /**
      * checks the encoding of the file and saves the encoding to the file-table
      * - only saves encoding for formats listed in this->_convert2utf8
-     * @triggers error if encoding could not be detected; in this case does not save anything to db
+     * @param string $usedParser
+     * @throws editor_Models_Import_FileParser_Exception
      */
-    protected function updateFile() {
+    protected function updateFile(string $usedParser) {
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $file->load($this->_fileId);
-        $file->setFileParser($this->usedParser);
+        $file->setFileParser($usedParser);
         
         $convert = false;
         foreach ($this->_convert2utf8 as $format){
@@ -350,7 +354,7 @@ abstract class editor_Models_Import_FileParser {
      
         foreach ($list as $item) {
             $sample = iconv($item, $item, $this->_origFile);
-            if (md5($sample) == md5($this->_origFile)) { 
+            if (md5($sample) == md5($this->_origFile)) {
                  $this->_origFile = iconv($item, 'UTF-8', $this->_origFile);
                  return $item;
             }
@@ -375,7 +379,7 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
-     * calculates and sets segment attributes needed by us, this info doesnt exist directly in the segment. 
+     * calculates and sets segment attributes needed by us, this info doesnt exist directly in the segment.
      * These are currently: pretrans, editable, autoStateId
      * Parameters are given by the current segment
      * @return editor_Models_Import_FileParser_SegmentAttributes
@@ -421,28 +425,6 @@ abstract class editor_Models_Import_FileParser {
     }
     
     /**
-     * Extrahiert aus einer trans-unit Quell-
-     * und Zielsegmente
-     *
-     * - speichert die Segmente in der Datenbank
-     * @param mixed $transUnit
-     * @return mixed $transUnit
-     */
-    abstract protected function extractSegment($transUnit);
-    
-    /**
-     * Extrahiert aus einem Segment (bereits ohne umschließende Tags) die Tags
-     *
-     * - speichert die Tags in der Datenbank
-     *
-     * @param mixed $segment
-     * @param bool isSource
-     * @return mixed $segment enthält anstelle der Tags die vom JS benötigten Replacement-Tags
-     *         wobei die id die ID des Segments in der Tabelle Segments darstellt
-     */
-    abstract protected function parseSegment($segment,$isSource);
-
-    /**
      * Gibt die MID des aktuellen Segments zurück
      * @return string
      */
@@ -457,37 +439,5 @@ abstract class editor_Models_Import_FileParser {
      */
     public function & getFieldContents() {
         return $this->segmentData;
-    }
-    
-    /**
-     * returns the file extensions (in lower case) parsable by this fileparser
-     * @return array;
-     */
-    public static function getFileExtensions() {
-        throw new ZfExtended_Exception('Method must be overwritten in subclass!'); //with strict standards statics may not abstract!
-    }
-    
-    /**
-     * Gets a mapping of file extensions to possible fileparsers 
-     * @return array
-     */
-    public static function getAllFileParsersMap() {
-        $d = dir(str_replace('.php', '', __FILE__));
-        $fileParsers = [];
-        while (false !== ($entry = $d->read())) {
-            if(strpos(strrev($entry), 'php.') !== 0) {
-                continue;
-            }
-            $cls = 'editor_Models_Import_FileParser_'.str_replace('.php', '', $entry);
-            //the class_exists triggers the autoload of the class
-            if(class_exists($cls) && is_subclass_of($cls, 'editor_Models_Import_FileParser')) {
-                $extensions = $cls::getFileExtensions();
-                foreach($extensions as $extension) {
-                    $fileParsers[$extension] = $cls;
-                }
-            }
-        }
-        $d->close();
-        return $fileParsers;
     }
 }
