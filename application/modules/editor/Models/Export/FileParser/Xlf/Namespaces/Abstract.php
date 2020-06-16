@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
 /**
  * XLF Fileparser Add On abstract class
  */
-abstract class editor_Models_Export_FileParser_Xlf_AbstractNamespace {
+abstract class editor_Models_Export_FileParser_Xlf_Namespaces_Abstract {
     /**
      * container for exported comments per segment
      * @var array

@@ -52,9 +52,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     private $wordCount = 0;
     private $segmentCount = 1;
     
-    private $startShiftCount = 0;
-    private $endShiftCount = 0;
-    
     /**
      * Helper to call namespace specfic parsing stuff
      * @var editor_Models_Import_FileParser_Xlf_Namespaces
@@ -171,6 +168,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected $lengthRestriction;
     
     /**
+     * @var editor_Models_Import_FileParser_Xlf_SurroundingTags
+     */
+    protected $surroundingTags;
+    
+    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
      */
@@ -189,6 +191,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->segmentBareInstance = ZfExtended_Factory::get('editor_Models_Segment');
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
         $this->lengthRestriction = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_LengthRestriction');
+        $this->surroundingTags = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_SurroundingTags', [$this->config]);
         $this->otherContent = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_OtherContent', [
             $this->contentConverter, $this->segmentBareInstance, $this->task, $fileId
         ]);
@@ -776,25 +779,19 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 }
             }
             
-            $surroundingTags = $this->calculateSurroundingTags($preserveWhitespace, $sourceChunks, $targetChunks);
+            $this->surroundingTags->calculate($preserveWhitespace, $sourceChunks, $targetChunks, $this->xmlparser);
             
-            //store already converted and uncut chunks
-            $sourceChunksUncut = $sourceChunks;
-            $targetChunksUncut = $targetChunks;
-            
-            //for source column we dont have a place holder, so we just cut off the leading/trailing tags and import the rest as source
-            $sourceChunks = array_slice($sourceChunks, $this->startShiftCount, count($sourceChunks) - $this->startShiftCount - $this->endShiftCount);
-            //for target we have to do the same on the converted chunks to be used,
-            $targetChunks = array_slice($targetChunks, $this->startShiftCount, count($targetChunks) - $this->startShiftCount - $this->endShiftCount);
-            
-            $this->segmentData = array();
-            $this->segmentData[$sourceName] = array(
-                'original' => $this->xmlparser->join($sourceChunks)
-            );
+            $this->segmentData = [];
+            $this->segmentData[$sourceName] = [
+                //for source column we dont have a place holder, so we just cut off the leading/trailing tags and import the rest as source
+                'original' => $this->xmlparser->join($this->surroundingTags->sliceTags($sourceChunks))
+            ];
         
-            $this->segmentData[$targetName] = array(
-                'original' => $this->xmlparser->join($targetChunks)
-            );
+            //for target we have to do the same tag cut off on the converted chunks to be used,
+            $targetChunksTagCut = $this->surroundingTags->sliceTags($targetChunks);
+            $this->segmentData[$targetName] = [
+                'original' => $this->xmlparser->join($targetChunksTagCut)
+            ];
             
             //parse attributes for each found segment not only for the whole trans-unit
             $attributes = $this->parseSegmentAttributes($transUnit, $mid);
@@ -812,7 +809,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->setMid($this->_mid.'-'.$mid);
             }
             
-            $emptyTarget = empty($targetChunks) && $targetChunks !== "0";
+            $emptyTarget = empty($targetChunksTagCut) && $targetChunksTagCut !== "0";
             $hasOriginalTarget = !(empty($this->segmentData[$targetName]['original']) && $this->segmentData[$targetName]['original']!=="0");
             //if source contains tags only or is empty (and is no missing source) then we are able to ignore non textual segments
             if(!$isSourceMrkMissing && !$this->hasText($this->segmentData[$sourceName]['original']) && ($emptyTarget || $hasOriginalTarget)) {
@@ -821,7 +818,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 //  on reviewing needs $hasOriginalTarget to be true, which is the case by above if
                 $placeHolders[$mid] = $this->xmlparser->join($emptyTarget ? $sourceChunksOriginal : $targetChunksOriginal);
                 //we add the length of the ignored segment to the additionalUnitLength
-                $this->otherContent->addIgnoredSegmentLength($emptyTarget ? $sourceChunksUncut : $targetChunksUncut, $attributes);
+                $this->otherContent->addIgnoredSegmentLength($emptyTarget ? $sourceChunks : $targetChunks, $attributes);
                 continue;
             }
             $segmentId = $this->setAndSaveSegmentValues();
@@ -831,7 +828,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             if($currentTarget !== self::MISSING_MRK) {
                 //we add a placeholder if it is a real segment, not just a placeholder for a missing mrk
-                $placeHolders[$mid] = $surroundingTags['before'].$this->getFieldPlaceholder($segmentId, $targetName).$surroundingTags['after'];
+                $placeHolders[$mid] = $this->surroundingTags->getLeading().$this->getFieldPlaceholder($segmentId, $targetName).$this->surroundingTags->getTrailing();
             }
         }
         
@@ -895,52 +892,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 return $placeHolder.$oldChunk;
             });
         }
-    }
-    
-    protected function calculateSurroundingTags($preserveWhitespace, array $sourceChunks, array $targetChunks) {
-        $surroundingTags = [
-            'before' => '',
-            'after' => '',
-        ];
-        
-        //if target is empty, we assume the target = source so that the feature can be used at all
-        // 1. because it checks for same tags in source and target
-        // 2. because we need the tags from source to be added as leading / trailing in target
-        $target = $this->xmlparser->join($targetChunks);
-        if(empty($target)) {
-            $targetChunks = $sourceChunks;
-        }
-        
-        //reset start/end shift count.
-        // the counts are set by hasSameStartAndEndTags to > 0,
-        // then the start/end offset where the placeHolder is placed is shifted
-        // to exclude tags leading and trailing tags in the segment
-        $this->startShiftCount = 0;
-        $this->endShiftCount = 0;
-        //if preserveWhitespace is enabled, hasSameStartAndEndTags should not hide tags,
-        // since potential whitespace tags does matter then in the content
-        //since we are calling the leading/trailing tag stuff on the already fetched source segments,
-        // we have no ability here to conserve content outside the mrk tags - which also should not be on preserveWhitespace
-        if(!$this->hasSameStartAndEndTags($preserveWhitespace, $sourceChunks, $targetChunks)) {
-            //if there is just leading/trailing whitespace but no tags we reset the counter
-            // since then we dont want to cut off something
-            //if there is whitespace between or before the leading / after the trailing tags,
-            // this whitespace is ignored depending the preserveWhitespace setting.
-            // above $sourceChunks $targetChunks does not contain any irrelevant whitespace (only empty chunks)
-            $this->startShiftCount = 0;
-            $this->endShiftCount = 0;
-            
-            return $surroundingTags;
-        }
-        
-        //we get and store the leading target tags for later insertion
-        $surroundingTags['before'] = $this->internalTag->restore($this->xmlparser->join(array_slice($targetChunks, 0, $this->startShiftCount)));
-        
-        //we get and store the trailing target tags for later insertion
-        if($this->endShiftCount > 0) {
-            $surroundingTags['after'] = $this->internalTag->restore($this->xmlparser->join(array_slice($targetChunks, -$this->endShiftCount)));
-        }
-        return $surroundingTags;
     }
     
     /**
@@ -1087,86 +1038,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         $mrkMissingInTarget = array_fill_keys($mrkMissingInTarget, self::MISSING_MRK);
         $this->currentTarget = array_merge($this->currentTarget, $mrkMissingInTarget);
-    }
-    
-    /**
-     * Checks recursivly if target and source starts/ends with the same chunks,
-     *   if there are some tags in the start/end chunks it checks if they are paired tags.
-     *   if source and target start and ends just with that paired tags (no other content expect whitespace) then the tags are ignored in import
-     * @param bool $preserveWhitespace
-     * @param array $source
-     * @param array $target
-     * @param bool $foundTag used for recursive call
-     * @return boolean returns false if there are no matching leading/trailing tags at all
-     */
-    protected function hasSameStartAndEndTags($preserveWhitespace, array $source, array $target, $foundTag = false) {
-        //source and target must have at least a start tag, text content, and an end tag, that means at least 3 chunks:
-        // if the feature is disabled no framing tags are ignored
-        if(!$this->config->runtimeOptions->import->xlf->ignoreFramingTags || count($source) < 4 || count($target) < 4){
-            return $foundTag;
-        }
-        
-        //init variables:
-        $sourceStart = array_shift($source);
-        $sourceEnd = array_pop($source);
-        $targetStart = array_shift($target);
-        $targetEnd = array_pop($target);
-        $startShiftCount = 0;
-        $endShiftCount = 0;
-        
-        if($sourceStart != $targetStart || $sourceEnd != $targetEnd){
-            //source or target chunks are different, so no tag match possible
-            return $foundTag;
-        }
-        
-        //if sourceStart is an empty string, get the next pairs
-        // if we do NOT preserveWhitespace, and sourceStart is whitespace then we also get the next pair
-        // or in other words: if we preserveWhitespace only tags without whitespace inbetween are considered as having sameStartAndEndTags
-        while(!is_null($sourceStart) && empty($sourceStart) || (!$preserveWhitespace && preg_match('#^\s+$#', $sourceStart))) {
-            $sourceStart = array_shift($source);
-            $targetStart = array_shift($target);
-            if($sourceStart != $targetStart) {
-                return $foundTag;
-            }
-            //inc internal start shift count
-            $startShiftCount++;
-        }
-        
-        //check next non empty/whitespace chunk
-        $startMatches = [];
-        if(!preg_match(editor_Models_Segment_InternalTag::REGEX_STARTTAG, $sourceStart, $startMatches)) {
-            //if no tag then exit
-            return $foundTag;
-        }
-        
-        while(!is_null($sourceEnd) && empty($sourceEnd) || (!$preserveWhitespace && preg_match('#^\s+$#', $sourceEnd))) {
-            $sourceEnd = array_pop($source);
-            $targetEnd = array_pop($target);
-            if($sourceEnd != $targetEnd) {
-                //if end chunks differ exit
-                return $foundTag;
-            }
-            //inc internal end shift count
-            $endShiftCount++;
-        }
-        
-        //check next non empty/whitespace chunk from behind
-        $endMatches = [];
-        if(!preg_match(editor_Models_Segment_InternalTag::REGEX_ENDTAG, $sourceEnd, $endMatches)) {
-            //if no tag then exit
-            return $foundTag;
-        }
-        
-        //if tag pairs from start to end does not match, then exit
-        if($startMatches[1] !== $endMatches[1]) {
-            return $foundTag;
-        }
-        $this->startShiftCount = $this->startShiftCount + ++$startShiftCount;
-        $this->endShiftCount = $this->endShiftCount + ++$endShiftCount;
-        
-        //start recursivly for more than one tag pair,
-        // we have found at least one tag pair so set $foundTag to true for next iteration
-        return $this->hasSameStartAndEndTags($preserveWhitespace, $source, $target, true);
     }
     
     /**
