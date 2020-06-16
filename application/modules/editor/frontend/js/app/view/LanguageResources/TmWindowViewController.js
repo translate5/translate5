@@ -126,9 +126,9 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     },
 
     /**
-     * Sdl engine combo change handler
+     * Engine combo change handler
      */
-    onSdlEngineComboChange:function(combo,newVal,oldVal,eOpts){
+    onEngineComboChange:function(combo,newVal,oldVal,eOpts){
         var me=this,
             view=me.getView(),
             selection=combo.getSelection(),
@@ -172,13 +172,8 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
      * Source and target language change handler
      */
     onLanguageComboChange:function(){
-        var me=this,
-            isSdl=me.isSdlResource();
-        if(!isSdl){
-            return;
-        }
-
-        me.filterSdlEngine();
+        var me=this;
+        me.filterEngines();
     },
 
     onCustomersTagFieldChange:function(field,newValue,oldValue,eOpts){
@@ -231,35 +226,43 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     },
 
     /**
-     * Filter the sdl engine store, when source or target language is selected
+     * Filter the engines store, when source or target language is selected
      */
-    filterSdlEngine:function(){
+    filterEngines:function(){
         var me=this,
             view=me.getView(),
-            sdlEngineComboField=view.down('#sdlEngine'),
-            sdlEngineComboStore=sdlEngineComboField.getStore(),
-            sourceLang=view.down('combo[name="sourceLang"]').getSelection(),
-            targetLang=view.down('combo[name="targetLang"]').getSelection(),
+            engineComboField=view.down('combo[name="engines"]:visible(true)'),
+            engineComboStore,
+            sourceLang,
+            targetLang,
             filterData=[];
         
+        if (engineComboField === null) {
+            return;
+        }
+        
+        engineComboStore=engineComboField.getStore();
+        sourceLang=view.down('combo[name="sourceLang"]').getSelection();
+        targetLang=view.down('combo[name="targetLang"]').getSelection();
+        
         //clean the engine filters
-        sdlEngineComboStore.clearFilter();
+        engineComboStore.clearFilter();
 
         //preselect when only one result is filtered
-        sdlEngineComboStore.on({
+        engineComboStore.on({
             filterchange:function (sdlstore,filters,eOpts){
                 if(sdlstore.getData().length==1){
-                    sdlEngineComboField.suspendEvents();
-                    sdlEngineComboField.setSelection(sdlstore.getAt(0));
-                    sdlEngineComboField.resumeEvents();
+                    engineComboField.suspendEvents();
+                    engineComboField.setSelection(sdlstore.getAt(0));
+                    engineComboField.resumeEvents();
                 }
             }
         })
 
         //clean the selected value in the sdl combo
-        sdlEngineComboField.suspendEvents();
-        sdlEngineComboField.clearValue(null);
-        sdlEngineComboField.resumeEvents();
+        engineComboField.suspendEvents();
+        engineComboField.clearValue(null);
+        engineComboField.resumeEvents();
         
         //if source is selected, create source filter
         if(sourceLang){
@@ -279,7 +282,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
 
         //apply the filters to the sdl language store
         if(filterData.length>0){
-            sdlEngineComboStore.addFilter(filterData,true);
+            engineComboStore.addFilter(filterData,true);
         }
     },
 
