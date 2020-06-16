@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -28,11 +28,11 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Initial Class of Plugin "XlfExportTranslateByAutostate"
- * This Plugin is for Across Connection where we have to abuse trans-units 
+ * This Plugin is for Across Connection where we have to abuse trans-units
  * translate="yes/no" for filtering changed segments coming from translate5
- * 
+ *
  * All segments modified are getting translate = yes
- * Modified means with a reviewed autostate, and real changed content or new comments. 
+ * Modified means with a reviewed autostate, and real changed content or new comments.
  */
 class editor_Plugins_XlfExportTranslateByAutostate_Init extends ZfExtended_Plugin_Abstract {
     
@@ -79,20 +79,20 @@ class editor_Plugins_XlfExportTranslateByAutostate_Init extends ZfExtended_Plugi
         $attributes = $event->getParam('attributes');
         settype($attributes, 'array');
         $attributes['translate'] = $translateYes ? 'yes' : 'no';
-        //setting back the attributes in the event for further handlers, 
-        // and the transunit attributes are generated from that array 
+        //setting back the attributes in the event for further handlers,
+        // and the transunit attributes are generated from that array
         $event->setParam('attributes', $attributes);
     }
     
     /**
      * returns true if there were made some new comments in the segments
      * @param array $segments
-     * @return boolean 
+     * @return boolean
      */
     protected function hasNewComments(array $segments) {
         $comment = ZfExtended_Factory::get('editor_Models_Comment');
         $nonImportedComments = function($item) {
-            return $item['userGuid'] != editor_Models_Import_FileParser_Xlf_AcrossNamespace::USERGUID;
+            return $item['userGuid'] != editor_Models_Import_FileParser_Xlf_Namespaces_Across::USERGUID;
         };
         /* @var $comment editor_Models_Comment */
         foreach($segments as $segment) {
