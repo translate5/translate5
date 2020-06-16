@@ -1069,8 +1069,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   checkSegmentLength: function(segmentText){
       var me = this,
-          meta = me.currentSegment && me.currentSegment.get('metaCache');
-      me.segmentLengthStatus = Ext.ComponentQuery.query('#segmentMinMaxLength')[0].getMinMaxLengthStatus(segmentText, meta);
+          meta = me.currentSegment && me.currentSegment.get('metaCache'),
+          fileId = me.currentSegment.get('fileId');
+      me.segmentLengthStatus = Ext.ComponentQuery.query('#segmentMinMaxLength')[0].getMinMaxLengthStatus(segmentText, meta, fileId);
   },
   
   /**
