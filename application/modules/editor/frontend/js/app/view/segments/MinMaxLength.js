@@ -384,7 +384,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         }
 
         editorBody = me.editor.getEditorBody();
-        allLines = me.getLinesAndLength(editorBody.innerHTML, me.segmentMeta);
+        allLines = me.getLinesAndLength(editorBody.innerHTML, me.segmentMeta, me.segmentFileId);
         if (allLines.length >= (me.segmentMeta.maxNumberOfLines)) {
             return;
         }
@@ -466,7 +466,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             errorMsg;
         
         segmentLengthTotal = me.editor.getTransunitLength(editorContent);
-        segmentLengthStatus = me.getMinMaxLengthStatus(editorContent,me.segmentMeta);
+        segmentLengthStatus = me.getMinMaxLengthStatus(editorContent,me.segmentMeta, me.segmentFileId);
         
         labelData = {
             length: segmentLengthTotal + messageSizeUnit,
@@ -488,10 +488,10 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             labelData.maxWidth = ''; // = not set; lines can be "endless" (= which is MAX_SAFE_INTEGER)
         }
         if (useMaxNumberOfLines) {
-            allLines = me.getLinesAndLength(editorContent, me.segmentMeta);
+            allLines = me.getLinesAndLength(editorContent, me.segmentMeta, me.segmentFileId);
             labelData.maxWidth = me.segmentMeta.maxNumberOfLines + '*' + maxWidthForLine;
             if (segmentLengthStatus.includes(me.lengthstatus.segmentTooManyLines)) {
-                allLines = me.getLinesAndLength(editorContent, me.segmentMeta);
+                allLines = me.getLinesAndLength(editorContent, me.segmentMeta, me.segmentFileId);
                 errorMsg = '; ' + allLines.length + ' ' + me.strings.lines;
                 labelData.maxWidth = labelData.maxWidth + errorMsg;
             }
@@ -546,13 +546,13 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * @param {Object} meta
      * @returns {Array} segmentLengthValid|segmentToShort|segmentToLong|segmentTooManyLines|segmentLinesTooLong|segmentLinesTooShort
      */
-    getMinMaxLengthStatus: function(htmlToCheck, meta) {
+    getMinMaxLengthStatus: function(htmlToCheck, meta, fileId) {
         var me = this,
             minMaxLengthComp = Editor.view.segments.MinMaxLength,
             useMaxNumberOfLines = minMaxLengthComp.useMaxNumberOfLines(me.segmentMeta);
         // maxWidth and/or minWidth are set EITHER for the trans-unit OR for the lines
         if (useMaxNumberOfLines) {
-            return me.getMinMaxLengthStatusForLines(htmlToCheck, meta);
+            return me.getMinMaxLengthStatusForLines(htmlToCheck, meta, fileId);
         } else {
             return me.getMinMaxLengthStatusForSegment(htmlToCheck, meta);
         }
@@ -590,7 +590,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * @param {Object} meta
      * @returns {Array} segmentTooManyLines|segmentLinesTooLong|segmentLinesTooShort|segmentLengthValid
      */
-    getMinMaxLengthStatusForLines: function(htmlToCheck, meta) {
+    getMinMaxLengthStatusForLines: function(htmlToCheck, meta, fileId) {
         var me = this,
             lengthstatus = [],
             allLines,
@@ -600,7 +600,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             maxWidth = minMaxLengthComp.getMaxWidthForSingleLine(meta),
             minWidth = minMaxLengthComp.getMinWidthForSingleLine(meta);
         
-        allLines = me.getLinesAndLength(htmlToCheck, meta);
+        allLines = me.getLinesAndLength(htmlToCheck, meta, fileId);
         
         if (allLines.length > meta.maxNumberOfLines) {
             lengthstatus.push(me.lengthstatus.segmentTooManyLines);
