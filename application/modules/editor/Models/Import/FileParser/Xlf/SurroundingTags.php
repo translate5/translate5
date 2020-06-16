@@ -127,64 +127,43 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTags {
             return $foundTag;
         }
         
-        //init variables:
-        $sourceStart = array_shift($source);
+        //init variables with empty string for loop in trimCount
+        $sourceStart = $sourceEnd = '';
         /* @var $sourceStart editor_Models_Import_FileParser_Tag */
-        $sourceEnd = array_pop($source);
         /* @var $sourceEnd editor_Models_Import_FileParser_Tag */
-        $targetStart = array_shift($target);
-        /* @var $targetStart editor_Models_Import_FileParser_Tag */
-        $targetEnd = array_pop($target);
-        /* @var $targetEnd editor_Models_Import_FileParser_Tag */
         
-        //source or target chunks are different, so no tag match possible
-        if($sourceStart != $targetStart || $sourceEnd != $targetEnd){
-            return $foundTag;
-        }
-
         //trim from start
         $startShiftCountTrim = $this->trimAndCount($sourceStart, $source, $target);
-        if($startShiftCountTrim < 0) {
-            return $foundTag;
-        }
         
-        //check next non empty/whitespace chunk
-        $isTag = $sourceStart instanceof editor_Models_Import_FileParser_Tag;
+        //check if we trimmed something and was the last trimmed chunk a tag chunk
+        $startIsTag = $startShiftCountTrim > 0 && $sourceStart instanceof editor_Models_Import_FileParser_Tag;
         
         // if it is an single tag standing for a isolated paired tag, we cut it off too
-        if($isTag && $sourceStart->isSingle() && in_array($sourceStart->tag, $this->isolatedPairedTags)) {
-            $this->startShiftCount = $this->startShiftCount + ++$startShiftCountTrim;
+        if($startIsTag && $sourceStart->isSingle() && in_array($sourceStart->tag, $this->isolatedPairedTags)) {
+            $this->startShiftCount = $this->startShiftCount + $startShiftCountTrim;
             
             // if we got a tag to be cut off, start new iteration with found tag = true
             return $this->hasSameStartAndEndTags($source, $target, true);
-        }
-        
-        // if it is no tag or no opening tag → nothing to cut
-        if(! $isTag || !$sourceStart->isOpen()) {
-            //if no tag then exit
-            return $foundTag;
         }
         
         //trim from end
         $endShiftCountTrim = $this->trimAndCount($sourceEnd, $source, $target, false);
-        if($endShiftCountTrim < 0) {
-            return $foundTag;
-        }
         
         //check next non empty/whitespace chunk from behind
-        $isTag = $sourceEnd instanceof editor_Models_Import_FileParser_Tag;
+        $endIsTag = $endShiftCountTrim > 0 && $sourceEnd instanceof editor_Models_Import_FileParser_Tag;
         
         // if it is an single tag standing for a isolated paired tag, we cut it off too
-        if($isTag && $sourceEnd->isSingle() && in_array($sourceEnd->tag, $this->isolatedPairedTags)) {
-            $this->endShiftCount = $this->endShiftCount + ++$endShiftCountTrim;
+        if($endIsTag && $sourceEnd->isSingle() && in_array($sourceEnd->tag, $this->isolatedPairedTags)) {
+            $this->endShiftCount = $this->endShiftCount + $endShiftCountTrim;
             
             // if we got a tag to be cut off, start new iteration with found tag = true
             return $this->hasSameStartAndEndTags($source, $target, true);
         }
         
-        // if it is no tag or no closing tag → nothing to cut
-        if(! $isTag || !$sourceEnd->isClose()) {
-            //if no tag then exit
+        //until here we cut of he allowed single tags, now we cut of paired tags
+        
+        // if start is no tag or no opening tag or end not tag or closing tag → nothing to cut
+        if(!( $startIsTag && $sourceStart->isOpen() && $endIsTag && $sourceEnd->isClose())) {
             return $foundTag;
         }
         
@@ -192,8 +171,8 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTags {
         if($sourceStart->tagNr !== $sourceEnd->tagNr) {
             return $foundTag;
         }
-        $this->startShiftCount = $this->startShiftCount + ++$startShiftCountTrim;
-        $this->endShiftCount = $this->endShiftCount + ++$endShiftCountTrim;
+        $this->startShiftCount = $this->startShiftCount + $startShiftCountTrim;
+        $this->endShiftCount = $this->endShiftCount + $endShiftCountTrim;
         
         //start recursivly for more than one tag pair,
         // we have found at least one tag pair so set $foundTag to true for next iteration
