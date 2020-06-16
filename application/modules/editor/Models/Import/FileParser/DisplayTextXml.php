@@ -399,8 +399,6 @@ The German and the English Comment tag of the string must be imported as comment
         );
         $this->segmentData[$targetName] = array(
             'original' => '',
-//FIXME remove me, just for test export!
-'original' => $segment
         );
             
         $this->parseSegmentAttributes($textId, $lengthId);

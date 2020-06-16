@@ -68,7 +68,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
         $sql= 'INSERT INTO LEK_pixel_mapping (`taskGuid`,`fileId`,`font`,`fontsize`,`unicodeChar`,`pixelWidth`)
                VALUES (?,?,?,?,?,?)
                ON DUPLICATE KEY UPDATE `taskGuid` = ?,`fileId` = ?,`font` = ?,`fontsize` = ?,`unicodeChar` = ?,`pixelWidth` = ?';
-        $fontSize = strtolower($fontSize);
+        $font = strtolower($font);
         $bindings = [
             $taskGuid, $fileId, $font, $fontSize, $char, $pixelWidth,
             $taskGuid, $fileId, $font, $fontSize, $char, $pixelWidth
