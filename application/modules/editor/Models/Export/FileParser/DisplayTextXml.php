@@ -26,14 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* * #@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- */
-
 /**
- *
+ * Export FileParser for DisplayText XML files
  */
 class editor_Models_Export_FileParser_DisplayTextXml extends editor_Models_Export_FileParser {
 
@@ -44,10 +38,7 @@ class editor_Models_Export_FileParser_DisplayTextXml extends editor_Models_Expor
     protected $_classNameDifftagger = 'editor_Models_Export_DiffTagger_Csv';
     
     /**
-     * übernimmt das eigentliche FileParsing
-     *
-     * - setzt an Stelle von <lekTargetSeg... wieder das überarbeitete Targetsegment ein
-     * - befüllt $this->_exportFile
+     * replaces <lekTargetSeg... placeholders with segment content and fills the _exportFile data container
      */
     protected function parse() {
         $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
