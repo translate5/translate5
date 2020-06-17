@@ -142,8 +142,8 @@ class editor_Models_Import_Worker_Import {
         $filesProcessedAtAll = 0;
         foreach ($filelist as $fileId => $path) {
             $path = $fileFilter->applyImportFilters($path, $fileId, $filelist);
-            $params = $this->getFileparserParams($path, $fileId);
-            $parser = $this->getFileParser($params[0], $params);
+            $file = new SplFileInfo($this->importConfig->importFolder.'/'.$path);
+            $parser = $this->getFileParser($fileId, $file);
             if(!$parser) {
                 continue;
             }
@@ -154,7 +154,7 @@ class editor_Models_Import_Worker_Import {
             }
             
             /* @var $parser editor_Models_Import_FileParser */
-            $segProc->setSegmentFile($fileId, $params[1]); //$params[1] => filename
+            $segProc->setSegmentFile($fileId, $file->getBasename()); //$params[1] => filename
             $parser->addSegmentProcessor($mqmProc);
             $parser->addSegmentProcessor($repHash);
             $parser->addSegmentProcessor($segProc);
@@ -251,30 +251,60 @@ class editor_Models_Import_Worker_Import {
             $this->wordCount += $count;
         }
     }
+    
     /**
-     * decide regarding to the fileextension, which FileParser should be loaded and return it
-     *
-     * @param string $path
-     * @return editor_Models_Import_FileParser
-     * @throws Zend_Exception
      */
-    protected function getFileParser(string $path,array $params){
-        $ext = strtolower(preg_replace('".*\.([^.]*)$"i', '\\1', $path));
+    protected function getFileParser(int $fileId, SplFileInfo $file){
         try {
-            $parserClass = $this->supportedFiles->getParser($ext);
+            $parserClass = $this->lookupFileParserCls($file->getExtension(), $file);
         } catch(editor_Models_Import_FileParser_NoParserException $e) {
-            //in supportedFiles the task is missing, so we have to add it here to the exception
-            $e->addExtraData([
-                'file' => $path,
-                'task' => $this->task,
-            ]);
             Zend_Registry::get('logger')->exception($e, ['level' => ZfExtended_Logger::LEVEL_WARN]);
             return false;
         }
-        $parser = ZfExtended_Factory::get($parserClass,$params)->getChainedParser();
+        
+        $parser = ZfExtended_Factory::get($parserClass, [
+            $file->getPathname(),
+            $file->getBasename(),
+            $fileId,
+            $this->task
+        ]);
         /* var $parser editor_Models_Import_FileParser */
         $parser->setSegmentFieldManager($this->segmentFieldManager);
         return $parser;
+    }
+    
+    /**
+     * Looks for a suitable file parser and returns the corresponding file parser cls
+     * @param string $extension
+     * @param SplFileInfo $file
+     * @throws editor_Models_Import_FileParser_NoParserException
+     * @return string
+     */
+    protected function lookupFileParserCls(string $extension, SplFileInfo $file): string {
+        $parserClasses = $this->supportedFiles->getParser($extension);
+        $errorMsg = '';
+        $errorMessages = [];
+        
+        $fileObject = $file->openFile('r', false);
+        $fileHead = $fileObject->fread(512);
+        foreach($parserClasses as $parserClass) {
+            if($parserClass::isParsable($fileHead, $errorMsg)) {
+                // if the first found file parser to that extension may parse it, we use it
+                return $parserClass;
+            }
+            if(!empty($errorMsg)) {
+                $errorMessages[$parserClass] = $errorMsg;
+            }
+        }
+        
+        //'For the given fileextension no parser is registered.'
+        throw new editor_Models_Import_FileParser_NoParserException('E1060', [
+            'file' => $file->getPathname(),
+            'task' => $this->task,
+            'extension' => $extension,
+            'errorMessages' => $errorMessages,
+            'availableParsers' => $this->supportedFiles->getSupportedExtensions,
+        ]);
     }
     
     /**
@@ -293,32 +323,19 @@ class editor_Models_Import_Worker_Import {
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', array($this->task, $this->segmentFieldManager));
         /* @var $segProc editor_Models_Import_SegmentProcessor_Relais */
         foreach ($relayFiles as $fileId => $path) {
-            $params = $this->getFileparserParams($path, $fileId);
-            $parser = $this->getFileParser($path, $params);
+            $file = new SplFileInfo($this->importConfig->importFolder.'/'.$path);
+            $parser = $this->getFileParser($fileId, $file);
             if(!$parser) {
                 continue;
             }
             /* @var $parser editor_Models_Import_FileParser */
-            $segProc->setSegmentFile($fileId, $params[1]);  //$params[1] => filename
+            $segProc->setSegmentFile($fileId, $file->getBasename());
             $parser->addSegmentProcessor($mqmProc);
             $parser->addSegmentProcessor($repHash);
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
     	}
         $mqmProc->handleErrors();
-    }
-    
-    /**
-     * Erzeugt die Parameter für den Fileparser Konstruktor als Array
-     * @return array
-     */
-    protected function getFileparserParams($path, $fileId) {
-        return array(
-            $this->importConfig->importFolder.DIRECTORY_SEPARATOR.$this->_localEncoded->encode($path),
-            basename($path),
-            $fileId,
-            $this->task,
-        );
     }
     
     protected function syncFileOrder() {

@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -70,22 +70,15 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
      */
     protected $collectedMissingFiles = [];
 
-    /**
-     * @var ZfExtended_Controller_Helper_LocalEncoded
-     */
-    protected $localEncoded = array();
-    
     public function __construct(){
         parent::__construct();
         $config = Zend_Registry::get('config');
         $this->enableLogMissingFiles = $config->runtimeOptions->import->reportOnNoRelaisFile;
-        $this->localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
-        
         $this->setPathPrefix($config->runtimeOptions->import->relaisDirectory);
     }
     
     /**
-     * Durchsucht das angegebene Relais Verzeichnis nach den im internen Baum gespeicherten Dateien 
+     * Durchsucht das angegebene Relais Verzeichnis nach den im internen Baum gespeicherten Dateien
      * und setzt bei Funden entsprechend den Relais File Status im internen Baum
      * @param string $importFolder
      * @return array
@@ -117,7 +110,7 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
             $child->relaisFileStatus = file_exists($fullpath) ? self::RELAIS_NOT_IMPORTED : self::RELAIS_NOT_FOUND;
         }
 
-        //here can invoke import filters to manipulate the file information, needed for example if the filename changes and therefore the filename based relais file matching would fail. 
+        //here can invoke import filters to manipulate the file information, needed for example if the filename changes and therefore the filename based relais file matching would fail.
         $this->events->trigger("customHandleFile", $this, array(
             'path' => $path,
             'fileChild' => $child,
@@ -139,8 +132,8 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
      * @param stdClass $child
      */
     protected function collectMissingFile($path, stdClass $child) {
-        if($child->relaisFileStatus !== self::RELAIS_NOT_FOUND 
-             || !$this->enableLogMissingFiles 
+        if($child->relaisFileStatus !== self::RELAIS_NOT_FOUND
+             || !$this->enableLogMissingFiles
              || empty($child->isFile)){
             return;
         }
@@ -173,6 +166,6 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
      */
     protected function isFileToImport(string $path) {
         return isset($this->relaisFilesStati[$path]) &&
-            $this->relaisFilesStati[$path] == self::RELAIS_NOT_IMPORTED;  
+            $this->relaisFilesStati[$path] == self::RELAIS_NOT_IMPORTED;
     }
 }
