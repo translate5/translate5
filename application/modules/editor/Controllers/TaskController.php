@@ -243,10 +243,10 @@ class editor_TaskController extends ZfExtended_RestController {
         //set default sort
         $this->addDefaultSort();
         if($this->handleProjectRequest()) {
-            $this->view->rows = $this->loadAll();
+            $this->view->rows = $this->loadAllForProjectOverview();
         }
         else {
-            $this->view->rows = $this->loadAllWithUserData();
+            $this->view->rows = $this->loadAllForTaskOverview();
         }
         $this->view->total = $this->totalCount;
     }
@@ -323,7 +323,21 @@ class editor_TaskController extends ZfExtended_RestController {
      * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
      * set qmSubEnabled for all rows
      */
-    protected function loadAllWithUserData() {
+    protected function loadAllForProjectOverview() {
+        $rows = $this->loadAll();
+        $customerData = $this->getCustomersForRendering($rows);
+        foreach ($rows as &$row) {
+            $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
+        }
+        return $rows;
+    }
+    
+    /**
+     * returns all (filtered) tasks with added user data
+     * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
+     * set qmSubEnabled for all rows
+     */
+    protected function loadAllForTaskOverview() {
         $rows = $this->loadAll();
         $taskGuids = array_map(function($item){
             return $item['taskGuid'];
@@ -901,6 +915,10 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($data['locked']);
         unset($data['lockingUser']);
         unset($data['userCount']);
+        //is the source task a single project task
+        if($this->entity->getId()==$this->entity->getProjectId()){
+            $data['taskType'] = $this->entity::INITIAL_TASKTYPE_PROJECT_TASK;
+        }
         $data['state'] = 'import';
         $this->entity->init($data);
         $this->entity->createTaskGuidIfNeeded();

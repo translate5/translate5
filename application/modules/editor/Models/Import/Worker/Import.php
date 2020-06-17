@@ -147,6 +147,12 @@ class editor_Models_Import_Worker_Import {
             if(!$parser) {
                 continue;
             }
+            
+            //set the task flag for sdlxliff parser
+            if($parser instanceof editor_Models_Import_FileParser_Sdlxliff){
+                $this->task->setIsSdlxliffFileParser(1);
+            }
+            
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]); //$params[1] => filename
             $parser->addSegmentProcessor($mqmProc);
