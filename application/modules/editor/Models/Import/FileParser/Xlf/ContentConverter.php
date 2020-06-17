@@ -152,9 +152,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param string $text optional, this is the tag value which should be shown in the frontend
      * @return string
      */
-    protected function createTag($rid, $tag, $originalContent, $text = null): editor_Models_Import_FileParser_Tag {
+    protected function createTag($rid, $tag, $originalContent, $text = null): ?editor_Models_Import_FileParser_Tag {
         if($this->removeTags){
-            return '';
+            return null;
         }
         switch ($tag) {
             case 'x':
