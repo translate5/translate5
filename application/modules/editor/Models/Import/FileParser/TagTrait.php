@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -28,8 +28,9 @@ END LICENSE AND COPYRIGHT
 
 /**
  * trait containing tag mapping logic of import process
- * 
- * For refactoring the import process to a better understandable structure some code is moved into traits to keep refactoring steps small! 
+ *
+ * For refactoring the import process to a better understandable structure some code is moved into traits to keep refactoring steps small!
+ * TODO instead of using this trait the tag creation should go into editor_Models_Import_FileParser_Tag
  */
 trait editor_Models_Import_FileParser_TagTrait {
     /**
@@ -108,7 +109,7 @@ trait editor_Models_Import_FileParser_TagTrait {
             //generate the html tag for the editor
             switch ($match[1]) {
                 // ↵    U+21B5      e2 86 b5    &crarr;     &#8629;     DOWNWARDS ARROW WITH CORNER LEFTWARDS
-                //'hardReturn' => ['text' => '&lt;↵ hardReturn/&gt;'], //in title irgendwas mit <hardReturn/> 
+                //'hardReturn' => ['text' => '&lt;↵ hardReturn/&gt;'], //in title irgendwas mit <hardReturn/>
                 //'softReturn' => ['text' => '&lt;↵ softReturn/&gt;'], //in title irgendwas mit <softReturn/>
                 //'macReturn' => ['text' => '&lt;↵ macReturn/&gt;'],  //in title irgendwas mit <macReturn/>
                 case 'hardReturn':
@@ -135,7 +136,7 @@ trait editor_Models_Import_FileParser_TagTrait {
                     //'char' => ['text' => 'protected Special character'],
                     if($tag == '<char ts="c2a0" length="1"/>'){
                 //new type non breaking space: U+00A0
-                //symbolyzed in word as: 
+                //symbolyzed in word as:
                 //U+00B0	°	c2 b0	&deg;	° 	&#176;	° 	DEGREE SIGN
                 //in unix tools:
                 //U+23B5	⎵	e2 8e b5		&#9141;	⎵ 	BOTTOM SQUARE BRACKET
@@ -150,7 +151,7 @@ trait editor_Models_Import_FileParser_TagTrait {
             }
             $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $text);
             //FIXME refactor whole tagparams stuff!
-            $p['class'] .= $cls; 
+            $p['class'] .= $cls;
             $p['length'] = $length;
             $p['title'] = $title; //Only translatable with using ExtJS QTips in the frontend, as title attribute not possible!
             
@@ -205,7 +206,7 @@ trait editor_Models_Import_FileParser_TagTrait {
         foreach($split as $idx => $chunk) {
             if($i++ % 2 === 1 || strlen($chunk) == 0) {
                 //ignore found tags in the content or empty chunks
-                continue; 
+                continue;
             }
             
             $split[$idx] = $this->whitespaceHelper->protectWhitespace($chunk, true);
