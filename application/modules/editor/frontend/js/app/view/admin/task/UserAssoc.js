@@ -41,7 +41,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
       editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
       fieldDeadline:'#UT#Deadline',
-      fieldSegmentrange:'#UT#Zugewiesene Segmente'
+      fieldSegmentrange: '#UT#Zugewiesene Segmente'
   },
   viewModel: {
       type: 'taskuserassoc'
