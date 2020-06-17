@@ -40,7 +40,8 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
       formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
       editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
-      fieldDeadline:'#UT#Deadline'
+      fieldDeadline:'#UT#Deadline',
+      fieldSegmentrange:'#UT#Zugewiesene Segmente'
   },
   viewModel: {
       type: 'taskuserassoc'
@@ -128,6 +129,12 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
             	  name: 'deadlineDate',
             	  fieldLabel: me.strings.fieldDeadline,
             	  submitFormat: Editor.DATE_ISO_FORMAT,
+                  anchor: '100%'
+              },{
+                  xtype: 'textfield',
+                  itemId: 'segmentrange',
+                  name: 'segmentrange',
+                  fieldLabel: me.strings.fieldSegmentrange,
                   anchor: '100%'
               }],
               dockedItems: [{

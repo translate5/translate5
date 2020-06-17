@@ -3771,6 +3771,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='RW50ZmVybmVu'><source>Entfernen</source><target>Remove</target></trans-unit>
 <trans-unit id='U3BlemlhbA=='><source>Spezial</source><target>Special</target></trans-unit>
 <trans-unit id='w7xiZXJzZXR6dA=='><source>übersetzt</source><target>translated</target></trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUgU2VnbWVudGU='><source>Zugewiesene Segmente</source><target>Assigned segments</target></trans-unit>
 </body>
   </file>
 </xliff>
