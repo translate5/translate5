@@ -36,29 +36,29 @@ END LICENSE AND COPYRIGHT
 /**
  * XLF Namespace Handler
  */
-class editor_Models_Export_FileParser_Xlf_Namespaces extends editor_Models_Export_FileParser_Xlf_AbstractNamespace {
+class editor_Models_Export_FileParser_Xlf_Namespaces extends editor_Models_Export_FileParser_Xlf_Namespaces_Abstract {
     protected $namespaces = [];
 
     public function __construct($xliff) {
         //TODO this code could be improved by moving the following checks into each namespace class and loop through the existing classes
         // instead of hardcoding the checks here
-        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_TmgrNamespace::IBM_XLIFF_NAMESPACE) !== false) {
-            $this->namespaces['ibm'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_TmgrNamespace');
+        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Namespaces_Tmgr::IBM_XLIFF_NAMESPACE) !== false) {
+            $this->namespaces['ibm'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_Namespaces_Tmgr');
         }
-        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Translate5Namespace::TRANSLATE5_XLIFF_NAMESPACE) !== false) {
-            $this->namespaces['translate5'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_Translate5Namespace');
+        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Namespaces_Translate5::TRANSLATE5_XLIFF_NAMESPACE) !== false) {
+            $this->namespaces['translate5'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_Namespaces_Translate5');
         }
-        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_AcrossNamespace::ACROSS_XLIFF_NAMESPACE) !== false) {
-            $this->namespaces['across'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_AcrossNamespace');
+        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Namespaces_Across::ACROSS_XLIFF_NAMESPACE) !== false) {
+            $this->namespaces['across'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_Namespaces_Across');
         }
-        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_MemoQNamespace::MEMOQ_XLIFF_NAMESPACE) !== false) {
-            $this->namespaces['memoq'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_MemoQNamespace');
+        if (strpos($xliff, editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ::MEMOQ_XLIFF_NAMESPACE) !== false) {
+            $this->namespaces['memoq'] = ZfExtended_Factory::get('editor_Models_Export_FileParser_Xlf_Namespaces_MemoQ');
         }
     }
 
     /**
      * {@inheritDoc}
-     * @see editor_Models_Export_FileParser_Xlf_AbstractNamespace::registerParserHandler()
+     * @see editor_Models_Export_FileParser_Xlf_Namespaces_Abstract::registerParserHandler()
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         $this->call(__FUNCTION__, func_get_args());

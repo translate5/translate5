@@ -152,7 +152,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @param string $text optional, this is the tag value which should be shown in the frontend
      * @return string
      */
-    protected function createTag($rid, $tag, $originalContent, $text = null) {
+    protected function createTag($rid, $tag, $originalContent, $text = null): editor_Models_Import_FileParser_Tag {
         if($this->removeTags){
             return '';
         }
@@ -162,6 +162,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             case 'it':
             case 'bx':
             case 'ex':
+                $tagType = editor_Models_Import_FileParser_Tag::TYPE_SINGLE;
                 $type = '_singleTag';
                 
                 //we use the content as rid, so we can match tag numbers in source and target
@@ -175,12 +176,14 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
                 // if no, increase and set the new value as new tagNr to that RID
                 // for g tags: RID = 'g-'.$openerKey;
             case 'g':
+                $tagType = editor_Models_Import_FileParser_Tag::TYPE_OPEN;
                 $type = '_leftTag';
                 break;
             case 'g-close':
                 //g-close tag is just a hack to distinguish between open and close
                 $tag = 'g';
             case 'ept':
+                $tagType = editor_Models_Import_FileParser_Tag::TYPE_CLOSE;
                 $type = '_rightTag';
                 break;
             default:
@@ -189,9 +192,14 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         if(strlen($text) === 0) {
             $text = htmlentities($originalContent);
         }
-        $tagNr = $this->getShortTagNumber($rid);
-        $p = $this->getTagParams($originalContent, $tagNr, $rid, $text);
-        return $this->{$type}->getHtmlTag($p);
+        $tagObj = new editor_Models_Import_FileParser_Tag($tagType);
+        $tagObj->tag = $tag;
+        $tagObj->tagNr = $this->getShortTagNumber($rid);
+        $tagObj->text = $text;
+        $tagObj->rid = $rid;
+        $tagObj->originalContent = $originalContent;
+        $tagObj->renderedTag = $this->{$type}->getHtmlTag($this->getTagParams($originalContent, $tagObj->tagNr, $rid, $text));
+        return $tagObj;
     }
     
     /**

@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  *
  * TODO This class is a draft!
  */
-class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_Import_FileParser_Xlf_AbstractNamespace{
+class editor_Models_Import_FileParser_Xlf_Namespaces_Across extends editor_Models_Import_FileParser_Xlf_Namespaces_Abstract{
     const ACROSS_XLIFF_NAMESPACE = 'xmlns:ax="AcrossXliff"';
     const USERGUID = 'across-imported';
 
@@ -49,7 +49,7 @@ class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_
 
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::registerParserHandler()
+     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::registerParserHandler()
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         $currentComment = null;
@@ -107,7 +107,7 @@ class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_
     /**
      * In Across the complete tag content must be used
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::useTagContentOnly()
+     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::useTagContentOnly()
      */
     public function useTagContentOnly() {
         return false;
@@ -116,7 +116,7 @@ class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_
     /**
      * After fetching the comments, the internal comments fetcher is resetted (if comments are inside MRKs and not the whole segment)
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::getComments()
+     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getComments()
      */
     public function getComments() {
         $comments = $this->comments;

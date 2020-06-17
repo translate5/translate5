@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
 /**
  * XLF Fileparser Add On to parse Across XLF specific stuff
  */
-class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_Export_FileParser_Xlf_AbstractNamespace{
+class editor_Models_Export_FileParser_Xlf_Namespaces_Across extends editor_Models_Export_FileParser_Xlf_Namespaces_Abstract{
     protected $currentPropertiesKey = null;
     protected $currentErrorInfosKey = null;
     protected $currentComments = [];
@@ -55,7 +55,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
 
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::registerParserHandler()
+     * @see editor_Models_Export_FileParser_Xlf_Namespaces_Abstract::registerParserHandler()
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         //a little bit hackish but the easiest way to get the task
@@ -127,7 +127,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
 
         foreach($this->comments as $comment) {
             //comments already imported from across are ignored
-            if($comment['userGuid'] == editor_Models_Import_FileParser_Xlf_AcrossNamespace::USERGUID) {
+            if($comment['userGuid'] == editor_Models_Import_FileParser_Xlf_Namespaces_Across::USERGUID) {
                 continue;
             }
             self::$xmlWriter->startElement('ax:named-property');
@@ -166,7 +166,7 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
 
         foreach($this->comments as $comment) {
             //comments already imported from across are ignored:
-            if($comment['userGuid'] == editor_Models_Import_FileParser_Xlf_AcrossNamespace::USERGUID) {
+            if($comment['userGuid'] == editor_Models_Import_FileParser_Xlf_Namespaces_Across::USERGUID) {
                 continue;
             }
             self::$xmlWriter->startElement('ax:errorInfo');

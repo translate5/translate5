@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
 /**
  * XLF Fileparser Add On to parse Translate5 XLF specific stuff
  */
-class editor_Models_Import_FileParser_Xlf_Translate5Namespace extends editor_Models_Import_FileParser_Xlf_AbstractNamespace{
+class editor_Models_Import_FileParser_Xlf_Namespaces_Translate5 extends editor_Models_Import_FileParser_Xlf_Namespaces_Abstract{
     const TRANSLATE5_XLIFF_NAMESPACE = 'xmlns:translate5="http://www.translate5.net/"';
     
     /**
@@ -47,7 +47,7 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace extends editor_Mod
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::transunitAttributes()
+     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::transunitAttributes()
      */
     public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
         //TODO parse:
@@ -58,7 +58,7 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace extends editor_Mod
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::registerParserHandler()
+     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::registerParserHandler()
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         $this->tagMap = [];
@@ -71,7 +71,7 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace extends editor_Mod
             foreach($givenTagMap as $bptKey => $data) {
                 $gTag = $data[0];
                 $originalTag = $data[1];
-                //we convert the tagMap to: 
+                //we convert the tagMap to:
                 // $this->tagMap[<g id="123">] = [<internalOpener>,<internalCloser>];
                 // $this->tagMap[<x id="321">] = <internalSingle>;
                 if(!empty($data[2])) {
@@ -87,7 +87,7 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace extends editor_Mod
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::getPairedTag()
+     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getPairedTag()
      */
     public function getPairedTag($xlfBeginTag, $xlfEndTag){
         //in the translate5 internal tag map everything is mapped by the opener only:
@@ -96,7 +96,7 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace extends editor_Mod
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::getSingleTag()
+     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getSingleTag()
      */
     public function getSingleTag($xlfTag){
         //some foreign tools add spaces between the last attribute and the closing />
@@ -110,7 +110,7 @@ class editor_Models_Import_FileParser_Xlf_Translate5Namespace extends editor_Mod
     /**
      * Translate5 uses x,g and bx ex tags only. So the whole content of the tags incl. the tags must be used.
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::useTagContentOnly()
+     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::useTagContentOnly()
      */
     public function useTagContentOnly() {
         return false;
