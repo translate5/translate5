@@ -500,4 +500,59 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $this->db->update(['finishedDate'=>$date],
             ['taskGuid=?' => $taskGuid,'role=?' => editor_Workflow_Abstract::ROLE_REVIEWER]);
     }
+    
+    /**
+     * If a task is in sequential-mode and ANY segments are assigned to ANY user,
+     * the editable-status of the segments will have to be checked for ALL segments
+     * for ALL users.
+     * @param string $taskGuid
+     * @return bool
+     */
+    public function isSegmentrangedTask(string $taskGuid) {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        if ($task->getUsageMode() !== $task::USAGE_MODE_SIMULTANEOUS) {
+            return false;
+        }
+        $s = $this->db->select()
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('segmentrange IS NOT NULL');
+        return $this->db->fetchAll($s)->count() > 0;
+    }
+    
+    /**
+     * Return an array with all segments (by their segmentNrInTask) and their assigned users.
+     * @param string $taskGuid
+     * @return array
+     */
+    public function getAllSegmentrangesByTask(string $taskGuid) {
+        $allSegmentrangesByTask = [];
+        /*Example for:
+         * - {94ff4a53-dae0-4793-beae-1f09968c3c93}: "1-3;5;9-10"
+         * - {c77edcf5-3c55-4c29-a73d-da80d4dcfb36}: "7-8"
+         * $allSegmentrangesByTask = [1 => '{94ff4a53-dae0-4793-beae-1f09968c3c93}',
+         *                            2 => '{94ff4a53-dae0-4793-beae-1f09968c3c93}',
+         *                            3 => '{94ff4a53-dae0-4793-beae-1f09968c3c93}',
+         *                            5 => '{94ff4a53-dae0-4793-beae-1f09968c3c93}',
+         *                            7 => '{c77edcf5-3c55-4c29-a73d-da80d4dcfb36}',
+         *                            8 => '{c77edcf5-3c55-4c29-a73d-da80d4dcfb36}',
+         *                            9 => '{94ff4a53-dae0-4793-beae-1f09968c3c93}',
+         *                           10 => '{94ff4a53-dae0-4793-beae-1f09968c3c93}'];
+         */
+        $s = $this->db->select()
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('segmentrange IS NOT NULL');
+        $allSegmentUserAssocs = $this->db->fetchAll($s)->toArray();
+        foreach ($allSegmentUserAssocs as $row) {
+            $allSegmentrangesForUser = explode(";", $row['segmentrange']);
+            foreach ($allSegmentrangesForUser as $segmentrange) {
+                $segmentrangeLimits = explode("-", $segmentrange);
+                for ($i = reset($segmentrangeLimits); $i <= end($segmentrangeLimits); $i++) {
+                    $allSegmentrangesByTask[$i] = $row['userGuid'];
+                }
+            }
+        }
+        return $allSegmentrangesByTask;
+    }
 }

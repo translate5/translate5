@@ -90,17 +90,42 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->addFirstEditable();
         $this->addIsFirstFileInfo($taskGuid);
         
-        // anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
+        // ----- Specific handling of rows (start) -----
+        
+        // - Check if the user can edit only segmentranges?
+        $taskUserAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $taskUserAssoc editor_Models_TaskUserAssoc */
+        $handleSegmentranges = $taskUserAssoc->isSegmentrangedTask($taskGuid);
+        if ($handleSegmentranges) {
+            $allSegmentUserAssocs = $taskUserAssoc->getAllSegmentrangesByTask($taskGuid);
+            // TODO: we only need the visible rows!
+            $sessionUser = new Zend_Session_Namespace('user');
+            $sessionUserGuid = $sessionUser->data->userGuid;
+        }
+        
+        // - Anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-        if ($task->anonymizeUsers()) {
+        $handleAnonymizeUsers = $task->anonymizeUsers();
+        if ($handleAnonymizeUsers) {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
             /* @var $workflowAnonymize editor_Workflow_Anonymize */
-            foreach ($this->view->rows as &$row) {
-                $row = $workflowAnonymize->anonymizeUserdata($taskGuid, $row['userGuid'], $row);
+        }
+        
+        if ($handleSegmentranges || $handleAnonymizeUsers) {
+            foreach ($this->view->rows as &$row) { // TODO: is it necessary to loop rows only once? / we only need the visible rows!
+                if ($handleSegmentranges) {
+                    $segmentNrInTask = $row['segmentNrInTask'];
+                    $row['editable'] = array_key_exists($segmentNrInTask, $allSegmentUserAssocs) && $allSegmentUserAssocs[$segmentNrInTask] == $sessionUserGuid;
+                }
+                if ($handleAnonymizeUsers) {
+                    $row = $workflowAnonymize->anonymizeUserdata($taskGuid, $row['userGuid'], $row);
+                }
             }
         }
+        
+        // ----- Specific handling of rows (end) -----
     }
     
     public function nextsegmentsAction() {
