@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -103,28 +103,28 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     );
     
     /**
-     * collected term states not listed in statusMap 
+     * collected term states not listed in statusMap
      * @var array
      */
     protected $unknownStates = array();
     
     /***
      * The actual term entry id from the lek_term_entry table
-     * 
+     *
      * @var int
      */
     protected $actualTermEntryIdDb;
 
     /***
      * Id of the last inserted attribute
-     * 
+     *
      * @var mixed
      */
     protected $actualParentId;
     
     /***
      * Id of the actuel db term record
-     * 
+     *
      * @var mixed
      */
     protected $actualTermIdDb;
@@ -152,14 +152,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     
     /***
      * The customers of the term collection
-     * 
+     *
      * @var array
      */
     public $customerIds=array();
     
     /***
      * if the current node is inside ntig
-     * 
+     *
      * @var boolean
      */
     private $isInsideTig=false;
@@ -204,14 +204,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     private $termEntryAttributeContainer=array();
     
     /***
-     * Term entry id from the database of the last merged term 
+     * Term entry id from the database of the last merged term
      * @var integer
      */
     private $lastMergeTermEntryIdDb;
     
     /***
      * Term entry id from the tbx (groupId) of the last merged term
-     * 
+     *
      * @var string
      */
     private $lastMergeGroupId;
@@ -248,8 +248,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     protected $termCollection;
     
     /***
-     * @var $logger ZfExtended_Logger 
-     */ 
+     * @var $logger ZfExtended_Logger
+     */
     protected $logger;
     
     /**
@@ -258,14 +258,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     protected $config;
 
 	/***
-     * 
+     *
      * @var ZfExtended_Models_User
      */
     protected $user;
     
     /***
      * Term entry model instance (this is a helper instance)
-     * 
+     *
      * @var editor_Models_TermCollection_TermEntry
      */
     protected $termEntryModel;
@@ -458,7 +458,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         }
         
         // save actual termEntryId
-        $this->actualTermEntry = $this->getIdTermEntry();            
+        $this->actualTermEntry = $this->getIdTermEntry();
         
         if(empty($this->actualTermEntry)) {
             $this->log('termEntry Tag without an ID found and ignored!');
@@ -559,6 +559,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             
             //get the termEntry id of the merged data and use it for the collectedData
             foreach ($this->termsToMergeContainer as $termData){
+                if(empty($termData['id'])) {
+                    continue;
+                }
                 //update the groupId and termEntryId for the merged terms
                 $singleTerm->update([
                     'groupId'=>$isMerged ? $this->lastMergeGroupId : $this->actualTermEntry,
@@ -651,9 +654,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      *   de => importiert de-de de de-at etc.pp.
      *   de-de => importiert de-de de
      *   restliche Sprachen ignorieren => return false
-     *   
+     *
      *   FIXME Performance: foreach term this loop is called!
-     *   
+     *
      * @return boolean
      */
     protected function isLanguageToProcess() {
@@ -690,7 +693,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     }
     
     /**
-     * Save the data to the lek terms table and set the actual term database id 
+     * Save the data to the lek terms table and set the actual term database id
      */
     protected function handleTerm() {
         if(!$this->isStartTag()){
@@ -719,7 +722,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         if(!empty($importMap)) {
             $allowedTypes = array_merge($allowedTypes, array_keys($importMap));
         }
-        //if current termNote is no starttag or type is not allowed to provide a status the we jump out 
+        //if current termNote is no starttag or type is not allowed to provide a status the we jump out
         if(!$this->isStartTag() || !in_array($type, $allowedTypes)){
           return;
         }
@@ -735,7 +738,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      * @return string
      */
     protected function getMappedStatus($tbxStatus, $type) {
-        //termNote type administrativeStatus are similar to normativeAuthorization, 
+        //termNote type administrativeStatus are similar to normativeAuthorization,
         // expect that the values have a suffix which must be removed
         if($type == 'administrativeStatus') {
             $tbxStatus = str_replace('-admn-sts$', '', $tbxStatus.'$');
@@ -903,8 +906,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     }
     
     /***
-     * Save ref attribute or note attribute 
-     * 
+     * Save ref attribute or note attribute
+     *
      * @param int $tmpParrentId
      * @param int $internalCount
      */
@@ -959,10 +962,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     
     /***
      * Save term entry attribute in the database.
-     * 
+     *
      * @param int $parentId
      * @param int $internalCount: the current tag count of the same type in one group
-     * 
+     *
      * @return boolean|editor_Models_Term_Attribute
      */
     protected function saveEntryAttribute($parentId,$internalCount=null){
@@ -981,10 +984,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     
     /***
      * Save term attribute in the database
-     * 
+     *
      * @param int $parentId
      * @param int $internalCount: the current tag count of the same type in one group
-     * 
+     *
      * @return null|editor_Models_Term_Attribute
      */
     protected function saveTermAttribute($parentId,$internalCount=null){
@@ -1014,10 +1017,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     
     /***
      * Get the term attribute or term entry attribute model
-     * 
+     *
      * @param bool $isTermAttribute
      * @param mixed $parentId
-     * 
+     *
      * @return editor_Models_Term_Attribute
      */
     protected function getAttributeObject($parentId){
@@ -1078,7 +1081,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         if(empty($this->config->runtimeOptions->tbx->defaultTermAttributeStatus)){
             $attributeStatus=editor_Models_Term::PROCESS_STATUS_FINALIZED;
         }
-        //Set the attribute status to finalized since the systems where the imported terms/attributes come from 
+        //Set the attribute status to finalized since the systems where the imported terms/attributes come from
         //are considered as leading system
         $attribute->setProcessStatus($attributeStatus);
         return $attribute;
@@ -1160,7 +1163,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /**
      * Return the term id from the tbx file. If no term id is provided in the tbx,
      * the term id from the lek_terms table will be return.
-     * 
+     *
      * @return string
      */
     private function getIdTerm() {
@@ -1173,7 +1176,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /***
      * Create a term entry record in the database, for the current collection and the
      * actual termEntryId
-     *  
+     *
      * @return int
      */
     private function createTermEntryRecord(){
@@ -1191,13 +1194,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      * 1. update the term if:
      *    - same termEntryId (tbx)
      *    - same termId (tbx)
-     *    - same collectionId 
-     * 2: Get all terms with same termEntryId (tbx), same collectionId and different termId (tbx)    
+     *    - same collectionId
+     * 2: Get all terms with same termEntryId (tbx), same collectionId and different termId (tbx)
      *       2a. Update the term if
      *          - same termEntryId(tbx)
      *          - same language
      *          - same term Text
-     *    
+     *
      *       2b. Add new term if
      *          - no term from 2a is update
      * 3. Add new term if :
@@ -1206,8 +1209,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      *      - same collectionId
      *      - same language
      *      - same termText
-     *    3b. Add new term(terms-all collected terms in the same term entry) if no matched terms from 3a  
-     *        
+     *    3b. Add new term(terms-all collected terms in the same term entry) if no matched terms from 3a
+     *
      */
     private function handleTermDb(){
         $terms=$this->termModel->isUpdateTermForCollection($this->actualTermEntry,$this->actualTermIdTbx,$this->termCollection->getId());
@@ -1259,7 +1262,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 
             if($tmpTermValue && $tmpTermValue->count()>0){
                 
-                //the first term thus found is updated by the values ​​in the TBX file. 
+                //the first term thus found is updated by the values ​​in the TBX file.
                 //The term-ID and termEntry-ID remain the same as they already existed in translate5.
                 $tmpTermValue=$tmpTermValue->toArray();
                 $tmpTermValue=$tmpTermValue[0];
@@ -1399,7 +1402,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /***
      * Save the imported file to the disk.
      * The file location will be "trasnalte5 parh" /data/tbx-import/tbx-for-filesystem-import/tc_"collectionId"/the file"
-     * 
+     *
      * @param string $filepath: source file location
      * @param string $name: source file name
      */

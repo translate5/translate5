@@ -62,8 +62,53 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
 	  		  }  
 		}
     },
-    
     formulas:{
+        /***
+         * Is the assoc panel loading active. It is active when the currentTask state is analysis
+         */
+        isLoadingActive:{
+            get: function(task) {
+                return task && task.isAnalysis();
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
+        /***
+         * Is the task assoc panel/grid enabled. Add languageresource assoc only when the task is unconfirmed or open
+         */
+        enablePanel:{
+            get: function (task) {
+                return task && (task.isUnconfirmed() || task.isOpen());
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
+        /***
+         * Task assoc panel bottom toolbar enable/disable formula. The panel contains the analysis/pretranslation checkboxes and button
+         */
+        enableDockedToolbar:{
+            get: function (task) {
+                var me=this,
+                    isAddTask=me.getView().up('window')!==undefined;
+                if(!isAddTask){
+                    return task && (!task.isErroneous() && !task.isImporting());
+                }
+                return isAddTask
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
+        /***
+         * Is the start analysis button hidden. The formula must be here since the button is part of the taskassoc panel
+         */
+        isAnalysisButtonHidden:{
+            get: function (task) {
+                var me=this,
+                    isAddTask=me.getView().up('window')!==undefined;
+                if(!isAddTask){
+                    return task && task.isImporting();
+                }
+                return isAddTask
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
         hasTmOrCollection:function(get){
             return this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TM)||this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TERM_COLLECTION) ;
         },

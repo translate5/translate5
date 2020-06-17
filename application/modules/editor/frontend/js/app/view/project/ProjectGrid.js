@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.project.ProjectGrid', {
 	extend: 'Ext.grid.Panel',
 	alias: 'widget.projectGrid',
+	cls:'projectGrid',
     requires:[
     	'Editor.view.project.ProjectGridViewController'
 	],
@@ -68,6 +69,8 @@ Ext.define('Editor.view.project.ProjectGrid', {
 	          return res.join(' ');
 	      }
 	},
+	//INFO: because the filters are not wirking when the projectGrid extends the taskGrid component,
+    //the required columns,translations and renderer functions are duplicated here. With this the projectGrid does not depend on the taskGrid component.
     initConfig: function(instanceConfig) {
         var me = this,
         	config={

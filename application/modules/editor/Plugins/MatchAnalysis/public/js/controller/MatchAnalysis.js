@@ -65,6 +65,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },{
 	  ref:'projectPanel',
 	  selector:'#projectPanel'
+    },{
+        ref:'projectTaskGrid',
+        selector:'#projectTaskGrid'
     }],
     TASK_STATE_ANALYSIS: 'matchanalysis',
     strings:{
@@ -86,12 +89,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         analysisLoadingMsg:'#UT#Analyse läuft'
     },
     
+    listeners:{
+        beforeStartAnalysis:'onBeforeStartAnalysis'  
+    },
     listen:{
-        messagebus: {
-            '#translate5 task': {
-                triggerReload: 'onTriggerTaskReload'
-            }
-        },
         component:{
             '#adminTaskPreferencesWindow tabpanel':{
                 render:'onTaskPreferencesWindowPanelRender'
@@ -124,6 +125,25 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         }
     },
 
+    /***
+     * Before analysis event handler
+     */
+    onBeforeStartAnalysis:function(taskId,operation){
+        var me = this,
+            setAnalysisRecordState=function(store,taskId){
+                var record = store ? store.getById(taskId) : null;
+                if(!record){
+                    return;
+                }
+                record.set('state','matchanalysis');
+            };
+        //before the analysis is started, set the task state to 'matchanalysis'
+        //the matchanalysis and languageresourcesassoc panel loading masks are binded 
+        //to the task status. Changing the status to analysis will automaticly apply the loading masks for those panels
+        setAnalysisRecordState(Ext.StoreManager.get('admin.Tasks'),taskId);
+        setAnalysisRecordState(me.getProjectTaskGrid().getStore(),taskId);
+    },
+    
     /**
      * Task action column items initialized event handler.
      */
@@ -172,8 +192,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
 
     onLanguageResourcesPanelRender:function(panel){
     	var me=this,
-    		task=panel.lookupViewModel().get('currentTask'),
-    		storeData=[], buttons = [];
+    		storeData=[];
     	
     	//init the pretranslate matchrate options (from 0-103)
     	for(var i=0;i<=103;i++){
@@ -183,24 +202,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		});
     	}
     	
-    	if(task && !task.isImporting()){
-        	buttons = [{
-                xtype:'button',
-                text:this.strings.analysis,
-                itemId:'btnAnalysis',
-                width:150,
-                dock:'bottom',
-                //TODO icon
-                listeners:{
-                    click:{
-                        fn:this.matchAnalysisButtonHandler,
-                        scope:this
-                    }
-                }
-            }];
-    	}
-    	
-    	//the task exist->add buttons in the task assoc panel
     	panel.addDocked([{
             xtype : 'toolbar',
             dock : 'bottom',
@@ -209,11 +210,31 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 type: 'hbox',
                 pack: 'start'
             },
-            items: buttons
+            items: [{
+                xtype:'button',
+                text:this.strings.analysis,
+                itemId:'btnAnalysis',
+                width:150,
+                dock:'bottom',
+                glyph: 'f200@FontAwesome5FreeSolid',
+                bind:{
+                    disabled:'{!enableDockedToolbar}',
+                    hidden:'{isAnalysisButtonHidden}'
+                },
+                listeners:{
+                    click:{
+                        fn:this.matchAnalysisButtonHandler,
+                        scope:this
+                    }
+                }
+            }]
         },{
             xtype : 'toolbar',
             dock : 'bottom',
             ui: 'footer',
+            bind:{
+                disabled:'{!enableDockedToolbar}'
+            },
             layout: {
                 type: 'vbox',
                 align: 'left'
@@ -355,15 +376,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     startAnalysis:function(taskId,operation){
         //'editor/:entity/:id/operation/:operation',
-        var me = this,
-            store = Ext.StoreManager.get('admin.Tasks'),
-            record = store ? store.getById(taskId) : null;
+        var me = this;
         
-        if(record){
-            record.set('state','matchanalysis');
-        }
-        
-        me.addLoadingMask();
+        me.fireEvent('beforeStartAnalysis',taskId,operation);
+
         Ext.Ajax.request({
             url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
             method: "PUT",
@@ -377,25 +393,11 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },
             scope: this,
             failure: function(response){
-                me.removeLoadingMask();
             	Editor.app.getController('ServerException').handleException(response);
             }
         })
     },
     
-    /**
-     * Would be better in the ViewController, but here are all the masking functions.
-     * Should be moved in the future. 
-     */
-    onTriggerTaskReload: function(data) {
-        var me = this, 
-            assocPanel = me.getLanguageResourceTaskAssocPanel(),
-            loadedTask = assocPanel && assocPanel.lookupViewModel().get('currentTask');
-        if(loadedTask && loadedTask.get('taskGuid') == data.taskGuid) {
-            me.removeLoadingMask();
-        }
-    },
-
     /***
      * Language resource to task assoc after save event handler
      */
@@ -441,42 +443,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             return 0;
         }
         return component.checked ? 1 : 0;
-    },
-    
-    /***
-     * Add loading mask in match analysis panel and in the task assoc panel
-     */
-    addLoadingMask:function(){
-        var me=this,
-            loadedTask,
-            assocPanel = me.getLanguageResourceTaskAssocPanel(),
-            matchAnalysisPanel = me.getMatchAnalysisPanel();
-        
-        assocPanel && assocPanel.setLoading(me.strings.analysisLoadingMsg);
-        
-        if(matchAnalysisPanel){
-            loadedTask = matchAnalysisPanel.lookupViewModel().get('currentTask');
-            loadedTask.set('state', me.TASK_STATE_ANALYSIS);
-            matchAnalysisPanel.setLoading(me.strings.analysisLoadingMsg);
-        }
-    },
-
-    /***
-     * Remove loading mask from task assoc panel and match analysis panel.
-     * If the reloadStore is set, the analysis panel will be reloaded
-     */
-    removeLoadingMask:function(reloadStore){
-        var me=this,
-            assocPanel = me.getLanguageResourceTaskAssocPanel(),
-            matchAnalysisPanel = me.getMatchAnalysisPanel(),
-            matchAnalysisGrid = me.getComponentByItemId('matchAnalysisGrid'),
-            store = matchAnalysisGrid && matchAnalysisGrid.getStore();
-        
-        assocPanel && assocPanel.setLoading(false);
-        matchAnalysisPanel && matchAnalysisPanel.setLoading(false);
-        if(matchAnalysisGrid && reloadStore && store.isLoaded()){
-            store.reload();
-        }
     }
 
 });

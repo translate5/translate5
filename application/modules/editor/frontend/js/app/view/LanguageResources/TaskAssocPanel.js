@@ -53,16 +53,19 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
         reload: '#UT#Aktualisieren',
         save: '#UT#Speichern',
         empty: '#UT#Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.',
-        groupHeader: '#UT#Aufgabe: {[values.rows[0].data.taskName]}',
         checked: '#UT#Ressource in Aufgabe verwenden',
         name: '#UT#Name',
         segmentsUpdateable: '#UT#Segmente zurückspeichern',
         source: '#UT#Quellsprache',
         target: '#UT#Zielsprache',
-        serviceName: '#UT#Ressource'
+        serviceName: '#UT#Ressource',
+        taskGuid:'#UT#Aufgabename'
     },
     padding: 0,
     layout:'fit',
+    bind:{
+        loading:'{isLoadingActive}'
+    },
     initConfig : function(instanceConfig) {
         var me = this,
         config = {
@@ -72,13 +75,27 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                 xtype : 'grid',
                 itemId : 'languageResourcesTaskAssocGrid',
             	bind:{
-            		store:'{taskAssoc}'
+            		store:'{taskAssoc}',
+            		disabled:'{!enablePanel}'
     			},
                 emptyText: me.strings.empty,
                 features : [ {
                     id: 'group',
                     ftype: 'grouping',
-                    groupHeaderTpl: me.strings.groupHeader,
+                    groupHeaderTpl: Ext.create('Ext.XTemplate',
+                            '{columnName}: {[this.formatValue(values)]}',
+                            {
+                                formatValue: function(values) {
+                                    var ret=values.name;
+                                    if(values.groupField=='taskGuid'){
+                                        //when taskGuid is active as grouping, render the task name as group value
+                                        var data=values.rows && values.rows[0];
+                                        return data ? data.get('taskName') : ret;
+                                    }
+                                    return ret;
+                                }
+                            }
+                    ),
                     hideGroupedHeader: false,
                     enableGroupingMenu: true,
                     groupers:[{property:'serviceName'},{property:'targetLang'}]
@@ -87,13 +104,23 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     xtype : 'checkcolumn',
                     text : '',
                     tooltip : me.strings.checked,
+                    text : me.strings.checked,
                     dataIndex : 'checked',
                     sortable : true,
                     cls: 'taskAssocChecked',
                     width:60,
                 }, {
+                    xtype : 'gridcolumn',
+                    tooltip : me.strings.taskGuid,
+                    text : me.strings.taskGuid,
+                    dataIndex : 'taskGuid',
+                    sortable : true,
+                    hidden:true,
+                    width:60,
+                },{
                     xtype : 'checkcolumn',
                     tooltip : me.strings.segmentsUpdateable,
+                    text : me.strings.segmentsUpdateable,
                     cls: 'segmentsUpdateable',
                     dataIndex : 'segmentsUpdateable',
                     sortable : true,
@@ -119,6 +146,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                 },{
                     xtype : 'gridcolumn',
                     tooltip : me.strings.source,
+                    text : me.strings.source,
                     cls : 'source-lang',
                     dataIndex : 'sourceLang',
                     renderer : me.langRenderer,
@@ -127,6 +155,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                 }, {
                     xtype : 'gridcolumn',
                     tooltip : me.strings.target,
+                    text : me.strings.target,
                     cls : 'target-lang',
                     dataIndex : 'targetLang',
                     renderer : me.langRenderer,

@@ -37,8 +37,10 @@
 <trans-unit id='U3RhdHVzIDI='><source>Status 2</source><target>Status 2</target></trans-unit>
 <trans-unit id='U3RhdHVzIDM='><source>Status 3</source><target>Status 3</target></trans-unit>
 <trans-unit id='w5xiZXJzZXR6dA=='><source>Übersetzt</source><target>Übersetzt</target></trans-unit>
+<trans-unit id='w7xiZXJzZXR6dA=='><source>übersetzt</source><target>übersetzt</target></trans-unit>
 <trans-unit id='TmljaHQgw7xiZXJzZXR6dA=='><source>Nicht übersetzt</source><target>Nicht übersetzt</target></trans-unit>
 <trans-unit id='TGVrdG9yaWVydA=='><source>Lektoriert</source><target>Lektoriert</target></trans-unit>
+<trans-unit id="bGVrdG9yaWVydA=="><source>lektoriert</source><target>lektoriert</target></trans-unit>
 <trans-unit id='TGVrdG9yaWVydCwgYXV0bw=='><source>Lektoriert, auto</source><target>Lektoriert, auto</target></trans-unit>
 <trans-unit id='R2VzcGVycnQ='><source>Gesperrt</source><target>Gesperrt</target></trans-unit>
 <trans-unit id='TGVrdG9yaWVydCwgdW5iZXLDvGhydCwgYXV0by1nZXNldHp0IGJlaW0gQXVmZ2FiZW5hYnNjaGx1c3M='><source>Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss</source><target>Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss</target></trans-unit>
@@ -1296,10 +1298,10 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='U2VnLjoge3NpYmxpbmdzfQ=='><source>Seg.: {siblings}</source><target>Seg.: {siblings}</target></trans-unit>
 <trans-unit id='RXMga29ubnRlbiBuaWNodCBhbGxlIHdpZWRlcmhvbHRlbiBTZWdtZW50ZSBnZXNwZWljaGVydCB3ZXJkZW4hIERpZXMga2FubiB1bnRlcnNjaGllZGxpY2hlIFVyc2FjaGVuIGhhYmVuLiBCaXR0ZSBzcGVpY2hlcm4gU2llIGRhcyB6dWxldHp0IGJlYXJiZWl0ZXRlIFNlZ21lbnQgZXJuZXV0IHVuZCB2ZXJ3ZW5kZW4gU2llIGRlbiBtYW51ZWxsZW4gTW9kdXMgZGVzIFdpZWRlcmhvbHVuZ3NlZGl0b3IgdW0gZGllIGJldHJvZmZlbmVuIFNlZ21lbnRlIHp1IGlkZW50aWZpemllcmVuIHVtIHNpZSBkYW5hY2ggaMOkbmRpc2NoIHp1IGJlYXJiZWl0ZW4u'><source>Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.</source><target>Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.</target></trans-unit>
 <trans-unit id='RGllIGF1dG9tYXRpc2NoZW4gRXJzZXR6dW5nZW4ga29ubnRlbiBuaWNodCBpbiBhbGxlbiBnZWZ1bmRlbmVuIFNlZ21lbnRlbiBkdXJjaGdlZsO8aHJ0IHdlcmRlbi4gRGllcyBrYW5uIHVudGVyc2NoaWVkbGljaGUgVXJzYWNoZW4gaGFiZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU3VjaGUgdW5kIEVyc2V0emVuIG9obmUgZGllICdBbGxlcyBFcnNldHplbicgRnVua3Rpb25hbGl0w6R0IHVtIGRpZSBiZXRyb2ZmZW5lbiBTZWdtZW50ZSBlaW56ZWxuIHp1IGZpbmRlbiB1bmQgenUgYmVhcmJlaXRlbi4='><source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die 'Alles Ersetzen' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source><target>Es konnten nicht in allen gefundenen Segmente der Inhalt automatisch ersetzt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die 'Alles Ersetzen' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</target></trans-unit>
-<trans-unit id='ZXhwb3J0aWVyZW4gKE9yZ2luYWxmb3JtYXQp'><source>exportieren (Orginalformat)</source><target>exportieren (Orginalformat)</target></trans-unit>
-<trans-unit id='ZXhwb3J0aWVyZW4gKFhMSUZGIDIuMSk='><source>exportieren (XLIFF 2.1)</source><target>exportieren (XLIFF 2.1)</target></trans-unit>
-<trans-unit id="ZXhwb3J0aWVyZW4gKE9yZ2luYWxmb3JtYXQgbWl0IMOEbmRlcnVuZ3NoaXN0b3JpZSk="><source>exportieren (Orginalformat mit Änderungshistorie)</source><target>exportieren (Orginalformat mit Änderungshistorie)</target></trans-unit>
-<trans-unit id='ZXhwb3J0aWVyZW4gKEV4Y2VsKQ=='><source>exportieren (Excel)</source><target>exportieren (Excel)</target></trans-unit>
+<trans-unit id='T3JpZ2luYWxmb3JtYXQsIHswfQ=='><source>Originalformat, {0}</source><target>Originalformat, {0}</target></trans-unit>
+<trans-unit id='WExJRkYgMi4x'><source>XLIFF 2.1</source><target>XLIFF 2.1</target></trans-unit>
+<trans-unit id="U0RMWExJRkYgbWl0IMOEbmRlcnVuZ3NtYXJraWVydW5nZW4="><source>SDLXLIFF mit Änderungsmarkierungen</source><target>SDLXLIFF mit Änderungsmarkierungen</target></trans-unit>
+<trans-unit id='RXh0ZXJuZSBCZWFyYmVpdHVuZyBhbHMgRXhjZWw='><source>Externe Bearbeitung als Excel</source><target>Externe Bearbeitung als Excel</target></trans-unit>
 <trans-unit id='S3VuZGVu'><source>Kunden</source><target>Kunden</target></trans-unit>
 <trans-unit id='S3VuZGVu'><source>Kunden</source><target>Kunden</target></trans-unit>
 <trans-unit id="QWxsZSBLdW5kZW4="><source>Alle Kunden</source><target>Alle Kunden</target></trans-unit>
@@ -1354,7 +1356,6 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='U3VjaGUgaW4gezB9'><source>Suche in {0}</source><target>Suche in {0}</target></trans-unit>
 <trans-unit id='U3ByYWNoLVJlc291cmNlbiB6dXdlaXNlbg=='><source>Sprach-Resourcen zuweisen</source><target>Sprach-Resourcen zuweisen</target></trans-unit>
 <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='><source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source><target>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</target></trans-unit>
-<trans-unit id='QXVmZ2FiZToge1t2YWx1ZXMucm93c1swXS5kYXRhLnRhc2tOYW1lXX0='><source>Aufgabe: {[values.rows[0].data.taskName]}</source><target>Aufgabe: {[values.rows[0].data.taskName]}</target></trans-unit>
 <trans-unit id='RGF0ZWliYXNpZXJ0ZXMgVE0gaGVydW50ZXJsYWRlbiB1bmQgbG9rYWwgc3BlaWNoZXJu'><source>Dateibasiertes TM herunterladen und lokal speichern</source><target>Dateibasiertes TM herunterladen und lokal speichern</target></trans-unit>
 <trans-unit id='QWxzIFRNWC1EYXRlaSBoZXJ1bnRlcmxhZGVuIHVuZCBsb2thbCBzcGVpY2hlcm4='><source>Als TMX-Datei herunterladen und lokal speichern</source><target>Als TMX-Datei herunterladen und lokal speichern</target></trans-unit>
 <trans-unit id='ezB9IEVyZ2Vibmlzc2U='><source>{0} Ergebnisse</source><target>{0} Ergebnisse</target></trans-unit>
@@ -1801,6 +1802,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RGFzIGFuZ2Vmb3JkZXJ0ZSBQcm9qZWt0IGV4aXN0aWVydCBuaWNodA=='><source>Das angeforderte Projekt existiert nicht</source><target>Das angeforderte Projekt existiert nicht</target></trans-unit>
 <trans-unit id='RGllIGFuZ2Vmb3JkZXJ0ZSBQcm9qZWt0YXVmZ2FiZSBleGlzdGllcnQgbmljaHQ='><source>Die angeforderte Projektaufgabe existiert nicht</source><target>Die angeforderte Projektaufgabe existiert nicht</target></trans-unit>
 <trans-unit id='UHJvamVrdCBpbSBha3R1ZWxsZW4gRmlsdGVyIG5pY2h0IGdlZnVuZGVu'><source>Projekt im aktuellen Filter nicht gefunden</source><target>Projekt im aktuellen Filter nicht gefunden</target></trans-unit>
+<trans-unit id='QmVudXR6ZXIgYmVuYWNocmljaHRpZ2Vu'><source>Benutzer benachrichtigen</source><target>Benutzer benachrichtigen</target></trans-unit>
+<trans-unit id='QWxsZSB6dWdld2llc2VuZW4gQmVudXR6ZXIgw7xiZXIgaWhyZSBadXdlaXN1bmcgcGVyIEUtTWFpbCBiZW5hY2hyaWNodGlnZW4='><source>Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen</source><target>Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen</target></trans-unit>
+<trans-unit id='RW50ZmVybmVu'><source>Entfernen</source><target>Entfernen</target></trans-unit>
+<trans-unit id='U3BlemlhbA=='><source>Spezial</source><target>Spezial</target></trans-unit>
   </body>
  </file>
 </xliff>
