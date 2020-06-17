@@ -9,15 +9,15 @@
  Contact:  http://www.MittagQI.com/  /  service (ÄTT) MittagQI.com
 
  This file may be used under the terms of the GNU General Public License version 3.0
- as published by the Free Software Foundation and appearing in the file gpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file gpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU General Public License version 3.0 requirements will be met:
  http://www.gnu.org/copyleft/gpl.html.
 
- For this file you are allowed to make use of the same FLOSS exceptions to the GNU 
- General Public License version 3.0 as specified by Sencha for Ext Js. 
- Please be aware, that Marc Mittag / MittagQI take no warranty  for any legal issue, 
- that may arise, if you use these FLOSS exceptions and recommend  to stick to GPL 3. 
+ For this file you are allowed to make use of the same FLOSS exceptions to the GNU
+ General Public License version 3.0 as specified by Sencha for Ext Js.
+ Please be aware, that Marc Mittag / MittagQI take no warranty  for any legal issue,
+ that may arise, if you use these FLOSS exceptions and recommend  to stick to GPL 3.
  For further information regarding this topic please see the attached license.txt
  of this software package.
  
@@ -31,7 +31,7 @@
  @license    GNU General Public License version 3.0 http://www.gnu.org/copyleft/gpl.html
              with FLOSS exceptions (see floss-exception.txt and ux-exception.txt at the root level)
  
- END LICENSE AND COPYRIGHT 
+ END LICENSE AND COPYRIGHT
  */
 
 /**
@@ -55,16 +55,24 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass   = 'editor_Models_Validator_PixelMapping';
     
     /**
-     * Insert or update PixelMapping for Unicode-Character as given in pixel-mapping.xlsx or in xlf-file.
-     * @param array $values
+     * Insert or update PixelMapping for Unicode-Character as given in pixel-mapping.xlsx or in import file
+     *
+     * @param string $taskGuid
+     * @param int $fileId
+     * @param string $font
+     * @param int $fontSize
+     * @param string $char
+     * @param int $pixelWidth
      */
-    public function insertPixelMappingRow($values) {
+    public function insertPixelMappingRow(string $taskGuid, ?int $fileId, string $font, int $fontSize, string $char, int $pixelWidth) {
         $sql= 'INSERT INTO LEK_pixel_mapping (`taskGuid`,`fileId`,`font`,`fontsize`,`unicodeChar`,`pixelWidth`)
                VALUES (?,?,?,?,?,?)
                ON DUPLICATE KEY UPDATE `taskGuid` = ?,`fileId` = ?,`font` = ?,`fontsize` = ?,`unicodeChar` = ?,`pixelWidth` = ?';
-        $values['font'] = strtolower($values['font']);
-        $bindings = array($values['taskGuid'], $values['fileId'], $values['font'], $values['fontsize'], $values['unicodeChar'], $values['pixelWidth'],
-                          $values['taskGuid'], $values['fileId'], $values['font'], $values['fontsize'], $values['unicodeChar'], $values['pixelWidth']);
+        $font = strtolower($font);
+        $bindings = [
+            $taskGuid, $fileId, $font, $fontSize, $char, $pixelWidth,
+            $taskGuid, $fileId, $font, $fontSize, $char, $pixelWidth
+        ];
         try {
             $this->db->getAdapter()->query($sql, $bindings);
             return;
@@ -173,10 +181,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
         }
         // If a default value is set (and not already set for this font-size), add it, too:
         if (!array_key_exists('default',$pixelMappingForTask[$fontFamily][$fontSize])) {
-            $defaultPixelWidthForFont = $this->getDefaultPixelWidth($fontSize);
-            if (!empty($defaultPixelWidthForFont)) {
-                $pixelMappingForTask[$fontFamily][$fontSize]['default'] = $defaultPixelWidthForFont;
-            }
+            $pixelMappingForTask[$fontFamily][$fontSize]['default'] = $this->getDefaultPixelWidth($fontSize);
         }
     }
     
@@ -208,10 +213,9 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
      * @param array $pixelMappingForSegment
      * @param int $fileId
      * @param array $charsNotSet
-     * @param string $charsNotSetMsg
      * @return int|NULL
      */
-    public function getCharWidth ($char, $pixelMappingForSegment, $fileId, &$charsNotSet, &$charsNotSetMsg) {
+    public function getCharWidth ($char, $pixelMappingForSegment, $fileId, &$charsNotSet) {
         $unicodeCharNumeric = $this->getNumericValueOfUnicodeChar($char);
         if (array_key_exists($unicodeCharNumeric, $pixelMappingForSegment)) {
             $pixelMappingForCharacter = $pixelMappingForSegment[$unicodeCharNumeric];
@@ -222,8 +226,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
                 return $pixelMappingForCharacter['default'];
             }
         }
-        $charsNotSet[] = $char;
-        $charsNotSetMsg .= '- ' . $unicodeCharNumeric . ' (' . $char. ')'."\n";
+        $charsNotSet[] = $unicodeCharNumeric . ' (' . $char. ')';
         if (array_key_exists('default', $pixelMappingForSegment)) {
             return $pixelMappingForSegment['default'];
         }

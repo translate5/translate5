@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Fileparsing for the Zend XLIFF files used for internal translation of translate5
- * 
+ *
  * The name is just ZendXliff/ZendXlf to distinguish it between regular Xliff and the xliff used in our Zend based application.
  * This name should not provide any connection between Zend and Xliff in general, only in the context of translate5!
  */
@@ -51,7 +51,7 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
     
     protected function initNamespaces() {
         parent::initNamespaces();
-        $this->namespaces->addNamespace('zxliff', new editor_Models_Import_FileParser_Xlf_ZendXlfNamespace());
+        $this->namespaces->addNamespace('zxliff', new editor_Models_Import_FileParser_Xlf_Namespaces_ZendXlf());
     }
     
     /**
@@ -80,11 +80,11 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
      */
     protected function setMid($mid) {
         $mid = explode('_', $mid);
-        //remove the segment count part from MID. 
+        //remove the segment count part from MID.
         // 1. Not needed since we don't have MRKs
-        // 2. can not be used otherwise relais matching won't work since our de.xliff and en.xliff are not aligned in segment position. 
-        // therefore there would be different MIDs for same content then. 
-        array_pop($mid); 
+        // 2. can not be used otherwise relais matching won't work since our de.xliff and en.xliff are not aligned in segment position.
+        // therefore there would be different MIDs for same content then.
+        array_pop($mid);
         $mid = $this->shortenMid(join('_', $mid));
         parent::setMid($mid);
     }
@@ -108,8 +108,8 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
         foreach($this->currentTarget as $mid => $target) {
             $this->protectHtml($target);
         }
-        //resetting here the original source chunks container, after protecting target, 
-        // since we don't want to reset the targets, only the source ones 
+        //resetting here the original source chunks container, after protecting target,
+        // since we don't want to reset the targets, only the source ones
         $this->originalSourceChunks = [];
         foreach($this->currentSource as $mid => $source) {
             $this->protectHtml($source);
@@ -142,7 +142,7 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
             $this->xmlparser->replaceChunk($origKey, $other);
         });
         
-        //register to all XML nodes to replace html tags, this is currently the only valid tag content between <source></source> and target tags 
+        //register to all XML nodes to replace html tags, this is currently the only valid tag content between <source></source> and target tags
         $parser->registerElement('*', null, function($tag, $key, $opener) use (&$j, $start, $parser){
             $origOpenerKey = $start + $opener['openerKey'];
             $origEndKey = $start + $key;

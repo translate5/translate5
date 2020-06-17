@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,34 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/** #@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- */
-
-
-/**
- * XLF Fileparser Add On to parse IBM XLF specific stuff
- */
-class editor_Models_Import_FileParser_Xlf_TmgrNamespace extends editor_Models_Import_FileParser_Xlf_AbstractNamespace{
-    const IBM_XLIFF_NAMESPACE = 'xmlns:tmgr="http://www.ibm.com"';
-
-    /**
-     * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::transunitAttributes()
-     */
-    public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
-        //FIXME add match rate infos into our matchRateType field!
-        settype($attributes['tmgr:matchratio'], 'integer');
-        $segmentAttributes->matchRate = $attributes['tmgr:matchratio'];
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::useTagContentOnly()
-     */
-    public function useTagContentOnly() {
-        return null; //For OpenTM2 we can calculate this value depending on the tag
-    }
-}
+Ext.define('Editor.plugins.PangeaMt.store.LanguageResources.PangeaMtEngine', {
+  extend : 'Ext.data.ArrayStore',
+  fields: [
+      {name: 'id', type: 'string'},
+      {name: 'name', type: 'string'},
+      {name: 'source', type: 'string'},
+      {name: 'target', type: 'string'},
+      {name: 'engineId', type: 'string'}
+  ],
+  storeId:'pangeaMtEngine'
+});

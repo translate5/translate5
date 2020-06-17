@@ -552,6 +552,9 @@ Ext.define('Editor.controller.TmOverview', {
         		engineName:sdlEngine.get('name')
             }));
         }
+        
+        // the same for plugins
+        this.fireEvent('engineSelect',form);
     },
 
     /**
