@@ -3,6 +3,23 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [5.0.1] - 2020-06-17
+###Added
+TRANSLATE-1900: Pixel length check: Handle characters with unkown pixel length
+  Pixel length check: Handle characters with unkown pixel length
+TRANSLATE-2054: Integrate PangeaMT with translate5
+  Integrate PangeaMT as new machine translation language resource.
+TRANSLATE-2092: Import specific DisplayText XML
+  Import specific DisplayText XML
+
+###Changed
+TRANSLATE-2070: In XLF Import: Move also bx,ex and it tags out of the segment (sponsored by Supertext)
+  Move paired tags out of the segment, where the corresponding tag belongs to another segment
+
+###Bugfixes
+TRANSLATE-2091: Prevent hanging imports when starting maintenance mode
+  Starting an improt while a maintenance is scheduled could lead to hanging import workers. Now workers don't start when a maintenance is scheduled.
+
 ## [5.0.0] - 2020-06-04
 ###Added
 TRANSLATE-1610: Bundle tasks to projects
