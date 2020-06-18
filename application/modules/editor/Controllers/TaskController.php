@@ -400,8 +400,20 @@ class editor_TaskController extends ZfExtended_RestController {
             if($isMailTo) {
                 $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
             }
+            
+            $this->addMissingSegmentrangesToResult($row);
         }
         return $rows;
+    }
+    
+    /**
+     * Add the number of segments that are not assigned to a user
+     * although some other segments ARE assigned to users of this role.
+     */
+    protected function addMissingSegmentrangesToResult(array &$row) {
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $row['missingsegmentranges'] = $tua->getAllNotAssignedSegments($row['taskGuid']);
     }
 
     /**

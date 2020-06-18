@@ -580,8 +580,10 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         // ]
         $allRoles = $this->getAllAssignedRolesByTask($taskGuid);
         foreach ($allRoles as $role) {
+            // TODO: use "1-3;5" instead of "1,2,3,5"
             $rolename = $role['role'];
-            $notAssignedSegments[$rolename] = $this->getAllNotAssignedSegmentsByRole($taskGuid, $rolename);
+            $missingSegments = $this->getAllNotAssignedSegmentsByRole($taskGuid, $rolename);
+            $notAssignedSegments[] = array('role' => $rolename, 'missingSegments' => implode(",", $missingSegments));
         }
         return $notAssignedSegments;
     }
