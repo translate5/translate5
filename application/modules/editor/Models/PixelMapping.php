@@ -64,7 +64,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
      * @param string $char
      * @param int $pixelWidth
      */
-    public function insertPixelMappingRow(string $taskGuid, int $fileId, string $font, int $fontSize, string $char, int $pixelWidth) {
+    public function insertPixelMappingRow(string $taskGuid, ?int $fileId, string $font, int $fontSize, string $char, int $pixelWidth) {
         $sql= 'INSERT INTO LEK_pixel_mapping (`taskGuid`,`fileId`,`font`,`fontsize`,`unicodeChar`,`pixelWidth`)
                VALUES (?,?,?,?,?,?)
                ON DUPLICATE KEY UPDATE `taskGuid` = ?,`fileId` = ?,`font` = ?,`fontsize` = ?,`unicodeChar` = ?,`pixelWidth` = ?';
