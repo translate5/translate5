@@ -303,7 +303,7 @@ class editor_Models_Import_Worker_Import {
             'task' => $this->task,
             'extension' => $extension,
             'errorMessages' => $errorMessages,
-            'availableParsers' => $this->supportedFiles->getSupportedExtensions,
+            'availableParsers' => $this->supportedFiles->getSupportedExtensions(),
         ]);
     }
     
