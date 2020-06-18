@@ -643,7 +643,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       if(!task){
           return;
       }
-      me.getProjectGrid().setLoading(true);
       me.getProjectPanel().getController().redirectFocus(task,false);
   },
   
@@ -871,6 +870,27 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           store = task.store,
           app = Editor.app;
       app.mask(me.strings.taskDestroy, task.get('taskName'));
+      store.remove(task);
+      store.sync({
+          //prevent default ServerException handling
+          preventDefaultHandler: true,
+          success: function() {
+              app.unmask();
+              me.fireEvent('afterTaskDelete',task);
+          },
+          failure: function(records, op){
+              task.reject();
+              app.unmask();
+              if(op.getError().status == '405') {
+                  Editor.MessageBox.addError(me.strings.taskNotDestroyed);
+              }
+              else {
+                  Editor.app.getController('ServerException').handleException(op.error.response);
+              }
+          }
+      
+      });
+      return;
       task.dropped = true; //doing the drop / erase manually
       task.save({
           //prevent default ServerException handling
@@ -879,9 +899,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               Editor.MessageBox.addByOperation(op);
           },
           success: function() {
-              store.load();
-              app.unmask();
-              me.fireEvent('afterTaskDelete',task);
+              store.load({
+                  callback: () => {
+                      app.unmask()
+                      me.fireEvent('afterTaskDelete',task);
+                  }
+              });
+              
           },
           failure: function(records, op){
               task.reject();
@@ -1215,6 +1239,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  if(!grid){
 		  return;
 	  }
-	  grid.getController().reloadProjectAndProjectTasks(true);
+	  grid.getController().reloadProjectAndProjectTasks();
   }
 });

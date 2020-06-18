@@ -117,6 +117,10 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 	 */
 	onProjectTaskLoad:function(store){
 		var me=this;
+		//if the component is not visualy active, do not focus the project tasks.
+		if(!me.getView().isVisible(true)){
+		    return;
+		}
 		me.focusProjectTask();
 	},
 	
@@ -135,7 +139,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 			//do not scroll on empty store
 			if(grid.getStore().getTotalCount()==0){
 				Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
-				grid.setLoading(false);
 				return;
 			}
 			grid.bufferedRenderer.scrollTo(index,{
@@ -143,7 +146,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 					//no db index if found
 					if(index===undefined || index<0){
 						Editor.MessageBox.addInfo(me.strings.noProjectMessage);
-						grid.setLoading(false);
 						return;
 					}
 					
@@ -159,12 +161,10 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 				},
 				notScrollCallback:function(){
 					Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
-					grid.setLoading(false);
 				}
 			});
 		}, function(err) {
 			//the exception is handled in the searchIndex
-			grid.setLoading(false);
 		});
 	},
 	
@@ -184,7 +184,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 		if(!record){
 			//display info message when the flag showNoRecordMessage is set 
 			showNoRecordMessage && Editor.MessageBox.addInfo(me.strings.noProjectTaskMessage);
-			projectGrid.setLoading(false);
 			//reset the selection and with this disable the projectTask panel
 			if(store.getTotalCount()==0){
 				me.getViewModel().set('projectTaskSelection',null);
@@ -197,8 +196,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 
 		//focus and select the record
 		me.focusRecordSilent(grid,record,'projectTaskSelection');
-		
-		projectGrid.setLoading(false);
 	},
 	
 	/***

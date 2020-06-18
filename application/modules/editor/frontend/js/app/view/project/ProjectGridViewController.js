@@ -150,30 +150,26 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
     
     /***
      * Reload project and projectTask stores
-     * 
-     * @param {Boolean} {silentProjectTasks}: when true projectTask load event will not be fired
+     *TODO: move me to project panel view controller, and before load reset the vm variables so the selection is reset
+     *
+     *  THE RESET DOES NOT FIX THE PROBLEM . select project task, go in task overview, remove this project, switch to project overview.
+     *  the project task is enabled without selection
      */
-    reloadProjectAndProjectTasks:function(silentProjectTasks){
+    reloadProjectAndProjectTasks:function(){
         var me = this,
-            projectTaskGrid = me.getView().up('#projectPanel').down('#projectTaskGrid'),
+            projectPanel= me.getView().up('#projectPanel'),
+            projectTaskGrid = projectPanel && projectPanel.down('#projectTaskGrid'),
             projectTaskStore = projectTaskGrid && projectTaskGrid.getStore();
         
+        if(!projectTaskStore){
+            return;
+        }
+        
+        me.getViewModel().set('projectSelection',null);
+        me.getViewModel().set('projectTaskSelection',null);
+        
         me.reloadProjects().then(function(records) {
-            if(!projectTaskStore){
-                return;
-            }
-            //suspend the event if set
-            if(silentProjectTasks){
-                projectTaskStore.suspendEvent('load');
-            }
-            projectTaskStore.load({
-                callback:function(){
-                    //after load resume the load event
-                    if(silentProjectTasks){
-                        projectTaskStore.resumeEvent('load');
-                    }
-                }
-            })
+            projectTaskStore.load()
         }, function(operation) {
             Editor.app.getController('ServerException').handleException(operation.error.response);
         });
