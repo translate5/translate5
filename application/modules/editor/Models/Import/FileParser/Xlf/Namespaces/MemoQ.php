@@ -36,13 +36,13 @@ END LICENSE AND COPYRIGHT
 /**
  * XLF Fileparser Add On to parse MemoQ XLF specific stuff
  */
-class editor_Models_Import_FileParser_Xlf_MemoQNamespace extends editor_Models_Import_FileParser_Xlf_AbstractNamespace{
+class editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ extends editor_Models_Import_FileParser_Xlf_Namespaces_Abstract{
     const MEMOQ_XLIFF_NAMESPACE = 'xmlns:mq="MQXliff"';
     const USERGUID = 'memoq-imported';
 
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::registerParserHandler()
+     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::registerParserHandler()
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         $memoqMqmTag = 'trans-unit > target > mrk[mtype=x-mq-range], ';
@@ -84,7 +84,7 @@ class editor_Models_Import_FileParser_Xlf_MemoQNamespace extends editor_Models_I
     /**
      * Translate5 uses x,g and bx ex tags only. So the whole content of the tags incl. the tags must be used.
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::useTagContentOnly()
+     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::useTagContentOnly()
      */
     public function useTagContentOnly() {
         return false;
@@ -93,7 +93,7 @@ class editor_Models_Import_FileParser_Xlf_MemoQNamespace extends editor_Models_I
     /**
      * After fetching the comments, the internal comments fetcher is resetted (if comments are inside MRKs and not the whole segment)
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::getComments()
+     * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::getComments()
      */
     public function getComments() {
         $comments = $this->comments;

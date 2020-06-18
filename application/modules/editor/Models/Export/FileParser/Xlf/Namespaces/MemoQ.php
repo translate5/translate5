@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
 /**
  * XLF Fileparser Add On to parse MemoQ XLF specific stuff
  */
-class editor_Models_Export_FileParser_Xlf_MemoQNamespace extends editor_Models_Export_FileParser_Xlf_AbstractNamespace {
+class editor_Models_Export_FileParser_Xlf_Namespaces_MemoQ extends editor_Models_Export_FileParser_Xlf_Namespaces_Abstract {
     protected $currentCommentsKey = null;
     protected $currentComments = [];
 
@@ -54,7 +54,7 @@ class editor_Models_Export_FileParser_Xlf_MemoQNamespace extends editor_Models_E
 
     /**
      * {@inheritDoc}
-     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::registerParserHandler()
+     * @see editor_Models_Export_FileParser_Xlf_Namespaces_Abstract::registerParserHandler()
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         //a little bit hackish but the easiest way to get the task
@@ -104,7 +104,7 @@ class editor_Models_Export_FileParser_Xlf_MemoQNamespace extends editor_Models_E
 
         foreach($this->comments as $comment) {
             //comments already imported from across are ignored
-            if($comment['userGuid'] == editor_Models_Import_FileParser_Xlf_MemoQNamespace::USERGUID) {
+            if($comment['userGuid'] == editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ::USERGUID) {
                 continue;
             }
             self::$xmlWriter->startElement('mq:comment');
