@@ -3773,6 +3773,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='w7xiZXJzZXR6dA=='><source>übersetzt</source><target>translated</target></trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUgU2VnbWVudGU='><source>Zugewiesene Segmente</source><target>Assigned segments</target></trans-unit>
 <trans-unit id='U2VnbWVudGU='><source>Segmente</source><target>Segments</target></trans-unit>
+<trans-unit id='TmljaHQgenVnZXdpZXNlbmUgU2VnbWVudGU='><source>Nicht zugewiesene Segmente</source><target>Segments that are not assigned</target></trans-unit>
 </body>
   </file>
 </xliff>

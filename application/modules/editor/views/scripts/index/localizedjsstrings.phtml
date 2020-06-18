@@ -866,9 +866,20 @@ Ext.define('Editor.controller.Localizer', {
             btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
             formTitleAdd: '<?php echo $this->translate->_('Benutzerzuweisung hinzufügen:');?>',
             formTitleEdit: '<?php echo $this->translate->_('Bearbeite Benutzer "{0}"');?>',
-            editInfo: '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>',
             fieldDeadline: '<?php echo $this->translate->_('Deadline');?>',
             fieldSegmentrange: '<?php echo $this->translate->_('Zugewiesene Segmente');?>'
+        }
+    });
+    
+    Ext.define("Editor.view.admin.task.UserAssocViewModel", {
+        override: "Editor.view.admin.task.UserAssocViewModel",
+        strings: {
+            editInfo: '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>',
+            segmentrangeError: '<?php echo $this->translate->_('Nicht zugewiesene Segmente');?>',
+            translator: '<?php echo $this->translate->_('Übersetzer');?>',
+            translatorCheck: '<?php echo $this->translate->_('Lektor');?>',
+            reviewer: '<?php echo $this->translate->_('Zweiter Lektor');?>',
+            visitor: '<?php echo $this->translate->_('Besucher');?>'
         }
     });
     

@@ -33,6 +33,14 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
        'Ext.data.Store',
        'Editor.model.admin.User'
     ],
+    strings: {
+        editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
+        segmentrangeError: '#UT#Nicht zugewiesene Segmente',
+        translator: '#UT#Übersetzer',
+        translatorCheck: '#UT#Zweiter Lektor',
+        reviewer: '#UT#Lektor',
+        visitor: '#UT#Besucher'
+    },
     
     stores: {
         users: {
@@ -69,6 +77,45 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
         enablePanel:{
             get: function (task) {
                 return task && (task.isUnconfirmed() || task.isOpen());
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
+        editInfoHtml:{
+            get: function (task) {
+                var me= this,
+                    html = me.strings.editInfo,
+                    missingsegmentranges,
+                    i,
+                    rolename;
+                if (task === null) {
+                    return html;
+                }
+                missingsegmentranges = task.get('missingsegmentranges');
+                if(missingsegmentranges.length > 0) {
+                    html += '<p class="errors"><br>' + me.strings.segmentrangeError + ':</p>';
+                    html += '<p>';
+                    for (i = 0; i < missingsegmentranges.length; i++) {
+                        switch(missingsegmentranges[i]['role']) {
+                          case 'translator':
+                              rolename = me.strings.translator;
+                              break;
+                          case 'translatorCheck':
+                              rolename = me.strings.translatorCheck;
+                              break;
+                          case 'reviewer':
+                              rolename = me.strings.reviewer;
+                              break;
+                          case 'visitor':
+                              rolename = me.strings.visitor;
+                              break;
+                          default:
+                              rolename =  '';
+                        }
+                      html += rolename + ': ' + missingsegmentranges[i]['missingSegments'] + '<br>';
+                    } 
+                    html += '</p>';
+                }
+                return html;
             },
             bind:{bindTo:'{currentTask}',deep:true}
         },

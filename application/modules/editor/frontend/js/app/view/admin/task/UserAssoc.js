@@ -39,7 +39,6 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       btnCancel: '#UT#Abbrechen',
       formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
       formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
-      editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
       fieldDeadline:'#UT#Deadline',
       fieldSegmentrange: '#UT#Zugewiesene Segmente'
   },
@@ -71,7 +70,9 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
               itemId: 'editInfoOverlay',
               cls: 'edit-info-overlay',
               padding: 10,
-              html: me.strings.editInfo
+              bind: {
+                  html: '{editInfoHtml}'
+              }
           },{
               xtype: 'form',
               title : me.strings.formTitleAdd,
