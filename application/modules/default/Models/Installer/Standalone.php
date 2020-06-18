@@ -53,7 +53,7 @@ class Models_Installer_Standalone {
      * Increase this value to force a restart of the updater while updating
      * @var integer
      */
-    const INSTALLER_VERSION = 12;
+    const INSTALLER_VERSION = 13;
     
     /**
      * @var string
@@ -416,6 +416,11 @@ class Models_Installer_Standalone {
      */
     protected function acceptLicenses(array $depsToAccept) {
         if(is_array($this->options) && ($this->options['license-ignore'] ?? false)){
+            return;
+        }
+        //FIXME since above options is not usable yet, we just check for the host to ignore the license question
+        //when using console kit we can replace this with an undocumented switch
+        if(md5(gethostname()) === '52c30971e2fe1d24879b307b44e0966f') {
             return;
         }
         $first = true;
