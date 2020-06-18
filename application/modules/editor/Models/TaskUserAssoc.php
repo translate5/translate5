@@ -502,57 +502,112 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * If a task is in sequential-mode and ANY segments are assigned to ANY user,
-     * the editable-status of the segments will have to be checked for ALL segments
-     * for ALL users.
-     * @param string $taskGuid
-     * @return bool
-     */
-    public function isSegmentrangedTask(string $taskGuid) {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        if ($task->getUsageMode() !== $task::USAGE_MODE_SIMULTANEOUS) {
-            return false;
-        }
-        $s = $this->db->select()
-            ->where('taskGuid = ?', $taskGuid)
-            ->where('segmentrange IS NOT NULL');
-        return $this->db->fetchAll($s)->count() > 0;
-    }
-    
-    /**
-     * Return an array with all segments (by their segmentNrInTask) and their assigned users.
+     * What roles are assigned to a task at all?
      * @param string $taskGuid
      * @return array
      */
-    public function getAllSegmentrangesByTask(string $taskGuid) {
-        $allSegmentrangesByTask = [];
-        /*Example for:
-         * - {94ff4a53-dae0-4793-beae-1f09968c3c93}: "1-3;5;9-10"
-         * - {c77edcf5-3c55-4c29-a73d-da80d4dcfb36}: "7-8"
-         * $allSegmentrangesByTask = [1 => '{94ff4a53-dae0-4793-beae-1f09968c3c93}',
-         *                            2 => '{94ff4a53-dae0-4793-beae-1f09968c3c93}',
-         *                            3 => '{94ff4a53-dae0-4793-beae-1f09968c3c93}',
-         *                            5 => '{94ff4a53-dae0-4793-beae-1f09968c3c93}',
-         *                            7 => '{c77edcf5-3c55-4c29-a73d-da80d4dcfb36}',
-         *                            8 => '{c77edcf5-3c55-4c29-a73d-da80d4dcfb36}',
-         *                            9 => '{94ff4a53-dae0-4793-beae-1f09968c3c93}',
-         *                           10 => '{94ff4a53-dae0-4793-beae-1f09968c3c93}'];
-         */
+    public function getAllAssignedRolesByTask($taskGuid) {
+        $s = $this->db->select()
+            ->from($this->db, array('role'))
+            ->distinct()
+            ->where('taskGuid = ?', $taskGuid);
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    // ---------------------- segmentrange: ------------------------
+    /**
+     * If a task is in sequential-mode and ANY segments are assigned to ANY user
+     * of the given user's role in the current workflow-step, the editable-status of
+     * the segments will have to be checked for ALL segments for ALL users of this role.
+     * @param editor_Models_Task $task
+     * @param string $role
+     * @return bool
+     */
+    public function isSegmentrangedTaskForRole(editor_Models_Task $task, string $role) : bool {
+        if ($task->getUsageMode() !== $task::USAGE_MODE_SIMULTANEOUS) {
+            return false;
+        }
+        $assignedSegments[] = $this->getAllAssignedSegmentsByRole($task->getTaskGuid(), $role);
+        return count($assignedSegments) > 0;
+    }
+    /**
+     * Return an array with all segments in given task for the given user in the given row.
+     * @param string $taskGuid
+     * @param string $userGuid
+     * @param string $role
+     * @return array
+     */
+    public function getAllAssignedSegmentsByUserAndRole(string $taskGuid, string $userGuid, string $role) : array {
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
+            ->where('userGuid = ?', $userGuid)
+            ->where('role = ?', $role)
             ->where('segmentrange IS NOT NULL');
-        $allSegmentUserAssocs = $this->db->fetchAll($s)->toArray();
-        foreach ($allSegmentUserAssocs as $row) {
-            $allSegmentrangesForUser = explode(";", $row['segmentrange']);
-            foreach ($allSegmentrangesForUser as $segmentrange) {
-                $segmentrangeLimits = explode("-", $segmentrange);
-                for ($i = reset($segmentrangeLimits); $i <= end($segmentrangeLimits); $i++) {
-                    $allSegmentrangesByTask[$i] = $row['userGuid'];
-                }
+        $tuaRows = $this->db->fetchAll($s)->toArray();
+        return editor_Models_TaskUserAssoc_Segmentrange::getSegmentNumbersFromRows($tuaRows);
+    }
+    /**
+     * Return an array with the numbers of all segments in the task
+     * that are assigned to any user of the given role.
+     * @param string $taskGuid
+     * @param string $role
+     * @return array
+     */
+    public function getAllAssignedSegmentsByRole(string $taskGuid, string $role) : array {
+        $s = $this->db->select()
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('role = ?', $role)
+            ->where('segmentrange IS NOT NULL');
+        $tuaRows = $this->db->fetchAll($s)->toArray();
+        return editor_Models_TaskUserAssoc_Segmentrange::getSegmentNumbersFromRows($tuaRows);
+    }
+    /**
+     * Return an array with the numbers of the segments in the task
+     * that are NOT assigned to any user although other segments ARE
+     * already assigned to users, sorted by role.
+     * @param string $taskGuid
+     * @return array
+     */
+    public function getAllNotAssignedSegments(string $taskGuid) : array {
+        $notAssignedSegments = [];
+        // Example for a task with 10 segments:
+        // - translator {94ff4a53-dae0-4793-beae-1f09968c3c93}: "1-3;5"
+        // - translator {c77edcf5-3c55-4c29-a73d-da80d4dcfb36}: "7-8"
+        // - translatorCheck {c77edcf5-3c55-4c29-a73d-da80d4dcfb36}: "8-10"
+        // $allNotAssignedSegments = [
+        //   translator => [4,6,9,10],
+        //   translatorCheck => [4,6,9,10]
+        // ]
+        $allRoles = $this->getAllAssignedRolesByTask($taskGuid);
+        foreach ($allRoles as $role) {
+            $rolename = $role['role'];
+            $notAssignedSegments[$rolename] = $this->getAllNotAssignedSegmentsByRole($taskGuid, $rolename);
+        }
+        return $notAssignedSegments;
+    }
+    
+    /**
+     * Return an array with the numbers of the segments in the task
+     * that are NOT assigned to any user of the given role.
+     * @param string $taskGuid
+     * @param string $role
+     * @return array
+     */
+    public function getAllNotAssignedSegmentsByRole(string $taskGuid, string $role) : array {
+        $notAssignedSegments = [];
+        // Example for a task with 10 segments:
+        // - translator {94ff4a53-dae0-4793-beae-1f09968c3c93}: "1-3;5"
+        // - translator {c77edcf5-3c55-4c29-a73d-da80d4dcfb36}: "7-8"
+        // $notAssignedSegments = [4,6,9,10]
+        $segmentModel = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segmentModel editor_Models_Segment */
+        $segmentsNr = $segmentModel->getTotalSegmentsCount($taskGuid);
+        $assignedSegments = $this->getAllAssignedSegmentsByRole($taskGuid, $role);
+        for ($i = 1; $i <= $segmentsNr; $i++) {
+            if (!in_array($i, $assignedSegments)) {
+                $notAssignedSegments[] = $i;
             }
         }
-        return $allSegmentrangesByTask;
+        return $notAssignedSegments;
     }
 }

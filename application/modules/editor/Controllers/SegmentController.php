@@ -92,21 +92,22 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         // ----- Specific handling of rows (start) -----
         
-        // - Check if the user can edit only segmentranges?
-        $taskUserAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $taskUserAssoc editor_Models_TaskUserAssoc */
-        $handleSegmentranges = $taskUserAssoc->isSegmentrangedTask($taskGuid);
-        if ($handleSegmentranges) {
-            $allSegmentUserAssocs = $taskUserAssoc->getAllSegmentrangesByTask($taskGuid);
-            // TODO: we only need the visible rows!
-            $sessionUser = new Zend_Session_Namespace('user');
-            $sessionUserGuid = $sessionUser->data->userGuid;
-        }
-        
-        // - Anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
+        
+        // - Check if the user can edit only segmentranges?
+        $sessionUser = new Zend_Session_Namespace('user');
+        $sessionUserGuid = $sessionUser->data->userGuid;
+        $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($sessionUserGuid, $task);
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $role = $tua->getRole();
+        $handleSegmentranges = $tua->isSegmentrangedTaskForRole($task, $role);
+        if ($handleSegmentranges) {
+            $assignedSegments = $tua->getAllAssignedSegmentsByUserAndRole($taskGuid, $sessionUserGuid, $role);
+        }
+        
+        // - Anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
         $handleAnonymizeUsers = $task->anonymizeUsers();
         if ($handleAnonymizeUsers) {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
@@ -114,10 +115,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         }
         
         if ($handleSegmentranges || $handleAnonymizeUsers) {
-            foreach ($this->view->rows as &$row) { // TODO: is it necessary to loop rows only once? / we only need the visible rows!
-                if ($handleSegmentranges) {
-                    $segmentNrInTask = $row['segmentNrInTask'];
-                    $row['editable'] = array_key_exists($segmentNrInTask, $allSegmentUserAssocs) && $allSegmentUserAssocs[$segmentNrInTask] == $sessionUserGuid;
+            foreach ($this->view->rows as &$row) {
+                if ($handleSegmentranges && $row['editable']) { // a segment that is not editable already must stay not editable!
+                    // TODO: get & put? testen
+                    // TODO: beim Abspeicherns vom Segment im Backend vorher nochmal auf editable absichern! (= darf der User überhaupt dieses Segment speichern anhand seiner segmtnranges?)
+                    $row['editable'] = in_array($row['segmentNrInTask'], $assignedSegments);
                 }
                 if ($handleAnonymizeUsers) {
                     $row = $workflowAnonymize->anonymizeUserdata($taskGuid, $row['userGuid'], $row);
