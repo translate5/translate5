@@ -26,4 +26,9 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ;
+INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2020-06-19', 'TRANSLATE-1900', 'feature', 'Pixel length check: Handle characters with unkown pixel length', 'Pixel length check: Handle characters with unkown pixel length', '8'),
+('2020-06-19', 'TRANSLATE-2054', 'feature', 'Integrate PangeaMT with translate5', 'Integrate PangeaMT as new machine translation language resource.', '12'),
+('2020-06-19', 'TRANSLATE-2092', 'feature', 'Import specific DisplayText XML', 'Import specific DisplayText XML', '8'),
+('2020-06-19', 'TRANSLATE-2071', 'feature', 'VisualTranslation: When a XSL Stylesheet is linked in an imported XML, a HTML as source for the VisualReview will be generated from it', 'An imported XML may contains a link to an XSL stylesheet. If this link exists (as a file or valid URL) the Source for the VisualTranslation is generated from the XSL processing of the XML', '12'),
+('2020-06-19', 'TRANSLATE-2070', 'change', 'In XLF Import: Move also bx,ex and it tags out of the segment (sponsored by Supertext)', 'Move paired tags out of the segment, where the corresponding tag belongs to another segment', '14'),
+('2020-06-19', 'TRANSLATE-2091', 'bugfix', 'Prevent hanging imports when starting maintenance mode', 'Starting an improt while a maintenance is scheduled could lead to hanging import workers. Now workers don\'t start when a maintenance is scheduled.', '8');
