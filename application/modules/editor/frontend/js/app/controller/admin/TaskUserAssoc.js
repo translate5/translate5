@@ -256,7 +256,8 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
               me.getPrefWindow().setLoading(false);
           },
           failure: function() {
-              me.application.getController('admin.TaskPreferences').handleReload();
+              store.load();
+              me.getPrefWindow().setLoading(false);
           }
       });
   },
