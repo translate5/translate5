@@ -40,7 +40,8 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
       formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
       fieldDeadline:'#UT#Deadline',
-      fieldSegmentrange: '#UT#Zugewiesene Segmente'
+      fieldSegmentrange: '#UT#Editierbare Segmente',
+      fieldSegmentrangeInfo: '#UT#Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)'
   },
   viewModel: {
       type: 'taskuserassoc'
@@ -136,6 +137,11 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   itemId: 'segmentrange',
                   name: 'segmentrange',
                   fieldLabel: me.strings.fieldSegmentrange,
+                  labelClsExtra: 'textfieldLabelInfoIcon',
+                  autoEl: {
+                      tag: 'span',
+                      'data-qtip': me.strings.fieldSegmentrangeInfo
+                  },
                   anchor: '100%'
               }],
               dockedItems: [{

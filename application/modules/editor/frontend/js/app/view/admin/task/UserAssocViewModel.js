@@ -35,7 +35,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
     ],
     strings: {
         editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
-        segmentrangeError: '#UT#Nicht zugewiesene Segmente',
+        segmentrangeError: '#UT#Nicht editierbare Segmente',
         translator: '#UT#Übersetzer',
         translatorCheck: '#UT#Zweiter Lektor',
         reviewer: '#UT#Lektor',

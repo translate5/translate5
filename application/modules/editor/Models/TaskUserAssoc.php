@@ -569,38 +569,36 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function getAllNotAssignedSegments(string $taskGuid) : array {
-        $notAssignedSegments = [];
         // Example for a task with 10 segments:
-        // - translator {94ff4a53-dae0-4793-beae-1f09968c3c93}: "1-3;5"
+        // - translator {94ff4a53-dae0-4793-beae-1f09968c3c93}: "1-3,5"
         // - translator {c77edcf5-3c55-4c29-a73d-da80d4dcfb36}: "7-8"
         // - translatorCheck {c77edcf5-3c55-4c29-a73d-da80d4dcfb36}: "8-10"
-        // $allNotAssignedSegments = [
-        //   translator => [4,6,9,10],
-        //   translatorCheck => [4,6,9,10]
+        // $notAssignedSegments = [
+        //   translator => [4,6,9-10],
+        //   translatorCheck => [1-7]
         // ]
+        $notAssignedSegments = [];
         $allRoles = $this->getAllAssignedRolesByTask($taskGuid);
         foreach ($allRoles as $role) {
-            // TODO: use "1-3;5" instead of "1,2,3,5"
             $rolename = $role['role'];
-            $missingSegments = $this->getAllNotAssignedSegmentsByRole($taskGuid, $rolename);
-            $notAssignedSegments[] = array('role' => $rolename, 'missingSegments' => implode(",", $missingSegments));
+            $notAssignedSegments[] = array('role' => $rolename, 'missingSegments' => $this->getAllNotAssignedSegmentsByRole($taskGuid, $rolename));
         }
         return $notAssignedSegments;
     }
     
     /**
-     * Return an array with the numbers of the segments in the task
+     * Return an string with the ranges of the segments in the task
      * that are NOT assigned to any user of the given role.
      * @param string $taskGuid
      * @param string $role
-     * @return array
+     * @return string
      */
-    public function getAllNotAssignedSegmentsByRole(string $taskGuid, string $role) : array {
-        $notAssignedSegments = [];
+    private function getAllNotAssignedSegmentsByRole(string $taskGuid, string $role) : string {
         // Example for a task with 10 segments:
-        // - translator {94ff4a53-dae0-4793-beae-1f09968c3c93}: "1-3;5"
+        // - translator {94ff4a53-dae0-4793-beae-1f09968c3c93}: "1-3,5"
         // - translator {c77edcf5-3c55-4c29-a73d-da80d4dcfb36}: "7-8"
         // $notAssignedSegments = [4,6,9,10]
+        $notAssignedSegments = [];
         $segmentModel = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segmentModel editor_Models_Segment */
         $segmentsNr = $segmentModel->getTotalSegmentsCount($taskGuid);
@@ -610,6 +608,6 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
                 $notAssignedSegments[] = $i;
             }
         }
-        return $notAssignedSegments;
+        return editor_Models_TaskUserAssoc_Segmentrange::getRanges($notAssignedSegments);
     }
 }

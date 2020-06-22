@@ -39,13 +39,13 @@ class editor_Models_TaskUserAssoc_Segmentrange {
      * @return array
      */
     public static function getSegmentNumbersFromRows(array $tuaRows) : array {
-        $segmentNumbers = [];
         // Example for:
         // - translator {94ff4a53-dae0-4793-beae-1f09968c3c93}: "1-3;5"
         // - translator {c77edcf5-3c55-4c29-a73d-da80d4dcfb36}: "7-8"
-        // $allSegmentNumbersAssigned = [1,2,3,5,7,8]
+        // $segmentNumbers = [1,2,3,5,7,8]
+        $segmentNumbers = [];
         foreach ($tuaRows as $row) {
-            $segmentsNumbersInRange = self::getSegmentNumbersFromRange($row['segmentrange']);
+            $segmentsNumbersInRange = self::getNumbers($row['segmentrange']);
             $segmentNumbers  = array_merge($segmentNumbers, $segmentsNumbersInRange);
         }
         return $segmentNumbers;
@@ -54,22 +54,52 @@ class editor_Models_TaskUserAssoc_Segmentrange {
     /**
      * Return an array with the numbers of the segments that are set in the given
      * single range.
-     * @param string $segmentrange
+     * @param string $segmentRanges
      * @return array
      */
-    private static function getSegmentNumbersFromRange(string $segmentrange) : array {
-        // Example for "1-3;5;8-9":
-        // $singleSegments = [1,2,3,5,8,9]
+    private static function getNumbers(string $segmentRanges) : array {
+        // Example for "1-3;5, 8-9 ":
+        // $segmentNumbers = [1,2,3,5,8,9]
         $segmentNumbers = [];
-        // TODO: Whitespace erlauben; hier rausnehmen
-        // TODO: auch Komma erlaubt; hier dann Komma mit Semikolon ersetzen
-        $allSingleRanges = explode(";", $segmentrange);
-        foreach ($allSingleRanges as $singleRange) {
-            $singleRangeLimits = explode("-", $singleRange);
-            for ($i = reset($singleRangeLimits); $i <= end($singleRangeLimits); $i++) {
-                $segmentNumbers[] = $i;
+        $segmentRanges = preg_replace('/;/', ',', $segmentRanges);
+        $segmentRanges = trim(preg_replace('/\s+/','', $segmentRanges));
+        $allSegmentGroups = explode(",", $segmentRanges);
+        foreach ($allSegmentGroups as $segmentGroup) {
+            $segmentGroupLimits = explode("-", $segmentGroup);
+            for ($i = reset($segmentGroupLimits); $i <= end($segmentGroupLimits); $i++) {
+                $segmentNumbers[] = (int)$i;
             }
         }
         return $segmentNumbers;
+    }
+    
+    /**
+     * Return ranges from numbers.
+     * @param string $segmentNumbers
+     * @return string
+     */
+    public static function getRanges(array $segmentNumbers) : string {
+        // Example for [1,2,3,5,8,9]:
+        // $segmentRanges = "1-3,5,8-9"
+        // from https://codereview.stackexchange.com/a/103767
+        $segmentNumbers = array_unique( $segmentNumbers);
+        sort($segmentNumbers);
+        $allSegmentGroups = array();
+        for( $i = 0; $i < count($segmentNumbers); $i++ ) {
+            if( $i > 0 && ($segmentNumbers[$i-1] == $segmentNumbers[$i] - 1)) {
+                array_push($allSegmentGroups[count($allSegmentGroups)-1], $segmentNumbers[$i]);
+            } else {
+                array_push($allSegmentGroups, array( $segmentNumbers[$i]));
+            }
+        }
+        $segmentRanges = array();
+        foreach( $allSegmentGroups as $segmentGroup) {
+            if( count($segmentGroup) == 1 ) {
+                $segmentRanges[] = $segmentGroup[0];
+            } else {
+                $segmentRanges[] = $segmentGroup[0] . '-' . $segmentGroup[count($segmentGroup)-1];
+            }
+        }
+        return implode( ',', $segmentRanges);
     }
 }
