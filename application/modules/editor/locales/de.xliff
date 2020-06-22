@@ -1808,7 +1808,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U3BlemlhbA=='><source>Spezial</source><target>Spezial</target></trans-unit>
 <trans-unit id='RWRpdGllcmJhcmUgU2VnbWVudGU='><source>Editierbare Segmente</source><target>Editierbare Segmente</target></trans-unit>
 <trans-unit id='U2VnbWVudGU='><source>Segmente</source><target>Segmente</target></trans-unit>
+<trans-unit id='TmljaHQgZWRpdGllcmJhcmUgU2VnbWVudGU='><source>Nicht editierbare Segmente</source><target>Nicht editierbare Segmente</target></trans-unit>
 <trans-unit id='QnNwOiAxLTMsNSw4LTkgKFdlbm4gZGllIFJvbGxlIGRpZXNlcyBVc2VycyBkYXMgRWRpdGllcmVuIGVybGF1YnQgdW5kIHp1IGlyZ2VuZGVpbmVtIFVzZXIgZGllc2VyIFJvbGxlIGVkaXRpZXJiYXJlIFNlZ21lbnRlIHp1Z2V3aWVzZW4gd2VyZGVuLCBkw7xyZmVuIGF1Y2ggYWxsZSBhbmRlcmVuIFVzZXIgZGllc2VyIFJvbGxlIG51ciBkaWUgU2VnbWVudGUgZWRpdGllcmVuLCBkaWUgaWhuZW4genVnZXdpZXNlbiBzaW5kLik='><source>Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)</source><target>Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)</target></trans-unit>
+<trans-unit id='RGllIEVpbmdhYmUgZsO8ciBkaWUgZWRpdGllcmJhcmVuIFNlZ21lbnRlIGlzdCBuaWNodCB2YWxpZGUuIEJzcDogMS0zLDUsOC05'><source>Die Eingabe für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9</source><target>Die Eingabe für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9</target></trans-unit>
   </body>
  </file>
 </xliff>
