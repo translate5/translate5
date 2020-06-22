@@ -1445,6 +1445,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
         $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
+        $this->addMissingSegmentrangesToResult($row);
         $this->view->rows = (object)$row;
 
         unset($this->view->rows->qmSubsegmentFlags);
