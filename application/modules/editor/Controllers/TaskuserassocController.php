@@ -192,6 +192,14 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->processClientReferenceVersion();
         $this->setDataInEntity();
         
+        if(isset($this->data->segmentrange) && !editor_Models_TaskUserAssoc_Segmentrange::validate($this->data->segmentrange)) {
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1280' => "The segmentrange that is assigned to the user is not valid."
+            ]);
+            throw ZfExtended_UnprocessableEntity::createResponse('E1280', [
+                'id' => 'Die Eingabe für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9',
+            ]);
+        }
         
         $this->entity->validate();
         $workflow->triggerBeforeEvents($oldEntity, $this->entity);

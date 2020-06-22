@@ -3775,6 +3775,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='U2VnbWVudGU='><source>Segmente</source><target>Segments</target></trans-unit>
 <trans-unit id='TmljaHQgZWRpdGllcmJhcmUgU2VnbWVudGU='><source>Nicht editierbare Segmente</source><target>Segments that are not editable</target></trans-unit>
 <trans-unit id='QnNwOiAxLTMsNSw4LTkgKFdlbm4gZGllIFJvbGxlIGRpZXNlcyBVc2VycyBkYXMgRWRpdGllcmVuIGVybGF1YnQgdW5kIHp1IGlyZ2VuZGVpbmVtIFVzZXIgZGllc2VyIFJvbGxlIGVkaXRpZXJiYXJlIFNlZ21lbnRlIHp1Z2V3aWVzZW4gd2VyZGVuLCBkw7xyZmVuIGF1Y2ggYWxsZSBhbmRlcmVuIFVzZXIgZGllc2VyIFJvbGxlIG51ciBkaWUgU2VnbWVudGUgZWRpdGllcmVuLCBkaWUgaWhuZW4genVnZXdpZXNlbiBzaW5kLik='><source>Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)</source><target>Example: 1-3,5,8-9 (If the role of this user allows editing and editable segments are assigned to any user of this role, all other users of this role may only edit the segments assigned to them.</target></trans-unit>
+<trans-unit id='RGllIEVpbmdhYmUgZsO8ciBkaWUgZWRpdGllcmJhcmVuIFNlZ21lbnRlIGlzdCBuaWNodCB2YWxpZGUuIEJzcDogMS0zLDUsOC05'><source>Die Eingabe für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9</source><target>Please check your input for the editable segments. Example: 1-3,5,8-9</target></trans-unit>
 </body>
   </file>
 </xliff>

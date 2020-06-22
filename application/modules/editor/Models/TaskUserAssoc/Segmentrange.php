@@ -33,6 +33,77 @@ END LICENSE AND COPYRIGHT
 class editor_Models_TaskUserAssoc_Segmentrange {
     
     /**
+     * Remove characters we don't need for further handling.
+     * - remove whitespace
+     * - replace ";" with ","
+     * @param string $segmentRanges
+     * @return string
+     */
+    private static function prepare(string $segmentRanges) : string {
+        // Example for "1-3;5, 8-9 ":
+        // return "1-3,5,8-9"
+        $segmentRanges = trim(preg_replace('/\s+/','', $segmentRanges));
+        $segmentRanges = preg_replace('/;/', ',', $segmentRanges);
+        return $segmentRanges;
+    }
+    
+    /**
+     * Returns the segmentGroups separated according to the prepared $segmentRanges.
+     * @param string $segmentRanges
+     * @return array
+     */
+    private static function getAllSegmentGroups(string $segmentRanges) : array {
+        // With the prepared $segmentRanges, the segmentGroups are seperated with ",".
+        return explode(",", $segmentRanges);
+    }
+    
+    /**
+     * Are the given $segmentRanges valid? (Empty values are ok.)
+     * @param string $segmentRanges
+     * @return bool
+     */
+    public static function validate(string $segmentRanges) : bool {
+        // valid: ""
+        // valid: "   "
+        // valid: "1-3,5,6-7"
+        // valid: "1-3,5;6-7 "
+        // not valid: "3-1,5,6-7"
+        // not valid: "1-3,5,6+7"
+        
+        $segmentRanges = self::prepare($segmentRanges);
+        
+        if ($segmentRanges == '') {
+            return true;
+        }
+        
+        if (!preg_match('/[0-9,-;]+/', $segmentRanges)) {
+            return false;
+        }
+        
+        $segmentNumbers = [];
+        $allSegmentGroups = self::getAllSegmentGroups($segmentRanges);
+        foreach ($allSegmentGroups as $segmentGroup) {
+            $segmentGroupLimits = explode("-", $segmentGroup);
+            if (!preg_match('/[0-9]+/', implode('',$segmentGroupLimits))) {
+                return false;
+            }
+            $segmentGroupStart = reset($segmentGroupLimits);
+            $segmentGroupEnd = end($segmentGroupLimits);
+            if ((int)$segmentGroupStart > (int)$segmentGroupEnd) {
+                return false;
+            }
+            for ($nr = $segmentGroupStart; $nr <= $segmentGroupEnd; $nr++) {
+                if(in_array($nr, $segmentNumbers)) {
+                    return false;
+                }
+                $segmentNumbers[] = (int)$nr;
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
      * Return an array with the numbers of the segments that are set in the given 
      * array of tua-rows.
      * @param array $tuaRows
@@ -61,13 +132,12 @@ class editor_Models_TaskUserAssoc_Segmentrange {
         // Example for "1-3;5, 8-9 ":
         // $segmentNumbers = [1,2,3,5,8,9]
         $segmentNumbers = [];
-        $segmentRanges = preg_replace('/;/', ',', $segmentRanges);
-        $segmentRanges = trim(preg_replace('/\s+/','', $segmentRanges));
-        $allSegmentGroups = explode(",", $segmentRanges);
+        $segmentRanges = self::prepare($segmentRanges);
+        $allSegmentGroups = self::getAllSegmentGroups($segmentRanges);
         foreach ($allSegmentGroups as $segmentGroup) {
             $segmentGroupLimits = explode("-", $segmentGroup);
-            for ($i = reset($segmentGroupLimits); $i <= end($segmentGroupLimits); $i++) {
-                $segmentNumbers[] = (int)$i;
+            for ($nr = reset($segmentGroupLimits); $nr <= end($segmentGroupLimits); $nr++) {
+                $segmentNumbers[] = (int)$nr;
             }
         }
         return $segmentNumbers;
