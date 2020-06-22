@@ -746,7 +746,8 @@ a.x-btn span.task-confirmation {
     font-weight: bold;
     font-style: italic;
 }
-.checkBoxLableInfoIcon:after{
+.checkBoxLableInfoIcon:after,
+.textfieldLabelInfoIcon:after {
     content: "";
     display: block;
     background-image:url(../images/information.png); 
