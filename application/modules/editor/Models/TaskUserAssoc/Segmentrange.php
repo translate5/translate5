@@ -29,6 +29,9 @@ END LICENSE AND COPYRIGHT
 /**
  * This model collects some internal handling of the segmentrange-column in the
  * taskUserAssoc-table (= for all DB-related methods see editor_Models_TaskUserAssoc).
+ * Segmentranges can be assigned to user as known from assigning pages when printing
+ * ("1-3,5,8-9"). This class handles everything that is related to the syntax and semantics
+ * of the segmentranges.
  */
 class editor_Models_TaskUserAssoc_Segmentrange {
     
