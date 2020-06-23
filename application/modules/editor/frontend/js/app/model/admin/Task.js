@@ -108,7 +108,7 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'usageMode', type: 'string'},
     {name: 'segmentCount', type: 'int', persist: false},
     {name: 'segmentFinishCount', type: 'int', persist: false},
-    {name: 'isSdlxliffFileParser', type: 'boolean'}
+    {name: 'diffExportUsable', type: 'boolean'}
   ],
   hasMany: [{
       model: 'Editor.model.segment.Field',

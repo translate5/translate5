@@ -36,6 +36,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     const OKAPI_BCONF_DEFAULT_NAME='okapi_default_import.bconf';
     const OKAPI_BCONF_EXPORT_NAME='okapi_default_export.bconf';
+    
+    /**
+     * Make the path of the export-bconf accessible elsewere also
+     * @return string
+     */
+    public static function createExportBconfPath(){
+        return APPLICATION_PATH.'/modules/editor/Plugins/Okapi/data/'.self::OKAPI_BCONF_EXPORT_NAME;
+    }
 
     /**
      * Supported file-types by okapi

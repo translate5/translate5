@@ -1756,26 +1756,4 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         return $parameters;
     }
-    
-    /***
-     * Load all segments pretranslated with mt engine
-     * @param string $taskGuid
-     * @return array
-     */
-    public function loadMtPretranslated(string $taskGuid) {
-        $mv=ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
-        /* @var $mv editor_Models_Segment_MaterializedView  */
-        $mv->setTaskGuid($taskGuid);
-        if(!$mv->exists()){
-            $mv->create();
-        }
-        $viewName=$mv->getName();
-        $prefix=editor_Models_Segment_MatchRateType::PREFIX_PRETRANSLATED.';'.editor_Models_Segment_MatchRateType::TYPE_MT;
-        $s=$this->db->select()->from($viewName)
-        ->setIntegrityCheck(false)
-        ->where('matchRateType LIKE ?',$prefix.'%')
-        ->order('segmentNrInTask');
-        return $this->db->fetchAll($s)->toArray();
-    }
-    
 }

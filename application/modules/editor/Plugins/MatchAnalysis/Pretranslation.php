@@ -112,10 +112,25 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      */
     protected $taskState;
     
-    public function __construct(){
+    
+    /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events = false;
+    
+    /***
+     * Analysis id
+     *
+     * @var mixed
+     */
+    protected $analysisId;
+    
+    public function __construct(int $analysisId){
         $this->initLogger('E1100', 'plugin.matchanalysis', '', 'Plug-In MatchAnalysis: ');
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array('editor_Plugins_MatchAnalysis_Pretranslation'));
+        $this->analysisId=$analysisId;
     }
     
     /**
@@ -223,6 +238,13 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
 
         //save the segment and history
         $this->saveSegmentAndHistory($segment,$history);
+        
+        $this->events->trigger('afterAnalysisSegmentPretranslate', $this, [
+            'entity' => $segment,
+            'analysisId' => $this->analysisId,
+            'languageResourceId' => $languageResourceid,
+            'result' => $result
+        ]);
     }
     
     /**
