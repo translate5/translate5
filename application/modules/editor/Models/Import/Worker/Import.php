@@ -148,11 +148,6 @@ class editor_Models_Import_Worker_Import {
                 continue;
             }
             
-            //set the task flag for sdlxliff parser
-            if($parser instanceof editor_Models_Import_FileParser_Sdlxliff){
-                $this->task->setIsSdlxliffFileParser(1);
-            }
-            
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $file->getBasename()); //$params[1] => filename
             $parser->addSegmentProcessor($mqmProc);
@@ -303,7 +298,7 @@ class editor_Models_Import_Worker_Import {
             'task' => $this->task,
             'extension' => $extension,
             'errorMessages' => $errorMessages,
-            'availableParsers' => $this->supportedFiles->getSupportedExtensions,
+            'availableParsers' => $this->supportedFiles->getSupportedExtensions(),
         ]);
     }
     

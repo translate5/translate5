@@ -1756,5 +1756,4 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         return $parameters;
     }
-    
 }
