@@ -27,6 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /***
+ * Update the segment matchrate and add the modelfront matchrate type to the segments matchrate type.
+ * With this class also analysis matchrate for a segment can be updated.
+ *
  */
 class editor_Plugins_ModelFront_MatchrateUpdater {
     
