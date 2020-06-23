@@ -42,25 +42,26 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
     data: {
         items: null
     },
-	stores: {
-		taskAssoc: {
-	  		  model:'Editor.model.LanguageResources.TaskAssoc',
-	  		  remoteFilter: true,
-	  		  pageSize: false,
-	  		  autoLoad:true,
-	  		  setFilters:function(filters){
-				//the binding is triggered wiht empty values to, we do not want to filter for empty taskGuid
-				if(filters && !filters.value){
-					filters=[];
-				}
-				this.superclass.superclass.setFilters.apply(this, [filters]);
-			  },
-	  		  filters:{
-	  			  property: 'taskGuid',
-	  			  operator:"eq",
-	  			  value:'{currentTask.taskGuid}'
-	  		  }  
-		}
+    stores: {
+        taskAssoc: {
+            model:'Editor.model.LanguageResources.TaskAssoc',
+            remoteFilter: true,
+            pageSize: false,
+            autoLoad:true,
+            setFilters:function(filters){
+                //the binding is also triggered when the value is empty. Ignore the filtering with empty value
+                if(filters && !filters.value){
+                    this.loadData([],false);
+                    return;
+                }
+                this.superclass.superclass.setFilters.apply(this, [filters]);
+            },
+            filters:{
+                property: 'taskGuid',
+                operator:"eq",
+                value:'{currentTask.taskGuid}'
+            }
+        }
     },
     formulas:{
         /***
@@ -68,7 +69,10 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
          */
         isLoadingActive:{
             get: function(task) {
-                return task && task.isAnalysis();
+                if(!task){
+                    return false;
+                }
+                return task.isAnalysis();
             },
             bind:{bindTo:'{currentTask}',deep:true}
         },

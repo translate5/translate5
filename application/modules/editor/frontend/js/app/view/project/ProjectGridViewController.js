@@ -40,8 +40,14 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
             '#translate5 task': {
                 triggerReload: 'onTriggerTaskReload'
             }
+        },
+        component:{
+            '#resetFilterBtn':{
+                click:'onResetFilterButtonClick'
+            }
         }
     },
+    
     onTriggerTaskReload: function(params) {
         var store = this.getView().getStore(),
             project;
@@ -53,11 +59,12 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
         }
         project && project.load();
     },
+    
     /***
-     * Reload project button handler
+     * Reset filter button click handler
      */
-    onReloadProjectClick:function(){
-        this.reloadProjectAndProjectTasks();
+    onResetFilterButtonClick:function(){
+        this.getView().getPlugin('gridfilters').clearFilters();
     },
     
     /***
@@ -146,32 +153,5 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
                  }
              });
          });
-    },
-    
-    /***
-     * Reload project and projectTask stores
-     *TODO: move me to project panel view controller, and before load reset the vm variables so the selection is reset
-     *
-     *  THE RESET DOES NOT FIX THE PROBLEM . select project task, go in task overview, remove this project, switch to project overview.
-     *  the project task is enabled without selection
-     */
-    reloadProjectAndProjectTasks:function(){
-        var me = this,
-            projectPanel= me.getView().up('#projectPanel'),
-            projectTaskGrid = projectPanel && projectPanel.down('#projectTaskGrid'),
-            projectTaskStore = projectTaskGrid && projectTaskGrid.getStore();
-        
-        if(!projectTaskStore){
-            return;
-        }
-        
-        me.getViewModel().set('projectSelection',null);
-        me.getViewModel().set('projectTaskSelection',null);
-        
-        me.reloadProjects().then(function(records) {
-            projectTaskStore.load()
-        }, function(operation) {
-            Editor.app.getController('ServerException').handleException(operation.error.response);
-        });
     }
 });

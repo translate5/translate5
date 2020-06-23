@@ -26,48 +26,57 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.matchAnalysisPanel',
+    extend : 'Ext.app.ViewModel',
+    alias : 'viewmodel.matchAnalysisPanel',
 
-    formulas: {
-        isAnalysisRunning:{
-            get: function(task) {
+    formulas : {
+        isAnalysisRunning : {
+            get : function (task) {
                 return task && task.isAnalysis();
             },
-            bind:{bindTo:'{currentTask}',deep:true}
+            bind : {
+                bindTo : '{currentTask}',
+                deep : true
+            }
         },
-        enablePanel:{
-            get: function (task) {
-                //if import status error disabled
+        enablePanel : {
+            get : function (task) {
+                // if import status error disabled
                 return task && (!task.isErroneous() && !task.isImporting());
             },
-            bind:{bindTo:'{currentTask}',deep:true}
+            bind : {
+                bindTo : '{currentTask}',
+                deep : true
+            }
         }
     },
 
-	stores: {
-		//this store is defined here because the reference filter binding is required
-		analysisStore: {
-			model:'Editor.plugins.MatchAnalysis.model.MatchAnalysis',
-			remoteSort: true,
-			remoteFilter: true,
-			pageSize: false,
-			autoLoad:true,
-			listeners:{
-				load:'onAnalysisRecordLoad'
-			},
-			setFilters:function(filters){
-				//the binding is triggered wiht empty values to, we do not want to filter for empty taskGuid
-				if(filters && !filters.value){
-					filters=[];
-				}
-				this.superclass.superclass.setFilters.apply(this, [filters]);
-			},
-			filters:{
-				property: 'taskGuid',
-				operator:"eq",
-				value:'{projectTaskSelection.taskGuid}'
-			}
-		}
+    stores : {
+        // this store is defined here because the reference filter binding is
+        // required
+        analysisStore : {
+            model : 'Editor.plugins.MatchAnalysis.model.MatchAnalysis',
+            remoteSort : true,
+            remoteFilter : true,
+            pageSize : false,
+            autoLoad : true,
+            listeners : {
+                load : 'onAnalysisRecordLoad'
+            },
+            setFilters : function (filters) {
+                // the binding is triggered wiht empty values to, we do not want
+                // to filter for empty taskGuid
+                if (filters && !filters.value) {
+                    this.loadData([], false);
+                    return;
+                }
+                this.superclass.superclass.setFilters.apply(this, [ filters ]);
+            },
+            filters : {
+                property : 'taskGuid',
+                operator : "eq",
+                value : '{projectTaskSelection.taskGuid}'
+            }
+        }
     }
 });
