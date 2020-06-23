@@ -102,8 +102,8 @@ END LICENSE AND COPYRIGHT
  * @method void setTaskType() setTaskType(string $taskType)
  * @method int getProjectId() getProjectId()
  * @method void setProjectId() setProjectId(int $projectId)
- * @method boolean getIsSdlxliffFileParser() getIsSdlxliffFileParser()
- * @method void setIsSdlxliffFileParser() setIsSdlxliffFileParser(bool $flag)
+ * @method boolean getDiffExportUsable() getDiffExportUsable()
+ * @method void setDiffExportUsable() setDiffExportUsable(bool $flag)
  * 
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
