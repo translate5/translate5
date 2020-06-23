@@ -26,36 +26,39 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 Ext.define('Editor.view.project.ProjectPanelViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.projectPanel',
-    
-    data:{
-    	projectSelection:null,
-    	projectTaskSelection:null
+    extend : 'Ext.app.ViewModel',
+    alias : 'viewmodel.projectPanel',
+
+    data : {
+        projectSelection : null,
+        projectTaskSelection : null
     },
-	stores: {
-		//this store is defined here because the reference filter binding is required
-		projectTasks: {
-			model:'Editor.model.admin.Task',
-			storeId:'projectTasks',
-			remoteSort: true,
-			remoteFilter: true,
-			pageSize: false,
-			listeners:{
-				load:'onProjectTaskLoad'
-			},
-		    setFilters:function(filters){
-		    	//the binding is triggered wiht empty values to, we do not want to filter for empty projectId
-				if(filters && !filters.value){
-					filters=[];
-				}
-				this.superclass.superclass.setFilters.apply(this, [filters]);
-			},
-			filters:{
-				property: 'projectId',
-				operator:"eq",
-				value:'{projectSelection.projectId}'
-			}
-		}
+    stores : {
+        // this store is defined here because the reference filter binding is
+        // required
+        projectTasks : {
+            model : 'Editor.model.admin.Task',
+            storeId : 'projectTasks',
+            remoteSort : true,
+            remoteFilter : true,
+            pageSize : false,
+            listeners : {
+                load : 'onProjectTaskLoad'
+            },
+            setFilters : function (filters) {
+                // the binding is also triggered when the value is empty. Ignore
+                // the filtering with empty value
+                if (filters && !filters.value) {
+                    this.loadData([], false);
+                    return;
+                }
+                this.superclass.superclass.setFilters.apply(this, [ filters ]);
+            },
+            filters : {
+                property : 'projectId',
+                operator : "eq",
+                value : '{projectSelection.projectId}'
+            }
+        }
     }
 });

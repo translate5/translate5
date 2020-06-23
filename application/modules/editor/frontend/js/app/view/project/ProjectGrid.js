@@ -51,7 +51,8 @@ Ext.define('Editor.view.project.ProjectGrid', {
 	      pmGuid: '#UT#Projektmanager',
 	      orderdate: '#UT#Bestelldatum',
 		  id:'#UT#Id',
-		  notFound: '#UT#nicht gefunden'
+		  notFound: '#UT#nicht gefunden',
+		  resetFilterText:'#UT#Filter zurücksetzen'
 	},
 	stateful:false,
 	plugins: ['gridfilters'],
@@ -171,8 +172,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
         	            glyph: 'f2f1@FontAwesome5FreeSolid',
         	            itemId: 'reloadProjectbtn',
         	            text: me.strings.reloadBtn,
-        	            tooltip: me.strings.reloadBtnTip,
-        	            handler:'onReloadProjectClick'
+        	            tooltip: me.strings.reloadBtnTip
         	        },{
         	            xtype: 'button',
         	            glyph: 'f067@FontAwesome5FreeSolid',
@@ -180,7 +180,13 @@ Ext.define('Editor.view.project.ProjectGrid', {
         	            text: me.strings.addProject,
         	            hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),
         	            tooltip: me.strings.addProjectTip
-        	        }]
+        	        },{
+                        xtype: 'button',
+                        glyph: 'f067@FontAwesome5FreeSolid',
+                        itemId: 'resetFilterBtn',
+                        text: me.strings.resetFilterText,
+                        tooltip: me.strings.resetFilterText
+                    }]
         		}]
         };
         if (instanceConfig) {

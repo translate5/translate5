@@ -151,7 +151,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       averageProcessingTimeSecondTranslatorLabel: '#UT#Ø Bearbeitungszeit zweiter Lektor'
   },
   listeners:{
-	  afterTaskDelete:'onAfterTaskDeleteEventHandler'  
+	  afterTaskDelete:'onAfterTaskDeleteEventHandler',
+	  beforeTaskDelete:'onBeforeTaskDeleteEventHandler'
   },
   listen: {
       store: {
@@ -575,7 +576,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * reloads the Task Grid, will also be called from other controllers
    */
   handleTaskReload: function () {
-      
       this.getAdminTasksStore().load();
   },
   
@@ -623,7 +623,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   
   /***
    * On project task grid selection.
-   * TODO: move this to separate project controller ?
    */
   onProjectTaskGridSelectionChange:function(grid,selection){
       var me = this,
@@ -712,7 +711,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   
   /***
    * Delete project action menu handler
-   * TODO: move this to separate project controller ?
    */
   editorDeleteProject:function(task,ev){
 	  this.getProjectGrid().getController().handleProjectDelete(task,ev);
@@ -863,14 +861,24 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   /**
    * delete the task
+   * Fires: beforeTaskDelete  and afterTaskDelete
+   * INFO: beforeTaskDelete is a chained event
    * @param {Editor.model.admin.Task} task
    */
   editorDeleteTask: function(task) {
       var me = this,
           store = task.store,
           app = Editor.app;
+      
       app.mask(me.strings.taskDestroy, task.get('taskName'));
-      store.remove(task);
+      
+      //the beforeTaskDelete is chained event. If one of the chained listeners does not return true,
+      //the task delete will be omitted.
+      if(!me.fireEvent('beforeTaskDelete',task)){
+          app.unmask();
+          return
+      }
+      
       store.sync({
           //prevent default ServerException handling
           preventDefaultHandler: true,
@@ -889,34 +897,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               }
           }
       
-      });
-      return;
-      task.dropped = true; //doing the drop / erase manually
-      task.save({
-          //prevent default ServerException handling
-          preventDefaultHandler: true,
-          callback: function(rec, op) {
-              Editor.MessageBox.addByOperation(op);
-          },
-          success: function() {
-              store.load({
-                  callback: () => {
-                      app.unmask()
-                      me.fireEvent('afterTaskDelete',task);
-                  }
-              });
-              
-          },
-          failure: function(records, op){
-              task.reject();
-              app.unmask();
-              if(op.getError().status == '405') {
-                  Editor.MessageBox.addError(me.strings.taskNotDestroyed);
-              }
-              else {
-                  Editor.app.getController('ServerException').handleException(op.error.response);
-              }
-          }
       });
   },
   /**
@@ -1228,17 +1208,20 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  }
 	  return activeTab;
   },
-  
+
+  /***
+   * Before task delete request event handler.
+   * Return true so the event call chain continues
+   */
+  onBeforeTaskDeleteEventHandler:function(task){
+      Ext.StoreManager.get('admin.Tasks').remove(task);
+      return true;
+  },
   /***
    * After the task is removed event handler
    */
   onAfterTaskDeleteEventHandler:function(task){
-	  var me=this,
-	      grid=me.getProjectGrid();
-	  
-	  if(!grid){
-		  return;
-	  }
-	  grid.getController().reloadProjectAndProjectTasks();
+      Ext.StoreManager.get('admin.Tasks').load();
   }
+  
 });
