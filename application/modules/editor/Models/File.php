@@ -85,7 +85,31 @@ class editor_Models_File extends ZfExtended_Models_Entity_Abstract {
         }, $this->db->fetchAll($s)->toArray());
         return array_combine($keys, $values);
     }
-
+    /**
+     * @param string $taskGuid
+     * @return Zend_Db_Table_Rowset_Abstract
+     */
+    public function getAllForTask($taskGuid) : Zend_Db_Table_Rowset_Abstract {        
+        $select = $this->db->select()->where('taskGuid = ?', $taskGuid);
+        return $this->db->fetchAll($select, 'fileOrder ASC');
+    }
+    /**
+     * Loads an entity by task-guid and 
+     * @param string $taskGuid
+     * @param string $fileName
+     * @return editor_Models_File|NULL
+     */
+    public function loadByTaskGuidAndFileName($taskGuid, $fileName){
+        $select = $this->db->select()
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('fileName = ?', $fileName);
+        $row = $this->db->fetchRow($select, 'fileOrder ASC');
+        if($row != null){
+            $this->row = $row;
+            return $this;
+        }
+        return null;
+    }
     /**
      * Saves the skeleton data for the current file to the disk
      * @param string $data Skeletonfile data
