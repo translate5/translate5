@@ -155,6 +155,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var string
      */
     protected $taskDataPath;
+    
+    /**
+     * 
+     * @var string[]
+     */
+    protected $orderedFilenames = null;
 
     /**
      * On cloning we need a new taskGuid and id
@@ -1326,5 +1332,21 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'workflow' => 'Workflow',
             'userCount' => 'Zahl zugewiesener Benutzer',
         );
+    }
+    
+    /**
+     * Retrieves the (cached) filenames of the releated files
+     * @return array
+     */
+    public function getCachedOrderedFileNames(): array {
+        if($this->orderedFilenames == null){
+            $this->orderedFilenames = array();
+            $filesModel = ZfExtended_Factory::get('editor_Models_File');
+            /* @var $filesModel editor_Models_File */
+            foreach($filesModel->getAllForTask($this->getTaskGuid()) as $file){
+                $this->orderedFilenames[$file->fileOrder] = $file->fileName;
+            }
+        }
+        return $this->orderedFilenames;
     }
 }
