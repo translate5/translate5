@@ -58,17 +58,17 @@ class editor_Models_TaskUserAssoc_Segmentrange {
     }
     
     /**
-     * Are the given $segmentRanges valid? (Empty values are ok.)
+     * Is the format of the given $segmentRanges valid? (Empty values are ok.)
      * @param string $segmentRanges
      * @return bool
      */
-    public static function validate(string $segmentRanges) : bool {
+    public function validateSyntax(string $segmentRanges) : bool {
         // valid: ""
         // valid: "   "
         // valid: "1-3,5,6-7"
         // valid: "1-3,5;6-7 "
-        // not valid: "3-1,5,6-7"
         // not valid: "1-3,5,6+7"
+        // not valid: "1-3,5,,6-7"
         
         $segmentRanges = self::prepare($segmentRanges);
         
@@ -80,23 +80,54 @@ class editor_Models_TaskUserAssoc_Segmentrange {
             return false;
         }
         
-        $segmentNumbers = [];
         $allSegmentGroups = self::getAllSegmentGroups($segmentRanges);
         foreach ($allSegmentGroups as $segmentGroup) {
             $segmentGroupLimits = explode("-", $segmentGroup);
             if (!preg_match('/[0-9]+/', implode('',$segmentGroupLimits))) {
                 return false;
             }
-            $segmentGroupStart = reset($segmentGroupLimits);
-            $segmentGroupEnd = end($segmentGroupLimits);
-            if ((int)$segmentGroupStart > (int)$segmentGroupEnd) {
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Values must not be in wrong order or overlapping (= neither in itself nor 
+     * with other users of the same role).
+     * @param string $segmentRanges
+     * @param string $taskGuid
+     * @param string $role
+     * @return bool
+     */
+    public function validateSemantics(string $segmentRanges, string $taskGuid, string $role) : bool {
+        // valid: "1-3,5,6-7"
+        // not valid: "1-3,5,2-7"
+        // not valid: "3-1,5,6-7"
+        // not valid: "1-3,5,6-7" for userX when userY has the same role with "2-4"
+        
+        $segmentRanges = self::prepare($segmentRanges);
+        
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $assignedSegments = $tua->getAllAssignedSegmentsByRole($taskGuid, $role);
+        
+        $segmentNumbers = [];
+        $allSegmentGroups = self::getAllSegmentGroups($segmentRanges);
+        foreach ($allSegmentGroups as $segmentGroup) {
+            $segmentGroupLimits = explode("-", $segmentGroup);
+            $segmentGroupStart = (int)reset($segmentGroupLimits);
+            $segmentGroupEnd = (int)end($segmentGroupLimits);
+            if ($segmentGroupStart > $segmentGroupEnd) {
                 return false;
             }
             for ($nr = $segmentGroupStart; $nr <= $segmentGroupEnd; $nr++) {
+                if(in_array($nr, $assignedSegments)) {
+                    return false;
+                }
                 if(in_array($nr, $segmentNumbers)) {
                     return false;
                 }
-                $segmentNumbers[] = (int)$nr;
+                $segmentNumbers[] = $nr;
             }
         }
         

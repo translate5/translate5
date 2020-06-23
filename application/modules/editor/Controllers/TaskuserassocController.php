@@ -192,13 +192,25 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->processClientReferenceVersion();
         $this->setDataInEntity();
         
-        if(isset($this->data->segmentrange) && !editor_Models_TaskUserAssoc_Segmentrange::validate($this->data->segmentrange)) {
-            ZfExtended_UnprocessableEntity::addCodes([
-                'E1280' => "The segmentrange that is assigned to the user is not valid."
-            ]);
-            throw ZfExtended_UnprocessableEntity::createResponse('E1280', [
-                'id' => 'Die Eingabe für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9',
-            ]);
+        if (isset($this->data->segmentrange)) {
+            $segmentrangeModel = ZfExtended_Factory::get('editor_Models_TaskUserAssoc_Segmentrange');
+            /* @var $segmentrangeModel editor_Models_TaskUserAssoc_Segmentrange */
+            if (!$segmentrangeModel->validateSyntax($this->data->segmentrange)) {
+                ZfExtended_UnprocessableEntity::addCodes([
+                    'E1280' => "The format of the segmentrange that is assigned to the user is not valid."
+                ]);
+                throw ZfExtended_UnprocessableEntity::createResponse('E1280', [
+                    'id' => 'Das Format für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9',
+                ]);
+            }
+            if (!$segmentrangeModel->validateSemantics($this->data->segmentrange, $this->entity->getTaskGuid(), $this->entity->getRole())) {
+                ZfExtended_UnprocessableEntity::addCodes([
+                    'E1281' => "The content of the segmentrange that is assigned to the user is not valid."
+                ]);
+                throw ZfExtended_UnprocessableEntity::createResponse('E1280', [
+                    'id' => 'Der Inhalt für die editierbaren Segmente ist nicht valide. Die Zahlen müssen in der richtigen Reihenfolge angegeben sein und dürfen nicht überlappen, weder innerhalb der Eingabe noch mit anderen Usern von derselben Rolle.',
+                ]);
+            }
         }
         
         $this->entity->validate();
