@@ -45,7 +45,11 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
     /**
      */
     protected function initEvents() {
-        $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleOnPretranslationOperation'));
+        //INFO: this is off because of the pretranslation resources problem. See comment in: https://jira.translate5.net/browse/TRANSLATE-1643
+        //This should be enabled again when the issue above is implemented.
+        //$this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleOnPretranslationOperation'));
+        $this->eventManager->attach('editor_LanguageresourceinstanceController', 'afterQueryAction', array($this, 'handleAfterQueryAction'));
+        $this->eventManager->attach('editor_Plugins_MatchAnalysis_Pretranslation', 'afterAnalysisSegmentPretranslate', array($this, 'handleAfterAnalysisSegmentPretranslate'));
     }
     
     /***
@@ -67,6 +71,91 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
         
         foreach ($tasks as $task){
             $this->queueWorker(is_array($task) ? $task['taskGuid'] : $task->getTaskGuid());
+        }
+    }
+    
+    /***
+     * After languagersources query action event handler
+     * @param Zend_EventManager_Event $event
+     * @return boolean
+     */
+    public function handleAfterQueryAction(Zend_EventManager_Event $event){
+        $view = $event->getParam('view');
+        $resourceType=$view->resourceType ?? null;
+        
+        //modelfront risk calculation is only available for mt resources
+        if(empty($resourceType) || $resourceType!=editor_Models_Segment_MatchRateType::TYPE_MT){
+            return;
+        }
+        
+        if(!isset($view->rows) || empty($view->rows)){
+            return;
+        }
+        
+        //For each mt result, calculate the matchrate using modelfront
+        $session = new Zend_Session_Namespace();
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid((string) $session->taskGuid);
+        
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $metaData=new stdClass();
+        $metaData->name=$translate->_('Matchrate');
+        $metaData->value='ModelFront';
+        foreach ($view->rows as &$row){
+            try {
+                $risk=ZfExtended_Factory::get('editor_Plugins_ModelFront_TranslationRiskPrediction',[$task]);
+                /* @var $risk editor_Plugins_ModelFront_TranslationRiskPrediction */
+                //INFO: in mt resources source should be the same as the searched string
+                $matchRate=round($risk->riskToMatchrate($row->source, $row->target));
+                $row->matchrate=$matchRate < 1 ? 1 : $matchRate;
+                
+                if(!is_array($row->metaData)){
+                    settype($row->metaData, 'array');
+                }
+                //add aditional info about the matchrate source
+                $row->metaData[]=$metaData;
+            } catch (editor_Plugins_ModelFront_Exception $e) {
+                $logger = Zend_Registry::get('logger')->cloneMe('plugin.modelfront');
+                $logger->exception($e, [
+                    'level' => $logger::LEVEL_WARN
+                ]);
+                continue;
+            }
+        }
+    }
+    
+    /***
+     * After segment is pretranslated, update the segment matchrate with modelfront results.
+     * NOTE: update only for mt pretranslate segments
+     * @param Zend_EventManager_Event $event
+     * @return boolean
+     */
+    public function handleAfterAnalysisSegmentPretranslate(Zend_EventManager_Event $event){
+        $segment = $event->getParam('entity');
+        /* @var $segment editor_Models_Segment */
+        $result = $event->getParam('result');
+        $analysisId = $event->getParam('analysisId');
+        $languageResourceId = $event->getParam('languageResourceId');
+        //mt pretranslated startin matchrate type
+        $prefix=editor_Models_Segment_MatchRateType::PREFIX_PRETRANSLATED.';'.editor_Models_Segment_MatchRateType::TYPE_MT;
+        if (strpos($segment->getMatchRateType(), $prefix) !== 0 || empty($result) || empty($analysisId) || empty($languageResourceId)) {
+            return;
+        }
+        
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($segment->getTaskGuid());
+        try {
+            
+            $risk=ZfExtended_Factory::get('editor_Plugins_ModelFront_TranslationRiskPrediction',[$task]);
+            /* @var $risk editor_Plugins_ModelFront_TranslationRiskPrediction */
+            $risk->updateSegmentMatchrate($segment,$analysisId,$languageResourceId);
+        } catch (editor_Plugins_ModelFront_Exception $e) {
+            $logger = Zend_Registry::get('logger')->cloneMe('plugin.modelfront');
+            $logger->exception($e, [
+                'level' => $logger::LEVEL_WARN
+            ]);
         }
     }
     

@@ -66,6 +66,6 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('taskType', 'inArray', [editor_Models_Task::getValidTaskTypes()]);
     $this->addValidator('usageMode', 'inArray', [[editor_Models_Task::USAGE_MODE_COMPETITIVE, editor_Models_Task::USAGE_MODE_COOPERATIVE, editor_Models_Task::USAGE_MODE_SIMULTANEOUS]]);
     $this->addValidator('projectId', 'int');
-    $this->addValidator('isSdlxliffFileParser', 'int');
+    $this->addValidator('diffExportUsable', 'int');
   }
 }
