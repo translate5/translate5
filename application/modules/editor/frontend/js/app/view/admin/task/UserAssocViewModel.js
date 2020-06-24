@@ -92,8 +92,7 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                 }
                 missingsegmentranges = task.get('missingsegmentranges');
                 if(missingsegmentranges.length > 0) {
-                    html += '<p class="errors"><br>' + me.strings.segmentrangeError + ':</p>';
-                    html += '<p>';
+                    html += '<hr><span class="errors">' + me.strings.segmentrangeError + ':</span><br>';
                     for (i = 0; i < missingsegmentranges.length; i++) {
                         switch(missingsegmentranges[i]['role']) {
                           case 'translator':
@@ -111,9 +110,8 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                           default:
                               rolename =  '';
                         }
-                      html += rolename + ': ' + missingsegmentranges[i]['missingSegments'] + '<br>';
+                      html += '- ' + rolename + ': ' + missingsegmentranges[i]['missingSegments'] + '<br>';
                     } 
-                    html += '</p>';
                 }
                 return html;
             },
