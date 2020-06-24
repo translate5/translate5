@@ -101,6 +101,12 @@ class editor_Models_Import_Configuration {
     public $checkFileType = true;
     
     /**
+     * Comma seperated list to add file-extensions to be ignored (APPLIES ONLY IF the filetype-check is disabled)
+     * @var string
+     */
+    public $ignoredUncheckedExtensions = '';
+    
+    /**
      * needed internally for de/serialization 
      * @var string
      */
