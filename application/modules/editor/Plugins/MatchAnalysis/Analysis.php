@@ -98,7 +98,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->taskState = $taskState;
         $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         $this->initHelper();
-        parent::__construct();
+        parent::__construct($analysisId);
     }
     
     /***
