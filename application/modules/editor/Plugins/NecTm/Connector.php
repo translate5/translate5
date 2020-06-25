@@ -311,6 +311,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         // - "target_text": "translate5 <div class="open 672069643d22393222 internal-tag ownttip">is Open Source</div>:"
         
         $this->resultList->addResult($translation, $result->match, $this->getMetaData($result));
+        $this->resultList->setSource($result->tu->source_text);
         return $this->resultList;
     }
     

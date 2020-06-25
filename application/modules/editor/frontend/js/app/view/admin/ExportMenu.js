@@ -110,7 +110,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
               itemId: 'exportDiffItem',
               hrefTarget: '_blank',
               href: me.makePath('task/export/id/{0}/diff/1'),
-              hidden:!exportAllowed || !me.task.get('isSdlxliffFileParser'),
+              hidden:!exportAllowed || !me.task.get('diffExportUsable'),
               text : me.messages.exportDiff
           },{
               itemId: 'exportItemXliff2',
