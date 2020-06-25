@@ -118,6 +118,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             'yml',
             'yaml',
     );
+    /**
+     * Ignored filetypes if a custom bconf is provided (which skips the check for supported files)
+     * 
+     * @var array
+     */
+    private $okapiCustomBconfIgnoredFileTypes = array(
+        'xsl',
+        'xslt'
+    );
 
     /**
      * The okapi config file-types
@@ -188,7 +197,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $config = $event->getParam('importConfig');
         /* @var $config editor_Models_Import_Configuration */
         $this->findBconfFiles($event->getParam('importFolder'));
-        $config->checkFileType = !$this->useCustomBconf;
+        if($this->useCustomBconf){
+            $config->checkFileType = false;
+            $config->ignoredUncheckedExtensions = implode(',', $this->okapiCustomBconfIgnoredFileTypes);
+        } else {
+            $config->checkFileType = true;
+        }
     }
 
     /**
@@ -289,7 +303,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
         if(empty($this->bconfFilePaths)){
             $this->useCustomBconf = false;
-            $this->bconfFilePaths[]=$this->getDefaultBconf();
+            $this->bconfFilePaths[] = $this->getDefaultBconf();
         }
     }
 
@@ -320,8 +334,13 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         // Since we currently can not get the information from the bconf which additional types are allowed,
         // we just pass all filetypes (expect the ones with a native fileparser) to be parsed via Okapi
         // If the user uploads invalid files, they are ignored and listed in the event log
-        if($this->useCustomBconf && !$this->fileTypes->hasParser($extension)) {
-            return true;
+        if($this->useCustomBconf) {
+            if(in_array($extension, $this->okapiCustomBconfIgnoredFileTypes)){
+                return false;
+            }
+            if(!$this->fileTypes->hasParser($extension)){
+                return true;
+            }
         }
 
         return in_array($extension, $this->okapiFileTypes);
