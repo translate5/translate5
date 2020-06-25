@@ -44,7 +44,7 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
     },
     tabPosition: 'left',
     tabRotation: 0,
-    glyph: 'xf085@FontAwesome',
+    glyph: 'xf085@FontAwesome5FreeSolid',
     listeners:{
         beforeshow: function(view, opts){
             this.forwardActiveTabEvent('beforeshow');

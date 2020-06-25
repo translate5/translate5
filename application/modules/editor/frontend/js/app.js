@@ -276,7 +276,7 @@ Ext.application({
    * opens the admin viewport
    * firing the editorViewportClosed event
    */
-  openAdministration: function() {
+  openAdministration: function(task) {
       var me = this, tabPanel;
       if(!Editor.controller.admin || ! Editor.controller.admin.TaskOverview) {
           return;
@@ -306,7 +306,7 @@ Ext.application({
       tabPanel = me.viewport.down('#adminMainSection');
 
       // on intial load we have to trigger the change manually
-      me.onAdminMainSectionChange(tabPanel, tabPanel.getActiveTab());
+      me.onAdminMainSectionChange(tabPanel, tabPanel.getActiveTab(),task);
       
       //set the value used for displaying the help pages
       Ext.getDoc().dom.title = me.windowTitle;
@@ -317,11 +317,6 @@ Ext.application({
   openAdministrationSection: function(panel, redirectRoute) {
       var me = this,
           mainTabs = me.viewport.down('> #adminMainSection');
-
-      //if we are already active we do nothing
-      if(mainTabs.getActiveTab() === panel) {
-      	  return;
-      }
 
       //what  happens if panel does not belong to the tabpanel?
       mainTabs.setActiveTab(panel);
@@ -335,15 +330,30 @@ Ext.application({
    * @param {Ext.tab.Panel} tabpanel
    * @param {Ext.Component} activatedPanel
    */
-  onAdminMainSectionChange: function(tabpanel, activatedPanel) {
+  onAdminMainSectionChange: function(tabpanel, activatedPanel,task) {
       var me = this,
           ctrl = activatedPanel.getController(),
           conf = ctrl && ctrl.defaultConfig,
-	      mainRoute = conf && conf.routes && Object.keys(conf.routes)[0];
+          mainRoute = conf && conf.routes && Object.keys(conf.routes)[0];
       me.fireEvent('adminSectionChanged', activatedPanel);
-      if(mainRoute) {
-          me.redirectTo(mainRoute);
+
+      if(!mainRoute) {
+          return;
       }
+      //if no redirect to task is set, open the main route
+      if(!task || !task.isModel){
+          me.redirectTo(mainRoute);
+          return;
+      }
+      //focus the redirect to task only if focus route exist in the component router
+      //TODO: implement focus route in the taskgrid (this will require possition action in the backend, something simillar as segments position)
+      var route=[mainRoute];
+      if(conf.routes[mainRoute+'/:id/:taskId/focus']!==undefined){
+          route.push(task.get('projectId'));
+          route.push(task.get('id'));
+          route.push('focus');
+      }
+      me.redirectTo(route.join('/'));
   },
   mask: function(msg, title) {
       if(!this.appMask) {

@@ -33,6 +33,7 @@ Ext.define('Editor.view.project.ProjectPanelViewModel', {
         projectSelection : null,
         projectTaskSelection : null
     },
+    
     stores : {
         // this store is defined here because the reference filter binding is
         // required
@@ -43,6 +44,7 @@ Ext.define('Editor.view.project.ProjectPanelViewModel', {
             remoteFilter : true,
             pageSize : false,
             listeners : {
+                beforeload : 'onProjectTaskBeforeLoad',
                 load : 'onProjectTaskLoad'
             },
             setFilters : function (filters) {

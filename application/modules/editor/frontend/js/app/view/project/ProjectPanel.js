@@ -39,7 +39,7 @@ Ext.define('Editor.view.project.ProjectPanel', {
     itemId: 'projectPanel',
     controller:'projectPanel',
     title: '#UT#Projekte',
-    glyph: 'xf0e8@FontAwesome',
+    glyph: 'xf0e8@FontAwesome5FreeSolid',
     layout: 'border',
     viewModel:{
         type: 'projectPanel'
@@ -54,8 +54,8 @@ Ext.define('Editor.view.project.ProjectPanel', {
             config={
             title:me.title,
             items:[{
-            xtype:'projectGrid',
-                reference:'projectGrid',
+                    xtype:'projectGrid',
+                    reference:'projectGrid',
                     header:false,
                     region: 'center',
                     split: true,
