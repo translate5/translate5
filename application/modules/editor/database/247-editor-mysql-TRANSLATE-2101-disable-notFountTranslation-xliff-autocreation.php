@@ -36,7 +36,7 @@ set_time_limit(0);
 //$this->doNotSavePhpForDebugging = false;
 
 
-//get all files from imageTags dir
+//get all files from data/cache dir
 $path = APPLICATION_PATH.'/../data/cache/';
 $content = scandir($path);
 $i = 0;
