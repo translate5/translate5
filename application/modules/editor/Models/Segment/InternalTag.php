@@ -90,13 +90,13 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     }
     
     /**
-     * Get all "lines" in the segment as indicated by newline-tags (= "hardReturn").
+     * Get all "lines" in the segment as indicated by newline-tags (= "hardReturn" or "softReturn").
      * @param string $segment
      * @return array
      */
     public function getLinesAccordingToNewlineTags(string $segment) {
         $replacer = function($match) {
-            if (in_array('hardReturn', $match)) {
+            if (in_array('hardReturn', $match) || in_array('softReturn', $match)) {
                 return '<hardReturn/>';
             }
             return $match[0];

@@ -26,10 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/***
+ * Calculates segment matchrate based on model front risk prediction results for each mt pretranslated segment,
+ * or also can be used for single source/target translation matchrate validator/checker
+ *
+ */
 class editor_Plugins_ModelFront_TranslationRiskPrediction {
 
-    const RISK_PREDICTION_MATCHRATETYPE=';risk-prediction;ModelFront';
-    
     /***
      * 
      * @var editor_Plugins_ModelFront_HttpApi
@@ -43,14 +46,14 @@ class editor_Plugins_ModelFront_TranslationRiskPrediction {
     protected $task;
     
     /***
-     *
-     * @var editor_Models_SegmentFieldManager
+     * 
+     * @var editor_Plugins_ModelFront_MatchrateUpdater
      */
-    protected $sfm;
+    protected $updater;
     
     public function __construct(editor_Models_Task $task) {
         $this->task=$task;
-        $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
+        $this->updater=ZfExtended_Factory::get('editor_Plugins_ModelFront_MatchrateUpdater');
         $this->initApi();
     }
     
@@ -70,91 +73,73 @@ class editor_Plugins_ModelFront_TranslationRiskPrediction {
     }
     
     /***
-     * Query the ModelFront api for translation risk prediction for each mt-pretranslated segment
+     * Update segment matchrate from modelfront results.
+     * If analysis and language resource is provided, the analysis matchrate will be updated to.
+     * 
+     * @param editor_Models_Segment $segment
+     * @param int $analysisId
+     * @param int $languageResourceId
+     * @throws editor_Plugins_ModelFront_Exception
      */
-    public function riskToMatchrate() {
-        //get all pretranslated segments
-        $segments=$this->loadSegments();
-        if(empty($segments)){
-            return;
-        }
+    public function updateSegmentMatchrate(editor_Models_Segment $segment,int $analysisId=null,int $languageResourceId=null) {
+
         $errors=[];
-        //TODO: split the calculate logic so it can be called for segment set from outside
-        foreach ($segments as $chunk){
-            $sourceData=$chunk['sourceEditToSort'] ?? $chunk['sourceToSort'];
-            $targetData=$chunk['targetEditToSort'] ?? $chunk['targetToSort'];
-            $data=[
-                'original'=>$sourceData,
-                'translation'=>$targetData
+        
+        /* @var $segment editor_Models_Segment */
+        $original=$segment->get('sourceEditToSort') ?? $segment->get('sourceToSort');
+        $translation=$segment->get('targetEditToSort') ?? $segment->get('targetToSort');
+        
+        $matchRate=null;
+        try {
+            $matchRate=$this->riskToMatchrate($original, $translation);
+        } catch (editor_Plugins_ModelFront_Exception $e) {
+            //if there are erros on the api request for the segment display them
+            $errors[]=[
+                'segmentId'=>$segment->getId(),
+                'error'=>$this->api->getErrors()
             ];
-            
-            $this->api->predictRisk($data);
-            //if there are erros on the api request for the segment, collect the errors and display them at the end
-            if(!empty($this->api->getErrors())){
-                $errors[]=[
-                    'segmentId'=>$chunk['id'],
-                    'error'=>$this->api->getErrors()
-                ];
-                continue;
-            }
-            
-            $data=$this->api->getResult();
-            if(empty($data)){
-                continue;
-            }
-            foreach ($data as $d){
-                $this->updateSegment($chunk['id'],$d);
-            }
-        }
-        if(!empty($errors)){
             throw new editor_Plugins_ModelFront_Exception('E1269',['errors'=>print_r($errors,1)]);
         }
-    }
-    
-    /***
-     * Update segment matchrate from the ModelFront risk results.
-     * @param int $id
-     * @param array $data
-     */
-    protected function updateSegment(int $id,array $data){
-        if(empty($data) || !isset($data['risk'])){
+        
+        if($matchRate<0){
             return;
         }
-        $segment=ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
-        $segment->load($id);
-        
-        $history = $segment->getNewHistoryEntity();
-        
-        //A risk is a floating point number with a value from 0.0 to 1.0
-        //where 1 is bad and 0 is perfect
-        $risk=(float) $data['risk'];
-        //convert the risk to matchrate
-        //in translate5 100% is perfect 0% is bad
-        $matchRate=100*(1-$risk);
-        $segment->setMatchRate(round($matchRate));
-        $segment->setMatchRateType($this->formatMatchrateType($segment->getMatchRateType()));
-        $history->save();
-        $segment->setTimestamp(NOW_ISO);
-        $segment->save();
+        $this->updater->setSegment($segment);
+        $this->updater->setMatchRate(round($matchRate));
+        $this->updater->updateSegment();
+        //update the analysis matchrate if the language resource and the analysis are set
+        if(isset($analysisId) && isset($languageResourceId)){
+            $this->updater->updateAnalysis($analysisId, $languageResourceId);
+        }
     }
     
+
     /***
-     * Load all mt pretranslated segments
+     * Get translation risk for given original and translation text and convert the risk to translate5 matchrate value.
+     * @param string $original
+     * @param string $translation
+     * @throws editor_Plugins_ModelFront_Exception
      * @return array
      */
-    protected function loadSegments(){
-        $segment=ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
-        return $segment->loadMtPretranslated($this->task->getTaskGuid());
-    }
-    
-    /**
-     * Add the prediction matchratetype in the given matchratre
-     * @param string $current
-     * @return string
-     */
-    protected function formatMatchrateType(string $current) {
-        return rtrim($current, self::RISK_PREDICTION_MATCHRATETYPE) . self::RISK_PREDICTION_MATCHRATETYPE;
+    public function riskToMatchrate(string $original, string $translation) {
+        $data=[
+            'original'=>$original,
+            'translation'=>$translation
+        ];
+        $this->api->predictRisk($data);
+        if(!empty($this->api->getErrors())){
+            throw new editor_Plugins_ModelFront_Exception('E1269',['errors'=>print_r($this->api->getErrors(),1)]);
+        }
+        $result=$this->api->getResult();
+        $result=$result[0]['risk'] ?? null;
+        if(empty($result)){
+            return -1;
+        }
+        //A risk is a floating point number with a value from 0.0 to 1.0
+        //where 1 is bad and 0 is perfect
+        $risk=(float) $result;
+        //convert the risk to matchrate
+        //in translate5 100% is perfect 0% is bad
+        return 100*(1-$risk);
     }
 }
