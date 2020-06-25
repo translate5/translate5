@@ -56,12 +56,10 @@ Ext.define('Editor.view.segments.StatusStrip', {
             configItems = [];
         
         //add the minmaxlength component if the config is provided
-        if(Editor.data.segments.enableCountSegmentLength){
-            configItems.push({
-                    xtype:'segment.minmaxlength',
-                    htmlEditor:instanceConfig.htmlEditor
-                });
-        }
+        configItems.push({
+            xtype:'segment.minmaxlength',
+            htmlEditor:instanceConfig.htmlEditor
+        });
         
         if (configItems.length > 0) {
             config = {
