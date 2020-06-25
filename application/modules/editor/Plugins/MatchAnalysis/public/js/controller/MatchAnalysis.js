@@ -119,7 +119,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             }
         },
         store:{
-            '#Editor.store.LanguageResources.TaskAssocStore':{
+            '#languageResourcesTaskAssoc':{
                 load:'onLanguageResourcesTaskAssocStoreLoad'
             }
         }
@@ -218,7 +218,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 dock:'bottom',
                 glyph: 'f200@FontAwesome5FreeSolid',
                 bind:{
-                    disabled:'{!enableDockedToolbar}',
+                    disabled:'{!enableDockedToolbar || !hasLanguageResourcesAssoc}',
                     hidden:'{isAnalysisButtonHidden}'
                 },
                 listeners:{
@@ -233,7 +233,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             dock : 'bottom',
             ui: 'footer',
             bind:{
-                disabled:'{!enableDockedToolbar}'
+                disabled:'{!enableDockedToolbar || !hasLanguageResourcesAssoc}'
             },
             layout: {
                 type: 'vbox',

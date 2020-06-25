@@ -45,6 +45,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
     stores: {
         taskAssoc: {
             model:'Editor.model.LanguageResources.TaskAssoc',
+            storeId:'languageResourcesTaskAssoc',
             remoteFilter: true,
             pageSize: false,
             autoLoad:true,
@@ -95,7 +96,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
                 if(!isAddTask){
                     return task && (!task.isErroneous() && !task.isImporting());
                 }
-                return isAddTask
+                return isAddTask;
             },
             bind:{bindTo:'{currentTask}',deep:true}
         },
@@ -113,6 +114,22 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
             },
             bind:{bindTo:'{currentTask}',deep:true}
         },
+        
+        /**
+         * Are there assigned language resources
+         */
+        hasLanguageResourcesAssoc:function(get){
+            var items=get('items');
+            if(!items){
+                return false;
+            }
+            for(var i=0;i<items.length;i++){
+                if(items[i].get('checked')){
+                    return true;
+                }
+            }
+            return false;
+        },
         hasTmOrCollection:function(get){
             return this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TM)||this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TERM_COLLECTION) ;
         },
@@ -124,6 +141,9 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
         }
     },
     
+    /***
+     * Check if the given resource type is selected in the language resources panel
+     */
     checkResourceType:function(items,resourceType){
         var hasType=false;
         if(!items){
