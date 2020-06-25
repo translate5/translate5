@@ -50,16 +50,6 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     }
     
     /**
-     * Updates the finishDate to the current timestamp for all reviewers
-     */
-    public function setReviewersFinishDate() {
-        $task = $this->config->task;
-        $taskAssoc=ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $taskAssoc editor_Models_TaskUserAssoc */
-        $taskAssoc->updateReviewersFinishDate($task->getTaskGuid(),NOW_ISO);
-    }
-    
-    /**
      * ends the task
      */
     public function endTask() {
