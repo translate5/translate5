@@ -638,11 +638,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   onProjectGridSelectionChange:function(grid,selection){
       var me = this,
-      task = selection ? selection[0] : null;
+        cnt=me.getProjectPanel().getController(),
+        task = selection ? selection[0] : null;
+      
       if(!task){
           return;
       }
-      me.getProjectPanel().getController().redirectFocus(task,false);
+      cnt.redirectFocus(task,false);
   },
   
   
@@ -981,13 +983,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   handleTaskProject: function(task) {
 	  var me=this,
 	      menu=me.getAdminMainSection(),
-	      activeTab=menu.getActiveTab().xtype;
-	      
-      if(activeTab=='projectPanel'){
-    	  me.redirectTo('task/'+task.get('id')+'/filter');
-      }else{
-    	  me.getProjectPanel().getController().redirectFocus(task,true);
+	      activeTab=menu.getActiveTab(),
+	      isTaskOverview=activeTab == me.getTaskGrid(),
+	      redirectCmp=isTaskOverview ? me.getProjectPanel(): activeTab,
+	      route='task/'+task.get('id')+'/filter';
+
+	  if(isTaskOverview){
+          route='project/'+task.get('projectId')+'/'+task.get('id')+'/focus';
       }
+      Editor.app.openAdministrationSection(redirectCmp,route);
   },
   
   /**

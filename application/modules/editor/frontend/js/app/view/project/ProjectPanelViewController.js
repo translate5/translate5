@@ -57,7 +57,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     },
     
     /***
-     * Redirect to project focus route route
+     * Redirect to project focus route
      */
     redirectFocus:function(record,includeTask){
     	var me=this;
@@ -76,7 +76,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     	route=route.join('/');
     	
     	Editor.app.openAdministrationSection(me.getView(),route);
-    	me.redirectTo(route);
     },
 
     /***
@@ -132,6 +131,14 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 			rec=parseInt(rute[2]);
 		}
 		me.selectProjectTaskRecord(rec);
+		me.lookup('projectGrid').setLoading(false);
+	},
+	
+	/***
+	 * Before project task store load
+	 */
+	onProjectTaskBeforeLoad:function(){
+	    this.lookup('projectGrid').setLoading(true);
 	},
 	
 	/***

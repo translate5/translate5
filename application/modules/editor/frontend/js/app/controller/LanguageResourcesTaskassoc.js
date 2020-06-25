@@ -89,54 +89,35 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
       me.getLanguageResourcesTaskAssocGrid().store.load(languageResourceparams);
   },
   
-  /***
-   * Save each assoc if if it is changed
-   */
-  saveTmAssoc: function(cmp) {
-      var me = this,
-          tmpStore = me.getLanguageResourcesTaskAssocGrid().store;
-
-      if(me.getAdminTaskWindow()){
-          me.getAdminTaskWindow().setLoading(true);
-      }
-      
-      tmpStore.each(me.saveOneAssocRecord, me);
-  },
   
   /**
    * uncheck segmentsUpdateable when uncheck whole row, restore segmentsUpdateable if recheck row
    */
-  handleCheckedChange: function(column, rowIdx, checked){
+  handleCheckedChange: function(column, rowIdx, checked,record){
       var me = this,
-          record = me.getLanguageResourcesTaskAssocGrid().store.getAt(rowIdx),
           oldValue = record.isModified('segmentsUpdateable') && record.getModified('segmentsUpdateable');
+      
       record.set('segmentsUpdateable', checked && oldValue);
       
-      me.saveTmAssoc();
+      me.saveRecord(record);
   },
   /**
    * check row when segmentsUpdateable is checked
    */
-  handleSegmentsUpdateableChange: function(column, rowIdx, checked) {
-      var me = this,
-          record = me.getLanguageResourcesTaskAssocGrid().store.getAt(rowIdx);
+  handleSegmentsUpdateableChange: function(column, rowIdx, checked,record) {
+      var me = this;
       if(checked && !record.get('checked')) {
           record.set('checked', true);
       }
-      me.saveTmAssoc();
+      me.saveRecord(record);
   },
+  
   /**
-   * currently no easy "subentity" versioning is possible here, because of the bulk (store each) like saving / deleting.
-   * on the other hand no versioning is needed, master entity languageResource does not contain changeable values which affects the taskassoc entity
-   * The taskassocs itself can be handled by plain 404 already deleted and duplicate entry messages.
+   * Save save assoc record
    */
-  saveOneAssocRecord: function(record){
-      var me = this;
-      if(!record.dirty){
-          me.hideLoadingMask();
-          return;
-      }
-      var str = me.strings,
+  saveRecord: function(record){
+      var me = this,
+          str = me.strings,
           params = {},
           method = 'DELETE',
           url = Editor.data.restpath+'languageresourcetaskassoc',
@@ -146,6 +127,9 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
               segmentsUpdateable: record.get('segmentsUpdateable')
           });
 
+      if(me.getAdminTaskWindow()){
+          me.getAdminTaskWindow().setLoading(true);
+      }
       if(record.get('checked')) {
           method = record.get('taskassocid') ? 'PUT' : 'POST';
           params = {data: checkedData};
@@ -161,7 +145,7 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
           success: function(response){
               if(record.data.checked){
                   var resp = Ext.util.JSON.decode(response.responseText),
-                      newId = resp.rows['languageResourceId'];
+                      newId = resp.rows['id'];
                   record.set('taskassocid', newId);
                   Editor.MessageBox.addSuccess(str.assocSave);
               }

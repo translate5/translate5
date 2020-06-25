@@ -43,7 +43,7 @@ Ext.define('Editor.view.project.ProjectActionMenu', {
 	        items:[,{
 		        text: me.messages.actionDeleteProject,
 		        action: 'editorDeleteProject',
-		        glyph: 'f014@FontAwesome',
+		        glyph: 'f2ed@FontAwesome5FreeSolid',
 		        hidden:true,
 		        bind:{
 		        	hidden:'{!isEditorDeleteProject}'

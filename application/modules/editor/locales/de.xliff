@@ -1807,6 +1807,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RW50ZmVybmVu'><source>Entfernen</source><target>Entfernen</target></trans-unit>
 <trans-unit id='U3BlemlhbA=='><source>Spezial</source><target>Spezial</target></trans-unit>
 <trans-unit id='RmlsdGVyIHp1csO8Y2tzZXR6ZW4='><source>Filter zurücksetzen</source><target>Filter zurücksetzen</target></trans-unit>
+<trans-unit id='UmVzc291cmNlOiB7bmFtZX0='><source>Ressource: {name}</source><target>Ressource: {name}</target></trans-unit>
   </body>
  </file>
 </xliff>

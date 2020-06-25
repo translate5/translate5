@@ -42,7 +42,7 @@ Ext.define('Editor.view.admin.user.Grid', {
   cls: 'adminUserGrid',
   title: '#UT#Benutzer',
   helpSection: 'useroverview',
-  glyph: 'xf0c0@FontAwesome',
+  glyph: 'xf0c0@FontAwesome5FreeSolid',
   height: '100%',
   layout: {
       type: 'fit'

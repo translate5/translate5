@@ -44,7 +44,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
   cls: 'adminTaskGrid',
   title: '#UT#Aufgaben',
   helpSection: 'taskoverview',
-  glyph: 'xf03a@FontAwesome',
+  glyph: 'xf03a@FontAwesome5FreeSolid',
   plugins: ['gridfilters'],
   layout: {
       type: 'fit'

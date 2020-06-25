@@ -149,7 +149,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     value:true
                 },{
                     xtype:'customers',
-                    name:'customerIds',
+                    name:'customerIds[]',
                     listeners:{
                         change:'onCustomersTagFieldChange'
                     },
@@ -163,7 +163,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     })
                 },{
                     xtype:'tagfield',
-                    //name:'useAsDefault',
+                    name:'customerUseAsDefaultIds[]',
                     itemId:'useAsDefault',
                     fieldLabel:me.strings.useAsDefault,
                     store:Ext.create('Ext.data.Store', {
