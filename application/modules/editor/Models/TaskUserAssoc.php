@@ -510,21 +510,29 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
             ->from($this->db, array('role'))
             ->distinct()
+            ->where('isPmOverride = 0')
             ->where('taskGuid = ?', $taskGuid);
         return $this->db->fetchAll($s)->toArray();
     }
     
     // ---------------------- segmentrange: ------------------------
     /**
-     * If a task is in sequential-mode and ANY segments are assigned to ANY user
-     * of the given user's role in the current workflow-step, the editable-status of
-     * the segments will have to be checked for ALL segments for ALL users of this role.
+     * If 
+     * (1) a task is in sequential-mode,  
+     * (2) not in PM-override, and
+     * (3) and ANY segments are assigned to ANY user of the given user's role 
+     *     in the current workflow-step, 
+     * then the editable-status of the segments will have to be checked for 
+     * ALL segments for ALL users of this role.
      * @param editor_Models_Task $task
      * @param string $role
      * @return bool
      */
     public function isSegmentrangedTaskForRole(editor_Models_Task $task, string $role) : bool {
         if ($task->getUsageMode() !== $task::USAGE_MODE_SIMULTANEOUS) {
+            return false;
+        }
+        if($this->getIsPmOverride()) {
             return false;
         }
         $assignedSegments[] = $this->getAllAssignedSegmentsByRole($task->getTaskGuid(), $role);

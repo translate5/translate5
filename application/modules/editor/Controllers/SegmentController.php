@@ -117,8 +117,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         if ($handleSegmentranges || $handleAnonymizeUsers) {
             foreach ($this->view->rows as &$row) {
                 if ($handleSegmentranges && $row['editable']) { // a segment that is not editable already must stay not editable!
-                    // TODO: get & put? testen
-                    // TODO: beim Abspeicherns vom Segment im Backend vorher nochmal auf editable absichern! (= darf der User überhaupt dieses Segment speichern anhand seiner segmtnranges?)
                     $row['editable'] = in_array($row['segmentNrInTask'], $assignedSegments);
                 }
                 if ($handleAnonymizeUsers) {
@@ -562,14 +560,39 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     /**
      * checks if current session taskguid matches to loaded segment taskguid
+     * and if the user is allowed to edit the segment at all
      * @throws ZfExtended_Models_Entity_NoAccessException
      * @return editor_Models_Task
      */
     protected function checkTaskGuidAndEditable() {
+        $isTaskGuidAndEditable = true;
+        
         $session = new Zend_Session_Namespace();
         $editable = $this->entity->getEditable();
 
         if (empty($editable) || $session->taskGuid !== $this->entity->getTaskGuid()) {
+            $isTaskGuidAndEditable = false;
+        }
+        
+        if ($isTaskGuidAndEditable && $editable) {
+            // if the user can edit only segmentranges, we must also check if s/he is allowed to edit and save this segment
+            $sessionUser = new Zend_Session_Namespace('user');
+            $sessionUserGuid = $sessionUser->data->userGuid;
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($this->entity->getTaskGuid());
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($sessionUserGuid, $task);
+            /* @var $tua editor_Models_TaskUserAssoc */
+            $role = $tua->getRole();
+            if ($tua->isSegmentrangedTaskForRole($task, $role)) {
+                $assignedSegments = $tua->getAllAssignedSegmentsByUserAndRole($taskGuid, $sessionUserGuid, $role);
+                if (!in_array($this->entity->getSegmentNrInTask(), $assignedSegments)) {
+                    $isTaskGuidAndEditable = false;
+                }
+            }
+        }
+        
+        if (!$isTaskGuidAndEditable) {
             //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
