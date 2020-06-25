@@ -225,7 +225,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         name: 'name',
                                         allowBlank: false,
                                         maxLength: 255,
-                                        minLength: 3
+                                        minLength: 1
                                     },
                                     {
                                         xtype: 'textfield',
