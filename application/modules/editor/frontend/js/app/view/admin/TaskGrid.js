@@ -707,19 +707,21 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   hidden: ! Editor.app.authenticatedUser.isAllowed('editorAddTask'),
                   tooltip: me.strings.addProjectTip
               },{
-	  			  xtype:'button',
-	  			  itemId:'addAdvanceFilterBtn',
-	  			  glyph: 'f0b0@FontAwesome5FreeSolid',
-				  text:me.strings.addFilterText,
-				  tooltip:me.strings.addFilterText
+                  xtype:'button',
+                  itemId:'addAdvanceFilterBtn',
+                  glyph: 'f0b0@FontAwesome5FreeSolid',
+                  text:me.strings.addFilterText,
+                  tooltip:me.strings.addFilterText
               },{
                   xtype: 'button',
                   glyph: 'f56e@FontAwesome5FreeSolid',
+                  itemId: 'export-meta-data-btn',
                   text: me.strings.exportMetaDataBtn,
                   tooltip: me.strings.exportMetaDataBtnTip
               },{
                   xtype: 'button',
                   glyph: 'f46d@FontAwesome5FreeSolid',
+                  itemId: 'show-kpi-btn',
                   text: me.strings.showKPIBtn,
                   tooltip: me.strings.showKPIBtnTip
               }]
