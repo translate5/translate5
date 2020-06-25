@@ -68,7 +68,7 @@ class editor_Models_Import_FileList {
      * returns a file list with files to be imported
      */
     public function processReviewedFiles() {
-        $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles', [$this->importConfig->checkFileType]);
+        $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles', [$this->importConfig->checkFileType, $this->importConfig->ignoredUncheckedExtensions]);
         /* @var $parser editor_Models_Import_DirectoryParser_WorkingFiles */
         $tree = $parser->parse($this->importConfig->getReviewDir(), $this->task);
         $notImportedFiles = $parser->getNotImportedFiles();
