@@ -86,31 +86,20 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                     html = me.strings.editInfo,
                     missingsegmentranges,
                     i,
+                    workflowdata,
+                    workflowroles,
                     rolename;
                 if (task === null) {
                     return html;
                 }
                 missingsegmentranges = task.get('missingsegmentranges');
                 if(missingsegmentranges.length > 0) {
+                    workflowdata =  task.getWorkflowMetaData();
+                    workflowroles = workflowdata.roles;
                     html += '<hr><span class="errors">' + me.strings.segmentrangeError + ':</span><br>';
                     for (i = 0; i < missingsegmentranges.length; i++) {
-                        switch(missingsegmentranges[i]['role']) {
-                          case 'translator':
-                              rolename = me.strings.translator;
-                              break;
-                          case 'translatorCheck':
-                              rolename = me.strings.translatorCheck;
-                              break;
-                          case 'reviewer':
-                              rolename = me.strings.reviewer;
-                              break;
-                          case 'visitor':
-                              rolename = me.strings.visitor;
-                              break;
-                          default:
-                              rolename =  '';
-                        }
-                      html += '- ' + rolename + ': ' + missingsegmentranges[i]['missingSegments'] + '<br>';
+                        rolename = missingsegmentranges[i]['role'];
+                        html += '- ' + workflowroles[rolename] + ': ' + missingsegmentranges[i]['missingSegments'] + '<br>';
                     } 
                 }
                 return html;
