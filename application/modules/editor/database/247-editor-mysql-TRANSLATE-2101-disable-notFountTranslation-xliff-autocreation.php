@@ -28,13 +28,10 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * After disabling ZfExtended_Controllers_Plugins_ParseXliff for production, remove all cache files produced by the plugin.
  * Remove all notFountTranslation- xliff files from data cache directory. The files are not required for production installations.
  */
 set_time_limit(0);
-
-//uncomment the following line, so that the file is not marked as processed:
-//$this->doNotSavePhpForDebugging = false;
-
 
 //get all files from data/cache dir
 $path = APPLICATION_PATH.'/../data/cache/';
