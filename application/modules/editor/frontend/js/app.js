@@ -65,7 +65,6 @@ Ext.ClassManager.onCreated(function(className) {
     }
 });
 
-
 Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
@@ -340,20 +339,7 @@ Ext.application({
       if(!mainRoute) {
           return;
       }
-      //if no redirect to task is set, open the main route
-      if(!task || !task.isModel){
-          me.redirectTo(mainRoute);
-          return;
-      }
-      //focus the redirect to task only if focus route exist in the component router
-      //TODO: implement focus route in the taskgrid (this will require possition action in the backend, something simillar as segments position)
-      var route=[mainRoute];
-      if(conf.routes[mainRoute+'/:id/:taskId/focus']!==undefined){
-          route.push(task.get('projectId'));
-          route.push(task.get('id'));
-          route.push('focus');
-      }
-      me.redirectTo(route.join('/'));
+      me.redirectTo(mainRoute);
   },
   mask: function(msg, title) {
       if(!this.appMask) {

@@ -53,6 +53,11 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                 afterTaskDelete:'onAfterTaskDeleteEventHandler',
                 beforeTaskDelete:'onBeforeTaskDeleteEventHandler'
             }
+        },
+        store: {
+            '#project.Project':{
+                load:'onProjectStoreLoad'
+            }
         }
     },
     
@@ -87,14 +92,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         if(window.location.hash!=me.rootRoute){
             return;
         }
-        //it is the default route, find if project task selection exist, if exist, use this 
-        //selection for focus, otherwise reload the project store
-        var rec=me.getViewModel().get('projectTaskSelection');
-        
-        if(rec){
-            me.redirectFocus(rec,true);
-            return;
-        }
         me.checkAndReloadStores();
     },
     
@@ -113,24 +110,29 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     onProjectTaskFocusRoute:function(id,taskId){
 		var me=this;
 		//focus the project record
-		me.selectProjectRecord(id);
-		me.selectProjectTaskRecord(taskId);
+		me.selectProjectRecord(id,taskId);
     },
     
     /***
      * Focus project task grid row. This is called afte project task store is loaded.
      * The taskId is calculated based on the current window hash
      */
-    focusProjectTask:function(){
+    focusProjectTask:function(store){
 		var me=this,
 			rute=window.location.hash,
 			rute=rute.split('/'),
 			isFocus=(rute.length==4 && rute[3]=='focus'),
-			rec=null;
+			id=null,
+			record=null;
+		
 		if(isFocus){
-			rec=parseInt(rute[2]);
+			id=parseInt(rute[2]);
+			record=store.getById(parseInt(id));
 		}
-		me.selectProjectTaskRecord(rec);
+		if(!record){
+		    record=store.getAt(0);
+		}
+		me.selectProjectTaskRecord(record);
 		me.lookup('projectGrid').setLoading(false);
 	},
 	
@@ -150,8 +152,40 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 		if(!me.getView().isVisible(true)){
 		    return;
 		}
-		me.focusProjectTask();
+		me.focusProjectTask(store);
 	},
+	
+    /***
+    * On project store load
+    */
+    onProjectStoreLoad:function(store){
+        //if the project panel is not active, ignore the redirect,
+        //when we redirect, the component focus is changed
+        if(!this.getView().isVisible(true)){
+            return;
+        }
+      
+        var me = this,
+            record = me.getView().getViewModel().get('projectSelection'),
+            task = null;
+        //when the global task is set, this is a "leave task action"
+        //set the route to this task
+        if(Editor.data.task){
+            me.redirectFocus(Editor.data.task,true);
+            Editor.data.task=null;
+            return;
+        }
+      
+        //if selected record already exist, use it
+        if(record){
+            task = store.getById(record.get('id'));
+        }
+        //no selected record is found, use the first in the store
+        if(!task){
+            task = store.getAt(0);
+        }
+        me.redirectFocus(task,false);
+    },
 	
     onReloadProjectBtnClick:function(){
         var me=this;
@@ -176,6 +210,10 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         this.checkAndReloadStores();
     },
     
+    onProjectPanelDeactivate:function(){
+        this.resetSelection();
+    },
+    
 	/***
 	 * Reload projects
      */
@@ -194,8 +232,9 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 	
 	/***
 	 * Select project record in the projectGrid. This will also search for the record index if the record is not loaded in the buffered grid
+	 * After the index is found and project is selected, select the project task to (if requested)
 	 */
-	selectProjectRecord:function(id){
+	selectProjectRecord:function(id,taskId){
 		var me=this,
 			grid=me.lookup('projectGrid'),
 			record=null;
@@ -212,21 +251,25 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 					//no db index if found
 					if(index===undefined || index<0){
 						Editor.MessageBox.addInfo(me.strings.noProjectMessage);
+						me.selectProjectTaskRecord(taskId);
 						return;
 					}
 					
 					record=grid.getStore().getById(parseInt(id));
 					if(record){
 						me.focusRecordSilent(grid,record,'projectSelection');
+						me.selectProjectTaskRecord(taskId);
 						return;
 					}
 					grid.getController().reloadProjects().then(function(){
 						record=grid.getStore().getById(parseInt(id));
 						me.focusRecordSilent(grid,record,'projectSelection');
+						me.selectProjectTaskRecord(taskId);
 					});
 				},
 				notScrollCallback:function(){
 					Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
+					me.selectProjectTaskRecord(taskId);
 				}
 			});
 		}, function(err) {
@@ -235,34 +278,29 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 	},
 	
     /***
-     * Select project task record in the projectTask grid. The selectionchange event will be suspende.
-     * If showNoRecordMessage is set, an info message will be shown when the requested record is not in
-     * the projectTask store
+     * Select project task record in the projectTask grid
      */
-    selectProjectTaskRecord:function(id,showNoRecordMessage){
+    selectProjectTaskRecord:function(record){
     	var me=this,
     		grid=me.lookup('projectTaskGrid'),
-    		projectGrid=me.lookup('projectGrid'),
-    		store=grid.getStore(),
-    		record=null;
+    		store=grid.getStore();
     	
-    	if(id !== null){
-    	    record=store.getById(parseInt(id));
+    	//if the requested project is not a model
+    	if(Ext.isNumeric(record)){
+    	    record=store.getById(record);
     	}
-    	if(!record){
-    	    record=store.getAt(0);
-    	}
+    	
         //focus and select the record
         me.focusRecordSilent(grid,record,'projectTaskSelection');
         
     	if(!record){
-    		//display info message when the flag showNoRecordMessage is set 
-    		showNoRecordMessage && Editor.MessageBox.addInfo(me.strings.noProjectTaskMessage);
-    		return;
+            me.lookup('projectGrid').setLoading(false);
+            return;
     	}
     
     	//update the location hash
     	me.redirectFocus(record,true);
+    	me.lookup('projectGrid').setLoading(false);
     },
     
 	/***

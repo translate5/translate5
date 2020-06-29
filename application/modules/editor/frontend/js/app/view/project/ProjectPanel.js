@@ -48,7 +48,9 @@ Ext.define('Editor.view.project.ProjectPanel', {
     strings:{
     	projectTasksTitle:'#UT#Aufgaben für das Projekt: {projectSelection.taskName}'
     },
-    
+    listen:{
+        'deactivate':'onProjectPanelDeactivate'
+    },
     initConfig: function(instanceConfig) {
         var me = this,
             config={

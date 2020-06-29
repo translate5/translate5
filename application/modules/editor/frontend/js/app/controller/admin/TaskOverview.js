@@ -155,11 +155,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  beforeTaskDelete:'onBeforeTaskDeleteEventHandler'
   },
   listen: {
-      store: {
-          '#project.Project':{
-        	  load:'onProjectStoreLoad'
-          }
-      },
       controller: {
           '#Editor.$application': {
               adminViewportClosed: 'clearTasks',
@@ -645,34 +640,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           return;
       }
       cnt.redirectFocus(task,false);
-  },
-  
-  
-  /***
-   * On project store load
-   */
-  onProjectStoreLoad:function(store){
-      var me = this,
-          activeTab = me.isProjectPanelActive(),
-          panel = me.getProjectPanel(),
-          vm = panel.getViewModel(),
-          record = vm.get('projectSelection'),
-          task = null;
-
-      //if the project panel is not active, ignore the redirect,
-      //when we redirect, the component focus is changed
-      if(!activeTab){
-          return;
-      }
-      //if selected record already exist, use it
-      if(record){
-          task = store.getById(record.get('id'));
-      }
-      //no selected record is found, use the first in the store
-      if(!task){
-          task = store.getAt(0);
-      }
-      panel.getController().redirectFocus(task,false);
   },
   
   /***
