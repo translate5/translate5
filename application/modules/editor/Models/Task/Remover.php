@@ -54,6 +54,7 @@ class editor_Models_Task_Remover {
      */
     public function remove($forced = false) {
         $taskGuid = $this->task->getTaskGuid();
+        $projectId = $this->task->getProjectId();
         if(empty($taskGuid)) {
             return false;
         }
@@ -63,6 +64,7 @@ class editor_Models_Task_Remover {
         $this->removeDataDirectory();
         $this->removeRelatedDbData();
         $this->task->delete();
+        $this->cleanupProject($projectId);
     }
     
     /**
@@ -71,6 +73,7 @@ class editor_Models_Task_Remover {
      */
     public function removeForced($removeFiles = true) {
         $taskGuid = $this->task->getTaskGuid();
+        $projectId = $this->task->getProjectId();
         if(empty($taskGuid)) {
             return false;
         }
@@ -82,6 +85,26 @@ class editor_Models_Task_Remover {
         }
         $this->removeRelatedDbData();
         $this->task->delete();
+        $this->cleanupProject($projectId);
+    }
+    
+    /**
+     * Remove the project if there are no tasks in the project
+     * @param int $projectId
+     */
+    protected function cleanupProject(int $projectId) {
+        $model=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $model editor_Models_Task */
+        $tasks=$model->loadProjectTasks($projectId);
+        if(count($tasks)>1 || empty($tasks)){
+            return;
+        }
+        $task=reset($tasks);
+        if($task['taskType']!=$model::INITIAL_TASKTYPE_PROJECT){
+            return;
+        }
+        $this->task->load($projectId);
+        $this->remove(true);
     }
     
     /**

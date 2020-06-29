@@ -211,7 +211,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenu', {
 		        bind:{
 		        	hidden:'{!isEditorDeleteTask}'
 		        },
-		        glyph: 'f014@FontAwesome',
+		        glyph: 'f2ed@FontAwesome5FreeSolid',
 		        sortIndex:16,
 		    },{
 		    	xtype:'menuseparator',

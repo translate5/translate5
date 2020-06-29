@@ -47,7 +47,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     itemId: 'tmOverviewPanel',
     title:'#UT#Sprach-Resourcen',
     helpSection: 'languageresource',
-    glyph: 'xf1c0@FontAwesome',
+    glyph: 'xf1c0@FontAwesome5FreeSolid',
     strings: {
         name: '#UT#Name',
         edit: '#UT#Bearbeiten',

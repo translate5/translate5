@@ -298,9 +298,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       $this->view->Php2JsVars()->set('frontend.importTask.fieldsDefaultValue', $rop->frontend->importTask->fieldsDefaultValue->toArray());
       
-      //flag if the segment count status strip component should be displayed
-      $this->view->Php2JsVars()->set('segments.enableCountSegmentLength', (bool)$rop->segments->enableCountSegmentLength);
-
       //disable language resources match panel in editor when only termcollection is assigned to the task
       $this->view->Php2JsVars()->set('editor.LanguageResources.disableIfOnlyTermCollection',(boolean)$rop->editor->LanguageResources->disableIfOnlyTermCollection);
       

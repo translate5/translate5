@@ -3771,6 +3771,13 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='RW50ZmVybmVu'><source>Entfernen</source><target>Remove</target></trans-unit>
 <trans-unit id='U3BlemlhbA=='><source>Spezial</source><target>Special</target></trans-unit>
 <trans-unit id='w7xiZXJzZXR6dA=='><source>übersetzt</source><target>translated</target></trans-unit>
+<trans-unit id='RmlsdGVyIHp1csO8Y2tzZXR6ZW4='><source>Filter zurücksetzen</source><target>Reset filters</target></trans-unit>
+<trans-unit id='TW9udGVuZWdyaW5pc2No'><source>Montenegrinisch</source><target>Montenegrin</target></trans-unit>
+<trans-unit id='QXJhYmlzY2g='><source>Arabisch</source><target>Arabic</target></trans-unit>
+<trans-unit id='VXJkdQ=='><source>Urdu</source><target>Urdu</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChTZXJiaWVuKQ=='><source>Serbisch (Kyrillisch) (Serbien)</source><target>Serbian (Cyrillic) (Serbia)</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKExhdGVpbikgKFNlcmJpZW4p'><source>Serbisch (Latein) (Serbien)</source><target>Serbian (Latin) (Serbia)</target></trans-unit>
+<trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IG1hdGNoIHRoZSBleHBlY3RlZCBzdHJ1Y3R1cmUgZm9yIGEgRE5TIGhvc3RuYW1l'><source>'%value%' does not match the expected structure for a DNS hostname</source><target>'%value%' does not match the expected structure for a DNS hostname</target></trans-unit>
 </body>
   </file>
 </xliff>

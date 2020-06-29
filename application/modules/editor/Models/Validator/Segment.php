@@ -74,21 +74,13 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
      * Validation will be done on calling entity->validate
      */
     protected function defineValidators() {
-        $editable = $this->segmentFieldManager->getEditableDataIndexList();
         $toValidate = $this->segmentFieldManager->getSortColMap();
         $config = Zend_Registry::get('config');
-        $contentLengthCheck = (boolean)$config->runtimeOptions->segments->enableCountSegmentLength;
         
         foreach($toValidate as $edit => $toSort) {
-            //if $contentLengthCheck is enabled, we have to check the segment length against the configured min max values
-            if($contentLengthCheck) {
-                $this->addValidatorCustom($edit, function($value) use ($edit){
-                    return $this->validateLength($value, $edit);
-                },true);
-            }
-            else {
-                $this->addDontValidateField($edit);
-            }
+            $this->addValidatorCustom($edit, function($value) use ($edit){
+                return $this->validateLength($value, $edit);
+            },true);
             //by default the edited and toSort fields don't have a length restriction, so we add it to the addDontValidateField
             // (ok, the MySQL length restriction for longtext fields, 
             // but that should not bother the user in the frontend, since a segment will never get so long)

@@ -192,7 +192,7 @@ Ext.define('Editor.controller.TmOverview', {
 
         //check and update the form fields from the engine
         me.handleEngineSelect(form);
-
+        
         window.setLoading(true);
         form.submit({
             timeout: 240,
@@ -233,6 +233,9 @@ Ext.define('Editor.controller.TmOverview', {
             form = window.down('form'),
             record = form.getRecord();
 
+        if(!form.isValid()) {
+            return;
+        }
         record.reject();
 
         me.mergeCustomerFieldIds(form);
