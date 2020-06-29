@@ -26,33 +26,20 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/** #@+
- * @author Marc Mittag
- * @package translate5
- * @version 0.7
- *
- */
 /**
- * Stellt Methoden bereit, die translate5 grundsätzlich als Stand Alone-Anwendung verfügbar machen
+ * Just a simple helper to detect Internet Explorer via the user agent
  */
-class IndexController extends ZfExtended_Controllers_Action {
+final class BrowserDetection {
     
-    public function indexAction(){
-        
-        require_once 'default/Controllers/helpers/BrowserDetection.php';
-        
-        // Internet Explorer is not supported anymore! redirect IE 11 or below users to a specific error page
-        if(BrowserDetection::isInternetExplorer()){
-            header('Location: '.APPLICATION_RUNDIR.'/index/internetexplorer');
-            exit;
-        }
-        
-        $this->redirect(APPLICATION_RUNDIR.'/editor');
-    }
     /**
-     * Shows a simple info page to the user that IE 11 is not supported anymore
+     * simple check to detect IE 11 and below. This is hacky, but using a library like browsercap e.g. is overkill for just detecting IE and always involves regulary maintaining the library / ubdate to the latest data
+     * @return boolean
      */
-    public function internetexplorerAction() {
-        $this->renderScript('error/internetExplorer.phtml');
+    public static function isInternetExplorer(){
+        $userAgent = array_key_exists('HTTP_USER_AGENT', $_SERVER) ? htmlentities($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES, 'UTF-8') : null;
+        if (!empty($userAgent) && (preg_match('~MSIE|Internet Explorer~i', $userAgent) || (strpos($userAgent, 'Trident/7.0') !== false && strpos($userAgent, 'rv:11.0') !== false))) {
+            return true;
+        }
+        return false;
     }
 }
