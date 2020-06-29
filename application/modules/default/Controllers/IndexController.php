@@ -58,9 +58,6 @@ class IndexController extends ZfExtended_Controllers_Action {
      * @return boolean
      */
     private function isInternetExplorer(){
-        
-        return true;
-        
         $userAgent = array_key_exists('HTTP_USER_AGENT', $_SERVER) ? htmlentities($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES, 'UTF-8') : null;
         if (!empty($userAgent) && (preg_match('~MSIE|Internet Explorer~i', $userAgent) || (strpos($userAgent, 'Trident/7.0') !== false && strpos($userAgent, 'rv:11.0') !== false))) {
             return true;
