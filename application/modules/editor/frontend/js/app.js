@@ -175,33 +175,34 @@ Ext.application({
       if(!Editor.data.logoutOnWindowClose) {
           return;
       }      
-      var notRun = true,
+      var me=this,
+          notRun = true,
           logout = function() {
               notRun = false;
-              //use the hardcoded URL since we don't want to redirect to a custom logout page, 
-              //but we just want to foirce a session destroy
               try{
-            	  
-            	  if(!Ext.isIE){
-            		//send asinc request
-            		  navigator.sendBeacon(Editor.data.pathToRunDir+'/login/logout');
-            		  return;
-            	  }
-            	  //ie11 workaroun
-            	  Ext.Ajax.request({
-            		  url: Editor.data.pathToRunDir+'/login/logout',
-                      method: 'get',
-                      async: false
-                  });
+                  var perfEntries = performance.getEntriesByType("navigation");
+                  //check for Navigation Timing API support
+                  if (!perfEntries) {
+                      Ext.raise({
+                          msg: 'logoutOnWindowClose feature is used with unsupported browser!'
+                      });
+                      return;
+                  }
+                  var sendBeacon=false;
+                  for (var i=0; i < perfEntries.length; i++) {
+                      if(perfEntries[i].type!=="navigate"){
+                          sendBeacon=true;
+                          break;
+                      }
+                  }
+                //use the hardcoded URL since we don't want to redirect to a custom logout page, 
+                  //but we just want to force a session destroy
+                  sendBeacon && navigator.sendBeacon(Editor.data.pathToRunDir+'/login/logout');
               }catch (e) {
-            	  
               }
           };
       Ext.get(window).on({
     	  beforeunload:function(){
-    		  Editor.data.logoutOnWindowClose && notRun && logout();
-    	  },
-    	  unload:function(){
     		  Editor.data.logoutOnWindowClose && notRun && logout();
     	  }
       });
