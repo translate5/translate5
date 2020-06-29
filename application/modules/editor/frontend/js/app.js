@@ -65,7 +65,6 @@ Ext.ClassManager.onCreated(function(className) {
     }
 });
 
-
 Ext.application({
   name : 'Editor',
   models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field' ],
@@ -276,7 +275,7 @@ Ext.application({
    * opens the admin viewport
    * firing the editorViewportClosed event
    */
-  openAdministration: function() {
+  openAdministration: function(task) {
       var me = this, tabPanel;
       if(!Editor.controller.admin || ! Editor.controller.admin.TaskOverview) {
           return;
@@ -306,7 +305,7 @@ Ext.application({
       tabPanel = me.viewport.down('#adminMainSection');
 
       // on intial load we have to trigger the change manually
-      me.onAdminMainSectionChange(tabPanel, tabPanel.getActiveTab());
+      me.onAdminMainSectionChange(tabPanel, tabPanel.getActiveTab(),task);
       
       //set the value used for displaying the help pages
       Ext.getDoc().dom.title = me.windowTitle;
@@ -317,11 +316,6 @@ Ext.application({
   openAdministrationSection: function(panel, redirectRoute) {
       var me = this,
           mainTabs = me.viewport.down('> #adminMainSection');
-
-      //if we are already active we do nothing
-      if(mainTabs.getActiveTab() === panel) {
-      	  return;
-      }
 
       //what  happens if panel does not belong to the tabpanel?
       mainTabs.setActiveTab(panel);
@@ -335,15 +329,17 @@ Ext.application({
    * @param {Ext.tab.Panel} tabpanel
    * @param {Ext.Component} activatedPanel
    */
-  onAdminMainSectionChange: function(tabpanel, activatedPanel) {
+  onAdminMainSectionChange: function(tabpanel, activatedPanel,task) {
       var me = this,
           ctrl = activatedPanel.getController(),
           conf = ctrl && ctrl.defaultConfig,
-	      mainRoute = conf && conf.routes && Object.keys(conf.routes)[0];
+          mainRoute = conf && conf.routes && Object.keys(conf.routes)[0];
       me.fireEvent('adminSectionChanged', activatedPanel);
-      if(mainRoute) {
-          me.redirectTo(mainRoute);
+
+      if(!mainRoute) {
+          return;
       }
+      me.redirectTo(mainRoute);
   },
   mask: function(msg, title) {
       if(!this.appMask) {

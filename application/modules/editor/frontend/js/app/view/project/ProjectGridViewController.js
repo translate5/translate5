@@ -40,8 +40,14 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
             '#translate5 task': {
                 triggerReload: 'onTriggerTaskReload'
             }
+        },
+        component:{
+            '#resetFilterBtn':{
+                click:'onResetFilterButtonClick'
+            }
         }
     },
+    
     onTriggerTaskReload: function(params) {
         var store = this.getView().getStore(),
             project;
@@ -53,11 +59,12 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
         }
         project && project.load();
     },
+    
     /***
-     * Reload project button handler
+     * Reset filter button click handler
      */
-    onReloadProjectClick:function(){
-        this.reloadProjectAndProjectTasks();
+    onResetFilterButtonClick:function(){
+        this.getView().getPlugin('gridfilters').clearFilters();
     },
     
     /***
@@ -146,36 +153,5 @@ Ext.define('Editor.view.project.ProjectGridViewController', {
                  }
              });
          });
-    },
-    
-    /***
-     * Reload project and projectTask stores
-     * 
-     * @param {Boolean} {silentProjectTasks}: when true projectTask load event will not be fired
-     */
-    reloadProjectAndProjectTasks:function(silentProjectTasks){
-        var me = this,
-            projectTaskGrid = me.getView().up('#projectPanel').down('#projectTaskGrid'),
-            projectTaskStore = projectTaskGrid && projectTaskGrid.getStore();
-        
-        me.reloadProjects().then(function(records) {
-            if(!projectTaskStore){
-                return;
-            }
-            //suspend the event if set
-            if(silentProjectTasks){
-                projectTaskStore.suspendEvent('load');
-            }
-            projectTaskStore.load({
-                callback:function(){
-                    //after load resume the load event
-                    if(silentProjectTasks){
-                        projectTaskStore.resumeEvent('load');
-                    }
-                }
-            })
-        }, function(operation) {
-            Editor.app.getController('ServerException').handleException(operation.error.response);
-        });
     }
 });

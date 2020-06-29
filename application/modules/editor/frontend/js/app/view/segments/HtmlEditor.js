@@ -241,9 +241,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     	result, length,
     	body = me.getEditorBody();
     me.checkTags(body);
-    if(Editor.data.segments.enableCountSegmentLength){
-        me.checkSegmentLength(body.innerHTML || "");
-    }
+    me.checkSegmentLength(body.innerHTML || "");
     result = me.unMarkup(body);
     me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
     return result;
@@ -750,7 +748,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           meta = me.currentSegment.get('metaCache');
       
       //if the segment length is not in the defined range, add an error message - not disableable, so before disableErrorCheck
-      if(Editor.data.segments.enableCountSegmentLength && !me.segmentLengthStatus.includes('segmentLengthValid')) { // see Editor.view.segments.MinMaxLength.lengthstatus
+      if(!me.segmentLengthStatus.includes('segmentLengthValid')) { // see Editor.view.segments.MinMaxLength.lengthstatus
           //fire the event, and get the message from the segmentminmaxlength component
           msg = Ext.ComponentQuery.query('#segmentMinMaxLength')[0].renderErrorMessage(meta, me.segmentLengthStatus);
           me.fireEvent('contentErrors', me, msg, false);

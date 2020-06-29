@@ -65,13 +65,13 @@ Ext.define('Editor.view.admin.TaskGridViewController', {
     },
     
     onTaskFilterRoute: function(id) {
-    	var me=this,
-    		route=['task',id,'filter'];
-		Editor.app.getController('admin.TaskOverview').addAdvancedFilter({
-  			property: 'id',
-    		operator:"eq",
-    		value:id
-		});
+        var me=this,
+            route=['task',id,'filter'];
+        Editor.app.getController('admin.TaskOverview').addAdvancedFilter({
+            property: 'id',
+            operator:"eq",
+            value:id
+        });
         Editor.app.openAdministrationSection(me.getView(), route.join('/'));
-    },
+    }
 });
