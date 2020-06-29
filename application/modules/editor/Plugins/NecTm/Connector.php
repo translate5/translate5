@@ -251,6 +251,9 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_Abstract::update()
      */
     public function update(editor_Models_Segment $segment) {
+        // if categores are empty: 403 with {"message": "Tag is required option"}
+        editor_Plugins_NecTm_Init::validateCategories(implode(',',$this->categories));
+        
         $source = $this->prepareSegmentContent($this->getQueryString($segment));
         $target = $this->prepareSegmentContent($segment->getTargetEdit());
         $filename = $this->languageResource->getSpecificData('fileName');  //  (= if file was imported for LanguageResource on creation)
@@ -277,7 +280,11 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        return $this->queryNecTmApi($this->prepareDefaultQueryString($segment), true);
+        return $this->queryNecTmApi($this->prepareDefaultQueryString($segment), true); // across tags outside from mrk test
+        // or, without strip-tags:
+        // return $this->queryNecTmApi($this->getQueryString($segment), true);         // <div class="single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip"><span title="<ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>" class="short"><1/></span><span data-originalid="4be77c53486417926f2569a91ee0626a" data-length="-1" class="full"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph></span></div>across tags outside from mrk test
+        // But both ways we will not query internal tags as saved in addTMUnit():      // <x id="1"/>across tags outside from mrk test
+        
     }
     
     /***
