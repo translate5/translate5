@@ -204,6 +204,8 @@ If you did not send the request yourself, please inform us of this.
     <source>Der ResetHash oder die Browsersitzung ist nicht (mehr) gültig. Bitte fordern Sie über das nebenstehende Formular eine E-Mail mit einem neuen Link an.</source>
     <target>The ResetHash or the browser session is not valid (anymore). Please request a new link via e-mail by using the beneath form.</target>
 </trans-unit>
+<trans-unit id='SWhyIFdlYmJyb3dzZXIgd2lyZCBuaWNodCBtZWhyIHVudGVyc3TDvHR6dA=='><source>Ihr Webbrowser wird nicht mehr unterstützt</source><target>Your browser is not supported anymore</target></trans-unit>
+<trans-unit id='TGVpZGVyIHdpcmQgZGVyIE1pY3Jvc29mdCBJbnRlcm5ldCBFeHBsb3JlciB2b24gdHJhbnNsYXRlNSBuaWNodCBtZWhyIHVudGVyc3TDvHR6dC4gQml0dGUgYmVudXR6ZW4gU2llIGVpbmVuIGFuZGVyZW4gV2ViYnJvd3NlciB3aWUgei5CLiBHb29nbGUgQ2hyb21lLCBNb3ppbGxhIEZpcmVGb3gsIEFwcGxlIFNhZmFyaSBvZGVyIE1pY3Jvc29mdCBFZGdlLg=='><source>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</source><target>We're sorry but Microsoft Internet Explorer is not supported anymore by translate5. Please use a more modern browser like Google Chrome, Mozilla FireFox, Apple Safari or Microsoft Edge.</target></trans-unit>  
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>
