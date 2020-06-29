@@ -750,7 +750,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       //if the segment length is not in the defined range, add an error message - not disableable, so before disableErrorCheck
       if(!me.segmentLengthStatus.includes('segmentLengthValid')) { // see Editor.view.segments.MinMaxLength.lengthstatus
           //fire the event, and get the message from the segmentminmaxlength component
-          msg = Ext.ComponentQuery.query('#segmentMinMaxLength')[0].renderErrorMessage(meta, me.segmentLengthStatus);
+          msg = Ext.ComponentQuery.query('#segmentMinMaxLength')[0].renderErrorMessage(me.segmentLengthStatus, meta);
           me.fireEvent('contentErrors', me, msg, false);
           return true;
       }
