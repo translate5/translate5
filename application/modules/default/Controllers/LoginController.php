@@ -42,6 +42,15 @@ class LoginController extends ZfExtended_Controllers_Login {
     }
     
     public function indexAction() {
+        
+        require_once 'default/Controllers/helpers/BrowserDetection.php';
+        
+        // Internet Explorer is not supported anymore! redirect IE 11 or below users to a specific error page
+        if(BrowserDetection::isInternetExplorer()){
+            header('Location: '.APPLICATION_RUNDIR.'/index/internetexplorer');
+            exit;
+        }
+        
         $lock = ZfExtended_Factory::get('ZfExtended_Models_Db_SessionUserLock');
         /* @var $lock ZfExtended_Models_Db_SessionUserLock */
         $this->view->lockedUsers = $lock->getLocked();
