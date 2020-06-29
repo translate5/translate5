@@ -32,7 +32,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel', {
     formulas : {
         isAnalysisRunning : {
             get : function (task) {
-                return task && task.isAnalysis();
+                return !task ? false : task.isAnalysis();
             },
             bind : {
                 bindTo : '{currentTask}',

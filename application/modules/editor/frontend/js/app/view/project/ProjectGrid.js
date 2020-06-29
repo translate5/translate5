@@ -182,7 +182,7 @@ Ext.define('Editor.view.project.ProjectGrid', {
         	            tooltip: me.strings.addProjectTip
         	        },{
                         xtype: 'button',
-                        glyph: 'f067@FontAwesome5FreeSolid',
+                        glyph: 'f068@FontAwesome5FreeSolid',
                         itemId: 'resetFilterBtn',
                         text: me.strings.resetFilterText,
                         tooltip: me.strings.resetFilterText

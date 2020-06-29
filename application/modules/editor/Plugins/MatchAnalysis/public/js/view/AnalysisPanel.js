@@ -75,7 +75,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
         loading:'{isAnalysisRunning}',
         disabled:'{!enablePanel}'
     },
-
+    
     initConfig: function(instanceConfig) {
         var me = this,
             columnRenderer=function(val, meta, record) {
@@ -93,7 +93,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                     cls: 'matchAnalysisGrid',
                     emptyText:me.strings.noAnalysis,
                     bind:{
-                    	store:'{analysisStore}'
+                        store:'{analysisStore}',
+                        loading:'{isAnalysisRunning}',
+                        disabled:'{!enablePanel}'
                     },
                     features: [{
                         ftype: 'summary'
