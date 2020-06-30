@@ -193,7 +193,23 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         $noFile = empty($fileinfo);
         $tmxUpload = !$noFile && in_array($fileinfo['type'], $validFileTypes['TMX']) && preg_match('/\.tmx$/', $fileinfo['name']);
         if ($tmxUpload) {
-            if ($this->api->importTMXfile($fileinfo['tmp_name'], $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
+            // NEC-TM will use the filename, but the name of the tmp file is useless:
+            // - we get: LanguageResources2018-09-website-rewrite-examples.tmxsUh4yU
+            // - we want: 2018-09-website-rewrite-examples.tmx
+            // Thus, we keep the file unique, but by a unique directory: 
+            // old: /tmp/LanguageResources2018-09-website-rewrite-examples.tmxsUh4yU
+            // new: /tmp/LanguageResourcessUh4yU/2018-09-website-rewrite-examples.tmx
+            // TODO: use this procedure in general when importing files for LanguageResources?
+            //      (= move it to handleUploadLanguageResourcesFile() in editor_LanguageresourceinstanceController)
+            $uniqueDirectory = str_replace($fileinfo['name'], '', $fileinfo['tmp_name']);
+            if (!is_dir($uniqueDirectory)) {
+                mkdir($uniqueDirectory, 0777, true);
+            }
+            $newfilename = $uniqueDirectory.'/'.$fileinfo['name']; // TODO: make '/' safe for all systems
+            rename($fileinfo['tmp_name'], $newfilename);
+            if ($this->api->importTMXfile($newfilename, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
+                unlink($newfilename);
+                rmdir($uniqueDirectory);
                 return true;
             }
             $this->handleNecTmError('LanguageResources - could not add TMX to NEC-TM'." LanguageResource: \n");
@@ -227,7 +243,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      */
     public function getValidExportTypes() {
         return [
-            'TMX' => 'application/xml',
+            'ZIP' => 'application/zip',
         ];
     }
     
