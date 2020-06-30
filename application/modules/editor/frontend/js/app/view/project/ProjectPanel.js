@@ -27,40 +27,44 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.project.ProjectPanel', {
-	extend: 'Ext.panel.Panel',
-	alias: 'widget.projectPanel',
+    extend: 'Ext.panel.Panel',
+    alias: 'widget.projectPanel',
     requires:[
-    	'Editor.view.project.ProjectGrid',
-    	'Editor.view.project.ProjectTaskGrid',
-    	'Editor.view.project.ProjectPanelViewController',
-    	'Editor.view.project.ProjectPanelViewModel',
-    	'Editor.view.admin.task.PreferencesWindow'
-	],
-	itemId: 'projectPanel',
-	controller:'projectPanel',
-	title: '#UT#Projekte',
-	glyph: 'xf0e8@FontAwesome',
-	layout: 'border',
+        'Editor.view.project.ProjectGrid',
+        'Editor.view.project.ProjectTaskGrid',
+        'Editor.view.project.ProjectPanelViewController',
+        'Editor.view.project.ProjectPanelViewModel',
+        'Editor.view.admin.task.PreferencesWindow'
+    ],
+    itemId: 'projectPanel',
+    controller:'projectPanel',
+    title: '#UT#Projekte',
+    glyph: 'xf0e8@FontAwesome5FreeSolid',
+    layout: 'border',
     viewModel:{
-    	type: 'projectPanel'
+        type: 'projectPanel'
     },
+    
     strings:{
     	projectTasksTitle:'#UT#Aufgaben für das Projekt: {projectSelection.taskName}'
     },
+    listen:{
+        'deactivate':'onProjectPanelDeactivate'
+    },
     initConfig: function(instanceConfig) {
         var me = this,
-        	config={
-        		title:me.title,
-        		items:[{
-        			xtype:'projectGrid',
-        			reference:'projectGrid',
-        			header:false,
-        			region: 'center',
-        			split: true,
-        			resizable: false,
-        			scrollable: true
-        		},{
-        			xtype: 'panel',
+            config={
+            title:me.title,
+            items:[{
+                    xtype:'projectGrid',
+                    reference:'projectGrid',
+                    header:false,
+                    region: 'center',
+                    split: true,
+                    resizable: false,
+                    scrollable: true
+                },{
+                    xtype: 'panel',
                     region: 'east',
                     split: true,
                     resizable: true,
@@ -70,24 +74,27 @@ Ext.define('Editor.view.project.ProjectPanel', {
                         pack: 'start',
                         align: 'stretch'
                     },
+                    bind:{
+                        disabled:'{!projectSelection}'
+                    },
                     items: [{
-                    	xtype: 'projectTaskGrid',
-                    	reference:'projectTaskGrid',
-                    	scrollable: true,
-                    	flex:0.3,
-                    	bind:{
-                    		title:me.strings.projectTasksTitle,
-                    		store:'{projectTasks}'
-		    			}
+                        xtype: 'projectTaskGrid',
+                        reference:'projectTaskGrid',
+                        scrollable: true,
+                        flex:0.3,
+                        bind:{
+                            title:me.strings.projectTasksTitle,
+                            store:'{projectTasks}'
+                        }
                     },{
-                    	xtype:'adminTaskPreferencesWindow',
-                    	scrollable: true,
-                    	flex:0.7,
-                    	bind:{
-                    		currentTask:'{projectTaskSelection}'
-                    	}
+                        xtype:'adminTaskPreferencesWindow',
+                        scrollable: true,
+                        flex:0.7,
+                        bind:{
+                            currentTask:'{projectTaskSelection}'
+                        }
                     }]
-        		}]
+                }]
         };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);

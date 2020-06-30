@@ -199,6 +199,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     //each combo needs its own store instance, see EXT6UPD-8
                                     store: Ext.create(Editor.store.admin.Languages),
                                     typeAhead: false,
+                                    autoSelect:true,
+                                    //autoSelectLast:false,
                                     displayField: 'label',
                                     forceSelection: true,
                                     //encodeSubmitValue: true, // → as JSON

@@ -83,7 +83,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
     layout: 'border',
     collapsed: false,
     title: '#UT#Kunden',
-    glyph: 'xf1ad@FontAwesome',
+    glyph: 'xf1ad@FontAwesome5FreeSolid',
     helpSection: 'customeroverview',
     defaultListenerScope: true,
     defaultButton: 'saveButton',
@@ -225,7 +225,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         name: 'name',
                                         allowBlank: false,
                                         maxLength: 255,
-                                        minLength: 3
+                                        minLength: 1
                                     },
                                     {
                                         xtype: 'textfield',

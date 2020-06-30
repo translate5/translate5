@@ -151,14 +151,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       averageProcessingTimeSecondTranslatorLabel: '#UT#Ø Bearbeitungszeit zweiter Lektor'
   },
   listeners:{
-	  afterTaskDelete:'onAfterTaskDeleteEventHandler'  
+	  afterTaskDelete:'onAfterTaskDeleteEventHandler',
+	  beforeTaskDelete:'onBeforeTaskDeleteEventHandler'
   },
   listen: {
-      store: {
-          '#project.Project':{
-        	  load:'onProjectStoreLoad'
-          }
-      },
       controller: {
           '#Editor.$application': {
               adminViewportClosed: 'clearTasks',
@@ -575,7 +571,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * reloads the Task Grid, will also be called from other controllers
    */
   handleTaskReload: function () {
-      
       this.getAdminTasksStore().load();
   },
   
@@ -623,7 +618,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   
   /***
    * On project task grid selection.
-   * TODO: move this to separate project controller ?
    */
   onProjectTaskGridSelectionChange:function(grid,selection){
       var me = this,
@@ -639,40 +633,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   onProjectGridSelectionChange:function(grid,selection){
       var me = this,
-      task = selection ? selection[0] : null;
+        cnt=me.getProjectPanel().getController(),
+        task = selection ? selection[0] : null;
+      
       if(!task){
           return;
       }
-      me.getProjectGrid().setLoading(true);
-      me.getProjectPanel().getController().redirectFocus(task,false);
-  },
-  
-  
-  /***
-   * On project store load
-   */
-  onProjectStoreLoad:function(store){
-      var me = this,
-          activeTab = me.isProjectPanelActive(),
-          panel = me.getProjectPanel(),
-          vm = panel.getViewModel(),
-          record = vm.get('projectSelection'),
-          task = null;
-
-      //if the project panel is not active, ignore the redirect,
-      //when we redirect, the component focus is changed
-      if(!activeTab){
-          return;
-      }
-      //if selected record already exist, use it
-      if(record){
-          task = store.getById(record.get('id'));
-      }
-      //no selected record is found, use the first in the store
-      if(!task){
-          task = store.getAt(0);
-      }
-      panel.getController().redirectFocus(task,false);
+      cnt.redirectFocus(task,false);
   },
   
   /***
@@ -713,7 +680,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   
   /***
    * Delete project action menu handler
-   * TODO: move this to separate project controller ?
    */
   editorDeleteProject:function(task,ev){
 	  this.getProjectGrid().getController().handleProjectDelete(task,ev);
@@ -864,22 +830,28 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   /**
    * delete the task
+   * Fires: beforeTaskDelete  and afterTaskDelete
+   * INFO: beforeTaskDelete is a chained event
    * @param {Editor.model.admin.Task} task
    */
   editorDeleteTask: function(task) {
       var me = this,
           store = task.store,
           app = Editor.app;
+      
       app.mask(me.strings.taskDestroy, task.get('taskName'));
-      task.dropped = true; //doing the drop / erase manually
-      task.save({
+      
+      //the beforeTaskDelete is chained event. If one of the chained listeners does not return true,
+      //the task delete will be omitted.
+      if(!me.fireEvent('beforeTaskDelete',task)){
+          app.unmask();
+          return
+      }
+      
+      store.sync({
           //prevent default ServerException handling
           preventDefaultHandler: true,
-          callback: function(rec, op) {
-              Editor.MessageBox.addByOperation(op);
-          },
           success: function() {
-              store.load();
               app.unmask();
               me.fireEvent('afterTaskDelete',task);
           },
@@ -893,6 +865,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                   Editor.app.getController('ServerException').handleException(op.error.response);
               }
           }
+      
       });
   },
   /**
@@ -977,13 +950,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   handleTaskProject: function(task) {
 	  var me=this,
 	      menu=me.getAdminMainSection(),
-	      activeTab=menu.getActiveTab().xtype;
-	      
-      if(activeTab=='projectPanel'){
-    	  me.redirectTo('task/'+task.get('id')+'/filter');
-      }else{
-    	  me.getProjectPanel().getController().redirectFocus(task,true);
+	      activeTab=menu.getActiveTab(),
+	      isTaskOverview=activeTab == me.getTaskGrid(),
+	      redirectCmp=isTaskOverview ? me.getProjectPanel(): activeTab,
+	      route='task/'+task.get('id')+'/filter';
+
+	  if(isTaskOverview){
+          route='project/'+task.get('projectId')+'/'+task.get('id')+'/focus';
       }
+      Editor.app.openAdministrationSection(redirectCmp,route);
   },
   
   /**
@@ -1204,17 +1179,20 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  }
 	  return activeTab;
   },
-  
+
+  /***
+   * Before task delete request event handler.
+   * Return true so the event call chain continues
+   */
+  onBeforeTaskDeleteEventHandler:function(task){
+      Ext.StoreManager.get('admin.Tasks').remove(task);
+      return true;
+  },
   /***
    * After the task is removed event handler
    */
   onAfterTaskDeleteEventHandler:function(task){
-	  var me=this,
-	      grid=me.getProjectGrid();
-	  
-	  if(!grid){
-		  return;
-	  }
-	  grid.getController().reloadProjectAndProjectTasks(true);
+      Ext.StoreManager.get('admin.Tasks').load();
   }
+  
 });

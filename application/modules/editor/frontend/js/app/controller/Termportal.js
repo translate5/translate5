@@ -63,7 +63,7 @@ Ext.define('Editor.controller.Termportal', {
             xtype: 'tab',
             closable: false,
             itemId: 'btnTermPortal',
-            glyph: 'xf002@FontAwesome',
+            glyph: 'xf002@FontAwesome5FreeSolid',
             text:me.strings.termPortal
         });
     },

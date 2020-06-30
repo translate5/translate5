@@ -55,24 +55,24 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
             data: '{rolesData}'
         },
         userAssoc:{
-        	  model:'Editor.model.admin.TaskUserAssoc',
-	 		  remoteFilter: true,
-	 		  pageSize: false,
-			  setFilters:function(filters){
-				//the binding is triggered wiht empty values to, we do not want to filter for empty taskGuid
-				if(filters && !filters.value){
-					filters=[];
-				}
-				this.superclass.superclass.setFilters.apply(this, [filters]);
-			  },
-	 		  filters:{
-	 			  property: 'taskGuid',
-	 			  operator:"eq",
-	 			  value:'{projectTaskSelection.taskGuid}'
-	 		  }
+            model:'Editor.model.admin.TaskUserAssoc',
+            remoteFilter: true,
+            pageSize: false,
+            setFilters:function(filters){
+                //the binding is also triggered when the value is empty. Ignore the filtering with empty value
+                if(filters && !filters.value){
+                    this.loadData([],false);
+                    return;
+                }
+                this.superclass.superclass.setFilters.apply(this, [filters]);
+            },
+            filters:{
+                property: 'taskGuid',
+                operator:"eq",
+                value:'{projectTaskSelection.taskGuid}'
+            }
         }
     },
-    
     formulas: {
         enablePanel:{
             get: function (task) {

@@ -43,6 +43,8 @@ class editor_Models_Import_DirectoryParser_ReferenceFiles extends editor_Models_
     public function __construct() {
         //disable (empty) the filter for reference files:
         $this->supportedFiles = null;
+        // disable any ignored extensions
+        $this->ignoreExtensionsList = [];
     }
     
     /**

@@ -740,7 +740,8 @@ Ext.define('Editor.controller.Localizer', {
             addProjectTip: '<?php echo $this->translate->_('Neues Projekt hinzufügen');?>',
             reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
             reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren.');?>',
-            notFound: '<?php echo $this->translate->_('nicht gefunden');?>'
+            notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
+            resetFilterText: '<?php echo $this->translate->_('Filter zurücksetzen');?>'
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
@@ -827,7 +828,6 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.view.admin.task.PreferencesWindow", {
         override: "Editor.view.admin.task.PreferencesWindow",
-        title: '<?php echo $this->translate->_('Einstellungen zu Aufgabe: {currentTask.taskName}');?>',
         strings: {
             close: '<?php echo $this->translate->_('Fenster schließen');?>',
             events: '<?php echo $this->translate->_('Ereignisse');?>'
