@@ -44,6 +44,7 @@ Ext.define('Editor.view.admin.task.filter.AdvancedFilter', {
     strings:{
     	filterHolderLabel:'#UT#Gesetzte Filter'
     },
+    hidden:true,
     bind:{
     	visible:'{isActiveFilter}'
     },

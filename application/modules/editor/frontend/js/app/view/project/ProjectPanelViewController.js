@@ -42,13 +42,32 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     	'project/:id/:taskId/focus' :'onProjectTaskFocusRoute' 
     },
     
+    listen:{
+        component:{
+            '#reloadProjectbtn':{
+                click:'onReloadProjectBtnClick'
+            }
+        },
+        controller: {
+            '#admin.TaskOverview':{
+                afterTaskDelete:'onAfterTaskDeleteEventHandler',
+                beforeTaskDelete:'onBeforeTaskDeleteEventHandler'
+            }
+        },
+        store: {
+            '#project.Project':{
+                load:'onProjectStoreLoad'
+            }
+        }
+    },
+    
     /***
-     * Redirect to project focus route route
+     * Redirect to project focus route
      */
     redirectFocus:function(record,includeTask){
     	var me=this;
     	if(!record){
-    		me.resetRoute();
+    		me.reset();
         	return;
     	}
     	var action='focus',
@@ -62,19 +81,18 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     	route=route.join('/');
     	
     	Editor.app.openAdministrationSection(me.getView(),route);
-    	me.redirectTo(route);
     },
 
     /***
      * On project rute
      */
     onProjectRoute:function(){
-    	var me=this;
-    	//if it is the default route, update the hash from the selected records
-    	if(window.location.hash==me.rootRoute){
-    		var rec=me.getViewModel().get('projectTaskSelection');
-    		rec && me.redirectFocus(rec,true)
-    	}
+        var me=this;
+        //if it is not the default route, ignore it
+        if(window.location.hash!=me.rootRoute){
+            return;
+        }
+        me.checkAndReloadStores();
     },
     
     
@@ -92,24 +110,37 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     onProjectTaskFocusRoute:function(id,taskId){
 		var me=this;
 		//focus the project record
-		me.selectProjectRecord(id);
-		me.selectProjectTaskRecord(taskId);
+		me.selectProjectRecord(id,taskId);
     },
     
     /***
      * Focus project task grid row. This is called afte project task store is loaded.
      * The taskId is calculated based on the current window hash
      */
-    focusProjectTask:function(){
+    focusProjectTask:function(store){
 		var me=this,
 			rute=window.location.hash,
 			rute=rute.split('/'),
 			isFocus=(rute.length==4 && rute[3]=='focus'),
-			rec=null;
+			id=null,
+			record=null;
+		
 		if(isFocus){
-			rec=parseInt(rute[2]);
+			id=parseInt(rute[2]);
+			record=store.getById(parseInt(id));
 		}
-		me.selectProjectTaskRecord(rec);
+		if(!record){
+		    record=store.getAt(0);
+		}
+		me.selectProjectTaskRecord(record);
+		me.lookup('projectGrid').setLoading(false);
+	},
+	
+	/***
+	 * Before project task store load
+	 */
+	onProjectTaskBeforeLoad:function(){
+	    this.lookup('projectGrid').setLoading(true);
 	},
 	
 	/***
@@ -117,17 +148,95 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 	 */
 	onProjectTaskLoad:function(store){
 		var me=this;
-		me.focusProjectTask();
+		//if the component is not visualy active, do not focus the project tasks.
+		if(!me.getView().isVisible(true)){
+		    return;
+		}
+		me.focusProjectTask(store);
 	},
 	
+    /***
+    * On project store load
+    */
+    onProjectStoreLoad:function(store){
+        //if the project panel is not active, ignore the redirect,
+        //when we redirect, the component focus is changed
+        if(!this.getView().isVisible(true)){
+            return;
+        }
+      
+        var me = this,
+            record = me.getView().getViewModel().get('projectSelection'),
+            task = null;
+        //when the global task is set, this is a "leave task action"
+        //set the route to this task
+        if(Editor.data.task){
+            me.redirectFocus(Editor.data.task,true);
+            Editor.data.task=null;
+            return;
+        }
+      
+        //if selected record already exist, use it
+        if(record){
+            task = store.getById(record.get('id'));
+        }
+        //no selected record is found, use the first in the store
+        if(!task){
+            task = store.getAt(0);
+        }
+        me.redirectFocus(task,false);
+    },
+	
+    onReloadProjectBtnClick:function(){
+        var me=this;
+        me.reloadProject();
+    },
+    
+    /***
+     * Before task delete event handler
+     * Return true so the event call chain continues
+     */
+    onBeforeTaskDeleteEventHandler:function(task){
+        var me=this,
+            projectTaskGrid = me.lookup('projectTaskGrid');
+        projectTaskGrid.getStore().remove(task);
+        return true;
+    },
+    
+    /***
+     * After task remove event handelr
+     */
+    onAfterTaskDeleteEventHandler:function(task){
+        this.checkAndReloadStores();
+    },
+    
+    onProjectPanelDeactivate:function(){
+        this.resetSelection();
+    },
+    
+	/***
+	 * Reload projects
+     */
+    reloadProject:function(){
+        var me = this,
+            grid = me.lookup('projectGrid'),
+            projectTaskGrid = me.lookup('projectTaskGrid'),
+            store = projectTaskGrid && projectTaskGrid.getStore();
+        
+        me.resetSelection();
+        
+        grid.getController().reloadProjects().then(function(records) {}, function(operation) {
+            Editor.app.getController('ServerException').handleException(operation.error.response);
+        });
+    },
 	
 	/***
 	 * Select project record in the projectGrid. This will also search for the record index if the record is not loaded in the buffered grid
+	 * After the index is found and project is selected, select the project task to (if requested)
 	 */
-	selectProjectRecord:function(id){
+	selectProjectRecord:function(id,taskId){
 		var me=this,
-			view=me.getView(),
-			grid=view.down('#projectGrid'),
+			grid=me.lookup('projectGrid'),
 			record=null;
 		
 		//serch for the task store record index
@@ -135,7 +244,6 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 			//do not scroll on empty store
 			if(grid.getStore().getTotalCount()==0){
 				Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
-				grid.setLoading(false);
 				return;
 			}
 			grid.bufferedRenderer.scrollTo(index,{
@@ -143,64 +251,58 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
 					//no db index if found
 					if(index===undefined || index<0){
 						Editor.MessageBox.addInfo(me.strings.noProjectMessage);
-						grid.setLoading(false);
+						me.selectProjectTaskRecord(taskId);
 						return;
 					}
 					
 					record=grid.getStore().getById(parseInt(id));
 					if(record){
 						me.focusRecordSilent(grid,record,'projectSelection');
+						me.selectProjectTaskRecord(taskId);
 						return;
 					}
 					grid.getController().reloadProjects().then(function(){
 						record=grid.getStore().getById(parseInt(id));
 						me.focusRecordSilent(grid,record,'projectSelection');
+						me.selectProjectTaskRecord(taskId);
 					});
 				},
 				notScrollCallback:function(){
 					Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
-					grid.setLoading(false);
+					me.selectProjectTaskRecord(taskId);
 				}
 			});
 		}, function(err) {
 			//the exception is handled in the searchIndex
-			grid.setLoading(false);
 		});
 	},
 	
-	/***
-	 * Select project task record in the projectTask grid. The selectionchange event will be suspende.
-	 * If showNoRecordMessage is set, an info message will be shown when the requested record is not in
-	 * the projectTask store
-	 */
-	selectProjectTaskRecord:function(id,showNoRecordMessage){
-		var me=this,
-			view=me.getView(),
-			grid=view.down('#projectTaskGrid'),
-			projectGrid=view.down('#projectGrid'),
-			store=grid.getStore(),
-			record= (id === null) ? store.getAt(0) : store.getById(parseInt(id));
-		
-		if(!record){
-			//display info message when the flag showNoRecordMessage is set 
-			showNoRecordMessage && Editor.MessageBox.addInfo(me.strings.noProjectTaskMessage);
-			projectGrid.setLoading(false);
-			//reset the selection and with this disable the projectTask panel
-			if(store.getTotalCount()==0){
-				me.getViewModel().set('projectTaskSelection',null);
-			}
-			return;
-		}
-		
-		//update the location hash
-		me.redirectFocus(record,true);
-
-		//focus and select the record
-		me.focusRecordSilent(grid,record,'projectTaskSelection');
-		
-		projectGrid.setLoading(false);
-	},
-	
+    /***
+     * Select project task record in the projectTask grid
+     */
+    selectProjectTaskRecord:function(record){
+    	var me=this,
+    		grid=me.lookup('projectTaskGrid'),
+    		store=grid.getStore();
+    	
+    	//if the requested project is not a model
+    	if(Ext.isNumeric(record)){
+    	    record=store.getById(record);
+    	}
+    	
+        //focus and select the record
+        me.focusRecordSilent(grid,record,'projectTaskSelection');
+        
+    	if(!record){
+            me.lookup('projectGrid').setLoading(false);
+            return;
+    	}
+    
+    	//update the location hash
+    	me.redirectFocus(record,true);
+    	me.lookup('projectGrid').setLoading(false);
+    },
+    
 	/***
 	 * Search the index of the record id in the given grid view.
 	 * If the index does not exist in the store, the index will be loaded from the db
@@ -224,25 +326,40 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
         params[proxy.getSortParam()] = proxy.encodeSorters(store.getSorters().items);
         params['projectsOnly'] = true;
         return new Ext.Promise(function (resolve, reject) {
-	        Ext.Ajax.request({
-	            url: Editor.data.restpath+'task/'+id+'/position',
-	            method: 'GET',
-	            params: params,
-	            scope: me,
-	            success: function(response){
-	            	 var responseData = Ext.JSON.decode(response.responseText);
-	                 if(!responseData){
-	                	 resolve(-1)
-	                     return;
-	                 }
-	            	 resolve(responseData.index);
-	            },
-	            failure: function(response){
-	            	Editor.app.getController('ServerException').handleException(response);
-	                reject("Error on search index request.");
-	            }
-	        });
+            Ext.Ajax.request({
+                url: Editor.data.restpath+'task/'+id+'/position',
+                method: 'GET',
+                params: params,
+                scope: me,
+                success: function(response){
+                	 var responseData = Ext.JSON.decode(response.responseText);
+                     if(!responseData){
+                    	 resolve(-1)
+                         return;
+                     }
+                	 resolve(responseData.index);
+                },
+                failure: function(response){
+                	Editor.app.getController('ServerException').handleException(response);
+                    reject("Error on search index request.");
+                }
+            });
         });
+    },
+    
+    /***
+     * Check if the project tasks store is empty, if yes full reload is required (projects + project tasks).
+     * If the project tasks store is not empty, just refresh the data.
+     */
+    checkAndReloadStores:function(){
+        var me=this,
+            grid = me.lookup('projectTaskGrid'),
+            store = grid.getStore();
+        if(store.getCount()==0){
+            me.reloadProject();
+            return;
+        }
+        store.load();
     },
     
     /***
@@ -250,27 +367,43 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      * This will also update the viw model variable name with the record
      */
     focusRecordSilent:function(grid,record,name){
-    	var me=this;
-		grid.suspendEvent('selectionchange');
-		me.getViewModel().set(name,record);
-		grid.setSelection(record);
-		grid.getView().focusRow(record);
-		grid.resumeEvent('selectionchange');
+        var me=this;
+        grid.suspendEvent('selectionchange');
+        me.getViewModel().set(name,record);
+        grid.setSelection(record);
+        record && grid.getView().focusRow(record);
+        grid.resumeEvent('selectionchange');
     },
     
     /***
-     * Reset the route and all route view model properties
+     * Set the default route
      */
     resetRoute:function(){
-		var me=this,
-			projectTaskGrid=me.getView().down('#projectTaskGrid');
-		//no record is provided, reset everything
-		projectTaskGrid.getStore().removeAll(true);
-		projectTaskGrid.view.refresh();
-	    me.getViewModel().set('projectSelection',null);
-	    me.getViewModel().set('projectTaskSelection',null);
-		Editor.app.openAdministrationSection(me.getView(),me.rootRoute);
-    	me.redirectTo(me.rootRoute);
+        var me=this;
+        Editor.app.openAdministrationSection(me.getView(),me.rootRoute);
+        me.redirectTo(me.rootRoute);
+    },
+    
+    /***
+     * Reset view model selections
+     */
+    resetSelection:function(){
+        var me=this,
+            projectTaskGrid = me.lookup('projectTaskGrid'),
+            projectGrid = me.lookup('projectGrid');
+
+        projectTaskGrid.getStore().removeAll(true);
+        projectTaskGrid.view.refresh();
+        //reset the vm selection properties
+        me.focusRecordSilent(projectGrid,null,'projectSelection');
+        me.focusRecordSilent(projectTaskGrid,null,'projectTaskSelection');
+    },
+    
+    /***
+     * Reset the task/project selection and set the default route
+     */
+    reset:function(){
+        this.resetSelection();
+        this.resetRoute();
     }
-	
 });

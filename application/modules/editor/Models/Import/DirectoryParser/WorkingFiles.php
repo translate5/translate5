@@ -37,35 +37,46 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_DirectoryParser_WorkingFiles {
   /**
-   * Datei- oder Verzeichnisnamen in dieser Liste werden ignoriert. 100% match.
-   * @var array
-   */
-  protected $ignoreList = array('.svn');
-  
-  /**
-   * if is null, no supported file check is done
-   * @var editor_Models_Import_SupportedFileTypes
-   */
-  protected $supportedFiles = null;
-  
-  /**
-   * RootNode Container
-   * @var StdClass
-   */
-  protected $rootNode;
-  
-  /**
    * collection of ignored files
    * @var array
    */
   static protected $notImportedFiles = [];
   
   static protected $filesFound = false;
-  
-  public function __construct(bool $checkFileTypes) {
+    
+  /**
+   * Datei- oder Verzeichnisnamen in dieser Liste werden ignoriert. 100% match.
+   * @var array
+   */
+  protected $ignoreList = array('.svn');
+  /**
+   * if is null, no supported file check is done
+   * @var editor_Models_Import_SupportedFileTypes
+   */
+  protected $supportedFiles = null;
+  /**
+   * This List of ignored extensions will be applied if supportedFiles is not set. Defined by constructor
+   * @var array
+   */
+  protected $ignoreExtensionsList = [];
+  /**
+   * RootNode Container
+   * @var StdClass
+   */
+  protected $rootNode;
+
+  /**
+   * 
+   * @param bool $checkFileTypes
+   * @param string $ignoredUncheckedExtensions: comma seperated list of extensions to ignore if $checkFileTypes is false 
+   */
+  public function __construct(bool $checkFileTypes, string $ignoredUncheckedExtensions='') {
       if($checkFileTypes) {
           //if supportedFiles is null, no filter is set and all files are imported
           $this->supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+      } else if(!empty($ignoredUncheckedExtensions)) {
+          // in case of an unchecked import there may be a extension blacklist defined
+          $this->ignoreExtensionsList = explode(',', $ignoredUncheckedExtensions);
       }
   }
   
@@ -149,12 +160,17 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    * @param DirectoryIterator $file
    * @return boolean
    */
-  protected function isIgnored(DirectoryIterator $file,string $directoryPath){
+  protected function isIgnored(DirectoryIterator $file, string $directoryPath){
+      
       if($file->isDot() || in_array($file->getFilename(), $this->ignoreList)){
           return true;
       }
       if(is_dir($directoryPath.DIRECTORY_SEPARATOR.$file)){
           return false;
+      }
+      if(empty($this->supportedFiles) && in_array(strtolower($file->getExtension()), $this->ignoreExtensionsList)){
+          self::$notImportedFiles[] = $file->getFilename();
+          return true;
       }
       //no extension filter set: pass all files
       if(empty($this->supportedFiles)){

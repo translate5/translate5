@@ -42,6 +42,8 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      */
     protected $bus;
     
+    protected $localePath = 'locales';
+    
     protected $frontendControllers = array(
         'pluginFrontEndMessageBus' => 'Editor.plugins.FrontEndMessageBus.controller.MessageBus',
         'pluginFrontEndMessageBusMultiUser' => 'Editor.plugins.FrontEndMessageBus.controller.MultiUserUsage',
