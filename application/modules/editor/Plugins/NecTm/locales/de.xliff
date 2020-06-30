@@ -8,9 +8,9 @@
             <source>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</source>
             <target>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</target>
         </trans-unit>
-        <trans-unit id='QWxzIFRNWC1EYXRlaSBoZXJ1bnRlcmxhZGVuIHVuZCBsb2thbCBzcGVpY2hlcm4='>
-            <source>Als TMX-Datei herunterladen und lokal speichern</source>
-            <target>Als TMX-Datei herunterladen und lokal speichern</target>
+        <trans-unit id='QWxzIGdlemlwcHRlIFRNWC1EYXRlaSBoZXJ1bnRlcmxhZGVuIHVuZCBsb2thbCBzcGVpY2hlcm4='>
+            <source>Als gezippte TMX-Datei herunterladen und lokal speichern</source>
+            <target>Als gezippte TMX-Datei herunterladen und lokal speichern</target>
         </trans-unit>
   </body>
  </file>
