@@ -68,7 +68,8 @@ Ext.define('Editor.controller.TmOverview', {
         noResourcesAssigned: '#UT#Keine Sprach-Resourcen zugewiesen.',
         taskassocgridcell:'#UT#Zugewiesene Sprach-Resourcen',
         exportTm: '#UT#als TM Datei exportieren',
-        exportTmx: '#UT#als TMX Datei exportieren'
+        exportTmx: '#UT#als TMX Datei exportieren',
+        exportZippedTmx: '#UT#als gezippte TMX Datei exportieren'
     },
     refs:[{
         ref: 'tmOverviewPanel',
@@ -408,6 +409,14 @@ Ext.define('Editor.controller.TmOverview', {
                         hrefTarget: '_blank',
                         href: url+'/download.tmx',
                         text : me.strings.exportTmx
+                    });
+                }
+                if (filetypes.indexOf('zip') !== -1) {
+                    items.push({
+                        itemId: 'exportZippedTmx',
+                        hrefTarget: '_blank',
+                        href: url+'/download.zip',
+                        text : me.strings.exportZippedTmx
                     });
                 }
                 return items;

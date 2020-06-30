@@ -8,9 +8,9 @@
             <source>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</source>
             <target>Import TMX to NEC-TM</target>
         </trans-unit>
-        <trans-unit id='QWxzIFRNWC1EYXRlaSBoZXJ1bnRlcmxhZGVuIHVuZCBsb2thbCBzcGVpY2hlcm4='>
-            <source>Als TMX-Datei herunterladen und lokal speichern</source>
-            <target>Download as TMX-file and save it locally.</target>
+        <trans-unit id='QWxzIGdlemlwcHRlIFRNWC1EYXRlaSBoZXJ1bnRlcmxhZGVuIHVuZCBsb2thbCBzcGVpY2hlcm4='>
+            <source>Als gezippte TMX-Datei herunterladen und lokal speichern</source>
+            <target>Download as zipped TMX-file and save it locally.</target>
         </trans-unit>
   </body>
  </file>
