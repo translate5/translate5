@@ -1145,3 +1145,32 @@ Ext.override(Ext.data.schema.Role, {
         }
     }
 });
+
+
+
+/***
+ * This is not an overide!.
+ * Try to detect if the browser interpreter produces an syntax error and ignore it when logoutOnWindowClose is active
+ * For more info about the problem see: https://jira.translate5.net/browse/TRANSLATE-2114
+ */
+Ext.get(window).on({
+    error:function(e){
+        if(!Editor.data.logoutOnWindowClose) {
+            return true;
+        }
+        
+        var event=e.event;
+        if (event.message.includes('<') && event.error instanceof SyntaxError){
+            e.preventDefault();
+            window.location = Editor.data.loginUrl;
+            return false;
+        }
+        return true;
+    }
+});
+
+Ext.override(Ext.global.console, {
+    error: function(msg) {
+        //TODO: check the not found class exception if it is from the localizer
+    }
+});

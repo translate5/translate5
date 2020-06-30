@@ -129,9 +129,10 @@ Ext.application({
       this.callParent(arguments);
       this.logoutOnWindowClose();
   },
+  
   launch : function() {
-	  var me=this;
-	  me.initViewportLaunch();
+      var me=this;
+      me.initViewportLaunch();
   },
   
   /***
@@ -176,35 +177,12 @@ Ext.application({
           return;
       }      
       var me=this,
-          notRun = true,
-          logout = function() {
-              notRun = false;
-              try{
-                  var perfEntries = performance.getEntriesByType("navigation");
-                  //check for Navigation Timing API support
-                  if (!perfEntries) {
-                      Ext.raise({
-                          msg: 'logoutOnWindowClose feature is used with unsupported browser!'
-                      });
-                      return;
-                  }
-                  var sendBeacon=false;
-                  for (var i=0; i < perfEntries.length; i++) {
-                      if(perfEntries[i].type!=="navigate"){
-                          sendBeacon=true;
-                          break;
-                      }
-                  }
-                //use the hardcoded URL since we don't want to redirect to a custom logout page, 
-                  //but we just want to force a session destroy
-                  sendBeacon && navigator.sendBeacon(Editor.data.pathToRunDir+'/login/logout');
-              }catch (e) {
-              }
+          logout =function(e) {
+            Ext.Loader.loadScript({url:'/editor/js/app-localized.js'})
+            navigator.sendBeacon(Editor.data.pathToRunDir+'/login/logout');
           };
       Ext.get(window).on({
-    	  beforeunload:function(){
-    		  Editor.data.logoutOnWindowClose && notRun && logout();
-    	  }
+          beforeunload:logout
       });
   },
   /**
