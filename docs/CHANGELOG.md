@@ -3,6 +3,35 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [5.0.3] - 2020-06-30
+###Added
+TRANSLATE-1774: Integrate NEC-TM with translate5 as LanguageResource
+  Integrated NEC-TM with translate5 as Language-Resource
+TRANSLATE-2052: Assign different segments of same task to different users
+  Added capabilities to assign different segments of the same task to different users
+
+###Bugfixes
+TRANSLATE-2094: Set finish date for all reviewers
+  Removed workflow action „setReviewersFinishDate“
+TRANSLATE-2096: Use FontAwesome5 icons in translate5
+  Use FontAwesome5 for all icons in translate5
+TRANSLATE-2097: Minimum characters requirement for client name in clients form
+  Minimum characters requirement for client name in clients form is now 1
+TRANSLATE-2101: Disable automated translation xliff creation from notFoundTranslation xliff in production instances
+  Disable automated creation of a xliff-file from notFoundTranslation xliff in production instances
+TRANSLATE-2102: Comma in PDF filename leads to failing visual import
+  VisualTranslation: Commas in PDF filenames (formerly leading to failing imports) are now automatically corrected
+TRANSLATE-2104: KPI button does not work
+  The KPI Button works as expected now
+TRANSLATE-2105: Serverside check for pixel-based length check fails on multiple lines
+  The serverside check for the pixel-based length check works as expected with multiple lines now
+TRANSLATE-2106: Remove white spaces from user login and password
+  Whitespace and blanks from user login and password in the login form are automatically removed
+TRANSLATE-2109: Remove string length restriction flag
+  Remove string length restriction configuration option
+TRANSLATE-2121: filename issues with tmx import and export from and to NEC-TM
+  Fixed issues with filenames on NEC-TM tmx export and import
+
 ## [5.0.2] - 2020-06-19
 ###Added
 TRANSLATE-1900: Pixel length check: Handle characters with unkown pixel length
