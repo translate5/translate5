@@ -173,13 +173,21 @@ Ext.application({
    * If configured the user is logged out on window close
    */
   logoutOnWindowClose: function() {
-      if(!Editor.data.logoutOnWindowClose) {
+      if(!Editor.data.logoutOnWindowClose || Editor.data.frontend.isOpenIdCustomerDomain) {
           return;
       }      
       var me=this,
           logout =function(e) {
-            Ext.Loader.loadScript({url:'/editor/js/app-localized.js'})
-            navigator.sendBeacon(Editor.data.pathToRunDir+'/login/logout');
+              //send logout request, this will destroy the user session
+              navigator.sendBeacon(Editor.data.pathToRunDir+'/login/logout');
+              function sleep(delay) {
+                  const start = new Date().getTime();
+                  while (new Date().getTime() < start + delay);
+              }
+               //wait 0,5 second for the logout request to be processed
+              //the beforeunload is also triggered with application reload(browser reload)
+              //so we need to give the logout request some time untill the new page reload is requested
+            sleep(500);
           };
       Ext.get(window).on({
           beforeunload:logout
