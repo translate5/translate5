@@ -86,7 +86,7 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
         
         $this->updateLanguageResourceStatus($connector);
         
-        if(isset($params['fileinfo']['tmp_name']) && !empty($params['fileinfo']['tmp_name'])){
+        if(isset($params['fileinfo']['tmp_name']) && !empty($params['fileinfo']['tmp_name']) && file_exists($params['fileinfo']['tmp_name'])){
             //remove the file from the temp dir
             unlink($params['fileinfo']['tmp_name']);
         }
