@@ -330,7 +330,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       /* @var $openId ZfExtended_OpenIDConnectClient */
       //set the frontend flag, if the current domain is registered for one of the customers
       $this->view->Php2JsVars()->set('frontend.isOpenIdCustomerDomain',$openId->isOpenIdCustomerSet());
-      
+      $isOpenIdOnLoginRedirect=(boolean)$openId->getCustomer()->getOpenIdRedirectCheckbox() ?? false;
+      //is the user directly redirected to the openid sso provider on login
+      $this->view->Php2JsVars()->set('frontend.isOpenIdOnLoginRedirect',$isOpenIdOnLoginRedirect);
       $this->setJsAppData();
     }
 

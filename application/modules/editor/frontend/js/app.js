@@ -173,7 +173,11 @@ Ext.application({
    * If configured the user is logged out on window close
    */
   logoutOnWindowClose: function() {
-      if(!Editor.data.logoutOnWindowClose || Editor.data.frontend.isOpenIdCustomerDomain) {
+      //ignore the logout on window close also when the current domain is configured 
+      //to use openid sso provider and we redirect directly to the sso provider without showing
+      //the translate5 login form
+      var ignoreOnOpenIdRequest=Editor.data.frontend.isOpenIdCustomerDomain && Editor.data.frontend.isOpenIdOnLoginRedirect;
+      if(!Editor.data.logoutOnWindowClose || ignoreOnOpenIdRequest) {
           return;
       }      
       var me=this,
