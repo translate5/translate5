@@ -33,6 +33,14 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
        'Ext.data.Store',
        'Editor.model.admin.User'
     ],
+    strings: {
+        editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
+        segmentrangeError: '#UT#Nicht editierbare Segmente',
+        translator: '#UT#Übersetzer',
+        translatorCheck: '#UT#Zweiter Lektor',
+        reviewer: '#UT#Lektor',
+        visitor: '#UT#Besucher'
+    },
     
     stores: {
         users: {
@@ -69,6 +77,32 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
         enablePanel:{
             get: function (task) {
                 return task && (task.isUnconfirmed() || task.isOpen());
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
+        },
+        editInfoHtml:{
+            get: function (task) {
+                var me= this,
+                    html = me.strings.editInfo,
+                    missingsegmentranges,
+                    i,
+                    workflowdata,
+                    workflowroles,
+                    rolename;
+                if (task === null) {
+                    return html;
+                }
+                missingsegmentranges = task.get('missingsegmentranges');
+                if(missingsegmentranges.length > 0) {
+                    workflowdata =  task.getWorkflowMetaData();
+                    workflowroles = workflowdata.roles;
+                    html += '<hr><span class="errors">' + me.strings.segmentrangeError + ':</span><br>';
+                    for (i = 0; i < missingsegmentranges.length; i++) {
+                        rolename = missingsegmentranges[i]['role'];
+                        html += '- ' + workflowroles[rolename] + ': ' + missingsegmentranges[i]['missingSegments'] + '<br>';
+                    } 
+                }
+                return html;
             },
             bind:{bindTo:'{currentTask}',deep:true}
         },

@@ -553,7 +553,7 @@ class editor_Plugins_NecTm_HttpApi {
     protected function throwBadGateway() {
         //FIXME wenn in getErrors ein 403, dann kein Zugriff auf das TM - entweder weil nicht existent (wissen wir aber nicht) oder wegen fehlender credentials??? → den letzten Fall muss ich eh noch evaluieren
         // entpsrechend hier ein aussagekräfigerer Text ausgeben
-        // Bei 401 Ebenfalls keine Zugriff Meldung
+        // Bei 401 Ebenfalls keine Zugriff Meldung (for Confluence-"Description / Solution": check table Zf_memcache also!)
         $e = new ZfExtended_BadGateway('NEC-TM-Api: The request returned an error.');
         $e->setDomain('NEC-TM-Api');
         $errors = $this->getErrors();

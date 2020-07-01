@@ -40,6 +40,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       confirmDelete: '#UT#Soll dieser Eintrag wirklich gelöscht werden?',
       userGuidCol: '#UT#Benutzer',
       roleCol: '#UT#Rolle',
+      segmentrangeCol: '#UT#Segmente',
       stateCol: '#UT#Status',
       addUser: '#UT#Hinzufügen',
       addUserTip: '#UT#Einen Benutzer dieser Aufgabe zuordnen.',
@@ -98,6 +99,11 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               return role;
           },
           text: me.strings.roleCol
+      },{
+          xtype: 'gridcolumn',
+          width: 70,
+          dataIndex: 'segmentrange',
+          text: me.strings.segmentrangeCol
       },{
           xtype: 'gridcolumn',
           width: 90,
