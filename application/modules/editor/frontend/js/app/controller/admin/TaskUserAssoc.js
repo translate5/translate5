@@ -49,6 +49,9 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       ref: 'userAssocForm',
       selector: 'adminTaskUserAssoc form'
   },{
+      ref: 'userAssocSegmentrange',
+      selector: 'adminTaskUserAssoc #segmentrange'
+  },{
       ref: 'editInfo',
       selector: 'adminTaskUserAssoc #editInfoOverlay'
   },{
@@ -142,6 +145,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           assoc = me.getAdminTaskUserAssocsStore(),
           task = me.getPrefWindow().getCurrentTask(),
           meta = task.getWorkflowMetaData(),
+          usageMode = task.get('usageMode'),
           role = meta.steps2roles[task.get('workflowStepName')] || Ext.Object.getKeys(meta.roles)[0],
           state = Ext.Object.getKeys(meta.states)[0],
           isTranslationTask=task.get('emptyTargets'),
@@ -149,7 +153,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       
       
       //in competitive mode instead OPEN / UNCONFIRMED is used
-      if(task.get('usageMode') == task.USAGE_MODE_COMPETITIVE && state == task.USER_STATE_OPEN){
+      if(usageMode == task.USAGE_MODE_COMPETITIVE && state == task.USER_STATE_OPEN){
           state = task.USER_STATE_UNCONFIRMED;
       }
       //set the default role to translator when the task is translation task and
@@ -166,6 +170,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       me.getEditInfo().hide();
       me.getUserAssocForm().show();
       me.getUserAssocForm().setDisabled(false);
+      me.getUserAssocSegmentrange().setDisabled(usageMode !== task.USAGE_MODE_SIMULTANEOUS);
       me.getUserAssoc().loadRecord(newRec);
       me.initState(null, role, '');
   },
@@ -179,12 +184,14 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       var me = this,
           emptySel = selection.length == 0,
           record=!emptySel ? selection[0] : null,
-          userEditable=record && record.get('editable');
-          userDeletable=record && record.get('deletable');
+          userEditable=record && record.get('editable'),
+          userDeletable=record && record.get('deletable'),
+          task = me.getPrefWindow().getCurrentTask();
       me.getAssocDelBtn().setDisabled(emptySel || !userDeletable);
       me.getEditInfo().setVisible(emptySel);
       me.getUserAssocForm().setVisible(!emptySel);
       me.getUserAssocForm().setDisabled(emptySel || !userEditable);
+      me.getUserAssocSegmentrange().setDisabled(task.get('usageMode') !== task.USAGE_MODE_SIMULTANEOUS);
       if(emptySel) {
           me.getUserAssocForm().getForm().reset();
       }

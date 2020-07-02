@@ -38,7 +38,7 @@ Ext.define('Editor.plugins.NecTm.view.LanguageResources.services.NecTm', {
     id: 'NEC-TM',
     strings: {
         addTooltip: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
-        download: '#UT#Als TMX-Datei herunterladen und lokal speichern'
+        download: '#UT#Als gezippte TMX-Datei herunterladen und lokal speichern'
     },
     
     /***
@@ -86,6 +86,6 @@ Ext.define('Editor.plugins.NecTm.view.LanguageResources.services.NecTm', {
      * @return array
      */
     getValidFiletypes:function(){
-        return ['tmx'];
+        return ['zip'];
     }
 });
