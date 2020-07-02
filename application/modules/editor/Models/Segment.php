@@ -1357,16 +1357,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $mv->getName()));
         $this->dbWritable = ZfExtended_Factory::get($this->dbInstanceClass);
         $db = $this->db;
-        try {
-            $this->tableName = $db->info($db::NAME);
-        }
-        catch(Zend_Db_Statement_Exception $e) {
-            if(stripos($e->getMessage(), 'SQLSTATE[42S02]: Base table or view not found') === false) {
-                throw $e;
-            }
+        //check if the materialized view exist, if not create it
+        if(!$mv->exists()){
             $mv->create();
-            $this->tableName = $db->info($db::NAME);
         }
+        $this->tableName = $db->info($db::NAME);
     }
 
     /**
