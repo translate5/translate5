@@ -69,9 +69,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     public function indexAction(){
         $rows = $this->entity->loadAllWithUserInfo();
         $this->view->rows = $rows;
-        
         $this->view->total = $this->entity->getTotalCount();
         $this->applyEditableAndDeletable();
+        $this->addSegmentrangesToResult();
     }
     
     public function postDispatch() {
@@ -192,6 +192,26 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->processClientReferenceVersion();
         $this->setDataInEntity();
         
+        if (isset($this->data->segmentrange)) {
+            $segmentrangeModel = ZfExtended_Factory::get('editor_Models_TaskUserAssoc_Segmentrange');
+            /* @var $segmentrangeModel editor_Models_TaskUserAssoc_Segmentrange */
+            if (!$segmentrangeModel->validateSyntax($this->data->segmentrange)) {
+                ZfExtended_UnprocessableEntity::addCodes([
+                    'E1280' => "The format of the segmentrange that is assigned to the user is not valid."
+                ]);
+                throw ZfExtended_UnprocessableEntity::createResponse('E1280', [
+                    'id' => 'Das Format für die editierbaren Segmente ist nicht valide. Bsp: 1-3,5,8-9',
+                ]);
+            }
+            if (!$segmentrangeModel->validateSemantics($this->data->segmentrange, $this->entity->getTaskGuid(), $this->entity->getRole())) {
+                ZfExtended_UnprocessableEntity::addCodes([
+                    'E1281' => "The content of the segmentrange that is assigned to the user is not valid."
+                ]);
+                throw ZfExtended_UnprocessableEntity::createResponse('E1280', [
+                    'id' => 'Der Inhalt für die editierbaren Segmente ist nicht valide. Die Zahlen müssen in der richtigen Reihenfolge angegeben sein und dürfen nicht überlappen, weder innerhalb der Eingabe noch mit anderen Usern von derselben Rolle.',
+                ]);
+            }
+        }
         
         $this->entity->validate();
         $workflow->triggerBeforeEvents($oldEntity, $this->entity);
@@ -300,6 +320,29 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows->surName = $user->getSurName();
         $this->view->rows->parentIds = $user->getParentIds();
         $this->view->rows->longUserName=$user->getUsernameLong();
+    }
+    
+    /**
+     * Add the number of segments that are not assigned to a user
+     * although some other segments ARE assigned to users of this role.
+     */
+    protected function addSegmentrangesToResult() {
+        $taskGuid = null;
+        $filters = $this->entity->getFilter()->getFilters();
+        array_walk(
+            $filters,
+            function ($item) use (&$taskGuid) {
+                if ($item->field == 'taskGuid') {
+                    $taskGuid = $item->value;
+                }
+            }
+        );
+        if (is_null($taskGuid)) {
+            return;
+        }
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $this->view->segmentstoassign = $tua->getAllNotAssignedSegments($taskGuid);
     }
     
     /***

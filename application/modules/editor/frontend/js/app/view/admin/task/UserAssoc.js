@@ -39,8 +39,9 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       btnCancel: '#UT#Abbrechen',
       formTitleAdd: '#UT#Benutzerzuweisung hinzufügen:',
       formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
-      editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
-      fieldDeadline:'#UT#Deadline'
+      fieldDeadline:'#UT#Deadline',
+      fieldSegmentrange: '#UT#Editierbare Segmente',
+      fieldSegmentrangeInfo: '#UT#Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)'
   },
   viewModel: {
       type: 'taskuserassoc'
@@ -70,7 +71,9 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
               itemId: 'editInfoOverlay',
               cls: 'edit-info-overlay',
               padding: 10,
-              html: me.strings.editInfo
+              bind: {
+                  html: '{editInfoHtml}'
+              }
           },{
               xtype: 'form',
               title : me.strings.formTitleAdd,
@@ -128,6 +131,17 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
             	  name: 'deadlineDate',
             	  fieldLabel: me.strings.fieldDeadline,
             	  submitFormat: Editor.DATE_ISO_FORMAT,
+                  anchor: '100%'
+              },{
+                  xtype: 'textfield',
+                  itemId: 'segmentrange',
+                  name: 'segmentrange',
+                  fieldLabel: me.strings.fieldSegmentrange,
+                  labelClsExtra: 'textfieldLabelInfoIcon',
+                  autoEl: {
+                      tag: 'span',
+                      'data-qtip': me.strings.fieldSegmentrangeInfo
+                  },
                   anchor: '100%'
               }],
               dockedItems: [{
