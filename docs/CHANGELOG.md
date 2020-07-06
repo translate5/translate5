@@ -3,6 +3,22 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [5.0.4] - 2020-07-06
+###Added
+TRANSLATE-2016: Align visual jobs with sdlxliff for review purposes
+  
+
+###Changed
+TRANSLATE-2128: Add capabilities to disable the "What you see is what you get" via config-option
+  
+
+###Bugfixes
+TRANSLATE-2074: Login: Syntax error or access violation (depending on role)
+  
+TRANSLATE-2114: Missing session leads to Javascript-Error
+  
+TRANSLATE-2123: Don't use zend cache for materialized view table check
+  
 ## [5.0.3] - 2020-06-30
 ###Added
 TRANSLATE-1774: Integrate NEC-TM with translate5 as LanguageResource
