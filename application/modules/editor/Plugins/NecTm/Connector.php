@@ -77,6 +77,10 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     protected $sourceLangForNecTm;
     protected $targetLangForNecTm;
     
+    /***
+     * @var editor_Services_TmTagManager
+     */
+    protected $tagManager;
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
@@ -91,6 +95,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         // For exporting files, the NEC-TM-Api needs to know the source and target language. Usually they are given when
         // calling the methods from the segment, but nor for getTm() - hence we store them right away:
         $this->setLanguagesForNecTm($languageResource);
+        
+        $this->tagManager=ZfExtended_Factory::get('editor_Services_TmTagManager');
     }
     
     /**
@@ -252,7 +258,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_FilebasedAbstract::getTm()
      */
     public function getTm($mime) {
-        $languageResource = $this->getLanguageResource();
         if($this->api->get($mime, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)) {
             return $this->api->getResult();
         }
@@ -270,8 +275,11 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         // if categores are empty: 403 with {"message": "Tag is required option"}
         editor_Plugins_NecTm_Init::validateCategories(implode(',',$this->categories));
         
-        $source = $this->prepareSegmentContent($this->getQueryString($segment));
-        $target = $this->prepareSegmentContent($segment->getTargetEdit());
+        $source=$this->getQueryStringByName($segment, editor_Models_SegmentField::TYPE_SOURCE);
+        $target=$this->getQueryStringByName($segment, editor_Models_SegmentField::TYPE_TARGET);
+        
+        $source=$this->tagManager->prepareForTm($source);
+        $target=$this->tagManager->prepareForTm($target);
         $filename = $this->languageResource->getSpecificData('fileName');  //  (= if file was imported for LanguageResource on creation)
         if($this->api->addTMUnit($source, $target, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories, $filename)) {
             return;
@@ -296,45 +304,55 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        return $this->queryNecTmApi($this->prepareDefaultQueryString($segment), true); // across tags outside from mrk test
-        // or, without strip-tags:
-        // return $this->queryNecTmApi($this->getQueryString($segment), true);         // <div class="single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip"><span title="<ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>" class="short"><1/></span><span data-originalid="4be77c53486417926f2569a91ee0626a" data-length="-1" class="full"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph></span></div>across tags outside from mrk test
-        // But both ways we will not query internal tags as saved in addTMUnit():      // <x id="1"/>across tags outside from mrk test
+        //get segment query string(tags included)
+        $queryString = $this->getQueryString($segment);
+        
+        //Although we take the source fields from the Tm answer below
+        // we have to set the default source here to fill the be added internal tags
+        $this->resultList->setDefaultSource($queryString);
+        
+        //get the query string with internal tags converted(export layout)
+        $queryString=$this->tagManager->prepareForTm($queryString);
+        return $this->queryNecTmApi($queryString, true);
         
     }
     
     /***
      * Query the NEC-TM-api for the search string
      * @param string $searchString
-     * @param bool $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @return editor_Services_ServiceResult
      */
-    protected function queryNecTmApi($searchString, $reimportWhitespace = false){
+    protected function queryNecTmApi(string $searchString){
         if(empty($searchString)) {
             return $this->resultList;
         }
-        $result = null;
+        $results = null;
         $this->validateLanguages($this->sourceLang, $this->targetLang);
         if($this->api->search($searchString, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
-            $result = $this->api->getResult();
+            $results = $this->api->getResult();
         }
         
-        if(empty($result)) {
+        if(empty($results)) {
             return $this->resultList;
         }
         
-        $translation = $result->tu->target_text ?? "";
-        if($reimportWhitespace) {
-            $translation = $this->importWhitespaceFromTagLessQuery($translation);
+        $row=1;
+        foreach ($results as $result){
+            $original=$result->tu->source_text ?? "";
+            $translation = $result->tu->target_text ?? "";
+            
+            error_log($row.'#'.$translation);
+            
+            //replace the tags to internal tags layout
+            $translation=$this->tagManager->convertFromTm($translation);
+            $original=$this->tagManager->convertFromTm($original);
+            
+            error_log($row.'#'.$translation);
+            $this->resultList->addResult($translation, $result->match, $this->getMetaData($result));
+            $this->resultList->setSource($original);
+            $row++;
+            
         }
-        
-        // NEC-TM seems to try to insert internal tags "at the same place" in the found translation.
-        // Example:
-        // - "source_text": "translate5 <div class="open 672069643d22393222 internal-tag ownttip">ist Open Source</div>:"
-        // - "target_text": "translate5 <div class="open 672069643d22393222 internal-tag ownttip">is Open Source</div>:"
-        
-        $this->resultList->addResult($translation, $result->match, $this->getMetaData($result));
-        $this->resultList->setSource($result->tu->source_text);
         return $this->resultList;
     }
     
