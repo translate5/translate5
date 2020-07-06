@@ -129,9 +129,10 @@ Ext.application({
       this.callParent(arguments);
       this.logoutOnWindowClose();
   },
+  
   launch : function() {
-	  var me=this;
-	  me.initViewportLaunch();
+      var me=this;
+      me.initViewportLaunch();
   },
   
   /***
@@ -172,38 +173,28 @@ Ext.application({
    * If configured the user is logged out on window close
    */
   logoutOnWindowClose: function() {
-      if(!Editor.data.logoutOnWindowClose) {
+      //ignore the logout on window close also when the current domain is configured 
+      //to use openid sso provider and we redirect directly to the sso provider without showing
+      //the translate5 login form
+      var ignoreOnOpenIdRequest=Editor.data.frontend.isOpenIdCustomerDomain && Editor.data.frontend.isOpenIdOnLoginRedirect;
+      if(!Editor.data.logoutOnWindowClose || ignoreOnOpenIdRequest) {
           return;
       }      
-      var notRun = true,
-          logout = function() {
-              notRun = false;
-              //use the hardcoded URL since we don't want to redirect to a custom logout page, 
-              //but we just want to foirce a session destroy
-              try{
-            	  
-            	  if(!Ext.isIE){
-            		//send asinc request
-            		  navigator.sendBeacon(Editor.data.pathToRunDir+'/login/logout');
-            		  return;
-            	  }
-            	  //ie11 workaroun
-            	  Ext.Ajax.request({
-            		  url: Editor.data.pathToRunDir+'/login/logout',
-                      method: 'get',
-                      async: false
-                  });
-              }catch (e) {
-            	  
+      var me=this,
+          logout =function(e) {
+              //send logout request, this will destroy the user session
+              navigator.sendBeacon(Editor.data.pathToRunDir+'/login/logout');
+              function sleep(delay) {
+                  const start = new Date().getTime();
+                  while (new Date().getTime() < start + delay);
               }
+               //wait 0,5 second for the logout request to be processed
+              //the beforeunload is also triggered with application reload(browser reload)
+              //so we need to give the logout request some time untill the new page reload is requested
+            sleep(500);
           };
       Ext.get(window).on({
-    	  beforeunload:function(){
-    		  Editor.data.logoutOnWindowClose && notRun && logout();
-    	  },
-    	  unload:function(){
-    		  Editor.data.logoutOnWindowClose && notRun && logout();
-    	  }
+          beforeunload:logout
       });
   },
   /**
