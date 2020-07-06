@@ -155,7 +155,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var string
      */
     protected $taskDataPath;
-
+    
     /**
      * On cloning we need a new taskGuid and id
      * {@inheritDoc}
@@ -327,12 +327,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         elseif($config->runtimeOptions->customers->anonymizeUsers) {
             //if we get here, the user may only see the user for the task he is pm and himself
-            $anonSql = 'AND filter.pmGuid = "'.$quoted.'" OR LEK_taskUserAssoc.userGuid = "'.$quoted.'"';
+            $anonSql = ' AND filter.pmGuid = "'.$quoted.'" OR LEK_taskUserAssoc.userGuid = "'.$quoted.'" ';
         }
         else {
             //the user may see only the user data from customers where the anon flag is false and where he is pm and himself
-            $anonSql = 'INNER JOIN LEK_customer ON LEK_customer.id=filter.customerId AND LEK_customer.anonymizeUsers=0';
-            $anonSql .= 'OR filter.pmGuid = "'.$quoted.'" OR LEK_taskUserAssoc.userGuid = "'.$quoted.'"';
+            $anonSql = ' INNER JOIN LEK_customer ON LEK_customer.id=filter.customerId AND LEK_customer.anonymizeUsers=0 ';
+            $anonSql .= ' OR filter.pmGuid = "'.$quoted.'" OR LEK_taskUserAssoc.userGuid = "'.$quoted.'" ';
         }
 
         if($loadAll){
@@ -344,13 +344,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         //apply the frontend task filters
         $this->applyFilterAndSort($s);
         //the inner query is the current task list with activ filters
-        $sql='SELECT Zf_users.*,filter.taskGuid from Zf_users, '.
-            '('.$s->assemble().') as filter '.
-             'INNER JOIN LEK_taskUserAssoc ON LEK_taskUserAssoc.taskGuid=filter.taskGuid '.
+        $sql=' SELECT Zf_users.*,filter.taskGuid from Zf_users, '.
+            ' ('.$s->assemble().') as filter '.
+             ' INNER JOIN LEK_taskUserAssoc ON LEK_taskUserAssoc.taskGuid=filter.taskGuid '.
              $anonSql.
-             'WHERE Zf_users.userGuid = LEK_taskUserAssoc.userGuid '.
-             'GROUP BY Zf_users.id '.
-             'ORDER BY Zf_users.surName; ';
+             ' WHERE Zf_users.userGuid = LEK_taskUserAssoc.userGuid '.
+             ' GROUP BY Zf_users.id '.
+             ' ORDER BY Zf_users.surName; ';
 
         $stmt = $this->db->getAdapter()->query($sql);
         return $stmt->fetchAll();

@@ -37,12 +37,36 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     const OKAPI_BCONF_DEFAULT_NAME='okapi_default_import.bconf';
     const OKAPI_BCONF_EXPORT_NAME='okapi_default_export.bconf';
     
+    private static $bconfExtensions = array('bconf');
     /**
      * Make the path of the export-bconf accessible elsewere also
      * @return string
      */
     public static function createExportBconfPath(){
         return APPLICATION_PATH.'/modules/editor/Plugins/Okapi/data/'.self::OKAPI_BCONF_EXPORT_NAME;
+    }
+    /**
+     * Make the path of the default import-bconf accessible elsewere also
+     * @return string
+     */
+    public static function createImportDefaultBconfPath(){
+        return APPLICATION_PATH.'/modules/editor/Plugins/Okapi/data/'.self::OKAPI_BCONF_DEFAULT_NAME;
+    }
+    /**
+     * Finds bconf-files in the given directory and returns them as array for the Okapi Import.At least the default import file is returned
+     * @param string $dir
+     * @return array
+     */
+    public static function findImportBconfFilesinDir(string $dir): array {
+        $bconfPathes = array();
+        $directory = new DirectoryIterator($dir);
+        foreach ($directory as $fileinfo) {
+            /* @var $fileinfo SplFileInfo */
+            if (in_array(strtolower($fileinfo->getExtension()), self::$bconfExtensions)) {
+                $bconfPathes[] = $fileinfo->getPathname();
+            }
+        }
+        return $bconfPathes;
     }
 
     /**
@@ -127,15 +151,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         'xsl',
         'xslt'
     );
-
-    /**
-     * The okapi config file-types
-     * @var array
-     */
-    private $okapiBconf= array(
-            'bconf'
-    );
-
     /**
      * Internal flag if custom bconf files were provided or not. In the latter case the internal default bconf is used.
      * @var string
@@ -290,20 +305,11 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @param string $importFolder
      */
     protected function findBconfFiles($importFolder) {
-        $this->bconfFilePaths = [];
+        $this->bconfFilePaths = self::findImportBconfFilesinDir($importFolder);
         $this->useCustomBconf = true;
-        $directory = new DirectoryIterator($importFolder);
-
-        foreach ($directory as $fileinfo) {
-            if (in_array(strtolower($fileinfo->getExtension()),$this->okapiBconf)) {
-                $this->bconfFilePaths[]=$fileinfo->getPathname();
-                continue;
-            }
-        }
-
-        if(empty($this->bconfFilePaths)){
+        if(count($this->bconfFilePaths) == 0){
             $this->useCustomBconf = false;
-            $this->bconfFilePaths[] = $this->getDefaultBconf();
+            $this->bconfFilePaths[] = self::createImportDefaultBconfPath();
         }
     }
 
@@ -377,21 +383,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         $worker->queue($workerParentId);
     }
-
-    /**
-     * Return the default bconf file for the import
-     * @return string
-     */
-    private function getDefaultBconf(){
-        return APPLICATION_PATH.'/'.$this->getPluginPath().'/'.'data'.'/'.self::OKAPI_BCONF_DEFAULT_NAME;
-    }
-
     /**
      * Return the default bconf file for the export
      * @return string
      */
     public function getExportBconf(){
-        return APPLICATION_PATH.'/'.$this->getPluginPath().'/'.'data'.'/'.self::OKAPI_BCONF_EXPORT_NAME;
+        return self::createExportBconfPath();
     }
 
     /**
