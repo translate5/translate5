@@ -53,6 +53,11 @@ Ext.define('Editor.plugins.NecTm.controller.Main', {
         selector: '#addTmWindow'
     }],
     listen: {
+        store: {
+            '#Tags':{
+                load: 'onCategoriesStoreLoad'
+            }
+        },
         component: {
             '#addTmWindow combo[name="resourceId"]': {
                 select: 'handleResourceChanged'
@@ -66,6 +71,19 @@ Ext.define('Editor.plugins.NecTm.controller.Main', {
         Editor.util.LanguageResources.addService(Ext.create('Editor.plugins.NecTm.view.LanguageResources.services.NecTm'));
     },
     /**
+     * Categories (="tags") store load handler: 
+     * Don't show top-level-categories.
+     */
+    onCategoriesStoreLoad:function(store){
+        var topLevelCategories = Editor.data.plugins.NecTm.topLevelCategories,
+            topLevelFilter = new Ext.util.Filter({
+                filterFn: function(item) {
+                    return !Ext.Array.contains(topLevelCategories, item.get('originalCategoryId'));
+                }
+            });
+        store.filter(topLevelFilter);
+    },
+    /**
      * When a new NEC-TM-LanguageResource is created, we show the 
      * categories-field (no need to add it - it is already in there).
      */
@@ -73,11 +91,16 @@ Ext.define('Editor.plugins.NecTm.controller.Main', {
         var form = combo.up('form'),
             resourceId = form.down('combo[name="resourceId"]').getValue(),
             categoriesField = form.queryById('categories'),
-            disableCategories = (resourceId.indexOf('editor_Plugins_NecTm') === -1);
+            disableCategories = (resourceId.indexOf('editor_Plugins_NecTm') === -1),
+            topLevelCategories;
         categoriesField.setDisabled(disableCategories);
         categoriesField.setReadOnly(disableCategories);
-        // For NEC-TMs, at least one category must be assigned.
-        categoriesField.setConfig('allowBlank',false);
+        if (!disableCategories) {
+            // For NEC-TMs, at least one category must be assigned. So, if no top-level-categories
+            // are set, this field is mandatory.
+            topLevelCategories = Editor.data.plugins.NecTm.topLevelCategories;
+            categoriesField.setConfig('allowBlank',topLevelCategories.length > 0);
+        }
     },
     /**
      * After the Edit-Window for a LanguageResource has been opened,
