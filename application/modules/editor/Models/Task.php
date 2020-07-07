@@ -155,7 +155,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var string
      */
     protected $taskDataPath;
-
+    
     /**
      * On cloning we need a new taskGuid and id
      * {@inheritDoc}

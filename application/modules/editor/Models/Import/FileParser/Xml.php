@@ -54,6 +54,8 @@ class editor_Models_Import_FileParser_Xml extends editor_Models_Import_FileParse
      */
     public static function isParsable(string $fileHead, string &$errorMsg): bool {
         $errorMsg = '';
+        //remove the bom from the text chunk. If it is not removed, the regex check below can fail
+        $fileHead=ZfExtended_Utils::remove_utf8_bom($fileHead);
         // check here the loaded XML content, if it is XLF everything is ok, since we extend the Xlf parser
         // if it is another (not supported) XML type we throw an exception
         $validVersions = ['1.1', '1.2'];
