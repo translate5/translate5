@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
-
+ START LICENSE AND COPYRIGHT
+ 
  This file is part of translate5
  
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
-
+ 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
-
+ 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+ 
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+ 
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
-
-END LICENSE AND COPYRIGHT
-*/
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
 
 /**#@+
  * @author Marc Mittag
@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  * NEC-TM Connector
  */
 class editor_Plugins_NecTm_Connector extends editor_Services_Connector_FilebasedAbstract {
-
+    
     /**
      * @var editor_Plugins_NecTm_HttpApi
      */
@@ -55,7 +55,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     protected $xmlparser;
     
     /**
-     * The categories for the languageResource: 
+     * The categories for the languageResource:
      * - those assigned to the languageResource by the user
      * AND
      * - those configured as top-level-categories in ZfConfig
@@ -70,17 +70,13 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     
     /**
      * All languages (id => rfc5646)
-     * @var array 
+     * @var array
      */
     protected $lngs;
     
     protected $sourceLangForNecTm;
     protected $targetLangForNecTm;
     
-    /***
-     * @var editor_Services_TmTagManager
-     */
-    protected $tagManager;
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
@@ -95,12 +91,10 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         // For exporting files, the NEC-TM-Api needs to know the source and target language. Usually they are given when
         // calling the methods from the segment, but nor for getTm() - hence we store them right away:
         $this->setLanguagesForNecTm($languageResource);
-        
-        $this->tagManager=ZfExtended_Factory::get('editor_Services_TmTagManager');
     }
     
     /**
-     * Set the categories for the languageResource: 
+     * Set the categories for the languageResource:
      * - those assigned to the languageResource by the user
      * AND
      * - those configured as top-level-categories in ZfConfig
@@ -168,7 +162,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
                     'sourceLangForNecTm' => $this->sourceLangForNecTm,
                     'targetLangForNecTm' => $this->targetLangForNecTm
                 ]);
-        }
+            }
     }
     
     /**
@@ -202,7 +196,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             // NEC-TM will use the filename, but the name of the tmp file is useless:
             // - we get: LanguageResources2018-09-website-rewrite-examples.tmxsUh4yU
             // - we want: 2018-09-website-rewrite-examples.tmx
-            // Thus, we keep the file unique, but by a unique directory: 
+            // Thus, we keep the file unique, but by a unique directory:
             // old: /tmp/LanguageResources2018-09-website-rewrite-examples.tmxsUh4yU
             // new: /tmp/LanguageResourcessUh4yU/2018-09-website-rewrite-examples.tmx
             // TODO: use this procedure in general when importing files for LanguageResources?
@@ -275,12 +269,11 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         // if categores are empty: 403 with {"message": "Tag is required option"}
         editor_Plugins_NecTm_Init::validateCategories(implode(',',$this->categories));
         
-        $source=$this->getQueryStringByName($segment, editor_Models_SegmentField::TYPE_SOURCE);
-        $target=$this->getQueryStringByName($segment, editor_Models_SegmentField::TYPE_TARGET);
-        
-        $source=$this->tagManager->prepareForTm($source);
-        $target=$this->tagManager->prepareForTm($target);
         $filename = $this->languageResource->getSpecificData('fileName');  //  (= if file was imported for LanguageResource on creation)
+        
+        $source= $this->prepareSegmentContent($this->getQueryString($segment));
+        $target= $this->prepareSegmentContent($segment->getTargetEdit());
+
         if($this->api->addTMUnit($source, $target, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories, $filename)) {
             return;
         }
@@ -304,54 +297,45 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        //get segment query string(tags included)
-        $queryString = $this->getQueryString($segment);
         
-        //Although we take the source fields from the Tm answer below
-        // we have to set the default source here to fill the be added internal tags
+        $queryString = $this->getQueryString($segment);
         $this->resultList->setDefaultSource($queryString);
         
-        //get the query string with internal tags converted(export layout)
-        $queryString=$this->tagManager->prepareForTm($queryString);
-        return $this->queryNecTmApi($queryString, true);
+        $queryString = $this->restoreWhitespaceForQuery($queryString);
         
-    }
-    
-    /***
-     * Query the NEC-TM-api for the search string
-     * @param string $searchString
-     * @return editor_Services_ServiceResult
-     */
-    protected function queryNecTmApi(string $searchString){
-        if(empty($searchString)) {
-            return $this->resultList;
-        }
+        //$map is set by reference
+        $map = [];
+        $queryString = $this->internalTag->toXliffPaired($queryString, true, $map);
+        $mapCount = count($map);
+        
+        //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
+        $xmlParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $xmlParser editor_Models_Import_FileParser_XmlParser */
+        
+        $this->shortTagIdent = $mapCount + 1;
+        $xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
+            $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true);
+            $textNode = $this->whitespaceTagReplacer($textNode);
+            $xmlParser->replaceChunk($key, $textNode);
+        });
+        
         $results = null;
         $this->validateLanguages($this->sourceLang, $this->targetLang);
-        if($this->api->search($searchString, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
+        if($this->api->search($queryString, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
             $results = $this->api->getResult();
-        }
-        
-        if(empty($results)) {
-            return $this->resultList;
-        }
-        
-        $row=1;
-        foreach ($results as $result){
-            $original=$result->tu->source_text ?? "";
-            $translation = $result->tu->target_text ?? "";
-            
-            error_log($row.'#'.$translation);
-            
-            //replace the tags to internal tags layout
-            $translation=$this->tagManager->convertFromTm($translation);
-            $original=$this->tagManager->convertFromTm($original);
-            
-            error_log($row.'#'.$translation);
-            $this->resultList->addResult($translation, $result->match, $this->getMetaData($result));
-            $this->resultList->setSource($original);
-            $row++;
-            
+            if(empty($results)) {
+                return $this->resultList;
+            }
+            foreach($results as $result) {
+                $source=$result->tu->source_text ?? "";
+                $target = $result->tu->target_text ?? "";
+                $target = $xmlParser->parse($target);
+                $target = $this->internalTag->reapply2dMap($target, $map);
+                $this->resultList->addResult($target, $result->match, $this->getMetaData($result));
+                $source = $xmlParser->parse($source);
+                $source = $this->internalTag->reapply2dMap($source, $map);
+                $this->resultList->setSource($source);
+            }
         }
         return $this->resultList;
     }
@@ -446,9 +430,9 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     }
     
     /**
-     * In difference to $this->throwBadGateway this method generates an 400 error 
+     * In difference to $this->throwBadGateway this method generates an 400 error
      *   which shows additional error information in the frontend
-     *   
+     *
      * @param string $logMsg
      */
     protected function handleNecTmError($logMsg) {
@@ -479,12 +463,12 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     /***
      * Calculate the new matchrate value.
      * Check if the current match is of type context-match or exact-exact match
-     * 
+     *
      * @param int $matchRate
      * @param array $metaData
      * @param editor_Models_Segment $segment
      * @param string $filename
-     * 
+     *
      * @return integer
      */
     protected function calculateMatchRate($matchRate,$metaData,$segment,$filename){
@@ -492,7 +476,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     }
     
     /***
-     * 
+     *
      * THIS IS NOT IMPLEMENTED SO FAR.
      * Clone the existing tm (= NEC-TM: tags) with "fuzzy" name. The new fuzzy connector will be returned.
      * @param int $analysisId
@@ -506,7 +490,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         $fuzzyLanguageResource = clone $this->languageResource;
         /* @var $fuzzyLanguageResource editor_Models_LanguageResources_LanguageResource  */
         
-        // - The fuzzyLanguageResource can use all the NEC-TM-tags that it has cloned. 
+        // - The fuzzyLanguageResource can use all the NEC-TM-tags that it has cloned.
         // - For saving internal translations, we introduce an extra tag (our internal translations must save to this extra-tag only!).
         // - After analyzing, this extra tag and all its content must be removed from the NEC-TM.
         
