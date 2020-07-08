@@ -876,11 +876,13 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.task.UserAssocViewModel",
         strings: {
             editInfo: '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>',
-            segmentrangeError: '<?php echo $this->translate->_('Nicht editierbare Segmente');?>',
+            segmentrangeError: '<?php echo $this->translate->_('Nicht zugewiesene Segmente');?>',
             translator: '<?php echo $this->translate->_('Übersetzer');?>',
             reviewer: '<?php echo $this->translate->_('Lektor');?>',
             translatorCheck: '<?php echo $this->translate->_('Zweiter Lektor');?>',
-            visitor: '<?php echo $this->translate->_('Besucher');?>'
+            visitor: '<?php echo $this->translate->_('Besucher');?>',
+            allEditedByUsers: '<?php echo $this->translate->_('(alle Segmente können von allen Nutzern editiert werden)');?>',
+            canNotBeEditedByUsers: '<?php echo $this->translate->_('(können derzeit von niemandem bearbeitet werden)');?>'
         }
     });
     
