@@ -99,24 +99,19 @@ class editor_Models_TaskUserAssoc_Segmentrange {
      * Values must not be in wrong order or overlapping (= neither in itself nor 
      * with other users of the same role).
      * @param string $segmentRanges
-     * @param string $taskGuid
-     * @param string $role
+     * @param string $assignedSegments
      * @return bool
      */
-    public function validateSemantics(string $segmentRanges, string $taskGuid, string $role) : bool {
+    public function validateSemantics(string $segmentRanges, array $assignedSegments) : bool {
         // valid: "1-3,5,6-7"
         // not valid: "1-3,5,2-7"
         // not valid: "3-1,5,6-7"
         // not valid: "1-3,5,6-7" for userX when userY has the same role with "2-4"
         
         $segmentRanges = self::prepare($segmentRanges);
-        
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        $assignedSegments = $tua->getAllAssignedSegmentsByRole($taskGuid, $role);
+        $allSegmentGroups = self::getAllSegmentGroups($segmentRanges);
         
         $segmentNumbers = [];
-        $allSegmentGroups = self::getAllSegmentGroups($segmentRanges);
         foreach ($allSegmentGroups as $segmentGroup) {
             $segmentGroupLimits = explode("-", $segmentGroup);
             $segmentGroupStart = (int)reset($segmentGroupLimits);
@@ -167,6 +162,9 @@ class editor_Models_TaskUserAssoc_Segmentrange {
         // Example for "1-3;5, 8-9 ":
         // $segmentNumbers = [1,2,3,5,8,9]
         $segmentNumbers = [];
+        if(empty($segmentRanges)){
+            return $segmentNumbers;
+        }
         $segmentRanges = self::prepare($segmentRanges);
         $allSegmentGroups = self::getAllSegmentGroups($segmentRanges);
         foreach ($allSegmentGroups as $segmentGroup) {
