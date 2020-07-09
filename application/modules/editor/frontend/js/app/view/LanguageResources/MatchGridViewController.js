@@ -250,7 +250,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
             resp = Ext.util.JSON.decode(response.responseText),
             editorquery =me.getView() &&  me.getView().getStore('editorquery');
 
-        if(editorquery){
+        if(!editorquery){
             return;
         }
         
@@ -292,7 +292,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
             json = null,
             segment;
         
-        if(store){
+        if(!store){
             return;
         }
         
