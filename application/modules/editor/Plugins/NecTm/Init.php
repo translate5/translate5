@@ -79,7 +79,14 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('Editor_CategoryController', 'afterIndexAction', array($this, 'filterToNECCategories'));
         $this->eventManager->attach('editor_LanguageresourceinstanceController', 'beforePostAction', array($this, 'validateParams'));
         
+        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
+    }
+    
+    public function injectFrontendConfig(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        $topLevelCategories = $this->service->getTopLevelCategoriesIds();
+        $view->Php2JsVars()->set('plugins.NecTm.topLevelCategories', $this->service->getTopLevelCategoriesIds());
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {
@@ -169,18 +176,6 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
             return;
         }
         $categories = $params['categories'] ?? '';
-        self::validateCategories($categories);
-    }
-    
-    /**
-     * For NEC-TMs: "We should always use tags in the data uploaded,
-     * if not, the data can't be searched by users (only by admin)",
-     * TMs cannot be updated, ...
-    * @param string $categories
-     */
-    public static function validateCategories($categories) {
-        if (empty($categories)) {
-            throw new editor_Plugins_NecTm_Exception('E1256');
-        }
+        $this->service->validateCategories($categories);
     }
 }
