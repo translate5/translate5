@@ -34,72 +34,71 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
     },
     formulas: {
     	isNotErrorImportPendingCustom:{
-    		get: function(get) {
+    		get: function(record) {
             	// !error && !import && !pending && !customState
-            	return this.get('task').isNotErrorImportPendingCustom();
+            	return record && record.isNotErrorImportPendingCustom();
             },
             bind:{bindTo:'{task}',deep:true}
     	},
     	isNotImportPendingCustom:{
-    		get: function(get) {
-            	return this.get('task').isNotImportPendingCustom();
+    		get: function(record) {
+            	return record && record.isNotImportPendingCustom();
             },
             bind:{bindTo:'{task}',deep:true}
     	},
     	isEditorEditTask:{
-    		get: function(get) {
-            	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorEditTask',this.get('task'));
+    		get: function(record) {
+            	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorEditTask',record);
             },
             bind:{bindTo:'{task}',deep:true}
     	},
         isEditorOpenTask: {
-            get: function(get) {
-            	var task=this.get('task');
+            get: function(record) {
             	//!error && !import && !pending && (!customState || customState == ExcelExported)
-            	return this.isMenuAllowed('editorOpenTask',task) && task.isNotErrorImportPending() && (!task.isCustomState() || task.get('state') == 'ExcelExported');
+            	return this.isMenuAllowed('editorOpenTask',record) && record.isNotErrorImportPending() && (!record.isCustomState() || record.get('state') == 'ExcelExported');
             },
             bind:{bindTo:'{task}',deep:true}
         },
         isEditorFinishTask:{
-    		get: function(get) {
-            	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorFinishTask',this.get('task'));
+    		get: function(record) {
+            	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorFinishTask',record);
             },
             bind:{bindTo:'{task}',deep:true}
         },
         isEditorUnfinishTask:{
-    		get: function(get) {
-            	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorUnfinishTask',this.get('task'));
+    		get: function(record) {
+            	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorUnfinishTask',record);
             },
             bind:{bindTo:'{task}',deep:true}
         },
         isEditorEndTask:{
-    		get: function(get) {
-            	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorEndTask',this.get('task'));
+    		get: function(record) {
+            	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorEndTask',record);
             },
             bind:{bindTo:'{task}',deep:true}
         },
         isEditorReopenTask:{
-    		get: function(get) {
-            	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorReopenTask',this.get('task'));
+    		get: function(record) {
+            	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorReopenTask',record);
             },
             bind:{bindTo:'{task}',deep:true}
         },
         isEditorPreferencesTask:{
-    		get: function(get) {
-            	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorPreferencesTask',this.get('task'));
+    		get: function(record) {
+            	return this.get('isNotErrorImportPendingCustom') && this.isMenuAllowed('editorPreferencesTask',record);
             },
             bind: '{task}'
         },
         isEditorCloneTask:{
-        	get: function(get) {
-            	return this.get('isNotImportPendingCustom') && this.isMenuAllowed('editorCloneTask',this.get('task'));
+        	get: function(record) {
+            	return this.get('isNotImportPendingCustom') && this.isMenuAllowed('editorCloneTask',record);
             },
             bind: '{task}'
         },
         isEditorShowexportmenuTask:{
-        	get: function(get) {
+        	get: function(record) {
         		//(!error || error && downloadable) && !import && !pending && (!customState || customState == ExcelExported)
-            	var task=this.get('task'),
+            	var task=record,
             		downloadable=task.isErroneous() && Editor.app.authenticatedUser.isAllowed('downloadImportArchive'),
             		allowed=this.isMenuAllowed('editorShowexportmenuTask',task);
             	if(downloadable && allowed){
@@ -110,20 +109,20 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
             bind: '{task}'
         },
         isEditorExcelreimportTask:{
-        	get: function(get) {
-            	return this.isMenuAllowed('editorExcelreimportTask',this.get('task')) && (this.get('task').get('state') == 'ExcelExported');
+        	get: function(record) {
+            	return this.isMenuAllowed('editorExcelreimportTask',record) && (record.get('state') == 'ExcelExported');
             },
             bind: '{task}'
         },
         isEditorDeleteTask:{
-        	get: function(get) {
-        		return this.get('isNotImportPendingCustom') && this.isMenuAllowed('editorDeleteTask',this.get('task'));
+        	get: function(record) {
+        		return this.get('isNotImportPendingCustom') && this.isMenuAllowed('editorDeleteTask',record);
         	},
             bind: '{task}'
         },
         isEditorLogTask:{
-        	get: function(get) {
-            	var task=this.get('task');
+        	get: function(record) {
+            	var task=record;
             	// !import && !pending && (!customState || customState == ExcelExported)
             	return this.isMenuAllowed('editorLogTask',task) && !task.isImporting() && !task.isPending() && (!task.isCustomState() || task.get('state') == 'ExcelExported');
             },
@@ -131,7 +130,7 @@ Ext.define('Editor.view.admin.task.menu.TaskActionMenuViewModel', {
         },
         //the menu grup lines are only visible for pm users
         isMenuGroupVisible:{
-        	get: function(get) {
+        	get: function(record) {
         		return this.get('isEditorPreferencesTask');
             },
             bind: '{task}'
