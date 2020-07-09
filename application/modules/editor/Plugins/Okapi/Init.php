@@ -139,6 +139,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             'txml',
             'vrsz',
             'wix',
+            'xlsx',
             'yml',
             'yaml',
     );
