@@ -248,8 +248,12 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     handleRequestSuccess: function(controller,response,segmentId,languageResourceid,query){
         var me = controller,
             resp = Ext.util.JSON.decode(response.responseText),
-            editorquery = me.getView().getStore('editorquery');
+            editorquery =me.getView() &&  me.getView().getStore('editorquery');
 
+        if(editorquery){
+            return;
+        }
+        
         if(segmentId == me.editedSegmentId){
             editorquery.remove([editorquery.findExact('languageResourceid',languageResourceid)]);
         }
@@ -284,9 +288,14 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
             strState =  me.SERVER_STATUS.SERVER_STATUS_SERVERERROR,
             targetMsg = '',
             result = {},
-            store = me.getView().getStore('editorquery'),
+            store = me.getView() && me.getView().getStore('editorquery'),
             json = null,
             segment;
+        
+        if(store){
+            return;
+        }
+        
         if(segmentId == me.editedSegmentId){
             //removing by index is working as array only!
             store.remove([store.findExact('languageResourceid',languageResourceid)]);
