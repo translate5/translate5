@@ -324,6 +324,8 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
                     }
                     else if(json.errors && json.errors.message) {
                         targetMsg = json.errors.message;
+                    }else if(json.errorMessage){
+                        targetMsg = json.errorMessage;
                     }
                     else {
                         targetMsg = response.responseText;
