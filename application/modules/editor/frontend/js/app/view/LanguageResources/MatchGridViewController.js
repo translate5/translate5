@@ -285,7 +285,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     handleRequestFailure: function(controller,response,segmentId,languageResourceid){
         var me = controller,
             respStatusMsg = me.strings.serverErrorMsgDefault,
-            strState =  me.SERVER_STATUS.SERVER_STATUS_SERVERERROR,
+            strState = me.SERVER_STATUS &&  me.SERVER_STATUS.SERVER_STATUS_SERVERERROR,
             targetMsg = '',
             result = {},
             store = me.getView() && me.getView().getStore('editorquery'),
