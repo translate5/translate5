@@ -25,19 +25,55 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+# for older installations, create the procedure here, so it can be used bellow for key remove
+DROP PROCEDURE IF EXISTS PROCEDURE_DROP_FOREIGN_KEY_IF_EXIST;
+    DELIMITER $$
+    CREATE PROCEDURE PROCEDURE_DROP_FOREIGN_KEY_IF_EXIST(IN tableName VARCHAR(64), IN constraintName VARCHAR(64))
+    BEGIN
+        IF EXISTS(
+            SELECT * FROM information_schema.table_constraints
+            WHERE 
+                table_schema    = DATABASE()     AND
+                table_name      = tableName      AND
+                constraint_name = constraintName AND
+                constraint_type = 'FOREIGN KEY')
+        THEN
+            SET @query = CONCAT('ALTER TABLE ', tableName, ' DROP FOREIGN KEY ', constraintName, ';');
+            PREPARE stmt FROM @query; 
+            EXECUTE stmt; 
+            DEALLOCATE PREPARE stmt; 
+        END IF; 
+    END$$
+    DELIMITER ;
+    
+# for older installations, create the procedure here, so it can be used bellow for index remove
+DROP PROCEDURE IF EXISTS PROCEDURE_DROP_INDEX_IF_EXIST;
+    DELIMITER $$
+    CREATE PROCEDURE PROCEDURE_DROP_INDEX_IF_EXIST(IN tableName VARCHAR(64), IN indexName VARCHAR(64))
+    BEGIN
+        IF((SELECT COUNT(*) AS index_exists FROM information_schema.statistics WHERE TABLE_SCHEMA = DATABASE() and table_name =
+    tableName AND index_name = indexName) > 0)
+        THEN
+            SET @query = CONCAT('DROP INDEX ', indexName, ' ON ', tableName, ';');
+            PREPARE stmt FROM @query; 
+            EXECUTE stmt; 
+            DEALLOCATE PREPARE stmt; 
+        END IF; 
+    END$$
+    DELIMITER ;
+    
 
-ALTER TABLE `LEK_workflow_userpref` 
-DROP FOREIGN KEY `LEK_workflow_userpref_ibfk_2`,
-DROP FOREIGN KEY `LEK_workflow_userpref_ibfk_1`;
-ALTER TABLE `LEK_workflow_userpref` 
-DROP INDEX `taskGuid` ;
+CALL PROCEDURE_DROP_FOREIGN_KEY_IF_EXIST('LEK_workflow_userpref', 'LEK_workflow_userpref_ibfk_2');
+CALL PROCEDURE_DROP_FOREIGN_KEY_IF_EXIST('LEK_workflow_userpref', 'LEK_workflow_userpref_ibfk_1');
 
-ALTER TABLE `LEK_taskUserAssoc` 
-DROP FOREIGN KEY `LEK_taskUserAssoc_ibfk_3`,
-DROP FOREIGN KEY `LEK_taskUserAssoc_ibfk_2`;
-ALTER TABLE `LEK_taskUserAssoc` 
-DROP INDEX `userGuid` ,
-DROP INDEX `taskGuid` ;
+CALL PROCEDURE_DROP_INDEX_IF_EXIST('LEK_workflow_userpref', 'taskGuid');
+
+CALL PROCEDURE_DROP_FOREIGN_KEY_IF_EXIST('LEK_taskUserAssoc', 'LEK_taskUserAssoc_ibfk_3');
+CALL PROCEDURE_DROP_FOREIGN_KEY_IF_EXIST('LEK_taskUserAssoc', 'LEK_taskUserAssoc_ibfk_2');
+
+CALL PROCEDURE_DROP_INDEX_IF_EXIST('LEK_taskUserAssoc', 'userGuid');
+CALL PROCEDURE_DROP_INDEX_IF_EXIST('LEK_taskUserAssoc', 'taskGuid');
+
 
 ALTER TABLE `LEK_taskUserAssoc` 
 ADD UNIQUE INDEX `taskGuid` (`taskGuid` ASC, `userGuid` ASC, `role` ASC),
