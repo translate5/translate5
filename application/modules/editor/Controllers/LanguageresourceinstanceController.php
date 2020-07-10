@@ -1029,23 +1029,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $connector = $this->getConnector();
 
-        
-        $this->log->exception(new ZfExtended_Exception(),[
-            'level'=>ZfExtended_Logger::LEVEL_ERROR,
-            'extra'=>[
-                'languageResource'=>$this->entity
-            ]
-        ]);
-        try {
-            $result = $connector->query($segment);
-        } catch (Exception $e) {
-            $this->log->exception($e,[
-                'level'=>ZfExtended_Logger::LEVEL_ERROR,
-                'extra'=>[
-                    'languageResource'=>$this->entity
-                ]
-            ]);
-        }
+        $result = $connector->query($segment);
         
         if($this->entity->getResourceType() ==editor_Models_Segment_MatchRateType::TYPE_TM){
             $result=$this->markDiff($segment, $result,$connector);
