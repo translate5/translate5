@@ -33,8 +33,13 @@ class editor_Logger_LanguageResourcesWriter extends ZfExtended_Logger_Writer_Abs
         /* @var $log editor_Models_Logger_LanguageResources */
         $log->setFromEventAndLanguageResource($event, $languageResource);
         $log->setLanguageResourceId($languageResource->getId());
+        
+        $event->getExtraFlattenendAndSanitized();
+        //then we just unset the task in both
+        unset($event->extra['languageResource']);
+        unset($event->extraFlat['languageResource']);
+        $log->setExtra($event->getExtraAsJson());
         $log->save();
-        return;
     }
     
     public function isAccepted(ZfExtended_Logger_Event $event) {
