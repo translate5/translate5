@@ -39,5 +39,5 @@ Ext.define('Editor.store.admin.task.Logs', {
   autoLoad: false,
   // must then be set to false after initing the grid and store
   suppressNextFilter: true, 
-  pageSize: 0
+  pageSize: 20
 });

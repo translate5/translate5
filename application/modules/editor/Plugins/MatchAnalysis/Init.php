@@ -44,6 +44,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     
     protected $localePath = 'locales';
     
+    /***
+     * 
+     * @var array
+     */
+    protected $assocs=[];
+    
     public function getFrontendControllers() {
         $result = array();
         $userSession = new Zend_Session_Namespace('user');
@@ -122,9 +128,18 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @return void|boolean
      */
     protected function queueAnalysis($taskGuid, $eventParams = []) {
-        if(!$this->checkLanguageResources($taskGuid)){
-            error_log("The associated language resource can not be used for analysis.");
-            return;
+        if($this->hasAssoc($taskGuid)){
+            //you can not run analysis without resources to be associated to the task
+            return false;
+        }
+        $valid=$this->checkLanguageResources();
+        if(empty($valid)){
+            $task=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($taskGuid);
+            $this->addWarn($task,'MatchAnalysis Plug-In: No valid analysable language resources found.',['invalid'=>print_r(array_diff($this->assocs,$valid),1)]);
+            $this->lockAndUnlockTask($task);
+            return false;
         }
         
         $worker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Worker');
@@ -136,7 +151,11 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         
         // init worker and queue it
         if (!$worker->init($taskGuid, $eventParams)) {
-            error_log('MatchAnalysis-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            $task=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($taskGuid);
+            $this->addWarn($task,'MatchAnalysis-Error on worker init(). Worker could not be initialized');
+            $this->lockAndUnlockTask($task);
             return false;
         }
         $parent=ZfExtended_Factory::get('ZfExtended_Models_Worker');
@@ -148,6 +167,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         }
         
         $worker->queue($parentWorkerId);
+        return true;
     }
     
     /***
@@ -185,25 +205,25 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     }
 
     /***
-     * Check if for the current task match resources are assigned.
-     * Check if the assigned match resources are analysable
-     * 
+     * Check if the given task has associated language resources
      * @param string $taskGuid
-     * 
      * @return boolean
      */
-    protected function checkLanguageResources($taskGuid){
+    protected function hasAssoc(string $taskGuid){
         $languageResources=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
-        
-        $assocs=$languageResources->loadByAssociatedTaskGuid($taskGuid);
-        
-        if(empty($assocs)){
-            return false;
-        }
-        
-        $hasAnalysable=false;
-        foreach ($assocs as $assoc){
+        $this->assocs=$languageResources->loadByAssociatedTaskGuid($taskGuid);
+        return empty($this->assocs);
+    }
+    
+    /***
+     * Check if the current associated language resources can be used for analysis
+     * @param string $taskGuid
+     * @return boolean|editor_Models_LanguageResources_Resource[]
+     */
+    protected function checkLanguageResources(){
+        $valid=[];
+        foreach ($this->assocs as $assoc){
             $languageresource=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
             /* @var $languageresource editor_Models_LanguageResources_LanguageResource  */
             
@@ -214,13 +234,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $resource=$manager->getResource($languageresource);
             
             //analysable language resource is found
-            if($resource->getAnalysable()){
-               $hasAnalysable=true; 
+            if(!empty($resource) && $resource->getAnalysable()){
+                $valid[]=$assoc;
             }
             
         }
-        
-        return $hasAnalysable;
+        return $valid;
     }
     
     /**
@@ -245,5 +264,39 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
                         'action' => 'export'
                 ));
         $r->addRoute('plugins_matchanalysis_export', $exportAnalysis);
+    }
+    
+    /***
+     * Log analysis warning
+     * @param string $taskGuid
+     * @param array $extra
+     * @param string $message
+     */
+    protected function addWarn(editor_Models_Task $task,string $message,array $extra=[]) {
+        $extra['task']=$task;
+        $logger = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
+        $logger->warn('E1100',$message,$extra);
+    }
+
+    /***
+     * Lock the given task with matchanalysis state and unlock the task with the original state.
+     * When the task state is changed, the message bus will notify the frontent.
+     * @param editor_Models_Task $task
+     */
+    protected function lockAndUnlockTask(editor_Models_Task $task) {
+        $taskOldState = $task->getState();
+        //lock the task dedicated for analysis
+        if($task->lock(NOW_ISO, editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS)) {
+            //lock the task while match analysis are running
+            $newState=editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS;
+            $task->setState(editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS);
+            $task->save();
+        }
+        //unlock the state
+        if(!empty($newState)){
+            $task->setState($taskOldState);
+            $task->save();
+        }
+        $task->unlock();
     }
 }

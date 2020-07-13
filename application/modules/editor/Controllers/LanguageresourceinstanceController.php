@@ -60,16 +60,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected $categories;
     
-    /**
-     * @var ZfExtended_Logger
-     */
-    protected $languageresourcesLog;
-    
-    /**
-     * @var Zend_Config
-     */
-    protected $config;
-    
     public function init() {
         //add filter type for languages
         $finalTableForAssoc = new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId');
@@ -86,13 +76,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->categories = ZfExtended_Factory::get('editor_Models_Categories');
         parent::init();
-        
-        $this->config = Zend_Registry::get('config');
-        $this->languageresourcesLog = ZfExtended_Factory::get('ZfExtended_Logger', [[
-            'writer' => [
-                'languageresourcesLog' => $this->config->resources->ZfExtended_Resource_Logger->writer->languageresourcesLog
-            ]
-        ]]);
     }
     
     /**
@@ -1046,17 +1029,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $connector = $this->getConnector();
 
-        try {
-            $result = $connector->query($segment);
-        } catch (Exception $e) {
-            $this->languageresourcesLog->exception($e,[
-                'level'=>ZfExtended_Logger::LEVEL_ERROR,
-                'extra'=>[
-                    'languageResource'=>$this->entity
-                ]
-            ]);
-            throw $e;
-        }
+        $result = $connector->query($segment);
         
         if($this->entity->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM){
             $result=$this->markDiff($segment, $result,$connector);
