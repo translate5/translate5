@@ -58,6 +58,13 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Models_Entity_Abstract {
+    
+    /***
+     * Custom task state when matchanalysis are running
+     * @var string
+     */
+    const TASK_STATE_ANALYSIS = 'matchanalysis';
+    
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_MatchAnalysis';
     protected $validatorInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Validator_MatchAnalysis';
     

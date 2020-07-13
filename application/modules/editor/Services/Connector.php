@@ -76,6 +76,16 @@ class editor_Services_Connector {
      */
     protected $targetLang;
     
+    /**
+     * @var ZfExtended_Logger
+     */
+    protected $languageresourcesLog;
+    
+    /**
+     * @var Zend_Config
+     */
+    protected $config;
+    
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null){
         $serviceType = $languageResource->getServiceType();
         $connector = ZfExtended_Factory::get($serviceType.editor_Services_Manager::CLS_CONNECTOR);
@@ -85,6 +95,16 @@ class editor_Services_Connector {
         $this->languageResource=$languageResource;
         $this->sourceLang=$sourceLang;
         $this->targetLang=$targetLang;
+        
+        $this->config = Zend_Registry::get('config');
+        //init the language resources logger with 2 writers. The task writer is used
+        //when the language resources is used for a task (ex: query action in editor match grid)
+        $this->languageresourcesLog = ZfExtended_Factory::get('ZfExtended_Logger', [[
+            'writer' => [
+                'languageresourcesLog' => $this->config->resources->ZfExtended_Resource_Logger->writer->languageresourcesLog,
+                'tasklog' => $this->config->resources->ZfExtended_Resource_Logger->writer->tasklog
+            ]
+        ]]);
     }
     
     /**
@@ -105,11 +125,11 @@ class editor_Services_Connector {
      * @return editor_Services_ServiceResult
      */
     public function query(editor_Models_Segment $segment) {
-        $serviceResult=$this->adapter->query($segment);
-        //ignore the log if no results
-        //if(!empty($serviceResult->getResult())){
-        //    $this->logMtUsage($segment,self::REQUEST_SOURCE_EDITOR);
-        //}
+        try {
+            $serviceResult=$this->adapter->query($segment);
+        } catch (Exception $e) {
+            $this->logException($e,$segment->getTaskGuid());
+        }
         return $serviceResult;
     }
     
@@ -121,11 +141,11 @@ class editor_Services_Connector {
      * @return editor_Services_ServiceResult
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
-        $serviceResult=$this->adapter->search($searchString,$field,$offset);
-        //ignore the log if no results
-        //if(!empty($serviceResult->getResult())){
-        //    $this->logMtUsage($searchString,self::REQUEST_SOURCE_EDITOR);
-        //}
+        try {
+            $serviceResult=$this->adapter->search($searchString,$field,$offset);
+        } catch (Exception $e) {
+            $this->logException($e);
+        }
         return $serviceResult;
     }
 
@@ -135,11 +155,11 @@ class editor_Services_Connector {
      * @return editor_Services_ServiceResult
      */
     public function translate(string $searchString){
-        $serviceResult=$this->adapter->translate($searchString);
-        //ignore the log if no results
-        //if(!empty($serviceResult->getResult())){
-        //    $this->logMtUsage($searchString,self::REQUEST_SOURCE_INSTANT_TRANSLATE);
-        //}
+        try {
+            $serviceResult=$this->adapter->translate($searchString);
+        } catch (Exception $e) {
+            $this->logException($e);
+        }
         return $serviceResult;
     }
     
@@ -148,7 +168,11 @@ class editor_Services_Connector {
      * @param string $moreInfo
      */
     public function getStatus(&$moreInfo){
-        return $this->adapter->getStatus($moreInfo);
+        try {
+            return $this->adapter->getStatus($moreInfo);
+        } catch (Exception $e) {
+            $this->logException($e);
+        }
     }
     
     /***
@@ -162,6 +186,28 @@ class editor_Services_Connector {
         if(method_exists($this->adapter, $method)) {
             return call_user_func_array([$this->adapter, $method], $arguments);
         }
+    }
+    
+    /***
+     * Logs the given exception (writes log entry in language resources log table and if 
+     * the task is available, writes log entry in the task log table to)
+     * 
+     * @param Exception $e
+     * @param string $taskGuid
+     */
+    protected function logException(Exception $e,string $taskGuid=''){
+        $session = new Zend_Session_Namespace();
+        $taskGuid=$taskGuid ?? $session->taskGuid;
+        $extra=[];
+        $extra['languageResource']=$this->languageResource;
+        if(!empty($taskGuid)){
+            $task=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($taskGuid);
+            $extra['task']=$task;
+        }
+        $extra['message']=$e->__toString();
+        throw new editor_Services_Connector_Exception('E1282',$extra);
     }
     
 //     /***
