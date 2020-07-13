@@ -3,6 +3,27 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [5.0.5] - 2020-07-13
+###Added
+[TRANSLATE-2137] - Translate files with InstantTranslate: Enable it to turn the feature of via configuration
+  
+
+###Bugfixes
+[TRANSLATE-2035] - Add extra column to languageresource log table
+  
+[TRANSLATE-2047] - Errormessages on DB Update V 3.4.1
+  
+[TRANSLATE-2120] - Add missing DB constraint to Zf_configuration table
+  
+[TRANSLATE-2129] - Look for and solve open Javascript bugs (theRootCause)
+  
+[TRANSLATE-2131] - APPLICATON_PATH under Windows contains slash
+  
+[TRANSLATE-2132] - Kpi buttons are visible for editor only users
+  
+[TRANSLATE-2134] - Remove document properties for MS Office and LibreOffice formats of default okapi bconf
+  
+
 ## [5.0.4] - 2020-07-06
 ###Added
 TRANSLATE-2016: Align visual jobs with sdlxliff for review purposes
