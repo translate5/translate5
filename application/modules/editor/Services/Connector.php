@@ -171,7 +171,16 @@ class editor_Services_Connector {
         try {
             return $this->adapter->getStatus($moreInfo);
         } catch (Exception $e) {
-            $this->logException($e);
+            try {
+                $this->logException($e);
+            } catch (editor_Services_Connector_Exception $e) {
+                //log the exception, since it is not trown again
+                $this->languageresourcesLog->exception($e);
+                //for the status check, catch the exception, set the status to error,
+                //and set the more info message to the current exception message
+                $moreInfo=$e->getMessage();
+                return editor_Services_Connector_Abstract::STATUS_ERROR;
+            }
         }
     }
     
@@ -206,7 +215,8 @@ class editor_Services_Connector {
             $task->loadByTaskGuid($taskGuid);
             $extra['task']=$task;
         }
-        $extra['message']=$e->__toString();
+        $extra['message']=$e->getMessage();
+        $extra['trace']=$e->__toString();
         throw new editor_Services_Connector_Exception('E1282',$extra);
     }
     
