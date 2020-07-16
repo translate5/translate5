@@ -28,8 +28,9 @@ END LICENSE AND COPYRIGHT
 
 
 /**
- * Xml export fileparser.
- *
+ * Xml export fileparser. This class needs to be defined because of the import/export
+ * class mapping in the Lek_files table. The export algorithm will try to find export fileparser based on
+ * the fileparser used to import this task.
  */
 class editor_Models_Export_FileParser_Xml extends editor_Models_Export_FileParser_Xlf {
 }
