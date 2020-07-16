@@ -34,6 +34,19 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
      */
     private $taskOldState=null;
     
+    
+    /***
+     * 
+     * @var ZfExtended_Logger
+     */
+    protected $log;
+    
+    
+    public function __construct() {
+        parent::__construct();
+        $this->log=Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
+    }
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -64,10 +77,10 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
             $this->task->setState($this->taskOldState);
             $this->task->save();
             $this->task->unlock();
-           
-            $logger = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
-            /* @var $logger ZfExtended_Logger */
-            $logger->exception($e);
+            $this->log->error('E1100', 'MatchAnalysis Plug-In: analysis and pre-translation cannot be run.', [
+                'task' => $this->task,
+                'message'=> $e->getMessage()
+            ]);
             return false;
         }
         return $ret;
@@ -145,7 +158,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         
         // init worker and queue it
         if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
-            $this->log->error('E1168', 'MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized.');
+            $this->log->error('E1168', 'MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized.',['task'=>$this->task]);
             return false;
         }
         $worker->queue($workerId);
