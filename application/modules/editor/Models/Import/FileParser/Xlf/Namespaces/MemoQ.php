@@ -40,6 +40,12 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_MemoQ extends editor_Models
     const MEMOQ_XLIFF_NAMESPACE = 'xmlns:mq="MQXliff"';
     const USERGUID = 'memoq-imported';
 
+    /***
+     * 
+     * @var array
+     */
+    protected $comments=[];
+    
     /**
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_Namespaces_Abstract::registerParserHandler()
