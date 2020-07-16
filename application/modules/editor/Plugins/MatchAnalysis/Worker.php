@@ -52,7 +52,6 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
      */
     public function work() {
         try {
-            $this->log=Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
             $params = $this->workerModel->getParameters();
             $ret=$this->doWork();
             
@@ -65,10 +64,10 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
             $this->task->setState($this->taskOldState);
             $this->task->save();
             $this->task->unlock();
-            $this->log->error('E1100', 'MatchAnalysis Plug-In: Error happend on match analysis and pretranslation.',[
-                'task' => $this->task,
-                'error '=> $e->__toString()//this will pring the message and the stack
-            ]);
+           
+            $logger = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
+            /* @var $logger ZfExtended_Logger */
+            $logger->exception($e);
             return false;
         }
         return $ret;

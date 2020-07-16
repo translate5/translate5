@@ -76,16 +76,6 @@ class editor_Services_Connector {
      */
     protected $targetLang;
     
-    /**
-     * @var ZfExtended_Logger
-     */
-    protected $languageresourcesLog;
-    
-    /**
-     * @var Zend_Config
-     */
-    protected $config;
-    
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null){
         $serviceType = $languageResource->getServiceType();
         $connector = ZfExtended_Factory::get($serviceType.editor_Services_Manager::CLS_CONNECTOR);
@@ -95,16 +85,6 @@ class editor_Services_Connector {
         $this->languageResource=$languageResource;
         $this->sourceLang=$sourceLang;
         $this->targetLang=$targetLang;
-        
-        $this->config = Zend_Registry::get('config');
-        //init the language resources logger with 2 writers. The task writer is used
-        //when the language resources is used for a task (ex: query action in editor match grid)
-        $this->languageresourcesLog = ZfExtended_Factory::get('ZfExtended_Logger', [[
-            'writer' => [
-                'languageresourcesLog' => $this->config->resources->ZfExtended_Resource_Logger->writer->languageresourcesLog,
-                'tasklog' => $this->config->resources->ZfExtended_Resource_Logger->writer->tasklog
-            ]
-        ]]);
     }
     
     /**
@@ -171,16 +151,7 @@ class editor_Services_Connector {
         try {
             return $this->adapter->getStatus($moreInfo);
         } catch (Exception $e) {
-            try {
-                $this->logException($e);
-            } catch (editor_Services_Connector_Exception $e) {
-                //log the exception, since it is not trown again
-                $this->languageresourcesLog->exception($e);
-                //for the status check, catch the exception, set the status to error,
-                //and set the more info message to the current exception message
-                $moreInfo=$e->getMessage();
-                return editor_Services_Connector_Abstract::STATUS_ERROR;
-            }
+            $this->logException($e);
         }
     }
     
@@ -216,7 +187,6 @@ class editor_Services_Connector {
             $extra['task']=$task;
         }
         $extra['message']=$e->getMessage();
-        $extra['trace']=$e->__toString();
         throw new editor_Services_Connector_Exception('E1282',$extra);
     }
     
