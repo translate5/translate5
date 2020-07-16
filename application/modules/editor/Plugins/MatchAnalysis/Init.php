@@ -128,7 +128,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @return void|boolean
      */
     protected function queueAnalysis($taskGuid, $eventParams = []) {
-        if($this->hasAssoc($taskGuid)){
+        if(!$this->hasAssoc($taskGuid)){
             //you can not run analysis without resources to be associated to the task
             return false;
         }
@@ -137,7 +137,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $task=ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($taskGuid);
-            $this->addWarn($task,'MatchAnalysis Plug-In: No valid analysable language resources found.',['invalid'=>print_r(array_diff($this->assocs,$valid),1)]);
+            $this->addWarn($task,'MatchAnalysis Plug-In: No valid analysable language resources found.',['invalid'=>print_r($this->assocs,1)]);
             $this->lockAndUnlockTask($task);
             return false;
         }
@@ -213,13 +213,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $languageResources=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
         $this->assocs=$languageResources->loadByAssociatedTaskGuid($taskGuid);
-        return empty($this->assocs);
+        return !empty($this->assocs);
     }
     
     /***
      * Check if the current associated language resources can be used for analysis
      * @param string $taskGuid
-     * @return boolean|editor_Models_LanguageResources_Resource[]
+     * @return array
      */
     protected function checkLanguageResources(){
         $valid=[];
