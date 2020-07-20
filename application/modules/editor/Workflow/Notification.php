@@ -32,6 +32,21 @@ END LICENSE AND COPYRIGHT
  * to redirect the generated mailer texts to over notification channels
  */
 class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
+    
+    /***
+     * Task log message for deadline notificiation
+     * @var string
+     */
+    const DEADLINE_NOTIFICATION_LOG_MESSAGE='DeadlineNotified';
+    
+    /***
+     * How frequent do cron periodical action is triggered. This is required
+     * for the deadline periodical notification so we adjast the deadline date select arount 
+     * this periond
+     * @var integer
+     */
+    const CRON_PERIODICAL_CALL_FREQUENCY_MIN=10;
+    
     /**
      * @var ZfExtended_TemplateBasedMail
      */
@@ -759,14 +774,12 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     
     /***
      * Deadline notifier. It will send notification to the configured user assocs days before or after the current day (days +/- can be defined in config default to 1)
-     *
+     * When the trignotification trigger is periodical, the deadline date select will be between "CRON_PERIODICAL_CALL_FREQUENCY_MIN" minutes period of time 
      * @param string $triggerConfig
      * @param string $template: template to be used for the mail
      * @param bool $isApproaching: default will notify daysOffset before deadline
      */
     protected function deadlineNotifier(stdClass $triggerConfig,string $template,bool $isApproaching=false) {
-        
-        $daysOffset=$triggerConfig->daysOffset ?? 1;
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
@@ -785,6 +798,21 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $template=$triggerConfig->template;
         }
         
+        $daysOffset=$triggerConfig->daysOffset ?? 1;
+        
+        $isApproaching = $isApproaching ? '+' : '-';
+        
+        //date select when this is triggered from the daily action
+        $dateSelect = 'DATE(tua.deadlineDate)=DATE(CURRENT_DATE) '.$isApproaching.' INTERVAL ? DAY';
+        
+        if($this->isPeriodical()){
+            //the deadline check date will be between: "days offset date" +/- "cron periodical call frequency"
+            $dateSelect='tua.deadlineDate BETWEEN '. 
+                ' DATE_SUB(NOW() '.$isApproaching.' INTERVAL ? DAY,INTERVAL '.Zend_Db_Table::getDefaultAdapter()->quote(self::CRON_PERIODICAL_CALL_FREQUENCY_MIN).' MINUTE)'.
+                ' AND '.
+                ' DATE_ADD(NOW() '.$isApproaching.' INTERVAL ? DAY,INTERVAL '.Zend_Db_Table::getDefaultAdapter()->quote(self::CRON_PERIODICAL_CALL_FREQUENCY_MIN).' MINUTE)';
+        }
+
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         
@@ -797,24 +825,25 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         }
         $s->where('tua.state != ?', $wf::STATE_FINISH)
         ->where('t.state = ?', $task::STATE_OPEN)
-        ->where('tua.deadlineDate=CURRENT_DATE '.($isApproaching ? '+' : '-').' INTERVAL ? DAY', $daysOffset);
-        
+        ->where($dateSelect, $daysOffset);
         $tuas = $db->fetchAll($s);
-        
+
+        //filter out the notified assoc
+        $tuas = $this->checkDeadlineNotified($tuas);
         if(empty($tuas)){
             return ;
         }
-        $this->tua = $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
         
+        $this->tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
         
         if(isset($triggerConfig->receiverUser)){
             $user->loadByLogin($triggerConfig->receiverUser);
         }
         
         foreach($tuas as $tua) {
-            $task->loadByTaskGuid($tua['taskGuid']);
-            $this->config->task = clone $task;
+            $this->config->task=ZfExtended_Factory::get('editor_Models_Task');
+            $this->config->task->loadByTaskGuid($tua['taskGuid']);
             
             $assoc=$tua;
             //if the receiverUser user is configured, send mail only to receiverUser
@@ -831,6 +860,66 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $this->createNotification($tua['role'], $template, $params);
             $this->addCopyReceivers($triggerConfig,$tua['role']);
             $this->notify($assoc);
+            $this->logDeadlineNotified($assoc,self::DEADLINE_NOTIFICATION_LOG_MESSAGE);
         }
+    }
+    
+    /***
+     * Filter out the task assocs from $assocs for which deadline notification is already send
+     * @param array $assocs
+     * @return array
+     */
+    protected function checkDeadlineNotified(array $assocs) {
+        if(empty($assocs)){
+            return $assocs;
+        }
+        $jsonIds=array_map(function($row){
+            //in the db the task assoc is stored as json
+            return '["'.$row['id'].'"]';
+        }, $assocs);
+        
+        $db = Zend_Registry::get('db');
+        /* @var $db Zend_Db_Table */
+        
+        $s = $db->select()
+        ->from('LEK_task_log',['extra'])
+        ->where('message = ?',self::DEADLINE_NOTIFICATION_LOG_MESSAGE)
+        ->where('extra IN (?)', $jsonIds);
+        $tuas = $db->fetchAll($s);
+        
+        if(empty($tuas)){
+            //no notifications send so far
+            return $assocs;
+        }
+
+        //remove already notified users
+        foreach ($tuas as $t){
+            $id=preg_replace('/[^0-9]/', '', $t['extra']);
+            $index = array_search($id, array_column($assocs, 'id'));
+            if($index!==false){
+                unset($assocs[$index]);
+            }
+        }
+        return $assocs;
+    }
+    
+    /***
+     * Write deadline notifiead log entry into task log table 
+     * @param array $tua
+     * @param string $message
+     */
+    protected function logDeadlineNotified(array $tua,string $message) {
+        $this->log->info('E1012', $message, [
+            $tua['id'],
+            'task'=>$this->config->task
+        ]);
+    }
+    
+    /***
+     * Is the current request from the periodical trigger
+     * @return boolean
+     */
+    protected function isPeriodical() {
+        return $this->getTrigger()=="doCronPeriodical";
     }
 }
