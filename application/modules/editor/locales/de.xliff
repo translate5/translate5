@@ -1820,6 +1820,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QWt0dWVsbGVzIERhdHVt'><source>Aktuelles Datum</source><target>Aktuelles Datum</target></trans-unit>
 <trans-unit id='U3R1bmRl'><source>Stunde</source><target>Stunde</target></trans-unit>
 <trans-unit id='TWludXRlbg=='><source>Minuten</source><target>Minuten</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBzZW5kZXQgc3RhbmRhcmRtw6TDn2lnIDEgVGFnIHZvciB1bmQgMSBUYWcgbmFjaCBkZW0gZmVzdGdlbGVndGVuIERhdHVtIHVuZCBkZXIgZmVzdGdlbGVndGVuIFVocnplaXQgKCsvLSAxMCBNaW51dGVuKSBlaW5lIEZyaXN0ZXJpbm5lcnVuZy4gRGllcyBrYW5uIHZvbiBJaHJlbSBBZG1pbmlzdHJhdG9yIGdlw6RuZGVydCB3ZXJkZW4u'><source>translate5 sendet standardmäßig 1 Tag vor und 1 Tag nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.</source><target>translate5 sendet standardmäßig 1 Tag vor und 1 Tag nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.</target></trans-unit>
 </body>
  </file>
 </xliff>

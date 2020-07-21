@@ -37,7 +37,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * Task log message for deadline notificiation
      * @var string
      */
-    const DEADLINE_NOTIFICATION_LOG_MESSAGE='DeadlineNotified';
+    const DEADLINE_NOTIFICATION_LOG_MESSAGE='Deadline notification send.';
     
     /***
      * How frequent do cron periodical action is triggered. This is required
@@ -936,7 +936,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @return string
      */
     protected function generateDeadlineNotifiedMessage(bool $isApproaching){
-        return self::DEADLINE_NOTIFICATION_LOG_MESSAGE.':'.($isApproaching ? 'DeadlineApproaching' : 'OverdueDeadline');
+        return self::DEADLINE_NOTIFICATION_LOG_MESSAGE.($isApproaching ? 'DeadlineApproaching' : 'OverdueDeadline');
     }
     
     /***
