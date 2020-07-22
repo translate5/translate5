@@ -81,6 +81,9 @@ Ext.define('Editor.view.ViewPortEditor', {
               }]
           },{
               region: 'center',
+              //setting segment grid 58% and match grid 42% of the height when visual review is active
+              //when visual review is not active, segment grid is 70% and matchgrid 30%
+              flex:!Editor.data.task.get('visualReviewFiles') ? 0.70 : 0.58,
               xtype: 'segments.grid',
               itemId: 'segmentgrid'
           },{

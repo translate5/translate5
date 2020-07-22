@@ -1031,7 +1031,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $result = $connector->query($segment);
         
-        if($this->entity->getResourceType() ==editor_Models_Segment_MatchRateType::TYPE_TM){
+        if($this->entity->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM){
             $result=$this->markDiff($segment, $result,$connector);
         }
         
@@ -1132,7 +1132,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $diffTagger->insertTagAttributes['class']='tmMatchGridResultTooltip';
         $diffTagger->deleteTagAttributes['class']='tmMatchGridResultTooltip';
         
-        $results=$result->getResult();
+        $results=$result->getResult() ?? [];
         foreach ($results as &$res) {
             $tags = [];
             //replace the internal tags before diff

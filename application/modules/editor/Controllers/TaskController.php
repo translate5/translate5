@@ -411,6 +411,10 @@ class editor_TaskController extends ZfExtended_RestController {
      * although some other segments ARE assigned to users of this role.
      */
     protected function addMissingSegmentrangesToResult(array &$row) {
+        //ignore for non-simultaneous task
+        if($row['usageMode']!==$this->entity::USAGE_MODE_SIMULTANEOUS){
+            return;
+        }
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         $row['missingsegmentranges'] = $tua->getAllNotAssignedSegments($row['taskGuid']);

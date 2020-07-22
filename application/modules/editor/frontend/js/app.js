@@ -182,6 +182,9 @@ Ext.application({
       }      
       var me=this,
           logout =function(e) {
+              if(!Editor.data.logoutOnWindowClose){
+                  return;
+              }
               //send logout request, this will destroy the user session
               navigator.sendBeacon(Editor.data.pathToRunDir+'/login/logout');
               function sleep(delay) {
