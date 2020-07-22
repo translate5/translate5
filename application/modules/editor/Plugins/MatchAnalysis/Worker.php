@@ -27,13 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Abstract {
-    const TASK_STATE_ANALYSIS = 'matchanalysis';
     
     /***
      * Task old state before the match analysis were started
      * @var string
      */
     private $taskOldState=null;
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -52,6 +52,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
      */
     public function work() {
         try {
+            $this->log=Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
             $params = $this->workerModel->getParameters();
             $ret=$this->doWork();
             
@@ -64,7 +65,10 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
             $this->task->setState($this->taskOldState);
             $this->task->save();
             $this->task->unlock();
-            error_log("Error happend on match analysis and pretranslation (taskGuid=".$this->task->getTaskGuid()."). Error was: ".$e);
+            $this->log->error('E1100', 'MatchAnalysis Plug-In: Error happend on match analysis and pretranslation.',[
+                'task' => $this->task,
+                'error '=> $e->__toString()//this will pring the message and the stack
+            ]);
             return false;
         }
         return $ret;
@@ -81,16 +85,14 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         $this->taskOldState = $this->task->getState();
         
         //lock the task dedicated for analysis
-        if($this->task->lock(NOW_ISO, self::TASK_STATE_ANALYSIS)) {
+        if($this->task->lock(NOW_ISO, editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS)) {
             //lock the task while match analysis are running
-            $newState=self::TASK_STATE_ANALYSIS;
-            $this->task->setState(self::TASK_STATE_ANALYSIS);
+            $newState=editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS;
+            $this->task->setState(editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS);
             $this->task->save();
         //else check if we are in import, then no separate lock is needed. Therefore if we are not in import this is an error
         } elseif($this->task->getState() != editor_Models_Task::STATE_IMPORT) {
-            $logger = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
-            /* @var $logger ZfExtended_Logger */
-            $logger->error('E1167', 'MatchAnalysis Plug-In: analysis and pre-translation cannot be run.', [
+            $this->log->error('E1167', 'MatchAnalysis Plug-In: analysis and pre-translation cannot be run.', [
                 'task' => $this->task
             ]);
             return;
@@ -144,8 +146,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         
         // init worker and queue it
         if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
-            $logger = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
-            $logger->error('E1168', 'MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized.');
+            $this->log->error('E1168', 'MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized.');
             return false;
         }
         $worker->queue($workerId);

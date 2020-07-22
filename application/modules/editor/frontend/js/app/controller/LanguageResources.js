@@ -235,8 +235,9 @@ Ext.define('Editor.controller.LanguageResources', {
           region: 'south',
           weight: 5,
           resizeHandles: 'n',
-          // setting segment grid 2/3 and match grid 1/3 of the height
-          flex: 0.5,
+          //setting segment grid 58% and match grid 42% of the height when visual review is active
+          //when visual review is not active, segment grid is 70% and matchgrid 30%
+          flex:!Editor.data.task.get('visualReviewFiles') ? 0.30 : 0.42,
           // minheight remains also for manual resizing
           minHeight: 150,
           listeners: {

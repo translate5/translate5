@@ -172,6 +172,10 @@ Ext.define('Editor.view.admin.log.Grid', {
                             me.down('gridpanel').store.reload();
                         }
                     }]
+                },{
+                    dock: 'bottom',
+                    xtype: 'pagingtoolbar',
+                    store: me.store
                 }]
                 
             },{

@@ -27,17 +27,14 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * MatchAnalysis Exception
  */
-class editor_Plugins_MatchAnalysis_Exception extends ZfExtended_ErrorCodeException {
+class editor_Services_Connector_Exception extends ZfExtended_ErrorCodeException {
     /**
      * @var string
      */
-    protected $domain = 'plugin.matchanalysis';
+    protected $domain = 'editor.languageresource.service.connector';
     
     static protected $localErrorCodes = [
-        'E1103' => 'MatchAnalysis Plug-In: tried to load analysis data without providing a valid taskGuid',
-        'E1239' => 'MatchAnalysis Plug-In: The associated language resource "{name}" is not available for match analysis and pre-translations.',
-        'E1100' => 'MatchAnalysis Plug-In: The associated language resource can not be used for analysis.'
+        'E1282' => 'Language resource communication error.'
     ];
 }

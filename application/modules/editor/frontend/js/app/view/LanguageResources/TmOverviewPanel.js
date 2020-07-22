@@ -399,7 +399,11 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             return;
         }
         record.set('status',record.STATUS_LOADING);
-        record.load();
+        record.load({
+            failure: function(record, operation) {
+                record.set('status',record.STATUS_ERROR);
+           }
+        });
     }
     
     
