@@ -535,7 +535,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         if($this->getIsPmOverride()) {
             return false;
         }
-        $assignedSegments[] = $this->getAllAssignedSegmentsByRole($task->getTaskGuid(), $role);
+        $assignedSegments = $this->getAllAssignedSegmentsByRole($task->getTaskGuid(), $role);
         return count($assignedSegments) > 0;
     }
     /**
@@ -569,6 +569,24 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $tuaRows = $this->db->fetchAll($s)->toArray();
         return editor_Models_TaskUserAssoc_Segmentrange::getSegmentNumbersFromRows($tuaRows);
     }
+    
+    /**
+     * Get all assigned segments for task and role but exclude the given user from the select
+     * @param string $taskGuid
+     * @param String $role
+     * @param string $userGuid
+     * @return array
+     */
+    public function getNotForUserAssignedSegments(string $taskGuid, String $role, string $userGuid): array {
+        $s = $this->db->select()
+        ->where('taskGuid = ?', $taskGuid)
+        ->where('role = ?', $role)
+        ->where('userGuid != ?', $userGuid)
+        ->where('segmentrange IS NOT NULL');
+        $tuaRows = $this->db->fetchAll($s)->toArray();
+        return editor_Models_TaskUserAssoc_Segmentrange::getSegmentNumbersFromRows($tuaRows);
+    }
+    
     /**
      * Return an array with the numbers of the segments in the task
      * that are NOT assigned to any user although other segments ARE
@@ -617,5 +635,16 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             }
         }
         return editor_Models_TaskUserAssoc_Segmentrange::getRanges($notAssignedSegments);
+    }
+    
+    /**
+     * returns the tua data with removed auth hash
+     * @return stdClass
+     */
+    public function getSanitizedEntityForLog(): stdClass {
+        $tua = $this->getDataObject();
+        unset($tua->staticAuthHash);
+        unset($tua->usedInternalSessionUniqId);
+        return $tua;
     }
 }

@@ -26,18 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+
 /**
- * MatchAnalysis Exception
+ * Xml export fileparser. This class needs to be defined because of the import/export
+ * class mapping in the Lek_files table. The export algorithm will try to find export fileparser based on
+ * the fileparser used to import this task.
  */
-class editor_Plugins_MatchAnalysis_Exception extends ZfExtended_ErrorCodeException {
-    /**
-     * @var string
-     */
-    protected $domain = 'plugin.matchanalysis';
-    
-    static protected $localErrorCodes = [
-        'E1103' => 'MatchAnalysis Plug-In: tried to load analysis data without providing a valid taskGuid',
-        'E1239' => 'MatchAnalysis Plug-In: The associated language resource "{name}" is not available for match analysis and pre-translations.',
-        'E1100' => 'MatchAnalysis Plug-In: The associated language resource can not be used for analysis.'
-    ];
+class editor_Models_Export_FileParser_Xml extends editor_Models_Export_FileParser_Xlf {
 }

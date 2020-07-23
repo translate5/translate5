@@ -120,7 +120,7 @@ function setfileUploadLanguageCombinationsAvailable() {
  */
 function isFileUploadAvailable() {
     var langComb = $('#sourceLocale').val() + '|' + $('#targetLocale').val();
-    return $.inArray(langComb, fileUploadLanguageCombinationsAvailable) !== -1;
+    return $.inArray(langComb, fileUploadLanguageCombinationsAvailable) !== -1 && Editor.data.apps.instanttranslate.fileTranslation;
 }
 /***
  * If files are allowed for the current language-combination, show text accordingly.

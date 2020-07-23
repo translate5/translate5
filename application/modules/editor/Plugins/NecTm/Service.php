@@ -103,4 +103,17 @@ class editor_Plugins_NecTm_Service extends editor_Services_ServiceAbstract {
         /* @var $config Zend_Config */
         return $config->runtimeOptions->plugins->NecTm->topLevelCategoriesIds->toArray();
     }
+    
+    /**
+     * For NEC-TMs: "We should always use tags in the data uploaded,
+     * if not, the data can't be searched by users (only by admin)",
+     * TMs cannot be updated, ...
+     * @param string $categories
+     * 
+     */
+    public function validateCategories($categories) {
+        if (empty($categories) && empty($this->getTopLevelCategoriesIds())) {
+            throw new editor_Plugins_NecTm_Exception('E1256');
+        }
+    }
 }

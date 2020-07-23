@@ -81,6 +81,7 @@ Ext.define('Editor.view.ViewPortEditor', {
               }]
           },{
               region: 'center',
+              flex:Editor.app.getController('LanguageResources').isLanguageResourcesDisabled() ? 0.3 : 0.5,
               xtype: 'segments.grid',
               itemId: 'segmentgrid'
           },{
@@ -166,5 +167,5 @@ Ext.define('Editor.view.ViewPortEditor', {
 		return  Ext.Object.merge(config,{
 			html: Editor.data.app.customHtmlContainer,
 		});
-    },
+    }
 });

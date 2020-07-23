@@ -715,12 +715,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
               },{
                   xtype: 'button',
                   glyph: 'f56e@FontAwesome5FreeSolid',
+                  hidden:!Editor.app.authenticatedUser.isAllowed('editorTaskKpi'),
                   itemId: 'export-meta-data-btn',
                   text: me.strings.exportMetaDataBtn,
                   tooltip: me.strings.exportMetaDataBtnTip
               },{
                   xtype: 'button',
                   glyph: 'f46d@FontAwesome5FreeSolid',
+                  hidden:!Editor.app.authenticatedUser.isAllowed('editorTaskKpi'),
                   itemId: 'show-kpi-btn',
                   text: me.strings.showKPIBtn,
                   tooltip: me.strings.showKPIBtnTip
@@ -735,9 +737,11 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 displayInfo: true
             },{
                 xtype: 'label',
+                hidden:!Editor.app.authenticatedUser.isAllowed('editorTaskKpi'),
                 itemId: 'kpi-average-processing-time-label'
             },{
                 xtype: 'label',
+                hidden:!Editor.app.authenticatedUser.isAllowed('editorTaskKpi'),
                 itemId: 'kpi-excel-export-usage-label'
             }]
         };
