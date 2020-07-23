@@ -915,6 +915,7 @@ abstract class editor_Workflow_Abstract {
                 $instance = ZfExtended_Factory::get($class);
                 /* @var $instance editor_Workflow_Actions_Abstract */
                 $instance->init($this->getActionConfig());
+                $instance->setTrigger($trigger);
                 $instances[$class] = $instance;
             }
             else {
@@ -1476,6 +1477,11 @@ abstract class editor_Workflow_Abstract {
      * will be called daily
      */
     abstract public function doCronDaily();
+    
+    /**
+     * will be called periodically between every 5 to 15 minutes, depending on the traffic on the installation.
+     */
+    abstract public function doCronPeriodical();
     
     /**
      * will be called when a new task user association is created
