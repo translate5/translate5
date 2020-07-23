@@ -872,6 +872,10 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
+    Editor.view.DateTimeField.DateTimePicker.prototype.todayText = '<?php echo $this->translate->_('Aktuelles Datum');?>';
+    Editor.view.DateTimeField.DateTimePicker.prototype.hourText = '<?php echo $this->translate->_('Stunde');?>';
+    Editor.view.DateTimeField.DateTimePicker.prototype.minuteText = '<?php echo $this->translate->_('Minuten');?>';
+    
     Ext.define("Editor.view.admin.task.UserAssocViewModel", {
         override: "Editor.view.admin.task.UserAssocViewModel",
         strings: {

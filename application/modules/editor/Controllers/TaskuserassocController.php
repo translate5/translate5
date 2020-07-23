@@ -230,7 +230,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->addUserInfoToResult();
         if(isset($this->data->state) && $oldEntity->getState() != $this->data->state){
             $this->log->info('E1012', 'job status changed from {oldState} to {newState}', [
-                'tua' => $this->getSanitizedEntityForLog(),
+                'tua' => $this->entity->getSanitizedEntityForLog(),
                 'oldState' => $oldEntity->getState(),
                 'newState' => $this->data->state,
             ]);
@@ -246,7 +246,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         parent::postAction();
         $this->log->request();
         $this->addUserInfoToResult();
-        $this->log->info('E1012', 'job created', ['tua' => $this->getSanitizedEntityForLog()]);
+        $this->log->info('E1012', 'job created', ['tua' => $this->entity->getSanitizedEntityForLog()]);
         $this->applyEditableAndDeletable();
     }
     
@@ -262,18 +262,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->entity->setId(0);
         //we have to perform the delete call on cloned object, since the delete call resets the data in the entity, but we need it for post processing 
         $entity->delete();
-        $this->log->info('E1012', 'job deleted', ['tua' => $this->getSanitizedEntityForLog()]);
-    }
-    
-    /**
-     * returns the tua data with removed auth hash 
-     * @return stdClass
-     */
-    protected function getSanitizedEntityForLog(): stdClass {
-        $tua = $this->entity->getDataObject();
-        unset($tua->staticAuthHash);
-        unset($tua->usedInternalSessionUniqId);
-        return $tua;
+        $this->log->info('E1012', 'job deleted', ['tua' => $this->entity->getSanitizedEntityForLog()]);
     }
     
     /**

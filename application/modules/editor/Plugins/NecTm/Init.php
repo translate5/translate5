@@ -85,7 +85,6 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
     
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
-        $topLevelCategories = $this->service->getTopLevelCategoriesIds();
         $view->Php2JsVars()->set('plugins.NecTm.topLevelCategories', $this->service->getTopLevelCategoriesIds());
     }
     
