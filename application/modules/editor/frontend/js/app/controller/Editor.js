@@ -83,8 +83,6 @@ Ext.define('Editor.controller.Editor', {
     generalKeyMap: null,
     prevNextSegment: null,
     sourceTags: null,
-    lastClipboardData: '',
-    lastCopiedSelectionWithTagHandling: '',
     copiedSelectionWithTagHandling: null,
     resetSegmentValueForEditor: null,
     htmlEditor: null,
@@ -165,8 +163,6 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-d':         ['D',{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ['S',{ctrl: true, alt: false}, me.save, true],
             'ctrl-g':         ['G',{ctrl: true, alt: false}, me.scrollToSegment, true],
-            'ctrl-c':         ['C',{ctrl: true, alt: false}, me.copySelectionWithInternalTags, false],
-            'ctrl-x':         ['X',{ctrl: true, alt: false}, me.cutSelectionWithInternalTags, false],
             'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
             'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
@@ -232,6 +228,9 @@ Ext.define('Editor.controller.Editor', {
         plug.on('edit', disableEditing);
         
         Ext.getDoc().on('copy', me.copySelectionWithInternalTags, me, {priority: 9999, delegated: false});
+        Ext.getDoc().on('cut', me.copySelectionWithInternalTags, me, {priority: 9999, delegated: false});
+        //previous cut handlers may stop default event processing, so we have to remove and cut the selected content manually in later handler:
+        Ext.getDoc().on('cut', me.removeSelectionAfterCut, me, {priority: 1001, delegated: false});        
         
         me.tooltip = Ext.create('Editor.view.ToolTip', {
             target: me.getSegmentGrid().getEl()
@@ -530,79 +529,34 @@ Ext.define('Editor.controller.Editor', {
                 fn: me.handleMouseUp,
                 scope: this,
                 preventDefault: false
+            },
+            copy: {
+                delegated: false,
+                priority: 9999,
+                fn: me.copySelectionWithInternalTags,
+                scope: me
+            },
+            cut: {
+                delegated: false,
+                priority: 9999,
+                fn: me.copySelectionWithInternalTags,
+                scope: me
+            },
+            paste: {
+                delegated: false,
+                priority: 5000,
+                fn: me.pasteContent,
+                scope: me
             }
         });
+
+        //add second cut handler to remove the content if default handler prevented
+        docEl.on('cut', me.removeSelectionAfterCut, me, {priority: 1001, delegated: false});        
+
         
         // Paste does not reach the browser's clipboard-functionality,
         // so we need our own SnapshotHistory for handling CTRL+Z and CTRL+Y.
         me.fireEvent('activateSnapshotHistory');
-        docEl.on('paste', function(e){
-            e.stopPropagation();
-            e.preventDefault();
-            var me = this,
-                plug = me.getEditPlugin(),
-                segmentId = plug.context.record.get('id'),
-                data,
-                clipboardData = (e.browserEvent.clipboardData || window.clipboardData).getData('Text'),
-                copiedFrom = null,
-                insertSelectionWithTagHandling = function() {
-                    if (copiedFrom === 'target') {
-                        // when copied from target, internal tags are still images! 
-                        data = me.copiedSelectionWithTagHandling.selDataHtml;
-                        editor.insertAtCursor(data);
-                        me.handleAfterContentChange();
-                    } else {
-                        // only Segment B may copy internal tags into Segment B
-                        if (segmentId !== me.copiedSelectionWithTagHandling.selSegmentId) {
-                            data = me.copiedSelectionWithTagHandling.selDataText;
-                        } else {
-                            data = me.copiedSelectionWithTagHandling.selDataHtml;
-                        }
-                        editor.insertMarkup(data);
-                        // handleAfterContentChange() is triggered from THERE
-                    }
-                    me.lastCopiedSelectionWithTagHandling = me.copiedSelectionWithTagHandling.selDataHtml;
-                    me.lastClipboardData = clipboardData;
-                },
-                insertFromClipboard = function() {
-                    editor.insertAtCursor(clipboardData);
-                    me.handleAfterContentChange();
-                    me.copiedSelectionWithTagHandling = null;
-                    me.lastClipboardData = clipboardData;
-                };
-            if (me.copiedSelectionWithTagHandling !== null && me.copiedSelectionWithTagHandling.copiedFrom) {
-                copiedFrom = me.copiedSelectionWithTagHandling.copiedFrom;
-            }
-            // We must handle data from CTRL+C that can come from two scenarios:
-            // - from within the t5-Tab (= in copiedSelectionWithTagHandling and in clipboard) 
-            // - from outside of the document (= in clipboard).
-            // Rule is:
-            // "On CTRL+V, we check if the clipboard-data is the same as before copying from the source.
-            // If yes, we paste what has been copied from the source. If not, we paste the clipboard-data."
-            // Problem: Copying from the source also changes the clipboard-data; hence we must reformulate
-            // the condition:
-            // (1) If the last copy didn't use copying with Tag-Handling, we use the clipboard-data.
-            if (me.copiedSelectionWithTagHandling === null) {
-                insertFromClipboard();
-                return;
-            }
-            // (2) If what has been copied with Tag-Handling (e.g. from the same segment's source) 
-            // has changed, then this is to be used.
-            if (me.lastCopiedSelectionWithTagHandling !== me.copiedSelectionWithTagHandling.selDataHtml) {
-                insertSelectionWithTagHandling();
-                return;
-            }
-            // (3) If what has been copied with Tag-Handling (e.g. from the same segment's source) 
-            // has NOT changed, but clipboard-data ALSO is still the same, then we use what has been copied 
-            // with Tag-Handling again (= e.g. pasting from source into target multiple times!).
-            if (me.lastCopiedSelectionWithTagHandling === me.copiedSelectionWithTagHandling.selDataHtml
-                    && me.lastClipboardData === clipboardData) {
-                insertSelectionWithTagHandling();
-                return;
-            }
-            // (4) "Fallback":
-            insertFromClipboard();
-        }, me, {delegated: false});
         
         if(me.editorTooltip){
             me.editorTooltip.setTarget(editor.getEditorBody());
@@ -628,6 +582,7 @@ Ext.define('Editor.controller.Editor', {
         var me = this;
         me.clearKeyMaps();
         // removing the following handler has no effect, but it should be removed here!
+        //FIXME should be unbound since rebind on each task open!? or not? 
         //Ext.getDoc().un('copy', me.copySelectionWithInternalTags);
         me.tooltip && me.tooltip.destroy();
         me.taskConfirmation && me.taskConfirmation.destroy();
@@ -695,8 +650,10 @@ Ext.define('Editor.controller.Editor', {
     /**
      * handleAfterContentChange: save snapshot.
      */
-    handleAfterContentChange: function() {
-    	this.fireEvent('saveSnapshot'); // see SnapshotHistory
+    handleAfterContentChange: function(preventSaveSnapshot) {
+    	if(!preventSaveSnapshot) {
+    	    this.fireEvent('saveSnapshot'); // see SnapshotHistory
+    	}
     	// trigger deferred change handler
     	if(!this.isCapturingChange){
     		var me = this;
@@ -1253,30 +1210,24 @@ Ext.define('Editor.controller.Editor', {
             });
         }
     },
-    cutSelectionWithInternalTags: function() {
-        // The user will expect the cut text to be available in the clipboard,
-        // so we do NOT stop the propagation of the event.
-        var me = this,
-            plug = me.getEditPlugin(),
-            editor,
-            sel,
-            selRange;
-        //do only something when editing targets:
-        if(!me.isEditing || !/^target/.test(plug.editor.columnToEdit)){
+    removeSelectionAfterCut: function(e) {
+        if(!e.defaultPrevented || !e.stopped) {
             return;
         }
-        // copy the selection...
-        me.copySelectionWithInternalTags();
-        // ... and with TrackChanges, handle the deletion accordingly (don't just cut the selected content!)
-        editor = plug.editor.mainEditor;
-        sel = rangy.getSelection(editor.getEditorBody());
-        selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
-        if (selRange === null) {
-            return;
+        var activeElement = Ext.fly(Ext.Element.getActiveElement()),
+            sel;
+
+        //currently removing the content after cut is only useful in the htmleditor, nowhere else
+        if(activeElement.is('iframe.x-htmleditor-iframe')) {            
+            sel = rangy.getSelection(this.getEditPlugin().editor.mainEditor.getEditorBody());       
+            if(sel.rangeCount) {
+                sel.getRangeAt(0).deleteContents();
+                sel.getRangeAt(0).collapse();
+                sel.getRangeAt(0).select();
+            }
         }
-        me.fireEvent('beforeCutSelection', selRange);
     },
-    copySelectionWithInternalTags: function() {
+    copySelectionWithInternalTags: function(e) {
         // The user will expect the copied text to be available in the clipboard,
         // so we do NOT stop the propagation of the event.
         if(!this.editorKeyMap) {
@@ -1286,77 +1237,60 @@ Ext.define('Editor.controller.Editor', {
         // CTRL+C gets the selected text (including internal tags)
         var me = this,
             plug = me.getEditPlugin(),
-            editor,
-            segmentId,
-            copiedFrom,
-            sel,
-            selRange,
-            i,
-            selDataHtml = '',
+            copy = {},
+            isTagColumn = false,
+            sel, selRange, i,
             selInternalTags,
-            selDataText,
             activeElement,
-            position,
-            isElementWithInternalTags = function(el){
-                var classNames = el.className.split(' ');
-                if (classNames.indexOf('segment-tag-container')>=0
-                    || classNames.indexOf('segment-tag-column')>=0) {
-                    return true;
-                }
-                return false;
-            },
-            isElementSourceSegment = function(el){
-                var classNames = el.className.split(' ');
-                if (classNames.indexOf('segment-tag-container')>=0
-                    || classNames.indexOf('type-source')>=0) {
-                    return true;
-                }
-                return false;
-            },
-            isEditor = function(el){
-                return (el.nodeName === 'IFRAME');
-            };
+            position;
+
+        //reset previous copies
+        me.copiedSelectionWithTagHandling = null;
             
         //do only something when editing targets:
         if(!me.isEditing || !/^target/.test(plug.editor.columnToEdit)){
             return;
         }
 
-        activeElement = Ext.Element.getActiveElement();
-        
+        activeElement = Ext.fly(Ext.Element.getActiveElement());
+        isTagColumn = activeElement.hasCls('segment-tag-column');
         // if the focus is not in an element that can use internal tags, we have nothing to do.
-        if (!isElementWithInternalTags(activeElement)) {
+        if (!activeElement.hasCls('segment-tag-container') && !isTagColumn && !activeElement.is('iframe.x-htmleditor-iframe')) {
             return;
         }
 
         // Where does the copied text come from? If it's from a segment's source or the Editor itself, 
         // we store the id from the segment, because in this case it will be allowed to paste the internal tags 
         // into the target (but only if the target belongs to the same segment as the source).
-        segmentId = '';
-        copiedFrom = '';
+        copy = {
+            selDataHtml: '', // = selected content WITH internal tags
+            selDataText: '', // = selected content WITHOUT internal tags
+            selSegmentId: '',
+            format: ''
+        };
         
         sel = rangy.getSelection();
         
         // selections that need extra handling:
-        switch(true) {
-            case isElementSourceSegment(activeElement):
-                // whole source segment selected? Then select the content within only.
-                // (= without the surrounding "<div (...) class="segment-tag-container (...) type-source">(...)</div>"
-                selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
-                position = me.getPositionInfoForRange(selRange,activeElement);
-                if(position.atStart && position.atEnd){
-                    sel.selectAllChildren(activeElement);
-                }
-                segmentId = plug.context.record.get('id');
-                copiedFrom = 'source';
-                break;
-            case isEditor(activeElement):
-                editor = plug.editor.mainEditor;
-                sel = rangy.getSelection(editor.getEditorBody());
-                segmentId = plug.context.record.get('id');
-                copiedFrom = 'target';
-                break;
-        } 
+        if(isTagColumn || activeElement.hasCls('segment-tag-container') || activeElement.hasCls('type-source')) {
+            if(isTagColumn && activeElement.down('div.x-grid-cell-inner')) {
+                activeElement = activeElement.down('div.x-grid-cell-inner');
+            }
+            // whole source segment selected? Then select the content within only.
+            // (= without the surrounding "<div (...) class="segment-tag-container (...) type-source">(...)</div>"
+            selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
+            position = me.getPositionInfoForRange(selRange, activeElement.dom);
+            if(position.atStart && position.atEnd){
+                sel.selectAllChildren(activeElement.dom);
+            }
+            copy.selSegmentId = plug.context.record.get('id');
+            copy.format = 'div';
+        }
+        else if (activeElement.is('iframe.x-htmleditor-iframe')) {
+            sel = rangy.getSelection(plug.editor.mainEditor.getEditorBody());
+            copy.selSegmentId = plug.context.record.get('id');
+            copy.format = 'img';
+        }
         
         selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
         if (selRange === null || selRange.collapsed) {
@@ -1370,29 +1304,95 @@ Ext.define('Editor.controller.Editor', {
         for (i = 0; i < sel.rangeCount; i++) {
             selRange = sel.getRangeAt(i);
             selRange = me.getRangeWithFullInternalTags(selRange);
-            selDataHtml += selRange.toHtml();
+            copy.selDataHtml += selRange.toHtml();
         }
         
-        // for insert as html
-        // (must not include element-ids that already exist in Ext.cache!)
-        selDataHtml = selDataHtml.replace(/id="ext-element-[0-9]+"/, '');
+        // preset text and html with the found ranges
+        // for insert as html (must not include element-ids that already exist in Ext.cache!)
+        copy.selDataText = copy.selDataHtml = copy.selDataHtml.replace(/id="ext-element-[0-9]+"/, '');
         
         // for insert as text only
-        // (internal tags are contained as divs; selRange.toString() would not remove them)
-        selDataText = selDataHtml;
-        selInternalTags = selRange.getNodes([1], function(node) {
-            return node.classList.contains('internal-tag');
-        });
-        Ext.Array.each(selInternalTags, function(internalTag) {
-            selDataText = selDataText.replace(internalTag.outerHTML, '');
-        });
+        //the toString is working if copying img tags
+        if(copy.format == 'div') {
+            // for copying internal tags as divs we have to do the following:
+            selInternalTags = selRange.getNodes([1], function(node) {
+                return node.classList.contains('internal-tag');
+            });
+            Ext.Array.each(selInternalTags, function(internalTag) {
+                copy.selDataText = copy.selDataText.replace(internalTag.outerHTML, '');
+            });
+        }
+        else {
+            copy.selDataText = selRange.toString();
+        }
         
-        me.copiedSelectionWithTagHandling = {
-                'selDataHtml': selDataHtml, // = selected content WITH internal tags
-                'selDataText': selDataText, // = selected content WITHOUT internal tags
-                'selSegmentId': segmentId,
-                'copiedFrom': copiedFrom
-        };
+        me.copiedSelectionWithTagHandling = copy;
+
+        console.log(me.copiedSelectionWithTagHandling);
+        //if we are in a regular copy / cut event we set the clipboard content to our needs
+        if(e && e.browserEvent) {
+            e.browserEvent.clipboardData.setData('text/plain', copy.selDataText);
+            e.browserEvent.clipboardData.setData('text/html', copy.selDataHtml);
+            e.preventDefault();
+            e.stopEvent();
+        }
+    },
+    /**
+     * Pasting our own content must be handled special to insert correct tags
+     */
+    pasteContent: function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        var me = this,
+            plug = me.getEditPlugin(),
+            segmentId = plug.context.record.get('id'),
+            internalClip = me.copiedSelectionWithTagHandling || {},
+            clipboard = (e.browserEvent.clipboardData || window.clipboardData),
+            clipboardText = clipboard.getData('Text'),
+            clipboardHtml = clipboard.getData('text/html'),
+            toInsert, sel,
+            textMatch = clipboardText == internalClip.selDataText,
+            //the clipboardHtml adds meta information like charset and so on, so we just check if 
+            // the stored one is a substring of the one in the clipboard
+            htmlMatch = clipboardHtml.includes(internalClip.selDataHtml);
+
+        //remove selected content before pasting the new content
+        sel = rangy.getSelection(this.getEditPlugin().editor.mainEditor.getEditorBody());       
+        if(sel.rangeCount) {
+            sel.getRangeAt(0).deleteContents();
+            sel.getRangeAt(0).collapse();
+            sel.getRangeAt(0).select();
+        }
+
+        //when making a copy in translate5, we store the content in an internal variable and in the clipboard
+        //if neither the text or html clipboard content matches the internally stored content, 
+        // that means that the pasted content comes from outside and we insert just text:
+        if(me.copiedSelectionWithTagHandling === null || !textMatch || !htmlMatch) {
+            me.htmlEditor.insertMarkup(clipboardText);
+            me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
+            me.copiedSelectionWithTagHandling = null;
+            return;
+        }
+        
+/*
+
+*/
+
+        console.log("text", clipboardText);
+        console.log("html", clipboardHtml);
+        console.log("data", internalClip);
+
+        //to insert tags, the copy/cut from segment must be the same as the paste to segment, so that tags are not moved between segments
+        if(segmentId === internalClip.selSegmentId) {
+            toInsert = internalClip.selDataHtml;
+        }
+        else {
+            toInsert = internalClip.selDataText;
+        }
+
+        // we always use insertMarkup, regardless if it is img or div content
+        me.htmlEditor.insertMarkup(toInsert);
+        me.handleAfterContentChange(true); //prevent saving snapshot, since this is done in insertMarkup
     },
     copySourceToTarget: function() {
         var plug = this.getEditPlugin();
