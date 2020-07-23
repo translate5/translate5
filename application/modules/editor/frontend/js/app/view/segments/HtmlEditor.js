@@ -702,6 +702,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @returns {String}
    */
   imgNodeToString: function(imgNode, markup) {
+  	  //it may happen that internal tags already converted to img are tried to be markuped again. In that case, just return the tag: 
+  	  if(/^tag-image-/.test(imgNode.id)) {
+  	  	  return imgNode.outerHTML;
+  	  }
       var id = '', 
           src = imgNode.src.replace(/^.*\/\/[^\/]+/, ''),
           img = Ext.fly(imgNode),

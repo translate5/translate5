@@ -76,16 +76,6 @@ class editor_Services_Connector {
      */
     protected $targetLang;
     
-    /**
-     * @var ZfExtended_Logger
-     */
-    protected $languageresourcesLog;
-    
-    /**
-     * @var Zend_Config
-     */
-    protected $config;
-    
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null){
         $serviceType = $languageResource->getServiceType();
         $connector = ZfExtended_Factory::get($serviceType.editor_Services_Manager::CLS_CONNECTOR);
@@ -95,16 +85,6 @@ class editor_Services_Connector {
         $this->languageResource=$languageResource;
         $this->sourceLang=$sourceLang;
         $this->targetLang=$targetLang;
-        
-        $this->config = Zend_Registry::get('config');
-        //init the language resources logger with 2 writers. The task writer is used
-        //when the language resources is used for a task (ex: query action in editor match grid)
-        $this->languageresourcesLog = ZfExtended_Factory::get('ZfExtended_Logger', [[
-            'writer' => [
-                'languageresourcesLog' => $this->config->resources->ZfExtended_Resource_Logger->writer->languageresourcesLog,
-                'tasklog' => $this->config->resources->ZfExtended_Resource_Logger->writer->tasklog
-            ]
-        ]]);
     }
     
     /**
@@ -206,7 +186,7 @@ class editor_Services_Connector {
             $task->loadByTaskGuid($taskGuid);
             $extra['task']=$task;
         }
-        $extra['message']=$e->__toString();
+        $extra['message']=$e->getMessage();
         throw new editor_Services_Connector_Exception('E1282',$extra);
     }
     
