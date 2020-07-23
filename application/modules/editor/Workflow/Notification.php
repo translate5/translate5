@@ -45,7 +45,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * this periond
      * @var integer
      */
-    const CRON_PERIODICAL_CALL_FREQUENCY_MIN=10;
+    const CRON_PERIODICAL_CALL_FREQUENCY_MIN=30;
     
     /**
      * @var ZfExtended_TemplateBasedMail
