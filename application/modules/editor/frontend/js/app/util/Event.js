@@ -105,9 +105,7 @@ Ext.define('Editor.util.Event', {
         if(!me.event){
             return false;
         }
-        if(me.event.ctrlKey) {
-            keyCodesForDeletion.push(me.extEv.X);                                                   // Ctrl+X
-        }
+        var res = (keyCodesForDeletion.indexOf(me.event.getKey()) != -1);
         return (keyCodesForDeletion.indexOf(me.event.getKey()) != -1);
     },
     /**
@@ -115,6 +113,11 @@ Ext.define('Editor.util.Event', {
      * @returns {Boolean}
      */
     eventIsInsertion: function() {
+        var me = this;
+        //cut, copy and paste is handled via the according events, so the keyboard events itself are not doing an insertion itself
+        if(me.eventIsCtrlV() || me.eventIsCtrlC() || me.eventIsCtrlX()) {
+            return false; 
+        }
         return true;
     },
     /**
@@ -138,6 +141,17 @@ Ext.define('Editor.util.Event', {
             return;
         }
         return  me.event.ctrlKey && (me.event.getKey() == me.extEv.X);                              // Ctrl+X
+    },
+    /**
+     * Is the Key-Event by Ctrl+C?
+     * @returns {Boolean}
+     */
+    eventIsCtrlC: function() {
+        var me = this;
+        if(!me.event){
+            return;
+        }
+        return  me.event.ctrlKey && (me.event.getKey() == me.extEv.C);                              // Ctrl+C
     },
     /**
      * Is the Key-Event Ctrl+Y?
