@@ -949,6 +949,26 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->segmentFieldManager->getView()->create();
         return $this->_loadByTaskGuid($taskGuid,$callback);
     }
+    /**
+     * Loads segments by task-guid and file-id. Returns just a simple array of id and sgmentNrInTask ordered by sgmentNrInTask
+     * @param string $taskGuid
+     * @param int $fileId
+     * @param boolean $ignoreLocked
+     * @return array
+     */
+    public function loadByTaskGuidFileId(string $taskGuid, int $fileId, $ignoreLocked=true){
+        $s = $this->db->select()
+            ->setIntegrityCheck(false)
+            ->from($this->tableName, array('id', 'segmentNrInTask', 'editable', 'pretrans'))
+            ->where($this->tableName.'.taskGuid = ?', $taskGuid)
+            ->where($this->tableName.'.fileId = ?', $fileId);
+        if($ignoreLocked){
+            $s->join('LEK_segments_meta', $this->tableName.'.id = LEK_segments_meta.segmentId', array())
+                ->where('LEK_segments_meta.locked != 1 OR LEK_segments_meta.locked IS NULL');
+        } 
+        $s->order($this->tableName.'.segmentNrInTask ASC');
+        return parent::loadFilterdCustom($s);
+    }
     
     /**
      * inits and returns the editor_Models_Segment_EditablesFinder

@@ -91,20 +91,15 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->addIsFirstFileInfo($taskGuid);
         
         // ----- Specific handling of rows (start) -----
-        
+
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
         
-        // - Check if the user can edit only segmentranges?
-        $sessionUser = new Zend_Session_Namespace('user');
-        $sessionUserGuid = $sessionUser->data->userGuid;
-        $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($sessionUserGuid, $task);
-        /* @var $tua editor_Models_TaskUserAssoc */
-        $role = $tua->getRole();
-        $handleSegmentranges = $tua->isSegmentrangedTaskForRole($task, $role);
-        if ($handleSegmentranges) {
-            $assignedSegments = $tua->getAllAssignedSegmentsByUserAndRole($taskGuid, $sessionUserGuid, $role);
+        $handleSegmentranges = $this->checkAndGetSegmentsRange($task);
+        if (is_array($handleSegmentranges)) {
+            $assignedSegments = $handleSegmentranges;
+            $handleSegmentranges = true;
         }
         
         // - Anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
@@ -585,7 +580,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             /* @var $tua editor_Models_TaskUserAssoc */
             $role = $tua->getRole();
             if ($tua->isSegmentrangedTaskForRole($task, $role)) {
-                $assignedSegments = $tua->getAllAssignedSegmentsByUserAndRole($taskGuid, $sessionUserGuid, $role);
+                $assignedSegments = $tua->getAllAssignedSegmentsByUserAndRole($task->getTaskGuid(), $sessionUserGuid, $role);
                 if (!in_array($this->entity->getSegmentNrInTask(), $assignedSegments)) {
                     $isTaskGuidAndEditable = false;
                 }
@@ -630,10 +625,20 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     public function getAction() {
         $this->entity->load($this->_getParam('id'));
-        // the following editable value is not intended to be saved,
-        // its only to reuse the taskcheck of checkTaskGuidAndEditable regardless of the editable state
-        $this->entity->setEditable(true);
-        $this->checkTaskGuidAndEditable();
+        $session = new Zend_Session_Namespace();
+        if ($session->taskGuid !== $this->entity->getTaskGuid()) {
+            //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        //check if the segment range feature is active for the current segment and task,
+        //if it is active, calculate the editable state of the segment
+        //segment get action is also called by the message bus to refresh the segment content whenever some 
+        //other user updates the segment
+        $handleSegmentranges = $this->checkAndGetSegmentsRange();
+        if (is_array($handleSegmentranges) && $this->entity->getEditable()) {
+            $editable = in_array($this->entity->getSegmentNrInTask(), $handleSegmentranges);
+            $this->entity->setEditable($editable);
+        }
         $this->view->rows = $this->entity->getDataObject();
     }
 
@@ -743,5 +748,33 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $qms=ZfExtended_Factory::get('editor_Models_Qmsubsegments');
         /* @var $qms  editor_Models_Qmsubsegments */
         return $qms->hasTaskMqm($taskGuid);
+    }
+    
+    /***
+     * Check if the segments range feature is active for the given task. If the feature is not active boolean false will be returned.
+     * If the feature is active, the assigned segments as array will be returned.
+     * @param editor_Models_Task $task
+     * @return boolean|array
+     */
+    protected function checkAndGetSegmentsRange(editor_Models_Task $task=null){
+        if(!isset($task)){
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($this->session->taskGuid);
+        }
+        if ($task->getUsageMode() !== $task::USAGE_MODE_SIMULTANEOUS) {
+            return false;
+        }
+        $sessionUser = new Zend_Session_Namespace('user');
+        $sessionUserGuid = $sessionUser->data->userGuid;
+        $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($sessionUserGuid, $task);
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $role = $tua->getRole();
+        $handleSegmentranges = $tua->isSegmentrangedTaskForRole($task, $role);
+        if(!$handleSegmentranges){
+            return false;
+        }
+        return $tua->getAllAssignedSegmentsByUserAndRole($task->getTaskGuid(), $sessionUserGuid, $role);
+        
     }
 }

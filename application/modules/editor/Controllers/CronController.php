@@ -72,6 +72,7 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
         $gc = $bootstrap->getPluginResource('ZfExtended_Resource_GarbageCollector');
         /* @var $gc ZfExtended_Resource_GarbageCollector */
         $gc->cleanUp($gc::ORIGIN_CRON);
+        $this->doCronWorkflow('doCronPeriodical');
         echo "OK";
     }
     
@@ -81,20 +82,30 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
     public function dailyAction() {
         $this->_helper->layout->disableLayout();
         $this->_helper->viewRenderer->setNoRender();
+
+        $this->doCronWorkflow('doCronDaily');
+        
+        $summary = ZfExtended_Factory::get('ZfExtended_Logger_Summary');
+        /* @var $summary ZfExtended_Logger_Summary */
+        $summary->sendSummaryToAdmins();
+        
+        echo "OK";
+    }
+    
+    /**
+     * call workflow action based on given name
+     * @param string $fn
+     */
+    protected function doCronWorkflow(string $fn){
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
         $workflows = $wfm->getWorkflows();
         foreach($workflows as $wfId => $cls) {
             $workflow = $wfm->get($wfId);
             /* @var $workflow editor_Workflow_Abstract */
-            $workflow->doCronDaily();
+            $workflow->$fn();
+           
         }
-
-        $summary = ZfExtended_Factory::get('ZfExtended_Logger_Summary');
-        /* @var $summary ZfExtended_Logger_Summary */
-        $summary->sendSummaryToAdmins();
-        
-        echo "OK";
     }
 }
 

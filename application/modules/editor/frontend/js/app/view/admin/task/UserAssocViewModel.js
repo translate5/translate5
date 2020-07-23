@@ -35,11 +35,13 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
     ],
     strings: {
         editInfo: '#UT#Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!',
-        segmentrangeError: '#UT#Nicht editierbare Segmente',
+        segmentrangeError: '#UT#Nicht zugewiesene Segmente',
         translator: '#UT#Übersetzer',
         translatorCheck: '#UT#Zweiter Lektor',
         reviewer: '#UT#Lektor',
-        visitor: '#UT#Besucher'
+        visitor: '#UT#Besucher',
+        allEditedByUsers:'#UT#(alle Segmente können von allen Nutzern editiert werden)',
+        canNotBeEditedByUsers:'#UT#(können derzeit von niemandem bearbeitet werden)'
     },
     
     stores: {
@@ -88,18 +90,35 @@ Ext.define('Editor.view.admin.task.UserAssocViewModel', {
                     i,
                     workflowdata,
                     workflowroles,
-                    rolename;
+                    rolename,
+                    allUnassigned=true;
                 if (task === null) {
                     return html;
                 }
                 missingsegmentranges = task.get('missingsegmentranges');
-                if(missingsegmentranges.length > 0) {
+                if(missingsegmentranges && missingsegmentranges.length > 0) {
                     workflowdata =  task.getWorkflowMetaData();
                     workflowroles = workflowdata.roles;
                     html += '<hr><span class="errors">' + me.strings.segmentrangeError + ':</span><br>';
                     for (i = 0; i < missingsegmentranges.length; i++) {
+                        allUnassigned=true;
                         rolename = missingsegmentranges[i]['role'];
+                        //check if there are assigned users of the curent rolename
+                        for(var u=0;u<task.get('users').length;u++){
+                            var assoc=task.get('users')[u];
+                            if(assoc.role===rolename && assoc.segmentrange && assoc.segmentrange!=""){
+                                allUnassigned=false;
+                            }
+                        }
+                        //add aditional text if all are unasigned or there are asigned users to a role
+                        if(allUnassigned){
+                            html += ' '+me.strings.allEditedByUsers + '<br>';
+                        }else{
+                            html += ' '+me.strings.canNotBeEditedByUsers + '<br>';
+                        }
+                        
                         html += '- ' + workflowroles[rolename] + ': ' + missingsegmentranges[i]['missingSegments'] + '<br>';
+                        html += '<hr>';
                     } 
                 }
                 return html;

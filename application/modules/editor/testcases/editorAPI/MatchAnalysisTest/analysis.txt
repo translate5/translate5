@@ -2,6 +2,7 @@
     {
         "resourceName": "MATESTresource1",
         "resourceColor": null,
+        "internalFuzzy": "Yes",
         "104": 0,
         "103": 0,
         "102": 0,
@@ -12,12 +13,12 @@
         "79": 0,
         "69": 0,
         "59": 0,
-        "noMatch": 0,
-        "internalFuzzy": "Yes"
+        "noMatch": 0
     },
     {
         "resourceName": "MATESTresource1 - internal Fuzzies",
         "resourceColor": null,
+        "internalFuzzy": "Yes",
         "104": 0,
         "103": 0,
         "102": 0,
@@ -33,6 +34,7 @@
     {
         "resourceName": "MATESTresource2",
         "resourceColor": null,
+        "internalFuzzy": "Yes",
         "104": 0,
         "103": 0,
         "102": 0,
@@ -43,12 +45,12 @@
         "79": 11,
         "69": 61,
         "59": 9,
-        "noMatch": 39,
-        "internalFuzzy": "Yes"
+        "noMatch": 39
     },
     {
         "resourceName": "MATESTresource2 - internal Fuzzies",
         "resourceColor": null,
+        "internalFuzzy": "Yes",
         "104": 0,
         "103": 0,
         "102": 0,
@@ -59,12 +61,12 @@
         "79": 7,
         "69": 8,
         "59": 4,
-        "noMatch": 22,
-        "internalFuzzy": "Yes"
+        "noMatch": 22
     },
     {
         "resourceName": "MATESTresource3",
         "resourceColor": null,
+        "internalFuzzy": "Yes",
         "104": 3,
         "103": 0,
         "102": 0,
@@ -75,12 +77,12 @@
         "79": 0,
         "69": 0,
         "59": 0,
-        "noMatch": 415,
-        "internalFuzzy": "Yes"
+        "noMatch": 415
     },
     {
         "resourceName": "",
         "resourceColor": "",
+        "internalFuzzy": "Yes",
         "104": 6,
         "103": 0,
         "102": 56,
@@ -91,7 +93,6 @@
         "79": 0,
         "69": 0,
         "59": 0,
-        "noMatch": 0,
-        "internalFuzzy": "Yes"
+        "noMatch": 0
     }
 ]

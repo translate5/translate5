@@ -266,8 +266,10 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_Abstract::update()
      */
     public function update(editor_Models_Segment $segment) {
-        // if categores are empty: 403 with {"message": "Tag is required option"}
-        editor_Plugins_NecTm_Init::validateCategories(implode(',',$this->categories));
+        // if categories are empty: NEC-TM-Api responds a 403 with {"message": "Tag is required option"}.
+        $service = ZfExtended_Factory::get('editor_Plugins_NecTm_Service');
+        /* @var $service editor_Plugins_NecTm_Service */
+        $service->validateCategories(implode(',',$this->categories));
         
         $filename = $this->languageResource->getSpecificData('fileName');  //  (= if file was imported for LanguageResource on creation)
         
