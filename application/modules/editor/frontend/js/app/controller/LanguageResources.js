@@ -235,11 +235,6 @@ Ext.define('Editor.controller.LanguageResources', {
           region: 'south',
           weight: 5,
           resizeHandles: 'n',
-          //setting segment grid 58% and match grid 42% of the height when visual review is active
-          //when visual review is not active, segment grid is 70% and matchgrid 30%
-          flex:!Editor.data.task.get('visualReviewFiles') ? 0.30 : 0.42,
-          // minheight remains also for manual resizing
-          minHeight: 150,
           listeners: {
               //remove the flex value after panel creation, since with flex value set not resizing is allowed
               boxready: function(panel) {
@@ -248,6 +243,9 @@ Ext.define('Editor.controller.LanguageResources', {
                   panel.setHeight(height);
               }
           },
+          height:Editor.data.task.get('visualReviewFiles') ? '25%' : '30%',
+          // minheight remains also for manual resizing
+          minHeight: 150,
           //collapsing is independant of resizing
           collapsible: true,
           resizable: true,
@@ -263,17 +261,18 @@ Ext.define('Editor.controller.LanguageResources', {
    * Check if the language resources match grid should be/is disabled
    */
   isLanguageResourcesDisabled:function(){
-	  var me=this,
+      var me=this,
 	  	  disableIfTermCollectionOnly=Editor.data.editor.LanguageResources.disableIfOnlyTermCollection,
-	  	  assocCount=me.getAssocStoreCount(),
+	  	  assoc=Editor.data.task.get('taskassocs') ? Editor.data.task.get('taskassocs') : null,
+	  	  assocCount=assoc ? assoc.length : 0,
 	  	  termCollectionCount=0;
 	  //no results in the assoc store -> disabled
 	  if(assocCount <=0){
 		  return true;
 	  }
 	  //foreach rec in the assoc store get the termcollection count
-	  me.assocStore.each(function(record){
-		  if(record.get('resourceType') === Editor.util.LanguageResources.resourceType.TERM_COLLECTION){
+	  assoc.forEach(function(record){
+		  if(record.resourceType === Editor.util.LanguageResources.resourceType.TERM_COLLECTION){
 			  termCollectionCount++;
 		  }
 	  });

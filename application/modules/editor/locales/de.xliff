@@ -1817,6 +1817,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='UmVzc291cmNlOiB7bmFtZX0='><source>Ressource: {name}</source><target>Ressource: {name}</target></trans-unit>
 <trans-unit id='KGFsbGUgU2VnbWVudGUga8O2bm5lbiB2b24gYWxsZW4gTnV0emVybiBlZGl0aWVydCB3ZXJkZW4p'><source>(alle Segmente können von allen Nutzern editiert werden)</source><target>(alle Segmente können von allen Nutzern editiert werden)</target></trans-unit>
 <trans-unit id='KGvDtm5uZW4gZGVyemVpdCB2b24gbmllbWFuZGVtIGJlYXJiZWl0ZXQgd2VyZGVuKQ=='><source>(können derzeit von niemandem bearbeitet werden)</source><target>(können derzeit von niemandem bearbeitet werden)</target></trans-unit>
+<trans-unit id='QWt0dWVsbGVzIERhdHVt'><source>Aktuelles Datum</source><target>Aktuelles Datum</target></trans-unit>
+<trans-unit id='U3R1bmRl'><source>Stunde</source><target>Stunde</target></trans-unit>
+<trans-unit id='TWludXRlbg=='><source>Minuten</source><target>Minuten</target></trans-unit>
 </body>
  </file>
 </xliff>

@@ -28,7 +28,11 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.task.UserAssoc', {
   extend: 'Ext.panel.Panel',
-  requires: ['Editor.view.admin.task.UserAssocGrid','Editor.view.admin.task.UserAssocViewModel'],
+  requires: [
+      'Editor.view.admin.task.UserAssocGrid',
+      'Editor.view.admin.task.UserAssocViewModel',
+      'Editor.view.DateTimeField.DateTimeField'
+  ],
   alias: 'widget.adminTaskUserAssoc',
   itemId:'adminTaskUserAssoc',
   strings: {
@@ -127,10 +131,10 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                       store: '{states}'
                   }
               },{
-            	  xtype: 'datefield',
-            	  name: 'deadlineDate',
-            	  fieldLabel: me.strings.fieldDeadline,
-            	  submitFormat: Editor.DATE_ISO_FORMAT,
+                  xtype:'datetimefield',
+                  name: 'deadlineDate',
+                  fieldLabel: me.strings.fieldDeadline,
+                  format : Editor.DATE_ISO_FORMAT,
                   anchor: '100%'
               },{
                   xtype: 'textfield',

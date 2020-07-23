@@ -99,6 +99,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $handleSegmentranges = $this->checkAndGetSegmentsRange($task);
         if (is_array($handleSegmentranges)) {
             $assignedSegments = $handleSegmentranges;
+            $handleSegmentranges = true;
         }
         
         // - Anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
