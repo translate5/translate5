@@ -761,6 +761,9 @@ a.x-btn span.task-confirmation {
 	font-family: FontAwesome5FreeSolid;
 	content: "\f05a";
 }
+.userAssocLabelIconField .x-form-item-label-inner{
+	width:60%;
+}
 
 .checkBoxLableInfoIconDefault {
 	background-repeat: no-repeat;

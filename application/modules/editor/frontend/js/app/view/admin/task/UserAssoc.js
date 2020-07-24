@@ -134,9 +134,10 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
               },{
                   xtype:'datetimefield',
                   name: 'deadlineDate',
-                  fieldLabel: me.strings.fieldDeadline,
                   format : Editor.DATE_ISO_FORMAT,
-                  labelClsExtra: 'labelInfoIcon',
+                  fieldLabel: me.strings.fieldDeadline,
+                  labelCls: 'labelInfoIcon',
+                  cls:'userAssocLabelIconField',
                   autoEl: {
                       tag: 'span',
                       'data-qtip': me.strings.deadlineDateInfoTooltip
@@ -147,7 +148,8 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                   itemId: 'segmentrange',
                   name: 'segmentrange',
                   fieldLabel: me.strings.fieldSegmentrange,
-                  labelClsExtra: 'labelInfoIcon',
+                  labelCls: 'labelInfoIcon',
+                  cls:'userAssocLabelIconField',
                   autoEl: {
                       tag: 'span',
                       'data-qtip': me.strings.fieldSegmentrangeInfo
