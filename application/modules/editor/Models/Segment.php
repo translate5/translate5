@@ -1690,7 +1690,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return number|mixed
      */
     public function getTotalSegmentsCount(string $taskGuid){
-        $this->reInitDb($taskGuid);
         $s = $this->db->select(true)
         ->columns('count(*) as cnt')
         ->where('`taskGuid`=?', $taskGuid);

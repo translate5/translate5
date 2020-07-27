@@ -34,6 +34,19 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
      */
     private $taskOldState=null;
     
+    
+    /***
+     * 
+     * @var ZfExtended_Logger
+     */
+    protected $log;
+    
+    
+    public function __construct() {
+        parent::__construct();
+        $this->log=Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
+    }
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -52,7 +65,6 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
      */
     public function work() {
         try {
-            $this->log=Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
             $params = $this->workerModel->getParameters();
             $ret=$this->doWork();
             
@@ -65,9 +77,9 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
             $this->task->setState($this->taskOldState);
             $this->task->save();
             $this->task->unlock();
-            $this->log->error('E1100', 'MatchAnalysis Plug-In: Error happend on match analysis and pretranslation.',[
+            $this->log->error('E1100', 'MatchAnalysis Plug-In: analysis and pre-translation cannot be run.', [
                 'task' => $this->task,
-                'error '=> $e->__toString()//this will pring the message and the stack
+                'message'=> $e->getMessage()
             ]);
             return false;
         }
@@ -146,7 +158,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         
         // init worker and queue it
         if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
-            $this->log->error('E1168', 'MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized.');
+            $this->log->error('E1168', 'MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized.',['task'=>$this->task]);
             return false;
         }
         $worker->queue($workerId);

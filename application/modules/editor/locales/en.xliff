@@ -3786,6 +3786,13 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IG1hdGNoIHRoZSBleHBlY3RlZCBzdHJ1Y3R1cmUgZm9yIGEgRE5TIGhvc3RuYW1l'><source>'%value%' does not match the expected structure for a DNS hostname</source><target>'%value%' does not match the expected structure for a DNS hostname</target></trans-unit>
 <trans-unit id='KGFsbGUgU2VnbWVudGUga8O2bm5lbiB2b24gYWxsZW4gTnV0emVybiBlZGl0aWVydCB3ZXJkZW4p'><source>(alle Segmente können von allen Nutzern editiert werden)</source><target>(all segments can be edited by all users)</target></trans-unit>
 <trans-unit id='KGvDtm5uZW4gZGVyemVpdCB2b24gbmllbWFuZGVtIGJlYXJiZWl0ZXQgd2VyZGVuKQ=='><source>(können derzeit von niemandem bearbeitet werden)</source><target>(can not be edited by anyone right now)</target></trans-unit>
+<trans-unit id='QWt0dWVsbGVzIERhdHVt'><source>Aktuelles Datum</source><target>Current date</target></trans-unit>
+<trans-unit id='U3R1bmRl'><source>Stunde</source><target>Hour</target></trans-unit>
+<trans-unit id='TWludXRlbg=='><source>Minuten</source><target>Minutes</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBzZW5kZXQgc3RhbmRhcmRtw6TDn2lnIDEgVGFnIHZvciB1bmQgMSBUYWcgbmFjaCBkZW0gZmVzdGdlbGVndGVuIERhdHVtIHVuZCBkZXIgZmVzdGdlbGVndGVuIFVocnplaXQgKCsvLSAxMCBNaW51dGVuKSBlaW5lIEZyaXN0ZXJpbm5lcnVuZy4gRGllcyBrYW5uIHZvbiBJaHJlbSBBZG1pbmlzdHJhdG9yIGdlw6RuZGVydCB3ZXJkZW4u'>
+  <source>translate5 sendet standardmäßig 1 Tag vor und 1 Tag nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.</source>
+  <target>translate5 will send a deadline reminder by default 1 day before and 1 day after the set date and time (+/- 10 min). This can be changed by your administrator.</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

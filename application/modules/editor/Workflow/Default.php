@@ -200,6 +200,17 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         $this->callActions(__FUNCTION__);
     }
     
+    /***
+     * 
+     * {@inheritDoc}
+     * @see editor_Workflow_Abstract::doCronPeriodical()
+     */
+    public function doCronPeriodical(){
+        $this->isCron = true;
+        //no info about tasks, tuas are possible in cron call, so set nothing here
+        $this->callActions(__FUNCTION__);
+    }
+    
     /**
      * {@inheritDoc}
      * @see editor_Workflow_Abstract::handleUserAssociationAdded()
@@ -243,5 +254,4 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         }
         $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
     }
-
 }

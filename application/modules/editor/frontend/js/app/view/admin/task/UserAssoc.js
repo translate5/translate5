@@ -28,7 +28,11 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.task.UserAssoc', {
   extend: 'Ext.panel.Panel',
-  requires: ['Editor.view.admin.task.UserAssocGrid','Editor.view.admin.task.UserAssocViewModel'],
+  requires: [
+      'Editor.view.admin.task.UserAssocGrid',
+      'Editor.view.admin.task.UserAssocViewModel',
+      'Ext.ux.DateTimeField'
+  ],
   alias: 'widget.adminTaskUserAssoc',
   itemId:'adminTaskUserAssoc',
   strings: {
@@ -41,7 +45,8 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       formTitleEdit: '#UT#Bearbeite Benutzer "{0}"',
       fieldDeadline:'#UT#Deadline',
       fieldSegmentrange: '#UT#Editierbare Segmente',
-      fieldSegmentrangeInfo: '#UT#Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)'
+      fieldSegmentrangeInfo: '#UT#Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)',
+      deadlineDateInfoTooltip:'#UT#translate5 sendet standardmäßig 1 Tag vor und 1 Tag nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.'
   },
   viewModel: {
       type: 'taskuserassoc'
@@ -127,17 +132,24 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
                       store: '{states}'
                   }
               },{
-            	  xtype: 'datefield',
-            	  name: 'deadlineDate',
-            	  fieldLabel: me.strings.fieldDeadline,
-            	  submitFormat: Editor.DATE_ISO_FORMAT,
+                  xtype:'datetimefield',
+                  name: 'deadlineDate',
+                  format : Editor.DATE_ISO_FORMAT,
+                  fieldLabel: me.strings.fieldDeadline,
+                  labelCls: 'labelInfoIcon',
+                  cls:'userAssocLabelIconField',
+                  autoEl: {
+                      tag: 'span',
+                      'data-qtip': me.strings.deadlineDateInfoTooltip
+                  },
                   anchor: '100%'
               },{
                   xtype: 'textfield',
                   itemId: 'segmentrange',
                   name: 'segmentrange',
                   fieldLabel: me.strings.fieldSegmentrange,
-                  labelClsExtra: 'textfieldLabelInfoIcon',
+                  labelCls: 'labelInfoIcon',
+                  cls:'userAssocLabelIconField',
                   autoEl: {
                       tag: 'span',
                       'data-qtip': me.strings.fieldSegmentrangeInfo
