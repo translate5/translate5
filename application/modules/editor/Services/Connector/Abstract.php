@@ -192,11 +192,21 @@ abstract class editor_Services_Connector_Abstract {
      * @return string
      */
     public function getQueryString(editor_Models_Segment $segment) {
+        return $this->getQueryStringByName($segment, editor_Models_SegmentField::TYPE_SOURCE);
+    }
+    
+    /***
+     * returns the original or edited $segmentField content to be queried, depending on source edit
+     * 
+     * @param editor_Models_Segment $segment
+     * @param string $segmentField: segmentField (source or target)
+     * @return string
+     */
+    public function getQueryStringByName(editor_Models_Segment $segment,string $segmentField) {
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($segment->getTaskGuid());
-        $source = editor_Models_SegmentField::TYPE_SOURCE;
-        $sourceMeta = $sfm->getByName($source);
+        $sourceMeta = $sfm->getByName($segmentField);
         $isSourceEdit = ($sourceMeta !== false && $sourceMeta->editable == 1);
-        return $isSourceEdit ? $segment->getFieldEdited($source) : $segment->getFieldOriginal($source);
+        return $isSourceEdit ? $segment->getFieldEdited($segmentField) : $segment->getFieldOriginal($segmentField);
     }
     
     /**

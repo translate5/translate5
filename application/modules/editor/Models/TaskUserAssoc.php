@@ -636,4 +636,15 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
         return editor_Models_TaskUserAssoc_Segmentrange::getRanges($notAssignedSegments);
     }
+    
+    /**
+     * returns the tua data with removed auth hash
+     * @return stdClass
+     */
+    public function getSanitizedEntityForLog(): stdClass {
+        $tua = $this->getDataObject();
+        unset($tua->staticAuthHash);
+        unset($tua->usedInternalSessionUniqId);
+        return $tua;
+    }
 }

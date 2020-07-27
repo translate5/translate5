@@ -1145,3 +1145,10 @@ Ext.override(Ext.data.schema.Role, {
         }
     }
 });
+/***
+ * Set the default dismis delay of the tooltip to 15 sec. In translate5 there are some larger tooltip texts
+ * and 5 sec (default dismis delay before override) is to short
+ */
+Ext.override(Ext.tip.ToolTip, {
+    dismissDelay:15000
+});

@@ -109,9 +109,10 @@ class editor_Plugins_NecTm_Service extends editor_Services_ServiceAbstract {
      * if not, the data can't be searched by users (only by admin)",
      * TMs cannot be updated, ...
      * @param string $categories
+     * 
      */
     public function validateCategories($categories) {
-        if (empty($categories) && empty($this->service->getTopLevelCategoriesIds())) {
+        if (empty($categories) && empty($this->getTopLevelCategoriesIds())) {
             throw new editor_Plugins_NecTm_Exception('E1256');
         }
     }
