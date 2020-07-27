@@ -48,13 +48,62 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
         $this->defaultMatchRate = $config->runtimeOptions->plugins->PangeaMt->matchrate;
     }
     
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::query()
+    /***
+     * 
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        return $this->queryPangeaMtApi($this->prepareDefaultQueryString($segment), true);
+        $queryString = $this->getQueryString($segment);
+        $this->resultList->setDefaultSource($queryString);
+        
+        $queryString = $this->restoreWhitespaceForQuery($queryString);
+        
+        //TODO: tag mapper class, something similar as TmTagManager from commit-> 7465209ac82597d88de70850b093d750a1964922
+        //$map is set by reference
+        $map = [];
+        $queryString = $this->internalTag->toXliffPaired($queryString, true, $map);
+        $mapCount = count($map);
+        
+        //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
+        $xmlParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $xmlParser editor_Models_Import_FileParser_XmlParser */
+        
+        $this->shortTagIdent = $mapCount + 1;
+        $xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
+            $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true);
+            $textNode = $this->whitespaceTagReplacer($textNode);
+            $xmlParser->replaceChunk($key, $textNode);
+        });
+            
+        $results = null;
+        $sourceLang = $this->languageResource->getSourceLangRfc5646(); // = e.g. "de", TODO: validate against $this->sourceLang (e.g. 4)
+        $targetLang = $this->languageResource->getTargetLangRfc5646();// = e.g. "en"; TODO: validate against $this->targetLang (e.g. 5)
+        $engineId = $this->languageResource->getSpecificData('engineId');
+        
+        if($this->api->search($queryString, $sourceLang, $targetLang, $engineId)){
+            $results = $this->api->getResult();
+            if(empty($results)) {
+                return $this->resultList;
+            }
+            
+            foreach ($results as $result) {
+                $result = $result[0];
+                $target = $result->tgt ?? "";
+                $source=$result->src ?? "";
+
+                $target = $xmlParser->parse($target);
+                $target = $this->internalTag->reapply2dMap($target, $map);
+                $this->resultList->addResult($target, $this->defaultMatchRate);
+                
+                $source = $xmlParser->parse($source);
+                $source = $this->internalTag->reapply2dMap($source, $map);
+                $this->resultList->setSource($source);
+            }
+        }
+        return $this->resultList;
     }
+    
     
     /**
      * (non-PHPdoc)
@@ -89,11 +138,6 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
         if($this->api->search($searchString, $sourceLang, $targetLang, $engineId)){
             $allResults = $this->api->getResult();
         }
-        /*
-         *   if($this->api->search($searchString, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
-            $result = $this->api->getResult();
-        }
-         */
         
         if(empty($allResults)) {
             return $this->resultList;

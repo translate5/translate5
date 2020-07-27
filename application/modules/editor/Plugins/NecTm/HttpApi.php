@@ -228,8 +228,7 @@ class editor_Plugins_NecTm_HttpApi {
                              // 'strip_tags'  => false,  // "Strip all XML tags from the query"; default: false
                              'tag'         => $tagIds);
         $processResponse = $this->necTmRequest($method, $endpointPath, $data, $queryParams);
-        $results = $this->result->results; // TODO: multiple results??
-        $this->result = $results[0] ?? $results;
+        $this->result = $this->result->results ?? [];
         return $processResponse;
     }
     
