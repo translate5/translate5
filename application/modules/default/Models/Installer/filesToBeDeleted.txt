@@ -169,3 +169,5 @@
 /public/modules/editor/js/app/view/segments/StatusStripViewController.js
 /public/modules/editor/js/app/view/ui/segments/column/Editable.js
 /public/modules/editor/js/app/view/ui/segments/column/IsWatched.js
+/public/modules/editor/js/app/view/DateTimeField/DateTimeField.js
+/public/modules/editor/js/app/view/DateTimeField/DateTimePicker.js
