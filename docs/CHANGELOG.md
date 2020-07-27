@@ -3,6 +3,27 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [5.0.6] - 2020-07-23
+###Changed
+TRANSLATE-2139: Pre-translation exceptions
+  The error handling for integrated language resources has been improved
+
+###Bugfixes
+TRANSLATE-2117: LanguageResources: update & query segments with tags
+  For PangeaMT and NEC-TM the usage of internal tags was provided / fixed and a general mechanism for language resources for this issue introduced
+TRANSLATE-2127: Xliff files with file extension xml are passed to okapi instead of translate5s xliff parser
+  XML files that acutally contain XLIFF had been passed to Okapi instead of the translate5 xliff parser, if they startet with a BOM (Byte order mark)
+TRANSLATE-2138: Visual via URL does not work in certain cases
+  In some cases passing the layout via URL did not work
+TRANSLATE-2142: Missing property definition
+  A small fix
+TRANSLATE-2143: Problems Live-Editing: Shortened segments, insufficient whitespace
+  Major enhancements in the „What you see is what you get“ feature regarding whitespace handling and layout issues
+TRANSLATE-2144: Several problems with copy and paste content into an edited segment
+  
+TRANSLATE-2146: Exclude materialized view check in segments total count
+  A small fix
+
 ## [5.0.5] - 2020-07-13
 ###Added
 [TRANSLATE-2137] - Translate files with InstantTranslate: Enable it to turn the feature of via configuration
