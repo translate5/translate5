@@ -1,0 +1,13 @@
+Purpose of this directory: 
+provide a unified way to include extjs ux libraries at one place, which is used with setPath in ExtJS then.
+
+Usage: 
+Embed the UX extensions via composer.
+Symlink the libraries / files and their licenses here, then set their path in app-js-development.phtml (see example there)
+
+The extjs delivered UX directory content is configured as separate Path.
+
+Deployment:
+The translate5 deploy process bundles this directory then as zip, downloaded separatly by the translate5 installer. 
+The licenses are handled by the comcast/php-legal-licenses, though each license should be provided here as symlink too!
+
