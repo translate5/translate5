@@ -55,7 +55,12 @@ Ext.manifest = {
     }
 };
 <?php } ?>
+//register ExtJS delivered UX components as default:
 Ext.Loader.setPath('Ext.ux', '<?php echo $this->extJsBasepath;?>/packages/ux/classic/src/');
+
+//Register custom UXs libs (use Package paths were possible, and single files only if really needed):
+Ext.Loader.setPath('Ext.ux.DateTimeField', '<?php echo $this->publicModulePath;?>/js/ux/DateTimeField.js');
+Ext.Loader.setPath('Ext.ux.DateTimePicker', '<?php echo $this->publicModulePath;?>/js/ux/DateTimePicker.js');
 
 //Intercept setPath for developing systems, on production all should work with above builded code
 Ext.Loader.setPathIntercepted = Ext.Loader.setPath;

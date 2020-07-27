@@ -31,7 +31,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
   requires: [
       'Editor.view.admin.task.UserAssocGrid',
       'Editor.view.admin.task.UserAssocViewModel',
-      'Editor.view.DateTimeField.DateTimeField'
+      'Ext.ux.DateTimeField'
   ],
   alias: 'widget.adminTaskUserAssoc',
   itemId:'adminTaskUserAssoc',
