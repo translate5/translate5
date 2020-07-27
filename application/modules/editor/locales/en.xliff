@@ -3789,6 +3789,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QWt0dWVsbGVzIERhdHVt'><source>Aktuelles Datum</source><target>Current date</target></trans-unit>
 <trans-unit id='U3R1bmRl'><source>Stunde</source><target>Hour</target></trans-unit>
 <trans-unit id='TWludXRlbg=='><source>Minuten</source><target>Minutes</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBzZW5kZXQgc3RhbmRhcmRtw6TDn2lnIDEgVGFnIHZvciB1bmQgMSBUYWcgbmFjaCBkZW0gZmVzdGdlbGVndGVuIERhdHVtIHVuZCBkZXIgZmVzdGdlbGVndGVuIFVocnplaXQgKCsvLSAxMCBNaW51dGVuKSBlaW5lIEZyaXN0ZXJpbm5lcnVuZy4gRGllcyBrYW5uIHZvbiBJaHJlbSBBZG1pbmlzdHJhdG9yIGdlw6RuZGVydCB3ZXJkZW4u'>
+  <source>translate5 sendet standardmäßig 1 Tag vor und 1 Tag nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.</source>
+  <target>translate5 will send a deadline reminder by default 1 day before and 1 day after the set date and time (+/- 10 min). This can be changed by your administrator.</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
