@@ -41,8 +41,8 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-$sql = 'SELECT count(*) as rows FROM LEK_workflow_action where LEK_workflow_action.trigger="doCronDaily" 
-        AND (LEK_workflow_action.action="notifyOverdueDeadline" 
+$sql = 'SELECT count(*) as `rows` FROM LEK_workflow_action where LEK_workflow_action.trigger="doCronDaily"
+        AND (LEK_workflow_action.action="notifyOverdueDeadline"
         OR LEK_workflow_action.action="notifyDeadlineApproaching") ';
 
 $db = Zend_Db_Table::getDefaultAdapter();
@@ -58,7 +58,7 @@ if(!empty($result) && $result['rows']>0){
     
 }else{
     //insert default periodical trigger for notifyOverdueDeadline and notifyDeadlineApproaching
-    $sql="INSERT INTO `LEK_workflow_action` (`workflow`, `trigger`, `actionClass`, `action`) 
+    $sql="INSERT INTO `LEK_workflow_action` (`workflow`, `trigger`, `actionClass`, `action`)
           VALUES ('default', 'doCronPeriodical', 'editor_Workflow_Notification', 'notifyOverdueDeadline'),
           ('default', 'doCronPeriodical', 'editor_Workflow_Notification', 'notifyDeadlineApproaching');";
 }
