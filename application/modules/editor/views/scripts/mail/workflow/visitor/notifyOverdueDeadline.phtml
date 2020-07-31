@@ -31,8 +31,9 @@
 
 $this->render('general.phtml');
 
-$title=$this->translate->_('Die Aufgabe "%s" ist "%s" überfällig!');
-$this->subject = sprintf($title,$this->task->getTaskName(),$this->daysOffset ?? null);
+$title=$this->translate->_('Die Aufgabe "%s" ist "%s" %s überfällig!');
+$daysString =($this->daysOffset > 1) ? $this->translate->_('Tagen') : $this->translate->_('Tag');
+$this->subject = sprintf($title,$this->task->getTaskName(),$this->daysOffset,$daysString);
 
 $mainText=$this->templateApply('bitte denken Sie an die Fertigstellung Ihrer Aufgabe zu untenstehendem Projekt. Der Abgabetermin ist überfällig.<br/><br/>Zur Bearbeitung loggen Sie sich bitte mit Ihren persönlichen Zugangsdaten hier ein:<br/><br/>{portalLink}<br/><br/>Per Doppelklick auf die Aufgabe gelangen Sie in den Editiermodus.<br/><br/>', $this->data);
 
