@@ -1368,7 +1368,13 @@ Ext.define('Editor.controller.SearchReplace', {
         }else{
         	var nextSegmenInTaskt=results[me.activeSegment.nextSegmentIndex];
         	if(nextSegmenInTaskt!=undefined){
-        		me.searchIndex(nextSegmenInTaskt.segmentNrInTask,callback);
+                grid.searchPosition(nextSegmenInTaskt.segmentNrInTask).then(function(index){
+                    if(index < 0){
+                        Editor.MessageBox.addInfo(me.strings.noIndexFound);
+                        return;
+                    }
+                    callback(index);
+                });
         	}
         }
     },
@@ -1437,47 +1443,6 @@ Ext.define('Editor.controller.SearchReplace', {
         });
     },
     
-    /***
-     * Find a index for given segment number in task, if the index is found the callback is called
-     */
-    searchIndex:function(segmentNrInTask,callback){
-        var me=this,
-            segmentGrid = me.getSegmentGrid(),
-            segmentStore=segmentGrid.editingPlugin.grid.store,
-            proxy = segmentStore.getProxy(),
-            params = {};
-        
-        params[proxy.getFilterParam()] = proxy.encodeFilters(segmentStore.getFilters().items);
-        params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
-        Ext.Ajax.request({
-            url: Editor.data.restpath+'segment/'+segmentNrInTask+'/position',
-            method: 'GET',
-            params: params,
-            scope: me,
-            success: function(response){
-                var responseData = Ext.JSON.decode(response.responseText);
-                if(!responseData){
-                    return;
-                }
-                var segmentIndex =responseData.index;
-                //if no index is found, display info message
-                if(!segmentIndex || segmentIndex<0){
-                    Editor.MessageBox.addInfo(me.strings.noIndexFound);
-                    return;
-                }
-                
-                callback(segmentIndex);
-            },
-            failure: function(response){
-                if(response.status===404 && (response.statusText ==="Nicht gefunden!" || response.statusText ==="Not Found")){
-                    Editor.MessageBox.addInfo(me.strings.noIndexFound);
-                    return;
-                }
-                Editor.app.getController('ServerException').handleException(response);
-            }
-        });
-    },
-
 
     /***
      * Update segment grid data based on matched results. 
