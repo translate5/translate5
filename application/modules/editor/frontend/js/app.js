@@ -53,6 +53,7 @@ Ext.Loader.setPath('Editor.controller.Localizer', Editor.data.basePath+'/editor/
 Ext.Loader.setPath('Editor.plugins', Editor.data.pluginFolder);
 
 Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
+Editor.DATE_HOUR_MINUTE_ISO_FORMAT = 'Y-m-d H:i';
 Editor.DATEONLY_ISO_FORMAT = 'Y-m-d';
 
 Ext.ClassManager.onCreated(function(className) {
