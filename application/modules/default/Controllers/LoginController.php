@@ -41,20 +41,28 @@ class LoginController extends ZfExtended_Controllers_Login {
         $this->_form   = new ZfExtended_Zendoverwrites_Form('loginIndex.ini');
     }
     
+
     public function indexAction() {
-        
         require_once 'default/Controllers/helpers/BrowserDetection.php';
-        
         // Internet Explorer is not supported anymore! redirect IE 11 or below users to a specific error page
         if(BrowserDetection::isInternetExplorer()){
             header('Location: '.APPLICATION_RUNDIR.'/index/internetexplorer');
             exit;
         }
-        
+     
+        $this->appendCustomScript();
+
         $lock = ZfExtended_Factory::get('ZfExtended_Models_Db_SessionUserLock');
         /* @var $lock ZfExtended_Models_Db_SessionUserLock */
         $this->view->lockedUsers = $lock->getLocked();
-        
+       
+        //set the redirecthash value in the session if it is provided by the login form submit
+        //Info: bacause of the multiple redirects (sso authentication), we save the hash in the session, and reaply it when
+        //we redirect to the editor module
+        $redirecthash = $this->getRequest()->getParam('redirecthash','');
+        if(!empty($redirecthash)){
+            $this->_session->redirecthash = $redirecthash;
+        }
         parent::indexAction();
         //if the login status is required, try to authenticate with openid connect
         if($this->view->loginStatus==ZfExtended_Models_SessionUserInterface::LOGIN_STATUS_OPENID){
@@ -84,17 +92,13 @@ class LoginController extends ZfExtended_Controllers_Login {
         
         $this->localeSetup();
         
-        
         $sessionUser = new Zend_Session_Namespace('user');
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
         $roles=$sessionUser->data->roles;
         
-        
         if($acl->isInAllowedRoles($roles, 'initial_page','editor')) {
-            header ('HTTP/1.1 302 Moved Temporarily');
-            header ('Location: '.APPLICATION_RUNDIR.'/editor');
-            exit;
+            $this->editorRedirect();
         }
         
         $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
@@ -138,6 +142,22 @@ class LoginController extends ZfExtended_Controllers_Login {
         header ('Location: '.$url);
         exit;
     }
+
+    /***
+     * Redirect to the editor module (append the hash if exist).
+     */
+    protected function editorRedirect(){
+        $redirecthash = isset($this->_session->redirecthash) ? $this->_session->redirecthash : null;
+        $redirectHeader = 'Location: '.APPLICATION_RUNDIR.'/editor';
+        if(!empty($redirecthash)){
+            //remove the redirect hash from the session. The rout handling is done by extjs
+            unset($this->_session->redirecthash);
+            $redirectHeader.=$redirecthash;
+        }
+        header ('HTTP/1.1 302 Moved Temporarily');
+        header ($redirectHeader);
+        exit;
+    }
     
     /***
      * Check if the current request is valid for the openid. If it is a valid openid request, the user
@@ -148,16 +168,23 @@ class LoginController extends ZfExtended_Controllers_Login {
         //the openid authentication is valid
         
         $isCustomerSet=$oidc->isOpenIdCustomerSet();
+        if(!$isCustomerSet){
+            return;
+        }
+
+        //add form hidden field, which is used when redirec to openid is needed
+        $redirect = new Zend_Form_Element_Hidden([
+            'name' => 'openidredirect',
+            'value' => $oidc->getCustomer()->getOpenIdRedirectCheckbox()
+        ]);
+        $this->_form->addElement($redirect);
+
         //set the redirect label if the customer exist
-        if($isCustomerSet && !$oidc->getCustomer()->getOpenIdRedirectCheckbox()){
-            
-            //add form hidden field, which is used when redirec to openid is needed
-            $redirect = new Zend_Form_Element_Hidden('redirect');
-            $this->_form->addElement($redirect);
+        if(!$oidc->getCustomer()->getOpenIdRedirectCheckbox()){
             
             //create the link field which needs to redirect the login via the configured openid server
             $link = new Zend_Form_Element_Note(array(
-                'name' => 'openidredirect',
+                'name' => 'openidSubmitButton',
                 'value' => $oidc->getCustomer()->getOpenIdRedirectLabel(),
                 'decorators' => array(
                     array('ViewHelper'),
@@ -165,7 +192,7 @@ class LoginController extends ZfExtended_Controllers_Login {
                         'tag' => 'button',
                         'id' => 'openid-login',
                         'href' => 'javascript:void(0);',
-                        'onclick'=>'document.getElementById("redirect").value="openid"; document.getElementById("submit").click();'
+                        'onclick'=>'document.getElementById("openidredirect").value="openid"; document.getElementById("btnSubmit").click();'
                     )),
                     
                 )
@@ -176,7 +203,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         
         try {
             //authenticate with the configured openid client
-            if($isCustomerSet && $oidc->authenticate()){
+            if($oidc->authenticate()){
                 //INFO: disable the openid logout, enable only if requested
                 //if($this->_request->getParam('id_token')!=null){
                 //    $userSession = new Zend_Session_Namespace('openId');
@@ -222,5 +249,42 @@ class LoginController extends ZfExtended_Controllers_Login {
                 }
             }
         }
+    }
+
+    /***
+     * Inject javascript into the login view
+     */
+    protected function appendCustomScript(){
+        //this is the required openid javascript for the login form.
+        //because of the client specific overides we are not able to invoke this script as separate file!
+        $openIdScript = "
+            function checkHash() {
+                var loginForm = document.getElementById('loginForm'),
+                redirectField = document.getElementById('openidredirect'),
+                rgx = /^(?:f(?:alse)?|no?|0+)$/i,
+                hasErrors = document.getElementsByClassName('errors').length>0;
+                
+                //append the current hash to the form submit action. With this the hash is perserved for the editor.
+                loginForm.action+=(window.location.hash);
+                //store the hash in field, it is required for the openid
+                document.getElementById('redirecthash').value=(window.location.hash);
+                
+                if(redirectField != null && (!rgx.test(redirectField.value) && !!redirectField.value)){
+                    //redirect directly to the open id sso. This is needed, since this is the only way to perserve the hash when we redirect directly to the openid sso
+                    redirectField.value = 'openid';
+                    //if there is no sso error, submit the form. This case is only when we redirect without showing translate5 login form
+                    !hasErrors && loginForm.submit()
+                }
+            }
+            if (window.addEventListener)
+                window.addEventListener('load', checkHash, false);
+            else if (window.attachEvent)
+                window.attachEvent('onload', checkHash);
+            else window.onload = checkHash;
+        ";
+        $renderer = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+            'ViewRenderer'
+        );
+        $renderer->view->headScript()->appendScript($openIdScript);
     }
 }

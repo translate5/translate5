@@ -7,6 +7,7 @@ data/dummyTm_*
 .buildpath
 .project
 .settings/
+.vscode/*
 #needed for automated tests on server:
 public/scheduled-tests-trigger.php
 public/scheduled-tests/*
