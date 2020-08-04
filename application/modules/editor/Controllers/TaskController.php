@@ -540,8 +540,10 @@ class editor_TaskController extends ZfExtended_RestController {
             if($this->entity->isProject()) {
                 $entityId=$this->entity->save();
                 $this->entity->initTaskDataDirectory();
+                // check/prepare/unzip our import
                 $dp->checkAndPrepare($this->entity);
-
+                // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
+                $this->events->trigger("afterUploadPreparation", $this, array('task' => $this->entity, 'dataProvider' => $dp));
                 //for projects this have to be done once before the single tasks are imported
                 $dp->archiveImportedData();
 
