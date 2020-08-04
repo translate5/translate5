@@ -190,6 +190,13 @@ $dep->dependencies = [[
             "relpath" => "docs/third-party-licenses/ExtJs6-license.txt"
         ]]
     ],[
+        "name" => "extjs-ux",
+        "label" => "ThirdParty ExtJS UX libraries",
+        "version" => "6.2.0",
+        "url" => "RELEASE:extjs-ux.zip",
+        "target" => "public/modules/editor/js/ux",
+        //"licenses" => licenses are confirmed with third-party-dependencies package, since UX packages are maintained there, but pulled in separatly to public directory here
+    ],[
         "name" => "rangy",
         "label" => "Rangy",
         "version" => "1.3.1-dev",
