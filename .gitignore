@@ -11,5 +11,4 @@ data/dummyTm_*
 public/scheduled-tests-trigger.php
 public/scheduled-tests/*
 /vendor
-/composer.lock
 /composer.phar
