@@ -32,7 +32,7 @@ use Translate5\FrontEndMessageBus\Configuration;
 /**
  * Increase me on each change! (also CLIENT_VERSION in Init.php!)
  */
-const SERVER_VERSION = '1.0';
+const SERVER_VERSION = '1.1';
 
 //errors should go to stderr only!
 ini_set('display_errors', "stderr");
@@ -57,7 +57,7 @@ ob_start(); //capture boot up info for bootup mail if configured
 $logger->info('version '.SERVER_VERSION);
 $logger->info('starting on '.$host.':'.$port, LOG_HTTP);
 $appMessageServer = new React\Socket\Server($host.':'.$port, $loop);
-$server = new React\Http\Server([$bus, 'processServerRequest']);
+$server = new React\Http\Server($loop, [$bus, 'processServerRequest']);
 $server->listen($appMessageServer);
 $server->on('error', function(\Exception $error) use ($logger){
     $logger->exception($error, LOG_HTTP);

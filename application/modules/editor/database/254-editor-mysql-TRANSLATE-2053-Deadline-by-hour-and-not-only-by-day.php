@@ -41,16 +41,16 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-$sql = 'SELECT count(*) as rows FROM LEK_workflow_action where LEK_workflow_action.trigger="doCronDaily" 
-        AND (LEK_workflow_action.action="notifyOverdueDeadline" 
-        OR LEK_workflow_action.action="notifyDeadlineApproaching") ';
+$sql = 'SELECT COUNT(*) AS `num_rows` FROM `LEK_workflow_action` 
+        WHERE LEK_workflow_action.trigger = "doCronDaily" 
+        AND (LEK_workflow_action.action = "notifyOverdueDeadline" OR LEK_workflow_action.action = "notifyDeadlineApproaching") ';
 
 $db = Zend_Db_Table::getDefaultAdapter();
 $res = $db->query($sql);
 $result = $res->fetchAll()[0] ?? [];
 
 
-if(!empty($result) && $result['rows']>0){
+if(!empty($result) && $result['num_rows'] > 0){
     //replace daily with periodical
     $sql="UPDATE LEK_workflow_action SET LEK_workflow_action.trigger='doCronPeriodical' ".
          "WHERE LEK_workflow_action.trigger='doCronDaily' ".
