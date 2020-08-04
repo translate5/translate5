@@ -3795,6 +3795,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 </trans-unit>
 <trans-unit id='VGFnZW4='><source>Tagen</source><target>days</target></trans-unit>
 <trans-unit id='VGFn'><source>Tag</source><target>day</target></trans-unit>
+<trans-unit id='V8OkaGxlbiBTaWUgZGllIFJlc3NvdXJjZSBhdXMgdW0gd2VpdGVyZSBJbmZvcyB6dSBiZWtvbW1lbi4='>
+    <source>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</source>
+    <target>Choose the resource to get more information.</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
