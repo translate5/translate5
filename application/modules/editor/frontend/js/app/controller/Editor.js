@@ -1729,7 +1729,7 @@ Ext.define('Editor.controller.Editor', {
         /***
          * If the selection exist, and the selection is the current requested segments, do nothing
          */
-        if(selection && selection[0] == segment){
+        if((selection && selection.length>0) && selection[0] == segment){
             return;
         }
 
@@ -1758,11 +1758,8 @@ Ext.define('Editor.controller.Editor', {
      */
     onSegmentsStoreLoad:function(){
         var me=this,
-            grid=me.getSegmentGrid(),
-            selection = grid.getSelection();
-        //if no segment selection exist, select(update the hash) the first segment in the task            
-        if(!selection || selection.length===0){
-            this.redirectTo('task/'+Editor.data.task.get('id')+'/1/edit')
-        }
+            segmentNrInTaskToFocus = 1;
+        segmentNrInTaskToFocus = Editor.app.parseSegmentIdFromTaskEditHash(true);
+        me.focusSegment(segmentNrInTaskToFocus);
     }
 });

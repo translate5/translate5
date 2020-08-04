@@ -153,7 +153,7 @@ Ext.application({
             //if no route is provided, use the defautl me[Editor.data.app.initMethod]();
             if(me.isEditTaskRoute()){
                 //check if the taskid is provided in the hash
-                var taskId=me.parseTaskIdFromTaskEditHash();
+                var taskId=me.parseTaskIdFromTaskEditHash(false);
                 if(taskId>0 && !Editor.data.task){
                     Editor.data.task={};
                     //set the taskId to the task global object
@@ -426,7 +426,7 @@ Ext.application({
         return classes;
     },
 
-    /**
+     /**
      * Check if in the current hash, the edit task route is defined. The edit task route is only valid
      * when the segments-editor is opened
      */
@@ -436,10 +436,27 @@ Ext.application({
 
     /***
      * Get task id from the task edit route.
+     * {Boolean} checkEditTaskRoute : validate if the current route is task edit route
      */
-    parseTaskIdFromTaskEditHash:function(){
+    parseTaskIdFromTaskEditHash:function(checkEditTaskRoute){
+        if(checkEditTaskRoute && !this.isEditTaskRoute()){
+            return -1;
+        }
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
         return (h && h.length>1) ? parseInt(h[1]) : -1;
+    },
+
+    /***
+     * Get segmentNrInTask from the task edit route
+     * {Boolean} checkEditTaskRoute : validate if the current route is task edit route
+     */
+    parseSegmentIdFromTaskEditHash:function(checkEditTaskRoute){
+        if(checkEditTaskRoute && !this.isEditTaskRoute()){
+            return -1;
+        }
+        //task edit route: task/:taskId/:segmentNrInTask/edit
+        var h = window.location.hash.split('/');
+        return (h && h.length==4) ? parseInt(h[2]) : -1;
     }
 });
