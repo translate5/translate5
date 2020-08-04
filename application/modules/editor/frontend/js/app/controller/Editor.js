@@ -1757,9 +1757,7 @@ Ext.define('Editor.controller.Editor', {
      * Segments store load event handler
      */
     onSegmentsStoreLoad:function(){
-        var me=this,
-            segmentNrInTaskToFocus = 1;
-        segmentNrInTaskToFocus = Editor.app.parseSegmentIdFromTaskEditHash(true);
-        me.focusSegment(segmentNrInTaskToFocus);
+        var me=this;
+        me.focusSegment(Math.max(1,Editor.app.parseSegmentIdFromTaskEditHash(true)));
     }
 });
