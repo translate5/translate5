@@ -13,16 +13,19 @@
               "reference": "1.9"
             }
           }
+        },{
+            "type": "pear",
+            "url": "https://pear.horde.org"
         }
-      ],
-	"require" : {
-		"gportela85/DateTimeField" : "^1.9",
-		"fortawesome/font-awesome" : "^5.13",
-		"phpoffice/phpspreadsheet" : "~1.12",
-		"hearst-digital/horde-text-diff" : "dev-master",
-		"querypath/querypath" : "~3.0",
-		"google/cloud-translate" : "~1.7",
-		"wikimedia/composer-merge-plugin" : "~1.4"
+    ],
+    "require" : {
+        "gportela85/DateTimeField" : "^1.9",
+        "fortawesome/font-awesome" : "^5.13",
+        "phpoffice/phpspreadsheet" : "~1.12",
+        "querypath/querypath" : "~3.0",
+        "google/cloud-translate" : "~1.7",
+        "wikimedia/composer-merge-plugin" : "~1.4",
+        "pear-pear.horde.org/Horde_Text_Diff": "^2.2"
 	},
 	"extra" : {
 		"merge-plugin" : {
