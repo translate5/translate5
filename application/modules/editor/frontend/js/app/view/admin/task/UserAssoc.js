@@ -134,7 +134,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
               },{
                   xtype:'datetimefield',
                   name: 'deadlineDate',
-                  format : Editor.DATE_ISO_FORMAT,
+                  format : Editor.DATE_HOUR_MINUTE_ISO_FORMAT,
                   fieldLabel: me.strings.fieldDeadline,
                   labelCls: 'labelInfoIcon',
                   cls:'userAssocLabelIconField',
