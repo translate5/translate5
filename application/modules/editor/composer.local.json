@@ -1,5 +1,22 @@
 {
+    "repositories": [{
+          "type": "package",
+          "package": {
+            "name": "gportela85/DateTimeField",
+            "license": "MIT",
+            "version": "1.9",
+            "description": "A DateTime Form Field UX for Sencha, ExtJS 5.x and ExtJS 6.x.",
+            "type": "extjs-ux",
+            "source": {
+              "url": "https://github.com/gportela85/DateTimeField.git",
+              "type": "git",
+              "reference": "1.9"
+            }
+          }
+        }
+      ],
 	"require" : {
+		"gportela85/DateTimeField" : "^1.9",
 		"fortawesome/font-awesome" : "^5.13",
 		"phpoffice/phpspreadsheet" : "~1.12",
 		"hearst-digital/horde-text-diff" : "dev-master",

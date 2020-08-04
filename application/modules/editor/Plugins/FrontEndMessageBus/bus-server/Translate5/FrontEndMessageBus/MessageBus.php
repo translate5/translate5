@@ -31,7 +31,7 @@ use Translate5\FrontEndMessageBus\Message\BackendMsg;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use React\Http\Response;
+use React\Http\Message\Response;
 
 /**
  */
@@ -162,7 +162,7 @@ class MessageBus implements MessageComponentInterface
     
     /**
      * Shortcut function to show debug data of all instances on localhost call
-     * @return \React\Http\Response
+     * @return \React\Http\Message\Response
      */
     protected function debugResponse() {
         $data = ['instances' => []];
