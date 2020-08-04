@@ -43,7 +43,7 @@ $template = '{header}
 {taskFragment}
 {footer}{footerTable}';
 
-$footerText=$this->translate->_('<br/><br/>Wir unterstützen Sie gerne bei Fragen zur Übersetzung und translate5 – sprechen Sie uns bitte hierzu gerne an.<br/><br/>Beste Grüße<br/><br/>Ihr translate5 Projekt-Team<br/><br/>');
+$footerText = $this->templateApply('<br/><br/>Wir unterstützen Sie gerne bei Fragen zur Übersetzung und translate5 – sprechen Sie uns bitte hierzu gerne an.<br/><br/>Mit freundlichen Grüßen<br/><br/>{companyName}<br/><br/>',$this->taskData);
 
 $this->textbody="To be able to see the mail layout, you need to use app which supports html.";
 
