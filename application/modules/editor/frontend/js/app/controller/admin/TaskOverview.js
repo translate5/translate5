@@ -348,8 +348,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       if(!me.isAllowed('editorOpenTask', task) && !me.isAllowed('editorEditTask', task)){
           return;
       }
-      //reset the route
-      me.redirectTo('');
       Editor.util.TaskActions.openTask(task, readonly);
   },
   editorLogTask: function(task) {

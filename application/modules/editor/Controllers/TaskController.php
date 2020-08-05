@@ -993,6 +993,16 @@ class editor_TaskController extends ZfExtended_RestController {
     public function putAction() {
         $this->entity->load($this->_getParam('id'));
 
+        if($this->entity->isProject()){
+            //project modification is not allowed. This will be changed in future.
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1284' => 'Projects are not editable.',
+            ]);
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1284', [
+                'Projekte können nicht bearbeitet werden.'
+            ]);
+        }
+
         //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
         $this->entity->checkStateAllowsActions([editor_Models_Excel_AbstractExImport::TASK_STATE_ISEXCELEXPORTED]);
 
