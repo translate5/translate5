@@ -106,7 +106,8 @@ Ext.define('Editor.controller.Editor', {
             'segmentsHtmleditor': {
                 initialize: 'initEditor',
                 contentErrors: 'handleSaveWithErrors',
-                afterSetValueAndMarkup: 'handleAfterContentChange'
+                afterSetValueAndMarkup: 'handleAfterContentChange',
+                afterInsertMarkup: 'handleDelayedChange'
             },
             'roweditor': {
                 destroy: 'handleDestroyRoweditor'
