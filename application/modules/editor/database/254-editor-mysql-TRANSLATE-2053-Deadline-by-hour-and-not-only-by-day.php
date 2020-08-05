@@ -58,7 +58,7 @@ if(!empty($result) && $result['num_rows'] > 0){
     
 }else{
     //insert default periodical trigger for notifyOverdueDeadline and notifyDeadlineApproaching
-    $sql="INSERT INTO `LEK_workflow_action` (`workflow`, `trigger`, `actionClass`, `action`) 
+    $sql="INSERT INTO `LEK_workflow_action` (`workflow`, `trigger`, `actionClass`, `action`)
           VALUES ('default', 'doCronPeriodical', 'editor_Workflow_Notification', 'notifyOverdueDeadline'),
           ('default', 'doCronPeriodical', 'editor_Workflow_Notification', 'notifyDeadlineApproaching');";
 }
