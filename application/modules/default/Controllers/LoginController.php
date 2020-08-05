@@ -260,15 +260,19 @@ class LoginController extends ZfExtended_Controllers_Login {
         $openIdScript = "
             function checkHash() {
                 var loginForm = document.getElementById('loginForm'),
-                redirectField = document.getElementById('openidredirect'),
-                rgx = /^(?:f(?:alse)?|no?|0+)$/i,
-                hasErrors = document.getElementsByClassName('errors').length>0;
+                    redirectField = document.getElementById('openidredirect'),
+                    redirecthashField = document.getElementById('redirecthash'),
+                    rgx = /^(?:f(?:alse)?|no?|0+)$/i,
+                    hasErrors = document.getElementsByClassName('errors').length>0;
                 
                 //append the current hash to the form submit action. With this the hash is perserved for the editor.
                 loginForm.action+=(window.location.hash);
-                //store the hash in field, it is required for the openid
-                document.getElementById('redirecthash').value=(window.location.hash);
-                
+
+                if(redirecthashField){
+                    //store the hash in field, it is required for the openid
+                    redirecthashField.value=(window.location.hash);
+                }
+
                 if(redirectField != null && (!rgx.test(redirectField.value) && !!redirectField.value)){
                     //redirect directly to the open id sso. This is needed, since this is the only way to perserve the hash when we redirect directly to the openid sso
                     redirectField.value = 'openid';
