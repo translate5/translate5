@@ -73,6 +73,9 @@ class editor_Models_Import {
         //pre import methods:
         try {
             $dataProvider->checkAndPrepare($this->task);
+            // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
+            $this->events->trigger("afterUploadPreparation", $this, array('task' => $this->task, 'dataProvider' => $dataProvider));
+            
             $dataProvider->archiveImportedData();
             $this->importConfig->importFolder = $dataProvider->getAbsImportPath();
             
