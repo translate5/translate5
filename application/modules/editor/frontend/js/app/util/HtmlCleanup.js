@@ -36,7 +36,8 @@ Ext.define('Editor.util.HtmlCleanup', {
 	/**
 	 * entfernt vom Editor / TrackChanges automatisch hinzugefügte unsichtbare Zeichen und alle internen Tags
 	 */
-	cleanAllUnwantedMarkup: function(html){
+	cleanForLiveEditing: function(html){
+	    // console.log("cleanForLiveEditing RAW: "+html+" / NICE: "+this.cleanAllEditingTags(this.cleanInvisibleCharacters(html)));
 		return this.cleanAllEditingTags(this.cleanInvisibleCharacters(html));
 	},
 	/**
@@ -70,39 +71,25 @@ Ext.define('Editor.util.HtmlCleanup', {
 		return html;
 	},
 	/**
-	 * Removes the "internal tags", div's with the classname "internal" and their contents. The replacement can be given, the default is the empty string
-	 * Multiple internal tags in a sequence are condensed to one replacement
-	 * @param string html: the markup to clean
-	 * @param string replacement: the replacement for the tag, defaults to ""
-	 * @param string itClassName: if set, can specify the classname of the internal tag to replace (can be "open", "close" or "single")
-	 * @return string: the cleaned text
-	 */
-	cleanInternalTags: function(html, replacement, itClassName){
-		if(!replacement){
-			replacement = '';
-		}
-		if(!itClassName || itClassName == ''){
-			return html.replace(/<[^>]+internal-tag[^>]+>.+?<\/div>/ig, replacement);
-		}
-		var regex = new RegExp('<[^>]+internal-tag[^>]+'+itClassName+'[^>]+>.+?</div>', 'ig');
-		html = html.replace(regex, replacement);
-		var regex = new RegExp('<[^>]+'+itClassName+'[^>]+internal-tag[^>]+>.+?</div>', 'ig');
-		return html.replace(regex, replacement);
-	},
-	/**
-	 * Removes internal tags and replaces them with a split-value
+	 * Removes internal tags and replaces them with a split-value.
+	 * Internal whitespace tags will be turned to appropriate markup and thus reflected in the Live Editing
 	 * In this process open-single-close combinations will lead to a single split and close followed by such a construct or open predeceeded by such a construct will be reduced to one split.
 	 * open-close combinations will be preserved as it can be assumed they once surrounded some text which was removed by the author
 	 * @param string splitKey: defaults to "<t5split>"
 	 * @return string: the cleaned text with split-values
 	 */
-	cleanInternalTagsForSplitting: function(html, splitKey){
+	cleanAndSplitInternalTagsForLiveEditing: function(html, splitKey){
 		if(!splitKey){
 			splitKey = '<t5split>';
 		}
-		html = this.cleanInternalTags(html, "<t5open>", 'open');
-		html = this.cleanInternalTags(html, "<t5close>", 'close');
-		html = this.cleanInternalTags(html, "<t5single>", 'single');
+		// replace whitespace-tags with rendered whitespace
+		html = this.cleanInternalTags(html, "&nbsp;<t5split>", ['single','nbsp']);
+		html = this.cleanInternalTags(html, "<br/><t5split>", ['single','newline']);
+		html = this.cleanInternalTags(html, " &emsp;<t5split>", ['single','tab']);
+		
+		html = this.cleanInternalTags(html, "<t5open>", ['open']);
+        html = this.cleanInternalTags(html, "<t5close>", ['close']);
+		html = this.cleanInternalTags(html, "<t5single>", ['single']);
 		// crucial: open/close sequences may contain just internal single tags and will be replaced as a whole
 		html = html.replace(/<t5open>(<t5single>)*<t5close>/ig, '<t5split>');
 		// neighbouring open-split or split-close construct are also replaced, only open/close combinations with real content in between (or no = empty real content) shall be kept
@@ -113,6 +100,27 @@ Ext.define('Editor.util.HtmlCleanup', {
 		html = html.replace(/<t5close>/ig, splitKey);
 		return html.replace(/<t5single>/ig, splitKey);
 	},
+	/**
+     * Removes the "internal tags", div's with the classname "internal" and their contents. The replacement can be given, the default is the empty string
+     * Multiple internal tags in a sequence are condensed to one replacement
+     * @param string html: the markup to clean
+     * @param string replacement: the replacement for the tag, defaults to ""
+     * @param string itClassName: if set, can specify the classname of the internal tag to replace (can be "open", "close" or "single")
+     * @return string: the cleaned text
+     */
+    cleanInternalTags: function(html, replacement, classNames){
+        if(!replacement){
+            replacement = '';
+        }
+        if(!classNames || classNames.length == 0){
+            return html.replace(/<[^>]+internal-tag[^>]+>.+?<\/div>/ig, replacement);
+        }
+        classNames = (classNames.length == 1) ? classNames[0] : classNames.join('[^>]+');
+        var regex = new RegExp('<[^>]+internal-tag[^>]+'+classNames+'[^>]+>.+?</div>', 'ig');
+        html = html.replace(regex, replacement);
+        var regex = new RegExp('<[^>]+'+classNames+'[^>]+internal-tag[^>]+>.+?</div>', 'ig');
+        return html.replace(regex, replacement);
+    },
 	
 	cleanDuplicateSaveImgTags: function(html){
 		// (1) remove DEL-Tags and their content
