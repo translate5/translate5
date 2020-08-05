@@ -457,11 +457,11 @@ Ext.define('Editor.view.segments.Grid', {
                 },
                 failure: function(response){
                     if(response.status===404 && (response.statusText ==="Nicht gefunden!" || response.statusText ==="Not Found")){
+                        //404 means no index found
                         res(-1);
                         return;
                     }
                     Editor.app.getController('ServerException').handleException(response);
-                    rej(response.statusText);
                 }
             });
         });
