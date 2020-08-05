@@ -323,7 +323,7 @@ Ext.application({
         tabPanel = me.viewport.down('#adminMainSection');
 
         // on intial load we have to trigger the change manually
-        //me.onAdminMainSectionChange(tabPanel, tabPanel.getActiveTab(),task);
+        me.onAdminMainSectionChange(tabPanel, tabPanel.getActiveTab(),task);
         
         //set the value used for displaying the help pages
         Ext.getDoc().dom.title = me.windowTitle;
