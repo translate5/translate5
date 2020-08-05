@@ -539,7 +539,9 @@ class editor_Plugins_NecTm_HttpApi {
                     //check next message
                     continue;
                 }
-                $this->throwBadGateway();
+                $ex=new editor_Services_Connector_Exception('E1282');
+                $ex->setMessage($e->getMessage());
+                throw $ex;
             }
             throw $e;
         }

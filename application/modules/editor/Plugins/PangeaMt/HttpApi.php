@@ -128,6 +128,12 @@ class editor_Plugins_PangeaMt_HttpApi {
         $service = ZfExtended_Factory::get('editor_Plugins_PangeaMt_Service');
         /* @var $service editor_Plugins_PangeaMt_Service */
         if(!$service->isConfigured()) {
+            $error = new stdClass();
+            $error->type = 'config';
+            $error->error = 'Missing PangeaMt configuration.';
+            $error->url =  $this->http->getUri(true);
+            $error->method = $this->httpMethod;
+            $this->error[] = $error;
             $this->throwBadGateway();
         }
         $config = Zend_Registry::get('config');
@@ -221,12 +227,12 @@ class editor_Plugins_PangeaMt_HttpApi {
      * @throws ZfExtended_BadGateway
      */
     protected function throwBadGateway() {
-        $e = new ZfExtended_BadGateway('PangeaMT-Api: The request returned an error.');
-        $e->setDomain('PangeaMT-Api');
-        $errors = $this->getErrors();
-        $errors[] = $this->result; //add real result to error data
-        $e->setErrors($errors);
-        throw $e;
+        $errors= $this->getErrors()[0] ?? [];
+        $ex=new editor_Services_Connector_Exception('E1282',[
+            'errors' => $errors
+        ]);
+        $ex->setMessage($errors->error ?? '');
+        throw $ex;
     }
     
     /**
