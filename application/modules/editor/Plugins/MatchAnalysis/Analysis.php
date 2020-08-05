@@ -489,12 +489,17 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 //store the languageResource
                 $this->resources[$languageresource->getId()] = $languageresource;
             } catch (Exception $e) {
-                $this->log->warn('E1102', 'Unable to use connector from Language Resource "{name}". Error was: "{msg}".', [
+                $errors = [];
+                //if the exception is of type ZfExtended_ErrorCodeException, get the additional exception info, and log it
+                if($e instanceof ZfExtended_ErrorCodeException){
+                    $errors = $e->getErrors() ?? [];
+                }
+                $this->log->warn('E1102', 'Unable to use connector from Language Resource "{name}". Error was: "{msg}".',array_merge( [
                     'task' => $this->task,
                     'name' => $languageresource->getName(),
                     'msg' => $e->getMessage(),
                     'languageResource' => $languageresource,
-                ]);
+                ],$errors));
                 $this->log->exception($e, [
                     'task' => $this->task,
                     'level' => $this->log::LEVEL_WARN,

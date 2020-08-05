@@ -540,8 +540,10 @@ class editor_TaskController extends ZfExtended_RestController {
             if($this->entity->isProject()) {
                 $entityId=$this->entity->save();
                 $this->entity->initTaskDataDirectory();
+                // check/prepare/unzip our import
                 $dp->checkAndPrepare($this->entity);
-
+                // trigger an event that gives plugins a chance to hook into the import process after unpacking/checking the files and before archiving them
+                $this->events->trigger("afterUploadPreparation", $this, array('task' => $this->entity, 'dataProvider' => $dp));
                 //for projects this have to be done once before the single tasks are imported
                 $dp->archiveImportedData();
 
@@ -990,6 +992,16 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function putAction() {
         $this->entity->load($this->_getParam('id'));
+
+        if($this->entity->isProject()){
+            //project modification is not allowed. This will be changed in future.
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1284' => 'Projects are not editable.',
+            ]);
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1284', [
+                'Projekte können nicht bearbeitet werden.'
+            ]);
+        }
 
         //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
         $this->entity->checkStateAllowsActions([editor_Models_Excel_AbstractExImport::TASK_STATE_ISEXCELEXPORTED]);

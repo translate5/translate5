@@ -116,7 +116,8 @@ Ext.define('Editor.controller.Editor', {
                 afterrender: 'initMoveToolTip'
             },
             '#segmentgrid': {
-                afterrender: 'initEditPluginHandler'
+                afterrender: 'initEditPluginHandler',
+                select:'onSegmentGridSelect'
             },
             '#showReferenceFilesButton': {
                 click:'onShowReferenceFilesButtonClick'
@@ -141,8 +142,19 @@ Ext.define('Editor.controller.Editor', {
             '#segmentMinMaxLength': {
                 insertNewline: 'insertWhitespaceNewline'
             }
+        },
+        store:{
+            '#Segments':{
+                load:'onSegmentsStoreLoad'
+            }
         }
     },
+
+    routes: {
+        'task/:id/:segmentNrInTask/edit': 'onTaskSegmentEditRoute',
+        'task/:id/edit': 'onTaskSegmentEditRoute',
+    },
+
     init : function() {
         var me = this;
         
@@ -278,7 +290,7 @@ Ext.define('Editor.controller.Editor', {
             plug = me.getEditPlugin();
         
         me.prevNextSegment.handleSortOrFilter();
-        if(plug.editor && plug.editor.context) {
+        if(plug && plug.editor && plug.editor.context) {
             plug.editor.context.reordered = true;
         }
     },
@@ -1655,6 +1667,7 @@ Ext.define('Editor.controller.Editor', {
         filePanel.expand();
         filePanel.down('referenceFileTree').expand();
     },
+
     /**
      * Confirm the current task
      */
@@ -1662,5 +1675,90 @@ Ext.define('Editor.controller.Editor', {
         Editor.util.TaskActions.confirm(function(task, app, strings){
             Editor.MessageBox.addSuccess(strings.taskConfirmed);
         });
+    },
+
+    /***
+     * Edit task and focus segment route
+     */
+    onTaskSegmentEditRoute:function(taskId,segmentNrInTask){
+        var me=this,
+            store = Ext.StoreManager.get('Segments'),
+            isLoaded=store.getCount()>0 && store.isLoaded;
+
+        if(!isLoaded){
+            store.on('load',function(){
+                me.focusSegment(segmentNrInTask);
+            },store,{ single : true});
+        }
+        me.openTask(taskId);
+        me.focusSegment(segmentNrInTask);
+    },
+
+    /***
+     * Open taks for editing for given taskid
+     */
+    openTask:function(taskId){
+        //if the task is loaded, do nothing
+        if(Editor.data.task){
+            return;
+        }
+        Editor.model.admin.Task.load(taskId, {
+            success: function(task) {
+                Editor.util.TaskActions.openTask(task);
+            },
+            failure: function(record, op, success) {
+                Editor.app.getController('ServerException').handleException(op.error.response);
+            }
+        });
+    },
+
+    /***
+     * Focus segment in the segments grid.
+     */
+    focusSegment:function(segmentNrInTask){
+        var grid=this.getSegmentGrid();
+        //focus only when the segments grid is visible
+        if(!segmentNrInTask || !grid || !grid.isVisible(true)){
+            return;
+        }
+
+        var store= grid.getStore(),
+            selection = grid.getSelection(),
+            segment=store.findRecord('segmentNrInTask',segmentNrInTask,0,false,false,true),
+            index=store.indexOf(segment);
+        
+        /***
+         * If the selection exist, and the selection is the current requested segments, do nothing
+         */
+        if((selection && selection.length>0) && selection[0] == segment){
+            return;
+        }
+
+        /***
+         * Valid grid index is found -> scroll the grid to the segment
+         */
+        if(index>-1){
+            grid.scrollTo(index);
+            return;
+        }
+        //the segment does not exist in the segments store, try to load the segment index from the db
+        grid.searchPosition(segmentNrInTask).then((idx)=>{
+            grid.scrollTo(idx);
+        });
+    },
+
+    /***
+     * When segment grid selection changes, update the hash
+     */
+    onSegmentGridSelect: function(grid, record, index, event){
+        this.redirectTo('task/'+Editor.data.task.get('id')+'/'+record.get('segmentNrInTask')+'/edit');
+    },
+
+    /***
+     * Segments store load event handler
+     */
+    onSegmentsStoreLoad:function(){
+        var me=this;
+        me.focusSegment(Math.max(1,Editor.app.parseSegmentIdFromTaskEditHash(true)));
     }
 });
