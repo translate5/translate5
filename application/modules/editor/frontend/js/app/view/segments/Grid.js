@@ -99,10 +99,6 @@ Ext.define('Editor.view.segments.Grid', {
             me.addCls('comments-for-locked-segments');
         } 
         
-        this.store = Ext.create('Editor.store.Segments',{
-            storeId: 'Segments'
-        });
-        
         //befülle interne Hash Map mit QM und Status Werten:
         Ext.each(Editor.data.segments.stateFlags, function(item){
             me.stateData[item.id] = item.label;
@@ -435,5 +431,39 @@ Ext.define('Editor.view.segments.Grid', {
             top:top,
             bottom:bottom,
         };
+    },
+
+    /***
+     * Search for segment position in the current store filtering
+     */
+    searchPosition:function(segmentNrInTask){
+        var me=this,
+            segmentStore=me.getStore(),
+            proxy = segmentStore.getProxy(),
+            params = {};
+        
+        params[proxy.getFilterParam()] = proxy.encodeFilters(segmentStore.getFilters().items);
+        params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
+        return new Promise((res,rej) => {
+            Ext.Ajax.request({
+                url: Editor.data.restpath+'segment/'+segmentNrInTask+'/position',
+                method: 'GET',
+                params: params,
+                scope: me,
+                success: function(response){
+                    var responseData = Ext.JSON.decode(response.responseText),
+                        index=responseData ? responseData.index : -1;
+                    res(index);
+                },
+                failure: function(response){
+                    if(response.status===404 && (response.statusText ==="Nicht gefunden!" || response.statusText ==="Not Found")){
+                        //404 means no index found
+                        res(-1);
+                        return;
+                    }
+                    Editor.app.getController('ServerException').handleException(response);
+                }
+            });
+        });
     }
 });

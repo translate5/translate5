@@ -122,6 +122,9 @@ Ext.define('Editor.controller.QmSubSegments', {
                 storeId: 'Severities',
                 data: Editor.data.task.get('qmSubSeverities')
             });
+        if(!combo){
+            return;
+        }
         //bindStore dynamically to combo:
         combo.bindStore(sevStore);
         combo.setValue(sevStore.getAt(0).get('id'));

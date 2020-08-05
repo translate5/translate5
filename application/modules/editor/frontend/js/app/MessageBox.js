@@ -185,7 +185,7 @@ Ext.define('Editor.MessageBox',{
   },
   showDirectError: function(msg, data) {
       var box = Ext.MessageBox,
-          info = (Editor.data.task ? "- tid: "+Editor.data.task.get('id') : '');
+          info = (Editor.data.task ? "- tid: "+Editor.data.task.id : '');
       if(data) {
           msg = msg + Editor.MessageBox.dataTable(data);
       }
