@@ -77,10 +77,15 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
             $this->task->setState($this->taskOldState);
             $this->task->save();
             $this->task->unlock();
-            $this->log->error('E1100', 'MatchAnalysis Plug-In: analysis and pre-translation cannot be run.', [
+            $errors = [];
+            //if the exception is of type ZfExtended_ErrorCodeException, get the additional exception info, and log it
+            if($e instanceof ZfExtended_ErrorCodeException){
+                $errors = $e->getErrors() ?? [];
+            }
+            $this->log->error('E1100', 'MatchAnalysis Plug-In: analysis and pre-translation cannot be run.',array_merge([
                 'task' => $this->task,
                 'message'=> $e->getMessage()
-            ]);
+            ],$errors));
             return false;
         }
         return $ret;
