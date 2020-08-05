@@ -1,4 +1,9 @@
 {
+    "config": {
+        "platform": {
+            "php": "7.3"
+        }
+    },
 	"require" : {
 		"wikimedia/composer-merge-plugin" : "~1.4",
 		"comcast/php-legal-licenses" : "~1.1"
