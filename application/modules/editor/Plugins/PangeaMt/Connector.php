@@ -169,10 +169,11 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
             $moreInfo = $e->getMessage();
             $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource.service.connector');
             /* @var $logger ZfExtended_Logger */
-            $logger->warn('E1282','Language resource communication error.',[
+            $logger->warn('E1282','Language resource communication error.',
+            array_merge($e->getErrors(),[
                 'languageResource'=>$this->languageResource,
                 'message'=>$e->getMessage()
-            ]);
+            ]));
             return self::STATUS_NOCONNECTION;
         }
     }
