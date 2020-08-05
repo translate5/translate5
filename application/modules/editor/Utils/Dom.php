@@ -20,10 +20,13 @@ https://www.gnu.org/licenses/lgpl-3.0.txt
 			 https://www.gnu.org/licenses/lgpl-3.0.txt
 
 END LICENSE AND COPYRIGHT
-*/
+*/ 
 
+/**
+ * A simple extension of the DOMDocument class to be able to capture the errors that may occur in the process of loading HTML/XML
+ * To not change the original API we do not throw exceptions but collect the errors instead of reporting them and make them accessible
+ */
 class editor_Utils_Dom extends DOMDocument {
-    
     /**
      * 
      * @var libXMLError[]
