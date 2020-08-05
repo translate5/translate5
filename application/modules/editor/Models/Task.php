@@ -104,7 +104,7 @@ END LICENSE AND COPYRIGHT
  * @method void setProjectId() setProjectId(int $projectId)
  * @method boolean getDiffExportUsable() getDiffExportUsable()
  * @method void setDiffExportUsable() setDiffExportUsable(bool $flag)
- * 
+ *
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
@@ -644,6 +644,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $session = new Zend_Session_Namespace();
         }
         $session->taskGuid = $this->getTaskGuid();
+        //FIXME very evil! No data should be put into the session, the session is no cache!
         $session->task = $this->getAsConfig();
         $session->taskOpenState = $openState;
         $session->taskWorkflow = $this->getWorkflow();
