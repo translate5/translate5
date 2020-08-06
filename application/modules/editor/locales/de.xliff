@@ -1823,6 +1823,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='dHJhbnNsYXRlNSBzZW5kZXQgc3RhbmRhcmRtw6TDn2lnIDEgVGFnIHZvciB1bmQgMSBUYWcgbmFjaCBkZW0gZmVzdGdlbGVndGVuIERhdHVtIHVuZCBkZXIgZmVzdGdlbGVndGVuIFVocnplaXQgKCsvLSAxMCBNaW51dGVuKSBlaW5lIEZyaXN0ZXJpbm5lcnVuZy4gRGllcyBrYW5uIHZvbiBJaHJlbSBBZG1pbmlzdHJhdG9yIGdlw6RuZGVydCB3ZXJkZW4u'><source>translate5 sendet standardmäßig 1 Tag vor und 1 Tag nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.</source><target>translate5 sendet standardmäßig 1 Tag vor und 1 Tag nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.</target></trans-unit>
 <trans-unit id='VGFnZW4='><source>Tagen</source><target>Tagen</target></trans-unit>
 <trans-unit id='VGFn'><source>Tag</source><target>Tag</target></trans-unit>
+<trans-unit id='RsO8ciB6dXPDpHR6bGljaGUgSW5mb3JtYXRpb24genUgZWluZW0gRXJlaWduaXMgYml0dGUgYXVmIGRlbiBDb2RlIGtsaWNrZW4='><source>Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken</source><target>Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken</target></trans-unit>
 </body>
  </file>
 </xliff>

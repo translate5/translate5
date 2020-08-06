@@ -58,7 +58,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
         $this->eventManager->attach('editor_Models_TaskUserTracking', 'afterUserTrackingInsert', array($this, 'handleUpdateUserTracking'));
-        $this->eventManager->attach('editor_Models_Task', 'unlock', array($this, 'reloadTask'));
+        $this->eventManager->attach('editor_Models_Task', 'unlock', array($this, 'handleTaskUnlock'));
         //$this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handlePing'));
         $this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'handleSegmentSave'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'afterGetAction', array($this, 'handleAlikeLoad'));
@@ -69,6 +69,9 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         $this->eventManager->attach('editor_SessionController', 'beforeDeleteAction', array($this, 'handleLogout'));
         $this->eventManager->attach('editor_SessionController', 'resyncOperation', array($this, 'handleSessionResync'));
         $this->eventManager->attach('LoginController', 'beforeLogoutAction', array($this, 'handleLogout'));
+
+        $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleTaskOperation'));
+        $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleTaskOperation'));
         
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
@@ -251,14 +254,29 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     }
     
     /**
-     * triggers a task reload in the GUI
+     * Task unlock event handler
      * @param Zend_EventManager_Event $event
      */
-    public function reloadTask(Zend_EventManager_Event $event) {
+    public function handleTaskUnlock(Zend_EventManager_Event $event) {
+        $this->reloadGuiTask($event->getParam('task'));
+    }
+
+    /**
+     * Task operation event handler
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleTaskOperation(Zend_EventManager_Event $event) {
+        $this->reloadGuiTask($event->getParam('entity'));
+    }
+
+    /***
+     * Notify the task chanel with fresh task data
+     */
+    protected function reloadGuiTask(editor_Models_Task $task){
         //reload the task instance in the GUI
         $this->bus->notify(self::CHANNEL_TASK, 'triggerReload', [
-            'taskGuid' => $event->getParam('task')->getTaskGuid(),
-            'taskId' => $event->getParam('task')->getId(),
+            'taskGuid' =>$task->getTaskGuid(),
+            'taskId' => $task->getId(),
         ]);
     }
     
