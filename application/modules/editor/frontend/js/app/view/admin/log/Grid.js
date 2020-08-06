@@ -47,7 +47,8 @@ Ext.define('Editor.view.admin.log.Grid', {
         domain: '#UT# Bereich',
         message: '#UT# Ereignis',
         created: '#UT# Zeitpunkt',
-        moreInfo: '#UT# Mehr Info'
+        moreInfo: '#UT# Mehr Info',
+        eventCodeInfoText : '#UT#Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken'
     },
     layout: 'fit',
     entityUrlPart: null,
@@ -171,6 +172,9 @@ Ext.define('Editor.view.admin.log.Grid', {
                         handler: function() {
                             me.down('gridpanel').store.reload();
                         }
+                    },{
+                        xtype:'displayfield',
+                        value:me.strings.eventCodeInfoText
                     }]
                 },{
                     dock: 'bottom',
