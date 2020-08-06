@@ -141,9 +141,13 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTags {
         // if it is an single tag standing for a isolated paired tag, we cut it off too
         if($startIsTag && $sourceStart->isSingle() && in_array($sourceStart->tag, $this->isolatedPairedTags)) {
             $this->startShiftCount = $this->startShiftCount + $startShiftCountTrim;
-            
-            // if we got a tag to be cut off, start new iteration with found tag = true
-            return $this->hasSameStartAndEndTags($source, $target, true);
+
+            //if we got a tag to be cut off, start new iteration with found tag = true
+            // remove the starting elements as counted above
+            return $this->hasSameStartAndEndTags(
+                array_slice($source, $startShiftCountTrim),
+                array_slice($target, $startShiftCountTrim),
+                true);
         }
         
         //trim from end
@@ -156,19 +160,23 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTags {
         if($endIsTag && $sourceEnd->isSingle() && in_array($sourceEnd->tag, $this->isolatedPairedTags)) {
             $this->endShiftCount = $this->endShiftCount + $endShiftCountTrim;
             
-            // if we got a tag to be cut off, start new iteration with found tag = true
-            return $this->hasSameStartAndEndTags($source, $target, true);
+            //if we got a tag to be cut off, start new iteration with found tag = true
+            // remove the ending elements as counted above
+            return $this->hasSameStartAndEndTags(
+                array_slice($source, 0, -$endShiftCountTrim),
+                array_slice($target, 0, -$endShiftCountTrim),
+                true);
         }
         
-        //until here we cut of he allowed single tags, now we cut of paired tags
+        //until here we cut of the allowed single tags, now we cut of paired tags
         
         // if start is no tag or no opening tag or end not tag or closing tag → nothing to cut
         if(!( $startIsTag && $sourceStart->isOpen() && $endIsTag && $sourceEnd->isClose())) {
             return $foundTag;
         }
         
-        //if tag pairs from start to end does not match, then exit
-        if($sourceStart->tagNr !== $sourceEnd->tagNr) {
+        //if tag pairs from start to end does not match or shiftCounts are negative, then exit
+        if($sourceStart->tagNr !== $sourceEnd->tagNr || $startShiftCountTrim < 0 || $endShiftCountTrim < 0) {
             return $foundTag;
         }
         $this->startShiftCount = $this->startShiftCount + $startShiftCountTrim;
@@ -176,7 +184,11 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTags {
         
         //start recursivly for more than one tag pair,
         // we have found at least one tag pair so set $foundTag to true for next iteration
-        return $this->hasSameStartAndEndTags($source, $target, true);
+        // remove the start and ending elements as counted above
+        return $this->hasSameStartAndEndTags(
+            array_slice($source, $startShiftCountTrim, -$endShiftCountTrim),
+            array_slice($target, $startShiftCountTrim, -$endShiftCountTrim),
+            true);
     }
     
     /**
@@ -189,8 +201,9 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTags {
      * @param bool $fromStart true if trim from start, false to trim from end
      * @return int  returns -1 if source and targetChunk do not match!
      */
-    protected function trimAndCount(&$sourceChunk, array &$source, array &$target, $fromStart = true): int {
+    protected function trimAndCount(&$sourceChunk, array $source, array $target, $fromStart = true): int {
         $shiftCount = 0;
+        
         while(!is_null($sourceChunk) && empty($sourceChunk) || (!$this->preserveWhitespace && preg_match('#^\s+$#', $sourceChunk))) {
             if($fromStart) {
                 $sourceChunk = array_shift($source);
@@ -206,6 +219,7 @@ class editor_Models_Import_FileParser_Xlf_SurroundingTags {
             //inc internal start shift count
             $shiftCount++;
         }
+        
         return $shiftCount;
     }
     
