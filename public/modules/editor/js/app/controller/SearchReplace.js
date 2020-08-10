@@ -217,7 +217,7 @@ Ext.define('Editor.controller.SearchReplace', {
     replacedSegmentsIndex:[],
     
     /***
-     * Required search parametars (must contain value)
+     * Required search parameters (must contain value)
      */
     requiredParams:['searchInField','searchField','searchType'],
     
@@ -479,7 +479,7 @@ Ext.define('Editor.controller.SearchReplace', {
         //check if the segment is allready visited
         if(Ext.Array.contains(me.replacedSegmentsIndex,me.activeSegment.nextSegmentIndex)){
         	//reset the search aprametars
-        	me.resetSearchParametars();
+        	me.resetSearchParameters();
         	//save the currently opened segment
         	Editor.app.getController('Editor').save();
         	return;
@@ -842,7 +842,7 @@ Ext.define('Editor.controller.SearchReplace', {
 
         me.searchRequired=false;
 
-        //get the search parametars (with filter and sort included)
+        //get the search parameters (with filter and sort included)
         params=me.getSearchReplaceParams();
         
         //validate the required params
@@ -957,7 +957,7 @@ Ext.define('Editor.controller.SearchReplace', {
         //show the loading mask on the search window and on the segment grid
         me.showReplaceAllLoading(true);
 
-        //get the search parametars
+        //get the search parameters
         params=me.getSearchReplaceParams(true);
 
         Ext.Ajax.request({
@@ -997,7 +997,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 me.segmentGridOnReplaceAll(replacedSegments,true);
 
                 //reset some of the viewmodels properties (clean the search results)
-                me.resetSearchParametars();
+                me.resetSearchParameters();
             },
             failure: function(response){
                 //stop the loading
@@ -1301,7 +1301,7 @@ Ext.define('Editor.controller.SearchReplace', {
         //check if the track changes are active, and set the internal flag
         me.isActiveTrackChanges();
 
-        //check if all search segment parametars are 0(this is the initial state of the search)
+        //check if all search segment parameters are 0(this is the initial state of the search)
         var isSearchStart=function(){
             return me.activeSegment.matchIndex===0 &&
             me.activeSegment.nextSegmentIndex===0 &&
@@ -1496,7 +1496,7 @@ Ext.define('Editor.controller.SearchReplace', {
      * Reset some of the search/replace tab view model properties.
      * 
      */
-    resetSearchParametars:function(){
+    resetSearchParameters:function(){
         if(!this.getSearchReplaceWindow()){
             return;
         }
@@ -1621,7 +1621,7 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     /***
-     * Get the search parametar from the search form.
+     * Get the search parameter from the search form.
      */
     getSearchReplaceParams:function(isReplace){
         var me=this,
@@ -1639,7 +1639,7 @@ Ext.define('Editor.controller.SearchReplace', {
         params['taskGuid']=Editor.data.task.get('taskGuid');
         params['searchType']=activeTab.down('radiofield').getGroupValue();
 
-        //set the form values as parametars
+        //set the form values as parameters
         for(var i=0;i<formFields.length;i++){
             if(formFields[i].itemId){
                 params[formFields[i].itemId]=formFields[i].getValue();
@@ -1650,7 +1650,7 @@ Ext.define('Editor.controller.SearchReplace', {
             params['durations']=me.timeTracking;
         }
 
-        //if track changes are active, set the trackchanges flag and parametars
+        //if track changes are active, set the trackchanges flag and parameters
         if(me.isActiveTrackChanges()){
             params['isActiveTrackChanges']=true;
             params['attributeWorkflowstep']=Editor.data.task.get('workflowStepName')+Editor.data.task.get('workflowStep');
@@ -1763,7 +1763,7 @@ Ext.define('Editor.controller.SearchReplace', {
     },
 
     /***
-     * Validate the required search parametars
+     * Validate the required search parameters
      */
     searchParamValidator:function(params){
     	var me=this,

@@ -41,7 +41,7 @@ Ext.define('Editor.view.searchandreplace.SearchTabViewController', {
         if(newValue===oldValue){
             return;
         }
-        this.resetSearchParametars();
+        this.resetSearchParameters();
     },
 
     /***
@@ -53,7 +53,7 @@ Ext.define('Editor.view.searchandreplace.SearchTabViewController', {
             activeTab=tabPanel.getActiveTab(),
             searchField=activeTab.down('#searchField');
 
-        this.resetSearchParametars();
+        this.resetSearchParameters();
         
         var task = new Ext.util.DelayedTask(function(){
             //reset the search value
@@ -65,7 +65,7 @@ Ext.define('Editor.view.searchandreplace.SearchTabViewController', {
      * When form field value is changed, reset the search helper variables.
      * This function will be called from multiple form fields
      */
-    resetSearchParametars:function(){
+    resetSearchParameters:function(){
         var me=this,
             tabPanel=me.getView().up('#searchreplacetabpanel'),
             activeTab=tabPanel.getActiveTab(),

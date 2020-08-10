@@ -91,7 +91,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     allowBlank:false,
                     enableKeyEvents:true,
                     listeners:{
-                        select:'resetSearchParametars'
+                        select:'resetSearchParameters'
                     }
                 },{
                     xtype:'checkbox',
@@ -99,7 +99,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     name:'matchCase',
                     boxLabel:me.strings.matchCaseLabel,
                     listeners:{
-                        change:'resetSearchParametars'
+                        change:'resetSearchParameters'
                     }
                 },{
                     xtype:'checkbox',
@@ -156,7 +156,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                         visible:'{isSearchView}'
                     },
                     listeners:{
-                        change:'resetSearchParametars'
+                        change:'resetSearchParameters'
                     }
                 }]
         };
