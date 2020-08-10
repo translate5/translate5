@@ -13,24 +13,24 @@ https://www.translate5.net/en/resources/#installation
 ## Use it hosted by translate5's developers
 https://www.translate5.net/en/pricing-support/#hosted
 
-## Need support
+## Need support?
 For occassional cases please go to
 https://confluence.translate5.net/questions
 
 For professional support:
 https://www.translate5.net/en/pricing-support-support-and-development-contract/
-## Want a feature
+## Want a feature?
 Get in touch:
 https://www.translate5.net/en/contact/
 
-## Who is behind
+## Who is behind it
 Have a look:
 https://www.translate5.net/en/who-is-behind/
 
 ## What is not in this repository
 There are some plug-ins, although under GPLv3 license, that are not available to the public without charge. 
 
-Available for all companies, that support translate5 are: InstantTranslate, DeepL connector, SDL GroupShare Connector
+Available for all companies, that support translate5 are: InstantTranslate, DeepL connector, SDL GroupShare Connector, ModelFront
 
 Available for all companies, that support translate5 and pay an additional fee:  translate5 visual, TrackChanges
 
