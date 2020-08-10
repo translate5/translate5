@@ -29,5 +29,6 @@ https://www.translate5.net/en/who-is-behind/
 
 ## License
 https://www.gnu.org/licenses/agpl-3.0.en.html
+
 Exceptions for plug-ins:
 https://github.com/translate5/translate5/blob/master/plugin-exception.txt
