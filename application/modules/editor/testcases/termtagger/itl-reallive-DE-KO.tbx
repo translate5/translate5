@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE martif SYSTEM "TBXcoreStructV02.dtd">
+<martif type="TBX" xml:lang="en">
+
+    <martifHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>TBX to test termTagger with problematic cases</title>
+            </titleStmt>
+            <publicationStmt>
+                <p/>
+            </publicationStmt>
+        </fileDesc>
+    </martifHeader>
+
+    <text>
+        <body>
+          
+            <termEntry>
+                <langSet lang="DE">
+                    <tig>
+                        <term>Datenblatt</term>
+                        <termNote type="normativeAuthorization">preferredTerm</termNote>
+                    </tig>
+                </langSet>
+                <langSet lang="KO">
+                    <tig>
+                        <term>데이터시트</term>
+                        <termNote type="normativeAuthorization">preferredTerm</termNote>
+                    </tig>
+                </langSet>
+            </termEntry>          
+          
+            <termEntry>
+                <langSet lang="DE">
+                    <tig>
+                        <term>genau</term>
+                        <termNote type="normativeAuthorization">preferredTerm</termNote>
+                    </tig>
+                </langSet>
+                <langSet lang="KO">
+                    <tig>
+                        <term>정확</term>
+                        <termNote type="normativeAuthorization">preferredTerm</termNote>
+                    </tig>
+                </langSet>
+            </termEntry>          
+        </body>
+
+        <back>
+        </back>
+
+    </text>
+</martif>

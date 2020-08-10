@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.1" version="1.1">
+  <!-- the transunit-ID should contain the base64-encoded source-string als used in the php source-code. This ID is used for matching. -->
+  <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
+  <file original="php-sourcecode" source-language="ha" target-language="en" datatype="php">
+    <body>
+    
+    	<trans-unit id='R2xvYmFsZXNlIFZvcsO8YmVyc2V0enVuZyDDvGJlcnNwcmluZ2Vu'>
+		    <source>Globalese Vorübersetzung überspringen</source>
+		    <target>Skip Globalese pre-translation</target>
+		</trans-unit>
+		
+		<trans-unit id='R2xvYmFsZXNlIEJlbnV0emVy'>
+		    <source>Globalese Benutzer</source>
+		    <target>Globalese username</target>
+		</trans-unit>
+		
+		<trans-unit id='QVBJIFNjaGzDvHNzZWw='>
+		    <source>API Schlüssel</source>
+		    <target>API Key</target>
+		</trans-unit>
+		
+		<trans-unit id='R2xvYmFsZXNlIEF1dGhlbnRpZml6aWVydW5n'>
+		    <source>Globalese Authentifizierung</source>
+		    <target>Globalese authentication</target>
+		</trans-unit>
+		
+		<trans-unit id='S2VpbmUgR2xvYmFsZXNlIMOcYmVyc2V0enVuZ3MtRW5naW5lIHZlcmbDvGdiYXIgKGbDvHIgSWhyZW4gR2xvYmFsZXNlIEJlbnV0emVyIHVuZCBJaHJlIFNwcmFjaGtvbWJpbmF0aW9uKS4gQml0dGUgw6RuZGVybiBTaWUgZGVuIEJlbnV0emVyIG9kZXIgw7xiZXJzcHJpbmdlbiBTaWUgZGllIFZvcsO8YmVyc2V0enVuZy4='>
+		    <source>Keine Globalese Übersetzungs-Engine verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.</source>
+		    <target>No Globalese translation engine available (for your Globalese username and language combination). Please change the Globalese username or skip pre-translation.</target>
+		</trans-unit>
+		
+		<trans-unit id='S2VpbmUgR2xvYmFsZXNlIEJlbnV0emVyZ3J1cHBlIHZlcmbDvGdiYXIgKGbDvHIgSWhyZW4gR2xvYmFsZXNlIEJlbnV0emVyIHVuZCBJaHJlIFNwcmFjaGtvbWJpbmF0aW9uKS4gQml0dGUgw6RuZGVybiBTaWUgZGVuIEJlbnV0emVyIG9kZXIgw7xiZXJzcHJpbmdlbiBTaWUgZGllIFZvcsO8YmVyc2V0enVuZy4='>
+		    <source>Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.</source>
+		    <target>No Globalese user group available (for your Globalese username and language combination). Please change the Globalese username or skip pre-translation.</target>
+		</trans-unit>
+		
+		<trans-unit id='QmVudXR6ZXIgb2RlciBQYXNzd29ydCBzaW5kIG5pY2h0IHZhbGlkZS4='>
+		    <source>Benutzer oder Passwort sind nicht valide.</source>
+		    <target>Username or password are not valid.</target>
+		</trans-unit>
+		
+		<trans-unit id='R2xvYmFsZXNlIEVpbnN0ZWxsdW5nZW4='>
+		    <source>Globalese Einstellungen</source>
+		    <target>Globalese settings</target>
+		</trans-unit>
+		
+		<trans-unit id='SW1wb3J0aWVyZW4='>
+		    <source>Importieren</source>
+		    <target>Import</target>
+		</trans-unit>
+		
+		<trans-unit id='R2xvYmFsZXNlIEJlbnV0emVyZ3J1cHBl'>
+		    <source>Globalese Benutzergruppe</source>
+		    <target>Globalese user group</target>
+		</trans-unit>
+		
+		<trans-unit id='R2xvYmFsZXNlIGVuZ2luZQ=='>
+		    <source>Globalese engine</source>
+		    <target>Globalese engine</target>
+		</trans-unit>
+		
+		<trans-unit id='Qml0dGUgd8OkaGxlbg=='>
+		    <source>Bitte wählen</source>
+		    <target>Please select</target>
+		</trans-unit>
+		
+		<trans-unit id='TGFkZW4='>
+		    <source>Laden</source>
+		    <target>Loading</target>
+		</trans-unit>
+
+		<trans-unit id='RsO8ciBkaWUgYWt0dWVsbGUgU3ByYWNoa29tYmluYXRpb24gZXhpc3RpZXJ0IGtlaW5lIEVuZ2luZSBpbiBHbG9iYWxlc2UuIEJpdHRlIMO8YmVyc3ByaW5nZW4gU2llIGRlbiBHbG9iYWxlc2UgU2Nocml0dCBmw7xyIGRpZXNlbiBJbXBvcnQu'>
+		    <source>Für die aktuelle Sprachkombination existiert keine Engine in Globalese. Bitte überspringen Sie den Globalese Schritt für diesen Import.</source>
+		    <target>No engine exists in Globalese for the current language combination. Please skip the Globalese step of the import.</target>
+		</trans-unit>
+		
+    </body>
+  </file>
+</xliff>

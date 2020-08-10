@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE martif SYSTEM "TBXcoreStructV02.dtd">
+<martif type="TBX" xml:lang="en">
+
+   <martifHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>TBX to test termTagger with problematic cases</title>
+         </titleStmt>
+         <publicationStmt>
+            <p/>
+         </publicationStmt>
+      </fileDesc>
+   </martifHeader>
+
+   <text>
+      <body>
+
+         <termEntry id="X_4216">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Sport</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>sport</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_1954">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Kombiinstrument</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>instrument cluster</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+
+         <termEntry id="X_2077">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>CLS</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>CLS</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_2078">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>CL</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>CL</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_2122">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>rot</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>red</term>
+               </tig>
+            </langSet>
+         </termEntry>
+         
+         
+         <termEntry id="X_2123">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>ESP® Kurvendynamik-Assistent</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>ESP® Curve Dynamic Assist</term>
+               </tig>
+            </langSet>
+         </termEntry>
+         
+         <termEntry id="X_2124">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Ansteuerung</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>actuation</term>
+               </tig>
+            </langSet>
+         </termEntry>
+         
+         <termEntry id="X_2124x">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Stellglied</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>actuator</term>
+               </tig>
+            </langSet>
+         </termEntry>
+         
+         <termEntry id="X_2131">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Rohbau</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>bodyshell</term>
+               </tig>
+            </langSet>
+         </termEntry>
+      </body>
+      <back>
+</back>
+
+   </text>
+</martif>

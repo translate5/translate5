@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file original="Test1" datatype="x-testdata" xml:space="preserve" source-language="de" target-language="zen">
+      <header><![CDATA[This data text must be ignored by the parser! Also contained <source> tags should not make any problem.
+Also linebreaks 
+should make any problem!]]></header>
+    <body>
+    <!-- What about comments? They can contain > < > characters-->
+      <trans-unit id="12344321" datatype="html">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file preserve &gt; trans-unit undefined.</note>
+      </trans-unit>
+      <trans-unit id="12344322" datatype="html" xml:space="preserve">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file preserve &gt; trans-unit preserve.</note>
+      </trans-unit>
+      <trans-unit id="12344323" datatype="html" xml:space="default">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            like config.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            likez configz.</target>
+        <note priority="1" from="description">Test file preserve &gt; trans-unit default.</note>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="Test2" datatype="x-testdata" xml:space="default" source-language="de" target-language="zen">
+    <body>
+      <trans-unit id="22344321" datatype="html">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            like config.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            likez configz.</target>
+        <note priority="1" from="description">Test file default &gt; trans-unit undefined.</note>
+      </trans-unit>
+      <trans-unit id="22344322" datatype="html" xml:space="preserve">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file default &gt; trans-unit preserve.</note>
+      </trans-unit>
+      <trans-unit id="22344323" datatype="html" xml:space="default">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            like config.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            likez configz.</target>
+        <note priority="1" from="description">Test file default &gt; trans-unit default.</note>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="Test3" datatype="x-testdata" source-language="de" target-language="zen">
+    <body>
+      <trans-unit id="32344321" datatype="html">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            like config.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            likez configz.</target>
+        <note priority="1" from="description">Test file undefined &gt; trans-unit undefined.</note>
+      </trans-unit>
+      <trans-unit id="32344322" datatype="html" xml:space="preserve">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            preserved.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            preservedz.</target>
+        <note priority="1" from="description">Test file undefined &gt; trans-unit preserve.</note>
+      </trans-unit>
+      <trans-unit id="32344323" datatype="html" xml:space="default">
+          <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
+            like config.</source>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
+            likez configz.</target>
+        <note priority="1" from="description">Test file undefined &gt; trans-unit default.</note>
+      </trans-unit>
+      <trans-unit id="32344324" datatype="html">
+          <source>
+          </source>
+          <note priority="1" from="description">This segment should be ignored at all since whitespace is collapsed and segment is empty then!</note>
+      </trans-unit>
+      <trans-unit id="32344325" datatype="html" xml:space="preserve">
+        <source> Test preserve whitespace. Between mrk tags.  And surrounding tags.  </source>
+        <seg-source> <mrk mtype="seg" mid="0">Test preserve whitespace.</mrk> <mrk mtype="seg" mid="1">Between mrk tags.</mrk>  <mrk mtype="seg" mid="2">And surrounding tags.</mrk>  </seg-source>
+        <target> <mrk mtype="seg" mid="0">Testz preservez whitespacez.</mrk> <mrk mtype="seg" mid="1">Betweenz mrkz tagsz.</mrk>  <mrk mtype="seg" mid="2">Andz surroundingz tagsz.</mrk>  </target>
+        <note priority="1" from="description">Preserve whitespace between mrk tags.</note>
+      </trans-unit>
+      <trans-unit id="32344326" datatype="html" xml:space="default">
+        <source> Test not to preserve whitespace. Between mrk tags.  And surrounding tags.  </source>
+        <seg-source> <mrk mtype="seg" mid="0">Test not to preserve whitespace.</mrk> <mrk mtype="seg" mid="1">Between mrk tags.</mrk>  <mrk mtype="seg" mid="2">And surrounding tags.</mrk>  </seg-source>
+        <target> 
+            <mrk mtype="seg" mid="0">Testz notz toz preservez whitespacez.</mrk> <mrk mtype="seg" mid="1">Betweenz mrkz tagsz.</mrk>  <mrk mtype="seg" mid="2">Andz surroundingz tagsz.</mrk>  
+        </target>
+        <note priority="1" from="description">Preserve whitespace between mrk tags as defined in the config.</note>
+      </trans-unit>
+      <trans-unit id="32344327" datatype="html" xml:space="preserve">
+        <source> Test not to preserve whitespace. Between mrk tags.  And surrounding tags.  </source>
+        <seg-source> <mrk mtype="seg" mid="0">Test preserve whitespace.</mrk> <mrk mtype="seg" mid="1">Between mrk tags.</mrk>  <mrk mtype="seg" mid="2">And surrounding tags.</mrk> <mrk mtype="seg" mid="3">With missing or empty target.</mrk>  </seg-source>
+        <target/>
+        <note priority="1" from="description">Preserve whitespace between mrk tags as defined in the config.</note>
+      </trans-unit>
+      <trans-unit id="32344328" datatype="html" xml:space="preserve">
+        <source> Test not to preserve whitespace. Between mrk tags.  And surrounding tags.  </source>
+        <seg-source> <mrk mtype="seg" mid="0">Test preserve whitespace.</mrk> <mrk mtype="seg" mid="1">Between mrk tags.</mrk>  <mrk mtype="seg" mid="2">And surrounding tags.</mrk> <mrk mtype="seg" mid="3">With missing or empty target.</mrk>  </seg-source>
+        <note priority="1" from="description">Preserve whitespace between mrk tags as defined in the config.</note>
+      </trans-unit>
+      <trans-unit id="32344329" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph></source>
+        <seg-source>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test</mrk>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
+          <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
+        </seg-source>
+        <target>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>zacross ztags zoutside zfrom zmrk ztest</mrk>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
+          <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
+        </target>
+        <alt-trans mid="1" match-quality="10%">
+          <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
+          <target>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></target>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="32344330" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source><ph id="1" ax:element-id="0">after edit 44 characters (42 text + 1nbsp + 1 between mrk)</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph></source>
+        <seg-source>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 44 characters (42 text + 1nbsp + 1 between mrk)</ph>across tags outside from mrk test</mrk>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
+          <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
+        </seg-source>
+        <alt-trans mid="1" match-quality="10%">
+          <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
+          <target>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></target>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="32344331" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><ph id="1" ax:element-id="0">after edit 44 characters (42 text + 1nbsp + 1 between mrk)</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
+        <seg-source>
+          <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 44 characters (42 text + 1nbsp + 1 between mrk)</ph>across tags outside from mrk test</mrk>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
+        </seg-source>
+        <alt-trans mid="1" match-quality="10%">
+          <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
+          <target>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></target>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="32344332" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source><ph id="1" ax:element-id="0">after edit 45 characters (42 text + 1nbsp + 2 surround isolated ph tag)</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
+        <seg-source>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 45 characters (42 text + 1nbsp + 2 surround isolated ph tag)</ph>across tags outside from mrk test</mrk>
+          <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
+        </seg-source>
+        <alt-trans mid="1" match-quality="10%">
+          <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
+          <target>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></target>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="32344333" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304" xml:space="preserve">
+        <source><ph id="1" ax:element-id="0">after edit 85 characters (42 text + 1nbsp + 42 other)</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph></source>
+        <seg-source>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 85 characters (42 text + 1nbsp + 42 other)</ph>across tags outside from mrk test</mrk>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
+          <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
+        </seg-source>
+        <alt-trans mid="1" match-quality="10%">
+          <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
+          <target>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></target>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="32344334" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304" xml:space="preserve">
+        <source><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><ph id="1" ax:element-id="0">after edit 85 characters (42 text + 1nbsp + 42 other)</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
+        <seg-source>
+          <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 85 characters (42 text + 1nbsp + 42 other)</ph>across tags outside from mrk test</mrk>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
+        </seg-source>
+        <alt-trans mid="1" match-quality="10%">
+          <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
+          <target>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></target>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="32344335" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304" xml:space="preserve">
+        <source><ph id="1" ax:element-id="0">after edit 85 characters (42 text + 1nbsp + 42 other)</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
+        <seg-source>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 85 characters (42 text + 1nbsp + 42 other)</ph>across tags outside from mrk test</mrk>
+          <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
+        </seg-source>
+        <alt-trans mid="1" match-quality="10%">
+          <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
+          <target>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></target>
+        </alt-trans>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

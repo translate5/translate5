@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="AbbreviationIncludesAnother_3and4Chars" creator="beo" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Abbreviations of four or three letters must be recognized, even if one contains the other.</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>AKSE steht für "automatische Kindersitzerkennung". AKS steht für "Automatisches Kupplungs-System".</source>
+            <target>AKSE means "AKSE", AKS means "automatic clutch system".</target>
+        </input>
+        <expectedOutput>
+            <source><div title="" class="term admittedTerm exact transFound" data-tbxid="X_233_2">AKSE</div> steht für "automatische Kindersitzerkennung". <div title="" class="term admittedTerm exact transFound" data-tbxid="X_233">AKS</div> steht für "<div title="" class="term admittedTerm exact transFound" data-tbxid="">Automatisches Kupplungs-System</div>".</source>
+            <target><div title="" class="term admittedTerm exact" data-tbxid="X_233_2">AKSE</div> means "<div title="" class="term admittedTerm exact" data-tbxid="">AKSE</div>", <div title="" class="term admittedTerm exact" data-tbxid="X_233">AKS</div> means "<div title="" class="term admittedTerm exact" data-tbxid="">automatic clutch system</div>".</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

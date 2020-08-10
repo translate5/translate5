@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="formulas-H2O" creator="MittagQI" mandatory="yes" sourceLang="DE" targetLang="ES" tbxPath="translate5-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Test formulas: H2O</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>H2O</source>
+            <target>H2O</target>
+        </input>
+        <expectedOutput>
+            <source><div title="" class="term preferredTerm exact transFound" data-tbxid="xyz">H2O</div></source>
+            <target><div title="" class="term preferredTerm exact" data-tbxid="xyz">H2O</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>

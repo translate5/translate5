@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="acronym rule" creator="beo" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="DE-EN-stemming.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Prüft, ob die folgende Stemming-Regel funktioniert: "Bei Akronymen in der TBX (definiert dadurch, dass sie nur aus Großbuchstaben bestehen) ist die Groß-/Kleinschreibung auch bei eingeschaltetem Stemming relevant."</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Die UNO ist eine internationale Organisation.
+Die Uno wird groß geschrieben.</source>
+            <target>UNO is an international organization.
+Uno is written in capital letters.</target>
+        </input>
+        <expectedOutput>
+            <source>Die <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">UNO</div> ist eine internationale Organisation.
+Die Uno wird groß geschrieben.</source>
+            <target><div title="" class="term admittedTerm exact" data-tbxid="xyz">UNO</div> is an international organization.
+Uno is written in capital letters.</target>
+        </expectedOutput>
+    </assertion>
+</testcase>
+

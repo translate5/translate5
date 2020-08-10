@@ -1,0 +1,68 @@
+<?php
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/**#@+
+ * @author Marc Mittag
+ * @package portal
+ * @version 2.0
+ *
+ */
+
+/* @var $this Zend_View */
+$this->render('general.phtml');
+
+$params = [        
+    'header' => $this->header,
+    'footer' => $this->footer,
+    'role' => $this->translate->_($this->role),
+    'responsibleUser' => '', //by default empty string, if given then it will be filled up
+];
+
+//may be empty (with anon users for example)
+if(!empty($this->responsibleUser)) {
+    $params['responsibleUser'] = $this->responsibleUser;
+    //put in separate template fragment, so that clients can overwrite (or disable by overwriting) that data
+    $params['responsibleUser'] = $this->templateApply('{responsibleUser.firstName} {responsibleUser.surName} ({responsibleUser.email}) ist nun für die Aufgabe verantwortlich.<br />', $params);
+}
+
+$taskNr = $this->task->getTaskNr();
+if(!empty($taskNr)) {
+    $taskNr .= ' - ';
+}
+$this->subject = $this->translate->_('Translate5 - Aufgabe durch anderen Benutzer übernommen').' "'.$taskNr.$this->task->getTaskName().'"';
+
+$template = '{header}
+    
+ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
+<br />
+<b>Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.</b><br />
+<br />{responsibleUser}
+{footer}';
+
+$this->textbody = strip_tags($this->templateApply($template, $params));
+echo $this->templateApply($template, $params);

@@ -1,0 +1,275 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified">
+    <xs:element name="testcase">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" type="xs:string" name="description"/>
+                <xs:element  minOccurs="1" maxOccurs="1" name="assertion">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="input" minOccurs="1" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="source" minOccurs="1" maxOccurs="1">
+                                            <xs:complexType mixed="true">
+                                                <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                                    <xs:element name="div" minOccurs="0">
+                                                        <xs:complexType mixed="true">
+                                                            <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                                                <xs:element name="span" minOccurs="0"  maxOccurs="2">
+                                                                    <xs:complexType>
+                                                                        <xs:simpleContent>
+                                                                            <xs:extension base="xs:string">
+                                                                                <xs:attribute type="xs:string" name="title" use="optional"/>
+                                                                                <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="id" use="optional"/>
+                                                                            </xs:extension>
+                                                                        </xs:simpleContent>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                                <xs:element name="img" minOccurs="0" maxOccurs="unbounded">
+                                                                    <xs:complexType>
+                                                                        <xs:simpleContent>
+                                                                            <xs:extension base="xs:string">
+                                                                                <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                                <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="data-comment" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="src" use="required"/>
+                                                                            </xs:extension>
+                                                                        </xs:simpleContent>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                            </xs:choice>
+                                                            <xs:attribute type="xs:string" name="class" use="required"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                    <xs:element name="img" minOccurs="0">
+                                                        <xs:complexType>
+                                                            <xs:simpleContent>
+                                                                <xs:extension base="xs:string">
+                                                                    <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                    <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                    <xs:attribute type="xs:string" name="data-comment" use="required"/>
+                                                                    <xs:attribute type="xs:string" name="src" use="required"/>
+                                                                </xs:extension>
+                                                            </xs:simpleContent>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:choice>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="target" minOccurs="1" maxOccurs="1">
+                                            <xs:complexType mixed="true">
+                                                <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                                    <xs:element name="div" minOccurs="0">
+                                                        <xs:complexType mixed="true">
+                                                            <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                                                <xs:element name="span" minOccurs="0"  maxOccurs="2">
+                                                                    <xs:complexType>
+                                                                        <xs:simpleContent>
+                                                                            <xs:extension base="xs:string">
+                                                                                <xs:attribute type="xs:string" name="title" use="optional"/>
+                                                                                <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="id" use="optional"/>
+                                                                            </xs:extension>
+                                                                        </xs:simpleContent>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                                <xs:element name="img" minOccurs="0" maxOccurs="unbounded">
+                                                                    <xs:complexType>
+                                                                        <xs:simpleContent>
+                                                                            <xs:extension base="xs:string">
+                                                                                <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                                <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="data-comment" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="src" use="required"/>
+                                                                            </xs:extension>
+                                                                        </xs:simpleContent>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                            </xs:choice>
+                                                            <xs:attribute type="xs:string" name="class" use="required"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                    <xs:element name="img" minOccurs="0">
+                                                        <xs:complexType>
+                                                            <xs:simpleContent>
+                                                                <xs:extension base="xs:string">
+                                                                    <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                    <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                    <xs:attribute type="xs:string" name="data-comment" use="required"/>
+                                                                    <xs:attribute type="xs:string" name="src" use="required"/>
+                                                                </xs:extension>
+                                                            </xs:simpleContent>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:choice>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="expectedOutput" minOccurs="1" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="source" minOccurs="1" maxOccurs="1">
+                                            <xs:complexType mixed="true">
+                                                <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                                    <xs:element name="div" minOccurs="0">
+                                                        <xs:complexType mixed="true">
+                                                            <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                                                <xs:element name="span" minOccurs="0"  maxOccurs="2">
+                                                                    <xs:complexType>
+                                                                        <xs:simpleContent>
+                                                                            <xs:extension base="xs:string">
+                                                                                <xs:attribute type="xs:string" name="title" use="optional"/>
+                                                                                <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="id" use="optional"/>
+                                                                            </xs:extension>
+                                                                        </xs:simpleContent>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                                <xs:element name="img" minOccurs="0" maxOccurs="unbounded">
+                                                                    <xs:complexType>
+                                                                        <xs:simpleContent>
+                                                                            <xs:extension base="xs:string">
+                                                                                <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                                <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="data-comment" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="src" use="required"/>
+                                                                            </xs:extension>
+                                                                        </xs:simpleContent>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                                <xs:element name="div" minOccurs="0">
+                                                        <xs:complexType mixed="true">
+                                                            <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                                                <xs:element name="span" minOccurs="0"  maxOccurs="2">
+                                                                    <xs:complexType>
+                                                                        <xs:simpleContent>
+                                                                            <xs:extension base="xs:string">
+                                                                                <xs:attribute type="xs:string" name="title" use="optional"/>
+                                                                                <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="id" use="optional"/>
+                                                                            </xs:extension>
+                                                                        </xs:simpleContent>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                            </xs:choice>
+                                                            <xs:attribute type="xs:string" name="class" use="required"/>
+                                                            <xs:attribute type="xs:string" name="data-tbxid" use="optional"/>
+                                                            <xs:attribute type="xs:string" name="title" use="optional"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                            </xs:choice>
+                                                            <xs:attribute type="xs:string" name="class" use="required"/>
+                                                            <xs:attribute type="xs:string" name="data-tbxid" use="optional"/>
+                                                            <xs:attribute type="xs:string" name="title" use="optional"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                    <xs:element name="img" minOccurs="0">
+                                                        <xs:complexType>
+                                                            <xs:simpleContent>
+                                                                <xs:extension base="xs:string">
+                                                                    <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                    <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                    <xs:attribute type="xs:string" name="data-comment" use="required"/>
+                                                                    <xs:attribute type="xs:string" name="src" use="required"/>
+                                                                </xs:extension>
+                                                            </xs:simpleContent>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:choice>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="target" minOccurs="1" maxOccurs="1">
+                                            <xs:complexType mixed="true">
+                                                <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                                    <xs:element name="div" minOccurs="0">
+                                                        <xs:complexType mixed="true">
+                                                            <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                                                <xs:element name="span" minOccurs="0"  maxOccurs="2">
+                                                                    <xs:complexType>
+                                                                        <xs:simpleContent>
+                                                                            <xs:extension base="xs:string">
+                                                                                <xs:attribute type="xs:string" name="title" use="optional"/>
+                                                                                <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="id" use="optional"/>
+                                                                            </xs:extension>
+                                                                        </xs:simpleContent>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                                <xs:element name="img" minOccurs="0" maxOccurs="unbounded">
+                                                                    <xs:complexType>
+                                                                        <xs:simpleContent>
+                                                                            <xs:extension base="xs:string">
+                                                                                <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                                <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="data-comment" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="src" use="required"/>
+                                                                            </xs:extension>
+                                                                        </xs:simpleContent>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                                
+                                                                
+                                                                <xs:element name="div" minOccurs="0">
+                                                        <xs:complexType mixed="true">
+                                                            <xs:choice maxOccurs="unbounded" minOccurs="0">
+                                                                <xs:element name="span" minOccurs="0"  maxOccurs="2">
+                                                                    <xs:complexType>
+                                                                        <xs:simpleContent>
+                                                                            <xs:extension base="xs:string">
+                                                                                <xs:attribute type="xs:string" name="title" use="optional"/>
+                                                                                <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                                <xs:attribute type="xs:string" name="id" use="optional"/>
+                                                                            </xs:extension>
+                                                                        </xs:simpleContent>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                            </xs:choice>
+                                                            <xs:attribute type="xs:string" name="class" use="required"/>
+                                                            <xs:attribute type="xs:string" name="data-tbxid" use="optional"/>
+                                                            <xs:attribute type="xs:string" name="title" use="optional"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                                
+                                                            </xs:choice>
+                                                            <xs:attribute type="xs:string" name="class" use="required"/>
+                                                            <xs:attribute type="xs:string" name="data-tbxid" use="optional"/>
+                                                            <xs:attribute type="xs:string" name="title" use="optional"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                    <xs:element name="img" minOccurs="0">
+                                                        <xs:complexType>
+                                                            <xs:simpleContent>
+                                                                <xs:extension base="xs:string">
+                                                                    <xs:attribute type="xs:string" name="class" use="required"/>
+                                                                    <xs:attribute type="xs:int" name="data-seq" use="required"/>
+                                                                    <xs:attribute type="xs:string" name="data-comment" use="required"/>
+                                                                    <xs:attribute type="xs:string" name="src" use="required"/>
+                                                                </xs:extension>
+                                                            </xs:simpleContent>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:choice>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute type="xs:string" name="type"/>
+                    </xs:complexType>                
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute use="required" type="xs:string" name="name"/>
+            <xs:attribute use="required" type="xs:string" name="creator"/>
+            <xs:attribute use="required" type="xs:string" name="mandatory"/>
+            <xs:attribute use="required" type="xs:string" name="sourceLang"/>
+            <xs:attribute use="required" type="xs:string" name="targetLang"/>
+            <xs:attribute use="required" type="xs:string" name="tbxPath"/>
+            <xs:attribute use="required" type="xs:int" name="sourceStringMatch"/>
+            <xs:attribute use="required" type="xs:int" name="targetStringMatch"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="complexTermTagCombination3" creator="MittagQI" mandatory="yes" sourceLang="DE" targetLang="ES" tbxPath="translate5-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>A term after a single tag at the beginning of a segment and another term between a single tag and end of segment</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source><div class="single 782069643d22323322202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="23-1-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div>Drehbürstensieb ist unser Testterm <div class="single 782069643d22323322202f"><span title="&lt;br/&gt;" class="short">&lt;2/&gt;</span><span id="23-2-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div>Tolles Drehbürstensieb</source>
+            <target><div class="single 782069643d22323322202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="23-3-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div>Tamiz de cepillos rotativos ist unser Testterm <div class="single 782069643d22323322202f"><span title="&lt;br/&gt;" class="short">&lt;2/&gt;</span><span id="23-4-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div>Gran tamiz de cepillos rotativos</target>
+        </input>
+        <expectedOutput>
+            <source><div class="single 782069643d22323322202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="23-1-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div><div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Drehbürstensieb</div> ist unser Testterm <div class="single 782069643d22323322202f"><span title="&lt;br/&gt;" class="short">&lt;2/&gt;</span><span id="23-2-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div><div title="" class="term admittedTerm lowercase transFound" data-tbxid="term_0000002_001_de-DE_001_0000005">Tolles Drehbürstensieb</div></source>
+            <target><div class="single 782069643d22323322202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="23-3-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div><div title="" class="term admittedTerm exact" data-tbxid="term_0000001_001_es-ES_001_0000003">Tamiz de cepillos rotativos</div> ist unser Testterm <div class="single 782069643d22323322202f"><span title="&lt;br/&gt;" class="short">&lt;2/&gt;</span><span id="23-4-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div><div title="" class="term admittedTerm exact" data-tbxid="term_0000002_001_es-ES_001_0000006">Gran tamiz de cepillos rotativos</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>

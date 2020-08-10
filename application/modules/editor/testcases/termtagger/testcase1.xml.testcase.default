@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="singleQuotesInTerm" creator="beo" mandatory="yes" sourceLang="DE" targetLang="IT" tbxPath="DE-IT.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>A term must be recognized, even if it contains single quotes.</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Bedarfsgerecht regelbare Ölpumpe</source>
+            <target>Regolazione della pompa dell'olio in funzione del fabbisogno</target>
+        </input>
+        <expectedOutput>
+            <source>Bedarfsgerecht regelbare <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Ölpumpe</div></source>
+            <target>Regolazione della  <div title="" class="term admittedTerm exact" data-tbxid="xyz">pompa dell'olio</div> in funzione del fabbisogno</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

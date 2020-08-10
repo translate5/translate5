@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="severalTermsInTermentry" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>If there are several terms in a termentry, all of them must be matched, regardless of their position inside the termEntry and their normativeAuthorization.</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Viele Geschenke und Gaben sind eine gute Ergänzung des Mitbringsels.</source>
+            <target>Many gifts and rewards are a good complement of offers.</target>
+        </input>
+        <expectedOutput>
+            <source>Viele <div title="" class="term preferredTerm stemmed transFound" data-tbxid="xyz">Geschenke</div> und <div title="" class="term admittedTerm stemmed transFound" data-tbxid="xyz">Gaben</div> sind eine gute Ergänzung des <div title="" class="term deprecatedTerm stemmed transFound" data-tbxid="xyz">Mitbringsels</div>.</source>
+            <target>Many <div title="" class="term preferredTerm stemmed" data-tbxid="xyz">gifts</div> and <div title="" class="term admittedTerm stemmed" data-tbxid="xyz">rewards</div> are a good complement of <div title="" class="term deprecatedTerm stemmed" data-tbxid="xyz">offers</div>.</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

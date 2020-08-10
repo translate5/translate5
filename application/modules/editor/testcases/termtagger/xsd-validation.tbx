@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<martif xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="TBXcsV02.xsd" type="TBX" lang="en"><martifHeader><fileDesc><sourceDesc>Testdatei beoTerm</sourceDesc></fileDesc></martifHeader><text><body><termEntry><langSet lang="de"><tig><term>Ölpumpe</term><termNote type="normativeAuthorization">preferredTerm</termNote></tig></langSet><langSet lang="it"><tig><term>pumpa dell'olio</term><termNote type="normativeAuthorization">preferredTerm</termNote></tig></langSet></termEntry></body></text></martif>

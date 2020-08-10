@@ -1,0 +1,110 @@
+<?php
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/**#@+
+ * @author Marc Mittag
+ * @package portal
+ * @version 2.0
+ *
+ */
+
+$this->render('general.phtml');
+
+//Define Action String
+if($this->isCron) {
+    $this->subject = $this->translate->_('Translate5 - Aufgabe automatisch abgeschlossen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
+    $action = 'Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br />';
+}
+else {
+    $this->subject = $this->translate->_('Translate5 - Aufgabe abgeschlossen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
+    $action = 'Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br />';
+}
+$action = $this->templateApply($action, [
+    'task' => $this->task->getDataObject(),
+    'previousRole' => $this->translate->_($this->triggeringRole),
+]);
+
+//Define User List of next role users 
+$params = [];
+if(empty($this->nextRole)&&  in_array($this->triggeringRole, $this->workflow->getSteps2Roles())){
+    $userNotification = "Die Aufgabe ist vollständig bearbeitet, es sind keine weiteren Benutzer der Aufgabe zugeordnet.<br />\n<br />\n";
+}
+elseif(!empty($this->nextRole)&&  in_array($this->triggeringRole, $this->workflow->getSteps2Roles())) {
+    $userNotification=<<<'END'
+Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>{nextRole}</i> freigegeben:<br />
+{userList}<br />
+Die Benutzer wurden per E-Mail darüber informiert.<br />
+<br />
+END;
+    $params['nextRole'] = $this->translate->_($this->nextRole); 
+    $params['userList'] = $this->workflowNotifyMail()->renderUserList($this->users);
+}
+else{
+    $userNotification = "Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />\n<br />\n";
+}
+$userNotificationHTML = $this->templateApply($userNotification,$params);
+$userNotificationText = $this->templateApply($userNotification,[
+    'userList' => $this->htmlOnly
+]);
+
+//list of previous users:
+$userPreviousTpl = "Benutzer der vorherigen Rolle <i>{previousRole}</i>:\n{previousUsers}<br/>\n";
+$userPreviousText = $this->templateApply($userPreviousTpl,[
+    'previousUsers' => $this->htmlOnly
+]);
+$userPreviousHTML = $this->templateApply($userPreviousTpl,[
+    'previousUsers' => $this->workflowNotifyMail()->renderUserList($this->previousUsers)
+]);
+
+$template = '{header}
+{action}<br />
+{usersNotified}<br />
+{usersPreviousRole}<br />
+<br />
+Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i>{previousRole}</i>:<br />
+{changedSegments}
+<hr />
+<br />
+{footer}';
+
+//create text body
+$this->textbody = strip_tags($this->templateApply($template, [
+    'header' => $this->header,
+    'footer' => $this->footer,
+    'action' => $action,
+    'usersNotified' => $userNotificationText,
+    'usersPreviousRole' => $userPreviousText,
+    'changedSegments' => $this->htmlOnly,
+]));
+
+echo $this->templateApply($template, [
+    //just overwrite the changedSegments
+    'usersNotified' => $userNotificationHTML,
+    'usersPreviousRole' => $userPreviousHTML,
+    'changedSegments' => $this->workflowNotifyHtmlMailSegmentList($this->segments),
+]);

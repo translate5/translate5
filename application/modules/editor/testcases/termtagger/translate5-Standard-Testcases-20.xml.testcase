@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="inflectedAtSegmentEnd" creator="MittagQI" mandatory="yes" sourceLang="DE" targetLang="ES" tbxPath="translate5-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Inflected term at the end of a segment</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>des Drehbürstensiebes</source>
+            <target></target>
+        </input>
+        <expectedOutput>
+            <source>des <div title="" class="term admittedTerm stemmed transNotFound" data-tbxid="term_0000001_001_de-DE_001_0000001">Drehbürstensiebes</div></source>
+            <target></target>
+        </expectedOutput>
+    </assertion>
+</testcase>

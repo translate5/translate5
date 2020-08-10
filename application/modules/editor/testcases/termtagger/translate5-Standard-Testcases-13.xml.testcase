@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="complexTagTermCombination4" creator="MittagQI" mandatory="yes" sourceLang="DE" targetLang="ES" tbxPath="translate5-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>A term at segment start directly followed by a single tag, at segment end a term without a tag in front</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Drehbürstensieb<div class="single 782069643d22323622202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="26-1-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div> ist unser Testterm Tolles Drehbürstensieb</source>
+            <target>Tamiz de cepillos rotativos<div class="single 782069643d22323622202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="26-2-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div> ist unser Testterm Gran tamiz de cepillos rotativos</target>
+        </input>
+        <expectedOutput>
+            <source><div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Drehbürstensieb</div><div class="single 782069643d22323622202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="26-1-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div> ist unser Testterm <div title="" class="term admittedTerm lowercase transFound" data-tbxid="term_0000002_001_de-DE_001_0000005">Tolles Drehbürstensieb</div></source>
+            <target><div title="" class="term admittedTerm exact" data-tbxid="term_0000001_001_es-ES_001_0000003">Tamiz de cepillos rotativos</div><div class="single 782069643d22323622202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="26-2-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div> ist unser Testterm <div title="" class="term admittedTerm exact" data-tbxid="term_0000002_001_es-ES_001_0000006">Gran tamiz de cepillos rotativos</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>

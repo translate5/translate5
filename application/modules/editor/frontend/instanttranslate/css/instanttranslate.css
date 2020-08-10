@@ -1,0 +1,443 @@
+
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/* --------------- container --------------- */
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    font-family: "Source Sans Pro", Helvetica, sans-serif;
+}
+
+.ui-selectmenu-menu ul {
+    max-height: 19em;
+}
+
+.wrap {
+    margin-bottom: 1em;
+}
+
+#source,
+#target{
+    flex: 1 300px;
+    min-width: 0;
+    margin: 10px;
+}
+
+.error {
+    color: #f00;
+}
+
+/* --------------- general --------------- */
+
+h4, p {
+    padding: 0px 3px;
+    margin: 5px 0px 2px 0px;
+    -webkit-margin-before: 0px;
+    -webkit-margin-after: 5px;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+
+.instant-translation-error {
+    display: none;
+    padding: 3px;
+}
+
+.overflow {
+    max-height: 220px;
+}
+
+#source .ui-widget,
+#target .ui-widget,
+#source .ui-menu-item,
+#target .ui-menu-item {
+    font-size: 0.9EM !important;
+}
+
+#source .ui-button,
+#target .ui-button {
+    margin-bottom: 10px;
+}
+
+.infotext {
+    font-family: "Roboto",sans-serif;
+    font-size: 12px;
+    color: #757575;
+}
+.infotext a,
+.infotext span {
+    text-decoration: none;
+    color: #00adef;
+}
+.infotext a:hover,
+.infotext span:hover {
+    text-decoration: underline;
+}
+#sourceText.source-text-error,
+#sourceText.source-text-error:focus {
+    border: 1px solid #f00;
+}
+.source-text-error.infotext {
+    color: #f00;
+}
+.source-text-error.infotext a,
+.source-text-error.infotext a:hover,
+.source-text-error.infotext span,
+.source-text-error.infotext span:hover {
+    color: #f00;
+    text-decoration: underline;
+}
+.source-text-error.infotext a:hover,
+.source-text-error.infotext span:hover {
+    color: #f00;
+    text-decoration: none;
+}
+
+/* --------------- header --------------- */
+
+#containerHeader {
+    margin: 10px;
+    border-bottom: 1px solid #00adef;
+    padding-top: 19px;
+    padding-bottom:  10px;
+}
+#logo {
+    flex: 0 0 180px;
+    order: 1;
+    height: 110px;
+    background: url(/images/translate5.png?v=1) no-repeat left top;
+    background-size: auto auto;
+    background-size: 150px;
+}
+#termPortalButtonContainer{
+    order: 2;
+    flex: 1 0 auto;
+    text-align: right;
+    margin-right: 7px;
+}
+#languageSelector {
+    order: 3;
+    text-align: right;
+    margin-right: 7px;
+}
+#locale-button {width: 9em;}
+#logoutContainer {
+    flex: 0 0 80px;
+    order: 4;
+    text-align: right;
+}
+#logoutContainer a {
+    color: #fff;
+}
+#logoutContainer a:hover {
+    background-color: #e6e6e6;
+    border-color:#c5c5c5;
+    color: #454545;
+}
+
+@media (max-width: 690px) {
+    #logo {
+        flex: 0 1 100%;
+        text-align:left;
+        margin-right: 0px;
+    }
+    #languageSelector {text-align: left; margin-top: 5px;}
+    #logoutContainer {margin-top: 5px;}
+    #termPortalButtonContainer {margin-top: 5px;}
+}
+
+@media (max-width: 600px) {
+    #containerHeader {
+        font-size: 90%;
+    }
+}
+
+/* --------------- spinner --------------- */
+
+.loadingSpinnerLayer,
+.loadingSpinnerIndicator {
+    display: none;
+}
+.loadingSpinnerLayer {
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+    background-color: #999;
+    z-index: 800;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    margin: 0px;
+    text-align: center;
+}
+.loadingSpinnerLayer img {
+    margin: 30%;
+    padding: 20px;
+    border: 1px solid #00adef;
+    background-color: #fff;
+    z-index: 900;
+}
+.loadingSpinnerIndicator {
+    margin: 2px 0px;
+}
+#translations .loadingSpinnerIndicator img {
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+    margin-bottom: -4px;
+}
+
+/* ----------- language-locales ---------- */
+
+.localesSelectList li.notavailable div {
+    color: #999;
+}
+.localesSelectList li.notavailable div:hover {
+    color: #eee;
+}
+
+/* --------------- source --------------- */
+
+#sourceLanguageAndContent {
+    padding-right: 10px;
+}
+#sourceContent {
+    z-index: 100;
+}
+#source textarea {
+    width: 99%;
+    height: 105px;
+    font-family: verdana,helvetica,sans-serif;
+    font-size: 17px;
+    line-height: 1.5;
+}
+#source textarea:focus {
+    outline: none !important;
+    border: 1px solid #00adef;
+}
+#sourceFile {
+    width: 94%;
+}
+#sourceContent,
+.show-if-source-is-file,
+#sourceIsText {
+    display: none;
+}
+
+@media (max-width: 710px) {
+    #sourceFile {
+        width: 94%;
+        font-size: 0.8EM;
+    }
+}@media (max-width: 470px) {
+    #sourceFile {
+        width: 90%;
+    }
+}
+
+/* --------------- target --------------- */
+
+#target {
+    z-index: 10;
+}
+#target h2 {
+    font-size: 0.9EM;
+}
+
+#translationSubmit {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    background-color: #4d90fe;
+    background-image: -webkit-linear-gradient(top,#4d90fe,#4787ed);
+    background-image: -moz-linear-gradient(top,#4d90fe,#4787ed);
+    background-image: -ms-linear-gradient(top,#4d90fe,#4787ed);
+    background-image: -o-linear-gradient(top,#4d90fe,#4787ed);
+    background-image: linear-gradient(top,#4d90fe,#4787ed);
+    border: 1px solid #3079ed;
+    color: #fff;
+}
+#translationSubmit:hover,
+#translationSubmit:focus,
+#translationSubmit:active {
+    background-image: none;
+    background-color: #e6e6e6;
+    border-color:#c5c5c5;
+    color: #454545;
+}
+#translations {
+    width: 100%;
+}
+.translation-sourcediff {
+    background: url(../../images/exclamation.png) no-repeat left center;
+    color: #666;
+    font-size: 12px;
+    padding: 3px 5px 3px 20px;
+}
+.translation-sourcediff-content {
+    background-color: #fff;
+    color: #000;
+    font-style: italic;
+    padding: 3px 5px;
+}
+.translation-sourcediff .highlight {
+    background-color: #fee202;
+    padding: 5px;
+}
+.translation-result {
+    background-color: #eee;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+.translation-infotext {
+    font-size: 12px;
+    color: #666;
+    padding: 0px 3px;
+    margin-top: -7px;
+}
+#instantTranslationIsOff a:hover,
+#instantTranslationIsOn a:hover {
+    text-decoration: underline;
+}
+#instantTranslationIsOff,
+#instantTranslationIsOn {
+    display: none;
+}
+
+/* -- alternativeTranslations -- */
+h5.translationsForLabel {
+	color: #999;
+	margin: 0px;
+}
+h5.translationsForLabel .displayTarget {
+	color: #000;
+}
+table.translationsForLabel td {
+    font-size: 90%;
+    vertical-align: top;
+}
+table.translationsForLabel progress {
+	width: 30px !important;
+	margin-right: 5px;
+}
+
+/* --------------- additional infos --------------- */
+/* -- https://stackoverflow.com/a/6258628 -- */
+
+.clearable,
+.copyable {
+  position: relative;
+  display: block;
+}
+.clearable textarea,
+.copyable div {
+  box-sizing: border-box;
+}
+.clearable-clear,
+.copyable-copy,
+.term-info,
+.process-status-attribute,
+.term-status {
+  position: absolute;
+  user-select: none;
+  cursor: pointer;
+}
+.clearable textarea {
+  padding-right: 24px;
+}
+.clearable-clear {
+  display: none;
+  right: 2px;
+  top: 0px;
+  padding: 0px 8px;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 1em;
+  color: #666;
+}
+.copyable div {
+  padding-bottom: 24px;
+}
+.copyable-copy {
+  left: 8px;
+  bottom: 1px;
+}
+.term-info {
+left: 45px;
+  bottom: 0px;
+  padding: 0px 4px;
+}
+.process-status-attribute{
+  left: 63px;  
+  bottom: 0px;
+  padding: 0px 4px;
+}
+.term-status {
+  left: 25px;
+  bottom: 0px;
+  padding: 0px 4px;
+}
+
+
+#countedCharacters {
+  position: absolute;
+  user-select: none;
+  right: 2px;
+  bottom: 16px;
+  padding: 0 10px;
+  font-family: "Roboto",sans-serif;
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+}
+#countedCharacters.source-text-error {
+    background-color: #f00;
+    color: #fff;
+    font-weight: bold;
+    font-size: 15px;
+    right: 14px;
+}
+
+/* --------------- ui-tooltip --------------- */
+  .ui-tooltip {
+    background: black;
+    padding: 10px;
+    color: white;
+    font: bold 9px "Helvetica Neue", Sans-Serif;
+  }
+  
+ #switchSourceTarget{
+	height:40px;
+	width:60px;
+	margin: 10px;
+ }
+
+.switchSourceTargetDisabled{
+	color: #999;
+}

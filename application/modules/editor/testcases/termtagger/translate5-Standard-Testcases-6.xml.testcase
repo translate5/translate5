@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="specialTerm:AcM.G." creator="MittagQI" mandatory="no" sourceLang="DE" targetLang="ES" tbxPath="translate5-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Terms like AcM.G. with capital letters and dots in between should be tagged</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>AcM.G.</source>
+            <target>AcM.G.</target>
+        </input>
+        <expectedOutput>
+            <source><div title="" class="term preferredTerm exact transFound" data-tbxid="xyz">AcM.G</div>.</source>
+            <target><div title="" class="term admittedTerm exact" data-tbxid="xyz">AcM.G</div>.</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

@@ -1,0 +1,28 @@
+-- /*
+-- START LICENSE AND COPYRIGHT
+-- 
+--  This file is part of translate5
+--  
+--  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+-- 
+--  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+-- 
+--  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+--  as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+--  included in the packaging of this file.  Please review the following information 
+--  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+--  http://www.gnu.org/licenses/agpl.html
+--   
+--  There is a plugin exception available for use with this release of translate5 for
+--  translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+--  plugin-exception.txt in the root folder of translate5.
+--   
+--  @copyright  Marc Mittag, MittagQI - Quality Informatics
+--  @author     MittagQI - Quality Informatics
+--  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+-- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+-- 
+-- END LICENSE AND COPYRIGHT
+-- */
+
+INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2017-01-19', 'TRANSLATE-767', 'bugfix', 'Changealike Window title was always in german', 'The title of the changealike popup window was always in german, regardless of the UI language', '8'),('2017-01-19', 'TRANSLATE-787', 'bugfix', 'editor does not start anymore - on all installed instances', 'Due to a dependency on a foreign webservice translate5 did not start anymore since the webservice was deactivated.', '8'),('2017-01-19', 'TRANSLATE-782', 'bugfix', 'Change text in task creation pop-up', 'Some notices for the users were updated in the task creation window.', '12'),('2017-01-19', 'TRANSLATE-781', 'bugfix', 'different white space inside of SDLXLIFF internal tags leads to failures in relais import', 'Since the source segment is compared of Source Language and Relais Language, the content must be completely equal to get a matching relais segment. Segments containing tags did not match properly, since this internal tags could contain different whitespaces in the XML tags. This was fixed.', '12'),('2017-01-19', 'TRANSLATE-780', 'bugfix', 'New Installations: ID column of LEK_browser_log must not be NULL', 'When installing the application the table statement of the browser logging could not be excecuted.', '8'),('2017-01-19', 'TRANSLATE-768', 'bugfix', 'Db Updater complains about Zf_worker_dependencies is missing', 'When updating from an older version the updater complained about a missing Zf_worker_dependencies table.', '8');

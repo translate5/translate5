@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="transNotFound-with-multiple-target-terms" creator="MittagQI" mandatory="yes" sourceLang="DE" targetLang="ES" tbxPath="translate5-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Multiple times the same term in one segment: Mark the correct number of source terms as transFound</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Drehbürstensiebes IM Test Groß- Kleinschreibungstoleranz - Drehbürstensieb, drehbürstensieb, DREHBÜRSTENSIEB, DrEHbürstenSIEB.</source>
+            <target>tamiz de cepillos rotativos Test Groß- Kleinschreibungstoleranz - Tamiz de cepillos rotativos, tamiz de cepillos rotativos.</target>
+        </input>
+        <expectedOutput>
+            <source><div title="" class="term admittedTerm stemmed transFound" data-tbxid="term_0000001_001_de-DE_001_0000001">Drehbürstensiebes</div> <div title="" class="term admittedTerm exact transNotDefined" data-tbxid="term_0000014_001_de-DE_001_0000029">IM</div> Test Groß- Kleinschreibungstoleranz - <div title="" class="term admittedTerm exact transFound" data-tbxid="term_0000001_001_de-DE_001_0000001">Drehbürstensieb</div>, <div title="" class="term admittedTerm lowercase transFound" data-tbxid="term_0000001_001_de-DE_001_0000001">drehbürstensieb</div>, <div title="" class="term admittedTerm lowercase transNotFound" data-tbxid="term_0000001_001_de-DE_001_0000001">DREHBÜRSTENSIEB</div>, <div title="" class="term admittedTerm lowercase transNotFound" data-tbxid="term_0000001_001_de-DE_001_0000001">DrEHbürstenSIEB</div>.</source>
+            <target><div title="" class="term admittedTerm lowercase" data-tbxid="term_0000001_001_es-ES_001_0000003">tamiz de cepillos rotativos</div> Test Groß- Kleinschreibungstoleranz - <div title="" class="term admittedTerm exact" data-tbxid="term_0000001_001_es-ES_001_0000003">Tamiz de cepillos rotativos</div>, <div title="" class="term admittedTerm lowercase" data-tbxid="term_0000001_001_es-ES_001_0000003">tamiz de cepillos rotativos</div>.</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

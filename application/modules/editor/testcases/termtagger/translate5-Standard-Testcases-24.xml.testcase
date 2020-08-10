@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="termWithApostroph" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>An apostroph inside a term must be possible</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>platziert im vorderen Radlauf der Fahrerseite</source>
+            <target>located in the front wheel arch on the driver's side</target>
+        </input>
+        <expectedOutput>
+            <source>platziert im vorderen Radlauf der <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Fahrerseite</div></source>
+            <target>located in the front wheel arch on the <div title="" class="term admittedTerm exact" data-tbxid="xyz">driver's side</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>

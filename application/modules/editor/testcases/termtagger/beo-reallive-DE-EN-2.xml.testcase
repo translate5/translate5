@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="sport" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="beo-reallive-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description></description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>noch mehr Spaß am Sport und Sinn für das Besondere</source>
+            <target>an even greater sense of sportiness and a touch of the exceptional</target>
+        </input>
+        <expectedOutput>
+            <source>noch mehr Spaß am <div title="" class="term admittedTerm exact transNotFound" data-tbxid="xyz">Sport</div> und Sinn für das Besondere</source>
+            <target>an even greater sense of sportiness and a touch of the exceptional</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

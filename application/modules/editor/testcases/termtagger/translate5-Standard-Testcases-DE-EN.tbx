@@ -1,0 +1,283 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE martif SYSTEM "TBXcoreStructV02.dtd">
+<martif type="TBX" xml:lang="en">
+
+    <martifHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>TBX to test termTagger with problematic cases</title>
+            </titleStmt>
+            <publicationStmt>
+                <p/>
+            </publicationStmt>
+        </fileDesc>
+    </martifHeader>
+
+    <text>
+        <body>
+          
+            <termEntry>
+                <langSet lang="de">
+                    <tig>
+                        <term>Mitbringsel</term>
+                        <termNote type="normativeAuthorization">deprecatedTerm</termNote>
+                    </tig>
+                    <tig>
+                        <term>Gabe</term>
+                    </tig>
+                    <tig>
+                        <term>Geschenk</term>
+                        <termNote type="normativeAuthorization">preferredTerm</termNote>
+                    </tig>
+                </langSet>
+                <langSet lang="en-GB">
+                    <tig>
+                        <term>offer</term>
+                        <termNote type="normativeAuthorization">deprecatedTerm</termNote>
+                    </tig>
+                    <tig>
+                        <term>gift</term>
+                        <termNote type="normativeAuthorization">preferredTerm</termNote>
+                    </tig>
+                    <tig>
+                        <term>reward</term>
+                    </tig>
+                </langSet>
+            </termEntry>          
+
+            <termEntry id="X_5937">
+                <langSet xml:lang="DE">
+                    <tig>
+                        <term>Leder Nappa</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="EN">
+                    <tig>
+                        <term>nappa leather</term>
+                    </tig>
+                </langSet>
+            </termEntry>
+
+            <termEntry id="X_2121">
+                <langSet xml:lang="DE">
+                    <tig>
+                        <term>schwarz</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="EN">
+                    <tig>
+                        <term>black</term>
+                    </tig>
+                </langSet>
+            </termEntry>
+         
+            <termEntry id="X_2125">
+                <langSet xml:lang="DE">
+                    <tig>
+                        <term>Fahrerseite</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="EN">
+                    <tig>
+                        <term>driver's side</term>
+                    </tig>
+                </langSet>
+            </termEntry>
+         
+            <termEntry id="X_2126">
+                <langSet xml:lang="DE">
+                    <tig>
+                        <term>Fahrersitz</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="EN">
+                    <tig>
+                        <term>driver's seat</term>
+                    </tig>
+                </langSet>
+            </termEntry>
+         
+            <termEntry id="X_2127">
+                <langSet xml:lang="DE">
+                    <tig>
+                        <term>Fahrzeug</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="EN">
+                    <tig>
+                        <term>vehicle</term>
+                    </tig>
+                </langSet>
+            </termEntry>
+         
+            <termEntry id="X_2128">
+                <langSet xml:lang="DE">
+                    <tig>
+                        <term>CD/DVD-Laufwerk</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="EN">
+                    <tig>
+                        <term>CD/DVD drive</term>
+                    </tig>
+                </langSet>
+            </termEntry>
+         
+            <termEntry id="X_2129">
+                <langSet xml:lang="DE">
+                    <tig>
+                        <term>Audio</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="EN">
+                    <tig>
+                        <term>audio</term>
+                    </tig>
+                </langSet>
+            </termEntry>
+         
+            <termEntry id="X_2130">
+                <langSet xml:lang="DE">
+                    <tig>
+                        <term>CDI</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="EN">
+                    <tig>
+                        <term>CDI</term>
+                    </tig>
+                </langSet>
+            </termEntry>
+
+            <termEntry id="X_2132">
+                <langSet xml:lang="DE">
+                    <tig>
+                        <term>Verkleidung</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="EN">
+                    <tig>
+                        <term>trim</term>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="X_2133">
+                <langSet xml:lang="DE">
+                    <tig>
+                        <term>Laderaum</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="EN">
+                    <tig>
+                        <term>load compartment</term>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="X_2134">
+                <langSet xml:lang="DE">
+                    <tig>
+                        <term>Laderaumverkleidung</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="EN">
+                    <tig>
+                        <term>load compartment trim</term>
+                    </tig>
+                </langSet>
+            </termEntry>
+
+         <termEntry id="X_233">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>AKS</term>
+               </tig>
+               <tig>
+                  <term>Automatisches Kupplungs-System</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>automatic clutch system</term>
+               </tig>
+               <tig>
+                  <term>AKS</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_233_2">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>AKSE</term>
+               </tig>
+               <tig>
+                  <term>Automatische Kindersitz-Erkennung</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>AKSE</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_1019">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>CL</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>CL</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_1020">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>CLS</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>CLS</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_1021">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>haus</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>house</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_1021">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Terminus</term>
+                  <termNote type="normativeAuthorization">preferredTerm</termNote>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>term</term>
+                  <termNote type="normativeAuthorization">preferredTerm</termNote>
+               </tig>
+            </langSet>
+         </termEntry>
+        </body>
+
+        <back>
+        </back>
+
+    </text>
+</martif>

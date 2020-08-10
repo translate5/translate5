@@ -1,0 +1,14 @@
+mid,quelle,target
+1,Das ist eine rotes Haus,This is a red house
+2,Hier ist das <b>Alignment</b> noch in Ordnung.,Here the alignment is OK.
+3,"Falscher Source Text, MID OK. <br> single tag zum inc der tag ID","Wrong Source Text here, MID OK."
+4,Hier ist das Alignment wieder in Ordnung.,Here the alignment is OK again.
+4a,"Gleicher Source Text, falsche MID","Same source text, wrong MID"
+5,Hier ist das <b>Alignment</b> wieder in Ordnung 2.,Here the alignment is OK again 2.
+5a,Falscher Source Text und MID.,Wrong Source Text and MID.
+6,Hier ist das Alignment wieder in Ordnung 3.,Here the alignment is OK again 3.
+7,Segment mit <b>ignorierten</b> und unterschiedlichen Tags,Segment with ignored and different tags
+8,Segment mit <b>ignorierten</b> und gleichen Tags,Segment with ignored and equal tags
+9,"Segment mit ""unterschiedlicher&quot; Entity Encodierung",Segment with different entity encoding
+10,"Segment mit ""gleicher"" Entity Encodierung","Segment with equal entity encoding"
+11,Segment mit &quot;gleicher&quot; Entity Encodierung,Segment with equal entity encoding

@@ -1,0 +1,56 @@
+
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+@CHARSET "UTF-8";
+
+/* 
+Images to the plugins image path are adressed relativly
+.ico-tm-edit {background-image: url("images/book_edit.png");background-repeat:no-repeat;background-position:center;}
+ */
+ 
+.spellcheck-tooltip-header .x-menu-item-text-default,
+.spellcheck-tooltip-header .x-menu-item-text-default:hover {background-color: #404040; color: #f0f0f0; font-weight:bold; margin: 0px; padding: 0px 8px;}
+
+.spellcheck-tooltip-moreinformation .x-menu-item-text-default,
+.spellcheck-tooltip-moreinformation .x-menu-item-text-default:hover {border-top: 1px solid #404040; width: 100%;}
+
+#segment-grid .segment-statusstrip .spellcheck-icon {
+	background-color: #5f7edd;
+    float: left;
+    padding: 5px 3px;
+    margin: 0px !important;
+    border-top:  0px !important;
+    border-right: 1px solid #fff;
+    border-bottom:  0px !important;
+    border-left:  0px !important;
+}
+
+#segment-grid .x-grid-row-editor .segment-content.x-form-readonly div.x-form-display-field.type-target {
+    display: none;
+}

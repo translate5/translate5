@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="formulas-2 Fe(NH4)2(SO4)2*3H2O" creator="MittagQI" mandatory="no" sourceLang="DE" targetLang="ES" tbxPath="translate5-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Test formulas: 2 Fe(NH4)2(SO4)2*3H2O</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>2 Fe(NH4)2(SO4)2*3H2O</source>
+            <target>2 Fe(NH4)2(SO4)2*3H2O</target>
+        </input>
+        <expectedOutput>
+            <source><div title="" class="term deprecatedTerm exact transFound" data-tbxid="xyz">2 Fe(NH4)2(SO4)2*3H2O</div></source>
+            <target><div title="" class="term deprecatedTerm exact" data-tbxid="xyz">2 Fe(NH4)2(SO4)2*3H2O</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>

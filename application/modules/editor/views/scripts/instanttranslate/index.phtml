@@ -1,0 +1,317 @@
+<?php
+/*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ 
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ 
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+ 
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
+?>
+
+<?php
+/* @var $this Zend_View */
+
+    // Which languages are available according to the LanguageResources?
+    // (We only the need the single lists here, not in which combination they work.)
+    // In order to save time we use this loop to calculate the characterLimit, too.
+    $allCharacterLimits = array();
+    $allSourceLanguageLocales = array();
+    $allTargetLanguageLocales = array();
+    
+    foreach ($this->allLanguageResources as $languageResource) {
+        $allCharacterLimits[] = $languageResource['characterLimit'];
+        foreach ($languageResource['source'] as $sourceLocale) {
+            //are the sublanguages used as dropdown selections
+            $useLanguage=strpos($sourceLocale, '-') === false || $this->showSublanguages;
+            if (!in_array($sourceLocale, $allSourceLanguageLocales) && $useLanguage) {
+                $allSourceLanguageLocales[] = $sourceLocale;
+            }
+        }
+        foreach ($languageResource['target']as $key => $targetLocale) {
+            //are the sublanguages used as dropdown selections
+            $useLanguage=strpos($targetLocale, '-') === false || $this->showSublanguages;
+            if (!in_array($targetLocale, $allTargetLanguageLocales) && $useLanguage) {
+                $allTargetLanguageLocales[] = $targetLocale;
+            }
+        }
+    }
+    sort($allSourceLanguageLocales);
+    sort($allTargetLanguageLocales);
+    
+    // the lowest number of characters that any of the LanguageResources can handle 
+    // is our limit for what the user is allowed to enter:
+    if(empty($allCharacterLimits)) {
+        $characterLimit = 3;
+    }
+    else {
+        $characterLimit = min($allCharacterLimits);
+    }
+    $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+?>
+
+<div class="loadingSpinnerLayer"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
+
+<div id="containerHeader" class="container">
+    <div id="logo"></div>
+<?php 
+
+    //check if the user is allowed to acces the term portal
+    if($this->isUserTermportalAllowed){
+        echo '<div id="termPortalButtonContainer"><a id="termPortalButton" class="ui-button ui-widget ui-corner-all">'.$translate->_("Terminologieportal").'</a></div>';
+    }else{
+        echo '<div id="termPortalButtonContainer"></div>';
+    }
+    
+    // see View_Helper_LanguageSelector
+    $session = new Zend_Session_Namespace();
+    
+    $availableTranslations = $translate->getAvailableTranslations();
+    asort($availableTranslations);
+    $languageSelector=[];
+    
+    //translated strings
+    $this->translations=array(
+        "clearText"                 => $translate->_("Text zurücksetzen"),
+        "copy"                      => $translate->_("Kopieren"),
+        "enterText"                 => $translate->_("Geben Sie Text ein"),
+        "serverErrorMsg500"         => $translate->_("Die Anfrage führte zu einem Fehler im angefragten Dienst."),
+        "noResultsFound"            => $translate->_("Es wurden keine Ergebnisse gefunden."),
+        "translate"                 => $translate->_("Übersetzen"),
+        "orTranslateFile"           => $translate->_("oder lassen Sie ein Dokument übersetzen"),
+        "orTranslateText"           => $translate->_("oder lassen Sie Text übersetzen, den Sie eingeben."),
+        "turnOffInstantTranslation" => $translate->_("Sofortübersetzung deaktivieren"),
+        "turnOnInstantTranslation"  => $translate->_("Sofortübersetzung aktivieren"),
+        "uploadFile"                => $translate->_("Laden Sie eine Datei hoch"),
+        "uploadFileNotFound"        => $translate->_("Bitte wählen Sie eine Datei aus."),
+        "notAllowed"                => $translate->_("nicht erlaubt"),
+        "openInTermPortal"          => $translate->_("Term in Terminologie-Portal öffnen"),
+        "attentionFuzzyMatch"       => $translate->_("Achtung! FuzzyMatch ({0})"),
+        "differenceIsHighlighted"   => $translate->_("Quellsegment zum TM-Match: Unterschied zu Ihrer Texteingabe hervorgehoben"),
+        "selectLanguages"           => $translate->_("Bitte wählen Sie eine Sprachkombination für die Übersetzung."),
+        "noLanguageResource"        => $translate->_("Für diese Sprachkombination steht keine SprachResource zur Verfügung."),
+        "translationsForLabel"      => $translate->_("Übersetzungen für"),
+        "termProposalIconTooltip"   => $translate->_("Als neuen Term im TermPortal vorschlagen"),
+        "availableUntil"            => $translate->_("verfügbar bis"),
+        "error"                     => $translate->_("Fehler"),
+        "noDownloadAfterError"      => $translate->_("Beim Übersetzen der Datei ist ein Fehler aufgetreten; ein Download steht nicht zur Verfügung."),
+        "noDownloadWhileImport"     => $translate->_("Während die automatische Übersetzung läuft, steht die Datei noch nicht zum Download zur Verfügung. Klicken Sie \"Aktualisieren\", um den Status erneut zu prüfen."),
+        "noDownloadNotTranslated"   => $translate->_("Beim Übersetzen der Datei ist ein Fehler aufgetreten; ein Download steht nicht zur Verfügung."),
+        "pretranslatedFiles"        => $translate->_("Vorübersetzte Dateien"),
+        "refresh"                   => $translate->_("Aktualisieren"),
+        "state"                     => $translate->_("Status"),
+        "asOf"                      => $translate->_("Stand:"),
+        "translationBasedOn"        => $translate->_("Übersetzt unter Verwendung von:"),
+    );
+    $this->Php2JsVars()->set('languageresource.translatedStrings',$this->translations);
+    
+    $languageSelector[]='<form action="#" method="post" name="languageSelector" id="languageSelector">';
+    $languageSelector[]='<select id="locale">';
+    foreach ($availableTranslations as $locale => $translation) {
+        $selected = ($locale == $session->locale) ? ' selected="selected"' : '';
+        $languageSelector[]='<option value="'.$locale.'"'.$selected.'>'.$translation.'</option>';
+    }
+    $languageSelector[]='</select>';
+    $languageSelector[]='</form>';
+    echo implode(' ', $languageSelector);
+?>
+    <div id="logoutContainer"><a id="logout" href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus"><?php echo $translate->_('Abmelden'); ?></a></div>
+    
+</div>
+
+<div id="containerTranslation" class="container">
+	<div id="source">
+        <form id="sourceLanguageAndContent">
+            <select id="sourceLocale" name="sourceLocale">
+                <?php
+                    $sourceLangSelected = false;
+                    $getParamSource = $this->source;
+                    if (!is_null($getParamSource)) {
+                        $sourceLangSelected = $getParamSource;
+                    } else if (!empty($this->sourceSearchLanguagePreselectionLocale)) {
+                        $sourceLangSelected = $this->sourceSearchLanguagePreselectionLocale;
+                    }
+                    $optionValues=[];
+                    $sourceLangSelected=strtolower($sourceLangSelected);
+                    foreach ($allSourceLanguageLocales as $sourceLangLocale) {
+                        $selected = ($sourceLangSelected != false && $sourceLangSelected == strtolower($sourceLangLocale)) ? ' selected="selected"' : '';
+                        $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
+                    }
+                    echo implode(' ', $optionValues);
+                ?>
+            </select>
+            <div id="sourceIsText" class="source-toggle show-if-source-is-text infotext"></div>
+            <div id="sourceIsFile" class="source-toggle show-if-source-is-file infotext"></div>
+            <div id="sourceContent" class="clearable">
+                <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"><?php echo htmlspecialchars($this->text); ?></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
+                <span class="clearable-clear show-if-source-is-text" title="<?php echo $this->translations["clearText"];?>">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
+                <span id="countedCharacters" class="show-if-source-is-text">0</span>
+                <input id="sourceFile" name="sourceFile" type="file" class="show-if-source-is-file"/>
+            </div>
+        <div id="sourceError" class="instant-translation-error ui-state-error ui-corner-all"></div>
+        <div id="pretranslatedfiles"></div>
+        </form>
+    </div>
+    <button id="switchSourceTarget">
+    </button>
+    <div id="target">
+        <form id="targetControls">
+            <select id="targetLocale" name="targetLocale">
+                <?php
+                    $targetLangSelected = false;
+                    $getParamTarget = $this->target;
+                    if (!is_null($getParamTarget)) {
+                        $targetLangSelected = $getParamTarget;
+                    } else if (!empty($this->targetSearchLanguagePreselectionLocale)) {
+                        $targetLangSelected = $this->targetSearchLanguagePreselectionLocale;
+                    }
+                    $optionValues=[];
+                    $targetLangSelected=strtolower($targetLangSelected);
+                    foreach ($allTargetLanguageLocales as $targetLangLocale) {
+                        $selected = ($targetLangSelected != false && $targetLangSelected == strtolower($targetLangLocale)) ? ' selected="selected"' : '';
+                        $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
+                    }
+                    echo implode(' ', $optionValues);
+                ?>
+            </select>
+            <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="click-starts-translation ui-corner-all ui-button ui-widget"/>
+            <div id="instantTranslationIsOff" class="click-starts-translation instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
+            <div id="instantTranslationIsOn" class="instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
+        </form>
+        <div id="targetError" class="instant-translation-error ui-state-error ui-corner-all"></div>
+        <div class="loadingSpinnerIndicator"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
+        <div id="translations">
+            <!-- inject translations here  -->
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var characterLimit = '<?php echo $characterLimit;?>';
+    
+</script>
+
+<script type="text/javascript">
+$( function() {
+    $('#logout a').mouseover(function(){
+        $(this).removeClass("ui-state-active");
+    });
+    $('#logout a').mouseout(function(){
+            $(this).addClass("ui-state-active");
+        });
+    $('#logout').on("click",function(){
+    	var loginUrl=Editor.data.loginUrl || Editor.data.apps.loginUrl;
+    	//check if it is used from iframe
+        if(window.parent!=undefined){
+            window.parent.location =loginUrl;
+        }else{
+        	window.location =loginUrl;
+        }
+    });
+    $('#locale').selectmenu({
+        change: function() {
+            var action = $(this).val();
+            $("#languageSelector").attr("action", "?locale=" + action);
+            $("#languageSelector").submit();
+        }
+      });
+    $('#sourceLocale').selectmenu({
+        open: function() {
+            updateLocalesSelectLists($(this));
+        },
+        change: function() {
+            checkInstantTranslation();
+        }
+      }).selectmenu("menuWidget").addClass("overflow localesSelectList");
+    $('#targetLocale').selectmenu({
+        open: function() {
+            updateLocalesSelectLists($(this));
+        },
+        change: function() {
+            checkInstantTranslation();
+        }
+      }).selectmenu("menuWidget").addClass("overflow localesSelectList");
+    $('#sourceFile').button();
+    $('#translationSubmit').button();
+    $('#sourceContent').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".clearable-clear" }
+    });
+    $('#translations .translation-sourcediff').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".translation-sourcediff" }
+    });
+    $('#translations .copyable-copy').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".copyable-copy" }
+    });
+    $('#translations .term-info').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".term-info" }
+    });
+    $('#translations .term-status').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".term-info" }
+    });
+    //check if the source and the target are the same
+    if($('#sourceLocale').val()==$('#targetLocale').val()){
+    	setTargetFirstAvailable($('#sourceLocale').val());
+    }
+    // start with checking according to the locales as stored for user
+    checkInstantTranslation($('#targetLocale'));
+    $("#sourceText").attr('maxlength',characterLimit);
+    clearAllErrorMessages();
+    setAllowedFileTypes();
+    setfileUploadLanguageCombinationsAvailable();
+    setTextForSource();
+    showSource();
+    $('#switchSourceTarget').button({
+    	icon: "ui-icon-transfer-e-w"
+	}).on("click",function(){
+		//switch source and target languages on button click
+		var sourceLocale=$("#sourceLocale").val(),
+			targetLocale=$("#targetLocale").val();
+		$("#sourceLocale").val(targetLocale);
+		$("#targetLocale").val(sourceLocale);
+		$("#sourceLocale").selectmenu("refresh");
+		$("#targetLocale").selectmenu("refresh");
+		var results=$('div.translation-result');
+		checkInstantTranslation();
+		if(results.length>0){
+			$('#sourceText').val(results[0].textContent);
+		}
+		$('#translations').hide();
+		startTranslation();
+    });
+} );
+</script>
+
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/ErrorHandler.js"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js"></script>
+
+<script type="text/javascript">
+// show list of available files
+showDownloads(<?php echo json_encode($this->allPretranslatedFiles); ?>, <?php echo json_encode($this->dateAsOf); ?>);
+// "toggle" source (text/file)
+$(document).on('click', '.source-toggle .change-source-type' , function() {
+    $('.source-toggle').toggle();
+    chosenSourceIsText = !chosenSourceIsText;
+    clearAllErrorMessages();
+    document.getElementById("sourceFile").value = "";
+    showSource();
+});
+</script>
+

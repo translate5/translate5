@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="termFollowedByDash" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Term with following dash must be recognized</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Informationen zum Fahrzeug</source>
+            <target>vehicle-related information</target>
+        </input>
+        <expectedOutput>
+            <source>Informationen zum <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Fahrzeug</div></source>
+            <target><div title="" class="term admittedTerm exact" data-tbxid="xyz">vehicle</div>-related information</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

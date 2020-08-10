@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="termWithApostroph" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>term which includes an apostroph</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Fahrersitz</source>
+            <target>driver's seat</target>
+        </input>
+        <expectedOutput>
+            <source><div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">Fahrersitz</div></source>
+            <target><div title="" class="term admittedTerm exact" data-tbxid="xyz">driver's seat</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>

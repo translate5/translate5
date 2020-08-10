@@ -1,0 +1,28 @@
+-- /*
+-- START LICENSE AND COPYRIGHT
+-- 
+--  This file is part of translate5
+--  
+--  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+-- 
+--  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+-- 
+--  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+--  as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+--  included in the packaging of this file.  Please review the following information 
+--  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+--  http://www.gnu.org/licenses/agpl.html
+--   
+--  There is a plugin exception available for use with this release of translate5 for
+--  translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+--  plugin-exception.txt in the root folder of translate5.
+--   
+--  @copyright  Marc Mittag, MittagQI - Quality Informatics
+--  @author     MittagQI - Quality Informatics
+--  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+-- 			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+-- 
+-- END LICENSE AND COPYRIGHT
+-- */
+
+INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2017-03-29', 'TRANSLATE-807', 'feature', 'Change default editor mode to ergonomic mode (configurable)', 'The new default mode of the editor is the so called ergonomic mode with bigger visualization of the source and target segment. This can be changed in the configuration on installation level.', '14'),('2017-03-29', 'TRANSLATE-796', 'feature', 'Enhance usability of concordance search', 'The concordance search of the MatchResource plug-in is changed, so that more search results are loaded automatically when the user scrolls down in the result grid.', '14'),('2017-03-29', 'TRANSLATE-826', 'feature', 'Show only a maximum of MessageBox messages', 'Saving a segment produces a uncritical system notification. In combination with other features and plug-ins not only one but multiple messages appear for each saved segment. When navigating very fast trough the application and save segments fastly the screen was flooded with such messages. Now only a specific amount of such messages remains on the screen. New messages deletes the oldest ones directly, instead of beeing added to the list of shown messages.', '14'),('2017-03-29', 'TRANSLATE-821', 'feature', 'Switch translate5 to Triton theme', 'translate5 uses now the more modern Triton theme', '14'),('2017-03-29', 'TRANSLATE-502', 'feature', 'OpenTM2-Integration into MatchResource plug-in', 'OpenTM2 is now usable through the MatchResource Plugin.', '14'),('2017-03-29', 'TRANSLATE-820', 'change', 'Implementation: Generalization of Languages model into ZfExtended', 'Implementation Detail: The Languages PHP class was moved into the ZfExtended library', '8'),('2017-03-29', 'TRANSLATE-818', 'change', 'handling and structure of internal tags refactored – conversion script needs a long time!', 'Internal tags was using a unique HTML id, which was causing trouble in comparing internal tags. This unique IDs were removed since not needed any more.', '12'),('2017-03-29', 'MITTAGQI-30', 'change', 'Some licenses has been changed', 'The Plugin exception of the translate5 license has been removed, the ZfExtended library is now under LGPL.', '14'),('2017-03-29', 'TRANSLATE-833', 'bugfix', 'Add application locale to the configurable Help URL', 'The configurable help pages receive now also the language key of the currently used language in the application, so that the help pages can also be localized.', '8'),('2017-03-29', 'TRANSLATE-839', 'bugfix', 'Database importer problems with character set on non UTF8 systems', 'No character set was defined for the mysql connection of the database updater, so that the system default character set for mysql connections was used instead. This was leading to problems in some SQL files containing non ASCII characters.', '8'),('2017-03-29', 'TRANSLATE-844', 'bugfix', 'Roweditor gets reduced to small bar in seldom circumstances', 'In seldom circumstances (switching tag view modes in combination with resetting segment grid filter and sorting) the roweditor was reduced to a small bar with about 10px height. This cannot happen anymore.', '14'),('2017-03-29', 'TRANSLATE-758', 'bugfix', 'DbUpdater under Windows can not deal with DB Passwords with special characters', 'Some special characters cannot be used in the database password under windows. In this case the user is informed by the installer / database updater.', '8'),('2017-03-29', 'TRANSLATE-805', 'bugfix', 'show match type tooltip also in roweditor', 'The match type tooltip was missing when hovering the roweditor', '14');

@@ -1,0 +1,28 @@
+h1. Documentation Draft / Notes for Tmmt Service Creation
+
+h2. Service Registration
+
+A service must be registered in the system in order to work / recognized. Core Services are hardcoded in the array 
+
+{code}editor_Plugins_TmMtIntegration_Services_Manager::$registeredServices{code}
+
+Other Services - for example provided as an own plugin - must be registered with the addService method of the above mentioned Manager.
+
+h2. File / Class Structure of a Service
+
+Mandatory classes:
+
+h3. ServiceNameSpace_Connector
+* extending editor_Plugins_TmMtIntegration_Services_ConnectorAbstract
+* This class provides the connection and communication to the underlying system
+
+h3. ServiceNameSpace_Service
+* extending editor_Plugins_TmMtIntegration_Services_ServiceAbstract
+* This class provides a list with the different configured resources provided by one service.
+
+Optional classes:
+
+h3. ServiceNameSpace_Resource
+* extending editor_Plugins_TmMtIntegration_Models_Resource
+* This class provides a customized resource, for example with own needed config flags like URL in the Moses service.
+

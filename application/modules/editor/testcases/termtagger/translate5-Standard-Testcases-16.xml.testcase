@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="complexTagTermCombination6" creator="MittagQI" mandatory="yes" sourceLang="DE" targetLang="ES" tbxPath="translate5-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>term in middle of segment before single tag; another term at the end of the segment</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>unser Testterm ist Drehbürstensieb<div class="single 782069643d22333322202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="33-1-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div> unser Testterm ist tolles Drehbürstensieb</source>
+            <target>unser Testterm ist tamiz de cepillos rotativos<div class="single 782069643d22333322202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="33-2-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div> unser Testterm ist tamiz de cepillos rotativos</target>
+        </input>
+        <expectedOutput>
+            <source>unser Testterm ist <div title="" class="term admittedTerm exact transFound" data-tbxid="term_0000001_001_de-DE_001_0000001">Drehbürstensieb</div><div class="single 782069643d22333322202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="33-1-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div> unser Testterm ist <div title="" class="term admittedTerm exact transNotFound" data-tbxid="term_0000002_001_de-DE_001_0000005">tolles Drehbürstensieb</div></source>
+            <target>unser Testterm ist <div title="" class="term admittedTerm lowercase" data-tbxid="term_0000001_001_es-ES_001_0000003">tamiz de cepillos rotativos</div><div class="single 782069643d22333322202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="33-2-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div> unser Testterm ist <div title="" class="term admittedTerm lowercase" data-tbxid="term_0000001_001_es-ES_001_0000003">tamiz de cepillos rotativos</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>
