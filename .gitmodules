@@ -1,6 +1,6 @@
 [submodule "application/modules/editor"]
         path = application/modules/editor
-        url = git@bitbucket.com:mittagqi/translate5ZfModule.git
+        url = ../translate5ZfModule.git
 [submodule "library/ZfExtended"]
         path = library/ZfExtended
-        url = git@bitbucket.com:mittagqi/ZfExtended.git
+        url = ../ZfExtended.git
