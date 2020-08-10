@@ -1,6 +1,3 @@
-[submodule "application/modules/editor"]
-        path = application/modules/editor
-        url = ../translate5ZfModule.git
 [submodule "library/ZfExtended"]
         path = library/ZfExtended
         url = ../ZfExtended.git
