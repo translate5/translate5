@@ -1,0 +1,234 @@
+### this file holds all changes and necessary configs needed for updates
+### newest changes on top
+2015-01-15 - TRANSLATE-391: short-tag generation on import creates invalid html:
+            => manually execute 055-editor-mysql-TRANSLATE-391.php
+
+2014-11-21 - New Features:
+            TRANSLATE-317: Smaller width for alternative columns
+
+2014-11-05 - Bugfixes:
+            TRANSLATE-197: Fixed: Changing a user state in a ended task throws an exception
+            TRANSLATE-321: Fixed: Meaningless error message if relais and proofread data are not aligned properly
+            TRANSLATE-320: Fixed: Reopening a bug does not recreate the materialized view of a task
+            TRANSLATE-316: Translated: check untranslated GUI strings
+            Code Clean Up: removed old preloadImages code
+
+2014-11-05 - New Features:
+            TRANSLATE-284: allow import-file format "*.XLF" for new IBM-XLIFF import
+            TRANSLATE-318: Hiding the string [META] as columns header in translate5 GUI
+            TRANSLATE-285: Skinning mechanism improvements: localize-able branding in editor
+
+2014-11-05 - Bugfixes:
+            TRANSLATE-315: wrong content on generated XML after finishing a task
+            TRANSLATE-314: SQL update error on changing user state with missing segment view
+            TRANSLATE-281: After import a new task a version conflict is thrown when trying to add an user
+
+2014-08-27 - Bugfixes: 
+            TRANSLATE-286: in Tab 'task properties' all text are still #UT# in my local translate5
+            TRANSLATE-289: MQM-flags are empty in new imported task (local version Marc)
+            TRANSLATE-268: text in config-window of repetition editor is not complete viewable
+            TRANSLATE-168: Rendering Bug of the comment accordion title on the right
+            TRANSLATE-276: comment-metadata-accordion in editor has a misfunction
+
+2014-08-13: TRANSLATE-130: DB Updater as a first part of the Install and Update Kit introduced.
+            - moved all DB SQL files from */docs to */database
+            - have a look at /library/ZfExtended/docs/install-changes.txt
+
+2014-08-06: TRANSLATE-123: configuration refactored
+            - look into the ROOT/docs/install-changes.txt before! 
+            - execute /application/modules/editor/database/039-editor-mysql-TRANSLATE-123-ACL.sql
+
+2014-06-26: TRANSLATE-217: fix with reference file paths
+            - run php script 038-editor-mysql-TRANSLATE-217.php in commandline, script needs DB credentials as parameters
+
+2014-06: run 036-editor-mysql-TRANSLATE-113.sql and 037-editor-mysql-TRANSLATE-113.sql on your db
+
+2014-05-15: TRANSLATE-158 time tracking for each segment edit
+            - apply 035-editor-mysql-TRANSLATE-158.sql
+            - The integer value stored in the duration field is the used time in milliseconds
+            - with the following select an easy access to the duration values is provided
+              if fields, which are only provided in LEK_segments (since not change in history, 
+              like MID or segmentNrInTask) should also appear in the result, 
+              then we can either join LEK_segments to the whole view, 
+              or we can add a join to LEK_segments in the second select of the union statement,
+              and add the desired fields in both selects of the union
+
+              With the following select you can get all durations of one task (taskGuid = XXXXXXXXXX),
+              for performance issues each select of the union must have a taskGuid filter, 
+              that means no view can be used!
+                (select s.id segmentId, s.taskGuid, s.userGuid, s.userName, s.timestamp, s.editable, s.pretrans, s.qmId, s.stateId, s.autoStateId, s.workflowStepNr, s.workflowStep, sd.name, sd.duration
+                  from LEK_segments s
+                  join LEK_segment_data sd on s.id = sd.segmentId where s.taskGuid = 'XXXXXXXXXX')
+                union all
+                  (select h.segmentId segmentId, h.taskGuid, h.userGuid, h.userName, h.timestamp, h.editable, h.pretrans, h.qmId, h.stateId, h.autoStateId, h.workflowStepNr, h.workflowStep, hd.name, hd.duration
+                  from LEK_segment_history h
+                  join LEK_segment_history_data hd on hd.segmentHistoryId = h.id where h.taskGuid = 'XXXXXXXXXX');
+
+2014-04-28: apply 034-editor-mysql-TRANSLATE-167.sql
+
+2014-04-23: Look for ZfExtended-changes
+
+2014-03-21: Changes for Target Alternates:
+            - Look for and adapt changes in the editor AclConfig.ini file, also in iniOverwrites
+            - make a database backup! the data is migrated in a different format by the following SQL files.
+            - apply 031-editor-mysql-TRANSLATE-118-alternates.sql
+            - apply 032-editor-mysql-TRANSLATE-118-migration.sql
+            - apply 033-editor-mysql-TRANSLATE-118-fixes.sql
+            - apply 031-editor-mysql-TRANSLATE-148.sql
+
+2013-12-05: Changes in User Task Association
+            - apply 030-editor-mysql-taskUserAssoc-used.sql
+
+2013-11-27: Look for changes in aclConfig.ini - new userRights introduced
+
+2013-11-15: Look for changes in aclConfig.ini - new frontendControllers introduced
+
+2013-11-07: New INI setting introduced: "enable100pEditWarning" default is true
+
+2013-11-04: Look for ZfExtended-changes
+2013-11-04: Look for and adapt changes in the editor AclConfig.ini file, also in iniOverwrites
+2013-11-02: Look for ZfExtended-changes
+
+2013-10-24: Changes in Task Overview Filtering
+            - apply 029-editor-mysql-taskoverview-filter.sql on your db
+            
+2013-10-10: Changes in Workflow Management
+            - apply 027-editor-mysql-workflow-update.sql on your db
+            - apply 028-editor-mysql-migration.sql on your db
+
+2013-10-07: to finish the tasks of all users with the role lector, who's tasks
+            are overdue, implement a cron call to /editor/cron/daily
+            This call will only be executed, if the call originates from the ip
+            runtimeOptions.cronIP (see your ini-Overwrites-File of 
+            /application/modules/editor/configs/application.ini in
+            /application/iniOverwrites/COMPANY/editorApplication.ini
+
+2013-10-07: 026-system-user.sql please adjust to your needs (please do not change
+            userGuid and login)
+
+2013-10-03: Completing of taskoverview.
+            - apply 024-editor-mysql-logging.sql
+            - apply 025-editor-mysql-exportRunning.sql
+
+2013-10-03: Usermanagement: execute 
+                - ZfExtended/docs/001-mysql-invalid-login.sql on your db
+                - ZfExtended/docs/002-mysql-users on your db
+                - ZfExtended/docs/003-mysql-passwd-reset.sql on your db
+                - docs/023-editor-mysql-taskUserAssoc.sql on your db
+                => in this order
+
+2013-10-03: Taskoverview. Important: before updating the system, make a DB backup and ensure that no user is working on the editor!
+            - apply 021-editor-mysql-taskoverview.sql
+
+2013-08-16: column-headers for csv-import are defined in application.ini of the editor-module.
+            Default is: firstline: mid, secondline: source, third line: target
+            Default can be overridden by iniOverwrites/../editorApplication.ini
+            - apply 022-editor-mysql-csv-import.sql
+
+2013-08-16: column-headers for csv-import are defined in application.ini of the editor-module.
+            Default is: firstline: mid, secondline: source, third line: target
+            Default can be overridden by iniOverwrites/../editorApplication.ini
+
+2013-07-30: As of applying the update with this change, all imported sdlxliff-segments
+            which have been autopropagated will not be blocked for editing any more, if
+            100%-matches are blocked for editing through import configuration. Also
+            they will not be marked as "pretrans" = 1 in the segment table any more.
+
+2013-06-21: Feature "comment column"
+            - apply 020-editor-mysql-comment.sql
+
+2013-05-27: Feature "column Segment-Number in Task"
+            - apply 019-editor-mysql-add-segmentNr-column.sql
+
+2013-05-10: Feature "Enable Source Editing"
+            - apply 018-editor-mysql-editable-source-column.sql
+            - activate feature in general in application.ini of editor, setting: runtimeOptions.editor.enableQmSubSegments = 1
+            - the feature have then to be enabled per task on import: parameter enableSourceEditing (0 or 1) 
+
+2013-04-15: mysql strict mode has to be off in my.ini 
+
+2013-04-10: restructuring of third-party libraries: translate5 needs the
+            third-party-libs Horde_Text_Diff (for the diff of the export), 
+            restful-zend-framework (for general REST-Communication of the JS-Frontend)
+            and XliffTermTagger (for the terminology-feature). All these libs are
+            not part of the translate5-package and are not published in the translate5
+            repositories on github. The reason is to enable every user by himself
+            to keep an eye on the license-issues of these componenents regarding his
+            needs. For more information see license.txt of this package.
+2013-03-25: apply 017-editor-mysql-changeSegmentIdToVarchar.sql to DB.
+2013-03-18: to deactivate completely the fuzzy-Feature of the Termtagger use runtimeOptions.termTagger.fuzzy = 'false' ; in iniOverwrites/editorApplication.ini
+2013-03-10: Browser-Support: Only a recent version of Firefox or Safari and Internet Explorer 7, 8, 9 and 10 are supported officially. Other browsers might function as well.
+2013-03-10: QM-Summary / QM-Subsegments: 
+            - 016-editor-mysql-qmsubsegments.sql apply
+              to database (only necessary, if feature is activated in application.ini of the editor)
+            - if needed, overwrite the entries beneath runtimeOptions.editor.qmSeverity in /iniOverwrites/APPLICACTION_AGENCY/editorApplication.ini
+            - if needed, place your own QM_issues.xml in /iniOverwrites/APPLICACTION_AGENCY/ and adjust the path to it beneath runtimeOptions.editor.qmFlagXmlFile in /iniOverwrites/APPLICACTION_AGENCY/editorApplication.ini
+2013-02-06: Dateianhänge pro Task:
+            - 015-editor-mysql-reference-files.sql einspielen
+            - Das in der neuen Einstellung "runtimeOptions.dir.taskData" konfigurierte Verzeichnis muss eventuell an eigene Beürftnisse angepasst werden.
+            - Das konfigurierte Verzeichnis muss existieren.	
+            - Neue Einstellung runtimeOptions.import.createArchivZip, nähere Infos siehe application.ini
+            Damit Referenz Datein importiert werden, müssen folgende Bedingungen erfüllt sein:
+            - Die folgenden Einstellungen müssen gesetzt sein:
+                runtimeOptions.import.proofReadDirectory
+                runtimeOptions.import.referenceDirectory
+                Die in den beiden Einstellungen konfigurierten Verzeichnisse müssen im Import Datensatz vorhanden sein.
+                Weitere Infos hierzu in der application.ini
+            - Falls der Editor unter Windows verwendet wird, muss die php Extension php_fileinfo.dll eingebunden werden:
+              dazu in der php.ini folgenden Eintrag einkommentieren bzw. hinzufügen: extension=php_fileinfo.dll 
+			  
+2013-01-29: 013-editor-mysql-termbugfix.sql nochmals einspielen
+2013-01-28: Default-Values of termtagger-Integration are set to runtimeOptions.termTagger.stemmed = 'true'; runtimeOptions.termTagger.fuzzyPercent = '70'; runtimeOptions.termTagger.lowercase = 'true'; This may lead to performance-issues during the import - so play with it.
+2013-01-28: Der Editor benötigt jetzt für den Änderungsexport Horde_Text_Diff (LGPL-Lizenz);
+2013-01-25: Relais Dateien Import - hierfür sind folgende Änderungen nötig:
+              - Einspielen von 014-editor-mysql-relaisLanguage.sql
+              - Neuer optionaler Import URL Parameter: relaisLang => Der Parameter beinhaltet die Relais Sprache, wenn er weggelassen wird oder leer ist werden keine Relais Daten importiert und auch die Relais Spalte nicht angezeigt. Das Format des Sprachkürzels ist gleich wie bei source und targetLang.
+              - Neue Einstellungen in /application/modules/editor/configs/application.ini (Für Kunden Anpassungen die Config Einträge nach /application/iniOverwrites/APPLICATION_AGENCY/editorApplication.ini übernehmen)
+                Die beiden folgenden Einstellungen legen die Unterverzeichnisse für Relais und Nutzdaten im Import Verzeichnis fest:
+              	  runtimeOptions.import.relaisDirectory = 'relais'
+				  runtimeOptions.import.proofReadDirectory = 'proofRead'
+				Die folgende Einstellung (true oder false) gibt an, ob bei fehlenden Relais Dateien eine Fehlermeldung (nur für den Admin sichtbar) erzeugt werden soll
+                  runtimeOptions.import.reportOnNoRelaisFile = true
+2012-12-19: optionaler Parameter diff in der Export-URL (siehe install.txt)
+2012-11-16: Ab Nutzung der Änderungshistorie im Export: php höher 5.3.3 ist erforderlich zur Erfassung der Wortgrenzen. https://bugs.php.net/bug.php?id=52971
+            die pcre-Unterstützung muss mit unicode-Unterstützung und aktiviertem PCRE_UCP-Flag kompiliert sein.
+2012-10-02: Terminologie: Integration Termtagger: Der Termtagger benötigt eine installierte Java-Runtime in Version 6 oder höher
+            absoluter Systempfad zum Taggerverzeichnis muss in /application/iniOverwrites/APPLICATION_AGENCY/editorApplication.ini 
+            mittels runtimeOptions.termTagger.dir gesetzt sein.
+            Einspielen der Dateien 
+                009editor-mysql-languages.sql, (bzw. falls bereits eine Tabelle 
+                    "languages" für den Editor existiert statt dessen Einspielen
+                     von 009CHANGE_EXISTING_LANGUAGES_TABLE_editor-mysql-languages.sql
+                010editor-mysql-Tree-to-MediumText-Delete-AutostatusId.sql
+                011editor-mysql-LEK_terms-language-to-int.sql,
+                012editor-mysql-rename-termId-to-mid.sql
+                013-editor-mysql-termbugfix.sql
+           Zum Nutzen der Terminologieintegration muss im Importverzeichnis des Editors eine 
+           Datei "taskGuid.tbx" liegen, die dem tbx-Core-Format entspricht. Ist
+           eine solche TBX-Datei vorhanden, wird diese importiert und anhand ihrer
+           die Terminologie ausgezeichnet. Ist sie vorhanden, entspricht aber
+           nicht TBX-Core, kommt es zu Fehlern beim Import.
+2012-09-04: Terminologie: mysql und mssql: 8editor-mysql-task-table-and-keys.sql bzw. 8editor-mssql-task-table-and-keys.sql einspielen 
+2012-09-04: Terminologie: mysql und mssql: 7editor-mysql-terminologie.sql bzw. 7editor-mssql-terminologie.sql einspielen
+2012-08-07: mysql: 6editor-mysql-change-toSort-to-300.sql einspielen
+2012-08-07: Für mssql: 6editor-mssql-change-toSort-to-max.sql ausführen
+2012-07-19: in beiden Datenbanktypen eine Spaltenänderung durchgeführt: 5editor-mysql-skeletonfile-as-blob.sql und 5editor-mssql-skeletonfile-as-blob.sql
+2012-07-06: betrifft nur mssql: 4editor-mssql-change-ntext-to-varchar-max.sql ausführen (datatype ntext ist deprecated)
+2012-07-06: editor-mssql-add-2-columns-to-LEK_segments.sql bzw. editor-mysql-add-2-columns-to-LEK_segments.sql in der DB ausführen 
+            (Bugfix insbesondere für mssql, das Schwierigkeiten bei selects mit zu langen query-Strings hat)
+2012-06-21: In der Zend Framework-Klasse Zend_DB_Statement ist derzeit ein Bug, der voraussichtlich mit der Version 1.11.12 
+    des ZF gefixt wird. Sobald dies der Fall ist, sollte auf 1.11.12 upgegraded werden.
+    Bis dahin sollte die Klasse manuell aus dem svn gepatcht werden. Hierzu kann der Code unter
+    folgender URL verwendet werden.
+    http://framework.zend.com/svn/framework/standard/trunk/library/Zend/Db/Statement.php
+    Zusätzlich müssen (unabhängig ob 1.11.12 oder der Patch verwendet wird) in der php.ini-Datei die
+    Werte pcre.backtrack_limit und pcre.recursion_limit jeweils auf 1000 statt des default-Wertes von 100000 gesetzt werden.
+2012-06-15: editor-mssql-addforeignKeys.sql bzw. editor-mysql-addforeignKeys.sql einspielen
+2012-06-15: Delete eines Tasks per URL mit folgendem Aufruf:
+    http://domain/APPLICATION_RUNDIR/editor/delete/index/taskGuid/%7BC1D11C25-45D2-11D0-B0E2-444553540203%7D
+2012-06-15: Die URLs 
+    http://domain/APPLICATION_RUNDIR/editor/delete
+    http://domain/APPLICATION_RUNDIR/editor/export
+    http://domain/APPLICATION_RUNDIR/editor/import
+    sollten aus Sicherheitsgründen im Webserver per Konfiguration so eingestellt sein, dass sie nur aus befugter Quelle
+    aufgerufen werden können - also z. B. von localhost oder aus dem internen LAN.

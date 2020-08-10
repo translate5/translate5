@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="AbbreviationIncludesAnother_2and3Chars" creator="beo" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Abbreviations of three or two letters must be recognized, even if one contains the other.</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>CL und CLS sind zwei verschiedene Abkürzungen.</source>
+            <target>CL and CLS are two distinct abbreviations.</target>
+        </input>
+        <expectedOutput>
+            <source><div title="" class="term admittedTerm exact transFound" data-tbxid="X_1019">CL</div> und <div title="" class="term admittedTerm exact transFound" data-tbxid="X_1020">CLS</div> sind zwei verschiedene Abkürzungen.</source>
+            <target><div title="" class="term admittedTerm exact" data-tbxid="X_1019">CL</div> and <div title="" class="term admittedTerm exact" data-tbxid="X_1020">CLS</div> are two distinct abbreviations.</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

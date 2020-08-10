@@ -1,0 +1,99 @@
+2014-08-07: new features:
+            TRANSLATE-123: configuration clean up
+
+2014-06-26: new features:
+            TRANSLATE-113: enhanced task properties in task overview
+            TRANSLATE-191: restriction that one user can only login once (optional)
+            TRANSLATE-185: User can upload a single file (and a optional TBX for SDLXLIFF)
+            TRANSLATE-142: PHP fatal error are also get reported by mail
+            TRANSLATE-192: Check plausibility of put should produce an error in the frontend
+            TRANSLATE-183: Login page does now a redirect to the configured login target if user is already authenticated
+            TRANSLATE-143: max execution time in im- and export can now be set in app.ini
+            TRANSLATE-158: introduced a time tracking for each segment edit
+	    TRANSLATE-219: change default MQM definitions
+            
+            Bugfixes:
+	    TRANSLATE-221: fixed and major issue with the unchanged autostates
+            TRANSLATE-217: fixed an issue with the paths of reference files
+            TRANSLATE-180: removed a nonsense finish icon on waiting task
+            TRANSLATE-179: fixed an error on import with missing linefeed at the end of the last line in a csv
+            TRANSLATE-177: algorithm for shortend toSort-Fields is now able to handle multibyte chars
+            TRANSLATE-148: removed unused fields in language table
+            - several smaller fixes and content changes
+
+2014-03-21: new features:
+            - alternates: All columns with a column header of CSV files are imported now, and displayed as editable columns
+            - a horizontal navigation between the editable columns is available if there are more than one target
+            - Comments of a segment are relocated into the metapanel on the right
+
+2013-11-22: By default export does not export termTags in the target any more 
+            (but still in the source). Reason is, that Trados Studio sometimes
+            seem to destroy segments when termTags and change-history are contained.
+            The export of termTags in the target can be activated again by application.ini
+2013-10-29: changes in translation process. See ZfExtended/docs/changes.txt
+2013-10-07: new features:
+        - Integration of taskoverview and useradministration
+            - A head row is added to translate5 with the following informations:
+            - Branding of the client (translate5 or DFKI)
+            - Name of the current task 
+            - Buttons to:
+            → close the current editing session (→ logout)
+            → return to administration (ends also the current editing session)
+            → finish task (finishes the task and returns 
+                to the administration)
+            → end task (ends the task and returns to the administration; only with
+                project management rights)
+
+            Opening the administration pages means closing the current opened 
+            editor panels. In the west panel of translate5 admin-pages the user 
+            is able to switch between user and task administration.
+
+            The user or task administration is opened in the main part of 
+            the viewport.
+
+        - User management, rights and roles
+
+
+
+2013-09-16: linebreaks and other whitespace inside sdlxliff-segments is now
+	protected in form of internal tags inside translate5 and is restored
+	on export.
+	For linuxBreaks (\n) the tag <softReturn/> is inserted.
+	For windowsBreaks (\r\n) the tag <hardReturn/> is inserted.
+	For macBreaks (\r) the tag <macReturn/> is inserted.
+	For muliple normal spaces in a row the first space remains untouched 
+	and the others are replaced with a single tag <space/>.
+	For all other whitespace each char is replace with a <space/>-tag on its own.
+	The following chars are protected as "all other whitespace":
+		U+0009 	HT, Horizontal Tab
+		U+000B 	VT, Vertical Tab
+		U+000C 	FF, Form feed
+		U+0085 	NEL, Next line
+		U+00A0 	no-break space 		
+		U+1680 	ogham space mark 
+		U+180E 	mongolian vowel separator 	
+		U+2000 	en quad 	 	
+		U+2001 	em quad 	 	
+		U+2002 	en space 	 	
+		U+2003 	em space 	 	
+		U+2004 	three-per-em space 	 	
+		U+2005 	four-per-em space 	 	
+		U+2006 	six-per-em space 	 	
+		U+2007 	figure space 	 	
+		U+2008 	punctuation space 	 	
+		U+2009 	thin space 	 	
+		U+200A 	hair space 	 	
+		U+2028 	line separator 		
+		U+2029 	paragraph separator 		
+		U+202F 	narrow no-break space 	 	
+		U+205F 	medium mathematical space 	 	
+		U+3000 	ideographic space 	
+		
+2013-09-16: The recreation of termTags (called on the serverside after 
+saving of a segment) so far also did tag strings inside of tags (i. e. inside 
+the title-attribute of a "<a>"-tag. This is fixed now.
+		
+2013-08-16: csv-import and export added. column-headers for csv-import are defined in application.ini of the editor-module.
+            Default is: firstline: mid, secondline: source, third line: target
+            Default can be overridden by iniOverwrites/../editorApplication.ini
+

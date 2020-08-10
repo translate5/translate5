@@ -1,0 +1,38 @@
+crossAPIurl=http://win.translate5.net
+;All Across TBX Export templates (as created by Across) will be used. For each of the export templates a TBX will be exported and imported into the translate5 termCollection, to that it is mapped to below in the area [FileMapping]
+crossExportFilesDir=/var/www/translate5/data/tbx-import/crossapi/
+apiUsername=crossapi.user
+apiPassword=pass
+ 
+ 
+;mergeTerms: Allowed values: true or false.
+;If this is true, terms will be merged as described at https://confluence.translate5.net/display/TAD/Term+Collection.
+;Otherwise all terms will be added to the termCollection, if the ID in the TBX does NOT exist already in the DB
+;when the ID of the termEntry of the TBX does already exist in the DB, the terms of this termEntry will always be merged
+mergeTerms=true;
+ 
+;Deletes all terms in all listed termCollections, that have a modification date older than the listed one.
+;Since every term that exists in a TBX gets a new updated date on TBX-import, even if it is not changed: Simply set this date to yesterday to delete all terms, that are not part of the current import
+;The updated date is a date internal to translate5 and different from the modified date of the term, that is shown in the interface
+deleteTermsLastTouchedOlderThan=2018-05-01
+ 
+;Deletes all terms in all listed termCollections, that have a modification date older than the start of the current import.
+;possible values: true or false
+deleteTermsOlderThanCurrentImport=true
+ 
+;Delete all proposals in a listed termCollections, that have a creation date older than this configs value.
+deleteProposalsLastTouchedOlderThan=2018-05-01
+ 
+;Delete all proposals in a listed termCollections, that have a creation date older than the start of the current import.
+;possible values: true or false
+deleteProposalsOlderThanCurrentImport=false
+ 
+;mapping between across export template name (potentially located in the crossExportFilesDir directory) and a translate5 termCollection.;the termCollection will be created, if it does not exist.
+[FileMapping]
+template-1.export=exampletermCollection
+ 
+;mapping between term collection name and customer number
+[CollectionMapping]
+exampletermCollection3=10001;
+exampletermCollection2=10002;
+exampletermCollection=123456789;

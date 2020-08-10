@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="specialCharsTargetStringMatch" creator="itl/MittagQI" mandatory="yes" sourceLang="DE" targetLang="KO" tbxPath="itl-reallive-DE-KO.tbx" sourceStringMatch="0" targetStringMatch="1">
+    <description>Match term in targetStringMatch-language, beside that directly a special char „ or “ exists / be able to tag segments with these chars</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>„Online-Datenblatt“</source>
+            <target>„온라인 데이터시트“</target>
+        </input>
+        <expectedOutput>
+            <source>„Online-<div title="" class="term preferredTerm exact transFound" data-tbxid="xyz">Datenblatt</div>“</source>
+            <target>„온라인 <div title="" class="term preferredTerm exact" data-tbxid="xyz">데이터시트</div>“</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

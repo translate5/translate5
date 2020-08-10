@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file original="original-7406.html" source-language="en" target-language="de" datatype="html">
+<body>
+<trans-unit id="1">
+<source xml:lang="en">This is the title</source>
+<seg-source><mrk mid="0" mtype="seg">This is the title</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">Das ist ein Titel 1-Testtext</mrk></target>
+</trans-unit>
+<trans-unit id="2">
+<source xml:lang="en">Hello world!</source>
+<seg-source><mrk mid="0" mtype="seg">Hello world!</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">Hallo Welt! 2-Testtext</mrk></target>
+</trans-unit>
+<trans-unit id="3">
+<source xml:lang="en">Lets make a <g id="1">simple</g>test!</source>
+<seg-source><mrk mid="0" mtype="seg">Lets make a <g id="1">simple</g>test!</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">Lasst uns <g id="1">einfach</g> testen! 3-Testtext</mrk></target>
+</trans-unit>
+<trans-unit id="4">
+<source xml:lang="en">Test &amp; entities ¶ and so!</source>
+<seg-source><mrk mid="0" mtype="seg">Test &amp; entities ¶ and so!</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">Teste &amp; Entities ¶ und so! 4-Testtext</mrk></target>
+</trans-unit>
+</body>
+</file>
+</xliff>

@@ -1,0 +1,1606 @@
+<?php
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/* @var $translate ZfExtended_Zendoverwrites_Translate */
+/* @var $this Zend_View */
+$this->translate->setJsonEncode(true);
+//Datei muss als Javascript ausgespielt werden.
+  header('Content-Type: text/javascript', TRUE);
+
+  //mehrfachverwendete Strings:
+  $yes = $this->translate->_('Ja');
+  $no  = $this->translate->_('Nein');
+  
+  $config = Zend_Registry::get('config');
+?>
+/*
+Editor Translation Files
+*/
+Ext.define('Editor.controller.Localizer', {
+    extend : 'Ext.app.Controller',
+    
+    statics: {
+        pluginTranslationInit: {},
+        addPluginInit: function(name, callback) {
+            this.pluginTranslationInit[name] = callback;
+        },
+    },
+    initPluginTranslations: function() {
+        var me = this;
+        Ext.Object.each(this.self.pluginTranslationInit, function(key, callback){
+            callback.call(me);
+        });
+    },
+	init: function() {
+	  Ext.view.AbstractView.prototype.loadingText = '<?php echo $this->translate->_('Übertrage Daten...');?>';
+  	Editor.controller.Preferences.prototype.messages.preferencesSaved = '<?php echo $this->translate->_('Einstellungen für diese Sitzung gespeichert!');?>';
+
+  	Editor.controller.Segments.prototype.messages = {
+      sortCleared: '<?php echo $this->translate->_('Die gewählte Sortierung der Segmente wurde zurückgesetzt!');?>',
+      segmentNotSaved: '<?php echo $this->translate->_('Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!');?>',
+      otherFiltersActive: '<?php echo $this->translate->_('ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind');?>',
+      noSegmentToFilter: '<?php echo $this->translate->_('Kein Segment dieser Datei entspricht den Filterkriterien');?>'
+    };
+
+    Editor.controller.ServerException.prototype.strings = {
+        "401_title": '<?php echo $this->translate->_('Erneute Anmeldung');?>',
+        "401_msg": '<?php echo $this->translate->_('Ihre Sitzungsdaten sind abgelaufen. Sie werden nun zur Anmeldeseite weitergeleitet.');?>',
+        "403": '<?php echo $this->translate->_('Für die angeforderten Daten fehlen Ihnen die nötigen Berechtigungen!');?>',
+        "403_destroy": '<?php echo $this->translate->_('Zum Löschen der Daten fehlen Ihnen die nötigen Berechtigungen!');?>',
+        "403_create": '<?php echo $this->translate->_('Zum Speichern von neuen Daten fehlen Ihnen die nötigen Berechtigungen!');?>',
+        "403_edit": '<?php echo $this->translate->_('Zum Speichern der bearbeiten Daten fehlen Ihnen die nötigen Berechtigungen!');?>',
+        "403_update": '<?php echo $this->translate->_('Zum Speichern der bearbeiten Daten fehlen Ihnen die nötigen Berechtigungen!');?>',
+        "404": '<?php echo $this->translate->_('Die angeforderten bzw. zu bearbeitenden Daten wurden nicht gefunden!');?>',
+        "405_del_assoc": '<?php echo $this->translate->_('Ein Benutzer konnte nicht aus der Aufgabe entfernt werden, da er die Aufgabe aktuell benutzt.');?>',
+        "406": '<?php echo $this->translate->_('Es ist ein Fehler aufgetreten!');?>',
+        "409": '<?php echo $this->translate->_('Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!');?>',
+        "503_title": '<?php echo $this->translate->_('Es läuft eine Wartung');?>',
+        "503_msg": '<?php echo $this->translate->_('Aktuell wird das System gewartet. Sobald die Wartung vorüber ist, können Sie wieder am System arbeiten.');?>',
+        title: '<?php echo $this->translate->_('Fehler');?>',
+        text: '<?php echo $this->translate->_('Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!');?>',
+        timeout: '<?php echo $this->translate->_('Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.');?>',
+        serverMsg: '<?php echo $this->translate->_('<br />Meldung vom Server: <i>{0} {1}</i>');?>'
+    };
+
+    Editor.MessageBox.prototype.self.SUCCESS = '<?php echo $this->translate->_('ok');?>';
+    Editor.MessageBox.prototype.self.ERROR = '<?php echo $this->translate->_('error');?>';
+    Editor.MessageBox.prototype.self.INFO = '<?php echo $this->translate->_('notice');?>';
+
+    <?php
+        //handling application name separatly, since used in different applications
+        $app = $this->translate->_('translate5');
+        //for better readability with line breaks
+        $disclaimer = 'Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.<br />
+    Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:
+    <ul>
+        <li>Google Chrome ab Version 48</li>
+        <li>Mozilla Firefox ab Version 44</li>
+        <li>Apple Safari ab Version 9</li>
+        <li>Microsoft Edge ab Version 80</li>
+    </ul>
+    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.
+    Hier kann es aber zu unvorhergesehenen Fehlern kommen.
+    Potentiell können auch manche Features komplett nicht funktionieren.';
+        
+        //for translated strings without without line breaks:
+        $disclaimer = str_replace("\n", '', $disclaimer);
+    
+        $disclaimer = $this->translate->_($disclaimer);
+        $disclaimer = sprintf($disclaimer, $app); //replacing application name placeholders
+    ?>
+    
+    Ext.app.Application.prototype.browserAdviceTextTitle = '<?php echo $this->translate->_('Nicht unterstützte Browser-Version');?>';
+    Ext.app.Application.prototype.browserAdviceText = '<?php echo $disclaimer;?>';
+
+    Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
+  	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
+  	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_(' - [LESEMODUS]');?>';
+  	Editor.view.segments.Grid.prototype.title_addition_unconfirmed = '<?php echo $this->translate->_(' - [AUFGABE UNBESTÄTIGT]');?>';
+  	Editor.view.segments.Grid.prototype.target_original = ' <?php echo $this->translate->_('(zur Importzeit)');?>';
+
+    Ext.define("Editor.locale.view.segments.grid.Header", {
+        override: "Editor.view.segments.grid.Header",
+        strings: {
+            progressTooltip: '<?php echo $this->translate->_('% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt');?>',
+            leaveBtn: '<?php echo $this->translate->_('Aufgabe verlassen');?>',
+            logoutBtn: '<?php echo $this->translate->_('Ausloggen');?>',
+            leaveTaskWindowTitle: '<?php echo $this->translate->_('Zurück zur Aufgabeliste');?>',
+            leaveTaskWindowMessage: '<?php echo $this->translate->_('Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?');?>',
+            leaveTaskWindowFinishBtn: '<?php echo $this->translate->_('Fertig und Aufgabe beenden');?>',
+            leaveTaskWindowCancelBtn: '<?php echo $this->translate->_('Aufgabe später weiterbearbeiten');?>'
+        }
+    });
+  	
+  	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
+  	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansicht');?>';
+  	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Details (nur Lesemodus)');?>';
+  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Details');?>';
+  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Normal');?>';
+  	gridToolbar.item_ergonomicModeReadonlyBtn = '<?php echo $this->translate->_('Normal (nur Lesemodus)');?>';
+  	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen');?>';
+  	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
+  	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
+  	//gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>';
+  	gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('MQM');?>';
+  	gridToolbar.item_qmsummaryTooltip = '<?php echo $this->translate->_('MQM Statistik');?>';
+  	gridToolbar.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>';
+  	gridToolbar.item_zoomIn = '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>';
+  	gridToolbar.item_zoomOut = '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>';
+  	gridToolbar.item_clearSortAndFilterBtn = '<?php echo $this->translate->_('Tabelle zurücksetzen');?>';
+  	gridToolbar.item_clearSortAndFilterTooltip = '<?php echo $this->translate->_('Sortierung / Filterung zurücksetzen');?>';
+  	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Lesezeichen');?>';
+  	gridToolbar.item_helpTooltip = '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>';
+  	gridToolbar.item_showBookmarkedSegments = '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>';
+    gridToolbar.strings.interfaceTranslation = '<?php echo $this->translate->_('Oberfläche');?>';
+  	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
+
+  	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
+  	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
+    
+    Ext.define("Editor.locale.view.segments.column.Content", {
+        override: "Editor.view.segments.column.Content",
+        strings: {
+            missingSource: '<?php echo $this->translate->_('ACHTUNG: QUELLSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT');?>',
+            missingTarget: '<?php echo $this->translate->_('ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.segments.column.IsWatched", {
+        override: "Editor.view.segments.column.IsWatched",
+        text: '<?php echo $this->translate->_('Lesezeichen');?>',
+        text_tip: '<?php echo $this->translate->_('mit Lesezeichen versehen');?>'
+    });
+    
+    Ext.define("Editor.locale.de.view.segments.column.MatchrateType", {
+        override: "Editor.view.segments.column.MatchrateType",
+        text: '<?php echo $this->translate->_('Matchrate Typ');?>',
+        strings: {
+            import: '<?php echo $this->translate->_('{0} (importiert)');?>',
+            edited: '<?php echo $this->translate->_('{0}');?>',
+            pretranslated: '<?php echo $this->translate->_('{0} (vorübersetzt)');?>',
+            noTarget: '<?php echo $this->translate->_('Kein Zieltext vorhanden');?>',
+            noValueDefined: '<?php echo $this->translate->_('Keine Information vorhanden');?>',
+            noValueDefinedDesc: '<?php echo $this->translate->_('Das verwendete Übersetzungswerkzeug hat keine Information zur Herkunft des Matches zur Verfügung gestellt.');?>',
+            olddata: '<?php echo $this->translate->_('Keine Information vorhanden');?>',
+            olddataDesc: '<?php echo $this->translate->_('Dieser Task wurde importiert, bevor das Match Rate Typ-Feature implementiert wurde.');?>',
+            type: {
+                "termcollection": '<?php echo $this->translate->_('Term-Collection');?>',
+                "tm": '<?php echo $this->translate->_('TM-Match');?>',
+                "mt": '<?php echo $this->translate->_('MT-Match');?>',
+                "interactive": '<?php echo $this->translate->_('editiert');?>',
+                "source": '<?php echo $this->translate->_('Quelle übernommen');?>',
+                "auto-propagated": '<?php echo $this->translate->_('Wiederholung');?>',
+                "auto-aligned": '<?php echo $this->translate->_('Alignment');?>',
+                "document-match": '<?php echo $this->translate->_('Dokumenten-Match');?>',
+                "internal-fuzzy-available": '<?php echo $this->translate->_('Interner Fuzzy');?>'
+            },
+            importDesc: {
+                "tm": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 aus einem TM übernommen');?>',
+                "mt": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 aus Machine Translation übernommen');?>',
+                "interactive": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 vom Benutzer editiert');?>',
+                "source": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 Quelle vom Benutzer übernommen');?>',
+                "auto-propagated": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 vom Benutzer angepasstes Segment, das automatisch als Wiederholung übernommen wurde (Autopropagation)');?>',
+                "auto-aligned": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 durch ein Alignment erstellte Übersetzung');?>',
+                "document-match": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 vom Benutzer angepasstes Segment, das automatisch als Wiederholung übernommen wurde (Document Match)');?>',
+                "unknown": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 gesetzter Status, der derzeit translate5 unbekannt ist');?>'
+            },
+            editedDesc: {
+                "tm": '<?php echo $this->translate->_('Im Browser aus TM übernommen');?>',
+                "mt": '<?php echo $this->translate->_('Im Browser aus MT übernommen');?>',
+                "termcollection": '<?php echo $this->translate->_('Im Browser aus Term-Collection übernommen');?>'
+            },
+            pretranslatedDesc: {
+                "tm": '<?php echo $this->translate->_('Bei der Vorübersetzung aus TM übernommen');?>',
+                "mt": '<?php echo $this->translate->_('Bei der Vorübersetzung aus MT übernommen');?>',
+                "termcollection": '<?php echo $this->translate->_('Bei der Vorübersetzung aus Term-Collection übernommen');?>',
+                "internal-fuzzy-available": '<?php echo $this->translate->_('Interner Fuzzy verfügbar');?>'
+            }
+        }
+    });
+  	
+  	Editor.view.segments.column.Editable.prototype.text = '<?php echo $this->translate->_('Gesperrt');?>';
+  	Editor.view.segments.column.AutoState.prototype.text = '<?php echo $this->translate->_('Bearbeitungsstatus');?>';
+  	Editor.view.ui.segments.column.State.prototype.text = '<?php echo $this->translate->_('Status');?>';
+  	Editor.view.ui.segments.column.UserName.prototype.text = '<?php echo $this->translate->_('letzter Bearbeiter');?>';
+  	Editor.view.segments.column.WorkflowStep.prototype.text = '<?php echo $this->translate->_('bearbeitet bei');?>';
+  	Editor.view.segments.column.Comments.prototype.text = '<?php echo $this->translate->_('Kommentare');?>';
+  	Editor.view.segments.column.Comments.prototype.text_morecomments = '<?php echo $this->translate->_('({0} weitere Kommentare)');?>';
+  	Editor.view.segments.column.Comments.prototype.text_morecomment = '<?php echo $this->translate->_('({0} weiterer Kommentar)');?>';
+  	Editor.view.segments.column.Comments.prototype.text_tooltip_icon = '<?php echo $this->translate->_('Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)');?>';
+
+	Editor.view.segments.column.SegmentNrInTask.prototype.text = '<?php echo $this->translate->_('Nr.');?>';
+    
+    Ext.define("Editor.locale.de.controller.ViewModes", {
+        override: "Editor.controller.ViewModes",
+        messageIsViewMode: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.');?>'
+    });
+  	
+  	Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
+  	Editor.view.fileorder.ReferenceTree.prototype.title = '<?php echo $this->translate->_('Referenz-Dateien');?>';
+
+  	Editor.view.preferences.Window.prototype.title = '<?php echo $this->translate->_('Einstellungen');?>';
+  	<?php
+        if($config->runtimeOptions->editor->enableQmSubSegments){
+        ?>
+        Editor.view.qmsubsegments.Window.prototype.title = '<?php echo $this->translate->_('MQM Statistik');?>';
+  	Editor.view.qmsubsegments.Window.prototype.tab_title_field = '<?php echo $this->translate->_('In Feld: {0}');?>';
+  	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_text = '<?php echo $this->translate->_('Fehlertyp');?>';
+  	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_totalTotal = '<?php echo $this->translate->_('Gesamt');?>';
+  	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_total = '<?php echo $this->translate->_('Summe');?>';
+
+  	Editor.view.qmsubsegments.AddFlagFieldset.prototype.strings = {
+		severityLabel: '<?php echo $this->translate->_('Gewichtung');?>',
+		commentLabel: '<?php echo $this->translate->_('Kommentar');?>',
+		qmAddBtn: '<?php echo $this->translate->_('MQM hinzufügen');?>'
+	};
+  	Editor.view.qmsubsegments.AddFlagFieldset.prototype.title = '<?php echo $this->translate->_('MQM');?>';
+	Editor.controller.QmSubSegments.prototype.strings = {
+    	buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
+    	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
+    };
+    <?php } ?>
+    
+  	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
+    Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';
+    Editor.view.preferences.Window.prototype.item_alikeBehaviour_individual_boxLabel = '<?php echo $this->translate->_('Bei jeder Wiederholung einzeln entscheiden');?>';
+    Editor.view.preferences.Window.prototype.item_alikeBehaviour_never_boxLabel = '<?php echo $this->translate->_('Nie automatisch ersetzen und Status setzen');?>';
+    Editor.view.preferences.Window.prototype.item_show_on_empty_target = '<?php echo $this->translate->_('Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist');?>';
+    Editor.view.preferences.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Abbrechen');?>';
+    Editor.view.preferences.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
+
+    Editor.view.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
+    Editor.view.segments.MetaPanel.prototype.item_metaQm_title = '<?php echo $this->translate->_('QM');?>';
+    Editor.view.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
+    Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
+    Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen (ALT + S danach {0})');?>';
+    Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip_nokey = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_cancel = '<?php echo $this->translate->_('Abbrechen (ESC)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_save = '<?php echo $this->translate->_('Speichern (STRG + S)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_reset = '<?php echo $this->translate->_('Segment auf initialen Inhalt zurücksetzen (ALT + ENTF)');?>';
+
+    Editor.view.segments.MetaPanelNavi.prototype.item_startWatchingSegment = '<?php echo $this->translate->_('Segment auf Lesezeichenliste (STRG + D)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_stopWatchingSegment = '<?php echo $this->translate->_('Segment von Lesezeichenliste entfernen (STRG + D)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_scrollToSegment = '<?php echo $this->translate->_('Zur Bearbeitung geöffnetes Segment wieder in den Sichtbereich bewegen (STRG + G)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNext = '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndNextFiltered = '<?php echo $this->translate->_('Speichern und nächstes bearbeitbares Segment im Workflow öffnen (STRG + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_saveAndPrevious = '<?php echo $this->translate->_('Speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + SHIFT + ENTER)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_alternateLeft = '<?php echo $this->translate->_('Vorherige Spalte editieren (STRG + ALT + ←)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_alternateRight = '<?php echo $this->translate->_('Nächste Spalte editieren (STRG + ALT + →)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_next = '<?php echo $this->translate->_('Nicht speichern und nächstes bearbeitbares Segment öffnen (STRG + ALT + ↓)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern und nächstes bearbeitbares Segment im Workflow öffnen (ALT + Bild ↓)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment öffnen (STRG + ALT + ↑)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern und vorheriges bearbeitbares Segment im Workflow öffnen (ALT + Bild ↑)');?>';
+    Editor.view.segments.MetaPanelNavi.prototype.item_whitespaceButtonGroup= '<?php echo $this->translate->_('Sonderzeichen hinzufügen:');?>';
+   
+    Ext.define("Editor.locale.de.controller.Editor", {
+        override: "Editor.controller.Editor",
+        messages: {
+            segmentReset: '<?php echo $this->translate->_('Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.');?>',
+            segmentNotBuffered: '<?php echo $this->translate->_('Das nächste / vorherige Segment wird noch geladen, bitte versuchen Sie es erneut.');?>',
+            segmentStillSaving: '<?php echo $this->translate->_('Das nächste / vorherige Segment wird noch gespeichert, bitte warten...');?>',
+            segmentsChanged: '<?php echo $this->translate->_('Die Sortierung bzw. Filterung wurde geändert, es kann kein nächstes / vorheriges Segment ausgewählt werden.');?>',
+            segmentsChangedJump: '<?php echo $this->translate->_('Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.');?>',
+            f2FirstOpened: '<?php echo $this->translate->_('Das erste bearbeitbare Segment wurde geöffnet, da kein anderes Segment ausgewählt war.');?>',
+            f2Readonly: '<?php echo $this->translate->_('Das ausgewählte Segment ist nicht bearbeitbar!');?>',
+            errorTitle: '<?php echo $this->translate->_('Fehler bei der Segment Validierung!');?>',
+            correctErrorsText: '<?php echo $this->translate->_('Fehler beheben');?>',
+            saveAnyway: '<?php echo $this->translate->_('Trotzdem speichern');?>',
+            takeTagTooltip: '<?php echo $this->translate->_('STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.');?>',
+            editorMoveTitle: '<?php echo $this->translate->_('Verschiebbarer Editor und hilfreiche Tastaturkürzel');?>',
+            editorMove: '<?php echo $this->translate->_('Der Segmenteditor kann mit der Maus beliebig positioniert werden. <br />Dazu lediglich den Segmenteditor anklicken und dann verschieben.');?>',
+            doubleclickToTakeMatch: '<?php echo $this->translate->_('Doppelklick auf die Zeile übernimmt diesen Match in das geöffnete Segment.');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.controller.editor.PrevNextSegment", {
+        override: "Editor.controller.editor.PrevNextSegment",
+        strings: {
+            gridEndReached: '<?php echo $this->translate->_('Kein weiteres Segment bearbeitbar!');?>',
+            gridStartReached: '<?php echo $this->translate->_('Kein vorheriges Segment bearbeitbar!');?>',
+            gridEndReachedFiltered: '<?php echo $this->translate->_('Kein weiteres Segment im Workflow bearbeitbar!');?>',
+            gridStartReachedFiltered: '<?php echo $this->translate->_('Kein vorheriges Segment im Workflow bearbeitbar!');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.segments.HtmlEditor", {
+        override: "Editor.view.segments.HtmlEditor",
+        strings: {
+            tagOrderErrorText: '<?php echo $this->translate->_('Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).');?>',
+            tagMissingText: '<?php echo $this->translate->_('Folgende Tags fehlen:<br/><ul><li>{0}</li></ul>So entfernen Sie den Fehler:<br/><ul><li>Klicken Sie auf OK, um diese Nachricht zu entfernen</li><li>Drücken Sie ESC, um das Segment ohne Speichern zu verlassen</li><li>Öffnen Sie das Segment erneut</li></ul>Wiederholen Sie jetzt Ihre Änderungen.<br/>Verwenden Sie alternativ die Hilfeschaltfläche, und suchen Sie nach Tastenkombinationen, um die fehlenden Tags aus der Quelle einzugeben.');?>',
+            tagDuplicatedText: '<?php echo $this->translate->_('Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:{0}');?>',
+            tagRemovedText: '<?php echo $this->translate->_('Es wurden Tags mit fehlendem Partner entfernt!');?>',
+            cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.controller.JsLogger", {
+        override: "Editor.controller.JsLogger",
+        strings: {
+            msgTitle: '<?php echo $this->translate->_('Videoaufnahme im Fehlerfall');?>',
+            msgInfo: '<?php echo $this->translate->_('Helfen Sie bei der Entwicklung von translate5: Erlauben Sie Bildschirmvideos im Fehlerfall.<br /><br />Bei einer Reihe von Fehlern kann das Open Source-Entwicklungsteam von translate5 diese nur reproduzieren und beheben, wenn die Benutzeraktionen, die  zu dem translate5-Fehler geführt haben, als Video aufgenommen werden. Es wird nur aufgezeichnet, was in translate5 passiert. Die Videoaufnahme startet erst, wenn ein Segment zur Bearbeitung geöffnet ist, und sie endet, sobald die Bearbeitung des Segments endet.<br /><br />Das Team von translate5 wäre sehr dankbar, wenn Sie diese Funktion aktivieren - vielen Dank im Voraus!<br /><br />Auch wenn die Videoaufzeichnung aktiviert ist, werden Videoaufzeichnungen nur gesendet, wenn Sie einen aufgetretenen Fehler melden.<br /><br />Videos, die mit einem Fehler in Verbindung stehen und an den Server gesendet wurden, werden gelöscht, sobald sie zur Behebung des Fehlers nicht mehr benötigt werden. Der einzige Verwendungszweck der Videos ist die Entwicklung von translate5. Die Daten werden nur für diesen Zweck verwendet.<br /><br />Weitere Informationen zur Videoaufzeichnung mit theRootCause und zum Datenschutz finden Sie unter https://confluence.translate5.net/x/EAArBw');?>',
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.segments.MinMaxLength", {
+        override: "Editor.view.segments.MinMaxLength",
+        strings: {
+            minText: '<?php echo $this->translate->_('Min. {minWidth}');?>',
+            maxText: '<?php echo $this->translate->_(' von {maxWidth}');?>',
+            siblingSegments: '<?php echo $this->translate->_('Seg.: {siblings}');?>',
+            segmentToShort: '<?php echo $this->translate->_('Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.');?>',
+            segmentToLong: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>',
+            segmentTooManyLines: '<?php echo $this->translate->_('Der Segmentinhalt enthält zu viele Zeilenumbrüche; maximal {0} Zeilen sind erlaubt.');?>',
+      		segmentLinesTooLong: '<?php echo $this->translate->_('Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).');?>',
+      		segmentLinesTooShort: '<?php echo $this->translate->_('Nicht alle Zeilen im Segmentinhalt erreichen die minimal erforderte Länge ({0}).');?>',
+      		lines: '<?php echo $this->translate->_('Zeilen');?>'
+        }
+    });
+    
+
+    Editor.view.segments.RowEditor.prototype.messages = {
+        segmentNotSavedUserMessage: '<?php echo $this->translate->_('Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank! <br/><br/>Gerade bearbeiteter Text war:<br/><br/>');?>',
+        cantSaveEmptySegment: '<?php echo $this->translate->_('Das Segment kann nicht ohne Inhalt gespeichert werden!');?>'
+    };
+    Editor.view.segments.RowEditing.prototype.messages = {
+        previousSegmentNotSaved: '<?php echo $this->translate->_('Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt seine Speicherung beendet hatte. Bitte versuchen Sie es noch einmal. Sollte es dann noch nicht funktionieren, drücken Sie bitte F5. Vielen Dank!');?>',
+        edit100pWarning: '<?php echo $this->translate->_('Achtung, Sie editieren einen 100% Match!');?>'
+    };
+
+    Ext.define("Editor.locale.view.ui.changealike.Window", {
+        override: "Editor.view.ui.changealike.Window",
+        title: '<?php echo $this->translate->_('Aktuelles Segment für die folgenden Segmente übernehmen?');?>',
+        item_cancelBtn: '<?php echo $this->translate->_('Keine Änderungen durchführen');?>',
+        item_saveBtn: '<?php echo $this->translate->_('Änderungen übernehmen');?>'
+    });
+  	Editor.view.changealike.Window.prototype.items_help = <?php echo json_encode($this->translate->_('Hilfe:'));?>;
+  	Editor.view.changealike.Window.prototype.items_segmentData = <?php echo json_encode('{edited}{addition}'); ?>;
+  	Editor.view.changealike.Window.prototype.overwriteSource = '<?php echo $this->translate->_('<b><i>Überschreibe Quelltext mit:</i></b> ');?>';
+  	Editor.view.changealike.Window.prototype.overwriteTarget = '<?php echo $this->translate->_('<b><i>Überschreibe Zieltext mit:</i></b> ');?>';
+
+  	Editor.view.ui.changealike.Grid.prototype.item_segmentNrInTaskColumn = '<?php echo $this->translate->_('Nr.');?>';
+  	Editor.view.ui.changealike.Grid.prototype.item_sourceColumn = '<?php echo $this->translate->_('Quelle');?>';
+  	Editor.view.ui.changealike.Grid.prototype.item_targetColumn = '<?php echo $this->translate->_('Ziel');?>';
+  	Editor.view.ui.changealike.Grid.prototype.item_relaisColumn = '<?php echo $this->translate->_('Relais');?>';
+  	Editor.view.ui.changealike.Grid.prototype.item_filterColumn = '<?php echo $this->translate->_('In aktueller Filterung enthalten');?>';
+  	Editor.view.ui.changealike.Grid.prototype.item_sourceMatchColumn = '<?php echo $this->translate->_('Quell-Treffer');?>';
+  	Editor.view.ui.changealike.Grid.prototype.item_targetMatchColumn = '<?php echo $this->translate->_('Ziel-Treffer');?>';
+
+    Editor.controller.ChangeAlike.prototype.messages = {
+        alikeSingular: '<?php echo $this->translate->_('{0} Wiederholung wurde bearbeitet und gespeichert');?>',
+        alikePlural: '<?php echo $this->translate->_('{0} Wiederholungen wurden bearbeitet und gespeichert');?>',
+        alikesDisabled: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.');?>',
+        alikesFailure: '<?php echo $this->translate->_('Die Wiederholungen konnten nicht gespeichert werden');?>',
+        alikesNotAllSaved: '<?php echo $this->translate->_('Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.');?>'
+    };
+    
+  	Ext.grid.column.Boolean.prototype.falseText = '<?php echo $no;?>';
+  	Ext.grid.column.Boolean.prototype.trueText = '<?php echo $yes;?>';
+
+        Ext.grid.filters.Filters.prototype.menuFilterText = '<?php echo $this->translate->_('Filter');?>';
+        Ext.grid.filters.filter.Number.prototype.emptyText = '<?php echo $this->translate->_('Nummer eingeben...');?>';
+        Ext.grid.filters.filter.String.prototype.emptyText = '<?php echo $this->translate->_('Filtertext eingeben...');?>';
+        Ext.grid.filters.filter.Boolean.prototype.yesText = '<?php echo $yes;?>';
+        Ext.grid.filters.filter.Boolean.prototype.noText = '<?php echo $no;?>';
+        Ext.grid.filters.filter.Date.prototype.config.fields.eq.text = '<?php echo $this->translate->_('am');?>';
+        Ext.grid.filters.filter.Date.prototype.config.fields.gt.text = '<?php echo $this->translate->_('nach');?>';
+        Ext.grid.filters.filter.Date.prototype.config.fields.lt.text = '<?php echo $this->translate->_('bevor');?>';
+        //Ext.grid.filters.filter.DateFilter.prototype.dateFormat = Editor.DATE_ISO_FORMAT;
+
+	Editor.MessageBox.prototype.titles = {
+		ok: '<?php echo $this->translate->_('Ok!');?>',
+		error: '<?php echo $this->translate->_('Fehler!');?>',
+		directError: '<?php echo $this->translate->_('Es ist ein Fehler aufgetreten!');?>',
+		warning: '<?php echo $this->translate->_('Warnung!');?>',
+		notice: '<?php echo $this->translate->_('Hinweis!');?>'
+	};
+
+    Editor.view.comments.Grid.prototype.text_edited = '<?php echo $this->translate->_('bearbeitet');?>';
+    Editor.view.comments.Grid.prototype.text_edit = '<?php echo $this->translate->_('Bearbeiten');?>';
+    Editor.view.comments.Grid.prototype.text_delete = '<?php echo $this->translate->_('Löschen');?>';
+
+    Ext.define("Editor.locale.de.view.comments.Panel", {
+        override: "Editor.view.comments.Panel",
+        title: '<?php echo $this->translate->_('Kommentare zum aktuellen Segment');?>',
+        item_saveBtn: '<?php echo $this->translate->_('Speichern');?>',
+        item_closeBtn: '<?php echo $this->translate->_('Schließen');?>',
+        item_commentNew: '<?php echo $this->translate->_('Kommentar neu');?>',
+        item_commentEdit: '<?php echo $this->translate->_('Kommentar bearbeiten');?>',
+        item_addComment: '<?php echo $this->translate->_('Neuer Kommentar');?>',
+        delete_confirm_title: '<?php echo $this->translate->_('Löschen des Kommentars bestätigen');?>',
+        delete_confirm_msg: '<?php echo $this->translate->_('Soll der Kommentar wirklich gelöscht werden?');?>'
+    });
+    
+    Ext.define("Editor.locale.de.controller.admin.TaskUserAssoc", {
+        override: "Editor.controller.admin.TaskUserAssoc",
+        messages: {
+            assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
+            assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
+            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.de.controller.admin.TaskUserAssoc", {
+        override: "Editor.controller.admin.TaskUserAssoc",
+        title: '<?php echo $this->translate->_('Referenz-Dateien');?>'
+    });
+
+    Ext.define("Editor.locale.de.controller.admin.TaskOverview", {
+        override: "Editor.controller.admin.TaskOverview",
+        strings: {
+            taskImported: '<?php echo $this->translate->_('Aufgabe "{0}" bereit.');?>',
+            taskError: '<?php echo $this->translate->_('Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!');?>',
+            taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
+            taskUnFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
+            taskReopen: '<?php echo $this->translate->_('Aufgabe wird wieder eröffnet...');?>',
+            taskEnding: '<?php echo $this->translate->_('Aufgabe wird beendet...');?>',
+            taskDestroy: '<?php echo $this->translate->_('Aufgabe wird gelöscht...');?>',
+            taskNotDestroyed: '<?php echo $this->translate->_('Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!');?>',
+            loadingWindowMessage: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>',
+            loading: '<?php echo $this->translate->_('Laden');?>',
+            importTaskMessage:'<?php echo $this->translate->_('Hochladen beendet. Import und Vorbereitung laufen.');?>',
+            deleteTaskDialogMessage:'<?php echo $this->translate->_('Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?');?>',
+            deleteTaskDialogTitle:'<?php echo $this->translate->_('Aufgabe löschen');?>',
+            taskImportButtonText:'<?php echo $this->translate->_('Aufgabe importieren');?>',
+            taskDeleteButtonText:'<?php echo $this->translate->_('Aufgabe löschen');?>',
+            averageProcessingTimeLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Lektor');?>',
+            excelExportUsageLabel: '<?php echo $this->translate->_('Excel-Export Nutzung');?>',
+            averageProcessingTimeTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit Übersetzer');?>',
+            averageProcessingTimeSecondTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit zweiter Lektor');?>',
+        },
+        confirmStrings: {
+            "editorFinishTask":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
+            "editorUnfinishTask":     {title: "<?php echo $this->translate->_('Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich wieder öffnen?');?>"},
+            "editorFinishAllTask":    {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?');?>"},
+            "editorUnfinishAllTask":  {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?');?>"},
+            "editorEndTask":          {title: "<?php echo $this->translate->_('Aufgabe endgültig beenden?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer endgültig beenden?');?>"},
+            "editorReopenTask":       {title: "<?php echo $this->translate->_('Beendete Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die beendete Aufgabe wirklich wieder öffnen?');?>"},
+            "editorDeleteTask":       {title: "<?php echo $this->translate->_('Aufgabe komplett löschen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich komplett und unwiderruflich löschen?');?>"}
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.TaskGrid", {
+        override: "Editor.view.admin.TaskGrid",
+        title: '<?php echo $this->translate->_('Aufgaben');?>',
+        states: {
+            open: '<?php echo $this->translate->_('offen');?>',
+            locked: '<?php echo $this->translate->_('in Arbeit');?>',
+            waiting: '<?php echo $this->translate->_('wartend');?>',
+            finished: '<?php echo $this->translate->_('abgeschlossen');?>',
+            end: '<?php echo $this->translate->_('beendet');?>',
+            unconfirmed: '<?php echo $this->translate->_('nicht bestätigt');?>',
+            import: '<?php echo $this->translate->_('import');?>',
+            forMe: '<?php echo $this->translate->_('für mich ');?>',
+            error: '<?php echo $this->translate->_('error');?>'
+        },
+        strings: {
+            ended: '<?php echo $this->translate->_('beendet');?>',
+            noUsers: '<?php echo $this->translate->_('Keine Benutzer zugeordnet!');?>',
+            notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
+            locked: '<?php echo $this->translate->_('in Arbeit');?>',
+            lockedBy: '<?php echo $this->translate->_('Bearbeitet und Gesperrt durch {0}');?>',
+            lockedMultiUser: '<?php echo $this->translate->_('In Bearbeitung durch:');?>',
+            lockedSystem: '<?php echo $this->translate->_('Durch das System gesperrt mit dem Status \'{0}\'');?>',
+            addProject: '<?php echo $this->translate->_('Projekt hinzufügen');?>',
+            addProjectTip: '<?php echo $this->translate->_('Neues Projekt hinzufügen');?>',
+            exportMetaDataBtn: '<?php echo $this->translate->_('Meta-Daten exportieren');?>',
+            exportMetaDataBtnTip: '<?php echo $this->translate->_('Meta-Daten für alle gefilterten Aufgaben exportieren.');?>',
+            showKPIBtn: '<?php echo $this->translate->_('Auswertungen anzeigen');?>',
+            showKPIBtnTip: '<?php echo $this->translate->_('Auswertungen für alle gefilterten Aufgaben anzeigen.');?>',
+            reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
+            reloadBtnTip: '<?php echo $this->translate->_('Aufgabenliste vom Server aktualisieren.');?>',
+            noRelaisLang: '<?php echo $this->translate->_('- Ohne Relaissprache -');?>',
+            emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).');?>',
+            currentWorkflowStepProgressTooltip: '<?php echo $this->translate->_('% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt');?>',
+            addFilterText: '<?php echo $this->translate->_('Erweiterte Filter');?>',
+            jobStatus: '<?php echo $this->translate->_('Job-Status');?>',
+            assignmentDateHeader: '<?php echo $this->translate->_('Zuweisungsdatum');?>',
+            finishedDateHeader: '<?php echo $this->translate->_('Abschlussdatum');?>',
+            deadlineDateHeader: '<?php echo $this->translate->_('Deadline Datum');?>'
+        },
+        text_cols: {
+            taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
+            taskName: '<?php echo $this->translate->_('Name');?>',
+            taskActions: '<?php echo $this->translate->_('Aktionen');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            relaisLang: '<?php echo $this->translate->_('Relaissprache');?>',
+            targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+            state: '<?php echo $this->translate->_('Status (Aufgbe)');?>',
+            customerId: '<?php echo $this->translate->_('Endkunde');?>',
+            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
+            users: '<?php echo $this->translate->_('Benutzer');?>',
+            wordCount: '<?php echo $this->translate->_('Wörter');?>',
+            wordCountTT: '<?php echo $this->translate->_('Anzahl Wörter');?>',
+            fileCount: '<?php echo $this->translate->_('Dateien');?>',
+            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            referenceFiles: '<?php echo $this->translate->_('Referenzdateien');?>',
+            terminologie: '<?php echo $this->translate->_('Terminologie');?>',
+            fullMatchEdit: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
+            lockLocked: '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>',
+            enableSourceEditing: '<?php echo $this->translate->_('Quellsprache bearbeitbar');?>',
+            emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>',
+            segmentCount: '<?php echo $this->translate->_('Segmentanzahl');?>',
+            segmentFinishCount: '<?php echo $this->translate->_('% abgeschlossen');?>',
+            workflowState: '<?php echo $this->translate->_('Workflow-Status');?>',
+            workflowUserRole: '<?php echo $this->translate->_('Benutzer-Rolle');?>',
+            userName: '<?php echo $this->translate->_('Benutzer');?>',
+            id: '<?php echo $this->translate->_('Id');?>',
+            taskGuid: '<?php echo $this->translate->_('Task-Guid');?>',
+            workflow: '<?php echo $this->translate->_('Workflow');?>',
+            taskassocs: '<?php echo $this->translate->_('Zugewiesene Sprach-Resourcen');?>',
+            pmName: '<?php echo $this->translate->_('Projektmanager');?>',
+            edit100PercentMatch: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
+            userCount: '<?php echo $this->translate->_('Zahl zugewiesener Benutzer');?>',
+            workflowStepName: '<?php echo $this->translate->_('Aktueller Workflow-Schritt');?>',
+            userState: '<?php echo $this->translate->_('Mein Job-Status');?>',
+            userJobDeadline: '<?php echo $this->translate->_('Meine Deadline');?>',
+            assignmentDate:'<?php echo $this->translate->_('Benutzer-Zuweisungsdatum');?>',
+            finishedDate:'<?php echo $this->translate->_('Benutzer-Abschlussdatum');?>',
+            deadlineDate:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.KpiWindow", {
+        override: "Editor.view.admin.task.KpiWindow",
+        title: '<?php echo $this->translate->_('Key Performance Indicators');?>',
+        strings: {
+            closeBtn: '<?php echo $this->translate->_('Fenster schließen');?>',
+            averageProcessingTimeToolTip: '<?php echo $this->translate->_('Durchschnittliche Zeit von der Zuweisung bis zum Abschluss einer Aufgabe.');?>',
+            excelExportUsageToolTip: '<?php echo $this->translate->_('Prozent der Aufgaben, bei denen der Excel-Export der Segmenttabelle genutzt wurde.');?>',
+            filterInfoLabel: '<?php echo $this->translate->_('Durchschnittliche Zeiten beziehen sich auf die Zeiten in der aktuellen Filterung.');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.LogWindow", {
+        override: "Editor.view.admin.task.LogWindow",
+        title: '<?php echo $this->translate->_('Ereignisse zu Aufgabe "{0}"');?>'
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.log.Window", {
+        override: "Editor.view.admin.log.Window",
+        strings: {
+            close: '<?php echo $this->translate->_('Fenster schließen');?>',
+            details: '<?php echo $this->translate->_('Detailansicht');?>',
+            btnBack: '<?php echo $this->translate->_('Zurück zu den Ereignissen');?>'
+    	}
+    });
+    
+    
+    Ext.define("Editor.locale.de.view.LanguageResources.log.LogWindow", {
+        override: "Editor.view.LanguageResources.log.LogWindow",
+        title: '<?php echo $this->translate->_('Ereignisse zu Sprachresource "{0}"');?>'
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.filter.AdvancedFilter", {
+        override: "Editor.view.admin.task.filter.AdvancedFilter",
+        strings:{
+        	filterHolderLabel: '<?php echo $this->translate->_('Gesetzte Filter');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.filter.FilterWindow", {
+        override: "Editor.view.admin.task.filter.FilterWindow",
+        strings:{
+        	workflowStateFilterLabel: '<?php echo $this->translate->_('Workflow-Status');?>',
+        	workflowUserRoleLabel: '<?php echo $this->translate->_('Zugewiesene Benutzer-Rolle/n');?>',
+        	userNameLabel: '<?php echo $this->translate->_('Zugewiesene/r Benutzer');?>',
+        	applyBtn: '<?php echo $this->translate->_('Anwenden');?>',
+        	cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+        	title:'<?php echo $this->translate->_('Erweiterte Filter');?>',
+        	anonymizedUsersInfo:'<?php echo $this->translate->_('Anonymisierte Benutzer nicht auswählbar');?>',
+        	gridFiltersInfo:'<?php echo $this->translate->_('Weitere Filter im Kopf jeder Spalte');?>',
+            assignmentDateText:'<?php echo $this->translate->_('Benutzer-Zuweisungsdatum');?>',
+            finishedDateText:'<?php echo $this->translate->_('Benutzer-Abschlussdatum');?>',
+            deadlineDateText:'<?php echo $this->translate->_('Benutzer-Deadline/s');?>'
+        }
+    });
+    
+    
+    Ext.define("Editor.locale.de.view.help.HelpWindow", {
+        override: "Editor.view.help.HelpWindow",
+        strings:{
+        	cbDoNotShowAgainLabel: '<?php echo $this->translate->_('Dieses Fenster nicht mehr automatisch anzeigen.');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.filter.DateFilter", {
+        override: "Editor.view.admin.task.filter.DateFilter",
+        strings:{
+        	eqText: '<?php echo $this->translate->_('am');?>',
+        	gtText: '<?php echo $this->translate->_('nach');?>',
+        	ltText: '<?php echo $this->translate->_('bevor');?>',
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.admin.task.TaskAttributes", {
+        override: "Editor.view.admin.task.TaskAttributes",
+        title: '<?php echo $this->translate->_('Eigenschaften');?>',
+        strings:{
+            taskName: '<?php echo $this->translate->_('Aufgabenname');?>',
+            customerName: '<?php echo $this->translate->_('Kunde');?>',
+            orderDate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
+            btnSave: '<?php echo $this->translate->_('Speichern');?>',
+            successUpdate: '<?php echo $this->translate->_('Die Aufgabe wurde erfolgreich aktualisiert');?>',
+            btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            btnReload: '<?php echo $this->translate->_('Aktualisieren');?>',
+            fullMatchLabel: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
+            editTrue: '<?php echo $this->translate->_('Ja');?>',
+            editFalse: '<?php echo $this->translate->_('Nein');?>',
+            usageModeTitle: '<?php echo $this->translate->_('Mehrere Benutzer');?>',
+            usageModeInfo: '<?php echo $this->translate->_('Bei Zuweisung mehrerer Benutzer zum selben Workflowschritt');?>',
+            usageModeDisabled: '<?php echo $this->translate->_('Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.');?>',
+            usageModeCoop: '<?php echo $this->translate->_('Sequentielles Arbeiten');?>',
+            usageModeCompetitive: '<?php echo $this->translate->_('Konkurrierende Zuweisung');?>',
+            usageModeSimultaneous: '<?php echo $this->translate->_('Gleichzeitiges Arbeiten');?>',
+            usageModeCoopInfo: '<?php echo $this->translate->_('Alle zugewiesenen Nutzer eines Workflowschritts können die Aufgabe bearbeiten, aber nur einer gleichzeitig.');?>',
+            usageModeCompetitiveInfo: '<?php echo $this->translate->_('Der erste zugewiesene Benutzer eines Workflowschritts, der den Job öffnet und akzeptiert, erledigt den Job. Alle anderen Benutzerzuordnungen werden entfernt und die Benutzer informiert.');?>',
+            usageModeSimultaneousInfo: '<?php echo $this->translate->_('Alle zugewiesenen Nutzer eines Workflowschritts können gleichzeitig arbeiten');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.TaskAddWindow", {
+        override: "Editor.view.admin.TaskAddWindow",
+        title: '<?php echo $this->translate->_('Projekt erstellen');?>',
+        strings: {
+            importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (Angabe notwendig)');?>',
+            importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
+            importUploadType: '<?php echo $this->translate->_('Das Dateiformat der ausgewählten Datei wird nicht unterstützt!');?>',
+            importNews: '<?php echo $this->translate->_('<a target="_blank" href="https://confluence.translate5.net/display/BUS/Supported+file+formats">Mehr Informationen</a> zu den importierbaren Dateiformaten.');?>',
+            taskNrLabel: '<?php echo $this->translate->_('Auftragsnummer');?>',
+            taskNameTip: '<?php echo $this->translate->_('Projektname (frei wählbar, Angabe notwendig)');?>',
+            taskNameLabel: '<?php echo $this->translate->_('Projektname¹');?>',
+            sourceLangTip: '<?php echo $this->translate->_('Quellsprache des Projektes (Angabe notwendig)');?>',
+            sourceLangLabel: '<?php echo $this->translate->_('Quellsprache¹');?>',
+            targetLangTip: '<?php echo $this->translate->_('Zielsprache des Projektes (Angabe notwendig)');?>',
+            targetLangLabel: '<?php echo $this->translate->_('Zielsprache¹');?>',
+            relaisLangTip: '<?php echo $this->translate->_('Relaissprache (Angabe notwendig sofern Relaisdaten vorhanden)');?>',
+            relaisLangLabel: '<?php echo $this->translate->_('Relaissprache');?>',
+            numberFieldLabel: '<?php echo $this->translate->_('Anzahl Wörter');?>',
+            targetDeliveryLabel: '<?php echo $this->translate->_('Lieferdatum');?>',
+            fullMatchLabel: '<?php echo $this->translate->_('100% Matches sind editierbar');?>',
+            lockLockedLabel: '<?php echo $this->translate->_('In importierter Datei gesperrte Segmente sind in translate5 gesperrt');?>',
+            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            sourceEditLabel: '<?php echo $this->translate->_('Ausgangstext ist editierbar');?>',
+            bottomInfo: '<?php echo $this->translate->_('¹ Diese Angaben / Daten werden für den Import zwingend benötigt.');?>',
+            feedbackText: '<?php echo $this->translate->_('Fehler beim Import!');?>',
+            feedbackTip: '<?php echo $this->translate->_('Fehler beim Import: Bitte wenden Sie sich an den Support!');?>',
+            addBtn: '<?php echo $this->translate->_('Aufgabe Importieren');?>',
+            addBtnWizard: '<?php echo $this->translate->_('Importieren (weitere überspringen)');?>',
+            btnNextWizard: '<?php echo $this->translate->_('Weiter');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+            btnSkip: '<?php echo $this->translate->_('Importieren (weitere überspringen)');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.admin.TaskUpload", {
+        override: "Editor.view.admin.TaskUpload",
+        strings: {
+            wizardTitle: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>',
+            finishButton: '<?php echo $this->translate->_('Schließen');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.TaskActionColumn", {
+        override: "Editor.view.admin.TaskActionColumn",
+        messages: {
+            projectOverview: '<?php echo $this->translate->_('zum Projekt springen');?>',
+            taskOverview: '<?php echo $this->translate->_('zur Aufgabe springen');?>',
+            taskActionMenu: '<?php echo $this->translate->_('Aufgabenmenü anzeigen');?>',
+            projectActionMenu: '<?php echo $this->translate->_('Projektmenü anzeigen');?>',
+            actionEdit: '<?php echo $this->translate->_('Aufgabe bearbeiten');?>'
+        }
+    });
+    
+  	Ext.define("Editor.locale.de.view.project.ProjectPanel", {
+        override: "Editor.view.project.ProjectPanel",
+        title:'<?php echo $this->translate->_('Projekte');?>',
+        strings:{
+        	projectTasksTitle:'<?php echo $this->translate->_('Aufgaben für das Projekt: {projectSelection.taskName}');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.project.ProjectPanelViewController", {
+        override: "Editor.view.project.ProjectPanelViewController",
+        strings:{
+        	noProjectMessage:'<?php echo $this->translate->_('Das angeforderte Projekt existiert nicht');?>',
+        	noProjectTaskMessage:'<?php echo $this->translate->_('Die angeforderte Projektaufgabe existiert nicht');?>',
+        	noProjectInFilter:'<?php echo $this->translate->_('Projekt im aktuellen Filter nicht gefunden');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.project.ProjectGrid", {
+        override: "Editor.view.project.ProjectGrid",
+        strings: {
+            addProject: '<?php echo $this->translate->_('Projekt hinzufügen');?>',
+            addProjectTip: '<?php echo $this->translate->_('Neues Projekt hinzufügen');?>',
+            reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
+            reloadBtnTip: '<?php echo $this->translate->_('Projektliste vom Server aktualisieren.');?>',
+            notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
+            resetFilterText: '<?php echo $this->translate->_('Filter zurücksetzen');?>'
+        },
+        text_cols: {
+            taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
+            taskName: '<?php echo $this->translate->_('Name');?>',
+            taskActions: '<?php echo $this->translate->_('Aktionen');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            customerId: '<?php echo $this->translate->_('Endkunde');?>',
+            orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
+            id: '<?php echo $this->translate->_('Id');?>',
+            pmGuid: '<?php echo $this->translate->_('Projektmanager');?>'
+        }
+    });
+    
+     Ext.define("Editor.locale.de.view.project.ProjectGridViewController", {
+        override: "Editor.view.project.ProjectGridViewController",
+        strings: {
+            deleteProjectDialogTitle: '<?php echo $this->translate->_('Projekt komplett löschen?');?>',
+            deleteProjectDialogMessage: '<?php echo $this->translate->_('Sollten das Projekt und alle im Projekt enthaltenen Aufgaben gelöscht werden?');?>',
+            projectDeleteButtonText: '<?php echo $this->translate->_('Projekt löschen');?>',
+            projectCanceltButtonText: '<?php echo $this->translate->_('Nein');?>',
+            projectRemovedMessage: '<?php echo $this->translate->_('Das Projekt wurde erfolgreich entfernt!');?>'
+        }
+    });
+    
+    
+    Ext.define("Editor.locale.de.view.admin.ExportMenu", {
+        override: "Editor.view.admin.ExportMenu",
+        messages: {
+            exportDef: '<?php echo $this->translate->_('Originalformat, {0}');?>',
+            exportDiff: '<?php echo $this->translate->_('SDLXLIFF mit Änderungsmarkierungen');?>',
+            export2Def: '<?php echo $this->translate->_('XLIFF 2.1');?>',
+            exportQmField: '<?php echo $this->translate->_('Export QM-Statistik (XML) für Feld: {0}');?>',
+            exportExcel: '<?php echo $this->translate->_('Externe Bearbeitung als Excel');?>',
+            downloadImportArchive: '<?php echo $this->translate->_('Importarchiv herunterladen');?>',
+            exportTranslation: '<?php echo $this->translate->_('übersetzt');?>',
+            exportReview: '<?php echo $this->translate->_('lektoriert');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.menu.TaskActionMenu", {
+        override: "Editor.view.admin.task.menu.TaskActionMenu",
+        messages: {
+            actionOpen: '<?php echo $this->translate->_('Aufgabe öffnen (schreibgeschützt)');?>',
+            actionEdit: '<?php echo $this->translate->_('Aufgabe bearbeiten');?>',
+            actionClone: '<?php echo $this->translate->_('Aufgabe klonen');?>',
+            actionFinish: '<?php echo $this->translate->_('Aufgabe abschließen');?>',
+            actionUnFinish: '<?php echo $this->translate->_('Aufgabe wieder öffnen');?>',
+            actionFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer abschließen');?>',
+            actionUnFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer wieder öffnen');?>',
+            actionEnd: '<?php echo $this->translate->_('Aufgabe komplett beenden');?>',
+            actionDelete: '<?php echo $this->translate->_('Aufgabe komplett löschen');?>',
+            actionLog: '<?php echo $this->translate->_('Ereignis-Protokoll');?>',
+            assocUser: '<?php echo $this->translate->_('Benutzer der Aufgabe zuweisen');?>', //FIXME remove me!
+            taskPrefs: '<?php echo $this->translate->_('Aufgabenspezifische Einstellungen');?>',
+            actionReOpen: '<?php echo $this->translate->_('beendete Aufgabe wieder öffnen');?>',
+            exp: '<?php echo $this->translate->_('Export');?>',
+            actionExcelReimport: '<?php echo $this->translate->_('Excel Re-Importieren');?>',
+            projectOverview: '<?php echo $this->translate->_('zum Projekt springen');?>',
+            taskOverview: '<?php echo $this->translate->_('zur Aufgabe springen');?>'
+        }
+    });
+    
+    
+    Ext.define("Editor.locale.de.view.project.ProjectActionMenu", {
+        override: "Editor.view.project.ProjectActionMenu",
+        messages: {
+            actionDeleteProject: '<?php echo $this->translate->_('Projekt komplett löschen');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.ExcelReimportWindow", {
+        override: "Editor.view.admin.task.ExcelReimportWindow",
+        title: '<?php echo $this->translate->_('Excel reimportieren');?>',
+        strings: {
+            info: '<?php echo $this->translate->_('Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in die Aufgabe ein.');?>',
+            reimportUploadType: '<?php echo $this->translate->_('Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .');?>',
+            loadingWindowMessage: '<?php echo $this->translate->_('Datei wird hochgeladen');?>',
+            uploadBtn: '<?php echo $this->translate->_('Excel hochladen');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+            closeBtn: '<?php echo $this->translate->_('Schließen');?>',
+            loadingWindowMessage: '<?php echo $this->translate->_('Datei wird hochgeladen');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.PreferencesWindow", {
+        override: "Editor.view.admin.task.PreferencesWindow",
+        strings: {
+            close: '<?php echo $this->translate->_('Fenster schließen');?>',
+            events: '<?php echo $this->translate->_('Ereignisse');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.log.Grid", {
+        override: "Editor.view.admin.log.Grid",
+        strings: {
+            reload: '<?php echo $this->translate->_('Aktualisieren');?>',
+            level: '<?php echo $this->translate->_('Typ');?>',
+            level_fatal: '<?php echo $this->translate->_('Schwerer Fehler');?>',
+            level_error: '<?php echo $this->translate->_('Fehler');?>',
+            level_warn: '<?php echo $this->translate->_('Warnung');?>',
+            level_info: '<?php echo $this->translate->_('Info');?>',
+            level_debug: '<?php echo $this->translate->_('Debug');?>',
+            level_trace: '<?php echo $this->translate->_('Trace');?>',
+            colUsername: '<?php echo $this->translate->_('Benutzer');?>',
+            eventCode: '<?php echo $this->translate->_('Code');?>',
+            eventCodeLong: '<?php echo $this->translate->_('Ereignis- bzw. Fehlercode');?>',
+            domain: '<?php echo $this->translate->_('Bereich');?>',
+            message: '<?php echo $this->translate->_('Ereignis');?>',
+            created: '<?php echo $this->translate->_('Zeitpunkt');?>',
+            moreInfo: '<?php echo $this->translate->_('Mehr Info');?>',
+            eventCodeInfoText: '<?php echo $this->translate->_('Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.UserAssoc", {
+        override: "Editor.view.admin.task.UserAssoc",
+        title: '<?php echo $this->translate->_('Benutzer-Plural');?>',
+        strings: {
+            fieldRole: '<?php echo $this->translate->_('Rolle');?>',
+            fieldState: '<?php echo $this->translate->_('Status');?>',
+            fieldUser: '<?php echo $this->translate->_('Benutzer');?>',
+            btnSave: '<?php echo $this->translate->_('Speichern');?>',
+            btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            formTitleAdd: '<?php echo $this->translate->_('Benutzerzuweisung hinzufügen:');?>',
+            formTitleEdit: '<?php echo $this->translate->_('Bearbeite Benutzer "{0}"');?>',
+            fieldDeadline: '<?php echo $this->translate->_('Deadline');?>',
+            fieldSegmentrange: '<?php echo $this->translate->_('Editierbare Segmente');?>',
+        	fieldSegmentrangeInfo: '<?php echo $this->translate->_('Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)');?>',
+        	deadlineDateInfoTooltip: '<?php echo $this->translate->_('translate5 sendet standardmäßig 1 Tag vor und 1 Tag nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.');?>'
+        }
+    });
+    
+    Ext.ux.DateTimePicker.prototype.todayText = '<?php echo $this->translate->_('Aktuelles Datum');?>';
+    Ext.ux.DateTimePicker.prototype.hourText = '<?php echo $this->translate->_('Stunde');?>';
+    Ext.ux.DateTimePicker.prototype.minuteText = '<?php echo $this->translate->_('Minuten');?>';
+    
+    Ext.define("Editor.view.admin.task.UserAssocViewModel", {
+        override: "Editor.view.admin.task.UserAssocViewModel",
+        strings: {
+            editInfo: '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>',
+            segmentrangeError: '<?php echo $this->translate->_('Nicht zugewiesene Segmente');?>',
+            translator: '<?php echo $this->translate->_('Übersetzer');?>',
+            reviewer: '<?php echo $this->translate->_('Lektor');?>',
+            translatorCheck: '<?php echo $this->translate->_('Zweiter Lektor');?>',
+            visitor: '<?php echo $this->translate->_('Besucher');?>',
+            allEditedByUsers: '<?php echo $this->translate->_('(alle Segmente können von allen Nutzern editiert werden)');?>',
+            canNotBeEditedByUsers: '<?php echo $this->translate->_('(können derzeit von niemandem bearbeitet werden)');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.UserAssocGrid", {
+        override: "Editor.view.admin.task.UserAssocGrid",
+        strings: {
+            confirmDeleteTitle: '<?php echo $this->translate->_('Eintrag löschen?');?>',
+            confirmDelete: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
+            userGuidCol: '<?php echo $this->translate->_('Benutzer');?>',
+            roleCol: '<?php echo $this->translate->_('Rolle');?>',
+            segmentrangeCol: '<?php echo $this->translate->_('Segmente');?>',
+            stateCol: '<?php echo $this->translate->_('Status');?>',
+            addUser: '<?php echo $this->translate->_('Hinzufügen');?>',
+            reload: '<?php echo $this->translate->_('Aktualisieren');?>',
+            addUserTip: '<?php echo $this->translate->_('Einen Benutzer dieser Aufgabe zuordnen.');?>',
+            removeUser: '<?php echo $this->translate->_('Entfernen');?>',
+            removeUserTip: '<?php echo $this->translate->_('Den gewählten Benutzer aus dieser Aufgabe entfernen.');?>',
+            save: '<?php echo $this->translate->_('Änderungen speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            assignmentDateLable: '<?php echo $this->translate->_('Zuweisung');?>',
+            finishedDateLabel: '<?php echo $this->translate->_('Abgeschlossen');?>',
+            deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
+            deadlineDateLable: '<?php echo $this->translate->_('Deadline');?>',
+            userSpecialProperties:'<?php echo $this->translate->_('Spezial');?>',
+            notifyUsersTitle: '<?php echo $this->translate->_('Zugewiesene Benutzer benachrichtigen?');?>',
+            notifyUsersMsg: '<?php echo $this->translate->_('Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtigt werden?');?>',
+            userNotifySuccess: '<?php echo $this->translate->_('Benutzer wurden erfolgreich per E-Mail benachrichtigt');?>',
+            notifyButtonText: '<?php echo $this->translate->_('Benutzer benachrichtigen');?>',
+            notifyButtonTooltip: '<?php echo $this->translate->_('Alle zugewiesenen Benutzer über ihre Zuweisung per E-Mail benachrichtigen');?>'
+        },
+        states: {
+            edit: '<?php echo $this->translate->_('in Arbeit');?>'
+        },
+    });
+
+    Ext.define("Editor.locale.de.view.admin.UserChooseWindow", {
+        override: "Editor.view.admin.UserChooseWindow",
+        title: '<?php echo $this->translate->_('Einen oder mehrere Benutzer auswählen');?>',
+        strings: {
+            loginCol: '<?php echo $this->translate->_('Login');?>',
+            firstNameCol: '<?php echo $this->translate->_('Vorname');?>',
+            surNameCol: '<?php echo $this->translate->_('Nachname');?>',
+            emailCol: '<?php echo $this->translate->_('E-Mail');?>',
+            addBtn: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.util.TaskActions", {
+        override: "Editor.util.TaskActions",
+        strings: {
+            taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
+            forcedReadOnly: '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
+            confirmFinish: '<?php echo $this->translate->_('Aufgabe abschließen?');?>',
+            confirmFinishMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>',
+            taskClosed: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich verlassen.');?>',
+            taskConfirmed: '<?php echo $this->translate->_('Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.');?>',
+            taskFinished: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich abgeschlossen.');?>',
+            taskClosing: '<?php echo $this->translate->_('Aufgabe wird verlassen...');?>',
+            taskConfirming: '<?php echo $this->translate->_('Aufgabe wird bestätigt...');?>',
+            taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen und verlassen...');?>',
+            saveSegmentFirst: '<?php echo $this->translate->_('Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.util.LanguageResources", {
+        override: "Editor.util.LanguageResources",
+        strings: {
+		    exactMatch: '<?php echo $this->translate->_('101% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt.');?>',
+            repetitionMatch: '<?php echo $this->translate->_('Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.');?>',
+            contextMatch: '<?php echo $this->translate->_('103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.');?>',
+            termcollectionMatch: '<?php echo $this->translate->_('104% ist ein 100% Treffer, der aus einer Termcollection kommt.');?>'
+        }
+    });
+    Ext.define("Editor.locale.de.view.task.ConfirmationWindow", {
+        override: "Editor.view.task.ConfirmationWindow",
+        strings: {
+            title: '<?php echo $this->translate->_('Aufgabe bestätigen?');?>',
+            confirmMsg: '<?php echo $this->translate->_('Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.');?>',
+            confirmCompetitive: '<?php echo $this->translate->_('<br/><br/>Allen anderen Benutzern wird die Aufgabe entzogen<br/> und sie wird ausschließlich in Ihrer Verantwortung liegen.');?>',
+            confirmBtn: '<?php echo $this->translate->_('bestätigen');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.ReferenceFilesInfoMessage", {
+        override: "Editor.view.ReferenceFilesInfoMessage",
+        strings: {
+            windowTitle: '<?php echo $this->translate->_('Referenz-Dateien');?>',
+            windowInfoMessage: '<?php echo $this->translate->_('Referenzdateien vorhanden');?>',
+            buttonText: '<?php echo $this->translate->_('Liste öffnen');?>',
+        }
+    });
+    
+    
+    Ext.define("Editor.locale.de.controller.SearchReplace", {
+        override: "Editor.controller.SearchReplace",
+        strings: {
+            searchInfoMessage: '<?php echo $this->translate->_('Die Suche wird nur auf den gefilterten Segmenten durchgeführt');?>',
+            comboFieldLabel: '<?php echo $this->translate->_('Ersetzen');?>',
+            noSearchResults: '<?php echo $this->translate->_('Keine Ergebnisse für die aktuelle Suche!');?>',
+            replaceAllWindowBtnText: '<?php echo $this->translate->_('Alle Ergebnisse ersetzen');?>',
+            cancelReplaceAllWindowBtnText: '<?php echo $this->translate->_('Abbrechen');?>',
+            replaceAllWindowTitle: '<?php echo $this->translate->_('Ergebnisse ersetzen');?>',
+            replaceAllWindowMessage: '<?php echo $this->translate->_('übereinstimmungen gefunden. Wollen Sie wirklich alle ersetzen? Alle gefundenen Segmente werden inklusive Auto-Status und letztem Editor geändert');?>',
+            characterLimitError: '<?php echo $this->translate->_('Der Suchstring ist zu groß');?>',
+            noIndexFound: '<?php echo $this->translate->_('Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.');?>',
+            searchAndReplaceMenuItem: '<?php echo $this->translate->_('Suchen und ersetzen');?>',
+            replaceAllErrors: '<?php echo $this->translate->_('Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.');?>',
+            searchReplaceToolbarBtn: '<?php echo $this->translate->_('Suche');?>'
+        }
+    });
+    
+    
+    Ext.define("Editor.locale.de.controller.Termportal", {
+        override: "Editor.controller.Termportal",
+        strings: {
+            termPortal: '<?php echo $this->translate->_('Terminologieportal');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.searchandreplace.SearchReplaceWindow", {
+        override: "Editor.view.searchandreplace.SearchReplaceWindow",
+        strings: {
+            windowTitle: '<?php echo $this->translate->_('Suchen und ersetzen');?>',
+            helpButtonTooltip: '<?php echo $this->translate->_('Info zum Suchen und Ersetzen');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.searchandreplace.SearchTab", {
+        override: "Editor.view.searchandreplace.SearchTab",
+        strings: {
+            comboFieldLabel: '<?php echo $this->translate->_('Suchen nach');?>',
+            searchInField: '<?php echo $this->translate->_('Suchen in');?>',
+            matchCaseLabel: '<?php echo $this->translate->_('Groß/Kleinschreibung beachten');?>',
+            towardsTop: '<?php echo $this->translate->_('Nach oben suchen');?>',
+            useForSearch: '<?php echo $this->translate->_('Bei der Suche verwenden');?>',
+            normalSearch: '<?php echo $this->translate->_('Normal (Standard)');?>',
+            wildcardsSearch: '<?php echo $this->translate->_('Wildcards (* und ?)');?>',
+            regularExpressionSearch: '<?php echo $this->translate->_('Regulärer Ausdruck');?>',
+            saveCurrentOpen: '<?php echo $this->translate->_('Segment beim Schließen speichern');?>',
+            invalidRegularExpression: '<?php echo $this->translate->_('Ungültiger Regulärer Ausdruck');?>',
+            unsupportedRegularExpression: '<?php echo $this->translate->_('Dieser reguläre Ausdruck wird nicht unterstützt');?>',
+            segmentMatchInfoMessage: '<?php echo $this->translate->_('Segmente mit Suchtreffer:');?>',
+            searchInLockedSegments: '<?php echo $this->translate->_('Suche in gesperrten Segmenten');?>'
+        }
+    });
+    
+	Ext.define("Editor.locale.de.view.searchandreplace.TabPanel", {
+        override: "Editor.view.searchandreplace.TabPanel",
+        strings: {
+            searchTabTitle: '<?php echo $this->translate->_('Suchen');?>',
+            replaceTabTitle: '<?php echo $this->translate->_('Ersetzen');?>',
+            closeButton: '<?php echo $this->translate->_('Schließen');?>',
+            replaceAllButton: '<?php echo $this->translate->_('Alles ersetzen');?>',
+            searchButton: '<?php echo $this->translate->_('Suchen');?>',
+            replaceButton: '<?php echo $this->translate->_('Ersetzen');?>',
+            mqmNotSupporterTooltip: '<?php echo $this->translate->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');?>',
+            multiUsersTooltip: '<?php echo $this->translate->_('Mehrere Benutzer bearbeiten gleichzeitig dieselbe Aufgabe');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.ToolTip", {
+        override: "Editor.view.ToolTip",
+        messages: {
+            deletedby: '<?php echo $this->translate->_('Deleted by');?>',
+            insertedby: '<?php echo $this->translate->_('Inserted by');?>',
+            history: '<?php echo $this->translate->_('HISTORY');?>',
+            notrackchangesplugin: '<?php echo $this->translate->_('TrackChanges found, but Plugin is not activated.');?>',
+            severity: '<?php echo $this->translate->_('Gewichtung');?>'
+        }
+    });
+    
+     Ext.define("Editor.locale.view.ApplicationInfoPanel", {
+        override: "Editor.view.ApplicationInfoPanel",
+        strings: {
+            task: '<?php echo $this->translate->_('Aufgabe');?>',
+            loggedinAs: '<?php echo $this->translate->_('Eingeloggter Benutzer');?>',
+            loginName: '<?php echo $this->translate->_('Loginname');?>',
+            readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.help.HelpButton", {
+        override: "Editor.view.help.HelpButton",
+        text: '<?php echo $this->translate->_('Hilfe');?>'
+    });
+
+    Ext.define("Editor.locale.de.view.HeadPanel", {
+        override: "Editor.view.HeadPanel",
+        strings: {
+            logout: '<?php echo $this->translate->_('Abmelden');?>',
+            readonly: '<?php echo $this->translate->_(' - [LESEMODUS]');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.de.admin.preferences.OverviewPanel", {
+        override: "Editor.view.admin.preferences.OverviewPanel",
+        title: '<?php echo $this->translate->_('Einstellungen');?>'
+    });
+
+    Ext.define("Editor.locale.de.admin.preferences.UserViewController", {
+        override: "Editor.view.admin.preferences.UserViewController",
+        strings: {
+            settings: '<?php echo $this->translate->_('Meine Einstellungen');?>',
+            pwSave: '<?php echo $this->translate->_('Passwort erfolgreich gespeichert!');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.admin.preferences.User", {
+        override: "Editor.view.admin.preferences.User",
+        title: '<?php echo $this->translate->_('Meine Einstellungen');?>',
+        strings: {
+            editPassword: '<?php echo $this->translate->_('Passwort ändern');?>',
+            password: '<?php echo $this->translate->_('Passwort');?>',
+            password_check: '<?php echo $this->translate->_('Passwort Kontrolle');?>',
+            passwordMisMatch: '<?php echo $this->translate->_('Die Passwörter stimmern nicht überein!');?>',
+            saveBtn: '<?php echo $this->translate->_('Speichern');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.user.GridViewController", {
+        override: "Editor.view.admin.user.GridViewController",
+        strings: {
+            confirmDeleteTitle: '<?php echo $this->translate->_('Benutzer endgültig löschen?');?>',
+            confirmDeleteMsg: '<?php echo $this->translate->_('Soll der gewählte Benutzer "{0}" wirklich endgültig gelöscht werden?');?>',
+            confirmResetPwTitle: '<?php echo $this->translate->_('Passwort zurücksetzen?');?>',
+            confirmResetPwMsg: '<?php echo $this->translate->_('Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.user.Grid", {
+        override: "Editor.view.admin.user.Grid",
+        title: '<?php echo $this->translate->_('Benutzer');?>',
+        text_cols: {
+            login: '<?php echo $this->translate->_('Login');?>',
+            firstName: '<?php echo $this->translate->_('Vorname');?>',
+            surName: '<?php echo $this->translate->_('Nachname');?>',
+            gender: '<?php echo $this->translate->_('Anrede');?>',
+            email: '<?php echo $this->translate->_('E-Mail');?>',
+            locale: '<?php echo $this->translate->_('Sprache');?>',
+            roles: '<?php echo $this->translate->_('Systemrollen');?>',
+            openIdIssuer: '<?php echo $this->translate->_('OpenId Emitten');?>'
+        },
+        strings: {
+            addUser: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
+            addUserTip: '<?php echo $this->translate->_('Einen neuen Benutzer hinzufügen.');?>',
+            actionEdit: '<?php echo $this->translate->_('Benutzer bearbeiten');?>',
+            actionDelete: '<?php echo $this->translate->_('Benutzer löschen');?>',
+            actionResetPw: '<?php echo $this->translate->_('Passwort des Benutzers zurücksetzen');?>',
+            gender_female: '<?php echo $this->translate->_('Frau');?>',
+            gender_male: '<?php echo $this->translate->_('Herr');?>',
+            gender_neutral: '<?php echo $this->translate->_('keine Angabe');?>',
+            reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
+            reloadBtnTip: '<?php echo $this->translate->_('Benutzerliste vom Server aktualisieren.');?>',
+            sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+            sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+            targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+            targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+            localeTooltip: '<?php echo $this->translate->_('Benutzersprache');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.user.AddWindowViewController", {
+        override: "Editor.view.admin.user.AddWindowViewController",
+        strings: {
+            userSaved: '<?php echo $this->translate->_('Der Änderungen an Benutzer "{0}" wurden erfolgreich gespeichert.');?>',
+            userAdded: '<?php echo $this->translate->_('Der Benutzer "{0}" wurde erfolgreich erstellt.');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.user.AddWindow", {
+        override: "Editor.view.admin.user.AddWindow",
+        title: '<?php echo $this->translate->_('Benutzer erstellen');?>',
+        titleEdit: '<?php echo $this->translate->_('Benutzer bearbeiten');?>',
+        strings: {
+            userInfo: '<?php echo $this->translate->_('Benutzerinformationen');?>',
+            loginInfo: '<?php echo $this->translate->_('Anmeldeinformationen');?>',
+            nameTip: '<?php echo $this->translate->_('Name (Angabe notwendig)');?>',
+            nameLabel: '<?php echo $this->translate->_('Name¹');?>',
+            firstNameTip: '<?php echo $this->translate->_('Vorname (Angabe notwendig)');?>',
+            firstNameLabel: '<?php echo $this->translate->_('Vorname¹');?>',
+            surNameTip: '<?php echo $this->translate->_('Nachname (Angabe notwendig)');?>',
+            surNameLabel: '<?php echo $this->translate->_('Nachname¹');?>',
+            genderLabel: '<?php echo $this->translate->_('Anrede');?>',
+            genderMale: '<?php echo $this->translate->_('Herr');?>',
+            genderFemale: '<?php echo $this->translate->_('Frau');?>',
+            genderNeutral: '<?php echo $this->translate->_('Ohne');?>',
+            loginTip: '<?php echo $this->translate->_('Anmeldename (Angabe notwendig)');?>',
+            loginLabel: '<?php echo $this->translate->_('Anmeldename¹');?>',
+            emailTip: '<?php echo $this->translate->_('E-Mail Adresse (Angabe notwendig)');?>',
+            emailLabel: '<?php echo $this->translate->_('E-Mail Adresse¹');?>',
+            rolesLabel: '<?php echo $this->translate->_('Systemrollen²');?>',
+            setPassword: '<?php echo $this->translate->_('Passwort setzen³');?>',
+            editPassword: '<?php echo $this->translate->_('Passwort ändern');?>',
+            password: '<?php echo $this->translate->_('Passwort');?>',
+            password_check: '<?php echo $this->translate->_('Passwort Kontrolle');?>',
+            passwordMisMatch: '<?php echo $this->translate->_('Die Passwörter stimmern nicht überein!');?>',
+            bottomInfo: '<?php echo $this->translate->_(' ¹ Diese Angaben werden zwingend benötigt.');?>',
+            bottomRoleInfo: '<?php echo $this->translate->_(' ² Systemrollen bestimmen darüber, welche Rechte im System ein Nutzer hat. Die Rolle Editor darf auf alle Komponenten des Editors zugreifen, sowie auf die Komponenten der Aufgabenübersicht, die für das Editieren von Aufgaben nötig sind. Die Rolle PM darf Benutzer verwalten und Benutzer Aufgaben im Workflow zuweisen oder entziehen. Achtung: Systemrollen dürfen nicht mit Workflowrollen wie Lektor oder Übersetzer verwechselt werden. Benutzer die im Workflow Aufgaben übernehmen sollen müssen mindestens die Systemrolle Editor erhalten.');?>',
+            bottomPwInfo: '<?php echo $this->translate->_(' ³ Wird kein Passwort gesetzt bekommt der Benutzer automatisch eine E-Mail zur Erstellung eines Passworts.');?>',
+            feedbackText: "<?php echo $this->translate->_(' Fehler beim Speichern!');?>",
+            feedbackTip: '<?php echo $this->translate->_('Fehler beim Speichern des Benutzers: Bitte wenden Sie sich an den Support!');?>',
+            addBtn: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
+            saveBtn: '<?php echo $this->translate->_('Benutzer speichern');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+            languagesLabel: '<?php echo $this->translate->_('Automatische Zuweisung');?>',
+            sourceLangageLabel: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+            sourceLangageTip: '<?php echo $this->translate->_('Quellsprache(n)');?>',
+            targetLangageLabel: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+            targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
+            languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>',
+            localeLabel: '<?php echo $this->translate->_('Benutzersprache');?>',
+            parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>',
+            bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.');?>'
+        }
+    });
+    Editor.view.admin.task.UserPrefsGrid.prototype.strings = {
+        defaultEntry: '<?php echo $this->translate->_('Standard Eintrag');?>',
+        confirmDeleteTitle: '<?php echo $this->translate->_('Eintrag löschen?');?>',
+        confirmDelete: '<?php echo $this->translate->_('Soll dieser Eintrag wirklich gelöscht werden?');?>',
+        colStep: '<?php echo $this->translate->_('Workflow Schritt');?>',
+        colUsername: '<?php echo $this->translate->_('Benutzer');?>',
+        colTargets: '<?php echo $this->translate->_('Spalten (vorhanden)');?>',
+        colNotEditContent: '<?php echo $this->translate->_('Nur MQM-tags bearbeiten');?>',
+        colAnonymous: '<?php echo $this->translate->_('Anonymisiert');?>',
+        colVisibility: '<?php echo $this->translate->_('Sichtbarkeit');?>',
+        add: '<?php echo $this->translate->_('Eintrag hinzufügen');?>',
+        reload: '<?php echo $this->translate->_('Aktualisieren');?>',
+        remove: '<?php echo $this->translate->_('Eintrag löschen');?>',
+        vis_show: '<?php echo $this->translate->_('anzeigen');?>',
+        vis_hide: '<?php echo $this->translate->_('ausblenden');?>',
+        vis_disable: '<?php echo $this->translate->_('nicht vorhanden');?>'
+    };
+    
+    Editor.view.admin.task.UserPrefsForm.prototype.title_edit = '<?php echo $this->translate->_('Bearbeite Eintrag: "{0} - {1}"');?>';
+    Editor.view.admin.task.UserPrefsForm.prototype.title_add = '<?php echo $this->translate->_('Eintrag erstellen');?>';
+    Editor.view.admin.task.UserPrefsForm.prototype.strings = {
+        fieldStep: '<?php echo $this->translate->_('Workflow Schritt');?>',
+        fieldUsername: '<?php echo $this->translate->_('Benutzer');?>',
+        fieldTargets: '<?php echo $this->translate->_('vorhandene Spalten');?>',
+        fieldNotEditContent: '<?php echo $this->translate->_('Nur MQM-tags bearbeiten');?>',
+        fieldAnonymous: '<?php echo $this->translate->_('anonymisierte Zieltextspalten');?>',
+        fieldVisibility: '<?php echo $this->translate->_('Sichtbarkeit nicht editierbarer Zieltextspalten');?>',
+        btnSave: '<?php echo $this->translate->_('Speichern');?>',
+        btnCancel: '<?php echo $this->translate->_('Abbrechen');?>',
+        visShow: '<?php echo $this->translate->_('Anzeigen');?>',
+        visHide: '<?php echo $this->translate->_('Ausblenden');?>',
+        visDisabled: '<?php echo $this->translate->_('nicht vorhanden');?>',
+        forAll: '<?php echo $this->translate->_('für alle');?>'
+    };
+    
+    Editor.view.admin.task.Preferences.prototype.title = '<?php echo $this->translate->_('Benutzer-Spezialeinstellungen');?>';
+    Editor.view.admin.task.Preferences.prototype.workflow_label = '<?php echo $this->translate->_('Workflow');?>';
+    Editor.view.admin.task.Preferences.prototype.editInfo = '<?php echo $this->translate->_('Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!');?>';
+    
+    Editor.controller.admin.TaskPreferences.prototype.strings = {
+      taskWorkflowSaved: '<?php echo $this->translate->_('Änderung des Workflows der Aufgabe gespeichert!');?>',
+      entrySaved: '<?php echo $this->translate->_('Eintrag gespeichert');?>',
+      entryDeleted: '<?php echo $this->translate->_('Eintrag gelöscht');?>',
+      entrySaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>',
+      forAll: '<?php echo $this->translate->_('für alle');?>',
+      customerTip: '<?php echo $this->translate->_('Kunde der Aufgabe (Angabe notwendig)');?>',
+      customerLabel: '<?php echo $this->translate->_('Kunde');?>'
+    };
+	Ext.define("Editor.locale.controller.admin.Customer", {
+		override: "Editor.controller.admin.Customer",
+        strings: {
+            customer:'<?php echo $this->translate->_("Kunden");?>',
+            allCustomers:'<?php echo $this->translate->_("Alle Kunden");?>',
+        }
+    });
+
+    Ext.define("Editor.locale.view.admin.customer.Panel", {
+    	override: "Editor.view.admin.customer.Panel",
+        title:'<?php echo $this->translate->_("Kunden");?>',
+        strings: {
+            reload:'<?php echo $this->translate->_("Aktualisieren");?>',
+            customerName:'<?php echo $this->translate->_("Kundenname");?>',
+            customerNumber:'<?php echo $this->translate->_("Kundennummer");?>',
+            save:'<?php echo $this->translate->_("Speichern");?>',
+            cancel:'<?php echo $this->translate->_("Abbrechen");?>',
+            remove:'<?php echo $this->translate->_("Löschen");?>',
+            editCustomerTitle:'<?php echo $this->translate->_("Kunde bearbeiten");?>',
+            addCustomerTitle:'<?php echo $this->translate->_("Kunde hinzufügen");?>',
+            saveCustomerMsg:'<?php echo $this->translate->_("Kunde wird gespeichert...");?>',
+            customerSavedMsg:'<?php echo $this->translate->_("Kunde gespeichert!");?>',
+            customerDeleteMsg:'<?php echo $this->translate->_("Diesen Kunden löschen?");?>',
+            customerDeleteTitle:'<?php echo $this->translate->_("Kunden löschen");?>',
+            customerDeletedMsg:'<?php echo $this->translate->_("Kunde gelöscht");?>',
+            export:'<?php echo $this->translate->_("Exportieren");?>',
+            domain:'<?php echo $this->translate->_("translate5 Domain");?>',
+            openIdServer:'<?php echo $this->translate->_("OpenId server");?>',
+            openIdIssuer:'<?php echo $this->translate->_("OpenId Issuer");?>',
+            openIdAuth2Url:'<?php echo $this->translate->_("OpenId OAuth URL");?>',
+            defaultRolesGroupLabel:'<?php echo $this->translate->_("Standardrollen");?>',
+            serverRolesGroupLabel:'<?php echo $this->translate->_("Erlaubte Rollen");?>',
+            openIdClientId:'<?php echo $this->translate->_("OpenId Benutzername");?>',
+            openIdClientSecret:'<?php echo $this->translate->_("OpenId Passwort");?>',
+            openIdRedirectLabel:'<?php echo $this->translate->_("Verlinkter Text Loginseite");?>',
+            openIdRedirectCheckbox:'<?php echo $this->translate->_("Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.");?>',
+            anonymizeUsers:'<?php echo $this->translate->_("User anonymisieren?");?>',
+            defaultRolesGroupLabelTooltip:'<?php echo $this->translate->_("Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.");?>',
+            serverRolesGroupLabelTooltip:'<?php echo $this->translate->_("Systemrollen, die der OpenID-Server in translate5 festlegen darf.");?>'
+        }
+    });
+
+    Ext.define("Editor.locale.view.admin.customer.Combo", {
+        override: "Editor.view.admin.customer.Combo",
+        fieldLabel:'<?php echo $this->translate->_("Endkunde");?>'
+    });
+
+    Ext.define("Editor.locale.view.admin.customer.TagField", {
+    	override: "Editor.view.admin.customer.TagField",
+        fieldLabel:'<?php echo $this->translate->_("Endkunde");?>'
+    });
+    
+    Ext.define("Editor.locale.controller.LanguageResources", {
+        override: "Editor.controller.LanguageResources",
+        strings: {
+            msgDisabledMatchRate: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.');?>',
+            msgDisabledSourceEdit: '<?php echo $this->translate->_('Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.');?>'
+        }
+    });
+    Ext.define("Editor.locale.view.LanguageResources.MatchGridViewController", {
+        override: "Editor.view.LanguageResources.MatchGridViewController",
+        strings: {
+            loading: '<?php echo $this->translate->_('wird geladen...');?>',
+            noresults: '<?php echo $this->translate->_('Es wurden keine Ergebnisse gefunden.');?>',
+            serverErrorMsgDefault: '<?php echo $this->translate->_('Die Anfrage an die Sprachressource dauerte zu lange.');?>',
+            serverErrorMsg500:'<?php echo $this->translate->_('Die Anfrage führte zu einem Fehler im angefragten Dienst.');?>',
+            serverErrorMsg408:'<?php echo $this->translate->_('Die Anfrage an die Sprachressource dauerte zu lange.');?>',
+            delInsTagTooltip:'<?php echo $this->translate->_('Unterschied zu Quellsegment');?>'
+        }
+    });
+    Ext.define("Editor.locale.view.LanguageResources.SearchGridViewController", {
+        override: "Editor.view.LanguageResources.SearchGridViewController",
+        strings: {
+            loading: '<?php echo $this->translate->_('wird geladen...');?>',
+            noresults: '<?php echo $this->translate->_('Es wurden keine Ergebnisse gefunden.');?>',
+            searchResultGridTitle: '<?php echo $this->translate->_('{0} Ergebnisse');?>',
+            serverErrorMsgDefault: '<?php echo $this->translate->_('Die Anfrage an die Sprachressource dauerte zu lange.');?>',
+            serverErrorMsg500:'<?php echo $this->translate->_('Die Anfrage führte zu einem Fehler im angefragten Dienst.');?>',
+            serverErrorMsg408:'<?php echo $this->translate->_('Die Anfrage an die Sprachressource dauerte zu lange.');?>',
+        }
+    });
+    Ext.define("Editor.locale.view.LanguageResources.EditorPanel", {
+        override: "Editor.view.LanguageResources.EditorPanel",
+        strings: {
+            searchTitle: '<?php echo $this->translate->_('Konkordanzsuche');?>',
+            matchTitle:'<?php echo $this->translate->_('Matches');?>',
+            sourceEmptyText:'<?php echo $this->translate->_('Quelltextsuche');?>',
+            targetEmptyText:'<?php echo $this->translate->_('Zieltextsuche');?>',
+            panelTitle:'<?php echo $this->translate->_('Matches und Konkordanz-Suche');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.MatchGrid", {
+        override: "Editor.view.LanguageResources.MatchGrid",
+        strings: {
+            source: '<?php echo $this->translate->_('Quelltext');?>',
+            target: '<?php echo $this->translate->_('Zieltext');?>',
+            match: '<?php echo $this->translate->_('Matchrate');?>',
+            ctrl: '<?php echo $this->translate->_('STRG');?>',
+            tooltipMsg: '<?php echo $this->translate->_('Diesen Match in das geöffnete Segment übernehmen.');?>',
+            atributeTooltipMsg: '<?php echo $this->translate->_('Attribute:');?>',
+            lastEditTooltipMsg: '<?php echo $this->translate->_('letzte Änderung:');?>',
+            createdTooltipMsg: '<?php echo $this->translate->_('erstellt:');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.SearchGrid", {
+        override: "Editor.view.LanguageResources.SearchGrid",
+        strings: {
+            source: '<?php echo $this->translate->_('Quelltext');?>',
+            target: '<?php echo $this->translate->_('Zieltext');?>',
+            match: '<?php echo $this->translate->_('Matchrate');?>',
+            ctrl: '<?php echo $this->translate->_('STRG');?>',
+            tmresource: '<?php echo $this->translate->_('TM-Ressource');?>',
+            sourceEmptyText:'<?php echo $this->translate->_('Quelltextsuche');?>',
+            targetEmptyText:'<?php echo $this->translate->_('Zieltextsuche');?>',
+            search:'<?php echo $this->translate->_('Alle durchsuchen');?>',
+            singleSearch:'<?php echo $this->translate->_('Suche in {0}');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.ProposalExport", {
+        override: "Editor.view.LanguageResources.ProposalExport",
+        strings: {
+            dateFieldLabel: '<?php echo $this->translate->_('Jünger als oder gleich');?>',
+            exportButtonText: '<?php echo $this->translate->_('Exportieren');?>',
+            cancelButtonText: '<?php echo $this->translate->_('Abbrechen');?>',
+            title: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
+        }
+    });
+    Ext.define("Editor.locale.controller.TaskAssoc", {
+        override: "Editor.controller.LanguageResourcesTaskassoc",
+        strings: {
+            assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
+            assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
+            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.TaskAssocPanel", {
+        override: "Editor.view.LanguageResources.TaskAssocPanel",
+        title: '<?php echo $this->translate->_('Sprach-Resourcen');?>',
+        strings: {
+            reload: '<?php echo $this->translate->_('Aktualisieren');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            empty: '<?php echo $this->translate->_('Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.');?>',
+            checked: '<?php echo $this->translate->_('Ressource in Aufgabe verwenden');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            segmentsUpdateable: '<?php echo $this->translate->_('Segmente zurückspeichern');?>',
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            serviceName: '<?php echo $this->translate->_('Ressource');?>',
+            taskGuid: '<?php echo $this->translate->_('Aufgabenname');?>'
+        }
+    });
+    Ext.define("Editor.locale.controller.TmOverview", {
+        override: "Editor.controller.TmOverview",
+        strings: {
+            deleteConfirm: '<?php echo $this->translate->_('Sprachressource endgültig löschen?');?>',
+            deleteConfirmText: '<?php echo $this->translate->_('Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?');?>',
+            deleteConfirmLocal: '<?php echo $this->translate->_('Sprachressource löschen?');?>',
+            deleteConfirmLocalText: '<?php echo $this->translate->_('Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprach-Resourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.');?>',
+            deleted: '<?php echo $this->translate->_('Sprachressource gelöscht.');?>',
+            edited: '<?php echo $this->translate->_('Die Sprachressource "{0}" wurde erfolgreich geändert.');?>',
+            created: '<?php echo $this->translate->_('Die Sprachressource "{0}" wurde erfolgreich erstellt.');?>',
+            noResourcesAssigned: '<?php echo $this->translate->_('Keine Sprach-Resourcen zugewiesen.');?>',
+            taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Sprach-Resourcen');?>',
+            exportTm: '<?php echo $this->translate->_('als TM Datei exportieren');?>',
+            exportTmx: '<?php echo $this->translate->_('als TMX Datei exportieren');?>',
+            exportZippedTmx: '<?php echo $this->translate->_('als gezippte TMX Datei exportieren');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.AddTmWindow", {
+        override: "Editor.view.LanguageResources.AddTmWindow",
+        strings: {
+            add: '<?php echo $this->translate->_('Sprachressource hinzufügen');?>',
+            resource: '<?php echo $this->translate->_('Ressource');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            file: '<?php echo $this->translate->_('TM/TMX-Datei (optional)');?>',
+            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
+            color: '<?php echo $this->translate->_('Farbe');?>',
+            categories: '<?php echo $this->translate->_('Kategorien');?>',
+            colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
+            customers: '<?php echo $this->translate->_('Für diese Kunden nutzen');?>',
+            mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
+            collection: '<?php echo $this->translate->_('TBX-Datei');?>',
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
+        }
+    });
+    
+    Ext.define("Editor.view.LanguageResources.TmWindowViewController", {
+        override: "Editor.view.LanguageResources.TmWindowViewController",
+        messages: {
+            notConfigured: '<?php echo $this->translate->_('Die Sprachresource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.EditTmWindow", {
+        override: "Editor.view.LanguageResources.EditTmWindow",
+        strings: {
+            edit: '<?php echo $this->translate->_('Sprachressource bearbeiten');?>',
+            resource: '<?php echo $this->translate->_('Ressource');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            file: '<?php echo $this->translate->_('TM-Datei');?>',
+            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
+            color: '<?php echo $this->translate->_('Farbe');?>',
+            colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
+            customers: '<?php echo $this->translate->_('Für diese Kunden nutzen');?>',
+            collection: '<?php echo $this->translate->_('TBX-Datei');?>',
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
+            categories: '<?php echo $this->translate->_('Kategorien');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.TmOverviewPanel", {
+        override: "Editor.view.LanguageResources.TmOverviewPanel",
+        title: '<?php echo $this->translate->_('Sprach-Resourcen');?>',
+        strings: {
+            name: '<?php echo $this->translate->_('Name');?>',
+            edit: '<?php echo $this->translate->_('Bearbeiten');?>',
+            tasks: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
+            erase: '<?php echo $this->translate->_('Löschen');?>',
+            resource: '<?php echo $this->translate->_('Ressource');?>',
+            refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
+            color: '<?php echo $this->translate->_('Farbe');?>',
+            addResource: '<?php echo $this->translate->_('Sprachressource hinzufügen');?>',
+            import: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen');?>',
+            importCollection: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen');?>',
+            noTaskAssigned: '<?php echo $this->translate->_('Keine Aufgaben zugewiesen.');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+            languageResourceStatusColumn: '<?php echo $this->translate->_('Status');?>',
+            languageResourceStatus: {
+                loading: '<?php echo $this->translate->_('Statusinformationen werden geladen');?>',
+                error: '<?php echo $this->translate->_('Fehler');?>',
+                available: '<?php echo $this->translate->_('verfügbar');?>',
+                unknown: '<?php echo $this->translate->_('unbekannt');?>',
+                noconnection: '<?php echo $this->translate->_('Keine Verbindung!');?>',
+                import: '<?php echo $this->translate->_('importiert');?>',
+                notloaded: '<?php echo $this->translate->_('verfügbar');?>',
+                novalidlicense: '<?php echo $this->translate->_('Keine gültige Lizenz.');?>',
+                notchecked: '<?php echo $this->translate->_('Nicht geprüft');?>',
+            },
+            taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
+            customers: '<?php echo $this->translate->_('Kunden');?>',
+        	defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
+        	useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
+            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.view.LanguageResources.services.TermCollection", {
+        override: "Editor.view.LanguageResources.services.TermCollection",
+        addTooltip: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen');?>',
+        exportTooltip: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
+    });
+
+    Ext.define("Editor.locale.view.LanguageResources.services.Default", {
+        override: "Editor.view.LanguageResources.services.Default",
+        exportTooltip: '<?php echo $this->translate->_('Exportieren');?>',
+        log: '<?php echo $this->translate->_('Log');?>'
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.services.OpenTM2", {
+        override: "Editor.view.LanguageResources.services.OpenTM2",
+        addTooltip: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen');?>',
+        download: '<?php echo $this->translate->_('Dateibasiertes TM herunterladen und lokal speichern');?>'
+    });
+
+    
+    Ext.define("Editor.locale.view.LanguageResources.ImportTmWindow", {
+        override: "Editor.view.LanguageResources.ImportTmWindow",
+        title: '<?php echo $this->translate->_('Sprach-Resourcen');?>',
+        strings: {
+            file: '<?php echo $this->translate->_('TMX-Datei');?>',
+            title: '<?php echo $this->translate->_('TMX Datei importieren');?>',
+            importTmx: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem bestehenden TM hinzufügen');?>',
+            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TMX Datei!');?>',
+            importSuccess: '<?php echo $this->translate->_('Weitere TM Daten erfolgreich importiert!');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.view.LanguageResources.ImportCollectionWindow", {
+        override: "Editor.view.LanguageResources.ImportCollectionWindow",
+        strings: {
+            title: '<?php echo $this->translate->_('TBX Datei importieren');?>',
+            file: '<?php echo $this->translate->_('TBX-Datei');?>',
+            importTbx: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen');?>',
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
+            importSuccess: '<?php echo $this->translate->_('Weitere Term-Collection Daten erfolgreich importiert!');?>',
+            save: '<?php echo $this->translate->_('Importieren');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
+            deleteTermEntriesDate:'<?php echo $this->translate->_('Terme löschen, deren letzte Berührung länger her ist als');?>',
+            deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
+            helpButtonTooltip:'<?php echo $this->translate->_('Info zum Term-Collection');?>',
+            deleteTermProposalsDate:'<?php echo $this->translate->_('Vorschläge löschen, deren letzte Berührung länger her ist als');?>',
+            deleteTermProposalsImport:'<?php echo $this->translate->_('Vorschläge löschen älter als aktueller Import');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.TaskGridWindow", {
+        override: "Editor.view.LanguageResources.TaskGridWindow",
+        strings: {
+            title: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
+            task: '<?php echo $this->translate->_('Aufgabe');?>',
+            state: '<?php echo $this->translate->_('Status');?>',
+            inUse: '<?php echo $this->translate->_('Status "{0}" durch einen anderen Benutzer');?>',
+            close: '<?php echo $this->translate->_('Schließen');?>',
+            reimport: '<?php echo $this->translate->_('Aufgaben reimportieren');?>',
+            reimportTooltip: '<?php echo $this->translate->_('Ausgewählte Aufgaben erneut ins aktuelle TM importieren');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.de.view.MaintenancePanel", {
+        override: "Editor.view.MaintenancePanel",
+        maintenanceMessage: '<?php echo $this->translate->_("<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Die Anwendung wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>");?>'
+    });
+    
+    Ext.define("Editor.locale.view.LanguageCombo", {
+        override: "Editor.view.LanguageCombo",
+        strings: {
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            neutral: '<?php echo $this->translate->_('Sprache');?>'
+        }
+    });
+
+    this.initPluginTranslations();
+  }
+});
+<?php
+
+$paths = $this->pluginLocale()->getLocalePaths();
+foreach($paths as $path) {
+    require $path;
+}
+
+exit;

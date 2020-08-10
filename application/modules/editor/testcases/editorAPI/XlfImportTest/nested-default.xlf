@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xliff version="1.1" xmlns="urn:oasis:names:tc:xliff:document:1.1" xmlns:tmgr="http://www.ibm.com">
+  <file datatype="plaintext" original="testfile1.html" source-language="en-US" target-language="de-DE" tool="OpenTM2">
+    <header>
+      <tmgr:properties>
+        <tmgr:folder>TEST_M01</tmgr:folder>
+        <tmgr:markup>IBMUHTM3</tmgr:markup>
+        <tmgr:sourcelang>English(U.S.)</tmgr:sourcelang>
+        <tmgr:targetlang>German(reform)</tmgr:targetlang>
+        <tmgr:shortname>TESTFILE.000</tmgr:shortname>
+        <tmgr:shipment>1</tmgr:shipment>
+      </tmgr:properties>
+    </header>
+    <body>
+      <trans-unit id="1" translate="yes">
+        <source>Apache 2.x on Unix systems - Manual</source>
+        <target state="translated">Apache 2.0 auf Unixsystemen - Manual</target>
+      </trans-unit>
+      <trans-unit id="2" translate="yes">
+        <source>PHP Manual</source>
+        <target state="translated">PHP Manual</target>
+      </trans-unit>
+      <trans-unit id="3" translate="yes">
+        <source>Installation and Configuration</source>
+        <target state="translated">Installation und Konfiguration</target>
+      </trans-unit>
+      <trans-unit id="4" translate="yes">
+        <source>Apache 1.3.x on Unix systems</source>
+        <target state="translated">Apache 1.3.x auf Unix-Systemen</target>
+      </trans-unit>
+      <group translate="yes">
+        <trans-unit id="5">
+          <source>Using the translate group attribute "yes" as default</source>
+          <target state="translated">Nutze das translate Gruppenattribut "yes" als Standard</target>
+        </trans-unit>
+        <trans-unit id="6" translate="yes">
+          <source>Override the translate group attribute "yes" with "yes"</source>
+          <target state="translated">Überschreibe das translate Gruppenattribut "yes" mit "yes"</target>
+        </trans-unit>
+        <trans-unit id="7" translate="no">
+          <source>Override the translate group attribute "yes" with "no" - segment not visible therefore</source>
+          <target state="translated">Überschreibe das translate Gruppenattribut "yes" mit "no" - das Segment ist daher unsichtbar</target>
+        </trans-unit>
+          <group translate="no">
+            <trans-unit id="8">
+            <source>Using the translate group attribute "no" as default</source>
+            <target state="translated">Nutze das translate Gruppenattribut "yes" als Standard</target>
+            </trans-unit>
+            <trans-unit id="9" translate="yes">
+            <source>Override the translate group attribute "yes" with "yes"</source>
+            <target state="translated">Überschreibe das translate Gruppenattribut "yes" mit "yes"</target>
+            </trans-unit>
+            <trans-unit id="10" translate="no">
+            <source>Override the translate group attribute "yes" with "no" - segment not visible therefore</source>
+            <target state="translated">Überschreibe das translate Gruppenattribut "yes" mit "no" - das Segment ist daher unsichtbar</target>
+            </trans-unit>
+        </group>
+      </group>
+      <trans-unit id="6" translate="yes">
+        <source>Test a hard return
+</source>
+        <target state="translated">Teste einen harten Umbruch
+</target>
+      </trans-unit>
+      <trans-unit id="7" translate="yes">
+        <source>Test a hard return</source>
+        <target state="translated">Teste einen harten Umbruch</target>
+      </trans-unit>
+      
+      <trans-unit id="3" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="AUTOSUBST" tmgr:matchratio="100">
+        <source>iOS Password Policy</source>
+        <target state="translated">iOS-Kennwortrichtlinie</target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">3</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="5" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="AUTOSUBST" tmgr:matchratio="100">
+        <source>Allow Simple Value</source>
+        <target state="translated">Einfachen Wert zulassen</target>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">3</count>
+        </count-group>
+      </trans-unit>
+  </file>
+  <file datatype="plaintext" original="testfile2.html" source-language="en-US" target-language="de-DE" tool="OpenTM2">
+    <header>
+      <tmgr:properties>
+        <tmgr:folder>TEST_M01</tmgr:folder>
+        <tmgr:markup>IBMNJDK2</tmgr:markup>
+        <tmgr:sourcelang>English(U.S.)</tmgr:sourcelang>
+        <tmgr:targetlang>German(reform)</tmgr:targetlang>
+        <tmgr:shortname>TESTFILE.001</tmgr:shortname>
+        <tmgr:shipment>1</tmgr:shipment>
+      </tmgr:properties>
+    </header>
+    <body>
+      <trans-unit id="1" translate="yes">
+        <source>Test same id again - which is valid!</source>
+        <target state="translated">Teste die gleiche ID nochmals - was zulässig ist!</target>
+      </trans-unit>        
+    </body>
+  </file>
+</xliff>

@@ -1,0 +1,12 @@
+mid,quelle,target
+1,Das ist eine rotes Haus,Questo e un casa roso.
+2,Hier ist das <b>Alignment</b> noch in Ordnung.,RELAIS - Here the alignment is OK.
+3,"Falscher Source Text, MID OK. FALSCH","RELAIS – Wrong Source Text here, MID OK."
+4,Hier ist das Alignment wieder in Ordnung.,RELAIS – Here the alignment is OK again.
+5,Hier ist das <b>Alignment</b> wieder in Ordnung 2.,RELAIS – Here the alignment is OK again 2.
+6,Hier ist das Alignment wieder in Ordnung 3.,RELAIS – Here the alignment is OK again 3.
+7,Segment mit ignorierten und unterschiedlichen <b>Tags</b>,RELAIS - Segment with ignored and different tags,Tags am Ende des Segments da dort der Whitespace nicht stehen bleiben darf
+8,Segment mit <b>ignorierten</b> und gleichen Tags,RELAIS – Segment with ignored and equal tags
+9,"Segment mit &quot;unterschiedlicher"" Entity Encodierung",RELAIS – Segment with different entity encoding
+10,"Segment mit ""gleicher"" Entity Encodierung",RELAIS – Segment with equal entity encoding
+11,Segment mit &quot;gleicher&quot; Entity Encodierung,RELAIS – Segment with equal entity encoding

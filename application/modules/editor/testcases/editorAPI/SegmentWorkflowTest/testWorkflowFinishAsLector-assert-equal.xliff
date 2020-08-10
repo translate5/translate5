@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dx="http://www.interoperability-now.org/schema" xmlns:sdl="http://sdl.com/FileTypes/SdlXliff/1.0" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-doc-1_0_extensions.xsd" dx:version="1.4" xmlns:translate5="http://www.translate5.net/" translate5:taskname="API Testing::SegmentWorkflowTest" translate5:taskguid="TASKGUID">
+<!-- attention: this format should be refactored to xliff 2.x. It will be, as soon as some one volunteers to do or donates funding for it -->
+<!-- attention: currently the usage of g- and x-tags in this doc is not completely in line with the xliff:doc-spec. This will change, when resources for this issue will be assigned -->
+<!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: all content is exported as it comes from CSV, this can result in invalid XLIFF! -->
+<!-- attention: MQM Tags are not exported at all! -->
+<file datatype="x-translate5" original="install-unix.apache2.html.sdlxliff" source-language="en" target-language="de" xml:space="preserve">
+<body>
+
+<trans-unit id="3" translate5:autostateId="1" translate5:autostateText="reviewed">
+<source>PHP Manual</source>
+<target state="translated" dx:match-quality="100.0">PHP Handbuch</target>
+<alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
+<target xml:lang="de">PHP Manual</target></alt-trans>
+<alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
+<target xml:lang="de">PHP <mrk mtype="x-sdl-added" sdl:revid="2a163962-c5a5-42e9-bef4-8ea930266b86">Handbuch</mrk><mrk mtype="x-sdl-deleted" sdl:revid="d36c8540-f873-4b2e-8102-bca83547d6f2">Manual</mrk></target></alt-trans>
+<state stateid="0"></state>
+<dx:qa-hits></dx:qa-hits>
+</trans-unit>
+
+<trans-unit id="5" translate5:autostateId="1" translate5:autostateText="reviewed">
+<source>Installation on Unix systems &amp; umlaut test äöü &lt; &lt;iamnotag&gt;</source>
+<target state="translated" dx:match-quality="100.0">Installation auf Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt; - bearbeitet durch den Testcode</target>
+<alt-trans alttranstype="previous-version" dx:origin-shorttext="target">
+<target xml:lang="de">Installation auf Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt;</target></alt-trans>
+<alt-trans alttranstype="reference" dx:origin-shorttext="target-diff">
+<target xml:lang="de">Installation auf Unix-Systemen &amp; Umlaut Test äöü &lt; &lt;ichbinkeintag&gt;<mrk mtype="x-sdl-added" sdl:revid="replaced-for-testing"> - bearbeitet durch den Testcode</mrk></target></alt-trans>
+<state stateid="0"/>
+<dx:qa-hits/>
+</trans-unit>
+
+<trans-unit id="7" translate5:autostateId="1" translate5:autostateText="reviewed">
+<source><mrk mtype="term" translate5:status="preferredTerm" translate5:translated="undefined">Apache</mrk> 2.x  on Unix systems</source>
+<target state="translated" dx:match-quality="0.0">Apache 2.x auf Unix-Systemen</target>
+<alt-trans dx:origin-shorttext="target" alttranstype="previous-version">
+<target xml:lang="de"></target></alt-trans>
+<alt-trans dx:origin-shorttext="target-diff" alttranstype="reference">
+<target xml:lang="de"><mrk mtype="x-sdl-added" sdl:revid="460dd477-a7fa-4568-aa8c-2e92179e25f3">Apache 2.x auf Unix-Systemen</mrk></target></alt-trans>
+<state stateid="0"></state>
+<dx:qa-hits></dx:qa-hits>
+</trans-unit>
+</body>
+</file>
+</xliff>

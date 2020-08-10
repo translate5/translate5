@@ -1,0 +1,230 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<!DOCTYPE martif SYSTEM "TBXcoreStructV02.dtd">
+<martif type="TBX" xml:lang="de-DE">
+    <martifHeader>
+        <fileDesc>
+            <sourceDesc>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <p type="XCSURI">./TBXXCSV02.xcs</p>
+        </encodingDesc>
+    </martifHeader>
+    <text>
+        <body>
+<termEntry id="termEntry_193">
+  <langSet xml:lang="de-DE">
+<descripGrp><descrip type="Definition">Ein Sieb mit einer Bürste, dass sich dreht ;-)</descrip></descripGrp>
+    <tig id="tig_193_de-DE_1">
+      <term id="term_193_de-DE_1">Drehbürstensieb</term>
+      <termNote type="normativeAuthorization">admittedTerm</termNote>
+    </tig>
+<tig id="tig_193_de-DE_1X">
+      <term id="term_193_de-DE_1X">Testsynonym DE</term>
+      <termNote type="normativeAuthorization">supersededTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+<descripGrp><descrip type="Definition">Spanischer Beschreibungstexttest</descrip></descripGrp>
+    <tig id="tig_193_es-ES_1">
+      <term id="term_193_es-ES_1">Tamiz de cepillos rotativos</term>
+    </tig>
+  </langSet>
+</termEntry>
+<termEntry id="termEntry_194">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_194_de-DE_1">
+      <!-- Ebene Terme Terminologie/terme-->
+      <term id="term_194_de-DE_1">tolles Drehbürstensieb</term>
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+    <tig id="tig_194_es-ES_1">
+      <!-- Ebene Terme Terminologie/terme-->
+      <term id="term_194_es-ES_1">Gran tamiz de cepillos rotativos</term>
+    </tig>
+  </langSet>
+</termEntry>
+<termEntry id="termEntry_195">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_195_de-DE_1">
+      <term id="term_195_de-DE_1">Haus</term>
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+    <tig id="tig_195_es-ES_1">
+      <term id="term_195_es-ES_1">casa</term>
+    </tig>
+  </langSet>
+</termEntry>
+
+<termEntry id="termEntry_196">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_196_de-DE_1">
+      <term id="term_196_de-DE_1">H2O</term>
+      <termNote type="normativeAuthorization">preferredTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+    <tig id="tig_196_es-ES_1">
+      <term id="term_196_es-ES_1">H2O</term>
+      <termNote type="normativeAuthorization">preferredTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+</termEntry>
+
+<termEntry id="termEntry_197">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_197_de-DE_1">
+      <term id="term_197_de-DE_1">AcM.G</term>
+      <termNote type="normativeAuthorization">preferredTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+    <tig id="tig_197_es-ES_1">
+      <term id="term_197_es-ES_1">AcM.G</term>
+    </tig>
+  </langSet>
+</termEntry>
+
+<termEntry id="termEntry_198">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_198_de-DE_1">
+      <term id="term_198_de-DE_1">[Fe(CN)6]3</term>
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+    <tig id="tig_198_es-ES_1">
+      <!-- Ebene Terme Terminologie/terme-->
+      <term id="term_198_es-ES_1">[Fe(CN)6]3</term>
+    </tig>
+  </langSet>
+</termEntry>
+
+<termEntry id="termEntry_199">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_199_de-DE_1">
+      <term id="term_199_de-DE_1">2 Fe(NH4)2(SO4)2*3H2O</term>
+      <termNote type="normativeAuthorization">deprecatedTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+    <tig id="tig_199_es-ES_1">
+      <term id="term_199_es-ES_1">2 Fe(NH4)2(SO4)2*3H2O</term>
+      <termNote type="normativeAuthorization">deprecatedTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+</termEntry>
+
+<termEntry id="termEntry_199x">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_199_de-DE_1x">
+      <term id="term_199_de-DE_1x">Abschnitt</term>
+      <termNote type="normativeAuthorization">deprecatedTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+    <tig id="tig_199_es-ES_1x">
+      <term id="term_199_es-ES_1x">segmento</term>
+      <termNote type="normativeAuthorization">deprecatedTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+</termEntry>
+
+<termEntry id="termEntry_200">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_200_de-DE_1">
+      <term id="term_200_de-DE_1">Wandring</term>
+      <termNote type="normativeAuthorization">admittedTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+    <tig id="tig_200_es-ES_1">
+      <term id="term_200_es-ES_1">pavillon</term>
+    </tig>
+  </langSet>
+</termEntry>
+
+
+<termEntry id="termEntry_201">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_201_de-DE_1">
+      <term id="term_201_de-DE_1">Belüftung</term>
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+    <tig id="tig_201_es-ES_1">
+      <term id="term_201_es-ES_1">aspiration</term>
+      <termNote type="normativeAuthorization">admittedTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+</termEntry>
+
+<termEntry id="termEntry_202">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_202_de-DE_1">
+      <term id="term_202_de-DE_1">Belüftung</term>
+      <termNote type="normativeAuthorization">admittedTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+    <tig id="tig_202_es-ES_1">
+      <term id="term_202_es-ES_1">aspiration</term>
+      <termNote type="normativeAuthorization">admittedTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+</termEntry>
+
+<termEntry id="termEntry_203">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_203_de-DE_1">
+      <term id="term_203_de-DE_1">Einströmdüse</term>
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+    <tig id="tig_203_es-ES_1">
+      <term id="term_203_es-ES_1">pavillon d'aspiration</term>
+    </tig>
+  </langSet>
+</termEntry>
+
+<termEntry id="termEntry_204">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_204_de-DE_1">
+      <term id="term_204_de-DE_1">Einströmdüsexxx</term>
+      <termNote type="normativeAuthorization">admittedTerm</termNote>
+      <!--Stati: admittedTerm = ohne Status, preferredTerm = freigegeben, deprecatedTerm = gesperrt, supersededTerm = geloeschter Eintrag -->
+    </tig>
+  </langSet>
+  <langSet xml:lang="es-ES">
+    <tig id="tig_204_es-ES_1">
+      <!-- Ebene Terme Terminologie/terme-->
+      <term id="term_204_es-ES_1">pavillon d aspiration</term>
+    </tig>
+  </langSet>
+</termEntry>
+
+<termEntry id="termEntry_205">
+  <langSet xml:lang="de-DE">
+    <tig id="tig_205_de-DE_1">
+      <!-- Ebene Terme Terminologie/terme-->
+      <term id="term_205_de-DE_1">IM</term>
+    </tig>
+  </langSet>
+</termEntry>
+
+        </body>
+    </text>
+</martif>

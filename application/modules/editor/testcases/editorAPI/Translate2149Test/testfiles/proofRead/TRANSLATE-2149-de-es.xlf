@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file original="word/styles.xml" source-language="es" target-language="de" datatype="x-undefined">
+<body>
+</body>
+</file>
+<file original="word/document.xml" source-language="es" target-language="de" datatype="x-undefined">
+<body>
+<trans-unit id="NFDBB2FA9-tu1" xml:space="preserve">
+<source xml:lang="es"><it id="1" pos="open">&lt;run1></it>Das ist das Haus <bpt id="2">&lt;run2></bpt>des Nikolaus<ept id="2">&lt;/run2></ept>das steht am <bpt id="3">&lt;run3></bpt>Südpol<ept id="3">&lt;/run3></ept> (oder war es der <bpt id="4">&lt;run4></bpt>Nordpol<ept id="4">&lt;/run4></ept>), <bpt id="5">&lt;run5></bpt>oder sogar<ept id="5">&lt;/run5></ept> ein <bpt id="6">&lt;run6></bpt>Test<ept id="6">&lt;/run6></ept>, Text für Translate5 <bpt id="7">&lt;run7></bpt>Der nur den Sinn hat<ept id="7">&lt;/run7></ept>.  Text der von extern kommt zu ersetzen “<bpt id="8">&lt;run8></bpt>damit wir keine Probleme mit dem Urheberrecht bekommen”. <ept id="8">&lt;/run8></ept><it id="1" pos="close">&lt;/run1></it></source>
+<seg-source><mrk mid="0" mtype="seg"><it id="1" pos="open">&lt;run1></it>Das ist das Haus <bpt id="2">&lt;run2></bpt>des Nikolaus<ept id="2">&lt;/run2></ept>das steht am <bpt id="3">&lt;run3></bpt>Südpol<ept id="3">&lt;/run3></ept> (oder war es der <bpt id="4">&lt;run4></bpt>Nordpol<ept id="4">&lt;/run4></ept>), <bpt id="5">&lt;run5></bpt>oder sogar<ept id="5">&lt;/run5></ept> ein <bpt id="6">&lt;run6></bpt>Test<ept id="6">&lt;/run6></ept>, Text für Translate5 <bpt id="7">&lt;run7></bpt>Der nur den Sinn hat<ept id="7">&lt;/run7></ept>.</mrk>  <mrk mid="1" mtype="seg">Text der von extern kommt zu ersetzen “<bpt id="8">&lt;run8></bpt>damit wir keine Probleme mit dem Urheberrecht bekommen”. <ept id="8">&lt;/run8></ept><it id="1" pos="close">&lt;/run1></it></mrk></seg-source>
+<target xml:lang="de"></target>
+</trans-unit>
+</body>
+</file>
+<file original="word/settings.xml" source-language="es" target-language="de" datatype="x-undefined">
+<body>
+</body>
+</file>
+</xliff>

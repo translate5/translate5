@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="tagInTerm" creator="MittagQI" mandatory="no" sourceLang="DE" targetLang="ES" tbxPath="translate5-Standard-Testcases-DE-ES.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Term with a tag inside of a word</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source> Drehbür<div class="single 782069643d223622202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="6-1-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div>stensieb.</source>
+            <target>Tamiz de cepillos rotat<div class="single 782069643d223522202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="5-2-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div>ivos.</target>
+        </input>
+        <expectedOutput>
+            <source> <div title="" class="term admittedTerm exact transNotFound" data-tbxid="term_0000001_001_de-DE_001_0000001">Drehbür<div class="single 782069643d223622202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="6-1-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div>stensieb</div>.</source>
+            <target><div title="" class="term admittedTerm exact transNotFound" data-tbxid="term_0000001_001_de-DE_001_0000001">Tamiz de cepillos rotat<div class="single 782069643d223522202f"><span title="&lt;br/&gt;" class="short">&lt;1/&gt;</span><span id="5-2-c5a0e9b5c299ec39a2fb26fa8b1c0dcf" class="full">&lt;br/&gt;</span></div>ivos</div>.</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

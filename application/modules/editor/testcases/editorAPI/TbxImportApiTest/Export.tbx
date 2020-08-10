@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE martif SYSTEM  "./TBXcdv04.dtd">
+	<martif type="TBX" xml:lang="en">
+		<martifHeader>
+			<fileDesc>
+				<sourceDesc>
+					<p>TBX export</p>
+				</sourceDesc>
+			</fileDesc>
+		</martifHeader>
+		<text>
+			<body>
+				<termEntry id="ide39f16f4-7f25-42f0-8f05-f470454089b2">
+					<descrip type="thesaurusDescriptor" target="ide36c2eba-0e69-405b-9348-97ba49d51e41">Default across Server</descrip>
+					<ref type="subjectField" target="id0E9A4B4C-1893-4cac-B3B0-F0B190DF3274">General</ref>
+					<transacGrp>
+						<transac>creation</transac>
+						<date>2018-03-22</date>
+						<transacNote type="responsiblePerson">Default Supervisor</transacNote>
+					</transacGrp>
+					<transacGrp>
+						<transac>modification</transac>
+						<date>2018-03-22</date>
+						<transacNote type="responsiblePerson">Default Supervisor</transacNote>
+					</transacGrp>
+					<langSet xml:lang="de-de">
+						<descripGrp>
+							<descrip type="definition" xml:lang="de-de">Ein Schreibgerät</descrip>
+							<transacGrp>
+								<transac>creation</transac>
+								<date>2018-03-22</date>
+								<transacNote type="responsiblePerson">Default Supervisor</transacNote>
+							</transacGrp>
+							<transacGrp>
+								<transac>modification</transac>
+								<date>2018-03-22</date>
+								<transacNote type="responsiblePerson">Default Supervisor</transacNote>
+							</transacGrp>
+							<note>Dieser Eintrag ist vorläufig</note>
+						</descripGrp>
+						<tig>
+							<term id="id08753133-db38-432b-85a5-c303c1624555">Kugelschreiber</term>
+							<termNote type="processStatus">finalized</termNote>
+							<termNote type="usageNote">Bitte immer verwenden, wenn der Text Hochdeutsch ist</termNote>
+							<termNote type="termType">main entry term</termNote>
+							<termNote type="partOfSpeech">noun</termNote>
+							<termNote type="grammaticalGender">masculine</termNote>
+							<termNote type="across_ISO_picklist_Usage">standard</termNote>
+							<admin type="projectSubset" target="id95535a52-5ba1-4ac2-9edd-c6291646de27">marcstest</admin>
+							<admin type="projectSubset" target="idf029bbb8-250e-4ecd-b8ad-8fdc4bf8c1ed">S</admin>
+							<admin type="customerSubset" target="ida257e5b4-db0f-433e-b353-095205e812af">Testkunde 1</admin>
+							<transacGrp>
+								<transac>creation</transac>
+								<date>2018-03-22</date>
+								<transacNote type="responsiblePerson">Default Supervisor</transacNote>
+							</transacGrp>
+							<transacGrp>
+								<transac>modification</transac>
+								<date>2018-03-22</date>
+								<transacNote type="responsiblePerson">Default Supervisor</transacNote>
+							</transacGrp>
+						</tig>
+						<tig>
+							<term id="id053ba3e2-9152-4100-a502-cfcdf9f08683">Kuli</term>
+							<termNote type="processStatus">finalized</termNote>
+							<termNote type="termType">abbreviated form of term</termNote>
+							<termNote type="partOfSpeech">noun</termNote>
+							<termNote type="grammaticalGender">masculine</termNote>
+							<termNote type="across_ISO_picklist_Usage">do not use</termNote>
+							<admin type="customerSubset" target="ida257e5b4-db0f-433e-b353-095205e812af">Testkunde 1</admin>
+							<transacGrp>
+								<transac>creation</transac>
+								<date>2018-03-22</date>
+								<transacNote type="responsiblePerson">Default Supervisor</transacNote>
+							</transacGrp>
+							<transacGrp>
+								<transac>modification</transac>
+								<date>2018-03-22</date>
+								<transacNote type="responsiblePerson">Default Supervisor</transacNote>
+							</transacGrp>
+						</tig>
+					</langSet></termEntry>
+			</body>
+			<back>
+<refObjectList type="subjectFieldSet">
+	<refObject id="id0E9A4B4C-1893-4cac-B3B0-F0B190DF3274">
+		<item type="subjectFieldName">General</item>
+	</refObject>
+</refObjectList>
+<refObjectList type="projectSet">
+	<refObject id="id95535a52-5ba1-4ac2-9edd-c6291646de27">
+		<item type="projectName">marcstest</item>
+	</refObject>
+	<refObject id="idf029bbb8-250e-4ecd-b8ad-8fdc4bf8c1ed">
+		<item type="projectName">S</item>
+	</refObject>
+</refObjectList>
+<refObjectList type="customerSet">
+	<refObject id="ida257e5b4-db0f-433e-b353-095205e812af">
+		<item type="customerName">Testkunde 1</item>
+	</refObject>
+</refObjectList>
+<refObjectList type="thesaurusDescrip">
+	<refObject id="ide36c2eba-0e69-405b-9348-97ba49d51e41">
+		<item type="thesaurusName">Default across Server</item>
+		<item type="thesaurusDescription"></item>
+		<item type="thesaurusSys">DictionaryDefault</item>
+		<item type="thesaurusImage">XXX</item>
+		<item type="thesaurusOwner">b6bacbf7-a2f3-484e-a803-17aedf423114</item>
+	</refObject>
+</refObjectList>
+</back>
+</text>
+</martif>

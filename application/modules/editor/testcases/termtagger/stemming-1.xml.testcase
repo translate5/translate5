@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="stopWordsOverwrite1" creator="beo" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="DE-EN-stemming.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Prüft, ob die Überschreibungsregel für die Stoppwortliste funktioniert. (Überschreibung ist case-sensitive)</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Die Automobilbranche, die Automobilbranche</source>
+            <target>The automotive industry, the automotive industry</target>
+        </input>
+        <expectedOutput>
+            <source>Die Automobilbranche, <div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">die</div> Automobilbranche</source>
+            <target><div title="" class="term admittedTerm lowercase" data-tbxid="xyz">The</div> automotive industry, <div title="" class="term admittedTerm exact" data-tbxid="xyz">the</div> automotive industry</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

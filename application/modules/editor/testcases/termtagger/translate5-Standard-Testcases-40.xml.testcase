@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="termsSurroundedByDoubleQuotes" creator="beo" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>Terms surrounded by simple quotes must be recognized.</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>Wir alle lieben "Geschenke".</source>
+            <target>We all love "gifts".</target>
+        </input>
+        <expectedOutput>
+            <source>Wir alle lieben "<div title="" class="term preferredTerm stemmed transFound" data-tbxid="">Geschenke</div>".</source>
+            <target>We all love "<div title="" class="term preferredTerm stemmed" data-tbxid="">gifts</div>".</target>
+        </expectedOutput>
+    </assertion>
+</testcase>

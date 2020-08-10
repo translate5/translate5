@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="termThatIncludesDashAndSlash" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="translate5-Standard-Testcases-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>A term that includes a dash and a slash must be recognized</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>CD/DVD-Laufwerk</source>
+            <target>CD/DVD drive</target>
+        </input>
+        <expectedOutput>
+            <source><div title="" class="term admittedTerm exact transFound" data-tbxid="xyz">CD/DVD-Laufwerk</div></source>
+            <target><div title="" class="term admittedTerm exact" data-tbxid="xyz">CD/DVD drive</div></target>
+        </expectedOutput>
+    </assertion>
+</testcase>

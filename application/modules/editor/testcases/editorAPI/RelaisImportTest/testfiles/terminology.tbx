@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<martif xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="TBXcsV02.xsd" type="TBX" lang="en">
+  <martifHeader>
+    <fileDesc>
+      <sourceDesc>
+        Testdatei beoTerm
+      </sourceDesc>
+    </fileDesc>
+  </martifHeader>
+
+  <text>
+    <body>
+
+		<termEntry id="termEntry_01">
+			<langSet lang="de">
+				<tig id="tig_01_1_00001_de">
+					<term id="term_01_1_de_1_00001">kleines haus</term>
+					<termNote type="normativeAuthorization">preferredTerm</termNote>
+
+				</tig>
+			</langSet>
+			<langSet lang="en">
+				<tig id="tig_01_1_00002_en">
+					<term id="term_01_1_en_1_00002">small house</term>
+					<termNote type="normativeAuthorization">preferredTerm</termNote>
+				</tig>
+			</langSet>
+		</termEntry>
+		
+		<termEntry id="termEntry_02">
+			<langSet lang="de">
+				<tig id="tig_02_1_00003_de">
+					<term id="term_02_1_de_1_00003">kleines, teures</term>
+					<termNote type="normativeAuthorization">preferredTerm</termNote>
+
+				</tig>
+			</langSet>
+			<langSet lang="en">
+				<tig id="tig_02_1_00004_en">
+					<term id="term_02_1_en_1_00004">small, expensive</term>
+					<termNote type="normativeAuthorization">preferredTerm</termNote>
+				</tig>
+			</langSet>
+		</termEntry>
+		
+		<termEntry id="termEntry_03">
+			<langSet lang="de">
+				<tig id="tig_03_1_00005_de">
+					<term id="term_03_1_de_1_00005">ein</term>
+					<termNote type="normativeAuthorization">preferredTerm</termNote>
+				</tig>
+			</langSet>
+			<langSet lang="en">
+				<tig id="tig_03_1_00006_en">
+					<term id="term_03_1_en_1_00006">a</term>
+					<termNote type="normativeAuthorization">preferredTerm</termNote>
+				</tig>
+			</langSet>
+		</termEntry>
+		
+		<termEntry id="termEntry_04">
+			<langSet lang="de">
+				<tig id="tig_04_1_00007_de">
+					<term id="term_04_1_de_1_00007">kleines</term>
+				</tig>
+			</langSet>
+			<langSet lang="en">
+				<tig id="tig_04_1_00008_en">
+					<term id="term_04_1_en_1_00008">small</term>
+				</tig>
+			</langSet>
+			<langSet lang="en">
+				<tig id="tig_04_1_00009_en">
+					<term id="term_04_1_en_1_00009">little</term>
+				</tig>
+			</langSet>
+		</termEntry>
+		
+		<termEntry id="termEntry_05">
+			<langSet lang="de">
+				<tig id="tig_05_1_00010a_de">
+					<term id="term_05_1_de_1_00010a">Burg</term>
+					<termNote type="normativeAuthorization">deprecatedTerm</termNote>
+				</tig>
+				<tig id="tig_05_1_00010_de">
+					<term id="term_05_1_de_1_00010">haus</term>
+					<termNote type="normativeAuthorization">preferredTerm</termNote>
+				</tig>
+				<tig id="tig_05_1_00010b_de">
+					<term id="term_05_1_de_1_00010b">schloss</term>
+					<termNote type="normativeAuthorization">standardizedTerm</termNote>
+				</tig>
+			</langSet>
+			<langSet lang="en">
+				<tig id="tig_05_1_00011_en">
+					<term id="term_05_1_en_1_00011a">house</term>
+					<termNote type="normativeAuthorization">preferredTerm</termNote>
+				</tig>
+				<tig id="tig_05_1_00011a_en">
+					<term id="term_05_1_en_1_00011b">royal castle</term>
+					<termNote type="normativeAuthorization">standardizedTerm</termNote>
+				</tig>
+				<tig id="tig_05_1_00011b_en">
+					<term id="term_05_1_en_1_00011c">castle</term>
+					<termNote type="normativeAuthorization">deprecatedTerm</termNote>
+				</tig>
+			</langSet>
+			<langSet lang="it">
+				<tig id="tig_05_1_00012_it">
+					<term id="term_05_1_it_1_00012">casa</term>
+					<termNote type="normativeAuthorization">standardizedTerm</termNote>
+				</tig>
+			</langSet>
+		</termEntry>
+		
+		<termEntry id="termEntry_06">
+			<langSet lang="de">
+				<tig id="tig_06_1_00013_de">
+					<term id="term_06_1_de_1_00013">haus</term>
+					<termNote type="normativeAuthorization">standardizedTerm</termNote>
+				</tig>
+			</langSet>
+			<langSet lang="en">
+				<tig id="tig_06_1_00014_en">
+					<term id="term_06_1_en_1_00014">home</term>
+					<termNote type="normativeAuthorization">deprecatedTerm</termNote>
+				</tig>
+			</langSet>
+		</termEntry>
+		
+		<termEntry id="termEntry_07">
+			<langSet lang="de">
+				<tig id="tig_07_1_00015_de">
+					<term id="term_07_1_de_1_00015">Vorwort</term>
+					<termNote type="normativeAuthorization">legalTerm</termNote>
+				</tig>
+			</langSet>
+		</termEntry>
+		
+		<termEntry id="termEntry_08">
+			<langSet lang="en">
+				<tig id="tig_08_1_00016_en">
+					<term id="term_08_1_en_1_00016">auto</term>
+				</tig>
+			</langSet>
+		</termEntry>
+		
+		<termEntry id="termEntry_09">
+			<langSet lang="de">
+			<descripGrp><descrip type="Definition">Bezeichnet einen Prozess oder Modul des Apache, welches genutzt wird, bevor der Prozess sich verzweigt. Englischer Begriff, sollte im Deutschen nicht verwendet werden.</descrip></descripGrp>
+				<tig id="tig_09_1_00017_de">
+					<term id="f_term_de">prefork</term>
+					<termNote type="normativeAuthorization">supersededTerm</termNote>
+				</tig>
+			</langSet>
+		</termEntry>
+		
+		<termEntry id="termEntry_10">
+			<langSet lang="en">
+				<tig id="tig_10_1_00018_en">
+					<term id="term_10_1_en_1_00018">MPM-Module</term>
+				</tig>
+			</langSet>
+		</termEntry>
+		
+		<termEntry id="termEntry_11">
+			<langSet lang="en">
+				<descripGrp><descrip type="Definition">Apache is the standard webserver and is released as open source under the Apache license.</descrip></descripGrp>
+				<tig id="tig_11_1_00019_en">
+					<term id="term_11_1_en_1_00019">Apache</term>
+					<termNote type="normativeAuthorization">preferredTerm</termNote>
+				</tig>
+			</langSet>
+		</termEntry>
+		
+		<termEntry id="termEntry_10a">
+			<langSet lang="de">
+				<tig id="a_de">
+					<term id="a_term_de">empfohlene Einstellung</term>
+					<termNote type="normativeAuthorization">preferredTerm</termNote>
+				</tig>
+				<tig id="b_de">
+					<term id="b_term_de">Einstellung</term>
+					<termNote type="normativeAuthorization">supersededTerm</termNote>
+				</tig>
+				<tig id="c_de">
+					<term id="c_term_de">nahegelegte Einstellung</term>
+					<termNote type="normativeAuthorization">admittedTerm</termNote>
+				</tig>
+			</langSet>
+			<langSet lang="en">
+				<tig id="a_en">
+					<term id="a_term_en">recommended setup</term>
+					<termNote type="normativeAuthorization">preferredTerm</termNote>
+				</tig>
+			</langSet>
+		</termEntry>
+
+	</body>
+  </text>
+
+</martif>

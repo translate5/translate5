@@ -1,0 +1,86 @@
+============
+Benötigte php-Extensions:
+- dom
+- php_gd2 mit Freetype-Support
+- mb_string
+- iconv
+
+============
+Benötigte Softwarebibliotheken:
+- ExtJs 4.0.7
+- Zend Framework 1.11.12 oder höher innerhalb der Linie 1.11 (vermutlich ist auch innerhalb der Linie 1.12 ein Upgrade problemlos)
+
+============
+Benötigte ZF-Voraussetzungen:
+- Benötigt im ZF-Default-Modul einen LoginController mit einer Methode logoutAction,
+  die den Logout des aktuellen Benutzers sicherstellt.
+
+============
+SQL einspielen
+
+- Das sql-File unter /application/moduls/editor/docs/editor-mmsql.sql bzw.
+  /application/moduls/editor/docs/editor-mysql.sql muss im MSSQL- bzw. MySQL-Server eingespielt werden
+Achtung: Die mysql-Variante setzt derzeit einen factory-Overwrite der Klasse
+editor_Models_Languages voraus, der die language-Daten nicht aus einer sql-Tabelle bezieht
+
+============
+Schreibrechte setzen
+
+- Schreibrechte für den Webserver unterhalb von
+    -- /public/modules/editor/images/imageTags
+    -- /public/modules/editor/images/imageTagsJson
+============
+Hinweis:
+- Die Grafiken für die short-Tags werden nicht beim Import automatisch generiert,
+  da sie immer in allen Projekten gleich sind. Sie liegen daher bereits fertig
+  generiert im Tag-Grafiken-Ordner unter /public/modules/editor/images/imageTags -
+  dort wo auch die full-Tags-Grafiken beim Import abgelegt werden.
+- Jede Full-Tag Grafik wird beim Import nur generiert, falls sie noch nicht vor-
+  handen ist. Mit zunehmender Anzahl bereits lektorierter Projekte sinkt daher die
+  Importdauer leicht, da vor allem bei Formaten wie idml oder html immer wieder die
+  gleichen Tagmuster auftreten.
+
+=======
+Import per URL:
+- Der Dateiimport kann durch die folgende URL angestoßen werden:
+http://domain/APPLICATION_RUNDIR/editor/import/index/edit100PercentMatches/0/taskGuid/%7BC1D11C25-45D2-11D0-B0E2-444553540203%7D/userName/Marc%20Mittag/userGuid/%7BC1D11C25-45D2-11D0-B0E2-444553540555%7D/sourceLang/1031/targetLang/1033/importRootFolder/C:%5Cicorrect.l%5Cicorrect%5Capplication%5Cmodules%5Ceditor%5Ctestfiles
+bis http://domain/APPLICATION_RUNDIR/editor/import/index/ ist die URL fix, danach folgen Parameter, die im folgenden erklärt werden:
+
+edit100PercentMatches: 0: 100 Prozent-Matches sind nicht editierbar; 1: 100 Prozent-Matches sind editierbar
+taskGuid: taskGuid des Importtasks URL-codiert
+userName: Benutzer, dem die Übersetzungen der Segmente initial zugeordnet sind; url-codiert in utf-8
+userGuid: userGuid: GUID des vorstehenden Benutzers URL-codiert
+sourceLang: ID der Quellsprache 
+targetLang: ID der Zielsprache
+languageType: Format der beiden vorhergehenden Sprach IDs: mögliche Werte: (rfc5646,unix,lcid) Der Parameter kann weggelassen werden, default ist rfc5646 bzw. der in der application.ini eingestellte Wert. Siehe runtimeOptions.import.languageType 
+importRootFolder: URL-codierter Pfad (in der Kodierung des Filesystems) zum Ordner, in dem die zu importierende Verzeichnishierarchie liegt
+optional: folderBase64Encoded: Wird dieser Parameter mit true oder 1 mit übergeben, dann wird der importRootFolder bevor er url-decodiert wird noch base64-decodiert.
+optional relaisLang: optional param relaisLang in the same format as targetLang; if empty or not defined, there will be no attempt to import relais-files
+optional enableSourceEditing: value 0 (=default) or 1, enables the editable source column feature 
+=======
+Importprüfung per URL:
+- Der Check des Dateiimports kann durch die folgende URL angestoßen werden:
+http://domain/APPLICATION_RUNDIR/editor/import/index/check/1/edit100PercentMatches/0/taskGuid/%7BC1D11C25-45D2-11D0-B0E2-444553540203%7D/userName/Marc%20Mittag/userGuid/%7BC1D11C25-45D2-11D0-B0E2-444553540555%7D/sourceLang/1031/targetLang/1033/importRootFolder/C:%5Cicorrect.l%5Cicorrect%5Capplication%5Cmodules%5Ceditor%5Ctestfiles
+
+Die Parameter sind analog zum Import per URL, mit Ausnahme des Parameters "check". 
+Hat dieser als Wert eine Zahl größer 0, wird der Importcheck statt des
+Imports ausgeführt. D. h., im Fehlerfall greift das errorCollect (ein Fehler 
+führt nicht zum unmittelbaren Programmabbruch, sondern alle Fehler während des 
+Imports werden gesammelt).
+
+Alle Fehler des Checks werden gesammelt im Browser ausgegeben, ins Log geschrieben
+ und so der Mailversand im Fehlerfall aktiviert ist, per Mail an den Admin gesandt.
+
+Alle Daten dieses Importchecks werden nach dem Check wieder aus der Datenbank gelöscht.
+
+Die geprüften Dateien werden in jedem Fall in Browser, Log und Mail ausgegeben.
+=======
+Export per URL:
+- Der Dateiimport kann durch die folgende URL angestoßen werden:
+http://domain/APPLICATION_RUNDIR/editor/export/index/taskGuid/%7BC1D11C25-45D2-11D0-B0E2-444553540203%7D/exportRootFolder/C:%5Cicorrect.l%5Cicorrect%5Capplication%5Cmodules%5Ceditor%5Ctestexport
+bis http://domain/APPLICATION_RUNDIR/editor/import/index/ ist die URL fix, danach folgen Parameter, die im folgenden erklärt werden:
+
+taskGuid: taskGuid des Exporttasks URL-codiert
+exportRootFolder: URL-codierter Pfad (in der Kodierung des Filesystems) zum Ordner, in dem die zu exportierende Verzeichnishierarchie abgelegt werden soll.
+optional: folderBase64Encoded: Wird dieser Parameter mit true oder 1 mit übergeben, dann wird der exportRootFolder bevor er url-decodiert wird noch base64-decodiert.
+optional: diff: Wird dieser Parameter mit true oder 1 mit übergeben, dann werden Änderungen durch das Lektorat in den Segmenten als diff gekennzeichnet. Die diff-Syntax ist dateiformatabhängig - für sdlxliff ist dies z. B. die Syntax, die Trados Studio selbst für seine "Änderungen nachverfolgen"-Funktion verwendet

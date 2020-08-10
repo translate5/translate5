@@ -1,0 +1,212 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE martif SYSTEM "TBXcoreStructV02.dtd">
+<martif type="TBX" xml:lang="en">
+
+   <martifHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>TBX for termTagger stemming tests (German only, translations not relevant)</title>
+         </titleStmt>
+         <publicationStmt>
+            <p/>
+         </publicationStmt>
+      </fileDesc>
+   </martifHeader>
+
+   <text>
+      <body>
+
+         <termEntry>
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>die</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>the</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry>
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Sie</term>
+                  <descrip type="definition">Roman von Stephen King</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>She</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry>
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>UNO</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>UNO</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry>
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>sicher</term>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>safe</term>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_2216">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Höhen</term>
+                  <descrip type="definition">Einstellmöglichkeit des Soundsystems. Bezeichnet den Klangparameter für die Audiowiedergabe des oberen Frequenzbereichs.</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>treble</term>
+                  <descrip type="definition">A sound system adjustment function. Designates the sound parameter for sound playback of the upper frequency range.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_4841">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Schütz</term>
+                  <descrip type="definition">Elektromechanisches Bauteil zum Schalten des Stromflusses bei hohen Spannungen.</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>contactor</term>
+                  <descrip type="definition">Electronic component for switching a current flow at high voltages.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_3535">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Wachs</term>
+                  <descrip type="definition">Pflegemittel für Oberflächen. Häufig in Form einer Paste oder Creme, wird benutzt um den Lack des Fahrzeuges zu schützen, z. B. gegen Witterungseinflüsse.</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>wax</term>
+                  <descrip type="definition">Care product for surfaces. Often in the form of a paste or cream, it is used to protect the paintwork of a vehicle e.g. from weather conditions.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_3218">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Plane</term>
+                  <descrip type="definition">Decke aus festem, Wasser abweisendem Material, die zum Schutz verwendet wird. Beispiel: Schutz von Fahrzeugen bei Karosseriereparaturen. Durch die Plane wird eine mögliche Zerstörung der Lack- und Glasflächen verhindert sowie Brandgefahr durch Funkenflug vermieden.</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>tarpaulin</term>
+                  <descrip type="definition">Cover made of strong, water-repellent material which is used for protection. Example: To protect vehicles during body repairs. The tarp prevents possible damage to paint and glass surfaces and the risk of fire due to sparks.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_5228">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Härte</term>
+                  <descrip type="definition">Mechanischer Widerstand, den ein Körper dem Eindringen eines anderen, härteren Körpers entgegensetzt. Diese Werkstoffeigenschaft lässt z. B. Rückschlüsse auf den Verschleiß zu.</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>hardness</term>
+                  <descrip type="definition">Mechanical resistance with which a body opposes the penetration of another harder body. This material property allows conclusions to be drawn about wear, for example.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_6853">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Vorgelege</term>
+                  <descrip type="definition">Zusatzgetriebe, das die Umdrehungszahl einer angetriebenen Welle reduziert und das Drehmoment erhöht.</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="EN">
+               <tig>
+                  <term>reduction gearbox</term>
+                  <descrip type="definition">Additional transmission which reduces the number of revolutions of a driven shaft and increases the torque.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_3992">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Radstern</term>
+                  <descrip type="definition">Teil eines Leichtmetallrads oder eines Trilexrads, der Felge und Radnabe verbindet (s. Bild, Pos. 1).</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>wheel spider</term>
+                  <descrip type="definition">Part of a light-alloy wheel or Trilex wheel which connects the rim and wheel hub (see picture, item 1).</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_2159">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Lüfter</term>
+                  <descrip type="definition">Flügelventilator, der den Kühler mit ausreichender Kühlluftmenge versorgt, wenn der Fahrtwind nicht ausreicht, z. B. bei langsamer Fahrt oder bei Stillstand des Fahrzeugs (s. Bild).</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>fan</term>
+                  <descrip type="definition">Ventilation device which uses blades to supply the cooler with sufficient cooling air if the airstream is not sufficient e.g. when driving slowly or with the vehicle at a standstill (see picture).</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+         <termEntry id="X_2165">
+            <langSet xml:lang="DE">
+               <tig>
+                  <term>Starter</term>
+                  <descrip type="definition">Elektro-, Pneumatik- oder Hydraulikmotor, der den Verbrennungsmotor antreibt, sodass die erforderliche Startdrehzahl erreicht wird und eine Zündung eingeleitet werden kann.</descrip>
+               </tig>
+            </langSet>
+            <langSet xml:lang="en-GB">
+               <tig>
+                  <term>starter</term>
+                  <descrip type="definition">Electric, pneumatic or hydraulic motor which drives the combustion engine so that it reaches the required starting speed and ignition can be initiated.</descrip>
+               </tig>
+            </langSet>
+         </termEntry>
+
+      </body>
+      <back>
+</back>
+
+   </text>
+</martif>

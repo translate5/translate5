@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testcase name="actuation" creator="beo/MittagQI" mandatory="yes" sourceLang="DE" targetLang="EN" tbxPath="beo-reallive-DE-EN.tbx" sourceStringMatch="0" targetStringMatch="0">
+    <description>'actuation' is tagged correctly, but is assigned to the wrong term 'actuator' in the tbx data (this can not be checked by the termTagger-Testcases at the moment, because the mapped term in the tbx is not checked.)</description>
+    <assertion type="assertOutputEquals">
+        <input>
+            <source>radselektive Bremseingriffe</source>
+            <target>wheel-selective brake actuation </target>
+        </input>
+        <expectedOutput>
+            <source>radselektive Bremseingriffe</source>
+            <target>wheel-selective brake <div title="" class="term admittedTerm exact" data-tbxid="xyz">actuation</div> </target>
+        </expectedOutput>
+    </assertion>
+</testcase>

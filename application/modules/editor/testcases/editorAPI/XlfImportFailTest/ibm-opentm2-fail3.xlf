@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xliff version="1.1" xmlns="urn:oasis:names:tc:xliff:document:1.1" xmlns:tmgr="http://www.ibm.com">
+  <file datatype="plaintext" original="testfile1.html" source-language="en-US" target-language="de-DE" tool="OpenTM2">
+    <header>
+      <tmgr:properties>
+        <tmgr:folder>TEST_M01</tmgr:folder>
+        <tmgr:markup>IBMUHTM3</tmgr:markup>
+        <tmgr:sourcelang>English(U.S.)</tmgr:sourcelang>
+        <tmgr:targetlang>German(reform)</tmgr:targetlang>
+        <tmgr:shortname>TESTFILE.000</tmgr:shortname>
+        <tmgr:shipment>1</tmgr:shipment>
+      </tmgr:properties>
+    </header>
+    <body>
+
+
+      <trans-unit id="8" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+          <source>f2-8 - sub tags can only be processed if there is an id in the surrounding tag: <ph id="a_3">x<sub>this text is visible as segment</sub>x</ph> and <ph>x<sub>this text is NOT visible as segment since the surrounding id is missing!</sub>x</ph></source>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">24</count>
+        </count-group>
+      </trans-unit>
+      
+      
+    </body>
+  </file>
+</xliff>

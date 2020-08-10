@@ -1,0 +1,26 @@
+<issues>
+	<issue type="Accuracy" level="0"  display="yes">
+		<issue type="Mistranslation" level="1" display="yes">
+			<issue type="Terminology" level="2" display="yes"/>
+		</issue>
+		<issue type="Omission" level="1" display="yes" />
+		<issue type="Addition" level="1" display="yes" />
+		<issue type="Untranslated" level="1" display="yes" />
+	</issue>
+	<issue type="Fluency" level="0"  display="yes">
+		<issue type="Register" level="1"  display="yes" />
+		<issue type="Style" level="1"  display="yes" />
+		<issue type="Inconsistency" level="1"  display="yes" />
+		<issue type="Spelling" level="1"  display="yes" />
+        <issue type="Typography" level="1"  display="yes" />
+		<issue type="Grammar" level="1"  display="yes"/>
+		<issue type="Locale violation" level="1"  display="yes"/>
+		<issue type="Unintelligible" level="1"  display="yes" />
+	</issue>
+	<issue type="Verity" level="0" display="yes">
+		<issue type="Completeness" level="1" display="yes"/>
+		<issue type="Legal requirements" level="1" display="yes"/>
+		<issue type="Locale applicability" level="1" display="yes"/>
+	</issue>
+</issues>
+
