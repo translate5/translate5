@@ -1649,7 +1649,7 @@ Ext.define('Editor.controller.Editor', {
     },
     
     handleReferenceFilesMessage:function(){
-        if(Editor.data.task.get('referenceFiles')){
+        if(Editor.data.task.get('referenceFiles') && Editor.data.frontend.showReferenceFilesPopup===true){
             var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
             task = new Ext.util.DelayedTask(function(){
                 referenceInfoMessage.destroy();

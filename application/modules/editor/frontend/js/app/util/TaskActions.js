@@ -126,6 +126,13 @@ Ext.define('Editor.util.TaskActions', {
         if(! Editor.app.authenticatedUser.isAllowed('editorFinishTask')){
             return;
         }
+
+        //do not show the confirmation window if it is configured so
+        if(Editor.data.frontend.showConfirmFinishTaskPopup!==true){
+            me._doFinish(callback);
+            return;
+        }
+
         Ext.Msg.confirm(me.strings.confirmFinish, me.strings.confirmFinishMsg, function(btn){
             if(btn == 'yes') {
                 me._doFinish(callback);
