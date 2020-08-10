@@ -333,6 +333,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $isOpenIdOnLoginRedirect=(boolean)$openId->getCustomer()->getOpenIdRedirectCheckbox() ?? false;
       //is the user directly redirected to the openid sso provider on login
       $this->view->Php2JsVars()->set('frontend.isOpenIdOnLoginRedirect',$isOpenIdOnLoginRedirect);
+
+      //show references files popup
+      $this->view->Php2JsVars()->set('frontend.showReferenceFilesPopup',$rop->editor->showReferenceFilesPopup);
+      //show confirm finish task popup
+      $this->view->Php2JsVars()->set('frontend.showConfirmFinishTaskPopup',$rop->editor->showConfirmFinishTaskPopup);
       $this->setJsAppData();
     }
 
