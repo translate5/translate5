@@ -27,6 +27,12 @@ https://www.translate5.net/en/contact/
 Have a look:
 https://www.translate5.net/en/who-is-behind/
 
+## What is not in this repository?
+There are some plug-ins, although under GPLv3 license, that are not available to the public without charge. 
+Available for all companies, that support translate5 are: InstantTranslate, DeepL connector, SDL GroupShare Connector
+Available for all companies, that support translate5 and pay an additional fee:  translate5 visual, TrackChanges
+All plug-ins are also available, when translate5 is hosted by translate5's development team.
+
 ## License
 https://www.gnu.org/licenses/agpl-3.0.en.html
 
