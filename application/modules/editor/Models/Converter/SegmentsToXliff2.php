@@ -714,7 +714,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $insOpenTag='/<ins[^>]*>/i';
         $delOpenTag='/<del[^>]*>/i';
         $attributesRegex='/(data-userguid|data-username|data-usertrackingid|data-timestamp)=("[^"]*")/i';
-        //parametar map between ins/del tags and the new mrk ins/del tags
+        //parameter map between ins/del tags and the new mrk ins/del tags
         $paramMap=[
             'data-userguid'=>'translate5:userGuid', // keep userGuid and username for tasks with TrackChange-Tags before anonymizing was implemented
             'data-username'=>'translate5:username',

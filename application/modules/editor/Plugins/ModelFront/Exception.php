@@ -35,7 +35,7 @@ class editor_Plugins_ModelFront_Exception extends ZfExtended_ErrorCodeException 
     protected $domain = 'plugin.modelfront';
     
     static protected $localErrorCodes = [
-        'E1266' => 'ModelFront Plug-In: authentication parametars are not defined.',
+        'E1266' => 'ModelFront Plug-In: authentication parameters are not defined.',
         'E1267' => 'ModelFront Plug-In: source or target languages are not defined.',
         'E1268' => 'ModelFront Plug-In: Error on ModelFront api request. The error was: {message}.',
         'E1269' => 'ModelFront Plug-In: Error on processing the segments. Segment list with errors: {errors}.'
