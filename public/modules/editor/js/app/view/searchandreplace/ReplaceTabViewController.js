@@ -52,8 +52,8 @@ Ext.define('Editor.view.searchandreplace.ReplaceTabViewController', {
     /***
      * When form field value is changed, reset the search helper variables
      */
-    resetSearchParametars:function(){
+    resetSearchParameters:function(){
         var searchTab=Ext.ComponentQuery.query('#searchTab')[0];
-        searchTab.getController().resetSearchParametars();
+        searchTab.getController().resetSearchParameters();
     }
 });

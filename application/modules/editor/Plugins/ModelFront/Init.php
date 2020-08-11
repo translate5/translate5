@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Info: the model front plugin depends on the matchanalysis plugin (matchanalys plugin must be active when model front plugin is active).
+ * Info: the ModelFront plugin depends on the MatchAnalysis plugin (MatchAnalysis plugin must be active when ModelFront plugin is active).
  */
 class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
     
