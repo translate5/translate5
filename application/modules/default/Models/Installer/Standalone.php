@@ -646,6 +646,7 @@ class Models_Installer_Standalone {
         require_once 'Zend/Session.php';
         Zend_Session::$_unitTestEnabled = true;
         require_once 'library/ZfExtended/BaseIndex.php';
+        ZfExtended_BaseIndex::$addMaintenanceConfig = true;
         $index = ZfExtended_BaseIndex::getInstance();
         $index->initApplication()->bootstrap();
         $index->addModuleOptions('default');
