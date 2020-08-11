@@ -1,0 +1,268 @@
+<?php
+/*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ 
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ 
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+ 
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
+namespace Translate5\MaintenanceCli\Command;
+
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Translate5\MaintenanceCli\WebAppBridge\Application;
+use Translate5\MaintenanceCli\Output\TaskTable;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
+
+//FIXME https://github.com/bamarni/symfony-console-autocomplete
+
+class TaskCleanCommand extends Command
+{
+    // the name of the command (the part after "bin/console")
+    protected static $defaultName = 'task-clean';
+    
+    /**
+     * @var InputInterface
+     */
+    protected $input;
+    
+    /**
+     * @var OutputInterface
+     */
+    protected $output;
+    
+    /**
+     * @var SymfonyStyle
+     */
+    protected $io;
+    
+    protected function configure()
+    {
+        $this
+        // the short description shown while running "php bin/console list"
+        ->setDescription('provides information about and the possibility to delete hanging import / erroneous tasks and orphaned task data directories.')
+        
+        // the full command description shown when running the command with
+        // the "--help" option
+        ->setHelp('Called with out parameters a overview of affected tasks is shown');
+        
+        $this->addOption(
+            'delete-error',
+            'e',
+            InputOption::VALUE_OPTIONAL,
+            'deletes one (with ID) or all tasks with errors',
+            false);
+        
+        $this->addOption(
+            'delete-import',
+            'i',
+            InputOption::VALUE_REQUIRED,
+            'deletes one task in state import');
+        
+        $this->addOption(
+            'delete-data',
+            'd',
+            InputOption::VALUE_NONE,
+            'deletes all orphaned data folders');
+    }
+
+    /**
+     * Execute the command
+     * {@inheritDoc}
+     * @see \Symfony\Component\Console\Command\Command::execute()
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->input = $input;
+        $this->output = $output;
+        $this->io = new SymfonyStyle($input, $output);
+        $app = new Application($input->getOption('zend-path'));
+        $app->init();
+        $this->io->title('Cleaning up tasks (errors, hanging imports, orphaned data directories)');
+        
+        $output->writeln([
+            '  <info>HostName:</> '.$app->getHostname(),
+            '   <info>AppRoot:</> '.APPLICATION_ROOT,
+            '   <info>Version:</> '.$app->getVersion(),
+            '',
+        ]);
+        $task = new \editor_Models_Task();
+        $allTasks = $task->loadAll();
+        $availableDataDirs = [];
+        $stateError = [];
+        $stateImport = [];
+        foreach($allTasks as $taskData) {
+            //$availableDataDirs[$taskData['id']] = $task->getRelativeTaskDataPath($taskData['taskGuid']);
+            $availableDataDirs[] = $task->getRelativeTaskDataPath($taskData['taskGuid']);
+            if($taskData['state'] == $task::STATE_IMPORT) {
+                $stateImport[$taskData['id']] = $taskData;
+            }
+            if($taskData['state'] == $task::STATE_ERROR) {
+                $stateError[$taskData['id']] = $taskData;
+            }
+        }
+        
+        $this->handleErrorTasks($stateError);
+        $this->handleImportTasks($stateImport);
+        $this->handleOrphanedTaskData($availableDataDirs);
+        $this->io->section('Use the following option parameters to delete the listed tasks:');
+        $this->io->text([
+            '--delete-error [ID]  - deletes one (with ID) or all tasks with errors',
+            '--delete-import ID   - deletes one task in state import',
+            '--delete-data        - deletes all orphaned data folders',
+        ]);
+        return 0;
+    }
+    
+    protected function handleErrorTasks(array $errorTasks) {
+        $this->io->section('Tasks with errors:');
+        if(empty($errorTasks)) {
+            $this->io->text('<info>No tasks with status "error" found!</>');
+            return;
+        }
+        $table = new TaskTable($this->output);
+        $table->setRows($errorTasks);
+        $table->render();
+        $this->output->writeln(['','']);
+        
+        $toDelete = $this->input->getOption('delete-error');
+        if($toDelete === false) {
+            return;
+        }
+        $task = new \editor_Models_Task();
+        //if a single task to be deleted is given:
+        if(!empty($toDelete)) {
+            $toDelete = (int) $toDelete;
+            if(!$this->isInList($toDelete, $errorTasks)) {
+                $this->io->error('Given task ID is not in the list of tasks with status "error" and can not be deleted here!');
+                return;
+            }
+            $task->load($toDelete);
+            $errorTasks = [(array) $task->getDataObject()];
+        }
+        if(empty($errorTasks)) {
+            return;
+        }
+        foreach($errorTasks as $oneTask) {
+            $task->init($oneTask);
+            $remover = new \editor_Models_Task_Remover($task);
+            $remover->remove(true);
+        }
+        if(count($errorTasks) === 1) {
+            $oneTask = reset($errorTasks);
+            $this->io->success('The task "'.$oneTask['taskName'].' ('.$oneTask['id'].' - '.$oneTask['taskGuid'].') was successfully deleted!');
+        }
+        else {
+            $this->io->success('The above listed tasks with status error were successfully deleted!');
+        }
+    }
+    
+    protected function handleImportTasks(array $stateImport) {
+        $this->io->section('Tasks with status import:');
+        if(empty($stateImport)) {
+            $this->io->text('<info>No tasks with status "import" found!</>');
+            return;
+        }
+        $table = new TaskTable($this->output);
+        $table->setRows($stateImport);
+        $table->render();
+        $this->output->writeln(['','']);
+        
+        $toDelete = (int) $this->input->getOption('delete-import');
+        if(empty($toDelete)) {
+            return;
+        }
+        if(!$this->isInList($toDelete, $stateImport)) {
+            $this->io->error('Given task ID is not in the list of tasks with status "import" and can not be deleted here!');
+            return;
+        }
+        $task = new \editor_Models_Task();
+        $task->load((int) $toDelete);
+        $remover = new \editor_Models_Task_Remover($task);
+        $remover->remove(true);
+        $this->io->success('The task "'.$task->getTaskName().' ('.$task->getId().' - '.$task->getTaskGuid().') was successfully deleted!');
+    }
+    
+    /**
+     * find orphaned data directories
+     * @param array $availableDataDirs
+     * @return array
+     */
+    protected function handleOrphanedTaskData(array $availableDataDirs) {
+        
+        //we just add the dot directories as available, so they are ignored
+        $availableDataDirs[] = '.';
+        $availableDataDirs[] = '..';
+        
+        $config = \Zend_Registry::get('config');
+        $taskDataPath = $config->runtimeOptions->dir->taskData;
+        $taskDirectories = scandir($taskDataPath);
+        
+        $orphaned = array_diff($taskDirectories, $availableDataDirs);
+
+        $delete = $this->input->getOption('delete-data');
+        
+        $table = new Table($this->output);
+        $table->setHeaders(['Folder', 'Modification Time']);
+        $hasAtLeastOneOrphaned = false;
+        foreach($orphaned as $dir) {
+            $absDir = $taskDataPath.DIRECTORY_SEPARATOR.$dir;
+            if(!is_dir($absDir) || $dir == '.' || $dir == '..') {
+                continue;
+            }
+            $hasAtLeastOneOrphaned = true;
+            $table->addRow([$dir, date('Y-m-d H:i:s', filemtime($absDir))]);
+            if($delete) {
+                /* @var $recursivedircleaner \ZfExtended_Controller_Helper_Recursivedircleaner */
+                $recursivedircleaner = \ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+                    'Recursivedircleaner'
+                );
+                $recursivedircleaner->delete($absDir);
+            }
+        }
+        $this->io->section('Data Directories without a task:');
+        if($hasAtLeastOneOrphaned) {
+            $table->render();
+            $this->output->writeln(['']);
+            if($delete) {
+                $this->io->success('The above listed folders were successfully deleted!');
+            }
+        }
+        else {
+            $this->io->text('<info>No orphaned data directories found!</>');
+        }
+    }
+    
+    /**
+     * checks if the given taskId is in the given tasklist
+     * @param int $taskId
+     * @param array $taskList
+     * @return boolean
+     */
+    protected function isInList(int $taskId, array $taskList): bool {
+        return in_array($taskId, array_column($taskList, 'id'));
+    }
+}
