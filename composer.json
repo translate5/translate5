@@ -4,14 +4,39 @@
             "php": "7.3"
         }
     },
-	"require" : {
-		"wikimedia/composer-merge-plugin" : "~1.4",
-		"comcast/php-legal-licenses" : "~1.1"
+    "repositories": [{
+          "type": "package",
+          "package": {
+            "name": "gportela85/datetimefield",
+            "license": "MIT",
+            "version": "1.9",
+            "description": "A DateTime Form Field UX for Sencha, ExtJS 5.x and ExtJS 6.x.",
+            "type": "extjs-ux",
+            "source": {
+              "url": "https://github.com/gportela85/DateTimeField.git",
+              "type": "git",
+              "reference": "1.9"
+            }
+          }
+        },{
+            "type": "pear",
+            "url": "https://pear.horde.org"
+        }
+    ],
+    "require" : {
+        "wikimedia/composer-merge-plugin" : "~1.4",
+        "comcast/php-legal-licenses" : "~1.1",
+        "gportela85/datetimefield" : "^1.9",
+        "fortawesome/font-awesome" : "^5.13",
+        "phpoffice/phpspreadsheet" : "~1.12",
+        "querypath/querypath" : "~3.0",
+        "google/cloud-translate" : "~1.7",
+        "pear-pear.horde.org/horde_text_diff": "^2.2"
 	},
 	"extra" : {
 		"merge-plugin" : {
 			"include" : [
-				"application/modules/*/composer.local.json",
+			    "application/modules/editor/Plugins/*/composer.local.json",
 				"library/*/composer.local.json"
 			],
 			"recurse": true
