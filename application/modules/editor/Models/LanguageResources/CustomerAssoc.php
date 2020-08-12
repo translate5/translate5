@@ -46,7 +46,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_CustomerAssoc';
     
     /***
-     * Save customer assoc from the request parametars for the given language resource.
+     * Save customer assoc from the request parameters for the given language resource.
      * A language resource that is saved must have at least one customer assigned
      * (if none is given, we use the defaultcustomer).
      * @param int $id
@@ -68,7 +68,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     }
     
     /**
-     * Update customer assoc from the request parametars.
+     * Update customer assoc from the request parameters.
      * @param int $id
      * @param array $customers
      * @param array $useAsDefault

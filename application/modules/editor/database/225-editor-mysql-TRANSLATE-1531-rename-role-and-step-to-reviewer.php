@@ -87,7 +87,7 @@ $sql="UPDATE LEK_segment_history SET workflowStep='reviewing'
     WHERE byRole='lector';";
 $db->query($sql);
 
-//search the parametars field in the lek_workflow_action table and rename the matches
+//search the parameters field in the lek_workflow_action table and rename the matches
 $sql="SELECT id,parameters from LEK_workflow_action
       WHERE parameters REGEXP 'lector';";
 $res = $db->query($sql);
