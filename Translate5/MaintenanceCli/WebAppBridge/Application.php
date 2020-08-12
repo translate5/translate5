@@ -110,7 +110,7 @@ class Application {
     
     /**
      * TODO run the given URL as it would be triggered by the web server
-     * @param unknown $url
+     * @param string $url
      */
     public function run($url) {
         /*

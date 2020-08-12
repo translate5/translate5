@@ -35,6 +35,7 @@ use Translate5\MaintenanceCli\Output\TaskTable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Exception\RuntimeException;
 
 
 //FIXME https://github.com/bamarni/symfony-console-autocomplete
@@ -228,14 +229,20 @@ class TaskCleanCommand extends Command
         $table = new Table($this->output);
         $table->setHeaders(['Folder', 'Modification Time']);
         $hasAtLeastOneOrphaned = false;
+        $totalSize = 0;
         foreach($orphaned as $dir) {
-            $absDir = $taskDataPath.DIRECTORY_SEPARATOR.$dir;
+            $absDir = realpath($taskDataPath.DIRECTORY_SEPARATOR.$dir);
             if(!is_dir($absDir) || $dir == '.' || $dir == '..') {
                 continue;
             }
             $hasAtLeastOneOrphaned = true;
             $table->addRow([$dir, date('Y-m-d H:i:s', filemtime($absDir))]);
+            $totalSize += $this->getDirectorySize($absDir);
             if($delete) {
+                $absRoot = realpath(APPLICATION_ROOT);
+                if(strpos($absDir, $absRoot) !== 0) {
+                    throw new RuntimeException('The to be deleted directory "'.$absDir.'" is not under application root "'.$absRoot.'"!');
+                }
                 /* @var $recursivedircleaner \ZfExtended_Controller_Helper_Recursivedircleaner */
                 $recursivedircleaner = \ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
                     'Recursivedircleaner'
@@ -247,13 +254,30 @@ class TaskCleanCommand extends Command
         if($hasAtLeastOneOrphaned) {
             $table->render();
             $this->output->writeln(['']);
+            $usage = number_format($totalSize / 1048576, 2) . ' MB';
             if($delete) {
-                $this->io->success('The above listed folders were successfully deleted!');
+                $this->io->success('The above listed folders were successfully deleted ('.$usage.' freed) !');
+            }
+            else {
+                $this->io->text('Disk usage of the above folders <info>'.$usage.'</>!');
             }
         }
         else {
             $this->io->text('<info>No orphaned data directories found!</>');
         }
+    }
+    
+    /**
+     * rerturns the total size of given directory in bytes
+     * @param string $dir
+     * @return int
+     */
+    protected function getDirectorySize(string $dir): int {
+        $bytes = 0;
+        foreach(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)) as $it){
+            $bytes += $it->getSize();
+        }
+        return $bytes;
     }
     
     /**
