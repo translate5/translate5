@@ -77,7 +77,7 @@ class editor_Plugins_ModelFront_HttpApi {
     
     
     /***
-     * Send predirct api call. The $data should be in ModelFront required layout:
+     * Send predict api call. The $data should be in ModelFront required layout:
      * 'original'=> source text
      * 'translation'=> translated source
      * @param array $data

@@ -618,7 +618,7 @@ Ext.define('Editor.controller.Segments', {
       //this bug also exist in extjs 6.2.0
       me.fireEvent('beforeSaveCall', record);
       
-      //get the segmentFinishCount parametar from the response
+      //get the segmentFinishCount parameter from the response
       var response=operation.getResponse(),
       	  decoded=response.responseText && Ext.JSON.decode(response.responseText),
 		  segmentFinishCount=decoded && decoded.segmentFinishCount;
