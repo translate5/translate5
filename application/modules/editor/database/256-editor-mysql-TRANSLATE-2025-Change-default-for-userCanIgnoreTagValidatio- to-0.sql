@@ -25,8 +25,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
--- this feature is used only in very rare cases and must then be explicitly activated
--- it remains in the workflow action table for reference.
--- to reactivate just set back the workflow to "default"
-
 UPDATE `Zf_configuration` SET `value` = '0' WHERE `Zf_configuration`.`name` = "runtimeOptions.segments.userCanIgnoreTagValidation";
+
+UPDATE `Zf_configuration` SET `default` = '0' WHERE `Zf_configuration`.`name` = "runtimeOptions.segments.userCanIgnoreTagValidation";
