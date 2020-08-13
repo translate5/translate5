@@ -31,7 +31,7 @@ require __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
-use Translate5\MaintenanceCli\Command\{TaskCleanCommand};
+use Translate5\MaintenanceCli\Command\{TaskCleanCommand,ConfigCommand};
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $app->getDefinition()->addOption(new InputOption(
@@ -40,5 +40,6 @@ $app->getDefinition()->addOption(new InputOption(
     InputOption::VALUE_REQUIRED,
     'Path to the Zend Library, by default the script tries to discover it automatically.',
     ''));
+$app->add(new ConfigCommand());
 $app->add(new TaskCleanCommand());
 $app->run();
