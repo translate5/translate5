@@ -1,3 +1,6 @@
 [submodule "library/ZfExtended"]
         path = library/ZfExtended
         url = ../ZfExtended.git
+[submodule "application/modules/editor/PrivatePlugins"]
+	path = application/modules/editor/PrivatePlugins
+	url = git@bitbucket.org:mittagqi/privateplugins.git
