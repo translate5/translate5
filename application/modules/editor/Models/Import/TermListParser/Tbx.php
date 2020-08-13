@@ -458,15 +458,15 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         }
         
         // save actual termEntryId
-        $this->actualTermEntry = $this->getIdTermEntry();
-        
-        if(empty($this->actualTermEntry)) {
-            $this->log('termEntry Tag without an ID found and ignored!');
-            return;
-        }
+        $this->actualTermEntry = $this->getNodeId();
         
         //check if the termEntry exist in the current collection
-        $existingEntry=$this->termEntryModel->getTermEntryByIdAndCollection($this->actualTermEntry,$this->termCollection->getId());
+        if(!is_null($this->actualTermEntry)) {
+            $existingEntry = $this->termEntryModel->getTermEntryByIdAndCollection($this->actualTermEntry,$this->termCollection->getId());
+        }
+        else {
+            $existingEntry = false;
+        }
         
         if($existingEntry && $existingEntry['id']>0){
             $this->actualTermEntryIdDb=$existingEntry['id'];
@@ -706,7 +706,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             $this->actualTermIdTbx=null;
             return;
         }
-        $this->actualTermIdTbx=$this->getIdTerm();
+        $this->actualTermIdTbx=$this->getNodeId();
         $this->handleTermDb();
     }
 
@@ -1148,29 +1148,17 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $this->logger->info($code,$logMessage,$data);
     }
     
-    /***
-     * Return the termEntry id from the tbx file. If no termEntry id is provided in the tbx,
-     * the termEntry id from the LEK_term_entry table will be return.
-     * @return string
-     */
-    private function getIdTermEntry() {
-        if(!empty($this->xml->getAttribute('id'))){
-            return $this->xml->getAttribute('id');
-        }
-        return 'termEntry_'.$this->termEntryModel->getNextAutoincrement();
-    }
-
     /**
-     * Return the term id from the tbx file. If no term id is provided in the tbx,
-     * the term id from the lek_terms table will be return.
+     * Return the term/termEntry id from the tbx file. If no id is provided in the tbx,
+     * we return null, which triggers automatic calculation by insert id
      *
      * @return string
      */
-    private function getIdTerm() {
+    private function getNodeId() {
         if(!empty($this->xml->getAttribute('id'))){
             return $this->xml->getAttribute('id');
         }
-        return 'term_'.$this->termModel->getNextAutoincrement();
+        return null;
     }
     
     /***
@@ -1184,6 +1172,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
         /* @var $termEntry editor_Models_TermCollection_TermEntry */
         $termEntry->setCollectionId($this->termCollection->getId());
+        if(is_null($this->actualTermEntry)) {
+            $termEntry->save();
+            $this->actualTermEntry = 'termEntry_'.$termEntry->getId();
+        }
         $termEntry->setGroupId($this->actualTermEntry);
         $termEntry->save();
         return $termEntry->getId();
@@ -1213,6 +1205,15 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      *
      */
     private function handleTermDb(){
+        //if actualTermIdTbx is null, in the previous code the next auto inc value was used,
+        // which implies that a new term will be created. We just preinsert the term here, and just update it later.
+        if(is_null($this->actualTermIdTbx)) {
+            $this->termContainer['id'] = $this->termModel->db->insert([
+                'mid' => 'preinsert',
+                'collectionId' => $this->termCollection->getId(),
+            ]);
+            $this->actualTermIdTbx = 'term_'.$this->termContainer['id'];
+        }
         $terms=$this->termModel->isUpdateTermForCollection($this->actualTermEntry,$this->actualTermIdTbx,$this->termCollection->getId());
         //if term is found(should return single row since termId is unique)
         if($terms->count()>0){
