@@ -36,6 +36,11 @@ Available for all companies with a support and development contract that pay an 
 
 All plug-ins are also available, when translate5 is hosted by translate5's development team.
 
+## Release notes (aka change log)
+Please see https://github.com/translate5/translate5/blob/develop/docs/CHANGELOG.md
+
+Or look them up directly in translate5 as described here: https://www.translate5.net/en/resources/#changelog
+
 ## License
 https://www.gnu.org/licenses/agpl-3.0.en.html
 
