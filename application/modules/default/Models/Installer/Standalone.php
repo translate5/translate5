@@ -558,7 +558,7 @@ class Models_Installer_Standalone {
         
         $dbupdater = ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
         /* @var $dbupdater ZfExtended_Models_Installer_DbUpdater */
-        $stat = $dbupdater->importAll(true); //FIXME remove this parameter after some time, see comment in importAll method
+        $stat = $dbupdater->importAll();
         
         $newChangeLogEntries = $changelog->moreChangeLogs($beforeMaxChangeLogId, $changelog::ALL_GROUPS);
         $version = ZfExtended_Utils::getAppVersion();
