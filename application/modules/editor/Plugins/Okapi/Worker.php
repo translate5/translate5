@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -83,12 +83,12 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if(empty($parameters['type']) 
+        if(empty($parameters['type'])
                 || !($parameters['type'] == self::TYPE_IMPORT || $parameters['type'] == self::TYPE_EXPORT)){
             return false;
         }
         return true;
-    } 
+    }
     
     /**
      * {@inheritDoc}
@@ -138,7 +138,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             //copy generated XLF into importFolder
             copy($convertedFile, $file.$api::OUTPUT_FILE_EXTENSION);
             
-            //add okapi export file filter for that file 
+            //add okapi export file filter for that file
             $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
             /* @var $fileFilter editor_Models_File_FilterManager */
             $fileFilter->addFilter($fileFilter::TYPE_IMPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
@@ -160,7 +160,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         $workFile = new SplFileInfo($params['file']);
         
         $manifestFile = new SplFileInfo($this->getDataDir().'/'.$this->getManifestFile($fileId));
-        //if we don't have a manifest.rkm file, the import was before we changed the export, 
+        //if we don't have a manifest.rkm file, the import was before we changed the export,
         // so use tikal export there again
         if(!$manifestFile->isFile()) {
             $this->doTikalFallback($workFile); //should be removed in the future
@@ -191,10 +191,16 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             $this->xliffExportPreValidation($workFile, $fileId);
             $api->uploadWorkFile($originalFile.$api::OUTPUT_FILE_EXTENSION, $workFile);
             $api->executeTask($sourceLang, $targetLang);
-            //the exported work file (containing xlf) must be renamed so that 
-            // the merged file can be saved under the original file name 
+            //the exported work file (containing xlf) must be renamed so that
+            // the merged file can be saved under the original file name
             rename($workFile, $workFile.$api::OUTPUT_FILE_EXTENSION);
             $api->downloadMergedFile($originalFile, $workFile);
+            
+            //TRANSLATE-2002: Currently Okapi can not reconvert PDF files, therefore it provides a txt file, so we have to rename the file though
+            if(strtolower($workFile->getExtension()) === 'pdf' && mime_content_type((string)$workFile) == 'text/plain') {
+                rename($workFile, $workFile.'.txt');
+            }
+            
             $result = true;
         } catch (Exception $e){
             $this->handleException($e, $workFile, $fileId, false);
@@ -202,7 +208,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             $api->removeProject();
         }
         
-        return $result; 
+        return $result;
     }
     
     /**
