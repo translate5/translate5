@@ -29,6 +29,7 @@
 /library/Horde_Text_Diff
 /library/google-translate-api
 /library/querypath
+/library/zend
 /library/README-Requirement-Horde-Diff.txt
 /library/README-Requirement-querypath.txt
 /public/ext-6.0.0
