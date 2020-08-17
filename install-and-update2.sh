@@ -6,6 +6,10 @@ CMD_MYSQL=/usr/bin/mysql
 type -p $CMD_PHP &>/dev/null || { echo "$CMD_PHP not found. Set \$CMD_PHP in $0"; exit 1; }
 type -p $CMD_MYSQL &>/dev/null || { echo "$CMD_MYSQL not found. Set \$CMD_MYSQL in $0"; exit 1; }
 
+echo
+echo "Deprecated - call translate5.sh --help"
+echo
+
 MODULE=$1
 shift
 $CMD_PHP -r "require_once('application/modules/default/Models/Installer/Standalone2.php'); \

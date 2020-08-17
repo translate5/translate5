@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -33,9 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * TODO: 
- * - Danach können z.B. die database funktionalität in ein Modul überführt werden
- * - Langfristig alles in Module packen 
+ * @deprecated - superseded though maintenance cli
  */
 class Models_Installer_Standalone2 {
     const INSTALL_INI = '/application/config/installation.ini';
@@ -85,7 +83,7 @@ class Models_Installer_Standalone2 {
     /**
      * Stores the md5 hash of this file before downloading the update.
      * If the hash is changing after downloading the translate5 package this means
-     * updates in the updater itself, so that it has to be restarted! 
+     * updates in the updater itself, so that it has to be restarted!
      * @var string
      */
     protected $installerHash;
@@ -113,7 +111,7 @@ class Models_Installer_Standalone2 {
     ];
     
     /**
-     * Options: 
+     * Options:
      * mysql_bin => path to mysql binary
      * @param array $options
      */
@@ -267,7 +265,7 @@ class Models_Installer_Standalone2 {
     }
     
     /**
-     * Our ZIP based installation and update process can't deal with file deletions, 
+     * Our ZIP based installation and update process can't deal with file deletions,
      * so this has currently to be done manually in this method.
      * See this as a workaround and not as a final solution.
      */
@@ -408,7 +406,7 @@ class Models_Installer_Standalone2 {
             return false;
         }
         echo $message;
-        $ret = 
+        $ret =
             $hidden
             ? exec(
                 PHP_OS === 'WINNT' || PHP_OS === 'WIN32'
@@ -506,7 +504,7 @@ class Models_Installer_Standalone2 {
     }
     
     /**
-     * generates a Zend Application like environment with all needed registry entries filled  
+     * generates a Zend Application like environment with all needed registry entries filled
      */
     protected function initApplication() {
         $_SERVER['REQUEST_URI'] = '/database/forceimportall';
