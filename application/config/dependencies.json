@@ -32,20 +32,6 @@
             ]
         },
         {
-            "name": "z1-php7.3",
-            "label": "PHP Zend (z1-php7.3)",
-            "url": "RELEASE:Zend-z1-php7.3-1.13.2-p2.zip",
-            "version": "1.13.2-p2",
-            "target": "library\/zend\/",
-            "licenses": [
-                {
-                    "uses": "z1-php7.3 (a fork of PHP Zend 1)",
-                    "license": "BSD-3-Clause",
-                    "relpath": "docs\/third-party-licenses\/Zend-license.txt"
-                }
-            ]
-        },
-        {
             "name": "Open_Sans",
             "label": "Open Sans Fonts",
             "url": "RELEASE:Open_Sans.zip",
