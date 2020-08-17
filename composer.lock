@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b5e15312ec1d6205f8e149cfd293be4",
+    "content-hash": "a578f6b883507b8815851a6c7d0eb44f",
     "packages": [
         {
             "name": "apix/log",
@@ -2869,6 +2869,65 @@
             "time": "2017-06-14T03:57:53+00:00"
         },
         {
+            "name": "shardj/zf1-future",
+            "version": "dev-thomaslauria-throwable-patch",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/MittagQI/zf1-php7.3.git",
+                "reference": "237350150c75a307b1d19dc6cf3eddfe07ed27f5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/MittagQI/zf1-php7.3/zipball/237350150c75a307b1d19dc6cf3eddfe07ed27f5",
+                "reference": "237350150c75a307b1d19dc6cf3eddfe07ed27f5",
+                "shasum": ""
+            },
+            "archive": {
+                "exclude": [
+                    "/demos",
+                    "/documentation",
+                    "/tests"
+                ]
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "replace": {
+                "zendframework/zendframework1": ">=1.12.20"
+            },
+            "require-dev": {
+                "phpunit/dbunit": "1.3.*",
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.12.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Zend_": "library/"
+                }
+            },
+            "include-path": [
+                "library/"
+            ],
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Zend Framework 1. The aim is to keep ZF1 working with the latest PHP versions",
+            "homepage": "http://framework.zend.com/",
+            "keywords": [
+                "framework",
+                "zf1"
+            ],
+            "support": {
+                "source": "https://github.com/MittagQI/zf1-php7.3/tree/thomaslauria-throwable-patch"
+            },
+            "time": "2020-08-12T11:26:24+00:00"
+        },
+        {
             "name": "symfony/console",
             "version": "v5.1.3",
             "source": {
@@ -4064,7 +4123,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "shardj/zf1-future": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
