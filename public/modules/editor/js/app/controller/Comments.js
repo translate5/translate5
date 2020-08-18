@@ -156,9 +156,6 @@ Ext.define('Editor.controller.Comments', {
             //fire the global open comments request
             Ext.fireEvent('editorOpenComments', segment);
         }
-        else {
-            me.getCommentPanel() && me.getCommentPanel().handleCollapse();
-        }
 
         //close metapanel if clicking single on a row, and the previous row was not editable
         if(me.getCommentPanel() && (!ed.editing || !ed.context.record)) {
@@ -257,8 +254,6 @@ Ext.define('Editor.controller.Comments', {
 
     openCommentWindow: function(rec) {
         var me = this,
-            form = me.getCommentForm(),
-            area = form.down('textarea'),
             store = me.getCommentsStore(),
             id = rec.get('id'),
             commentPanel=me.getCommentPanel(),
@@ -272,13 +267,6 @@ Ext.define('Editor.controller.Comments', {
         
         panelController.handleAddComment();
 
-        if(area.rendered && area.isVisible()) {
-            new Ext.util.DelayedTask(function(){
-                area.selectText();
-                area.focus();
-            }).delay(100);
-        }
-        
         store.load({
             params: {segmentId: id}
         });

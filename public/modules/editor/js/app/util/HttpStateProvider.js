@@ -168,6 +168,13 @@ Ext.define('Editor.util.HttpStateProvider',{
     	var me=this,
     		originalName=me.DEFAULT_STATE_PREFIX+name;
     	return this.store.findExact('name', originalName);
+    },
+
+    /***
+     * Get the editor custom state config name prefix.
+     */
+    getEditorCustomStateConfigPrefix: function(){
+        return this.DEFAULT_STATE_PREFIX+'editor.';
     }
 
 });
