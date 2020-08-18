@@ -27,10 +27,8 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Translate5\MaintenanceCli\WebAppBridge\Application;
 use Translate5\MaintenanceCli\Output\TaskTable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputOption;
@@ -40,10 +38,10 @@ use Symfony\Component\Console\Exception\RuntimeException;
 
 //FIXME https://github.com/bamarni/symfony-console-autocomplete
 
-class TaskCleanCommand extends Command
+class TaskCleanCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'task-clean';
+    protected static $defaultName = 'task:clean';
     
     /**
      * @var InputInterface
@@ -64,7 +62,7 @@ class TaskCleanCommand extends Command
     {
         $this
         // the short description shown while running "php bin/console list"
-        ->setDescription('provides information about and the possibility to delete hanging import / erroneous tasks and orphaned task data directories.')
+        ->setDescription('provides information about and the possibility to delete hanging import / erroneous tasks and orphaned task data directories')
         
         // the full command description shown when running the command with
         // the "--help" option
@@ -97,19 +95,11 @@ class TaskCleanCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->input = $input;
-        $this->output = $output;
-        $this->io = new SymfonyStyle($input, $output);
-        $app = new Application($input->getOption('zend-path'));
-        $app->init();
-        $this->io->title('Cleaning up tasks (errors, hanging imports, orphaned data directories)');
+        $this->initInputOutput($input, $output);
+        $this->initTranslate5();
         
-        $output->writeln([
-            '  <info>HostName:</> '.$app->getHostname(),
-            '   <info>AppRoot:</> '.APPLICATION_ROOT,
-            '   <info>Version:</> '.$app->getVersion(),
-            '',
-        ]);
+        $this->writeTitle('Cleaning up tasks (errors, hanging imports, orphaned data directories)');
+        
         $task = new \editor_Models_Task();
         $allTasks = $task->loadAll();
         $availableDataDirs = [];

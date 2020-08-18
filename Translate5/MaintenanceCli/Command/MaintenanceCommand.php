@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /*
  START LICENSE AND COPYRIGHT
@@ -26,17 +25,16 @@
  
  END LICENSE AND COPYRIGHT
  */
+namespace Translate5\MaintenanceCli\Command;
 
-require_once __DIR__.'/../vendor/autoload.php';
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{TaskCleanCommand,ConfigCommand,DatabaseUpdateCommand,WorkerListCommand};
-
-$app = new Application('Translate5 CLI Maintenance', '1.0');
-$app->addCommands([
-    new ConfigCommand(),
-    new TaskCleanCommand(),
-    new DatabaseUpdateCommand(),
-    new WorkerListCommand(),
-]);
-$app->run();
+class MaintenanceCommand extends Translate5AbstractCommand {
+    
+    /*
+     * TODO - just the same as in ServerMaintenance - just for the local instance
+     */
+}
