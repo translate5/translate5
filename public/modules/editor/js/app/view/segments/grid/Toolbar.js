@@ -64,7 +64,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
     item_showBookmarkedSegments: '#UT#Nur Segmente mit Lesezeichen anzeigen',
     item_customizedModeBtn: '#UT#Angepasst',
-    item_resetCustomLayoutBtn:'#UT#Layout zurücksetzen',
     strings:{
     	interfaceTranslation:'#UT#Oberfläche'
     },
@@ -223,18 +222,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     text: me.item_clearSortAndFilterBtn
                 },{
                     xtype: 'tbseparator'
-                },{
-                    xtype: 'button',
-                    itemId: 'resetCustomLayoutBtn',
-                    bind: {
-                        hidden: '{!isCustomView}'
-                    },
-                    text: me.item_resetCustomLayoutBtn
-                },{
-                    xtype: 'tbseparator',
-                    bind: {
-                        hidden: '{!isCustomView}'
-                    }
                 },{
                     xtype: 'button',
                     itemId: 'watchListFilterBtn',
