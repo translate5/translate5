@@ -3789,10 +3789,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QWt0dWVsbGVzIERhdHVt'><source>Aktuelles Datum</source><target>Current date</target></trans-unit>
 <trans-unit id='U3R1bmRl'><source>Stunde</source><target>Hour</target></trans-unit>
 <trans-unit id='TWludXRlbg=='><source>Minuten</source><target>Minutes</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNSBzZW5kZXQgc3RhbmRhcmRtw6TDn2lnIDEgVGFnIHZvciB1bmQgMSBUYWcgbmFjaCBkZW0gZmVzdGdlbGVndGVuIERhdHVtIHVuZCBkZXIgZmVzdGdlbGVndGVuIFVocnplaXQgKCsvLSAxMCBNaW51dGVuKSBlaW5lIEZyaXN0ZXJpbm5lcnVuZy4gRGllcyBrYW5uIHZvbiBJaHJlbSBBZG1pbmlzdHJhdG9yIGdlw6RuZGVydCB3ZXJkZW4u'>
-  <source>translate5 sendet standardmäßig 1 Tag vor und 1 Tag nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.</source>
-  <target>translate5 will send a deadline reminder by default 1 day before and 1 day after the set date and time (+/- 10 min). This can be changed by your administrator.</target>
-</trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBzZW5kZXQgc3RhbmRhcmRtw6TDn2lnIDIgVGFnZSB2b3IgdW5kIDIgVGFnZSBuYWNoIGRlbSBmZXN0Z2VsZWd0ZW4gRGF0dW0gdW5kIGRlciBmZXN0Z2VsZWd0ZW4gVWhyemVpdCAoKy8tIDEwIE1pbnV0ZW4pIGVpbmUgRnJpc3RlcmlubmVydW5nLiBEaWVzIGthbm4gdm9uIElocmVtIEFkbWluaXN0cmF0b3IgZ2XDpG5kZXJ0IHdlcmRlbi4='><source>translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.</source><target>translate5 will send a deadline reminder by default 2 days before and 2 days after the set date and time (+/- 10 min). This can be changed by your administrator.</target></trans-unit>
 <trans-unit id='VGFnZW4='><source>Tagen</source><target>days</target></trans-unit>
 <trans-unit id='VGFn'><source>Tag</source><target>day</target></trans-unit>
 <trans-unit id='V8OkaGxlbiBTaWUgZGllIFJlc3NvdXJjZSBhdXMgdW0gd2VpdGVyZSBJbmZvcyB6dSBiZWtvbW1lbi4='>
