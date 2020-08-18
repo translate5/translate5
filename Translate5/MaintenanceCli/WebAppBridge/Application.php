@@ -56,19 +56,7 @@ class Application {
         }
     }
     
-    protected function initZend() {
-        foreach($this->zendIncludeDir as $dir) {
-            $zend = rtrim($dir,'/\\');
-            if(is_dir($zend) && file_exists($zend.'/Zend/Version.php')) {
-                set_include_path(get_include_path().PATH_SEPARATOR.$zend);
-                return;
-            }
-        }
-        throw new RuntimeException('No Zend library could be found in include path. Please provide the path to zend with the --zend parameter.');
-    }
-    
     public function init() {
-        $this->initZend();
         $cwd = getcwd();
         
         $_SERVER['REQUEST_URI'] = '/database/forceimportall';

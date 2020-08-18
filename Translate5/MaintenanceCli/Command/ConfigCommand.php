@@ -27,38 +27,18 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
-use Translate5\MaintenanceCli\Output\TaskTable;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 
 
-class ConfigCommand extends Command
+class ConfigCommand extends Translate5AbstractCommand
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'config';
-    
-    /**
-     * @var InputInterface
-     */
-    protected $input;
-    
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
-    
-    /**
-     * @var SymfonyStyle
-     */
-    protected $io;
     
     protected function configure()
     {
@@ -93,19 +73,10 @@ Modified values are shown bold in the simple listing.');
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->input = $input;
-        $this->output = $output;
-        $this->io = new SymfonyStyle($input, $output);
-        $app = new Application($input->getOption('zend-path'));
-        $app->init();
-        $this->io->title('Change Translate5 configuration.');
-        
-        $output->writeln([
-            '  <info>HostName:</> '.$app->getHostname(),
-            '   <info>AppRoot:</> '.APPLICATION_ROOT,
-            '   <info>Version:</> '.$app->getVersion(),
-            '',
-        ]);
+        $this->initInputOutput($input, $output);
+        $this->initTranslate5();
+        $this->writeTitle('Change Translate5 configuration.');
+
         $config = new \editor_Models_Config();
         $name = $this->input->getArgument('name');
         $foundConfigs = $config->loadListByNamePart($name);
