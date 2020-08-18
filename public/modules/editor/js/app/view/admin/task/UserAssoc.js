@@ -46,7 +46,7 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
       fieldDeadline:'#UT#Deadline',
       fieldSegmentrange: '#UT#Editierbare Segmente',
       fieldSegmentrangeInfo: '#UT#Bsp: 1-3,5,8-9 (Wenn die Rolle dieses Users das Editieren erlaubt und zu irgendeinem User dieser Rolle editierbare Segmente zugewiesen werden, dürfen auch alle anderen User dieser Rolle nur die Segmente editieren, die ihnen zugewiesen sind.)',
-      deadlineDateInfoTooltip:'#UT#translate5 sendet standardmäßig 1 Tag vor und 1 Tag nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.'
+      deadlineDateInfoTooltip:'#UT#translate5 sendet standardmäßig 2 Tage vor und 2 Tage nach dem festgelegten Datum und der festgelegten Uhrzeit (+/- 10 Minuten) eine Fristerinnerung. Dies kann von Ihrem Administrator geändert werden.'
   },
   viewModel: {
       type: 'taskuserassoc'
