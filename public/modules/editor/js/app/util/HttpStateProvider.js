@@ -138,7 +138,12 @@ Ext.define('Editor.util.HttpStateProvider',{
      * Sync the store records with the database
      */
     sync: function () {
-    	this.store.sync();
+        var me=this;
+    	me.store.sync({
+            success:function(){
+                me.fireEvent('statesynchronized', me);
+            }
+        });
     },
  
     /***

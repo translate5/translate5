@@ -35,6 +35,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.fileorder.ReferenceTree', {
   extend: 'Ext.tree.Panel',
   alias: 'widget.referenceFileTree',
+  itemId:'referenceFileTree',
   store: 'ReferenceFiles',
   cls: 'fileTree',
   rootVisible: false,

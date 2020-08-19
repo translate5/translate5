@@ -65,7 +65,7 @@ Ext.define('Editor.view.ViewPortEditor', {
           items = [{
               xtype: 'panel',
               stateId: 'editor.westPanel',
-              //stateEvents: ['collapse', 'expand'],
+              stateEvents: ['collapse', 'expand'],
               stateful:true,
               region: 'west',
               weight: 30,
@@ -81,7 +81,7 @@ Ext.define('Editor.view.ViewPortEditor', {
                   xtype: 'fileorder.tree',
                   stateId: 'editor.westPanelFileorderTree',
                   stateEvents: ['collapse', 'expand'],
-                  stateful:true,
+                  stateful:true
               },{
                   xtype: 'referenceFileTree',
                   stateId: 'editor.westPanelReferenceFileTree',
@@ -92,11 +92,13 @@ Ext.define('Editor.view.ViewPortEditor', {
               region: 'center',
               flex:Editor.app.getController('LanguageResources').isLanguageResourcesDisabled() ? 0.3 : 0.5,
               xtype: 'segments.grid',
-              itemId: 'segmentgrid'
+              itemId: 'segmentgrid',
+              stateful:true
           },{
               xtype: 'panel',
               stateId: 'editor.eastPanel',
-              //stateEvents: ['collapse', 'expand'],
+              itemId:'editorEastPanel',
+              stateEvents: ['collapse', 'expand'],
               stateful:true,
               region: 'east',
               width: 330,

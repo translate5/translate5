@@ -86,9 +86,6 @@ Ext.define('Editor.controller.ViewModes', {
             },
             '#segmentgrid': {
                 beforestartedit: 'checkModeBeforeEdit'
-            },
-            '#resetCustomLayoutBtn':{
-                click:'onResetCustomLayoutClick'
             }
         }
     },
@@ -105,6 +102,16 @@ Ext.define('Editor.controller.ViewModes', {
      */
     editModeColumnWidth:[],
     currentTagMode: 'short-tag',
+
+    constructor:function(){
+        var me=this;
+        me.callParent(arguments);
+        //register state provider event handlers
+        Ext.state.Manager.getProvider().on({
+            statechange:me.onStateProviderStateChange,
+            statesynchronized:me.onStateProviderStateChange
+        });
+    },
 
     init : function() {
         var me = this;
@@ -126,6 +133,8 @@ Ext.define('Editor.controller.ViewModes', {
         
         ROW_HEIGHT_ERGONOMIC: 60,
         ROW_HEIGHT_DEFAULT: 15,
+
+        ERGONOMIC_MODE_DEFAULT_SEGMENT_SIZE:4,
     },
     isFullTag: function(){
         return (this.currentTagMode == this.self.TAG_FULL);
@@ -139,7 +148,7 @@ Ext.define('Editor.controller.ViewModes', {
     handleViewportReady: function(grid) {
         var me=this;
         if(me.isCustomView()){
-            me.setViewMode( this.self.MODE_CUSTOM);
+            me.setViewMode(me.self.MODE_CUSTOM);
             return;
         }
         //start editor in normal(ergonomic) mode if configured, respect before set readonly mode
@@ -228,9 +237,12 @@ Ext.define('Editor.controller.ViewModes', {
         });
     },
     handleViewMode: function(item) {
-        var me=this;
-        if(me.isCustomView()){
-            me.removeCustomView()
+        var me=this,
+            isCustomView = me.isCustomView();
+
+        //if it is custom view mode, reset the custom layout (remove the custom user state)
+        if(isCustomView){
+            me.resetCustomLayout();
         }
         switch (item.mode.type) {
             case 'visualReviewMode':
@@ -252,9 +264,14 @@ Ext.define('Editor.controller.ViewModes', {
         var me = this;
 
         if(me.isCustomView()){
-            me.setViewMode( this.self.MODE_CUSTOM);
+            me.setViewMode(me.self.MODE_CUSTOM);
             return;
         }
+
+        //When the editor view mode is changed, we do not want this state to be saved.
+        //This function will cancel all state save events while the editor view mode is being modified
+        //After the editor view mode is adjusted, each stateful component shange will trigger the state change
+        me.suspendEditorStateSave();
 
         readonly = me.setReadonly(readonly);
         me.getViewModeMenu().hideMenu();
@@ -293,8 +310,14 @@ Ext.define('Editor.controller.ViewModes', {
             contentColumns = grid.hasRelaisColumn ? 3 : 2;
 
         if(me.isCustomView()){
+            me.setViewMode(me.self.MODE_CUSTOM);
             return;
         }
+
+        //When the editor view mode is changed, we do not want this state to be saved.
+        //This function will cancel all state save events while the editor view mode is being modified
+        //After the editor view mode is adjusted, each stateful component shange will trigger the state change
+        me.suspendEditorStateSave();
 
         readonly = me.setReadonly(readonly);
         
@@ -352,8 +375,9 @@ Ext.define('Editor.controller.ViewModes', {
         
         //ergoOnly others, with other mode
         wasAlreadyErgo || me.setViewMode(me.self.MODE_ERGONOMIC);
-        wasAlreadyErgo || grid.setSegmentSize(4);
-
+        if(!wasAlreadyErgo || grid.getSegmentSize()!==me.self.ERGONOMIC_MODE_DEFAULT_SEGMENT_SIZE){
+            grid.setSegmentSize(me.self.ERGONOMIC_MODE_DEFAULT_SEGMENT_SIZE)
+        }
         grid.view.refresh();
         me.handleTagButtonClick('short');
         me.saveAlreadyOpened();
@@ -366,10 +390,16 @@ Ext.define('Editor.controller.ViewModes', {
     showNonErgonomicElements : function() {
         var me = this;
         me.saveAlreadyOpened();
+
         Ext.Array.each(me.visibleColumns, function(col){
             col.show();
         });
         
+        //Info: state save needs to be suspended here since the file panel expand will resize the editor columns which leads to state change
+        me.getSegmentGrid().on('beforestatesave', function(){
+            return false;
+        }, me,{single:true});
+
         me.getFilePanel().expand();
         
         Ext.Array.each(me.getSegmentGrid().getColumns(), function(col){
@@ -467,27 +497,13 @@ Ext.define('Editor.controller.ViewModes', {
     },
 
     /***
-     * Reset custom button event handler. This will reset the custom view mode to simple mode
+     * Remove custom view state configuration and reset the order of the segments grid column to the default order.
+     * After the reset, new view mode can be applied
      */
-    onResetCustomLayoutClick:function(){
+    resetCustomLayout:function(){
         var me=this;
-        if(!me.isCustomMode()){
-            return;
-        }
-        //me.getSegmentGrid().suspendEvents();
         me.removeCustomView();
         me.getSegmentGrid().resetColumnOrder();
-        me.ergonomicMode();
-        //me.getSegmentGrid().resumeEvents();
-    },
-
-    /***
-     * Check if the given state config name belongs the editor state config group
-     */
-    isEditorCustomStateConfig : function(configName){
-        var sp = Ext.state.Manager.getProvider(),
-            prefix = sp.getEditorCustomStateConfigPrefix();
-        return (sp.DEFAULT_STATE_PREFIX + configName).startsWith(prefix) || configName.startsWith(prefix);
     },
 
     /***
@@ -509,19 +525,70 @@ Ext.define('Editor.controller.ViewModes', {
         return isCustomViewFlag;
     },
 
+
+    /***
+     * Get all editor state records in the stateprovider store
+     */
+    getEditorStateConfigRecords:function(){
+        var stateProvider = Ext.state.Manager.getProvider(),
+            store = stateProvider.store;
+        return store.query('name',stateProvider.getEditorCustomStateConfigPrefix());
+    },
+
     /***
      * Remove the custom view configuration for the current logged in user
      */
     removeCustomView:function(){
-        var stateProvider = Ext.state.Manager.getProvider(),
-            store = stateProvider.store,
-            remove = store.query('name',stateProvider.getEditorCustomStateConfigPrefix());
+        var me=this,
+            remove = me.getEditorStateConfigRecords();
         if(remove.length>0){
             remove.each(function(rec){
+                //set the value to empty array (this will not remove the state record from the store)
                 rec.set('value','{}');
             })
-            store.sync();
+            Ext.state.Manager.getProvider().sync();
         }
+    },
+
+    onStateProviderStateChange:function(){
+        var me=this;
+        //this can be called from the diferent scopes
+        if(!(me instanceof Editor.controller.ViewModes)){
+            me = Editor.app.getController('ViewModes');
+        }
+        //if the view mode is custom based on the state provider, update the vm variable
+        if(me.isCustomView()){
+            me.setViewMode(me.self.MODE_CUSTOM);
+        }
+    },
+
+    /***
+     * Suspend the initial state save for all editor stateful components.
+     * The state should not be saved when the editor view mode is adjusted.
+     */
+    suspendEditorStateSave:function(){
+        var me=this,
+            states = me.getEditorStateConfigRecords();//get all editor state records from the state provider
+
+        if(states.length<0){
+            return;
+        }
+        //default state name prefix for the state records in the state provider
+        var defaultSatePrefix = Ext.state.Manager.getProvider().DEFAULT_STATE_PREFIX;
+        states.each(function(rec){
+            var cmpStateId =rec.get('name').replace(defaultSatePrefix,''),//remove the default state prefix from the record name (the result should be the component state id)
+                cmp=Ext.ComponentQuery.query('[stateId="'+cmpStateId+'"]');
+            cmp = cmp[0] !=undefined ? cmp[0] : null;
+            //is component with state id from the record name found
+            if(cmp){
+                //for the found stateful component, do not save the state initialy
+                cmp.on('beforestatesave', function(){
+                    return false;
+                }, me,{single:true});
+            }
+            
+        })
+
     }
 
 });
