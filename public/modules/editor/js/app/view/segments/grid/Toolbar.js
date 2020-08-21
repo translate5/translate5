@@ -63,6 +63,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_watchListFilterBtn: '#UT#Lesezeichen',
     item_helpTooltip: '#UT#Tastaturkürzel nachschlagen',
     item_showBookmarkedSegments: '#UT#Nur Segmente mit Lesezeichen anzeigen',
+    item_customizedModeBtn: '#UT#Angepasst',
     strings:{
     	interfaceTranslation:'#UT#Oberfläche'
     },
@@ -125,6 +126,18 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                         checked: '{isErgoView}'
                     },
                     text: me.item_ergonomicModeReadonlyBtn,
+                    group: 'toggleView',
+                    textAlign: 'left'
+                },{
+                    xtype: 'menucheckitem',
+                    mode:{
+                        type: 'customMode'
+                    },
+                    bind: {
+                        checked: '{isCustomView}',
+                        hidden: '{!isCustomView}'
+                    },
+                    text : me.item_customizedModeBtn,
                     group: 'toggleView',
                     textAlign: 'left'
                 },{

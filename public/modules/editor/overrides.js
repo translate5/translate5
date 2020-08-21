@@ -1152,3 +1152,50 @@ Ext.override(Ext.data.schema.Role, {
 Ext.override(Ext.tip.ToolTip, {
     dismissDelay:15000
 });
+
+
+/***
+ * Check for column lenght throws an exception when not columns are defined.
+ * Check if the columns object exist before lenght check
+ */
+Ext.override(Ext.panel.Table, {
+    buildColumnHash: function(columns) {
+        var len = columns &&  columns.length,
+            columnState, i, result;
+        // Create a useable state lookup hash from which each column
+        // may look up its state based upon its stateId
+        // {
+        //      col_name: {
+        //          index: 0,
+        //          width: 100,
+        //          locked: true
+        //      },
+        //      col_details: {
+        //          index: 1,
+        //          width: 200,
+        //          columns: {
+        //              col_details_1: {
+        //                  index: 0,
+        //                  width: 100
+        //              },
+        //              col_details_2: {
+        //                  index: 1,
+        //                  width: 100
+        //              }
+        //          }
+        //      },
+        // }
+        if (columns) {
+            result = {};
+            for (i = 0 , len = columns.length; i < len; i++) {
+                columnState = columns[i];
+                columnState.index = i;
+                if (columnState.columns) {
+                    columnState.columns = this.buildColumnHash(columnState.columns);
+                }
+                result[columnState.id] = columnState;
+            }
+            return result;
+        }
+    }
+});
