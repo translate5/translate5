@@ -270,9 +270,14 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         $service = ZfExtended_Factory::get('editor_Plugins_NecTm_Service');
         /* @var $service editor_Plugins_NecTm_Service */
         $service->validateCategories(implode(',',$this->categories));
-        
         $filename = $this->languageResource->getSpecificData('fileName');  //  (= if file was imported for LanguageResource on creation)
-        
+        //if no filename is specified for the language resource, use the current translate5 domain as filename
+        if(empty($filename)){
+            $config = Zend_Registry::get('config');
+            $serverName = $config->runtimeOptions->server->name;
+            //replace non-alpha-numeric characters
+            $filename = preg_replace('/[^a-z0-9]+/', '_', strtolower($serverName));
+        }
         $source= $this->prepareSegmentContent($this->getQueryString($segment));
         $target= $this->prepareSegmentContent($segment->getTargetEdit());
 
