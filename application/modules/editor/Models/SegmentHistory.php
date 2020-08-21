@@ -206,6 +206,4 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
               AND seg.autoStateId IN(?);';
         $retval=$this->db->getAdapter()->query($sql,[$taskGuid,implode(',', $autoStates)]);
     }
-    
-    
 }

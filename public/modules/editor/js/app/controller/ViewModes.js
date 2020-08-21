@@ -108,6 +108,10 @@ Ext.define('Editor.controller.ViewModes', {
         me.toggleTags(me.self.TAG_SHORT);
     },
 
+    listeners:{
+        viewModeChanged : 'onViewModeChange'
+    },
+
     statics: {
         STYLE_BOX_ID: 'ergonomicStyleId',
         
@@ -326,7 +330,7 @@ Ext.define('Editor.controller.ViewModes', {
         me.handleTagButtonClick('short');
         me.saveAlreadyOpened();
 
-        wasAlreadyErgo || me.fireEvent('viewModeChanged',me);
+        me.fireEvent('viewModeChanged',me);
     },
     /**
      * show or expand all columns and areas not needed in ergonomic mode, which have been visible before
@@ -450,5 +454,20 @@ Ext.define('Editor.controller.ViewModes', {
         Ext.getBody().removeCls(oldSize);
         Ext.getBody().addCls(size);
         me.fireEvent('segmentSizeChanged', me, size, oldSize);
+    },
+
+    /***
+     * View mode change event handler
+     */
+    onViewModeChange:function(){
+        var me=this,
+            grid = me.getSegmentGrid(),
+            pos = grid.getSelectionModel().getCurrentPosition();
+
+        if(!pos || pos.rowIdx == undefined){
+            return;
+        }
+        //preserve the row selection on viewmode change
+        grid.scrollTo(pos.rowIdx);
     }
 });
