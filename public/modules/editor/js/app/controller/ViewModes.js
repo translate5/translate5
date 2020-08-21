@@ -574,16 +574,16 @@ Ext.define('Editor.controller.ViewModes', {
             grid = me.getSegmentGrid(),
             pos = grid.getSelectionModel().getCurrentPosition();
 
+        //resume the state save for the editor stateful components after the view mode adjusments are finished
+        new Ext.util.DelayedTask(function(){
+            me.manageEditorStateSave(true);
+        }).delay(2000);
+        
         if(!pos || pos.rowIdx == undefined){
             return;
         }
         //preserve the row selection on viewmode change
         grid.scrollTo(pos.rowIdx);
-
-        //resume the state save for the editor stateful components after the view mode adjusments are finished
-        new Ext.util.DelayedTask(function(){
-            me.manageEditorStateSave(true);
-        }).delay(2000);
     },
 
     /***
