@@ -43,6 +43,7 @@ Ext.define('Editor.view.segments.column.ContentEditable', {
       Ext.applyIf(conf, {
           dataIndex: field + 'Edit',
           itemId: field + 'EditColumn',
+          stateId:field + 'EditColumn',
           tdCls: 'editable segment-tag-column'+this.getTypeCls(conf.segmentField)
       });
       this.callParent(arguments);

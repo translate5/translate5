@@ -65,6 +65,19 @@ Ext.define('Editor.view.comments.PanelViewController', {
         }
     },
 
+    /***
+     * Comment panel expand event handler
+     */
+    onCommentPanelExpand:function(){
+        var me=this,
+            form = me.getCommentForm(),
+            area = form.down('textarea');
+        if(area.rendered && area.isVisible()) {
+            area.selectText();
+            area.focus(false, 500);
+        }
+    },
+
     /**
      * Interceptor Method to call saveComment. 
      * Since saveComment returns boolean it can stop the event loop, which is not wanted, 
@@ -230,9 +243,8 @@ Ext.define('Editor.view.comments.PanelViewController', {
            return; 
         }
         var me = this,
-            form = me.getCommentForm(),
-            area = form.down('textarea'),
             commentPanel = me.getCommentPanel();
+            
         if(! rec.get('isEditable')){
             return;
         }
@@ -241,10 +253,6 @@ Ext.define('Editor.view.comments.PanelViewController', {
 
         if(commentPanel.isCollapsable && commentPanel.collapsed) {
             return; //collapsed no select / focus needed
-        }
-        if(area.rendered && area.isVisible()) {
-            area.selectText();
-            area.focus(false, 500);
         }
     },
 
@@ -362,6 +370,4 @@ Ext.define('Editor.view.comments.PanelViewController', {
     getCommentContainer:function(){
         return Ext.ComponentQuery.query('#commentPanel #commentContainer')[0];
     }
-
-
 });

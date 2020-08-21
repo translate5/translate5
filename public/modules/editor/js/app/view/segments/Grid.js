@@ -62,8 +62,7 @@ Ext.define('Editor.view.segments.Grid', {
     plugins: ['gridfilters'],
     alias: 'widget.segments.grid',
     helpSection: 'editor',
-    stateId: 'segmentsGrid',
-    stateful: true,
+    stateId: 'editor.segmentsGrid',
     id: 'segment-grid',
     viewModel: {
         type:'segmentsGrid'
@@ -79,6 +78,85 @@ Ext.define('Editor.view.segments.Grid', {
     hasRelaisColumn: false,
     stateData: {},
     qualityData: {},
+
+    currentSegmentSize: null,
+
+    /**
+     * New segment size cls class with segment size number in it.
+     */
+    newSegmentSizeCls:'',
+
+    /**
+     * New segment size cls class with segment size number in it.
+     */
+    oldSegmentSizeCls:'',
+
+    /**
+     * @cfg {Int} segmentSize
+     */
+    segmentSize:0,
+    
+    publishes: {
+    	//publish this field so it is bindable
+    	segmentSize: true
+    },
+    
+    //events to trigger the state update
+    stateEvents:['segmentSizeChanged'],
+    
+    stateful:{
+        segmentSize:true,
+        columns:true
+    },
+    
+     /***
+     * add our custom config to the state return object
+     */
+    getState: function() {
+		var me = this,
+			state = me.callParent() || {};
+		state = me.addPropertyToState(state, 'segmentSize');
+        return state;
+    },
+    
+    /***
+     * After applying the default component states, add the custom one
+     */
+    applyState: function(state) {
+    	if(Ext.isEmpty(state) || Ext.Object.isEmpty(state)){
+    		return;
+        }
+        this.callParent(arguments);
+    	this.setSegmentSize(state.segmentSize);
+    },
+	
+	getSegmentSize:function(){
+		return this.segmentSize;
+    },
+    
+    /**
+     * Sets the segment font size via CSS class
+     */
+    setSegmentSize: function(size, relative) {
+        var me=this,
+            oldSize = me.currentSegmentSize,
+            sizer;
+        if(relative) {
+            size = oldSize + size;
+        }
+        size = Math.min(Math.max(size, 1), 6);
+        me.currentSegmentSize = size;
+        me.segmentSize = me.currentSegmentSize;
+        sizer = function(size) {return 'segment-size-'+size};
+        size = sizer(size);
+        oldSize = sizer(oldSize);
+        Ext.getBody().removeCls(oldSize);
+        Ext.getBody().addCls(size);
+        me.fireEvent('segmentSizeChanged', me, size, oldSize);
+        me.newSegmentSizeCls = size;
+        me.oldSegmentSizeCls = oldSize;
+    },
+
     constructor: function() {
         this.plugins = [
             'gridfilters',
@@ -93,7 +171,8 @@ Ext.define('Editor.view.segments.Grid', {
             fields = Editor.data.task.segmentFields(),
             userPref = Editor.data.task.userPrefs().first(),
             fieldList = [],
-            fieldClsList;
+            fieldClsList,
+            tmpColumnInitialIndex = 0;
 
         if(Editor.app.authenticatedUser.isAllowed('editorCommentsForLockedSegments')) {
             me.addCls('comments-for-locked-segments');
@@ -110,10 +189,14 @@ Ext.define('Editor.view.segments.Grid', {
         columns.push.apply(columns, [{
             xtype: 'segmentNrInTaskColumn',
             itemId: 'segmentNrInTaskColumn',
+            stateId: 'segmentNrInTaskColumn',
+            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             width: 50
         },{
             xtype: 'workflowStepColumn',
             itemId: 'workflowStepColumn',
+            stateId: 'workflowStepColumn',
+            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             renderer: function(v) {
                 var steps = Editor.data.task.getWorkflowMetaData().steps;
                 return steps[v] ? steps[v] : v;
@@ -122,11 +205,17 @@ Ext.define('Editor.view.segments.Grid', {
         },{
             xtype: 'autoStateColumn',
             itemId: 'autoStateColumn',
+            stateId: 'autoStateColumn',
+            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             width: 82
         },{
-            xtype: 'matchrateColumn'
+            xtype: 'matchrateColumn',
+            stateId: 'matchrateColumn',
+            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
         },{
             xtype: 'matchrateTypeColumn',
+            stateId: 'matchrateTypeColumn',
+            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             hidden: true
         }]);
         
@@ -136,7 +225,7 @@ Ext.define('Editor.view.segments.Grid', {
         });
         
         fieldList = Editor.model.segment.Field.listSort(fieldList);
-        
+
         Ext.Array.each(fieldList, function(rec){
             var name = rec.get('name'),
                 type = rec.get('type'),
@@ -165,6 +254,7 @@ Ext.define('Editor.view.segments.Grid', {
                 }
                 var col2push = {
                     xtype: 'contentColumn',
+                    columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
                     grid: me,
                     segmentField: rec,
                     fieldName: name,
@@ -193,6 +283,7 @@ Ext.define('Editor.view.segments.Grid', {
                 width = Math.min(Math.max(width, labelWidth), maxWidth);
                 var col2push = {
                     xtype: 'contentEditableColumn',
+                    columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
                     grid: me,
                     segmentField: rec,
                     fieldName: name,
@@ -215,38 +306,47 @@ Ext.define('Editor.view.segments.Grid', {
                 columns.push(col2push);
             }
         });
-        
-    
         columns.push.apply(columns, [{
             xtype: 'commentsColumn',
             itemId: 'commentsColumn',
+            stateId:'commentsColumn',
+            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             width: 200
         }]);
-    
+
         if(Editor.data.segments.showStatus){
             columns.push({
                 xtype: 'stateColumn',
-                itemId: 'stateColumn'
+                itemId: 'stateColumn',
+                stateId:'stateColumn',
+                columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             });
         }
-        
         if(Editor.data.segments.showQM){
             columns.push({
                 xtype: 'qualityColumn',
-                itemId: 'qualityColumn'
+                itemId: 'qualityColumn',
+                stateId:'qualityColumn',
+                columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             });
         }
     
         columns.push.apply(columns, [{
             xtype: 'usernameColumn',
             itemId: 'usernameColumn',
+            stateId:'usernameColumn',
+            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             width: 122
         },{
             xtype: 'editableColumn',
-            itemId: 'editableColumn'
+            itemId: 'editableColumn',
+            stateId:'editableColumn',
+            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
         },{
             xtype: 'iswatchedColumn',
-            itemId: 'iswatchedColumn'
+            itemId: 'iswatchedColumn',
+            stateId:'iswatchedColumn',
+            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
         }]);
     
         Ext.applyIf(me, {
@@ -266,7 +366,6 @@ Ext.define('Editor.view.segments.Grid', {
             },
             columns: columns
         });
-
         me.callParent(arguments);
 
         fieldClsList = me.query('contentEditableColumn').concat(me.query('contentColumn'));
@@ -275,6 +374,7 @@ Ext.define('Editor.view.segments.Grid', {
         });
         Ext.util.CSS.removeStyleSheet('segment-content-width-definition');
         Ext.util.CSS.createStyleSheet(fieldClsList.join("\n"),'segment-content-width-definition');
+        
     },
     
     initConfig: function(instanceConfig) {
@@ -306,7 +406,7 @@ Ext.define('Editor.view.segments.Grid', {
                 dockedItems: [{
                     xtype: 'segmentsToolbar',
                     dock: 'top',
-                    }]
+                }]
             };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
@@ -465,5 +565,28 @@ Ext.define('Editor.view.segments.Grid', {
                 }
             });
         });
+    },
+
+    /***
+     * Reset grid column order. As sort index, columnInitialIndex(grid column property) is used
+     */
+    resetColumnOrder:function(){
+        var me=this,
+            headerCt = me.getHeaderContainer(),
+            columns = me.getColumns();
+
+        //sort the column order based on the columnInitialIndex field value
+        Ext.Array.sort(columns,function(col1,col2) {
+            if(col1.columnInitialIndex < col2.columnInitialIndex) return -1;
+            if(col1.columnInitialIndex > col2.columnInitialIndex) return 1;
+            return 0;
+        });
+
+        headerCt.suspendLayouts();
+        for(var i=0;i<columns.length;i++){
+            headerCt.moveAfter(columns[i],(columns[i-1] || null));
+        }
+        headerCt.resumeLayouts(true);
     }
+
 });
