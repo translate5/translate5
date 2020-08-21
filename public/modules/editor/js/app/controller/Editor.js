@@ -1732,12 +1732,13 @@ Ext.define('Editor.controller.Editor', {
         var store= grid.getStore(),
             selection = grid.getSelection(),
             segment=store.findRecord('segmentNrInTask',segmentNrInTask,0,false,false,true),
-            index=store.indexOf(segment);
+            index=store.indexOf(segment),
+            row = grid.getView().getRow(index);
         
         /***
-         * If the selection exist, and the selection is the current requested segments, do nothing
+         * If the selection exist, and the selection is the current requested segments, and the selected row is visible -> do nothing
          */
-        if((selection && selection.length>0) && selection[0] == segment){
+        if((selection && selection.length>0) && selection[0] == segment && (row && Ext.get(row).isVisible(true))){
             return;
         }
 
@@ -1750,7 +1751,7 @@ Ext.define('Editor.controller.Editor', {
         }
         //the segment does not exist in the segments store, try to load the segment index from the db
         grid.searchPosition(segmentNrInTask).then((idx)=>{
-            grid.scrollTo(idx);
+            grid.scrollTo(Math.max(0,idx));
         });
     },
 
@@ -1764,9 +1765,18 @@ Ext.define('Editor.controller.Editor', {
     /***
      * Segments store load event handler
      */
-    onSegmentsStoreLoad:function(){
-        var me=this;
-        me.focusSegment(Math.max(1,Editor.app.parseSegmentIdFromTaskEditHash(true)));
+    onSegmentsStoreLoad:function(store){
+        var me=this,
+            segmentIdFromHash = Editor.app.parseSegmentIdFromTaskEditHash(true);
+        if(store.proxy.reader.metaData.jumpToSegmentIndex && store.proxy.reader.metaData.jumpToSegmentIndex > -1){
+            me.getSegmentGrid().scrollTo(store.proxy.reader.metaData.jumpToSegmentIndex);
+            return;
+        }
+        if(segmentIdFromHash > 0){
+            me.focusSegment(segmentIdFromHash);
+            return;
+        }
+        me.focusSegment(1);
     },
 
     /**
