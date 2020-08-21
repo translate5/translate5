@@ -394,7 +394,6 @@ class editor_Plugins_NecTm_HttpApi {
         $data = [];
         $queryParams = [];
         $processResponse = $this->necTmRequest($method, $endpointPath, $data, $queryParams);
-        error_log($this->result->jobs[0]->status);
         return $this->result->jobs[0]->status;
     }
     
