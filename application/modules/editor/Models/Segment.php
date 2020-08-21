@@ -1770,4 +1770,20 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         return $parameters;
     }
+
+    /***
+     * Get the last edited segment in task for the user and.
+     */
+    public function getLastEditedByUserAndTask(string $taskGuid, string $userGuid) : int{
+        $this->reInitDb($taskGuid);
+        $mv = $this->segmentFieldManager->getView();
+        //find the last edited segment for the user from the segment view table and the segments history
+        $sql = "select * from ( select id as 'segmentId',timestamp as 'date' from ".$mv->getName()." where taskGuid = ? and userGuid = ? order by date desc limit 1 ) v 
+                union all 
+                select * from ( select segmentId,created as 'date' from LEK_segment_history where taskGuid = ? and userGuid = ? order by date desc limit 1 ) h 
+                order by date desc limit 1";
+        $stmt = $this->db->getAdapter()->query($sql,[$taskGuid,$userGuid,$taskGuid,$userGuid]);
+        $result = $stmt->fetchAll();
+        return $result[0]['segmentId'] ?? -1;
+    }
 }
