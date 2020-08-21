@@ -158,7 +158,7 @@ class editor_Models_TaskUserAssoc_Segmentrange {
      * @param string $segmentRanges
      * @return array
      */
-    private static function getNumbers(string $segmentRanges) : array {
+    public static function getNumbers(string $segmentRanges) : array {
         // Example for "1-3;5, 8-9 ":
         // $segmentNumbers = [1,2,3,5,8,9]
         $segmentNumbers = [];

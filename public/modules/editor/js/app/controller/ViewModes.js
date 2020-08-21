@@ -118,6 +118,10 @@ Ext.define('Editor.controller.ViewModes', {
         me.toggleTags(me.self.TAG_SHORT);
     },
 
+    listeners:{
+        viewModeChanged : 'onViewModeChange'
+    },
+
     statics: {
         STYLE_BOX_ID: 'ergonomicStyleId',
         
@@ -382,7 +386,7 @@ Ext.define('Editor.controller.ViewModes', {
         me.handleTagButtonClick('short');
         me.saveAlreadyOpened();
 
-        wasAlreadyErgo || me.fireEvent('viewModeChanged',me);
+        me.fireEvent('viewModeChanged',me);
     },
     /**
      * show or expand all columns and areas not needed in ergonomic mode, which have been visible before
@@ -563,6 +567,21 @@ Ext.define('Editor.controller.ViewModes', {
     },
 
     /***
+     * View mode change event handler
+     */
+    onViewModeChange:function(){
+        var me=this,
+            grid = me.getSegmentGrid(),
+            pos = grid.getSelectionModel().getCurrentPosition();
+
+        if(!pos || pos.rowIdx == undefined){
+            return;
+        }
+        //preserve the row selection on viewmode change
+        grid.scrollTo(pos.rowIdx);
+    },
+
+    /***
      * Suspend the initial state save for all editor stateful components.
      * The state should not be saved when the editor view mode is adjusted.
      */
@@ -588,7 +607,6 @@ Ext.define('Editor.controller.ViewModes', {
             }
             
         })
-
     }
 
 });
