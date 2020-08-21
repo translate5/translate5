@@ -155,6 +155,11 @@ Ext.define('Editor.controller.ViewModes', {
             me.setViewMode(me.self.MODE_CUSTOM);
             return;
         }
+
+        //When the editor view mode is changed, we do not want this state to be saved.
+        //This function will cancel all state save events while the editor view mode is being modified
+        me.manageEditorStateSave(false);
+
         //start editor in normal(ergonomic) mode if configured, respect before set readonly mode
         if(Editor.data.app.startViewMode == 'normal') {
             me.ergonomicMode(grid.lookupViewModel().get('editorIsReadonly'));
@@ -244,10 +249,15 @@ Ext.define('Editor.controller.ViewModes', {
         var me=this,
             isCustomView = me.isCustomView();
 
+        //When the editor view mode is changed, we do not want this state to be saved.
+        //This function will cancel all state save events while the editor view mode is being modified
+        me.manageEditorStateSave(false);
+        
         //if it is custom view mode, reset the custom layout (remove the custom user state)
         if(isCustomView){
             me.resetCustomLayout();
         }
+
         switch (item.mode.type) {
             case 'visualReviewMode':
             case 'customMode':
@@ -271,11 +281,6 @@ Ext.define('Editor.controller.ViewModes', {
             me.setViewMode(me.self.MODE_CUSTOM);
             return;
         }
-
-        //When the editor view mode is changed, we do not want this state to be saved.
-        //This function will cancel all state save events while the editor view mode is being modified
-        //After the editor view mode is adjusted, each stateful component shange will trigger the state change
-        me.suspendEditorStateSave();
 
         readonly = me.setReadonly(readonly);
         me.getViewModeMenu().hideMenu();
@@ -317,11 +322,6 @@ Ext.define('Editor.controller.ViewModes', {
             me.setViewMode(me.self.MODE_CUSTOM);
             return;
         }
-
-        //When the editor view mode is changed, we do not want this state to be saved.
-        //This function will cancel all state save events while the editor view mode is being modified
-        //After the editor view mode is adjusted, each stateful component shange will trigger the state change
-        me.suspendEditorStateSave();
 
         readonly = me.setReadonly(readonly);
         
@@ -400,9 +400,9 @@ Ext.define('Editor.controller.ViewModes', {
         });
         
         //Info: state save needs to be suspended here since the file panel expand will resize the editor columns which leads to state change
-        me.getSegmentGrid().on('beforestatesave', function(){
-            return false;
-        }, me,{single:true});
+        // me.getSegmentGrid().on('beforestatesave', function(){
+        //     return false;
+        // }, me,{single:true});
 
         me.getFilePanel().expand();
         
@@ -579,13 +579,19 @@ Ext.define('Editor.controller.ViewModes', {
         }
         //preserve the row selection on viewmode change
         grid.scrollTo(pos.rowIdx);
+
+        //resume the state save for the editor stateful components after the view mode adjusments are finished
+        new Ext.util.DelayedTask(function(){
+            me.manageEditorStateSave(true);
+        }).delay(2000);
     },
 
     /***
-     * Suspend the initial state save for all editor stateful components.
-     * The state should not be saved when the editor view mode is adjusted.
+     * Mange the stateful property of all editor stateful components.
+     * In some cases (when editor view mode is adjusted), the saving of the state should be disabled.
+     * The state saving will be enabled after the editor view mode adjustments are finished
      */
-    suspendEditorStateSave:function(){
+    manageEditorStateSave:function(statefull){
         var me=this,
             states = me.getEditorStateConfigRecords();//get all editor state records from the state provider
 
@@ -600,10 +606,7 @@ Ext.define('Editor.controller.ViewModes', {
             cmp = cmp[0] !=undefined ? cmp[0] : null;
             //is component with state id from the record name found
             if(cmp){
-                //for the found stateful component, do not save the state initialy
-                cmp.on('beforestatesave', function(){
-                    return false;
-                }, me,{single:true});
+                cmp.setStateful(statefull);
             }
             
         })
