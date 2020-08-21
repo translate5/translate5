@@ -64,6 +64,7 @@ Ext.define('Editor.view.segments.column.Content', {
       Ext.applyIf(conf, {
           dataIndex: field,
           itemId: field + 'Column',
+          stateId:field + 'Column',
           tdCls: 'segment-tag-column'+this.getTypeCls(conf.segmentField)
       });
       this.callParent(arguments);

@@ -45,6 +45,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
     scrollable: 'y',
     frameHeader: false,
     id: 'segment-metadata',
+    itemId:'editorSegmentsMetaData',
     title: '#UT#Segment-Metadaten',
 
     layout: 'auto',
