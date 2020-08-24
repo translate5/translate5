@@ -161,6 +161,14 @@ class editor_Plugins_PangeaMt_HttpApi {
     protected function getHttp($method, $endpointPath = '') {
         $this->http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        //set the request timeout from configuration if provided
+        if(isset($config->runtimeOptions->plugins->PangeaMt->requestTimeout)){
+            $this->http->setConfig([
+                'request_timeout'=> $config->runtimeOptions->plugins->PangeaMt->requestTimeout
+            ]);
+        }
         $this->http->setUri($this->getUrl($endpointPath));
         $this->http->setMethod($method);
         $this->httpMethod = $method;
