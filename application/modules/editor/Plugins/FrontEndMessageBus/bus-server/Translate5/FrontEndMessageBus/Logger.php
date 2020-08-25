@@ -28,7 +28,7 @@
 namespace Translate5\FrontEndMessageBus;
 
 /**
- * 
+ *
  * @method void fatal() fatal(string $message, $domain = null)
  * @method void error() error(string $message, $domain = null)
  * @method void warn() warn  (string $message, $domain = null)
@@ -99,10 +99,10 @@ class Logger {
                 echo $msg."\n";
             break;
         }
-//FIXME print data only on verbose!
+        //FIXME log data only on verbose!
         if(false && !is_null($second) && (is_array($second) || is_object($second))) {
             $msg .= "\n".print_r($second,1);
+            echo $msg;
         }
-        error_log($msg);
     }
 }
