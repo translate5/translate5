@@ -66,7 +66,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      */
     redirectFocus:function(record, includeTask){
         var me = this,
-            isModel = Editor.data.task.isModel,
+            isModel = record && record.isModel,
             id = isModel ? record.get('id') : record.id,
             projectId = isModel ? record.get('projectId') : record.projectId;
 
