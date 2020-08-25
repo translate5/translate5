@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a578f6b883507b8815851a6c7d0eb44f",
+    "content-hash": "71cce4be5bb541942d9ceffe2c0cd50c",
     "packages": [
         {
             "name": "apix/log",
@@ -2870,16 +2870,16 @@
         },
         {
             "name": "shardj/zf1-future",
-            "version": "dev-thomaslauria-throwable-patch",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/MittagQI/zf1-php7.3.git",
-                "reference": "237350150c75a307b1d19dc6cf3eddfe07ed27f5"
+                "reference": "f7b607d74841dcfbf4b1e576cbc083f22b982886"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/MittagQI/zf1-php7.3/zipball/237350150c75a307b1d19dc6cf3eddfe07ed27f5",
-                "reference": "237350150c75a307b1d19dc6cf3eddfe07ed27f5",
+                "url": "https://api.github.com/repos/MittagQI/zf1-php7.3/zipball/f7b607d74841dcfbf4b1e576cbc083f22b982886",
+                "reference": "f7b607d74841dcfbf4b1e576cbc083f22b982886",
                 "shasum": ""
             },
             "archive": {
@@ -2923,9 +2923,9 @@
                 "zf1"
             ],
             "support": {
-                "source": "https://github.com/MittagQI/zf1-php7.3/tree/thomaslauria-throwable-patch"
+                "source": "https://github.com/MittagQI/zf1-php7.3/tree/master"
             },
-            "time": "2020-08-12T11:26:24+00:00"
+            "time": "2020-08-25T09:01:10+00:00"
         },
         {
             "name": "symfony/console",
