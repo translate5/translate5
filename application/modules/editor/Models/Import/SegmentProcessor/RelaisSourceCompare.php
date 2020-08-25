@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Compares the segment-source of a relais-source with it's segment-source
  * Also generalizes the errors that may occur
- * This is used for the Relais-Processor but also the visual-reviews aligned layout
+ * This is used for the Relais-Processor but also the Visual Reviews aligned layout
  */
 class editor_Models_Import_SegmentProcessor_RelaisSourceCompare {
 

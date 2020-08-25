@@ -2439,14 +2439,17 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>XLIFF 2.1</source>
     <target>XLIFF 2.1</target>
 </trans-unit>
-<trans-unit id='RXh0ZXJuZSBCZWFyYmVpdHVuZyBhbHMgRXhjZWw='><source>Externe Bearbeitung als Excel</source><target>External editing as Excel</target></trans-unit>
+<trans-unit id='RXh0ZXJuZSBCZWFyYmVpdHVuZyBhbHMgRXhjZWw='>
+    <source>Externe Bearbeitung als Excel</source>
+    <target>External editing as Excel</target>
+</trans-unit>
 <trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='>
     <source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source>
     <target>Re-import chosen tasks into current TM</target>
 </trans-unit>
-<trans-unit id='VGVybWlub2xvZ2llcG9ydGFs'>
-    <source>Terminologieportal</source>
-    <target>Terminology portal</target>
+<trans-unit id='VGVybVBvcnRhbA=='>
+    <source>TermPortal</source>
+    <target>TermPortal</target>
 </trans-unit>
 <trans-unit id='U3VjaGU='><source>Suche</source><target>Search</target></trans-unit>
 <trans-unit id='RmlsdGVy'>
@@ -2457,22 +2460,18 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 	<source>Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.</source>
 	<target>There are currently no clients connected to your account and therefore no TermCollections assigned. Therefore no term search is possible.</target>
 </trans-unit>
-
 <trans-unit id='RXMgd3VyZGVuIGtlaW5lIHZlcmbDvGdiYXJlbiB0ZXJtQ29sbGVjdGlvbiBmw7xyIGRlbiBJaG5lbiB6dWdlb3JkbmV0ZW4gS3VuZGVuIGdlZnVuZGVuLg=='>
 	<source>Es wurden keine verfügbaren termCollection für den Ihnen zugeordneten Kunden gefunden.</source>
 	<target>No available term collections were found for the clients that are associated to you.</target>
 </trans-unit>
-
 <trans-unit id='RWludHLDpGdl'>
     <source>Einträge</source>
     <target>Entries</target>
 </trans-unit>
-
 <trans-unit id='VGVybWU='>
 	<source>Terme</source>
 	<target>Terms</target>
 </trans-unit>
-
 <trans-unit id='RWludHJhZ3NlaWdlbnNjaGFmdGVu'>
 	<source>Eintragseigenschaften</source>
 	<target>Term entry attributes</target>
@@ -2997,8 +2996,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Segmentschriftgrad verkleinern (STRG + -)</source>
     <target>decrease segment font-size (STRG + -)</target>
 </trans-unit>
-<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5n'>
-    <source>Sofortübersetzung</source>
+<trans-unit id='SW5zdGFudFRyYW5zbGF0ZQ=='>
+    <source>InstantTranslate</source>
     <target>Instant-Translate</target>
 </trans-unit>
 <trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gaW4gRm9ybSBlaW5lciBUQlggRGF0ZWkgaW1wb3J0aWVyZW4gdW5kIGRlbSBiZXN0ZWhlbmRlbiBUZXJtLUNvbGxlY3Rpb24gaGluenVmw7xnZW4='>
@@ -3218,7 +3217,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='dHJhbnNsYXRlNS10ZXJtcG9ydGFs'>
     <source>translate5-termportal</source>
-    <target>Terminologieportal</target>
+    <target>TermPortal</target>
 </trans-unit>
 <trans-unit id='RGllIMO8YmVyZ2ViZW5lIFF1ZWxsc3ByYWNoZSAie2xhbmd1YWdlfSIgaXN0IHVuZ8O8bHRpZyE='>
   <source>Die übergebene Quellsprache "{language}" ist ungültig!</source>
@@ -3384,8 +3383,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='VGVybS1Db2xsZWN0aW9uIGbDvHIgVGVybS1Wb3JzY2hsYWcgd8OkaGxlbg=='><source>Term-Collection für Term-Vorschlag wählen</source><target>Select Term-Collection for term proposal</target></trans-unit>
 <trans-unit id='SsO8bmdlciBhbHMgb2RlciBnbGVpY2g='><source>Jünger als oder gleich</source><target>Younger than or equal</target></trans-unit>
 <trans-unit id='RXhwb3J0aWVyZW4='><source>Exportieren</source><target>Export</target></trans-unit>
-<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIG5hY2g='><source>Sofortübersetzung nach</source><target>InstantTranslate into</target></trans-unit>
-<trans-unit id='VGVybWlub2xvZ2llcG9ydGFsLVNwcmFjaGVu'><source>Terminologieportal-Sprachen</source><target>TermPortal-languages</target></trans-unit>
+<trans-unit id='SW5zdGFudFRyYW5zbGF0ZSBuYWNo'><source>InstantTranslate nach</source><target>InstantTranslate into</target></trans-unit>
+<trans-unit id='VGVybVBvcnRhbCBTcHJhY2hlbg=='><source>TermPortal Sprachen</source><target>TermPortal languages</target></trans-unit>
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>All languages available</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Saving the term will also create a new entry for</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Vorschläge löschen, deren letzte Berührung länger her ist als</source><target>Delete proposals last touched longer ago than</target></trans-unit>
