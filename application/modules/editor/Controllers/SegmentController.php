@@ -89,6 +89,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->addIsWatchedFlag();
         $this->addFirstEditable();
         $this->addIsFirstFileInfo($taskGuid);
+        $this->addJumpToSegmentIndex();
         
         // ----- Specific handling of rows (start) -----
 
@@ -222,8 +223,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         if($this->offset > 0 || empty($this->view->rows)) {
             return;
         }
-        //since we dont use metaData otherwise, we can overwrite it completly:
-        $this->view->metaData = new stdClass();
+
+        if(!isset($this->view->metaData)){
+            //since we dont use metaData otherwise, we can overwrite it completly:
+            $this->view->metaData = new stdClass();
+        }
         
         //loop over the loaded segments, if there is an editable use that
         foreach($this->view->rows as $idx => $segment) {
@@ -775,6 +779,66 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             return false;
         }
         return $tua->getAllAssignedSegmentsByUserAndRole($task->getTaskGuid(), $sessionUserGuid, $role);
-        
+    }
+
+    /***
+     * Add jumpToSegmentIndex property to the view metaData object.
+     * Where to jump is determined in the following order:
+     * 
+     * 1. Last edited/modified segment by the current user and task
+     * 2. First defined segment in the segment range definition for the current user for the task for the workflow role
+     * 3. First editable segment in the workflow
+     * 4. First segment in the task
+     */
+    protected function addJumpToSegmentIndex(){
+        $sessionUser = new Zend_Session_Namespace('user');
+        $userGuid = $sessionUser->data->userGuid;
+        $taskGuid = $this->session->taskGuid;
+
+
+        if(!isset($this->view->metaData)){
+            $this->view->metaData = new stdClass();
+        }
+
+        //jump to the last edited segment from the user
+        $segmentId = $this->entity->getLastEditedByUserAndTask($taskGuid,$userGuid);
+
+        if($segmentId > 0){
+            //last edited segment found, find and set the segment index
+            $this->entity->load($segmentId);
+            $this->view->metaData->jumpToSegmentIndex = $this->entity->getIndex();
+            return;
+        }
+
+        $tua = null;
+        try {
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskGuidForceWorkflowRole($userGuid,$taskGuid);
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+        }
+
+        if(empty($tua)){
+            $this->view->metaData->jumpToSegmentIndex = $this->view->metaData->firstEditable ?? 0;
+            return;
+        }
+
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+
+        //if for the task there are no ranges defined, use first editable(if defined) or 0
+        if(!$tua->isSegmentrangedTaskForRole($task,$tua->getRole())){
+            $this->view->metaData->jumpToSegmentIndex = $this->view->metaData->firstEditable ?? 0;
+            return;
+        }
+
+        $range = $tua->getSegmentrange() ?? null;
+        //if there are ranges defined for the user, use the first defined range
+        if(!empty($range)){
+            $segments = editor_Models_TaskUserAssoc_Segmentrange::getNumbers($range);
+            $this->entity->loadBySegmentNrInTask(reset($segments),$taskGuid);
+            $this->view->metaData->jumpToSegmentIndex = $this->entity->getIndex();
+            return;
+        }
+        $this->view->metaData->jumpToSegmentIndex = 0;
     }
 }

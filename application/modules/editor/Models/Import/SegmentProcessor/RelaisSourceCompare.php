@@ -73,6 +73,14 @@ class editor_Models_Import_SegmentProcessor_RelaisSourceCompare {
         return $this->normalize($source) === $this->normalize($relais);
     }
     /**
+     * Checks if content is empty using the crrent normalization
+     * @param string $content
+     * @return bool
+     */
+    public function isEmpty(string $content): bool {
+        return (strlen(trim($this->normalize($content))) == 0);
+    }
+    /**
      * The given segment content is normalized for source / relais source comparsion
      * Currently all tags are removed (means ignored). To keep word boundaries the tags
      * are replaced with whitespace, multiple whitespaces are replaced to a single one

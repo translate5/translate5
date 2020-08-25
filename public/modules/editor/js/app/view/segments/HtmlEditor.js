@@ -43,6 +43,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.HtmlEditor', {
   extend: 'Ext.form.field.HtmlEditor',
   alias: 'widget.segmentsHtmleditor',
+  itemId:'segmentsHtmleditor',
   markupImages: null,
   //prefix der img Tag ids im HTML Editor
   idPrefix: 'tag-image-',
@@ -121,7 +122,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         xtype:'segments.statusstrip',
         htmlEditor: me
     });
-    me.mon(me.viewModesController, 'segmentSizeChanged', me.setSegmentSize, me);
   },
   setHeight: function(height) {
       var me = this,
@@ -326,7 +326,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         this.fireEvent('saveSnapshot'); // Keep a snapshot from the new content
       }
   },
-  setSegmentSize: function(controller, size, oldSize) {
+  setSegmentSize: function(grid, size, oldSize) {
       var body = Ext.fly(this.getEditorBody());
       if(body) {
           body.removeCls(oldSize);
