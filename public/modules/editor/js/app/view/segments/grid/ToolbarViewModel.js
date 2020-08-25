@@ -40,6 +40,9 @@ Ext.define('Editor.view.segments.grid.ToolbarViewModel', {
         },
         isErgoView: function(get) {
             return get('viewmodeIsErgonomic') && get('editorIsReadonly');
+        },
+        isCustomView: function(get) {
+            return get('viewmodeIsCustom');
         }
     }
 });

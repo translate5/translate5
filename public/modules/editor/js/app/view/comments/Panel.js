@@ -56,6 +56,10 @@ Ext.define('Editor.view.comments.Panel', {
     delete_confirm_title: '#UT#Löschen des Kommentars bestätigen',
     delete_confirm_msg: '#UT#Soll der Kommentar wirklich gelöscht werden?',
 
+    listeners:{
+        expand : 'onCommentPanelExpand'
+    },
+
     /**
      * is the panel collapsable
      */
@@ -176,7 +180,6 @@ Ext.define('Editor.view.comments.Panel', {
 
     handleExpand:function(){
         var me=this;
-
         if(me.isCollapsable && me.collapsed){
             //FIXME everything with the expangin inside the comments controoler
             me.expand();

@@ -230,6 +230,9 @@ Ext.define('Editor.controller.LanguageResources', {
       if(me.isLanguageResourcesDisabled()){
           return;
       }
+      //disable the editor state saveing
+      Editor.app.getController('ViewModes').manageEditorStateSave(false);
+
       me.getEditorViewport().add({
           xtype: 'languageResourceEditorPanel',
           region: 'south',

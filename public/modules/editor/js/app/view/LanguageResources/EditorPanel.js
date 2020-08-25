@@ -56,6 +56,9 @@ Ext.define('Editor.view.LanguageResources.EditorPanel', {
         hidden: '{taskIsReadonly}'
     },
     itemId:'languageResourceEditorPanel',
+    stateId: 'editor.languageResourceEditorPanel',
+    stateEvents: ['collapse', 'expand'],
+    stateful:false,
     activeTab: 0,
     header: {
         hidden: true

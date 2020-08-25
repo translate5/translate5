@@ -74,6 +74,9 @@ Ext.define('Editor.controller.Editor', {
     },{
         ref:'filepanel',
         selector:'#filepanel'
+    },{
+        ref:'segmentsHtmleditor',
+        selector:'#segmentsHtmleditor'
     }],
     registeredTooltips: [],
     isEditing: false,
@@ -117,7 +120,8 @@ Ext.define('Editor.controller.Editor', {
             },
             '#segmentgrid': {
                 afterrender: 'initEditPluginHandler',
-                select:'onSegmentGridSelect'
+                select:'onSegmentGridSelect',
+                segmentSizeChanged:'onSegmentGridSegmentsSizeChanged'
             },
             '#showReferenceFilesButton': {
                 click:'onShowReferenceFilesButtonClick'
@@ -230,7 +234,7 @@ Ext.define('Editor.controller.Editor', {
     /**
      * track isEditing state 
      */
-    initEditPluginHandler: function () {
+    initEditPluginHandler: function (segmentsGrid) {
         var me = this,
             plug = me.getEditPlugin(),
             disableEditing = function(){me.isEditing = false;};
@@ -246,7 +250,7 @@ Ext.define('Editor.controller.Editor', {
         Ext.getDoc().on('cut', me.removeSelectionAfterCut, me, {priority: 1001, delegated: false});        
         
         me.tooltip = Ext.create('Editor.view.ToolTip', {
-            target: me.getSegmentGrid().getEl()
+            target: segmentsGrid.getEl()
         });
         
         me.prevNextSegment = Ext.create('Editor.controller.editor.PrevNextSegment', {
@@ -256,13 +260,13 @@ Ext.define('Editor.controller.Editor', {
         me.relayEvents(me.prevNextSegment, ['prevnextloaded']);
         
         //reset the store next/prev information if data changed
-        me.getSegmentGrid().store.on('filterchange', me.handleSortOrFilter, me);
-        me.getSegmentGrid().store.on('sort', me.handleSortOrFilter, me);
+        segmentsGrid.store.on('filterchange', me.handleSortOrFilter, me);
+        segmentsGrid.store.on('sort', me.handleSortOrFilter, me);
         
         /**
          * disable the column show / hide menu while editing a segment (EXT6UPD-85)
          */
-        Ext.override(me.getSegmentGrid().getHeaderContainer(), {
+        Ext.override(segmentsGrid.getHeaderContainer(), {
             beforeMenuShow: function(menu) {
                 this.callParent([menu]);
                 menu.down('#columnItem').setDisabled(plug.editing);
@@ -283,6 +287,9 @@ Ext.define('Editor.controller.Editor', {
         plug.editor = plug.initEditor(); 
         
         me.handleReferenceFilesMessage();
+
+        //after segment grid is rendered, get the segment grid segment size values and update the html editor text size with those values
+        me.onSegmentGridSegmentsSizeChanged(segmentsGrid,segmentsGrid.newSegmentSizeCls,segmentsGrid.oldSegmentSizeCls);
     },
     
     handleSortOrFilter: function() {
@@ -762,13 +769,13 @@ Ext.define('Editor.controller.Editor', {
      * Keyboard handler for zoom in, calls just the viewmodes function directly
      */
     handleZoomIn: function() {
-        Editor.app.getController('ViewModes').setSegmentSize(1, true);
+        this.getSegmentGrid().setSegmentSize(1, true);
     },
     /**
      * Keyboard handler for zoom out, calls just the viewmodes function directly
      */
     handleZoomOut: function() {
-        Editor.app.getController('ViewModes').setSegmentSize(-1, true);
+        this.getSegmentGrid().setSegmentSize(-1, true);
     },
     
     /**
@@ -1649,7 +1656,7 @@ Ext.define('Editor.controller.Editor', {
     },
     
     handleReferenceFilesMessage:function(){
-        if(Editor.data.task.get('referenceFiles') && Editor.data.frontend.showReferenceFilesPopup===true){
+        if(Editor.data.task.get('referenceFiles')){
             var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
             task = new Ext.util.DelayedTask(function(){
                 referenceInfoMessage.destroy();
@@ -1725,12 +1732,13 @@ Ext.define('Editor.controller.Editor', {
         var store= grid.getStore(),
             selection = grid.getSelection(),
             segment=store.findRecord('segmentNrInTask',segmentNrInTask,0,false,false,true),
-            index=store.indexOf(segment);
+            index=store.indexOf(segment),
+            row = grid.getView().getRow(index);
         
         /***
-         * If the selection exist, and the selection is the current requested segments, do nothing
+         * If the selection exist, and the selection is the current requested segments, and the selected row is visible -> do nothing
          */
-        if((selection && selection.length>0) && selection[0] == segment){
+        if((selection && selection.length>0) && selection[0] == segment && (row && Ext.get(row).isVisible(true))){
             return;
         }
 
@@ -1743,7 +1751,7 @@ Ext.define('Editor.controller.Editor', {
         }
         //the segment does not exist in the segments store, try to load the segment index from the db
         grid.searchPosition(segmentNrInTask).then((idx)=>{
-            grid.scrollTo(idx);
+            grid.scrollTo(Math.max(0,idx));
         });
     },
 
@@ -1757,8 +1765,33 @@ Ext.define('Editor.controller.Editor', {
     /***
      * Segments store load event handler
      */
-    onSegmentsStoreLoad:function(){
-        var me=this;
-        me.focusSegment(Math.max(1,Editor.app.parseSegmentIdFromTaskEditHash(true)));
+    onSegmentsStoreLoad:function(store){
+        var me=this,
+            segmentIdFromHash = Editor.app.parseSegmentIdFromTaskEditHash(true);
+        if(store.proxy.reader.metaData.jumpToSegmentIndex && store.proxy.reader.metaData.jumpToSegmentIndex > -1){
+            me.getSegmentGrid().scrollTo(store.proxy.reader.metaData.jumpToSegmentIndex);
+            return;
+        }
+        if(segmentIdFromHash > 0){
+            me.focusSegment(segmentIdFromHash);
+            return;
+        }
+        me.focusSegment(1);
+    },
+
+    /**
+     * Segments grid segment size event handler
+     * 
+     * @param {Ext.Component} grid 
+     * @param {String} newSize 
+     * @param {String} oldSize 
+     */
+    onSegmentGridSegmentsSizeChanged:function(grid, newSize, oldSize){
+        var me=this,
+            htmlEditor = me.getSegmentsHtmleditor();
+        if(!htmlEditor){
+            return;
+        }
+        htmlEditor.setSegmentSize(grid,newSize,oldSize);
     }
 });

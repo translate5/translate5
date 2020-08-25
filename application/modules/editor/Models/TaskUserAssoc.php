@@ -539,7 +539,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         return count($assignedSegments) > 0;
     }
     /**
-     * Return an array with all segments in given task for the given user in the given row.
+     * Return an array with all segments in given task for the given user in the given role.
      * @param string $taskGuid
      * @param string $userGuid
      * @param string $role
