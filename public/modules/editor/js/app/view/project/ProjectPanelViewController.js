@@ -64,23 +64,27 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
     /***
      * Redirect to project focus route
      */
-    redirectFocus:function(record,includeTask){
-    	var me=this;
-    	if(!record){
-    		me.reset();
-        	return;
-    	}
-    	var action='focus',
-    		route=['project',record.get('projectId')];
-    	
-    	if(includeTask){
-    		route.push(record.get('id'));
-    	}
-    	
-    	route.push(action);
-    	route=route.join('/');
-    	
-    	Editor.app.openAdministrationSection(me.getView(),route);
+    redirectFocus:function(record, includeTask){
+        var me = this,
+            isModel = Editor.data.task.isModel,
+            id = isModel ? record.get('id') : record.id,
+            projectId = isModel ? record.get('projectId') : record.projectId;
+
+        if(!record){
+            me.reset();
+            return;
+        }
+        var action='focus',
+            route=['project', projectId];
+
+        if(includeTask){
+            route.push(id);
+        }
+
+        route.push(action);
+        route = route.join('/');
+
+        Editor.app.openAdministrationSection(me.getView(),route);
     },
 
     /***
