@@ -94,7 +94,7 @@ Ext.define('Editor.controller.LanguageResources', {
   strings: {
       msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
       msgDisabledSourceEdit: '#UT#Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.',
-      instantTranslate:'#UT#Sofortübersetzung'
+      instantTranslate:'#UT#InstantTranslate'
   },
   init: function() {
 	  //INFO: the default service is initialized in the TmOverview controller
