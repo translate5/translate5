@@ -188,4 +188,17 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         }
         return $filtered;
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see ZfExtended_Models_Config::loadListByNamePart()
+     */
+    public function loadListByNamePart(string $name) {
+        $result = parent::loadListByNamePart($name);
+        $iniOptions = Zend_Registry::get('bootstrap')->getApplication()->getOptions();
+        foreach($result as &$row) {
+            $this->mergeWithIni($iniOptions, explode('.', $row['name']), $row);
+        }
+        return $result;
+    }
 }
