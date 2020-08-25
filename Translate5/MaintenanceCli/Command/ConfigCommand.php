@@ -108,13 +108,14 @@ Modified values are shown bold in the simple listing.');
                 }
             }
             else {
-                $this->io->table(['name', 'value'], array_map(function($item) {
+                $this->io->table(['name', 'origin', 'value'], array_map(function($item) {
                     $value = OutputFormatter::escape($item['value']);
                     if($item['value'] !== $item['default']) {
                         $value = '<options=bold>'.$value.'</>';
                     }
                     return [
                         OutputFormatter::escape($item['name']),
+                        $item['origin'],
                         $value,
                     ];
                 }, $foundConfigs));
@@ -148,7 +149,12 @@ Modified values are shown bold in the simple listing.');
         }
         $config->update($exactConfig['name'], $exactConfig['value']);
         $this->showDetail($exactConfig);
-        $this->io->success($msg);
+        if(array_key_exists('overwritten', $exactConfig)) {
+            $this->io->warning($msg.' (in the DB only - change/remove it manually in/from the installation.ini)');
+        }
+        else {
+            $this->io->success($msg);
+        }
         return 0;
     }
     
@@ -168,8 +174,15 @@ Modified values are shown bold in the simple listing.');
             '      level: '.$configData['level'],
             '',
         ];
+        
+        $hasIni = array_key_exists('overwritten', $configData);
+        if($hasIni) {
+            $out[1] = '  ini value: <options=bold>'.OutputFormatter::escape($configData['value']).'</>';
+            array_splice($out, 2, 0, '             <error>The value is set in the installation.ini and must be changed (or removed) there!</>');
+            array_splice($out, 3, 0, '   db value: '.OutputFormatter::escape($configData['overwritten']).'');
+        }
         if(array_key_exists('oldvalue', $configData)) {
-            $out[1] = '  new value: <fg=green;options=bold>'.OutputFormatter::escape($configData['value']).'</>';
+            $out[1] = '  '.($hasIni ? 'ini':'new').' value: <fg=green;options=bold>'.OutputFormatter::escape($configData['value']).'</>';
             array_splice($out, 2, 0, '  old value: <fg=red>'.OutputFormatter::escape($configData['oldvalue']).'</>');
         }
         
