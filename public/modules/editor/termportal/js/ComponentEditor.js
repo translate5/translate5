@@ -518,7 +518,7 @@ var ComponentEditor={
     },
     
     /***
-     * Check and hide the instant translate combo if the component editor is active
+     * Check and hide the InstantTranslate combo if the component editor is active
      */
     isComponentEditorActive:function(){
     	var me=this,
@@ -622,7 +622,7 @@ var ComponentEditor={
 				drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute),
 				$instantTranslateComponent=$termAttributeHolder.find('div.instanttranslate-integration');
 			
-			//if the instant translate component exist, add the comment editor always after it
+			//if the InstantTranslate component exist, add the comment editor always after it
 			if($instantTranslateComponent.length>0){
 				$instantTranslateComponent.after(drawData);
 			}else{
