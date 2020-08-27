@@ -1088,6 +1088,8 @@
 <trans-unit id='TmljaHQgYWxsZSBaZWlsZW4gaW0gU2VnbWVudGluaGFsdCBzaW5kIHVudGVyIGRlciBtYXhpbWFsIGVybGF1YnRlbiBMw6RuZ2UgKHswfSku'><source>Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).</source><target>Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).</target></trans-unit>
 <trans-unit id='TmljaHQgYWxsZSBaZWlsZW4gaW0gU2VnbWVudGluaGFsdCBlcnJlaWNoZW4gZGllIG1pbmltYWwgZXJmb3JkZXJ0ZSBMw6RuZ2UgKHswfSku'><source>Nicht alle Zeilen im Segmentinhalt erreichen die minimal erforderte Länge ({0}).</source><target>Nicht alle Zeilen im Segmentinhalt erreichen die minimal erforderte Länge ({0}).</target></trans-unit>
 <trans-unit id='WmVpbGVu'><source>Zeilen</source><target>Zeilen</target></trans-unit>
+<trans-unit id='QWt0dWVsbA=='><source>Aktuell</source><target>Aktuell</target></trans-unit>
+<trans-unit id='aW5zZ2VzYW10'><source>insgesamt</source><target>insgesamt</target></trans-unit>
 <trans-unit id='TG9rYWxpc2llcnVuZw=='><source>Lokalisierung</source><target>Lokalisierung</target></trans-unit>
 <trans-unit id='U3ByYWNoZQ=='><source>Sprache</source><target>Sprache</target></trans-unit>
 <trans-unit id='e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg=='><source>{salutation} {surName},<br/>
