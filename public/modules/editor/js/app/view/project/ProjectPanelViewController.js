@@ -65,15 +65,14 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      * Redirect to project focus route
      */
     redirectFocus:function(record, includeTask){
+        if(!record){
+            this.reset();
+            return;
+        }
         var me = this,
             isModel = record && record.isModel,
             id = isModel ? record.get('id') : record.id,
             projectId = isModel ? record.get('projectId') : record.projectId;
-
-        if(!record){
-            me.reset();
-            return;
-        }
         var action='focus',
             route=['project', projectId];
 
