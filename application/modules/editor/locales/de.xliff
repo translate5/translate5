@@ -1305,7 +1305,6 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id="U0RMWExJRkYgbWl0IMOEbmRlcnVuZ3NtYXJraWVydW5nZW4="><source>SDLXLIFF mit Änderungsmarkierungen</source><target>SDLXLIFF mit Änderungsmarkierungen</target></trans-unit>
 <trans-unit id='RXh0ZXJuZSBCZWFyYmVpdHVuZyBhbHMgRXhjZWw='><source>Externe Bearbeitung als Excel</source><target>Externe Bearbeitung als Excel</target></trans-unit>
 <trans-unit id='S3VuZGVu'><source>Kunden</source><target>Kunden</target></trans-unit>
-<trans-unit id='S3VuZGVu'><source>Kunden</source><target>Kunden</target></trans-unit>
 <trans-unit id="QWxsZSBLdW5kZW4="><source>Alle Kunden</source><target>Alle Kunden</target></trans-unit>
 <trans-unit id='SGluenVmw7xnZW4='><source>Hinzufügen</source><target>Hinzufügen</target></trans-unit>
 <trans-unit id='S3VuZGVubmFtZQ=='><source>Kundenname</source><target>Kundenname</target></trans-unit>
@@ -1324,7 +1323,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='QUNIVFVORzogWklFTFNQUkFDSExJQ0hFUiBJTkhBTFQgSU4gVk9SSEVSSUdFTSBPREVSIE5BQ0hGT0xHRU5ERU0gU0VHTUVOVA=='><source>ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</source><target>ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</target></trans-unit>
 <trans-unit id='V2llZGVyaG9sdW5nIG51ciBhdXRvbWF0aXNjaCBlcnNldHplbiBiencuIEVyc2V0enVuZyBkZXIgV2llZGVyaG9sdW5nIHZvcnNjaGxhZ2VuLCB3ZW5uIFppZWwgbGVlciBpc3Q='><source>Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist</source><target>Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist</target></trans-unit>
 <trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermCustomerSearch</source><target>TermCustomerSearch</target></trans-unit>
-<trans-unit id='VGVybWlub2xvZ2llcG9ydGFs'><source>Terminologieportal</source><target>Terminologieportal</target></trans-unit>
+<trans-unit id='VGVybVBvcnRhbA=='><source>TermPortal</source><target>TermPortal</target></trans-unit>
 <trans-unit id='RGFzIFByb2pla3QgZW50aMOkbHQgYWx0ZXJuYXRpdmUgw5xiZXJzZXR6dW5nZW4uIEJlaSBkZXIgw5xiZXJuYWhtZSB2b24gTWF0Y2hlcyB3aXJkIGRpZSBTZWdtZW50IE1hdGNocmF0ZSBkYWhlciBuaWNodCB2ZXLDpG5kZXJ0Lg=='><source>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</source><target>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</target></trans-unit>
 <trans-unit id='QmVpbSBCZWFyYmVpdGVuIGRlciBRdWVsbHNwYWx0ZSBrw7ZubmVuIE1hdGNoZXMgbmljaHQgw7xiZXJub21tZW4gd2VyZGVuLg=='><source>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</source><target>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</target></trans-unit>
 <trans-unit id='U3ByYWNoLVJlc291cmNlbg=='><source>Sprach-Resourcen</source><target>Sprach-Resourcen</target></trans-unit>
@@ -1397,7 +1396,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZXIgaXN0IFBNIGluIGVpbmVyIG9kZXIgbWVocmVyZW4gQXVmZ2FiZW4u'><source>Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.</source><target>Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.</target></trans-unit>
 <trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmdyw7bDn2VybiAoU1RSRyArICsp"><source>Segmentschriftgrad vergrößern (STRG + +)</source><target>Segmentschriftgrad vergrößern (STRG + +)</target></trans-unit>
 <trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmtsZWluZXJuIChTVFJHICsgLSk="><source>Segmentschriftgrad verkleinern (STRG + -)</source><target>Segmentschriftgrad verkleinern (STRG + -)</target></trans-unit>
-<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5n'><source>Sofortübersetzung</source><target>Sofortübersetzung</target></trans-unit>
+<trans-unit id='SW5zdGFudFRyYW5zbGF0ZQ=='><source>InstantTranslate</source><target>InstantTranslate</target></trans-unit>
 <trans-unit id='RGllIMO8YmVyZ2ViZW5lIFF1ZWxsc3ByYWNoZSAie2xhbmd1YWdlfSIgaXN0IHVuZ8O8bHRpZyE='><source>Die übergebene Quellsprache "{language}" ist ungültig!</source><target>Die übergebene Quellsprache "{language}" ist ungültig!</target></trans-unit>
 <trans-unit id='RGllIMO8YmVyZ2ViZW5lIFppZWxzcHJhY2hlICJ7bGFuZ3VhZ2V9IiBpc3QgdW5nw7xsdGlnIQ=='><source>Die übergebene Zielsprache "{language}" ist ungültig!</source><target>Die übergebene Zielsprache "{language}" ist ungültig!</target></trans-unit>
 <trans-unit id='RXMgd3VyZGUgZWluZSBSZWxhaXNzcHJhY2hlIGdlc2V0enQsIGFiZXIgaW0gSW1wb3J0cGFrZXQgYmVmaW5kZW4gc2ljaCBrZWluZSBSZWxhaXNkYXRlbi4='><source>Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.</source><target>Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.</target></trans-unit>
@@ -1472,8 +1471,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='SW50ZXJuZXIgRnV6enkgYWt0aXY='><source>Interner Fuzzy aktiv</source><target>Interner Fuzzy aktiv</target></trans-unit>
 <trans-unit id='RXJzdGVsbHVuZ3NkYXR1bQ=='><source>Erstellungsdatum</source><target>Erstellungsdatum</target></trans-unit>
 <trans-unit id='dHJhbnNsYXRlNS1hcHBz'><source>translate5-apps</source><target>translate5-apps</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNS1pbnN0YW50dHJhbnNsYXRl'><source>translate5-instanttranslate</source><target>Sofortübersetzung</target></trans-unit>
-<trans-unit id='dHJhbnNsYXRlNS10ZXJtcG9ydGFs'><source>translate5-termportal</source><target>Terminologieportal</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNS1pbnN0YW50dHJhbnNsYXRl'><source>translate5-instanttranslate</source><target>InstantTranslate</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNS10ZXJtcG9ydGFs'><source>translate5-termportal</source><target>TermPortal</target></trans-unit>
 <trans-unit id='T3BlbklkIEVtaXR0ZW4='><source>OpenId Emitten</source><target>OpenId Emitten</target></trans-unit>
 <trans-unit id='4oG0IERlciBCZW51dHplciBrYW5uIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuLiBEaWVzZXIgQmVudXR6ZXIgd2lyZCB2b24gdHJhbnNsYXRlNSBuYWNoIGRlciBPcGVuSWQtQXV0aGVudGlmaXppZXJ1bmcgYXV0b21hdGlzY2ggZXJzdGVsbHQu'><source>⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.</source><target>⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.</target></trans-unit>
 <trans-unit id='dHJhbnNsYXRlNSB3aXJkIGdlbGFkZW46'><source>translate5 wird geladen:</source><target>translate5 wird geladen:</target></trans-unit>
@@ -1576,8 +1575,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='Li4uIFNwcmFjaGUgYXVzd8OkaGxlbg=='><source>... Sprache auswählen</source><target>... Sprache auswählen</target></trans-unit>
 <trans-unit id='U3ByYWNoZSBmw7xyIFRlcm0tVm9yc2NobGFnIHfDpGhsZW4='><source>Sprache für Term-Vorschlag wählen</source><target>Sprache für Term-Vorschlag wählen</target></trans-unit>
 <trans-unit id='VGVybS1Db2xsZWN0aW9uIGbDvHIgVGVybS1Wb3JzY2hsYWcgd8OkaGxlbg=='><source>Term-Collection für Term-Vorschlag wählen</source><target>Term-Collection für Term-Vorschlag wählen</target></trans-unit>
-<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIG5hY2g='><source>Sofortübersetzung nach</source><target>Sofortübersetzung nach</target></trans-unit>
-<trans-unit id='VGVybWlub2xvZ2llcG9ydGFsLVNwcmFjaGVu'><source>Terminologieportal-Sprachen</source><target>Terminologieportal-Sprachen</target></trans-unit>
+<trans-unit id='SW5zdGFudFRyYW5zbGF0ZSBuYWNo'><source>InstantTranslate nach</source><target>InstantTranslate nach</target></trans-unit>
+<trans-unit id='VGVybVBvcnRhbCBTcHJhY2hlbg=='><source>TermPortal Sprachen</source><target>TermPortal Sprachen</target></trans-unit>
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>Alle verfügbaren Sprachen</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</target></trans-unit>
 <trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>TermProposer</target></trans-unit>
@@ -1827,6 +1826,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='VGFn'><source>Tag</source><target>Tag</target></trans-unit>
 <trans-unit id='RsO8ciB6dXPDpHR6bGljaGUgSW5mb3JtYXRpb24genUgZWluZW0gRXJlaWduaXMgYml0dGUgYXVmIGRlbiBDb2RlIGtsaWNrZW4='><source>Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken</source><target>Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken</target></trans-unit>
 <trans-unit id='QW5nZXBhc3N0'><source>Angepasst</source><target>Angepasst</target></trans-unit>
-</body>
+<trans-unit id='RXMgd3VyZGVuIGtlaW5lIHZlcmbDvGdiYXJlbiB0ZXJtQ29sbGVjdGlvbiBmw7xyIGRlbiBJaG5lbiB6dWdlb3JkbmV0ZW4gS3VuZGVuIGdlZnVuZGVuLg=='><source>Es wurden keine verfügbaren termCollection für den Ihnen zugeordneten Kunden gefunden.</source><target>Es wurden keine verfügbaren termCollection für den Ihnen zugeordneten Kunden gefunden.</target></trans-unit>
+  </body>
  </file>
 </xliff>

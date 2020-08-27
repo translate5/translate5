@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
 class editor_Services_Connector {
     
     /***
-     * The request source when language resources is used is instant translate
+     * The request source when language resources is used is InstantTranslate
      * @var string
      */
     const REQUEST_SOURCE_INSTANT_TRANSLATE='instanttranslate';
@@ -249,7 +249,7 @@ class editor_Services_Connector {
 //     }
     
 //     /***
-//      * Get customers when instant translate is used as request source.
+//      * Get customers when InstantTranslate is used as request source.
 //      * The return value will be the intersection of the customers of the language resource and the customers of the current user
 //      * @return NULL|array
 //      */
