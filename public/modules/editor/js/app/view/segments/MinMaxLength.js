@@ -488,13 +488,15 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         // 3 Zeilen * 200px; Aktuell: 4 Zeilen, insgesamt 599px
         // 3 lines * 200px; Current: 4 lines, together 599px
         
+        // 1223px von 3*200; 3: 864
+        
         // labelData
         if (maxWidthForSegment === Number.MAX_SAFE_INTEGER) {
             labelData.maxWidth = ''; // = not set; lines can be "endless" (= which is MAX_SAFE_INTEGER)
         }
         if (useMaxNumberOfLines) {
             allLines = me.getLinesAndLength(editorContent, me.segmentMeta, me.segmentFileId);
-            labelData.maxWidth = me.segmentMeta.maxNumberOfLines + '*' + maxWidthForLine;
+            labelData.maxWidth = me.segmentMeta.maxNumberOfLines + ' ' + me.strings.lines + ' * ' + maxWidthForLine;
             if (segmentLengthStatus.includes(me.lengthstatus.segmentTooManyLines)) {
                 allLines = me.getLinesAndLength(editorContent, me.segmentMeta, me.segmentFileId);
                 errorMsg = '; ' + allLines.length + ' ' + me.strings.lines;
