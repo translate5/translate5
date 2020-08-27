@@ -31,7 +31,7 @@ CREATE TABLE `LEK_languageresources_mt_usage_log` (
   `sourceLang` INT(11) NULL,
   `targetLang` INT(11) NULL,
   `queryString` LONGTEXT NULL,
-  `requestSource` VARCHAR(45) NULL COMMENT 'MT language resource request source. Mt usage can be requested from the translate5 editor, or translate5 apps like InstantTranslate.',
+  `requestSource` VARCHAR(45) NULL COMMENT 'MT language resource request source. Mt usage can be requested from the translate5 editor, or translate5 apps like instant translate.',
   `translatedCharacterCount` INT(11) NULL,
   `timestamp` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `customers` VARCHAR(1024) NULL,
