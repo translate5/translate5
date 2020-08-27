@@ -289,6 +289,7 @@
 <trans-unit id='QXVmZ2FiZSB3aXJkIGJlZW5kZXQgdW5kIHZlcmxhc3Nlbi4uLg=='><source>Aufgabe wird beendet und verlassen...</source><target>Aufgabe wird beendet und verlassen...</target></trans-unit>
 <trans-unit id='QXVmZ2FiZQ=='><source>Aufgabe</source><target>Aufgabe</target></trans-unit>
 <trans-unit id='QWJtZWxkZW4='><source>Abmelden</source><target>Abmelden</target></trans-unit>
+<trans-unit id='QXVmZ2FiZW4='><source>Aufgaben</source><target>Aufgaben</target></trans-unit>
 <trans-unit id='TWVpbmUgRWluc3RlbGx1bmdlbg=='><source>Meine Einstellungen</source><target>Meine Einstellungen</target></trans-unit>
 <trans-unit id='RWluZ2Vsb2dndGVyIEJlbnV0emVy'><source>Eingeloggter Benutzer</source><target>Eingeloggter Benutzer</target></trans-unit>
 <trans-unit id='TG9naW5uYW1l'><source>Loginname</source><target>Loginname</target></trans-unit>
@@ -300,6 +301,7 @@
 <trans-unit id='UGFzc3dvcnQgenVyw7xja3NldHplbj8='><source>Passwort zurücksetzen?</source><target>Passwort zurücksetzen?</target></trans-unit>
 <trans-unit id='U29sbCBkYXMgUGFzc3dvcnQgZGVzIEJlbnV0emVycyAiezB9IiB3aXJrbGljayB6dXLDvGNrZ2VzZXR6dCB3ZXJkZW4/PGJyIC8+IERlciBCZW51dHplciB3aXJkIHBlciBFLU1haWwgYmVuYWNocmljaHRpZ3QsIGRhc3MgZXIgZWluIG5ldWVzIFBhc3N3b3J0IGFuZm9yZGVybiBtdXNzLg=='><source>Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.</source><target>Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.</target></trans-unit>
 <trans-unit id='RGVyIMOEbmRlcnVuZ2VuIGFuIEJlbnV0emVyICJ7MH0iIHd1cmRlbiBlcmZvbGdyZWljaCBnZXNwZWljaGVydC4='><source>Der Änderungen an Benutzer "{0}" wurden erfolgreich gespeichert.</source><target>Der Änderungen an Benutzer "{0}" wurden erfolgreich gespeichert.</target></trans-unit>
+<trans-unit id='QmVudXR6ZXI='><source>Benutzer</source><target>Benutzer</target></trans-unit>
 <trans-unit id='RGVyIEJlbnV0emVyICJ7MH0iIHd1cmRlIGVyZm9sZ3JlaWNoIGVyc3RlbGx0Lg=='><source>Der Benutzer "{0}" wurde erfolgreich erstellt.</source><target>Der Benutzer "{0}" wurde erfolgreich erstellt.</target></trans-unit>
 <trans-unit id='QmVudXR6ZXLDvGJlcnNpY2h0'><source>Benutzerübersicht</source><target>Benutzerübersicht</target></trans-unit>
 <trans-unit id='QW5yZWRl'><source>Anrede</source><target>Anrede</target></trans-unit>
