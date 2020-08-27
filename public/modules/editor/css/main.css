@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* T5DEV-161: visualReview requres this to be set to 'initial' and not to 'relative' else the review file will not be displayed! */
+/* T5DEV-161: visual review requres this to be set to 'initial' and not to 'relative' else the review file will not be displayed! */
 div.x-container.x-container-default {position: initial;}
 
 
