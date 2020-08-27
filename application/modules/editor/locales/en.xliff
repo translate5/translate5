@@ -1985,6 +1985,14 @@
     <source>Zeilen</source>
     <target>lines</target>
   </trans-unit>
+  <trans-unit id='QWt0dWVsbA=='>
+    <source>Aktuell</source>
+    <target>Current</target>
+  </trans-unit>
+  <trans-unit id='aW5zZ2VzYW10'>
+    <source>insgesamt</source>
+    <target>together</target>
+  </trans-unit>
   <trans-unit id='U3ByYWNoZQ=='>
       <source>Sprache</source>
       <target>Language</target>

@@ -49,6 +49,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         segmentLinesTooLong: '#UT#Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).',
         segmentLinesTooShort: '#UT#Nicht alle Zeilen im Segmentinhalt erreichen die minimal erforderte Länge ({0}).',
         lines: '#UT#Zeilen',
+        current: '#UT#Aktuell',
+        together: '#UT#insgesamt',
     },
     lengthstatus: {
         segmentLengthValid: 'segmentLengthValid',
@@ -482,6 +484,9 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         if (segmentLengthStatus.includes(me.lengthstatus.segmentLengthValid)) {
             tplData.cls = 'valid-length';
         }
+        
+        // 3 Zeilen * 200px; Aktuell: 4 Zeilen, insgesamt 599px
+        // 3 lines * 200px; Current: 4 lines, together 599px
         
         // labelData
         if (maxWidthForSegment === Number.MAX_SAFE_INTEGER) {
