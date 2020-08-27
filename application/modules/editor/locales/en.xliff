@@ -3006,7 +3006,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='SW5zdGFudFRyYW5zbGF0ZQ=='>
     <source>InstantTranslate</source>
-    <target>Instant-Translate</target>
+    <target>InstantTranslate</target>
 </trans-unit>
 <trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gaW4gRm9ybSBlaW5lciBUQlggRGF0ZWkgaW1wb3J0aWVyZW4gdW5kIGRlbSBiZXN0ZWhlbmRlbiBUZXJtLUNvbGxlY3Rpb24gaGluenVmw7xnZW4='>
     <source>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen</source>
@@ -3220,7 +3220,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='dHJhbnNsYXRlNS1pbnN0YW50dHJhbnNsYXRl'>
     <source>translate5-instanttranslate</source>
-    <target>Instant-Translate</target>
+    <target>InstantTranslate</target>
 </trans-unit>
 
 <trans-unit id='dHJhbnNsYXRlNS10ZXJtcG9ydGFs'>
