@@ -40,17 +40,18 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     hidden:true,
     mixins: ['Editor.util.Range'],
     strings: {
-        minText:'#UT#Min. {minWidth}',
-        maxText:'#UT# von {maxWidth}',
-        siblingSegments: '#UT#Seg.: {siblings}',
         segmentToShort:'#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
         segmentToLong:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.',
         segmentTooManyLines: '#UT#Der Segmentinhalt enthält zu viele Zeilenumbrüche; maximal {0} Zeilen sind erlaubt.',
         segmentLinesTooLong: '#UT#Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).',
         segmentLinesTooShort: '#UT#Nicht alle Zeilen im Segmentinhalt erreichen die minimal erforderte Länge ({0}).',
+        min: '#UT#min',
+        max: '#UT#max',
+        line: '#UT#Zeile',
         lines: '#UT#Zeilen',
         current: '#UT#Aktuell',
         together: '#UT#insgesamt',
+        siblingSegments: '#UT#Seg.: {siblings}'
     },
     lengthstatus: {
         segmentLengthValid: 'segmentLengthValid',
@@ -158,31 +159,22 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * 
      */
     initComponent : function() {
-        var str = this.strings;
-        //If there is only max length: 10 of 12
-        //If there is only min length: 12 (Min. 10)
-        //If both are given: 10 of 12 (Min. 10)
-        //same with sibling segments: 
-        //If there is only max length: 10 of 12 (Seg.: 23, 24, 25)
-        //If there is only min length: 12 (Min. 10; Seg.: 23, 24, 25)
-        //If both are given: 10 of 12 (Min. 10; Seg.: 23, 24, 25)
+        
+        // 3 Zeilen * 200px; Aktuell: 4 Zeilen, insgesamt 599px
+        // 3 lines * 200px; Current: 4 lines, together 599px
         
         this.labelTpl = new Ext.XTemplate(
-            '{length}',
-            '<tpl if="maxWidth">',
-                str.maxText,
+            '<tpl if="target">',
+                '{target}',
+                '; ',
             '</tpl>',
-            '<tpl if="minWidth || siblings">',
-                ' (',
-                '<tpl if="minWidth">',
-                    str.minText,
-                '</tpl>',
-                '<tpl if="minWidth && siblings">',
-                    '; ',
-                '</tpl>',
-                '<tpl if="siblings">',
-                    str.siblingSegments,
-                '</tpl>',
+            '<tpl if="current">',
+                this.strings.current,
+                ': {current}',
+            '</tpl>',
+            '<tpl if="siblings">',
+                '; (',
+                this.strings.siblingSegments,
                 ')',
             '</tpl>'
         );
@@ -442,95 +434,71 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         var me = this;
         me.setPositionOfCaret(me.bookmarkForCaret);
     },
-
     /**
      * Update the minmax status strip label
      */
     updateLabelForEditor: function(){
-        var me=this,
-            segmentLengthTotal,
-            segmentLengthStatus = [],
-            minMaxLengthComp = Editor.view.segments.MinMaxLength,
-            useMaxNumberOfLines = minMaxLengthComp.useMaxNumberOfLines(me.segmentMeta),
-            messageSizeUnit = minMaxLengthComp.getSizeUnit(me.segmentMeta),
-            minWidthForSegment = minMaxLengthComp.getMinWidthForSegment(me.segmentMeta),
-            maxWidthForSegment = minMaxLengthComp.getMaxWidthForSegment(me.segmentMeta),
-            maxWidthForLine = minMaxLengthComp.getMaxWidthForSingleLine(me.segmentMeta),
-            minWidthForLine = minMaxLengthComp.getMinWidthForSingleLine(me.segmentMeta),
-            labelData,
-            tplData,
-            editorBody = me.editor.getEditorBody(),
-            editorContent = editorBody.innerHTML,
-            allLines,
-            line,
-            i,
-            errors = [],
-            errorMsg;
-        
-        segmentLengthTotal = me.editor.getTransunitLength(editorContent);
-        segmentLengthStatus = me.getMinMaxLengthStatus(editorContent,me.segmentMeta, me.segmentFileId);
-        
-        labelData = {
-            length: segmentLengthTotal + messageSizeUnit,
-            minWidth: minWidthForSegment,
-            maxWidth: maxWidthForSegment,
-            siblings: null
-        };
-        tplData = {
-            cls: 'invalid-length'
-        };
-        
-        // tplData
-        if (segmentLengthStatus.includes(me.lengthstatus.segmentLengthValid)) {
-            tplData.cls = 'valid-length';
+        var config = Editor.view.segments.MinMaxLength, // TODO: why do we use a reference to ourself here instead of me or this ? Why do we have static methods at all ??
+            sizeUnit = config.getSizeUnit(this.segmentMeta),
+            useLines = config.useMaxNumberOfLines(this.segmentMeta);
+            segmentMinWidth = config.getMinWidthForSegment(this.segmentMeta),
+            segmentMaxWidth = config.getMaxWidthForSegment(this.segmentMeta),
+            lineMinWidth = config.getMinWidthForSingleLine(this.segmentMeta),
+            lineMaxWidth = config.getMaxWidthForSingleLine(this.segmentMeta),
+            editorContent = this.editor.getEditorBody().innerHTML,
+            totalLength = this.editor.getTransunitLength(editorContent)
+            lengthStatus = this.getMinMaxLengthStatus(editorContent, this.segmentMeta, this.segmentFileId),
+            tplData = { cls:'invalid-length' };
+        /*
+        if(sizeUnit != ''){
+            sizeUnit = ' ' + sizeUnit;
         }
-        
-        // 3 Zeilen * 200px; Aktuell: 4 Zeilen, insgesamt 599px
-        // 3 lines * 200px; Current: 4 lines, together 599px
-        
-        // 1223px von 3*200; 3: 864
-        
-        // labelData
-        if (maxWidthForSegment === Number.MAX_SAFE_INTEGER) {
-            labelData.maxWidth = ''; // = not set; lines can be "endless" (= which is MAX_SAFE_INTEGER)
+        */
+        var labelData = { current: (totalLength + sizeUnit), target: '', siblings: null };
+        // decoration, normaly invalid and valid if the status is accordingly
+        if(lengthStatus.includes(this.lengthstatus.segmentLengthValid)){
+           tplData.cls = 'valid-length';
         }
-        if (useMaxNumberOfLines) {
-            allLines = me.getLinesAndLength(editorContent, me.segmentMeta, me.segmentFileId);
-            labelData.maxWidth = me.segmentMeta.maxNumberOfLines + ' ' + me.strings.lines + ' * ' + maxWidthForLine;
-            if (segmentLengthStatus.includes(me.lengthstatus.segmentTooManyLines)) {
-                allLines = me.getLinesAndLength(editorContent, me.segmentMeta, me.segmentFileId);
-                errorMsg = '; ' + allLines.length + ' ' + me.strings.lines;
-                labelData.maxWidth = labelData.maxWidth + errorMsg;
+        if(useLines){
+            var i, errors = [], allLines = this.getLinesAndLength(editorContent, this.segmentMeta, this.segmentFileId), addTotal = true;
+            labelData.target = this.segmentMeta.maxNumberOfLines + ' ' + this.strings.lines + ' * ';
+            if(lineMinWidth > 0){
+                labelData.target += this.strings.min + '. ' + lineMinWidth + sizeUnit;
             }
-            if (segmentLengthStatus.includes(me.lengthstatus.segmentLinesTooLong)) {
-                for (i = 0; i < allLines.length; i++) {
-                    line = allLines[i];
-                    if (line.lineWidth > maxWidthForLine) {
-                        errors.push((i+1) + ': ' + line.lineWidth);
+            if (lineMaxWidth !== Number.MAX_SAFE_INTEGER && lineMaxWidth > 0){
+                if(lineMinWidth > 0){ labelData.target += ', '; }
+                labelData.target += this.strings.max + '. ' + lineMaxWidth + sizeUnit;
+            }
+            labelData.current = allLines.length + ' ' + this.strings.lines;
+            if(lengthStatus.includes(this.lengthstatus.segmentLinesTooLong) || lengthStatus.includes(this.lengthstatus.segmentLinesTooShort)){
+                for(i = 0; i < allLines.length; i++) {
+                    if (allLines[i].lineWidth > lineMaxWidth || allLines[i].lineWidth < lineMinWidth) {
+                        errors.push(this.strings.line + ' ' + (i + 1) + ': ' + allLines[i].lineWidth + sizeUnit);
                     }
                 }
-                errorMsg = (errors.length === 0) ? '' : ('; ' + errors.join('; '));
-                labelData.maxWidth = labelData.maxWidth + errorMsg;
-            }
-            if (segmentLengthStatus.includes(me.lengthstatus.segmentLinesTooShort)) {
-                for (i = 0; i < allLines.length; i++) {
-                    line = allLines[i];
-                    if (line.lineWidth < minWidthForLine) {
-                        errors.push((i+1) + ': ' + line.lineWidth);
-                    }
+                if(errors.length > 0){
+                    labelData.current += ', ' + errors.join(', ');
+                    addTotal = false;
                 }
-                errorMsg = (errors.length === 0) ? '' : ('; ' + errors.join('; '));
-                labelData.minWidth = minWidthForSegment + errorMsg;
+            }
+            if(addTotal){
+                labelData.current += ', ' + this.strings.together + ' ' + totalLength + sizeUnit;
+            }
+        } else {
+            if (segmentMinWidth > 0){
+                labelData.target += this.strings.min + ': ' + segmentMinWidth + sizeUnit;
+            }
+            if (segmentMaxWidth !== Number.MAX_SAFE_INTEGER && segmentMaxWidth > 0){ // = not set; lines can be "endless" (= which is MAX_SAFE_INTEGER)
+               if(labelData.target != '') { labelData.target += ', '; }
+               labelData.target += this.strings.max + ': ' + segmentMaxWidth + sizeUnit;
             }
         }
-        
         // tooltip
-        tplData.tip = me.renderErrorMessage(segmentLengthStatus, me.segmentMeta);
-        
-        
+        tplData.tip = this.renderErrorMessage(lengthStatus, this.segmentMeta);
+
         // siblings
-        if(me.segmentMeta && me.segmentMeta.siblingData) {
-            var nrs = Ext.Object.getValues(me.segmentMeta.siblingData).map(function(item){
+        if(this.segmentMeta && this.segmentMeta.siblingData){
+            var nrs = Ext.Object.getValues(this.segmentMeta.siblingData).map(function(item){
                 return item.nr;
             });
             //show segments only if there are more then one (inclusive the current one)
@@ -538,9 +506,12 @@ Ext.define('Editor.view.segments.MinMaxLength', {
                 labelData.siblings = nrs.join(', ');
             }
         }
-        
-        tplData.text = me.labelTpl.apply(labelData);
-        me.update(tplData);
+        // just a beautification
+        if(labelData.target != ''){
+            labelData.target = labelData.target.charAt(0).toUpperCase() + labelData.target.slice(1);
+        }
+        tplData.text = this.labelTpl.apply(labelData);
+        this.update(tplData);
     },
     
     // ********************************************************************
