@@ -350,17 +350,18 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.segments.MinMaxLength", {
         override: "Editor.view.segments.MinMaxLength",
         strings: {
-            minText: '<?php echo $this->translate->_('Min. {minWidth}');?>',
-            maxText: '<?php echo $this->translate->_(' von {maxWidth}');?>',
-            siblingSegments: '<?php echo $this->translate->_('Seg.: {siblings}');?>',
             segmentToShort: '<?php echo $this->translate->_('Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.');?>',
             segmentToLong: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>',
             segmentTooManyLines: '<?php echo $this->translate->_('Der Segmentinhalt enthält zu viele Zeilenumbrüche; maximal {0} Zeilen sind erlaubt.');?>',
       		segmentLinesTooLong: '<?php echo $this->translate->_('Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).');?>',
       		segmentLinesTooShort: '<?php echo $this->translate->_('Nicht alle Zeilen im Segmentinhalt erreichen die minimal erforderte Länge ({0}).');?>',
+      		min: '<?php echo $this->translate->_('min');?>',
+        	max: '<?php echo $this->translate->_('max');?>',
+      		line: '<?php echo $this->translate->_('Zeile');?>',
       		lines: '<?php echo $this->translate->_('Zeilen');?>',
       		current: '<?php echo $this->translate->_('Aktuell');?>',
-      		together: '<?php echo $this->translate->_('insgesamt');?>'
+      		together: '<?php echo $this->translate->_('insgesamt');?>',
+      		siblingSegments: '<?php echo $this->translate->_('Seg.: {siblings}');?>'
         }
     });
     

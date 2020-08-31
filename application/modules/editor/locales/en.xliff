@@ -2415,13 +2415,29 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Status "{0}" durch einen anderen Benutzer</source>
     <target>status "{0}" by another user</target>
 </trans-unit>
-<trans-unit id='TWluLiB7bWluV2lkdGh9'>
-    <source>Min. {minWidth}</source>
-    <target>min. {minWidth}</target>
+<trans-unit id='bWlu'>
+	<source>min</source>
+	<target>min</target>
 </trans-unit>
-<trans-unit id='IHZvbiB7bWF4V2lkdGh9'>
-    <source> von {maxWidth}</source>
-    <target> of {maxWidth}</target>
+<trans-unit id='bWF4'>
+	<source>max</source>
+	<target>max</target>
+</trans-unit>
+<trans-unit id='WmVpbGU='>
+	<source>Zeile</source>
+	<target>Line</target>
+</trans-unit>
+<trans-unit id='WmVpbGVu'>
+	<source>Zeilen</source>
+	<target>Lines</target>
+</trans-unit>
+<trans-unit id='QWt0dWVsbA=='>
+	<source>Aktuell</source>
+	<target>Current</target>
+</trans-unit>
+<trans-unit id='aW5zZ2VzYW10'>
+	<source>insgesamt</source>
+	<target>together</target>
 </trans-unit>
 <trans-unit id='U2VnLjoge3NpYmxpbmdzfQ=='>
     <source>Seg.: {siblings}</source>
