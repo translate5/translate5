@@ -35,8 +35,8 @@
 		    <target>Export</target>
 		</trans-unit>
 		
-		<trans-unit id='U3RhcnQgZGVyIEFuYWx5c2UgaW0gVGFiIOKAnFNwcmFjaC1SZXNvdXJjZW4genV3ZWlzZW7igJw='>
-		    <source>Start der Analyse im Tab “Sprach-Resourcen zuweisen“</source>
+		<trans-unit id='U3RhcnQgZGVyIEFuYWx5c2UgaW0gVGFiIOKAnFNwcmFjaHJlc3NvdXJjZW4genV3ZWlzZW7igJw='>
+		    <source>Start der Analyse im Tab “Sprachressourcen zuweisen“</source>
 		    <target>Start analysis in the tab “Associate language resources“</target>
 		</trans-unit>
 
