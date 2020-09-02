@@ -38,6 +38,7 @@ Ext.define('Editor.view.project.ProjectPanel', {
     ],
     itemId: 'projectPanel',
     controller:'projectPanel',
+    helpSection: 'project',
     title: '#UT#Projekte',
     glyph: 'xf0e8@FontAwesome5FreeSolid',
     layout: 'border',

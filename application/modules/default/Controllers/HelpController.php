@@ -49,4 +49,10 @@ class HelpController extends ZfExtended_Controllers_Action {
     public function segmentsgridAction() {
         $this->_helper->layout->disableLayout();
     }
+    public function projectAction() {
+        $this->_helper->layout->disableLayout();
+    }
+    public function preferencesAction() {
+        $this->_helper->layout->disableLayout();
+    }
 }
