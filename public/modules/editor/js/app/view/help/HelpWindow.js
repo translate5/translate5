@@ -45,7 +45,6 @@ Ext.define('Editor.view.help.HelpWindow', {
     },
     strings:{
     	cbDoNotShowAgainLabel:'#UT#Dieses Fenster nicht mehr automatisch anzeigen.'
-    		//do not automaticly show this window
     },
     statics:{
     	//get the current window state id without creating the window
