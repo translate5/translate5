@@ -368,9 +368,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
                 $item->name = $name;
                 $item->value = $found->{$name};
                 switch ($name) {
-                    case 'file_name':
-                        $item->value = $this->languageResource->getSpecificData('fileName');
-                        break;
                     case 'tag':
                         $tagIds = $item->value;
                         foreach ($tagIds as $tagId) {
