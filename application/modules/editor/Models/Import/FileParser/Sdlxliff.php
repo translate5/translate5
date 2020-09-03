@@ -407,6 +407,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     protected function extractSegment($transUnit) {
         $this->segmentData = array();
         $result = $this->transunitParser->parse('<trans-unit'.$transUnit, function($mid, $source, $target, $comments) {
+            if(strlen(trim(strip_tags($source))) === 0 && strlen(trim(strip_tags($target))) === 0){
+                return null;
+            }
             $sourceName = $this->segmentFieldManager->getFirstSourceName();
             $targetName = $this->segmentFieldManager->getFirstTargetName();
             $this->setMid($mid);

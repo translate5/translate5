@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -122,7 +122,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
         $this->xmlparser->registerElement('trans-unit mrk[mtype=x-sdl-added]', function($tag, $attr, $key){
             $this->xmlparser->replaceChunk($key, '');
         }, function($tag, $key, $opener){
-            $this->xmlparser->replaceChunk($key, ''); 
+            $this->xmlparser->replaceChunk($key, '');
         });
         
         //remove sdl-deleted mrks and its content
@@ -135,18 +135,18 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
         });
         
         $this->xmlparser->registerElement('trans-unit > target mrk[mtype=x-sdl-comment]', function($tag, $attr, $key){
-            //we have to remove the comment mrks, otherwise they are translated to internal reference internal tags, 
+            //we have to remove the comment mrks, otherwise they are translated to internal reference internal tags,
             // which then mess up the TM
             $this->xmlparser->replaceChunk($key, '');
             $commentId = $this->xmlparser->getAttribute($attr, 'sdl:cid');
             // we collect the comment IDs and add a text container for the selected content there:
             $this->comments[$commentId] = ['text' => [], 'field' => editor_Models_Import_FileParser_Sdlxliff::TARGET];
         }, function($tag, $key, $opener){
-            $this->xmlparser->replaceChunk($key, ''); 
+            $this->xmlparser->replaceChunk($key, '');
         });
         
         $this->xmlparser->registerElement('trans-unit > seg-source mrk[mtype=x-sdl-comment]', function($tag, $attr, $key){
-            //restore comments later only if import comments is enabled  
+            //restore comments later only if import comments is enabled
             if($this->config->runtimeOptions->import->sdlxliff->importComments) {
                 $this->maskedSourceChunks[$key] = $this->xmlparser->getChunk($key);
             }
@@ -155,7 +155,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
             // we collect the comment IDs and add a text container for the selected content there:
             $this->comments[$commentId] = ['text' => [], 'field' => editor_Models_Import_FileParser_Sdlxliff::SOURCE];
         }, function($tag, $key, $opener){
-            //restore comments later only if import comments is enabled  
+            //restore comments later only if import comments is enabled
             if($this->config->runtimeOptions->import->sdlxliff->importComments) {
                 $this->maskedSourceChunks[$key] = $this->xmlparser->getChunk($key);
             }
@@ -163,7 +163,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
         });
         
         $this->xmlparser->registerOther(function($other, $key) {
-            //if other is empty or is deleted text we do not count and track it  
+            //if other is empty or is deleted text we do not count and track it
             if((empty($other)&&$other!=="0") || $this->xmlparser->getParent('mrk[mtype=x-sdl-deleted]')) {
                 return;
             }
@@ -192,7 +192,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
                 //we have to find out if the comment was for the whole segment or only a part of it
                 if(count($comment['text']) == $this->countOtherContent) {
                     //we set the comment to true, that means comment on whole segment not only some word(s)
-                    $this->comments[$key]['text'] = true; 
+                    $this->comments[$key]['text'] = true;
                 }
             }
             $this->unitComments[$mid] = $this->comments;
@@ -210,9 +210,9 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
     }
     
     /**
-     * if there is no or an empty target, easiest way to prepare it, 
+     * if there is no or an empty target, easiest way to prepare it,
      *   is by cloning the source content and then ignore the so created content on parsing
-     * @param string $transUnit 
+     * @param string $transUnit
      * @return string
      */
     protected function handleEmptyTarget(string $transUnit): string {
@@ -277,6 +277,11 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
                 }
                 else {
                     $placeHolder = $segmentSaver($mid, $this->sourceMrkContent[$idx], $this->targetMrkContent[$idx], $this->unitComments[$mid] ?? null);
+                }
+                
+                //if there was not generated a placeholder, there is nothing to replace
+                if(is_null($placeHolder)) {
+                    continue;
                 }
                 
                 $startMrk = $this->targetMrkChunkIndex[$idx][0];
