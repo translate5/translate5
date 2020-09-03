@@ -338,6 +338,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('frontend.showReferenceFilesPopup',$rop->editor->showReferenceFilesPopup);
       //show confirm finish task popup
       $this->view->Php2JsVars()->set('frontend.showConfirmFinishTaskPopup',$rop->editor->showConfirmFinishTaskPopup);
+      
+      $db = Zend_Db_Table::getDefaultAdapter();
+      //set db version as frontend param
+      $this->view->Php2JsVars()->set('dbVersion',$db->getServerVersion());
+
       $this->setJsAppData();
     }
 
