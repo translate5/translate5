@@ -255,6 +255,7 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                         return;
                     }
                     
+                    //reset the task frontend object after valid index is found
                     if(Editor.data.task){
                         Editor.data.task=null;
                     }
@@ -272,6 +273,10 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
                     });
                 },
                 notScrollCallback:function(){
+                    //reset the task frontend object after no valid index is found
+                    if(Editor.data.task){
+                        Editor.data.task=null;
+                    }
                     Editor.MessageBox.addInfo(me.strings.noProjectInFilter);
                     me.selectProjectTaskRecord(taskId);
                 }
