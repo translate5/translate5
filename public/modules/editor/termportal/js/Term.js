@@ -272,7 +272,7 @@ var Term={
 			    me.$_resultTermsHolder.hide();
 			}
 			
-			//if term is proposed from the instant translate, and the source exist more than once
+			//if term is proposed from the InstantTranslate, and the source exist more than once
 			if(me.searchTermsResponse.length > 1 && isTermProposalFromInstantTranslate){
 				showInfoMessage(proposalTranslations['multipleSourcesFoundMessage'],proposalTranslations['multipleSourcesFoundTitle']);
 			}
@@ -1104,7 +1104,7 @@ var Term={
         },
         
         /***
-         * Init the instant translate select html to jquery component
+         * Init the InstantTranslate select html to jquery component
          * This will also register the onselect handler
          */
         initInstantTranslateSelect:function(){
@@ -1357,7 +1357,7 @@ var Term={
 			$termAttributeHolder.empty();
 			$termAttributeHolder.append(attributeRenderData);
 			
-			//render the instant translate into select
+			//render the InstantTranslate into select
 			if(instantTranslateInto){
 				$termAttributeHolder.prepend(instantTranslateInto);
 				Term.initInstantTranslateSelect();
