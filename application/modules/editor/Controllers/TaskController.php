@@ -1711,11 +1711,11 @@ class editor_TaskController extends ZfExtended_RestController {
         //TODO The optimal way to implement this, is like similar to the segment::positionAction in a general way so that it is usable for all entities.
         
         $this->handleProjectRequest();
-        $this->loadAll();
+        $rows=$this->loadAll();
         $id = (int) $this->_getParam('id');
         $index = false;
-        if(!empty($this->view->rows)) {
-            $index = array_search($id, array_column($this->view->rows, 'id'));
+        if(!empty($rows)) {
+            $index = array_search($id, array_column($rows, 'id'));
         }
         if($index === false){
             $index = -1;
