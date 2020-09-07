@@ -34,7 +34,7 @@ Ext.define('Editor.view.LanguageResources.log.LogWindow', {
         'Editor.view.admin.log.Window'
     ],
     languageResource: null,
-    title: '#UT#Ereignisse zu Sprachresource "{0}"',
+    title: '#UT#Ereignisse zu Sprachressource "{0}"',
     initConfig: function(instanceConfig) {
         var me = this,
             config;

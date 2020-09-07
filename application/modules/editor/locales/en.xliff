@@ -2439,14 +2439,17 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>XLIFF 2.1</source>
     <target>XLIFF 2.1</target>
 </trans-unit>
-<trans-unit id='RXh0ZXJuZSBCZWFyYmVpdHVuZyBhbHMgRXhjZWw='><source>Externe Bearbeitung als Excel</source><target>External editing as Excel</target></trans-unit>
+<trans-unit id='RXh0ZXJuZSBCZWFyYmVpdHVuZyBhbHMgRXhjZWw='>
+    <source>Externe Bearbeitung als Excel</source>
+    <target>External editing as Excel</target>
+</trans-unit>
 <trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='>
     <source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source>
     <target>Re-import chosen tasks into current TM</target>
 </trans-unit>
-<trans-unit id='VGVybWlub2xvZ2llcG9ydGFs'>
-    <source>Terminologieportal</source>
-    <target>Terminology portal</target>
+<trans-unit id='VGVybVBvcnRhbA=='>
+    <source>TermPortal</source>
+    <target>TermPortal</target>
 </trans-unit>
 <trans-unit id='U3VjaGU='><source>Suche</source><target>Search</target></trans-unit>
 <trans-unit id='RmlsdGVy'>
@@ -2457,22 +2460,18 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 	<source>Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.</source>
 	<target>There are currently no clients connected to your account and therefore no TermCollections assigned. Therefore no term search is possible.</target>
 </trans-unit>
-
 <trans-unit id='RXMgd3VyZGVuIGtlaW5lIHZlcmbDvGdiYXJlbiB0ZXJtQ29sbGVjdGlvbiBmw7xyIGRlbiBJaG5lbiB6dWdlb3JkbmV0ZW4gS3VuZGVuIGdlZnVuZGVuLg=='>
 	<source>Es wurden keine verfügbaren termCollection für den Ihnen zugeordneten Kunden gefunden.</source>
 	<target>No available term collections were found for the clients that are associated to you.</target>
 </trans-unit>
-
 <trans-unit id='RWludHLDpGdl'>
     <source>Einträge</source>
     <target>Entries</target>
 </trans-unit>
-
 <trans-unit id='VGVybWU='>
 	<source>Terme</source>
 	<target>Terms</target>
 </trans-unit>
-
 <trans-unit id='RWludHJhZ3NlaWdlbnNjaGFmdGVu'>
 	<source>Eintragseigenschaften</source>
 	<target>Term entry attributes</target>
@@ -2708,8 +2707,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</source>
   <target>On editing the source language column no matches can be taken over.</target>
 </trans-unit>
-<trans-unit id='U3ByYWNoLVJlc291cmNlbg=='>
-  <source>Sprach-Resourcen</source>
+<trans-unit id='U3ByYWNocmVzc291cmNlbg=='>
+  <source>Sprachressourcen</source>
   <target>Language resources</target>
 </trans-unit>
 <trans-unit id='U3ByYWNocmVzc291cmNlIGVuZGfDvGx0aWcgbMO2c2NoZW4/'>
@@ -2732,8 +2731,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Die Sprachressource "{0}" wurde erfolgreich erstellt.</source>
   <target>The language resource &quot;{0}&quot; was successfully created.</target>
 </trans-unit>
-<trans-unit id='RGllIFNwcmFjaHJlc291cmNlICJ7MH0iIG11c3MgZXJzdCBrb25maWd1cmllcnQgd2VyZGVuLiBXZWl0ZXJlIEluZm9zOiB7MX0='>
-  <source>Die Sprachresource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}</source>
+<trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBtdXNzIGVyc3Qga29uZmlndXJpZXJ0IHdlcmRlbi4gV2VpdGVyZSBJbmZvczogezF9'>
+  <source>Die Sprachressource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}</source>
   <target>The language resource &quot;{0}&quot; needs to be configured first. Further information: {1}</target>
 </trans-unit>
 <trans-unit id='d2lyZCBnZWxhZGVuLi4u'>
@@ -2828,8 +2827,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Suche in {0}</source>
     <target>Search in {0}</target>
 </trans-unit>
-<trans-unit id='U3ByYWNoLVJlc291cmNlbiB6dXdlaXNlbg=='>
-  <source>Sprach-Resourcen zuweisen</source>
+<trans-unit id='U3ByYWNocmVzc291cmNlbiB6dXdlaXNlbg=='>
+  <source>Sprachressourcen zuweisen</source>
   <target>Associate language resources</target>
 </trans-unit>
 <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiB1bmQgZsO8ciBkZW4gS3VuZGVuIGRlcyBnZcO2ZmZuZXRlbiBUYXNrcyB2ZXJmw7xnYmFyLg=='>
@@ -2852,16 +2851,16 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>{0} Ergebnisse</source>
   <target>{0} results</target>
 </trans-unit>
-<trans-unit id='S2VpbmUgU3ByYWNoLVJlc291cmNlbiB6dWdld2llc2VuLg=='>
-  <source>Keine Sprach-Resourcen zugewiesen.</source>
+<trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlbiB6dWdld2llc2VuLg=='>
+  <source>Keine Sprachressourcen zugewiesen.</source>
   <target>No match resources associated.</target>
 </trans-unit>
 <trans-unit id='S2VpbmUgQXVmZ2FiZW4genVnZXdpZXNlbi4='>
   <source>Keine Aufgaben zugewiesen.</source>
   <target>No tasks associated.</target>
 </trans-unit>
-<trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNoLVJlc291cmNlbg=='>
-    <source>Zugewiesene Sprach-Resourcen</source>
+<trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNocmVzc291cmNlbg=='>
+    <source>Zugewiesene Sprachressourcen</source>
     <target>Associated language resources</target>
 </trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUgQXVmZ2FiZW4='>
@@ -2932,8 +2931,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Sprachressource löschen?</source>
     <target>Delete language resource?</target>
 </trans-unit>
-<trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBhdXMgZGVyIExpc3RlIGRlciBoaWVyIGFuZ2V6ZWlndGVuIFNwcmFjaC1SZXNvdXJjZW4gZ2Vsw7ZzY2h0IHdlcmRlbj8gPGJyIC8+IEVzIHdlcmRlbiBrZWluZSBEYXRlbiBpbSB2ZXJrbsO8cGZ0ZW4gVE0gU3lzdGVtIGdlbMO2c2NodCwgZGEga2VpbmUgVmVyYmluZHVuZyBiZXN0ZWh0Lg=='>
-    <source>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprach-Resourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</source>
+<trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBhdXMgZGVyIExpc3RlIGRlciBoaWVyIGFuZ2V6ZWlndGVuIFNwcmFjaHJlc3NvdXJjZW4gZ2Vsw7ZzY2h0IHdlcmRlbj8gPGJyIC8+IEVzIHdlcmRlbiBrZWluZSBEYXRlbiBpbSB2ZXJrbsO8cGZ0ZW4gVE0gU3lzdGVtIGdlbMO2c2NodCwgZGEga2VpbmUgVmVyYmluZHVuZyBiZXN0ZWh0Lg=='>
+    <source>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</source>
     <target>Do you really want to remove the language resource &quot;{0}&quot; from the here listed language resources? <br /> No data will be deleted in the associated TM system, since there is currently no connection to the TM system.</target>
 </trans-unit>
 <trans-unit id='U3RhdHVzaW5mb3JtYXRpb25lbiB3ZXJkZW4gZ2VsYWRlbg=='>
@@ -2997,9 +2996,9 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Segmentschriftgrad verkleinern (STRG + -)</source>
     <target>decrease segment font-size (STRG + -)</target>
 </trans-unit>
-<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5n'>
-    <source>Sofortübersetzung</source>
-    <target>Instant-Translate</target>
+<trans-unit id='SW5zdGFudFRyYW5zbGF0ZQ=='>
+    <source>InstantTranslate</source>
+    <target>InstantTranslate</target>
 </trans-unit>
 <trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gaW4gRm9ybSBlaW5lciBUQlggRGF0ZWkgaW1wb3J0aWVyZW4gdW5kIGRlbSBiZXN0ZWhlbmRlbiBUZXJtLUNvbGxlY3Rpb24gaGluenVmw7xnZW4='>
     <source>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen</source>
@@ -3213,12 +3212,12 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='dHJhbnNsYXRlNS1pbnN0YW50dHJhbnNsYXRl'>
     <source>translate5-instanttranslate</source>
-    <target>Instant-Translate</target>
+    <target>InstantTranslate</target>
 </trans-unit>
 
 <trans-unit id='dHJhbnNsYXRlNS10ZXJtcG9ydGFs'>
     <source>translate5-termportal</source>
-    <target>Terminologieportal</target>
+    <target>TermPortal</target>
 </trans-unit>
 <trans-unit id='RGllIMO8YmVyZ2ViZW5lIFF1ZWxsc3ByYWNoZSAie2xhbmd1YWdlfSIgaXN0IHVuZ8O8bHRpZyE='>
   <source>Die übergebene Quellsprache "{language}" ist ungültig!</source>
@@ -3248,12 +3247,12 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Die Aufgabe ist durch einen Benutzer gesperrt, und kann daher nicht gelöscht werden.</source>
   <target>The task is locked by a user, and cannot be deleted therefore!</target>
 </trans-unit>
-<trans-unit id='RGllIGdld8O8bnNjaHRlIFNwcmFjaHJlc291cmNlIGdpYnQgZXMgbmljaHQh'>
-  <source>Die gewünschte Sprachresource gibt es nicht!</source>
+<trans-unit id='RGllIGdld8O8bnNjaHRlIFNwcmFjaHJlc3NvdXJjZSBnaWJ0IGVzIG5pY2h0IQ=='>
+  <source>Die gewünschte Sprachressource gibt es nicht!</source>
   <target>The chosen language resource does not exist.</target>
 </trans-unit>
-<trans-unit id='RGllIEF1ZmdhYmUgd2lyZCBiZWFyYmVpdGV0LCBkaWUgU3ByYWNocmVzb3VyY2Uga2FubiBkYWhlciBpbSBNb21lbnQgbmljaHQgdm9uIGRlciBBdWZnYWJlIGVudGZlcm50IHdlcmRlbiE='>
-  <source>Die Aufgabe wird bearbeitet, die Sprachresource kann daher im Moment nicht von der Aufgabe entfernt werden!</source>
+<trans-unit id='RGllIEF1ZmdhYmUgd2lyZCBiZWFyYmVpdGV0LCBkaWUgU3ByYWNocmVzc291cmNlIGthbm4gZGFoZXIgaW0gTW9tZW50IG5pY2h0IHZvbiBkZXIgQXVmZ2FiZSBlbnRmZXJudCB3ZXJkZW4h'>
+  <source>Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment nicht von der Aufgabe entfernt werden!</source>
   <target>The Task is in use, the language resource can not be removed from the task at the meoment!</target>
 </trans-unit>
 
@@ -3297,7 +3296,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='RXJlaWduaXNzZSB6dSBBdWZnYWJlICJ7MH0i'>
     <source>Ereignisse zu Aufgabe "{0}"</source>
-    <target>Events to task "{0}"</target>
+    <target>Events for task "{0}"</target>
+</trans-unit>
+<trans-unit id='RXJlaWduaXNzZSB6dSBTcHJhY2hyZXNzb3VyY2UgInswfSI='>
+	<source>Ereignisse zu Sprachressource "{0}"</source>
+	<target>Events for language resource "{0}"</target>
 </trans-unit>
 <trans-unit id='RGV0YWlsYW5zaWNodA=='>
     <source>Detailansicht</source>
@@ -3384,8 +3387,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='VGVybS1Db2xsZWN0aW9uIGbDvHIgVGVybS1Wb3JzY2hsYWcgd8OkaGxlbg=='><source>Term-Collection für Term-Vorschlag wählen</source><target>Select Term-Collection for term proposal</target></trans-unit>
 <trans-unit id='SsO8bmdlciBhbHMgb2RlciBnbGVpY2g='><source>Jünger als oder gleich</source><target>Younger than or equal</target></trans-unit>
 <trans-unit id='RXhwb3J0aWVyZW4='><source>Exportieren</source><target>Export</target></trans-unit>
-<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIG5hY2g='><source>Sofortübersetzung nach</source><target>InstantTranslate into</target></trans-unit>
-<trans-unit id='VGVybWlub2xvZ2llcG9ydGFsLVNwcmFjaGVu'><source>Terminologieportal-Sprachen</source><target>TermPortal-languages</target></trans-unit>
+<trans-unit id='SW5zdGFudFRyYW5zbGF0ZSBuYWNo'><source>InstantTranslate nach</source><target>InstantTranslate into</target></trans-unit>
+<trans-unit id='VGVybVBvcnRhbCBTcHJhY2hlbg=='><source>TermPortal Sprachen</source><target>TermPortal languages</target></trans-unit>
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>All languages available</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Saving the term will also create a new entry for</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Vorschläge löschen, deren letzte Berührung länger her ist als</source><target>Delete proposals last touched longer ago than</target></trans-unit>
@@ -3601,7 +3604,7 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZWxpc3Rl'><source>Zurück zur Aufgabeliste</source><target>Back to task list</target></trans-unit>
 <trans-unit id='V29ya2Zsb3c='><source>Workflow</source><target>Workflow</target></trans-unit>
 <trans-unit id='WmFobCB6dWdld2llc2VuZXIgQmVudXR6ZXI='><source>Zahl zugewiesener Benutzer</source><target>Number of users</target></trans-unit>
-<trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc291cmNlbg=='><source>Anzahl zugewiesene Sprachresourcen</source><target>Number of assigned language resources</target></trans-unit>
+<trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc3NvdXJjZW4='><source>Anzahl zugewiesene Sprachressourcen</source><target>Number of assigned language resources</target></trans-unit>
 <trans-unit id='MTAwJS1UcmVmZmVyIGVkaXRpZXJiYXI='><source>100%-Treffer editierbar</source><target>100% matches editable</target></trans-unit>
 <trans-unit id='UHJvamVrdG1hbmFnZXI='><source>Projektmanager</source><target>Project manager</target></trans-unit>
 <trans-unit id='JSBhYmdlc2NobG9zc2Vu'><source>% abgeschlossen</source><target>% finished</target></trans-unit>

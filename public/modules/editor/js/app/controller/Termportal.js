@@ -46,7 +46,7 @@ Ext.define('Editor.controller.Termportal', {
     },
 
     strings:{
-        termPortal:'#UT#Terminologieportal'
+        termPortal:'#UT#TermPortal'
     },
 
     /**

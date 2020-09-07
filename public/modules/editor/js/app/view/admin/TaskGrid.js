@@ -67,7 +67,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       terminologie: '#UT#Terminologie',
       userCount: '#UT#Zahl zugewiesener Benutzer',
       users: '#UT#Benutzer',
-      taskassocs: '#UT#Anzahl zugewiesene Sprachresourcen',
+      taskassocs: '#UT#Anzahl zugewiesene Sprachressourcen',
       pmName: '#UT#Projektmanager',
       pmGuid: '#UT#Projektmanager',
       orderdate: '#UT#Bestelldatum',

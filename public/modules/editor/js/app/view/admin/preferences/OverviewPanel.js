@@ -36,6 +36,7 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
     itemId: 'preferencesOverviewPanel',
     controller: 'preferencesOverviewPanel',
     stateId: 'preferencesOverviewPanel',
+    helpSection: 'preferences',
     stateful: true,
     title: '#UT#Einstellungen',
     defaults: {

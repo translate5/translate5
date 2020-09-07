@@ -170,6 +170,22 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
      * Regex not supported by mysql
      */
     blackListRegex:[
+        //hexadecimal and unicodes should be tested on real cases
+        ///\\x[a-fA-F0-9]{2}/g,//Hexadecimal escape | \xFF where FF are 2 hexadecimal digits | Matches the character at the specified position in the code page  |  \xA9 matches © when using the Latin-1 code page
+        ///\\u[a-fA-F0-9]{4}/g,//Matches a specific Unicode code point.
+        
+        //this is a tag specific regex. Here is needed different approche (tabs,linebrakes etc.. are saved as tags in the db)
+        /\\n/g,//Character escape
+        /\\r/g,//Character escape
+        /\\t/g,//Character escape
+        /\\v/g,//Character escape
+        /\\b/g,//javascript: [\b\t] matches a backspace or a tab character.
+    ],
+    
+    /***
+     * Regex not supported by older database versions
+     */
+    blackListRegexOldDbVersion:[
         /\\x[a-fA-F0-9]{2}/g,//Hexadecimal escape | \xFF where FF are 2 hexadecimal digits | Matches the character at the specified position in the code page  |  \xA9 matches © when using the Latin-1 code page
         /\\n/g,//Character escape
         /\\r/g,//Character escape
@@ -202,7 +218,6 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
         /\(\?\!.*?\)/g,//Similar to positive lookahead, except that negative lookahead only succeeds if the regex inside the lookahead fails to match.
         /\[\:(.*)\:\]/g,
     ],
-    
     /***
      * Search field validator
      */
@@ -222,9 +237,22 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
             }
             
             if(val!==""){
-                var blArray=searchTab.blackListRegex,
-                arrLength=blArray.length;
+                var isMysql =Editor.data.dbVersion && ( Editor.data.dbVersion.startsWith("5") || Editor.data.dbVersion.startsWith("8")),
+                    version =Editor.data.dbVersion &&  parseFloat(Editor.data.dbVersion),
+                    blArray=searchTab.blackListRegexOldDbVersion;
                 
+                //TODO: (mysql update) remove this check when we update to the mysql 8 or mariadb
+                //is mysql and version is > 7 
+                if(isMysql && version>7){
+                    blArray=searchTab.blackListRegex;
+                }
+                
+                //is maria db and version > 10.1
+                if(!isMysql && version>10.1){
+                    blArray=searchTab.blackListRegex;
+                }
+                
+                var arrLength=blArray.length;
                 for (var i = 0; i < arrLength; i++){
                     var arrayRegex=blArray[i];
                     if(searchTab.isRegexMatch(arrayRegex,val)){

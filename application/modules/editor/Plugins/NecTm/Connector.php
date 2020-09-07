@@ -368,9 +368,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
                 $item->name = $name;
                 $item->value = $found->{$name};
                 switch ($name) {
-                    case 'file_name':
-                        $item->value = $this->languageResource->getSpecificData('fileName');
-                        break;
                     case 'tag':
                         $tagIds = $item->value;
                         foreach ($tagIds as $tagId) {
@@ -421,8 +418,24 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_Abstract::translate()
      */
     public function translate(string $searchString){
-        // TODO: check for additional handling when implementing TRANSLATE-1252
-        return $this->queryNecTmApi($searchString);
+        if(empty($searchString)) {
+            return $this->resultList;
+        }
+        $results = null;
+        $this->validateLanguages($this->sourceLang, $this->targetLang);
+        if($this->api->search($searchString, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
+            $results = $this->api->getResult();
+            if(empty($results)) {
+                return $this->resultList;
+            }
+            foreach($results as $result) {
+                $source=$result->tu->source_text ?? "";
+                $target = $result->tu->target_text ?? "";
+                $this->resultList->addResult($target, $result->match, $this->getMetaData($result));
+                $this->resultList->setSource($source);
+            }
+        }
+        return $this->resultList;
     }
     
     /**
