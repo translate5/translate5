@@ -104,10 +104,11 @@ Ext.define('Editor.view.segments.Grid', {
     //events to trigger the state update
     stateEvents:['segmentSizeChanged'],
     
-    stateful:{
+    statefulOFF: {
         segmentSize:true,
         columns:true
     },
+    stateful: false,
     
      /***
      * add our custom config to the state return object
