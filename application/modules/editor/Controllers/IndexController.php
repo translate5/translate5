@@ -666,6 +666,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             throw new ZfExtended_NotFoundException();
         }
         //currently this method is fixed to JS:
+        // TODO FIXME: $extension might be empty !
         header('Content-Type: '.$types[$extension]);
         //FIXME add version URL suffix to plugin.css inclusion
         header('Last-Modified: '.gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));
