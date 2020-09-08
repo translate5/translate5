@@ -33,10 +33,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.column.ContentEditable', {
   extend: 'Editor.view.segments.column.Content',
   alias: 'widget.contentEditableColumn',
-  //how is this defined for alternative columns:
-  isErgonomicVisible: true,
-  //how is this defined for alternative columns:
-  isErgonomicSetWidth: true,
   isEditableContentColumn: true,
   constructor: function(conf) {
       var field = conf.fieldName;
