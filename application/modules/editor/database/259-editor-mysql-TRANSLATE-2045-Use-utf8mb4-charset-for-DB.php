@@ -51,8 +51,13 @@ $conf = $db->getConfig();
 
 $dbname = $conf['dbname'];
 
-$res = $db->query('ALTER DATABASE `'.$dbname.'` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;');
-$res->execute();
+try {
+    $res = $db->query('ALTER DATABASE `'.$dbname.'` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;');
+    $res->execute();
+} catch (Zend_Db_Statement_Exception $e) {
+    echo "Error on database charset and collation alter statement. The script requires mysql user with alter privileges.";
+    return;
+}
 
 //generate the update characterset/COLLATION query for all tables
 $tableSql = "SELECT CONCAT( ".
@@ -80,20 +85,36 @@ WHERE
     t1.COLLATION_NAME IS NOT NULL AND
     t1.COLLATION_NAME IN ('utf8_bin');";
 
+//after all changes on the tables and columns, run the optimize and repair on each table in the database
+$tableOptimizer = "SELECT CONCAT( 'REPAIR TABLE ',  table_name, '; OPTIMIZE TABLE ',table_name,';') as r 
+     FROM information_schema.TABLES AS T, information_schema.`COLLATION_CHARACTER_SET_APPLICABILITY` AS C 
+     WHERE C.collation_name = T.table_collation 
+     AND T.table_schema = ? ;";
+
 //generate the alter query results
 $resUtf8Alter = $db->query($utf8BinAlter,[$dbname]);
 $queryesUtf8Alter = $resUtf8Alter->fetchAll();
+
+//generate the table optimizer queries
+$resTableOptimizer = $db->query($tableOptimizer,[$dbname]);
+$queryTableOptimizer = $resTableOptimizer->fetchAll();
+
 
 $res = $db->query($tableSql,[$dbname]);
 $queryes = $res->fetchAll();
 
 //merge the query results to single query
-$runAlterQuery = function($q,$r=[]){
-    array_unshift($r,'SET FOREIGN_KEY_CHECKS=0;');
+$runAlterQuery = function($q,$r=[],$disableForeignKeyCheck = false){
+    if(!$disableForeignKeyCheck){
+        array_unshift($r,'SET FOREIGN_KEY_CHECKS=0;');
+    }
     array_walk($q, function ($item)  use (&$r){
         $r[] = $item['r'] ?? [];
     });
-    $r[]='SET FOREIGN_KEY_CHECKS=1;';
+    
+    if(!$disableForeignKeyCheck){
+        $r[]='SET FOREIGN_KEY_CHECKS=1;';
+    }
     
     $r = implode(PHP_EOL, $r);
     if(!empty($r)){
@@ -121,3 +142,4 @@ $runAlterQuery($queryesUtf8Alter);
 
 $db->query("SET NAMES utf8mb4;");
 
+$runAlterQuery($queryTableOptimizer,[],true);
