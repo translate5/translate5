@@ -39,19 +39,27 @@ class Models_Installer_PreconditionCheck {
      * Error Messages while checking environment are added here
      * @var array
      */
-    protected $errorsEnvironment = array();
+    protected $errorsEnvironment = [];
     
     /**
      * Error Messages while checking environment are added here
      * @var array
      */
-    protected $infosEnvironment = array();
+    protected $infosEnvironment = [];
     
     /**
      * Error Messages while checking DB are added here
      * @var array
      */
-    protected $errorsDb = array();
+    protected $errorsDb = [];
+    
+    
+    /***
+     * Warning messages while chacking DB are added here
+     * 
+     * @var array
+     */
+    protected $warningDb = [];
     
     /**
      * checks the implemented environment checks, stops on error
@@ -158,6 +166,12 @@ class Models_Installer_PreconditionCheck {
             $msg2 = 'See https://confluence.translate5.net/display/CON/Server+environment+-+configure+from+scratch#Serverenvironmentconfigurefromscratch-mysqlconfigMySQLconfiguration for more information and solutions.';
             $this->stop($msg."\n  - ".join("\n  - ", $this->errorsDb)."\n\n".$msg2."\n");
         }
+        
+        if(!empty($this->warningDb)) {
+            $msg = 'Some Database requirements of translate5 are not optimal: ';
+            $msg2 = 'See https://confluence.translate5.net/display/CON/Server+environment+-+configure+from+scratch#Serverenvironmentconfigurefromscratch-mysqlconfigMySQLconfiguration for more information and solutions.';
+            echo($msg."\n  - ".join("\n  - ", $this->warningDb)."\n\n".$msg2."\n");
+        }
     }
     
     /**
@@ -188,11 +202,11 @@ class Models_Installer_PreconditionCheck {
         if(empty($res)) {
             return; //should not be
         }
-        if($res->charset !== 'utf8') {
-            $this->errorsDb[] = 'Your DBs charset is '.$res->charset.' but should be utf8';
+        if($res->charset !== 'utf8mb4') {
+            $this->warningDb[] = 'Your DBs charset is '.$res->charset.' but should be utf8mb4';
         }
-        if($res->collation !== 'utf8_general_ci') {
-            $this->errorsDb[] = 'Your DBs collation is '.$res->collation.' but should be utf8_general_ci';
+        if($res->collation !== 'utf8mb4_unicode_ci') {
+            $this->warningDb[] = 'Your DBs collation is '.$res->collation.' but should be utf8mb4_unicode_ci';
         }
     }
     
