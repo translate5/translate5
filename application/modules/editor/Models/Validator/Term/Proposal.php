@@ -32,7 +32,7 @@ class editor_Models_Validator_Term_Proposal extends ZfExtended_Models_Validator_
    */
   protected function defineValidators() {
     $this->addValidator('id', 'int');
-    $this->addValidator('term', 'stringLength', array('min' => 0, 'max' => 19000));
+    $this->addValidator('term', 'stringLength', array('min' => 0, 'max' => 16386));
     $this->addDontValidateField('collectionId');
     $this->addDontValidateField('termId');
   }

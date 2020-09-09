@@ -332,8 +332,8 @@ class Models_Installer_Standalone2 {
      */
     protected function promptDbCredentials() {
         $this->logger->log('Please enter the MySQL database settings, the database must already exist.');
-        $this->logger->log('Default character set must be utf8. This can be done for example with the following command: ');
-        $this->logger->log('  CREATE DATABASE IF NOT EXISTS `translate5` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;'."\n");
+        $this->logger->log('Default character set must be utf8mb4. This can be done for example with the following command: ');
+        $this->logger->log('  CREATE DATABASE IF NOT EXISTS `translate5` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'."\n");
         
         foreach($this->dbCredentials as $key => $default) {
             //executable is determined by the surrounding bash script
