@@ -31,25 +31,61 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.searchreplacewindow',
     itemId: 'searchreplacewindow',
+    stateful: true,
+    stateId: 'editor.searchreplacewindow',
     requires:[
         'Editor.view.searchandreplace.TabPanel'
     ],
+    listeners: {
+        beforeclose: function() {
+            this.saveState();
+        }
+    },
     minHeight : 350,
     width : 370,
     autoHeight: true,
     layout:'fit',
+    x: 10,
+    y: 10,
     strings:{
         windowTitle:'#UT#Suchen und ersetzen',
         helpButtonTooltip:'#UT#Info zum Suchen und Ersetzen'
     },
-    
-    listeners:{
-        show:function(win,eOpts){
-            win.setX(10);
-            win.setY(10);
+    applyState: function(state) {
+        var me = this,
+            search = me.down('#searchTab #searchField'),
+            ctrl = Editor.app.getController('SearchReplace');
+        me.callParent([state]);
+        
+        //the search fields of replace and search are on a magical way in sync, so we just set one here
+        if(search && state.searchValue) {
+            search.setValue(state.searchValue);
+        }
+        //the searchInField is calculated, depending on how the search is started. 
+        //the default value is here the controllers defaultColumnDataIndex which we just set here from the state
+        if(state.searchInField) {
+            ctrl.defaultColumnDataIndex = state.searchInField;
+        }
+        else {
+            ctrl.defaultColumnDataIndex = Editor.controller.SearchReplace.prototype.defaultColumnDataIndex;
         }
     },
-    
+    getState: function() {
+        var me = this, 
+            state = me.callParent();
+            
+        //the search fields of replace and search are on a magical way in sync, 
+        // so we store only the search field
+        state.searchValue = me.down('#searchTab #searchField').getValue();
+        try {
+            state.searchInField = me.down('searchreplacetabpanel').getActiveTab().down('#searchInField').getValue();
+        }
+        catch(e) {
+            //if we can not find the field, we just do not save that value
+            state.searchInField = null;
+        }
+        return state;
+    },
     initConfig : function(instanceConfig) {
         var me = this,
             config = {
