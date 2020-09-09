@@ -128,6 +128,7 @@ class editor_Services_OpenTM2_HttpApi {
      * @return Zend_Http_Client
      */
     protected function getHttp($method, $urlSuffix = '') {
+        //TODO: here we need only the resource. No lr is required.
         $url = rtrim($this->languageResource->getResource()->getUrl(), '/');
         $urlSuffix = ltrim($urlSuffix, '/');
         $this->http = ZfExtended_Factory::get('Zend_Http_Client');

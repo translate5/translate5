@@ -523,6 +523,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
+        if(empty($this->languageResource)){
+            //TODO use the resource. Ping action!
+        }
         $name = $this->languageResource->getSpecificData('fileName');
         
         if(empty($name)) {

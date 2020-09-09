@@ -108,6 +108,11 @@ abstract class editor_Services_Connector_Abstract {
      */
     protected $tagsWereStripped = true;
     
+    /***
+     * @var editor_Models_LanguageResources_Resource
+     */
+    protected $resource;
+    
     /**
      * initialises the internal result list
      */
@@ -119,6 +124,11 @@ abstract class editor_Services_Connector_Abstract {
         $this->initHelper();
             //$this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
         $this->initImageTags();
+    }
+    
+    public function ping($resource){
+        $this->resource = $resource;
+        return $this->getStatus("")!==self::STATUS_AVAILABLE;
     }
     
     /**
@@ -138,12 +148,13 @@ abstract class editor_Services_Connector_Abstract {
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
         $this->sourceLang = $sourceLang;
         $this->targetLang = $targetLang;
+        $this->resource = $languageResource->getResource();
         $this->languageResource = $languageResource;
         $this->resultList->setLanguageResource($languageResource);
         $this->languageResource->sourceLangRfc5646=$this->languageResource->getSourceLangRfc5646();
         $this->languageResource->targetLangRfc5646=$this->languageResource->getTargetLangRfc5646();
     }
-
+    
     /**
      * Updates translations in the connected service
      * for returning error messages to the GUI use rest_messages
