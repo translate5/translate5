@@ -1154,48 +1154,123 @@ Ext.override(Ext.tip.ToolTip, {
 });
 
 
-/***
- * Check for column lenght throws an exception when not columns are defined.
- * Check if the columns object exist before lenght check
+/**
+ * Fixes and additions regarding states and grid table
  */
 Ext.override(Ext.panel.Table, {
+    /**
+     * Check for column lenght throws an exception when not columns are defined.
+     * Check if the columns object exist before lenght check
+     */
     buildColumnHash: function(columns) {
-        var len = columns &&  columns.length,
-            columnState, i, result;
-        // Create a useable state lookup hash from which each column
-        // may look up its state based upon its stateId
-        // {
-        //      col_name: {
-        //          index: 0,
-        //          width: 100,
-        //          locked: true
-        //      },
-        //      col_details: {
-        //          index: 1,
-        //          width: 200,
-        //          columns: {
-        //              col_details_1: {
-        //                  index: 0,
-        //                  width: 100
-        //              },
-        //              col_details_2: {
-        //                  index: 1,
-        //                  width: 100
-        //              }
-        //          }
-        //      },
-        // }
         if (columns) {
-            result = {};
-            for (i = 0 , len = columns.length; i < len; i++) {
-                columnState = columns[i];
-                columnState.index = i;
-                if (columnState.columns) {
-                    columnState.columns = this.buildColumnHash(columnState.columns);
-                }
-                result[columnState.id] = columnState;
+            return this.callParent([columns]);
+        }
+    },
+    /**
+     * apply grid state also to already rendered grids (needed for our view modes)
+     */
+    applyState: function(state) {
+        var me = this,
+            cols = state && state.columns;
+        if(this.rendered) {
+            if(!cols || !Ext.isArray(cols)) {
+                return;
             }
-            return result;
+            //handle columns here only, no other table settings
+            cols.forEach(function(conf, newIdx){
+                var col = me.down('gridcolumn[stateId="'+conf.id+'"]'),
+                    oldIdx = col && me.headerCt.getHeaderIndex(col),
+                    oldStateful = me.stateful;
+                if(!col) {
+                    return;
+                }
+                if(oldStateful) {
+                    me.stateful = false;
+                }
+                if(oldIdx && oldIdx >= 0) {
+                    me.headerCt.move(oldIdx, newIdx);
+                }
+                if(conf.hidden !== undefined) {
+                    col.setHidden(conf.hidden);
+                }
+                if(conf.width !== undefined) {
+                    col.setWidth(conf.width);
+                }
+                if(conf.flex !== undefined) {
+                    col.setFlex(conf.flex);
+                }
+                me.stateful = oldStateful;
+            });
+        }
+        else {
+            this.callParent([state]);
+        }
+    },
+    onStateChange: function() {
+        //we may only save a state if the component is already rendered. 
+        // especially for grids otherwise a save state is triggered while construction which saves wrong states then
+        if(this.rendered) {
+            return this.callParent();
         }
     }
 });
+
+/**
+ * Fixes regarding states and grid table
+ */
+Ext.override(Ext.grid.column.Column, {
+    //the problem is that the original method is implemented wrong. 
+    // There is written, that width has precedence over flex, but that is just wrong. 
+    // The flex value is deleted if the user changes the column width, so only a width value remains
+    // On column reset the column is set back to flex - if defined
+    // That means if there is a flex value, the width has to be deleted and the flex must be kept
+    getColumnState: function() {
+        var state = this.callParent();        
+        //first we restore the flex state
+        this.savePropToState('flex', state);
+        if (state) {
+            //first we remove falsy/null/0 values, since they make not sense to be saved for flex/width values:
+            if('flex' in state && !state.flex) {
+                 delete state.flex;
+            }
+
+            //width is additionaly removed if flex is set and is not falsy
+            if('width' in state && (!state.width || state.flex)) {
+                delete state.width;
+            }
+        }
+        return state;
+    }
+});
+
+/**
+ * Enabling the active tab to be stateful
+ * the tab panel needs stateEvents containing tabchange'
+ */
+ Ext.override(Ext.tab.Panel, {
+    getState: function() {
+        var me = this,
+            state = me.callParent();
+        return me.addPropertyToState(state, 'activeTab', me.items.indexOf(me.getActiveTab()));
+    },
+    applyState: function(state ) {
+        if(state && state.activeTab) {
+            this.setActiveTab(state.activeTab);
+            delete state.activeTab;
+        }
+        this.callParent([state]);
+    }
+});
+
+/**
+ * We use an empty {} as default value, but Window applyState crash when called with an empty object.
+ */
+Ext.override(Ext.window.Window, {
+    applyState: function(state) {
+        if(!Ext.Object.isEmpty(state)) {
+            this.callParent([state]);
+        }
+    }
+});
+

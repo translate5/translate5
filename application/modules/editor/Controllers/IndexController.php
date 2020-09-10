@@ -459,7 +459,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         //set frontend array from the config data
         //the array is used as initial user config store data
-        $php2js->set('app.configData',$config->loadAllMerged($user));
+        $php2js->set('app.configData', $config->loadAllMerged($user, 'runtimeOptions.frontend.defaultState.%'));
     }
     
     protected function getAppVersion() {

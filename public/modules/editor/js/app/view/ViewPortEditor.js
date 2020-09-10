@@ -62,12 +62,13 @@ Ext.define('Editor.view.ViewPortEditor', {
     items_west_title: '#UT#Dateien',
     initComponent: function() {
       var me = this,
+          task = Editor.data.task,
+          isEditor = Editor.app.authenticatedUser.isAllowed('editorEditTask', task),
           items = [{
               xtype: 'panel',
               stateId: 'editor.westPanel',
               stateEvents: ['collapse', 'expand'],
-              statefulOFF:true,
-              stateful:false,
+              stateful:true,
               region: 'west',
               weight: 30,
               resizable: true,
@@ -82,29 +83,25 @@ Ext.define('Editor.view.ViewPortEditor', {
                   xtype: 'fileorder.tree',
                   stateId: 'editor.westPanelFileorderTree',
                   stateEvents: ['collapse', 'expand'],
-                  statefulOFF:true,
-                  stateful:false
+                  stateful:true
               },{
                   xtype: 'referenceFileTree',
                   stateId: 'editor.westPanelReferenceFileTree',
                   stateEvents: ['collapse', 'expand'],
-                  statefulOFF:true,
-                  stateful:false
+                  stateful:true
               }]
           },{
               region: 'center',
               flex:Editor.app.getController('LanguageResources').isLanguageResourcesDisabled() ? 0.3 : 0.5,
               xtype: 'segments.grid',
               itemId: 'segmentgrid',
-              statefulOFF:true,
-              stateful:false
+              stateful:true
           },{
               xtype: 'panel',
               stateId: 'editor.eastPanel',
               itemId:'editorEastPanel',
               stateEvents: ['collapse', 'expand'],
-              statefulOFF:true,
-              stateful:false,
+              stateful:true,
               region: 'east',
               width: 330,
               weight: 30,
@@ -137,14 +134,12 @@ Ext.define('Editor.view.ViewPortEditor', {
                       xtype: 'segmentsMetapanel',
                       stateId: 'editor.eastPanelSegmentsMetapanel',
                       stateEvents: ['collapse', 'expand'],
-                      statefulOFF:true,
-                      stateful:false
+                      stateful:true
                   },{
                       xtype: 'commentPanel',
                       stateId: 'editor.eastPanelCommentPanel',
                       stateEvents: ['collapse', 'expand'],
-                      statefulOFF:true,
-                      stateful:false
+                      stateful:true
                   }]
               }]
           }];
@@ -158,6 +153,10 @@ Ext.define('Editor.view.ViewPortEditor', {
       Ext.applyIf(me, {
           items: items
       });
+
+      //must be set before child components will use it
+      me.getViewModel().set('taskIsReadonly', task.isReadOnly() || !isEditor);
+
       me.callParent(arguments);
     },
     
