@@ -66,7 +66,8 @@ Ext.define('Editor.view.ViewPortEditor', {
               xtype: 'panel',
               stateId: 'editor.westPanel',
               stateEvents: ['collapse', 'expand'],
-              stateful:true,
+              statefulOFF:true,
+              stateful:false,
               region: 'west',
               weight: 30,
               resizable: true,
@@ -81,25 +82,29 @@ Ext.define('Editor.view.ViewPortEditor', {
                   xtype: 'fileorder.tree',
                   stateId: 'editor.westPanelFileorderTree',
                   stateEvents: ['collapse', 'expand'],
-                  stateful:true
+                  statefulOFF:true,
+                  stateful:false
               },{
                   xtype: 'referenceFileTree',
                   stateId: 'editor.westPanelReferenceFileTree',
                   stateEvents: ['collapse', 'expand'],
-                  stateful:true
+                  statefulOFF:true,
+                  stateful:false
               }]
           },{
               region: 'center',
               flex:Editor.app.getController('LanguageResources').isLanguageResourcesDisabled() ? 0.3 : 0.5,
               xtype: 'segments.grid',
               itemId: 'segmentgrid',
-              stateful:true
+              statefulOFF:true,
+              stateful:false
           },{
               xtype: 'panel',
               stateId: 'editor.eastPanel',
               itemId:'editorEastPanel',
               stateEvents: ['collapse', 'expand'],
-              stateful:true,
+              statefulOFF:true,
+              stateful:false,
               region: 'east',
               width: 330,
               weight: 30,
@@ -132,12 +137,14 @@ Ext.define('Editor.view.ViewPortEditor', {
                       xtype: 'segmentsMetapanel',
                       stateId: 'editor.eastPanelSegmentsMetapanel',
                       stateEvents: ['collapse', 'expand'],
-                      stateful:true,
+                      statefulOFF:true,
+                      stateful:false
                   },{
                       xtype: 'commentPanel',
                       stateId: 'editor.eastPanelCommentPanel',
                       stateEvents: ['collapse', 'expand'],
-                      stateful:true,
+                      statefulOFF:true,
+                      stateful:false
                   }]
               }]
           }];

@@ -45,7 +45,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     alias: 'widget.tmOverviewPanel',
     controller: 'tmOverviewPanel',
     itemId: 'tmOverviewPanel',
-    title:'#UT#Sprach-Resourcen',
+    title:'#UT#Sprachressourcen',
     helpSection: 'languageresource',
     glyph: 'xf1c0@FontAwesome5FreeSolid',
     strings: {

@@ -109,7 +109,7 @@ Ext.define('Editor.util.SearchReplaceUtils', {
         var me = this,
             nodes;
         nodes = range.getNodes([1,3], function(node) {
-            if(me.hasClass(node.parentNode,me.CSS_CLASSNAME_REPLACED_INS)){
+            if(node.parentNode && me.hasClass(node.parentNode,me.CSS_CLASSNAME_REPLACED_INS)){
                 return node;
             }
             return false;
