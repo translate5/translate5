@@ -72,7 +72,7 @@ Ext.define('Editor.controller.ViewModes', {
             '#editorViewport': {
                 boxready: 'handleViewportReady'
             },
-            'gridpanel segmentsToolbar menucheckitem[group="toggleView"]' : {
+            'gridpanel segmentsToolbar menuitem[group="toggleView"]' : {
                 click : 'handleViewMode'
             },
             'gridpanel segmentsToolbar menucheckitem[group="tagMode"]' : {
@@ -85,6 +85,7 @@ Ext.define('Editor.controller.ViewModes', {
                 click : 'handleTagZoomClick'
             },
             '#segmentgrid': {
+                beforeinitcolumns: 'initSegmentGridColumns',
                 beforestartedit: 'checkModeBeforeEdit'
             }
         }
@@ -103,15 +104,7 @@ Ext.define('Editor.controller.ViewModes', {
     editModeColumnWidth:[],
     currentTagMode: 'short-tag',
 
-    constructor:function(){
-        var me=this;
-        me.callParent(arguments);
-        //register state provider event handlers
-        Ext.state.Manager.getProvider().on({
-            statechange:me.onStateProviderStateChange,
-            statesynchronized:me.onStateProviderStateChange
-        });
-    },
+    active: false, //must be activated / deactivated on entering / leaving a task
 
     init : function() {
         var me = this;
@@ -131,7 +124,6 @@ Ext.define('Editor.controller.ViewModes', {
         
         MODE_EDIT : 'edit',             //normal/small edit mode
         MODE_ERGONOMIC : 'ergonomic',   //ergonomic/big edit mode
-        MODE_CUSTOM : 'custom',
         CLS_READONLY: 'editor-readonly',
         
         
@@ -150,20 +142,43 @@ Ext.define('Editor.controller.ViewModes', {
         return (this.currentTagMode == this.self.TAG_HIDE);
     },
     handleViewportReady: function(grid) {
-        var me=this;
-        if(me.isCustomView()){
-            me.setViewMode(me.self.MODE_CUSTOM);
-            return;
-        }
+        var me = this,
+            readonly = grid.lookupViewModel().get('taskIsReadonly');
 
-        //When the editor view mode is changed, we do not want this state to be saved.
-        //This function will cancel all state save events while the editor view mode is being modified
-        me.manageEditorStateSave(false);
-
-        //start editor in normal(ergonomic) mode if configured, respect before set readonly mode
+        //start editor in normal(ergonomic) mode if configured
         if(Editor.data.app.startViewMode == 'normal') {
-            me.ergonomicMode(grid.lookupViewModel().get('editorIsReadonly'));
+            me.loadErgonomicModePresets(readonly, true);
         }
+        else {
+            me.loadEditModePresets(readonly, true);
+        }
+    },
+    /**
+     * Handler to intercept the initial segment grid column definition to make a local copy
+     * @param {Array} 
+     */
+    initSegmentGridColumns: function(columns) {
+        var me = this,
+            attrToKeep = ['stateId','isFirstTarget','width','hidden','flex','isContentColumn','isEditableContentColumn'];
+        //store column presets as they come from the grid
+        me.gridPreset = [];
+        Ext.Array.each(columns, function(column){
+            var conf = {},
+                columnProto = Ext.ClassManager.getByAlias('widget.'+column.xtype).prototype;
+            //calculate if column should be hidden in readonly mode:
+            conf.isHiddenInReadonly = (column.isContentColumn && !column.isEditableContentColumn && column.segmentField.get('editable'));
+            
+            //the following values may be set either in the column class or in the column config in the grid
+            // so if in the config they are missing, they have to fetched from the class
+            attrToKeep.forEach(function(val){
+                if(column[val] !== undefined) {
+                    conf[val] = column[val];
+                } else if(columnProto && columnProto[val] !== undefined) {
+                    conf[val] = columnProto[val];
+                }
+            });
+            me.gridPreset.push(conf);
+        }); 
     },
     clearViewModes: function() {
         this.visibleColumns = [];
@@ -180,9 +195,6 @@ Ext.define('Editor.controller.ViewModes', {
     isEditMode: function(){
         return (this.getViewMode() == this.self.MODE_EDIT);
     },
-    isCustomMode: function(){
-        return (this.getViewMode() == this.self.MODE_CUSTOM);
-    },
     /**
      * sets the editor to readonly / write mode
      * returns true when readonly / false if not. 
@@ -191,8 +203,8 @@ Ext.define('Editor.controller.ViewModes', {
     setReadonly: function(readonly) {
         var me = this,
             editingPlugin = me.getSegmentGrid().editingPlugin,
-            body = Ext.getBody(),
-            readonly = readonly || me.readonlyForced;
+            body = Ext.getBody();
+        readonly = readonly || me.readonlyForced;
 
         me.getViewPort().getViewModel().set('editorIsReadonly', readonly);
         
@@ -208,211 +220,175 @@ Ext.define('Editor.controller.ViewModes', {
 
         return readonly;
     },
-    /**
-     * saves the default values of the default view mode in order to restore them after leaving economic mode
-     */
-    setVisibleElements: function(){
-        var me = this,
-            columns = me.getSegmentGrid().getColumns();
-        Ext.Array.each(columns, function(col){
-            if(col.isErgonomicSetWidth) {
-                col.originalWidth = col.getWidth() || col.initialConfig.width || 0;
-            }
-            if(col.isVisible()){
-                me.visibleColumns.push(col);
-            }
-        });
-    },
 
     /**
-     * Save the edit mode column width for later usage
+     * if the view mode is requested to be changed via menu, the custom layout is deleted!
      */
-    saveEditModeColumnWidth:function(){
-        var me = this,
-            columns = me.getSegmentGrid().getColumns();
-        Ext.Array.each(columns, function(col){
-            me.editModeColumnWidth[col.itemId]=col.getWidth() || col.initialConfig.width || 0;
-        });
-    },
-
-    /**
-     * returns all ContentColumn instances which should be hidden on view mode (and shown again in edit mode)
-     * @return [Editor.view.segment.ContentColumn]
-     */
-    getHideColumns: function() {
-        var cols = this.getSegmentGrid().query('contentColumn');
-        return Ext.Array.filter(cols, function(col) {
-            return !col.isEditableContentColumn && col.segmentField.get('editable');
-        });
-    },
     handleViewMode: function(item) {
-        var me=this,
-            isCustomView = me.isCustomView();
-
-        //When the editor view mode is changed, we do not want this state to be saved.
-        //This function will cancel all state save events while the editor view mode is being modified
-        me.manageEditorStateSave(false);
+        var me = this,
+            readonly = me.getSegmentGrid().lookupViewModel().get('taskIsReadonly');
         
-        //if it is custom view mode, reset the custom layout (remove the custom user state)
-        if(isCustomView){
-            me.resetCustomLayout();
-        }
-
         switch (item.mode.type) {
             case 'visualReviewMode':
-            case 'customMode':
                 break;
             case 'ergonomicMode':
-                this.ergonomicMode(item.mode.readonly);
+                me.loadErgonomicModePresets(readonly);
                 break;
             case 'editMode':
             default:
-                this.editMode(item.mode.readonly);
+                me.loadEditModePresets(readonly);
                 break;
         }
     },
     /**
-     * aktiviert den Bearbeitungsmodus des Grids (alle Spalten eingeblendet, editieren möglich, Hide Tags deaktivieren) 
+     * returns the detailed mode default state object for the segment grid
+     * @param {Boolean}
+     * @return {Object} 
      */
-    editMode: function(readonly, calledOnInit) {
-        var me = this;
+    getSegmentGridDetailModePreset: function(readonly) {
+        var me = this, preset = [];
+        me.gridPreset.forEach(function(column){
+            preset.push({
+                id: column.stateId,
+                hidden: column.isHiddenInReadonly && readonly || column.hidden,
+                width: column.width
+            });
+        });
+        return {columns: preset, segmentSize: 2};
+    },
+    /**
+     * returns the normal mode default state object for the segment grid
+     * @param {Boolean}
+     * @return {Object} 
+     */
+    getSegmentGridNormalModePreset: function(readonly) {
+        var me = this, 
+            preset = [],
+            grid = me.getSegmentGrid(),
+            contentColumns = grid.hasRelaisColumn ? 3 : 2;
+            
+        me.gridPreset.forEach(function(column){
+            
+            var newcol = {
+                    id: column.stateId,
+                    hidden: true
+                };
+                
+            switch(column.stateId) {
+                case "segmentNrInTaskColumn":
+                    newcol.hidden = false;
+                    newcol.width = 60;
+                    break;
+                case "autoStateColumn": 
+                    newcol.hidden = false;
+                    newcol.width = 96;
+                    break;
+                case "matchrateColumn": 
+                    newcol.hidden = false;
+                    newcol.width = 90;
+                    break;
+                case "contentColumn_source": 
+                case "contentColumn_relais": 
+                    newcol.hidden = false;
+                    newcol.flex = 1/contentColumns;
+                    break;
+                case "contentColumn_target": 
+                    newcol.hidden = !readonly;
+                    newcol.flex = 1/contentColumns;
+                    break;
+                case "contentColumn_target_edit": 
+                    newcol.hidden = readonly;
+                    newcol.flex = 1/contentColumns;
+                    break;
+            }
+            
+            preset.push(newcol);
+        });
+        return {columns: preset, segmentSize: me.self.ERGONOMIC_MODE_DEFAULT_SEGMENT_SIZE};
+    },
+    /**
+     * aktiviert den Bearbeitungsmodus des Grids (alle Spalten eingeblendet, editieren möglich, Hide Tags deaktivieren)
+     */
+    loadEditModePresets: function(readonly, editorinit) {
+        var me = this,
+            stateProv = Ext.state.Manager.getProvider();
 
-        if(me.isCustomView()){
-            me.setViewMode(me.self.MODE_CUSTOM);
-            return;
+        if(!editorinit) {
+            //if a presetted view mode is used the custom states are reset
+            me.resetCustomLayout();
         }
 
         readonly = me.setReadonly(readonly);
+
         me.getViewModeMenu().hideMenu();
         me.getShortTagBtn().setChecked(true);
 
+        //call reconfigure only if used to change view while running
+        if(! editorinit || !stateProv.hasCustomState(me.getSegmentGrid())) {
+            me.getSegmentGrid().applyState(me.getSegmentGridDetailModePreset(readonly));
+        }
+
         //editMode und viewMode
-        if(me.isErgonomicMode()){
-            me.showNonErgonomicElements();
+//FIXME - the same for all panels! expand/or collapse depending on their intial state def
+        if(! editorinit || !stateProv.hasCustomState(me.getFilePanel())) {
+            me.getFilePanel().expand(false);
+        }
+        else {
+            //since the initial state of the file panel is modified in this preset, we have to force save it if nothing changed
+            me.getFilePanel().saveState();
         }
 
         //nur editMode
         me.setViewMode(me.self.MODE_EDIT);
-        me.getSegmentGrid().setSegmentSize(2);
 
         //editMode und viewMode
         me.getSegmentGrid().view.refresh();
         me.handleTagButtonClick('short');
+        me.saveAlreadyOpened();
 
-        //show/hide target columns, only the targetEdits are visible when readonly
-        Ext.Array.each(me.getHideColumns(), function(col){
-            col.setVisible(!readonly);
-        });
-
-        //save the edito mode column width for later usage
-        me.saveEditModeColumnWidth();
         me.fireEvent('viewModeChanged',me);
     },
     /**
      * activates the ergonomic mode of the grid (source and edit-column enlarged, all other columns hidden; file-area hidden)
      */
-    ergonomicMode: function(readonly) {
+    loadErgonomicModePresets: function(readonly, editorinit) {
         var me = this,
             grid = me.getSegmentGrid(),
-            columns = grid.getColumns(),
-            wasAlreadyErgo = me.isErgonomicMode(),
-            contentColumns = grid.hasRelaisColumn ? 3 : 2;
-
-        if(me.isCustomView()){
-            me.setViewMode(me.self.MODE_CUSTOM);
-            return;
+            stateProv = Ext.state.Manager.getProvider();
+            
+        if(!editorinit) {
+            //if a presetted view mode is used the custom states are reset
+            me.resetCustomLayout();
         }
-
-        readonly = me.setReadonly(readonly);
-        
+            
+        me.setReadonly(readonly);
         me.getViewModeMenu().hideMenu();
         me.getShortTagBtn().setChecked(true);
-        
-        wasAlreadyErgo || me.setVisibleElements();
 
-        //ergo only
         //collapse only if the panel is visible
-        if(me.getFilePanel().isVisible()){
-            me.getFilePanel().collapse();
+        if(! editorinit || !stateProv.hasCustomState(me.getFilePanel())) {
+            //reset the initial values for some elements, since they are newly set by the afterwards load*ModePreset calls
+            if(me.getFilePanel().isVisible()){
+                me.getFilePanel().collapse(null, false);
+            }
+            else {
+                //since the initial state of the file panel is modified in this preset, we have to force save it if nothing changed
+                me.getFilePanel().saveState();
+            }
         }
-        
-        //calculate width of non content columns visible in ergo mode
-        var widthToRedColWidth = 0;
-        Ext.Array.each(columns, function(col){
-            if(col.isErgonomicSetWidth && col.isErgonomicVisible && col.ergonomicWidth  !== undefined){
-                if(col.isHidden()){
-                    return;
-                }
-                widthToRedColWidth += col.ergonomicWidth;
-            }
-        });
 
-        //add width of the scrollbar to the non available width for columns
-        widthToRedColWidth += Ext.getScrollbarSize().width;
-        
-        //content columns width is grid width - 
-        me.colWidth = (grid.getWidth()- widthToRedColWidth) / contentColumns;
-        
-        Ext.Array.each(columns, function(col){
-            if(col.isErgonomicSetWidth){
-                col.show();
-                if(col.ergonomicWidth  === undefined){
-                    col.setWidth(me.colWidth);
-                }
-                else{
-                    col.setWidth(col.ergonomicWidth);
-                }
-            }
-        });
-
-
-        //set the ergonimic columns back to visible
-        Ext.Array.each(columns, function(col){
-            if(! col.isErgonomicVisible){
-                col.hide();
-            }
-        },me);
-    
-        //inject css to the head to manipulate the column css, because it is easier than to set inject ergomic class for each column in the dom
-        Ext.util.CSS.removeStyleSheet(me.self.STYLE_BOX_ID); //delete if already exists!
-        Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .segment-tag-column.x-grid-cell .x-grid-cell-inner { width: '+me.colWidth+'px; }',me.self.STYLE_BOX_ID);
+        //call reconfigure only if used to change view while running
+        if(!editorinit || !stateProv.hasCustomState(grid)) {
+            grid.applyState(me.getSegmentGridNormalModePreset(readonly));
+        }
         
         //ergoOnly others, with other mode
-        wasAlreadyErgo || me.setViewMode(me.self.MODE_ERGONOMIC);
-        if(!wasAlreadyErgo || grid.getSegmentSize()!==me.self.ERGONOMIC_MODE_DEFAULT_SEGMENT_SIZE){
-            grid.setSegmentSize(me.self.ERGONOMIC_MODE_DEFAULT_SEGMENT_SIZE)
-        }
+        me.setViewMode(me.self.MODE_ERGONOMIC);
         grid.view.refresh();
         me.handleTagButtonClick('short');
         me.saveAlreadyOpened();
 
         me.fireEvent('viewModeChanged',me);
-    },
-    /**
-     * show or expand all columns and areas not needed in ergonomic mode, which have been visible before
-     */
-    showNonErgonomicElements : function() {
-        var me = this;
-        me.saveAlreadyOpened();
-
-        Ext.Array.each(me.visibleColumns, function(col){
-            col.show();
-        });
-        
-        //Info: state save needs to be suspended here since the file panel expand will resize the editor columns which leads to state change
-        // me.getSegmentGrid().on('beforestatesave', function(){
-        //     return false;
-        // }, me,{single:true});
-
-        me.getFilePanel().expand();
-        
-        Ext.Array.each(me.getSegmentGrid().getColumns(), function(col){
-            //apply the column width from saved values
-            if(me.editModeColumnWidth[col.itemId]){
-                col.setWidth(me.editModeColumnWidth[col.itemId]);
-            }
-        });
-        Ext.util.CSS.removeStyleSheet(me.self.STYLE_BOX_ID);
     },
     /**
      * Unified tag mode button handler
@@ -421,19 +397,23 @@ Ext.define('Editor.controller.ViewModes', {
     handleTagButtonClick: function(btn) {
         var me = this,
             mode = Ext.isString(btn) ? btn : btn.tagMode,
-            editor = me.getActiveEditor();
-        
+            editor = me.getActiveEditor(),
+            readonly = me.getSegmentGrid().lookupViewModel().get('taskIsReadonly');
+
         switch(mode) {
             case 'hide': 
+                me.setReadonly(true);
                 me.toggleTags(me.self.TAG_HIDE);
                 break;
             case 'full': 
                 me.toggleTags(me.self.TAG_FULL);
+                me.setReadonly(readonly);
                 editor && editor.showFullTags();
                 me.repositionEditorRow();
                 break;
             case 'short': 
                 me.toggleTags(me.self.TAG_SHORT);
+                me.setReadonly(readonly);
                 editor && editor.showShortTags();
                 me.repositionEditorRow();
                 break;
@@ -443,13 +423,13 @@ Ext.define('Editor.controller.ViewModes', {
     /***
      * On locale switch click. This will change the translate5 interface language
      */
-    handleLocaleMenuClick:function(btn){
+    handleLocaleMenuClick: function(btn){
     	Editor.app.setTranslation(btn.getValue());
     },
 
     getActiveEditor: function() {
         if(! this.getSegmentGrid().editingPlugin.editor){
-        return null;
+            return null;
         }
         return this.getSegmentGrid().editingPlugin.editor.mainEditor;
     },
@@ -470,9 +450,9 @@ Ext.define('Editor.controller.ViewModes', {
      */
     toggleTags : function(mode) {
         var me = this;
-        Ext.getBody().removeCls([this.self.TAG_FULL, this.self.TAG_SHORT, this.self.TAG_HIDE]);
+        Ext.getBody().removeCls([me.self.TAG_FULL, me.self.TAG_SHORT, me.self.TAG_HIDE]);
         Ext.getBody().addCls(mode);
-        this.currentTagMode = mode;
+        me.currentTagMode = mode;
     },
     /**
      * saving a segment on switching view mode
@@ -504,113 +484,22 @@ Ext.define('Editor.controller.ViewModes', {
      * Remove custom view state configuration and reset the order of the segments grid column to the default order.
      * After the reset, new view mode can be applied
      */
-    resetCustomLayout:function(){
-        var me=this;
-        me.removeCustomView();
-        me.getSegmentGrid().resetColumnOrder();
+    resetCustomLayout: function(){
+        Ext.state.Manager.getProvider().reset('editor');
     },
 
-    /***
-     * Check if it is custom view. Custom view is when in the state provider there are custom
-     * state records for the editor
-     */
-    isCustomView:function(){
-        var stateProvider = Ext.state.Manager.getProvider(),
-            customStateItems = stateProvider.store.query('name',stateProvider.getEditorCustomStateConfigPrefix()),
-            isCustomViewFlag = false;
-        if(!customStateItems || customStateItems.length < 1 ){
-            return isCustomViewFlag;
-        }
-        customStateItems.each(function(rec){
-            if(rec.get('value') != '' && rec.get('value')!='{}'){
-                isCustomViewFlag = true;
-            }
-        })
-        return isCustomViewFlag;
-    },
-
-
-    /***
-     * Get all editor state records in the stateprovider store
-     */
-    getEditorStateConfigRecords:function(){
-        var stateProvider = Ext.state.Manager.getProvider(),
-            store = stateProvider.store;
-        return store.query('name',stateProvider.getEditorCustomStateConfigPrefix());
-    },
-
-    /***
-     * Remove the custom view configuration for the current logged in user
-     */
-    removeCustomView:function(){
-        var me=this,
-            remove = me.getEditorStateConfigRecords();
-        if(remove.length>0){
-            remove.each(function(rec){
-                //set the value to empty array (this will not remove the state record from the store)
-                rec.set('value','{}');
-            })
-            Ext.state.Manager.getProvider().sync();
-        }
-    },
-
-    onStateProviderStateChange:function(){
-        var me=this;
-        //this can be called from the diferent scopes
-        if(!(me instanceof Editor.controller.ViewModes)){
-            me = Editor.app.getController('ViewModes');
-        }
-        //if the view mode is custom based on the state provider, update the vm variable
-        if(me.isCustomView()){
-            me.setViewMode(me.self.MODE_CUSTOM);
-        }
-    },
-
-    /***
+    /**
      * View mode change event handler
      */
-    onViewModeChange:function(){
-        var me=this,
+    onViewModeChange: function(){
+        var me = this,
             grid = me.getSegmentGrid(),
             pos = grid.getSelectionModel().getCurrentPosition();
 
-        //resume the state save for the editor stateful components after the view mode adjusments are finished
-        new Ext.util.DelayedTask(function(){
-            me.manageEditorStateSave(true);
-        }).delay(2000);
-        
         if(!pos || pos.rowIdx == undefined){
             return;
         }
         //preserve the row selection on viewmode change
         grid.scrollTo(pos.rowIdx);
-    },
-
-    /***
-     * Mange the stateful property of all editor stateful components.
-     * In some cases (when editor view mode is adjusted), the saving of the state should be disabled.
-     * The state saving will be enabled after the editor view mode adjustments are finished
-     */
-    manageEditorStateSave:function(statefull){
-return;
-        var me=this,
-            states = me.getEditorStateConfigRecords();//get all editor state records from the state provider
-
-        if(states.length<0){
-            return;
-        }
-        //default state name prefix for the state records in the state provider
-        var defaultSatePrefix = Ext.state.Manager.getProvider().DEFAULT_STATE_PREFIX;
-        states.each(function(rec){
-            var cmpStateId =rec.get('name').replace(defaultSatePrefix,''),//remove the default state prefix from the record name (the result should be the component state id)
-                cmp=Ext.ComponentQuery.query('[stateId="'+cmpStateId+'"]');
-            cmp = cmp[0] !=undefined ? cmp[0] : null;
-            //is component with state id from the record name found
-            if(cmp){
-                cmp.setStateful(statefull);
-            }
-            
-        })
     }
-
 });
