@@ -338,6 +338,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('frontend.showReferenceFilesPopup',$rop->editor->showReferenceFilesPopup);
       //show confirm finish task popup
       $this->view->Php2JsVars()->set('frontend.showConfirmFinishTaskPopup',$rop->editor->showConfirmFinishTaskPopup);
+      
+      $db = Zend_Db_Table::getDefaultAdapter();
+      //set db version as frontend param
+      $this->view->Php2JsVars()->set('dbVersion',$db->getServerVersion());
+
       $this->setJsAppData();
     }
 
@@ -661,6 +666,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             throw new ZfExtended_NotFoundException();
         }
         //currently this method is fixed to JS:
+        // TODO FIXME: $extension might be empty !
         header('Content-Type: '.$types[$extension]);
         //FIXME add version URL suffix to plugin.css inclusion
         header('Last-Modified: '.gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));

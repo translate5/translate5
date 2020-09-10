@@ -1317,7 +1317,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'state' =>'Status',
             'targetLang' => 'Zielsprache',
             'taskActions' => 'Aktionen',
-            'taskassocs' => 'Anzahl zugewiesene Sprachresourcen',
+            'taskassocs' => 'Anzahl zugewiesene Sprachressourcen',
             'taskName' => 'Aufgabenname',
             'taskNr' => 'Auftragsnr.',
             'terminologie' => 'Terminologie',

@@ -293,7 +293,6 @@
 <trans-unit id='TWVpbmUgRWluc3RlbGx1bmdlbg=='><source>Meine Einstellungen</source><target>Meine Einstellungen</target></trans-unit>
 <trans-unit id='RWluZ2Vsb2dndGVyIEJlbnV0emVy'><source>Eingeloggter Benutzer</source><target>Eingeloggter Benutzer</target></trans-unit>
 <trans-unit id='TG9naW5uYW1l'><source>Loginname</source><target>Loginname</target></trans-unit>
-<trans-unit id='enVyw7xjayB6dXIgQXVmZ2FiZW5saXN0ZQ=='><source>zurück zur Aufgabenliste</source><target>zurück zur Aufgabenliste</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSBiZWVuZGVu'><source>Aufgabe beenden</source><target>Aufgabe beenden</target></trans-unit>
 <trans-unit id='IC0gW0xFU0VNT0RVU10='><source> - [LESEMODUS]</source><target> - [LESEMODUS]</target></trans-unit>
 <trans-unit id='QmVudXR6ZXIgZW5kZ8O8bHRpZyBsw7ZzY2hlbj8='><source>Benutzer endgültig löschen?</source><target>Benutzer endgültig löschen?</target></trans-unit>
@@ -1330,13 +1329,13 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='VGVybVBvcnRhbA=='><source>TermPortal</source><target>TermPortal</target></trans-unit>
 <trans-unit id='RGFzIFByb2pla3QgZW50aMOkbHQgYWx0ZXJuYXRpdmUgw5xiZXJzZXR6dW5nZW4uIEJlaSBkZXIgw5xiZXJuYWhtZSB2b24gTWF0Y2hlcyB3aXJkIGRpZSBTZWdtZW50IE1hdGNocmF0ZSBkYWhlciBuaWNodCB2ZXLDpG5kZXJ0Lg=='><source>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</source><target>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</target></trans-unit>
 <trans-unit id='QmVpbSBCZWFyYmVpdGVuIGRlciBRdWVsbHNwYWx0ZSBrw7ZubmVuIE1hdGNoZXMgbmljaHQgw7xiZXJub21tZW4gd2VyZGVuLg=='><source>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</source><target>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</target></trans-unit>
-<trans-unit id='U3ByYWNoLVJlc291cmNlbg=='><source>Sprach-Resourcen</source><target>Sprach-Resourcen</target></trans-unit>
+<trans-unit id='U3ByYWNocmVzc291cmNlbg=='><source>Sprachressourcen</source><target>Sprachressourcen</target></trans-unit>
 <trans-unit id='U3ByYWNocmVzc291cmNlIGVuZGfDvGx0aWcgbMO2c2NoZW4/'><source>Sprachressource endgültig löschen?</source><target>Sprachressource endgültig löschen?</target></trans-unit>
 <trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiB3aXJrbGljaCBlbmRnw7xsdGlnIGdlbMO2c2NodCB3ZXJkZW4/'><source>Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?</source><target>Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?</target></trans-unit>
 <trans-unit id='U3ByYWNocmVzc291cmNlIGdlbMO2c2NodC4='><source>Sprachressource gelöscht.</source><target>Sprachressource gelöscht.</target></trans-unit>
 <trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSAiezB9IiB3dXJkZSBlcmZvbGdyZWljaCBnZcOkbmRlcnQu'><source>Die Sprachressource "{0}" wurde erfolgreich geändert.</source><target>Die Sprachressource "{0}" wurde erfolgreich geändert.</target></trans-unit>
 <trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSAiezB9IiB3dXJkZSBlcmZvbGdyZWljaCBlcnN0ZWxsdC4='><source>Die Sprachressource "{0}" wurde erfolgreich erstellt.</source><target>Die Sprachressource "{0}" wurde erfolgreich erstellt.</target></trans-unit>
-<trans-unit id='RGllIFNwcmFjaHJlc291cmNlICJ7MH0iIG11c3MgZXJzdCBrb25maWd1cmllcnQgd2VyZGVuLiBXZWl0ZXJlIEluZm9zOiB7MX0='><source>Die Sprachresource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}</source><target>Die Sprachresource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}</target></trans-unit>
+<trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBtdXNzIGVyc3Qga29uZmlndXJpZXJ0IHdlcmRlbi4gV2VpdGVyZSBJbmZvczogezF9'><source>Die Sprachressource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}</source><target>Die Sprachressource "{0}" muss erst konfiguriert werden. Weitere Infos: {1}</target></trans-unit>
 <trans-unit id='d2lyZCBnZWxhZGVuLi4u'><source>wird geladen...</source><target>wird geladen...</target></trans-unit>
 <trans-unit id='RXMgd3VyZGVuIGtlaW5lIEVyZ2Vibmlzc2UgZ2VmdW5kZW4u'><source>Es wurden keine Ergebnisse gefunden.</source><target>Es wurden keine Ergebnisse gefunden.</target></trans-unit>
 <trans-unit id='RGllIEFuZnJhZ2UgYW4gZGllIFNwcmFjaHJlc3NvdXJjZSBkYXVlcnRlIHp1IGxhbmdlLg=='><source>Die Anfrage an die Sprachressource dauerte zu lange.</source><target>Die Anfrage an die Sprachressource dauerte zu lange.</target></trans-unit>
@@ -1359,14 +1358,14 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='VE0tUmVzc291cmNl'><source>TM-Ressource</source><target>TM-Ressource</target></trans-unit>
 <trans-unit id='QWxsZSBkdXJjaHN1Y2hlbg=='><source>Alle durchsuchen</source><target>Alle durchsuchen</target></trans-unit>
 <trans-unit id='U3VjaGUgaW4gezB9'><source>Suche in {0}</source><target>Suche in {0}</target></trans-unit>
-<trans-unit id='U3ByYWNoLVJlc291cmNlbiB6dXdlaXNlbg=='><source>Sprach-Resourcen zuweisen</source><target>Sprach-Resourcen zuweisen</target></trans-unit>
+<trans-unit id='U3ByYWNocmVzc291cmNlbiB6dXdlaXNlbg=='><source>Sprachressourcen zuweisen</source><target>Sprachressourcen zuweisen</target></trans-unit>
 <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='><source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source><target>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</target></trans-unit>
 <trans-unit id='RGF0ZWliYXNpZXJ0ZXMgVE0gaGVydW50ZXJsYWRlbiB1bmQgbG9rYWwgc3BlaWNoZXJu'><source>Dateibasiertes TM herunterladen und lokal speichern</source><target>Dateibasiertes TM herunterladen und lokal speichern</target></trans-unit>
 <trans-unit id='QWxzIFRNWC1EYXRlaSBoZXJ1bnRlcmxhZGVuIHVuZCBsb2thbCBzcGVpY2hlcm4='><source>Als TMX-Datei herunterladen und lokal speichern</source><target>Als TMX-Datei herunterladen und lokal speichern</target></trans-unit>
 <trans-unit id='ezB9IEVyZ2Vibmlzc2U='><source>{0} Ergebnisse</source><target>{0} Ergebnisse</target></trans-unit>
-<trans-unit id='S2VpbmUgU3ByYWNoLVJlc291cmNlbiB6dWdld2llc2VuLg=='><source>Keine Sprach-Resourcen zugewiesen.</source><target>Keine Sprach-Resourcen zugewiesen.</target></trans-unit>
+<trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlbiB6dWdld2llc2VuLg=='><source>Keine Sprachressourcen zugewiesen.</source><target>Keine Sprachressourcen zugewiesen.</target></trans-unit>
 <trans-unit id='S2VpbmUgQXVmZ2FiZW4genVnZXdpZXNlbi4='><source>Keine Aufgaben zugewiesen.</source><target>Keine Aufgaben zugewiesen.</target></trans-unit>
-<trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNoLVJlc291cmNlbg=='><source>Zugewiesene Sprach-Resourcen</source><target>Zugewiesene Sprach-Resourcen</target></trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNocmVzc291cmNlbg=='><source>Zugewiesene Sprachressourcen</source><target>Zugewiesene Sprachressourcen</target></trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUgQXVmZ2FiZW4='><source>Zugewiesene Aufgaben</source><target>Zugewiesene Aufgaben</target></trans-unit>
 <trans-unit id='U3ByYWNocmVzc291cmNlIGJlYXJiZWl0ZW4='><source>Sprachressource bearbeiten</source><target>Sprachressource bearbeiten</target></trans-unit>
 <trans-unit id='U1RSRw=='><source>STRG</source><target>STRG</target></trans-unit>
@@ -1385,7 +1384,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='YWxzIFRNWCBEYXRlaSBleHBvcnRpZXJlbg=='><source>als TMX Datei exportieren</source><target>als TMX Datei exportieren</target></trans-unit>
 <trans-unit id='YWxzIGdlemlwcHRlIFRNWCBEYXRlaSBleHBvcnRpZXJlbg=='><source>als gezippte TMX Datei exportieren</source><target>als gezippte TMX Datei exportieren</target></trans-unit>
 <trans-unit id='U3ByYWNocmVzc291cmNlIGzDtnNjaGVuPw=='><source>Sprachressource löschen?</source><target>Sprachressource löschen?</target></trans-unit>
-<trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBhdXMgZGVyIExpc3RlIGRlciBoaWVyIGFuZ2V6ZWlndGVuIFNwcmFjaC1SZXNvdXJjZW4gZ2Vsw7ZzY2h0IHdlcmRlbj8gPGJyIC8+IEVzIHdlcmRlbiBrZWluZSBEYXRlbiBpbSB2ZXJrbsO8cGZ0ZW4gVE0gU3lzdGVtIGdlbMO2c2NodCwgZGEga2VpbmUgVmVyYmluZHVuZyBiZXN0ZWh0Lg=='><source>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprach-Resourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</source><target>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprach-Resourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</target></trans-unit>
+<trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBhdXMgZGVyIExpc3RlIGRlciBoaWVyIGFuZ2V6ZWlndGVuIFNwcmFjaHJlc3NvdXJjZW4gZ2Vsw7ZzY2h0IHdlcmRlbj8gPGJyIC8+IEVzIHdlcmRlbiBrZWluZSBEYXRlbiBpbSB2ZXJrbsO8cGZ0ZW4gVE0gU3lzdGVtIGdlbMO2c2NodCwgZGEga2VpbmUgVmVyYmluZHVuZyBiZXN0ZWh0Lg=='><source>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</source><target>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</target></trans-unit>
 <trans-unit id='U3RhdHVzaW5mb3JtYXRpb25lbiB3ZXJkZW4gZ2VsYWRlbg=='><source>Statusinformationen werden geladen</source><target>Statusinformationen werden geladen</target></trans-unit>
 <trans-unit id='TmljaHQgZ2VwcsO8ZnQ='><source>Nicht geprüft</source><target>Nicht geprüft</target></trans-unit>
 <trans-unit id='dmVyZsO8Z2Jhcg=='><source>verfügbar</source><target>verfügbar</target></trans-unit>
@@ -1410,6 +1409,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='U3VwcG9ydCBFLU1haWw6'><source>Support E-Mail:</source><target>Support E-Mail:</target></trans-unit>
 <trans-unit id='VGFnbW9kaQ=='><source>Tagmodi</source><target>Tagmodi</target></trans-unit>
 <trans-unit id='RXJlaWduaXNzZSB6dSBBdWZnYWJlICJ7MH0i'><source>Ereignisse zu Aufgabe "{0}"</source><target>Ereignisse zu Aufgabe "{0}"</target></trans-unit>
+<trans-unit id='RXJlaWduaXNzZSB6dSBTcHJhY2hyZXNzb3VyY2UgInswfSI='><source>Ereignisse zu Sprachressource "{0}"</source><target>Ereignisse zu Sprachressource "{0}"</target></trans-unit>
 <trans-unit id='RGV0YWlsYW5zaWNodA=='><source>Detailansicht</source><target>Detailansicht</target></trans-unit>
 <trans-unit id='WnVyw7xjayB6dSBkZW4gRXJlaWduaXNzZW4='><source>Zurück zu den Ereignissen</source><target>Zurück zu den Ereignissen</target></trans-unit>
 <trans-unit id='RXJlaWduaXMtUHJvdG9rb2xs'><source>Ereignis-Protokoll</source><target>Ereignis-Protokoll</target></trans-unit>
@@ -1427,8 +1427,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='TWVociBJbmZv'><source>Mehr Info</source><target>Mehr Info</target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dCwgdW5kIGthbm4gZGFoZXIgbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbi4='><source>Die Aufgabe wird von einem Benutzer benutzt, und kann daher nicht gelöscht werden.</source><target>Die Aufgabe wird von einem Benutzer benutzt, und kann daher nicht gelöscht werden.</target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgaXN0IGR1cmNoIGVpbmVuIEJlbnV0emVyIGdlc3BlcnJ0LCB1bmQga2FubiBkYWhlciBuaWNodCBnZWzDtnNjaHQgd2VyZGVuLg=='><source>Die Aufgabe ist durch einen Benutzer gesperrt, und kann daher nicht gelöscht werden.</source><target>Die Aufgabe ist durch einen Benutzer gesperrt, und kann daher nicht gelöscht werden.</target></trans-unit>
-<trans-unit id='RGllIGdld8O8bnNjaHRlIFNwcmFjaHJlc291cmNlIGdpYnQgZXMgbmljaHQh'><source>Die gewünschte Sprachresource gibt es nicht!</source><target>Die gewünschte Sprachresource gibt es nicht!</target></trans-unit>
-<trans-unit id='RGllIEF1ZmdhYmUgd2lyZCBiZWFyYmVpdGV0LCBkaWUgU3ByYWNocmVzb3VyY2Uga2FubiBkYWhlciBpbSBNb21lbnQgbmljaHQgdm9uIGRlciBBdWZnYWJlIGVudGZlcm50IHdlcmRlbiE='><source>Die Aufgabe wird bearbeitet, die Sprachresource kann daher im Moment nicht von der Aufgabe entfernt werden!</source><target>Die Aufgabe wird bearbeitet, die Sprachresource kann daher im Moment nicht von der Aufgabe entfernt werden!</target></trans-unit>
+<trans-unit id='RGllIGdld8O8bnNjaHRlIFNwcmFjaHJlc3NvdXJjZSBnaWJ0IGVzIG5pY2h0IQ=='><source>Die gewünschte Sprachressource gibt es nicht!</source><target>Die gewünschte Sprachressource gibt es nicht!</target></trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgd2lyZCBiZWFyYmVpdGV0LCBkaWUgU3ByYWNocmVzc291cmNlIGthbm4gZGFoZXIgaW0gTW9tZW50IG5pY2h0IHZvbiBkZXIgQXVmZ2FiZSBlbnRmZXJudCB3ZXJkZW4h'><source>Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment nicht von der Aufgabe entfernt werden!</source><target>Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment nicht von der Aufgabe entfernt werden!</target></trans-unit>
 <trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gaW4gRm9ybSBlaW5lciBUQlggRGF0ZWkgaW1wb3J0aWVyZW4gdW5kIGRlbSBiZXN0ZWhlbmRlbiBUZXJtLUNvbGxlY3Rpb24gaGluenVmw7xnZW4='><source>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen</source><target>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen</target></trans-unit>
 <trans-unit id='VEJYLURhdGVp'><source>TBX-Datei</source><target>TBX-Datei</target></trans-unit>
 <trans-unit id='VEJYIERhdGVpIGltcG9ydGllcmVu'><source>TBX Datei importieren</source><target>TBX Datei importieren</target></trans-unit>
@@ -1553,7 +1553,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='R2VzYW10emFobCBkZXIgV8O2cnRlcg=='><source>Gesamtzahl der Wörter</source><target>Gesamtzahl der Wörter</target></trans-unit>
 <trans-unit id='QW5hbHlzZQ=='><source>Analyse</source><target>Analyse</target></trans-unit>
 <trans-unit id='RXhwb3J0'><source>Export</source><target>Export</target></trans-unit>
-<trans-unit id='U3RhcnQgZGVyIEFuYWx5c2UgaW0gVGFiIOKAnFNwcmFjaC1SZXNvdXJjZW4genV3ZWlzZW7igJw='><source>Start der Analyse im Tab “Sprach-Resourcen zuweisen“</source><target>Start der Analyse im Tab “Sprach-Resourcen zuweisen“</target></trans-unit>
+<trans-unit id='U3RhcnQgZGVyIEFuYWx5c2UgaW0gVGFiIOKAnFNwcmFjaHJlc3NvdXJjZW4genV3ZWlzZW7igJw='><source>Start der Analyse im Tab “Sprachressourcen zuweisen“</source><target>Start der Analyse im Tab “Sprachressourcen zuweisen“</target></trans-unit>
 <trans-unit id='V2llZGVyaG9sdW5nZW46'><source>Wiederholungen:</source><target>Wiederholungen:</target></trans-unit>
 <trans-unit id='U3VtbWU6'><source>Summe:</source><target>Summe:</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBGdXp6eSB2ZXJ3ZW5kZXQ='><source>Interne Fuzzy verwendet</source><target>Interne Fuzzy verwendet</target></trans-unit>
@@ -1684,7 +1684,7 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='QXVmZ2FiZSBzcMOkdGVyIHdlaXRlcmJlYXJiZWl0ZW4='><source>Aufgabe später weiterbearbeiten</source><target>Aufgabe später weiterbearbeiten</target></trans-unit>
 <trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZWxpc3Rl'><source>Zurück zur Aufgabeliste</source><target>Zurück zur Aufgabeliste</target></trans-unit>
 <trans-unit id='WmFobCB6dWdld2llc2VuZXIgQmVudXR6ZXI='><source>Zahl zugewiesener Benutzer</source><target>Zahl zugewiesener Benutzer</target></trans-unit>
-<trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc291cmNlbg=='><source>Anzahl zugewiesene Sprachresourcen</source><target>Anzahl zugewiesene Sprachresourcen</target></trans-unit>
+<trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc3NvdXJjZW4='><source>Anzahl zugewiesene Sprachressourcen</source><target>Anzahl zugewiesene Sprachressourcen</target></trans-unit>
 <trans-unit id='MTAwJS1UcmVmZmVyIGVkaXRpZXJiYXI='><source>100%-Treffer editierbar</source><target>100%-Treffer editierbar</target></trans-unit>
 <trans-unit id='JSBhYmdlc2NobG9zc2Vu'><source>% abgeschlossen</source><target>% abgeschlossen</target></trans-unit>
 <trans-unit id='JSBhYmdlc2NobG9zc2VuIGR1cmNoIHp1Z2V3aWVzZW5lIEJlbnV0emVyIGltIGFrdHVlbGxlbiBXb3JrZmxvd3NjaHJpdHQ='><source>% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt</source><target>% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt</target></trans-unit>

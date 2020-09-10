@@ -592,6 +592,7 @@ Ext.define('Editor.controller.ViewModes', {
      * The state saving will be enabled after the editor view mode adjustments are finished
      */
     manageEditorStateSave:function(statefull){
+return;
         var me=this,
             states = me.getEditorStateConfigRecords();//get all editor state records from the state provider
 

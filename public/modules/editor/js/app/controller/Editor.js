@@ -1656,7 +1656,8 @@ Ext.define('Editor.controller.Editor', {
     },
     
     handleReferenceFilesMessage:function(){
-        if(Editor.data.task.get('referenceFiles')){
+        //if there are reference files for the task and if it is show reference files is alowed from config
+        if(Editor.data.task.get('referenceFiles') && Editor.data.frontend.showReferenceFilesPopup===true){
             var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
             task = new Ext.util.DelayedTask(function(){
                 referenceInfoMessage.destroy();

@@ -30,7 +30,7 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{TaskCleanCommand,ConfigCommand,DatabaseUpdateCommand,WorkerListCommand};
+use Translate5\MaintenanceCli\Command\{TaskCleanCommand,ConfigCommand,DatabaseUpdateCommand,WorkerListCommand,LogCommand};
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $app->addCommands([
@@ -38,5 +38,6 @@ $app->addCommands([
     new TaskCleanCommand(),
     new DatabaseUpdateCommand(),
     new WorkerListCommand(),
+    new LogCommand(),
 ]);
 $app->run();

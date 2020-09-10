@@ -51,13 +51,19 @@ class ConfigCommand extends Translate5AbstractCommand
         ->setHelp('Tool to list, get and set translate5 configuration values - currently in Zf_configuration only.
 Modified values are shown bold in the simple listing.');
         
-        $this->addArgument('name', InputArgument::REQUIRED, 'The part of a configuration value name. If more than one config value is found, all are listed.');
+        $this->addArgument('name', InputArgument::OPTIONAL, 'The part of a configuration value name. If more than one config value is found, all are listed.');
         $this->addArgument('value', InputArgument::OPTIONAL, 'Value to be set for the configuration, only usable if name is concrete enough to find only one configuration entry.');
         $this->addOption(
             'detail',
             'd',
             InputOption::VALUE_NONE,
             'Show config details on listing');
+        
+        $this->addOption(
+            'modified',
+            'm',
+            InputOption::VALUE_NONE,
+            'Show only modified values on listing');
         
         $this->addOption(
             'empty',
@@ -79,7 +85,7 @@ Modified values are shown bold in the simple listing.');
 
         $config = new \editor_Models_Config();
         $name = $this->input->getArgument('name');
-        $foundConfigs = $config->loadListByNamePart($name);
+        $foundConfigs = $config->loadListByNamePart((string) $name);
         if(empty($foundConfigs)) {
             $this->io->warning('No configuration found with name "*'.OutputFormatter::escape($name).'*"');
             return 1;
@@ -92,12 +98,21 @@ Modified values are shown bold in the simple listing.');
             return 1;
         }
         
+        $isModifiedOnly = $this->input->getOption('modified');
         $isExact = count($foundConfigs) === 1;
         if($isExact) {
             $this->io->section('Configuration found:');
+            if($isModifiedOnly) {
+                $this->io->note("Option -m|--modified ignored!");
+            }
         }
         else {
             $this->io->section('Multiple Configurations found:');
+            if($isModifiedOnly) {
+                $foundConfigs = array_filter($foundConfigs, function($config) {
+                    return $config['value'] != $config['default'];
+                });
+            }
         }
         
         $listDetails = $this->input->getOption('detail');
@@ -109,7 +124,7 @@ Modified values are shown bold in the simple listing.');
             }
             else {
                 $this->io->table(['name', 'origin', 'value'], array_map(function($item) {
-                    $value = OutputFormatter::escape($item['value']);
+                    $value = OutputFormatter::escape((string) $item['value']);
                     if($item['value'] !== $item['default']) {
                         $value = '<options=bold>'.$value.'</>';
                     }
@@ -163,23 +178,28 @@ Modified values are shown bold in the simple listing.');
      * @param array $configData
      */
     protected function showDetail(array $configData) {
+        $value = OutputFormatter::escape((string) $configData['value']);
+        $hasIni = array_key_exists('overwritten', $configData);
+        if($configData['value'] != $configData['default']) {
+            $value = '<options=bold>'.$value.'</>';
+        }
+        
         $out = [
-            '       <info>name: <options=bold>'.OutputFormatter::escape($configData['name']).'</>',
-            '      value: <options=bold>'.OutputFormatter::escape($configData['value']).'</>',
-            '   category: '.OutputFormatter::escape($configData['category']),
-            '    default: '.OutputFormatter::escape($configData['default']),
-            '   defaults: '.OutputFormatter::escape($configData['defaults']),
+            '       <info>name: <options=bold>'.OutputFormatter::escape((string) $configData['name']).'</>',
+            '      value: '.$value,
+            '   category: '.OutputFormatter::escape((string) $configData['category']),
+            '    default: '.OutputFormatter::escape((string) $configData['default']),
+            '   defaults: '.OutputFormatter::escape((string) $configData['defaults']),
             '       type: '.$configData['type'],
-            'description: '.OutputFormatter::escape($configData['description']),
+            'description: '.OutputFormatter::escape((string) $configData['description']),
             '      level: '.$configData['level'],
             '',
         ];
         
-        $hasIni = array_key_exists('overwritten', $configData);
         if($hasIni) {
             $out[1] = '  ini value: <options=bold>'.OutputFormatter::escape($configData['value']).'</>';
             array_splice($out, 2, 0, '             <error>The value is set in the installation.ini and must be changed (or removed) there!</>');
-            array_splice($out, 3, 0, '   db value: '.OutputFormatter::escape($configData['overwritten']).'');
+            array_splice($out, 3, 0, '   db value: '.OutputFormatter::escape((string) $configData['overwritten']).'');
         }
         if(array_key_exists('oldvalue', $configData)) {
             $out[1] = '  '.($hasIni ? 'ini':'new').' value: <fg=green;options=bold>'.OutputFormatter::escape($configData['value']).'</>';

@@ -112,7 +112,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
         $excel->setCallback('targetLang',function($targetLang) use ($languages){
         });
         
-        $excel->setLabel('serviceName', $translate->_("Resource"));
+        $excel->setLabel('serviceName', $translate->_("Ressource"));
         $excel->setLabel('languageResourceName', $translate->_("Name"));
         $excel->setLabel('timestamp', $translate->_("Erstellungsdatum"));
         //TODO: devide the character count with customer number
