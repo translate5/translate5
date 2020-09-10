@@ -46,6 +46,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     rowToEditOrigHeight: 0,
     editorExtraHeight:10, // 20,
     editorLocalTop: 0,
+    firstEdit: true,
     /**
      * If set to true, rowEditor remains on its position on startEdit and grid scrolls instead
      */
@@ -191,7 +192,20 @@ Ext.define('Editor.view.segments.RowEditor', {
             scrollLeftChanged = scrollLeft !== me.lastScrollLeft;
 
         me.lastScrollTop  = scrollTop;
-        me.lastScrollLeft = scrollLeft;
+        
+        // Fix for TRANSLATE-1031:
+        // If you scroll right in the editor before you have opened the editor the first time, 
+        // and then you open the editor, the content of the roweditor is shifted right.
+        // This seems to be a bug in chrome: 
+        // therefore we use lastScrollLeft to shift the editor to the correct position
+        // if the grid was scrolled after the editor has opened once - we need no shift anymore
+        // and force lastScrollLeft to be zero
+        if(me.firstEdit) {
+            me.lastScrollLeft = scrollLeft;
+        }
+        else {
+            me.lastScrollLeft = 0;
+        }
         if (scrollLeftChanged) {
             me.reposition();
         }
@@ -414,6 +428,9 @@ Ext.define('Editor.view.segments.RowEditor', {
         sel = rangy.getSelection()
         if(sel) {
             sel.removeAllRanges();
+        }
+        if(me.firstEdit) {
+            me.firstEdit = false;
         }
     },
     /**
