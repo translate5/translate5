@@ -50,13 +50,10 @@ class editor_Services_OpenTM2_Service extends editor_Services_ServiceAbstract {
      * @see editor_Services_ServiceAbstract::isConfigured()
      */
     public function isConfigured() {
-        if (!isset($this->config->runtimeOptions->LanguageResources->opentm2->server)) {
+        if (!isset($this->config->runtimeOptions->LanguageResources->opentm2->server) || empty($this->config->runtimeOptions->LanguageResources->opentm2->server)) {
             return false;
         }
-        if (!isset($this->config->runtimeOptions->LanguageResources->opentm2->tmprefix)) {
-            return false;
-        }
-        if (!isset($this->config->runtimeOptions->LanguageResources->opentm2->showMultiple100PercentMatches)) {
+        if (!isset($this->config->runtimeOptions->LanguageResources->opentm2->tmprefix) || empty($this->config->runtimeOptions->LanguageResources->opentm2->tmprefix)) {
             return false;
         }
         return true;

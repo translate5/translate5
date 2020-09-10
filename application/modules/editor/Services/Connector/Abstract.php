@@ -46,6 +46,7 @@ abstract class editor_Services_Connector_Abstract {
     const STATUS_UNKNOWN = 'unknown';
     const STATUS_NOCONNECTION = 'noconnection';
     const STATUS_NOVALIDLICENSE = 'novalidlicense';
+    const STATUS_NOT_LOADED = 'notloaded';
     
     const FUZZY_SUFFIX = '-fuzzy-';
     
@@ -126,9 +127,18 @@ abstract class editor_Services_Connector_Abstract {
         $this->initImageTags();
     }
     
-    public function ping($resource){
+    /***
+     * Check the resource connection. This will return true conection with the resource can
+     * be established
+     * @param editor_Models_LanguageResources_Resource $resource
+     * @return boolean
+     */
+    public function ping(editor_Models_LanguageResources_Resource $resource){
         $this->resource = $resource;
-        return $this->getStatus("")!==self::STATUS_AVAILABLE;
+        $moreInfo = "";
+        //the valid api response statuses
+        $isValidFor = [self::STATUS_AVAILABLE,self::STATUS_NOT_LOADED];
+        return in_array($this->getStatus($moreInfo), $isValidFor);
     }
     
     /**
@@ -151,8 +161,10 @@ abstract class editor_Services_Connector_Abstract {
         $this->resource = $languageResource->getResource();
         $this->languageResource = $languageResource;
         $this->resultList->setLanguageResource($languageResource);
-        $this->languageResource->sourceLangRfc5646=$this->languageResource->getSourceLangRfc5646();
-        $this->languageResource->targetLangRfc5646=$this->languageResource->getTargetLangRfc5646();
+        if($languageResource->getId()!=null){
+            $this->languageResource->sourceLangRfc5646=$this->languageResource->getSourceLangRfc5646();
+            $this->languageResource->targetLangRfc5646=$this->languageResource->getTargetLangRfc5646();
+        }
     }
     
     /**

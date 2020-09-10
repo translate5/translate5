@@ -60,8 +60,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
         parent::connectTo($languageResource, $sourceLang, $targetLang);
-        $class = 'editor_Services_OpenTM2_HttpApi';
-        $this->api = ZfExtended_Factory::get($class, [$languageResource]);
+        $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
+        $this->api->setLanguageResource($languageResource);
         $this->xmlparser= ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         /* @var $parser editor_Models_Import_FileParser_XmlParser */
     }
@@ -523,12 +523,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
-        if(empty($this->languageResource)){
-            //TODO use the resource. Ping action!
+        $langaugeResourceNotSet = empty($this->languageResource);
+        if($langaugeResourceNotSet){
+            $this->languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            $this->languageResource->setServiceType($this->resource->getServiceType());
+            $this->languageResource->setResourceId($this->resource->getId());
+            $this->connectTo($this->languageResource, 'en', 'de');
         }
         $name = $this->languageResource->getSpecificData('fileName');
         
-        if(empty($name)) {
+        if(!$langaugeResourceNotSet && empty($name)) {
             $moreInfo = 'The internal stored filename is invalid';
             return self::STATUS_NOCONNECTION;
         }

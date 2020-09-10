@@ -65,10 +65,6 @@ class editor_Services_OpenTM2_HttpApi {
      */
     protected $httpMethod;
     
-    public function __construct(editor_Models_LanguageResources_LanguageResource $languageResource) {
-        $this->languageResource = $languageResource;
-    }
-    
     /**
      * This method creates a new memory.
      */
@@ -148,7 +144,12 @@ class editor_Services_OpenTM2_HttpApi {
      * @return Zend_Http_Client
      */
     protected function getHttpWithMemory($method, $urlSuffix = '') {
-        return $this->getHttp($method, urlencode($this->languageResource->getSpecificData('fileName')).'/'.ltrim($urlSuffix, '/'));
+        $fileName=isset($this->languageResource) ?  $this->languageResource->getSpecificData('fileName') : false;
+        $url = '/'.ltrim($urlSuffix, '/');
+        if(!empty($fileName)){
+            $url = urlencode($fileName).'/'.ltrim($urlSuffix, '/');
+        }
+        return $this->getHttp($method, $url);
     }
     
     /**
@@ -352,6 +353,7 @@ return $response;
         $badGatewayMessages = [
             'stream_socket_client(): php_network_getaddresses: getaddrinfo failed: Name or service not known',
             'stream_socket_client(): unable to connect to tcp',
+            'Unable to Connect to tcp'
         ];
         
         try {
@@ -439,5 +441,13 @@ return $response;
      */
     protected function nowDate() {
         return gmdate('Ymd\THis\Z');
+    }
+    
+    public function setLanguageResource(editor_Models_LanguageResources_LanguageResource $languageResource) {
+        $this->languageResource = $languageResource;
+    }
+    
+    public function getLanguageResource() {
+        return $this->languageResource;
     }
 }

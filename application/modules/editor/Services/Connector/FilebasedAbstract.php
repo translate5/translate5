@@ -70,7 +70,7 @@ abstract class editor_Services_Connector_FilebasedAbstract extends editor_Servic
      * @var string
      */
     const STATUS_IMPORT = 'import';
-    const STATUS_NOT_LOADED = 'notloaded';
+    
     
     /**
      * Adds the given file to the underlying system on TM creation
