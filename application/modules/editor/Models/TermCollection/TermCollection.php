@@ -102,8 +102,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         /* @var $languageModel editor_Models_Languages */
         
         //get source and target language fuzzies
-        $sourceLangs=$languageModel->getFuzzyLanguages($sourceLang);
-        $targetLangs=$languageModel->getFuzzyLanguages($targetLang);
+        $sourceLangs=$languageModel->getFuzzyLanguages($sourceLang,'id',true);
+        $targetLangs=$languageModel->getFuzzyLanguages($targetLang,'id',true);
         
         $sqlOld_and_very_slow_on_large_data=' SELECT * FROM LEK_terms '.
               'WHERE groupId IN ( '.
