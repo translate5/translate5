@@ -636,7 +636,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         }
         //check if the segment range feature is active for the current segment and task,
         //if it is active, calculate the editable state of the segment
-        //segment get action is also called by the message bus to refresh the segment content whenever some 
+        //segment get action is also called by the message bus to refresh the segment content whenever some
         //other user updates the segment
         $handleSegmentranges = $this->checkAndGetSegmentsRange();
         if (is_array($handleSegmentranges) && $this->entity->getEditable()) {
@@ -784,7 +784,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     /***
      * Add jumpToSegmentIndex property to the view metaData object.
      * Where to jump is determined in the following order:
-     * 
+     *
      * 1. Last edited/modified segment by the current user and task
      * 2. First defined segment in the segment range definition for the current user for the task for the workflow role
      * 3. First editable segment in the workflow
@@ -795,18 +795,25 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $userGuid = $sessionUser->data->userGuid;
         $taskGuid = $this->session->taskGuid;
 
+        //needed only on first page and if we have rows
+        if($this->offset > 0 || empty($this->view->rows)) {
+            return;
+        }
 
         if(!isset($this->view->metaData)){
             $this->view->metaData = new stdClass();
         }
 
         //jump to the last edited segment from the user
-        $segmentId = $this->entity->getLastEditedByUserAndTask($taskGuid,$userGuid);
+        //we need a clone of the entity, so that the filters are initialized
+        $segment = clone $this->entity;
+        /* @var $segment editor_Models_Segment */
+        $segmentId = $segment->getLastEditedByUserAndTask($taskGuid,$userGuid);
 
         if($segmentId > 0){
             //last edited segment found, find and set the segment index
-            $this->entity->load($segmentId);
-            $this->view->metaData->jumpToSegmentIndex = $this->entity->getIndex();
+            $segment->load($segmentId);
+            $this->view->metaData->jumpToSegmentIndex = $segment->getIndex();
             return;
         }
 

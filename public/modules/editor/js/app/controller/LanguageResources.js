@@ -230,8 +230,6 @@ Ext.define('Editor.controller.LanguageResources', {
       if(me.isLanguageResourcesDisabled()){
           return;
       }
-      //disable the editor state saveing
-      Editor.app.getController('ViewModes').manageEditorStateSave(false);
 
       me.getEditorViewport().add({
           xtype: 'languageResourceEditorPanel',
@@ -263,23 +261,25 @@ Ext.define('Editor.controller.LanguageResources', {
   /***
    * Check if the language resources match grid should be/is disabled
    */
-  isLanguageResourcesDisabled:function(){
-      var me=this,
-	  	  disableIfTermCollectionOnly=Editor.data.editor.LanguageResources.disableIfOnlyTermCollection,
-	  	  assoc=Editor.data.task.get('taskassocs') ? Editor.data.task.get('taskassocs') : null,
-	  	  assocCount=assoc ? assoc.length : 0,
-	  	  termCollectionCount=0;
-	  //no results in the assoc store -> disabled
-	  if(assocCount <=0){
-		  return true;
-	  }
-	  //foreach rec in the assoc store get the termcollection count
-	  assoc.forEach(function(record){
-		  if(record.resourceType === Editor.util.LanguageResources.resourceType.TERM_COLLECTION){
-			  termCollectionCount++;
-		  }
-	  });
-	  //disabled if only term collections and it is configuret do disable the panel
-	  return termCollectionCount === assocCount && disableIfTermCollectionOnly;
+  isLanguageResourcesDisabled: function(){
+      var disableIfTermCollectionOnly = Editor.data.editor.LanguageResources.disableIfOnlyTermCollection,
+          assoc = Editor.data.task.get('taskassocs') ? Editor.data.task.get('taskassocs') : null,
+          assocCount = assoc ? assoc.length : 0,
+          termCollectionCount = 0;
+      
+      //no results in the assoc store -> disabled
+      if(!assoc || assocCount <= 0){
+        return true;
+      }
+      
+      //foreach rec in the assoc store get the termcollection count
+      assoc.forEach(function(record){
+        if(record.resourceType === Editor.util.LanguageResources.resourceType.TERM_COLLECTION){
+            termCollectionCount++;
+        }
+      });
+      
+      //disabled if only term collections and it is configuret do disable the panel
+      return termCollectionCount === assocCount && disableIfTermCollectionOnly;
   }
 });

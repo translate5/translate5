@@ -50,9 +50,10 @@ Ext.define('Editor.view.segments.column.Content', {
    * **Required.**
    */
   fieldName: null,
+  minWidth: 250,
   width: 250,
-  resizable: false,
-  fixed: true,
+  //resizable: false,
+  //fixed: true,
   isContentColumn: true,
   variableRowHeight: true,
   strings: {

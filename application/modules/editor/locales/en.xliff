@@ -2387,21 +2387,25 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Aufgabe klonen</source>
     <target>Clone task</target>
 </trans-unit>
-<trans-unit id='RGV0YWlscw=='>
-    <source>Details</source>
-    <target>Details</target>
+<trans-unit id='WnUgRGV0YWlsYW5zaWNodCB6dXLDvGNrc2V0emVu'>
+    <source>Zu Detailansicht zurücksetzen</source>
+    <target>Reset to detailed view</target>
 </trans-unit>
-<trans-unit id='RGV0YWlscyAobnVyIExlc2Vtb2R1cyk='>
-    <source>Details (nur Lesemodus)</source>
-    <target>Details (read-only)</target>
+<trans-unit id='WnUgbm9ybWFsZXIgQW5zaWNodCB6dXLDvGNrc2V0emVu'>
+    <source>Zu normaler Ansicht zurücksetzen</source>
+    <target>Reset to normal view</target>
 </trans-unit>
-<trans-unit id='Tm9ybWFs'>
-    <source>Normal</source>
-    <target>Normal</target>
+<trans-unit id='VGFncyB2ZXJiZXJnZW4gKG51ciBMZXNlbW9kdXMp'>
+    <source>Tags verbergen (nur Lesemodus)</source>
+    <target>Hide tags (read-only)</target>
 </trans-unit>
-<trans-unit id='Tm9ybWFsIChudXIgTGVzZW1vZHVzKQ=='>
-    <source>Normal (nur Lesemodus)</source>
-    <target>Normal (read-only)</target>
+<trans-unit id="VGFnLUt1cnphbnNpY2h0">
+    <source>Tag-Kurzansicht</source>
+    <target>Short tag view</target>
+</trans-unit>
+<trans-unit id="VGFnLVZvbGxhbnNpY2h0">
+    <source>Tag-Vollansicht</source>
+    <target>Full tag view</target>
 </trans-unit>
 <trans-unit id='U3RhdHVzICJ7MH0iIGR1cmNoIGVpbmVuIGFuZGVyZW4gQmVudXR6ZXI='>
     <source>Status "{0}" durch einen anderen Benutzer</source>
