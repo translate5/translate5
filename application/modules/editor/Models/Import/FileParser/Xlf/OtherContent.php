@@ -324,6 +324,7 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
             $data = array_merge($otherContentSource, $otherContentTarget);
             $this->throwSegmentationException('E1069', [
                 'content' => print_r($data,1),
+                'filename' => $this->contentConverter->getFileName()
             ]);
         }
         

@@ -443,4 +443,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             'tag' => $tag
         ]);
     }
+    
+    public function getFileName() {
+        return $this->filename;
+    }
 }
