@@ -227,10 +227,12 @@ Ext.define('Editor.controller.ViewModes', {
     handleViewMode: function(item) {
         var me = this,
             readonly = me.getSegmentGrid().lookupViewModel().get('taskIsReadonly');
-        
+        if(!item.mode || !item.mode.type) {
+            //if no type is given, the the view mode change can not be handled here 
+            // and must be done elsewhere (the place where the new view mode button was created)
+            return;
+        }
         switch (item.mode.type) {
-            case 'visualReviewMode':
-                break;
             case 'ergonomicMode':
                 me.loadErgonomicModePresets(readonly);
                 break;
