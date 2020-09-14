@@ -42,12 +42,6 @@ div.x-container.x-container-default {position: initial;}
     white-space: pre;
 }
 
-/* this default width is needed, see TRANSLATE-563 */
-#changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
-#segment-grid .x-grid-row .segment-tag-column .x-grid-cell-inner {
-  width: 250px;
-}
-
 .direction-rtl {
     direction:rtl;
 }

@@ -2395,21 +2395,25 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Aufgabe klonen</source>
     <target>Clone task</target>
 </trans-unit>
-<trans-unit id='RGV0YWlscw=='>
-    <source>Details</source>
-    <target>Details</target>
+<trans-unit id='WnUgRGV0YWlsYW5zaWNodCB6dXLDvGNrc2V0emVu'>
+    <source>Zu Detailansicht zurücksetzen</source>
+    <target>Reset to detailed view</target>
 </trans-unit>
-<trans-unit id='RGV0YWlscyAobnVyIExlc2Vtb2R1cyk='>
-    <source>Details (nur Lesemodus)</source>
-    <target>Details (read-only)</target>
+<trans-unit id='WnUgbm9ybWFsZXIgQW5zaWNodCB6dXLDvGNrc2V0emVu'>
+    <source>Zu normaler Ansicht zurücksetzen</source>
+    <target>Reset to normal view</target>
 </trans-unit>
-<trans-unit id='Tm9ybWFs'>
-    <source>Normal</source>
-    <target>Normal</target>
+<trans-unit id='VGFncyB2ZXJiZXJnZW4gKG51ciBMZXNlbW9kdXMp'>
+    <source>Tags verbergen (nur Lesemodus)</source>
+    <target>Hide tags (read-only)</target>
 </trans-unit>
-<trans-unit id='Tm9ybWFsIChudXIgTGVzZW1vZHVzKQ=='>
-    <source>Normal (nur Lesemodus)</source>
-    <target>Normal (read-only)</target>
+<trans-unit id="VGFnLUt1cnphbnNpY2h0">
+    <source>Tag-Kurzansicht</source>
+    <target>Short tag view</target>
+</trans-unit>
+<trans-unit id="VGFnLVZvbGxhbnNpY2h0">
+    <source>Tag-Vollansicht</source>
+    <target>Full tag view</target>
 </trans-unit>
 <trans-unit id='U3RhdHVzICJ7MH0iIGR1cmNoIGVpbmVuIGFuZGVyZW4gQmVudXR6ZXI='>
     <source>Status "{0}" durch einen anderen Benutzer</source>
@@ -3825,6 +3829,8 @@ The following task was imported with errors / warnings / notices. Please take ca
 </trans-unit>
 <trans-unit id='RsO8ciB6dXPDpHR6bGljaGUgSW5mb3JtYXRpb24genUgZWluZW0gRXJlaWduaXMgYml0dGUgYXVmIGRlbiBDb2RlIGtsaWNrZW4='><source>Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken</source><target>For more information about the event click on the event code</target></trans-unit>
 <trans-unit id='QW5nZXBhc3N0'><source>Angepasst</source><target>Customized</target></trans-unit>
+<trans-unit id='R2VzcGVycnQgZGEgYWxzIEV4Y2VsIGV4cG9ydGllcnQuIFp1bSBFbnRzcGVycmVuIEV4Y2VsIHJlLWltcG9ydGllcmVuLiBGYWxscyBFeGNlbCBuaWNodCB6dXIgSGFuZDogTmV1IGV4cG9ydGllcmVuLg=='><source>Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.</source><target>Locked because exported as Excel. Re-import Excel to unlock. If Excel is not at hand: export again.</target></trans-unit>
+<trans-unit id='PGI+S2VpbmUgRXJnZWJuaXNzZSBnZWZ1bmRlbjwvYj48YnIvPkbDvHIgSWhyZSBTdWNoZSBnaWJ0IGVzIGtlaW5lIEVpbnRyw6RnZSBpbiBkZXIgVGVybWlub2xvZ2llIHVuZCBkZW0gVHJhbnNsYXRpb24gTWVtb3J5IHVuZCBmw7xyIGRpZSBnZXfDpGhsdGUgU3ByYWNoa29tYmluYXRpb24gc3RlaHQga2VpbmUgbWFzY2hpbmVsbGUgw5xiZXJzZXR6dW5nIHp1ciBWZXJmw7xndW5nLg=='><source><b>Keine Ergebnisse gefunden</b><br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.</source><target><b>No results found</b><br/>There are no entries for your search in the terminology and the translation memory and there is no machine translation available for your language combination.</target></trans-unit>
 </body>
   </file>
 </xliff>

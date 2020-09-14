@@ -138,11 +138,9 @@ Ext.define('Editor.controller.Localizer', {
   	
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
   	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansicht');?>';
-  	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Details (nur Lesemodus)');?>';
-  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Details');?>';
-  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Normal');?>';
-  	gridToolbar.item_ergonomicModeReadonlyBtn = '<?php echo $this->translate->_('Normal (nur Lesemodus)');?>';
-  	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen');?>';
+  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Zu Detailansicht zurücksetzen');?>';
+  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Zu normaler Ansicht zurücksetzen');?>';
+  	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>';
   	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
   	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
   	//gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>';
@@ -156,7 +154,6 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Lesezeichen');?>';
   	gridToolbar.item_helpTooltip = '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>';
   	gridToolbar.item_showBookmarkedSegments = '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>';
-    gridToolbar.item_customizedModeBtn = '<?php echo $this->translate->_('Angepasst');?>';
     gridToolbar.strings.interfaceTranslation = '<?php echo $this->translate->_('Oberfläche');?>';
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
 
@@ -524,7 +521,8 @@ Ext.define('Editor.controller.Localizer', {
             jobStatus: '<?php echo $this->translate->_('Job-Status');?>',
             assignmentDateHeader: '<?php echo $this->translate->_('Zuweisungsdatum');?>',
             finishedDateHeader: '<?php echo $this->translate->_('Abschlussdatum');?>',
-            deadlineDateHeader: '<?php echo $this->translate->_('Deadline Datum');?>'
+            deadlineDateHeader: '<?php echo $this->translate->_('Deadline Datum');?>',
+            exelExportedTooltip: '<?php echo $this->translate->_('Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.');?>'
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
