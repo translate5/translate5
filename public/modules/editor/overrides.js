@@ -1199,3 +1199,31 @@ Ext.override(Ext.panel.Table, {
         }
     }
 });
+
+/***
+ * Number of milliseconds to wait after user interaction to fire an update.
+ * The update event triggers the remote filtering.
+ * Each field requires separate override
+ */
+Ext.override(Ext.grid.filters.filter.String, {
+    updateBuffer:2000
+});
+
+/***
+ * Number of milliseconds to wait after user interaction to fire an update.
+ * The update event triggers the remote filtering
+ * Each field requires separate override
+ */
+Ext.override(Ext.grid.filters.filter.Number, {
+    updateBuffer:2000
+});
+
+/***
+ * Number of milliseconds to wait after user interaction to fire an update.
+ * The update event triggers the remote filtering
+ * Each field requires separate override
+ */
+Ext.override(Ext.grid.filters.filter.List, {
+    updateBuffer:2000
+});
+
