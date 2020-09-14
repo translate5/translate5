@@ -95,7 +95,15 @@ Ext.define('Editor.view.ViewPortEditor', {
               flex:Editor.app.getController('LanguageResources').isLanguageResourcesDisabled() ? 0.3 : 0.5,
               xtype: 'segments.grid',
               itemId: 'segmentgrid',
-              stateful:true
+              stateful: {
+                  segmentSize:true,
+                  columns:true,
+                  sorters: false,
+                  filters: false,
+                  grouper: false,
+                  storeState: false // → does not work
+              }
+              //stateful:true → see additional config in Grid Class
           },{
               xtype: 'panel',
               stateId: 'editor.eastPanel',
