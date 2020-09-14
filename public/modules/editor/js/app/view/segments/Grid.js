@@ -104,12 +104,6 @@ Ext.define('Editor.view.segments.Grid', {
     //events to trigger the state update
     stateEvents:['segmentSizeChanged'],
     
-    statefulOFF: {
-        segmentSize:true,
-        columns:true
-    },
-    stateful: false,
-    
      /***
      * add our custom config to the state return object
      */
@@ -128,7 +122,8 @@ Ext.define('Editor.view.segments.Grid', {
     		return;
         }
         this.callParent(arguments);
-    	this.setSegmentSize(state.segmentSize);
+        //to prevent a stateChange loop we have to call setSegmentSize silently:
+    	this.setSegmentSize(state.segmentSize, false, true);
     },
 	
 	getSegmentSize:function(){
@@ -138,10 +133,13 @@ Ext.define('Editor.view.segments.Grid', {
     /**
      * Sets the segment font size via CSS class
      */
-    setSegmentSize: function(size, relative) {
+    setSegmentSize: function(size, relative, ignorestatechange) {
         var me=this,
             oldSize = me.currentSegmentSize,
             sizer;
+        if(ignorestatechange) {
+            this.stateful = false;
+        }
         if(relative) {
             size = oldSize + size;
         }
@@ -156,6 +154,9 @@ Ext.define('Editor.view.segments.Grid', {
         me.fireEvent('segmentSizeChanged', me, size, oldSize);
         me.newSegmentSizeCls = size;
         me.oldSegmentSizeCls = oldSize;
+        if(ignorestatechange) {
+            this.stateful = me.initialConfig.stateful;
+        }
     },
 
     constructor: function() {
@@ -172,8 +173,7 @@ Ext.define('Editor.view.segments.Grid', {
             fields = Editor.data.task.segmentFields(),
             userPref = Editor.data.task.userPrefs().first(),
             fieldList = [],
-            fieldClsList,
-            tmpColumnInitialIndex = 0;
+            fieldClsList;
 
         if(Editor.app.authenticatedUser.isAllowed('editorCommentsForLockedSegments')) {
             me.addCls('comments-for-locked-segments');
@@ -191,13 +191,11 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'segmentNrInTaskColumn',
             itemId: 'segmentNrInTaskColumn',
             stateId: 'segmentNrInTaskColumn',
-            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             width: 50
         },{
             xtype: 'workflowStepColumn',
             itemId: 'workflowStepColumn',
             stateId: 'workflowStepColumn',
-            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             renderer: function(v) {
                 var steps = Editor.data.task.getWorkflowMetaData().steps;
                 return steps[v] ? steps[v] : v;
@@ -207,16 +205,13 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'autoStateColumn',
             itemId: 'autoStateColumn',
             stateId: 'autoStateColumn',
-            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             width: 82
         },{
             xtype: 'matchrateColumn',
             stateId: 'matchrateColumn',
-            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
         },{
             xtype: 'matchrateTypeColumn',
             stateId: 'matchrateTypeColumn',
-            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             hidden: true
         }]);
         
@@ -228,18 +223,17 @@ Ext.define('Editor.view.segments.Grid', {
         fieldList = Editor.model.segment.Field.listSort(fieldList);
 
         Ext.Array.each(fieldList, function(rec){
-            var name = rec.get('name'),
+            var col2push,
+                name = rec.get('name'),
                 type = rec.get('type'),
                 editable = rec.get('editable'),
                 label = rec.get('label'),
                 width = rec.get('width'),
                 widthFactorHeader = Editor.data.columns.widthFactorHeader,
                 widthOffsetEditable = Editor.data.columns.widthOffsetEditable,
-                ergoWidth = width * Editor.data.columns.widthFactorErgonomic,
                 labelWidth = (label.length) * widthFactorHeader,
                 maxWidth = Editor.data.columns.maxWidth,
-                isEditableTarget = type == rec.TYPE_TARGET && editable,
-                isErgoVisible = !firstTargetFound && isEditableTarget || type == rec.TYPE_SOURCE || type == rec.TYPE_RELAIS;
+                isEditableTarget = type == rec.TYPE_TARGET && editable;
             
             if(!me.hasRelaisColumn && type == rec.TYPE_RELAIS) {
                 me.hasRelaisColumn = true;
@@ -249,61 +243,43 @@ Ext.define('Editor.view.segments.Grid', {
             firstTargetFound = firstTargetFound || isEditableTarget; 
 
             if(!rec.isTarget() || ! userPref.isNonEditableColumnDisabled()) {
+                //width is only lesser maxWidth for columns where width was calculated < 250px on serverside
                 width = Math.min(Math.max(width, labelWidth), maxWidth);
                 if(isEditableTarget) {
                     label = label + me.target_original;
                 }
-                var col2push = {
+                col2push = {
                     xtype: 'contentColumn',
-                    columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
                     grid: me,
                     segmentField: rec,
                     fieldName: name,
+                    stateId: 'contentColumn_'+name,
                     hidden: !userPref.isNonEditableColumnVisible() && rec.isTarget(),
-                    isErgonomicVisible: isErgoVisible && !editable,
-                    isErgonomicSetWidth: true, //currently true for all our affected default fields
                     isContentColumn: true,//TODO this propertie is missing
                     text: label,
                     tooltip: label,
                     width: width
                 };
-                if(width < maxWidth){
-                //the following line would be an alternative to only adjust the columnWidth of 
-                //hidden cols in ergoMode. This would ensure, that the horizontal scrollbar
-                //keeps working, which it does not if it is not initialized at the first place
-                //(due to an ExtJs-bug)    
-                //if(width !== maxWidth && (isErgoVisible && !editable)=== false){
-                    col2push.ergonomicWidth = Math.max(labelWidth, ergoWidth);
-                }
                 columns.push(col2push);
             }
             
             if(editable){
                 labelWidth = (label.length) * widthFactorHeader + widthOffsetEditable;
                 label = Ext.String.format(me.column_edited_icon, rec.get('label'), Ext.BLANK_IMAGE_URL, me.column_edited, me.column_edited);
+                //width is only lesser maxWidth for columns where width was calculated < 250px on serverside
                 width = Math.min(Math.max(width, labelWidth), maxWidth);
-                var col2push = {
+                col2push = {
                     xtype: 'contentEditableColumn',
-                    columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
                     grid: me,
                     segmentField: rec,
                     fieldName: name,
-                    isErgonomicVisible: isErgoVisible,
-                    isErgonomicSetWidth: true, //currently true for all our affected default fields
+                    stateId: 'contentColumn_'+name+'_edit',
                     isContentColumn: true,//TODO those properties are missing 
                     isEditableContentColumn: true,//TODO those properties are missing
                     tooltip: rec.get('label'),
                     text: label,
                     width: width
                 };
-                if(width < maxWidth){
-                //the following line would be an alternative to only adjust the columnWidth of 
-                //hidden cols in ergoMode. This would ensure, that the horizontal scrollbar
-                //keeps working, which it does not if it is not initialized at the first place
-                //(due to an ExtJs-bug)
-                //if(width !== maxWidth && !isErgoVisible){
-                    col2push.ergonomicWidth = Math.max(labelWidth, ergoWidth);
-                }
                 columns.push(col2push);
             }
         });
@@ -311,7 +287,6 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'commentsColumn',
             itemId: 'commentsColumn',
             stateId:'commentsColumn',
-            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             width: 200
         }]);
 
@@ -320,7 +295,6 @@ Ext.define('Editor.view.segments.Grid', {
                 xtype: 'stateColumn',
                 itemId: 'stateColumn',
                 stateId:'stateColumn',
-                columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             });
         }
         if(Editor.data.segments.showQM){
@@ -328,7 +302,6 @@ Ext.define('Editor.view.segments.Grid', {
                 xtype: 'qualityColumn',
                 itemId: 'qualityColumn',
                 stateId:'qualityColumn',
-                columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             });
         }
     
@@ -336,19 +309,19 @@ Ext.define('Editor.view.segments.Grid', {
             xtype: 'usernameColumn',
             itemId: 'usernameColumn',
             stateId:'usernameColumn',
-            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
             width: 122
         },{
             xtype: 'editableColumn',
             itemId: 'editableColumn',
             stateId:'editableColumn',
-            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
         },{
             xtype: 'iswatchedColumn',
             itemId: 'iswatchedColumn',
             stateId:'iswatchedColumn',
-            columnInitialIndex:(tmpColumnInitialIndex++),//initial index of the column, before the custom state is applied
         }]);
+    
+        //allow the view mode controller to prepare (and store) the columns setup
+        me.fireEvent('beforeinitcolumns', columns);
     
         Ext.applyIf(me, {
        /**
@@ -367,15 +340,10 @@ Ext.define('Editor.view.segments.Grid', {
             },
             columns: columns
         });
+
         me.callParent(arguments);
 
         fieldClsList = me.query('contentEditableColumn').concat(me.query('contentColumn'));
-        Ext.Array.each(fieldClsList, function(item, idx){
-            fieldClsList[idx] = '#segment-grid .x-grid-row .x-grid-cell-'+item.itemId+' .x-grid-cell-inner { width: '+item.width+'px; }';
-        });
-        Ext.util.CSS.removeStyleSheet('segment-content-width-definition');
-        Ext.util.CSS.createStyleSheet(fieldClsList.join("\n"),'segment-content-width-definition');
-        
     },
     
     initConfig: function(instanceConfig) {
@@ -565,28 +533,5 @@ Ext.define('Editor.view.segments.Grid', {
                 }
             });
         });
-    },
-
-    /***
-     * Reset grid column order. As sort index, columnInitialIndex(grid column property) is used
-     */
-    resetColumnOrder:function(){
-        var me=this,
-            headerCt = me.getHeaderContainer(),
-            columns = me.getColumns();
-
-        //sort the column order based on the columnInitialIndex field value
-        Ext.Array.sort(columns,function(col1,col2) {
-            if(col1.columnInitialIndex < col2.columnInitialIndex) return -1;
-            if(col1.columnInitialIndex > col2.columnInitialIndex) return 1;
-            return 0;
-        });
-
-        headerCt.suspendLayouts();
-        for(var i=0;i<columns.length;i++){
-            headerCt.moveAfter(columns[i],(columns[i-1] || null));
-        }
-        headerCt.resumeLayouts(true);
     }
-
 });
