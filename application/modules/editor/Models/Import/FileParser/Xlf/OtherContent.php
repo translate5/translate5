@@ -322,6 +322,16 @@ class editor_Models_Import_FileParser_Xlf_OtherContent {
         $otherContent = join(array_merge($otherContentSource, $otherContentTarget));
         if(!empty($otherContent) && preg_match('/[^\s]+/', $this->contentConverter->removeXlfTags($otherContent))) {
             $data = array_merge($otherContentSource, $otherContentTarget);
+            foreach ($data as &$d) {
+                //print the code point for non printable characters
+                if(!ctype_print($d) && mb_strlen($d)>0){
+                    $tmp = [];
+                    $tmp['unicode'] = json_encode((string)$d);
+                    $tmp['codepoint'] = mb_ord($d);
+                    $d=[];
+                    $d = $tmp;
+                }
+            }
             $this->throwSegmentationException('E1069', [
                 'content' => print_r($data,1),
                 'filename' => $this->contentConverter->getFileName()
