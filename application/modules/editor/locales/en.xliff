@@ -3549,9 +3549,17 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Sonderzeichen hinzufügen:</source>
     <target>Add special characters:</target>
 </trans-unit>
-<trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='>
-    <source>Aufgabe verlassen</source>
-    <target>Leave task</target>
+<trans-unit id='U3DDpHRlciB3ZWl0ZXIgYXJiZWl0ZW4='>
+	<source>Später weiter arbeiten</source>
+	<target>Continue task later</target>
+</trans-unit>
+<trans-unit id='QWxsZXMgZmVydGlnIC0gQXVmZ2FiZSBhYnNjaGxpZcOfZW4='>
+	<source>Alles fertig - Aufgabe abschließen</source>
+	<target>All done - finish task</target>
+</trans-unit>
+<trans-unit id='Tm9jaCBldHdhcyB6dSB0dW4/IDxici8+RG9jaCBub2NoIHNww6R0ZXIgd2VpdGVyIGFyYmVpdGVuPw=='>
+	<source>Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?</source>
+	<target>Still something to do? <br/>Better be able to continue later?</target>
 </trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='>
     <source>Nur Segmente mit Lesezeichen anzeigen</source>
@@ -3585,7 +3593,6 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Delete proposals older than current import</target></trans-unit>
 <trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Log out</target></trans-unit>
 <trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Add special characters:</target></trans-unit>
-<trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Leave task</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Show only bookmarked segments</target></trans-unit>
 <trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
 <trans-unit id='S2V5IFBlcmZvcm1hbmNlIEluZGljYXRvcnM='><source>Key Performance Indicators</source><target>Key Performance Indicators</target></trans-unit>
@@ -3600,8 +3607,6 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='RXJsYXVidGUgUm9sbGVu'><source>Erlaubte Rollen</source><target>Allowed roles</target></trans-unit>
 <trans-unit id='RGVyIHJlZmVyZW56aWVydGUgQmVudXR6ZXIgaXN0IGRlciBBdWZnYWJlIG5pY2h0IG1laHIgenVnZXdpZXNlbiBvZGVyIGV4aXN0aWVydCBuaWNodCBtZWhyLg=='><source>Der referenzierte Benutzer ist der Aufgabe nicht mehr zugewiesen oder existiert nicht mehr.</source><target>The referenced user is not associated to the task or does event not exist anymore.</target></trans-unit>
 <trans-unit id='TcO2Y2h0ZW4gU2llIGRpZSBBdWZnYWJlIGJlZW5kZW4gdW5kIHp1csO8Y2tzZW5kZW4sIG9kZXIgbcO2Y2h0ZW4gU2llIGRpZXNlIHNww6R0ZXIgd2VpdGVyYmVhcmJlaXRlbj8='><source>Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?</source><target>Do you want to finish the task and submit it, or edit it again later?</target></trans-unit>
-<trans-unit id='RmVydGlnIHVuZCBBdWZnYWJlIGJlZW5kZW4='><source>Fertig und Aufgabe beenden</source><target>I‘m done. Finish task</target></trans-unit><trans-unit id='QXVmZ2FiZSBzcMOkdGVyIHdlaXRlcmJlYXJiZWl0ZW4='><source>Aufgabe später weiterbearbeiten</source><target>Continue task later</target></trans-unit>
-<trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZWxpc3Rl'><source>Zurück zur Aufgabeliste</source><target>Back to task list</target></trans-unit>
 <trans-unit id='V29ya2Zsb3c='><source>Workflow</source><target>Workflow</target></trans-unit>
 <trans-unit id='WmFobCB6dWdld2llc2VuZXIgQmVudXR6ZXI='><source>Zahl zugewiesener Benutzer</source><target>Number of users</target></trans-unit>
 <trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc3NvdXJjZW4='><source>Anzahl zugewiesene Sprachressourcen</source><target>Number of assigned language resources</target></trans-unit>
