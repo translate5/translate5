@@ -1133,8 +1133,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Is the given task importing
    */
   isImportingCheck:function(task){
-
-      if(task.isImporting() || task.get('state') == 'ExcelExported') {
+      if(task.isImporting() || task.isExcelExported()) {
           return true;
       }
       if(task.isCustomState()) {

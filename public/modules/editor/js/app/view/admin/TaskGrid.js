@@ -92,7 +92,6 @@ Ext.define('Editor.view.admin.TaskGrid', {
       assignmentDateHeader:'#UT#Zuweisungsdatum',
       finishedDateHeader:'#UT#Abschlussdatum',
       deadlineDateHeader:'#UT#Deadline Datum',
-      
   },
   strings: {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
@@ -115,7 +114,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       addFilterTooltip:'#UT#Filter hinzufügen',
       currentWorkflowStepProgressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt',
       addFilterText:'#UT#Erweiterte Filter',
-      jobStatus:'#UT#Job-Status'
+      jobStatus:'#UT#Job-Status',
+      exelExportedTooltip:'#UT#Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.',
   },
   states: {
       open: '#UT#offen',
@@ -383,8 +383,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
                       addQtip(meta, me.errorTipTpl.apply(rec.get('lastErrors')));
                       return rec.get('state');
                   }
+                  
                   if(rec.isLocked() && rec.isCustomState()) {
-                      addQtip(meta, Ext.String.format(me.strings.lockedSystem, rec.get('state')));
+                      var statusTooltip = Ext.String.format(me.strings.lockedSystem, rec.get('state'));
+                      //use different tooltip for exel exported tasks
+                      if(rec.isExcelExported()){
+                          statusTooltip = me.strings.exelExportedTooltip;
+                      }
+                      addQtip(meta, statusTooltip);
                       return me.strings.locked;
                   }
                   if(rec.isLocked() && rec.isUnconfirmed()) {
@@ -396,7 +402,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                       return me.states.unconfirmed;
                   }
                   //locked and editable means multi user editing
-                  if(rec.isLocked() && rec.isEditable()) {                  	  
+                  if(rec.isLocked() && rec.isEditable()) {
                       addQtip(meta, multiUserTpl.apply(rec.get('users')));
                       return me.strings.locked;
                   }
