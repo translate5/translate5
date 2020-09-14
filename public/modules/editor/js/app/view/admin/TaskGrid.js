@@ -386,8 +386,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   
                   if(rec.isLocked() && rec.isCustomState()) {
                       var statusTooltip = Ext.String.format(me.strings.lockedSystem, rec.get('state'));
-                      //use different tooltip for exel exported 
-                      if(rec.get('state') == "ExcelExported"){
+                      //use different tooltip for exel exported tasks
+                      if(rec.isExcelExported()){
                           statusTooltip = me.strings.exelExportedTooltip;
                       }
                       addQtip(meta, statusTooltip);

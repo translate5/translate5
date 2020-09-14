@@ -302,6 +302,13 @@ Ext.define('Editor.model.admin.Task', {
   isNotErrorImportPendingCustom:function(){
       return this.isNotErrorImportPending() && !this.isCustomState();
   },
+  
+  /**
+   * Is the current ask in excel export state
+   */
+  isExcelExported:function(){
+      return this.get('state') == 'ExcelExported';
+  },
 
   /**
    * returns the the metadata for the workflow of the task
