@@ -195,10 +195,7 @@ Ext.define('Editor.controller.Segments', {
   gridAfterRender: function(grid) {
       var me = this,
           params = [],
-          vm = this.application.getController('ViewModes'),
           task = Editor.data.task,
-          isEditor = Editor.app.authenticatedUser.isAllowed('editorEditTask', task),
-          readOnly = task.isReadOnly() || !isEditor,
           title = Ext.String.ellipsis(task.get('taskName'), 60),
           store = grid.store,
           proxy = store.getProxy(),
@@ -208,20 +205,13 @@ Ext.define('Editor.controller.Segments', {
           'data-qtip': task.getTaskName()
       });
       
-      if(readOnly) {
+      if(grid.lookupViewModel().get('taskIsReadonly')) {
           title = title + grid.title_readonly;
       }
 
       if(task.isUnconfirmed()) {
           title = title + grid.title_addition_unconfirmed;
       }
-      
-      grid.lookupViewModel().set('taskIsReadonly', readOnly);
-      vm && vm.editMode(readOnly);
-
-      //fire the global event for component view change
-      //TODO: refactor so that event is only fired once in a application view load function which should be created when rebuilding the main menu
-      Ext.fireEvent('applicationViewChanged','editor',grid.getTitle());
       
       initialGridFilters = initialGridFilters && initialGridFilters.segmentgrid;
 

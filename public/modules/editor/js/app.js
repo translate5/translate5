@@ -255,11 +255,11 @@ Ext.application({
             Ext.select("body > div.loading").destroy();
         }
         task.initWorkflow();
+        me.getController('ViewModes').activate();
         me.viewport = Ext.create(Editor.data.app.viewport, {
             renderTo : Ext.getBody()
         });
         me.viewport.show();
-        
         //vp.doLayout();
         //this.viewport.setLoading(true);
         /*
@@ -299,6 +299,7 @@ Ext.application({
             return;
         }
         if(me.viewport){
+            me.getController('ViewModes').deactivate();
             me.viewport.destroy();
             me.fireEvent('editorViewportClosed');
         }
