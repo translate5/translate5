@@ -426,7 +426,6 @@ Ext.define('Editor.view.segments.Grid', {
         var me = this,
             view = me.getView(),
             options = {
-                focus: true,
                 animate: false //may not be animated, to place the callback at the correct place 
             };
         
