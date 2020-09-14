@@ -77,9 +77,6 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
             menu={
                 xtype: 'menu',
                 items: [{
-                    text: "FOO",
-                    hideOnClick: false
-                },{
                     xtype: 'menuitem',
                     mode:{
                         type: 'editMode'

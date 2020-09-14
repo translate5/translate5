@@ -1155,10 +1155,11 @@ Ext.override(Ext.tip.ToolTip, {
 
 
 /**
- * Fixes and additions regarding states and grid table
+ * ExtJS 6.2 Fixes and additions regarding states and grid table
  */
 Ext.override(Ext.panel.Table, {
     /**
+     * Fix:
      * Check for column lenght throws an exception when not columns are defined.
      * Check if the columns object exist before lenght check
      */
@@ -1168,6 +1169,7 @@ Ext.override(Ext.panel.Table, {
         }
     },
     /**
+     * Addition:
      * apply grid state also to already rendered grids (needed for our view modes)
      */
     applyState: function(state) {
@@ -1207,12 +1209,44 @@ Ext.override(Ext.panel.Table, {
             this.callParent([state]);
         }
     },
+    /**
+     * Fix that no stateChange is fired while grid construction
+     */
     onStateChange: function() {
         //we may only save a state if the component is already rendered. 
         // especially for grids otherwise a save state is triggered while construction which saves wrong states then
         if(this.rendered) {
             return this.callParent();
         }
+    },
+    /**
+     * Fix: 
+     * Who the f**k wants the track states always enabled on the grid store??? 
+     * This is currently the case Ext.panel.Table constructor of ExtJS 6.2
+     * This should be coupled with the stateful config of the grid and NOT enabled by default!
+     * Coupling with the stateful flag is not possible since the config values in stateful are replaced by an empty config, which evaluates to true basically.
+     * So with otherwords: The stateful config is more as buggy, see also Ext.grid.filters.Filters below.
+     * Since we do not use stateful filters at the moment, we disable that permanently. 
+     * To have that in a correct manner, we should wait on a ExtJS Update.
+     */
+    constructor: function(config) {
+        this.callParent([
+            config
+        ]);
+
+        this.store.trackStateChanges = false;
+    }
+});
+
+/**
+ * ExtJS 6.2 bug: there is currently no other way to enable stateful grid with columns only.
+ * Since there is currently no need to have stateful filters in one of the grids, 
+ * we just disable that generally
+ */
+Ext.override(Ext.grid.filters.Filters, {
+    init: function(grid) {
+        this.callParent([grid]);
+        grid.store.statefulFilters = false;
     }
 });
 
@@ -1273,4 +1307,3 @@ Ext.override(Ext.window.Window, {
         }
     }
 });
-
