@@ -965,7 +965,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         if($ignoreLocked){
             $s->join('LEK_segments_meta', $this->tableName.'.id = LEK_segments_meta.segmentId', array())
                 ->where('LEK_segments_meta.locked != 1 OR LEK_segments_meta.locked IS NULL');
-        } 
+        }
         $s->order($this->tableName.'.segmentNrInTask ASC');
         return parent::loadFilterdCustom($s);
     }
@@ -1778,11 +1778,17 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->reInitDb($taskGuid);
         $mv = $this->segmentFieldManager->getView();
         //find the last edited segment for the user from the segment view table and the segments history
-        $sql = "select * from ( select id as 'segmentId',timestamp as 'date' from ".$mv->getName()." where taskGuid = ? and userGuid = ? order by date desc limit 1 ) v 
-                union all 
-                select * from ( select segmentId,created as 'date' from LEK_segment_history where taskGuid = ? and userGuid = ? order by date desc limit 1 ) h 
-                order by date desc limit 1";
-        $stmt = $this->db->getAdapter()->query($sql,[$taskGuid,$userGuid,$taskGuid,$userGuid]);
+        $sql = 'select * from (
+    select id as "segmentId",userGuid,timestamp as "date" from '.$mv->getName().'
+    where taskGuid = ?
+union
+    select segmentId,userGuid,created as "date" from
+    LEK_segment_history
+    where taskGuid = ?
+) as merged
+where userGuid = ?
+order by date desc, segmentId asc limit 1';
+        $stmt = $this->db->getAdapter()->query($sql,[$taskGuid,$taskGuid,$userGuid]);
         $result = $stmt->fetchAll();
         return $result[0]['segmentId'] ?? -1;
     }

@@ -77,7 +77,6 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     editedSegmentId: -1, //the id of the edited segment
     firstEditableRow: -1,
     NUMBER_OF_CHACHED_SEGMENTS:10,
-    ergonomicMode: false,
     //tooltip for source and del tags in grid source column
     sourceFieldDelInsTooltip:null,
     /**

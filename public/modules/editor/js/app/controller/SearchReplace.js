@@ -130,7 +130,7 @@ Ext.define('Editor.controller.SearchReplace', {
     /***
      * Default column data index
      */
-    DEFAULT_COLUMN_DATA_INDEX:'targetEdit',
+    defaultColumnDataIndex: 'targetEdit',
 
     /***
      * When the filter is active and the user open the search/replace window, we display the info message that
@@ -546,7 +546,7 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     resetActiveColumnDataIndex:function(){
         var me=this;
-        me.activeColumnDataIndex =me.DEFAULT_COLUMN_DATA_INDEX;
+        me.activeColumnDataIndex = null;
     },
     
     /***
@@ -727,13 +727,13 @@ Ext.define('Editor.controller.SearchReplace', {
         if(!key || (key == Ext.event.Event.F)){
             focusTab = 'searchTab';
             if(!Ext.Array.contains(me.searchFields,me.activeColumnDataIndex)){
-                me.activeColumnDataIndex=me.DEFAULT_COLUMN_DATA_INDEX;
+                me.activeColumnDataIndex=me.defaultColumnDataIndex;
             }
         }
 
         if(key == Ext.event.Event.H){
             if(Ext.Array.contains(me.replaceFields,me.activeColumnDataIndex)){
-                me.activeColumnDataIndex=me.DEFAULT_COLUMN_DATA_INDEX;
+                me.activeColumnDataIndex=me.defaultColumnDataIndex;
             }
             focusTab = 'replaceTab';
         }
@@ -769,10 +769,10 @@ Ext.define('Editor.controller.SearchReplace', {
         Ext.widget('searchreplacewindow').show();
     },
     
-    /***
+    /**
      * Init the search and replace columns combos
      */
-    initSearchInFieldStore:function(){
+    initSearchInFieldStore: function(){
         var me=this,
             segmentGrid=Ext.ComponentQuery.query('#segmentgrid')[0],
             columns = segmentGrid.query('gridcolumn[isContentColumn]:not([hidden])'),
