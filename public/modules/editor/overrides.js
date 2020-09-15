@@ -1182,7 +1182,7 @@ Ext.override(Ext.panel.Table, {
             //handle columns here only, no other table settings
             cols.forEach(function(conf, newIdx){
                 var col = me.down('gridcolumn[stateId="'+conf.id+'"]'),
-                    oldIdx = col && me.headerCt.getHeaderIndex(col),
+                    moveTo = me.headerCt.getHeaderAtIndex(newIdx),
                     oldStateful = me.stateful;
                 if(!col) {
                     return;
@@ -1190,11 +1190,11 @@ Ext.override(Ext.panel.Table, {
                 if(oldStateful) {
                     me.stateful = false;
                 }
-                if(oldIdx && oldIdx >= 0) {
-                    me.headerCt.move(oldIdx, newIdx);
-                }
                 if(conf.hidden !== undefined) {
                     col.setHidden(conf.hidden);
+                }
+                if(col && moveTo) {
+                    me.headerCt.moveBefore(col, moveTo);
                 }
                 if(conf.width !== undefined) {
                     col.setWidth(conf.width);
