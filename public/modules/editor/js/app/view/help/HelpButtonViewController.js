@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -54,7 +54,26 @@ Ext.define('Editor.view.help.HelpButtonViewController', {
         var me = this,
             win = Ext.widget('helpWindow');
         win.setTitle(me.getView().text + ' - ' + Editor.data.helpSectionTitle)
-        win.show();
+
+        //if no loader is defined, the content is remote -> is not the default page
+        if(!win.getLoader()){
+            me.getView().setHidden(false);
+            win.show();
+            return;
+        }
+        
+        //check the loader content. If the response returns empty string there is no need to 
+        // show the help window
+        win.getLoader().on({
+            load:function(cmp,response){
+                if(response.responseText==""){
+                    me.getView().setHidden(true);
+                    return;
+                }
+                me.getView().setHidden(false);
+                win.show();
+            }
+        })
     },
     onEditorViewportOpened: function() {
         this.onApplicationSectionChanged(this.getView().up('#segmentgrid'));
@@ -64,20 +83,19 @@ Ext.define('Editor.view.help.HelpButtonViewController', {
    * On component view change event handler. This event is a global event.
    */
   onApplicationSectionChanged: function(panel){
-	  Editor.data.helpSection = panel.helpSection || panel.xtype;
-	  Editor.data.helpSectionTitle = panel.getTitle();
-	  
-	  var me=this,
-	  	isHelpButtonVisible=me.isHelpButtonVisible();
-	  
-	  //the button is not visible when there is not url defined for the section
-	  me.getView().setHidden(!isHelpButtonVisible);
-	  
-	  if(!isHelpButtonVisible){
-		  return;
-	  }
-	  //the help button exist, call the show help window function
-	  this.showUserStateHelpWindow();
+      Editor.data.helpSection = panel.helpSection || panel.xtype;
+      Editor.data.helpSectionTitle = panel.getTitle();
+      
+      var me=this,
+          isHelpButtonVisible=me.isHelpButtonVisible();
+      
+      if(!isHelpButtonVisible){
+          //the button is not visible when there is not url defined for the section
+          me.getView().setHidden(true);
+          return;
+      }
+      //the help button exist, call the show help window function
+      me.showUserStateHelpWindow();
   },
 
   
@@ -85,22 +103,29 @@ Ext.define('Editor.view.help.HelpButtonViewController', {
    * Show the help window only it is alowed for the curent userstate
    */
   showUserStateHelpWindow:function(){
-	  var provider=Ext.state.Manager.getProvider(),
-	      helpWindowState=provider.get(Editor.view.help.HelpWindow.getStateIdStatic());
-	  //is the doNotShowAgain userstate enabled
-	  if(!helpWindowState || helpWindowState.doNotShowAgain){
-		  return;
-	  }
-	  
-	  this.showHelpWindow();
+      var me=this,
+          provider=Ext.state.Manager.getProvider(),
+          helpWindowState=provider.get(Editor.view.help.HelpWindow.getStateIdStatic());
+
+      if(!helpWindowState){
+          //no state is found in the state provider
+          return;
+      }
+      
+      if(helpWindowState.doNotShowAgain){
+          me.getView().setHidden(false);
+          return;
+      }
+      
+      me.showHelpWindow();
   },
   
   /**
    * The help button is visible when for the helpwindow there is loaderUrl configured
    */
   isHelpButtonVisible:function(){
-	  var sectionConfig=Editor.data.frontend.helpWindow[Editor.data.helpSection];
-	  return sectionConfig && sectionConfig.loaderUrl!=="";
+      var sectionConfig=Editor.data.frontend.helpWindow[Editor.data.helpSection];
+      return sectionConfig && sectionConfig.loaderUrl!=="";
   }
   
 });
