@@ -45,7 +45,7 @@ Ext.define('Editor.util.TaskActions', {
         taskOpening: '#UT#Aufgabe wird im Editor geöffnet...',
         forcedReadOnly: '#UT#Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!',
         confirmFinish: "#UT#Aufgabe abschließen?",
-        confirmFinishMsg: "#UT#Wollen Sie die Aufgabe wirklich abschließen?",
+        confirmFinishMsg: "#UT#Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?",
         taskClosed: '#UT#Aufgabe wurde erfolgreich verlassen.',
         taskConfirmed: '#UT#Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.',
         taskFinished: '#UT#Aufgabe wurde erfolgreich abgeschlossen.',
@@ -134,7 +134,7 @@ Ext.define('Editor.util.TaskActions', {
         }
 
         Ext.Msg.confirm(me.strings.confirmFinish, me.strings.confirmFinishMsg, function(btn){
-            if(btn == 'yes') {
+            if(btn == 'no') {
                 me._doFinish(callback);
             }
         });
