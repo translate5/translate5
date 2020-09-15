@@ -59,7 +59,6 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
         }
         
         //check if the user is allowed to finish the task
-        // TODO: REMOVE FALSE
         if(!user.isAllowed('editorFinishTask', task)){
             me.handleLeaveTaskButton("backBtn");
             return;
