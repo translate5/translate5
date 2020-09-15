@@ -612,13 +612,17 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
                 'js' => 'text/javascript',
                 'css' => 'text/css',
                 'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
                 'png' => 'image/png',
                 'gif' => 'image/gif',
+                'webp' => 'image/webp',
                 'svg' => 'image/svg',
                 'woff' => 'application/woff',
                 'woff2' => 'application/woff2',
                 'ttf' => 'application/ttf',
                 'eot' => 'application/eot',
+                'mp3' => 'audio/mp3',
+                'mp4' => 'video/mp4',            
                 'html'=> 'text/html'
         );
         $slash = '/';
@@ -665,9 +669,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         if(!file_exists($wholePath)){
             throw new ZfExtended_NotFoundException();
         }
-        //currently this method is fixed to JS:
-        // TODO FIXME: $extension might be empty !
-        header('Content-Type: '.$types[$extension]);
+        if(in_array($extension, $types)){
+            header('Content-Type: '.$types[$extension]);
+        }
         //FIXME add version URL suffix to plugin.css inclusion
         header('Last-Modified: '.gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));
         //with etags we would have to use the values of $_SERVER['HTTP_IF_NONE_MATCH'] too!
