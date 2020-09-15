@@ -1376,9 +1376,13 @@
   <source>Dieser Anmeldename wird bereits verwendet.</source>
   <target>This loginname is already in use!</target>
 </trans-unit>
-<trans-unit id='RGFzIFNlZ21lbnQga2FubiBuaWNodCBiZWFyYmVpdGV0IHdlcmRlbiwgZGEgZGllIEF1ZmdhYmUgaW0gIm51ciBMZXNlIi0gYnp3LiBBbnNpY2h0c21vZHVzIGlzdC4='>
-  <source>Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.</source>
-  <target>The segment cannot be edited, because the task is read-only / in view mode.</target>
+<trans-unit id='RGFzIFNlZ21lbnQga2FubiBuaWNodCBiZWFyYmVpdGV0IHdlcmRlbiwgZGEgZGllIEF1ZmdhYmUgaW0gIm51ciBMZXNlbW9kdXMiIGlzdC4='>
+    <source>Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lesemodus" ist.</source>
+    <target>The segment cannot be edited, because the task is read-only.</target>
+</trans-unit>
+<trans-unit id='RGFzIFNlZ21lbnQga2FubiBuaWNodCBiZWFyYmVpdGV0IHdlcmRlbiwgZGEgZGllICJUYWdzIiBhdXNnZWJsZW5kZXQgd3VyZGVuLiBLbGlja2VuIFNpZSBhdWYgIkFuc2ljaHQiIHVuZCBibGVuZGVuIFNpZSBkaWUgVGFncyB3aWVkZXIgZWluLg=='>
+    <source>Das Segment kann nicht bearbeitet werden, da die "Tags" ausgeblendet wurden. Klicken Sie auf "Ansicht" und blenden Sie die Tags wieder ein.</source>
+    <target>The segment cannot be edited because the "tags" have been hidden. Click on "View mode" and show the tags again.</target>
 </trans-unit>
 <trans-unit id='SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiAlMSRzIG5pY2h0IG9mZml6aWVsbCB1bnRlcnN0w7x0enQuPGJyIC8+ICAgICBEaWUgQW53ZW5kdW5nIHd1cmRlIGhpbnNpY2h0bGljaCBGdW5rdGlvbmFsaXTDpHQgdW5kIFBlcmZvcm1hbmNlIGluIGRlbiBmb2xnZW5kZW4gQnJvd3NlciBvZmZpemllbGwgZ2V0ZXN0ZXQ6ICAgIDx1bD4gICAgICAgIDxsaT5Hb29nbGUgQ2hyb21lIGFiIFZlcnNpb24gNDg8L2xpPiAgICAgICAgPGxpPk1vemlsbGEgRmlyZWZveCBhYiBWZXJzaW9uIDQ0PC9saT4gICAgICAgIDxsaT5BcHBsZSBTYWZhcmkgYWIgVmVyc2lvbiA5PC9saT4gICAgICAgIDxsaT5NaWNyb3NvZnQgRWRnZSBhYiBWZXJzaW9uIDgwPC9saT4gICAgPC91bD4gICAgUHJpbnppcGllbGwga2FubiAlMSRzIGF1Y2ggbWl0IGFuZGVyZW4gQnJvd3Nlcm4gYnp3LiDDpGx0ZXJlbiBWZXJzaW9uZW4gZnVua3Rpb25pZXJlbi4gICAgIEhpZXIga2FubiBlcyBhYmVyIHp1IHVudm9yaGVyZ2VzZWhlbmVuIEZlaGxlcm4ga29tbWVuLiAgICAgUG90ZW50aWVsbCBrw7ZubmVuIGF1Y2ggbWFuY2hlIEZlYXR1cmVzIGtvbXBsZXR0IG5pY2h0IGZ1bmt0aW9uaWVyZW4u'>
   <source>Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.<br />     Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:    <ul>        <li>Google Chrome ab Version 48</li>        <li>Mozilla Firefox ab Version 44</li>        <li>Apple Safari ab Version 9</li>        <li>Microsoft Edge ab Version 80</li>    </ul>    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.     Hier kann es aber zu unvorhergesehenen Fehlern kommen.     Potentiell können auch manche Features komplett nicht funktionieren.</source>
