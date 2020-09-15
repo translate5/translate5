@@ -220,8 +220,6 @@ Ext.define('Editor.util.HttpStateProvider',{
         var me = this,
             result = [];
         me.getConfigRecords(subpath).each(function(rec){
-            // if there is no custom state, it returns true which does not break the loop and will finally be returned 
-            // if there is a custom state, it returns false, the loop is breaked and false is returned
             var val = rec.get('value');
             if(val != '' && val != me.NO_CUSTOM) {
                 //return the stateIds (name - prefix)
