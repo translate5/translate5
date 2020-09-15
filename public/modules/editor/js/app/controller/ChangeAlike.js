@@ -562,12 +562,12 @@ Ext.define('Editor.controller.ChangeAlike', {
       return false; //prevent default close action
   },
   isManualProcessingDisabled: function() {
-    return (Editor.data.preferences.alikeBehaviour == 'never');
+    return (Editor.data.preferences.alikeBehaviour.get('value') == 'never');
   }, 
   isAutoProcessing: function() {
-    return (Editor.data.preferences.alikeBehaviour == 'always');
+    return (Editor.data.preferences.alikeBehaviour.get('value') == 'always');
   }, 
   isManualProcessing: function() {
-    return (Editor.data.preferences.alikeBehaviour == 'individual');
+    return (Editor.data.preferences.alikeBehaviour.get('value') == 'individual');
   }
 });
