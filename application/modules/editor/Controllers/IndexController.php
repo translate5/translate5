@@ -261,7 +261,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       }
       $this->view->Php2JsVars()->set('enable100pEditWarning', (bool) $rop->editor->enable100pEditWarning);
       
-      $this->view->Php2JsVars()->set('preferences.alikeBehaviour', $rop->alike->defaultBehaviour);
       $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$rop->loginUrl);
       $this->view->Php2JsVars()->set('logoutOnWindowClose', APPLICATION_RUNDIR.$rop->logoutOnWindowClose);
       
@@ -459,7 +458,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         //set frontend array from the config data
         //the array is used as initial user config store data
-        $php2js->set('app.configData',$config->loadAllMerged($user));
+        $php2js->set('app.configData', $config->loadAllMerged($user, 'runtimeOptions.frontend.defaultState.%'));
+        //TODO currently the single preference is the alike Behaviour, if there will be more we should consider to:
+        // either make an own preferences API which internally then maps to merge config
+        // or provide all preferences on a bulk way (similar to the defaultState.% loading)
+        $php2js->set('preferences.alikeBehaviour', $config->loadAllMerged($user, 'runtimeOptions.alike.defaultBehaviour')[0]);
     }
     
     protected function getAppVersion() {
@@ -612,13 +615,17 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
                 'js' => 'text/javascript',
                 'css' => 'text/css',
                 'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
                 'png' => 'image/png',
                 'gif' => 'image/gif',
+                'webp' => 'image/webp',
                 'svg' => 'image/svg',
                 'woff' => 'application/woff',
                 'woff2' => 'application/woff2',
                 'ttf' => 'application/ttf',
                 'eot' => 'application/eot',
+                'mp3' => 'audio/mp3',
+                'mp4' => 'video/mp4',            
                 'html'=> 'text/html'
         );
         $slash = '/';
@@ -665,9 +672,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         if(!file_exists($wholePath)){
             throw new ZfExtended_NotFoundException();
         }
-        //currently this method is fixed to JS:
-        // TODO FIXME: $extension might be empty !
-        header('Content-Type: '.$types[$extension]);
+        if(in_array($extension, $types)){
+            header('Content-Type: '.$types[$extension]);
+        }
         //FIXME add version URL suffix to plugin.css inclusion
         header('Last-Modified: '.gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));
         //with etags we would have to use the values of $_SERVER['HTTP_IF_NONE_MATCH'] too!

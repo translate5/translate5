@@ -61,9 +61,10 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      *  CONFIG_LEVEL_USER=16;     //user configuration. State fields and user custom configuration. ALL other Users   ↓
      *
      * @param ZfExtended_Models_User $user
+     * @param string $nameFilter optional config name filter, applied with like (% must be provided in $nameFilter as desired)
      * @return array
      */
-    public function loadAllMerged(ZfExtended_Models_User $user){
+    public function loadAllMerged(ZfExtended_Models_User $user, string $nameFilter = null){
         //get all application config level for the user
         $userLevelStrings = $user->getApplicationConfigLevel();
         
@@ -72,6 +73,9 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         $s = $this->db->select()
         ->from('Zf_configuration')
         ->where('level & ? > 0', $userLevelInt);
+        if(!empty($nameFilter)) {
+            $s->where('name like ?', $nameFilter);
+        }
         $dbResults = $this->loadFilterdCustom($s);
 
         //merge the ini with zfconfig values

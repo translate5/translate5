@@ -57,8 +57,8 @@ Ext.define('Editor.view.LanguageResources.EditorPanel', {
     },
     itemId:'languageResourceEditorPanel',
     stateId: 'editor.languageResourceEditorPanel',
-    stateEvents: ['collapse', 'expand'],
-    stateful:false,
+    stateEvents: ['collapse', 'expand', 'tabchange'],
+    stateful: true,
     activeTab: 0,
     header: {
         hidden: true
@@ -97,5 +97,5 @@ Ext.define('Editor.view.LanguageResources.EditorPanel', {
             	 assocStore:instanceConfig.assocStore
 	         });
 		}
-	},	
+	}
 });

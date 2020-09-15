@@ -1376,9 +1376,13 @@
   <source>Dieser Anmeldename wird bereits verwendet.</source>
   <target>This loginname is already in use!</target>
 </trans-unit>
-<trans-unit id='RGFzIFNlZ21lbnQga2FubiBuaWNodCBiZWFyYmVpdGV0IHdlcmRlbiwgZGEgZGllIEF1ZmdhYmUgaW0gIm51ciBMZXNlIi0gYnp3LiBBbnNpY2h0c21vZHVzIGlzdC4='>
-  <source>Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.</source>
-  <target>The segment cannot be edited, because the task is read-only / in view mode.</target>
+<trans-unit id='RGFzIFNlZ21lbnQga2FubiBuaWNodCBiZWFyYmVpdGV0IHdlcmRlbiwgZGEgZGllIEF1ZmdhYmUgaW0gIm51ciBMZXNlbW9kdXMiIGlzdC4='>
+    <source>Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lesemodus" ist.</source>
+    <target>The segment cannot be edited, because the task is read-only.</target>
+</trans-unit>
+<trans-unit id='RGFzIFNlZ21lbnQga2FubiBuaWNodCBiZWFyYmVpdGV0IHdlcmRlbiwgZGEgZGllICJUYWdzIiBhdXNnZWJsZW5kZXQgd3VyZGVuLiBLbGlja2VuIFNpZSBhdWYgIkFuc2ljaHQiIHVuZCBibGVuZGVuIFNpZSBkaWUgVGFncyB3aWVkZXIgZWluLg=='>
+    <source>Das Segment kann nicht bearbeitet werden, da die "Tags" ausgeblendet wurden. Klicken Sie auf "Ansicht" und blenden Sie die Tags wieder ein.</source>
+    <target>The segment cannot be edited because the "tags" have been hidden. Click on "View mode" and show the tags again.</target>
 </trans-unit>
 <trans-unit id='SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiAlMSRzIG5pY2h0IG9mZml6aWVsbCB1bnRlcnN0w7x0enQuPGJyIC8+ICAgICBEaWUgQW53ZW5kdW5nIHd1cmRlIGhpbnNpY2h0bGljaCBGdW5rdGlvbmFsaXTDpHQgdW5kIFBlcmZvcm1hbmNlIGluIGRlbiBmb2xnZW5kZW4gQnJvd3NlciBvZmZpemllbGwgZ2V0ZXN0ZXQ6ICAgIDx1bD4gICAgICAgIDxsaT5Hb29nbGUgQ2hyb21lIGFiIFZlcnNpb24gNDg8L2xpPiAgICAgICAgPGxpPk1vemlsbGEgRmlyZWZveCBhYiBWZXJzaW9uIDQ0PC9saT4gICAgICAgIDxsaT5BcHBsZSBTYWZhcmkgYWIgVmVyc2lvbiA5PC9saT4gICAgICAgIDxsaT5NaWNyb3NvZnQgRWRnZSBhYiBWZXJzaW9uIDgwPC9saT4gICAgPC91bD4gICAgUHJpbnppcGllbGwga2FubiAlMSRzIGF1Y2ggbWl0IGFuZGVyZW4gQnJvd3Nlcm4gYnp3LiDDpGx0ZXJlbiBWZXJzaW9uZW4gZnVua3Rpb25pZXJlbi4gICAgIEhpZXIga2FubiBlcyBhYmVyIHp1IHVudm9yaGVyZ2VzZWhlbmVuIEZlaGxlcm4ga29tbWVuLiAgICAgUG90ZW50aWVsbCBrw7ZubmVuIGF1Y2ggbWFuY2hlIEZlYXR1cmVzIGtvbXBsZXR0IG5pY2h0IGZ1bmt0aW9uaWVyZW4u'>
   <source>Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.<br />     Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:    <ul>        <li>Google Chrome ab Version 48</li>        <li>Mozilla Firefox ab Version 44</li>        <li>Apple Safari ab Version 9</li>        <li>Microsoft Edge ab Version 80</li>    </ul>    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.     Hier kann es aber zu unvorhergesehenen Fehlern kommen.     Potentiell können auch manche Features komplett nicht funktionieren.</source>
@@ -1985,6 +1989,14 @@
     <source>Zeilen</source>
     <target>lines</target>
   </trans-unit>
+  <trans-unit id='QWt0dWVsbA=='>
+    <source>Aktuell</source>
+    <target>Current</target>
+  </trans-unit>
+  <trans-unit id='aW5zZ2VzYW10'>
+    <source>insgesamt</source>
+    <target>together</target>
+  </trans-unit>
   <trans-unit id='U3ByYWNoZQ=='>
       <source>Sprache</source>
       <target>Language</target>
@@ -2387,33 +2399,53 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Aufgabe klonen</source>
     <target>Clone task</target>
 </trans-unit>
-<trans-unit id='RGV0YWlscw=='>
-    <source>Details</source>
-    <target>Details</target>
+<trans-unit id='WnUgRGV0YWlsYW5zaWNodCB6dXLDvGNrc2V0emVu'>
+    <source>Zu Detailansicht zurücksetzen</source>
+    <target>Reset to detailed view</target>
 </trans-unit>
-<trans-unit id='RGV0YWlscyAobnVyIExlc2Vtb2R1cyk='>
-    <source>Details (nur Lesemodus)</source>
-    <target>Details (read-only)</target>
+<trans-unit id='WnUgbm9ybWFsZXIgQW5zaWNodCB6dXLDvGNrc2V0emVu'>
+    <source>Zu normaler Ansicht zurücksetzen</source>
+    <target>Reset to normal view</target>
 </trans-unit>
-<trans-unit id='Tm9ybWFs'>
-    <source>Normal</source>
-    <target>Normal</target>
+<trans-unit id='VGFncyB2ZXJiZXJnZW4gKG51ciBMZXNlbW9kdXMp'>
+    <source>Tags verbergen (nur Lesemodus)</source>
+    <target>Hide tags (read-only)</target>
 </trans-unit>
-<trans-unit id='Tm9ybWFsIChudXIgTGVzZW1vZHVzKQ=='>
-    <source>Normal (nur Lesemodus)</source>
-    <target>Normal (read-only)</target>
+<trans-unit id="VGFnLUt1cnphbnNpY2h0">
+    <source>Tag-Kurzansicht</source>
+    <target>Short tag view</target>
+</trans-unit>
+<trans-unit id="VGFnLVZvbGxhbnNpY2h0">
+    <source>Tag-Vollansicht</source>
+    <target>Full tag view</target>
 </trans-unit>
 <trans-unit id='U3RhdHVzICJ7MH0iIGR1cmNoIGVpbmVuIGFuZGVyZW4gQmVudXR6ZXI='>
     <source>Status "{0}" durch einen anderen Benutzer</source>
     <target>status "{0}" by another user</target>
 </trans-unit>
-<trans-unit id='TWluLiB7bWluV2lkdGh9'>
-    <source>Min. {minWidth}</source>
-    <target>min. {minWidth}</target>
+<trans-unit id='bWlu'>
+	<source>min</source>
+	<target>min</target>
 </trans-unit>
-<trans-unit id='IHZvbiB7bWF4V2lkdGh9'>
-    <source> von {maxWidth}</source>
-    <target> of {maxWidth}</target>
+<trans-unit id='bWF4'>
+	<source>max</source>
+	<target>max</target>
+</trans-unit>
+<trans-unit id='WmVpbGU='>
+	<source>Zeile</source>
+	<target>Line</target>
+</trans-unit>
+<trans-unit id='WmVpbGVu'>
+	<source>Zeilen</source>
+	<target>Lines</target>
+</trans-unit>
+<trans-unit id='QWt0dWVsbA=='>
+	<source>Aktuell</source>
+	<target>Current</target>
+</trans-unit>
+<trans-unit id='aW5zZ2VzYW10'>
+	<source>insgesamt</source>
+	<target>together</target>
 </trans-unit>
 <trans-unit id='U2VnLjoge3NpYmxpbmdzfQ=='>
     <source>Seg.: {siblings}</source>
@@ -3549,9 +3581,21 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Sonderzeichen hinzufügen:</source>
     <target>Add special characters:</target>
 </trans-unit>
-<trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='>
-    <source>Aufgabe verlassen</source>
-    <target>Leave task</target>
+<trans-unit id='U3DDpHRlciB3ZWl0ZXIgYXJiZWl0ZW4='>
+	<source>Später weiter arbeiten</source>
+	<target>Continue task later</target>
+</trans-unit>
+<trans-unit id='QWxsZXMgZmVydGlnIC0gQXVmZ2FiZSBhYnNjaGxpZcOfZW4='>
+	<source>Alles fertig - Aufgabe abschließen</source>
+	<target>All done - finish task</target>
+</trans-unit>
+<trans-unit id='Tm9jaCBldHdhcyB6dSB0dW4/IDxici8+RG9jaCBub2NoIHNww6R0ZXIgd2VpdGVyIGFyYmVpdGVuPw=='>
+	<source>Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?</source>
+	<target>Still something to do? <br/>Better be able to continue later?</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSBzcMOkdGVyIHdlaXRlcmJlYXJiZWl0ZW4='>
+	<source>Aufgabe später weiterbearbeiten</source>
+	<target>Continue task later</target>
 </trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='>
     <source>Nur Segmente mit Lesezeichen anzeigen</source>
@@ -3585,7 +3629,6 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Delete proposals older than current import</target></trans-unit>
 <trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Log out</target></trans-unit>
 <trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Add special characters:</target></trans-unit>
-<trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Leave task</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Show only bookmarked segments</target></trans-unit>
 <trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
 <trans-unit id='S2V5IFBlcmZvcm1hbmNlIEluZGljYXRvcnM='><source>Key Performance Indicators</source><target>Key Performance Indicators</target></trans-unit>
@@ -3600,8 +3643,6 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <trans-unit id='RXJsYXVidGUgUm9sbGVu'><source>Erlaubte Rollen</source><target>Allowed roles</target></trans-unit>
 <trans-unit id='RGVyIHJlZmVyZW56aWVydGUgQmVudXR6ZXIgaXN0IGRlciBBdWZnYWJlIG5pY2h0IG1laHIgenVnZXdpZXNlbiBvZGVyIGV4aXN0aWVydCBuaWNodCBtZWhyLg=='><source>Der referenzierte Benutzer ist der Aufgabe nicht mehr zugewiesen oder existiert nicht mehr.</source><target>The referenced user is not associated to the task or does event not exist anymore.</target></trans-unit>
 <trans-unit id='TcO2Y2h0ZW4gU2llIGRpZSBBdWZnYWJlIGJlZW5kZW4gdW5kIHp1csO8Y2tzZW5kZW4sIG9kZXIgbcO2Y2h0ZW4gU2llIGRpZXNlIHNww6R0ZXIgd2VpdGVyYmVhcmJlaXRlbj8='><source>Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?</source><target>Do you want to finish the task and submit it, or edit it again later?</target></trans-unit>
-<trans-unit id='RmVydGlnIHVuZCBBdWZnYWJlIGJlZW5kZW4='><source>Fertig und Aufgabe beenden</source><target>I‘m done. Finish task</target></trans-unit><trans-unit id='QXVmZ2FiZSBzcMOkdGVyIHdlaXRlcmJlYXJiZWl0ZW4='><source>Aufgabe später weiterbearbeiten</source><target>Continue task later</target></trans-unit>
-<trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZWxpc3Rl'><source>Zurück zur Aufgabeliste</source><target>Back to task list</target></trans-unit>
 <trans-unit id='V29ya2Zsb3c='><source>Workflow</source><target>Workflow</target></trans-unit>
 <trans-unit id='WmFobCB6dWdld2llc2VuZXIgQmVudXR6ZXI='><source>Zahl zugewiesener Benutzer</source><target>Number of users</target></trans-unit>
 <trans-unit id='QW56YWhsIHp1Z2V3aWVzZW5lIFNwcmFjaHJlc3NvdXJjZW4='><source>Anzahl zugewiesene Sprachressourcen</source><target>Number of assigned language resources</target></trans-unit>
@@ -3801,6 +3842,8 @@ The following task was imported with errors / warnings / notices. Please take ca
 </trans-unit>
 <trans-unit id='RsO8ciB6dXPDpHR6bGljaGUgSW5mb3JtYXRpb24genUgZWluZW0gRXJlaWduaXMgYml0dGUgYXVmIGRlbiBDb2RlIGtsaWNrZW4='><source>Für zusätzliche Information zu einem Ereignis bitte auf den Code klicken</source><target>For more information about the event click on the event code</target></trans-unit>
 <trans-unit id='QW5nZXBhc3N0'><source>Angepasst</source><target>Customized</target></trans-unit>
+<trans-unit id='R2VzcGVycnQgZGEgYWxzIEV4Y2VsIGV4cG9ydGllcnQuIFp1bSBFbnRzcGVycmVuIEV4Y2VsIHJlLWltcG9ydGllcmVuLiBGYWxscyBFeGNlbCBuaWNodCB6dXIgSGFuZDogTmV1IGV4cG9ydGllcmVuLg=='><source>Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.</source><target>Locked because exported as Excel. Re-import Excel to unlock. If Excel is not at hand: export again.</target></trans-unit>
+<trans-unit id='PGI+S2VpbmUgRXJnZWJuaXNzZSBnZWZ1bmRlbjwvYj48YnIvPkbDvHIgSWhyZSBTdWNoZSBnaWJ0IGVzIGtlaW5lIEVpbnRyw6RnZSBpbiBkZXIgVGVybWlub2xvZ2llIHVuZCBkZW0gVHJhbnNsYXRpb24gTWVtb3J5IHVuZCBmw7xyIGRpZSBnZXfDpGhsdGUgU3ByYWNoa29tYmluYXRpb24gc3RlaHQga2VpbmUgbWFzY2hpbmVsbGUgw5xiZXJzZXR6dW5nIHp1ciBWZXJmw7xndW5nLg=='><source><b>Keine Ergebnisse gefunden</b><br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.</source><target><b>No results found</b><br/>There are no entries for your search in the terminology and the translation memory and there is no machine translation available for your language combination.</target></trans-unit>
 </body>
   </file>
 </xliff>
