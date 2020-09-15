@@ -40,7 +40,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.Preferences', {
   extend : 'Ext.app.Controller',
   views: ['preferences.Window'],
-  requires: ['Ext.state.CookieProvider'],
   storageKey: 'EditorPreferences',
   initialPreferences: {
     alikeBehaviour: Editor.data.preferences.alikeBehaviour
@@ -56,22 +55,23 @@ Ext.define('Editor.controller.Preferences', {
     ref : 'form',
     selector : '#preferencesWindow form'
   }],
-  init : function() {
-    this.control({
-      '#preferencesWindow #saveBtn': {
-        click: this.handleSave
-      },
-      '#preferencesWindow #cancelBtn': {
-        click: this.handleCancel
-      },
-      '#segmentgrid #optionsBtn' : {
-        click: this.showPreferences
+  listen: {
+      component: {
+          '#preferencesWindow #saveBtn': {
+              click: 'handleSave'
+          },
+          '#preferencesWindow #cancelBtn': {
+              click: 'handleCancel'
+          },
+          '#segmentgrid #optionsBtn' : {
+              click: 'showPreferences'
+          }
       }
-    });
-    this.storage = Ext.create('Ext.state.CookieProvider');
-    Editor.data.preferences = this.storage.get(this.storageKey);
-    if(!Editor.data.preferences){
-      Editor.data.preferences = this.initialPreferences;
+  },
+  init : function() {
+    var alike = Editor.data.preferences.alikeBehaviour;
+    if(!alike.isModel) {
+        Editor.data.preferences.alikeBehaviour = Editor.model.UserConfig.create(alike);
     }
   },
   /**
@@ -80,7 +80,12 @@ Ext.define('Editor.controller.Preferences', {
   showPreferences: function() {
       var me = this;
       me.window = new Editor.view.preferences.Window;
-      me.getForm().getForm().setValues(Editor.data.preferences);
+      
+      //TODO if there will be more preferences, we should refactor that, so that we can loop over form.getValues and instead of 
+      // Editor.data.preferences a preferences store is used.
+      me.getForm().getForm().setValues({
+          alikeBehaviour: Editor.data.preferences.alikeBehaviour.get('value')
+      });
       //disable change alike settings if a segment is currently opened. 
       // If not a user would be able to change the change alike behaviour, 
       // while alikes are already loaded or not loaded. This would lead to bugs.
@@ -91,10 +96,15 @@ Ext.define('Editor.controller.Preferences', {
    * Speichert die Einstellungen und schließt das Fenster
    */
   handleSave: function() {
-    Editor.data.preferences = this.getForm().getForm().getValues();
-    this.storage.set(this.storageKey, Editor.data.preferences);
-    Editor.MessageBox.addSuccess(this.messages.preferencesSaved);
-    this.window.close();
+    var me = this,
+        alike = Editor.data.preferences.alikeBehaviour;
+    alike.set('value', this.getForm().getForm().getValues().alikeBehaviour);
+    alike.save({
+        success: function() {
+            Editor.MessageBox.addSuccess(me.messages.preferencesSaved);
+            me.window.close();
+        } 
+    });
   },
   handleCancel: function() {
     this.window.close();

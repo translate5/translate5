@@ -90,7 +90,8 @@ Ext.define('Editor.controller.ViewModes', {
             }
         }
     },
-    messageIsViewMode: '#UT#Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.',
+    messageIsViewMode: '#UT#Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lesemodus" ist.',
+    messageIsViewModeDueHiddenTags: '#UT#Das Segment kann nicht bearbeitet werden, da die "Tags" ausgeblendet wurden. Klicken Sie auf "Ansicht" und blenden Sie die Tags wieder ein.',
     
     /**
      * Flag when true, editor can not be set into a non readonly mode
@@ -309,46 +310,62 @@ Ext.define('Editor.controller.ViewModes', {
         return {columns: preset, segmentSize: me.self.ERGONOMIC_MODE_DEFAULT_SEGMENT_SIZE};
     },
     /**
-     * aktiviert den Bearbeitungsmodus des Grids (alle Spalten eingeblendet, editieren möglich, Hide Tags deaktivieren)
+     * @private
      */
-    loadEditModePresets: function(readonly, editorinit) {
+    loadModePreset: function(mode, readonly, editorinit, doCustomStuff) {
         var me = this,
+            langResPanel = me.getViewPort().down('#languageResourceEditorPanel'),
+            eastPanel = me.getViewPort().down('#editorEastPanel'),
             stateProv = Ext.state.Manager.getProvider();
 
         if(!editorinit) {
             //if a presetted view mode is used the custom states are reset
             me.resetCustomLayout();
         }
-
+        
         readonly = me.setReadonly(readonly);
-
         me.getViewModeMenu().hideMenu();
         me.getShortTagBtn().setChecked(true);
-
-        //call reconfigure only if used to change view while running
-        if(! editorinit || !stateProv.hasCustomState(me.getSegmentGrid())) {
-            me.getSegmentGrid().applyState(me.getSegmentGridDetailModePreset(readonly));
+        
+        doCustomStuff();
+        
+        if(langResPanel && (! editorinit || !stateProv.hasCustomState(langResPanel))) {
+            langResPanel.expand(false);
+            langResPanel.setHeight(langResPanel.config.height || langResPanel.initialConfig.height);
         }
-
-        //editMode und viewMode
-//FIXME - the same for all panels! expand/or collapse depending on their intial state def
-        if(! editorinit || !stateProv.hasCustomState(me.getFilePanel())) {
-            me.getFilePanel().expand(false);
+        if(eastPanel && (! editorinit || !stateProv.hasCustomState(eastPanel))) {
+            eastPanel.expand(false);
         }
-        else {
-            //since the initial state of the file panel is modified in this preset, we have to force save it if nothing changed
-            me.getFilePanel().saveState();
-        }
-
-        //nur editMode
-        me.setViewMode(me.self.MODE_EDIT);
-
+        
+        me.setViewMode(mode);
+        
         //editMode und viewMode
         me.getSegmentGrid().view.refresh();
         me.handleTagButtonClick('short');
         me.saveAlreadyOpened();
 
         me.fireEvent('viewModeChanged',me);
+    },
+    /**
+     * aktiviert den Bearbeitungsmodus des Grids (alle Spalten eingeblendet, editieren möglich, Hide Tags deaktivieren)
+     */
+    loadEditModePresets: function(readonly, editorinit) {
+        var me = this,
+            stateProv = Ext.state.Manager.getProvider();
+            
+        me.loadModePreset(me.self.MODE_EDIT, readonly, editorinit, function(){
+            //call reconfigure only if used to change view while running
+            if(! editorinit || !stateProv.hasCustomState(me.getSegmentGrid())) {
+                me.getSegmentGrid().applyState(me.getSegmentGridDetailModePreset(readonly));
+            }
+    
+            //editMode und viewMode
+            if(! editorinit || !stateProv.hasCustomState(me.getFilePanel())) {
+                me.getFilePanel().expand(false);
+                me.getFilePanel().down('panel').expand(false);
+            }
+        });
+        
     },
     /**
      * activates the ergonomic mode of the grid (source and edit-column enlarged, all other columns hidden; file-area hidden)
@@ -358,39 +375,21 @@ Ext.define('Editor.controller.ViewModes', {
             grid = me.getSegmentGrid(),
             stateProv = Ext.state.Manager.getProvider();
             
-        if(!editorinit) {
-            //if a presetted view mode is used the custom states are reset
-            me.resetCustomLayout();
-        }
-            
-        me.setReadonly(readonly);
-        me.getViewModeMenu().hideMenu();
-        me.getShortTagBtn().setChecked(true);
-
-        //collapse only if the panel is visible
-        if(! editorinit || !stateProv.hasCustomState(me.getFilePanel())) {
-            //reset the initial values for some elements, since they are newly set by the afterwards load*ModePreset calls
-            if(me.getFilePanel().isVisible()){
-                me.getFilePanel().collapse(null, false);
+        this.loadModePreset(me.self.MODE_ERGONOMIC, readonly, editorinit, function(){
+            //collapse only if the panel is visible
+            if(! editorinit || !stateProv.hasCustomState(me.getFilePanel())) {
+                //reset the initial values for some elements, since they are newly set by the afterwards load*ModePreset calls
+                if(me.getFilePanel().isVisible()){
+                    me.getFilePanel().collapse(null, false);
+                    me.getFilePanel().down('panel').expand(false);
+                }
             }
-            else {
-                //since the initial state of the file panel is modified in this preset, we have to force save it if nothing changed
-                me.getFilePanel().saveState();
+    
+            //call reconfigure only if used to change view while running
+            if(!editorinit || !stateProv.hasCustomState(grid)) {
+                grid.applyState(me.getSegmentGridNormalModePreset(readonly));
             }
-        }
-
-        //call reconfigure only if used to change view while running
-        if(!editorinit || !stateProv.hasCustomState(grid)) {
-            grid.applyState(me.getSegmentGridNormalModePreset(readonly));
-        }
-        
-        //ergoOnly others, with other mode
-        me.setViewMode(me.self.MODE_ERGONOMIC);
-        grid.view.refresh();
-        me.handleTagButtonClick('short');
-        me.saveAlreadyOpened();
-
-        me.fireEvent('viewModeChanged',me);
+        });
     },
     /**
      * Unified tag mode button handler
@@ -470,10 +469,16 @@ Ext.define('Editor.controller.ViewModes', {
         }
     },
     checkModeBeforeEdit: function(plugin) {
-        if(this.getViewPort().getViewModel().get('editorIsReadonly')) {
-            Editor.MessageBox.addWarning(this.messageIsViewMode);
-            return false;
+        var vm = this.getViewPort().getViewModel();
+        if(!vm.get('editorIsReadonly')) {
+            return;
         }
+        if(vm.get('taskIsReadonly')) {
+            Editor.MessageBox.addWarning(this.messageIsViewMode);
+        } else {
+            Editor.MessageBox.addWarning(this.messageIsViewModeDueHiddenTags);
+        }
+        return false;
     },
     /**
      * Handles clicking the zoom buttons
