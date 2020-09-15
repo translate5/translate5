@@ -1769,6 +1769,11 @@ Ext.define('Editor.controller.Editor', {
     onSegmentsStoreLoad:function(store){
         var me=this,
             segmentIdFromHash = Editor.app.parseSegmentIdFromTaskEditHash(true);
+
+        if(store.getCount() == 0) {
+            return;
+        }
+
         if(store.proxy.reader.metaData.jumpToSegmentIndex && store.proxy.reader.metaData.jumpToSegmentIndex > -1){
             me.getSegmentGrid().scrollTo(store.proxy.reader.metaData.jumpToSegmentIndex);
             return;
