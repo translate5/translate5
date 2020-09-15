@@ -3565,6 +3565,10 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 	<source>Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?</source>
 	<target>Still something to do? <br/>Better be able to continue later?</target>
 </trans-unit>
+<trans-unit id='QXVmZ2FiZSBzcMOkdGVyIHdlaXRlcmJlYXJiZWl0ZW4='>
+	<source>Aufgabe später weiterbearbeiten</source>
+	<target>Continue task later</target>
+</trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='>
     <source>Nur Segmente mit Lesezeichen anzeigen</source>
     <target>Show only bookmarked segments</target>
