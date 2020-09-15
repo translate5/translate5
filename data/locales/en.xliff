@@ -257,19 +257,7 @@
             <trans-unit id="QmVhcmJlaXR1bmdzbW9kdXM=">
                 <source>Bearbeitungsmodus</source>
                 <target>Processing mode</target>
-            </trans-unit>
-            <trans-unit id="VGFncyB2ZXJiZXJnZW4=">
-                <source>Tags verbergen</source>
-                <target>Hide tags</target>
-            </trans-unit>
-            <trans-unit id="VGFnLUt1cnphbnNpY2h0">
-                <source>Tag-Kurzansicht</source>
-                <target>Short tag view</target>
-            </trans-unit>
-            <trans-unit id="VGFnLVZvbGxhbnNpY2h0">
-                <source>Tag-Vollansicht</source>
-                <target>Full tag view</target>
-            </trans-unit>
+            </trans-unit>            
             <trans-unit id="UU0=">
                 <source>QM</source>
                 <target>QM</target>

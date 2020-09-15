@@ -127,22 +127,20 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.segments.grid.Header",
         strings: {
             progressTooltip: '<?php echo $this->translate->_('% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt');?>',
-            leaveBtn: '<?php echo $this->translate->_('Aufgabe verlassen');?>',
+            leaveBtn: '<?php echo $this->translate->_('Später weiter arbeiten');?>',
             logoutBtn: '<?php echo $this->translate->_('Ausloggen');?>',
-            leaveTaskWindowTitle: '<?php echo $this->translate->_('Zurück zur Aufgabeliste');?>',
+            leaveTaskWindowTitle: '<?php echo $this->translate->_('Später weiter arbeiten');?>',
             leaveTaskWindowMessage: '<?php echo $this->translate->_('Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?');?>',
-            leaveTaskWindowFinishBtn: '<?php echo $this->translate->_('Fertig und Aufgabe beenden');?>',
+            leaveTaskWindowFinishBtn: '<?php echo $this->translate->_('Alles fertig - Aufgabe abschließen');?>',
             leaveTaskWindowCancelBtn: '<?php echo $this->translate->_('Aufgabe später weiterbearbeiten');?>'
         }
     });
   	
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
   	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansicht');?>';
-  	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Details (nur Lesemodus)');?>';
-  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Details');?>';
-  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Normal');?>';
-  	gridToolbar.item_ergonomicModeReadonlyBtn = '<?php echo $this->translate->_('Normal (nur Lesemodus)');?>';
-  	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen');?>';
+  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Zu Detailansicht zurücksetzen');?>';
+  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Zu normaler Ansicht zurücksetzen');?>';
+  	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>';
   	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
   	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
   	//gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>';
@@ -156,7 +154,6 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_watchListFilterBtn = '<?php echo $this->translate->_('Lesezeichen');?>';
   	gridToolbar.item_helpTooltip = '<?php echo $this->translate->_('Tastaturkürzel nachschlagen');?>';
   	gridToolbar.item_showBookmarkedSegments = '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>';
-    gridToolbar.item_customizedModeBtn = '<?php echo $this->translate->_('Angepasst');?>';
     gridToolbar.strings.interfaceTranslation = '<?php echo $this->translate->_('Oberfläche');?>';
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
 
@@ -235,12 +232,13 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.column.Comments.prototype.text_tooltip_icon = '<?php echo $this->translate->_('Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)');?>';
 
 	Editor.view.segments.column.SegmentNrInTask.prototype.text = '<?php echo $this->translate->_('Nr.');?>';
-    
+
     Ext.define("Editor.locale.de.controller.ViewModes", {
         override: "Editor.controller.ViewModes",
-        messageIsViewMode: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.');?>'
+        messageIsViewMode: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lesemodus" ist.');?>',
+        messageIsViewModeDueHiddenTags: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die "Tags" ausgeblendet wurden. Klicken Sie auf "Ansicht" und blenden Sie die Tags wieder ein.');?>'
     });
-  	
+
   	Editor.view.fileorder.Tree.prototype.title = '<?php echo $this->translate->_('Arbeits-Dateien');?>';
   	Editor.view.fileorder.ReferenceTree.prototype.title = '<?php echo $this->translate->_('Referenz-Dateien');?>';
 
@@ -350,15 +348,18 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.segments.MinMaxLength", {
         override: "Editor.view.segments.MinMaxLength",
         strings: {
-            minText: '<?php echo $this->translate->_('Min. {minWidth}');?>',
-            maxText: '<?php echo $this->translate->_(' von {maxWidth}');?>',
-            siblingSegments: '<?php echo $this->translate->_('Seg.: {siblings}');?>',
             segmentToShort: '<?php echo $this->translate->_('Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.');?>',
             segmentToLong: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>',
             segmentTooManyLines: '<?php echo $this->translate->_('Der Segmentinhalt enthält zu viele Zeilenumbrüche; maximal {0} Zeilen sind erlaubt.');?>',
       		segmentLinesTooLong: '<?php echo $this->translate->_('Nicht alle Zeilen im Segmentinhalt sind unter der maximal erlaubten Länge ({0}).');?>',
       		segmentLinesTooShort: '<?php echo $this->translate->_('Nicht alle Zeilen im Segmentinhalt erreichen die minimal erforderte Länge ({0}).');?>',
-      		lines: '<?php echo $this->translate->_('Zeilen');?>'
+      		min: '<?php echo $this->translate->_('min');?>',
+        	max: '<?php echo $this->translate->_('max');?>',
+      		line: '<?php echo $this->translate->_('Zeile');?>',
+      		lines: '<?php echo $this->translate->_('Zeilen');?>',
+      		current: '<?php echo $this->translate->_('Aktuell');?>',
+      		together: '<?php echo $this->translate->_('insgesamt');?>',
+      		siblingSegments: '<?php echo $this->translate->_('Seg.: {siblings}');?>'
         }
     });
     
@@ -474,7 +475,7 @@ Ext.define('Editor.controller.Localizer', {
             averageProcessingTimeSecondTranslatorLabel:'<?php echo $this->translate->_('Ø Bearbeitungszeit zweiter Lektor');?>',
         },
         confirmStrings: {
-            "editorFinishTask":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
+            "editorFinishTask":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?');?>"},
             "editorUnfinishTask":     {title: "<?php echo $this->translate->_('Aufgabe wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich wieder öffnen?');?>"},
             "editorFinishAllTask":    {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer abschließen?');?>"},
             "editorUnfinishAllTask":  {title: "<?php echo $this->translate->_('Aufgabe für alle Nutzer wieder öffnen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich für alle Benutzer wieder öffnen?');?>"},
@@ -521,7 +522,8 @@ Ext.define('Editor.controller.Localizer', {
             jobStatus: '<?php echo $this->translate->_('Job-Status');?>',
             assignmentDateHeader: '<?php echo $this->translate->_('Zuweisungsdatum');?>',
             finishedDateHeader: '<?php echo $this->translate->_('Abschlussdatum');?>',
-            deadlineDateHeader: '<?php echo $this->translate->_('Deadline Datum');?>'
+            deadlineDateHeader: '<?php echo $this->translate->_('Deadline Datum');?>',
+            exelExportedTooltip: '<?php echo $this->translate->_('Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.');?>'
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',
@@ -944,7 +946,7 @@ Ext.define('Editor.controller.Localizer', {
             taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
             forcedReadOnly: '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
             confirmFinish: '<?php echo $this->translate->_('Aufgabe abschließen?');?>',
-            confirmFinishMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>',
+            confirmFinishMsg: '<?php echo $this->translate->_('Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?');?>',
             taskClosed: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich verlassen.');?>',
             taskConfirmed: '<?php echo $this->translate->_('Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.');?>',
             taskFinished: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich abgeschlossen.');?>',

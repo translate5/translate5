@@ -52,7 +52,7 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
             user = Editor.app.authenticatedUser,
             task = Editor.data.task,
             str = me.getView().strings;
-        
+
         //without any loaded task or if the HeadPanel controller does not exist we can not leave the task
         if(!task){
             return;

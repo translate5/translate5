@@ -50,9 +50,6 @@ Ext.define('Editor.view.segments.column.SegmentNrInTask', {
         'Editor.view.segments.column.BaseMixin',
         'Editor.view.segments.column.InfoToolTipMixin'
     ],
-    isErgonomicVisible: true,
-    isErgonomicSetWidth: true,
-    ergonomicWidth: 60,
     otherRenderers: null,
     filter: {
         type: 'numeric'
