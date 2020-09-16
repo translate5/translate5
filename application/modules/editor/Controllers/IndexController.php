@@ -633,7 +633,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $requestedType =$this->getParam(1);
         $requestedFile =$this->getParam(2);
         $js = explode($slash, $requestedFile);
-        $extension = pathinfo($requestedFile, PATHINFO_EXTENSION);
+        $extension = strtolower(pathinfo($requestedFile, PATHINFO_EXTENSION));
         
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase!
@@ -672,8 +672,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         if(!file_exists($wholePath)){
             throw new ZfExtended_NotFoundException();
         }
+        error_log("############# PLUGIN PUBLIC ACTION: ".$requestedFile." / ".$extension." / ".$types[$extension]);
         if(in_array($extension, $types)){
             header('Content-Type: '.$types[$extension]);
+        } else {
+            // TODO FIXME: it seems by default the content-type text/html is set by apache instead of no content-type
+            // this leads to problems with files without extensions as is often the case with wget downloaded websites
+            header('Content-Type: ');
         }
         //FIXME add version URL suffix to plugin.css inclusion
         header('Last-Modified: '.gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));
