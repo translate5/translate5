@@ -6,6 +6,131 @@ For a reference to the issue keys see http://jira.translate5.net
 
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [5.0.8] - 2020-09-07
+
+### Important Notes:
+#### TRANSLATE-2177: Commandline Interface to maintain translate5
+For the usage of the pre-released CLI tool for maintaining translate5 see: 
+https://confluence.translate5.net/display/CON/CLI+Maintenance+Command
+#### TRANSLATE-2184: User info endpoint is unreachable
+With this improvement new openid config is introduced : runtimeOptions.openid.requestUserInfo
+If this config is active (by default active), the user info endpoint will be requested for additional user information. In some authentication providers, this request is not required at all, since all needed user information can be fetched from the claims. 
+
+
+
+
+#### TRANSLATE-2053: Deadline by hour and not only by day
+This feature requires an activated periodical cron. For activation see: https://confluence.translate5.net/display/CON/Install+translate5+and+direct+dependencies#Installtranslate5anddirectdependencies-cronjobsConfigureCronjobs/taskscheduler
+#### TRANSLATE-2025: Change default for runtimeOptions.segments.userCanIgnoreTagValidation to 0
+The system setting that allows users to ignore tag validation has been set to "do not allow".
+If you need users to be allowed to ignore the tag validation, you need to switch this on again.
+To switch it on again, call in the translate5 installation folder:
+./translate5.sh config runtimeOptions.segments.userCanIgnoreTagValidation 1
+
+### Added
+[TRANSLATE-1134](https://jira.translate5.net/browse/TRANSLATE-1134): Jump to last edited/active segment<br>
+The last edited/active segment is selected again on reopening a task.
+
+[TRANSLATE-2111](https://jira.translate5.net/browse/TRANSLATE-2111): Make pop-up about "Reference files available" and "Do you really want to finish" pop-up configurable<br>
+Make pop-up abaout "Reference files available" and "Do you really want to finish" pop-up configurable
+
+[TRANSLATE-2125](https://jira.translate5.net/browse/TRANSLATE-2125): Split screen for Visual Editing (sponsored by Transline)<br>
+In Visual Editing the original and the modified is shown in two beneath windows.
+
+
+### Changed
+[TRANSLATE-2113](https://jira.translate5.net/browse/TRANSLATE-2113): Check if translate5 runs with latest MariaDB and MySQL versions<br>
+It was verified that translate5 can be installed and run with latest MariaDB and MySQL versions.
+
+[TRANSLATE-2122](https://jira.translate5.net/browse/TRANSLATE-2122): Unify naming of InstantTranslate and TermPortal everywhere<br>
+Unify naming of InstantTranslate and TermPortal everywhere
+
+[TRANSLATE-2175](https://jira.translate5.net/browse/TRANSLATE-2175): Implement maintenance command to delete orphaned data directories<br>
+With the brand new ./translate5.sh CLI command several maintenance tasks can be performed. See https://confluence.translate5.net/display/CON/CLI+Maintenance+Command
+
+[TRANSLATE-2189](https://jira.translate5.net/browse/TRANSLATE-2189): Ignore segments with tags only in SDLXLIFF import if enabled<br>
+SDLXLIFF Import: If a segment contains only tags it is ignored from import. This is the default behaviour in native XLF import.
+
+[TRANSLATE-2025](https://jira.translate5.net/browse/TRANSLATE-2025): Change default for runtimeOptions.segments.userCanIgnoreTagValidation to 0<br>
+Tag errors can now not ignored anymore on saving a segment. 
+
+[TRANSLATE-2163](https://jira.translate5.net/browse/TRANSLATE-2163): Enhance documentation of Across termExport for translate5s termImport Plug-in<br>
+Enhance documentation of Across termExport for translate5s termImport Plug-in
+
+[TRANSLATE-2165](https://jira.translate5.net/browse/TRANSLATE-2165): Make language resource timeout for PangeaMT configurable<br>
+Make language resource timeout for PangeaMT configurable
+
+[TRANSLATE-2179](https://jira.translate5.net/browse/TRANSLATE-2179): Support of PHP 7.4 for translate5<br>
+Support of PHP 7.4 for translate5
+
+[TRANSLATE-2182](https://jira.translate5.net/browse/TRANSLATE-2182): Change default colors for Matchrate Colorization in the VisualReview<br>
+Change default colors for Matchrate Colorization in the VisualReview
+
+[TRANSLATE-2184](https://jira.translate5.net/browse/TRANSLATE-2184): OpenID Authentication: User info endpoint is unreachable<br>
+This is fixed.
+
+[TRANSLATE-2192](https://jira.translate5.net/browse/TRANSLATE-2192): Move "leave task" button in simple mode to the upper right corner of the layout area<br>
+Move "leave task" button in simple mode to the upper right corner of the layout area
+
+[TRANSLATE-2199](https://jira.translate5.net/browse/TRANSLATE-2199): Support more regular expressions in segment search<br>
+Support all regular expressions in segment search, that are possible based on MySQL 8 or MariaDB 10.2.3
+
+
+### Bugfixes
+[TRANSLATE-2002](https://jira.translate5.net/browse/TRANSLATE-2002): Translated PDF files should be named xyz.pdf.txt in the export package<br>
+Okapi may return translated PDF files only as txt files, so the file should be named .txt instead .pdf.
+
+[TRANSLATE-2049](https://jira.translate5.net/browse/TRANSLATE-2049): ERROR in core: E9999 - Action does not exist and was not trapped in __call()<br>
+Sometimes the above error occurred, this is fixed now.
+
+[TRANSLATE-2062](https://jira.translate5.net/browse/TRANSLATE-2062): Support html fragments as import files without changing the structure<br>
+This feature was erroneously disabled by a bconf change which is revoked right now.
+
+[TRANSLATE-2149](https://jira.translate5.net/browse/TRANSLATE-2149): Xliff import deletes part of segment and a tag<br>
+In seldom circumstances XLF content was deleted on import.
+
+[TRANSLATE-2157](https://jira.translate5.net/browse/TRANSLATE-2157): Company name in deadline reminder footer<br>
+The company name was added in the deadline reminder footer e-mail.
+
+[TRANSLATE-2162](https://jira.translate5.net/browse/TRANSLATE-2162): Task can not be accessed after open randomly<br>
+It happend randomly, that a user was not able to access a task after opening it. The error message was: You are not authorized to access the requested data. This is fixed.
+
+[TRANSLATE-2166](https://jira.translate5.net/browse/TRANSLATE-2166): Add help page for project and preferences overview<br>
+Add help page for project and preferences overview
+
+[TRANSLATE-2167](https://jira.translate5.net/browse/TRANSLATE-2167): Save filename with a save request to NEC-TM<br>
+A filenames is needed for later TMX export, so one filename is generated and saved to NEC-TM.
+
+[TRANSLATE-2176](https://jira.translate5.net/browse/TRANSLATE-2176): remove not race condition aware method in term import<br>
+A method in the term import was not thread safe.
+
+
+
+
+[TRANSLATE-2187](https://jira.translate5.net/browse/TRANSLATE-2187): Bad performance on loading terms in segment meta panel<br>
+Bad performance on loading terms in segment meta panel
+
+[TRANSLATE-2188](https://jira.translate5.net/browse/TRANSLATE-2188): Text in layout of xsl-generated html gets doubled<br>
+Text in layout of xsl-generated html gets doubled
+
+[TRANSLATE-2190](https://jira.translate5.net/browse/TRANSLATE-2190): PHP ERROR in core: E9999 - Cannot refresh row as parent is missing - fixed in DbDeadLockHandling context<br>
+In DbDeadLockHandling it may happen that on redoing the request a needed row is gone, this is no problem so far, so this error is ignored in that case.
+
+[TRANSLATE-2191](https://jira.translate5.net/browse/TRANSLATE-2191): Session Problem: Uncaught Zend_Session_Exception: Zend_Session::start()<br>
+Fixed this PHP error.
+
+[TRANSLATE-2194](https://jira.translate5.net/browse/TRANSLATE-2194): NEC-TM not usable in InstantTranslate<br>
+NEC-TM not usable in InstantTranslate
+
+[TRANSLATE-2198](https://jira.translate5.net/browse/TRANSLATE-2198): Correct spelling of "Ressource(n)" in German<br>
+Correct spelling of "Ressource(n)" in German
+
+[TRANSLATE-2210](https://jira.translate5.net/browse/TRANSLATE-2210): If a task is left, it is not focused in the project overview<br>
+This is fixed now
+
+
+
+
 ## [5.0.7] - 2020-08-05
 
 ### Added
