@@ -46,6 +46,7 @@ abstract class editor_Services_Connector_Abstract {
     const STATUS_UNKNOWN = 'unknown';
     const STATUS_NOCONNECTION = 'noconnection';
     const STATUS_NOVALIDLICENSE = 'novalidlicense';
+    const STATUS_NOT_LOADED = 'notloaded';
     
     const FUZZY_SUFFIX = '-fuzzy-';
     
@@ -108,6 +109,11 @@ abstract class editor_Services_Connector_Abstract {
      */
     protected $tagsWereStripped = true;
     
+    /***
+     * @var editor_Models_LanguageResources_Resource
+     */
+    protected $resource;
+    
     /**
      * initialises the internal result list
      */
@@ -119,6 +125,20 @@ abstract class editor_Services_Connector_Abstract {
         $this->initHelper();
             //$this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
         $this->initImageTags();
+    }
+    
+    /***
+     * Check the resource connection. This will return true conection with the resource can
+     * be established
+     * @param editor_Models_LanguageResources_Resource $resource
+     * @return boolean
+     */
+    public function ping(editor_Models_LanguageResources_Resource $resource){
+        $this->resource = $resource;
+        $moreInfo = "";
+        //the valid api response statuses
+        $isValidFor = [self::STATUS_AVAILABLE,self::STATUS_NOT_LOADED];
+        return in_array($this->getStatus($moreInfo), $isValidFor);
     }
     
     /**
@@ -138,12 +158,15 @@ abstract class editor_Services_Connector_Abstract {
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
         $this->sourceLang = $sourceLang;
         $this->targetLang = $targetLang;
+        $this->resource = $languageResource->getResource();
         $this->languageResource = $languageResource;
         $this->resultList->setLanguageResource($languageResource);
-        $this->languageResource->sourceLangRfc5646=$this->languageResource->getSourceLangRfc5646();
-        $this->languageResource->targetLangRfc5646=$this->languageResource->getTargetLangRfc5646();
+        if($languageResource->getId()!=null){
+            $this->languageResource->sourceLangRfc5646=$this->languageResource->getSourceLangRfc5646();
+            $this->languageResource->targetLangRfc5646=$this->languageResource->getTargetLangRfc5646();
+        }
     }
-
+    
     /**
      * Updates translations in the connected service
      * for returning error messages to the GUI use rest_messages
