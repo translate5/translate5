@@ -672,7 +672,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         if(!file_exists($wholePath)){
             throw new ZfExtended_NotFoundException();
         }
-        error_log("############# PLUGIN PUBLIC ACTION: ".$requestedFile." / ".$extension." / ".$types[$extension]);
         if(in_array($extension, $types)){
             header('Content-Type: '.$types[$extension]);
         } else {
