@@ -459,10 +459,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         //set frontend array from the config data
         //the array is used as initial user config store data
         $php2js->set('app.configData', $config->loadAllMerged($user, 'runtimeOptions.frontend.defaultState.%'));
-        //TODO currently the single preference is the alike Behaviour, if there will be more we should consider to:
+        
+        //TODO currently the single preference is the alike Behaviour and showOnEmptyTarget,
+        // if there will be more we should consider to:
         // either make an own preferences API which internally then maps to merge config
         // or provide all preferences on a bulk way (similar to the defaultState.% loading)
         $php2js->set('preferences.alikeBehaviour', $config->loadAllMerged($user, 'runtimeOptions.alike.defaultBehaviour')[0]);
+        $php2js->set('preferences.showOnEmptyTarget', $config->loadAllMerged($user, 'runtimeOptions.alike.showOnEmptyTarget')[0]);
     }
     
     protected function getAppVersion() {
