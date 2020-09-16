@@ -304,7 +304,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('customers.openid.showOpenIdDefaultCustomerData',(boolean)$rop->customers->openid->showOpenIdDefaultCustomerData);
       
       //boolean config if the logout button in the segments editor header is visible or not
-      $this->view->Php2JsVars()->set('editor.toolbar.hideLogoutButton',(boolean)$rop->editor->toolbar->hideLogoutButton);
+      $this->view->Php2JsVars()->set('editor.toolbar.hideCloseButton',(boolean)$rop->editor->toolbar->hideCloseButton);
       //boolean config if the leave task button button in the segments editor header is visible or not
       $this->view->Php2JsVars()->set('editor.toolbar.hideLeaveTaskButton',(boolean)$rop->editor->toolbar->hideLeaveTaskButton);
       
@@ -625,7 +625,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
                 'ttf' => 'application/ttf',
                 'eot' => 'application/eot',
                 'mp3' => 'audio/mp3',
-                'mp4' => 'video/mp4',            
+                'mp4' => 'video/mp4',
                 'html'=> 'text/html'
         );
         $slash = '/';
