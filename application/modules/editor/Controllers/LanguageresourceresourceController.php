@@ -76,6 +76,21 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
             $result[] = $uninstalledService;
         }
         
+        foreach ($result as &$r){
+            if(!isset($r->id)){
+                continue;
+            }
+            $service = ZfExtended_Factory::get($r->serviceType.editor_Services_Manager::CLS_SERVICE);
+            /* @var $service editor_Services_ServiceAbstract */
+            $resource = $service->getResources()[0] ?? false;
+            //for the resource check the connection
+            if(!empty($resource)){
+                $connector = ZfExtended_Factory::get($resource->serviceType.editor_Services_Manager::CLS_CONNECTOR);
+                /* @var $connector editor_Services_Connector_Abstract */
+                $r->languages = $connector->languages();
+            }
+        }
+        
         //sort the results alphabetically by name
         $customSort = function($a,$b){
             if ($a->name == $b->name){

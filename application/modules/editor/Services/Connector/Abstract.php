@@ -329,6 +329,20 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /***
+     * Return the available languges for the current resource endpoint(api)
+     */
+    public function languages(){
+        $languages = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languages editor_Models_Languages*/
+        $ret=$languages->loadAllKeyValueCustom('id','rfc5646');
+        $ret = array_values($ret);
+        return [
+            'sourceLang' => $ret,
+            'targetLang' => $ret,
+        ];
+    }
+    
+    /***
      * Initialize fuzzy connectors. Returns the current instance if not supported.
      * @param int $analysisId
      * @return editor_Services_Connector_Abstract
