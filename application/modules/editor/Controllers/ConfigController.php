@@ -73,7 +73,7 @@ class editor_ConfigController extends ZfExtended_RestController {
         $user=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $user->load($userSession->data->id);
-        $this->log->debug('E0815', 'Updated user GUI state "{name}" to "{value}"', [
+        $this->log->debug('E0000', 'Updated user GUI state "{name}" to "{value}"', [
             'name' => $this->data->name,
             'value' => $this->data->value ?? '',
         ]);
