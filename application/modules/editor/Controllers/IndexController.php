@@ -672,7 +672,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         if(!file_exists($wholePath)){
             throw new ZfExtended_NotFoundException();
         }
-        if(in_array($extension, $types)){
+        if(array_key_exists($extension, $types)){
             header('Content-Type: '.$types[$extension]);
         } else {
             // TODO FIXME: it seems by default the content-type text/html is set by apache instead of no content-type
