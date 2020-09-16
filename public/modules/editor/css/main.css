@@ -822,11 +822,3 @@ a.x-btn span.task-confirmation {
 .redTextColumn{
 	color:#ff0000;
 }
-
-/* FIXME: visual review iframe toolbar rules. These rules do not work being part of the visual reviews plugin.css but do work when being placed here. Why ? */
-.main-review-toolbar .visual-review-matchratebtn.x-btn-pressed .x-btn-glyph { opacity:0.5; }
-.visual-review-pager .review-page-btn .x-btn-inner-default-toolbar-small { color:#919191; font-weight:bold; font-size:16px; line-height:16px; width:16px; padding:0; text-align:center; }
-.visual-review-pager .review-page-btn.x-btn-default-toolbar-small.x-btn-disabled { background-color:#ffffff; opacity:1; border-color:#919191; }
-/* FIXME: trackchanges-icon, added for the same reason as the visual review stuff above */
-.ico-strikethrough { background-image: url("../images/icon_trackchanges.png"); }
-
