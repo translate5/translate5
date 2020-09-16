@@ -6,6 +6,67 @@ For a reference to the issue keys see http://jira.translate5.net
 
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [5.0.9] - 2020-09-16
+
+### Important Notes:
+ ADD MANUALLY Infos from Jiras 'Important release notes:' here
+
+
+### Added
+[TRANSLATE-1050](https://jira.translate5.net/browse/TRANSLATE-1050): Save user customization of editor<br>
+The user may now change the visible columns and column positions and widths of the segment grid. This customizations are restored on next login.
+
+[TRANSLATE-2071](https://jira.translate5.net/browse/TRANSLATE-2071): VisualReview: XML with "What you see is what you get" via XSL transformation<br>
+A XML with a XSLT can be imported into translate5. The XML is then converted into viewable content in VisualReview.
+
+[TRANSLATE-2111](https://jira.translate5.net/browse/TRANSLATE-2111): Make pop-up about "Reference files available" and "Do you really want to finish" pop-up configurable<br>
+For both pop ups it is now configurable if they should be used and shown in the application.
+
+[TRANSLATE-1793](https://jira.translate5.net/browse/TRANSLATE-1793): search and replace: keep last search field or preset by workflow step.<br>
+The last searched field and content is saved and remains in the search window when it was closed.
+
+
+### Changed
+[TRANSLATE-1617](https://jira.translate5.net/browse/TRANSLATE-1617): Renaming of buttons on leaving a task<br>
+The label of the leave Button was changed.
+
+[TRANSLATE-2180](https://jira.translate5.net/browse/TRANSLATE-2180): Enhance displayed text for length restrictions in the editor<br>
+The display text of the segment length restriction was changed.
+
+[TRANSLATE-2186](https://jira.translate5.net/browse/TRANSLATE-2186): Implement close window button for editor only usage<br>
+To show that Button set runtimeOptions.editor.toolbar.hideCloseButton to 0. This button can only be used if translate5 was opened via JS window.open call.
+
+[TRANSLATE-2193](https://jira.translate5.net/browse/TRANSLATE-2193): Remove "log out" button in editor<br>
+The user has first to leave the task before he can log out.
+
+
+### Bugfixes
+[TRANSLATE-630](https://jira.translate5.net/browse/TRANSLATE-630): Enhance, when text filters of columns are send<br>
+When using a textfilter in a grid in the frontend, the user has to type very fast since the filters were sent really fast to the server. This is changed now.
+
+[TRANSLATE-1877](https://jira.translate5.net/browse/TRANSLATE-1877): Missing additional content and filename of affected file in E1069 error message<br>
+Error E1069 shows now also the filename and the affected characters.
+
+[TRANSLATE-2010](https://jira.translate5.net/browse/TRANSLATE-2010): Change tooltip of tasks locked because of excel export<br>
+The content of the tooltip was improved.
+
+[TRANSLATE-2014](https://jira.translate5.net/browse/TRANSLATE-2014): Enhance "No results found" message in InstantTranslate<br>
+Enhance "No results found" message in InstantTranslate
+
+[TRANSLATE-2156](https://jira.translate5.net/browse/TRANSLATE-2156): Remove "Choose automatically" option from drop-down, that chooses source or target for connecting the layout with<br>
+Since this was confusing users the option was removed and source is the new default
+
+[TRANSLATE-2195](https://jira.translate5.net/browse/TRANSLATE-2195): InstantTranslate filepretranslation API has a wrong parameter name<br>
+The parameter was 0 instead as documented in confluence.
+
+[TRANSLATE-2215](https://jira.translate5.net/browse/TRANSLATE-2215): VisualReview JS Error: me.down(...) is null<br>
+Error happend in conjunction with the usage of the action buttons in Visual Review.
+
+[TRANSLATE-1031](https://jira.translate5.net/browse/TRANSLATE-1031): Currently edited column in row editor is not aligned right<br>
+When scrolling horizontally in the segment grid, this could lead to positioning problems of the segment editor.
+
+
+
 ## [5.0.8] - 2020-09-07
 
 ### Important Notes:
