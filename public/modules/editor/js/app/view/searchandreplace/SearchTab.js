@@ -122,8 +122,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                         {
                             boxLabel  : me.strings.normalSearch,
                             name      : 'searchType',
-                            inputValue: 'normalSearch',
-                            checked:true,
+                            inputValue: 'normalSearch'
                         }, {
                             boxLabel  : me.strings.wildcardsSearch,
                             name      : 'searchType',
