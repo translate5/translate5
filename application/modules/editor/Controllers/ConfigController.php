@@ -73,11 +73,19 @@ class editor_ConfigController extends ZfExtended_RestController {
         $user=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $user->load($userSession->data->id);
-        $this->log->debug('E0000', 'Updated user GUI state "{name}" to "{value}"', [
-            'name' => $this->data->name,
-            'value' => $this->data->value ?? '',
-        ]);
-        $this->entity->updateConfig($user, $this->data->name, (string) ($this->data->value ?? ''));
+        $this->entity->loadByName($this->data->name);
+        //we may only update the config, if there is a value given (the frontend sends only the modified data on save)
+        if(property_exists($this->data, 'value')) {
+            $value = (string) $this->data->value;
+            $this->entity->updateConfig($user, $this->data->name, $value);
+            //this value may not be saved! It is just for setting the return value to the gui.
+            $this->entity->setValue($value);
+            $this->log->debug('E0000', 'Updated user GUI state "{name}" to "{value}"', [
+                'name' => $this->data->name,
+                'value' => $value,
+            ]);
+        }
+        $this->view->rows = $this->entity->loadAllMerged($user, $this->data->name)[0];
     }
     
     

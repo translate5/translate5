@@ -739,9 +739,9 @@ Ext.define('Editor.controller.SearchReplace', {
         }
         
         var tabPanel=searchReplaceWindow.down('#searchreplacetabpanel'),
-            activeTab=tabPanel.down('#'+focusTab+'');
+            activeTab=tabPanel.down('#'+focusTab);
         tabPanel.setActiveTab(activeTab);
-        tabPanel.getViewModel().set('searchView',(focusTab == 'searchTab') ? true : false);
+        tabPanel.getViewModel().set('searchView', focusTab == 'searchTab');
         searchReplaceWindow.show();
     },
     
