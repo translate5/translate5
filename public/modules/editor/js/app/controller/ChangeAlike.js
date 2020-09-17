@@ -262,7 +262,7 @@ Ext.define('Editor.controller.ChangeAlike', {
 
 	  //If it is set to true, the repetition editor only pops up (processes automatically) 
 	  //when the target of the current segment is empty
-	  if(Editor.data.preferences.showOnEmptyTarget && record.get('target')!=""){
+	  if(Editor.data.preferences.showOnEmptyTarget.get('value') && record.get('target')!=""){
 		  me.fireEvent('segmentUsageFinished', me);
 		  me.callbackToSaveChain();
 		  return;

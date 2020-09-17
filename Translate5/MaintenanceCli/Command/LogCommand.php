@@ -108,13 +108,13 @@ the format is:
             'since',
             's',
             InputOption::VALUE_REQUIRED,
-            'Shows log data since the given pint int time (strtotime parsable string)');
+            'Shows log data since the given point in time (strtotime parsable string).');
         
         $this->addOption(
             'until',
             'u',
             InputOption::VALUE_REQUIRED,
-            'Shows log data until the given pint int time (strtotime parsable string)');
+            'Shows log data until the given point in time (strtotime parsable string). If the parameter starts with a "+" it is automatically added to the since date.');
         
         $this->addOption(
             'no-summary',
@@ -378,6 +378,10 @@ the format is:
             }
         }
         if($until = $this->input->getOption('until')) {
+            $until = trim($until);
+            if(strpos($until, '+') !== false) {
+                $until = $this->input->getOption('since').' '.$until;
+            }
             $until = strtotime($until);
             if($until === false) {
                 $this->io->warning('The given --until|-u time can not be parsed to a valid date - ignored!');
