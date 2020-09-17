@@ -262,7 +262,7 @@ Ext.define('Editor.controller.ChangeAlike', {
 
 	  //If it is set to true, the repetition editor only pops up (processes automatically) 
 	  //when the target of the current segment is empty
-	  if(Editor.data.preferences.showOnEmptyTarget && record.get('target')!=""){
+	  if(Editor.data.preferences.showOnEmptyTarget.get('value') && record.get('target')!=""){
 		  me.fireEvent('segmentUsageFinished', me);
 		  me.callbackToSaveChain();
 		  return;
@@ -562,12 +562,12 @@ Ext.define('Editor.controller.ChangeAlike', {
       return false; //prevent default close action
   },
   isManualProcessingDisabled: function() {
-    return (Editor.data.preferences.alikeBehaviour == 'never');
+    return (Editor.data.preferences.alikeBehaviour.get('value') == 'never');
   }, 
   isAutoProcessing: function() {
-    return (Editor.data.preferences.alikeBehaviour == 'always');
+    return (Editor.data.preferences.alikeBehaviour.get('value') == 'always');
   }, 
   isManualProcessing: function() {
-    return (Editor.data.preferences.alikeBehaviour == 'individual');
+    return (Editor.data.preferences.alikeBehaviour.get('value') == 'individual');
   }
 });

@@ -40,9 +40,6 @@ Ext.define('Editor.view.segments.column.Matchrate', {
     extend: 'Editor.view.segments.column.MatchrateType',
     alias: 'widget.matchrateColumn',
     mixins: ['Editor.view.segments.column.BaseMixin'],
-    isErgonomicVisible: true,
-    isErgonomicSetWidth: true,
-    ergonomicWidth: 90,
     dataIndex: 'matchRate',
     text: 'Matchrate',
     initComponent: function() {

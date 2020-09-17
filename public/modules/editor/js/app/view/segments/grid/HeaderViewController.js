@@ -33,16 +33,13 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
 
     listen: {
         component: {
-            '#logoutHeaderBtn':{
-                click:'onLogoutHeaderBtnClick'
-            },
             '#leaveTaskHeaderBtn':{
                 click:'onLeaveTaskHeaderBtn'
             },
+            '#closeHeaderBtn':{
+                click:'onCloseBtn'
+            }
         }
-    },
-    onLogoutHeaderBtnClick:function(){
-        Editor.app.logout();
     },
     /**
      * Called when the leave task is clicked. This button will provide a dialog, so the user can decide between leave the task or finish the task
@@ -52,7 +49,7 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
             user = Editor.app.authenticatedUser,
             task = Editor.data.task,
             str = me.getView().strings;
-        
+
         //without any loaded task or if the HeadPanel controller does not exist we can not leave the task
         if(!task){
             return;
@@ -124,5 +121,10 @@ Ext.define('Editor.view.segments.grid.HeaderViewController', {
                 Editor.MessageBox.addSuccess(strings.taskClosed);
             });
         }
+    },
+    onCloseBtn: function() {
+        Editor.util.TaskActions.close(function(task, app, strings){
+            window.close();
+        });
     }
 });

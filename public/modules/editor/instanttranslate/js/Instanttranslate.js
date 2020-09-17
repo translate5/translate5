@@ -681,13 +681,14 @@ function requestFileTranslate(){
     // Create a formdata object and add the files
     var data = new FormData();
     
-    $.each(uploadedFiles, function(key, value){
-        data.append(key, value);
-    });
+    if(uploadedFiles && uploadedFiles.length>0){
+        //only single file can be selected
+        data.append('file', uploadedFiles[0]);
+    }
     
     data.append('source', $('#sourceLocale').val());
     data.append('target', $('#targetLocale').val());
-    
+
     $.ajax({
         url:Editor.data.restpath+'instanttranslateapi/filepretranslate',
         type: 'POST',
