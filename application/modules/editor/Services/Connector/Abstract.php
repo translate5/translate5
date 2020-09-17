@@ -358,11 +358,7 @@ abstract class editor_Services_Connector_Abstract {
         $languages = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languages editor_Models_Languages*/
         $ret=$languages->loadAllKeyValueCustom('id','rfc5646');
-        $ret = array_values($ret);
-        return [
-            'sourceLang' => $ret,
-            'targetLang' => $ret,
-        ];
+        return array_values($ret);
     }
     
     /***

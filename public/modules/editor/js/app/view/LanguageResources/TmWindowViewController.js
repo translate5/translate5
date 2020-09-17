@@ -78,7 +78,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     /**
      * Resource combo handler
      */
-    onResourceChange:function(field){
+    onResourceChange:function(field,resource){
         var me=this,
             view=me.getView(),
             uploadField=view.down('filefield[name="tmUpload"]'),
@@ -93,7 +93,8 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         
         vm.set('serviceName',serviceName);
 
-        var isSdl=me.isSdlResource(),
+        var resourcesStore=Ext.StoreManager.get('Editor.store.LanguageResources.Resources'),
+            isSdl=me.isSdlResource(),
             isTermcollection=me.isTermcollectionResource();
 
         uploadField.tooltip=isTermcollection ? view.strings.collection : view.strings.file;
@@ -106,7 +107,17 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         //sdlEngineCombo.setDisabled(!isSdl);
         if(isSdl){
             sdlEngineCombo.getStore().clearFilter();
+            return;
         }
+        //for non engine type resource load the resource languages
+        var record = resourcesStore.getById(resource),
+            sourceField=view.down('combo[name="sourceLang"]'),
+            targetField=view.down('combo[name="targetLang"]'),
+            sourceData = record ? record.get('sourceLanguages') : [],
+            targetData = record ? record.get('targetLanguages') : [];
+            
+        sourceField.getStore().setData(sourceData);
+        targetField.getStore().setData(targetData);
     },
     
     /**
