@@ -46,18 +46,33 @@ Ext.define('Editor.view.help.HelpButtonViewController', {
         },
         component: {
             '#mainHelpButton':{
-                click:'showHelpWindow'
+                click:'onMainHelpButtonClick'
             }
         }
     },
-    showHelpWindow: function() {
+    
+    onMainHelpButtonClick:function(){
+        this.showHelpWindow();
+    },
+    
+    /***
+     * Check if the help window should be shown based on multiple conditions.
+     * 
+     * If the defined loader returns empty content, the window is not shown.
+     * If the doNotShowAgain(user state propertie) is boolean true, the window is not shown.
+     */
+    showHelpWindow: function(doNotShowAgain) {
         var me = this,
             win = Ext.widget('helpWindow');
+        
         win.setTitle(me.getView().text + ' - ' + Editor.data.helpSectionTitle)
 
         //if no loader is defined, the content is remote -> is not the default page
         if(!win.getLoader()){
             me.getView().setHidden(false);
+            if(doNotShowAgain === true){
+                return;
+            }
             win.show();
             return;
         }
@@ -66,15 +81,23 @@ Ext.define('Editor.view.help.HelpButtonViewController', {
         // show the help window
         win.getLoader().on({
             load:function(cmp,response){
+                //if the loader returns empty content, do not show the button and the window
                 if(response.responseText==""){
                     me.getView().setHidden(true);
                     return;
                 }
+               
                 me.getView().setHidden(false);
+
+                //ig do not show again user state config is true, do not show the window
+                if(doNotShowAgain === true){
+                    return;
+                }
                 win.show();
             }
-        })
+        });
     },
+    
     onEditorViewportOpened: function() {
         this.onApplicationSectionChanged(this.getView().up('#segmentgrid'));
     },
@@ -112,12 +135,7 @@ Ext.define('Editor.view.help.HelpButtonViewController', {
           return;
       }
       
-      if(helpWindowState.doNotShowAgain){
-          me.getView().setHidden(false);
-          return;
-      }
-      
-      me.showHelpWindow();
+      me.showHelpWindow(helpWindowState.doNotShowAgain);
   },
   
   /**
