@@ -97,6 +97,23 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         return $this->queryMicrosoftApi($searchString);
     }
     
+    
+    public function languages(){
+        //TODO: how to we solve the problem with missing langauge shortcuts ?
+        $languages = $this->api->getLanguages();
+        $languages = array_keys($languages);
+        $result = [];
+        foreach ($languages as $lng){
+            $model = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $model editor_Models_languages */
+            $ret = $model->loadByRfc([$lng]);
+            if(!empty($ret)){
+                $result[] = reset($ret);
+            }
+        }
+        return $result;
+    }
+    
     /***
      * Query the microsoft api for the search string
      * @param string $searchString
@@ -143,9 +160,21 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
-        if($this->api->getStatus()){
-            return self::STATUS_AVAILABLE;
+        try {
+            if($this->api->getStatus()){
+                return self::STATUS_AVAILABLE;
+            }
+            return self::STATUS_NOCONNECTION;
+        }catch (ZfExtended_ErrorCodeException $e){
+            $moreInfo = $e->getMessage();
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource.service.connector');
+            /* @var $logger ZfExtended_Logger */
+            $logger->warn('E1282','Language resource communication error.',
+                array_merge($e->getErrors(),[
+                    'languageResource'=>$this->languageResource,
+                    'message'=>$e->getMessage()
+                ]));
+            return self::STATUS_NOCONNECTION;
         }
-        return self::STATUS_NOCONNECTION;
     }
 }

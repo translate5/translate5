@@ -33,7 +33,7 @@ Ext.define('Editor.view.LanguageCombo', {
     extend: 'Ext.form.field.ComboBox',
     alias: 'widget.languagecombo',
     typeAhead: false,
-    displayField: 'label',
+    displayField: 'langName',
     forceSelection: true,
     anyMatch: true,
     queryMode: 'local',
