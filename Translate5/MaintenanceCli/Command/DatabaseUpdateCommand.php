@@ -27,6 +27,7 @@
  */
 namespace Translate5\MaintenanceCli\Command;
 
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -62,11 +63,10 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         // the "--help" option
         ->setHelp('Lists and import database update files.');
 
-        //TODO
-//         $this->addArgument('filename',
-//             InputArgument::OPTIONAL,
-//             'Part of a file name or the complete hash of a file - without -i just print the file content.'
-//         );
+         $this->addArgument('filename',
+             InputArgument::OPTIONAL,
+             'Part of a file name or the complete hash of a file - without -i just print the file content.'
+         );
         
         $this->addOption(
             'import',
@@ -92,6 +92,11 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
         
         //$this->getModifiedFiles();
         $dbupdater->calculateChanges();
+        
+        $result = $this->processOnlyOneFile($dbupdater);
+        if($result >= 0) {
+            return $result;
+        }
         
         $newFiles = $dbupdater->getNewFiles();
         $toProcess = [];
@@ -133,10 +138,57 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
                 }
             }
             if(!empty($modified)) {
-                $this->io->warning('Marked '.count($modified).' modified files as uptodate - no SQL change was applied to the DB!');
+                $this->io->warning('Marked '.count($modified).' modified files as up to date - no SQL change was applied to the DB!');
             }
         }
         
+        return 0;
+    }
+    
+    protected function processOnlyOneFile(\ZfExtended_Models_Installer_DbUpdater $dbupdater) {
+        $fileName = $this->input->getArgument('filename');
+        if(empty($fileName)) {
+            return -1;
+        }
+        $new = $dbupdater->getNewFiles();
+        $modified = $dbupdater->getModifiedFiles();
+        foreach($modified as &$mod) {
+            $mod['modified'] = 1;
+        }
+        $all = array_merge($new, $modified);
+        $found = false;
+        foreach($all as $file) {
+            if($file['entryHash'] === $fileName || strpos($file['relativeToOrigin'], $fileName) !== false) {
+                $found = true;
+                break;
+            }
+        }
+        if(!$found) {
+            $this->io->warning('No file matching '.$fileName.' found!');
+            return 1;
+        }
+        $this->output->writeln(file_get_contents($file['absolutePath']));
+        if(! $this->input->getOption('import')) {
+            return 0;
+        }
+        if(empty($file['modified'])) {
+            $dbupdater->applyNew([$file['entryHash'] => 1]);
+        }
+        else {
+            $dbupdater->updateModified([$file['entryHash'] => 1]);
+        }
+        $errors = $dbupdater->getErrors();
+        if(!empty($errors)) {
+            $this->io->error($errors);
+            $this->io->warning('Imported with errors - check them!');
+            return 1;
+        }
+        if(empty($file['modified'])) {
+            $this->io->success('Imported file '.$file['relativeToOrigin'].'!');
+        }
+        else {
+            $this->io->warning('Marked modified '.$file['relativeToOrigin'].' file as up to date - no SQL change was applied to the DB!');
+        }
         return 0;
     }
 }

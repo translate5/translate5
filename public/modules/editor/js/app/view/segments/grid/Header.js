@@ -48,11 +48,11 @@ Ext.define('Editor.view.segments.grid.Header', {
     controller: 'segmentsHeader',
     strings: {
         progressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt',
-        leaveBtn: '#UT#Aufgabe verlassen',
-        logoutBtn: '#UT#Ausloggen',
-        leaveTaskWindowTitle:'#UT#Zurück zur Aufgabeliste',
+        leaveBtn: '#UT#Später weiter arbeiten',
+        leaveTaskWindowTitle:'#UT#Später weiter arbeiten',
+        closeBtn: '#UT#Anwendung verlassen',
         leaveTaskWindowMessage:'#UT#Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?',
-        leaveTaskWindowFinishBtn:'#UT#Fertig und Aufgabe beenden',
+        leaveTaskWindowFinishBtn:'#UT#Alles fertig - Aufgabe abschließen',
         leaveTaskWindowCancelBtn:'#UT#Aufgabe später weiterbearbeiten'
     },
     initConfig: function(instanceConfig) {
@@ -85,13 +85,13 @@ Ext.define('Editor.view.segments.grid.Header', {
                     itemId: 'leaveTaskHeaderBtn',
                     icon: Editor.data.moduleFolder+'images/table_back.png',
                     text: me.strings.leaveBtn,
-                    hidden: Editor.data.editor.toolbar.hideLeaveTaskButton //FIXME für ITL auf false setzen!
+                    hidden: Editor.data.editor.toolbar.hideLeaveTaskButton
                 },{
                     xtype: 'button',
-                    itemId:'logoutHeaderBtn',
+                    itemId:'closeHeaderBtn',
                     icon: Editor.data.moduleFolder+'images/door_out.png',
-                    text: me.strings.logoutBtn,
-                    hidden: Editor.data.editor.toolbar.hideLogoutButton //FIXME für ITL auf false setzen!
+                    text: me.strings.closeBtn,
+                    hidden: Editor.data.editor.toolbar.hideCloseButton
                 }]
             };
         

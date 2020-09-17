@@ -368,13 +368,9 @@ class Models_Installer_Standalone {
      * Adds the downloaded Zend Lib to the include path
      */
     protected function addZendToIncludePath() {
-        $zendDir = $this->options['zend'];
-        if(!is_dir($zendDir)) {
-            $this->log("Could not find Zend library ".$zendDir);
-            exit;
+        if(file_exists($this->currentWorkingDir.'/vendor/autoload.php')) {
+            require_once $this->currentWorkingDir.'/vendor/autoload.php';
         }
-        $path = get_include_path();
-        set_include_path($path.PATH_SEPARATOR.$zendDir);
     }
     
     /**

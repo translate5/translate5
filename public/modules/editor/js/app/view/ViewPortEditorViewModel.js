@@ -44,9 +44,6 @@ Ext.define('Editor.view.ViewPortEditorViewModel', {
         },
         viewmodeIsEdit: function(get){
             return get('editorViewmode') == Editor.controller.ViewModes.MODE_EDIT;
-        },
-        viewmodeIsCustom: function(get){
-            return get('editorViewmode') == Editor.controller.ViewModes.MODE_CUSTOM;
         }
     }
 });
