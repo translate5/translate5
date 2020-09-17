@@ -304,7 +304,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('customers.openid.showOpenIdDefaultCustomerData',(boolean)$rop->customers->openid->showOpenIdDefaultCustomerData);
       
       //boolean config if the logout button in the segments editor header is visible or not
-      $this->view->Php2JsVars()->set('editor.toolbar.hideLogoutButton',(boolean)$rop->editor->toolbar->hideLogoutButton);
+      $this->view->Php2JsVars()->set('editor.toolbar.hideCloseButton',(boolean)$rop->editor->toolbar->hideCloseButton);
       //boolean config if the leave task button button in the segments editor header is visible or not
       $this->view->Php2JsVars()->set('editor.toolbar.hideLeaveTaskButton',(boolean)$rop->editor->toolbar->hideLeaveTaskButton);
       
@@ -459,10 +459,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         //set frontend array from the config data
         //the array is used as initial user config store data
         $php2js->set('app.configData', $config->loadAllMerged($user, 'runtimeOptions.frontend.defaultState.%'));
-        //TODO currently the single preference is the alike Behaviour, if there will be more we should consider to:
+        
+        //TODO currently the single preference is the alike Behaviour and showOnEmptyTarget,
+        // if there will be more we should consider to:
         // either make an own preferences API which internally then maps to merge config
         // or provide all preferences on a bulk way (similar to the defaultState.% loading)
         $php2js->set('preferences.alikeBehaviour', $config->loadAllMerged($user, 'runtimeOptions.alike.defaultBehaviour')[0]);
+        $php2js->set('preferences.showOnEmptyTarget', $config->loadAllMerged($user, 'runtimeOptions.alike.showOnEmptyTarget')[0]);
     }
     
     protected function getAppVersion() {
@@ -625,7 +628,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
                 'ttf' => 'application/ttf',
                 'eot' => 'application/eot',
                 'mp3' => 'audio/mp3',
-                'mp4' => 'video/mp4',            
+                'mp4' => 'video/mp4',
                 'html'=> 'text/html'
         );
         $slash = '/';
@@ -633,7 +636,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $requestedType =$this->getParam(1);
         $requestedFile =$this->getParam(2);
         $js = explode($slash, $requestedFile);
-        $extension = pathinfo($requestedFile, PATHINFO_EXTENSION);
+        $extension = strtolower(pathinfo($requestedFile, PATHINFO_EXTENSION));
         
         //pluginname is alpha characters only so check this for security reasons
         //ucfirst is needed, since in JS packages start per convention with lowercase, Plugins in PHP with uppercase!
@@ -672,8 +675,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         if(!file_exists($wholePath)){
             throw new ZfExtended_NotFoundException();
         }
-        if(in_array($extension, $types)){
+        if(array_key_exists($extension, $types)){
             header('Content-Type: '.$types[$extension]);
+        } else {
+            // TODO FIXME: it seems by default the content-type text/html is set by apache instead of no content-type
+            // this leads to problems with files without extensions as is often the case with wget downloaded websites
+            header('Content-Type: ');
         }
         //FIXME add version URL suffix to plugin.css inclusion
         header('Last-Modified: '.gmdate('D, d M Y H:i:s \G\M\T', filemtime($wholePath)));

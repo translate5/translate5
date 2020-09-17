@@ -57,6 +57,19 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
             ctrl = Editor.app.getController('SearchReplace');
         me.callParent([state]);
         
+        //init radio buttons in a stateful way
+        Ext.applyIf(state, {
+            searchTab: {
+                searchType: 'normalSearch'
+            },
+            replaceTab: {
+                searchType: 'normalSearch'
+            }
+        });
+
+        state.searchTab && me.down('#searchTab').form.setValues(state.searchTab);
+        state.replaceTab && me.down('#replaceTab').form.setValues(state.replaceTab);
+
         //the search fields of replace and search are on a magical way in sync, so we just set one here
         if(search && state.searchValue) {
             search.setValue(state.searchValue);
@@ -74,8 +87,16 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
         var me = this, 
             state = me.callParent();
             
-        //the search fields of replace and search are on a magical way in sync, 
+        //first we save all settings in general
+        state.searchTab = me.down('#searchTab').getValues();
+        state.replaceTab = me.down('#replaceTab').getValues();
+                
+        //then we deal some fields in a special way:
+        // the search fields of replace and search are on a magical way in sync, 
         // so we store only the search field
+        delete state.searchTab.searchField;
+        delete state.replaceTab.searchField;
+
         state.searchValue = me.down('#searchTab #searchField').getValue();
         try {
             state.searchInField = me.down('searchreplacetabpanel').getActiveTab().down('#searchInField').getValue();

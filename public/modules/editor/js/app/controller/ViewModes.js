@@ -291,6 +291,9 @@ Ext.define('Editor.controller.ViewModes', {
                     newcol.width = 90;
                     break;
                 case "contentColumn_source": 
+                    newcol.hidden = column.isHiddenInReadonly; //hides the column if there is an editable pendant
+                    newcol.flex = 1/contentColumns;
+                    break;
                 case "contentColumn_relais": 
                     newcol.hidden = false;
                     newcol.flex = 1/contentColumns;
@@ -299,6 +302,7 @@ Ext.define('Editor.controller.ViewModes', {
                     newcol.hidden = !readonly;
                     newcol.flex = 1/contentColumns;
                     break;
+                case "contentColumn_source_edit": 
                 case "contentColumn_target_edit": 
                     newcol.hidden = readonly;
                     newcol.flex = 1/contentColumns;
