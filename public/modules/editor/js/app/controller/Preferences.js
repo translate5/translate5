@@ -69,10 +69,15 @@ Ext.define('Editor.controller.Preferences', {
       }
   },
   init : function() {
-    var alike = Editor.data.preferences.alikeBehaviour;
+    var alike = Editor.data.preferences.alikeBehaviour,
+        emptyTarget = Editor.data.preferences.showOnEmptyTarget;
     if(!alike.isModel) {
         Editor.data.preferences.alikeBehaviour = Editor.model.UserConfig.create(alike);
     }
+    if(!emptyTarget.isModel) {
+        Editor.data.preferences.showOnEmptyTarget = Editor.model.UserConfig.create(emptyTarget);
+    }
+
   },
   /**
    * zeigt das Preferences Fenster an
@@ -84,7 +89,8 @@ Ext.define('Editor.controller.Preferences', {
       //TODO if there will be more preferences, we should refactor that, so that we can loop over form.getValues and instead of 
       // Editor.data.preferences a preferences store is used.
       me.getForm().getForm().setValues({
-          alikeBehaviour: Editor.data.preferences.alikeBehaviour.get('value')
+          alikeBehaviour: Editor.data.preferences.alikeBehaviour.get('value'),
+          showOnEmptyTarget: Editor.data.preferences.showOnEmptyTarget.get('value')
       });
       //disable change alike settings if a segment is currently opened. 
       // If not a user would be able to change the change alike behaviour, 
@@ -94,15 +100,23 @@ Ext.define('Editor.controller.Preferences', {
   },
   /**
    * Speichert die Einstellungen und schließt das Fenster
+   * 
+   * TODO very ugly implementation: should be refactored with TRANSLATE-471
+   * Idea: make a store which contains all configs updateable by the user. From that store we can then fill the preferences here
    */
   handleSave: function() {
     var me = this,
-        alike = Editor.data.preferences.alikeBehaviour;
+        alike = Editor.data.preferences.alikeBehaviour,
+        emptyTarget = Editor.data.preferences.showOnEmptyTarget;
     alike.set('value', this.getForm().getForm().getValues().alikeBehaviour);
-    alike.save({
+    emptyTarget.set('value', this.getForm().getForm().getValues().showOnEmptyTarget);
+    emptyTarget.save({
         success: function() {
-            Editor.MessageBox.addSuccess(me.messages.preferencesSaved);
-            me.window.close();
+            alike.save({
+                success: function() {
+                    me.window.close();
+                } 
+            });
         } 
     });
   },

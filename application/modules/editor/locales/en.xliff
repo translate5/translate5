@@ -3844,6 +3844,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QW5nZXBhc3N0'><source>Angepasst</source><target>Customized</target></trans-unit>
 <trans-unit id='R2VzcGVycnQgZGEgYWxzIEV4Y2VsIGV4cG9ydGllcnQuIFp1bSBFbnRzcGVycmVuIEV4Y2VsIHJlLWltcG9ydGllcmVuLiBGYWxscyBFeGNlbCBuaWNodCB6dXIgSGFuZDogTmV1IGV4cG9ydGllcmVuLg=='><source>Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.</source><target>Locked because exported as Excel. Re-import Excel to unlock. If Excel is not at hand: export again.</target></trans-unit>
 <trans-unit id='PGI+S2VpbmUgRXJnZWJuaXNzZSBnZWZ1bmRlbjwvYj48YnIvPkbDvHIgSWhyZSBTdWNoZSBnaWJ0IGVzIGtlaW5lIEVpbnRyw6RnZSBpbiBkZXIgVGVybWlub2xvZ2llIHVuZCBkZW0gVHJhbnNsYXRpb24gTWVtb3J5IHVuZCBmw7xyIGRpZSBnZXfDpGhsdGUgU3ByYWNoa29tYmluYXRpb24gc3RlaHQga2VpbmUgbWFzY2hpbmVsbGUgw5xiZXJzZXR6dW5nIHp1ciBWZXJmw7xndW5nLg=='><source><b>Keine Ergebnisse gefunden</b><br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.</source><target><b>No results found</b><br/>There are no entries for your search in the terminology and the translation memory and there is no machine translation available for your language combination.</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='>
+    <source>Aufgabe verlassen</source>
+    <target>Leave application</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
