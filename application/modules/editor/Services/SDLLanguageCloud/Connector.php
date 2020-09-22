@@ -98,17 +98,12 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
             return $this->resultList;
         }
         
-        //load all languages (sdl api use iso6393 langage shortcuts)
-        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        $lngs=$langModel->loadAllKeyValueCustom('id','iso6393');
-        
         $result=null;
         $params=[
             'domainCode'=>$this->languageResource->getSpecificData('domainCode'),
             'text'=>$searchString,
-            'from'=>$lngs[$this->sourceLang],
-            'to'=>$lngs[$this->targetLang]
+            'from'=>$this->languageResource->getSourceLangCode(),
+            'to'=>$this->languageResource->getTargetLangCode(),
         ];
         if($this->api->search($params)){
             $result=$this->api->getResult();

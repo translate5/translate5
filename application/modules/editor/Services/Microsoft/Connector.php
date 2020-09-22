@@ -99,19 +99,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
     
     
     public function languages(){
-        //TODO: how to we solve the problem with missing langauge shortcuts ?
-        $languages = $this->api->getLanguages();
-        $languages = array_keys($languages);
-        $result = [];
-        foreach ($languages as $lng){
-            $model = ZfExtended_Factory::get('editor_Models_Languages');
-            /* @var $model editor_Models_languages */
-            $ret = $model->loadByRfc([$lng]);
-            if(!empty($ret)){
-                $result[] = reset($ret);
-            }
-        }
-        return $result;
+        return array_keys($this->api->getLanguages());
     }
     
     /***
@@ -125,13 +113,9 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
             return $this->resultList;
         }
         
-        //load all languages (sdl api use iso6393 langage shortcuts)
-        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        $lngs=$langModel->loadAllKeyValueCustom('id','rfc5646');
         
         $result=null;
-        if($this->api->search($searchString,$lngs[$this->sourceLang],$lngs[$this->targetLang])){
+        if($this->api->search($searchString,$this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode())){
             $result=$this->api->getResult();
         }
         

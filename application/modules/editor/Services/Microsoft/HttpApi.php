@@ -103,16 +103,17 @@ class editor_Services_Microsoft_HttpApi {
             ]
         ];
         $content = json_encode($requestBody);
-
         $result = $this->searchApi($path,$params, $content);
-        $result=$this->processTranslateResponse($result);
-        //if in directory lookup the result is empty, trigger a normal result so translation from microsoft is received
-        if(empty($this->result) && $isDirecotrLookup){
+        
+        //if the DictionaryLookup produces an error, try with the normal translate request
+        if(empty($this->result) && !empty($this->error) && $this->isDictionaryLookup){
+            //if in directory lookup the result is empty, trigger a normal result so translation from microsoft is received
             $path="/translate?api-version=3.0";
             $result = $this->searchApi($path,$params,$content);
             return $this->processTranslateResponse($result);
         }
-        return $result;
+        
+        return $this->processTranslateResponse($result);
     }
 
     /***
@@ -124,6 +125,8 @@ class editor_Services_Microsoft_HttpApi {
      * @return string
      */
     protected function searchApi($path,$params,$content) {
+        //reset the errors array
+        $this->error = [];
         $headers = "Content-type: application/json\r\n" .
             "Content-length: " . strlen($content) . "\r\n" .
             "Ocp-Apim-Subscription-Key: $this->apiKey\r\n" .
@@ -163,7 +166,7 @@ class editor_Services_Microsoft_HttpApi {
      * @return boolean
      */
     public function getStatus(){
-        return empty($this->search('Hello world.', 'en', 'de'));
+        return !empty($this->search('Hello world.', 'en', 'de'));
     }
 
 
@@ -201,6 +204,20 @@ class editor_Services_Microsoft_HttpApi {
         return $this->getResult();
     }
 
+    /***
+     * Check if the given language code is valid for the api
+     * @param string $languageCode: language code
+     * @return boolean
+     */
+    public function isValidLanguage($languageCode){
+        try {
+            $this->search('Hi','en', $languageCode);
+            return empty($this->error);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
     /**
      * returns the found errors
      */
