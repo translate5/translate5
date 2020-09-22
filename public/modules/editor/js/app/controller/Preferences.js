@@ -106,10 +106,11 @@ Ext.define('Editor.controller.Preferences', {
    */
   handleSave: function() {
     var me = this,
+        values = this.getForm().getForm().getValues(),
         alike = Editor.data.preferences.alikeBehaviour,
         emptyTarget = Editor.data.preferences.showOnEmptyTarget;
-    alike.set('value', this.getForm().getForm().getValues().alikeBehaviour);
-    emptyTarget.set('value', this.getForm().getForm().getValues().showOnEmptyTarget);
+    alike.set('value', values.alikeBehaviour);
+    emptyTarget.set('value', values.showOnEmptyTarget);
     emptyTarget.save({
         success: function() {
             alike.save({
