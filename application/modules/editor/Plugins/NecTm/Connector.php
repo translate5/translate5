@@ -77,13 +77,24 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     protected $sourceLangForNecTm;
     protected $targetLangForNecTm;
     
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::__construct()
+     */
+    public function __construct() {
+        parent::__construct();
+        $this->api = ZfExtended_Factory::get('editor_Plugins_NecTm_HttpApi');
+    }
+    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
      */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
         parent::connectTo($languageResource, $sourceLang, $targetLang);
-        $this->api = ZfExtended_Factory::get('editor_Plugins_NecTm_HttpApi');
+        
         $this->xmlparser= ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         // The NEC-TM-Api uses "Tags"; we handle them via categories:
         $this->setCategories($languageResource);
