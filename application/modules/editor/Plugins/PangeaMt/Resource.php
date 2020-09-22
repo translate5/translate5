@@ -80,24 +80,13 @@ class editor_Plugins_PangeaMt_Resource extends editor_Models_LanguageResources_R
     protected function setSupportedLanguages() {
         $api = ZfExtended_Factory::get('editor_Plugins_PangeaMt_HttpApi');
         /* @var $api editor_Plugins_PangeaMt_HttpApi */
-        if ($api->getEngines()) {
-            $allEngines = $api->getResult();
-            $allSupportedSourceLangs = [];
-            $allSupportedTargetLangs = [];
-            foreach ($allEngines as $engine) {
-                if (!in_array($engine->src, $allSupportedSourceLangs)) {
-                    $allSupportedSourceLangs[] = $engine->src;
-                }
-                if (!in_array($engine->tgt, $allSupportedTargetLangs)) {
-                    $allSupportedTargetLangs[] = $engine->tgt;
-                }
-                
-            }
-            sort($allSupportedSourceLangs);
-            sort($allSupportedTargetLangs);
-            $this->supportedSourceLangs = $allSupportedSourceLangs;
-            $this->supportedTargetLangs = $allSupportedTargetLangs;
+        $languages = $api->getLanguages();
+        if(empty($languages)){
+            return;
         }
+        
+        $this->supportedSourceLangs = $languages[editor_Services_Connector_Abstract::SOURCE_LANGUAGES_KEY];
+        $this->supportedTargetLangs = $languages[editor_Services_Connector_Abstract::TARGET_LANGUAGES_KEY];
     }
     
     /**

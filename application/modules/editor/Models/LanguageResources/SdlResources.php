@@ -143,9 +143,9 @@ class editor_Models_LanguageResources_SdlResources {
             $data=array(
                 'id'=>is_array($engine) ? $engine['id'] :'mt'.$engineCounter,
                 'name' =>is_array($engine) ? $engine['name'] : $engine->type.', ['.$engine->fromCulture.','.$engine->toCulture.']',
-                'source' => is_array($engine) ? $engine['sourceLangRfc5646'] : $engine->fromCulture,
+                'source' => is_array($engine) ? $engine['sourceLangCode'] : $engine->fromCulture,
                 'sourceIso' => is_array($engine) ? $getIsoLangs($engine['sourceLang']) : $engine->from->code,
-                'target' => is_array($engine) ? $engine['targetLangRfc5646']: $engine->toCulture,
+                'target' => is_array($engine) ? $engine['targetLangCode']: $engine->toCulture,
                 'targetIso' => is_array($engine) ? $getIsoLangs($engine['targetLang']):$engine->to->code,
                 'domainCode' => is_array($engine) ? $getDomainCode($engine['specificData']):$engine->domainCode,
                 'characterLimit' => $getCharacterLimit([$customerLimit,$engineLimit]),

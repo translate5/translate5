@@ -94,8 +94,8 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
                 $connector = ZfExtended_Factory::get($r->serviceType.editor_Services_Manager::CLS_CONNECTOR);
                 /* @var $connector editor_Services_Connector_Abstract */
                 $languages=$connector->languages();
-                $r->sourceLanguages = $languages;
-                $r->targetLanguages = $languages;
+                $r->sourceLanguages =$this->handleLanguageCodes($languages[editor_Services_Connector_Abstract::SOURCE_LANGUAGES_KEY] ??  $languages);
+                $r->targetLanguages =$this->handleLanguageCodes($languages[editor_Services_Connector_Abstract::TARGET_LANGUAGES_KEY] ?? $languages);
             }
         }
 
@@ -127,6 +127,19 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
 
     public function postAction() {
         throw new ZfExtended_BadMethodCallException(__CLASS__.'->post');
+    }
+    
+    /***
+     * For each language code in the input array, try to find the matching languages record from
+     * the lek_languages table.
+     *
+     * @param array $languages
+     * @return array[]
+     */
+    protected function handleLanguageCodes(array $languages){
+        $mapper = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguagesMapper');
+        /* @var $mapper editor_Models_LanguageResources_LanguagesMapper */
+        return $mapper->map($languages);
     }
 }
 

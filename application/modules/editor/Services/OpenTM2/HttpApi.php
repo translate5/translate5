@@ -168,14 +168,14 @@ class editor_Services_OpenTM2_HttpApi {
         if($response->getStatus() === 200) {
             $this->result = $response->getBody();
 	    if($mime == "application/xml"){
-		if($this->languageResource->targetLangRfc5646 == 'mn') $this->result = str_replace('xml:lang="ru"','xml:lang="mn"',$this->result);
-		if($this->languageResource->targetLangRfc5646 == 'mn-MN') $this->result = str_replace('xml:lang="ru"','xml:lang="mn-MN"',$this->result);
-		if($this->languageResource->targetLangRfc5646 == 'hi') $this->result = str_replace('xml:lang="ar"','xml:lang="hi"',$this->result);
-		if($this->languageResource->targetLangRfc5646 == 'hi-IN') $this->result = str_replace('xml:lang="ar"','xml:lang="hi-IN"',$this->result);
-		if($this->languageResource->targetLangRfc5646 == 'mn') $this->result = str_replace('<prop type="tmgr:language">RUSSIAN</prop>','<prop type="tmgr:language">MONGOLIAN</prop>',$this->result);
-		if($this->languageResource->targetLangRfc5646 == 'mn-MN') $this->result = str_replace('<prop type="tmgr:language">RUSSIAN</prop>','<prop type="tmgr:language">MONGOLIAN</prop>',$this->result);
-		if($this->languageResource->targetLangRfc5646 == 'hi') $this->result = str_replace('<prop type="tmgr:language">ARABIC</prop>','<prop type="tmgr:language">HINDI</prop>',$this->result);
-		if($this->languageResource->targetLangRfc5646 == 'hi-IN') $this->result = str_replace('<prop type="tmgr:language">ARABIC</prop>','<prop type="tmgr:language">HINDI</prop>',$this->result);
+		if($this->languageResource->targetLangCode == 'mn') $this->result = str_replace('xml:lang="ru"','xml:lang="mn"',$this->result);
+		if($this->languageResource->targetLangCode == 'mn-MN') $this->result = str_replace('xml:lang="ru"','xml:lang="mn-MN"',$this->result);
+		if($this->languageResource->targetLangCode == 'hi') $this->result = str_replace('xml:lang="ar"','xml:lang="hi"',$this->result);
+		if($this->languageResource->targetLangCode == 'hi-IN') $this->result = str_replace('xml:lang="ar"','xml:lang="hi-IN"',$this->result);
+		if($this->languageResource->targetLangCode == 'mn') $this->result = str_replace('<prop type="tmgr:language">RUSSIAN</prop>','<prop type="tmgr:language">MONGOLIAN</prop>',$this->result);
+		if($this->languageResource->targetLangCode == 'mn-MN') $this->result = str_replace('<prop type="tmgr:language">RUSSIAN</prop>','<prop type="tmgr:language">MONGOLIAN</prop>',$this->result);
+		if($this->languageResource->targetLangCode == 'hi') $this->result = str_replace('<prop type="tmgr:language">ARABIC</prop>','<prop type="tmgr:language">HINDI</prop>',$this->result);
+		if($this->languageResource->targetLangCode == 'hi-IN') $this->result = str_replace('<prop type="tmgr:language">ARABIC</prop>','<prop type="tmgr:language">HINDI</prop>',$this->result);
 	    }
             return true;
         }
@@ -210,12 +210,12 @@ class editor_Services_OpenTM2_HttpApi {
      */
     public function lookup(editor_Models_Segment $segment, string $queryString, string $filename) {
         $json = new stdClass();
-	if($this->languageResource->targetLangRfc5646 == 'mn') $this->languageResource->targetLangRfc5646 = 'ru';
-        if($this->languageResource->targetLangRfc5646 == 'mn-MN') $this->languageResource->targetLangRfc5646 = 'ru-RU';
-        if($this->languageResource->targetLangRfc5646 == 'hi') $this->languageResource->targetLangRfc5646 = 'ar';
-        if($this->languageResource->targetLangRfc5646 == 'hi-IN') $this->languageResource->targetLangRfc5646 = 'ar';
-        $json->sourceLang = $this->languageResource->sourceLangRfc5646;
-        $json->targetLang = $this->languageResource->targetLangRfc5646;
+	if($this->languageResource->targetLangCode == 'mn') $this->languageResource->targetLangCode = 'ru';
+        if($this->languageResource->targetLangCode == 'mn-MN') $this->languageResource->targetLangCode = 'ru-RU';
+        if($this->languageResource->targetLangCode == 'hi') $this->languageResource->targetLangCode = 'ar';
+        if($this->languageResource->targetLangCode == 'hi-IN') $this->languageResource->targetLangCode = 'ar';
+        $json->sourceLang = $this->languageResource->sourceLangCode;
+        $json->targetLang = $this->languageResource->targetLangCode;
         $json->source = $queryString;
         //In general OpenTM2 can deal with whole paths, not only with filenames.
         // But we hold the filepaths in the FileTree JSON, so this value is not easily accessible, 
@@ -292,8 +292,8 @@ class editor_Services_OpenTM2_HttpApi {
         $json->type = "Manual";
         $json->markupTable = "OTMXUXLF"; //fixed markup table for our XLIFF subset
         
-        $json->sourceLang = $this->languageResource->getSourceLangRfc5646();
-        $json->targetLang = $this->languageResource->getTargetLangRfc5646();
+        $json->sourceLang = $this->languageResource->getSourceLangCode();
+        $json->targetLang = $this->languageResource->getTargetLangCode();
 
 	if($json->targetLang == 'mn') $json->targetLang = 'ru';
         if($json->targetLang == 'mn-MN') $json->targetLang = 'ru-RU';

@@ -116,8 +116,8 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
             sourceData = record ? record.get('sourceLanguages') : [],
             targetData = record ? record.get('targetLanguages') : [];
             
-        sourceField.getStore().setData(sourceData);
-        targetField.getStore().setData(targetData);
+        sourceField.getStore().loadRawData(sourceData);
+        targetField.getStore().loadRawData(targetData);
     },
     
     /**

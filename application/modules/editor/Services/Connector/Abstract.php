@@ -50,6 +50,22 @@ abstract class editor_Services_Connector_Abstract {
     
     const FUZZY_SUFFIX = '-fuzzy-';
     
+    /***
+     * Source languages array key for the languages result.
+     * In some of the resources the supported "from-to" languages are not the same.
+     * That is why the languages grouping is required in some of them. 
+     * @var string
+     */
+    const SOURCE_LANGUAGES_KEY = 'sourceLanguages';
+    
+    /***
+     * Target languages array key for the languages result.
+     * In some of the resources the supported "from-to" languages are not the same.
+     * That is why the languages grouping is required in some of them.
+     * @var string
+     */
+    const TARGET_LANGUAGES_KEY = 'targetLanguages';
+    
     /*** 
      * Default resource matchrate
      * @var integer
@@ -162,8 +178,8 @@ abstract class editor_Services_Connector_Abstract {
         $this->languageResource = $languageResource;
         $this->resultList->setLanguageResource($languageResource);
         if($languageResource->getId()!=null){
-            $this->languageResource->sourceLangRfc5646=$this->languageResource->getSourceLangRfc5646();
-            $this->languageResource->targetLangRfc5646=$this->languageResource->getTargetLangRfc5646();
+            $this->languageResource->sourceLangCode=$this->languageResource->getSourceLangCode();
+            $this->languageResource->targetLangCode=$this->languageResource->getTargetLangCode();
         }
     }
     
@@ -352,7 +368,9 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /***
-     * Return the available languges for the current resource endpoint(api)
+     * Return the available language codes for the current resource endpoint(api)
+     * Use SOURCE_LANGUAGES_KEY and TARGET_LANGUAGES_KEY as languages grouped results when 
+     * the resource does not support same from - to language combinations
      */
     public function languages(){
         $languages = ZfExtended_Factory::get('editor_Models_Languages');
