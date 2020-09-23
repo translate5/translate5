@@ -3848,6 +3848,7 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Aufgabe verlassen</source>
     <target>Leave application</target>
 </trans-unit>
+<trans-unit id='QXVzZ2VibGVuZGV0ZSBiZWFyYmVpdGJhcmUgU3BhbHRlbiB3dXJkZW4gc2ljaHRiYXIgZ2VzY2hhbHRldCwgZGEgZGllIEF1ZmdhYmUgenVtIEVkaXRpZXJlbiBnZcO2ZmZuZXQgd3VyZGUsIGFiZXIga2VpbmUgZWRpdGllcmJhcmUgU3BhbHRlIHNpY2h0YmFyIHdhci4='><source>Ausgeblendete bearbeitbare Spalten wurden sichtbar geschaltet, da die Aufgabe zum Editieren geöffnet wurde, aber keine editierbare Spalte sichtbar war.</source><target>Hidden editable columns turned visible, since task had been opened for editing and no editable column was visible.</target></trans-unit>
 </body>
   </file>
 </xliff>
