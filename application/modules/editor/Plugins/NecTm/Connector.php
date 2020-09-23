@@ -287,7 +287,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             $config = Zend_Registry::get('config');
             $serverName = $config->runtimeOptions->server->name;
             //replace non-alpha-numeric characters
-            $filename = preg_replace('/[^a-z0-9]+/', '_', strtolower($serverName));
+            $filename = preg_replace('/[^a-z0-9]+/', '_', strtolower($serverName)).'.tmx';
         }
         $source= $this->prepareSegmentContent($this->getQueryString($segment));
         $target= $this->prepareSegmentContent($segment->getTargetEdit());
