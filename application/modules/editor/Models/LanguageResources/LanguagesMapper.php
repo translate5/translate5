@@ -94,5 +94,13 @@ class editor_Models_LanguageResources_LanguagesMapper {
     protected function resetMissing() {
         $this->missing = [];
     }
+    
+    /***
+     * Return missing languages after the mapping is done
+     * @return array
+     */
+    public function getMissing() {
+        return $this->missing;
+    }
 }
 
