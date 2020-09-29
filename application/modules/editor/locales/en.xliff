@@ -3848,6 +3848,14 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Aufgabe verlassen</source>
     <target>Leave application</target>
 </trans-unit>
+<trans-unit id='RGVtby1RTS1GZWhsZXIgMQ=='><source>Demo-QM-Fehler 1</source><target>Demo QM error 1</target></trans-unit>
+<trans-unit id='RmFsc2NoZSDDnGJlcnNldHp1bmc='><source>Falsche Übersetzung</source><target>Mistranslation</target></trans-unit>
+<trans-unit id='VGVybWlub2xvZ2llcHJvYmxlbQ=='><source>Terminologieproblem</source><target>Terminology problem</target></trans-unit>
+<trans-unit id='RmxpZcOfZW5kZXMgUHJvYmxlbQ=='><source>Fließendes Problem</source><target>Fluency issue</target></trans-unit>
+<trans-unit id='SW5rb25zaXN0ZW56'><source>Inkonsistenz</source><target>Inconsistency</target></trans-unit>
+<trans-unit id='TWFudWVsbGVyIERlbW8gU3RhdHVzIDE='><source>Manueller Demo Status 1</source><target>Demo manual status 1</target></trans-unit>
+<trans-unit id='TXVzcyBlcm5ldXQgw7xiZXJwcsO8ZnQgd2VyZGVu'><source>Muss erneut überprüft werden</source><target>Needs to be re-checked</target></trans-unit>
+<trans-unit id='S2VpbiBTdGF0dXMgZmVzdGdlbGVndA=='><source>Kein Status festgelegt</source><target>no status set</target></trans-unit>
 </body>
   </file>
 </xliff>
