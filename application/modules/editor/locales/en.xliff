@@ -18,15 +18,15 @@
       </trans-unit>
       <trans-unit id="TGVrdG9yaWVydCwgdW5iZXLDvGhydCwgYXV0by1nZXNldHp0IGJlaW0gQXVmZ2FiZW5hYnNjaGx1c3M=">
         <source>Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss</source>
-        <target>Reviewed, untouched, auto-set at finish of workflow step</target>
+        <target>Reviewed, unchanged, auto-set at finish of workflow step</target>
       </trans-unit>
       <trans-unit id="TGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0">
         <source>Lektoriert, unverändert</source>
-        <target>Reviewed, untouched</target>
+        <target>Reviewed, unchanged</target>
       </trans-unit>
       <trans-unit id="TGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv">
         <source>Lektoriert, unverändert, auto</source>
-        <target>Reviewed, untouched, auto-set</target>
+        <target>Reviewed, unchanged, auto-set</target>
       </trans-unit>
       <trans-unit id="Mi4gTGVrdG9yYXQ=">
         <source>2. Lektorat</source>
@@ -3856,6 +3856,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='TWFudWVsbGVyIERlbW8gU3RhdHVzIDE='><source>Manueller Demo Status 1</source><target>Demo manual status 1</target></trans-unit>
 <trans-unit id='TXVzcyBlcm5ldXQgw7xiZXJwcsO8ZnQgd2VyZGVu'><source>Muss erneut überprüft werden</source><target>Needs to be re-checked</target></trans-unit>
 <trans-unit id='S2VpbiBTdGF0dXMgZmVzdGdlbGVndA=='><source>Kein Status festgelegt</source><target>no status set</target></trans-unit>
+<trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv'><source>PM lektoriert, unverändert, auto</source><target>PM reviewed, unchanged, auto-set</target></trans-unit>
 </body>
   </file>
 </xliff>
