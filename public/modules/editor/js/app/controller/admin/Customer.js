@@ -403,10 +403,10 @@ Ext.define('Editor.controller.admin.Customer', {
         var me = this,
             gridFilters = grid.filters,
             store = gridFilters.store,
-            sorters = store.sorters,
+            sorters = store.sorters ? store.sorters : null,
             customerColumnName = me.getCustomerColumnNameInStore(store),
             customerColumn;
-        if(sorters.length > 0){
+        if(sorters && sorters.length > 0){
             sorters.clear();
         }
         if (val == '') {
