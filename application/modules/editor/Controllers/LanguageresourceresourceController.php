@@ -60,13 +60,17 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
             /* @var $resource editor_Models_LanguageResources_Resource */
             $isFilebased = $resource->getFilebased();
             if($isFilebased && $isAllowedFilebased || !$isFilebased && $isAllowedNonFilebased) {
-                $result[] = $resource->getDataObject();
+                $result[$resource->getid()] = $resource->getDataObject();
             }
         }
         
         // (2)  the unconfigured services 
         $allUnconfiguredServices = $serviceManager->getAllUnconfiguredServices();
         foreach ($allUnconfiguredServices as $unconfiguredService) {
+            //filter out all configured but not reachable services(the api status request returns different status from available) 
+            if(isset($unconfiguredService->id) && isset($result[$unconfiguredService->id])){
+                unset($result[$unconfiguredService->id]);
+            }
             $result[] = $unconfiguredService;
         }
         
@@ -75,6 +79,9 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
         foreach ($allUninstalledPluginServices as $uninstalledService) {
             $result[] = $uninstalledService;
         }
+        
+        //remove the resource id as array key (it is not required)
+        $result = array_values($result);
         
         //sort the results alphabetically by name
         $customSort = function($a,$b){
