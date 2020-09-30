@@ -32,6 +32,8 @@ class HelpController extends ZfExtended_Controllers_Action {
         $this->_helper->layout->disableLayout();
     }
     public function editorAction() {
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $this->view->youtubeUrl = $translate->_("EditorYoutubeVideoGuide");
         $this->_helper->layout->disableLayout();
     }
     public function languageresourceAction() {
