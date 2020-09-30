@@ -463,6 +463,9 @@ var Attribute={
 	    		  attVal=attVal.replace(/$/mg,'<br>');
 	    	}
 	    }
+	    if(attribute.name === "termNote" && attribute.attrType === "normativeAuthorization"){
+	        attVal=Editor.data.apps.termportal.allPreferredTerm[attVal] ? Editor.data.apps.termportal.allPreferredTerm[attVal] : attVal;
+	    }
 	    return me.getAttributeRenderData(attribute,attVal);
 	},
 	
