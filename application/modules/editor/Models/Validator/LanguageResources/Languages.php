@@ -34,8 +34,8 @@ class editor_Models_Validator_LanguageResources_Languages extends ZfExtended_Mod
         $this->addValidator('id', 'int');
         $this->addValidator('sourceLang', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('targetLang', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('sourceLangRfc5646', 'stringLength', array('min' => 0, 'max' => 7));
-        $this->addValidator('targetLangRfc5646', 'stringLength', array('min' => 0, 'max' => 7));
+        $this->addValidator('sourceLangCode', 'stringLength', array('min' => 0, 'max' => 45));
+        $this->addValidator('targetLangCode', 'stringLength', array('min' => 0, 'max' => 45));
         $this->addValidator('languageResourceId', 'int');
     }
 }

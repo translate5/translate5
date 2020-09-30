@@ -1066,10 +1066,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                     /* @var $model editor_Models_LanguageResources_Languages */
                     
                     $model->setSourceLang($x['language']);
-                    $model->setSourceLangRfc5646($x['rfc5646']);
+                    $model->setSourceLangCode($x['rfc5646']);
                     
                     $model->setTargetLang($y['language']);
-                    $model->setTargetLangRfc5646($y['rfc5646']);
+                    $model->setTargetLangCode($y['rfc5646']);
                     
                     $model->setLanguageResourceId($key);
                     $model->save();

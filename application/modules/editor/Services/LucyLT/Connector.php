@@ -204,10 +204,10 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
         /* @var $resource editor_Services_LucyLT_Resource */
         
         $result = [
-            'source' => $resource->getMappedLanguage($this->languageResource->getSourceLangRfc5646())
+            'source' => $resource->getMappedLanguage($this->languageResource->getSourceLangCode())
         ];
         
-        $result['target'] = $resource->getMappedLanguage($this->languageResource->getTargetLangRfc5646());
+        $result['target'] = $resource->getMappedLanguage($this->languageResource->getTargetLangCode());
         
         return join('-', $result);
     }
