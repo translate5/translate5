@@ -3848,6 +3848,49 @@ The following task was imported with errors / warnings / notices. Please take ca
     <source>Aufgabe verlassen</source>
     <target>Leave application</target>
 </trans-unit>
+<trans-unit id='QW1oYXJpc2No'><source>Amharisch</source><target>Amharic</target></trans-unit>
+<trans-unit id='Q2VidWFubw=='><source>Cebuano</source><target>Cebuano</target></trans-unit>
+<trans-unit id='S29yc2lzY2g='><source>Korsisch</source><target>Corsican</target></trans-unit>
+<trans-unit id='RnJpZXNpc2No'><source>Friesisch</source><target>Frisian</target></trans-unit>
+<trans-unit id='SXJsw6RuZGlzY2g='><source>Irländisch</source><target>Irish</target></trans-unit>
+<trans-unit id='U2Nob3R0aXNjaC1Hw6RsaXNjaA=='><source>Schottisch-Gälisch</source><target>Scots Gaelic</target></trans-unit>
+<trans-unit id='SGF1c2E='><source>Hausa</source><target>Hausa</target></trans-unit>
+<trans-unit id='SGF3YWlhbmlzY2g='><source>Hawaianisch</source><target>Hawaiian</target></trans-unit>
+<trans-unit id='SG1vbmc='><source>Hmong</source><target>Hmong</target></trans-unit>
+<trans-unit id='SGFpdGlhbmlzY2hlcyBLcmVvbA=='><source>Haitianisches Kreol</source><target>Haitian Creole</target></trans-unit>
+<trans-unit id='TGF0ZWlu'><source>Latein</source><target>Latin</target></trans-unit>
+<trans-unit id='THV4ZW1idXJnaXNjaA=='><source>Luxemburgisch</source><target>Luxembourgish</target></trans-unit>
+<trans-unit id='TGFv'><source>Lao</source><target>Lao</target></trans-unit>
+<trans-unit id='TWFkYWdhc3Npc2No'><source>Madagassisch</source><target>Malagasy</target></trans-unit>
+<trans-unit id='TXlhbm1hciAoQmlybWFuaXNjaCk='><source>Myanmar (Birmanisch)</source><target>Myanmar (Burmese)</target></trans-unit>
+<trans-unit id='TmVwYWxp'><source>Nepali</source><target>Nepali</target></trans-unit>
+<trans-unit id='Tm9yd2VnaXNjaA=='><source>Norwegisch</source><target>Norwegian</target></trans-unit>
+<trans-unit id='TnlhbmphIChDaGljaGV3YSk='><source>Nyanja (Chichewa)</source><target>Nyanja (Chichewa)</target></trans-unit>
+<trans-unit id='T2RpYSAoT3JpeWEp'><source>Odia (Oriya)</source><target>Odia (Oriya)</target></trans-unit>
+<trans-unit id='S2lueWFyd2FuZGE='><source>Kinyarwanda</source><target>Kinyarwanda</target></trans-unit>
+<trans-unit id='U2luZGhp'><source>Sindhi</source><target>Sindhi</target></trans-unit>
+<trans-unit id='U2luZ2hhbGVzaXNjaCAoU2luZ2hhbGVzaXNjaCk='><source>Singhalesisch (Singhalesisch)</source><target>Sinhala (Sinhalese)</target></trans-unit>
+<trans-unit id='U2Ftb2Fu'><source>Samoan</source><target>Samoan</target></trans-unit>
+<trans-unit id='U2hvbmE='><source>Shona</source><target>Shona</target></trans-unit>
+<trans-unit id='U3VuZGFuZXNpc2No'><source>Sundanesisch</source><target>Sundanese</target></trans-unit>
+<trans-unit id='VWlndXJpc2No'><source>Uigurisch</source><target>Uyghur</target></trans-unit>
+<trans-unit id='SmlkZGlzY2g='><source>Jiddisch</source><target>Yiddish</target></trans-unit>
+<trans-unit id='UGhpbGlwcGluaXNjaA=='><source>Philippinisch</source><target>Filipino</target></trans-unit>
+<trans-unit id='Rmlkc2NoaWFuaXNjaA=='><source>Fidschianisch</source><target>Fijian</target></trans-unit>
+<trans-unit id='S3VyZGlzY2ggKE5vcmQp'><source>Kurdisch (Nord)</source><target>Kurdish (North)</target></trans-unit>
+<trans-unit id='SG1vbmcgRGF3'><source>Hmong Daw</source><target>Hmong Daw</target></trans-unit>
+<trans-unit id='UXVlcmV0YXJvIE90b21p'><source>Queretaro Otomi</source><target>Queretaro Otomi</target></trans-unit>
+<trans-unit id='RGFyaQ=='><source>Dari</source><target>Dari</target></trans-unit>
+<trans-unit id='S2xpbmdvbmlzY2g='><source>Klingonisch</source><target>Klingon</target></trans-unit>
+<trans-unit id='S2xpbmdvbmlzY2ggKHBscWFEKQ=='><source>Klingonisch (plqaD)</source><target>Klingon (plqaD)</target></trans-unit>
+<trans-unit id='VG9uZ2Fu'><source>Tongan</source><target>Tongan</target></trans-unit>
+<trans-unit id='VGFoaXRpYW4='><source>Tahitian</source><target>Tahitian</target></trans-unit>
+<trans-unit id='WXVjYXRlYyBNYXlh'><source>Yucatec Maya</source><target>Yucatec Maya</target></trans-unit>
+<trans-unit id='S2FudG9uZXNpc2NoICh0cmFkaXRpb25lbGwp'><source>Kantonesisch (traditionell)</source><target>Cantonese (Traditional)</target></trans-unit>
+<trans-unit id='RnJlaWdhYmVzdGF0dXM='><source>Freigabestatus</source><target>Release status</target></trans-unit>
+<trans-unit id='RXJzdGVsbHVuZw=='><source>Erstellung</source><target>Creation</target></trans-unit>
+<trans-unit id='RXJsYXVidGVzIFN5bm9ueW0='><source>Erlaubtes Synonym</source><target>Admitted synonym</target></trans-unit>
+<trans-unit id='VmVyYm90ZW5lIEJlbmVubnVuZw=='><source>Verbotene Benennung</source><target>Forbidden designation</target></trans-unit>
 <trans-unit id='RGVtby1RTS1GZWhsZXIgMQ=='><source>Demo-QM-Fehler 1</source><target>Demo QM error 1</target></trans-unit>
 <trans-unit id='RmFsc2NoZSDDnGJlcnNldHp1bmc='><source>Falsche Übersetzung</source><target>Mistranslation</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ2llcHJvYmxlbQ=='><source>Terminologieproblem</source><target>Terminology problem</target></trans-unit>

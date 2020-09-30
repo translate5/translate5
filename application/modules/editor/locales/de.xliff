@@ -1834,6 +1834,49 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='R2VzcGVycnQgZGEgYWxzIEV4Y2VsIGV4cG9ydGllcnQuIFp1bSBFbnRzcGVycmVuIEV4Y2VsIHJlLWltcG9ydGllcmVuLiBGYWxscyBFeGNlbCBuaWNodCB6dXIgSGFuZDogTmV1IGV4cG9ydGllcmVuLg=='><source>Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.</source><target>Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.</target></trans-unit>
 <trans-unit id='PGI+S2VpbmUgRXJnZWJuaXNzZSBnZWZ1bmRlbjwvYj48YnIvPkbDvHIgSWhyZSBTdWNoZSBnaWJ0IGVzIGtlaW5lIEVpbnRyw6RnZSBpbiBkZXIgVGVybWlub2xvZ2llIHVuZCBkZW0gVHJhbnNsYXRpb24gTWVtb3J5IHVuZCBmw7xyIGRpZSBnZXfDpGhsdGUgU3ByYWNoa29tYmluYXRpb24gc3RlaHQga2VpbmUgbWFzY2hpbmVsbGUgw5xiZXJzZXR6dW5nIHp1ciBWZXJmw7xndW5nLg=='><source><b>Keine Ergebnisse gefunden</b><br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.</source><target><b>Keine Ergebnisse gefunden</b><br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Aufgabe verlassen</target></trans-unit>
+<trans-unit id='QW1oYXJpc2No'><source>Amharisch</source><target>Amharisch</target></trans-unit>
+<trans-unit id='Q2VidWFubw=='><source>Cebuano</source><target>Cebuano</target></trans-unit>
+<trans-unit id='S29yc2lzY2g='><source>Korsisch</source><target>Korsisch</target></trans-unit>
+<trans-unit id='RnJpZXNpc2No'><source>Friesisch</source><target>Friesisch</target></trans-unit>
+<trans-unit id='SXJsw6RuZGlzY2g='><source>Irländisch</source><target>Irländisch</target></trans-unit>
+<trans-unit id='U2Nob3R0aXNjaC1Hw6RsaXNjaA=='><source>Schottisch-Gälisch</source><target>Schottisch-Gälisch</target></trans-unit>
+<trans-unit id='SGF1c2E='><source>Hausa</source><target>Hausa</target></trans-unit>
+<trans-unit id='SGF3YWlhbmlzY2g='><source>Hawaianisch</source><target>Hawaianisch</target></trans-unit>
+<trans-unit id='SG1vbmc='><source>Hmong</source><target>Hmong</target></trans-unit>
+<trans-unit id='SGFpdGlhbmlzY2hlcyBLcmVvbA=='><source>Haitianisches Kreol</source><target>Haitianisches Kreol</target></trans-unit>
+<trans-unit id='TGF0ZWlu'><source>Latein</source><target>Latein</target></trans-unit>
+<trans-unit id='THV4ZW1idXJnaXNjaA=='><source>Luxemburgisch</source><target>Luxemburgisch</target></trans-unit>
+<trans-unit id='TGFv'><source>Lao</source><target>Lao</target></trans-unit>
+<trans-unit id='TWFkYWdhc3Npc2No'><source>Madagassisch</source><target>Madagassisch</target></trans-unit>
+<trans-unit id='TXlhbm1hciAoQmlybWFuaXNjaCk='><source>Myanmar (Birmanisch)</source><target>Myanmar (Birmanisch)</target></trans-unit>
+<trans-unit id='TmVwYWxp'><source>Nepali</source><target>Nepali</target></trans-unit>
+<trans-unit id='Tm9yd2VnaXNjaA=='><source>Norwegisch</source><target>Norwegisch</target></trans-unit>
+<trans-unit id='TnlhbmphIChDaGljaGV3YSk='><source>Nyanja (Chichewa)</source><target>Nyanja (Chichewa)</target></trans-unit>
+<trans-unit id='T2RpYSAoT3JpeWEp'><source>Odia (Oriya)</source><target>Odia (Oriya)</target></trans-unit>
+<trans-unit id='S2lueWFyd2FuZGE='><source>Kinyarwanda</source><target>Kinyarwanda</target></trans-unit>
+<trans-unit id='U2luZGhp'><source>Sindhi</source><target>Sindhi</target></trans-unit>
+<trans-unit id='U2luZ2hhbGVzaXNjaCAoU2luZ2hhbGVzaXNjaCk='><source>Singhalesisch (Singhalesisch)</source><target>Singhalesisch (Singhalesisch)</target></trans-unit>
+<trans-unit id='U2Ftb2Fu'><source>Samoan</source><target>Samoan</target></trans-unit>
+<trans-unit id='U2hvbmE='><source>Shona</source><target>Shona</target></trans-unit>
+<trans-unit id='U3VuZGFuZXNpc2No'><source>Sundanesisch</source><target>Sundanesisch</target></trans-unit>
+<trans-unit id='VWlndXJpc2No'><source>Uigurisch</source><target>Uigurisch</target></trans-unit>
+<trans-unit id='SmlkZGlzY2g='><source>Jiddisch</source><target>Jiddisch</target></trans-unit>
+<trans-unit id='UGhpbGlwcGluaXNjaA=='><source>Philippinisch</source><target>Philippinisch</target></trans-unit>
+<trans-unit id='Rmlkc2NoaWFuaXNjaA=='><source>Fidschianisch</source><target>Fidschianisch</target></trans-unit>
+<trans-unit id='S3VyZGlzY2ggKE5vcmQp'><source>Kurdisch (Nord)</source><target>Kurdisch (Nord)</target></trans-unit>
+<trans-unit id='SG1vbmcgRGF3'><source>Hmong Daw</source><target>Hmong Daw</target></trans-unit>
+<trans-unit id='UXVlcmV0YXJvIE90b21p'><source>Queretaro Otomi</source><target>Queretaro Otomi</target></trans-unit>
+<trans-unit id='RGFyaQ=='><source>Dari</source><target>Dari</target></trans-unit>
+<trans-unit id='S2xpbmdvbmlzY2g='><source>Klingonisch</source><target>Klingonisch</target></trans-unit>
+<trans-unit id='S2xpbmdvbmlzY2ggKHBscWFEKQ=='><source>Klingonisch (plqaD)</source><target>Klingonisch (plqaD)</target></trans-unit>
+<trans-unit id='VG9uZ2Fu'><source>Tongan</source><target>Tongan</target></trans-unit>
+<trans-unit id='VGFoaXRpYW4='><source>Tahitian</source><target>Tahitian</target></trans-unit>
+<trans-unit id='WXVjYXRlYyBNYXlh'><source>Yucatec Maya</source><target>Yucatec Maya</target></trans-unit>
+<trans-unit id='S2FudG9uZXNpc2NoICh0cmFkaXRpb25lbGwp'><source>Kantonesisch (traditionell)</source><target>Kantonesisch (traditionell)</target></trans-unit>
+<trans-unit id='RnJlaWdhYmVzdGF0dXM='><source>Freigabestatus</source><target>Freigabestatus</target></trans-unit>
+<trans-unit id='RXJzdGVsbHVuZw=='><source>Erstellung</source><target>Erstellung</target></trans-unit>
+<trans-unit id='RXJsYXVidGVzIFN5bm9ueW0='><source>Erlaubtes Synonym</source><target>Erlaubtes Synonym</target></trans-unit>
+<trans-unit id='VmVyYm90ZW5lIEJlbmVubnVuZw=='><source>Verbotene Benennung</source><target>Verbotene Benennung</target></trans-unit>
 <trans-unit id='RGVtby1RTS1GZWhsZXIgMQ=='><source>Demo-QM-Fehler 1</source><target>Demo-QM-Fehler 1</target></trans-unit>
 <trans-unit id='RmFsc2NoZSDDnGJlcnNldHp1bmc='><source>Falsche Übersetzung</source><target>Falsche Übersetzung</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ2llcHJvYmxlbQ=='><source>Terminologieproblem</source><target>Terminologieproblem</target></trans-unit>
