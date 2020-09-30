@@ -18,7 +18,7 @@
       </trans-unit>
       <trans-unit id="TGVrdG9yaWVydCwgdW5iZXLDvGhydCwgYXV0by1nZXNldHp0IGJlaW0gQXVmZ2FiZW5hYnNjaGx1c3M=">
         <source>Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss</source>
-        <target>Reviewed, unchanged, auto-set at finish of workflow step</target>
+        <target>Reviewed, untouched, auto-set at finish of workflow step</target>
       </trans-unit>
       <trans-unit id="TGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0">
         <source>Lektoriert, unverändert</source>
