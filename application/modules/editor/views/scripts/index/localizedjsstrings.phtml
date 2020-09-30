@@ -1344,8 +1344,8 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             searchTitle: '<?php echo $this->translate->_('Konkordanzsuche');?>',
             matchTitle:'<?php echo $this->translate->_('Matches');?>',
-            sourceEmptyText:'<?php echo $this->translate->_('Quelltextsuche');?>',
-            targetEmptyText:'<?php echo $this->translate->_('Zieltextsuche');?>',
+            sourceEmptyText:'<?php echo $this->translate->_('Suche im Ausgangstext');?>',
+            targetEmptyText:'<?php echo $this->translate->_('Suche im Zieltext');?>',
             panelTitle:'<?php echo $this->translate->_('Matches und Konkordanz-Suche');?>',
         }
     });
@@ -1353,7 +1353,7 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.view.LanguageResources.MatchGrid", {
         override: "Editor.view.LanguageResources.MatchGrid",
         strings: {
-            source: '<?php echo $this->translate->_('Quelltext');?>',
+            source: '<?php echo $this->translate->_('Ausgangstext');?>',
             target: '<?php echo $this->translate->_('Zieltext');?>',
             match: '<?php echo $this->translate->_('Matchrate');?>',
             ctrl: '<?php echo $this->translate->_('STRG');?>',
@@ -1367,13 +1367,13 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.view.LanguageResources.SearchGrid", {
         override: "Editor.view.LanguageResources.SearchGrid",
         strings: {
-            source: '<?php echo $this->translate->_('Quelltext');?>',
+            source: '<?php echo $this->translate->_('Ausgangstext');?>',
             target: '<?php echo $this->translate->_('Zieltext');?>',
             match: '<?php echo $this->translate->_('Matchrate');?>',
             ctrl: '<?php echo $this->translate->_('STRG');?>',
             tmresource: '<?php echo $this->translate->_('TM-Ressource');?>',
-            sourceEmptyText:'<?php echo $this->translate->_('Quelltextsuche');?>',
-            targetEmptyText:'<?php echo $this->translate->_('Zieltextsuche');?>',
+            sourceEmptyText:'<?php echo $this->translate->_('Suche im Ausgangstext');?>',
+            targetEmptyText:'<?php echo $this->translate->_('Suche im Zieltext');?>',
             search:'<?php echo $this->translate->_('Alle durchsuchen');?>',
             singleSearch:'<?php echo $this->translate->_('Suche in {0}');?>'
         }
