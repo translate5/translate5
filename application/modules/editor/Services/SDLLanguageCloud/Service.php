@@ -45,13 +45,13 @@ class editor_Services_SDLLanguageCloud_Service extends editor_Services_ServiceAb
      * @see editor_Services_ServiceAbstract::isConfigured()
      */
     public function isConfigured() {
-        if (!isset($this->config->runtimeOptions->LanguageResources->sdllanguagecloud->server)) {
+        if (!isset($this->config->runtimeOptions->LanguageResources->sdllanguagecloud->server) || empty($this->config->runtimeOptions->LanguageResources->sdllanguagecloud->server)) {
             return false;
         }
-        if (!isset($this->config->runtimeOptions->LanguageResources->sdllanguagecloud->apiKey)) {
+        if (!isset($this->config->runtimeOptions->LanguageResources->sdllanguagecloud->apiKey) || empty($this->config->runtimeOptions->LanguageResources->sdllanguagecloud->apiKey)) {
             return false;
         }
-        if (!isset($this->config->runtimeOptions->LanguageResources->sdllanguagecloud->matchrate)) {
+        if (!isset($this->config->runtimeOptions->LanguageResources->sdllanguagecloud->matchrate) || empty($this->config->runtimeOptions->LanguageResources->sdllanguagecloud->matchrate)) {
             return false;
         }
         return true;
