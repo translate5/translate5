@@ -45,13 +45,13 @@ class editor_Services_Microsoft_Service extends editor_Services_ServiceAbstract 
      * @see editor_Services_ServiceAbstract::isConfigured()
      */
     public function isConfigured() {
-        if (!isset($this->config->runtimeOptions->LanguageResources->microsoft->apiKey)) {
+        if (!isset($this->config->runtimeOptions->LanguageResources->microsoft->apiKey) || empty($this->config->runtimeOptions->LanguageResources->microsoft->apiKey)) {
             return false;
         }
-        if (!isset($this->config->runtimeOptions->LanguageResources->microsoft->apiUrl)) {
+        if (!isset($this->config->runtimeOptions->LanguageResources->microsoft->apiUrl) || empty($this->config->runtimeOptions->LanguageResources->microsoft->apiUrl)) {
             return false;
         }
-        if (!isset($this->config->runtimeOptions->LanguageResources->microsoft->matchrate)) {
+        if (!isset($this->config->runtimeOptions->LanguageResources->microsoft->matchrate) || empty($this->config->runtimeOptions->LanguageResources->microsoft->matchrate)) {
             return false;
         }
         return true;

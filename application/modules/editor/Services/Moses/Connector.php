@@ -143,7 +143,8 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
-        $res = $this->languageResource->getResource();
+        //TODO: change the usage of resource in each connector in all lr
+        $res = $this->resource;
         /* @var $res editor_Services_Moses_Resource */
         
         $http = ZfExtended_Factory::get('Zend_Http_Client');
