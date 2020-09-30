@@ -1834,6 +1834,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='R2VzcGVycnQgZGEgYWxzIEV4Y2VsIGV4cG9ydGllcnQuIFp1bSBFbnRzcGVycmVuIEV4Y2VsIHJlLWltcG9ydGllcmVuLiBGYWxscyBFeGNlbCBuaWNodCB6dXIgSGFuZDogTmV1IGV4cG9ydGllcmVuLg=='><source>Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.</source><target>Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.</target></trans-unit>
 <trans-unit id='PGI+S2VpbmUgRXJnZWJuaXNzZSBnZWZ1bmRlbjwvYj48YnIvPkbDvHIgSWhyZSBTdWNoZSBnaWJ0IGVzIGtlaW5lIEVpbnRyw6RnZSBpbiBkZXIgVGVybWlub2xvZ2llIHVuZCBkZW0gVHJhbnNsYXRpb24gTWVtb3J5IHVuZCBmw7xyIGRpZSBnZXfDpGhsdGUgU3ByYWNoa29tYmluYXRpb24gc3RlaHQga2VpbmUgbWFzY2hpbmVsbGUgw5xiZXJzZXR6dW5nIHp1ciBWZXJmw7xndW5nLg=='><source><b>Keine Ergebnisse gefunden</b><br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.</source><target><b>Keine Ergebnisse gefunden</b><br/>Für Ihre Suche gibt es keine Einträge in der Terminologie und dem Translation Memory und für die gewählte Sprachkombination steht keine maschinelle Übersetzung zur Verfügung.</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSB2ZXJsYXNzZW4='><source>Aufgabe verlassen</source><target>Aufgabe verlassen</target></trans-unit>
+<trans-unit id='QXVzZ2VibGVuZGV0ZSBiZWFyYmVpdGJhcmUgU3BhbHRlbiB3dXJkZW4gc2ljaHRiYXIgZ2VzY2hhbHRldCwgZGEgZGllIEF1ZmdhYmUgenVtIEVkaXRpZXJlbiBnZcO2ZmZuZXQgd3VyZGUsIGFiZXIga2VpbmUgZWRpdGllcmJhcmUgU3BhbHRlIHNpY2h0YmFyIHdhci4='><source>Ausgeblendete bearbeitbare Spalten wurden sichtbar geschaltet, da die Aufgabe zum Editieren geöffnet wurde, aber keine editierbare Spalte sichtbar war.</source><target>Ausgeblendete bearbeitbare Spalten wurden sichtbar geschaltet, da die Aufgabe zum Editieren geöffnet wurde, aber keine editierbare Spalte sichtbar war.</target></trans-unit>
 <trans-unit id='QW1oYXJpc2No'><source>Amharisch</source><target>Amharisch</target></trans-unit>
 <trans-unit id='Q2VidWFubw=='><source>Cebuano</source><target>Cebuano</target></trans-unit>
 <trans-unit id='S29yc2lzY2g='><source>Korsisch</source><target>Korsisch</target></trans-unit>
@@ -1873,6 +1874,18 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='VGFoaXRpYW4='><source>Tahitian</source><target>Tahitian</target></trans-unit>
 <trans-unit id='WXVjYXRlYyBNYXlh'><source>Yucatec Maya</source><target>Yucatec Maya</target></trans-unit>
 <trans-unit id='S2FudG9uZXNpc2NoICh0cmFkaXRpb25lbGwp'><source>Kantonesisch (traditionell)</source><target>Kantonesisch (traditionell)</target></trans-unit>
+<trans-unit id='RnJlaWdhYmVzdGF0dXM='><source>Freigabestatus</source><target>Freigabestatus</target></trans-unit>
+<trans-unit id='RXJzdGVsbHVuZw=='><source>Erstellung</source><target>Erstellung</target></trans-unit>
+<trans-unit id='RXJsYXVidGVzIFN5bm9ueW0='><source>Erlaubtes Synonym</source><target>Erlaubtes Synonym</target></trans-unit>
+<trans-unit id='VmVyYm90ZW5lIEJlbmVubnVuZw=='><source>Verbotene Benennung</source><target>Verbotene Benennung</target></trans-unit>
+<trans-unit id='RGVtby1RTS1GZWhsZXIgMQ=='><source>Demo-QM-Fehler 1</source><target>Demo-QM-Fehler 1</target></trans-unit>
+<trans-unit id='RmFsc2NoZSDDnGJlcnNldHp1bmc='><source>Falsche Übersetzung</source><target>Falsche Übersetzung</target></trans-unit>
+<trans-unit id='VGVybWlub2xvZ2llcHJvYmxlbQ=='><source>Terminologieproblem</source><target>Terminologieproblem</target></trans-unit>
+<trans-unit id='RmxpZcOfZW5kZXMgUHJvYmxlbQ=='><source>Fließendes Problem</source><target>Fließendes Problem</target></trans-unit>
+<trans-unit id='SW5rb25zaXN0ZW56'><source>Inkonsistenz</source><target>Inkonsistenz</target></trans-unit>
+<trans-unit id='TWFudWVsbGVyIERlbW8gU3RhdHVzIDE='><source>Manueller Demo Status 1</source><target>Manueller Demo Status 1</target></trans-unit>
+<trans-unit id='TXVzcyBlcm5ldXQgw7xiZXJwcsO8ZnQgd2VyZGVu'><source>Muss erneut überprüft werden</source><target>Muss erneut überprüft werden</target></trans-unit>
+<trans-unit id='S2VpbiBTdGF0dXMgZmVzdGdlbGVndA=='><source>Kein Status festgelegt</source><target>Kein Status festgelegt</target></trans-unit>
   </body>
  </file>
 </xliff>
