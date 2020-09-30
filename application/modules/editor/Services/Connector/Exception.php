@@ -35,6 +35,7 @@ class editor_Services_Connector_Exception extends ZfExtended_ErrorCodeException 
     protected $domain = 'editor.languageresource.service.connector';
     
     static protected $localErrorCodes = [
-        'E1282' => 'Language resource communication error.'
+        'E1282' => 'Language resource communication error.',
+        'E1288' => 'The language code [{languageCode}] from resource [{resourceName}] is not valid or does not exist in the translate5 language code collection.'
     ];
 }

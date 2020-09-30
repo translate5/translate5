@@ -37,4 +37,26 @@ class editor_Services_Microsoft_Resource extends editor_Models_LanguageResources
         $this->analysable = true;//is used by match analysis
         $this->type = editor_Models_Segment_MatchRateType::TYPE_MT;
     }
+    
+    /***
+     * Check if the valid resource language is valid for the api.
+     * {@inheritDoc}
+     * @see editor_Models_LanguageResources_Resource::hasSourceLang()
+     */
+    public function hasSourceLang(editor_Models_Languages $sourceLang) {
+        $api = ZfExtended_Factory::get('editor_Services_Microsoft_HttpApi');
+        /* @var $api editor_Services_Microsoft_HttpApi */
+        return $api->isValidLanguage($sourceLang->getRfc5646());
+    }
+    
+    /***
+     * Check if the valid resource language is valid for the api
+     * {@inheritDoc}
+     * @see editor_Models_LanguageResources_Resource::hasTargetLang()
+     */
+    public function hasTargetLang(editor_Models_Languages $targetLang) {
+        $api = ZfExtended_Factory::get('editor_Services_Microsoft_HttpApi');
+        /* @var $api editor_Services_Microsoft_HttpApi */
+        return $api->isValidLanguage($targetLang->getRfc5646());
+    }
 }

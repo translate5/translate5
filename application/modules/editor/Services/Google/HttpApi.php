@@ -118,11 +118,24 @@ class editor_Services_Google_HttpApi {
      * @return boolean
      */
     public function getStatus(){
-        $result=$this->getTranslateClient()->translate('Hello, this is simple test.',[
-            'source'=>'en',
-            'target'=>'de'
-        ]);
-        return !empty($result);
+        try {
+            $result=$this->getTranslateClient()->translate('Hi',[
+                'source'=>'en',
+                'target'=>'de'
+            ]);
+            return !empty($result);
+        } catch (Exception $e) {
+            $this->badGateway($e);
+            return false;
+        }
+    }
+    
+    /***
+     * A list of supported ISO 639-1 language codes.
+     * @return array
+     */
+    public function getLanguages() {
+        return $this->getTranslateClient()->languages();
     }
     
     /***
@@ -168,7 +181,16 @@ class editor_Services_Google_HttpApi {
         
         $error = new stdClass();
         $error->type = 'HTTP';
-        $error->error = $e->getMessage();
+        try {
+            $jsonError = json_decode($e->getMessage());
+            $err = $jsonError->error;
+            $error->error = $err->message;
+            $error->code = $err->code;
+            $badGateway->setMessage($err->message);
+        } catch (Exception $e) {
+            $error->error = $e->getMessage();
+        }
+        
         $error->method ='GET';
         
         $badGateway->setErrors([$error]);

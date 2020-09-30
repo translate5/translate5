@@ -204,10 +204,10 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
         /* @var $resource editor_Services_LucyLT_Resource */
         
         $result = [
-            'source' => $resource->getMappedLanguage($this->languageResource->getSourceLangRfc5646())
+            'source' => $resource->getMappedLanguage($this->languageResource->getSourceLangCode())
         ];
         
-        $result['target'] = $resource->getMappedLanguage($this->languageResource->getTargetLangRfc5646());
+        $result['target'] = $resource->getMappedLanguage($this->languageResource->getTargetLangCode());
         
         return join('-', $result);
     }
@@ -233,17 +233,14 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
     }
     
     public function getStatus(& $moreInfo){
-        $res = $this->languageResource->getResource();
-        /* @var $res editor_Services_Moses_Resource */
-        
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
         
-        $auth = explode(':', $res->getCredentials());
+        $auth = explode(':', $this->resource->getCredentials());
         $http->setAuth($auth[0], $auth[1]);
         $http->setConfig(['timeout' => 3]);
         
-        $url = rtrim($res->getUrl(), '/');
+        $url = rtrim($this->resource->getUrl(), '/');
         $http->setUri($url.'/mtrans/exec');
         $http->setHeaders('Content-Type: application/json');
         $http->setHeaders('Accept: application/json');
@@ -264,7 +261,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
             case 200:
                 if(strpos($response->getBody(), 'resource path="mtrans/exec"') !== false) {
                     return self::STATUS_AVAILABLE;
-                };
+                }
                 break;
             case 401:
                 $moreInfo = 'Translate5 can not authenticate itself at the Lucy LT server.';

@@ -52,10 +52,10 @@ class editor_Services_Moses_Service extends editor_Services_ServiceAbstract {
      * @see editor_Services_ServiceAbstract::isConfigured()
      */
     public function isConfigured() {
-        if (!isset($this->config->runtimeOptions->LanguageResources->moses->server)) {
+        if (!isset($this->config->runtimeOptions->LanguageResources->moses->server) || empty($this->config->runtimeOptions->LanguageResources->moses->server)) {
             return false;
         }
-        if (!isset($this->config->runtimeOptions->LanguageResources->moses->matchrate)) {
+        if (!isset($this->config->runtimeOptions->LanguageResources->moses->matchrate) || empty($this->config->runtimeOptions->LanguageResources->moses->matchrate)) {
             return false;
         }
         return true;
