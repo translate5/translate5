@@ -40,7 +40,7 @@ Ext.define('Editor.view.project.ProjectActionMenu', {
   constructor: function(instanceConfig) {
 	    var me = this,
 	    config = {
-	        items:[,{
+	        items:[{
 		        text: me.messages.actionDeleteProject,
 		        action: 'editorDeleteProject',
 		        glyph: 'f2ed@FontAwesome5FreeSolid',

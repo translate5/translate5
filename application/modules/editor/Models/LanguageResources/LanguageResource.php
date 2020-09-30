@@ -70,17 +70,17 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public $targetLang;
     
     /***
-     * Source lang rfc value helper property 
+     * Source language code value helper property 
      * @var String
      */
-    public $sourceLangRfc5646;
+    public $sourceLangCode;
     
     
     /***
-     * Target lang rfc value helper property
+     * Target lang code value helper property
      * @var String
      */
-    public $targetLangRfc5646;
+    public $targetLangCode;
     
     
     /***
@@ -163,7 +163,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             ->from(array('tm' => 'LEK_languageresources'),array('tm.*'))
             ->setIntegrityCheck(false)
             ->join(array('ca' => 'LEK_languageresources_customerassoc'), 'tm.id = ca.languageResourceId', '')
-            ->join(array('l' => 'LEK_languageresources_languages'), 'tm.id = l.languageResourceId', array('sourceLang','targetLang','sourceLangRfc5646','targetLangRfc5646'))
+            ->join(array('l' => 'LEK_languageresources_languages'), 'tm.id = l.languageResourceId', array('sourceLang','targetLang','sourceLangCode','targetLangCode'))
             ->where('ca.customerId IN(?)',$customers);
 
             if(!empty($serviceNames)){
@@ -325,27 +325,27 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
     
     /***
-     * Get the source lang rfc values from the languageresource language table.
+     * Get the source lang code from the languageresource language table.
      * Note: the enity id need to be valid
      * @return array|string
      */
-    public function getSourceLangRfc5646(){
-        if(!$this->sourceLangRfc5646){
-            $this->sourceLangRfc5646=$this->getLanguageByField('sourceLangRfc5646');
+    public function getSourceLangCode(){
+        if(!$this->sourceLangCode){
+            $this->sourceLangCode=$this->getLanguageByField('sourceLangCode');
         }
-        return $this->sourceLangRfc5646;
+        return $this->sourceLangCode;
     }
     
     /***
-     * Get the target lang rfc values from the languageresource language table.
+     * Get the target lang code from the languageresource language table.
      * Note: the enity id need to be valid
      * @return array|string
      */
-    public function getTargetLangRfc5646(){
-        if(!$this->targetLangRfc5646){
-            $this->targetLangRfc5646=$this->getLanguageByField('targetLangRfc5646');
+    public function getTargetLangCode(){
+        if(!$this->targetLangCode){
+            $this->targetLangCode=$this->getLanguageByField('targetLangCode');
         }
-        return $this->targetLangRfc5646;
+        return $this->targetLangCode;
     }
     
     /***
@@ -374,7 +374,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     
     /***
      * Merge the group the languages by language resource. In the return array for each language resource, all available languages ids and 
-     * rfc language values will be in separate array.
+     * language code values will be in separate array.
      * NOTE: the function is used to merge the languages from ungrouped results from "loadByUserCustomerAssocs" function.
      * 
      * @param array $languageResources
@@ -391,14 +391,14 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
                 
                 //init the language resource languages array, and save the first language
                 $languageResources[$key]['sourceLang']=[];
-                $languageResources[$key]['sourceLangRfc5646']=[];
+                $languageResources[$key]['sourceLangCode']=[];
                 $languageResources[$key]['sourceLang'][]=$res['sourceLang'];
-                $languageResources[$key]['sourceLangRfc5646'][]=$res['sourceLangRfc5646'];
+                $languageResources[$key]['sourceLangCode'][]=$res['sourceLangCode'];
                 
                 $languageResources[$key]['targetLang']=[];
-                $languageResources[$key]['targetLangRfc5646']=[];
+                $languageResources[$key]['targetLangCode']=[];
                 $languageResources[$key]['targetLang'][]=$res['targetLang'];
-                $languageResources[$key]['targetLangRfc5646'][]=$res['targetLangRfc5646'];
+                $languageResources[$key]['targetLangCode'][]=$res['targetLangCode'];
                 
                 $removeMeAfter=false;
             }
@@ -406,11 +406,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             //check if the language allready exist for the language resource
             if(!in_array($res['sourceLang'], $languageResources[$resIndex[$res['id']]]['sourceLang'])){
                 $languageResources[$resIndex[$res['id']]]['sourceLang'][]=$res['sourceLang'];
-                $languageResources[$resIndex[$res['id']]]['sourceLangRfc5646'][]=$res['sourceLangRfc5646'];
+                $languageResources[$resIndex[$res['id']]]['sourceLangCode'][]=$res['sourceLangCode'];
             }
             if(!in_array($res['targetLang'], $languageResources[$resIndex[$res['id']]]['targetLang'])){
                 $languageResources[$resIndex[$res['id']]]['targetLang'][]=$res['targetLang'];
-                $languageResources[$resIndex[$res['id']]]['targetLangRfc5646'][]=$res['targetLangRfc5646'];
+                $languageResources[$resIndex[$res['id']]]['targetLangCode'][]=$res['targetLangCode'];
             }
             
             //remove the result from the array

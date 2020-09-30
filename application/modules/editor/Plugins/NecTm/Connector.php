@@ -77,13 +77,24 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     protected $sourceLangForNecTm;
     protected $targetLangForNecTm;
     
+    
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::__construct()
+     */
+    public function __construct() {
+        parent::__construct();
+        $this->api = ZfExtended_Factory::get('editor_Plugins_NecTm_HttpApi');
+    }
+    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
      */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
         parent::connectTo($languageResource, $sourceLang, $targetLang);
-        $this->api = ZfExtended_Factory::get('editor_Plugins_NecTm_HttpApi');
+        
         $this->xmlparser= ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         // The NEC-TM-Api uses "Tags"; we handle them via categories:
         $this->setCategories($languageResource);
@@ -113,8 +124,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
      */
     protected function setLanguagesForNecTm($languageResource) {
-        $this->sourceLangForNecTm = $this->getLangCodeForNecTm($languageResource->sourceLangRfc5646);
-        $this->targetLangForNecTm = $this->getLangCodeForNecTm($languageResource->targetLangRfc5646);
+        $this->sourceLangForNecTm = $this->getLangCodeForNecTm($languageResource->sourceLangCode);
+        $this->targetLangForNecTm = $this->getLangCodeForNecTm($languageResource->targetLangCode);
     }
     
     /**
@@ -276,7 +287,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             $config = Zend_Registry::get('config');
             $serverName = $config->runtimeOptions->server->name;
             //replace non-alpha-numeric characters
-            $filename = preg_replace('/[^a-z0-9]+/', '_', strtolower($serverName));
+            $filename = preg_replace('/[^a-z0-9]+/', '_', strtolower($serverName)).'.tmx';
         }
         $source= $this->prepareSegmentContent($this->getQueryString($segment));
         $target= $this->prepareSegmentContent($segment->getTargetEdit());

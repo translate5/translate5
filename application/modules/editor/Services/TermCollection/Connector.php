@@ -209,12 +209,15 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         return $this->resultList;
     }
 
-    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
+        if(!isset($this->languageResource)){
+            //this should come from the resource status check in the resources api request
+            return self::STATUS_AVAILABLE;
+        }
         $status=$this->languageResource->getSpecificData('status');
         if(empty($status)){
             $status=self::STATUS_AVAILABLE;

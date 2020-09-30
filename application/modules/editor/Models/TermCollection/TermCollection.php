@@ -102,8 +102,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         /* @var $languageModel editor_Models_Languages */
         
         //get source and target language fuzzies
-        $sourceLangs=$languageModel->getFuzzyLanguages($sourceLang);
-        $targetLangs=$languageModel->getFuzzyLanguages($targetLang);
+        $sourceLangs=$languageModel->getFuzzyLanguages($sourceLang,'id',true);
+        $targetLangs=$languageModel->getFuzzyLanguages($targetLang,'id',true);
         
         $sqlOld_and_very_slow_on_large_data=' SELECT * FROM LEK_terms '.
               'WHERE groupId IN ( '.
@@ -323,12 +323,12 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         
         //if the language does not exist in the assoc as source, add entry with the source as $language and empty as target
         if(!$lngAssoc->isInCollection($language, 'sourceLang', $collectionId)){
-            $lngAssoc->saveLanguages($language, null, $collectionId);
+            $lngAssoc->saveLanguagesWithRfcCode($language, null, $collectionId);
         }
         
         //if the language does not exist in the assoc as target, add entry with the target as $language and empty as source
         if(!$lngAssoc->isInCollection($language, 'targetLang', $collectionId)){
-            $lngAssoc->saveLanguages(null, $language, $collectionId);
+            $lngAssoc->saveLanguagesWithRfcCode(null, $language, $collectionId);
         }
     }
     

@@ -114,8 +114,8 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         /* @var $languageModel editor_Models_Languages */
         
         //get source and target language fuzzies
-        $sourceLangs=$languageModel->getFuzzyLanguages($task->getSourceLang());
-        $targetLangs=$languageModel->getFuzzyLanguages($task->getTargetLang());
+        $sourceLangs=$languageModel->getFuzzyLanguages($task->getSourceLang(),'id',true);
+        $targetLangs=$languageModel->getFuzzyLanguages($task->getTargetLang(),'id',true);
         
         //get all available services
         $services=ZfExtended_Factory::get('editor_Services_Manager');

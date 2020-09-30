@@ -538,11 +538,26 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         $sourceLangId = $this->getParam('sourceLang');
         $targetLangId = $this->getParam('targetLang');
+        
         $validLanguages = $this->validateLanguages($resource, $sourceLangId, $targetLangId);
         
         if(!$validLanguages || !$this->validate()){
             return;
         }
+        
+        $sourceLangCode = null;
+        $targetLangCode = null;
+        //find the language codes for the current resource
+        //in each resource separate language code matching should be introduced
+        //because some of the resources are supporting different type of language codes
+        //rfc as a language code will be used when no custom matching is implemented for the resource
+        if(!empty($sourceLangId)){
+            $sourceLangCode = $resource->getLanguageCodeSource($sourceLangId);
+        }
+        if(!empty($targetLangId)){
+            $targetLangCode = $resource->getLanguageCodeTarget($targetLangId);
+        }
+
         //set the entity resource type from the $resource
         $this->entity->setResourceType($resource->getType());
         
@@ -576,7 +591,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //save the resource languages to
         $resourceLanguages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
         /* @var $resourceLanguages editor_Models_LanguageResources_Languages */
-        $resourceLanguages->saveLanguages($sourceLangId, $targetLangId, $this->data['id']);
+        $resourceLanguages->setSourceLang($sourceLangId);
+        $resourceLanguages->setSourceLangCode($sourceLangCode);
+        $resourceLanguages->setTargetLang($targetLangId);
+        $resourceLanguages->setTargetLangCode($targetLangCode);
+        $resourceLanguages->setLanguageResourceId($this->data['id']);
+        if(!empty($sourceLangId) || !empty($targetLangId)){
+            $resourceLanguages->save();
+        }
         
         if($resource->getFilebased()) {
             $this->handleInitialFileUpload($manager);
@@ -748,7 +770,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         $errors = [];
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $t ZfExtended_Zendoverwrites_Translate */;;
+        /* @var $t ZfExtended_Zendoverwrites_Translate */
         
         if(!$hasSourceLang) {
             $errors['sourceLang'] = $t->_('Diese Quellsprache wird von der Ressource nicht unterstützt!');
