@@ -156,8 +156,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         tooltip: me.strings.tasks,
                         action: 'tasks',
                         iconCls: 'ico-tm-tasks',
+                        hidden:true,
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            return record.get('status') == 'novalidlicense' ? true : false;
+                            item.hidden=!record.get('writable');
                         }
                     },{
                         action: 'import',
