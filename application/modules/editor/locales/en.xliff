@@ -22,11 +22,11 @@
       </trans-unit>
       <trans-unit id="TGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0">
         <source>Lektoriert, unverändert</source>
-        <target>Reviewed, untouched</target>
+        <target>Reviewed, unchanged</target>
       </trans-unit>
       <trans-unit id="TGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv">
         <source>Lektoriert, unverändert, auto</source>
-        <target>Reviewed, untouched, auto-set</target>
+        <target>Reviewed, unchanged, auto-set</target>
       </trans-unit>
       <trans-unit id="Mi4gTGVrdG9yYXQ=">
         <source>2. Lektorat</source>
@@ -3891,6 +3891,15 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='RXJzdGVsbHVuZw=='><source>Erstellung</source><target>Creation</target></trans-unit>
 <trans-unit id='RXJsYXVidGVzIFN5bm9ueW0='><source>Erlaubtes Synonym</source><target>Admitted synonym</target></trans-unit>
 <trans-unit id='VmVyYm90ZW5lIEJlbmVubnVuZw=='><source>Verbotene Benennung</source><target>Forbidden designation</target></trans-unit>
+<trans-unit id='RGVtby1RTS1GZWhsZXIgMQ=='><source>Demo-QM-Fehler 1</source><target>Demo QM error 1</target></trans-unit>
+<trans-unit id='RmFsc2NoZSDDnGJlcnNldHp1bmc='><source>Falsche Übersetzung</source><target>Mistranslation</target></trans-unit>
+<trans-unit id='VGVybWlub2xvZ2llcHJvYmxlbQ=='><source>Terminologieproblem</source><target>Terminology problem</target></trans-unit>
+<trans-unit id='RmxpZcOfZW5kZXMgUHJvYmxlbQ=='><source>Fließendes Problem</source><target>Fluency issue</target></trans-unit>
+<trans-unit id='SW5rb25zaXN0ZW56'><source>Inkonsistenz</source><target>Inconsistency</target></trans-unit>
+<trans-unit id='TWFudWVsbGVyIERlbW8gU3RhdHVzIDE='><source>Manueller Demo Status 1</source><target>Demo manual status 1</target></trans-unit>
+<trans-unit id='TXVzcyBlcm5ldXQgw7xiZXJwcsO8ZnQgd2VyZGVu'><source>Muss erneut überprüft werden</source><target>Needs to be re-checked</target></trans-unit>
+<trans-unit id='S2VpbiBTdGF0dXMgZmVzdGdlbGVndA=='><source>Kein Status festgelegt</source><target>no status set</target></trans-unit>
+<trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv'><source>PM lektoriert, unverändert, auto</source><target>PM reviewed, unchanged, auto-set</target></trans-unit>
 </body>
   </file>
 </xliff>

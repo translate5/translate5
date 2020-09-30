@@ -85,8 +85,22 @@ class editor_Services_Manager {
         foreach(self::$registeredServices as $service) {
             $service = ZfExtended_Factory::get($service.self::CLS_SERVICE);
             /* @var $service editor_Services_ServiceAbstract */
-            if (!$service->isConfigured() || empty($service->getResources())) {
+            
+            $resource = $service->getResources()[0] ?? false;
+            if (!$service->isConfigured() || empty($resource)) {
                 $serviceNames[] = (object) ['name' => '['.$service->getName().']', 'serviceName' => $service->getName(), 'helppage' => urldecode($service->getHelppage())];
+                continue;
+            }
+
+            //for the resource check the connection
+            if(!empty($resource)){
+                $connector = ZfExtended_Factory::get($resource->serviceType.editor_Services_Manager::CLS_CONNECTOR);
+                /* @var $connector editor_Services_Connector_Abstract */
+                
+                //the service is also not available when connection cannot be established
+                if($connector && !$connector->ping($resource)){
+                    $serviceNames[] = (object) ['id'=>$resource->getid(),'name' => '['.$service->getName().']', 'serviceName' => $service->getName(), 'helppage' => urldecode($service->getHelppage())];
+                }
             }
         }
         return $serviceNames;
