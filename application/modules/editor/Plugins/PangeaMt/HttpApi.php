@@ -115,6 +115,34 @@ class editor_Plugins_PangeaMt_HttpApi {
         return $this->getEngines(); // test status by requesting the engines that the API provides
     }
     
+    /***
+     * Get all supported languages by the api, grouped by source and target language
+     * 
+     * @return array
+     */
+    public function getLanguages() {
+        if (!$this->getEngines()) {
+            return [];
+        }
+        $allEngines = $this->getResult();
+        $allSupportedSourceLangs = [];
+        $allSupportedTargetLangs = [];
+        foreach ($allEngines as $engine) {
+            if (!in_array($engine->src, $allSupportedSourceLangs)) {
+                $allSupportedSourceLangs[] = $engine->src;
+            }
+            if (!in_array($engine->tgt, $allSupportedTargetLangs)) {
+                $allSupportedTargetLangs[] = $engine->tgt;
+            }
+            
+        }
+        sort($allSupportedSourceLangs);
+        sort($allSupportedTargetLangs);
+        return [
+            editor_Services_Connector_Abstract::SOURCE_LANGUAGES_KEY=> $allSupportedSourceLangs,
+            editor_Services_Connector_Abstract::TARGET_LANGUAGES_KEY => $allSupportedTargetLangs,
+        ];
+    }
     // -------------------------------------------------------------------------
     // General handling of the API-requests
     // TODO: most of the following code is the same for each language-resource...

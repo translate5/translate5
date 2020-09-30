@@ -63,7 +63,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         $this->termModel = ZfExtended_Factory::get('editor_Models_Term');
         $lang = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $lang editor_Models_Languages */
-        $this->targetFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getTargetLang());
+        $this->targetFuzzyLanguages = $lang->getFuzzyLanguages($this->task->getTargetLang(),'id',true);
     }
     
     /**

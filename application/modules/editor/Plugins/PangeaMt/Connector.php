@@ -77,8 +77,8 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
         });
             
         $results = null;
-        $sourceLang = $this->languageResource->getSourceLangRfc5646(); // = e.g. "de", TODO: validate against $this->sourceLang (e.g. 4)
-        $targetLang = $this->languageResource->getTargetLangRfc5646();// = e.g. "en"; TODO: validate against $this->targetLang (e.g. 5)
+        $sourceLang = $this->languageResource->getSourceLangCode(); // = e.g. "de", TODO: validate against $this->sourceLang (e.g. 4)
+        $targetLang = $this->languageResource->getTargetLangCode();// = e.g. "en"; TODO: validate against $this->targetLang (e.g. 5)
         $engineId = $this->languageResource->getSpecificData('engineId');
         
         if($this->api->search($queryString, $sourceLang, $targetLang, $engineId)){
@@ -103,7 +103,6 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
         }
         return $this->resultList;
     }
-    
     
     /**
      * (non-PHPdoc)
@@ -132,8 +131,8 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
             return $this->resultList;
         }
         $allResults = null;
-        $sourceLang = $this->languageResource->getSourceLangRfc5646(); // = e.g. "de", TODO: validate against $this->sourceLang (e.g. 4)
-        $targetLang = $this->languageResource->getTargetLangRfc5646();// = e.g. "en"; TODO: validate against $this->targetLang (e.g. 5)
+        $sourceLang = $this->languageResource->getSourceLangCode(); // = e.g. "de", TODO: validate against $this->sourceLang (e.g. 4)
+        $targetLang = $this->languageResource->getTargetLangCode();// = e.g. "en"; TODO: validate against $this->targetLang (e.g. 5)
         $engineId = $this->languageResource->getSpecificData('engineId');
         if($this->api->search($searchString, $sourceLang, $targetLang, $engineId)){
             $allResults = $this->api->getResult();

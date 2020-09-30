@@ -209,7 +209,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         return $this->resultList;
     }
 
-    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()

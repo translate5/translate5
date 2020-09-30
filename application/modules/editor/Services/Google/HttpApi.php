@@ -119,7 +119,7 @@ class editor_Services_Google_HttpApi {
      */
     public function getStatus(){
         try {
-            $result=$this->getTranslateClient()->translate('Hello, this is simple test.',[
+            $result=$this->getTranslateClient()->translate('Hi',[
                 'source'=>'en',
                 'target'=>'de'
             ]);
@@ -128,6 +128,14 @@ class editor_Services_Google_HttpApi {
             $this->badGateway($e);
             return false;
         }
+    }
+    
+    /***
+     * A list of supported ISO 639-1 language codes.
+     * @return array
+     */
+    public function getLanguages() {
+        return $this->getTranslateClient()->languages();
     }
     
     /***
