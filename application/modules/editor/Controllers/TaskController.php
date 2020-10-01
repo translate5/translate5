@@ -1528,10 +1528,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 break;
         }
 
-
-        $workerId = $worker->queue();
-
-        //FIXME multiple problems here
+        //FIXME multiple problems here with the export worker
         // it is possible that we get the following in DB (implicit ordererd by ID here):
         //      Export_Worker for ExportReq1
         //      Export_Worker for ExportReq2 → overwrites the tempExportDir of ExportReq1
@@ -1540,17 +1537,28 @@ class editor_TaskController extends ZfExtended_RestController {
         //
         // If we implement in future export workers which need to work on the temp export data,
         // we have to ensure that each export worker get its own export directory.
+        $workerId = $worker->queue();
 
         $worker = ZfExtended_Factory::get('editor_Models_Export_ExportedWorker');
         /* @var $worker editor_Models_Export_ExportedWorker */
-        $zipFile = $worker->initZip($this->entity->getTaskGuid(), $exportFolder);
 
+        if($context == 'filetranslation') {
+            $zipFile = $worker->initWaitOnly($this->entity->getTaskGuid(), $exportFolder);
+        }
+        else {
+            $zipFile = $worker->initZip($this->entity->getTaskGuid(), $exportFolder);
+        }
 
         //TODO for the API usage of translate5 blocking on export makes no sense
         // better would be a URL to fetch the latest export or so (perhaps using state 202?)
         $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
         $worker->queue($workerId);
 
+        if($context == 'filetranslation') {
+            $this->provideFiletranslationDownload($exportFolder);
+            exit;
+        }
+        
         //currently we can only strip the directory path for xliff2 exports, since for default exports we need this as legacy code
         // can be used in general with implementation of TRANSLATE-764
         if($context == 'xliff2') {
@@ -1566,11 +1574,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $suffix = '.zip';
         }
 
-        if($context == 'filetranslation') {
-            $this->provideFiletranslationDownload($zipFile);
-            exit;
-        }
-
         $this->logInfo('Task exported', ['context' => $context, 'diff' => $diff]);
         $this->provideZipDownload($zipFile, $suffix);
 
@@ -1583,25 +1586,55 @@ class editor_TaskController extends ZfExtended_RestController {
      * extracts the translated file from given $zipFile and sends it to the browser.
      * @param string $zipFile
      */
-    protected function provideFiletranslationDownload($zipFile) {
-        $za = new ZipArchive;
-        if ($za->open($zipFile) !== TRUE) {
-            throw new ZfExtended_NotFoundException("Archive Zip for task ".$this->entity->getTaskGuid()." could not be found");
+    protected function provideFiletranslationDownload($exportFolder) {
+        clearstatcache(); //ensure that files modfied by other plugins are available in stat cache
+        $content = scandir($exportFolder);
+        error_log(print_r($content,1));
+        $foundFile = null;
+        foreach($content as $file) {
+            //skip dots and all xlf files,
+            if($file == '.' || $file == '..') {
+                continue;
+            }
+            //if no non xlf file was found yet, we use the xlf as found file
+            if(empty($foundFile) && preg_match('/\.xlf$/i', $file)) {
+                $foundFile = $file;
+                //but we try to look for another file, so continue here
+                continue;
+            }
+            //if we found a non xlf file, this file is used:
+            $foundFile = $file;
+            break;
         }
+        
+        $clean = function() use($exportFolder) {
+            $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+                'Recursivedircleaner'
+                );
+            $recursivedircleaner->delete($exportFolder);
+        };
+        
+        $translatedfile = $exportFolder.DIRECTORY_SEPARATOR.$foundFile;
+        error_log("Trans ".$translatedfile);
+        error_log("Found ".$foundFile);
+        if(empty($foundFile) || !file_exists($translatedfile)) {
+            $clean();
+            throw new ZfExtended_NotFoundException('Requested file not found!');
+        }
+        
+        $pathInfo = pathinfo($translatedfile);
+        
         // where do we find what, what is named how.
         $languages = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languages editor_Models_Languages */
         $languages->load($this->entity->getTargetLang());
         $targetLangRfc = $languages->getRfc5646();
-        $filenamename = $this->entity->getImportfilename('filename');
-        $filenamesuffix = $this->entity->getImportfilename('suffix');
-        $filenameImported = $filenamename . '.' . $filenamesuffix;
-        $filenameExport = $filenamename . '_' . $targetLangRfc . '.' . $filenamesuffix;
-        $destination = $this->entity->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.'exportZip';
-        // extract and send the translated file to the browser
-        $za->extractTo($destination);
-        $translatedfile = $destination.DIRECTORY_SEPARATOR.$this->entity->getTaskGuid().DIRECTORY_SEPARATOR.$filenameImported;
-        $za->close();
+        
+        $filenameExport = $pathInfo['filename'] . '_' . $targetLangRfc;
+        
+        if(!empty('.' . $pathInfo['extension'])) {
+            $filenameExport .= '.' . $pathInfo['extension'];
+        }
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
         header('Content-Description: File Transfer');
@@ -1611,6 +1644,7 @@ class editor_TaskController extends ZfExtended_RestController {
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Pragma: public');
         readfile($translatedfile);
+        $clean(); //remove export dir
     }
 
     /**

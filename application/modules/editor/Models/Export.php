@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -136,8 +136,8 @@ class editor_Models_Export {
     }
     
     /**
-     * decide regarding to the fileextension, which FileParser should be loaded and return it. 
-     *  Returns null if no fileparser was stored to the file. This can happen on errors in preprocessing of files without a native file parser. 
+     * decide regarding to the fileextension, which FileParser should be loaded and return it.
+     *  Returns null if no fileparser was stored to the file. This can happen on errors in preprocessing of files without a native file parser.
      *
      * @param int $fileId
      * @param string $path
