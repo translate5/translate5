@@ -206,7 +206,19 @@ If you did not send the request yourself, please inform us of this.
 </trans-unit>
 <trans-unit id='SWhyIFdlYmJyb3dzZXIgd2lyZCBuaWNodCBtZWhyIHVudGVyc3TDvHR6dA=='><source>Ihr Webbrowser wird nicht mehr unterstützt</source><target>Your browser is not supported anymore</target></trans-unit>
 <trans-unit id='TGVpZGVyIHdpcmQgZGVyIE1pY3Jvc29mdCBJbnRlcm5ldCBFeHBsb3JlciB2b24gdHJhbnNsYXRlNSBuaWNodCBtZWhyIHVudGVyc3TDvHR6dC4gQml0dGUgYmVudXR6ZW4gU2llIGVpbmVuIGFuZGVyZW4gV2ViYnJvd3NlciB3aWUgei5CLiBHb29nbGUgQ2hyb21lLCBNb3ppbGxhIEZpcmVGb3gsIEFwcGxlIFNhZmFyaSBvZGVyIE1pY3Jvc29mdCBFZGdlLg=='><source>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</source><target>We're sorry but Microsoft Internet Explorer is not supported anymore by translate5. Please use a more modern browser like Google Chrome, Mozilla FireFox, Apple Safari or Microsoft Edge.</target></trans-unit>  
-<trans-unit id='RWRpdG9yWW91dHViZVZpZGVvR3VpZGU='><source>EditorYoutubeVideoGuide</source><target>https://www.youtube.com/embed/BJQRFmWhOH8</target></trans-unit>
+<trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{ProjectOverviewYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/BJQRFmWhOH8</target></trans-unit>
+<trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{ProjectOverviewYoutubeVideoGuideDescriptionContent}</source><target><br/>
+Overview:<br/>
+<a target="youtubevideoframe" href="https://www.youtube.com/embed/BJQRFmWhOH8?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+<a target="youtubevideoframe" href="https://www.youtube.com/embed/BJQRFmWhOH8?start=18&amp;autoplay=1" dir="auto">0:18</a> Main Sections<br/>
+<a target="youtubevideoframe" href="https://www.youtube.com/embed/BJQRFmWhOH8?start=32&amp;autoplay=1" dir="auto">0:32</a> Projects<br/>
+<a target="youtubevideoframe" href="https://www.youtube.com/embed/BJQRFmWhOH8?start=54&amp;autoplay=1" dir="auto">0:54</a> Tasks<br/>
+<a target="youtubevideoframe" href="https://www.youtube.com/embed/BJQRFmWhOH8?start=101&amp;autoplay=1" dir="auto">1:41</a> Language resources<br/>
+<a target="youtubevideoframe" href="https://www.youtube.com/embed/BJQRFmWhOH8?start=138&amp;autoplay=1" dir="auto">2:18</a> TermPortal<br/>
+<a target="youtubevideoframe" href="https://www.youtube.com/embed/BJQRFmWhOH8?start=150&amp;autoplay=1" dir="auto">2:30</a> InstantTranslate<br/>
+<a target="youtubevideoframe" href="https://www.youtube.com/embed/BJQRFmWhOH8?start=167&amp;autoplay=1" dir="auto">2:47</a> Editor<br/>
+<a target="youtubevideoframe" href="https://www.youtube.com/embed/BJQRFmWhOH8?start=210&amp;autoplay=1" dir="auto">3:30</a> Contact information<br/></target>
+</trans-unit>
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>
