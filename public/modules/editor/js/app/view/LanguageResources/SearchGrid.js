@@ -57,12 +57,12 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
     layout: 'fit',
     scrollable: true,
     strings: {
-        source: '#UT#Quelltext',
+        source: '#UT#Ausgangstext',
         target: '#UT#Zieltext',
         match: '#UT#Matchrate',
         ctrl: '#UT#STRG',
-        sourceEmptyText:'#UT#Quelltextsuche',
-        targetEmptyText:'#UT#Zieltextsuche',
+        sourceEmptyText:'#UT#Suche im Ausgangstext',
+        targetEmptyText:'#UT#Suche im Zieltext',
         tmresource:'#UT#TM-Ressource',
         search:'#UT#Alle durchsuchen',
         singleSearch:'#UT#Suche in {0}'
