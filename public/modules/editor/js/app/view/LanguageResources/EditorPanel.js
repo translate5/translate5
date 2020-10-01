@@ -48,8 +48,8 @@ Ext.define('Editor.view.LanguageResources.EditorPanel', {
     strings: {
         searchTitle: '#UT#Konkordanzsuche',
         matchTitle:'#UT#Matches',
-        sourceEmptyText:'#UT#Quelltextsuche',
-        targetEmptyText:'#UT#Zieltextsuche',
+        sourceEmptyText:'#UT#Suche im Ausgangstext',
+        targetEmptyText:'#UT#Suche im Zieltext',
         panelTitle:'#UT#Matches und Konkordanz-Suche'
     },
     bind: {
