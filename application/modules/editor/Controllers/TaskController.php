@@ -1589,7 +1589,6 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function provideFiletranslationDownload($exportFolder) {
         clearstatcache(); //ensure that files modfied by other plugins are available in stat cache
         $content = scandir($exportFolder);
-        error_log(print_r($content,1));
         $foundFile = null;
         foreach($content as $file) {
             //skip dots and all xlf files,
@@ -1615,8 +1614,6 @@ class editor_TaskController extends ZfExtended_RestController {
         };
         
         $translatedfile = $exportFolder.DIRECTORY_SEPARATOR.$foundFile;
-        error_log("Trans ".$translatedfile);
-        error_log("Found ".$foundFile);
         if(empty($foundFile) || !file_exists($translatedfile)) {
             $clean();
             throw new ZfExtended_NotFoundException('Requested file not found!');
