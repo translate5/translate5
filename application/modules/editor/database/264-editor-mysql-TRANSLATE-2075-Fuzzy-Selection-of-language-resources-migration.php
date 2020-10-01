@@ -88,13 +88,19 @@ function convertLanguage(string $needle,array $haystack) {
     return $return;
 }
 foreach ($result as $res){
+    echo "To check : ".$res['name']. ' Service:'.$res['serviceName'] .'<br/>'. PHP_EOL;
     if(!isset($languagesCache[$res['languageResourceId']])){
+        try {
         $connector = ZfExtended_Factory::get($res['serviceType'].editor_Services_Manager::CLS_CONNECTOR);
         /* @var $connector editor_Services_Connector_Abstract */
         $languages=$connector->languages();
         $languagesCache[$res['languageResourceId']]=$languages;
+        } catch (Exception $e) {
+            echo "Resource with name: ".$res['name']. ' ignored because of error. Error was:'.$e->getMessage() .'<br/>'. PHP_EOL;
+            continue;
+        }
     }
-    echo "To check : ".$res['name']. ' Service:'.$res['serviceName'] .'<br/>'. PHP_EOL;
+    
     
     $languages = $languagesCache[$res['languageResourceId']];
     $s = convertLanguage($res['sourceLangCode'], $languages[editor_Services_Connector_Abstract::SOURCE_LANGUAGES_KEY] ??  $languages);
