@@ -3901,6 +3901,8 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='TXVzcyBlcm5ldXQgw7xiZXJwcsO8ZnQgd2VyZGVu'><source>Muss erneut überprüft werden</source><target>Needs to be re-checked</target></trans-unit>
 <trans-unit id='S2VpbiBTdGF0dXMgZmVzdGdlbGVndA=='><source>Kein Status festgelegt</source><target>no status set</target></trans-unit>
 <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv'><source>PM lektoriert, unverändert, auto</source><target>PM reviewed, unchanged, auto-set</target></trans-unit>
+<trans-unit id='U3VjaGUgaW0gQXVzZ2FuZ3N0ZXh0'><source>Suche im Ausgangstext</source><target>Search in the source text</target></trans-unit>
+<trans-unit id='U3VjaGUgaW0gWmllbHRleHQ='><source>Suche im Zieltext</source><target>Search in the target text</target></trans-unit>
 </body>
   </file>
 </xliff>
