@@ -33,7 +33,12 @@ use Symfony\Component\Console\Exception\RuntimeException;
  * Initializes the Zend based Translate5 Core application
  */
 class Application {
-
+    /**
+     * flag if the session should be regularly started or not (by default off)
+     * @var boolean
+     */
+    public static $startSession = false;
+    
     protected $zendIncludeDir = [
         './library/zend/'
     ];
@@ -66,7 +71,7 @@ class Application {
         define('APPLICATION_ENV', 'application');
         
         require_once 'Zend/Session.php';
-        \Zend_Session::$_unitTestEnabled = true;
+        \Zend_Session::$_unitTestEnabled = ! self::$startSession;
         require_once 'library/ZfExtended/BaseIndex.php';
         \ZfExtended_BaseIndex::$addMaintenanceConfig = true;
         $index = \ZfExtended_BaseIndex::getInstance();
