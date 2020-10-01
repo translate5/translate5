@@ -106,7 +106,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
           
         //set the task to null. View model binding will not be triggered
         //with undefined task values
-        if(task == undefined){
+        if(task === undefined){
             task = null;
         }
         vm.set('currentTask',task);
