@@ -167,7 +167,7 @@ Ext.define('Editor.controller.ViewModes', {
             var conf = {},
                 columnProto = Ext.ClassManager.getByAlias('widget.'+column.xtype).prototype;
             //calculate if column should be hidden in readonly mode:
-            conf.isHiddenInReadonly = (column.isContentColumn && !column.isEditableContentColumn && column.segmentField.get('editable'));
+            conf.isContentColumnWithEditablePendant = (column.isContentColumn && !column.isEditableContentColumn && column.segmentField.get('editable'));
             
             //the following values may be set either in the column class or in the column config in the grid
             // so if in the config they are missing, they have to fetched from the class
@@ -253,7 +253,7 @@ Ext.define('Editor.controller.ViewModes', {
         me.gridPreset.forEach(function(column){
             preset.push({
                 id: column.stateId,
-                hidden: column.isHiddenInReadonly && readonly || column.hidden,
+                hidden: column.hidden,
                 width: column.width
             });
         });
@@ -291,7 +291,7 @@ Ext.define('Editor.controller.ViewModes', {
                     newcol.width = 90;
                     break;
                 case "contentColumn_source": 
-                    newcol.hidden = column.isHiddenInReadonly; //hides the column if there is an editable pendant
+                    newcol.hidden = column.isContentColumnWithEditablePendant; //hides the column if there is an editable pendant
                     newcol.flex = 1/contentColumns;
                     break;
                 case "contentColumn_relais": 
@@ -299,12 +299,15 @@ Ext.define('Editor.controller.ViewModes', {
                     newcol.flex = 1/contentColumns;
                     break;
                 case "contentColumn_target": 
-                    newcol.hidden = !readonly;
+                    newcol.hidden = true;
                     newcol.flex = 1/contentColumns;
                     break;
                 case "contentColumn_source_edit": 
+                    newcol.hidden = !column.isContentColumnWithEditablePendant; //show the column instead of the non editable one
+                    newcol.flex = 1/contentColumns;
+                    break;
                 case "contentColumn_target_edit": 
-                    newcol.hidden = readonly;
+                    newcol.hidden = false;
                     newcol.flex = 1/contentColumns;
                     break;
             }
