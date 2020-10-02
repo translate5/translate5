@@ -89,7 +89,7 @@ class editor_Models_Import_SegmentProcessor_RelaisSourceCompare {
      * @param string $content
      * @return string
      */
-    private function normalize(string $content) {
+    public function normalize(string $content) {
         if($this->configuredCompareMode & self::MODE_IGNORE_TAGS) {
             $content = $this->internalTag->replace($content, ' ');
             //trim removes leading / trailing whitespaces added by tag removing

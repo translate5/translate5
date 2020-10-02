@@ -62,7 +62,8 @@ Ext.define('Editor.controller.Editor', {
         editorMove: '#UT#Der Segmenteditor kann mit der Maus beliebig positioniert werden. <br />Dazu lediglich den Segmenteditor anklicken und dann verschieben.',
         takeTagTooltip: '#UT#STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.',
         saveAnyway: '#UT# Trotzdem speichern',
-        doubleclickToTakeMatch: '#UT# Doppelklick auf die Zeile übernimmt diesen Match in das geöffnete Segment.'
+        doubleclickToTakeMatch: '#UT# Doppelklick auf die Zeile übernimmt diesen Match in das geöffnete Segment.',
+        noVisibleContentColumn:'#UT#Ausgeblendete bearbeitbare Spalten wurden sichtbar geschaltet, da die Aufgabe zum Editieren geöffnet wurde, aber keine editierbare Spalte sichtbar war.'
     },
     DEC_DIGITS: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
     refs : [{
@@ -333,7 +334,13 @@ Ext.define('Editor.controller.Editor', {
      * saves the segment of the already opened editor and restarts startEditing call 
      */
     handleBeforeStartEdit: function(plugin, args){
-        var me = this, segment = args[0], i = 0, deferInterval; 
+        var me = this, 
+            segment = args[0], 
+            i = 0, 
+            deferInterval;
+        //check the content editable column visibility
+        me.handleNotEditableContentColumn();
+        
         //if there is already an edited segment, we have to save that first
         if(plugin.editing) {
             this.fireEvent('prepareTrackChangesForSaving');
@@ -371,8 +378,8 @@ Ext.define('Editor.controller.Editor', {
                 }
                 if(skip || !pending) {
                     clearInterval(deferInterval);
-                    me.getSegmentGrid().setLoading(false);                    
-                }         
+                    me.getSegmentGrid().setLoading(false);
+                }
             },500);
             return false;
         }
@@ -1770,6 +1777,9 @@ Ext.define('Editor.controller.Editor', {
         var me=this,
             segmentIdFromHash = Editor.app.parseSegmentIdFromTaskEditHash(true);
 
+        //check the content editable column visibility
+        me.handleNotEditableContentColumn();
+        
         if(store.getCount() == 0) {
             return;
         }
@@ -1799,5 +1809,28 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
         htmlEditor.setSegmentSize(grid,newSize,oldSize);
+    },
+    
+    /***
+     * Make sure that there is an editable content column when user try to edit segment when the task is in edit mode
+     */
+    handleNotEditableContentColumn:function(){
+        var me=this,
+            isReadOnly = me.getSegmentGrid().lookupViewModel().get('taskIsReadonly');
+        
+        if(isReadOnly){
+            return;
+        }
+        
+        var hiddenEditable=Ext.ComponentQuery.query('contentEditableColumn[hidden="true"]'),
+            allEditable = Ext.ComponentQuery.query('contentEditableColumn');
+
+        if(hiddenEditable.length == allEditable.length){
+            //no visible content editable column found. Show info message and display all hidden content editable columns
+            Editor.MessageBox.addInfo(this.messages.noVisibleContentColumn);
+            for(var i=0;i<hiddenEditable.length;i++){
+                hiddenEditable[i].setVisible(true);
+            }
+        }
     }
 });

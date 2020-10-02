@@ -197,7 +197,7 @@ class LoginController extends ZfExtended_Controllers_Login {
                     
                 )
             ));
-            $link->setOrder(3);
+            $link->setOrder(4);
             $this->_form->addElement($link);
         }
         

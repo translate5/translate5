@@ -294,6 +294,12 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $this->view->allProcessstatus = $allProcessStatus;
         //set the processStatus translations so it can be used in the frontend to
         $this->view->Php2JsVars()->set('apps.termportal.allProcessstatus',$allProcessStatus);
+        
+        $this->view->Php2JsVars()->set('apps.termportal.allPreferredTerm',[
+            'preferredTerm'=>$this->translate->_('Vorzugsbenennung'),
+            'deprecatedTerm'=>$this->translate->_('Verbotene Benennung'),
+            'admittedTerm'=>$this->translate->_('Erlaubtes Synonym')
+        ]);
     }
     
     /**

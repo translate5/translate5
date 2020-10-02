@@ -37,8 +37,8 @@ class editor_Models_Validator_LanguageResources_LanguageResource extends ZfExten
         $this->addValidator('name', 'stringLength', array('min' => 0, 'max' => 1024));
         $this->addValidator('sourceLang', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('targetLang', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('sourceLangRfc5646', 'stringLength', array('min' => 0, 'max' => 7));
-        $this->addValidator('targetLangRfc5646', 'stringLength', array('min' => 0, 'max' => 7));
+        $this->addValidator('sourceLangCode', 'stringLength', array('min' => 0, 'max' => 45));
+        $this->addValidator('targetLangCode', 'stringLength', array('min' => 0, 'max' => 45));
         $this->addValidator('color', 'stringLength', array('min' => 0, 'max' => 8));
         $this->addValidator('resourceId', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('serviceName', 'stringLength', array('min' => 0, 'max' => 255));

@@ -60,13 +60,18 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
             /* @var $resource editor_Models_LanguageResources_Resource */
             $isFilebased = $resource->getFilebased();
             if($isFilebased && $isAllowedFilebased || !$isFilebased && $isAllowedNonFilebased) {
-                $result[] = $resource->getDataObject();
+                $result[$resource->getid()] = $resource->getDataObject();
             }
         }
         
         // (2)  the unconfigured services 
         $allUnconfiguredServices = $serviceManager->getAllUnconfiguredServices();
         foreach ($allUnconfiguredServices as $unconfiguredService) {
+            //filter out all configured but not reachable services(the api status request returns different status from available) 
+            if(isset($unconfiguredService->id) && isset($result[$unconfiguredService->id])){
+                unset($result[$unconfiguredService->id]);
+                unset($unconfiguredService->id);
+            }
             $result[] = $unconfiguredService;
         }
         
@@ -75,6 +80,27 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
         foreach ($allUninstalledPluginServices as $uninstalledService) {
             $result[] = $uninstalledService;
         }
+        
+        // (4) load the resource available languages for each service resource
+        foreach ($result as &$r){
+            // if there is no id set, the service is unconfigured
+            if(!isset($r->id)){
+                continue;
+            }
+            $service = ZfExtended_Factory::get($r->serviceType.editor_Services_Manager::CLS_SERVICE);
+            /* @var $service editor_Services_ServiceAbstract */
+            $resource = $service->getResources()[0] ?? false;
+            if(!empty($resource)){
+                $connector = ZfExtended_Factory::get($r->serviceType.editor_Services_Manager::CLS_CONNECTOR);
+                /* @var $connector editor_Services_Connector_Abstract */
+                $languages=$connector->languages();
+                $r->sourceLanguages =$this->handleLanguageCodes($languages[editor_Services_Connector_Abstract::SOURCE_LANGUAGES_KEY] ??  $languages);
+                $r->targetLanguages =$this->handleLanguageCodes($languages[editor_Services_Connector_Abstract::TARGET_LANGUAGES_KEY] ?? $languages);
+            }
+        }
+
+        //remove the resource id as array key (it is not required)
+        $result = array_values($result);
         
         //sort the results alphabetically by name
         $customSort = function($a,$b){
@@ -101,6 +127,19 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
 
     public function postAction() {
         throw new ZfExtended_BadMethodCallException(__CLASS__.'->post');
+    }
+    
+    /***
+     * For each language code in the input array, try to find the matching languages record from
+     * the lek_languages table.
+     *
+     * @param array $languages
+     * @return array[]
+     */
+    protected function handleLanguageCodes(array $languages){
+        $mapper = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguagesMapper');
+        /* @var $mapper editor_Models_LanguageResources_LanguagesMapper */
+        return $mapper->map($languages);
     }
 }
 

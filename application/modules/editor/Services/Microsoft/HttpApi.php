@@ -97,28 +97,23 @@ class editor_Services_Microsoft_HttpApi {
         }
         $params = "&from=".$sourceLang."&to=".$targetLang;
 
-        try{
-            $requestBody =[
-                [
-                    'Text' => $text,
-                ]
-            ];
-            $content = json_encode($requestBody);
-
-            $result = $this->searchApi($path,$params, $content);
-            $result=$this->processResponse($result);
+        $requestBody =[
+            [
+                'Text' => $text,
+            ]
+        ];
+        $content = json_encode($requestBody);
+        $result = $this->searchApi($path,$params, $content);
+        
+        //if the DictionaryLookup produces an error, try with the normal translate request
+        if(empty($this->result) && !empty($this->error) && $this->isDictionaryLookup){
             //if in directory lookup the result is empty, trigger a normal result so translation from microsoft is received
-            if(empty($this->result) && $isDirecotrLookup){
-                $path="/translate?api-version=3.0";
-                $result = $this->searchApi($path,$params,$content);
-                return $this->processResponse($result);
-            }
-            return $result;
-        } catch (Exception $e) {
-            error_log(print_r($e->getMessage(),1));
-            //$this->badGateway($e);
-            return false;
+            $path="/translate?api-version=3.0";
+            $result = $this->searchApi($path,$params,$content);
+            return $this->processTranslateResponse($result);
         }
+        
+        return $this->processTranslateResponse($result);
     }
 
     /***
@@ -130,6 +125,8 @@ class editor_Services_Microsoft_HttpApi {
      * @return string
      */
     protected function searchApi($path,$params,$content) {
+        //reset the errors array
+        $this->error = [];
         $headers = "Content-type: application/json\r\n" .
             "Content-length: " . strlen($content) . "\r\n" .
             "Ocp-Apim-Subscription-Key: $this->apiKey\r\n" .
@@ -145,7 +142,11 @@ class editor_Services_Microsoft_HttpApi {
             )
         );
         $context  = stream_context_create ($options);
-        $result = file_get_contents ($this->apiUrl . $path . $params, false, $context);
+        $result = @file_get_contents ($this->apiUrl . $path . $params, false, $context);
+        if (false === $result) {
+            $this->error[] = error_get_last();
+            return false;
+        }
         return $result;
     }
 
@@ -165,10 +166,58 @@ class editor_Services_Microsoft_HttpApi {
      * @return boolean
      */
     public function getStatus(){
-        return true;
+        return !empty($this->search('Hello world.', 'en', 'de'));
     }
 
 
+    /***
+     * Gets the set of languages currently supported for translation
+     * @return string|boolean
+     */
+    public function getLanguages(){
+        $path = "/languages?api-version=3.0";
+        $headers = "Content-type: application/json\r\n" .
+            "Ocp-Apim-Subscription-Key: $this->apiKey\r\n" .
+            "X-ClientTraceId: " . ZfExtended_Utils::uuid() . "\r\n";
+        
+        // NOTE: Use the key 'http' even if you are making an HTTPS request. See:
+        // https://php.net/manual/en/function.stream-context-create.php
+        $options = array (
+            'http' => array (
+                'header' => $headers,
+                'method' => 'GET'
+            )
+        );
+        //retunr only the supported languages for translation
+        $params = '&scope=translation';
+        $context  = stream_context_create ($options);
+        $response = @file_get_contents ($this->apiUrl . $path.$params, false, $context);
+        
+        if (false === $response) {
+            $this->error[] = error_get_last();
+            $this->badGateway();
+        }
+        $decode = json_decode($response,true);
+        //The value of the translation property is a dictionary of (key, value) pairs. 
+        //Each key is a BCP 47 language tag. A key identifies a language for which text can be translated to or translated from
+        $this->result = $decode['translation'] ?? [];
+        return $this->getResult();
+    }
+
+    /***
+     * Check if the given language code is valid for the api
+     * @param string $languageCode: language code
+     * @return boolean
+     */
+    public function isValidLanguage($languageCode){
+        try {
+            $this->search('Hi','en', $languageCode);
+            return empty($this->error);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+    
     /**
      * returns the found errors
      */
@@ -184,25 +233,26 @@ class editor_Services_Microsoft_HttpApi {
         return $this->result;
     }
 
-    protected function badGateway(Exception $e) {
-        $badGateway = new ZfExtended_BadGateway('Die angefragte Microsoft Instanz ist nicht erreichbar', 0, $e);
-        $badGateway->setDomain('Microsoft Api');
-
-        $error = new stdClass();
-        $error->type = 'HTTP';
-        $error->error = $e->getMessage();
-        $error->method ='GET';
-
-        $badGateway->setErrors([$error]);
-        throw $badGateway;
+    protected function badGateway() {
+        $errors= $this->getErrors()[0] ?? [];
+        $ex=new editor_Services_Connector_Exception('E1282',[
+            'errors' => $errors
+        ]);
+        $ex->setMessage($errors['message'] ?? '');
+        throw $ex;
     }
 
     /**
      * Set the response result
      * @return boolean
      */
-    protected function processResponse($response) {
+    protected function processTranslateResponse($response) {
+        if(!empty($this->error)){
+            throw $this->badGateway();
+        }
+        
         $result=json_decode($response,true);
+        
         $translation=isset($result[0]['translations']) ? $result[0]['translations'] : [];
         if(empty($translation)&& $translation !== "0"){
             return empty($this->error);

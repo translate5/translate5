@@ -197,6 +197,42 @@ class editor_Models_LanguageResources_Resource {
         return true;
     }
     
+    
+    /***
+     * Get the source language code for given source language id.
+     * The language code is used as source language api parameter.
+     * 
+     * @param int $sourceLanguageId
+     * @return string
+     */
+    public function getLanguageCodeSource(int $sourceLanguageId) {
+        return $this->getLanguageCode($sourceLanguageId);
+    }
+    
+    /***
+     * Get the target language code for given target language id.
+     * The language code is used as target language api parameter.
+     * 
+     * @param int $targetLanguageId
+     * @return string
+     */
+    public function getLanguageCodeTarget(int $targetLanguageId) {
+        return $this->getLanguageCode($targetLanguageId);
+    }
+    
+    /***
+     * Get the langauge code for the given langauge id. By default the language code for the langauge is the rfc value.
+     * Override this method in the child resources if differend language code is needed
+     * @param int $langauge
+     * @return string
+     */
+    protected function getLanguageCode(int $langaugeId) {
+        $langauge = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langauge editor_Models_Languages */
+        $langauge->load($langaugeId);
+        return $langauge->getRfc5646();
+    }
+    
     /**
      * sets the service type
      * @param string $name
