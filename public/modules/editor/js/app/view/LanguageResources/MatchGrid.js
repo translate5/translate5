@@ -56,7 +56,7 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	           'Editor.util.LanguageResources'
 	],
 	strings: {
-        source: '#UT#Quelltext',
+        source: '#UT#Ausgangstext',
         target: '#UT#Zieltext',
         match: '#UT#Matchrate',
 		ctrl: '#UT#STRG',

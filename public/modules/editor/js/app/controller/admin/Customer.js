@@ -92,6 +92,7 @@ Ext.define('Editor.controller.admin.Customer', {
     // Multitenancy: Customer Switch
     customerSwitchId: 'customerSwitch', // CustomerSwitch-dropdown: component-Id
     customerSwitchAllClientsValue: 0,   // CustomerSwitch-dropdown: value for "All clients"
+    customerSwitchLastClientsValue: 0,  // Last value of the custom clients switch. It is used when the user leave the task
     // Multitenancy: filtering
     handleFiltering: true,
     
@@ -224,7 +225,8 @@ Ext.define('Editor.controller.admin.Customer', {
                 name: allCustomers,
                 id: me.customerSwitchAllClientsValue
             }]);
-            me.setCustomerSwitchValue(me.customerSwitchAllClientsValue);
+            
+            me.setCustomerSwitchValue(me.customerSwitchLastClientsValue);
         });
     },
 
@@ -252,6 +254,7 @@ Ext.define('Editor.controller.admin.Customer', {
         }
         me.consoleLog("setCustomerSwitchValue for customerId: " + val);
         me.getCustomerSwitch().setValue(val);
+        me.customerSwitchLastClientsValue = val;
     },
 
     /**
@@ -345,8 +348,10 @@ Ext.define('Editor.controller.admin.Customer', {
         if (!me.handleFiltering) {
             return;
         }
-        val = me.getCustomerName(me.getCustomerSwitchValue());
-        me.consoleLog('onCustomerSwitchSelect: ' + me.getCustomerSwitchValue() + '/' + val);
+        var customerId = me.getCustomerSwitchValue();
+        val = me.getCustomerName(customerId);
+        me.customerSwitchLastClientsValue = customerId;
+        me.consoleLog('onCustomerSwitchSelect: ' + customerId + '/' + val);
         me.setCustomerFilterForAllGrids(val,me.customerSwitchId);
     },
 
@@ -403,10 +408,10 @@ Ext.define('Editor.controller.admin.Customer', {
         var me = this,
             gridFilters = grid.filters,
             store = gridFilters.store,
-            sorters = store.sorters,
+            sorters = store.sorters ? store.sorters : null,
             customerColumnName = me.getCustomerColumnNameInStore(store),
             customerColumn;
-        if(sorters.length > 0){
+        if(sorters && sorters.length > 0){
             sorters.clear();
         }
         if (val == '') {

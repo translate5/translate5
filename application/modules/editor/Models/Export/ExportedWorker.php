@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -29,11 +29,11 @@ END LICENSE AND COPYRIGHT
 /**
  * This class provides a general Worker which can be configured with a callback method which.
  * This class is designed for simple workers which dont need a own full blown worker class.
- * 
- * The following parameters are needed: 
+ *
+ * The following parameters are needed:
  * class → the class which should be instanced on work. Classes with Constructor Parameters are currently not supported!
  * method → the class method which is called on work. The method receives the taskguid and the whole parameters array.
- * 
+ *
  * Be careful: This class can not be used in worker_dependencies !
  */
 class editor_Models_Export_ExportedWorker extends ZfExtended_Worker_Abstract {
@@ -48,7 +48,8 @@ class editor_Models_Export_ExportedWorker extends ZfExtended_Worker_Abstract {
             $logger->error('E1144', 'ExportedWorker: No Parameter "folderToBeZipped" given for worker.');
             return false;
         }
-        if(empty($parameters['zipFile'])){
+        //if no zipFile given and no waitOnly throw an error
+        if(empty($parameters['zipFile']) && empty($parameters['waitOnly'])){
             $logger->error('E1143', 'ExportedWorker: No Parameter "zipFile" given for worker.');
             return false;
         }
@@ -66,8 +67,10 @@ class editor_Models_Export_ExportedWorker extends ZfExtended_Worker_Abstract {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
         
-        //creates an export.zip if necessary
-        $this->exportToZip($task);
+        if(empty($parameters['waitOnly'])) {
+            //creates an export.zip if necessary
+            $this->exportToZip($task);
+        }
         
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $eventManager->trigger('exportCompleted', $this, array('task' => $task, 'parameters' => $parameters));
@@ -90,6 +93,16 @@ class editor_Models_Export_ExportedWorker extends ZfExtended_Worker_Abstract {
                 'zipFile' => $zipFile,
         ]);
         return $zipFile;
+    }
+    
+    public function initWaitOnly($taskGuid, $exportFolder) {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        $this->init($taskGuid, [
+                'folderToBeZipped' => $exportFolder,
+                'waitOnly' => true,
+        ]);
     }
     
     /**

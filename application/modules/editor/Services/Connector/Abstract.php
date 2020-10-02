@@ -46,8 +46,25 @@ abstract class editor_Services_Connector_Abstract {
     const STATUS_UNKNOWN = 'unknown';
     const STATUS_NOCONNECTION = 'noconnection';
     const STATUS_NOVALIDLICENSE = 'novalidlicense';
+    const STATUS_NOT_LOADED = 'notloaded';
     
     const FUZZY_SUFFIX = '-fuzzy-';
+    
+    /***
+     * Source languages array key for the languages result.
+     * In some of the resources the supported "from-to" languages are not the same.
+     * That is why the languages grouping is required in some of them. 
+     * @var string
+     */
+    const SOURCE_LANGUAGES_KEY = 'sourceLanguages';
+    
+    /***
+     * Target languages array key for the languages result.
+     * In some of the resources the supported "from-to" languages are not the same.
+     * That is why the languages grouping is required in some of them.
+     * @var string
+     */
+    const TARGET_LANGUAGES_KEY = 'targetLanguages';
     
     /*** 
      * Default resource matchrate
@@ -108,6 +125,11 @@ abstract class editor_Services_Connector_Abstract {
      */
     protected $tagsWereStripped = true;
     
+    /***
+     * @var editor_Models_LanguageResources_Resource
+     */
+    protected $resource;
+    
     /**
      * initialises the internal result list
      */
@@ -119,6 +141,20 @@ abstract class editor_Services_Connector_Abstract {
         $this->initHelper();
             //$this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
         $this->initImageTags();
+    }
+    
+    /***
+     * Check the resource connection. This will return true conection with the resource can
+     * be established
+     * @param editor_Models_LanguageResources_Resource $resource
+     * @return boolean
+     */
+    public function ping(editor_Models_LanguageResources_Resource $resource){
+        $this->resource = $resource;
+        $moreInfo = "";
+        //the valid api response statuses
+        $isValidFor = [self::STATUS_AVAILABLE,self::STATUS_NOT_LOADED];
+        return in_array($this->getStatus($moreInfo), $isValidFor);
     }
     
     /**
@@ -138,12 +174,15 @@ abstract class editor_Services_Connector_Abstract {
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
         $this->sourceLang = $sourceLang;
         $this->targetLang = $targetLang;
+        $this->resource = $languageResource->getResource();
         $this->languageResource = $languageResource;
         $this->resultList->setLanguageResource($languageResource);
-        $this->languageResource->sourceLangRfc5646=$this->languageResource->getSourceLangRfc5646();
-        $this->languageResource->targetLangRfc5646=$this->languageResource->getTargetLangRfc5646();
+        if($languageResource->getId()!=null){
+            $this->languageResource->sourceLangCode=$this->languageResource->getSourceLangCode();
+            $this->languageResource->targetLangCode=$this->languageResource->getTargetLangCode();
+        }
     }
-
+    
     /**
      * Updates translations in the connected service
      * for returning error messages to the GUI use rest_messages
@@ -326,6 +365,18 @@ abstract class editor_Services_Connector_Abstract {
     public function close() {
         //to be implemented if needed
         $this->log(__METHOD__);
+    }
+    
+    /***
+     * Return the available language codes for the current resource endpoint(api)
+     * Use SOURCE_LANGUAGES_KEY and TARGET_LANGUAGES_KEY as languages grouped results when 
+     * the resource does not support same from - to language combinations
+     */
+    public function languages(){
+        $languages = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languages editor_Models_Languages*/
+        $ret=$languages->loadAllKeyValueCustom('id','rfc5646');
+        return array_values($ret);
     }
     
     /***

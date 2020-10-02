@@ -3499,3 +3499,6 @@
 
 /* "label" of license/accept checkbox */
 form .description {margin-left: 2EM;}
+
+#btnSubmit-label {display: none;}
+#btnSubmit-element {float: left; margin-right: 2EM;} 

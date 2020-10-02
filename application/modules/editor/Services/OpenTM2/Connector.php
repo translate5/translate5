@@ -60,10 +60,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
         parent::connectTo($languageResource, $sourceLang, $targetLang);
-        $class = 'editor_Services_OpenTM2_HttpApi';
-        $this->api = ZfExtended_Factory::get($class, [$languageResource]);
+        $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
+        $this->api->setLanguageResource($languageResource);
         $this->xmlparser= ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $parser editor_Models_Import_FileParser_XmlParser */
     }
     
     /**
@@ -87,7 +86,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
     public function addTm(array $fileinfo = null,array $params=null) {
-        $sourceLang = $this->languageResource->getSourceLangRfc5646(); 
+        $sourceLang = $this->languageResource->getSourceLangCode(); 
 
         //to ensure that we get unique TMs Names although of the above stripped content, 
         // we add the LanguageResource ID and a prefix which can be configured per each translate5 instance 
@@ -523,9 +522,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
+        $langaugeResourceNotSet = empty($this->languageResource);
+        if($langaugeResourceNotSet){
+            $this->languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            $this->languageResource->setServiceType($this->resource->getServiceType());
+            $this->languageResource->setResourceId($this->resource->getId());
+            $this->connectTo($this->languageResource, 'en', 'de');
+        }
         $name = $this->languageResource->getSpecificData('fileName');
         
-        if(empty($name)) {
+        if(!$langaugeResourceNotSet && empty($name)) {
             $moreInfo = 'The internal stored filename is invalid';
             return self::STATUS_NOCONNECTION;
         }
@@ -642,7 +648,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $data = $this->getTm($validExportTypes[$mime]);
         
         $fuzzyFileName = $this->renderFuzzyLanguageResourceName($this->languageResource->getSpecificData('fileName'), $analysisId);
-        $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangRfc5646(), $data);
+        $this->api->createMemory($fuzzyFileName, $this->languageResource->getSourceLangCode(), $data);
         
         $fuzzyLanguageResource = clone $this->languageResource;
         /* @var $fuzzyLanguageResource editor_Models_LanguageResources_LanguageResource  */
