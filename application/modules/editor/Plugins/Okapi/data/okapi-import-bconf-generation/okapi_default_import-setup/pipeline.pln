@@ -4,8 +4,8 @@
 segmentSource.b=true
 segmentTarget.b=false
 renumberCodes.b=false
-sourceSrxPath=/home/marc/Downloads/html-bconf-test/languages.srx
-targetSrxPath=/home/marc/Downloads/html-bconf-test/languages.srx
+sourceSrxPath=/home/marc/NetBeansProjects/translate5/application/modules/editor/Plugins/Okapi/data/okapi-import-bconf-generation/okapi_default_import-setup/languages.srx
+targetSrxPath=/home/marc/NetBeansProjects/translate5/application/modules/editor/Plugins/Okapi/data/okapi-import-bconf-generation/okapi_default_import-setup/languages.srx
 copySource.b=false
 checkSegments.b=false
 trimSrcLeadingWS.i=-1
