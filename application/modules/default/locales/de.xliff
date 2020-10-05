@@ -236,16 +236,18 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
 <trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{ProjectOverviewYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/1TkBCfo9ovw</target></trans-unit>
 <trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{ProjectOverviewYoutubeVideoGuideDescriptionContent}</source>
 <target><br/>
-Übersicht:<br/>
-<a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
-<a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=18&amp;autoplay=1" dir="auto">0:18</a> Hauptbereiche<br/>
-<a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=32&amp;autoplay=1" dir="auto">0:32</a> Projekte<br/>
-<a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=57&amp;autoplay=1" dir="auto">0:57</a> Aufgaben<br/>
-<a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=103&amp;autoplay=1" dir="auto">1:43</a> Sprachressourcen<br/>
-<a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=144&amp;autoplay=1" dir="auto">2:24</a> TermPortal<br/>
-<a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=157&amp;autoplay=1" dir="auto">2:37</a> InstantTranslate<br/>
-<a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=176&amp;autoplay=1" dir="auto">2:56</a> Editor<br/>
-<a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=223&amp;autoplay=1" dir="auto">3:43</a> Kontaktinformationen<br/>
+<figure>
+    <figcaption><b>Übersicht:</b></figcaption>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=18&amp;autoplay=1" dir="auto">0:18</a> Hauptbereiche<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=32&amp;autoplay=1" dir="auto">0:32</a> Projekte<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=57&amp;autoplay=1" dir="auto">0:57</a> Aufgaben<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=103&amp;autoplay=1" dir="auto">1:43</a> Sprachressourcen<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=144&amp;autoplay=1" dir="auto">2:24</a> TermPortal<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=157&amp;autoplay=1" dir="auto">2:37</a> InstantTranslate<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=176&amp;autoplay=1" dir="auto">2:56</a> Editor<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=223&amp;autoplay=1" dir="auto">3:43</a> Kontaktinformationen<br/>
+</figure>
 </target>
 </trans-unit>
   </body>
