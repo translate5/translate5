@@ -11,6 +11,7 @@
 <body>
 <!-- srx rules as found at https://bitbucket.org/okapiframework/srx-repository at 2019-01-29 -->
 <languagerules>
+<!-- default okapi -->
 <languagerule languagerulename="German">
 <!--titles - GERMAN-->
 <rule break="no">
@@ -135,74 +136,6 @@
 <rule break="no">
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
-</rule>
-<!--sentence final punctuation (incl. quotation marks) - GERMAN-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+['"\p{Ps}\(]*[\p{Lu}\p{N}]</afterbreak>
-</rule>
-<!--general sentence final punctuation (incl. quotation marks)-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
-</rule>
-<!--unnamed rule - GERMAN-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[‘“"]*\s*[\.!?]+\s*[‘“"]*</beforebreak>
-<afterbreak>\s+['|"|\p{Ps}|\(]*\p{Lu}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
-<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis character w/ punctuation before or after-->
-<rule break="yes">
-<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 1-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 2-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis following terminal punctuation-->
-<rule break="yes">
-<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
-<afterbreak>\u2026</afterbreak>
-</rule>
-<!--ellipsis followed by opening bracket-->
-<rule break="yes">
-<beforebreak>\u2026</beforebreak>
-<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
-</rule>
-<!--ellipsis followed by closing bracket-->
-<rule break="yes">
-<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
-<afterbreak>\s*</afterbreak>
-</rule>
-<!--inline scripture references-->
-<rule break="yes">
-<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
-</rule>
-<!--copyright statement-->
-<rule break="yes">
-<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
-<afterbreak>©\s*[0-9]{4}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[?!]</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
-<!--newline-->
-<rule break="yes">
-<beforebreak>\n</beforebreak>
-<afterbreak></afterbreak>
 </rule>
 <!--  SRX abbreviations for German  (UTF-8)  -->
 <!-- From ULi http://uli.unicode.org/home/uli-documents -->
@@ -3296,11 +3229,6 @@
 LanguageTool is published under the GNU Lesser General Public License (LGPL).
 For more detailed license information, see COPYING.txt and README.md.
 -->
-<!-- Split at e.g. "1a. Und ..." -->
-<rule break="yes">
-<beforebreak>\d+[a-z]\.\s</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
 <!-- Don't split at e.g. "d. h." -->
 <rule break="no">
 <beforebreak>[^-\p{L}]\p{L}[\.!?…]['|"|«|\)|\]|\}]?\s</beforebreak>
@@ -3426,9 +3354,89 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>\b(Tel|Temp|trans|Tsd|übertr|übl|ff|ugs|univ|urspr|usw|vgl|Vol|vorm|vorm|Vp|Vs|vs|wg|Hd|Ztr|zus|Zus|zzt|zz|zzgl|Zz|Zt|Min|bzgl|bezügl|Frhr|ggfs|insb)\.\s</beforebreak>
 <afterbreak></afterbreak>
 </rule>
+
+<!-- srx rules as found at https://bitbucket.org/okapiframework/srx-repository at 2019-01-29 -->
+<!--sentence final punctuation (incl. quotation marks) - GERMAN-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['"\p{Ps}\(]*[\p{Lu}\p{N}]</afterbreak>
+</rule>
+<!--general sentence final punctuation (incl. quotation marks)-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
+</rule>
+<!--unnamed rule - GERMAN-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[‘“"]*\s*[\.!?]+\s*[‘“"]*</beforebreak>
+<afterbreak>\s+['|"|\p{Ps}|\(]*\p{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
+<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis character w/ punctuation before or after-->
+<rule break="yes">
+<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 1-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 2-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis following terminal punctuation-->
+<rule break="yes">
+<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
+<afterbreak>\u2026</afterbreak>
+</rule>
+<!--ellipsis followed by opening bracket-->
+<rule break="yes">
+<beforebreak>\u2026</beforebreak>
+<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
+</rule>
+<!--ellipsis followed by closing bracket-->
+<rule break="yes">
+<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
+<afterbreak>\s*</afterbreak>
+</rule>
+<!--inline scripture references-->
+<rule break="yes">
+<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
+</rule>
+<!--copyright statement-->
+<rule break="yes">
+<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
+<afterbreak>©\s*[0-9]{4}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[?!]</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!--newline-->
+<rule break="yes">
+<beforebreak>\n</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+
+<!-- 
+LanguageTool is published under the GNU Lesser General Public License (LGPL).
+For more detailed license information, see COPYING.txt and README.md.
+-->
+<!-- Split at e.g. "1a. Und ..." -->
+<rule break="yes">
+<beforebreak>\d+[a-z]\.\s</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
 <!-- Break rules -->
 <rule break="yes">
-<beforebreak>[\.!?…][\u0002|'|"|«|\)|\]|\}¹²³]?\s+</beforebreak>
+<beforebreak>[\.!?…][\u0002|'|"|«|\)|\]|\}¹²³]\s+</beforebreak>
 <afterbreak></afterbreak>
 </rule>
 <rule break="yes">
@@ -3480,6 +3488,7 @@ For more detailed license information, see COPYING.txt and README.md.
 
 
 
+<!-- default okapi -->
 <languagerule languagerulename="English">
 
 <!--  SRX abbreviations for English  (UTF-8)  -->
@@ -4204,14 +4213,6 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>\b\p{L}\.</beforebreak>
 <afterbreak>\p{L}\.</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak>[^,][\s]\p{L}{2}\.\s</beforebreak>
-<afterbreak>\p{N}+\)\s</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>\bOK\.\s</beforebreak>
-<afterbreak>\p{Ll}+</afterbreak>
-</rule>
 <rule break="no">
 <beforebreak>[\.\s]\p{L}{1,2}\.\s</beforebreak>
 <afterbreak>[\p{N}\p{Ll}]</afterbreak>
@@ -4244,19 +4245,6 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>\(\p{Ll}+\.\s</beforebreak>
 <afterbreak></afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak>[\.!?…][\u00BB\u2019\u201D\u203A"'\p{Pe}\u0002¹²³]*\s</beforebreak>
-<afterbreak></afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[\.!?…]['"\u00BB\u2019\u201D\u203A\p{Pe}\u0002]*</beforebreak>
-<afterbreak>\p{Lu}[^\p{Lu}]</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>\s\p{L}[\.!?…]\s</beforebreak>
-<afterbreak>\p{Lu}\p{Ll}</afterbreak>
-</rule>
-
 	
 <!--titles-->
 <rule break="no">
@@ -4351,6 +4339,29 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
 </rule>
+
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL).For more detailed license information, see COPYING.txt and README.md. -->
+<rule break="yes">
+<beforebreak>[^,][\s]\p{L}{2}\.\s</beforebreak>
+<afterbreak>\p{N}+\)\s</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>\bOK\.\s</beforebreak>
+<afterbreak>\p{Ll}+</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[\.!?…][\u00BB\u2019\u201D\u203A"'\p{Pe}\u0002¹²³]*\s</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[\.!?…]['"\u00BB\u2019\u201D\u203A\p{Pe}\u0002]*</beforebreak>
+<afterbreak>\p{Lu}[^\p{Lu}]</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>\s\p{L}[\.!?…]\s</beforebreak>
+<afterbreak>\p{Lu}\p{Ll}</afterbreak>
+</rule>
+
 <!--general sentence final punctuation (incl. quotation marks)-->
 <rule break="yes">
 <beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
@@ -4414,6 +4425,7 @@ For more detailed license information, see COPYING.txt and README.md.
 
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Bulgarian">
 <!--titles-->
 <rule break="no">
@@ -4592,6 +4604,7 @@ For more detailed license information, see COPYING.txt and README.md.
 
 <!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
 
+<!-- default okapi -->
 <languagerule languagerulename="Breton">
 <rule break="no">
 <beforebreak>\b[dD]\.l\.e\.?</beforebreak>
@@ -4599,7 +4612,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </rule>
 <!-- Break rules -->
 <rule break="yes">
-<beforebreak>[\.!?…][\u0002|'|"|«|\)|\]|\}¹²³]?\s+</beforebreak>
+<beforebreak>[\.!?…][\u0002|'|"|«|\)|\]|\}¹²³]\s+</beforebreak>
 <afterbreak></afterbreak>
 </rule>
 <rule break="yes">
@@ -4613,6 +4626,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </languagerule>
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Czech">
 <!--  SRX abbreviations for Czech  (UTF-8)  -->
 <!-- From ULi http://uli.unicode.org/home/uli-documents -->
@@ -5125,6 +5139,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </rule>
 </languagerule>
 
+<!-- default okapi -->
 <languagerule languagerulename="Danish">
 <!--titles - DANISH-->
 <rule break="no">
@@ -7556,21 +7571,7 @@ For more detailed license information, see COPYING.txt and README.md.
 
 <!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
 
-<!-- Split e.g.: He won't. Really. -->
-<rule break="yes">
-<beforebreak>'\p{L}[\.!?…]\s</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
-<!-- Split e.g.: He won't say no. Not really. -->
-<rule break="yes">
-<beforebreak>\sno[\.!?…]\s</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
-<!-- Split at "a.m." or "p.m." followed by a capital letter. -->
-<rule break="yes">
-<beforebreak>[ap]\.m\.\s</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
+
 <!-- Don't split at e.g. "U. S. A." -->
 <rule break="no">
 <beforebreak>[^-\p{L}]\p{L}[\.!?…]['|"|«|\)|\]|\}]?\s</beforebreak>
@@ -7698,9 +7699,24 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>\b(etc|mv|osv)\.\s</beforebreak>
 <afterbreak>\p{Ll}</afterbreak>
 </rule>
+<!-- Split e.g.: He won't. Really. -->
+<rule break="yes">
+<beforebreak>'\p{L}[\.!?…]\s</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!-- Split e.g.: He won't say no. Not really. -->
+<rule break="yes">
+<beforebreak>\sno[\.!?…]\s</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!-- Split at "a.m." or "p.m." followed by a capital letter. -->
+<rule break="yes">
+<beforebreak>[ap]\.m\.\s</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
 <!-- Break rules -->
 <rule break="yes">
-<beforebreak>[\.!?…][\u0002|'|"|«|\)|\]|\}¹²³]?\s+</beforebreak>
+<beforebreak>[\.!?…][\u0002|'|"|«|\)|\]|\}¹²³]\s+</beforebreak>
 <afterbreak></afterbreak>
 </rule>
 <rule break="yes">
@@ -7716,6 +7732,7 @@ For more detailed license information, see COPYING.txt and README.md.
 
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Greek">
 
 <!--  SRX abbreviations for Greek  (UTF-8)  -->
@@ -10547,6 +10564,28 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
 </rule>
+
+
+
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
+<!--κ.λπ. - και λοιπά-->
+<rule break="no">
+<beforebreak>\bκ\.λπ\.\s</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<!--π.χ. - παραδείγματος χάριν-->
+<rule break="no">
+<beforebreak>\bπ\.χ\.\s</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<!--months-->
+<rule break="no">
+<beforebreak>\b(Ιαν|Φεβ|Μαρ|Απρ|Μαϊ|Ιουν|Ιουλ|Αυγ|Σεπ|Οκτ|Νοε|Δεκ)\.\s</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+
+
+<!-- From ULi http://uli.unicode.org/home/uli-documents -->
 <!--sentence final punctuation (incl. quotation marks) - GREEK-->
 <rule break="yes">
 <beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"]*\s*[\.;?!]+\s*[\p{Pe}\p{Pf}\p{Po}"]*</beforebreak>
@@ -10611,23 +10650,7 @@ For more detailed license information, see COPYING.txt and README.md.
 <afterbreak></afterbreak>
 </rule>
 
-
 <!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
-<!--κ.λπ. - και λοιπά-->
-<rule break="no">
-<beforebreak>\bκ\.λπ\.\s</beforebreak>
-<afterbreak></afterbreak>
-</rule>
-<!--π.χ. - παραδείγματος χάριν-->
-<rule break="no">
-<beforebreak>\bπ\.χ\.\s</beforebreak>
-<afterbreak></afterbreak>
-</rule>
-<!--months-->
-<rule break="no">
-<beforebreak>\b(Ιαν|Φεβ|Μαρ|Απρ|Μαϊ|Ιουν|Ιουλ|Αυγ|Σεπ|Οκτ|Νοε|Δεκ)\.\s</beforebreak>
-<afterbreak></afterbreak>
-</rule>
 <rule break="yes">
 <beforebreak>[\.!;…][\u00BB\u2019\u201D\u203A"'\p{Pe}\u0002]*\s</beforebreak>
 <afterbreak></afterbreak>
@@ -10643,6 +10666,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </languagerule>
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Spanish">
 <!--  SRX abbreviations for Spanish  (UTF-8)  -->
 <!-- From ULi http://uli.unicode.org/home/uli-documents -->
@@ -11648,6 +11672,67 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
 </rule>
+
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
+<!-- Abbreviations that cannot finish sentences-->
+<rule break="no">
+<beforebreak>\b([Aa]vda|[Pp][ol]|Pl?za|[Aa]dm|[Dd]pto)\.\s</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="no">
+<beforebreak>\b(Dña|Dr[a]?|Sra|Sto|S(ri)?ta|Ldo|Ing|Prof|Excmo|Ilmo|Mgfco|admdor|admdora)\.\s</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="no">
+<beforebreak>\b([Aa]rt|[Cc]ód|[Ss]ecc|[Tt]ít)\.\s</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<rule break="no">
+<beforebreak>\b([Ee]d(it)?|[Nn]o|n|[Nn]úm|[Pp]ág|p|c|\d+er)|[V\.]gr\.\s</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<!-- Abbreviations that can finish sentences -->
+<rule break="no">
+<beforebreak>\b(Sr|Jr|Admón|Inc|Co|Hnos|Vda|[VU]d[s]?)\.[\p{Pe}\p{Pf}\p{Pd}"']*\s</beforebreak>
+<afterbreak>\p{Ll}</afterbreak>
+</rule>
+<!-- Any word in acronyms like U.S.A.F or F. B. I. or C. or c.s.p. or p. e. -->
+<rule break="no">
+<beforebreak>\b(\p{L}\.)+[\p{Pe}\p{Pf}\p{Pd}"']*\s</beforebreak>
+<afterbreak>\p{Ll}</afterbreak>
+</rule>
+<!-- Any word in acronyms like EE.UU. or BB. DD. -->
+<rule break="no">
+<beforebreak>\b([\p{Lu}]{2}\.)+[\p{Pe}\p{Pf}\p{Pd}"']*\s</beforebreak>
+<afterbreak>\p{Ll}</afterbreak>
+</rule>
+<!-- max min etc -->
+<rule break="no">
+<beforebreak>\b([Ee]tc|m[aá]x|m[ií]n|aprox|\d+o)\.[\p{Pe}\p{Pf}\p{Pd}"']*\s</beforebreak>
+<afterbreak>\p{Ll}</afterbreak>
+</rule>
+<!-- Composed abbrev. -->
+<rule break="no">
+<beforebreak>\bet al\.[\p{Pe}\p{Pf}\p{Pd}"']*\s</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<!-- Units -->
+<rule break="no">
+<beforebreak>\b([Pp]ta[s]?|K[gm][s]|[mc]?[gmls]|[Hh](rs)?)\.[\p{Pe}\p{Pf}\p{Pd}"']*\s</beforebreak>
+<afterbreak>\p{Ll}</afterbreak>
+</rule>
+<!-- (enum...) -->
+<rule break="no">
+<beforebreak>\b(\Q...\E|…)\p{Pe}\s</beforebreak>
+<afterbreak>\p{Ll}</afterbreak>
+</rule>
+<!-- pero ¡ah! no estaba
+<rule break="no">
+<beforebreak>\b¡\p{L}+!\s</beforebreak>
+<afterbreak>\p{Ll}</afterbreak>
+</rule>
+ -->
+ <!-- From ULi http://uli.unicode.org/home/uli-documents -->
 <!--sentence final punctuation (incl. quotation marks) - SPANISH-->
 <rule break="yes">
 <beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
@@ -11713,64 +11798,6 @@ For more detailed license information, see COPYING.txt and README.md.
 </rule>
 
 <!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
-<!-- Abbreviations that cannot finish sentences-->
-<rule break="no">
-<beforebreak>\b([Aa]vda|[Pp][ol]|Pl?za|[Aa]dm|[Dd]pto)\.\s</beforebreak>
-<afterbreak></afterbreak>
-</rule>
-<rule break="no">
-<beforebreak>\b(Dña|Dr[a]?|Sra|Sto|S(ri)?ta|Ldo|Ing|Prof|Excmo|Ilmo|Mgfco|admdor|admdora)\.\s</beforebreak>
-<afterbreak></afterbreak>
-</rule>
-<rule break="no">
-<beforebreak>\b([Aa]rt|[Cc]ód|[Ss]ecc|[Tt]ít)\.\s</beforebreak>
-<afterbreak></afterbreak>
-</rule>
-<rule break="no">
-<beforebreak>\b([Ee]d(it)?|[Nn]o|n|[Nn]úm|[Pp]ág|p|c|\d+er)|[V\.]gr\.\s</beforebreak>
-<afterbreak></afterbreak>
-</rule>
-<!-- Abbreviations that can finish sentences -->
-<rule break="no">
-<beforebreak>\b(Sr|Jr|Admón|Inc|Co|Hnos|Vda|[VU]d[s]?)\.[\p{Pe}\p{Pf}\p{Pd}"']*\s</beforebreak>
-<afterbreak>\p{Ll}</afterbreak>
-</rule>
-<!-- Any word in acronyms like U.S.A.F or F. B. I. or C. or c.s.p. or p. e. -->
-<rule break="no">
-<beforebreak>\b(\p{L}\.)+[\p{Pe}\p{Pf}\p{Pd}"']*\s</beforebreak>
-<afterbreak>\p{Ll}</afterbreak>
-</rule>
-<!-- Any word in acronyms like EE.UU. or BB. DD. -->
-<rule break="no">
-<beforebreak>\b([\p{Lu}]{2}\.)+[\p{Pe}\p{Pf}\p{Pd}"']*\s</beforebreak>
-<afterbreak>\p{Ll}</afterbreak>
-</rule>
-<!-- max min etc -->
-<rule break="no">
-<beforebreak>\b([Ee]tc|m[aá]x|m[ií]n|aprox|\d+o)\.[\p{Pe}\p{Pf}\p{Pd}"']*\s</beforebreak>
-<afterbreak>\p{Ll}</afterbreak>
-</rule>
-<!-- Composed abbrev. -->
-<rule break="no">
-<beforebreak>\bet al\.[\p{Pe}\p{Pf}\p{Pd}"']*\s</beforebreak>
-<afterbreak></afterbreak>
-</rule>
-<!-- Units -->
-<rule break="no">
-<beforebreak>\b([Pp]ta[s]?|K[gm][s]|[mc]?[gmls]|[Hh](rs)?)\.[\p{Pe}\p{Pf}\p{Pd}"']*\s</beforebreak>
-<afterbreak>\p{Ll}</afterbreak>
-</rule>
-<!-- (enum...) -->
-<rule break="no">
-<beforebreak>\b(\Q...\E|…)\p{Pe}\s</beforebreak>
-<afterbreak>\p{Ll}</afterbreak>
-</rule>
-<!-- pero ¡ah! no estaba
-<rule break="no">
-<beforebreak>\b¡\p{L}+!\s</beforebreak>
-<afterbreak>\p{Ll}</afterbreak>
-</rule>
- -->
 <rule break="yes">
 <beforebreak>[\.…][\u00BB\u2019\u201D\u203A"'\u0002]*\s</beforebreak>
 <afterbreak></afterbreak>
@@ -11781,6 +11808,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </rule>
 </languagerule>
 
+<!-- default okapi -->
 <languagerule languagerulename="Estonian">
 <!--titles-->
 <rule break="no">
@@ -11936,6 +11964,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </rule>
 </languagerule>
 
+<!-- default okapi -->
 <languagerule languagerulename="Finnish">
 
 <!--  SRX abbreviations for Finnish  (UTF-8)  -->
@@ -12774,6 +12803,7 @@ For more detailed license information, see COPYING.txt and README.md.
 
 
 
+<!-- default okapi -->
 <languagerule languagerulename="French">
 
 <!--titles - FRENCH-->
@@ -12908,78 +12938,7 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak>\s»\.|\.\s»|\s[!?]\s»|\s»\s[!?]|\s[!?]</beforebreak>
-<afterbreak>\s+('|"|«\s|\p{Pi}|\()*\p{Lu}</afterbreak>
-</rule>
-<!--sentence final punctuation (incl. quotation marks) - FRENCH-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+(«\s|\p{Pi}|"|'|\()*\p{Lu}</afterbreak>
-</rule>
-<!--general sentence final punctuation (incl. quotation marks)-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
-</rule>
-<!--unnamed rule - FRENCH-->
-<rule break="yes">
-<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
-<afterbreak>\s+('|"|«\s|\p{Pi}|\()*\p{Lu}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
-<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis character w/ punctuation before or after-->
-<rule break="yes">
-<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\s+\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 1-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 2-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis following terminal punctuation-->
-<rule break="yes">
-<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
-<afterbreak>\u2026</afterbreak>
-</rule>
-<!--ellipsis followed by opening bracket-->
-<rule break="yes">
-<beforebreak>\u2026</beforebreak>
-<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
-</rule>
-<!--ellipsis followed by closing bracket-->
-<rule break="yes">
-<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
-<afterbreak>\s*</afterbreak>
-</rule>
-<!--inline scripture references-->
-<rule break="yes">
-<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
-</rule>
-<!--copyright statement-->
-<rule break="yes">
-<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
-<afterbreak>©\s*[0-9]{4}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[?!]</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
-<!--newline-->
-<rule break="yes">
-<beforebreak>\n</beforebreak>
-<afterbreak></afterbreak>
-</rule>
+
 
 <!--  SRX abbreviations for French  (UTF-8)  -->
 <!-- From ULi http://uli.unicode.org/home/uli-documents -->
@@ -13592,9 +13551,83 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>\b(ave?|boul|Mr?|MM?)\.\s</beforebreak>
 <afterbreak></afterbreak>
 </rule>
+<rule break="yes">
+<beforebreak>\s»\.|\.\s»|\s[!?]\s»|\s»\s[!?]|\s[!?]</beforebreak>
+<afterbreak>\s+('|"|«\s|\p{Pi}|\()*\p{Lu}</afterbreak>
+</rule>
+<!--sentence final punctuation (incl. quotation marks) - FRENCH-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+(«\s|\p{Pi}|"|'|\()*\p{Lu}</afterbreak>
+</rule>
+<!--general sentence final punctuation (incl. quotation marks)-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
+</rule>
+<!--unnamed rule - FRENCH-->
+<rule break="yes">
+<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
+<afterbreak>\s+('|"|«\s|\p{Pi}|\()*\p{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
+<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis character w/ punctuation before or after-->
+<rule break="yes">
+<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\s+\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 1-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 2-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis following terminal punctuation-->
+<rule break="yes">
+<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
+<afterbreak>\u2026</afterbreak>
+</rule>
+<!--ellipsis followed by opening bracket-->
+<rule break="yes">
+<beforebreak>\u2026</beforebreak>
+<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
+</rule>
+<!--ellipsis followed by closing bracket-->
+<rule break="yes">
+<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
+<afterbreak>\s*</afterbreak>
+</rule>
+<!--inline scripture references-->
+<rule break="yes">
+<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
+</rule>
+<!--copyright statement-->
+<rule break="yes">
+<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
+<afterbreak>©\s*[0-9]{4}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[?!]</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!--newline-->
+<rule break="yes">
+<beforebreak>\n</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
 <!-- Break rules -->
 <rule break="yes">
-<beforebreak>[\.!?…][\u0002|'|"|«|\)|\]|\}¹²³]?\s+</beforebreak>
+<beforebreak>[\.!?…][\u0002|'|"|«|\)|\]|\}¹²³]\s+</beforebreak>
 <afterbreak></afterbreak>
 </rule>
 <rule break="yes">
@@ -13608,6 +13641,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </languagerule>
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Croatian">
 <!--titles - CROATIAN-->
 <rule break="no">
@@ -13789,6 +13823,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </languagerule>
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Hungarian">
 <!--titles - HUNGARIAN-->
 <rule break="no">
@@ -13969,8 +14004,9 @@ For more detailed license information, see COPYING.txt and README.md.
 </rule>
 </languagerule>
 
+<!-- default okapi -->
 <languagerule languagerulename="Italian">
-<languagerule languagerulename="Italian">
+
 <!--titles - ITALIAN - special cases-->
 <rule break="no">
 <beforebreak>\b([Dd]ott\.ssa|[Ss]ig\.[nr]a|[Ff]\.ll[aio]|[Ss]\.lla)</beforebreak>
@@ -14089,65 +14125,6 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
 </rule>
-<!--general sentence final punctuation (incl. quotation marks)-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
-<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis character w/ punctuation before or after-->
-<rule break="yes">
-<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*\[?(\u2026|\.\s*\.\s*\.\s*)\]?|\[?(\u2026|\.\s*\.\s*\.)\]?\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 1-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 2-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis following terminal punctuation-->
-<rule break="yes">
-<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
-<afterbreak>\[?\u2026\]?</afterbreak>
-</rule>
-<!--ellipsis followed by opening bracket-->
-<rule break="yes">
-<beforebreak>\[?\u2026\]?</beforebreak>
-<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
-</rule>
-<!--ellipsis followed by closing bracket-->
-<rule break="yes">
-<beforebreak>\[?\u2026\]?\s*[\]\}\)]+</beforebreak>
-<afterbreak>\s*</afterbreak>
-</rule>
-<!--inline scripture references-->
-<rule break="yes">
-<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
-</rule>
-<!--copyright statement-->
-<rule break="yes">
-<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
-<afterbreak>©\s*[0-9]{4}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[?!]</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
-<!--newline-->
-<rule break="yes">
-<beforebreak>\n</beforebreak>
-<afterbreak></afterbreak>
-</rule>
-</languagerule>
 
 
 <!--  SRX abbreviations for Italian  (UTF-8)  -->
@@ -15390,6 +15367,126 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>\b(abbr|acron|agg|art|avv|card|compar|conf|cong|det|dim|f|fonosimb|ger|impers|indef|indet|inter|intr|inv|lat|loc|m|n|num|ord|p|pers|pl|pass|pres|pref|prep|pron|ponom|rel|s|sost|simb|suff|ter|tr|v|var)\.\s</beforebreak>
 <afterbreak></afterbreak>
 </rule>
+
+<!-- From ULi http://uli.unicode.org/home/uli-documents -->
+<!--general sentence final punctuation (incl. quotation marks)-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
+<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis character w/ punctuation before or after-->
+<rule break="yes">
+<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*\[?(\u2026|\.\s*\.\s*\.\s*)\]?|\[?(\u2026|\.\s*\.\s*\.)\]?\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 1-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 2-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis following terminal punctuation-->
+<rule break="yes">
+<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
+<afterbreak>\[?\u2026\]?</afterbreak>
+</rule>
+<!--ellipsis followed by opening bracket-->
+<rule break="yes">
+<beforebreak>\[?\u2026\]?</beforebreak>
+<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
+</rule>
+<!--ellipsis followed by closing bracket-->
+<rule break="yes">
+<beforebreak>\[?\u2026\]?\s*[\]\}\)]+</beforebreak>
+<afterbreak>\s*</afterbreak>
+</rule>
+<!--inline scripture references-->
+<rule break="yes">
+<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
+</rule>
+<!--copyright statement-->
+<rule break="yes">
+<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
+<afterbreak>©\s*[0-9]{4}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[?!]</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!--newline-->
+<rule break="yes">
+<beforebreak>\n</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<!-- default okapi rules -->
+<!--general sentence final punctuation (incl. quotation marks)-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
+<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis character w/ punctuation before or after-->
+<rule break="yes">
+<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*\[?(\u2026|\.\s*\.\s*\.\s*)\]?|\[?(\u2026|\.\s*\.\s*\.)\]?\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 1-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 2-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis following terminal punctuation-->
+<rule break="yes">
+<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
+<afterbreak>\[?\u2026\]?</afterbreak>
+</rule>
+<!--ellipsis followed by opening bracket-->
+<rule break="yes">
+<beforebreak>\[?\u2026\]?</beforebreak>
+<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
+</rule>
+<!--ellipsis followed by closing bracket-->
+<rule break="yes">
+<beforebreak>\[?\u2026\]?\s*[\]\}\)]+</beforebreak>
+<afterbreak>\s*</afterbreak>
+</rule>
+<!--inline scripture references-->
+<rule break="yes">
+<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
+</rule>
+<!--copyright statement-->
+<rule break="yes">
+<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
+<afterbreak>©\s*[0-9]{4}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[?!]</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!--newline-->
+<rule break="yes">
+<beforebreak>\n</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+
 <rule break="yes">
 <beforebreak>[\.!?…][\u00BB\u2019\u201D\u203A"'\p{Pe}\u0002¹²³]*\s</beforebreak>
 <afterbreak></afterbreak>
@@ -15405,6 +15502,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </languagerule>
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Japanese">
 <rule break="no">
 <beforebreak>\p{Nd}*[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*\p{Nd}+[:：]\p{Nd}+(－\p{Nd}+)?。</beforebreak>
@@ -15440,6 +15538,26 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[0-9]+\.[0-9]+\.[0-9]+</beforebreak>
 <afterbreak>\s+\P{Ll}</afterbreak>
 </rule>
+
+
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
+<rule break="no">
+<beforebreak>[:]+[\p{Pe}\p{Pf}\p{Po}"-[\u002C\u003A\u003B\u055D\u060C\u061B\u0703\u0704\u0705\u0706\u0707\u0708\u0709\u07F8\u1363\u1364\u1365\u1366\u1802\u1804\u1808\u204F\u205D\u3001\uA60D\uFE10\uFE11\uFE13\uFE14\uFE50\uFE51\uFE54\uFE55\uFF0C\uFF1A\uFF1B\uFF64]]*</beforebreak>
+<afterbreak>\s+\P{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[:]+[\p{Pe}\p{Pf}\p{Po}"-[\u002C\u003A\u003B\u055D\u060C\u061B\u0703\u0704\u0705\u0706\u0707\u0708\u0709\u07F8\u1363\u1364\u1365\u1366\u1802\u1804\u1808\u204F\u205D\u3001\uA60D\uFE10\uFE11\uFE13\uFE14\uFE50\uFE51\uFE54\uFE55\uFF0C\uFF1A\uFF1B\uFF64]]*</beforebreak>
+<afterbreak>\s</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[。．！？…]+</beforebreak>
+<afterbreak>.</afterbreak>
+</rule>
+<rule break="no">
+<beforebreak>\.\.\.</beforebreak>
+<afterbreak>\s+\P{Lu}</afterbreak>
+</rule>
+<!-- default okapi -->
 <rule break="yes">
 <beforebreak>[[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]）][。！？]</beforebreak>
 <afterbreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]</afterbreak>
@@ -15472,22 +15590,6 @@ For more detailed license information, see COPYING.txt and README.md.
 
 
 <!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
-<rule break="no">
-<beforebreak>[:]+[\p{Pe}\p{Pf}\p{Po}"-[\u002C\u003A\u003B\u055D\u060C\u061B\u0703\u0704\u0705\u0706\u0707\u0708\u0709\u07F8\u1363\u1364\u1365\u1366\u1802\u1804\u1808\u204F\u205D\u3001\uA60D\uFE10\uFE11\uFE13\uFE14\uFE50\uFE51\uFE54\uFE55\uFF0C\uFF1A\uFF1B\uFF64]]*</beforebreak>
-<afterbreak>\s+\P{Lu}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[:]+[\p{Pe}\p{Pf}\p{Po}"-[\u002C\u003A\u003B\u055D\u060C\u061B\u0703\u0704\u0705\u0706\u0707\u0708\u0709\u07F8\u1363\u1364\u1365\u1366\u1802\u1804\u1808\u204F\u205D\u3001\uA60D\uFE10\uFE11\uFE13\uFE14\uFE50\uFE51\uFE54\uFE55\uFF0C\uFF1A\uFF1B\uFF64]]*</beforebreak>
-<afterbreak>\s</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[。．！？…]+</beforebreak>
-<afterbreak>.</afterbreak>
-</rule>
-<rule break="no">
-<beforebreak>\.\.\.</beforebreak>
-<afterbreak>\s+\P{Lu}</afterbreak>
-</rule>
 <rule break="yes">
 <beforebreak>^\s*\p{Nd}+[\p{Nd}\.\)\]]+\s+</beforebreak>
 <afterbreak>\p{Lu}</afterbreak>
@@ -15506,6 +15608,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </rule>
 </languagerule>
 
+<!-- default okapi -->
 <languagerule languagerulename="Korean">
 <rule break="no">
 <beforebreak>[a-zA-z].</beforebreak>
@@ -15554,6 +15657,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </rule>
 </languagerule>
 
+<!-- default okapi -->
 <languagerule languagerulename="Lithuanian">
 <!--titles - LITHUANIAN-->
 <rule break="no">
@@ -15724,6 +15828,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </rule>
 </languagerule>
 
+<!-- default okapi -->
 <languagerule languagerulename="Latvian">
 <!--titles - LATVIAN-->
 <rule break="no">
@@ -15906,6 +16011,7 @@ For more detailed license information, see COPYING.txt and README.md.
 
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Dutch">
 <!--titles - DUTCH-->
 <rule break="no">
@@ -16025,64 +16131,6 @@ For more detailed license information, see COPYING.txt and README.md.
 <rule break="no">
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
-</rule>
-<!--general sentence final punctuation (incl. quotation marks)-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
-<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis character w/ punctuation before or after-->
-<rule break="yes">
-<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 1-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 2-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis following terminal punctuation-->
-<rule break="yes">
-<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
-<afterbreak>\u2026</afterbreak>
-</rule>
-<!--ellipsis followed by opening bracket-->
-<rule break="yes">
-<beforebreak>\u2026</beforebreak>
-<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
-</rule>
-<!--ellipsis followed by closing bracket-->
-<rule break="yes">
-<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
-<afterbreak>\s*</afterbreak>
-</rule>
-<!--inline scripture references-->
-<rule break="yes">
-<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
-</rule>
-<!--copyright statement-->
-<rule break="yes">
-<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
-<afterbreak>©\s*[0-9]{4}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[?!]</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
-<!--newline-->
-<rule break="yes">
-<beforebreak>\n</beforebreak>
-<afterbreak></afterbreak>
 </rule>
 
 
@@ -17575,6 +17623,70 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>\bprof\.\s</beforebreak>
 <afterbreak></afterbreak>
 </rule>
+
+<!-- default okapi -->
+<!--general sentence final punctuation (incl. quotation marks)-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
+<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis character w/ punctuation before or after-->
+<rule break="yes">
+<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 1-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 2-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis following terminal punctuation-->
+<rule break="yes">
+<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
+<afterbreak>\u2026</afterbreak>
+</rule>
+<!--ellipsis followed by opening bracket-->
+<rule break="yes">
+<beforebreak>\u2026</beforebreak>
+<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
+</rule>
+<!--ellipsis followed by closing bracket-->
+<rule break="yes">
+<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
+<afterbreak>\s*</afterbreak>
+</rule>
+<!--inline scripture references-->
+<rule break="yes">
+<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
+</rule>
+<!--copyright statement-->
+<rule break="yes">
+<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
+<afterbreak>©\s*[0-9]{4}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[?!]</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!--newline-->
+<rule break="yes">
+<beforebreak>\n</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+
+
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
+
 <rule break="yes">
 <beforebreak>[\.!?…][\u00BB\u2019\u201D\u203A\u00AB\p{Pe}\u0002¹²³]*\s</beforebreak>
 <afterbreak></afterbreak>
@@ -17591,6 +17703,7 @@ For more detailed license information, see COPYING.txt and README.md.
 
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Polish">
 <!--titles - POLISH-->
 <rule break="no">
@@ -17715,64 +17828,6 @@ For more detailed license information, see COPYING.txt and README.md.
 <rule break="no">
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
-</rule>
-<!--general sentence final punctuation (incl. quotation marks)-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
-<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis character w/ punctuation before or after-->
-<rule break="yes">
-<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 1-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 2-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis following terminal punctuation-->
-<rule break="yes">
-<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
-<afterbreak>\u2026</afterbreak>
-</rule>
-<!--ellipsis followed by opening bracket-->
-<rule break="yes">
-<beforebreak>\u2026</beforebreak>
-<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
-</rule>
-<!--ellipsis followed by closing bracket-->
-<rule break="yes">
-<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
-<afterbreak>\s*</afterbreak>
-</rule>
-<!--inline scripture references-->
-<rule break="yes">
-<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
-</rule>
-<!--copyright statement-->
-<rule break="yes">
-<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
-<afterbreak>©\s*[0-9]{4}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[?!]</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
-<!--newline-->
-<rule break="yes">
-<beforebreak>\n</beforebreak>
-<afterbreak></afterbreak>
 </rule>
 
 <!--  SRX abbreviations for Polish  (UTF-8)  -->
@@ -19350,15 +19405,9 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>\bwyst\.\s</beforebreak>
 <afterbreak></afterbreak>
 </rule>
-<rule break="yes">
-<beforebreak>\b(?iu)mazeł\stow\.\s</beforebreak>
-<afterbreak></afterbreak>
-</rule>
-<rule break="no">
-	
-	
-<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
 
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
+<rule break="no">
 <beforebreak>\b[Tt]ow\.\s</beforebreak>
 <afterbreak></afterbreak>
 </rule>
@@ -19864,6 +19913,72 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[\.!?…]['"\u00BB\u2019\u201D\u203A\u0002]*\p{Pe}\s</beforebreak>
 <afterbreak>\p{Ll}</afterbreak>
 </rule>
+
+<!-- default okapi -->
+
+<!--general sentence final punctuation (incl. quotation marks)-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
+<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis character w/ punctuation before or after-->
+<rule break="yes">
+<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 1-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 2-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis following terminal punctuation-->
+<rule break="yes">
+<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
+<afterbreak>\u2026</afterbreak>
+</rule>
+<!--ellipsis followed by opening bracket-->
+<rule break="yes">
+<beforebreak>\u2026</beforebreak>
+<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
+</rule>
+<!--ellipsis followed by closing bracket-->
+<rule break="yes">
+<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
+<afterbreak>\s*</afterbreak>
+</rule>
+<!--inline scripture references-->
+<rule break="yes">
+<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
+</rule>
+<!--copyright statement-->
+<rule break="yes">
+<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
+<afterbreak>©\s*[0-9]{4}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[?!]</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!--newline-->
+<rule break="yes">
+<beforebreak>\n</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
+<rule break="yes">
+<beforebreak>\b(?iu)mazeł\stow\.\s</beforebreak>
+<afterbreak></afterbreak>
+</rule>
 <rule break="yes">
 <beforebreak>[\.!?…]['"\p{Pe}\u00BB\u2019\u201D\u203A\u0002¹²³]*\s</beforebreak>
 <afterbreak></afterbreak>
@@ -19880,6 +19995,7 @@ For more detailed license information, see COPYING.txt and README.md.
 
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Portuguese">
 <!--titles - PORTUGUESE-->
 <rule break="no">
@@ -20009,70 +20125,6 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
 </rule>
-<!--sentence final punctuation (incl. quotation marks) - PORTUGUESE-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+['|"|\p{Pi}|\(]*\p{Lu}|\s+\(\u2026\)\s+\p{Lu}</afterbreak>
-</rule>
-<!--general sentence final punctuation (incl. quotation marks)-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
-<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis character w/ punctuation before or after-->
-<rule break="yes">
-<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*\(?(\u2026|\.\s*\.\s*\.\s*)\)?|\(?(\u2026|\.\s*\.\s*\.)\)?\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 1-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 2-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis following terminal punctuation-->
-<rule break="yes">
-<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
-<afterbreak>\(?\u2026\)?</afterbreak>
-</rule>
-<!--ellipsis followed by opening bracket-->
-<rule break="yes">
-<beforebreak>\(?\u2026\)?</beforebreak>
-<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
-</rule>
-<!--ellipsis followed by closing bracket-->
-<rule break="yes">
-<beforebreak>\(?\u2026\)?\s*[\]\}\)]+</beforebreak>
-<afterbreak>\s*</afterbreak>
-</rule>
-<!--inline scripture references-->
-<rule break="yes">
-<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
-</rule>
-<!--copyright statement-->
-<rule break="yes">
-<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
-<afterbreak>©\s*[0-9]{4}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[?!]</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
-<!--newline-->
-<rule break="yes">
-<beforebreak>\n</beforebreak>
-<afterbreak></afterbreak>
-</rule>
-
 
 <!--  SRX abbreviations for Portuguese  (UTF-8)  -->
 <!-- From ULi http://uli.unicode.org/home/uli-documents -->
@@ -20400,9 +20452,76 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>V\.\s</beforebreak>
 <afterbreak>S\.s</afterbreak>
 </rule>
+
+<!-- default okapi -->
+<!--sentence final punctuation (incl. quotation marks) - PORTUGUESE-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['|"|\p{Pi}|\(]*\p{Lu}|\s+\(\u2026\)\s+\p{Lu}</afterbreak>
+</rule>
+<!--general sentence final punctuation (incl. quotation marks)-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
+<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis character w/ punctuation before or after-->
+<rule break="yes">
+<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*\(?(\u2026|\.\s*\.\s*\.\s*)\)?|\(?(\u2026|\.\s*\.\s*\.)\)?\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 1-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 2-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis following terminal punctuation-->
+<rule break="yes">
+<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
+<afterbreak>\(?\u2026\)?</afterbreak>
+</rule>
+<!--ellipsis followed by opening bracket-->
+<rule break="yes">
+<beforebreak>\(?\u2026\)?</beforebreak>
+<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
+</rule>
+<!--ellipsis followed by closing bracket-->
+<rule break="yes">
+<beforebreak>\(?\u2026\)?\s*[\]\}\)]+</beforebreak>
+<afterbreak>\s*</afterbreak>
+</rule>
+<!--inline scripture references-->
+<rule break="yes">
+<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
+</rule>
+<!--copyright statement-->
+<rule break="yes">
+<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
+<afterbreak>©\s*[0-9]{4}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[?!]</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!--newline-->
+<rule break="yes">
+<beforebreak>\n</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
 <!-- Break rules -->
 <rule break="yes">
-<beforebreak>[\.!?…][\u0002|'|"|«|\)|\]|\}¹²³]?\s+</beforebreak>
+<beforebreak>[\.!?…][\u0002|'|"|«|\)|\]|\}¹²³]\s+</beforebreak>
 <afterbreak></afterbreak>
 </rule>
 <rule break="yes">
@@ -20417,6 +20536,7 @@ For more detailed license information, see COPYING.txt and README.md.
 
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Romanian">
 
 <!--titles - ROMANIAN-->
@@ -20548,67 +20668,10 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
 </rule>
-<!--general sentence final punctuation (incl. quotation marks)-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
-<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis character w/ punctuation before or after-->
-<rule break="yes">
-<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 1-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 2-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis following terminal punctuation-->
-<rule break="yes">
-<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
-<afterbreak>\u2026</afterbreak>
-</rule>
-<!--ellipsis followed by opening bracket-->
-<rule break="yes">
-<beforebreak>\u2026</beforebreak>
-<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
-</rule>
-<!--ellipsis followed by closing bracket-->
-<rule break="yes">
-<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
-<afterbreak>\s*</afterbreak>
-</rule>
-<!--inline scripture references-->
-<rule break="yes">
-<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
-</rule>
-<!--copyright statement-->
-<rule break="yes">
-<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
-<afterbreak>©\s*[0-9]{4}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[?!]</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
-<!--newline-->
-<rule break="yes">
-<beforebreak>\n</beforebreak>
-<afterbreak></afterbreak>
-</rule>
 
 
-<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. --><rule break="no">
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
+<rule break="no">
 <beforebreak>\b\d+\.\s</beforebreak>
 <afterbreak>\p{Ll}|\p{Lu}{2,}</afterbreak>
 </rule>
@@ -20688,6 +20751,67 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[\[\(]*…[\]\)]* </beforebreak>
 <afterbreak>\p{Ll}</afterbreak>
 </rule>
+
+<!-- default okapi -->
+<!--general sentence final punctuation (incl. quotation marks)-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
+<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis character w/ punctuation before or after-->
+<rule break="yes">
+<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 1-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 2-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis following terminal punctuation-->
+<rule break="yes">
+<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
+<afterbreak>\u2026</afterbreak>
+</rule>
+<!--ellipsis followed by opening bracket-->
+<rule break="yes">
+<beforebreak>\u2026</beforebreak>
+<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
+</rule>
+<!--ellipsis followed by closing bracket-->
+<rule break="yes">
+<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
+<afterbreak>\s*</afterbreak>
+</rule>
+<!--inline scripture references-->
+<rule break="yes">
+<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
+</rule>
+<!--copyright statement-->
+<rule break="yes">
+<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
+<afterbreak>©\s*[0-9]{4}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[?!]</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!--newline-->
+<rule break="yes">
+<beforebreak>\n</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
 <rule break="yes">
 <beforebreak>[\.!?…]['"\u00BB\u2019\u201D\u203A\u0002¹²³]*\s</beforebreak>
 <afterbreak></afterbreak>
@@ -20703,6 +20827,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </languagerule>
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Russian">
 <rule break="no">
 <beforebreak>и З.</beforebreak>
@@ -20823,64 +20948,6 @@ For more detailed license information, see COPYING.txt and README.md.
 <rule break="no">
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
-</rule>
-<!--general sentence final punctuation (incl. quotation marks)-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
-<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis character w/ punctuation before or after-->
-<rule break="yes">
-<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 1-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 2-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis following terminal punctuation-->
-<rule break="yes">
-<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
-<afterbreak>\u2026</afterbreak>
-</rule>
-<!--ellipsis followed by opening bracket-->
-<rule break="yes">
-<beforebreak>\u2026</beforebreak>
-<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
-</rule>
-<!--ellipsis followed by closing bracket-->
-<rule break="yes">
-<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
-<afterbreak>\s*</afterbreak>
-</rule>
-<!--inline scripture references-->
-<rule break="yes">
-<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
-</rule>
-<!--copyright statement-->
-<rule break="yes">
-<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
-<afterbreak>©\s*[0-9]{4}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[?!]</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
-<!--newline-->
-<rule break="yes">
-<beforebreak>\n</beforebreak>
-<afterbreak></afterbreak>
 </rule>
 
 
@@ -21011,6 +21078,69 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>["”'\u00BB]\s*</beforebreak>
 <afterbreak>\s*\p{Ll}</afterbreak>
 </rule>
+
+<!-- default okapi -->
+<!--general sentence final punctuation (incl. quotation marks)-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
+<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis character w/ punctuation before or after-->
+<rule break="yes">
+<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 1-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 2-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis following terminal punctuation-->
+<rule break="yes">
+<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
+<afterbreak>\u2026</afterbreak>
+</rule>
+<!--ellipsis followed by opening bracket-->
+<rule break="yes">
+<beforebreak>\u2026</beforebreak>
+<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
+</rule>
+<!--ellipsis followed by closing bracket-->
+<rule break="yes">
+<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
+<afterbreak>\s*</afterbreak>
+</rule>
+<!--inline scripture references-->
+<rule break="yes">
+<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
+</rule>
+<!--copyright statement-->
+<rule break="yes">
+<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
+<afterbreak>©\s*[0-9]{4}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[?!]</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!--newline-->
+<rule break="yes">
+<beforebreak>\n</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+
+
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
 <!-- break  -->
 <rule break="yes">
 <beforebreak>[\.!?…]['"\u00BB\u2019\u201D\u203A\u0002¹²³]*\s</beforebreak>
@@ -21032,6 +21162,7 @@ For more detailed license information, see COPYING.txt and README.md.
 
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Slovak">
 
 <!--titles - SLOVAK-->
@@ -21152,64 +21283,6 @@ For more detailed license information, see COPYING.txt and README.md.
 <rule break="no">
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
-</rule>
-<!--general sentence final punctuation (incl. quotation marks)-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
-<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis character w/ punctuation before or after-->
-<rule break="yes">
-<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 1-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 2-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis following terminal punctuation-->
-<rule break="yes">
-<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
-<afterbreak>\u2026</afterbreak>
-</rule>
-<!--ellipsis followed by opening bracket-->
-<rule break="yes">
-<beforebreak>\u2026</beforebreak>
-<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
-</rule>
-<!--ellipsis followed by closing bracket-->
-<rule break="yes">
-<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
-<afterbreak>\s*</afterbreak>
-</rule>
-<!--inline scripture references-->
-<rule break="yes">
-<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
-</rule>
-<!--copyright statement-->
-<rule break="yes">
-<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
-<afterbreak>©\s*[0-9]{4}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[?!]</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
-<!--newline-->
-<rule break="yes">
-<beforebreak>\n</beforebreak>
-<afterbreak></afterbreak>
 </rule>
 
 <!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
@@ -22873,6 +22946,70 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[\.\s]\p{L}{1,2}\.\s</beforebreak>
 <afterbreak>[\p{N}\p{Ll}]</afterbreak>
 </rule>
+
+
+<!-- default okapi -->
+<!--general sentence final punctuation (incl. quotation marks)-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
+<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis character w/ punctuation before or after-->
+<rule break="yes">
+<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 1-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 2-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis following terminal punctuation-->
+<rule break="yes">
+<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
+<afterbreak>\u2026</afterbreak>
+</rule>
+<!--ellipsis followed by opening bracket-->
+<rule break="yes">
+<beforebreak>\u2026</beforebreak>
+<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
+</rule>
+<!--ellipsis followed by closing bracket-->
+<rule break="yes">
+<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
+<afterbreak>\s*</afterbreak>
+</rule>
+<!--inline scripture references-->
+<rule break="yes">
+<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
+</rule>
+<!--copyright statement-->
+<rule break="yes">
+<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
+<afterbreak>©\s*[0-9]{4}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[?!]</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!--newline-->
+<rule break="yes">
+<beforebreak>\n</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+
+
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
 <rule break="yes">
 <beforebreak>[\.!?…][\u00BB\u2019\u201D\u203A"'\p{Pe}\u0002¹²³]*\s</beforebreak>
 <afterbreak></afterbreak>
@@ -22888,6 +23025,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </languagerule>
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Slovenian">
 
 <!--titles - SLOVENIAN-->
@@ -23004,64 +23142,7 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
 </rule>
-<!--general sentence final punctuation (incl. quotation marks)-->
-<rule break="yes">
-<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
-<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
-<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis character w/ punctuation before or after-->
-<rule break="yes">
-<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 1-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--footnote references 2-->
-<rule break="yes">
-<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
-<afterbreak>\s\s?\p{Lu}</afterbreak>
-</rule>
-<!--ellipsis following terminal punctuation-->
-<rule break="yes">
-<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
-<afterbreak>\u2026</afterbreak>
-</rule>
-<!--ellipsis followed by opening bracket-->
-<rule break="yes">
-<beforebreak>\u2026</beforebreak>
-<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
-</rule>
-<!--ellipsis followed by closing bracket-->
-<rule break="yes">
-<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
-<afterbreak>\s*</afterbreak>
-</rule>
-<!--inline scripture references-->
-<rule break="yes">
-<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
-<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
-</rule>
-<!--copyright statement-->
-<rule break="yes">
-<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
-<afterbreak>©\s*[0-9]{4}</afterbreak>
-</rule>
-<rule break="yes">
-<beforebreak>[?!]</beforebreak>
-<afterbreak>\p{Lu}</afterbreak>
-</rule>
-<!--newline-->
-<rule break="yes">
-<beforebreak>\n</beforebreak>
-<afterbreak></afterbreak>
-</rule>
+
 
 <!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
 
@@ -23205,6 +23286,69 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>\b[gG]l\.\s</beforebreak>
 <afterbreak></afterbreak>
 </rule>
+
+<!-- default okapi -->
+<!--general sentence final punctuation (incl. quotation marks)-->
+<rule break="yes">
+<beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
+<afterbreak>\s+['"\p{Pi}\(]*\p{Lu}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[.?!]+("|'|‘|’|“|”)[.?!]+</beforebreak>
+<afterbreak>\s+[\p{Pi}"'\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis character w/ punctuation before or after-->
+<rule break="yes">
+<beforebreak>[.!?]?['"\p{Pf}\p{Pe}]?\s*(\u2026|\.\s*\.\s*\.\s*)|(\u2026|\.\s*\.\s*\.)\s*[;.!?]?['"\p{Pf}\p{Pe}]?</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\(\[\{&lt;]*\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 1-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[.?!][\p{Pe}\p{Pf}"']{0,3}[0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--footnote references 2-->
+<rule break="yes">
+<beforebreak>\p{Ll}{2,}[\p{Pe}\p{Pf}"']{0,3}[.!?][0-9]{1,2}</beforebreak>
+<afterbreak>\s\s?\p{Lu}</afterbreak>
+</rule>
+<!--ellipsis following terminal punctuation-->
+<rule break="yes">
+<beforebreak>[.?!][\s\p{Pe}\p{Pf}\]\}\)]*</beforebreak>
+<afterbreak>\u2026</afterbreak>
+</rule>
+<!--ellipsis followed by opening bracket-->
+<rule break="yes">
+<beforebreak>\u2026</beforebreak>
+<afterbreak>\s*[\[\{\(]+\s*</afterbreak>
+</rule>
+<!--ellipsis followed by closing bracket-->
+<rule break="yes">
+<beforebreak>\u2026\s*[\]\}\)]+</beforebreak>
+<afterbreak>\s*</afterbreak>
+</rule>
+<!--inline scripture references-->
+<rule break="yes">
+<beforebreak>[.?!]['"\p{Pe}\p{Pf}]*</beforebreak>
+<afterbreak>\s*[\p{Pi}\p{Ps}\[\{\(]([1-5] )?\p{Lu}</afterbreak>
+</rule>
+<!--copyright statement-->
+<rule break="yes">
+<beforebreak>[.?!][\p{Pe}\p{Pf}"']*\s*</beforebreak>
+<afterbreak>©\s*[0-9]{4}</afterbreak>
+</rule>
+<rule break="yes">
+<beforebreak>[?!]</beforebreak>
+<afterbreak>\p{Lu}</afterbreak>
+</rule>
+<!--newline-->
+<rule break="yes">
+<beforebreak>\n</beforebreak>
+<afterbreak></afterbreak>
+</rule>
+
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
+
 <rule break="yes">
 <beforebreak>[\.!?…][\u00BB\u2019\u201D\u203A"'\p{Pe}\u0002¹²³]*\s</beforebreak>
 <afterbreak></afterbreak>
@@ -23219,6 +23363,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </rule>
 </languagerule>
 
+<!-- default okapi -->
 <languagerule languagerulename="Serbian">
 <!--titles - SERBIAN-->
 <rule break="no">
@@ -23334,6 +23479,7 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[AaBb]\.</beforebreak>
 <afterbreak>\s[CcDd]\.</afterbreak>
 </rule>
+<!-- default okapi -->
 <!--general sentence final punctuation (incl. quotation marks)-->
 <rule break="yes">
 <beforebreak>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*\s*[\.?!]+\s*[\p{Pe}\p{Pf}\p{Po}"'"'‘’“”]*</beforebreak>
@@ -23393,6 +23539,7 @@ For more detailed license information, see COPYING.txt and README.md.
 <afterbreak></afterbreak>
 </rule>
 </languagerule>
+<!-- default okapi -->
 <languagerule languagerulename="Twi">
 <!--titles - TWI-->
 <rule break="no">
@@ -23564,6 +23711,7 @@ For more detailed license information, see COPYING.txt and README.md.
 </languagerule>
 
 
+<!-- default okapi -->
 <languagerule languagerulename="Chinese">
 <rule break="no">
 <beforebreak>\p{Nd}*[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]+\s*\p{Nd}+[:：]\p{Nd}+(－\p{Nd}+)?。</beforebreak>
@@ -23599,6 +23747,41 @@ For more detailed license information, see COPYING.txt and README.md.
 <beforebreak>[0-9]+\.[0-9]+\.[0-9]+</beforebreak>
 <afterbreak>\s+\P{Ll}</afterbreak>
 </rule>
+
+
+<!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
+
+<!-- These are really CJK rules - cleanup later -->
+
+	<rule break="no">
+		<beforebreak>\p{Nd}*\w+\s*\p{Nd}+[:：]\p{Nd}+(－\p{Nd}+)?。
+		</beforebreak>
+		<afterbreak>\w</afterbreak>
+	</rule>
+	<rule break="no">
+		<beforebreak>\w[。？！](」|』)</beforebreak>
+		<afterbreak>\s*（\s*\w+\s*\p{Nd}+[:：]\p{Nd}+(ー\p{Nd}+)?</afterbreak>
+	</rule>
+	<rule break="no">
+		<beforebreak>\w[。？！]</beforebreak>
+		<afterbreak>\s*（\s*\w+\s*\p{Nd}+[:：]\p{Nd}+(ー\p{Nd}+)?(参照)?
+		</afterbreak>
+	</rule>
+	<rule break="no">
+		<beforebreak>\w[。？！](」|』)?</beforebreak>
+		<afterbreak>\s*（?\s*[1234１２３４]ニーファイ\p{Nd}+</afterbreak>
+	</rule>
+	<rule break="no">
+		<beforebreak>\w[。？！](」|』)</beforebreak>
+		<afterbreak>\s*（\s*[「『〔]</afterbreak>
+	</rule>
+	<rule break="no">
+		<beforebreak>\w[。？！](」|』)</beforebreak>
+		<afterbreak>と|に</afterbreak>
+	</rule>
+	
+	
+	<!-- default okapi -->
 <rule break="yes">
 <beforebreak>[[\p{L}|\p{N}]）][。！？]</beforebreak>
 <afterbreak>[\p{L}|\p{N}]</afterbreak>
@@ -23644,34 +23827,6 @@ For more detailed license information, see COPYING.txt and README.md.
 
 <!-- LanguageTool is published under the GNU Lesser General Public License (LGPL). For more detailed license information, see COPYING.txt and README.md. -->
 
-<!-- These are really CJK rules - cleanup later -->
-
-	<rule break="no">
-		<beforebreak>\p{Nd}*\w+\s*\p{Nd}+[:：]\p{Nd}+(－\p{Nd}+)?。
-		</beforebreak>
-		<afterbreak>\w</afterbreak>
-	</rule>
-	<rule break="no">
-		<beforebreak>\w[。？！](」|』)</beforebreak>
-		<afterbreak>\s*（\s*\w+\s*\p{Nd}+[:：]\p{Nd}+(ー\p{Nd}+)?</afterbreak>
-	</rule>
-	<rule break="no">
-		<beforebreak>\w[。？！]</beforebreak>
-		<afterbreak>\s*（\s*\w+\s*\p{Nd}+[:：]\p{Nd}+(ー\p{Nd}+)?(参照)?
-		</afterbreak>
-	</rule>
-	<rule break="no">
-		<beforebreak>\w[。？！](」|』)?</beforebreak>
-		<afterbreak>\s*（?\s*[1234１２３４]ニーファイ\p{Nd}+</afterbreak>
-	</rule>
-	<rule break="no">
-		<beforebreak>\w[。？！](」|』)</beforebreak>
-		<afterbreak>\s*（\s*[「『〔]</afterbreak>
-	</rule>
-	<rule break="no">
-		<beforebreak>\w[。？！](」|』)</beforebreak>
-		<afterbreak>と|に</afterbreak>
-	</rule>
 	<rule break="yes">
 		<beforebreak>[\w）][。！？]</beforebreak>
 		<afterbreak>\w</afterbreak>
