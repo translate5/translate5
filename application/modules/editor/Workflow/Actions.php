@@ -177,33 +177,6 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         }
     }
     
-    /**
-     * Associates automatically a different PM (The one who starts the import is the default) to the task by the PMs languages
-     * @return ZfExtended_Models_User|false the new PM user, false if no one found
-     */
-    public function autoAssociateTaskPm() {
-        $task = $this->config->task;
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        
-        $sourceLang = $task->getSourceLang();
-        $targetLang = $task->getTargetLang();
-        $users = $user->loadAllByLanguages($sourceLang, $targetLang);
-        
-        foreach($users as $userData) {
-            $roles = explode(',', $userData['roles']);
-            if(!in_array(ACL_ROLE_PM, $roles)) {
-                continue;
-            }
-            $user->init($userData);
-            $task->setPmGuid($user->getUserGuid());
-            $task->setPmName($user->getUsernameLong());
-            $task->save();
-            return $user;
-        }
-        return false;
-    }
-    
     /***
      * Checks the deadine dates of a task assoc, if it is overdued, it'll be finished for all lectors, triggers normal workflow handlers if needed.
      */
