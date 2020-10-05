@@ -373,7 +373,15 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         foreach($this->originalTags as $key => $tag) {
             //use replace on the single tag to replace the internal tag with the xliff2 tag
             $this->originalTags[$key] = $this->replace($tag, function($match) use ($key, &$newid, &$origTags, &$openTagIds, &$closeTags){
+                
+                //if newid is null, calculation is disabled and we have to use the original ID
+                $useOriginalId = is_null($newid);
+                    
                 $originalId = $match[3];
+                if($useOriginalId) {
+                    $newid = $originalId;
+                }
+                
                 $type = $match[1];
                 if($type == 'single') {
                     $result = sprintf('<ph id="%s"/>', $newid++);
@@ -384,9 +392,15 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
                     $openTagIds[$originalId] = $newid++;
                 }
                 else {
-                    $result = sprintf('<ec id="%s" startRef="XXX" />', $newid++);
+                    $result = sprintf('<ec startRef="%s" />', $newid++);
                     $closeTags[$key] = $originalId;
                 }
+                
+                if($useOriginalId) {
+                    //set to null again for next iteration
+                    $newid = null;
+                }
+                
                 $origTags[$key] = $match[0];
                 return $result;
             });
