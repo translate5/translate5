@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -61,6 +61,25 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     const CONFIG_ADD_QM = 'addQm';
     
     /***
+     * Segment id xliff prefix
+     * @var string
+     */
+    const SEGMENT_ID_PREFIX="seg";
+    
+    /***
+     * Unit id xliff prefix
+     * @var string
+     */
+    const UNIT_ID_PREFIX="unit";
+    
+    
+    /***
+     * Qm id xliff prefix
+     * @var string
+     */
+    const QM_ID_PREFIX="QM_";
+    
+    /***
      * Value for 'its:person' argument in unit tag
      * @var string
      */
@@ -98,7 +117,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     
     /***
      * Finished workflow step
-     * 
+     *
      * @var string
      */
     protected $workflowStep = null;
@@ -106,7 +125,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     /***
       Mapping of translate5 autostates to xliff 2.x substate to xliff 2.x default segment state is as follows.
       
-			Please note: 
+			Please note:
 			- "auto-set" are status flags, that are set by the "translate5 repetition editor" (auto-propagate)
 			- "untouched, auto-set" are status flags, that are changed automatically when a user finishes its job, because the finish means approval of everything, he did not touch manually.
 			
@@ -125,13 +144,13 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
 			reviewed					    ->	reviewed					->	reviewed
 			reviewed, auto-set				->	reviewed_auto				->	reviewed
 			reviewed, untouched, auto-set
-				at finish of workflow step	->	reviewed_untouched			->	reviewed 
+				at finish of workflow step	->	reviewed_untouched			->	reviewed
 			reviewed, unchanged				->	reviewed_unchanged			->	reviewed
 			reviewed, unchanged, auto-set	->	reviewed_unchanged_auto		->	reviewed
 		
 		//3rd default translate5 workflow step: set during check of the review by the translator
 			Review checked by translator	->	reviewed_translator			->	final
-			Review checked by translator, 
+			Review checked by translator,
 				auto-set					->	reviewed_translator_auto	->	final
 			
 		//Not part of the translate5 workflow - done by the PM at any time of the workflow
@@ -174,12 +193,11 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      */
     protected $insDelTagId;
     
-    /***
-     * Applied xliff comments (some of them need to exist only once in the file)
-     * @var array
+    /**
+     * Id of the ins and dels mrk tags. The number will be autoincremented
+     * after ins or del mrk tag is produced.
      */
-    private $xliffCommentsApplied=[
-    ];
+    protected $termId = 1;
     
     /**
      * Array with taskUserTracking-data of our task
@@ -188,23 +206,10 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     protected $trackingData = [];
     
     /***
-     * Segment id xliff prefix
-     * @var string
+     * Applied xliff comments (some of them need to exist only once in the file)
+     * @var array
      */
-    const SEGMENT_ID_PREFIX="seg";
-    
-    /***
-     * Unit id xliff prefix
-     * @var string
-     */
-    const UNIT_ID_PREFIX="unit";
-    
-    
-    /***
-     * Qm id xliff prefix
-     * @var string
-     */
-    const QM_ID_PREFIX="QM_";
+    private $xliffCommentsApplied = [];
     
     /**
      * @param array $config the configuration for the xliff converter, see the CONFIG_ flags
@@ -366,6 +371,8 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             $this->initItsPersonGuid($segment);
             $this->initItsRefPersonGuid($segment);
         }
+        //reset term mrk id to 1 per trans-unit
+        $this->termId = 1;
         
         $unitTag[]='unit';
         $unitTag[]='id="'.self::UNIT_ID_PREFIX.$segment['segmentNrInTask'].'"';
@@ -462,7 +469,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                 $this->escape($comment['userGuid']),
                 $this->escape($comment['userName']),
                 $created,
-                $modified, 
+                $modified,
                 $this->escape($comment['comment']));
         }
         $this->result[] = '</notes>';
@@ -473,7 +480,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      * @param Zend_Db_Table_Row $field
      * @param array $segment
      */
-    protected function processSegmentField(Zend_Db_Table_Row $field, array $segment,array $qms=[]) {
+    protected function processSegmentField(Zend_Db_Table_Row $field, array $segment, array $qms = []) {
         if($field->type == editor_Models_SegmentField::TYPE_SOURCE) {
             return; //handled before
         }
@@ -565,7 +572,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         }
         //it is no user that is assigned to the task, it can be pm
         if($segment['userGuid'] === $this->task->getPmGuid()){
-            //If the workflow step that is currently finishd is translation or translator-check, the PM is used for its:person. 
+            //If the workflow step that is currently finishd is translation or translator-check, the PM is used for its:person.
             //If the current workflow step is review, than the project manager is used for its:revPerson
             if($this->workflowStep===editor_Workflow_Abstract::STEP_TRANSLATION || $this->workflowStep===editor_Workflow_Abstract::STEP_TRANSLATORCHECK){
                 $this->itsPersonGuid=$this->task->getPmGuid();
@@ -663,7 +670,11 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         // 1. toXliff converts the internal tags to xliff 2 tags
         // 2. remove MQM tags
         //TODO MQM tags are just removed and not supported by our XLIFF exporter so far!
-        $text = $this->taghelperInternal->toXliff2Paired($text, false, $this->tagMap, $this->tagId);
+        
+        //local id calculation leads to invalid XLIFF2, since semantical same tags in source and target must have the same id.
+        // using null here disables local calculation, fallback is then the original ID which is fine
+        $tagId = null;
+        $text = $this->taghelperInternal->toXliff2Paired($text, false, $this->tagMap, $tagId);
         $text = $this->handleTerminology($text, false); //internaltag replacment not needed, since already converted
         $text = $this->taghelperMqm->remove($text);
         return $text;
@@ -701,7 +712,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                 }
             }
             
-            return '<mrk id="'.$this->escape($tbxId).'" type="term" translate5:status="'.$this->escape($status).'"'.$translation.'>';
+            return '<mrk id="term-'.($this->termId++).'" type="term" translate5:termid="'.$this->escape($tbxId).'" translate5:status="'.$this->escape($status).'"'.$translation.'>';
         }, '</mrk>', $protectInternalTags);
     }
     
@@ -739,7 +750,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                     //convert the date
                     if($argName==='translate5:date'){
                         $argValue= str_replace('"','', $argValue);
-                        //check if the date is 13 digit timestamp 
+                        //check if the date is 13 digit timestamp
                         if(is_numeric($argValue) && strlen((string)$argValue)===13){
                             //convert the timestamp to ISO 8601 date
                             $argValue=date('c',$argValue/1000);
@@ -851,7 +862,7 @@ translate5 autostates show the segment state more in detail, than xliff 2 is abl
 
 Mapping of translate5 autostates to xliff 2.x substate to xliff 2.x default segment state is as follows.
 
-Please note: 
+Please note:
 - "auto-set" are status flags, that are set by the "translate5 repetition editor" (auto-propagate)
 - "untouched, auto-set" are status flags, that are changed automatically when a user finishes its job, because the finish means approval of everything, he did not touch manually.
 
@@ -870,13 +881,13 @@ translated, auto-set			->	translated_auto				->	translated
 reviewed					    ->	reviewed					->	reviewed
 reviewed, auto-set				->	reviewed_auto				->	reviewed
 reviewed, untouched, auto-set
-	at finish of workflow step	->	reviewed_untouched			->	reviewed 
+	at finish of workflow step	->	reviewed_untouched			->	reviewed
 reviewed, unchanged				->	reviewed_unchanged			->	reviewed
 reviewed, unchanged, auto-set	->	reviewed_unchanged_auto		->	reviewed
 
 //3rd default translate5 workflow step: set during check of the review by the translator
 Review checked by translator	->	reviewed_translator			->	final
-Review checked by translator, 
+Review checked by translator,
 	auto-set					->	reviewed_translator_auto	->	final
 
 //Not part of the translate5 workflow - done by the PM at any time of the workflow
@@ -895,6 +906,7 @@ PM reviewed, unchanged, auto-set->	reviewed_pm_unchanged_auto	->	final
  The translate5:status  attribut on mrk-tags of type="term" shows the term classification of the term in the terminology.
  Its values can be one of the following: preferredTerm, admittedTerm, legalTerm, regulatedTerm, standardizedTerm, deprecatedTerm, supersededTerm.
  translate5:status can occur in mrk tags inside of source AND target tags.
+ translate5:termid contains the term id used for that term in translate5.
    -->';
                 break;
             case 'qmAndTrachChangesComment':
