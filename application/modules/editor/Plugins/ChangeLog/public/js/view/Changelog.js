@@ -60,9 +60,9 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
         me.callParent(arguments);
     },
     initConfig: function(instanceConfig) {
-        var me=this;
-        me.title=me.strings.title,
-        config={
+        var me = this;
+        me.title = me.strings.title;
+        config = {
             items:[{
                 xtype: 'grid',
                 itemId: 'changeLogGrid',
@@ -90,7 +90,11 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
                     filter: {
                         type: 'string'
                     },
-                    text: me.strings.jiranumber
+                    text: me.strings.jiranumber,
+                    renderer: function(v) {
+                        var url = Ext.String.format(Editor.data.plugins.ChangeLog.jiraIssuesUrl, v);
+                        return '<a href="'+url+'" target="_blank">'+v+'</a>';
+                    }
                 },{
                     xtype: 'gridcolumn',
                     flex: 1,
