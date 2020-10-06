@@ -392,7 +392,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
                     $openTagIds[$originalId] = $newid++;
                 }
                 else {
-                    $result = sprintf('<ec startRef="%s" />', $newid++);
+                    $result = sprintf('<ec id="%1$s" startRef="%1$s" />', $newid++);
                     $closeTags[$key] = $originalId;
                 }
                 
