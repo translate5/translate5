@@ -13,3 +13,5 @@ public/scheduled-tests-trigger.php
 public/scheduled-tests/*
 /vendor
 /composer.phar
+# needed for ./translate5.sh release:notes
+/jira-cookie.txt
