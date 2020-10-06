@@ -56,7 +56,13 @@
         echo '<div id="instantTranslateButtonContainer"></div>';
     }
 ?>
-    <div id="logoutContainer"><a id="logout" href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus"><?php echo $translate->_('Abmelden'); ?></a></div>
+
+<?php
+//if the user is not ip based, show the logout button
+if(!$this->isIpBasedUser){
+    echo '<div id="logoutContainer"><a id="logout" href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus">'.$translate->_('Abmelden').'</a></div>';
+}
+?>
 </div>
 <?php 
 if(isset($this->error)){
