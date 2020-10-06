@@ -14,8 +14,9 @@
 --  http://www.gnu.org/licenses/agpl.html
 --   
 --  There is a plugin exception available for use with this release of translate5 for
---  translate5: Please see http://www.translate5.net/plugin-exception.txt or 
---  plugin-exception.txt in the root folder of translate5.
+--  translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+--  Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+--  folder of translate5.
 --   
 --  @copyright  Marc Mittag, MittagQI - Quality Informatics
 --  @author     MittagQI - Quality Informatics
@@ -25,12 +26,11 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-#TODO do we use the default moduele here ?!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-
+-- default module because it is used for authentication
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('default', 'termCustomerSearch', 'frontend', 'ipBasedAuthentication');
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('default', 'instantTranslate', 'frontend', 'ipBasedAuthentication');
 
+UPDATE `Zf_acl_rules` SET `role`='editor' WHERE `module`='editor' AND `role`='basic' AND `resource`='editor_index' AND `right`='all';
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`,`level`) 
 VALUES ('runtimeOptions.authentication.ipbased.IpAddresses', '1', 'editor', 'system', '[]', '[]', '', 'list', 'List of ip addresses for ip based authentication.',4);
@@ -40,3 +40,8 @@ VALUES ('runtimeOptions.authentication.ipbased.IpCustomerMap', '1', 'editor', 's
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`,`level`) 
 VALUES ('runtimeOptions.authentication.ipbased.userRoles', '1', 'editor', 'system', '[]', '[]', '', 'list', 'User roles for ip base authenticated user.',4);
+
+-- add the plugin into an existing plugin config
+UPDATE  `Zf_configuration`
+SET  `value` = REPLACE(`value`, '"]', '","editor_Plugins_IpAuthentication_Init"]')
+WHERE  `Zf_configuration`.`name` ="runtimeOptions.plugins.active" and not `Zf_configuration`.`value` like '%editor_Plugins_IpAuthentication_Init%';
