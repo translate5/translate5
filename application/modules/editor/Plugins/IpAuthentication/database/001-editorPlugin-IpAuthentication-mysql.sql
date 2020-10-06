@@ -36,10 +36,10 @@ INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `valu
 VALUES ('runtimeOptions.authentication.ipbased.IpAddresses', '1', 'editor', 'system', '[]', '[]', '', 'list', 'List of ip addresses for ip based authentication.',4);
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`,`level`) 
-VALUES ('runtimeOptions.authentication.ipbased.IpCustomerMap', '1', 'editor', 'system', '{}', '{}', '', 'map', 'Ip address to customer number map',4);
+VALUES ('runtimeOptions.authentication.ipbased.IpCustomerMap', '1', 'editor', 'system', '{}', '{}', '', 'map', 'Ip address to customer number map. Example where the users coming from 192.168.2.143 are assigned to customer with number 1000 :{"192.168.2.143" : "1000"} . If no ip to customer map is defined, the default customer will be assigned to the ip authenticated users',4);
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`,`level`) 
-VALUES ('runtimeOptions.authentication.ipbased.userRoles', '1', 'editor', 'system', '[]', '[]', '', 'list', 'User roles for ip base authenticated user.',4);
+VALUES ('runtimeOptions.authentication.ipbased.userRoles', '1', 'editor', 'system', '["instantTranslate","termCustomerSearch"]', '["instantTranslate","termCustomerSearch"]', '', 'list', 'User roles for ip base authenticated user.',4);
 
 -- add the plugin into an existing plugin config
 UPDATE  `Zf_configuration`
