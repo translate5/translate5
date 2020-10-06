@@ -25,7 +25,7 @@ translate5 autostates show the segment state more in detail, than xliff 2 is abl
 
 Mapping of translate5 autostates to xliff 2.x substate to xliff 2.x default segment state is as follows.
 
-Please note: 
+Please note:
 - "auto-set" are status flags, that are set by the "translate5 repetition editor" (auto-propagate)
 - "untouched, auto-set" are status flags, that are changed automatically when a user finishes its job, because the finish means approval of everything, he did not touch manually.
 
@@ -44,13 +44,13 @@ translated, auto-set			->	translated_auto				->	translated
 reviewed					    ->	reviewed					->	reviewed
 reviewed, auto-set				->	reviewed_auto				->	reviewed
 reviewed, untouched, auto-set
-	at finish of workflow step	->	reviewed_untouched			->	reviewed 
+	at finish of workflow step	->	reviewed_untouched			->	reviewed
 reviewed, unchanged				->	reviewed_unchanged			->	reviewed
 reviewed, unchanged, auto-set	->	reviewed_unchanged_auto		->	reviewed
 
 //3rd default translate5 workflow step: set during check of the review by the translator
 Review checked by translator	->	reviewed_translator			->	final
-Review checked by translator, 
+Review checked by translator,
 	auto-set					->	reviewed_translator_auto	->	final
 
 //Not part of the translate5 workflow - done by the PM at any time of the workflow
@@ -68,6 +68,7 @@ PM reviewed, unchanged, auto-set->	reviewed_pm_unchanged_auto	->	final
  The translate5:status  attribut on mrk-tags of type="term" shows the term classification of the term in the terminology.
  Its values can be one of the following: preferredTerm, admittedTerm, legalTerm, regulatedTerm, standardizedTerm, deprecatedTerm, supersededTerm.
  translate5:status can occur in mrk tags inside of source AND target tags.
+ translate5:termid contains the term id used for that term in translate5.
    -->
 <source>zurück <pc id="1">zum Haus</pc></source>
 <!--
@@ -84,23 +85,23 @@ The other attributes of these mrk tags are self-explaining. The value of the id 
 The value of translate5:date is in the format  "2017-12-06 13:12:34"
 -->
 <target>
-<mrk id="1" translate="yes" translate5:trackChanges="ins" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:49:28+01:00" ><sc id="3"/></mrk>back <mrk id="2" translate="no" translate5:trackChanges="del" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:49:27+01:00" ><sc id="4"/></mrk>to the house<ec id="5" startRef="4" />
+<mrk id="1" translate="yes" translate5:trackChanges="ins" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:49:28+01:00" ><sc id="1"/></mrk>back <mrk id="2" translate="no" translate5:trackChanges="del" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:49:27+01:00" ><sc id="1"/></mrk>to the house<ec id="1" startRef="1" />
 </target>
 </segment>
 </unit>
 <unit id="unit2" its:revPerson="test lector" translate5:revPersonGuid="{00000000-0000-0000-C100-CCDDEE000002}">
 <segment id="seg2" state="reviewed" subState="translate5Autostate:reviewed">
-<source><pc id="6">das Haus</pc> ist zurück</source>
+<source><pc id="1">das Haus</pc> ist zurück</source>
 <target>
-<sc id="8"/>the house<mrk id="4" translate="no" translate5:trackChanges="del" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:52:14+01:00" ><ec id="9" startRef="8" /></mrk>\u00a0is<mrk id="3" translate="yes" translate5:trackChanges="ins" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:52:15+01:00" ><ec id="10" startRef="8" /></mrk> back
+<sc id="1"/>the house<mrk id="4" translate="no" translate5:trackChanges="del" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:52:14+01:00" ><ec id="1" startRef="1" /></mrk>\u00a0is<mrk id="3" translate="yes" translate5:trackChanges="ins" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:52:15+01:00" ><ec id="1" startRef="1" /></mrk> back
 </target>
 </segment>
 </unit>
 <unit id="unit3" its:revPerson="test lector" translate5:revPersonGuid="{00000000-0000-0000-C100-CCDDEE000002}">
 <segment id="seg3" state="translated" subState="translate5Autostate:translated">
-<source><pc id="11">aus die maus</pc>ENDE</source>
+<source><pc id="1">aus die maus</pc>ENDE</source>
 <target>
-<pc id="13">off the mouse</pc>ENDE
+<pc id="1">off the mouse</pc>ENDE
 </target>
 </segment>
 </unit>
