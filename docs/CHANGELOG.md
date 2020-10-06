@@ -6,6 +6,71 @@ For a reference to the issue keys see http://jira.translate5.net
 
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+
+## [5.0.10] - 2020-10-06
+
+### Important Notes:
+ 
+
+
+### Changed
+[TRANSLATE-2244](https://jira.translate5.net/browse/TRANSLATE-2244): Embed translate5 guide video in help window<br>
+Embed the translate5 guide videos as iframe in the help window. The videos are either in german or english, they are chosen automatically depending on the GUI interface. A list of links to jump to specific parrs of the videos are provided.
+
+[TRANSLATE-2214](https://jira.translate5.net/browse/TRANSLATE-2214): Change SSO Login Button Position<br>
+The SSO Login Button is now placed right of the login button instead between the login input field and the submit button.
+
+[TRANSLATE-1237](https://jira.translate5.net/browse/TRANSLATE-1237): Exported xliff 2.1 is not valid<br>
+The XLF 2.1 output is now valid (validated against https://okapi-lynx.appspot.com/validation).
+
+
+### Bugfixes
+[TRANSLATE-2243](https://jira.translate5.net/browse/TRANSLATE-2243): Task properties panel stays enabled without selected task<br>
+Sometimes the task properties panel was enabled even when there is no task selected in the project tasks grid.
+
+[TRANSLATE-2242](https://jira.translate5.net/browse/TRANSLATE-2242): Source text translation in matches and concordance search grid<br>
+Change the German translation for matches and concordance search grid source column from: Quelltext to Ausgangstext.
+
+[TRANSLATE-2240](https://jira.translate5.net/browse/TRANSLATE-2240): PDF in InstantTranslate<br>
+Translating a PDF file with InstantTranslate document upload leads to a file with 0 bytes and file extension .pdf instead a TXT file named .pdf.txt. (like Okapi is producing it).
+
+[TRANSLATE-2239](https://jira.translate5.net/browse/TRANSLATE-2239): Installer is broken due zend library invocation change<br>
+The installer is broken since the the zend libraries were moved and integrated with the composer auto loader. Internally a class_exist is used which now returns always true which is wrong for the installation.
+
+[TRANSLATE-2237](https://jira.translate5.net/browse/TRANSLATE-2237): Auto state translations<br>
+Update some of the auto state translations (see image attached)
+
+[TRANSLATE-2236](https://jira.translate5.net/browse/TRANSLATE-2236): Change quality and state flags default values<br>
+Update the default value of the runtimeOptions.segments.stateFlags and runtimeOptions.segments.qualityFlags to more usable demo values.
+
+[TRANSLATE-2235](https://jira.translate5.net/browse/TRANSLATE-2235): Not all segmentation rules (SRX rules) in okapi bconf acutally are triggered<br>
+The reason seems to be, that all segment break="no" rules of a language need to be above all break="yes" rules, even if the break="yes" rules do not interfere with the break="no" rules.
+
+[TRANSLATE-2234](https://jira.translate5.net/browse/TRANSLATE-2234): Error on global customers filter<br>
+-
+
+[TRANSLATE-2233](https://jira.translate5.net/browse/TRANSLATE-2233): Remove autoAssociateTaskPm workflow action<br>
+Remove the autoAssociateTaskPm workflow functionality from the workflow action configuration and from the source code too.
+
+[TRANSLATE-2232](https://jira.translate5.net/browse/TRANSLATE-2232): Action button "Associated tasks" is visible for non TM resources<br>
+The action button for re-importing segments to tm in the language resource overview grid is visible for no tm resources (ex: the button is visible for mt resources). The button only should be visible for TM resources.
+
+[TRANSLATE-2218](https://jira.translate5.net/browse/TRANSLATE-2218): Trying to edit a segment with disabled editable content columns lead to JS error<br>
+Trying to edit a segment when all editable columns are hidden, was leading to a JS error.
+
+[TRANSLATE-2173](https://jira.translate5.net/browse/TRANSLATE-2173): Language resources without valid configuration should be shown with brackets in "Add" dialogue<br>
+Available but not configured LanguageResources are shown in the selection list in brackets.
+
+[TRANSLATE-2075](https://jira.translate5.net/browse/TRANSLATE-2075): Fuzzy-Selection of language resources does not work as it should<br>
+When working with language resources the mapping between the languages of the language resource and the languages in translate5 was improved, especially in matching sub-languages. For Details see the issue.
+
+[TRANSLATE-2041](https://jira.translate5.net/browse/TRANSLATE-2041): Tag IDs of created XLF 2 are invalid for importing in other CAT tools<br>
+The XLF 2.1 output is now valid (validated against https://okapi-lynx.appspot.com/validation).
+
+[TRANSLATE-2011](https://jira.translate5.net/browse/TRANSLATE-2011): translate 2 standard term attributes for TermPortal<br>
+Added the missing term-attribute translations.
+
+
 ## [5.0.9] - 2020-09-16
 
 ### Important Notes:
