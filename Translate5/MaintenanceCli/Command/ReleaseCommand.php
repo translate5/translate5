@@ -29,18 +29,11 @@ namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Translate5\MaintenanceCli\WebAppBridge\Application;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Input\InputArgument;
 use JiraRestApi\JiraException;
 use JiraRestApi\Configuration\ArrayConfiguration;
 use JiraRestApi\Project\ProjectService;
-use JiraRestApi\Version\VersionService;
 use JiraRestApi\Issue\Version;
 use JiraRestApi\Issue\IssueService;
-
-
 
 class ReleaseCommand extends Translate5AbstractCommand
 {
@@ -60,7 +53,7 @@ class ReleaseCommand extends Translate5AbstractCommand
     
     /**
      * selected release version
-     * @var JiraRestApi\Issue\Version
+     * @var Version
      */
     protected $releaseVersion = null;
     
@@ -131,6 +124,15 @@ class ReleaseCommand extends Translate5AbstractCommand
         }
         $this->loadIssues();
         
+        $url = \Zend_Registry::get('config')->runtimeOptions->jiraIssuesUrl;
+        $this->io->text([
+            '<info>URL to list and modify issues of this release</info>',
+            parse_url($url, PHP_URL_SCHEME).'://'.parse_url($url, PHP_URL_HOST).'/issues/?jql=project%20%3D%20'.self::PROJECT_KEY.'%20and%20fixVersion%20%3D%20%22'.$this->releaseVersion->id.'%22'
+        ]);
+        
+        if(!$this->io->confirm('Create the SQL and Update the change log (or modify them in JIRA again)?', false)) {
+            return 0;
+        }
         $this->createSql();
         $this->updateChangeLog();
         
@@ -173,7 +175,7 @@ Example: for editor and pm (2+4): → 6');
         $vers = $proj->getVersions(self::PROJECT_KEY);
         
         foreach ($vers as $v) {
-            /* @var $v JiraRestApi\Issue\Version */
+            /* @var $v Version */
             if($v->released) {
                 continue;
             }
@@ -191,8 +193,7 @@ Example: for editor and pm (2+4): → 6');
     }
     
     protected function loadIssues() {
-        //$jql = 'project = '.self::PROJECT_KEY.' and fixVersion = "'.$this->releaseVersion->name.'"';
-        $jql = 'project = '.self::PROJECT_KEY.' and key in (TRANSLATE-2218, TRANSLATE-2045)';
+        $jql = 'project = '.self::PROJECT_KEY.' and fixVersion = "'.$this->releaseVersion->name.'"';
         
         $issueService = new IssueService($this->jiraConf);
         
