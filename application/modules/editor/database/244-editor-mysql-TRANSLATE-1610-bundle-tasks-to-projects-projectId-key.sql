@@ -26,7 +26,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-ALTER TABLE .`LEK_task` 
+ALTER TABLE `LEK_task` 
 ADD INDEX `fk_LEK_task_1_idx1` (`projectId` ASC);
 ALTER TABLE `LEK_task` 
 ADD CONSTRAINT `fk_project_tasks`
