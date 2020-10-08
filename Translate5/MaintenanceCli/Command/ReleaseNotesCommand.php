@@ -35,7 +35,7 @@ use JiraRestApi\Project\ProjectService;
 use JiraRestApi\Issue\Version;
 use JiraRestApi\Issue\IssueService;
 
-class ReleaseCommand extends Translate5AbstractCommand
+class ReleaseNotesCommand extends Translate5AbstractCommand
 {
     /**
      * Translate5 JIRA Project key
@@ -335,6 +335,9 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
         file_put_contents($filename, $sql);
     }
     
+    /**
+     * Injects the MarkDown changelog into the CHANGELOG.md file
+     */
     protected function updateChangeLog() {
         $date = date('Y-m-d', time());
         
@@ -357,21 +360,21 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
             $md .= "\n### Added\n";
         }
         foreach($this->issues['new feature'] as $row) {
-            $md .= $this->linkIssue($row->key).': '.$row->summary."<br>\n".$row->description."\n\n";
+            $md .= '**'.$this->linkIssue($row->key).': '.$row->summary."** <br>\n".$row->description."\n\n";
         }
         
         if(!empty($this->issues['change'])) {
             $md .= "\n### Changed\n";
         }
         foreach($this->issues['change'] as $row) {
-            $md .= $this->linkIssue($row->key).': '.$row->summary."<br>\n".$row->description."\n\n";
+            $md .= '**'.$this->linkIssue($row->key).': '.$row->summary."** <br>\n".$row->description."\n\n";
         }
         
         if(!empty($this->issues['fix'])) {
             $md .= "\n### Bugfixes\n";
         }
         foreach($this->issues['fix'] as $row) {
-            $md .= $this->linkIssue($row->key).': '.$row->summary."<br>\n".$row->description."\n\n";
+            $md .= '**'.$this->linkIssue($row->key).': '.$row->summary."** <br>\n".$row->description."\n\n";
         }
         
         $filename = APPLICATION_ROOT.'/docs/CHANGELOG.md';
