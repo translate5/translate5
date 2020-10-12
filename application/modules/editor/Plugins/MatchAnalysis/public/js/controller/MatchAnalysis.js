@@ -86,7 +86,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         pretranslateMt:'#UT#Vorübersetzen (MT)',
         pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt',
         termtaggerSegment:'#UT#Terminologie prüfen und markieren',
-        analysisLoadingMsg:'#UT#Analyse läuft'
+        analysisLoadingMsg:'#UT#Analyse läuft',
+        batchQuery:'#UT#Enable batch query'
     },
     
     listeners:{
@@ -242,6 +243,17 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             items : [{
                 xtype:'checkbox',
                 value: 1,
+                cls:'checkBoxLableInfoIcon',
+                boxLabel:me.strings.batchQuery,
+                autoEl: {
+                    tag: 'div',
+                    'data-qtip': me.strings.batchQuery
+                },
+                itemId:'batchQuery',
+                padding: '0 20 0 0'
+            },{
+                xtype:'checkbox',
+                value: 1,
     			boxLabel:this.strings.internalFuzzy,
     			itemId:'cbInternalFuzzy',
     			dock:'bottom'
@@ -389,7 +401,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 pretranslateTmAndTerm: me.isChecboxChecked('pretranslateTmAndTerm'),
                 pretranslateMt: me.isChecboxChecked('pretranslateMt'),
                 termtaggerSegment: me.isChecboxChecked('termtaggerSegment'),
-                isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0
+                isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0,
+                batchQuery:me.isChecboxChecked('batchQuery')
             },
             scope: this,
             failure: function(response){

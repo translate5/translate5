@@ -232,6 +232,28 @@ class editor_Plugins_NecTm_HttpApi {
         return $processResponse;
     }
     
+    
+    /**
+     */
+    public function searchBatch(array $queryStrings, $sourceLang, $targetLang, $tagIds, $limit) {
+        $method = 'GET';
+        $endpointPath = 'tm/query_batch';
+        $data = [];
+        $queryParams = [
+            'q'=> $queryStrings,
+            'limi'=> $limit,//Limit output to this number of segments. Default value: 10
+            'slang'=> $sourceLang,
+            'tlang'=> $targetLang,
+            'aut_trans'=> 'false',
+            'tag'=> $tagIds,
+            
+        ];
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $queryParams);
+        $this->result = $this->result ?? [];
+        return $processResponse;
+    }
+    
+    
     /**
      * Concordance-search; NEC-TM-api requires source- and target language.
      * @param string $searchString

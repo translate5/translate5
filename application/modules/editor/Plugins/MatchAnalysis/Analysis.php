@@ -87,6 +87,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected $repetitionUpdater;
     
+    
     /**
      * @param editor_Models_Task $task
      * @param integer $analysisId
@@ -240,6 +241,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             
             if($this->isDisabledDueErrors($connector, $languageResourceid)) {
                 continue;
+            }
+            
+            //if the current connector supports batch query, enable the batch query for this connector
+            if($connector->isBatchQuery() && $this->batchQuery){
+                $connector->enableBatch();
             }
             
             $connector->resetResultList();
@@ -546,5 +552,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     
     public function setInternalFuzzy($internalFuzzy) {
         $this->internalFuzzy=$internalFuzzy;
+    }
+    
+    public function setBatchQuery(bool $batchQuery) {
+        $this->batchQuery = $batchQuery;
     }
 }
