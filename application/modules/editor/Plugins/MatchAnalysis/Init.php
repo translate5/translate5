@@ -50,6 +50,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      */
     protected $assocs=[];
     
+    /***
+     * Langauge resources which are supporting batch query
+     * @var array
+     */
+    protected $batchAssocs = [];
+    
     public function getFrontendControllers() {
         $result = array();
         $userSession = new Zend_Session_Namespace('user');
@@ -132,7 +138,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             //you can not run analysis without resources to be associated to the task
             return false;
         }
-        $valid=$this->checkLanguageResources();
+        $valid=$this->checkLanguageResources($taskGuid);
         if(empty($valid)){
             $task=ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
@@ -140,6 +146,11 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $this->addWarn($task,'MatchAnalysis Plug-In: No valid analysable language resources found.',['invalid'=>print_r($this->assocs,1)]);
             $this->lockAndUnlockTask($task);
             return false;
+        }
+        
+        $parentWorkerId=null;
+        if(!empty($this->batchAssocs) && $eventParams['batchQuery']){
+            $parentWorkerId=$this->queueBatchWorker($taskGuid, $eventParams);
         }
         
         $worker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Worker');
@@ -158,12 +169,14 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $this->lockAndUnlockTask($task);
             return false;
         }
-        $parent=ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $parent ZfExtended_Models_Worker */
-        $result=$parent->loadByState("editor_Models_Import_Worker", ZfExtended_Models_Worker::STATE_PREPARE,$taskGuid);
-        $parentWorkerId=null;
-        if(!empty($result)){
-            $parentWorkerId=$result[0]['id'];
+        
+        if(empty($parentWorkerId)){
+            $parent=ZfExtended_Factory::get('ZfExtended_Models_Worker');
+            /* @var $parent ZfExtended_Models_Worker */
+            $result=$parent->loadByState("editor_Models_Import_Worker", ZfExtended_Models_Worker::STATE_PREPARE,$taskGuid);
+            if(!empty($result)){
+                $parentWorkerId=$result[0]['id'];
+            }
         }
         
         $worker->queue($parentWorkerId);
@@ -187,6 +200,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         settype($params['pretranslateMt'], 'boolean');
         settype($params['termtaggerSegment'], 'boolean');
         settype($params['isTaskImport'], 'boolean');
+        settype($params['batchQuery'], 'boolean');
         
         $params['pretranslate'] = $pretranslate;
         
@@ -202,6 +216,41 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         foreach ($taskGuids as $taskGuid){
             $this->queueAnalysis($taskGuid,$params);
         }
+    }
+    
+    /***
+     * For each batch supported connector queue one batch worker
+     * @param string $taskGuid
+     * @param array $eventParams
+     * @return boolean|NULL|number
+     */
+    protected function queueBatchWorker(string $taskGuid,array $eventParams){
+        $parentWorkerId = null;
+        foreach ($this->batchAssocs as $batchConnector){
+            $batchWorker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_BatchWorker');
+            /* @var $batchWorker editor_Plugins_MatchAnalysis_BatchWorker */
+            
+            if (!$batchWorker->init($taskGuid, ['connector'=>$batchConnector])) {
+                $task=ZfExtended_Factory::get('editor_Models_Task');
+                /* @var $task editor_Models_Task */
+                $task->loadByTaskGuid($taskGuid);
+                $this->addWarn($task,'MatchAnalysis-Error on batchWorker init(). Worker could not be initialized');
+                $this->lockAndUnlockTask($task);
+                return false;
+            }
+            
+            if(empty($parentWorkerId)){
+                $parent=ZfExtended_Factory::get('ZfExtended_Models_Worker');
+                /* @var $parent ZfExtended_Models_Worker */
+                $result=$parent->loadByState("editor_Models_Import_Worker", ZfExtended_Models_Worker::STATE_PREPARE,$taskGuid);
+                $parentWorkerId=null;
+                if(!empty($result)){
+                    $parentWorkerId=$result[0]['id'];
+                }
+            }
+            $parentWorkerId=$batchWorker->queue($parentWorkerId);
+        }
+        return $parentWorkerId;
     }
 
     /***
@@ -221,7 +270,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @param string $taskGuid
      * @return array
      */
-    protected function checkLanguageResources(){
+    protected function checkLanguageResources(string $taskGuid){
+        
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        
         $valid=[];
         foreach ($this->assocs as $assoc){
             $languageresource=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
@@ -232,6 +286,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $manager = ZfExtended_Factory::get('editor_Services_Manager');
             /* @var $manager editor_Services_Manager */
             $resource=$manager->getResource($languageresource);
+            
+            $connector=$manager->getConnector($languageresource,$task->getSourceLang(),$task->getTargetLang());
+            /* @var $connector editor_Services_Connector */
+            //collect all connectors which are supporting batch query
+            if($connector->isBatchQuery()){
+                $this->batchAssocs[]=clone $connector;
+            }
             
             //analysable language resource is found
             if(!empty($resource) && $resource->getAnalysable()){

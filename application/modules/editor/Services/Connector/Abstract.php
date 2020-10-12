@@ -130,6 +130,12 @@ abstract class editor_Services_Connector_Abstract {
      */
     protected $resource;
     
+    /***
+     * Number of segments wich the batch query sedns at once
+     * @var integer
+     */
+    protected $batchQueryBuffer=1;
+    
     /**
      * initialises the internal result list
      */
@@ -224,6 +230,16 @@ abstract class editor_Services_Connector_Abstract {
      * @return editor_Services_ServiceResult
      */
     abstract public function query(editor_Models_Segment $segment);
+    
+    
+    /***
+     * Query the resource with multiple segments at once, and save the results in the database.
+     * @param string $taskGuid
+     */
+    public function batchQuery(string $taskGuid){
+        
+    }
+    
 
     /**
      * returns the original or edited source content to be queried, depending on source edit
@@ -328,6 +344,15 @@ abstract class editor_Services_Connector_Abstract {
         return preg_replace('/('.preg_quote($searchString, '/').')/i', '<span class="highlight">\1</span>', $haystack);
     }
     
+    protected function saveBatchResults(editor_Models_Segment $seg) {
+        $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
+        /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */
+        $model->setLanguageResource($this->languageResource->getId());
+        $model->setSegmentId($seg->getId());
+        $model->setResult(serialize($this->resultList));
+        $model->save();
+    }
+    
     /**
      * makes a tm / mt / file concordance search
      * @param string $queryString
@@ -401,5 +426,13 @@ abstract class editor_Services_Connector_Abstract {
      */
     public function isInternalFuzzy() {
         return $this->isInternalFuzzy;
+    }
+    
+    /***
+     * If the batch query buffer is set for more then 1 segment, then this connector should support batch query requests
+     * @return boolean
+     */
+    public function isBatchQuery() {
+        return $this->batchQueryBuffer>1;
     }
 }

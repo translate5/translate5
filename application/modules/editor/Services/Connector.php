@@ -76,6 +76,12 @@ class editor_Services_Connector {
      */
     protected $targetLang;
     
+    /***
+     * if set to true, it will get the results from the batch cache table when using the query action
+     * @var boolean
+     */
+    protected $batchQuery = false;
+    
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null){
         $serviceType = $languageResource->getServiceType();
         $connector = ZfExtended_Factory::get($serviceType.editor_Services_Manager::CLS_CONNECTOR);
@@ -106,6 +112,15 @@ class editor_Services_Connector {
      */
     public function query(editor_Models_Segment $segment) {
         try {
+            $serviceResult = null;
+            //if thje batch query is enabled, get the results from the cache
+            if($this->batchQuery && $this->adapter->isBatchQuery()){
+                $serviceResult = $this->getCachedResult($segment);
+            }
+            //if there is no service results, try the query
+            if(!empty($serviceResult)){
+                return $serviceResult;
+            }
             $serviceResult=$this->adapter->query($segment);
         } catch (Exception $e) {
             $this->logException($e,$segment->getTaskGuid());
@@ -188,6 +203,27 @@ class editor_Services_Connector {
         }
         $extra['message']=$e->getMessage();
         throw new editor_Services_Connector_Exception('E1282',$extra);
+    }
+    
+    
+    protected function getCachedResult(editor_models_segment $segment) {
+        $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
+        /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */
+        return $model->getResults($segment->getId(),$this->languageResource->getId());
+    }
+    
+    /***
+     * Load the query results from batch query table
+     */
+    public function enableBatch() {
+        $this->batchQuery = true;
+    }
+    
+    /***
+     * Load the results with calling the adapters query action 
+     */
+    public function disableBatch() {
+        $this->batchQuery = false;
     }
     
 //     /***
