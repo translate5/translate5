@@ -91,7 +91,7 @@ class editor_Plugins_NecTm_HttpApi {
     
     /**
      * For logging purposes
-     * @var Zend_Http_Client
+     * @var ZfExtended_HttpClient
      */
     protected $http;
     
@@ -236,7 +236,7 @@ class editor_Plugins_NecTm_HttpApi {
     /**
      */
     public function searchBatch(array $queryStrings, $sourceLang, $targetLang, $tagIds, $limit) {
-        $method = 'GET';
+        $method = 'POST';
         $endpointPath = 'tm/query_batch';
         $data = [];
         $queryParams = [
@@ -248,7 +248,7 @@ class editor_Plugins_NecTm_HttpApi {
             'tag'=> $tagIds,
             
         ];
-        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $queryParams);
+        $processResponse = $this->necTmBatchRequest($method, $endpointPath, $data, $queryParams);
         $this->result = $this->result ?? [];
         return $processResponse;
     }
@@ -474,14 +474,14 @@ class editor_Plugins_NecTm_HttpApi {
     }
     
     /**
-     * prepares a Zend_Http_Client, prefilled with the configured URL + the given REST URL Parts
+     * prepares a ZfExtended_HttpClient, prefilled with the configured URL + the given REST URL Parts
      * @param string $method
      * @param string $endpointPath
-     * @return Zend_Http_Client
+     * @return ZfExtended_HttpClient
      */
     protected function getHttp($method, $endpointPath = '') {
-        $this->http = ZfExtended_Factory::get('Zend_Http_Client');
-        /* @var $http Zend_Http_Client */
+        $this->http = ZfExtended_Factory::get('ZfExtended_HttpClient');
+        /* @var $http ZfExtended_HttpClient */
         $this->http->setUri($this->getUrl($endpointPath));
         $this->http->setMethod($method);
         $this->httpMethod = $method;
@@ -539,12 +539,35 @@ class editor_Plugins_NecTm_HttpApi {
         return $processResponse;
     }
     
+    
+    /**
+     */
+    protected function necTmBatchRequest($method, $endpointPath = '', $data = [], $queryParams = [], $files = []) {
+        $http = $this->getHttp($method, $endpointPath);
+        $http->setParameterPost($queryParams);
+        $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
+        if (!empty($data)) {
+            $http->setRawData(json_encode($data), self::ENC_TYPE);
+        }
+        if (!empty($files)) {
+            foreach ($files as $formname => $filename) {
+                $http->setFileUpload($filename,$formname);
+            }
+        }
+        $response = $this->request($http);
+        $processResponse = $this->processResponse($response);
+        if (!$processResponse) {
+            $this->throwBadGateway();
+        }
+        return $processResponse;
+    }
+    
     /**
      * wraps the http request call to catch connection exceptions
-     * @param Zend_Http_Client $http
+     * @param ZfExtended_HttpClient $http
      * @return Zend_Http_Response
      */
-    protected function request(Zend_Http_Client $http) {
+    protected function request(ZfExtended_HttpClient $http) {
         //exceptions with one of that messages are leading to badgateway exceptions
         $badGatewayMessages = [
             'php_network_getaddresses: getaddrinfo failed: Name or service not known',

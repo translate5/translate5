@@ -409,12 +409,15 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         $sourceLang = $this->languageResource->getSourceLangCode();
         $targetLang = $this->languageResource->getTargetLangCode();
         $engineId = $this->languageResource->getSpecificData('engineId');
+        $this->resultList->resetResult();
         if($this->api->searchBatch($queryStrings, $sourceLang, $targetLang, $engineId,$this->batchQueryBuffer)){
             $results = $this->api->getResult();
             if(empty($results)) {
                 return;
             }
-            
+            if(count($results)!=count($queryStrings)){
+                error_log("Query and result count is different: Query was:". print_r($queryStrings,1) . " | result was: ".print_r($results,1));
+            }
             //for each segment, one result is available
             foreach ($results as $segmentResults) {
                 //get the segment from the beginning of the cache
@@ -445,6 +448,11 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
                     
                 $tmResults = $segmentResults->results ?? [];
                 foreach ($tmResults as $tmRes){
+                    $query = $segmentResults->query ?? "";
+                    if($queryString!= $query){
+                        error_log("[".$seg->getSegmentNrInTask()."]Different source as query source. Query:[".$queryString."] | Tmsource:[".$query."]");
+                        continue;
+                    }
                     
                     $source=$tmRes->tu->source_text ?? "";
                     $target = $tmRes->tu->target_text ?? "";

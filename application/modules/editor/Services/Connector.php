@@ -116,6 +116,7 @@ class editor_Services_Connector {
             //if thje batch query is enabled, get the results from the cache
             if($this->batchQuery && $this->adapter->isBatchQuery()){
                 $serviceResult = $this->getCachedResult($segment);
+                error_log("Batchquery result used:".$segment->getSegmentNrInTask());
             }
             //if there is no service results, try the query
             if(!empty($serviceResult)){
