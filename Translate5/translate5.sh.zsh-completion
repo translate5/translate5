@@ -1,0 +1,78 @@
+#compdef translate5.sh
+
+_translate5.sh()
+{
+    local state com cur
+
+    cur=${words[${#words[@]}]}
+
+    # lookup for command
+    for word in ${words[@]:1}; do
+        if [[ $word != -* ]]; then
+            com=$word
+            break
+        fi
+    done
+
+    if [[ ${cur} == --* ]]; then
+        state="option"
+        opts=("--help:Display this help message" "--quiet:Do not output any message" "--verbose:Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug" "--version:Display this application version" "--ansi:Force ANSI output" "--no-ansi:Disable ANSI output" "--no-interaction:Do not ask any interactive question")
+    elif [[ $cur == $com ]]; then
+        state="command"
+        coms=("config:List, get and set translate5 configuration values." "help:Displays help for a command" "list:Lists commands" "log:Query the translate5 log" "database\:update:Maintain database updates." "release\:notes:Updates the release notes, only usable in development installations." "session\:impersonate:Returns a URL to authenticate password less as the given user." "task\:clean:provides information about and the possibility to delete hanging import / erroneous tasks and orphaned task data directories" "worker\:list:Prints a list of current workers or details about one worker")
+    fi
+
+    case $state in
+        command)
+            _describe 'command' coms
+        ;;
+        option)
+            case "$com" in
+
+            config)
+            opts+=("--detail:Show config details on listing" "--modified:Show only modified values on listing" "--empty:Set the value to an empty string \(which can not be given as set argument\).")
+            ;;
+
+            help)
+            opts+=("--format:The output format \(txt, xml, json, or md\)" "--raw:To output raw command help")
+            ;;
+
+            list)
+            opts+=("--raw:To output raw command list" "--format:The output format \(txt, xml, json, or md\)")
+            ;;
+
+            log)
+            opts+=("--level:Filtering for specific level\(s\). If given as string, only the level given as string is shown. Given as integer: filtering for all levels as bitmask." "--follow:Show the most recent log entries, and continuously print new entries as they are appended to the log. Do not show a summary." "--all:Shows the full blown log data \(extra, trace, etc\)" "--since:Shows log data since the given point in time \(strtotime parsable string\)." "--until:Shows log data until the given point in time \(strtotime parsable string\). If the parameter starts with a "+" it is automatically added to the since date." "--no-summary:Do not print the summary and intro texts - for further shell scripting." "--summary-only:Print only the summary." "--purge:Warning: purges the logs found be the given filters. Is asking for confirmation of not used with -q\|--quiet or -n\|--no-interaction.")
+            ;;
+
+            database:update)
+            opts+=("--import:Imports all new database files or a single file if a filename / hash was given.")
+            ;;
+
+            release:notes)
+            opts+=()
+            ;;
+
+            session:impersonate)
+            opts+=()
+            ;;
+
+            task:clean)
+            opts+=("--delete-error:deletes one \(with ID\) or all tasks with errors" "--delete-import:deletes one task in state import" "--delete-data:deletes all orphaned data folders")
+            ;;
+
+            worker:list)
+            opts+=()
+            ;;
+
+            esac
+
+            _describe 'option' opts
+        ;;
+        *)
+            # fallback to file completion
+            _arguments '*:file:_files'
+    esac
+}
+
+compdef _translate5.sh translate5.sh
