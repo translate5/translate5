@@ -46,7 +46,7 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
         $view = $event->getParam('view');
         $userSession = new Zend_Session_Namespace('user');
         //do not show the logout button if the user is ipbased
-        $view->isIpBasedUser=strpos($userSession->data->login, ZfExtended_Models_IpBaseUser::IP_BASED_USER_LOGIN_PREFIX) === 0;
+        $view->isIpBasedUser=strpos($userSession->data->login, editor_Plugins_IpAuthentication_Models_IpBaseUser::IP_BASED_USER_LOGIN_PREFIX) === 0;
     }
     
     /**
@@ -55,8 +55,8 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
      * The LoginController will handle the redirect
      */
     public function onLoginBeforeIndexAction() {
-        $user=ZfExtended_Factory::get('ZfExtended_Models_IpBaseUser');
-        /* @var $user ZfExtended_Models_IpBaseUser */
+        $user=ZfExtended_Factory::get('editor_Plugins_IpAuthentication_Models_IpBaseUser');
+        /* @var $user editor_Plugins_IpAuthentication_Models_IpBaseUser */
         if(!$user->isIpBasedRequest()){
             return;
         }
@@ -68,8 +68,8 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
      */
     public function onGarbageCollectorCleanUp() {
         //remove all ip based user wich can not be found in the session
-        $users = ZfExtended_Factory::get('ZfExtended_Models_IpBaseUser');
-        /* @var $users ZfExtended_Models_IpBaseUser */
+        $users = ZfExtended_Factory::get('editor_Plugins_IpAuthentication_Models_IpBaseUser');
+        /* @var $users editor_Plugins_IpAuthentication_Models_IpBaseUser */
         
         $users = $users->findAllExpired();
         
