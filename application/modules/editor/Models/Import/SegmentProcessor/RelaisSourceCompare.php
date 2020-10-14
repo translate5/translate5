@@ -92,8 +92,10 @@ class editor_Models_Import_SegmentProcessor_RelaisSourceCompare {
     public function normalize(string $content) {
         if($this->configuredCompareMode & self::MODE_IGNORE_TAGS) {
             $content = $this->internalTag->replace($content, ' ');
+            // internal tags may represent whitespace of the original text which are now converted to blanks,
+            // to enable a proper comparision we have to normalize the whitespace
             //trim removes leading / trailing whitespaces added by tag removing
-            $content = trim(preg_replace('/\s{2,}/', ' ', $content));
+            $content = trim(editor_Utils::normalizeWhitespace($content, ' '));
         }
         if($this->configuredCompareMode & self::MODE_NORMALIZE_ENTITIES){
             return html_entity_decode($content);
