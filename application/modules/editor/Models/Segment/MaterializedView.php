@@ -154,7 +154,7 @@ class editor_Models_Segment_MaterializedView {
             
             //searching in our text fields should be searched binary, see TRANSLATE-646 
             if($v == 'original' || $v == 'edited') {
-                $sql .= ' COLLATE utf8_bin';
+                $sql .= ' COLLATE utf8mb4_bin';
             }
             
             $addColTpl[$v] = $sql;

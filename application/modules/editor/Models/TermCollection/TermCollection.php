@@ -108,14 +108,14 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $sqlOld_and_very_slow_on_large_data=' SELECT * FROM LEK_terms '.
               'WHERE groupId IN ( '.
               'SELECT `t`.`groupId` FROM `LEK_terms` AS `t` '.
-              'WHERE lower(term) like lower(?) COLLATE utf8_bin '.
+              'WHERE lower(term) like lower(?) COLLATE utf8mb4_bin '.
               'AND (t.collectionId=?) AND (t.language IN(?)) GROUP BY `t`.`groupId`) '.
               'AND language IN(?) AND collectionId=?';
         
         $s=$this->db->select()
             ->setIntegrityCheck(false)
             ->from('LEK_terms')
-            ->where('lower(term) like lower(?) COLLATE utf8_bin',$queryString)
+            ->where('lower(term) like lower(?) COLLATE utf8mb4_bin',$queryString)
             ->where('collectionId=?',$this->getId())
             ->where('language IN(?)',$field=='source' ? $sourceLangs : $targetLangs)
             ->group('groupId');
