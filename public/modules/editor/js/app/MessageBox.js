@@ -57,10 +57,14 @@ Ext.define('Editor.MessageBox',{
     addWarning: function(msg,delayFactor) {
         Editor.MessageBox.getInstance().addMessage(msg, Editor.MessageBox.WARNING, delayFactor);
     },
-    addError: function(msg) {
+    /**
+     * @param {String} msg
+     * @param {String} errorCode 
+     */
+    addError: function(msg, errorCode) {
       //Editor.MessageBox.getInstance().addMessage(msg, Editor.MessageBox.ERROR);
       //display a alert instead:
-      Editor.MessageBox.getInstance().showDirectError(msg);
+      Editor.MessageBox.getInstance().showDirectError(msg, null, errorCode);
     },
     addInfo: function(msg, delayFactor) {
       Editor.MessageBox.getInstance().addMessage(msg, Editor.MessageBox.INFO, delayFactor);
@@ -183,13 +187,23 @@ Ext.define('Editor.MessageBox',{
           '</div>'
       ].join('');
   },
-  showDirectError: function(msg, data) {
+  showDirectError: function(msg, data, errorCode) {
       var box = Ext.MessageBox,
-          info = (Editor.data.task ? "- tid: "+Editor.data.task.id : '');
+          info = [];
       if(data) {
           msg = msg + Editor.MessageBox.dataTable(data);
       }
-      msg += Editor.MessageBox.debugInfoMarkup(Editor.data.app.user.login+info);
+      if(errorCode) {
+        if(Editor.data.errorCodesUrl) {
+            errorCode = '<a href="'+Ext.String.format(Editor.data.errorCodesUrl, errorCode)+'" target="_blank">'+errorCode+'</a>'; 
+        }
+        info.push(errorCode);
+      }
+      info.push(Editor.data.app.user.login);
+      if(Editor.data.task) {
+        info.push("tid: "+Editor.data.task.id);
+      }
+      msg += Editor.MessageBox.debugInfoMarkup(info.join('; '));
       box.show({
           title: this.titles.directError,
           msg: msg,
