@@ -580,7 +580,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($this->entity->getTaskGuid());
-            $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($sessionUserGuid, $task);
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($sessionUserGuid, $task);
             /* @var $tua editor_Models_TaskUserAssoc */
             $role = $tua->getRole();
             if ($tua->isSegmentrangedTaskForRole($task, $role)) {
