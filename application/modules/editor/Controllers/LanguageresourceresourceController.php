@@ -84,7 +84,7 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
         // (4) load the resource available languages for each service resource
         foreach ($result as &$r){
             // if there is no id set, the service is unconfigured
-            if(!isset($r->id)){
+            if(!isset($r->id) || !isset($r->serviceType)){
                 continue;
             }
             $service = ZfExtended_Factory::get($r->serviceType.editor_Services_Manager::CLS_SERVICE);
