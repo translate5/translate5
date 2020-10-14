@@ -883,7 +883,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
         ->setIntegrityCheck(false)
         ->from($tableTerm, ['term as label','id as value','term as desc','definition','groupId','collectionId','termEntryId','language'])
-        ->where('lower(`'.$tableTerm.'`.term) like lower(?) COLLATE utf8_bin',$queryString)
+        ->where('lower(`'.$tableTerm.'`.term) like lower(?) COLLATE utf8mb4_bin',$queryString)
         ->where('`'.$tableTerm.'`.language IN(?)',explode(',', $languages))
         ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
         ->where('`'.$tableTerm.'`.processStatus IN(?)',$processStats);
@@ -902,7 +902,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->setIntegrityCheck(false)
         ->from($tableProposal, ['term as label','termId as value','term as desc'])
         ->joinInner($tableTerm, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['definition','groupId','collectionId', 'termEntryId','language'])
-        ->where('lower(`'.$tableProposal.'`.term) like lower(?) COLLATE utf8_bin',$queryString)
+        ->where('lower(`'.$tableProposal.'`.term) like lower(?) COLLATE utf8mb4_bin',$queryString)
         ->where('`'.$tableTerm.'`.language IN(?)',explode(',', $languages))
         ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
         ->order($tableTerm.'.term asc');
