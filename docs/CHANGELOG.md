@@ -7,6 +7,39 @@ For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
 
+
+## [5.0.11] - 2020-10-14
+
+### Important Notes:
+#### [TRANSLATE-2045](https://jira.translate5.net/browse/TRANSLATE-2045)
+- This update modifies the whole data of the database! 
+Therefore a back up of the database directly before the update is mandatory!
+- On larger installations this update may need some time (for example for 2.5 million segments in 700 tasks the script needed about 15 minutes)
+- The database script requires user with ALTER privilege on the database - which should be the case if installed translate5 as described in the installation guide.
+- In the case of errors collect them and send them to us and restore your backup. 
+- In the issue description is a manual guide for the migration
+ 
+
+
+### Changed
+[TRANSLATE-2246](https://jira.translate5.net/browse/TRANSLATE-2246): Move the Ip based exception and the extended user model into the same named Plugin<br>
+Some code refactoring.
+
+
+### Bugfixes
+[TRANSLATE-2259](https://jira.translate5.net/browse/TRANSLATE-2259): Inconsistent workflow may lead in TaskUserAssoc Entity Not Found error when saving a segment.<br>
+The PM is allowed to set the Job associations as they want it. This may lead to an inconsistent workflow. One error when editing segments in an inconsistent workflow is fixed now.
+
+[TRANSLATE-2258](https://jira.translate5.net/browse/TRANSLATE-2258): Fix error E1161 "The job can not be modified due editing by a user" so that it is not triggered by viewing only users.<br>
+The above mentioned error is now only triggered if the user has opened the task for editing, before also a readonly opened task was triggering that error.
+
+[TRANSLATE-2247](https://jira.translate5.net/browse/TRANSLATE-2247): New installations save wrong mysql executable path (for installer and updater)<br>
+Fix a bug preventing new installations to be usable.
+
+[TRANSLATE-2045](https://jira.translate5.net/browse/TRANSLATE-2045): Use utf8mb4 charset for DB<br>
+Change all utf8 fields to the mysql datatype utf8mb4. 
+
+
 ## [5.0.10] - 2020-10-06
 
 ### Important Notes:
