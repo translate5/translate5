@@ -125,6 +125,7 @@ Ext.define('Editor.controller.ServerException', {
             json = null,
             tpl = new Ext.Template(str.serverMsg),
             action = response && response.request && response.request.options.action,
+            errorCode,
             getServerMsg = function() {
                 if(json.errorMessage){
                     return json.errorMessage;
@@ -174,6 +175,7 @@ Ext.define('Editor.controller.ServerException', {
             statusText = json.message;
             _status = status.toString();
         }
+        errorCode = json && json.errorCode;
         switch(status) {
             case -1:
                 //if the XHR was aborted, do nothing here, since this is "wanted" behaviour
@@ -197,7 +199,7 @@ Ext.define('Editor.controller.ServerException', {
                             removed = assocs.getRemovedRecords();
                         assocs.removed = Ext.Array.difference(removed, req.options.records);
                     }
-                    Editor.MessageBox.addError(appendServerMsg(str["405_del_assoc"]));
+                    Editor.MessageBox.addError(appendServerMsg(str["405_del_assoc"]), errorCode);
                     return;
                 }
                 if(response && response.request) {
@@ -210,7 +212,7 @@ Ext.define('Editor.controller.ServerException', {
                 if(str[_status+'_'+action]) {
                     _status = _status+'_'+action;
                 }
-                Editor.MessageBox.addError(appendServerMsg(str[_status]));
+                Editor.MessageBox.addError(appendServerMsg(str[_status]), errorCode);
                 return;
             case 401: //Unauthorized → redirect to login
                 Ext.MessageBox.show({
@@ -225,7 +227,7 @@ Ext.define('Editor.controller.ServerException', {
                 return;
             case 409: //Conflict: show message from server
             //FIXME the errors coming with a translation, should show the error message directly, without introduction text
-                Editor.MessageBox.addError(appendServerMsg(str["409"]));
+                Editor.MessageBox.addError(appendServerMsg(str["409"]), errorCode);
                 return;
             //422 unprocessable entity: normally the errors are shown via form.markInvalid. 
             // If not, we add up the error message with info from the payload
@@ -239,7 +241,7 @@ Ext.define('Editor.controller.ServerException', {
                     errorsToUse = json.errors;
                 }
                 else {
-                    Editor.MessageBox.addError(str["409"]+'<ul><li>'+json.errorMessage+'</li></ul>');
+                    Editor.MessageBox.addError(str["409"]+'<ul><li>'+json.errorMessage+'</li></ul>', errorCode);
                     return;
                 }
                 json.errorMessage = [];
@@ -248,13 +250,13 @@ Ext.define('Editor.controller.ServerException', {
                         json.errorMessage.push(error);
                     });
                 });
-                Editor.MessageBox.addError(str["409"]+'<ul><li>'+json.errorMessage.join('</li><li>')+'</li></ul>');
+                Editor.MessageBox.addError(str["409"]+'<ul><li>'+json.errorMessage.join('</li><li>')+'</li></ul>', errorCode);
                 return;
             case 406: //Not Acceptable: show message from server
-                Editor.MessageBox.addError(getServerMsg());
+                Editor.MessageBox.addError(getServerMsg(), errorCode);
             case 502: //Bad Gateway → the real error is coming from a requested third party system
                 Ext.Array.each(json.errors, function(item){
-                    Editor.MessageBox.getInstance().showDirectError(item.msg, item.data);
+                    Editor.MessageBox.getInstance().showDirectError(item.msg, item.data, errorCode);
                 });
                 return;
             case 503:
@@ -272,7 +274,7 @@ Ext.define('Editor.controller.ServerException', {
         if(json && json.errorMessage) {
             statusText += ': <br>'+json.errorMessage;
         }
-        Editor.MessageBox.addError(text+tpl.apply([_status, statusText]));
+        Editor.MessageBox.addError(text+tpl.apply([_status, statusText]), errorCode);
     },
     renderHtmlMessage: function(title, response){
         var me = this,

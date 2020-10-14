@@ -26,24 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/***
- * CREATE TABLE IF NOT EXISTS `LEK_task_excelexport` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
-  `userGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to Zf_users',
-  `exported` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_LEK_task_excelexport_1`
-    FOREIGN KEY (`taskGuid`)
-    REFERENCES `LEK_task` (`taskGuid`)
-    ON DELETE CASCADE,
-  CONSTRAINT `fk_LEK_task_excelexport_2`
-    FOREIGN KEY (`userGuid`)
-    REFERENCES `Zf_users` (`userGuid`)
-    ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
- *
- */
 class editor_Models_Validator_TaskExcelExport extends ZfExtended_Models_Validator_Abstract {
 
     protected function defineValidators() {
