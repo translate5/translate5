@@ -72,6 +72,6 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
         if(!empty($table)) {
             $field = $table.'`.`'.$field;
         }
-        $this->where(' lower(`'.$field.'`) like lower(?) COLLATE utf8_bin', '%'.$value.'%');
+        $this->where(' lower(`'.$field.'`) like lower(?) COLLATE utf8mb4_bin', '%'.$value.'%');
     }
 }

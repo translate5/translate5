@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Important: If a TUA can not be loaded (for example if the tua role does not match a workflow step) then such a user proceeds as PM override user!
  */
-class editor_Models_Loaders_Taskuserassoc{
+class editor_Models_Loaders_Taskuserassoc {
     
     /**
      * Loads single assoc for given userGuid and task, forced to the role matching the workflow step

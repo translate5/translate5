@@ -192,7 +192,6 @@ abstract class editor_Workflow_Abstract {
         self::STATE_UNCONFIRMED,
         self::STATE_OPEN,
         self::STATE_EDIT,
-        self::STATE_VIEW,
     );
     /**
      * roles which are part of the workflow chain (in this order)
