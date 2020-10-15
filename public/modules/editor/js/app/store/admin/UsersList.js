@@ -26,23 +26,22 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 Ext.define('Editor.store.admin.UsersList', {
-	extend : 'Ext.data.Store',
-  	model: 'Editor.model.admin.User',
-    autoLoad: true,
+    extend : 'Ext.data.Store',
+    model: 'Editor.model.admin.User',
     pageSize: 0,
     idProperty: 'id',
     listeners: {
-    	/***
-  	   * Add the task filter to the userlist store
-  	   */
+        /**
+         * Add the task filter to the userlist store
+         */
         beforeload:function(store,operation,eOpts){
-	      var taskStore=Ext.StoreManager.get('admin.Tasks'),
-		        proxy=store.getProxy(),
-		        merged = Ext.merge({}, proxy.getExtraParams(), {
-		            filter:proxy.encodeFilters(taskStore.getFilters().items)
-		        });
-		    proxy.setExtraParams(merged);
-	    }
+            var taskStore=Ext.StoreManager.get('admin.Tasks'),
+                proxy=store.getProxy(),
+                merged = Ext.merge({}, proxy.getExtraParams(), {
+                    filter:proxy.encodeFilters(taskStore.getFilters().items)
+                });
+            proxy.setExtraParams(merged);
+        }
     },
     proxy : {
       type : 'rest', 

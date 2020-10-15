@@ -344,7 +344,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         //apply the frontend task filters
         $this->applyFilterAndSort($s);
         //the inner query is the current task list with activ filters
-        $sql=' SELECT Zf_users.*,filter.taskGuid from Zf_users, '.
+        $userCols = 'Zf_users.`'.join('`, Zf_users.`', $userModel->getPublicColumns()).'`';
+        $sql = ' SELECT '.$userCols.',filter.taskGuid from Zf_users, '.
             ' ('.$s->assemble().') as filter '.
              ' INNER JOIN LEK_taskUserAssoc ON LEK_taskUserAssoc.taskGuid=filter.taskGuid '.
              $anonSql.
