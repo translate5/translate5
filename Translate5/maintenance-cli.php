@@ -30,7 +30,17 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
-use Translate5\MaintenanceCli\Command\{TaskCleanCommand,ConfigCommand,DatabaseUpdateCommand,WorkerListCommand,LogCommand,SessionImpersonateCommand,ReleaseNotesCommand,ChangelogCommand};
+use Translate5\MaintenanceCli\Command\{
+    TaskCleanCommand,
+    ConfigCommand,
+    DatabaseUpdateCommand,
+    WorkerListCommand,
+    LogCommand,
+    SessionImpersonateCommand,
+    ReleaseNotesCommand,
+    ChangelogCommand,
+    DevelopmentNewdbchangeCommand
+};
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $commands = [
@@ -43,6 +53,7 @@ $commands = [
     new ChangelogCommand(),
 ];
 if(file_exists('.git')) {
+    $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new ReleaseNotesCommand();
 }
 $app->addCommands($commands);

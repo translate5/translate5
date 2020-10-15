@@ -10,8 +10,10 @@ Missing Versions are merged into in the next upper versions, so no extra section
 ## [5.0.10] - 2020-10-06
 
 ### Important Notes:
- 
 
+### Added
+[TRANSLATE-2160](https://jira.translate5.net/browse/TRANSLATE-2160): IP-based Authentication, that creates temporary users
+For the roles "InstantTranslate" and "Term search" it is now possible to configure IP addresses in translate5s configuration. Users coming from these IPs will then be logged in automatically with a temporary user. All uploaded data and the temporary user will automatically be deleted, when the session expires.
 
 ### Changed
 [TRANSLATE-2244](https://jira.translate5.net/browse/TRANSLATE-2244): Embed translate5 guide video in help window<br>
