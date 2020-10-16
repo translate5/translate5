@@ -116,7 +116,6 @@ class editor_Services_Connector {
             //if thje batch query is enabled, get the results from the cache
             if($this->batchQuery && $this->adapter->isBatchQuery()){
                 $serviceResult = $this->getCachedResult($segment);
-                error_log("Batchquery result used:".$segment->getSegmentNrInTask());
             }
             //if there is no service results, try the query
             if(!empty($serviceResult)){
@@ -207,6 +206,11 @@ class editor_Services_Connector {
     }
     
     
+    /***
+     * Load the lates service result cache for the given segment in the current language resource
+     * @param editor_models_segment $segment
+     * @return editor_Services_ServiceResult
+     */
     protected function getCachedResult(editor_models_segment $segment) {
         $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
         /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */

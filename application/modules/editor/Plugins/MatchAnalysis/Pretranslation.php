@@ -126,7 +126,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     protected $analysisId;
     
     /***
-     *
+     * Is the current analysis and pretranslation running with batch query enabled
      * @var boolean
      */
     protected $batchQuery = false;
