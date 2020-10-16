@@ -81,9 +81,6 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @see ZfExtended_Plugin_Abstract::init()
      */
     public function init() {
-        if(ZfExtended_Debug::hasLevel('plugin', 'MatchAnalysis')) {
-            ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
-        }
         $this->addController('MatchAnalysisController');
         $this->initEvents();
         $this->initRoutes();
@@ -148,6 +145,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             return false;
         }
         
+        //enable bath query via config
+        $eventParams['batchQuery'] = (boolean)$this->config->enableBatchQuery;
+        
         $parentWorkerId=null;
         if(!empty($this->batchAssocs) && $eventParams['batchQuery']){
             $parentWorkerId=$this->queueBatchWorker($taskGuid, $eventParams);
@@ -200,7 +200,6 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         settype($params['pretranslateMt'], 'boolean');
         settype($params['termtaggerSegment'], 'boolean');
         settype($params['isTaskImport'], 'boolean');
-        settype($params['batchQuery'], 'boolean');
         
         $params['pretranslate'] = $pretranslate;
         

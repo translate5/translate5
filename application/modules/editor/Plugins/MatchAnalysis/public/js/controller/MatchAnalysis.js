@@ -86,8 +86,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         pretranslateMt:'#UT#Vorübersetzen (MT)',
         pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt',
         termtaggerSegment:'#UT#Terminologie prüfen und markieren',
-        analysisLoadingMsg:'#UT#Analyse läuft',
-        batchQuery:'#UT#Enable batch query'
+        analysisLoadingMsg:'#UT#Analyse läuft'
     },
     
     listeners:{
@@ -241,17 +240,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 align: 'left'
             },
             items : [{
-                xtype:'checkbox',
-                value: 1,
-                cls:'checkBoxLableInfoIcon',
-                boxLabel:me.strings.batchQuery,
-                autoEl: {
-                    tag: 'div',
-                    'data-qtip': me.strings.batchQuery
-                },
-                itemId:'batchQuery',
-                padding: '0 20 0 0'
-            },{
                 xtype:'checkbox',
                 value: 1,
     			boxLabel:this.strings.internalFuzzy,

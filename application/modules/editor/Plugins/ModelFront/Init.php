@@ -36,9 +36,6 @@ class editor_Plugins_ModelFront_Init extends ZfExtended_Plugin_Abstract {
      * @see ZfExtended_Plugin_Abstract::init()
      */
     public function init() {
-        if(ZfExtended_Debug::hasLevel('plugin', 'ModelFront')) {
-            ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
-        }
         $this->initEvents();
     }
     

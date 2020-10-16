@@ -317,30 +317,11 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      */
     public function query(editor_Models_Segment $segment) {
         
-        $queryString = $this->getQueryString($segment);
-        $this->resultList->setDefaultSource($queryString);
-        
-        $queryString = $this->restoreWhitespaceForQuery($queryString);
-        
-        //$map is set by reference
-        $map = [];
-        $queryString = $this->internalTag->toXliffPaired($queryString, true, $map);
-        $mapCount = count($map);
-        
-        //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
-        $xmlParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $xmlParser editor_Models_Import_FileParser_XmlParser */
-        
-        $this->shortTagIdent = $mapCount + 1;
-        $xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
-            $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true);
-            $textNode = $this->whitespaceTagReplacer($textNode);
-            $xmlParser->replaceChunk($key, $textNode);
-        });
+        $this->initAndPrepareQueryString($segment);
         
         $results = null;
         $this->validateLanguages($this->sourceLang, $this->targetLang);
-        if($this->api->search($queryString, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
+        if($this->api->search($this->searchQueryString, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
             $results = $this->api->getResult();
             if(empty($results)) {
                 return $this->resultList;
@@ -348,55 +329,11 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             foreach($results as $result) {
                 $source=$result->tu->source_text ?? "";
                 $target = $result->tu->target_text ?? "";
-                $target = $xmlParser->parse($target);
-                $target = $this->internalTag->reapply2dMap($target, $map);
-                $this->resultList->addResult($target, $result->match, $this->getMetaData($result));
-                $source = $xmlParser->parse($source);
-                $source = $this->internalTag->reapply2dMap($source, $map);
-                $this->resultList->setSource($source);
+                $this->resultList->addResult($this->prepareTranslatedText($target), $result->match, $this->getMetaData($result));
+                $this->resultList->setSource($this->prepareTranslatedText($source));
             }
         }
         return $this->resultList;
-    }
-    
-    
-    public function batchQuery(string $taskGuid){
-        $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$taskGuid]);
-        /* @var $segments editor_Models_Segment_Iterator */
-        
-        //number of temporary cached segments
-        $tmpBuffer = 0;
-        //holds the query strings for batch request
-        $queryStrings = [];
-        //source query to segment map
-        $querySegmentMap = [];
-        
-        foreach ($segments as $segment){
-            $queryString = $this->getQueryString($segment);
-            $queryString = $this->restoreWhitespaceForQuery($queryString);
-            //set the query string to segment map. Later it will be used to reapply the taks
-            $querySegmentMap[] = clone $segment;
-            
-            //collect the source text
-            $queryStrings[]=$queryString;
-            $tmpBuffer++;
-            
-            if($tmpBuffer != $this->batchQueryBuffer){
-                continue;
-            }
-            
-            $tmpBuffer=0;
-            
-            //send batch query request, and save the results to the batch cache
-            $this->handleBatchQuerys($queryStrings,$querySegmentMap);
-            
-            $querySegmentMap = [];
-            $queryStrings = [];
-        }
-        
-        if(!empty($queryStrings)){
-            $this->handleBatchQuerys($queryStrings,$querySegmentMap);
-        }
     }
     
     /***
@@ -405,68 +342,37 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @param array $queryStrings
      * @param array $querySegmentMap
      */
-    protected function handleBatchQuerys(array $queryStrings,array $querySegmentMap){
+    public function handleBatchQuerys(array $queryStrings,array $querySegmentMap){
         $sourceLang = $this->languageResource->getSourceLangCode();
         $targetLang = $this->languageResource->getTargetLangCode();
         $engineId = $this->languageResource->getSpecificData('engineId');
         $this->resultList->resetResult();
-        if($this->api->searchBatch($queryStrings, $sourceLang, $targetLang, $engineId,$this->batchQueryBuffer)){
-            $results = $this->api->getResult();
-            if(empty($results)) {
-                return;
+        if(!$this->api->searchBatch($queryStrings, $sourceLang, $targetLang, $engineId,$this->batchQueryBuffer)){
+            return;
+        }
+        $results = $this->api->getResult();
+        if(empty($results)) {
+            return;
+        }
+        //for each segment, one result is available
+        foreach ($results as $segmentResults) {
+            //get the segment from the beginning of the cache
+            //we assume that for each requested query string, we get one response back
+            $seg =array_shift($querySegmentMap);
+            /* @var $seg editor_Models_Segment */
+            
+            $this->initAndPrepareQueryString($seg);
+            
+            $tmResults = $segmentResults->results ?? [];
+            foreach ($tmResults as $tmRes){
+                $source=$tmRes->tu->source_text ?? "";
+                $target = $tmRes->tu->target_text ?? "";
+                $this->resultList->addResult($this->prepareTranslatedText($target), $tmRes->match, $this->getMetaData($tmRes));
+                $this->resultList->setSource($this->prepareTranslatedText($source));
             }
-            if(count($results)!=count($queryStrings)){
-                error_log("Query and result count is different: Query was:". print_r($queryStrings,1) . " | result was: ".print_r($results,1));
-            }
-            //for each segment, one result is available
-            foreach ($results as $segmentResults) {
-                //get the segment from the beginning of the cache
-                //we assume that for each requested query string, we get one response back
-                $seg =array_shift($querySegmentMap);
-                /* @var $seg editor_Models_Segment */
-                
-                $queryString = $this->getQueryString($seg);
-                $this->resultList->setDefaultSource($queryString);
-                
-                $queryString = $this->restoreWhitespaceForQuery($queryString);
-                
-                //$map is set by reference
-                $map = [];
-                $queryString = $this->internalTag->toXliffPaired($queryString, true, $map);
-                $mapCount = count($map);
-                
-                //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
-                $xmlParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-                /* @var $xmlParser editor_Models_Import_FileParser_XmlParser */
-                
-                $this->shortTagIdent = $mapCount + 1;
-                $xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
-                    $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true);
-                    $textNode = $this->whitespaceTagReplacer($textNode);
-                    $xmlParser->replaceChunk($key, $textNode);
-                });
-                    
-                $tmResults = $segmentResults->results ?? [];
-                foreach ($tmResults as $tmRes){
-                    $query = $segmentResults->query ?? "";
-                    if($queryString!= $query){
-                        error_log("[".$seg->getSegmentNrInTask()."]Different source as query source. Query:[".$queryString."] | Tmsource:[".$query."]");
-                        continue;
-                    }
-                    
-                    $source=$tmRes->tu->source_text ?? "";
-                    $target = $tmRes->tu->target_text ?? "";
-                    $target = $xmlParser->parse($target);
-                    $target = $this->internalTag->reapply2dMap($target, $map);
-                    $this->resultList->addResult($target, $tmRes->match, $this->getMetaData($tmRes));
-                    $source = $xmlParser->parse($source);
-                    $source = $this->internalTag->reapply2dMap($source, $map);
-                    $this->resultList->setSource($source);
-                }
-                
-                $this->saveBatchResults($seg);
-                $this->resultList->resetResult();
-            }
+            
+            $this->saveBatchResults($seg);
+            $this->resultList->resetResult();
         }
     }
     

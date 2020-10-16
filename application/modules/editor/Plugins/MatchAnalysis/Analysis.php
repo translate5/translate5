@@ -162,6 +162,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         //remove fuzzy languageResource from opentm2
         $this->removeFuzzyResources();
+        
+        //clean the batch query cache if there is one
+        $this->removeBatchCache();
 
         return true;
     }
@@ -542,6 +545,22 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         foreach($this->connectors as $connector){
             if($connector->isInternalFuzzy()){
                 $connector->delete();
+            }
+        }
+    }
+    
+    /***
+     * Remove batch cache for all batch connectors if the batch query is enabled
+     */
+    protected function removeBatchCache(){
+        if(empty($this->connectors) || !$this->batchQuery){
+            return;
+        }
+        $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
+        /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */
+        foreach($this->connectors as $connector){
+            if($connector->isBatchQuery()){
+                $model->deleteForLanguageresource($connector->getLanguageResource()->getId());
             }
         }
     }

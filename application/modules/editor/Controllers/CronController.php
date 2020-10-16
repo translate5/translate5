@@ -89,6 +89,10 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
         /* @var $summary ZfExtended_Logger_Summary */
         $summary->sendSummaryToAdmins();
         
+        $batchCache = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
+        /* @var $batchCache editor_Plugins_MatchAnalysis_Models_BatchResult */
+        $batchCache->deleteOlderRecords();
+        
         echo "OK";
     }
     

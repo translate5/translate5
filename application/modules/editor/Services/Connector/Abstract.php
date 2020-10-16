@@ -136,6 +136,24 @@ abstract class editor_Services_Connector_Abstract {
      */
     protected $batchQueryBuffer=1;
     
+    /***
+     * 
+     * @var editor_Models_Import_FileParser_XmlParser
+     */
+    protected $xmlParser;
+    
+    /***
+     * 
+     * @var array
+     */
+    protected $queryStringTagMap = [];
+    
+    /***
+     * Query string prepared for api search. This value is generated after initAndPrepareQueryString call
+     * @var string
+     */
+    protected $searchQueryString;
+    
     /**
      * initialises the internal result list
      */
@@ -143,6 +161,7 @@ abstract class editor_Services_Connector_Abstract {
         $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->trackChange = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        $this->xmlParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         
         $this->initHelper();
             //$this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
@@ -237,6 +256,53 @@ abstract class editor_Services_Connector_Abstract {
      * @param string $taskGuid
      */
     public function batchQuery(string $taskGuid){
+        $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$taskGuid]);
+        /* @var $segments editor_Models_Segment_Iterator */
+        
+        //number of temporary cached segments
+        $tmpBuffer = 0;
+        //holds the query strings for batch request
+        $queryStrings = [];
+        //source query to segment map
+        $querySegmentMap = [];
+        
+        foreach ($segments as $segment){
+            
+            //build the query without registering xml parser
+            $this->initAndPrepareQueryString($segment,false);
+            
+            //set the query string to segment map. Later it will be used to reapply the taks
+            $querySegmentMap[] = clone $segment;
+            
+            //collect the source text
+            $queryStrings[]=$this->searchQueryString;
+            $tmpBuffer++;
+            
+            if($tmpBuffer != $this->batchQueryBuffer){
+                continue;
+            }
+            
+            $tmpBuffer=0;
+            
+            //send batch query request, and save the results to the batch cache
+            $this->handleBatchQuerys($queryStrings,$querySegmentMap);
+            
+            $querySegmentMap = [];
+            $queryStrings = [];
+        }
+        
+        if(!empty($queryStrings)){
+            $this->handleBatchQuerys($queryStrings,$querySegmentMap);
+        }
+    }
+    /***
+     * Batch query request for $queryStrings and saving the results for each translation.
+     * This is only template function. Override this in each connector if the connector supports batch
+     * query requests.
+     * @param array $queryStrings
+     * @param array $querySegmentMap
+     */
+    public function handleBatchQuerys(array $queryStrings,array $querySegmentMap) {
         
     }
     
@@ -374,6 +440,55 @@ abstract class editor_Services_Connector_Abstract {
      * @return editor_Services_ServiceResult
      */
     abstract public function translate(string $searchString);
+    
+    
+    /***
+     * Prepares the search query string for api search. 
+     * Sets the search query string as default source result.
+     * Handles the white spaces and track changes for the search query string.
+     * Stores internal tag map, so later the tags can be reapplied to the received translation.
+     * This function only should be used with prepareTranslatedText combination 
+     *
+     * @param editor_Models_Segment $segment
+     * @param bool $useXmlParser
+     */
+    protected function initAndPrepareQueryString(editor_Models_Segment $segment,bool $useXmlParser = true) {
+        
+        $this->searchQueryString = $this->getQueryString($segment);
+        $this->resultList->setDefaultSource($this->searchQueryString);
+        $this->searchQueryString = $this->restoreWhitespaceForQuery($this->searchQueryString);
+        
+        //$queryStringTagMap is set by reference
+        $this->queryStringTagMap = [];
+        $this->searchQueryString = $this->internalTag->toXliffPaired($this->searchQueryString, true, $this->queryStringTagMap);
+        if(!$useXmlParser){
+            return;
+        }
+        $mapCount = count($this->queryStringTagMap);
+        
+        //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
+        $xmlParser = $this->xmlParser;
+        
+        $this->shortTagIdent = $mapCount + 1;
+        $this->xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
+            $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true);
+            $textNode = $this->whitespaceTagReplacer($textNode);
+            $xmlParser->replaceChunk($key, $textNode);
+        });
+    }
+    
+    /***
+     * Parses the received text translation and reapply the internal tags.
+     * This should be called only after initAndPrepareQueryString
+     * @param string $translatedText
+     * @return string
+     */
+    protected function prepareTranslatedText(string $translatedText) {
+        //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied,
+        // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
+        $target = $this->xmlParser->parse($translatedText);
+        return $this->internalTag->reapply2dMap($target, $this->queryStringTagMap);
+    }
     
     /**
      * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)

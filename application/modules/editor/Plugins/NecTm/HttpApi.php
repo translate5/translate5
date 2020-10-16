@@ -91,7 +91,7 @@ class editor_Plugins_NecTm_HttpApi {
     
     /**
      * For logging purposes
-     * @var ZfExtended_HttpClient
+     * @var Zend_Http_Client
      */
     protected $http;
     
@@ -474,19 +474,19 @@ class editor_Plugins_NecTm_HttpApi {
     }
     
     /**
-     * prepares a ZfExtended_HttpClient, prefilled with the configured URL + the given REST URL Parts
+     * prepares a Zend_Http_Client, prefilled with the configured URL + the given REST URL Parts
      * @param string $method
      * @param string $endpointPath
-     * @return ZfExtended_HttpClient
+     * @return Zend_Http_Client
      */
     protected function getHttp($method, $endpointPath = '') {
-        $this->http = ZfExtended_Factory::get('ZfExtended_HttpClient');
-        /* @var $http ZfExtended_HttpClient */
+        $this->http = ZfExtended_Factory::get('Zend_Http_Client');
         $this->http->setUri($this->getUrl($endpointPath));
         $this->http->setMethod($method);
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
         $this->http->setHeaders('Accept', self::ENC_TYPE);
+        $this->http->setRemoveArrayIndexInUrlEncode(true);
         return $this->http;
     }
     
@@ -564,10 +564,10 @@ class editor_Plugins_NecTm_HttpApi {
     
     /**
      * wraps the http request call to catch connection exceptions
-     * @param ZfExtended_HttpClient $http
+     * @param Zend_Http_Client $http
      * @return Zend_Http_Response
      */
-    protected function request(ZfExtended_HttpClient $http) {
+    protected function request(Zend_Http_Client $http) {
         //exceptions with one of that messages are leading to badgateway exceptions
         $badGatewayMessages = [
             'php_network_getaddresses: getaddrinfo failed: Name or service not known',
