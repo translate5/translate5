@@ -61,8 +61,6 @@ Ext.define('Editor.util.HttpStateProvider',{
      */
     DEFAULT_STATE_PREFIX: ['runtimeOptions.frontend.defaultState'],
     
-    NO_CUSTOM: '{}',
-    
     constructor: function (config) {
         config = config || {};
         var me = this;
@@ -105,19 +103,19 @@ Ext.define('Editor.util.HttpStateProvider',{
      */
     set: function (name, value) {
         var me = this,
-            json = me.encodeValue(value),
             pos = me.findRecordIndex(name), 
-            row;
+            row, val;
 
         if(pos < 0 || me.disabled){
             return;
         }
         row = me.store.getAt(pos);
+        val = row.get('value');
         //if the store value is empty, this config is disabled (the default value in zf_config is empty)
-        if(row.get('value') === ""){
+        if(Ext.isEmpty(val)){
             return;
         }
-        row.set('value', json);
+        row.set('value', value);
         me.fireEvent('statechange', me, name, value);
     },
 
@@ -133,7 +131,7 @@ Ext.define('Editor.util.HttpStateProvider',{
             return defaultValue;
         }
         row = me.store.getAt(pos);
-        return me.decodeValue(row.get('value'));
+        return row.get('value');
     },
 
     /***
@@ -160,26 +158,6 @@ Ext.define('Editor.util.HttpStateProvider',{
                 me.fireEvent('statesynchronized', me);
             }
         });
-    },
- 
-    /***
-     * Encode the record value as json string
-     */
-    encodeValue:function(value){
-    	if(!value || value==""){
-    		return "";
-    	}
-    	return JSON.stringify(value);
-    },
-    
-    /***
-     * Parse the json value
-     */
-    decodeValue:function(value){
-    	if(!value || value==""){
-    		return "";
-    	}
-    	return JSON.parse(value);
     },
     
     /**
@@ -221,7 +199,7 @@ Ext.define('Editor.util.HttpStateProvider',{
             result = [];
         me.getConfigRecords(subpath).each(function(rec){
             var val = rec.get('value');
-            if(val != '' && val != me.NO_CUSTOM) {
+            if(Ext.isObject(val) && !Ext.Object.isEmpty(val)) {
                 //return the stateIds (name - prefix)
                 result.push(rec.get('name').substring(me.DEFAULT_STATE_PREFIX[0].length + 1));
             }
@@ -244,8 +222,8 @@ Ext.define('Editor.util.HttpStateProvider',{
             return;
         }
         remove.each(function(rec){
-            //set the value to empty array (this will not remove the state record from the store)
-            rec.set('value', me.NO_CUSTOM);
+            //set the value to empty map (this will not remove the state record from the store)
+            rec.set('value', {});
         })
         Ext.state.Manager.getProvider().sync();
     },
