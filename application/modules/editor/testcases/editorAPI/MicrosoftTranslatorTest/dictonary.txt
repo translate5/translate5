@@ -1,0 +1,50 @@
+{
+    "target": "venture",
+    "matchrate": 70,
+    "source": "",
+    "languageResourceType": "mt",
+    "state": "loaded",
+    "metaData": {
+        "alternativeTranslations": [
+            {
+                "normalizedTarget": "venture",
+                "displayTarget": "venture",
+                "posTag": "OTHER",
+                "confidence": 0.4028,
+                "prefixWord": "",
+                "backTranslations": [
+                    {
+                        "normalizedText": "wagen",
+                        "displayText": "wagen",
+                        "numExamples": 1,
+                        "frequencyCount": 2413
+                    },
+                    {
+                        "normalizedText": "unternehmen",
+                        "displayText": "unternehmen",
+                        "numExamples": 1,
+                        "frequencyCount": 1933
+                    },
+                    {
+                        "normalizedText": "unterfangen",
+                        "displayText": "unterfangen",
+                        "numExamples": 1,
+                        "frequencyCount": 626
+                    },
+                    {
+                        "normalizedText": "wagnis",
+                        "displayText": "wagnis",
+                        "numExamples": 0,
+                        "frequencyCount": 504
+                    },
+                    {
+                        "normalizedText": "unternehmung",
+                        "displayText": "unternehmung",
+                        "numExamples": 0,
+                        "frequencyCount": 132
+                    }
+                ]
+            }
+        ]
+    }
+}
