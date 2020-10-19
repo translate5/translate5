@@ -51,6 +51,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
         $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->microsoft->matchrate;
+        $this->batchQueryBuffer = 30;
     }
     
     /**
@@ -74,7 +75,23 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        return $this->queryMicrosoftApi($this->prepareDefaultQueryString($segment), true);
+        $this->initAndPrepareQueryString($segment);
+        if(!$this->api->search($this->searchQueryString,$this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode())){
+            return $this->resultList;
+        }
+        $result=$this->api->getResult();
+        $metaData=[];
+        $translation="";
+        foreach ($result as $res) {
+            if(empty($translation)&& $translation !== "0"){
+                $translation=$res['text'];
+            }
+            if(isset($res['metaData'])){
+                $metaData[]=$res['metaData'];
+            }
+        }
+        $this->resultList->addResult($this->prepareTranslatedText($translation), $this->defaultMatchRate,['alternativeTranslations'=>$metaData]);
+        return $this->resultList;
     }
     
     /**
@@ -103,6 +120,40 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
     }
     
     /***
+     * Send batch query request to the remote endpoint. For each segment, save one cache entry in the batch cache database
+     * where the result will be serialized editor_Services_ServiceResult.
+     * @param array $queryStrings
+     * @param array $querySegmentMap
+     */
+    public function handleBatchQuerys(array $queryStrings,array $querySegmentMap){
+        $sourceLang = $this->languageResource->getSourceLangCode();
+        $targetLang = $this->languageResource->getTargetLangCode();
+        $this->resultList->resetResult();
+        if(!$this->api->search($queryStrings, $sourceLang, $targetLang)){
+            return;
+        }
+        $results = $this->api->getResult();
+        if(empty($results)) {
+            return;
+        }
+        
+        //for each segment, one result is available
+        foreach ($results as $segmentResults) {
+            //get the segment from the beginning of the cache
+            //we assume that for each requested query string, we get one response back
+            $seg =array_shift($querySegmentMap);
+            /* @var $seg editor_Models_Segment */
+            
+            $this->initAndPrepareQueryString($seg);
+            
+            $this->resultList->addResult($this->prepareTranslatedText($segmentResults['text']), $this->defaultMatchRate);
+            
+            $this->saveBatchResults($seg);
+            $this->resultList->resetResult();
+        }
+    }
+    
+    /***
      * Query the microsoft api for the search string
      * @param string $searchString
      * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
@@ -112,7 +163,6 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         if(empty($searchString)&&$searchString!=="0") {
             return $this->resultList;
         }
-        
         
         $result=null;
         if($this->api->search($searchString,$this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode())){
