@@ -32,7 +32,25 @@ Ext.define('Editor.model.UserConfig', {
     {name: 'id', type: 'int'},
     {name: 'userGuid', type: 'string'},
     {name: 'name', type: 'string'},
-    {name: 'value', type: 'string'}
+    {
+      name: 'value', 
+      convert: function(value, record) {
+        switch(record.data.type) {
+          case 'boolean':
+            return !/^(?:f(?:alse)?|no?|0+)$/i.test(value) && !!value;
+          case 'integer':
+            return parseInt(value);
+          case 'map':
+          case 'list':
+            //TODO should be that, but the whole defaultState logic needs value to be a string
+            //return Ext.JSON.decode(value);
+          case 'string':
+          case 'absolutepath':
+          default: 
+            return value;
+        }
+      }
+    }
   ],
   idProperty: 'name',
   proxy : {
