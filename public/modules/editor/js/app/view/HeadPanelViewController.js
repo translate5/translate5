@@ -44,15 +44,7 @@ Ext.define('Editor.view.HeadPanelViewController', {
             '#logoutSingle' : {
                 click: 'handleLogout'
             }
-        },
-        store:{
-            '#UserConfig':{
-                load:'onUserConfigLoad'
-            }
         }
-    },
-    onUserConfigLoad: function() {
-        console.log("Ich gehe auch in einem View Controller");
     },
     handleInitAdmin: function() {
         var hp = this.getView();
