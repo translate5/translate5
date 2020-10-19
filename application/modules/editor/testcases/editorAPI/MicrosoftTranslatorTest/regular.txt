@@ -1,0 +1,10 @@
+{
+    "target": "test car",
+    "matchrate": 70,
+    "source": "",
+    "languageResourceType": "mt",
+    "state": "loaded",
+    "metaData": {
+        "alternativeTranslations": []
+    }
+}
