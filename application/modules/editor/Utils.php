@@ -29,6 +29,7 @@ class editor_Utils {
     /**
      * Some general mappings to turn UTF chars to ascii chars (e.g. ü => ue, ß => sz, etc)
      * among other adjustments for unwanted special chars like +, (, )
+     * TODO FIXME: this overlaps with the list of ligatures and digraphs, unify ...
      * @var array
      */
     private static $asciiMap = [
@@ -37,7 +38,122 @@ class editor_Utils {
         'Ô' => 'o', 'Õ' => 'o', 'Ø' => 'o', 'Ù' => 'u', 'Ú' => 'u', 'Û' => 'u', 'Ů' => 'u', 'Ý' => 'y', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'å' => 'a', 'ç' => 'c', 'č' => 'c', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ì' => 'i',
         'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ñ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ø' => 'o', 'ù' => 'u', 'ů' => 'u', 'û' => 'u', 'û' => 'u', 'ý' => 'y', 'ÿ' => 'y',
         '(' => '-', ')' => '-', '+' => 'plus', '&' => 'and', '#' => '-', '?' => '' ];
-    
+    /**
+     * List of "funny" (unusual) whitespace characters in Hex-notation. These Characters usually are treated as normal whitespace and need to be replaced e.g. when segmenting the visual review files
+     * @var array
+     */
+    private static $whitespaceChars = [
+        '\u0009', //Hex UTF-8 bytes or codepoint of horizontal tab 	
+        '\u000B', //Hex UTF-8 bytes or codepoint of vertical tab 
+        '\u000C', //Hex UTF-8 bytes or codepoint of page feed 
+        '\u0085', //Hex UTF-8 bytes or codepoint of control sign for next line 
+        '\u00A0', //Hex UTF-8 bytes or codepoint of protected space  
+        '\u1680', //Hex UTF-8 bytes or codepoint of Ogam space  
+        '\u180E', //Hex UTF-8 bytes or codepoint of mongol vocal divider ᠎
+        '\u2028', //Hex UTF-8 bytes or codepoint of line separator
+        '\u202F', //Hex UTF-8 bytes or codepoint of small protected space  
+        '\u205F', //Hex UTF-8 bytes or codepoint of middle mathematical space  
+        '\u3000', //Hex UTF-8 bytes or codepoint of ideographic space 　
+        // according to https://en.wikibooks.org/wiki/Unicode/Character_reference/2000-2FFF
+        // all chars \u200[0..F] should/can be handled as special spaces (??)
+        // so the rest of the chars are added.
+        '\u2000',
+        '\u2001',
+        '\u2002',
+        '\u2003',
+        '\u2004',
+        '\u2005',
+        '\u2006',
+        '\u2007',
+        '\u2008',
+        '\u2009',
+        '\u200A',
+        '\u200B', // ​
+        '\u200C', // ‌
+        '\u200D', // ‍
+        '\u200E', // ‎
+        '\u200F' // ‏
+    ];
+    /**
+     * List of problematic characters (Characters that presumably have no meaning for the text) in Hex-notation
+     * This are the following characters: , , , , , , , , , , , 
+     * @var array
+     */
+    private static $problematicChars = [
+        '\uE003',
+        '\ue005',
+        '\uE009',
+        '\uE015',
+        '\uE016',
+        '\uE01B',
+        '\uE01C',
+        '\uE01D',
+        '\uE01E',
+        '\uE01F',
+        '\uE043',
+        '\uE062'
+    ];
+    /**
+     * List of Ligatures with their Ascii replacements in Hex-notation
+     * See: https://en.wikipedia.org/wiki/Typographic_ligature#Ligatures_in_Unicode_.28Latin_alphabets.29
+     * @var array
+     */
+    private static $ligatures = [
+        '\uA732' => 'AA', // Ꜳ
+        '\uA733' => 'aa', // ꜳ
+        '\u00C6' => 'AE', // Æ
+        '\u00E6' => 'ae', // æ
+        '\uA734' => 'AO', // Ꜵ
+        '\uA735' => 'ao', // ꜵ
+        '\uA736' => 'AU', // Ꜷ
+        '\uA737' => 'au', // ꜷ
+        '\uA738' => 'AV', // Ꜹ
+        '\uA739' => 'av', // ꜹ
+        '\uA73A' => 'AV', // Ꜻ
+        '\uA73B' => 'av', // ꜻ
+        '\uA73C' => 'AY', // Ꜽ
+        '\uA73D' => 'ay', // ꜽ
+        '\u1F670' => 'et', // ὧ0
+        '\uFB00' => 'ff', // ﬀ
+        '\uFB03' => 'ffi', // ﬃ
+        '\uFB04' => 'ffl', // ﬄ
+        '\uFB01' => 'fi', // ﬁ
+        '\uFB02' => 'fl', // ﬂ
+        '\u0152' => 'OE', // Œ
+        '\u0153' => 'oe', // œ
+        '\uA74E' => 'OO', // Ꝏ
+        '\uA74F' => 'oo', // ꝏ
+        '\u1E9E' => 'ſs', // ẞ
+        '\u00DF' => 'ſz', // ß
+        '\uFB06' => 'st', // ﬆ
+        '\uFB05' => 'ſt', // ﬅ
+        '\uA728' => 'TZ', // Ꜩ
+        '\uA729' => 'tz', // ꜩ
+        '\u1D6B' => 'ue', // ᵫ
+        '\uA760' => 'VY', // Ꝡ
+        '\uA761' => 'vy', // ꝡ
+    ];
+    /**
+     * List of Digraphs with their Ascii replacements in Hex-notation
+     * See https://en.wikipedia.org/wiki/Digraph_(orthography)#In_Unicode
+     * @var array
+     */
+    private static $digraphs = [
+        '\u01F1' => 'DZ', // Ǳ
+        '\u01F2' => 'Dz', // ǲ
+        '\u01F3' => 'dz', // ǳ
+        '\u01C4' => 'DŽ', // Ǆ
+        '\u01C5' => 'Dž', // ǅ
+        '\u01C6' => 'dž', // ǆ
+        '\u0132' => 'IJ', // Ĳ
+        '\u0133' => 'ij', // ĳ
+        '\u01C7' => 'LJ', // Ǉ
+        '\u01C8' => 'Lj', // ǈ
+        '\u01C9' => 'lj', // ǉ
+        '\u01CA' => 'NJ', // Ǌ
+        '\u01CB' => 'Nj', // ǋ
+        '\u01CC' => 'nj', // ǌ
+    ];
     /**
      * Ascifies a string
      * The string may still contains UTF chars after the conversion, this is just a "first step" ...
@@ -46,7 +162,6 @@ class editor_Utils {
      */
     public static function asciify($name){
         $name = trim($name);
-        // Only using array map does ensure correct multibyte character handling
         $name = strtr($name, self::$asciiMap);
         $name = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('-', '.', ''), $name);
         return trim(preg_replace('/[\-]+/i', '-', $name), '-');
@@ -67,7 +182,63 @@ class editor_Utils {
         $name = preg_replace('/-{2,}/', '-',  $name);
         return $name;
     }
-
+    /**
+     * Normalizes all sequences of whitespace to the given replacement (default: single blank)
+     * @param string $text
+     * @param string $replacement
+     * @return string
+     */
+    public static function normalizeWhitespace($text, $replacement=' '){
+        return preg_replace('/\s+/', $replacement, self::replaceFunnyWhitespace($text, $replacement));
+    }
+    /**
+     * Replaces all funny whitespace chars (characters representing whitespace that are no blanks " ") with the replacement (default: single blank)
+     * @param string $text
+     * @param string $replacement
+     * @return string
+     */
+    public static function replaceFunnyWhitespace($text, $replacement=' '){
+        foreach(self::$whitespaceChars as $wsc){
+            $text = str_replace(json_decode('"'.$wsc.'"'), $replacement, $text);
+        }
+        return $text;
+    }
+    /**
+     * Replaces Ligatures with their ascii-representation in text
+     * @param string $text
+     * @return string
+     */
+    public static function replaceLigatures($text){
+        foreach(self::$ligatures as $ligature => $replacement){
+            $text = str_replace(json_decode('"'.$ligature.'"'), $replacement, $text);
+        }
+        return $text;
+    }
+    /**
+     * Replaces Digraphs with their ascii-representation in text
+     * @param string $text
+     * @return string
+     */
+    public static function replaceDigraphs($text){
+        foreach(self::$digraphs as $digraph => $replacement){
+            $text = str_replace(json_decode('"'.$digraph.'"'), $replacement, $text);
+        }
+        return $text;
+    }
+    /**
+     * Removes/Replace some chars which have no meaning for textual content and presumably are only "non printable characters"
+     * While these are multibyte chars, a segmentation may be written inside these bytes an then the charcters are damaged
+     * FIXME Stephan: Please add some DOC here how these chars affected the segmentation and how you found that out
+     * @param string $text
+     * @param string $replacement
+     * @return string
+     */
+    public static function replaceProblematicChars($text, $replacement='') {
+        foreach(self::$problematicChars as $char){
+            $text = str_replace(json_decode('"'.$char.'"'), $replacement, $text);
+        }
+        return $text;
+    }
     /**
      * splits the text up into HTML tags / entities on one side and plain text on the other side
      * The order in the array is important for the following wordBreakUp, since there are HTML tags and entities ignored.
@@ -80,7 +251,6 @@ class editor_Utils {
     public static  function tagBreakUp($text,$tagRegex='/(<[^<>]*>|&[^;]+;)/'){
         return preg_split($tagRegex, $text, NULL,  PREG_SPLIT_DELIM_CAPTURE);
     }
-    
     /**
      * Zerlegt die Wortteile des segment-Arrays anhand der Wortgrenzen in ein Array,
      * welches auch die Worttrenner als jeweils eigene Arrayelemente enthält
