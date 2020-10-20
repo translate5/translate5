@@ -52,7 +52,13 @@
 				"library/*/composer.local.json"
 			],
 			"recurse" : true
-		}
+		},
+        "hooks": {
+            "pre-commit": [
+                "echo committing as $(git config user.name)"
+            ],
+            "commit-msg": "grep -q '[A-Z]+-[0-9]+.*' $1"
+        }
 	},
 	"name" : "mittagqi/translate5",
 	"description" : "Open Source Translation System\nCloud translation, review, post-editing and terminology platform",
@@ -68,5 +74,8 @@
 		"review",
 		"post-editing"
 	],
-	"license" : "AGPL-3.0-only"
+	"license" : "AGPL-3.0-only",
+	"require-dev" : {
+		"brainmaestro/composer-git-hooks" : "^2.8"
+	}
 }
