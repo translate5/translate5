@@ -33,6 +33,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 
 class DevelopmentGithookCommand extends Translate5AbstractCommand
 {
@@ -85,15 +86,38 @@ class DevelopmentGithookCommand extends Translate5AbstractCommand
         $this->initInputOutput($input, $output);
         $this->initTranslate5();
 
-        switch($input->getArgument('hook')) {
+        $hook = $input->getArgument('hook');
+        switch($hook) {
             case 'commit-msg':
                 return $this->commitMsg($input->getArgument('arg'));
+            case 'pre-commit':
+                return $this->preCommit();
+            default:
+                throw new InvalidArgumentException('Git hook '.$hook.' is not implemented!');
         }
         
         return 0;
     }
     
-    protected function commitMsg($commitMsg) {
+    protected function preCommit() {
+        //check phtml modifications and produce a warning.
+        $output = [];
+        exec('git diff-index --name-only --cached HEAD --', $output);
+        
+        if(empty($output)) {
+            return 0;
+        }
+        foreach($output as $line) {
+            if(preg_match('/\.phtml$/i', $line)) {
+                $this->io->warning('PHTML file modified! Inform client-specific users about the change if needed (via special release note in issue)!');
+                return 0;
+            }
+        }
+        return 0;
+    }
+    
+    protected function commitMsg($commitMsgFile) {
+        $commitMsg = trim(file_get_contents($commitMsgFile));
         if(empty($commitMsg)) {
             $this->io->error('No commit message given!');
             return 1;
