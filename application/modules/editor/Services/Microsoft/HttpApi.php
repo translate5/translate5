@@ -66,7 +66,7 @@ class editor_Services_Microsoft_HttpApi {
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
 
-        $this->apiKey = isset($config->runtimeOptions->LanguageResources->microsoft->apiKey) ?$config->runtimeOptions->LanguageResources->microsoft->apiKey:null ;
+        $this->apiKey = isset($config->runtimeOptions->LanguageResources->microsoft->apiKey) ? $config->runtimeOptions->LanguageResources->microsoft->apiKey:null ;
         if(empty($this->apiKey)){
             throw new ZfExtended_Exception("Microsoft translator api key is not defined");
         }
@@ -97,23 +97,27 @@ class editor_Services_Microsoft_HttpApi {
         }
         $params = "&from=".$sourceLang."&to=".$targetLang;
 
-        $requestBody =[
-            [
-                'Text' => $text,
-            ]
-        ];
+        if(!is_array($text)){
+            $text = [$text];
+        }
+        $requestBody  = [];
+        foreach ($text as $t) {
+            $requestBody[] = ['Text' => $t];
+        }
+
         $content = json_encode($requestBody);
         $result = $this->searchApi($path,$params, $content);
         
+        $result =$this->processTranslateResponse($result);
         //if the DictionaryLookup produces an error, try with the normal translate request
-        if(empty($this->result) && !empty($this->error) && $this->isDictionaryLookup){
+        if(empty($this->result) && $this->isDictionaryLookup){
             //if in directory lookup the result is empty, trigger a normal result so translation from microsoft is received
             $path="/translate?api-version=3.0";
             $result = $this->searchApi($path,$params,$content);
             return $this->processTranslateResponse($result);
         }
         
-        return $this->processTranslateResponse($result);
+        return $result;
     }
 
     /***
@@ -166,7 +170,7 @@ class editor_Services_Microsoft_HttpApi {
      * @return boolean
      */
     public function getStatus(){
-        return !empty($this->search('Hello world.', 'en', 'de'));
+        return true;
     }
 
 
@@ -252,14 +256,22 @@ class editor_Services_Microsoft_HttpApi {
         }
         
         $result=json_decode($response,true);
-        
-        $translation=isset($result[0]['translations']) ? $result[0]['translations'] : [];
-        if(empty($translation)&& $translation !== "0"){
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            $ex=new editor_Services_Connector_Exception('E1282');
+            $ex->setMessage(json_last_error_msg());
+            throw $ex;
+        }
+        if(empty($result)){
             return empty($this->error);
         }
-
+        
         $collection=[];
-        foreach ($translation as $single) {
+        foreach ($result as $res) {
+            //we get only one translation per search
+            $single = reset($res['translations']);
+            if($single === false){
+                continue;
+            }
             //the response layout contains only text, when no dictonary lookup is used
             if(isset($single['text'])){
                 $collection[]=[

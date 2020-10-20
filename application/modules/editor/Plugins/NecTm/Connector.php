@@ -86,6 +86,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     public function __construct() {
         parent::__construct();
         $this->api = ZfExtended_Factory::get('editor_Plugins_NecTm_HttpApi');
+        $this->batchQueryBuffer = 30;
     }
     
     /**
@@ -316,30 +317,11 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      */
     public function query(editor_Models_Segment $segment) {
         
-        $queryString = $this->getQueryString($segment);
-        $this->resultList->setDefaultSource($queryString);
-        
-        $queryString = $this->restoreWhitespaceForQuery($queryString);
-        
-        //$map is set by reference
-        $map = [];
-        $queryString = $this->internalTag->toXliffPaired($queryString, true, $map);
-        $mapCount = count($map);
-        
-        //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
-        $xmlParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $xmlParser editor_Models_Import_FileParser_XmlParser */
-        
-        $this->shortTagIdent = $mapCount + 1;
-        $xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
-            $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true);
-            $textNode = $this->whitespaceTagReplacer($textNode);
-            $xmlParser->replaceChunk($key, $textNode);
-        });
+        $this->initAndPrepareQueryString($segment);
         
         $results = null;
         $this->validateLanguages($this->sourceLang, $this->targetLang);
-        if($this->api->search($queryString, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
+        if($this->api->search($this->searchQueryString, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
             $results = $this->api->getResult();
             if(empty($results)) {
                 return $this->resultList;
@@ -347,15 +329,51 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             foreach($results as $result) {
                 $source=$result->tu->source_text ?? "";
                 $target = $result->tu->target_text ?? "";
-                $target = $xmlParser->parse($target);
-                $target = $this->internalTag->reapply2dMap($target, $map);
-                $this->resultList->addResult($target, $result->match, $this->getMetaData($result));
-                $source = $xmlParser->parse($source);
-                $source = $this->internalTag->reapply2dMap($source, $map);
-                $this->resultList->setSource($source);
+                $this->resultList->addResult($this->prepareTranslatedText($target), $result->match, $this->getMetaData($result));
+                $this->resultList->setSource($this->prepareTranslatedText($source));
             }
         }
         return $this->resultList;
+    }
+    
+    /***
+     * Send batch query request to the remote endpoint. For each segment, save one cache entry in the batch cache database
+     * where the result will be serialized editor_Services_ServiceResult.
+     * @param array $queryStrings
+     * @param array $querySegmentMap
+     */
+    public function handleBatchQuerys(array $queryStrings,array $querySegmentMap){
+        $sourceLang = $this->languageResource->getSourceLangCode();
+        $targetLang = $this->languageResource->getTargetLangCode();
+        $engineId = $this->languageResource->getSpecificData('engineId');
+        $this->resultList->resetResult();
+        if(!$this->api->searchBatch($queryStrings, $sourceLang, $targetLang, $engineId,$this->batchQueryBuffer)){
+            return;
+        }
+        $results = $this->api->getResult();
+        if(empty($results)) {
+            return;
+        }
+        //for each segment, one result is available
+        foreach ($results as $segmentResults) {
+            //get the segment from the beginning of the cache
+            //we assume that for each requested query string, we get one response back
+            $seg =array_shift($querySegmentMap);
+            /* @var $seg editor_Models_Segment */
+            
+            $this->initAndPrepareQueryString($seg);
+            
+            $tmResults = $segmentResults->results ?? [];
+            foreach ($tmResults as $tmRes){
+                $source=$tmRes->tu->source_text ?? "";
+                $target = $tmRes->tu->target_text ?? "";
+                $this->resultList->addResult($this->prepareTranslatedText($target), $tmRes->match, $this->getMetaData($tmRes));
+                $this->resultList->setSource($this->prepareTranslatedText($source));
+            }
+            
+            $this->saveBatchResults($seg);
+            $this->resultList->resetResult();
+        }
     }
     
     /**

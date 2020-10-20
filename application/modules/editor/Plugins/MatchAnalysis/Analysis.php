@@ -87,6 +87,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected $repetitionUpdater;
     
+    
     /**
      * @param editor_Models_Task $task
      * @param integer $analysisId
@@ -161,6 +162,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         //remove fuzzy languageResource from opentm2
         $this->removeFuzzyResources();
+        
+        //clean the batch query cache if there is one
+        $this->removeBatchCache();
 
         return true;
     }
@@ -240,6 +244,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             
             if($this->isDisabledDueErrors($connector, $languageResourceid)) {
                 continue;
+            }
+            
+            //if the current connector supports batch query, enable the batch query for this connector
+            if($connector->isBatchQuery() && $this->batchQuery){
+                $connector->enableBatch();
             }
             
             $connector->resetResultList();
@@ -540,11 +549,31 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         }
     }
     
+    /***
+     * Remove batch cache for all batch connectors if the batch query is enabled
+     */
+    protected function removeBatchCache(){
+        if(empty($this->connectors) || !$this->batchQuery){
+            return;
+        }
+        $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
+        /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */
+        foreach($this->connectors as $connector){
+            if($connector->isBatchQuery()){
+                $model->deleteForLanguageresource($connector->getLanguageResource()->getId());
+            }
+        }
+    }
+    
     public function setPretranslate($pretranslate){
         $this->pretranslate=$pretranslate;
     }
     
     public function setInternalFuzzy($internalFuzzy) {
         $this->internalFuzzy=$internalFuzzy;
+    }
+    
+    public function setBatchQuery(bool $batchQuery) {
+        $this->batchQuery = $batchQuery;
     }
 }

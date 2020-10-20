@@ -95,10 +95,13 @@ class editor_Plugins_PangeaMt_HttpApi {
         $method = 'POST';
         $endpointPath = 'translate';
         $data = [];
+        if(!is_array($queryString)){
+            $queryString = [$queryString];
+        }
         $data = array('src'    => $sourceLang,
                       'tgt'    => $targetLang,
                       'engine' => (string)$engineId,
-                      'text'   => [$queryString]);
+                      'text'   => $queryString);
         /* PangeaMT can also handle multiple parts:
               "text": [
                 "¿Cómo estás?",
@@ -217,6 +220,8 @@ class editor_Plugins_PangeaMt_HttpApi {
     protected function pangeaMtRequest($method, $endpointPath = '', $data = [], $queryParams = []) {
         $http = $this->getHttp($method, $endpointPath);
         $http->setParameterGet($queryParams);
+        //60 s timeout to cover the batch querys
+        $http->setConfig(['timeout' => 60]);
         $data[] = ["apikey" => $this->apiKey];
         if (!empty($data)) {
             $http->setRawData(json_encode($data), self::ENC_TYPE);

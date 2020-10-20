@@ -174,9 +174,6 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     protected $fileTypes;
 
     public function init() {
-        if(ZfExtended_Debug::hasLevel('plugin', 'Okapi')) {
-            ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
-        }
         $this->fileTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $fileTypes editor_Models_Import_SupportedFileTypes */
         foreach ($this->okapiFileTypes as $ext) {

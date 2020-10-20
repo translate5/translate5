@@ -45,6 +45,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
         $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->google->matchrate;
+        $this->batchQueryBuffer = 50;
     }
     
     /**
@@ -72,7 +73,14 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        return $this->queryGoogleApi($this->prepareDefaultQueryString($segment), true);
+        $this->initAndPrepareQueryString($segment);
+        if(!$this->api->search($this->searchQueryString,$this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode())){
+            return $this->resultList;
+        }
+        $result=$this->api->getResult();
+        $translation = $result['text'] ?? "";
+        $this->resultList->addResult($this->prepareTranslatedText($translation), $this->defaultMatchRate);
+        return $this->resultList;
     }
     
     /**
@@ -100,6 +108,40 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
     public function languages(){
         return $this->api->getLanguages();
     }
+    
+    /***
+     * Send batch query request to the remote endpoint. For each segment, save one cache entry in the batch cache database
+     * where the result will be serialized editor_Services_ServiceResult.
+     * @param array $queryStrings
+     * @param array $querySegmentMap
+     */
+    public function handleBatchQuerys(array $queryStrings,array $querySegmentMap){
+        $sourceLang = $this->languageResource->getSourceLangCode();
+        $targetLang = $this->languageResource->getTargetLangCode();
+        $this->resultList->resetResult();
+        if(!$this->api->searchBatch($queryStrings, $sourceLang, $targetLang)){
+            return;
+        }
+        $results = $this->api->getResult();
+        if(empty($results)) {
+            return;
+        }
+        
+        //for each segment, one result is available
+        foreach ($results as $segmentResults) {
+            //get the segment from the beginning of the cache
+            //we assume that for each requested query string, we get one response back
+            $seg =array_shift($querySegmentMap);
+            /* @var $seg editor_Models_Segment */
+            
+            $this->initAndPrepareQueryString($seg);
+
+            $this->resultList->addResult($this->prepareTranslatedText($segmentResults['text']), $this->defaultMatchRate);
+            $this->saveBatchResults($seg);
+            $this->resultList->resetResult();
+        }
+    }
+    
     /***
      * Query the google cloud api for the search string
      * @param string $searchString
