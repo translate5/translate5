@@ -32,6 +32,10 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Import_FileParser_Xlf_ContentConverter {
     use editor_Models_Import_FileParser_TagTrait;
     
+    const RID_TYPE_RID = 'rid';
+    const RID_TYPE_ID = 'id';
+    const RID_TYPE_FAKE = 'fake';
+    
     /**
      * @var editor_Models_Import_FileParser_XmlParser
      */
@@ -128,8 +132,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             else {
                 $text = null;
             }
-            $rid = $this->getRid($opener);
-            $this->result[] = $this->createTag($rid, $tag, $originalContent, $text);
+            $this->result[] = $this->createTag($opener, $tag, $originalContent, $text);
         });
         
         $this->xmlparser->registerElement('x,bx,ex', null, [$this, 'handleReplacerTag']);
@@ -146,16 +149,18 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     
     /**
      * creates an internal tag out of the given data
-     * @param string $rid ID to identify tag pairs (for tagNr calculation)
+     * @param string $openerMeta openerMeta array to get the ID to identify tag pairs (for tagNr calculation)
      * @param string $tag
      * @param string $originalContent this is value which is restored on export
      * @param string $text optional, this is the tag value which should be shown in the frontend
      * @return string
      */
-    protected function createTag($rid, $tag, $originalContent, $text = null): ?editor_Models_Import_FileParser_Tag {
+    protected function createTag($openerMeta, $tag, $originalContent, $text = null): ?editor_Models_Import_FileParser_Tag {
         if($this->removeTags){
             return null;
         }
+        $ridType = null;
+        $rid = $this->getRid($openerMeta, $ridType);
         switch ($tag) {
             case 'x':
             case 'ph':
@@ -194,7 +199,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         }
         $tagObj = new editor_Models_Import_FileParser_Tag($tagType);
         $tagObj->tag = $tag;
-        $tagObj->tagNr = $this->getShortTagNumber($rid);
+        $tagObj->tagNr = $this->getShortTagNumber($ridType, $rid);
         $tagObj->text = $text;
         $tagObj->rid = $rid;
         $tagObj->originalContent = $originalContent;
@@ -203,16 +208,19 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     }
     
     /**
-     * Calculates an identifier of a tag, to match opener and closer tag (for tag numbering)
+     * Calculates an identifier of a tag, to match opener and closer tag (for tag numbering).
      * @param array $openerMeta
+     * @param array $ridType will receive the rid type
      */
-    protected function getRid($openerMeta) {
+    protected function getRid($openerMeta, & $ridType) {
         $rid = $this->xmlparser->getAttribute($openerMeta['attributes'], 'rid');
         if($rid !== false) {
+            $ridType = self::RID_TYPE_RID;
             return $rid;
         }
         $id = $this->xmlparser->getAttribute($openerMeta['attributes'], 'id');
         if($id !== false) {
+            $ridType = self::RID_TYPE_ID;
             return $id;
         }
         //according to the spec all tags must have an ID, so if we get here,
@@ -221,6 +229,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         if(empty($openerMeta['fakedRid'])){
             $openerMeta['fakedRid'] = $openerMeta['tag'].'-'.$openerMeta['openerKey'];
         }
+        $ridType = self::RID_TYPE_FAKE;
         return $openerMeta['fakedRid'];
     }
     
@@ -229,14 +238,17 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * rid can be given as tag attribute, if nothing found the ID is used as fallback.
      * A rid should always be given, since it is also needed to map the tags in source to target,
      *  so that same tagNr are used for same tags there
+     * @param string $ridType
      * @param string $rid
      * @return number
      */
-    protected function getShortTagNumber($rid) {
+    protected function getShortTagNumber($ridType, $rid) {
         if(empty($rid)) {
             return $this->shortTagIdent++;
         }
         //pairedTags have a rid, we have to look it up or to create it
+        // we need the ridType here too, since a trans-unit may mix tags using ids only and tags using rid (which can be the same as the id in other, not related tags)
+        $rid = $ridType.'-'.$rid;
         if(empty($this->shortTagNumbers[$rid])) {
             $this->shortTagNumbers[$rid] = $this->shortTagIdent++;
         }
@@ -381,8 +393,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         if($originalTagData = $this->xmlparser->getAttribute($opener['attributes'], 'translate5OriginalContent')) {
             $chunk = htmlspecialchars_decode($originalTagData);
         }
-        $rid = $this->getRid($opener);
-        $this->result[] = $this->createTag($rid, $tag, $chunk);
+        $this->result[] = $this->createTag($opener, $tag, $chunk);
     }
     
     /**
@@ -398,8 +409,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $this->result[] = $result[0];
             return;
         }
-        $rid = $this->getRid($this->xmlparser->current());
-        $this->result[] = $this->createTag($rid, $tag, $chunk);
+        $this->result[] = $this->createTag($this->xmlparser->current(), $tag, $chunk);
     }
     
     /**
@@ -417,8 +427,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $this->result[] = $result[1];
             return;
         }
-        $rid = $this->getRid($opener);
-        $this->result[] = $this->createTag($rid, $tag.'-close', $closeChunk);
+        $this->result[] = $this->createTag($opener, $tag.'-close', $closeChunk);
     }
     
     /**
