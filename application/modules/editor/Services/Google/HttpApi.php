@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use Google\Cloud\Translate\TranslateClient;
+use Google\Cloud\Translate\V2\TranslateClient;
 use Google\Cloud\Core\Exception\BadRequestException;
 
 class editor_Services_Google_HttpApi {
@@ -82,7 +82,7 @@ class editor_Services_Google_HttpApi {
     /**
      * Get the google translate api client.
      *
-     * @return \Google\Cloud\Translate\TranslateClient
+     * @return \Google\Cloud\Translate\V2\TranslateClient
      */
     protected function getTranslateClient() {
         $this->translateClient=new TranslateClient([
@@ -103,6 +103,28 @@ class editor_Services_Google_HttpApi {
     public function search($text,$sourceLang,$targetLang) {
         try {
             $response=$this->getTranslateClient()->translate($text,[
+                'source'=>$sourceLang,
+                'target'=>$targetLang
+            ]);
+            return $this->processResponse($response);
+            
+        } catch (BadRequestException $e) {
+            $this->badGateway($e);
+            return false;
+        }
+    }
+    
+    /**
+     * Search the api for given source/target language by domainCode
+     *
+     * @param array $text
+     * @param string $sourceLang
+     * @param string $targetLang
+     * @return boolean
+     */
+    public function searchBatch($text,$sourceLang,$targetLang) {
+        try {
+            $response=$this->getTranslateClient()->translateBatch($text,[
                 'source'=>$sourceLang,
                 'target'=>$targetLang
             ]);

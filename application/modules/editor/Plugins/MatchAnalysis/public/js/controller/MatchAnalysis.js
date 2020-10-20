@@ -384,12 +384,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
             method: "PUT",
             params: {
-            	internalFuzzy: me.isChecboxChecked('cbInternalFuzzy'),
+            	internalFuzzy: me.isCheckboxChecked('cbInternalFuzzy'),
                 pretranslateMatchrate: me.getComponentByItemId('cbMinMatchrate').getValue(),
-                pretranslateTmAndTerm: me.isChecboxChecked('pretranslateTmAndTerm'),
-                pretranslateMt: me.isChecboxChecked('pretranslateMt'),
-                termtaggerSegment: me.isChecboxChecked('termtaggerSegment'),
-                isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0
+                pretranslateTmAndTerm: me.isCheckboxChecked('pretranslateTmAndTerm'),
+                pretranslateMt: me.isCheckboxChecked('pretranslateMt'),
+                termtaggerSegment: me.isCheckboxChecked('termtaggerSegment'),
+                isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0,
+                batchQuery:me.isCheckboxChecked('batchQuery')
             },
             scope: this,
             failure: function(response){
@@ -437,7 +438,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     /***
      * Check if the checbox component is checked
      */
-    isChecboxChecked:function(itemId){
+    isCheckboxChecked:function(itemId){
         var component=this.getComponentByItemId(itemId);
         if(!component || component.isDisabled()){
             return 0;
