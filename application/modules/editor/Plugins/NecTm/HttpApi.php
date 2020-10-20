@@ -232,6 +232,28 @@ class editor_Plugins_NecTm_HttpApi {
         return $processResponse;
     }
     
+    
+    /**
+     */
+    public function searchBatch(array $queryStrings, $sourceLang, $targetLang, $tagIds, $limit) {
+        $method = 'POST';
+        $endpointPath = 'tm/query_batch';
+        $data = [];
+        $queryParams = [
+            'q'=> $queryStrings,
+            'limi'=> $limit,//Limit output to this number of segments. Default value: 10
+            'slang'=> $sourceLang,
+            'tlang'=> $targetLang,
+            'aut_trans'=> 'false',
+            'tag'=> $tagIds,
+            
+        ];
+        $processResponse = $this->necTmBatchRequest($method, $endpointPath, $data, $queryParams);
+        $this->result = $this->result ?? [];
+        return $processResponse;
+    }
+    
+    
     /**
      * Concordance-search; NEC-TM-api requires source- and target language.
      * @param string $searchString
@@ -459,12 +481,12 @@ class editor_Plugins_NecTm_HttpApi {
      */
     protected function getHttp($method, $endpointPath = '') {
         $this->http = ZfExtended_Factory::get('Zend_Http_Client');
-        /* @var $http Zend_Http_Client */
         $this->http->setUri($this->getUrl($endpointPath));
         $this->http->setMethod($method);
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
         $this->http->setHeaders('Accept', self::ENC_TYPE);
+        $this->http->setRemoveArrayIndexInUrlEncode(true);
         return $this->http;
     }
     
@@ -500,6 +522,29 @@ class editor_Plugins_NecTm_HttpApi {
             $query = '?' . implode("&",$paramsForQuery);
         }
         $http = $this->getHttp($method, $endpointPath.$query);
+        $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
+        if (!empty($data)) {
+            $http->setRawData(json_encode($data), self::ENC_TYPE);
+        }
+        if (!empty($files)) {
+            foreach ($files as $formname => $filename) {
+                $http->setFileUpload($filename,$formname);
+            }
+        }
+        $response = $this->request($http);
+        $processResponse = $this->processResponse($response);
+        if (!$processResponse) {
+            $this->throwBadGateway();
+        }
+        return $processResponse;
+    }
+    
+    
+    /**
+     */
+    protected function necTmBatchRequest($method, $endpointPath = '', $data = [], $queryParams = [], $files = []) {
+        $http = $this->getHttp($method, $endpointPath);
+        $http->setParameterPost($queryParams);
         $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
         if (!empty($data)) {
             $http->setRawData(json_encode($data), self::ENC_TYPE);

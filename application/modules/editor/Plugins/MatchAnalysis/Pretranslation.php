@@ -125,6 +125,12 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      */
     protected $analysisId;
     
+    /***
+     * Is the current analysis and pretranslation running with batch query enabled
+     * @var boolean
+     */
+    protected $batchQuery = false;
+    
     public function __construct(int $analysisId){
         $this->initLogger('E1100', 'plugin.matchanalysis', '', 'Plug-In MatchAnalysis: ');
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
@@ -330,6 +336,12 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         //INFO: use the first connector, since no mt engine priority exist
         $connector = $this->mtConnectors[0];
         /* @var $connector editor_Services_Connector */
+        
+        //if the current connector supports batch query, enable the batch query for this connector
+        if($connector->isBatchQuery() && $this->batchQuery){
+            $connector->enableBatch();
+        }
+        
         $connector->resetResultList();
         $matches = $connector->query($segment);
         $matchResults=$matches->getResult();
