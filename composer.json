@@ -63,7 +63,7 @@
 		}
 	},
 	"scripts": {
-        	"post-install-cmd": "cghooks add --ignore-lock",
+        	"post-install-cmd": "cghooks add --ignore-lock; cghooks update",
         	"post-update-cmd": "cghooks update"
 	},
 	"name" : "mittagqi/translate5",
