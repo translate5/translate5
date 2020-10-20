@@ -136,6 +136,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         $analysis->setPretranslateMatchrate($params['pretranslateMatchrate']);
         $analysis->setPretranslateMt($params['pretranslateMt']);
         $analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
+        $analysis->setBatchQuery($params['batchQuery']);
         $return=$analysis->calculateMatchrate();
         
         //unlock the state

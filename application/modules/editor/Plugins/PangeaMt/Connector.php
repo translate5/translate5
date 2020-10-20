@@ -46,6 +46,7 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
         $this->defaultMatchRate = $config->runtimeOptions->plugins->PangeaMt->matchrate;
+        $this->batchQueryBuffer=30;
     }
     
     /***
@@ -54,34 +55,14 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $queryString = $this->getQueryString($segment);
-        $this->resultList->setDefaultSource($queryString);
-        
-        $queryString = $this->restoreWhitespaceForQuery($queryString);
-        
-        //TODO: tag mapper class, something similar as TmTagManager from commit-> 7465209ac82597d88de70850b093d750a1964922
-        //$map is set by reference
-        $map = [];
-        $queryString = $this->internalTag->toXliffPaired($queryString, true, $map);
-        $mapCount = count($map);
-        
-        //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
-        $xmlParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $xmlParser editor_Models_Import_FileParser_XmlParser */
-        
-        $this->shortTagIdent = $mapCount + 1;
-        $xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
-            $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true);
-            $textNode = $this->whitespaceTagReplacer($textNode);
-            $xmlParser->replaceChunk($key, $textNode);
-        });
+        $this->initAndPrepareQueryString($segment);
             
         $results = null;
         $sourceLang = $this->languageResource->getSourceLangCode(); // = e.g. "de", TODO: validate against $this->sourceLang (e.g. 4)
         $targetLang = $this->languageResource->getTargetLangCode();// = e.g. "en"; TODO: validate against $this->targetLang (e.g. 5)
         $engineId = $this->languageResource->getSpecificData('engineId');
         
-        if($this->api->search($queryString, $sourceLang, $targetLang, $engineId)){
+        if($this->api->search($this->searchQueryString, $sourceLang, $targetLang, $engineId)){
             $results = $this->api->getResult();
             if(empty($results)) {
                 return $this->resultList;
@@ -91,14 +72,8 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
                 $result = $result[0];
                 $target = $result->tgt ?? "";
                 $source=$result->src ?? "";
-
-                $target = $xmlParser->parse($target);
-                $target = $this->internalTag->reapply2dMap($target, $map);
-                $this->resultList->addResult($target, $this->defaultMatchRate);
-                
-                $source = $xmlParser->parse($source);
-                $source = $this->internalTag->reapply2dMap($source, $map);
-                $this->resultList->setSource($source);
+                $this->resultList->addResult($this->prepareTranslatedText($target), $this->defaultMatchRate);
+                $this->resultList->setSource($this->prepareTranslatedText($source));
             }
         }
         return $this->resultList;
@@ -118,6 +93,47 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
      */
     public function translate(string $searchString){
         return $this->queryPangeaMtApi($searchString);
+    }
+    
+    
+    /***
+     * Send batch query request to the remote endpoint. For each segment, save one cache entry in the batch cache database
+     * where the result will be serialized editor_Services_ServiceResult.
+     * @param array $queryStrings
+     * @param array $querySegmentMap
+     */
+    public function handleBatchQuerys(array $queryStrings,array $querySegmentMap){
+        $sourceLang = $this->languageResource->getSourceLangCode();
+        $targetLang = $this->languageResource->getTargetLangCode();
+        $engineId = $this->languageResource->getSpecificData('engineId');
+        $this->resultList->resetResult();
+        if(!$this->api->search($queryStrings, $sourceLang, $targetLang, $engineId)){
+            return;
+        }
+        $results = $this->api->getResult();
+        if(empty($results)) {
+            return;
+        }
+        
+        //for each segment, one result is available
+        foreach ($results as $segmentResults) {
+            //get the segment from the beginning of the cache
+            //we assume that for each requested query string, we get one response back
+            $seg =array_shift($querySegmentMap);
+            /* @var $seg editor_Models_Segment */
+            
+            $this->initAndPrepareQueryString($seg);
+            
+            foreach ($segmentResults as $result) {
+                $target = $result->tgt ?? "";
+                $source=$result->src ?? "";
+                $this->resultList->addResult($this->prepareTranslatedText($target), $this->defaultMatchRate);
+                $this->resultList->setSource($this->prepareTranslatedText($source));
+            }
+            
+            $this->saveBatchResults($seg);
+            $this->resultList->resetResult();
+        }
     }
     
     /***
