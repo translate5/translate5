@@ -86,6 +86,6 @@ class Translate2282Test extends \ZfExtended_Test_ApiTestcase {
         self::$api->login('testlector');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        //self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }
