@@ -15,3 +15,5 @@ public/scheduled-tests/*
 /composer.phar
 # needed for ./translate5.sh release:notes
 /jira-cookie.txt
+cghooks.lock
+

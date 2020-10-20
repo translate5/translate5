@@ -53,12 +53,16 @@
 			],
 			"recurse" : true
 		},
-        "hooks": {
-            "pre-commit": [
-                "echo committing as $(git config user.name)"
-            ],
-            "commit-msg": "grep -q '[A-Z]+-[0-9]+.*' $1"
-        }
+		"hooks" : {
+			"pre-commit" : [
+				"echo committing as $(git config user.name)"
+			],
+			"commit-msg" : "./translate5.sh dev:githook commit-msg $1"
+		}
+	},
+	"scripts": {
+        	"post-install-cmd": "cghooks add --ignore-lock",
+        	"post-update-cmd": "cghooks update"
 	},
 	"name" : "mittagqi/translate5",
 	"description" : "Open Source Translation System\nCloud translation, review, post-editing and terminology platform",
