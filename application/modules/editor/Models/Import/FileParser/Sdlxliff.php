@@ -99,6 +99,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     protected $comments;
 
     /**
+     * @var ZfExtended_Logger
+     */
+    protected $logger;
+    
+    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
      */
@@ -117,6 +122,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->initHelper();
         $this->checkForSdlChangeMarker();
         $this->prepareTagMapping();
+        $this->logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.sdlxliff');
         $this->transunitParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_TransunitParser');
         //diff export for this task can be used
         $this->task->setDiffExportUsable(1);
@@ -288,7 +294,10 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         }
 
         if ($counterTrans === 0) {
-            error_log('Die Datei ' . $this->_fileName . ' enthielt keine übersetzungsrelevanten Segmente!');
+            $this->logger->warn('E1291', 'The file "{filename}" did not contain any translation relevant content. Either all segments are set to translate="no" or the file was not segmented.', [
+                'task' => $this->task,
+                'filename' => $this->_fileName,
+            ]);
         }
         $this->_skeletonFile = implode('<group', $groups);
         $this->_skeletonFile = str_replace(array('<group bin-unit ', '/bin-unit</group>'), array('<bin-unit', '</bin-unit>'), $this->_skeletonFile);
@@ -698,9 +707,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
 
         //if import disabled we log a warning and remove all comments
         if(! $this->config->runtimeOptions->import->sdlxliff->importComments) {
-            $logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.sdlxliff');
-            /* @var $logger ZfExtended_Logger */
-            $logger->warn('E1000', 'The file "{filename}" has contained SDL comments, but comment import is disabled: the comments were removed!', [
+            $this->logger->warn('E1000', 'The file "{filename}" has contained SDL comments, but comment import is disabled: the comments were removed!', [
                 'task' => $this->task,
                 'filename' => $this->_fileName,
             ]);
