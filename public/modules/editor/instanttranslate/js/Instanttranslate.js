@@ -485,7 +485,8 @@ function renderSingleMatchAndResources (translateTextResponse) {
                   'processStatusAttribute':'',
                   'processStatusAttributeValue':'',
                   'languageRfc':'',
-                  'alternativeTranslations':''
+                  'alternativeTranslations':'',
+                  'singleResultBestMatchrateTooltip':Editor.data.languageresource.translatedStrings['singleResultBestMatchrateTooltip']
                   };
     resultHtml += renderTranslationContainer(resultData);
     return resultHtml;
@@ -574,6 +575,10 @@ function renderTranslationContainer(resultData) {
     var translationsContainer = '';
     
     translationsContainer += '<h4>';
+    //if this tooltip is set, there is onyl one result -> result with best matchrate 
+    if(resultData.singleResultBestMatchrateTooltip){
+        translationsContainer += '<span class="singleResultBestMatchrateInfoIcon" title="'+resultData.singleResultBestMatchrateTooltip+'"></span>';
+    }
     translationsContainer += resultData.languageResourceHeadline;
     translationsContainer += '<span class="loadingSpinnerIndicator"><img src="'+Editor.data.publicModulePath+'images/loading-spinner.gif"/></span>';
     translationsContainer += '</h4>';
