@@ -122,6 +122,20 @@ class DevelopmentGithookCommand extends Translate5AbstractCommand
             $this->io->error('No commit message given!');
             return 1;
         }
+
+        //valid non issue based commit messages:
+        if($commitMsg == 'changelog and submodules') {
+            return 0;
+        }
+        if(!preg_match('/^Merge remote-tracking branch /i', $commitMsg)) {
+            return 0;
+        }
+        if(!preg_match('/^Merge branch /i', $commitMsg)) {
+            return 0;
+        }
+        if(!preg_match('/^Merge .* [A-Z]+-[0-9]+ /i', $commitMsg)) {
+            return 0;
+        }
         if(!preg_match('/^[A-Z]+-[0-9]+: .*/', $commitMsg)) {
             $this->io->error('Commit message does not start with issue key: "KEY-123: "!');
             return 1;
