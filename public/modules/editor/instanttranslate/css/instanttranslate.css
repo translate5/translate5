@@ -441,3 +441,9 @@ left: 45px;
 .switchSourceTargetDisabled{
 	color: #999;
 }
+.singleResultBestMatchrateInfoIcon {
+    background: url(../../images/information.png) no-repeat left center;
+    color: #666;
+    font-size: 12px;
+    padding: 3px 5px 3px 20px;
+}
