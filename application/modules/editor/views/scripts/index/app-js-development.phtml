@@ -44,8 +44,14 @@ $version = '?v='.$this->appVersion;
 <link rel="stylesheet" type="text/css" href="<?php echo $this->extJsBasepath;?>/build/packages/ux/classic/classic/resources/ux-all.css"/>
 <link rel="stylesheet" type="text/css" href="<?php echo $this->publicModulePath;?>/fontawesome/extjs.css"/>
 
-<script src="<?php echo $this->extJsBasepath;?>/build/ext-all-debug.js"></script>
-<script src="<?php echo $this->extJsBasepath;?>/build/classic/locale/locale-<?php echo $this->locale;?>-debug.js"></script>
+<?php
+$extSuffix = '';
+if($this->appVersion == ZfExtended_Utils::VERSION_DEVELOPMENT){
+    $extSuffix = '-debug';
+}
+?>
+<script src="<?php echo $this->extJsBasepath;?>/build/ext-all<?php echo $extSuffix;?>.js"></script>
+<script src="<?php echo $this->extJsBasepath;?>/build/classic/locale/locale-<?php echo $this->locale.$extSuffix;?>.js"></script>
 <script src="<?php echo $this->publicModulePath; ?>/js/app/MessageBox.js"></script>
 <script>
 <?php if($this->appVersion != ZfExtended_Utils::VERSION_DEVELOPMENT){ ?>
