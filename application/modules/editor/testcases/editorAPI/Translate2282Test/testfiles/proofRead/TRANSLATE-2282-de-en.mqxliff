@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd" xmlns:mq="MQXliff">
+<file original="foobar.idml" source-language="de" target-language="en-us" datatype="x-chained">
+<body>
+<trans-unit id="185">
+<source xml:space="preserve">Der Text besteht im Wesentlichen aus Lorem (<bpt id="1" ctype="bold">{}</bpt><bpt id="2" rid="1">&lt;uf ufcatid=&quot;2&quot;&gt;</bpt>1<ept id="1">{}</ept><ept id="3" rid="1">&lt;/uf&gt;</ept>), Ipsum (<bpt id="4" ctype="bold">{}</bpt><bpt id="5" rid="2">&lt;uf ufcatid=&quot;2&quot;&gt;</bpt>2<ept id="4">{}</ept><ept id="6" rid="2">&lt;/uf&gt;</ept>) mit fixen Tags (<bpt id="7" ctype="bold">{}</bpt><bpt id="8" rid="3">&lt;uf ufcatid=&quot;2&quot;&gt;</bpt>3<ept id="7">{}</ept><ept id="9" rid="3">&lt;/uf&gt;</ept>) die eine falsche Nummer bekommen (<bpt id="10" ctype="bold">{}</bpt><bpt id="11" rid="4">&lt;uf ufcatid=&quot;2&quot;&gt;</bpt>4<ept id="10">{}</ept><ept id="12" rid="4">&lt;/uf&gt;</ept>) und somit zu Fehlern führen. (<bpt id="13" ctype="bold">{}</bpt><bpt id="14" rid="5">&lt;uf ufcatid=&quot;2&quot;&gt;</bpt>5<ept id="13">{}</ept><ept id="15" rid="5">&lt;/uf&gt;</ept>).</source>
+<target xml:space="preserve">The text generally consists of lorem (<bpt id="1" ctype="bold">{}</bpt><bpt id="2" rid="6">&lt;uf ufcatid=&quot;2&quot;&gt;</bpt>1<ept id="1">{}</ept><ept id="3" rid="6">&lt;/uf&gt;</ept>), ipsum (<bpt id="4" ctype="bold">{}</bpt><bpt id="5" rid="7">&lt;uf ufcatid=&quot;2&quot;&gt;</bpt>2<ept id="4">{}</ept><ept id="6" rid="7">&lt;/uf&gt;</ept>) with permanent tags (<bpt id="7" ctype="bold">{}</bpt><bpt id="8" rid="8">&lt;uf ufcatid=&quot;2&quot;&gt;</bpt>3<ept id="7">{}</ept><ept id="9" rid="8">&lt;/uf&gt;</ept>) which are getting a wrong number (<bpt id="10" ctype="bold">{}</bpt><bpt id="11" rid="9">&lt;uf ufcatid=&quot;2&quot;&gt;</bpt>4<ept id="10">{}</ept><ept id="12" rid="9">&lt;/uf&gt;</ept>) producing errors (<bpt id="13" ctype="bold">{}</bpt><bpt id="14" rid="10">&lt;uf ufcatid=&quot;2&quot;&gt;</bpt>5<ept id="13">{}</ept><ept id="15" rid="10">&lt;/uf&gt;</ept>).</target>
+<context-group>
+<context context-type="x-mmq-structural-context">ImportableParagraphs / ImportableParagraph#111</context>
+</context-group>
+</trans-unit>
+</body>
+</file>
+</xliff>
