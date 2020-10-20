@@ -56,7 +56,7 @@
 		"hooks" : {
 			"pre-commit" : [
 				"echo committing as $(git config user.name)",
-				"bash pre-commit.sample",
+				"bash .git/hooks/pre-commit.sample",
 				"./translate5.sh dev:githook pre-commit"
 			],
 			"commit-msg" : "./translate5.sh dev:githook commit-msg $1"
