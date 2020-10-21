@@ -8,6 +8,65 @@ Missing Versions are merged into in the next upper versions, so no extra section
 
 
 
+
+## [5.0.12] - 2020-10-21
+
+### Important Notes:
+-  
+
+
+### Changed
+**[TRANSLATE-2279](https://jira.translate5.net/browse/TRANSLATE-2279): Integrate git hook checks** <br>
+Development: Integrate git hooks to validate source code.
+
+
+### Bugfixes
+**[TRANSLATE-2282](https://jira.translate5.net/browse/TRANSLATE-2282): Mixing XLF id and rid values led to wrong tag numbering** <br>
+When in some paired XLF tags the rid was used, and in others the id to pair the tags, this could lead to duplicated tag numbers.
+
+**[TRANSLATE-2280](https://jira.translate5.net/browse/TRANSLATE-2280): OpenTM2 is not reachable anymore if TMPrefix configuration is empty** <br>
+OpenTM2 installations were not reachable anymore from the application if the tmprefix was not configured. Empty tmprefixes are valid again.
+
+**[TRANSLATE-2278](https://jira.translate5.net/browse/TRANSLATE-2278): Check if the searched text is valid for segmentation** <br>
+Text segmentation and text segmentation search in instant-translate only will be done only when for the current search TM is available or risk-predictor (ModelFront) is enabled.
+
+**[TRANSLATE-2277](https://jira.translate5.net/browse/TRANSLATE-2277): UserConfig value does not respect config data type** <br>
+The UserConfig values did not respect the underlying configs data type, therefore the preferences of the repetition editor were not loaded correctly and the repetition editor did not come up.
+
+**[TRANSLATE-2265](https://jira.translate5.net/browse/TRANSLATE-2265): Microsoft translator directory lookup change** <br>
+Solves the problem that microsoft translator does not provide results when searching text in instant translate with more then 5 characters.
+
+**[TRANSLATE-2264](https://jira.translate5.net/browse/TRANSLATE-2264): Relative links for instant-translate file download** <br>
+Fixed file file download link in instant translate when the user is accessing translate5 from different domain.
+
+**[TRANSLATE-2263](https://jira.translate5.net/browse/TRANSLATE-2263): Do not use ExtJS debug anymore** <br>
+Instead of using the debug version of ExtJS now the normal one is used. This reduces the initial load from 10 to 2MB.
+
+**[TRANSLATE-2262](https://jira.translate5.net/browse/TRANSLATE-2262): Remove sensitive data of API endpoint task/userlist** <br>
+The userlst needed for filtering in the task management exposes the encrypted password.
+
+**[TRANSLATE-2261](https://jira.translate5.net/browse/TRANSLATE-2261): Improve terminology import performance** <br>
+The import performance of large terminology was really slow, by adding some databases indexes the imported was boosted. 
+
+**[TRANSLATE-2260](https://jira.translate5.net/browse/TRANSLATE-2260): Visual Review: Normalizing whitespace when comparing segments for content-align / pivot-language** <br>
+Whitespace will now be normalized when aligned visuals in the visual review or pivot languages are validated against the segments 
+
+**[TRANSLATE-2252](https://jira.translate5.net/browse/TRANSLATE-2252): Reapply tooltip over processing status column** <br>
+The tool-tips were changed accidentally and are restored now.
+
+**[TRANSLATE-2251](https://jira.translate5.net/browse/TRANSLATE-2251): Reapply "Red bubble" to changed segments in left side layout of split screen** <br>
+The red bubble representing edited segments will now also show in the left (unedited) frame of the split-view of the visual review
+
+**[TRANSLATE-2250](https://jira.translate5.net/browse/TRANSLATE-2250): Also allow uploading HTML for VisualReview** <br>
+Since it is possible to put HTML files as layout source in the visual folder of the zip import package, selecting an HTML file in the GUI should be allowed, too.
+
+**[TRANSLATE-2245](https://jira.translate5.net/browse/TRANSLATE-2245): Switch analysis to batch mode, where language resources support it** <br>
+Sending multiple segment per request when match analysis and pre-translation is running now can be configured in (default enabled): runtimeOptions.plugins.MatchAnalysis.enableBatchQuery; Currently this is supported by the following language resources: Nectm, PangeaMt, Microsoft, Google, DeepL
+
+**[TRANSLATE-2220](https://jira.translate5.net/browse/TRANSLATE-2220): XML/XSLT import for visual review: Filenames may not be suitable for OKAPI processing** <br>
+FIX: Any filenames e.g. like "File (Kopie)" now can be processed, either as aligned XML/XSLT file or with a direct XML/XSL import 
+
+
 ## [5.0.11] - 2020-10-14
 
 ### Important Notes:
