@@ -109,7 +109,11 @@ class DevelopmentGithookCommand extends Translate5AbstractCommand
         }
         foreach($output as $line) {
             if(preg_match('/\.phtml$/i', $line)) {
-                $this->io->warning('PHTML file modified! Inform client-specific users about the change if needed (via special release note in issue)!');
+                $this->io->warning([
+                    'PHTML file modified!',
+                    'Inform client-specific users about the change if needed (via special release note in issue)!',
+                    'Consider implementing a precondition check or alter script which checks for the existence of your change in the client-specific overwrite!'
+                ]);
                 return 0;
             }
         }
