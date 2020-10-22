@@ -41,6 +41,12 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
     /**
      */
     public static function setUpBeforeClass(): void {
+        //check if this test needs to be skiped.
+        if (self::isMasterTest()) {
+            self::markTestSkipped('Test runs only in master test to reduce usage/costs.');
+            return;
+        }
+        
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $appState = self::assertAppState();
