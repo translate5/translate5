@@ -40,7 +40,8 @@ use Translate5\MaintenanceCli\Command\{
     ReleaseNotesCommand,
     ChangelogCommand,
     DevelopmentNewdbchangeCommand,
-    DevelopmentGithookCommand
+    DevelopmentGithookCommand,
+    DevelopmentNewModelCommand
 };
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
@@ -52,6 +53,7 @@ $commands = [
     new LogCommand(),
     new SessionImpersonateCommand(),
     new ChangelogCommand(),
+    new DevelopmentNewModelCommand(),
 ];
 if(file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
