@@ -312,6 +312,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->setLanguageResourceJsVars();
       
       $this->view->Php2JsVars()->set('editor.editorBrandingSource',$rop->editor->editorBrandingSource);
+      
+      $this->view->Php2JsVars()->set('editor.htmleditorCss', [
+          APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module').'/css/htmleditor.css'
+      ]);
 
       $this->view->Php2JsVars()->set('customPanel.title',$this->translate->_($rop->editor->customPanel->title));
       $this->view->Php2JsVars()->set('customPanel.url',$rop->editor->customPanel->url);
@@ -600,8 +604,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     public function localizedjsstringsAction() {
-      $this->getResponse()->setHeader('Content-Type', 'text/javascript', TRUE);
-      $this->_helper->layout->disableLayout();
+        $this->getResponse()->setHeader('Content-Type', 'text/javascript', TRUE);
+        $this->_helper->layout->disableLayout();
     }
     
     public function wdhehelpAction() {
