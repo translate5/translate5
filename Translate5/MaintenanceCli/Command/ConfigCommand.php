@@ -152,6 +152,8 @@ Modified values are shown bold in the simple listing.');
             return 1;
         }
         
+        $config->init($exactConfig);
+        
         $exactConfig['oldvalue'] = $exactConfig['value'];
         
         if($setEmpty) {
@@ -161,6 +163,10 @@ Modified values are shown bold in the simple listing.');
         else {
             $exactConfig['value'] = $newValue;
             $msg = 'The value was updated!';
+        }
+        if(!$config->isValidInDefaults($exactConfig['value'])) {
+            $this->io->error(sprintf('The given value "%s" is not valid, only the following values are allowed: %s', $exactConfig['value'], $config->getDefaults()));
+            return 1;
         }
         $config->update($exactConfig['name'], $exactConfig['value']);
         $this->showDetail($exactConfig);
