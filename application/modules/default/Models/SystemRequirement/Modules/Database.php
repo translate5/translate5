@@ -42,7 +42,10 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
     function validate(): ZfExtended_Models_SystemRequirement_Result {
         $this->result->id = 'database';
         $this->result->name = 'Database';
-        $this->result->badSummary = ['See https://confluence.translate5.net/display/CON/Server+environment+-+configure+from+scratch#Serverenvironmentconfigurefromscratch-mysqlconfigMySQLconfiguration for more information and solutions.'];
+        $this->result->badSummary = [
+            '<error>Fix the errors and call the script again!</error>',
+            'See https://confluence.translate5.net/display/CON/Server+environment+-+configure+from+scratch#Serverenvironmentconfigurefromscratch-mysqlconfigMySQLconfiguration for more information and solutions.'
+        ];
         
         $config = Zend_Registry::get('config');
         $db = Zend_Db::factory($config->resources->db);
@@ -71,7 +74,7 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         }
         $phpZone = date('P');
         if($mysqlZone == $phpZone) {
-            return;
+            //return;
         }
         $msg = 'Your DB timezone (GMT '.$mysqlZone.') and your PHP timezone (GMT '.$phpZone.') differ! Please ensure that PHP (apache and CLI) timezone is set correctly and the DBs timezone is the same!';
         $this->result->error[] = $msg;
