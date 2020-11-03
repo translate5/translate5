@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,7 +36,8 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
        'Editor.view.admin.task.Preferences',
        'Editor.view.admin.task.TaskAttributes',
        'Editor.view.admin.task.LogGrid',
-       'Editor.view.admin.task.LogWindow'
+       'Editor.view.admin.task.LogWindow',
+       'Editor.view.admin.config.Grid'
     ],
     itemId: 'adminTaskPreferencesWindow',
     header:false,
@@ -62,9 +63,9 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         }
         
         if(auth.isAllowed('languageResourcesTaskassoc')) {
-	        tabs.push({
-	        	xtype: 'languageResourceTaskAssocPanel'
-	        });
+            tabs.push({
+                xtype: 'languageResourceTaskAssocPanel'
+            });
         }
         
         if(auth.isAllowed('editorEditTaskPm') || 
@@ -81,10 +82,23 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'editorAdminTaskLogGrid',
                 title: this.strings.events,
                 bind:{
-                	task:'{currentTask}'
+                    task:'{currentTask}'
                 }
             });
         }
+        //TODO: auth check->is alowed
+        tabs.push({
+            xtype: 'adminConfigGrid',
+            store:{
+                model:'Editor.model.TaskConfig',
+                autoLoad:false,//it will be loaded when extraParam is set
+            },
+            bind:{
+                extraParams:{
+                    taskGuid : '{projectTaskSelection.taskGuid}'
+                }
+            }
+        });
         
         config = {
             items : [{

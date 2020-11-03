@@ -37,9 +37,15 @@ abstract class editor_Controllers_EditorrestController extends ZfExtended_RestCo
      * @var Zend_Session_Namespace
      */
     protected $session;
-
-    protected function initRestControllerSpecific() {
-        parent::initRestControllerSpecific();
+    
+    /**
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    protected $translate;
+    
+    public function init(){
+        parent::init();
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->session = new Zend_Session_Namespace();
     }
     

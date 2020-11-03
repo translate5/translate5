@@ -197,7 +197,7 @@ Ext.define('Editor.view.ViewPortEditor', {
     			}]
     		});
     	}
-    	
+    	//TODO: replace me with new getTask from model
 		return  Ext.Object.merge(config,{
 			html: Editor.data.app.customHtmlContainer,
 		});

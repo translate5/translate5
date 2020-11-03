@@ -131,10 +131,10 @@ Ext.define('Editor.view.segments.MetaPanel', {
     addStateFlags: function() {
       var me = this,
           stati = me.down('#metaStates'),
-          flags = Editor.data.segments.stateFlags,
+          flags = Editor.data.task.getTaskConfigValue('segments.stateFlags'),
           counter = 1;
       
-      Ext.each(flags, function(item){
+      Ext.Object.each(flags, function(key,value){
           var tooltip; 
           if(counter < 10) {
               tooltip = Ext.String.format(me.item_metaStates_tooltip, counter++);
@@ -145,8 +145,8 @@ Ext.define('Editor.view.segments.MetaPanel', {
         stati.add({
           name: 'stateId',
           anchor: '100%',
-          inputValue: item.id,
-          boxLabel: '<span data-qtip="'+tooltip+'">'+item.label+'</span>'
+          inputValue: key,
+          boxLabel: '<span data-qtip="'+tooltip+'">'+value+'</span>'
         });
       });
     },
