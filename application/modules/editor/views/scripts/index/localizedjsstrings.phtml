@@ -838,6 +838,29 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
+    
+    Ext.define("Editor.locale.de.view.admin.config.Grid", {
+        override: "Editor.view.admin.config.Grid",
+        title:"<?php echo $this->translate->_('Konfig überschreiben');?>",
+        strings: {
+            id: '<?php echo $this->translate->_('Id');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            value: '<?php echo $this->translate->_('Value');?>',
+            editRecordTooltip: '<?php echo $this->translate->_('Konfiguration bearbeiten');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.config.Editor", {
+        override: "Editor.view.admin.config.Editor",
+        title: "<?php echo $this->translate->_('Konfiguration bearbeiten');?>",
+        strings: {
+            cancelConfigBtn: '<?php echo $this->translate->_('Abbrechen');?>',
+            saveConfigBtn: '<?php echo $this->translate->_('Speichern');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            value: '<?php echo $this->translate->_('Value');?>',
+        }
+    });
+    
     Ext.define("Editor.locale.de.view.admin.log.Grid", {
         override: "Editor.view.admin.log.Grid",
         strings: {

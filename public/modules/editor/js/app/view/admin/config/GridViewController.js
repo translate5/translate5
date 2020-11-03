@@ -26,23 +26,28 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.model.UserConfig', {
-  extend: 'Editor.model.Config',
-  fields: [
-    {name: 'userGuid', type: 'string',critical: true},//critical: true -> send this param always when save 
-  ],
-  idProperty: 'name',
-  proxy : {
-    type : 'rest',
-    url: Editor.data.restpath+'config',
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
+Ext.define('Editor.view.admin.config.GridViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.adminConfigGrid',
+    requires: [
+        'Editor.view.admin.config.Editor'
+    ],
+    
+    onRowDblClick:function(store, record){
+        this.openConfigEditor(record);
     },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+    
+    onEditClick: function(view, recIndex, cellIndex, item, e, record) {
+        this.openConfigEditor(record);
+    },
+    
+    /***
+     * Opens the config editor for the given config record
+     */
+    openConfigEditor:function(record){
+        var me=this,
+            editor = Ext.create('Editor.view.admin.config.Editor');
+        editor.loadRecord(record);
+        editor.show();
     }
-  }
 });

@@ -26,10 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.model.UserConfig', {
+Ext.define('Editor.model.CustomerConfig', {
   extend: 'Editor.model.Config',
   fields: [
-    {name: 'userGuid', type: 'string',critical: true},//critical: true -> send this param always when save 
+    {name: 'customerId', type: 'int',critical: true},//critical: true -> send this param always when save 
   ],
   idProperty: 'name',
   proxy : {

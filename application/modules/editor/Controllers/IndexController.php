@@ -231,14 +231,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       }
       
       $this->setJsSegmentFlags('segments.qualityFlags', $rop->segments->qualityFlags->toArray());
-      $manualStates = $rop->segments->stateFlags->toArray();
-      $manualStates[0] = $this->translate->_('Nicht gesetzt');
-      $this->setJsSegmentFlags('segments.stateFlags', $manualStates);
+      
       $this->view->Php2JsVars()->set('segments.showStatus', (bool)$rop->segments->showStatus);
       $this->view->Php2JsVars()->set('segments.showQM', (bool)$rop->segments->showQM);
-      $this->view->Php2JsVars()->set('segments.userCanIgnoreTagValidation', (bool)$rop->segments->userCanIgnoreTagValidation);
-      $this->view->Php2JsVars()->set('segments.userCanModifyWhitespaceTags', (bool)$rop->segments->userCanModifyWhitespaceTags);
-      $this->view->Php2JsVars()->set('segments.userCanInsertWhitespaceTags', (bool)$rop->segments->userCanInsertWhitespaceTags);
       $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
       /* @var $states editor_Models_Segment_AutoStates */
       $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
@@ -418,7 +413,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.branding', (string) $this->translate->_($ed->branding));
         $php2js->set('app.company', $this->config->runtimeOptions->companyName);
         $php2js->set('app.name', $this->config->runtimeOptions->appName);
-        $php2js->set('app.customHtmlContainer', (string) $this->translate->_($ed->customHtmlContainer));
         $php2js->set('app.user', $userSession->data);
         $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));
         $php2js->set('app.sessionKey', session_name());

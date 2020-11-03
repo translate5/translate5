@@ -26,23 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.model.UserConfig', {
-  extend: 'Editor.model.Config',
-  fields: [
-    {name: 'userGuid', type: 'string',critical: true},//critical: true -> send this param always when save 
-  ],
-  idProperty: 'name',
-  proxy : {
-    type : 'rest',
-    url: Editor.data.restpath+'config',
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
-    },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
-    }
-  }
+Ext.define('Editor.view.admin.config.GridViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.adminConfigGrid'
 });

@@ -174,9 +174,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Returns a Zend_Config Object; if task specific settings exist, they are set now.
      * @return Zend_Config
      */
-    protected function getConfig() {
+    public function getConfig() {
         // This is a temporary preparation for implementing TRANSLATE-471.
-        if (empty($this->getCustomerId())) {
+        if (empty ($this->getCustomerId())) {
             // Step 1a: start with systemwide config
             $config = new Zend_Config(Zend_Registry::get('config')->toArray(), true);
         }
@@ -185,13 +185,28 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $config = $this->_getCachedCustomer($this->getCustomerId())->getConfig();
         }
 
+        $taskGuid = $this->getTaskGuid();
+        
+        if($taskGuid!==null && $taskGuid!=""){
+            
+            $model = ZfExtended_Factory::get('editor_Models_Config');
+            /* @var $model editor_Models_Config */
+            $result = $model->mergeTaskValues($this->getTaskGuid());
+            
+            $configOperator = ZfExtended_Factory::get('ZfExtended_Resource_DbConfig');
+            /* @var $configOperator ZfExtended_Resource_DbConfig */
+            $configOperator->initDbOptionsTree($result);
+            
+            $taskConfig = new Zend_Config($configOperator->getDbOptionTree());
+            $config = $config->merge($taskConfig);
+        }
         // Step 2: anything task-specific for this task?
         // TODO...
 
         $config->setReadOnly();
         return $config;
     }
-
+    
     /**
      * Add a tasktype for the validation.
      * @param string $taskType
@@ -624,9 +639,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if(empty($session)) {
             $session = new Zend_Session_Namespace();
         }
+        
         $session->taskGuid = $this->getTaskGuid();
-        //FIXME very evil! No data should be put into the session, the session is no cache!
-        $session->task = $this->getAsConfig();
         $session->taskOpenState = $openState;
         $session->taskWorkflow = $this->getWorkflow();
         $session->taskWorkflowStepNr = $this->getWorkflowStep();
@@ -642,7 +656,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $session = new Zend_Session_Namespace();
         }
         $session->taskGuid = null;
-        $session->task = null;
         $session->taskOpenState = null;
         $session->taskWorkflowStepNr = null;
     }

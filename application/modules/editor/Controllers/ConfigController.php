@@ -42,14 +42,30 @@ class editor_ConfigController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction() {
-        $userSession = new Zend_Session_Namespace('user');
+        $taskGuid = $this->getParam('taskGuid');
+        if(!empty($taskGuid)){
+            $this->view->rows = $this->entity->mergeTaskValues($taskGuid);
+            return;
+        }
         
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        $user->load($userSession->data->id);
+        $customerId = $this->getParam('customerId');
+        if(!empty($customerId)){
+            $this->view->rows = $this->entity->mergeCustomerValues($customerId);
+            return;
+        }
+        
+        $userGuid = $this->getParam('userGuid');
+        if(!empty($customerId)){
+            $this->view->rows = $this->entity->mergeUserValues($userGuid);
+            return;
+        }
+        //TODO: when i send task guid i know it is about the task specific config. Then set the level as task, and this should load the requrired task data
+        // same for customer
+        //$domainFilter = $this->getParam('domainFilter');
+        
         
         //load all zf configuration values merged with the user config and .ini values
-        $this->view->rows = $this->entity->loadAllMerged($user);
+        $this->view->rows = $this->entity->loadAllMerged(null);
     }
     
     /**
@@ -68,24 +84,83 @@ class editor_ConfigController extends ZfExtended_RestController {
      */
     public function putAction() {
         $this->decodePutData();
-        $userSession = new Zend_Session_Namespace('user');
         
-        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        $user->load($userSession->data->id);
-        $this->entity->loadByName($this->data->name);
-        //we may only update the config, if there is a value given (the frontend sends only the modified data on save)
-        if(property_exists($this->data, 'value')) {
-            $value = (string) $this->data->value;
-            $this->entity->updateConfig($user, $this->data->name, $value);
-            //this value may not be saved! It is just for setting the return value to the gui.
-            $this->entity->setValue($value);
-            $this->log->debug('E0000', 'Updated user GUI state "{name}" to "{value}"', [
-                'name' => $this->data->name,
-                'value' => $value,
+        if(!property_exists($this->data, 'value')) {
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1025' => 'Field "value" must be provided.'
             ]);
+            throw new ZfExtended_UnprocessableEntity('E1025');
         }
-        $this->view->rows = $this->entity->loadAllMerged($user, $this->data->name)[0];
+        
+        $this->entity->loadByName($this->data->name);
+
+        $level = null;
+        $value = (string) $this->data->value;
+
+        $userGuid = $this->data->userGuid ?? null;
+        if(!empty($userGuid)){
+            $level = $this->entity::CONFIG_LEVEL_USER;
+        }
+        
+        $taskGuid = $this->data->taskGuid ?? null;
+        if(!empty($taskGuid)){
+            $level = $this->entity::CONFIG_LEVEL_TASK;
+        }
+        
+        $customerId = $this->data->customerId ?? null;;
+        if(!empty($customerId)){
+            $level = $this->entity::CONFIG_LEVEL_CUSTOMER;
+        }
+        $row = [];
+        switch ($level) {
+            case $this->entity::CONFIG_LEVEL_USER:
+                $userConfig=ZfExtended_Factory::get('editor_Models_UserConfig');
+                /* @var $userConfig editor_Models_UserConfig */
+                $userConfig->updateInsertConfig($userGuid,$this->data->name,$value);
+                //this value may not be saved! It is just for setting the return value to the gui.
+                $this->entity->setValue($value);
+
+                $row['userGuid'] = $userGuid;
+                
+                $this->log->debug('E0000', 'Updated user GUI state "{name}" to "{value}"', [
+                    'name' => $this->data->name,
+                    'value' => $value,
+                ]);
+                break;
+            case $this->entity::CONFIG_LEVEL_TASK:
+                $taskConfig=ZfExtended_Factory::get('editor_Models_TaskConfig');
+                /* @var $taskConfig editor_Models_TaskConfig */
+                $taskConfig->updateInsertConfig($taskGuid,$this->data->name,$value);
+                //this value may not be saved! It is just for setting the return value to the gui.
+                $this->entity->setValue($value);
+                
+                $row['taskGuid'] = $taskGuid;
+                
+                $this->log->debug('E0000', 'Updated task config value "{name}" to "{value}"', [
+                    'name' => $this->data->name,
+                    'value' => $value,
+                ]);
+                break;
+            case $this->entity::CONFIG_LEVEL_CUSTOMER:
+                $customerConfig=ZfExtended_Factory::get('editor_Models_CustomerConfig');
+                /* @var $customerConfig editor_Models_CustomerConfig */
+                $customerConfig->updateInsertConfig($customerId,$this->data->name,$value);
+                //this value may not be saved! It is just for setting the return value to the gui.
+                $this->entity->setValue($value);
+                
+                $row['customerId'] = $customerId;
+                
+                $this->log->debug('E0000', 'Updated customer config value "{name}" to "{value}"', [
+                    'name' => $this->data->name,
+                    'value' => $value,
+                ]);
+                break;
+            default:
+                break;
+        }
+
+        //merge the current entity with the custom config data ($row)
+        $this->view->rows = array_merge($row, $this->entity->toArray());
     }
     
     
@@ -107,4 +182,24 @@ class editor_ConfigController extends ZfExtended_RestController {
         throw new ZfExtended_BadMethodCallException(__CLASS__.'->'.__FUNCTION__);
     }
     
+    /**
+     * Check if the current user is allowed to update config with $level
+     * @param int $level
+     * @throws editor_Models_ConfigException
+     */
+    protected function isUpdateAllowed(int $level) {
+        $userSession = new Zend_Session_Namespace('user');
+        
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->load($userSession->data->id);
+        
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        if($acl->isInAllowedRoles($user->getRoles(),'stateconfig',$this->entity->getConfigLevelLabel($level))){
+            throw new editor_Models_ConfigException('E1292', [
+                'level' => $level
+            ]);
+        }
+    }
 }

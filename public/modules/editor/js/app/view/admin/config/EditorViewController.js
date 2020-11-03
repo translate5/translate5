@@ -26,23 +26,35 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.model.UserConfig', {
-  extend: 'Editor.model.Config',
-  fields: [
-    {name: 'userGuid', type: 'string',critical: true},//critical: true -> send this param always when save 
-  ],
-  idProperty: 'name',
-  proxy : {
-    type : 'rest',
-    url: Editor.data.restpath+'config',
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
+Ext.define('Editor.view.admin.config.EditorViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.adminConfigEditor',
+    
+    listen:{
+        component:{
+            '#saveConfigBtn':{
+                click:'onSaveConfigBtnClick'
+            },
+            '#cancelConfigBtn':{
+                click:'onCancelConfigBtnClick'
+            }
+        }
     },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+    
+    onSaveConfigBtnClick:function(){
+        var me=this,
+            record = me.getViewModel().get('record');
+
+        record.save();
+        //TODO: it should be defined on record level
+//        record.save({
+//                params:{taskGuid : record.get('taskGuid')
+//            }
+//        });
+    },
+    
+    onCancelConfigBtnClick:function(){
+        var me=this;
+        me.getView().destroy();
     }
-  }
 });

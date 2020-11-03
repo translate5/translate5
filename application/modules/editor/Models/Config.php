@@ -27,6 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * TODO: config validator. It needs to check if the field is requeired or not 
+ *
  */
 class editor_Models_Config extends ZfExtended_Models_Config {
 
@@ -37,18 +39,59 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     const CONFIG_LEVEL_SYSTEM   = 1;
     const CONFIG_LEVEL_INSTANCE = 2;
     const CONFIG_LEVEL_CUSTOMER = 4;
+    //const CONFIG_LEVEL_TASK_IMPORT = 8;//TODO: 2 different levels for task. When the task is in import, this config can be modefied, After the task is imported, this config can not be changed,
+    //const CONFIG_LEVEL_TASK = 16;//TODO: this config can be modefied any time on task stage
     const CONFIG_LEVEL_TASK     = 8;
     const CONFIG_LEVEL_USER     = 16;
     
     // system 1 (default), instance 2, customer 4, task 8 , user 16
     protected $configLabel=[
-        self::CONFIG_LEVEL_SYSTEM   => 'system',
+        self::CONFIG_LEVEL_SYSTEM   => 'system',//TODO: the system confi should go as constant in the code and not overritable at all or listed in zf configuration
         self::CONFIG_LEVEL_INSTANCE => 'instance',
         self::CONFIG_LEVEL_CUSTOMER => 'customer',
         self::CONFIG_LEVEL_TASK     => 'task',
         self::CONFIG_LEVEL_USER     => 'user'
     ];
     
+    /***
+     * Load configs fron the database by given level and merge those configs with .ini overrides.
+     * @param int $level
+     * @throws ZfExtended_ErrorCodeException
+     * @return array[]
+     */
+    public function loadByLevel(int $level) {
+        
+//TODO: this will validate the level agains the user alowed level. But do we need to do this ?
+//since i think this is only needed when we try to save config. But for loading everyone should be able to read the 
+//customer/user/client specific configs
+
+//         $userSession = new Zend_Session_Namespace('user');
+        
+//         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+//         /* @var $user ZfExtended_Models_User */
+//         $user->load($userSession->data->id);
+//         $userLevelStrings = $user->getApplicationConfigLevel();
+//         $userLevelInt = array_unique(array_map([$this, 'convertStringLevelToInt'], $userLevelStrings));
+//         if(!in_array($level, $userLevelInt)){
+//             //TODO: the user is not alowed to load this kind of level
+//             throw new ZfExtended_ErrorCodeException();
+//         }
+        
+        $s = $this->db->select()
+        ->from('Zf_configuration')
+        ->where('level = ? ', $level);
+        $dbResults = $this->loadFilterdCustom($s);
+        
+        //merge the ini with zfconfig values
+        $iniOptions = Zend_Registry::get('bootstrap')->getApplication()->getOptions();
+        
+        $dbResultsNamed = [];
+        foreach($dbResults as &$row) {
+            $this->mergeWithIni($iniOptions, explode('.', $row['name']), $row);
+            $dbResultsNamed[$row['name']] = $row;
+        }
+        return $dbResultsNamed;
+    }
     /***
      * Load all zf configuration values merged with the user config values and installation.ini vaues. The user config value will
      * override the zf confuguration/ini (default) values.
@@ -60,11 +103,19 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      *  CONFIG_LEVEL_TASK=8;      //task configuration PM Users           ↓
      *  CONFIG_LEVEL_USER=16;     //user configuration. State fields and user custom configuration. ALL other Users   ↓
      *
-     * @param ZfExtended_Models_User $user
      * @param string $nameFilter optional config name filter, applied with like (% must be provided in $nameFilter as desired)
      * @return array
      */
-    public function loadAllMerged(ZfExtended_Models_User $user, string $nameFilter = null){
+    //TODO: fix this function. This should load all configs merged with ini based on $userLevelInt and filter as name
+    //remove the user merge from bellow, and check if the user merge is required for this function in one of the calls
+    public function loadAllMerged(string $nameFilter = null){
+        
+        $userSession = new Zend_Session_Namespace('user');
+        
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->load($userSession->data->id);
+        
         //get all application config level for the user
         $userLevelStrings = $user->getApplicationConfigLevel();
         
@@ -80,16 +131,13 @@ class editor_Models_Config extends ZfExtended_Models_Config {
 
         //merge the ini with zfconfig values
         $iniOptions = Zend_Registry::get('bootstrap')->getApplication()->getOptions();
+        
         $dbResultsNamed = [];
         foreach($dbResults as &$row) {
             $this->mergeWithIni($iniOptions, explode('.', $row['name']), $row);
             $dbResultsNamed[$row['name']] = $row;
         }
-        
-        //TODO enable possibility so that a admin is able to load only the DB values, without the merged user config
-        //     since the same is needed for saving, we can use here the same parameter, for example targetLevel
-        //merge user config and ensure that result is an array and not a object map
-        return array_values($this->mergeUserValues($user, $dbResultsNamed));
+        return array_values($this->mergeUserValues($user->getUserGuid(), $dbResultsNamed));
     }
     
     /**
@@ -98,21 +146,80 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      * @param array $dbResults
      * @return array
      */
-    protected function mergeUserValues(ZfExtended_Models_User $user, array $dbResults): array {
+    public function mergeUserValues(string $userGuid, array $dbResults=[]): array {
+        if(empty($dbResults)){
+            $dbResults = $this->loadByLevel(self::CONFIG_LEVEL_USER);
+        }
+        array_walk($dbResults, function(&$r) use($userGuid){
+            $r['userGuid'] = $userGuid;
+        });
         $s = $this->db->select()
         ->setIntegrityCheck(false)
         ->from('LEK_user_config')
-        ->where('userGuid = ?',$user->getUserGuid());
+        ->where('userGuid = ?',$userGuid);
         $userResults = $this->db->getAdapter()->fetchAll($s);
-        foreach($userResults as $row) {
-            if(!empty($dbResults[$row['name']])) {
+        return array_values($this->mergeConfig($userResults, $dbResults));
+    }
+    
+    /**
+     * overrides the DB config values from the task config
+     * @param string $taskGuid
+     * @param array $dbResults
+     * @return array
+     */
+    public function mergeTaskValues(string $taskGuid, array $dbResults=[]):array {
+        if(empty($dbResults)){
+            $dbResults = $this->loadByLevel(self::CONFIG_LEVEL_TASK);
+        }
+        array_walk($dbResults, function(&$r) use($taskGuid){
+            $r['taskGuid'] = $taskGuid;
+        });
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from('LEK_task_config')
+        ->where('taskGuid = ?',$taskGuid);
+        $userResults = $this->db->getAdapter()->fetchAll($s);
+        return array_values($this->mergeConfig($userResults, $dbResults));
+    }
+    
+    /***
+     * overrides the DB config values from the customer config
+     * @param int $customerId
+     * @param array $dbResults
+     * @return array
+     */
+    public function mergeCustomerValues(int $customerId, array $dbResults=[]):array {
+        if(empty($dbResults)){
+            $dbResults = $this->loadByLevel(self::CONFIG_LEVEL_CUSTOMER);
+        }
+        array_walk($dbResults, function(&$r) use($customerId){
+            $r['customerId'] = $customerId;
+        });
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from('LEK_customer_config')
+        ->where('customerId = ?',$customerId);
+        $userResults = $this->db->getAdapter()->fetchAll($s);
+        return array_values($this->mergeConfig($userResults, $dbResults));
+    }
+    
+    /***
+     * Merge the input array into the result array. Values will be merged only if the config from 
+     * the input array exisit in the result array
+     * @param array $input
+     * @param array $result
+     * @return string
+     */
+    protected function mergeConfig(array $input,array $result){
+        foreach($input as $row) {
+            if(!empty($result[$row['name']])) {
                 $row['overwritten'] = $row['value'];
-                $dbResults[$row['name']]['overwritten'] = $dbResults[$row['name']]['value'];
-                $dbResults[$row['name']]['value'] = $row['value'];
-                $dbResults[$row['name']]['origin'] = self::CONFIG_SOURCE_USER;
+                $result[$row['name']]['overwritten'] = $result[$row['name']]['value'];
+                $result[$row['name']]['value'] = $row['value'];
+                $result[$row['name']]['origin'] = self::CONFIG_SOURCE_USER;
             }
         }
-        return $dbResults;
+        return $result;
     }
     
     /**
@@ -128,13 +235,42 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         return 0;
     }
     
+    public function updateConfig(string $configName, string $configValue, int $configLevel) {
+        
+        $userSession = new Zend_Session_Namespace('user');
+        
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->load($userSession->data->id);
+        
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        if($acl->isInAllowedRoles($user->getRoles(),'stateconfig',$this->configLabel[$configLevel])){
+            throw new ZfExtended_ErrorCodeException("");//TODO: new error code: The user is not alowed to modefy config of this level
+        }
+        
+        switch ($configLevel) {
+            case self::CONFIG_LEVEL_USER:
+                $userConfig=ZfExtended_Factory::get('editor_Models_UserConfig');
+                /* @var $userConfig editor_Models_UserConfig */
+                $userConfig->updateInsertConfig($user->getUserGuid(),$configName,$configValue);
+            break;
+            case self::CONFIG_LEVEL_TASK:
+                break;
+            case self::CONFIG_LEVEL_CUSTOMER:
+                break;
+            case self::CONFIG_LEVEL_SYSTEM:
+                break;
+        }
+    }
+    
     /***
      * Update the user config and the default zf_config value for given user and config name
      * @param ZfExtended_Models_User $user
      * @param string $configName
      * @param string $configValue
      */
-    public function updateConfig(ZfExtended_Models_User $user,string $configName,string $configValue){
+    public function xxxupdateConfig(ZfExtended_Models_User $user,string $configName,string $configValue){
         /* @var $acl ZfExtended_Acl */
         //Info: uncomment this when the frontend config managment will be available.
         //from the frontend, an level is required also as additional param, so the decision here can be made
@@ -204,5 +340,9 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             $this->mergeWithIni($iniOptions, explode('.', $row['name']), $row);
         }
         return $result;
+    }
+    
+    public function getConfigLevelLabel(int $level){
+        return $this->configLabel[$level] ?? null;
     }
 }

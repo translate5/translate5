@@ -102,12 +102,16 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
         
         // Step 2: anything customer-specific?
         if (!empty($this->getId())) {
-            // TODO: get and merge Zend_Config for customerId,
-            //       this is just a quick & dirty workaround for anonymizeUsers
-            $config->runtimeOptions->customers->anonymizeUsers = $this->getAnonymizeUsers();
+            
+            $model = ZfExtended_Factory::get('editor_Models_Config');
+            /* @var $model editor_Models_Config */
+            $result = $model->mergeCustomerValues($this->getId());
+            $configOperator = ZfExtended_Factory::get('ZfExtended_Resource_DbConfig');
+            /* @var $configOperator ZfExtended_Resource_DbConfig */
+            $configOperator->initDbOptionsTree($result);
+            return new Zend_Config($configOperator->getDbOptionTree(),true);
         }
         
-        $config->setReadOnly();
         return $config;
     }
     
