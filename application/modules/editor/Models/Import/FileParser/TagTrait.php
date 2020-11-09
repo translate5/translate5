@@ -166,14 +166,15 @@ trait editor_Models_Import_FileParser_TagTrait {
      * @param string $shortTag
      * @param string $tagId
      * @param string $text
+     * @param boolean $xmlTags optional, by default true, may be disabled for example if no XML content should be replaced by regex with a custom tag
      */
-    protected function getTagParams($tag, $shortTag, $tagId, $text) {
-        return array(
-            'class' => $this->parseSegmentGetStorageClass($tag),
+    protected function getTagParams($tag, $shortTag, $tagId, $text, $xmlTags = true) {
+        return [
+            'class' => $this->parseSegmentGetStorageClass($tag, $xmlTags),
             'text' => $text,
             'shortTag' => $shortTag,
             'id' => $tagId, //mostly original tag id
-        );
+        ];
     }
     
     /**
@@ -181,15 +182,19 @@ trait editor_Models_Import_FileParser_TagTrait {
      * checks if $tag starts with < and ends with >
      *
      * @param string $tag contains the tag
+     * @param boolean $xmlTags true if the tags are XMLish (so starting and ending with < and >)
      * @return string encoded tag content
      */
-    protected function parseSegmentGetStorageClass($tag) {
-        if(substr($tag, 0, 1) !== '<' || substr($tag, -1) !== '>'){
-            trigger_error('The Tag ' . $tag . ' has not the structure of a tag.', E_USER_ERROR);
+    protected function parseSegmentGetStorageClass(string $tag, bool $xmlTags): string {
+        if($xmlTags) {
+            if(substr($tag, 0, 1) !== '<' || substr($tag, -1) !== '>'){
+                trigger_error('The Tag ' . $tag . ' has not the structure of a tag.', E_USER_ERROR);
+            }
+            //we store the tag content without leading < and trailing >
+            //since we expect to cut of just two ascii characters no mb_ function is needed, the UTF8 content inbetween is untouched
+            $tag = substr($tag, 1, -1);
         }
-        //we store the tag content without leading < and trailing >
-        //since we expect to cut of just two ascii characters no mb_ function is needed, the UTF8 content inbetween is untouched
-        return implode('', unpack('H*', substr($tag, 1, -1)));
+        return implode('', unpack('H*', $tag));
     }
     
     /**

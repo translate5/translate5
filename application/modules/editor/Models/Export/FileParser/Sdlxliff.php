@@ -168,7 +168,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
      *
      * @return string file
      */
-    public function getFile() {
+    protected function getFile() {
         parent::getFile();
         $this->_exportFile = preg_replace('"(<mrk[^>]*[^/])></mrk>"i', '\\1/>', $this->_exportFile);
         $this->injectRevisions();
