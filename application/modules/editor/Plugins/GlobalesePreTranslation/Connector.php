@@ -183,7 +183,14 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
             return $response->getBody();
         }
         
-        $result = json_decode(trim($response->getBody()));
+        $body = trim($response->getBody());
+        
+        //do not decode valid response with empty content
+        if(empty($body)){
+            return null;
+        }
+        
+        $result = json_decode($body);
         
         //is valid response with 
         if(is_array($result) && count($result) < 1){
