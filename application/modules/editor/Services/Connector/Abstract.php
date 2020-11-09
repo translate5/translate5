@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Services_Connector_Abstract {
     
-    //FIXME this is just a temporary solution until TagTrait is refactored into smaller reusable classes, see TRANSLATE-1509 
+    //FIXME this is just a temporary solution until TagTrait is refactored into smaller reusable classes, see TRANSLATE-1509
     use editor_Models_Import_FileParser_TagTrait;
     
     const STATUS_NOTCHECKED = 'notchecked';
@@ -53,7 +53,7 @@ abstract class editor_Services_Connector_Abstract {
     /***
      * Source languages array key for the languages result.
      * In some of the resources the supported "from-to" languages are not the same.
-     * That is why the languages grouping is required in some of them. 
+     * That is why the languages grouping is required in some of them.
      * @var string
      */
     const SOURCE_LANGUAGES_KEY = 'sourceLanguages';
@@ -66,7 +66,7 @@ abstract class editor_Services_Connector_Abstract {
      */
     const TARGET_LANGUAGES_KEY = 'targetLanguages';
     
-    /*** 
+    /***
      * Default resource matchrate
      * @var integer
      */
@@ -137,13 +137,13 @@ abstract class editor_Services_Connector_Abstract {
     protected $batchQueryBuffer=1;
     
     /***
-     * 
+     *
      * @var editor_Models_Import_FileParser_XmlParser
      */
     protected $xmlParser;
     
     /***
-     * 
+     *
      * @var array
      */
     protected $queryStringTagMap = [];
@@ -193,8 +193,8 @@ abstract class editor_Services_Connector_Abstract {
     /**
      * Link this Connector Instance to the given LanguageResource and its resource, in the given language combination
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
-     * @param int $sourceLang language id 
-     * @param int $targetLang language id 
+     * @param int $sourceLang language id
+     * @param int $targetLang language id
      */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
         $this->sourceLang = $sourceLang;
@@ -243,8 +243,8 @@ abstract class editor_Services_Connector_Abstract {
 
     /**
      * makes a tm / mt / file query to find a match / translation
-     * returns an array with stdObjects, each stdObject contains the fields: 
-     * 
+     * returns an array with stdObjects, each stdObject contains the fields:
+     *
      * @param editor_Models_Segment $segment
      * @return editor_Services_ServiceResult
      */
@@ -318,7 +318,7 @@ abstract class editor_Services_Connector_Abstract {
     
     /***
      * returns the original or edited $segmentField content to be queried, depending on source edit
-     * 
+     *
      * @param editor_Models_Segment $segment
      * @param string $segmentField: segmentField (source or target)
      * @return string
@@ -333,10 +333,10 @@ abstract class editor_Services_Connector_Abstract {
     /**
      * prepares and gets the query string in a default manner:
      * - restore whitespace
-     * - remove all translate5 tags 
-     * the single steps from that function can be reused if needed the query string in a different way 
+     * - remove all translate5 tags
+     * the single steps from that function can be reused if needed the query string in a different way
      * @param editor_Models_Segment $segment
-     * @return string 
+     * @return string
      */
     protected function prepareDefaultQueryString(editor_Models_Segment $segment) {
         //1. organizational preparation
@@ -389,7 +389,7 @@ abstract class editor_Services_Connector_Abstract {
     /**
      * converts whitespace coming from the connected resource to translate5 usable whitespace tags
      * Warning: text may not contain other tags - they will be destroyed! For more complex solution see OpenTM2
-     * 
+     *
      * @param string $textNode
      */
     protected function importWhitespaceFromTagLessQuery($textNode) {
@@ -434,8 +434,8 @@ abstract class editor_Services_Connector_Abstract {
     
     /***
      * Search the resource for available translation. Where the source text is in resource source language and the received results
-     * are in the resource target language 
-     * 
+     * are in the resource target language
+     *
      * @param string $searchString plain text without tags
      * @return editor_Services_ServiceResult
      */
@@ -443,11 +443,11 @@ abstract class editor_Services_Connector_Abstract {
     
     
     /***
-     * Prepares the search query string for api search. 
+     * Prepares the search query string for api search.
      * Sets the search query string as default source result.
      * Handles the white spaces and track changes for the search query string.
      * Stores internal tag map, so later the tags can be reapplied to the received translation.
-     * This function only should be used with prepareTranslatedText combination 
+     * This function only should be used with prepareTranslatedText combination
      *
      * @param editor_Models_Segment $segment
      * @param bool $useXmlParser
@@ -509,7 +509,7 @@ abstract class editor_Services_Connector_Abstract {
     
     /***
      * Return the available language codes for the current resource endpoint(api)
-     * Use SOURCE_LANGUAGES_KEY and TARGET_LANGUAGES_KEY as languages grouped results when 
+     * Use SOURCE_LANGUAGES_KEY and TARGET_LANGUAGES_KEY as languages grouped results when
      * the resource does not support same from - to language combinations
      */
     public function languages(){
