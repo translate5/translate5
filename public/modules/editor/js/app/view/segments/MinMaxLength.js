@@ -74,7 +74,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
          * @returns bool
          */
         useMaxNumberOfLines: function(meta) {
-            return !!meta.maxNumberOfLines; // meta.maxNumberOfLines = null if not set
+            return !!(meta && meta.maxNumberOfLines); // meta.maxNumberOfLines = null if not set
         },
         /**
          * Returns the minWidth according to the meta-data.
