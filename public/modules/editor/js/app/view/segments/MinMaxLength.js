@@ -226,7 +226,6 @@ Ext.define('Editor.view.segments.MinMaxLength', {
 
     /***
      * Handler for html editor initializer, the function is called after the iframe is initialized
-     * FIXME testme
      */
     onHtmlEditorInitialize:function(){
         var me=this;
