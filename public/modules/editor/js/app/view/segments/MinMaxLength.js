@@ -74,8 +74,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
          * @returns bool
          */
         useMaxNumberOfLines: function(meta) {
-            var isPixel = meta && (meta.sizeUnit === Editor.view.segments.PixelMapping.SIZE_UNIT_FOR_PIXELMAPPING);
-            return isPixel && !!meta.maxNumberOfLines; // meta.maxNumberOfLines = null if not set
+            return !!(meta && meta.maxNumberOfLines); // meta.maxNumberOfLines = null if not set
         },
         /**
          * Returns the minWidth according to the meta-data.
@@ -227,7 +226,6 @@ Ext.define('Editor.view.segments.MinMaxLength', {
 
     /***
      * Handler for html editor initializer, the function is called after the iframe is initialized
-     * FIXME testme
      */
     onHtmlEditorInitialize:function(){
         var me=this;
@@ -440,13 +438,13 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     updateLabelForEditor: function(){
         var config = Editor.view.segments.MinMaxLength, // TODO: why do we use a reference to ourself here instead of me or this ? Why do we have static methods at all ??
             sizeUnit = config.getSizeUnit(this.segmentMeta),
-            useLines = config.useMaxNumberOfLines(this.segmentMeta);
+            useLines = config.useMaxNumberOfLines(this.segmentMeta),
             segmentMinWidth = config.getMinWidthForSegment(this.segmentMeta),
             segmentMaxWidth = config.getMaxWidthForSegment(this.segmentMeta),
             lineMinWidth = config.getMinWidthForSingleLine(this.segmentMeta),
             lineMaxWidth = config.getMaxWidthForSingleLine(this.segmentMeta),
             editorContent = this.editor.getEditorBody().innerHTML,
-            totalLength = this.editor.getTransunitLength(editorContent)
+            totalLength = this.editor.getTransunitLength(editorContent),
             lengthStatus = this.getMinMaxLengthStatus(editorContent, this.segmentMeta, this.segmentFileId),
             tplData = { cls:'invalid-length' };
         /*

@@ -100,6 +100,11 @@ class Models_Installer_Standalone {
     protected $preconditonChecker;
     
     /**
+     * @var Symfony\Component\Console\Application
+     */
+    protected $cli;
+    
+    /**
      * Options:
      * mysql_bin => path to mysql binary
      * @param array $options
@@ -107,8 +112,9 @@ class Models_Installer_Standalone {
     public static function mainLinux(array $options = null) {
         $saInstaller = new self(getcwd(), $options);
         $saInstaller->checkAndCallTools();
-        $saInstaller->checkEnvironment();
+        $saInstaller->checkGitAndInit();
         $saInstaller->processDependencies();
+        $saInstaller->checkEnvironment();
         $saInstaller->addZendToIncludePath();
         $saInstaller->installation();//checks internally if steps are already done
         $saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
@@ -241,10 +247,33 @@ class Models_Installer_Standalone {
         };
     }
     
-    protected function checkEnvironment() {
+    protected function checkGitAndInit() {
         $this->installerFile = __FILE__;
         $this->installerHash = md5_file($this->installerFile);
-        $this->preconditonChecker->checkEnvironment();
+        if(file_exists('.git')) {
+            die("\n\n A .git file/directory does exist in the project root!
+    Please use git to update your installation and call ./translate5.sh database:update \n\n");
+        }
+    }
+    
+    protected function checkEnvironment() {
+        passthru('./translate5.sh --ansi system:check --pre-installation');
+/*
+ * if we will be completly on translate5.sh then we could do the following inclusion.
+ * But currently we would instance a double Zend App - here in Standalone and with below app call. There fore we do it with exec.
+        
+        require_once $this->currentWorkingDir.'/vendor/autoload.php';
+        $this->cli = new Symfony\Component\Console\Application();
+        $this->cli->add(new Translate5\MaintenanceCli\Command\SystemCheckCommand());
+        $input = new Symfony\Component\Console\Input\ArrayInput([
+            'command' => 'system:check',
+//            // (optional) define the value of command arguments
+//            'fooArgument' => 'barValue',
+//            // (optional) pass options to the command
+//            '--message-limit' => $messages,
+        ]);
+        $this->cli->run($input);
+        */
     }
     
     protected function checkMyselfForUpdates() {

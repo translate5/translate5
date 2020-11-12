@@ -1458,7 +1458,22 @@ class editor_TaskController extends ZfExtended_RestController {
 
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj;
-        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
+
+        $isTaskPm = $this->isAuthUserTaskPm($this->entity->getPmGuid());
+        $tua = null;
+        try {
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+        }
+        
+        //to access a task the user must either have the loadAllTasks right, or must be the tasks PM, or must be associated to the task
+        $isTaskAccessable = $this->isAllowed('backend', 'loadAllTasks') || $isTaskPm || !is_null($tua);
+        if(!$isTaskAccessable) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        
+        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $isTaskPm;
         $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
         $this->addMissingSegmentrangesToResult($row);
@@ -1501,7 +1516,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * does the export as zip file.
      */
     public function exportAction() {
-        parent::getAction();
+        $this->getAction();
         $diff = (boolean)$this->getRequest()->getParam('diff');
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
 
