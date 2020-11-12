@@ -27,6 +27,19 @@ END LICENSE AND COPYRIGHT
  * To not change the original API we do not throw exceptions but collect the errors instead of reporting them and make them accessible
  */
 class editor_Utils_Dom extends DOMDocument {
+    
+    /**
+     * Helper to retrieve the inner HTML of a DOM Node
+     * @param DOMNode $element
+     * @return string
+     */
+    public static function innerHTML(DOMNode $element) : string {
+        $html = '';
+        foreach ($element->childNodes as $child){
+            $html .= $element->ownerDocument->saveHTML($child);
+        }
+        return $html;
+    }
     /**
      * 
      * @var libXMLError[]
