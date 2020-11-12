@@ -204,7 +204,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     displayField: 'label',
                                     forceSelection: true,
                                     //encodeSubmitValue: true, // → as JSON
-                                    //anyMatch: true,
+                                    anyMatch: true,
                                     queryMode: 'local',
                                     valueField: 'id',
                                     allowBlank: false
