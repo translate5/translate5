@@ -60,12 +60,13 @@ final class editor_TextNode extends editor_Tag {
         $this->name = '';
         $this->singular = true;
     }
-    /**
-     * Retrieves our text content
-     * @return string
-     */
+
     public function getText(){
         return $this->text;
+    }
+
+    public function getTextLength(){
+        return mb_strlen($this->text);
     }
     
     public function addChild(editor_Tag $child){

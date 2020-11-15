@@ -36,7 +36,7 @@
  * Holds a segment and the internal tags as objects and provide to render this structure or to recreate it from the rendered markup
  */
 class editor_Segment_Tags implements JsonSerializable {
-
+        
     /**
      * The counterpart to ::toJson: creates the tags from the serialized json data
      * @param string $jsonString
@@ -46,11 +46,10 @@ class editor_Segment_Tags implements JsonSerializable {
     public static function fromJson($jsonString) : editor_Segment_Tags {
         try {
             $data = json_decode($jsonString);
-            $tags = new editor_Segment_Tags();
+            $tags = new editor_Segment_Tags($data->segmentId, $data->segmentText, $data->field);
             foreach($data->tags as $tag){
-                $tags->addTag(editor_Segment_InternalTag::fromJson($tag));
+                $tags->addTag(editor_Segment_TagCreator::instance()->fromJsonData($tag));
             }
-            $tags->setFromJson($data);
             return $tags;
         } catch (Exception $e) {
             throw new Exception('Could not deserialize editor_Segment_Tags from JSON-Object '.json_encode($data));
@@ -93,20 +92,40 @@ class editor_Segment_Tags implements JsonSerializable {
         $this->segmentId = $segmentId;
         $this->segmentText = $segmentText;
         $this->field = $field;
-    }    
+    } 
     /**
      *
-     * @return string
-     */
-    public function toJson(){
-        return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    }
-    /**
-     * 
      * @param editor_Segment_InternalTag $tag
      */
     public function addTag(editor_Segment_InternalTag $tag){
+        $tag->tagIndex = count($this->tags);
+        $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= mb_strlen($this->segmentText));
         $this->tags[] = $tag;
+    }
+    /**
+     * Retrieves the tag at a certain index
+     * @param int $index
+     * @return editor_Segment_InternalTag|NULL
+     */
+    public function getAt($index){
+        if($index < count($this->tags)){
+            return $this->tags[$index];
+        }
+        return NULL;
+    }
+    /**
+     * Retrieves the tags of a certain type
+     * @param string $type
+     * @return editor_Segment_InternalTag[]
+     */
+    public function getByType(string $type){
+        $result = array();
+        foreach($this->tags as $tag){
+            if($tag->getType() == $type){
+                $result[] = $tag;
+            }
+        }
+        return $result;
     }
     /**
      * Sorts the items ascending, takes the second index into account when items have the same startIndex
@@ -114,6 +133,17 @@ class editor_Segment_Tags implements JsonSerializable {
     public function sort(){
         usort($this->tags, array($this, 'compare'));
     }
+    
+    /* Serialization API */
+    
+    /**
+     *
+     * @return string
+     */
+    public function toJson(){
+        return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+    
     
     public function jsonSerialize(){
         $data = new stdClass();
@@ -127,15 +157,8 @@ class editor_Segment_Tags implements JsonSerializable {
         $data->field = $this->field;
         return $data;        
     }
-    /**
-     *
-     * @param stdClass $data
-     */
-    protected function setFromJson(stdClass $data){
-        $this->segmentId = $data->segmentId;
-        $this->segmentText = $data->segmentText;
-        $this->field = $data->field;
-    }
+    
+    /* Rendering API */
     
     public function render(){
         $numTags = count($this->tags);
@@ -179,7 +202,7 @@ class editor_Segment_Tags implements JsonSerializable {
         }
         // now we create the nested data-model from the up to now sequential but sorted $rtags model. We also add the text-portions of the segment as text nodes
         // this container just acts as the master container 
-        $holder = new editor_Segment_AnyInternalTag(0, strlen($this->segmentText));
+        $holder = new editor_Segment_AnyInternalTag(0, mb_strlen($this->segmentText));
         $container = $holder;
         foreach($rtags as $tag){
             $container->getNearestContainer($tag)->addChild($tag);
@@ -199,15 +222,57 @@ class editor_Segment_Tags implements JsonSerializable {
     public function getSegmentTextPart(int $start, int $end) : string {
         return substr($this->segmentText, $start, ($end - $start));
     }
+    
+    /* Unparsing API */
+
+    public function unparse(string $html) {
+        $dom = new editor_Utils_Dom();
+        // to make things easier we add a wrapper to hold all tags and only use it's children
+        $element = $dom->loadUnicodeElement('<div>'.$html.'</div>');
+        if($element != NULL){
+            $wrapper = $this->fromDomElement($element, 0);
+            // sequence the nested tags as our children
+            $wrapper->sequenceChildren($this);
+            $this->consolidate();
+            // Crucial: finalize, set the tag-props
+            $this->addTagProps();
+        } else {
+            throw new Exception('Could not unparse Internal Tags from Markup '.$html);
+        }        
+    }
     /**
-     * Joins Tags that are equal and directly beneath each other. Can be used after  the tags are parsed to condense them to those that really matter
+     * Creates a nested structure of Internal tags & text-nodes recursively out of a n DOMElement structure
+     * @param DOMElement $element
+     * @param int $startIndex
+     * @return editor_Segment_InternalTag
      */
-    public function consolidate(){
+    private function fromDomElement(DOMElement $element, int $startIndex){
+        $tag = editor_Segment_TagCreator::instance()->fromDomElement($element, $startIndex);
+        if($element->hasChildNodes()){
+            for($i = 0; $i < $element->childNodes->length; $i++){
+                $child = $element->childNodes->item($i);
+                if($child->nodeType == XML_TEXT_NODE){
+                    $tag->addText($child->nodeValue);
+                } else if($child->nodeType == XML_ELEMENT_NODE){
+                    $tag->addChild($this->fromDomElement($child, $startIndex));
+                }
+                $startIndex += $tag->getLastChild()->getTextLength();
+            }
+        }
+        $tag->endIndex = $startIndex;
+        return $tag;
+    }
+    /**
+     * Joins Tags that are equal and directly beneath each other
+     * Also removes any internal connections between the tags
+     */
+    private function consolidate(){
         $this->sort();
         $numTags = count($this->tags);
         if($numTags > 1){
             $tags = [];
             $last = $this->tags[0];
+            $last->resetChildren();
             $tags[] = $last;
             for($i=1; $i < $numTags; $i++){
                 $tag = $this->tags[$i];
@@ -215,11 +280,22 @@ class editor_Segment_Tags implements JsonSerializable {
                     $last->endIndex = $tag->endIndex;
                 } else {
                     $last = $tag;
+                    $last->resetChildren();
                     $tags[] = $last;
                 }
             }
-            
+            $this->tags = $tags;
         }
-        $this->tags = $tags;
+    }
+    /**
+     * Adds the properties 'tagIndex' and 'isFullLength' to the tags, which are needed by consuming APIs
+     */
+    private function addTagProps(){
+        $num = count($this->tags);
+        $textLength = mb_strlen($this->segmentText);
+        for($i=0; $i < $num; $i++){
+            $this->tags[$i]->tagIndex = $i;
+            $this->tags[$i]->isFullLength = ($this->tags[$i]->startIndex == 0 && $this->tags[$i]->endIndex >= $textLength);
+        }
     }
 }
