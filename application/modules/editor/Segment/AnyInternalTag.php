@@ -54,7 +54,7 @@ class editor_Segment_AnyInternalTag extends editor_Segment_InternalTag {
         $this->startIndex = $startIndex;
         $this->endIndex = $endIndex;
         $this->category = $category;
-        $this->name = $nodeName;
+        $this->name = strtolower($nodeName);
         $this->singular = in_array($nodeName, static::$singularTypes);
     }
     /**
@@ -64,16 +64,5 @@ class editor_Segment_AnyInternalTag extends editor_Segment_InternalTag {
      */
     protected function createBaseClone(){
         return new editor_Segment_AnyInternalTag($this->startIndex, $this->endIndex, $this->category, $this->name);
-    }
-    
-    protected function furtherSerialize(stdClass $data){
-        // add our nodename to the serilization
-        $data->nodename = $this->name;
-    }
-
-    protected function furtherUnserialize(stdClass $data){
-        // set our nodename from serialized data
-        $this->name = $data->nodename;
-        $this->singular = in_array($this->name, static::$singularTypes);
     }
 }

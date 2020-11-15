@@ -176,27 +176,40 @@ class editor_Tag {
     /**
      * Unparses an HTML-String to an editor_Tag
      * IMPORTANT: This will handle the tags inner content as TEXT, so no nested tags will be parsed !
-     * TODO: add support for nested tags
      * @param string $html
      * @return editor_Tag|NULL
      */
     public static function unparse($html){
         $dom = new editor_Utils_Dom();
-        $dom->loadHTML(trim($html)); // the @ is to silence errors and misconfigures of HTML
-        if($dom->isValid()){
-            $node = $dom->firstChild;
-            if($node != null && $node->nodeType == XML_ELEMENT_NODE){
-                $tag = editor_Tag::create($node->nodeName);
-                $tag->addText(editor_Utils_Dom::innerHTML($node));
-                if($node->hasAttributes()){
-                    foreach($node->setAttributes as $attr) {
-                        $tag->addAttribute($attr->nodeName, $attr->nodeValue);
-                    }
-                }
-                return $tag;
+        $node = $dom->loadUnicodeElement($html);
+        if($node != NULL){
+            return static::fromDomElement($node);
+        }
+        return NULL;
+    }
+    /**
+     * Creates a editor_Tag out of a DOMElement
+     * @param DOMElement $node
+     * @return editor_Tag
+     */
+    protected static function fromDomElement(DOMElement $node){
+        $tag = editor_Tag::create($node->nodeName);
+        if($node->hasAttributes()){
+            foreach($node->attributes as $attr){
+                $tag->addAttribute($attr->nodeName, $attr->nodeValue);
             }
         }
-        return null;
+        if($node->hasChildNodes()){
+            for($i = 0; $i < $node->childNodes->length; $i++){
+                $child = $node->childNodes->item($i);
+                if($child->nodeType == XML_TEXT_NODE){
+                    $tag->addText($child->nodeValue);
+                } else if($child->nodeType == XML_ELEMENT_NODE){
+                    $tag->addChild(static::fromDomElement($child));
+                }
+            }
+        }
+        return $tag;
     }
     /**
      * 
@@ -238,7 +251,7 @@ class editor_Tag {
         if(empty($nodeName)){
             throw new Exception('A tag must have a node name');
         }
-        $this->name = $nodeName;
+        $this->name = strtolower($nodeName);
         $this->singular = in_array($nodeName, self::$singularTypes);
     }
     
@@ -270,11 +283,31 @@ class editor_Tag {
         return $this;
     }
     /**
-     * 
+     * Retrieves the first child if there are any
      * @return boolean
      */
     public function hasChildren(){
         return (count($this->children) > 0);
+    }
+    /**
+     * 
+     * @return editor_Tag|NULL
+     */
+    public function getFirstChild(){
+        if($this->hasChildren()){
+            return $this->children[0];
+        }
+        return NULL;
+    }
+    /**
+     * Retrieves the last child if there are any
+     * @return editor_Tag|NULL
+     */
+    public function getLastChild(){
+        if($this->hasChildren()){
+            return $this->children[count($this->children) - 1];
+        }
+        return NULL;
     }
     /**
      * 
@@ -291,6 +324,19 @@ class editor_Tag {
      */
     public function getParent(){
         return $this->parent;
+    }
+    /**
+     * Retrieves our children
+     * @return editor_Tag[]
+     */
+    public function getChildren(){
+        return $this->children;
+    }
+    /**
+     * Resets our children
+     */
+    public function resetChildren(){
+        $this->children = [];
     }
     
     /* classname API */
@@ -524,7 +570,33 @@ class editor_Tag {
     }
 
     /* content */
-
+    
+    /**
+     * Retrieves our textual content without markup
+     * @return string
+     */
+    public function getText(){
+        $text = '';
+        if($this->hasChildren()){
+            foreach($this->children as $child){
+                $text .= $child->getText();
+            }
+        }
+        return $text;
+    }
+    /**
+     * Returns our text length / number of characters
+     * @return int
+     */
+    public function getTextLength(){
+        $length = 0;
+        if($this->hasChildren()){
+            foreach($this->children as $child){
+                $length += $child->getTextLength();
+            }
+        }
+        return $length;
+    }
     /**
      * Returns the tag-name
      * @return string
