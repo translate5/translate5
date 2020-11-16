@@ -62,7 +62,13 @@ class editor_Segment_Tags implements JsonSerializable {
      * @return int
      */
     public static function compare(editor_Segment_InternalTag $a, editor_Segment_InternalTag $b){
-        if($b->startIndex === $a->startIndex){
+        if($a->startIndex === $b->startIndex){
+            // crucial: we must make sure, that a "normal" tag may contain a single tag all at the same index (no text-content). Thius, the normal tags always must weight less
+            if($a->isSingular() && !$b->isSingular()){
+                return 1;
+            } else if(!$a->isSingular() && $b->isSingular()){
+                return -1;
+            }
             return $b->endIndex - $a->endIndex;
         }
         return $a->startIndex - $b->startIndex;
@@ -93,6 +99,27 @@ class editor_Segment_Tags implements JsonSerializable {
         $this->segmentText = $segmentText;
         $this->field = $field;
     } 
+    /**
+     * 
+     * @return number
+     */
+    public function getSegmentId(){
+        return $this->segmentId;
+    }
+    /**
+     * 
+     * @return string
+     */
+    public function getSegmentText(){
+        return $this->segmentText;
+    }
+    /**
+     * 
+     * @return string
+     */
+    public function getField(){
+        return $this->field;
+    }
     /**
      *
      * @param editor_Segment_InternalTag $tag

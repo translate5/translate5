@@ -205,8 +205,10 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
      * @return boolean
      */
     public function canContain(editor_Segment_InternalTag $tag){
-        if($this->startIndex <= $tag->startIndex && $this->endIndex >= $tag->endIndex){
-            return true;
+        if(!$this->isSingular()){
+            if($this->startIndex <= $tag->startIndex && $this->endIndex >= $tag->endIndex){
+                return true;
+            }
         }
         return false;
     }
