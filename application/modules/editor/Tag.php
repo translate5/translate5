@@ -34,7 +34,9 @@
 
 /**
  * represents a HTML-Tag as PHP-Object
- * Expects all string values to be UTF-8
+ * It in some kinds is a simpler & easier seriazable version of DOMElement
+ * The classname-attribute has an own datamodel that resembles it's array nature
+ * Expects all string values to be UTF-8 encoded
  */
 class editor_Tag {
    

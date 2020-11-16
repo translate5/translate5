@@ -32,7 +32,10 @@
  END LICENSE AND COPYRIGHT
  */
 
-
+/**
+ * This API creates the types of Internal tags either fromn a DOMElement or JSON serialization
+ * WORK IN PROGRESS
+ */
 class editor_Segment_TagCreator {
     
     /**

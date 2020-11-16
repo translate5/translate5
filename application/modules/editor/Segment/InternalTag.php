@@ -34,8 +34,10 @@
 
 /**
  * Abstraction for an Internal tag as used in the segment text's
- * This adds serialization-capabilities but keep in mind that the serialization will not take the children (nested structures) into account
- * Keep in mind that start & end-index work just like counting chars in php, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
+ * This adds serialization/unserialization-capabilities (JSON), cloning capabilities and the general managability of internal tags
+ * Generally internal tags must be used with start & end indice relative to the segment texts.
+ * Keep in mind that start & end-index work just like counting chars or the substr API in php, the tag starts BEFORE the start index and ends BEFORE the index of the end index, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
+ * To identify the Types of Internal tags a general API editor_Segment_TagCreator is provided
  * 
  * @method editor_Segment_InternalTag clone(boolean $withDataAttribs)
  * @method editor_Segment_InternalTag createBaseClone()

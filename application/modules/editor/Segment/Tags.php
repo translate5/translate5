@@ -35,6 +35,14 @@
 /**
  * Holds a segment and the internal tags as objects and provide to render this structure or to recreate it from the rendered markup
  */
+/**
+ * Abstraction to bundle the segment's text and it's internal tags
+ * The structure of the tags in this class is a simple sequence, any nesting / interleaving ic covered with rendering / unparsing
+ * The rendering will take care about interleaving and nested tags and may part a tag into chunks
+ * When Markup is unserialized multiple chunks in a row of an internal tag will be joined to a single tag and the structure will be re-sequencialized
+ * Keep in mind that start & end-index work just like counting chars or the substr API in php, the tag starts BEFORE the start index and ends BEFORE the index of the end index, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
+ * To identify the Types of Internal tags a general API editor_Segment_TagCreator is provided
+ */
 class editor_Segment_Tags implements JsonSerializable {
         
     /**

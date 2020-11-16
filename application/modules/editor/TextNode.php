@@ -34,7 +34,7 @@
 
 /**
  * represents a HTML TextNode as PHP-Object
- * A text node has an empty Node-name
+ * A text node has an empty Node-name and will render only it's text content
  * 
  * @method editor_TextNode clone(boolean $withDataAttribs)
  * @method editor_TextNode createBaseClone()

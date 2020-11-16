@@ -33,8 +33,8 @@
  */
 
 /**
- * Abstraction for an Internal tag of variable type
- * The main use for this class is testing !
+ * Abstraction for an Internal tag of variable type. This usually covers Tags, that are no real internal tags or even markup of other source
+ * The main use for this class is for testing purposes
  * 
  * @method editor_Segment_AnyInternalTag clone(boolean $withDataAttribs)
  * @method editor_Segment_AnyInternalTag createBaseClone()
