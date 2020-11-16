@@ -668,7 +668,7 @@ class editor_Tag {
         return editor_Tag::create($this->getName());
     }
     /**
-     * Helper clone our properties
+     * Helper clone our properties. Does not clone the ID
      * @param editor_Tag $tag
      * @param boolean $withDataAttribs
      * @return editor_Tag
@@ -676,7 +676,7 @@ class editor_Tag {
     protected function cloneProps(editor_Tag $tag, $withDataAttribs=false){
         $tag->setClasses($this->getClasses());
         foreach($this->attribs as $name => $val){
-            if($withDataAttribs || substr($name, 0, 5) != 'data-'){
+            if(($withDataAttribs || substr($name, 0, 5) != 'data-') && $name != 'id'){
                 $tag->setAttribute($name, $val);
             }
         }
