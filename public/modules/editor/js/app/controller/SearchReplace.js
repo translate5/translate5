@@ -250,14 +250,7 @@ Ext.define('Editor.controller.SearchReplace', {
      * @param {Editor.view.segments.HtmlEditor} editor
      */
     initEditor: function(editor) {
-        var me = this;
-        Ext.util.CSS.createStyleSheetToWindow(
-            editor.getDoc(),
-            '.searchreplace-active-match {background-color: rgb(255, 0, 0) !important;}'+
-            '.searchreplace-hide-element {display: none !important;}'//this class exist also in t5 main css. It is used also by the segment grid
-        );
-
-        me.editor = editor;
+        this.editor = editor;
     },
 
     /**

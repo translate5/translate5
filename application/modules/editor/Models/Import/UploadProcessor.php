@@ -42,6 +42,12 @@ class editor_Models_Import_UploadProcessor {
     const ERROR_EMPTY_FILE = 'emptyUploadFile';
 
     /**
+     * Is set to true if there are some unknown upload errors (mostly POST size exceed ini size, which must be handled by the admin)
+     * @var boolean
+     */
+    protected $hasUnknownErrors = false;
+    
+    /**
      * container for upload errors
      * @var array
      */
@@ -155,7 +161,8 @@ class editor_Models_Import_UploadProcessor {
                 $msg = $msg ?? 'Die ausgewählte Datei war leer!';
                 break;
             default:
-                $msg = 'Unbekannter Fehler beim Dateiupload.';
+                $this->hasUnknownErrors = true;
+                $msg = $errorType;
                 break;
         }
         $this->uploadErrors[$fileField][$errorType] = $msg;
@@ -169,7 +176,12 @@ class editor_Models_Import_UploadProcessor {
         if(empty($this->uploadErrors)) {
             return;
         }
-        throw ZfExtended_FileUploadException::createResponse('E1026', $this->uploadErrors, $extraData);
+        $e = ZfExtended_FileUploadException::createResponse('E1026', $this->uploadErrors, $extraData);
+        if($this->hasUnknownErrors) {
+            //in this case the admin must be informed
+            Zend_Registry::get('logger')->exception($e,['level' => ZfExtended_Logger::LEVEL_ERROR]);
+        }
+        throw $e;
     }
 
 }

@@ -246,5 +246,12 @@ $dep->dependencies = [[
     ]
 ];
 
+$dep->post_install_copy = [
+    "vendor/fortawesome/font-awesome/css" => "public/modules/editor/fontawesome/css",
+    "vendor/fortawesome/font-awesome/js" => "public/modules/editor/fontawesome/js",
+    "vendor/fortawesome/font-awesome/webfonts" => "public/modules/editor/fontawesome/webfonts",
+    "vendor/fortawesome/font-awesome/LICENSE.txt" => "public/modules/editor/fontawesome/LICENSE.txt"
+];
+
 $dep = json_encode($dep, JSON_PRETTY_PRINT);
 file_put_contents('dependencies.json', $dep);
