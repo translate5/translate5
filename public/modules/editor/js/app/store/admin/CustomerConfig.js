@@ -26,10 +26,29 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.config.MapFieldViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.adminTaskMapField',
-    data: {
-        configValue: null
+Ext.define('Editor.store.admin.CustomerConfig', {
+    extend : 'Editor.store.admin.Config',
+    model: 'Editor.model.CustomerConfig',
+    alias: 'store.customerConfig',
+    autoLoad: false,
+    remoteFilter: false,
+    remoteSort: false,
+    pageSize: 0,
+    
+    /***
+     * Load customer specific config for given customer id
+     */
+    loadByCustomerId:function(curentCustomerId,callback){
+        if(!curentCustomerId || curentCustomerId < 1){
+            return;
+        }
+        var me=this,
+            proxy = me.getProxy(),
+            existing = proxy.getExtraParams(),
+            merged = Ext.Object.merge(existing, {
+                customerId : curentCustomerId
+            });
+        proxy.setExtraParams(merged);
+        me.load(callback);
     }
 });

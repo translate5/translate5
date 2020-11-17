@@ -50,15 +50,20 @@ Ext.define('Editor.view.segments.MetaPanel', {
 
     layout: 'auto',
     
+    strings:{
+        item_metaQm_title: '#UT#QM',
+    },
     //Item Strings:
-    item_metaQm_title: '#UT#QM',
     item_metaStates_title: '#UT#Status',
     item_metaTerms_title: '#UT#Terminologie',
     item_metaStates_tooltip: '#UT#Segment auf den ausgewählten Status setzen (ALT + S danach {0})',
     item_metaStates_tooltip_nokey: '#UT#Segment auf den ausgewählten Status setzen',
     
     initComponent: function() {
-      var me = this;
+      var me = this,
+          showStatus = Editor.app.getTaskConfig('segments.showStatus'),
+          showQM = Editor.app.getTaskConfig('segments.showQM');
+          
       Ext.applyIf(me, {
         items: [
           {
@@ -92,8 +97,8 @@ Ext.define('Editor.view.segments.MetaPanel', {
                 itemId: 'metaQm',
                 defaultType: 'radio',
                 collapsible: true,
-                hideable: Editor.data.segments.showQM, 
-                hidden:  !Editor.data.segments.showQM,
+                hideable: showQM, 
+                hidden:  !showQM,
                 title: me.item_metaQm_title
               },
               {
@@ -101,8 +106,8 @@ Ext.define('Editor.view.segments.MetaPanel', {
                 itemId: 'metaStates',
                 collapsible: true,
                 defaultType: 'radio',
-                hideable: Editor.data.segments.showStatus, 
-                hidden:  !Editor.data.segments.showStatus,
+                hideable: showStatus, 
+                hidden:  !showStatus,
                 title: me.item_metaStates_title
               }
             ]
@@ -114,24 +119,13 @@ Ext.define('Editor.view.segments.MetaPanel', {
       me.addQualityFlags();
       me.addStateFlags();
     },
-    initConfig: function(instanceConfig) {
-        var me = this,
-            config = {
-                title: me.title //see EXT6UPD-9
-            };
-        
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
-        }
-        return me.callParent([config]);
-    },
     /**
      * Fügt anhand der php2js Daten die Status Felder hinzu
      */
     addStateFlags: function() {
       var me = this,
           stati = me.down('#metaStates'),
-          flags = Editor.data.task.getTaskConfigValue('segments.stateFlags'),
+          flags = Editor.app.getTaskConfig('segments.stateFlags'),
           counter = 1;
       
       Ext.Object.each(flags, function(key,value){

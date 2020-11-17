@@ -78,7 +78,9 @@ Ext.define('Editor.view.admin.customer.Panel', {
         openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.',
         anonymizeUsers:'#UT#User anonymisieren?',
         defaultRolesGroupLabelTooltip: '#UT#Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.',
-        serverRolesGroupLabelTooltip: '#UT#Systemrollen, die der OpenID-Server in translate5 festlegen darf.'
+        serverRolesGroupLabelTooltip: '#UT#Systemrollen, die der OpenID-Server in translate5 festlegen darf.',
+        propertiesTabPanelTitle: '#UT#Eigenschaften',
+        configTabTitle:'#UT#Systemstandardkonfiguration überschreiben'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -214,10 +216,9 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 fieldDefaults: {
                                     anchor: '1'
                                 },
-                                title:me.strings.editCustomerTitle,
+                                title:me.strings.propertiesTabPanelTitle,
                                 bind: {
-                                    disabled: '{!record}',
-                                    title: '{title}'
+                                    disabled: '{!record}'
                                 },
                                 items: [
                                     {
@@ -440,10 +441,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 ]
                             },{
                                 xtype: 'adminConfigGrid',
-                                store:{
-                                    model:'Editor.model.CustomerConfig',
-                                    autoLoad:false,//it will be loaded when extraParam is set
-                                },
+                                store:'admin.CustomerConfig',
+                                title:me.strings.configTabTitle,
                                 bind: {
                                     disabled: '{!record}',
                                     extraParams:{

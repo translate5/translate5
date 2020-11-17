@@ -41,9 +41,6 @@ Ext.define('Editor.controller.Preferences', {
   extend : 'Ext.app.Controller',
   views: ['preferences.Window'],
   storageKey: 'EditorPreferences',
-  initialPreferences: {
-    alikeBehaviour: Editor.data.preferences.alikeBehaviour
-  },
   messages: {
     preferencesSaved: '#UT#Einstellungen für diese Sitzung gespeichert!'
   },
@@ -68,17 +65,6 @@ Ext.define('Editor.controller.Preferences', {
           }
       }
   },
-  init : function() {
-    var alike = Editor.data.preferences.alikeBehaviour,
-        emptyTarget = Editor.data.preferences.showOnEmptyTarget;
-    if(!alike.isModel) {
-        Editor.data.preferences.alikeBehaviour = Editor.model.UserConfig.create(alike);
-    }
-    if(!emptyTarget.isModel) {
-        Editor.data.preferences.showOnEmptyTarget = Editor.model.UserConfig.create(emptyTarget);
-    }
-
-  },
   /**
    * zeigt das Preferences Fenster an
    */
@@ -89,8 +75,8 @@ Ext.define('Editor.controller.Preferences', {
       //TODO if there will be more preferences, we should refactor that, so that we can loop over form.getValues and instead of 
       // Editor.data.preferences a preferences store is used.
       me.getForm().getForm().setValues({
-          alikeBehaviour: Editor.data.preferences.alikeBehaviour.get('value'),
-          showOnEmptyTarget: Editor.data.preferences.showOnEmptyTarget.get('value')
+          alikeBehaviour: Editor.app.getUserConfig('alike.defaultBehaviour'),
+          showOnEmptyTarget: Editor.app.getUserConfig('alike.showOnEmptyTarget')
       });
       //disable change alike settings if a segment is currently opened. 
       // If not a user would be able to change the change alike behaviour, 
@@ -107,8 +93,8 @@ Ext.define('Editor.controller.Preferences', {
   handleSave: function() {
     var me = this,
         values = this.getForm().getForm().getValues(),
-        alike = Editor.data.preferences.alikeBehaviour,
-        emptyTarget = Editor.data.preferences.showOnEmptyTarget;
+        alike = Editor.app.getUserConfig('alike.defaultBehaviour',true),
+        emptyTarget = Editor.app.getUserConfig('alike.showOnEmptyTarget',true);
     alike.set('value', values.alikeBehaviour);
     emptyTarget.set('value', values.showOnEmptyTarget);
     emptyTarget.save({

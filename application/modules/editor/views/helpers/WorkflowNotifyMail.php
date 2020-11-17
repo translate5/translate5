@@ -46,13 +46,14 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
      * @return string
      */
     public function renderUserList(array $users) {
-        $notifyConfig = Zend_Registry::get('config')->runtimeOptions->editor->notification;
+        // anonymize users?
+        $task = $this->view->task;
+        
+        $notifyConfig = $task->getConfig()->runtimeOptions->editor->notification;
         $columns = $notifyConfig->userListColumns->toArray();
         
         $receiverLocale=$this->view->receiver->locale ?? null;
         
-        // anonymize users?
-        $task = $this->view->task;
         /* @var $task editor_Models_Task */
         $taskGuid = $task->getTaskGuid();
         if ($task->anonymizeUsers(false)) { 

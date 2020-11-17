@@ -28,11 +28,15 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.model.Config', {
   extend: 'Ext.data.Model',
+  CONFIG_LEVEL_INSTANCE : 2,//TODO: if other needed, define the constant on backend
   fields: [
     {name: 'id', type: 'int'},
+    {name: 'isReadOnly', type: 'bool',defaultValue: false},//TODO: readonly validator
     {name: 'name', type: 'string'},
+    {name: 'guiName', type: 'string'},
     {
-      name: 'value', 
+      name: 'value',
+      critical: true,
       convert: function(value, record) {
         if(value === "") {
             return null;
@@ -56,7 +60,7 @@ Ext.define('Editor.model.Config', {
             return Ext.JSON.decode(value);
           case 'string':
           case 'absolutepath':
-          default: 
+          default:
             return value;
         }
       },
@@ -79,19 +83,15 @@ Ext.define('Editor.model.Config', {
         name:'defaults',
         type:'string',
         convert:function(value,record){
-            if(value === "") {
+            if(value == undefined ){
+                return "";
+            }
+            if(value === "" || value == null) {
                 //this is only default for list and string (it is used for store bind value -> it must be array)
                 return [];
             }
-            switch(record.data.type) {
-            case 'list':
-                if(Ext.isArray(value) || Ext.isObject(value)) {
-                    return value;
-                }
-                return Ext.JSON.decode(value);
-            case 'string':
-                return value.split(',');
-            }
+            //the values are comma separated
+            return value.split(',');
         }
     }
   ],

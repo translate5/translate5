@@ -26,20 +26,33 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.config.EditorViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.adminConfigEditor',
-    data: {
-        record: null
-    },
+Ext.define('Editor.store.admin.Config', {
+    extend : 'Ext.data.Store',
+    model: 'Editor.model.Config',
+    alias: 'store.config',
+    autoLoad: false,
+    remoteFilter: false,
+    remoteSort: false,
+    pageSize: 0,
+    sorters: ['guiGroup', 'guiName'],
+    groupField: 'guiGroup',
     
-    formulas: {
-        configHasDefaults:function(get){
-            var rec = get('record');
-            if(!rec){
-                return false;
-            }
-            return rec.get('defaults') && rec.get('defaults').length>0;
+    /***
+     * Search for config value by given name
+     */
+    getConfig:function(name){
+        var me=this,
+          pos = me.findExact('name','runtimeOptions.'+name),//TODO: get me from const
+          row;
+        
+        if (pos < 0) {
+            return null;
         }
+        row = me.getAt(pos);
+        //Convert the map types to object (this is not done by the model instance). 
+        if(row.get('type') == 'map'){
+            return Ext.JSON.decode(row.get('value'));
+        }
+        return row.get('value');
     }
 });

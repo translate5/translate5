@@ -26,35 +26,29 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.config.EditorViewController', {
-    extend: 'Ext.app.ViewController',
-    alias: 'controller.adminConfigEditor',
+Ext.define('Editor.store.admin.task.Config', {
+    extend : 'Editor.store.admin.Config',
+    model: 'Editor.model.TaskConfig',
+    alias: 'store.taskConfig',
+    autoLoad: false,
+    remoteFilter: false,
+    remoteSort: false,
+    pageSize: 0,
     
-    listen:{
-        component:{
-            '#saveConfigBtn':{
-                click:'onSaveConfigBtnClick'
-            },
-            '#cancelConfigBtn':{
-                click:'onCancelConfigBtnClick'
-            }
+    /***
+     * Load task data for given task guid
+     */
+    loadByTaskGuid:function(curentTaskGuid,callback){
+        if(!curentTaskGuid || curentTaskGuid == ""){
+            return;
         }
-    },
-    
-    onSaveConfigBtnClick:function(){
         var me=this,
-            record = me.getViewModel().get('record');
-
-        record.save();
-        //TODO: it should be defined on record level
-//        record.save({
-//                params:{taskGuid : record.get('taskGuid')
-//            }
-//        });
-    },
-    
-    onCancelConfigBtnClick:function(){
-        var me=this;
-        me.getView().destroy();
+            proxy = me.getProxy(),
+            existing = proxy.getExtraParams(),
+            merged = Ext.Object.merge(existing, {
+                taskGuid : curentTaskGuid
+            });
+        proxy.setExtraParams(merged);
+        me.load(callback);
     }
 });
