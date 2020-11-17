@@ -3581,9 +3581,9 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Sonderzeichen hinzufügen:</source>
     <target>Add special characters:</target>
 </trans-unit>
-<trans-unit id='U3DDpHRlciB3ZWl0ZXIgYXJiZWl0ZW4='>
-	<source>Später weiter arbeiten</source>
-	<target>Continue task later</target>
+<trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZW7DvGJlcnNpY2h0'>
+    <source>Zurück zur Aufgabenübersicht</source>
+    <target>Back to task list</target>
 </trans-unit>
 <trans-unit id='QWxsZXMgZmVydGlnIC0gQXVmZ2FiZSBhYnNjaGxpZcOfZW4='>
 	<source>Alles fertig - Aufgabe abschließen</source>
