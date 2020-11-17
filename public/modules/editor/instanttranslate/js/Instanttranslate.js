@@ -258,29 +258,33 @@ function setTargetFirstAvailable(sourceRfc){
 function getLocalesAccordingToReference (accordingTo, selectedLocale) {
     var localesAvailable = [],
         languageResourceId,
-        languageResourceToCheck,
-        languageResourceToCheckAllSources,
-        languageResourceToCheckAllTargets,
-        languageResourceLocaleSet,
-        languageResourceAllLocalesToAdd;
+        toCheck,
+        langSet,
+        useSub = Editor.data.instanttranslate.showSublanguages,
+        allToAdd;
+
     for (languageResourceId in Editor.data.apps.instanttranslate.allLanguageResources) {
-        if (Editor.data.apps.instanttranslate.allLanguageResources.hasOwnProperty(languageResourceId)) {
-            languageResourceToCheck = Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId];
-            languageResourceToCheckAllSources = languageResourceToCheck.source;
-            languageResourceToCheckAllTargets = languageResourceToCheck.target;
-            languageResourceLocaleSet = (accordingTo === 'accordingToSourceLocale') ? languageResourceToCheckAllSources : languageResourceToCheckAllTargets;
-            if (isAvailableLocale(selectedLocale, languageResourceLocaleSet)) {
-                languageResourceAllLocalesToAdd = (accordingTo === 'accordingToSourceLocale') ? languageResourceToCheckAllTargets : languageResourceToCheckAllSources;
-                $.each(languageResourceAllLocalesToAdd, function(index, languageResourceLocaleToAdd) {
-                    // TermCollections can translate in all combinations of their source- and target-languages,
-                    // but not from the source to the SAME target-language.
-                    if (languageResourceLocaleToAdd != selectedLocale
-                        && $.inArray(languageResourceLocaleToAdd, localesAvailable) === -1) {
-                            localesAvailable.push(languageResourceLocaleToAdd);
-                    }
-                });
-            }
+        if (! Editor.data.apps.instanttranslate.allLanguageResources.hasOwnProperty(languageResourceId)) {
+            continue;
         }
+        toCheck = Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId];
+        langSet = (accordingTo === 'accordingToSourceLocale') ? toCheck.source : toCheck.target;
+        if (!isAvailableLocale(selectedLocale, langSet)) {
+            continue;
+        }
+        allToAdd = (accordingTo === 'accordingToSourceLocale') ? toCheck.target : toCheck.source;
+        $.each(allToAdd, function(index, toAdd) {
+            // TermCollections can translate in all combinations of their source- and target-languages,
+            // but not from the source to the SAME target-language.
+            var isSame = toAdd == selectedLocale,
+                //prevent duplicates
+                notAdded = ($.inArray(toAdd, localesAvailable) === -1);
+            
+            //respect showSublanguages config too
+            if (!isSame && notAdded && (useSub || !/-/.test(toAdd))) {
+                localesAvailable.push(toAdd);
+            }
+        });
     }
     localesAvailable.sort();
     return localesAvailable;
