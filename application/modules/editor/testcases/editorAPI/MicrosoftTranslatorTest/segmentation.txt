@@ -1,0 +1,4 @@
+{
+    "translationForSegmentedText": "Against the background of the concept of free software. Directs MittagQI's development. From translate5 as a community-based open source translation system.",
+    "usedResources": "API Testing::MicrosoftTranslatorTest (Microsoft)"
+}

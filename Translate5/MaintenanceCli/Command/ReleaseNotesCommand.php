@@ -332,6 +332,7 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
         
         $version = str_replace(['translate5 - ', ' '], ['', '-'], $this->releaseVersion->name).'-'.date('Y-m-d', time());
         $filename = APPLICATION_ROOT.'/application/modules/editor/database/sql-changelog-'.$version.'.sql';
+        $this->io->success('Created SQL changelog file '.$filename);
         file_put_contents($filename, $sql);
     }
     
@@ -383,6 +384,7 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
             $this->io->warning('Check the changelog! A version '.$version.' does exist already!');
         }
         $lastPos = mb_strpos($content, "\n## [");
+        $this->io->success('Updated changelog file '.$filename);
         file_put_contents($filename, substr_replace($content, $md, $lastPos, 0));
     }
     
