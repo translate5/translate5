@@ -334,18 +334,6 @@ Ext.define('Editor.model.admin.Task', {
       return this.get('taskName');
   },
   
-  getTaskConfigValue:function(name){
-      var store = this.taskConfig(),
-        pos = store.findExact('name','runtimeOptions.'+name),//TODO: get me from const
-        row;
-      
-      if (pos < 0) {
-          return null;
-      }
-      row = store.getAt(pos);
-      return row.get('value');
-  },
-  
   /**
    * @todo improve workflow handling in Javascript, => adapt the php workflow in js, a class with same methods (like getNextStep step2Role etc)
    * actually all workflow information is encapsulated in frontendRights (thats OK) 

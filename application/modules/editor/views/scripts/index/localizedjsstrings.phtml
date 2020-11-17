@@ -243,10 +243,8 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.fileorder.ReferenceTree.prototype.title = '<?php echo $this->translate->_('Referenz-Dateien');?>';
 
   	Editor.view.preferences.Window.prototype.title = '<?php echo $this->translate->_('Einstellungen');?>';
-  	<?php
-        if($config->runtimeOptions->editor->enableQmSubSegments){
-        ?>
-        Editor.view.qmsubsegments.Window.prototype.title = '<?php echo $this->translate->_('MQM Statistik');?>';
+    
+    Editor.view.qmsubsegments.Window.prototype.title = '<?php echo $this->translate->_('MQM Statistik');?>';
   	Editor.view.qmsubsegments.Window.prototype.tab_title_field = '<?php echo $this->translate->_('In Feld: {0}');?>';
   	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_text = '<?php echo $this->translate->_('Fehlertyp');?>';
   	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_totalTotal = '<?php echo $this->translate->_('Gesamt');?>';
@@ -262,7 +260,6 @@ Ext.define('Editor.controller.Localizer', {
     	buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
     	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
     };
-    <?php } ?>
     
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';
@@ -834,19 +831,38 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.task.PreferencesWindow",
         strings: {
             close: '<?php echo $this->translate->_('Fenster schließen');?>',
-            events: '<?php echo $this->translate->_('Ereignisse');?>'
+            events: '<?php echo $this->translate->_('Ereignisse');?>',
+            config: '<?php echo $this->translate->_('Kundenstandardkonfiguration überschreiben');?>'
         }
     });
     
-    
     Ext.define("Editor.locale.de.view.admin.config.Grid", {
         override: "Editor.view.admin.config.Grid",
-        title:"<?php echo $this->translate->_('Konfig überschreiben');?>",
         strings: {
+            title:'<?php echo $this->translate->_('Konfig überschreiben');?>',
             id: '<?php echo $this->translate->_('Id');?>',
+            guiName: '<?php echo $this->translate->_('Kurzer Name');?>',
             name: '<?php echo $this->translate->_('Name');?>',
             value: '<?php echo $this->translate->_('Value');?>',
-            editRecordTooltip: '<?php echo $this->translate->_('Konfiguration bearbeiten');?>'
+            editRecordTooltip: '<?php echo $this->translate->_('Konfiguration bearbeiten');?>',
+            saveRecordTooltip: '<?php echo $this->translate->_('Speichern');?>',
+            description: '<?php echo $this->translate->_('Beschreibung');?>',
+            reloadBtn: '<?php echo $this->translate->_('Aktualisieren');?>',
+            overwriteOrigin: '<?php echo $this->translate->_('Auf ebene gesetzt');?>',
+            configActiveColumn: '<?php echo $this->translate->_('Aktiviert');?>',
+            configDeactiveColumn: '<?php echo $this->translate->_('Deaktiviert');?>',
+            updateConfigSuccessMessage: '<?php echo $this->translate->_('Konfiguration gespeichert');?>',
+            instanceConfigChangeMessageBoxText: '<?php echo $this->translate->_('Die Änderung wird beim nächsten Login wirksam.');?>',
+            collapseAll: '<?php echo $this->translate->_('Alles zuklappen');?>',
+            expandAll: '<?php echo $this->translate->_('Alles aufklappen');?>',
+            toolbarFilter: '<?php echo $this->translate->_('Suche');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.config.ConfigWizard", {
+        override: "Editor.view.admin.config.ConfigWizard",
+        strings: {
+            wizardTitle:'<?php echo $this->translate->_('Konfig überschreiben');?>',
         }
     });
     
@@ -1319,7 +1335,9 @@ Ext.define('Editor.controller.Localizer', {
             openIdRedirectCheckbox:'<?php echo $this->translate->_("Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.");?>',
             anonymizeUsers:'<?php echo $this->translate->_("User anonymisieren?");?>',
             defaultRolesGroupLabelTooltip:'<?php echo $this->translate->_("Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.");?>',
-            serverRolesGroupLabelTooltip:'<?php echo $this->translate->_("Systemrollen, die der OpenID-Server in translate5 festlegen darf.");?>'
+            serverRolesGroupLabelTooltip:'<?php echo $this->translate->_("Systemrollen, die der OpenID-Server in translate5 festlegen darf.");?>',
+            propertiesTabPanelTitle:'<?php echo $this->translate->_("Eigenschaften");?>',
+            configTabTitle:'<?php echo $this->translate->_("Systemstandardkonfiguration überschreiben");?>'
         }
     });
 

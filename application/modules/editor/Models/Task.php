@@ -136,6 +136,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
      */
     protected static $customerCache = [];
+    
+    /***
+     * Internal cache task config cache
+     * @var Zend_Config
+     */
+    protected static $taskCustomerConfig=[];
 
     protected $dbInstanceClass = 'editor_Models_Db_Task';
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
@@ -155,6 +161,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var string
      */
     protected $taskDataPath;
+
     
     /**
      * On cloning we need a new taskGuid and id
@@ -172,39 +179,38 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Returns a Zend_Config Object; if task specific settings exist, they are set now.
+     * This will load only the task specific configs. It will not load all other 
+     * system-wide configs.
      * @return Zend_Config
      */
     public function getConfig() {
-        // This is a temporary preparation for implementing TRANSLATE-471.
-        if (empty ($this->getCustomerId())) {
-            // Step 1a: start with systemwide config
-            $config = new Zend_Config(Zend_Registry::get('config')->toArray(), true);
+        if(empty($this->getTaskGuid())){
+            throw new editor_Models_ConfigException('E1297');
         }
-        else {
-            // Step 1b: anything customer-specific for this task?
-            $config = $this->_getCachedCustomer($this->getCustomerId())->getConfig();
+        if(isset(self::$taskCustomerConfig[$this->getTaskGuid()])){
+            return self::$taskCustomerConfig[$this->getTaskGuid()];
         }
-
-        $taskGuid = $this->getTaskGuid();
+        $configModel = ZfExtended_Factory::get('editor_Models_Config');
+        /* @var $configModel editor_Models_Config */
         
-        if($taskGuid!==null && $taskGuid!=""){
-            
-            $model = ZfExtended_Factory::get('editor_Models_Config');
-            /* @var $model editor_Models_Config */
-            $result = $model->mergeTaskValues($this->getTaskGuid());
-            
-            $configOperator = ZfExtended_Factory::get('ZfExtended_Resource_DbConfig');
-            /* @var $configOperator ZfExtended_Resource_DbConfig */
-            $configOperator->initDbOptionsTree($result);
-            
-            $taskConfig = new Zend_Config($configOperator->getDbOptionTree());
-            $config = $config->merge($taskConfig);
-        }
-        // Step 2: anything task-specific for this task?
-        // TODO...
-
-        $config->setReadOnly();
-        return $config;
+        //fetch all config from DB
+        $dbConfig = ZfExtended_Factory::get('ZfExtended_Models_Config');
+        /* @var $dbConfig ZfExtended_Models_Config */
+        $base = $dbConfig->loadAll();
+        //for merge set config name as array key
+        $base = $configModel->nameAsKey($base);
+        
+        //merge task overwrites with task customer overwrites
+        $result = $configModel->mergeTaskValues($this->getTaskGuid(),$base);
+        
+        $configOperator = ZfExtended_Factory::get('ZfExtended_Resource_DbConfig');
+        /* @var $configOperator ZfExtended_Resource_DbConfig */
+        $configOperator->initDbOptionsTree($result);
+        $taskConfig = new Zend_Config($configOperator->getDbOptionTree());
+        $taskConfig->setReadOnly();
+        //cache the config for this request
+        self::$taskCustomerConfig[$this->getTaskGuid()] = $taskConfig;
+        return self::$taskCustomerConfig[$this->getTaskGuid()];
     }
     
     /**

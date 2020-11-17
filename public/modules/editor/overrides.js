@@ -1334,4 +1334,3 @@ Ext.override(Ext.grid.filters.filter.Number, {
 Ext.override(Ext.grid.filters.filter.List, {
     updateBuffer:2000
 });
-

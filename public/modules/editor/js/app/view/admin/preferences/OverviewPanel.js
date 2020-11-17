@@ -30,7 +30,8 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
     extend: 'Ext.tab.Panel',
     requires: [
         'Editor.view.admin.preferences.OverviewPanelViewController',
-        'Editor.view.admin.preferences.User'
+        'Editor.view.admin.preferences.User',
+        'Editor.view.admin.config.Grid'
     ],
     alias: 'widget.preferencesOverviewPanel',
     itemId: 'preferencesOverviewPanel',
@@ -84,6 +85,14 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
         
         if(user.isAllowed('userPrefFrontendController')) {
             configSections.push({xtype: 'preferencesUser'});
+        }
+        
+        
+        //TODO: rights check
+        if(true || user.isAllowed('')) {
+            configSections.push({
+                xtype: 'adminConfigGrid'
+            });
         }
         
         /**

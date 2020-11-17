@@ -30,7 +30,16 @@ class editor_Models_ConfigException extends ZfExtended_ErrorCodeException {
      */
     protected $domain = 'configuration';
     
+    /**
+     * @var integer
+     */
+    protected $httpReturnCode = 422;
+    
     protected static $localErrorCodes = [
-        'E1292' => 'Not enough rights to modify config with level : {level}'
+        'E1292' => 'Not enough rights to modify config with level : {level}',
+        'E1296' => 'Unable to modify config {name}. The task is not in import state.',
+        'E1297'=> 'Unable to load task config. "taskGuid" is not set for this entity.',
+        'E1298'=> 'Unable to load task customer config. "customerId" not set for this entity.',
+        'E1299'=> 'Not allowed to load user config for different user.',
     ];
 }

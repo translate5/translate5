@@ -3905,6 +3905,18 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='U3VjaGUgaW0gWmllbHRleHQ='><source>Suche im Zieltext</source><target>Search in the target text</target></trans-unit>
 <trans-unit id='RsO8ciBqZWRlbiBTYXR6IHd1cmRlIGRhcyBiZXN0ZSB2ZXJmw7xnYmFyZSBUcmFuc2xhdGlvbi1NZW1vcnktTWF0Y2ggdmVyd2VuZGV0ICgxMDAlIG9kZXIgYmVzc2VyKS4gV2VubiBrZWluZSAxMDAlaWdlIMOcYmVyZWluc3RpbW11bmcgaW0gVHJhbnNsYXRpb24gTWVtb3J5IGdlZnVuZGVuIHd1cmRlLCB3aXJkIGRpZSBtYXNjaGluZWxsZSDDnGJlcnNldHp1bmcgdmVyd2VuZGV0Lg=='><source>Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet.</source><target>For each sentence the best available translation memory match has been used (100% or better). If not translation memory 100% match was found, machine translation is used.</target></trans-unit>
 <trans-unit id='S29uZmlndXJhdGlvbiBiZWFyYmVpdGVu'><source>Konfiguration bearbeiten</source><target>Edit configuration</target></trans-unit>
+<trans-unit id='S29uZmlnIMO8YmVyc2NocmVpYmVu'><source>Konfig überschreiben</source><target>Overwrite config</target></trans-unit>
+<trans-unit id='RGllIMOEbmRlcnVuZyB3aXJkIGJlaW0gbsOkY2hzdGVuIExvZ2luIHdpcmtzYW0u'><source>Die Änderung wird beim nächsten Login wirksam.</source><target>This change will take effect on next login.</target></trans-unit>
+<trans-unit id='QWxsZXMgenVrbGFwcGVu'><source>Alles zuklappen</source><target>Collapse all</target></trans-unit>
+<trans-unit id='QWxsZXMgYXVma2xhcHBlbg=='><source>Alles aufklappen</source><target>Expand all</target></trans-unit>
+<trans-unit id='S3VuZGVuc3RhbmRhcmRrb25maWd1cmF0aW9uIMO8YmVyc2NocmVpYmVu'><source>Kundenstandardkonfiguration überschreiben</source><target>Overwrite client default configuration</target></trans-unit>
+<trans-unit id='U3lzdGVtc3RhbmRhcmRrb25maWd1cmF0aW9uIMO8YmVyc2NocmVpYmVu'><source>Systemstandardkonfiguration überschreiben</source><target>Overwrite system default configuration</target></trans-unit>
+<trans-unit id='w5xiZXJzY2hyaWViZW4='><source>Überschrieben</source><target>Overwrite</target></trans-unit>
+<trans-unit id='QXVmIGViZW5lIGdlc2V0enQ='><source>Auf ebene gesetzt</source><target>Set on level</target></trans-unit>
+<trans-unit id='S3VyemVyIE5hbWU='><source>Kurzer Name</source><target>Short name</target></trans-unit>
+<trans-unit id='QWt0aXZpZXJ0'><source>Aktiviert</source><target>Activated</target></trans-unit>
+<trans-unit id='RGVha3RpdmllcnQ='><source>Deaktiviert</source><target>Disabled</target></trans-unit>
+<trans-unit id='UU0='><source>QM</source><target>QA</target></trans-unit>
 </body>
   </file>
 </xliff>

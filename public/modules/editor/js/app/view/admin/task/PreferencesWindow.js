@@ -43,7 +43,8 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     header:false,
     strings: {
         close: '#UT#Fenster schließen',
-        events: '#UT#Ereignisse'
+        events: '#UT#Ereignisse',
+        config : '#UT#Kundenstandardkonfiguration überschreiben'
     },
     layout: 'fit',
     viewModel: {
@@ -89,10 +90,8 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         //TODO: auth check->is alowed
         tabs.push({
             xtype: 'adminConfigGrid',
-            store:{
-                model:'Editor.model.TaskConfig',
-                autoLoad:false,//it will be loaded when extraParam is set
-            },
+            store:'admin.task.Config',
+            title:me.strings.config,
             bind:{
                 extraParams:{
                     taskGuid : '{projectTaskSelection.taskGuid}'

@@ -39,32 +39,61 @@ Ext.define('Editor.view.admin.config.Grid', {
     alias: 'widget.adminConfigGrid',
     itemId: 'adminConfigGrid',
     glyph: 'xf085@FontAwesome5FreeSolid',
-    title:'#UT#Konfig überschreiben',
-    store:{
-        model:'Editor.model.Config',
-        autoLoad:false
-    },
+    
+    store:'admin.Config',
     layout: {
         type: 'fit'
     },
+    selModel: 'cellmodel',
+    plugins: [
+        'gridfilters',
+        {
+            ptype: 'cellediting',
+            clicksToEdit: 1
+        }
+    ],
     strings: {
+        title:'#UT#Konfig überschreiben',
         id:'#UT#Value',
         name:'#UT#Name',
+        guiName:'#UT#Kurzer Name',
         value:'#UT#Value',
         editRecordTooltip:'#UT#Konfiguration bearbeiten',
+        saveRecordTooltip:'#UT#Speichern',
+        description:'#UT#Beschreibung',
+        reloadBtn: '#UT#Aktualisieren',
+        overwriteOrigin : '#UT#Auf ebene gesetzt',
+        configActiveColumn:'#UT#Aktiviert',
+        configDeactiveColumn:'#UT#Deaktiviert',
+        updateConfigSuccessMessage:'#UT#Konfiguration gespeichert',
+        instanceConfigChangeMessageBoxText:'#UT#Die Änderung wird beim nächsten Login wirksam.',
+        collapseAll:'#UT#Alles zuklappen',
+        expandAll:'#UT#Alles aufklappen',
+        toolbarFilter:'#UT#Suche'
     },
+    
     listeners:{
-        rowdblclick:'onRowDblClick'
+        edit:'onConfigEdit',
+        activate:'onGridActivate'
     },
+    
+    viewConfig : {
+        getRowClass: function (record) {
+            if(record.get('isReadOnly')){
+                return 'disabled-row';
+            }
+            return '';
+        },
+        listeners : {
+            groupexpand : 'onGroupExpand'
+        }
+    },
+    
     /***
      * Extra params property used for store proxy binding 
      * How to use:
      * {
             xtype: 'adminConfigGrid',
-            store:{
-                model:'Editor.model.TaskConfig',
-                autoLoad:false,//it will be loaded when extraParam is set
-            },
             bind:{
                 extraParams:{
                     taskGuid : '{projectTaskSelection.taskGuid}'
@@ -88,13 +117,13 @@ Ext.define('Editor.view.admin.config.Grid', {
         
         //check for empty values, and remove them. Loads for empty values is not required
         Ext.Object.each(newExtra, function(key, value, myself) {
-            if(!value || value === "" || value === undefined){
+            if(!value || value === "" || value == undefined){
                 delete newExtra[key]
             }
         });
         
         if(Ext.Object.getSize(newExtra) < 1){
-            this.getStore().removeAll();
+            this.getStore().removeAll(true);
             return;
         }
         
@@ -103,24 +132,44 @@ Ext.define('Editor.view.admin.config.Grid', {
             existing = store.getProxy().getExtraParams(),
             merged = Ext.Object.merge(existing, newExtra);
         store.getProxy().setExtraParams(merged);
-        store.setPageSize(0);//set the page size to 0, TODO: if pageing required remove me
-        store.load();
+        store.load({
+            callback:function(){
+                me.getController().onCollapseAll();
+            }
+        });
     },
     
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
+                title:me.strings.title,
+                features: [{
+                    ftype: 'grouping',
+                    startCollapsed: true,
+                    groupHeaderTpl: '{name} ({rows.length})'
+                }],
                 columns: [{
                     xtype: 'gridcolumn',
-                    width: 230,
                     dataIndex: 'id',
+                    hidden:true,
                     filter: {
                         type: 'number'
                     },
                     text: me.strings.id
                 },{
                     xtype: 'gridcolumn',
+                    width: 300,
+                    dataIndex: 'guiName',
+                    cellWrap: true,
+                    renderer: me.guiNameCellRenderer,
+                    filter: {
+                        type: 'string'
+                    },
+                    text: me.strings.guiName
+                },{
+                    xtype: 'gridcolumn',
                     width: 230,
+                    cellWrap: true,
                     dataIndex: 'name',
                     filter: {
                         type: 'string'
@@ -128,24 +177,174 @@ Ext.define('Editor.view.admin.config.Grid', {
                     text: me.strings.name
                 },{
                     xtype: 'gridcolumn',
-                    width: 230,
+                    width: 150,
                     dataIndex: 'value',
+                    getEditor:me.getEditorConfig,
+                    renderer:me.getValueRenderer,
+                    scope:me,
                     text: me.strings.value
                 },{
-                    xtype: 'actioncolumn',
-                    width: 30,
-                    sortable: false,
-                    menuDisabled: true,
+                    xtype: 'gridcolumn',
+                    hidden:true,
+                    width: 50,
+                    dataIndex: 'origin',
+                    text: me.strings.overwriteOrigin
+                }],
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'top',
                     items: [{
-                        glyph: 'xf044@FontAwesome5FreeSolid',
-                        tooltip: me.strings.editRecordTooltip,
-                        handler: 'onEditClick'
-                    }]
-                }] 
+                        xtype: 'button', 
+                        glyph: 'f2f1@FontAwesome5FreeSolid',
+                        handler:function(){
+                            me.getStore().reload();
+                        },
+                        text: me.strings.reloadBtn
+                    },{
+                        xtype: 'button', 
+                        glyph: 'f068@FontAwesome5FreeSolid',
+                        handler:'onCollapseAll',
+                        text: me.strings.collapseAll
+                    },{
+                        xtype: 'button', 
+                        glyph: 'f067@FontAwesome5FreeSolid',
+                        handler:'onExpandAll',
+                        text: me.strings.expandAll
+                    },me.strings.toolbarFilter,{
+                        xtype: 'textfield',
+                        name: 'searchField',
+                        itemId: 'searchField',
+                        hideLabel: true,
+                        width: 200
+                    }],
+                }]
             };
         if (instanceConfig) {
         	config=me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
-    }
+    },
+    
+    /***
+     * 
+     */
+    getEditorConfig:function(record){
+        var me=this,
+            hasDefaults = record.get('defaults').length>0,
+            config={
+                xtype: 'textfield',
+                name: 'value',
+                value:record.get('value')
+            };
+        if(record.get('isReadOnly') && record.get('isReadOnly')==true){
+            return false; 
+        }
+        switch(record.get('type')){
+            case 'int':
+            case 'integer':
+                config={
+                    xtype: 'numberfield',
+                    name: 'value',
+                    value:record.get('value'),
+                };
+                break;
+            case 'string':
+                if(hasDefaults){
+                    config={
+                        xtype: 'combo',
+                        name: 'value',
+                        store:record.get('defaults'),
+                        value:record.get('value'),
+                        queryMode: 'local',
+                        typeAhead: false
+                        //filterPickList: true
+                    };
+                }
+                break;
+            case 'boolean':
+            case 'bool':
+                config={
+                    xtype: 'combo',
+                    name: 'value',
+                    displayField: 'value',
+                    valueField: 'id',
+                    store:Ext.create('Ext.data.Store', {
+                        fields: ['id', 'value'],
+                        data : [
+                            {"id":"false", "value":me.up('grid').strings.configDeactiveColumn},
+                            {"id":"true", "value":me.up('grid').strings.configActiveColumn},
+                        ]
+                    }),
+                    value:record.get('value'),
+                    queryMode: 'local',
+                    typeAhead: false
+                    //filterPickList: true
+                };
+                break;
+            case 'list':
+                config={
+                  xtype: 'tagfield',
+                  name: 'value',
+                  store:hasDefaults ? record.get('defaults') : [],
+                  value:record.get('value'),
+                  typeAhead: true,
+                  queryMode: 'local',
+                  filterPickList: false,
+                  triggerOnClick: true,
+                  createNewOnBlur: !hasDefaults,
+                  createNewOnEnter: !hasDefaults,
+                  triggerAction: 'all',
+                  growMax: 150
+              };
+            break;
+        }
+        return Ext.create('Ext.grid.CellEditor', {
+            field:Ext.create(config),
+            completeOnEnter: false
+        });
+    },
+    
+    /***
+     * Grid value cell renderer
+     */
+    getValueRenderer:function (value, metaData, record) {
+        var me=this;
+        switch (record.get('type')) {
+            case 'boolean': // bool
+                if(value == true){
+                    return me.strings.configActiveColumn;
+                }
+                if(value == false){
+                    return me.strings.configDeactiveColumn;
+                }
+            break;
+            case 'map':
+                if(Ext.isObject(value)) {
+                    return Ext.JSON.encode(value);
+                }
+            break;
+        }
+        
+        return value;
+    },
+    
+    /***
+     * Cell renderer for the guiName cell.
+     */
+    guiNameCellRenderer:function(value, meta, record) {
+        
+        var html = ['<b>'];
+        html.push(value);
+        html.push('</b>');
+        html.push('</br>');
+        
+        var desc = record && record.get('description');
+        if(desc){
+            html.push('<i>');
+            html.push(desc);
+            html.push('</i>');
+            html.push('</br>');
+        }
+        return html.join("");
+    },
 });

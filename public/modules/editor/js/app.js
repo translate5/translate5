@@ -69,7 +69,7 @@ Ext.ClassManager.onCreated(function(className) {
 Ext.application({
     name : 'Editor',
     models : [ 'File', 'Segment', 'admin.User', 'admin.Task', 'segment.Field','Config','TaskConfig','CustomerConfig'],
-    stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages','UserConfig'],
+    stores : [ 'Files', 'ReferenceFiles', 'Segments', 'AlikeSegments', 'admin.Languages','UserConfig','admin.Config','admin.CustomerConfig','admin.task.Config'],
     requires: [
         'Editor.view.ViewPort',
         'Editor.view.ViewPortEditor',
@@ -103,6 +103,13 @@ Ext.application({
      * @event adminViewportOpened
      * Fires after the admin viewport was opened by the app (nothing to do with ext rendered or show).
      */
+    
+    /**
+     * @event editorConfigLoaded
+     * Fires after the task specific and customer specific config is loaded. After successful config load the editor viewport
+     * will be opened
+     */
+    
     //***********************************************************************************
     //End Events
     //***********************************************************************************
@@ -235,41 +242,47 @@ Ext.application({
             me.openTaskDirect();
             return;
         }
-        Editor.data.task = task;
-        Editor.model.Segment.redefine(task.segmentFields());
         
-        Editor.data.taskLanguages = {
-            source: languages.getById(task.get('sourceLang')),
-            relais: languages.getById(task.get('relaisLang')),
-            target: languages.getById(task.get('targetLang'))
-        }
-        
-        if(me.viewport){
-            //trigger closeEvent depending on which viewport was open
-            closeEvent = me.viewport.isEditorViewport ? 'editorViewportClosed' : 'adminViewportClosed';
-            me.viewport.destroy();
-            me.fireEvent(closeEvent);
-        }
-        else {
-            Ext.getBody().removeCls('loading');
-            Ext.select("body > div.loading").destroy();
-        }
-        task.initWorkflow();
-        me.getController('ViewModes').activate();
-        me.viewport = Ext.create(Editor.data.app.viewport, {
-            renderTo : Ext.getBody()
+        me.loadEditorConfigData(task,function(){
+            
+            me.fireEvent('editorConfigLoaded', me, task);
+            
+            Editor.data.task = task;
+            Editor.model.Segment.redefine(task.segmentFields());
+            
+            Editor.data.taskLanguages = {
+                source: languages.getById(task.get('sourceLang')),
+                relais: languages.getById(task.get('relaisLang')),
+                target: languages.getById(task.get('targetLang'))
+            }
+            
+            if(me.viewport){
+                //trigger closeEvent depending on which viewport was open
+                closeEvent = me.viewport.isEditorViewport ? 'editorViewportClosed' : 'adminViewportClosed';
+                me.viewport.destroy();
+                me.fireEvent(closeEvent);
+            }
+            else {
+                Ext.getBody().removeCls('loading');
+                Ext.select("body > div.loading").destroy();
+            }
+            task.initWorkflow();
+            me.getController('ViewModes').activate();
+            me.viewport = Ext.create(Editor.data.app.viewport, {
+                renderTo : Ext.getBody()
+            });
+            me.viewport.show();
+            //vp.doLayout();
+            //this.viewport.setLoading(true);
+            /*
+            - destroys all admin components, updates all editor stores. Inits the editor component if needed.
+            */
+            //enable logout split button
+            //disable logout normal Button
+            me.fireEvent('editorViewportOpened', me, task);
+            Ext.getDoc().dom.title = me.windowTitle + ' - ' + task.getTaskName(); 
+            me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
         });
-        me.viewport.show();
-        //vp.doLayout();
-        //this.viewport.setLoading(true);
-        /*
-        - destroys all admin components, updates all editor stores. Inits the editor component if needed.
-        */
-        //enable logout split button
-        //disable logout normal Button
-        me.fireEvent('editorViewportOpened', me, task);
-        Ext.getDoc().dom.title = me.windowTitle + ' - ' + task.getTaskName(); 
-        me.getController('Fileorder').loadFileTree();//@todo bei ITL muss der load wiederum automatisch geschehen
     },
     /**
      * Used to open a task directly without administration panel
@@ -368,7 +381,7 @@ Ext.application({
     },
     unmask: function() {
         //no "this" usage, so we can use this method directly as failure handler 
-        Editor.app.appMask.close();
+        Editor.app.appMask && Editor.app.appMask.close();
     },
     logout: function() {
         window.location = Editor.data.loginUrl;
@@ -460,5 +473,69 @@ Ext.application({
         //task edit route: task/:taskId/:segmentNrInTask/edit
         var h = window.location.hash.split('/');
         return (h && h.length==4) ? parseInt(h[2]) : -1;
+    },
+    
+    /***
+     * Load customer and task config store required for the editor.
+     */
+    loadEditorConfigData:function(task,callback){
+        //TODO: single store for all configs when task is opened ?
+        //how about if i send customerId and taskGuid, and this will merge on the backedn all in one result ?
+        var me=this,
+            taskConfigStore  = Ext.StoreManager.get('admin.task.Config'),
+            customerConfigStore = Ext.StoreManager.get('admin.CustomerConfig');
+        //load customer config store, then load the taskConfig store, and at the end open the task for editing
+        customerConfigStore.loadByCustomerId(task.get('customerId'),function(records, operation,success){
+            if(!success){
+                Editor.app.getController('ServerException').handleCallback(records, operation, false);
+                me.unmask();
+                return;
+            }
+            //fist load the task config, save the task state and open the editor
+            taskConfigStore.loadByTaskGuid(task.get('taskGuid'),function(records, operation, success){
+                me.unmask();
+                if(!success){
+                    Editor.app.getController('ServerException').handleCallback(records, operation, false);
+                    return;
+                }
+                callback();
+            });
+        });
+    },
+    
+    /***
+     * Return the task specific config value by given config name
+     */
+    getTaskConfig:function(configName){
+        return Ext.StoreManager.get('admin.task.Config').getConfig(configName);
+    },
+    
+    /***
+     * Return task customer specific config value by given config name
+     */
+    getTaskCustomerConfig:function(configName){
+        return Ext.StoreManager.get('admin.CustomerConfig').getConfig(configName);
+    },
+    
+    /***
+     * Get the user specific config by given config name.
+     * INFO: currently the user configs are loaded also in the state provider and with that,
+     * no need for separate user config store, just load the data from there.
+     * TODO: interface for saveing this config values ?
+     * 
+     * {Boolean} returnRecord : the record will be returned instead of the record value
+     */
+    getUserConfig:function(configName,returnRecord){
+        var store=Ext.state.Manager.getProvider().store,
+            pos = store.findExact('name', 'runtimeOptions.'+configName),
+            row;
+        if (pos < 0) {
+            return null;
+        }
+        row = store.getAt(pos);
+        if(returnRecord){
+            return row;
+        }
+        return row.get('value');
     }
 });
