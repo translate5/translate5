@@ -48,8 +48,8 @@ Ext.define('Editor.view.segments.grid.Header', {
     controller: 'segmentsHeader',
     strings: {
         progressTooltip:'#UT#% abgeschlossen durch zugewiesene Benutzer im aktuellen Workflowschritt',
-        leaveBtn: '#UT#Später weiter arbeiten',
-        leaveTaskWindowTitle:'#UT#Später weiter arbeiten',
+        leaveBtn: '#UT#Zurück zur Aufgabenübersicht',
+        leaveTaskWindowTitle:'#UT#Zurück zur Aufgabenübersicht',
         closeBtn: '#UT#Anwendung verlassen',
         leaveTaskWindowMessage:'#UT#Möchten Sie die Aufgabe beenden und zurücksenden, oder möchten Sie diese später weiterbearbeiten?',
         leaveTaskWindowFinishBtn:'#UT#Alles fertig - Aufgabe abschließen',
