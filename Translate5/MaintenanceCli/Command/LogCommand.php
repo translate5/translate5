@@ -419,7 +419,7 @@ the format is:
                 $token = array_shift($tokens);
                 continue;
             }
-            if(preg_match('/^[a-z0-9]\.[a-z0-9.]$/', $token)) {
+            if(preg_match('/^[a-z0-9]+\.[a-z0-9.]+$/', $token)) {
                 $domains[] = $token;
                 $token = array_shift($tokens);
                 continue;

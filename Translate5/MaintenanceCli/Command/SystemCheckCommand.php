@@ -56,7 +56,7 @@ class SystemCheckCommand extends Translate5AbstractCommand
             'pre-installation',
             null,
             InputOption::VALUE_NONE,
-            'In installation mode only the basic environment check is called and the Zend Application is not initialized');
+            'In installation mode only the basic environment check (or the given module) is called and the Zend Application is not initialized');
             
     }
 
@@ -74,7 +74,16 @@ class SystemCheckCommand extends Translate5AbstractCommand
         $isInstallation = $input->getOption('pre-installation');
         
         $this->initInputOutput($input, $output);
-        if(!$isInstallation) {
+        $module = $input->getArgument('module');
+        if($isInstallation) {
+            if(empty($module)) {
+                $this->io->title('Translate5 pre-installation check');
+            }
+            else {
+                $this->io->title('Translate5 installation check - module '.$module);
+            }
+        }
+        else {
             $this->initTranslate5();
             $this->writeTitle('Translate5 system health check');
         }
@@ -82,7 +91,7 @@ class SystemCheckCommand extends Translate5AbstractCommand
         $result = 0;
         $validator = new \ZfExtended_Models_SystemRequirement_Validator($isInstallation);
         /* @var $validator \ZfExtended_Models_SystemRequirement_Validator */
-        $results = $validator->validate();
+        $results = $validator->validate($module);
         foreach($results as $module => $oneResult) {
             /* @var $validator \ZfExtended_Models_SystemRequirement_Result */
             if($oneResult->hasError()) {
@@ -97,6 +106,7 @@ class SystemCheckCommand extends Translate5AbstractCommand
             $this->io->text(str_pad($oneResult->name, 30, ' ', STR_PAD_RIGHT).': '.$shortResult);
             if($oneResult->hasError()) {
                 $this->io->error($oneResult->error);
+                $result = 1; //on errors we return as failed
             }
             if($oneResult->hasWarning()) {
                 $this->io->warning($oneResult->warning);
