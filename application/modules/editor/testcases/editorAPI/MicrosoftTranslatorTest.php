@@ -41,8 +41,8 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
     /**
      */
     public static function setUpBeforeClass(): void {
-        //check if this test needs to be skiped.
-        if (self::isMasterTest()) {
+        //check if this test needs to be skipped.
+        if (!self::isMasterTest()) {
             self::markTestSkipped('Test runs only in master test to reduce usage/costs.');
             return;
         }
@@ -117,7 +117,7 @@ class MicrosoftTranslatorTest extends \ZfExtended_Test_ApiTestcase {
     }
     
     /***
-     * Filter only the required fields for the test 
+     * Filter only the required fields for the test
      * @param mixed $result
      * @return array
      */
