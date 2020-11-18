@@ -75,9 +75,18 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
             $this->view->rows = "[]";
             return;
         }
+        
+        //if the current request is for project, throw exception
+        if(is_array($data->targetLang) && count($data->targetLang)>1){
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1025' => 'Globalese pretranslation is not supported for project imports.'
+            ]);
+            throw new ZfExtended_UnprocessableEntity('E1025');
+        }
+        
         $connector = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Connector');
         $connector->setAuth($data->username,$data->apiKey);
-        
+
         /* @var $connector editor_Plugins_GlobalesePreTranslation_Connector */
         $engines = $connector->getEngines($data->sourceLang,$data->targetLang);
         

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -51,6 +51,20 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
     
     onAuthPanelBeforeRender:function(panel,eOpts){
         this.initFieldDefaultValues();
+    },
+    
+    /***
+     * On panel activate validate if the current import is project import.
+     */
+    onAuthPanelActivate:function(){
+        var me=this,
+            view=me.getView(),
+            window=view.up('window'),
+            targetLangValue=window.down('combo[name="targetLang[]"]').getValue();
+        //if the current import is project, skip the globalese pretranslation
+        if(targetLangValue.length > 1){
+            view.fireEvent('wizardCardFinished',2);
+        }
     },
 
     initFieldDefaultValues:function(){
@@ -97,18 +111,17 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             view=me.getView(),
             window=view.up('window'),
             sourceLangValue=window.down('combo[name="sourceLang"]').getValue(),
-            targetLangValue=window.down('combo[name="targetLang"]').getValue(),
+            targetLangValue=window.down('combo[name="targetLang[]"]').getValue(),
             apiusername=view.down('#apiUsername').getValue(),
             apipassword=view.down('#apiPassword').getValue(),
             globaleseEngine=window.down('#globaleseEngine'),
             globaleseGroup=window.down('#globaleseGroup'),
             url = Editor.data.restpath+'plugins_globalesepretranslation_globalese/engines',
-            params = {},
             paramsData = Ext.JSON.encode({
                 username: apiusername,
                 apiKey: apipassword,
                 sourceLang:sourceLangValue,
-                targetLang:targetLangValue
+                targetLang:targetLangValue[0]
             }),
             params = {data: paramsData};
         
@@ -122,23 +135,23 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
                     Editor.MessageBox.addInfo(me.strings.noEnginesFoundMsg, 1.4);
                 }
                 if(responsData.rows && responsData.rows.length<1){
-                	Editor.MessageBox.addInfo(me.strings.noEnginesForLanguageComboMsg, 1.4);
-                	globaleseEngine.setDisabled(true);
-                	globaleseGroup.setDisabled(true);
+                    Editor.MessageBox.addInfo(me.strings.noEnginesForLanguageComboMsg, 1.4);
+                    globaleseEngine.setDisabled(true);
+                    globaleseGroup.setDisabled(true);
                 }else{
-                	//engines exist, set the store from the loaded data
-                	var engines = Ext.create('Ext.data.Store', {
-                		fields: [
-                			{name: 'id', type: 'int'},
-                			{name: 'name',  type: 'string'},
-                			{name: 'group',  type: 'int'},
-                			{name: 'source',  type: 'string'},
-                			{name: 'target',  type: 'string'},
-                			{name: 'status',  type: 'string'},
-                			],
-                			data : responsData.rows
-                	});
-                	globaleseEngine.setStore(engines);
+                    //engines exist, set the store from the loaded data
+                    var engines = Ext.create('Ext.data.Store', {
+                        fields: [
+                            {name: 'id', type: 'int'},
+                            {name: 'name',  type: 'string'},
+                            {name: 'group',  type: 'int'},
+                            {name: 'source',  type: 'string'},
+                            {name: 'target',  type: 'string'},
+                            {name: 'status',  type: 'string'},
+                            ],
+                            data : responsData.rows
+                    });
+                    globaleseEngine.setStore(engines);
                 }
                 
                 view.fireEvent('wizardCardFinished');
@@ -162,17 +175,14 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             apiusername=view.down('#apiUsername').getValue(),
             apipassword=view.down('#apiPassword').getValue(),
             globaleseGroup=window.down('#globaleseGroup'),
-            url = Editor.data.restpath+'plugins_globalesepretranslation_globalese/groups';
-        
-            window.setLoading(me.strings.loadingWindowMessage);
-            
-            params = {},
+            url = Editor.data.restpath+'plugins_globalesepretranslation_globalese/groups',
             authData = Ext.JSON.encode({
                 username: apiusername,
                 apiKey: apipassword,
             }),
             params = {data: authData};
         
+        window.setLoading(me.strings.loadingWindowMessage);
         Ext.Ajax.request({
             url:url,
             method: 'GET',
@@ -205,19 +215,3 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
         });
     }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
