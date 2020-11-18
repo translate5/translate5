@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -313,9 +313,10 @@ class Models_Installer_Standalone {
         if(is_array($options) && isset($options['mysql_bin']) && $options['mysql_bin'] != self::MYSQL_BIN) {
             $this->dbCredentials['executable'] = $options['mysql_bin'];
         }
-        if(!is_array($options) || empty($options['db::username']) || empty($options['db::password']) || empty($options['db::database'])) {
+        if(!is_array($options) || empty($options['db::host']) || empty($options['db::username']) || empty($options['db::password']) || empty($options['db::database'])) {
             while(! $this->promptDbCredentials());
         } else {
+            $this->dbCredentials['host']     = $options['db::host'];
             $this->dbCredentials['username'] = $options['db::username'];
             $this->dbCredentials['password'] = $options['db::password'];
             $this->dbCredentials['database'] = $options['db::database'];
