@@ -74,7 +74,7 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         }
         $phpZone = date('P');
         if($mysqlZone == $phpZone) {
-            //return;
+            return;
         }
         $msg = 'Your DB timezone (GMT '.$mysqlZone.') and your PHP timezone (GMT '.$phpZone.') differ! Please ensure that PHP (apache and CLI) timezone is set correctly and the DBs timezone is the same!';
         $this->result->error[] = $msg;
