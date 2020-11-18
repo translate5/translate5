@@ -56,7 +56,7 @@ class SystemCheckCommand extends Translate5AbstractCommand
             'pre-installation',
             null,
             InputOption::VALUE_NONE,
-            'In installation mode only the basic environment check is called and the Zend Application is not initialized');
+            'In installation mode only the basic environment check (or the given module) is called and the Zend Application is not initialized');
             
     }
 
