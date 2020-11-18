@@ -49,7 +49,8 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth', {
     importType:'postimport',
     
     listeners: {
-        beforerender: 'onAuthPanelBeforeRender'
+        beforerender : 'onAuthPanelBeforeRender',
+        activate : 'onAuthPanelActivate'
     },
     
     strings:{
