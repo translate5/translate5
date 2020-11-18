@@ -120,8 +120,8 @@ class Models_Installer_Standalone {
         $saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
         $saInstaller->initApplication();
         $saInstaller->postInstallation();
-        $saInstaller->checkDb();
         $saInstaller->updateDb(); //this does also cache cleaning!
+        $saInstaller->checkDb();
         $saInstaller->done();
     }
     
@@ -257,23 +257,17 @@ class Models_Installer_Standalone {
     }
     
     protected function checkEnvironment() {
-        passthru('./translate5.sh --ansi system:check --pre-installation');
-/*
- * if we will be completly on translate5.sh then we could do the following inclusion.
- * But currently we would instance a double Zend App - here in Standalone and with below app call. There fore we do it with exec.
-        
         require_once $this->currentWorkingDir.'/vendor/autoload.php';
         $this->cli = new Symfony\Component\Console\Application();
+        $this->cli->setAutoExit(false);
         $this->cli->add(new Translate5\MaintenanceCli\Command\SystemCheckCommand());
         $input = new Symfony\Component\Console\Input\ArrayInput([
             'command' => 'system:check',
-//            // (optional) define the value of command arguments
-//            'fooArgument' => 'barValue',
-//            // (optional) pass options to the command
-//            '--message-limit' => $messages,
+            '--pre-installation' => null,
+            '--ansi' => null,
         ]);
         $this->cli->run($input);
-        */
+        $this->log('');
     }
     
     protected function checkMyselfForUpdates() {
@@ -321,8 +315,13 @@ class Models_Installer_Standalone {
             $this->dbCredentials['database'] = $options['db::database'];
         }
         
-        $this->initDb();
         $this->createInstallationIni();
+        if(! $this->checkDb()) {
+            unlink($this->currentWorkingDir.self::INSTALL_INI);
+            $this->log("\nFix the above errors and restart the installer! DB Config ".self::INSTALL_INI." was automatically removed therefore.\n");
+            exit;
+        }
+        $this->initDb();
         $this->promptHostname();
         $this->moveClientSpecific();
     }
@@ -564,11 +563,38 @@ class Models_Installer_Standalone {
         } else {
             $this->log("\nDB Config could NOT be stored in .".self::INSTALL_INI."!\n");
         }
+        
+        Zend_Registry::set('config', new Zend_Config([
+            'resources' => new Zend_Config([
+                'db' => new Zend_Config([
+                    'adapter' => "PDO_MYSQL",
+                    'isDefaultTableAdapter' => 1,
+                    'params' => new Zend_Config([
+                        'charset' => "utf8mb4",
+                        'host' => $this->dbCredentials['host'],
+                        'username' => $this->dbCredentials['username'],
+                        'password' => $this->dbCredentials['password'],
+                        'dbname' => $this->dbCredentials['database'],
+                    ])
+                ])
+            ])
+        ]));
+        
         return ($bytes > 0);
     }
     
-    protected function checkDb() {
-        $this->preconditonChecker->checkDb();
+    /**
+     * returns true if the DB is OK
+     * @return bool
+     */
+    protected function checkDb(): bool {
+        $input = new Symfony\Component\Console\Input\ArrayInput([
+            'command' => 'system:check',
+            'module' => 'database',
+            '--pre-installation' => null,
+            '--ansi' => null,
+        ]);
+        return $this->cli->run($input) === 0;
     }
     
     /**
