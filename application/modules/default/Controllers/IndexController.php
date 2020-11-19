@@ -47,7 +47,8 @@ class IndexController extends ZfExtended_Controllers_Action {
             exit;
         }
         
-        $this->redirect(APPLICATION_RUNDIR.'/editor');
+        //the redirect to the editor module is done in the view script.
+        // this default behaviour can then be overwritten in client-specific if needed
     }
     /**
      * Shows a simple info page to the user that IE 11 is not supported anymore
