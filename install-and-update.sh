@@ -26,6 +26,8 @@ case "$1" in
 "--announceMaintenance")  
             CONFIG=",'announceMaintenance' => '$2','announceMessage' => '$3'"
             ;;
+"--license-ignore")  CONFIG=",'license-ignore' => '1'"
+            ;;
 *)          CONFIG=",'applicationZipOverride' => '$1'"
             ;;
 esac
