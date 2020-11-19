@@ -27,7 +27,7 @@
 -- */
 UPDATE Zf_configuration SET
                  `default` = "[\"instantTranslate\",\"termCustomerSearch\"]",
-                 `defaults` = "",
+                 `defaults` = "instantTranslate,termCustomerSearch",
                  `guiName` = "IP-based authentication: Assigned roles",
                  `guiGroup` = "System setup: Authentication",
                  `level` = "2",

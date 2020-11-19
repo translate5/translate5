@@ -79,8 +79,16 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             $s->where('lower(name) NOT LIKE ?',strtolower($filter).'%');
         }
         $dbResults = $this->loadFilterdCustom($s);
-        //for merging we need the name as column key
-        return $this->nameAsKey($dbResults);
+        
+        
+        $dbResultsNamed = [];
+        //merge the ini with zfconfig values
+        $iniOptions = Zend_Registry::get('bootstrap')->getApplication()->getOptions();
+        foreach($dbResults as &$row) {
+            $this->mergeWithIni($iniOptions, explode('.', $row['name']), $row);
+            $dbResultsNamed[$row['name']] = $row;
+        }
+        return $dbResultsNamed;
     }
     /***
      * Load all zf configuration values merged with the user config values and installation.ini vaues. The user config value will
@@ -155,18 +163,18 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
         //when the task is not with state import, change for level task level import and task is allowed
-        $level = [self::CONFIG_LEVEL_TASK,self::CONFIG_LEVEL_TASK_IMPORT];
-        $isImportDisabled = false;
-        if($task->getState() != $task::STATE_IMPORT){
-            $isImportDisabled = true;
-        }
+        $isImportDisabled = $task->getState() != $task::STATE_IMPORT;
+        
         //load the task customer config as config base for this task
         //on customer level, we can override task specific config. With this, those overrides will be loaded
         //and used as base value in task config window
-        $customerBase = $this->mergeCustomerValues($task->getCustomerId(),$dbResults,$level);
+        //configs with customer level will be marked as readonly on the frontend
+        $customerBase = $this->mergeCustomerValues($task->getCustomerId(),$dbResults);
         array_walk($customerBase, function(&$r) use($taskGuid,$isImportDisabled){
             $r['taskGuid'] = $taskGuid;
-            $r['isReadOnly'] = $isImportDisabled && $r['level']==self::CONFIG_LEVEL_TASK_IMPORT;
+            //it is readonly when the config is inport config and the task is not in inport state
+            //or when the current config is custoler level config
+            $r['isReadOnly'] = ($isImportDisabled && $r['level']==self::CONFIG_LEVEL_TASK_IMPORT) || $r['level']==self::CONFIG_LEVEL_CUSTOMER;
         });
         $s = $this->db->select()
         ->setIntegrityCheck(false)
@@ -381,5 +389,17 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             $out[$row['name']] = $row;
         }
         return $out;
+    }
+    
+    /**
+     * Return map of level(int key) and translated level name
+     * @return array
+     */
+    public function getLabelMap() {
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+        return array_map(function($value) use ($translate) {
+            return $translate->_($value);
+        }, $this->configLabel);
     }
 }

@@ -26,15 +26,6 @@
 -- */
 
 UPDATE Zf_configuration SET
-                `default` = "{}",
-                `defaults` = "NULL",
-                `guiName` = "Add file extensions",
-                `guiGroup` = "File formats",
-                `level` = "4",
-                `description`  = "json object that adds file extensions to the okapi plug-in, that are not supported by default via okapi. Keys: Fileextention; Values: mime-type. Example: {\"js\":\"application/octet-stream\",\"anything\":\"application/octet-stream\"}",
-                `comment` = ""
-                WHERE `name` = "runtimeOptions.plugins.Okapi.customFileExtensions";
-UPDATE Zf_configuration SET
                 `default` = "",
                 `defaults` = "",
                 `guiName` = "Okapi longhorn URL",

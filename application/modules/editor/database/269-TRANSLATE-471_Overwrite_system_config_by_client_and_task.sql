@@ -60,6 +60,22 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
  INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
  VALUES ('editor', 'pm', 'applicationconfigLevel', 'taskImport');
  
+ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
+ VALUES ('editor', 'admin', 'applicationconfigLevel', 'customer');
+ 
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
+ VALUES ('editor', 'admin', 'applicationconfigLevel', 'task');
+ 
+ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
+ VALUES ('editor', 'admin', 'applicationconfigLevel', 'taskImport');
+ 
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
+VALUES ('editor', 'pm', 'frontend', 'configOverwriteGrid');
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
+VALUES ('editor', 'admin', 'frontend', 'configOverwriteGrid');
+ 
+ 
  -- remove the system right level acl. The system config should not be edited via frontend/api
  DELETE FROM `Zf_acl_rules` WHERE `resource`='applicationconfigLevel' AND `right`='system';
  
@@ -374,8 +390,10 @@ UPDATE Zf_configuration SET
                  `description`  = "The enclosure translate5 will expect to parse CSV files. If this is not present in the CSV, a CSV import will fail (Okapi bconf is not used for CSV iimport).",
                  `comment` = ""
                  WHERE `name` = "runtimeOptions.import.csv.enclosure";
+-- 
 UPDATE Zf_configuration SET
-                 `default` = "mid",
+                 `value` = "id",
+                 `default` = "id",
                  `defaults` = "",
                  `guiName` = "CSV import: Name of ID column",
                  `guiGroup` = "File formats",
@@ -384,7 +402,8 @@ UPDATE Zf_configuration SET
                  `comment` = ""
                  WHERE `name` = "runtimeOptions.import.csv.fields.mid";
 UPDATE Zf_configuration SET
-                 `default` = "quelle",
+                 `value` = "source",
+                 `default` = "source",
                  `defaults` = "",
                  `guiName` = "CSV import: Name of source text column",
                  `guiGroup` = "File formats",
@@ -460,7 +479,7 @@ UPDATE Zf_configuration SET
                  `defaults` = "",
                  `guiName` = "OpenTM2: Show all 100% matches",
                  `guiGroup` = "Language resources",
-                 `level` = "16",
+                 `level` = "2",
                  `description`  = "If this is not checked, for 100%-Matches that differ in the target, the target of the match with the highest match rate is shown. If the match rate is the same, the match with the newest change date is shown.If this is checked, all 100%-Matches that differ in the target are shown.",
                  `comment` = ""
                  WHERE `name` = "runtimeOptions.LanguageResources.opentm2.showMultiple100PercentMatches";
@@ -502,7 +521,7 @@ UPDATE Zf_configuration SET
                  WHERE `name` = "runtimeOptions.tbx.termImportMap.across_userdef_picklist_Verwendung.Unwort";
 UPDATE Zf_configuration SET
                  `default` = "finalized",
-                 `defaults` = "",
+                 `defaults` = "finalized,unprocessed",
                  `guiName` = "Terminology import: Default term attributes process status",
                  `guiGroup` = "Language resources",
                  `level` = "2",
@@ -557,7 +576,7 @@ UPDATE Zf_configuration SET
                  WHERE `name` = "runtimeOptions.translation.fallbackLocale";
 UPDATE Zf_configuration SET
                  `default` = "",
-                 `defaults` = "",
+                 `defaults` = "de,en",
                  `guiName` = "Application GUI locale",
                  `guiGroup` = "System setup: General",
                  `level` = "2",
@@ -1008,7 +1027,7 @@ UPDATE Zf_configuration SET
                  WHERE `name` = "runtimeOptions.worker.editor_Models_Import_Worker.maxParallelWorkers";
 UPDATE Zf_configuration SET
                  `default` = "admittedTerm",
-                 `defaults` = "",
+                 `defaults` = "preferredTerm,deprecatedTerm,standardizedTerm,legalTerm,supersededTerm,admittedTerm",
                  `guiName` = "Default term status (for import)",
                  `guiGroup` = "TermPortal",
                  `level` = "2",

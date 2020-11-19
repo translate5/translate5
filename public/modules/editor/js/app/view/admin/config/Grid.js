@@ -69,7 +69,8 @@ Ext.define('Editor.view.admin.config.Grid', {
         instanceConfigChangeMessageBoxText:'#UT#Die Änderung wird beim nächsten Login wirksam.',
         collapseAll:'#UT#Alles zuklappen',
         expandAll:'#UT#Alles aufklappen',
-        toolbarFilter:'#UT#Suche'
+        toolbarFilter:'#UT#Suche',
+        overwriteLevelList:'#UT#Ebene:'
     },
     
     listeners:{
@@ -330,10 +331,12 @@ Ext.define('Editor.view.admin.config.Grid', {
     
     /***
      * Cell renderer for the guiName cell.
+     * TODO: use template
      */
     guiNameCellRenderer:function(value, meta, record) {
+        var me=this,
+            html = ['<b>'];
         
-        var html = ['<b>'];
         html.push(value);
         html.push('</b>');
         html.push('</br>');
@@ -345,6 +348,23 @@ Ext.define('Editor.view.admin.config.Grid', {
             html.push('</i>');
             html.push('</br>');
         }
+        
+        html.push('<i>');
+        var levels = [];
+        Ext.Object.each(Editor.data.frontend.config.configLabelMap, function(property, v){
+            if(record.get('level')<=property && property != record.CONFIG_LEVEL_USER){//ignore user level in the list
+                levels.push(v);
+            }
+        });
+        
+        html.push('<small>');
+        html.push(me.strings.overwriteLevelList);
+        html.push(levels.join(","));
+        html.push('</small>');
+        
+        html.push('</i>');
+        html.push('</br>');
+        
         return html.join("");
     },
 });

@@ -42,8 +42,8 @@ Ext.define('Editor.controller.editor.CustomPanel', {
     },
     
     filePanelBeforeRender:function(filepanel){
-        var title = Editor.app.getTaskCustomerConfig('editor.customPanel.title'),
-            url = Editor.app.getTaskCustomerConfig('editor.customPanel.url');
+        var title = Editor.app.getTaskConfig('editor.customPanel.title'),
+            url = Editor.app.getTaskConfig('editor.customPanel.url');
         
         //if the url is not configured, do nothing
         if(!url){

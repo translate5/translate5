@@ -87,9 +87,7 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
             configSections.push({xtype: 'preferencesUser'});
         }
         
-        
-        //TODO: rights check
-        if(true || user.isAllowed('')) {
+        if(user.isAllowed('configOverwriteGrid')) {
             configSections.push({
                 xtype: 'adminConfigGrid'
             });

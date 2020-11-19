@@ -87,18 +87,19 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 }
             });
         }
-        //TODO: auth check->is alowed
-        tabs.push({
-            xtype: 'adminConfigGrid',
-            store:'admin.task.Config',
-            title:me.strings.config,
-            bind:{
-                extraParams:{
-                    taskGuid : '{projectTaskSelection.taskGuid}'
-                }
-            }
-        });
         
+        if(auth.isAllowed('configOverwriteGrid')) {
+            tabs.push({
+                xtype: 'adminConfigGrid',
+                store:'admin.task.Config',
+                title:me.strings.config,
+                bind:{
+                    extraParams:{
+                        taskGuid : '{projectTaskSelection.taskGuid}'
+                    }
+                }
+            });
+        }
         config = {
             items : [{
                 xtype: 'tabpanel',
