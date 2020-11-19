@@ -44,3 +44,20 @@ AND `name` NOT LIKE 'runtimeOptions.frontend.defaultState.%';
 UPDATE `Zf_configuration` 
 SET `level`=32 
 WHERE `name` LIKE 'runtimeOptions.frontend.defaultState.%';
+
+-- this config does not exist in the code
+DELETE FROM `Zf_configuration` WHERE `name`='runtimeOptions.plugins.Okapi.customFileExtensions';
+
+-- this config was used only in okapi plugin. Change it as boolean flag.
+UPDATE `Zf_configuration` 
+SET `name`='runtimeOptions.plugins.Okapi.import.fileconverters.attachOriginalFileAsReference', 
+`value`=(select 0 or if((SELECT CASE WHEN JSON_VALID(value) THEN JSON_EXTRACT(value, "$.okapi") ELSE null END),1,0 )), 
+`default`='1', 
+`type`='boolean' 
+WHERE `name`='runtimeOptions.import.fileconverters.attachOriginalFileAsReference';
+
+-- set doNotShowAgain flag as boolean for all default state help windows
+UPDATE `Zf_configuration` 
+SET `default`='{"doNotShowAgain":false}' 
+WHERE `name` LIKE 'runtimeOptions.frontend.defaultState.helpWindow.%';
+

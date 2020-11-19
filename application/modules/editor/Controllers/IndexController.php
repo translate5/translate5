@@ -327,6 +327,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //set db version as frontend param
       $this->view->Php2JsVars()->set('dbVersion',$db->getServerVersion());
 
+      $config = ZfExtended_Factory::get('editor_Models_Config');
+      /* @var $config editor_Models_Config */
+      $this->view->Php2JsVars()->set('frontend.config.configLabelMap',$config->getLabelMap());
+      
       $this->setJsAppData();
     }
 

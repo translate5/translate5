@@ -128,7 +128,7 @@ Ext.define('Editor.util.TaskActions', {
         }
 
         //do not show the confirmation window if it is configured so
-        if(Editor.app.getTaskCustomerConfig('editor.showConfirmFinishTaskPopup')!==true){
+        if(Editor.app.getTaskConfig('editor.showConfirmFinishTaskPopup')!==true){
             me._doFinish(callback);
             return;
         }

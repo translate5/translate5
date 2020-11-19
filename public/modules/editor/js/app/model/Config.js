@@ -28,7 +28,8 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.model.Config', {
   extend: 'Ext.data.Model',
-  CONFIG_LEVEL_INSTANCE : 2,//TODO: if other needed, define the constant on backend
+  CONFIG_LEVEL_INSTANCE : 2,
+  CONFIG_LEVEL_USER : 32,
   fields: [
     {name: 'id', type: 'int'},
     {name: 'isReadOnly', type: 'bool',defaultValue: false},//TODO: readonly validator

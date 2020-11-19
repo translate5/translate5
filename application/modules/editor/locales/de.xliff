@@ -1901,6 +1901,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='S3VyemVyIE5hbWU='><source>Kurzer Name</source><target>Kurzer Name</target></trans-unit>
 <trans-unit id='QWt0aXZpZXJ0'><source>Aktiviert</source><target>Aktiviert</target></trans-unit>
 <trans-unit id='RGVha3RpdmllcnQ='><source>Deaktiviert</source><target>Deaktiviert</target></trans-unit>
+<trans-unit id='RWJlbmU6'><source>Ebene:</source><target>Ebene:</target></trans-unit>
   </body>
  </file>
 </xliff>

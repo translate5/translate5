@@ -3917,6 +3917,8 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QWt0aXZpZXJ0'><source>Aktiviert</source><target>Activated</target></trans-unit>
 <trans-unit id='RGVha3RpdmllcnQ='><source>Deaktiviert</source><target>Disabled</target></trans-unit>
 <trans-unit id='UU0='><source>QM</source><target>QA</target></trans-unit>
+<trans-unit id='S2FubiBhdWYgRWJlbmUgw7xiZXJzY2hyaWViZW4gd2VyZGVuOg=='><source>Kann auf Ebene überschrieben werden:</source><target>Kann auf Ebene überschrieben werden:</target></trans-unit>
+<trans-unit id='RWJlbmU6'><source>Ebene:</source><target>Level:</target></trans-unit>
 </body>
   </file>
 </xliff>

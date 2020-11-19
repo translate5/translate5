@@ -476,30 +476,17 @@ Ext.application({
     },
     
     /***
-     * Load customer and task config store required for the editor.
+     * Load the task specific config store.
      */
     loadEditorConfigData:function(task,callback){
-        //TODO: single store for all configs when task is opened ?
-        //how about if i send customerId and taskGuid, and this will merge on the backedn all in one result ?
-        var me=this,
-            taskConfigStore  = Ext.StoreManager.get('admin.task.Config'),
-            customerConfigStore = Ext.StoreManager.get('admin.CustomerConfig');
-        //load customer config store, then load the taskConfig store, and at the end open the task for editing
-        customerConfigStore.loadByCustomerId(task.get('customerId'),function(records, operation,success){
+        var me=this;
+        Ext.StoreManager.get('admin.task.Config').loadByTaskGuid(task.get('taskGuid'),function(records, operation, success){
+            me.unmask();
             if(!success){
                 Editor.app.getController('ServerException').handleCallback(records, operation, false);
-                me.unmask();
                 return;
             }
-            //fist load the task config, save the task state and open the editor
-            taskConfigStore.loadByTaskGuid(task.get('taskGuid'),function(records, operation, success){
-                me.unmask();
-                if(!success){
-                    Editor.app.getController('ServerException').handleCallback(records, operation, false);
-                    return;
-                }
-                callback();
-            });
+            callback();
         });
     },
     
@@ -511,17 +498,9 @@ Ext.application({
     },
     
     /***
-     * Return task customer specific config value by given config name
-     */
-    getTaskCustomerConfig:function(configName){
-        return Ext.StoreManager.get('admin.CustomerConfig').getConfig(configName);
-    },
-    
-    /***
      * Get the user specific config by given config name.
      * INFO: currently the user configs are loaded also in the state provider and with that,
      * no need for separate user config store, just load the data from there.
-     * TODO: interface for saveing this config values ?
      * 
      * {Boolean} returnRecord : the record will be returned instead of the record value
      */
