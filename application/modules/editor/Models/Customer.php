@@ -79,9 +79,6 @@
  * @method integer getOpenIdRedirectCheckbox() getOpenIdRedirectCheckbox()
  * @method void setOpenIdRedirectCheckbox() setOpenIdRedirectCheckbox(integer $openIdRedirectCheckbox)
  * 
- * @method boolean getAnonymizeUsers() getAnonymizeUsers()
- * @method void setAnonymizeUsers() getAnonymizeUsers(boolean $anonymizeUsers)
- * 
  * 
 */
 class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {

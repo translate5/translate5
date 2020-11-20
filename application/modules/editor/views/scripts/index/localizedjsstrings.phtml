@@ -852,11 +852,12 @@ Ext.define('Editor.controller.Localizer', {
             configActiveColumn: '<?php echo $this->translate->_('Aktiviert');?>',
             configDeactiveColumn: '<?php echo $this->translate->_('Deaktiviert');?>',
             updateConfigSuccessMessage: '<?php echo $this->translate->_('Konfiguration gespeichert');?>',
-            instanceConfigChangeMessageBoxText: '<?php echo $this->translate->_('Die Änderung wird beim nächsten Login wirksam.');?>',
+            instanceConfigChangeMessageBoxText: '<?php echo $this->translate->_('Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.');?>',
             collapseAll: '<?php echo $this->translate->_('Alles zuklappen');?>',
             expandAll: '<?php echo $this->translate->_('Alles aufklappen');?>',
             toolbarFilter: '<?php echo $this->translate->_('Suche');?>',
-            overwriteLevelList: '<?php echo $this->translate->_('Ebene:');?>'
+            overwriteLevelList: '<?php echo $this->translate->_('Ebene:');?>',
+            readOnlyFilter: '<?php echo $this->translate->_('Schreibgeschützte Konfigurationen sichtbar:');?>',
         }
     });
     
@@ -1334,7 +1335,6 @@ Ext.define('Editor.controller.Localizer', {
             openIdClientSecret:'<?php echo $this->translate->_("OpenId Passwort");?>',
             openIdRedirectLabel:'<?php echo $this->translate->_("Verlinkter Text Loginseite");?>',
             openIdRedirectCheckbox:'<?php echo $this->translate->_("Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.");?>',
-            anonymizeUsers:'<?php echo $this->translate->_("User anonymisieren?");?>',
             defaultRolesGroupLabelTooltip:'<?php echo $this->translate->_("Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.");?>',
             serverRolesGroupLabelTooltip:'<?php echo $this->translate->_("Systemrollen, die der OpenID-Server in translate5 festlegen darf.");?>',
             propertiesTabPanelTitle:'<?php echo $this->translate->_("Eigenschaften");?>',

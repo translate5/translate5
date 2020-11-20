@@ -72,7 +72,5 @@ class editor_Models_Validator_Customer extends ZfExtended_Models_Validator_Abstr
         
         $this->addValidator('openIdRedirectCheckbox', 'int');
         
-        // `anonymizeUsers` tinyint(1) NOT NULL DEFAULT 0
-        $this->addValidator('anonymizeUsers', 'boolean');
     }
 }

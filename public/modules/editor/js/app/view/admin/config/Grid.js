@@ -39,7 +39,6 @@ Ext.define('Editor.view.admin.config.Grid', {
     alias: 'widget.adminConfigGrid',
     itemId: 'adminConfigGrid',
     glyph: 'xf085@FontAwesome5FreeSolid',
-    
     store:'admin.Config',
     layout: {
         type: 'fit'
@@ -66,11 +65,12 @@ Ext.define('Editor.view.admin.config.Grid', {
         configActiveColumn:'#UT#Aktiviert',
         configDeactiveColumn:'#UT#Deaktiviert',
         updateConfigSuccessMessage:'#UT#Konfiguration gespeichert',
-        instanceConfigChangeMessageBoxText:'#UT#Die Änderung wird beim nächsten Login wirksam.',
+        instanceConfigChangeMessageBoxText:'#UT#Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.',
         collapseAll:'#UT#Alles zuklappen',
         expandAll:'#UT#Alles aufklappen',
         toolbarFilter:'#UT#Suche',
-        overwriteLevelList:'#UT#Ebene:'
+        overwriteLevelList:'#UT#Ebene:',
+        readOnlyFilter:'#UT#Schreibgeschützte Konfigurationen sichtbar'
     },
     
     listeners:{
@@ -135,6 +135,10 @@ Ext.define('Editor.view.admin.config.Grid', {
         store.getProxy().setExtraParams(merged);
         store.load({
             callback:function(){
+                me.getStore().addFilter({
+                    property: 'isReadOnly',
+                    value   : false
+                });
                 me.getController().onCollapseAll();
             }
         });
@@ -217,6 +221,11 @@ Ext.define('Editor.view.admin.config.Grid', {
                         itemId: 'searchField',
                         hideLabel: true,
                         width: 200
+                    },me.strings.readOnlyFilter,{
+                        xtype: 'checkbox',
+                        name: 'showReadOnly',
+                        checked:false,
+                        itemId: 'showReadOnly'
                     }],
                 }]
             };
