@@ -61,3 +61,11 @@ UPDATE `Zf_configuration`
 SET `default`='{"doNotShowAgain":false}' 
 WHERE `name` LIKE 'runtimeOptions.frontend.defaultState.helpWindow.%';
 
+-- migrate all anonymized customer to customer specific config
+INSERT INTO `LEK_customer_config` (`customerId`, `name`, `value`) 
+SELECT id, "runtimeOptions.customers.anonymizeUsers", 1 
+FROM `LEK_customer`
+WHERE `anonymizeUsers` = 1;
+
+ALTER TABLE `LEK_customer` 
+DROP COLUMN `anonymizeUsers`;

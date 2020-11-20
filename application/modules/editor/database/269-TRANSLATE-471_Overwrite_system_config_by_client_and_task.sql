@@ -2469,10 +2469,10 @@ UPDATE Zf_configuration SET
 UPDATE Zf_configuration SET
                  `default` = "1",
                  `defaults` = "",
-                 `guiName` = "",
-                 `guiGroup` = "",
-                 `level` = "4",
-                 `description`  = "List all available languages in the new term dropdown.",
+                 `guiName` = "All translate5 languages available for creating term?",
+                 `guiGroup` = "TermPortal",
+                 `level` = "2",
+                 `description`  = "If activated, when the user creates a new term in the TermPortal, he is able to select the language of the term from all languages available in translate5. If deactivated, he can only choose from those languages, that exist in the language resources that are available for him at the moment.",
                  `comment` = ""
                  WHERE `name` = "runtimeOptions.termportal.newTermAllLanguagesAvailable";
 UPDATE Zf_configuration SET

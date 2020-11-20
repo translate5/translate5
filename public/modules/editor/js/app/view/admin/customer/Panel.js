@@ -76,7 +76,6 @@ Ext.define('Editor.view.admin.customer.Panel', {
         serverRolesGroupLabel: '#UT#Erlaubte Rollen',
         openIdRedirectLabel:'#UT#Verlinkter Text Loginseite',
         openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.',
-        anonymizeUsers:'#UT#User anonymisieren?',
         defaultRolesGroupLabelTooltip: '#UT#Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.',
         serverRolesGroupLabelTooltip: '#UT#Systemrollen, die der OpenID-Server in translate5 festlegen darf.',
         propertiesTabPanelTitle: '#UT#Eigenschaften',
@@ -149,15 +148,6 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     type: 'string'
                                 }
                             },
-                            {
-                                xtype: 'owncheckcolumn',
-                                dataIndex: 'anonymizeUsers',
-                                text: me.strings.anonymizeUsers,
-                                filter: {
-                                    type: 'boolean'
-                                },
-                                width: 70
-                            }
                             /*{
                                 xtype: 'actioncolumn',
                                 text:  me.strings.export,
@@ -235,14 +225,6 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         name: 'number',
                                         allowBlank: false,
                                         maxLength: 255
-                                    },
-                                    {
-                                        xtype: 'checkbox',
-                                        fieldLabel: me.strings.anonymizeUsers,
-                                        name: 'anonymizeUsers',
-                                        inputValue:1,
-                                        uncheckedValue:0,
-                                        checked:1
                                     },{
                                         xtype:'textfield',
                                         fieldLabel:me.strings.domain,

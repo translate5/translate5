@@ -1891,7 +1891,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RsO8ciBqZWRlbiBTYXR6IHd1cmRlIGRhcyBiZXN0ZSB2ZXJmw7xnYmFyZSBUcmFuc2xhdGlvbi1NZW1vcnktTWF0Y2ggdmVyd2VuZGV0ICgxMDAlIG9kZXIgYmVzc2VyKS4gV2VubiBrZWluZSAxMDAlaWdlIMOcYmVyZWluc3RpbW11bmcgaW0gVHJhbnNsYXRpb24gTWVtb3J5IGdlZnVuZGVuIHd1cmRlLCB3aXJkIGRpZSBtYXNjaGluZWxsZSDDnGJlcnNldHp1bmcgdmVyd2VuZGV0Lg=='><source>Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet.</source><target>Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet.</target></trans-unit>
 <trans-unit id='S29uZmlndXJhdGlvbiBiZWFyYmVpdGVu'><source>Konfiguration bearbeiten</source><target>Konfiguration bearbeiten</target></trans-unit>
 <trans-unit id='S29uZmlnIMO8YmVyc2NocmVpYmVu'><source>Konfig überschreiben</source><target>Konfig überschreiben</target></trans-unit>
-<trans-unit id='RGllIMOEbmRlcnVuZyB3aXJkIGJlaW0gbsOkY2hzdGVuIExvZ2luIHdpcmtzYW0u'><source>Die Änderung wird beim nächsten Login wirksam.</source><target>Die Änderung wird beim nächsten Login wirksam.</target></trans-unit>
+<trans-unit id='RGllIMOEbmRlcnVuZyB3aXJkIGJlaW0gbsOkY2hzdGVuIExvZ2luIHdpcmtzYW0uIERpZXMgZ2lsdCBhdWNoIGbDvHIgYW5kZXJlIGRlcnplaXQgZWluZ2Vsb2dndGUgQmVudXR6ZXIu'><source>Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.</source><target>Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.</target></trans-unit>
 <trans-unit id='QWxsZXMgenVrbGFwcGVu'><source>Alles zuklappen</source><target>Alles zuklappen</target></trans-unit>
 <trans-unit id='QWxsZXMgYXVma2xhcHBlbg=='><source>Alles aufklappen</source><target>Alles aufklappen</target></trans-unit>
 <trans-unit id='S3VuZGVuc3RhbmRhcmRrb25maWd1cmF0aW9uIMO8YmVyc2NocmVpYmVu'><source>Kundenstandardkonfiguration überschreiben</source><target>Kundenstandardkonfiguration überschreiben</target></trans-unit>
@@ -1902,6 +1902,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QWt0aXZpZXJ0'><source>Aktiviert</source><target>Aktiviert</target></trans-unit>
 <trans-unit id='RGVha3RpdmllcnQ='><source>Deaktiviert</source><target>Deaktiviert</target></trans-unit>
 <trans-unit id='RWJlbmU6'><source>Ebene:</source><target>Ebene:</target></trans-unit>
+<trans-unit id='U2NocmVpYmdlc2Now7x0enRlIEtvbmZpZ3VyYXRpb25lbiBzaWNodGJhcg=='><source>Schreibgeschützte Konfigurationen sichtbar</source><target>Schreibgeschützte Konfigurationen sichtbar</target></trans-unit>
   </body>
  </file>
 </xliff>

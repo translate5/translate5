@@ -34,6 +34,9 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         component:{
             '#searchField':{
                 change:'onSearchFieldChange'
+            },
+            '#showReadOnly':{
+                change:'onShowReadOnlyChange'
             }
         }
     },
@@ -143,6 +146,22 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         me.localConfigFilter();
 
         //mark the matched searchValue
+        me.markMatches();
+    },
+    
+    onShowReadOnlyChange:function(field, newValue, oldValue, eOpts ){
+        var me=this,
+            store =me.getView().getStore();
+
+        if(newValue){
+            store.removeFilter('isReadOnly');
+        }else{
+            store.addFilter({ 
+                property: 'isReadOnly',
+                value   : false
+            });
+        }
+        
         me.markMatches();
     },
     
