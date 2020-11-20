@@ -123,26 +123,26 @@ Ext.define('Editor.view.segments.MetaPanel', {
      * Fügt anhand der php2js Daten die Status Felder hinzu
      */
     addStateFlags: function() {
-      var me = this,
-          stati = me.down('#metaStates'),
-          flags = Editor.app.getTaskConfig('segments.stateFlags'),
-          counter = 1;
-      
-      Ext.Object.each(flags, function(key,value){
-          var tooltip; 
-          if(counter < 10) {
-              tooltip = Ext.String.format(me.item_metaStates_tooltip, counter++);
-          }
-          else {
-              tooltip = me.item_metaStates_tooltip_nokey;
-          }
-        stati.add({
-          name: 'stateId',
-          anchor: '100%',
-          inputValue: key,
-          boxLabel: '<span data-qtip="'+tooltip+'">'+value+'</span>'
+        var me = this,
+            stati = me.down('#metaStates'),
+            flags = Editor.data.segments.stateFlags,
+            counter = 1;
+        
+        Ext.each(flags, function(item){
+            var tooltip; 
+            if(counter < 10) {
+                tooltip = Ext.String.format(me.item_metaStates_tooltip, counter++);
+            }
+            else {
+                tooltip = me.item_metaStates_tooltip_nokey;
+            }
+          stati.add({
+            name: 'stateId',
+            anchor: '100%',
+            inputValue: item.id,
+            boxLabel: '<span data-qtip="'+tooltip+'">'+item.label+'</span>'
+          });
         });
-      });
     },
     /**
      * Fügt anhand der php2js Daten die QM Felder hinzu
