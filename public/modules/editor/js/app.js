@@ -479,13 +479,16 @@ Ext.application({
      * Load the task specific config store.
      */
     loadEditorConfigData:function(task,callback){
-        var me=this;
-        Ext.StoreManager.get('admin.task.Config').loadByTaskGuid(task.get('taskGuid'),function(records, operation, success){
+        var me=this,
+            store = Ext.StoreManager.get('admin.task.Config');
+        
+        store.loadByTaskGuid(task.get('taskGuid'),function(records, operation, success){
             me.unmask();
             if(!success){
                 Editor.app.getController('ServerException').handleCallback(records, operation, false);
                 return;
             }
+            store.clearFilter(true);
             callback();
         });
     },
