@@ -231,7 +231,7 @@ class editor_ConfigController extends ZfExtended_RestController {
      */
     protected function checkTaskLevelAllowed(string $taskGuid) {
         //if it is task import config, check the task state
-        if($this->entity->getLevel() == $this->entity::CONFIG_LEVEL_TASK_IMPORT){
+        if($this->entity->getLevel() == $this->entity::CONFIG_LEVEL_TASKIMPORT){
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($taskGuid);

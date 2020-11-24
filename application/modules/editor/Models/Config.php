@@ -42,7 +42,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     const CONFIG_LEVEL_SYSTEM   = 1;
     const CONFIG_LEVEL_INSTANCE = 2;
     const CONFIG_LEVEL_CUSTOMER = 4;
-    const CONFIG_LEVEL_TASK_IMPORT = 8;
+    const CONFIG_LEVEL_TASKIMPORT = 8;
     const CONFIG_LEVEL_TASK = 16;
     const CONFIG_LEVEL_USER     = 32;
     
@@ -51,7 +51,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         self::CONFIG_LEVEL_SYSTEM   => 'system',
         self::CONFIG_LEVEL_INSTANCE => 'instance',
         self::CONFIG_LEVEL_CUSTOMER => 'customer',
-        self::CONFIG_LEVEL_TASK_IMPORT     => 'taskImport',
+        self::CONFIG_LEVEL_TASKIMPORT     => 'taskImport',
         self::CONFIG_LEVEL_TASK     => 'task',
         self::CONFIG_LEVEL_USER     => 'user'
     ];
@@ -174,7 +174,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             $r['taskGuid'] = $taskGuid;
             //it is readonly when the config is inport config and the task is not in inport state
             //or when the current config is custoler level config
-            $r['isReadOnly'] = ($isImportDisabled && $r['level']==self::CONFIG_LEVEL_TASK_IMPORT) || $r['level']==self::CONFIG_LEVEL_CUSTOMER;
+            $r['isReadOnly'] = ($isImportDisabled && $r['level']==self::CONFIG_LEVEL_TASKIMPORT) || $r['level']==self::CONFIG_LEVEL_CUSTOMER;
         });
         $s = $this->db->select()
         ->setIntegrityCheck(false)
@@ -200,7 +200,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     public function mergeCustomerValues(
             int $customerId, 
             array $dbResults=[],
-            array $level = [self::CONFIG_LEVEL_CUSTOMER,self::CONFIG_LEVEL_TASK,self::CONFIG_LEVEL_TASK_IMPORT] 
+            array $level = [self::CONFIG_LEVEL_CUSTOMER,self::CONFIG_LEVEL_TASK,self::CONFIG_LEVEL_TASKIMPORT] 
         ):array {
         
         if(empty($dbResults)){
@@ -235,7 +235,7 @@ class editor_Models_Config extends ZfExtended_Models_Config {
             $user->load($userSession->data->id);
             //get all application config level for the user
             $userLevelStrings = $user->getApplicationConfigLevel();
-            $levels = array_sum(array_map([$this, 'convertStringLevelToInt'], $userLevelStrings));
+            $levels = array_map([$this, 'convertStringLevelToInt'], $userLevelStrings);
             //do not load all map config types (usualy default state) since no config editor for the frontend
             //is available for now
             $dbResults = $this->loadByLevel($levels,[ZfExtended_Resource_DbConfig::TYPE_MAP]);
@@ -397,9 +397,10 @@ class editor_Models_Config extends ZfExtended_Models_Config {
      */
     public function getLabelMap() {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */
         return array_map(function($value) use ($translate) {
-            return $translate->_($value);
+            //prefix is requred so we do not overwrite the original translation
+            return $translate->_('config_overwrite_'.$value);
         }, $this->configLabel);
     }
 }

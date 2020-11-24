@@ -132,7 +132,7 @@ UPDATE Zf_configuration SET
 UPDATE Zf_configuration SET
                  `default` = "1",
                  `defaults` = "",
-                 `guiName` = "",
+                 `guiName` = "Is the status panel on the right side of the editor visible",
                  `guiGroup` = "Editor: Miscellaneous options",
                  `level` = "16",
                  `description`  = "If checked, the status panel on the right side of the editor is visible",
