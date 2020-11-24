@@ -87,6 +87,25 @@ class Models_SystemRequirement_Modules_Database extends ZfExtended_Models_System
         }
     }
     
+    protected function checkJsonFunctions(Zend_Db_Adapter_Abstract $db) {
+        $m = $e = null;
+        try {
+            $db->query("SELECT JSON_VALID('{}');SELECT JSON_EXTRACT('{\"id\": 1}', \"$.id\");");
+            return;
+        }
+        catch(Zend_Db_Statement_Exception $e) {
+            $m = $e->getMessage();
+        }
+        if(preg_match('/FUNCTION .*JSON_.*does not exist/', $m)) {
+            //trigger does really not exist, so all is ok
+            $this->result->error[] = "Your DB version is not supported anymore. Please update to newer version (MariaDB or MySQL >= 5.7) supporting the JSON functions.";
+            return;
+        }
+        
+        //some other error occured
+        throw $e;
+    }
+    
     protected function checkCharset(Zend_Db_Adapter_Abstract $db) {
         $result = $db->query("SELECT @@character_set_database charset, @@collation_database collation;");
         $res = $result->fetchObject();
