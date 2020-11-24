@@ -28,5 +28,9 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.config.GridViewModel', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.adminConfigGrid'
+    alias: 'viewmodel.adminConfigGrid',
+
+    data:{
+        hasReadOnly:true
+    }
 });

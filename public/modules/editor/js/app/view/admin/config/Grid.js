@@ -140,6 +140,7 @@ Ext.define('Editor.view.admin.config.Grid', {
                     value   : false
                 });
                 me.getController().onCollapseAll();
+                me.getController().handleHasReadOnly();
             }
         });
     },
@@ -205,6 +206,7 @@ Ext.define('Editor.view.admin.config.Grid', {
                         glyph: 'f2f1@FontAwesome5FreeSolid',
                         handler:function(){
                             me.getStore().reload();
+                            me.getController().handleHasReadOnly();
                         },
                         text: me.strings.reloadBtn
                     },{
@@ -223,9 +225,18 @@ Ext.define('Editor.view.admin.config.Grid', {
                         itemId: 'searchField',
                         hideLabel: true,
                         width: 200
-                    },me.strings.readOnlyFilter,{
+                    },{
+                        xtype: 'label',
+                        text:me.strings.readOnlyFilter,
+                        bind:{
+                            visible:'{hasReadOnly}'
+                        }
+                    },{
                         xtype: 'checkbox',
                         name: 'showReadOnly',
+                        bind:{
+                            visible:'{hasReadOnly}'
+                        },
                         checked:false,
                         itemId: 'showReadOnly'
                     }],
