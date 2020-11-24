@@ -52,11 +52,11 @@ Ext.define('Editor.view.admin.config.Grid', {
         }
     ],
     strings: {
-        title:'#UT#Konfig überschreiben',
+        title:'#UT#Konfiguration',
         id:'#UT#Value',
-        name:'#UT#Name',
+        name:'#UT#Code ID',
         guiName:'#UT#Kurzer Name',
-        value:'#UT#Value',
+        value:'#UT#Wert',
         editRecordTooltip:'#UT#Konfiguration bearbeiten',
         saveRecordTooltip:'#UT#Speichern',
         description:'#UT#Beschreibung',
@@ -69,8 +69,8 @@ Ext.define('Editor.view.admin.config.Grid', {
         collapseAll:'#UT#Alles zuklappen',
         expandAll:'#UT#Alles aufklappen',
         toolbarFilter:'#UT#Suche',
-        overwriteLevelList:'#UT#Ebene:',
-        readOnlyFilter:'#UT#Schreibgeschützte Konfigurationen sichtbar'
+        overwriteLevelList:'#UT#Überschreibbar auf Ebene:',
+        readOnlyFilter:'#UT#Schreibgeschützte Konfigurationen sichtbar:'
     },
     
     listeners:{
@@ -163,7 +163,7 @@ Ext.define('Editor.view.admin.config.Grid', {
                     text: me.strings.id
                 },{
                     xtype: 'gridcolumn',
-                    width: 300,
+                    flex:0.4,
                     dataIndex: 'guiName',
                     cellWrap: true,
                     renderer: me.guiNameCellRenderer,
@@ -173,8 +173,18 @@ Ext.define('Editor.view.admin.config.Grid', {
                     text: me.strings.guiName
                 },{
                     xtype: 'gridcolumn',
-                    width: 230,
+                    dataIndex: 'value',
+                    flex:0.2,
+                    tdCls:'grid-cell-text-center',
+                    getEditor:me.getEditorConfig,
+                    renderer:me.getValueRenderer,
+                    scope:me,
+                    text: me.strings.value
+                },{
+                    xtype: 'gridcolumn',
+                    flex:0.2,
                     cellWrap: true,
+                    tdCls:'grid-cell-text-center',
                     dataIndex: 'name',
                     filter: {
                         type: 'string'
@@ -182,16 +192,8 @@ Ext.define('Editor.view.admin.config.Grid', {
                     text: me.strings.name
                 },{
                     xtype: 'gridcolumn',
-                    width: 150,
-                    dataIndex: 'value',
-                    getEditor:me.getEditorConfig,
-                    renderer:me.getValueRenderer,
-                    scope:me,
-                    text: me.strings.value
-                },{
-                    xtype: 'gridcolumn',
                     hidden:true,
-                    width: 50,
+                    flex:0.2,
                     dataIndex: 'origin',
                     text: me.strings.overwriteOrigin
                 }],

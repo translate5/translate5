@@ -51,7 +51,7 @@ Ext.define('Editor.view.admin.config.ConfigWizard', {
     task:null,
     autoScroll: true,
     strings:{
-        wizardTitle:'#UT#Konfig überschreiben'
+        wizardTitle:'#UT#Konfiguration'
     },
     listeners:{
         activate:'onConfigWizardActivate'

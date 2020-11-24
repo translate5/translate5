@@ -79,7 +79,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
         defaultRolesGroupLabelTooltip: '#UT#Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.',
         serverRolesGroupLabelTooltip: '#UT#Systemrollen, die der OpenID-Server in translate5 festlegen darf.',
         propertiesTabPanelTitle: '#UT#Eigenschaften',
-        configTabTitle:'#UT#Systemstandardkonfiguration überschreiben'
+        configTabTitle:'#UT#Standardkonfiguration des Systems'
     },
     shrinkWrap: 0,
     layout: 'border',

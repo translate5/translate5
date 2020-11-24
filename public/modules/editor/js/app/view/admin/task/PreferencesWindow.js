@@ -44,7 +44,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     strings: {
         close: '#UT#Fenster schließen',
         events: '#UT#Ereignisse',
-        config : '#UT#Kundenstandardkonfiguration überschreiben'
+        config : '#UT#Standardkonfiguration Kunde überschreiben'
     },
     layout: 'fit',
     viewModel: {
@@ -78,15 +78,6 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
         
-        if(auth.isAllowed('editorTaskLog')) {
-            tabs.push({
-                xtype: 'editorAdminTaskLogGrid',
-                title: this.strings.events,
-                bind:{
-                    task:'{currentTask}'
-                }
-            });
-        }
         
         if(auth.isAllowed('configOverwriteGrid')) {
             tabs.push({
@@ -100,6 +91,17 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 }
             });
         }
+        
+        if(auth.isAllowed('editorTaskLog')) {
+            tabs.push({
+                xtype: 'editorAdminTaskLogGrid',
+                title: this.strings.events,
+                bind:{
+                    task:'{currentTask}'
+                }
+            });
+        }
+        
         config = {
             items : [{
                 xtype: 'tabpanel',

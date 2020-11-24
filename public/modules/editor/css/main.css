@@ -826,3 +826,7 @@ a.x-btn span.task-confirmation {
 .disabled-row .x-grid-cell {
 	color: #acacac !important;
 }
+.grid-cell-text-center{
+    vertical-align: middle;
+    text-align: center;
+}

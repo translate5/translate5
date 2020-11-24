@@ -46,13 +46,12 @@ Ext.define('Editor.view.segments.MetaPanel', {
     frameHeader: false,
     id: 'segment-metadata',
     itemId:'editorSegmentsMetaData',
-    title: '#UT#Segment-Metadaten',
+    strings:{
+        title: '#UT#Segment-Metadaten',
+    },
 
     layout: 'auto',
-    
-    strings:{
-        item_metaQm_title: '#UT#QM',
-    },
+    item_metaQm_title: '#UT#QM',
     //Item Strings:
     item_metaStates_title: '#UT#Status',
     item_metaTerms_title: '#UT#Terminologie',
@@ -65,6 +64,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
           showQM = Editor.app.getTaskConfig('segments.showQM');
           
       Ext.applyIf(me, {
+        title:me.title,
         items: [
           {
             xtype: 'form',
