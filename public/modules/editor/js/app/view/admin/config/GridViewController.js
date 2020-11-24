@@ -79,6 +79,21 @@ Ext.define('Editor.view.admin.config.GridViewController', {
         }
     },
     
+    /***
+     * If there is one readonly config in the curretn config store, set view model propertie
+     */
+    handleHasReadOnly:function(){
+        var me=this,
+            store = me.getView().getStore(),
+            hasReadOnly = false;
+        store.each(function(rec){
+            if(!hasReadOnly && rec.get('isReadOnly')){
+                hasReadOnly = true;
+            }
+        },me,{filtered: true});
+        me.getView().getViewModel().set('hasReadOnly',hasReadOnly);
+    },
+    
     onGroupExpand:function(){
         this.markMatches();
     },
