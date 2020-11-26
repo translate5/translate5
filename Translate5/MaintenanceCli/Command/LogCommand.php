@@ -255,7 +255,7 @@ the format is:
             }
             else {
                 $this->io->text($row['created'].' '.
-                    $this->levels[$row['level']].' <options=bold>'.$row['eventCode'].'</> (#'.$row['id'].') '.
+                    $this->levels[$row['level']].' <options=bold>'.$row['eventCode'].'</> (# '.$row['id'].') '.
                     OutputFormatter::escape((string) $row['domain']).' → '.
                     OutputFormatter::escape((string)str_replace("\n", ' ', $row['message'])));
             }
