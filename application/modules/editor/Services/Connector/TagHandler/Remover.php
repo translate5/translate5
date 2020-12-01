@@ -57,6 +57,6 @@ class editor_Services_Connector_TagHandler_Remover extends editor_Services_Conne
      * @return string
      */
     public function restoreInResult(string $resultString): string {
-        return $this->importWhitespaceFromTagLessQuery();
+        return $this->importWhitespaceFromTagLessQuery($resultString);
     }
 }
