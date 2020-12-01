@@ -73,22 +73,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::open()
-     */
-    public function open() {
-        //This call is not necessary, since this resource is opened automatically.
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::close()
-     */
-    public function close() {
-        //This call is not necessary, since this resource is closed automatically.
-    }
-    
-    /**
-     * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
     public function addTm(array $fileinfo = null,array $params=null) {
@@ -308,7 +292,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_FilebasedAbstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
-        if($this->api->search(strip_tags($searchString), $field, $offset)){
+        if($this->api->search($searchString, $field, $offset)){
             $result = $this->api->getResult();
             
             if(empty($result) || empty($result->results)){
@@ -341,7 +325,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         if(empty($searchString) && $searchString !== "0") {
             return $this->resultList;
         }
-        $searchString = strip_tags($searchString);
         $this->resultList->setDefaultSource($searchString);
         
         //create dummy segment so we can use the lookup

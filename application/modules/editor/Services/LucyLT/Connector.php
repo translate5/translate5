@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -47,12 +47,11 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
     /**
      * (non-PHPdoc)
      * @see editor_Services_Connector_Abstract::query()
-     * 
+     *
      * FIXME currently no unified whitespace handling is used (see other connectors), should be refactored on demand
      */
     public function query(editor_Models_Segment $segment) {
-        $queryString = $this->getQueryString($segment);
-        $this->resultList->setDefaultSource($queryString);
+        $queryString = $this->getQueryStringAndSetAsDefault($segment);
 
         $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         /* @var $internalTag editor_Models_Segment_InternalTag */
@@ -113,7 +112,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
                             "@name"  => "INPUT",
                             "@value" => $queryString
                     ], [
-                            "@name"  => "MARK_UNKNOWNS",  //disable unknown translation marking <U[UNKNOWN]> 
+                            "@name"  => "MARK_UNKNOWNS",  //disable unknown translation marking <U[UNKNOWN]>
                             "@value" => "0"
                     ], [
                             "@name"  => "MARK_ALTERNATIVES", //disable alternative marking, not seen yet
@@ -148,7 +147,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
         return false;
     }
     
-    /* 
+    /*
      * Lucy Result:
 {
 	"inputParams": {
@@ -190,7 +189,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
 			"@value": "Windows-1252"
 		}]
 	}
-} 
+}
      
      */
     
@@ -210,14 +209,6 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
         $result['target'] = $resource->getMappedLanguage($this->languageResource->getTargetLangCode());
         
         return join('-', $result);
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_Abstract::search()
-     */
-    public function search(string $searchString, $field = 'source', $offset = null) {
-        throw new BadMethodCallException("The Lucy LT Connector does not support search requests");
     }
     
     public function translate(string $searchString){

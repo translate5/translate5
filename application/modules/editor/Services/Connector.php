@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * - provides a connection to a concrete language resource, via the internal adapter (which contains the concrete connector instance)
  * - intercepts some calls to the adapter to provide unified logging etc per each call
  * - all non intercepted methods are passed directly to the underlying adapter
- * 
+ *
  * FIXME add __called function names from underlying adapter (ABstractConnector)
  */
 class editor_Services_Connector {
@@ -57,7 +57,7 @@ class editor_Services_Connector {
     
     
     /***
-     * 
+     *
      * @var editor_Models_LanguageResources_LanguageResource
      */
     protected $languageResource;
@@ -137,7 +137,7 @@ class editor_Services_Connector {
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
         try {
-            $serviceResult=$this->adapter->search($searchString,$field,$offset);
+            $serviceResult = $this->adapter->search(strip_tags($searchString),$field,$offset);
         } catch (Exception $e) {
             $this->logException($e);
         }
@@ -151,7 +151,7 @@ class editor_Services_Connector {
      */
     public function translate(string $searchString){
         try {
-            $serviceResult=$this->adapter->translate($searchString);
+            $serviceResult = $this->adapter->translate(strip_tags($searchString));
         } catch (Exception $e) {
             $this->logException($e);
         }
@@ -184,9 +184,9 @@ class editor_Services_Connector {
     }
     
     /***
-     * Logs the given exception (writes log entry in language resources log table and if 
+     * Logs the given exception (writes log entry in language resources log table and if
      * the task is available, writes log entry in the task log table to)
-     * 
+     *
      * @param Exception $e
      * @param string $taskGuid
      */
@@ -225,7 +225,7 @@ class editor_Services_Connector {
     }
     
     /***
-     * Load the results with calling the adapters query action 
+     * Load the results with calling the adapters query action
      */
     public function disableBatch() {
         $this->batchQuery = false;
