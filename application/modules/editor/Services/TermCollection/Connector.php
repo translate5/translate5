@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -106,7 +106,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             $deleteProposalsDate=NOW_ISO;
         }
         
-        //delete term proposals 
+        //delete term proposals
         if(!empty($deleteProposalsDate)){
             $proposals=ZfExtended_Factory::get('editor_Models_Term_Proposal');
             /* @var $proposals editor_Models_Term_Proposal */
@@ -131,7 +131,8 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        return $this->queryCollectionResults($this->prepareDefaultQueryString($segment), true);
+        $qs = $this->getQueryStringAndSetAsDefault($segment);
+        return $this->queryCollectionResults($this->tagHandler->prepareQuery($qs)($segment), true);
     }
     
     /**
@@ -150,7 +151,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @see editor_Services_Connector_Abstract::translate()
      */
     public function translate(string $searchString){
-        $this->tagsWereStripped = false;
         return $this->queryCollectionResults($searchString);
     }
     
@@ -193,9 +193,9 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
                     $res['definitions']=$definitions[$res['termEntryId']];
                 }
                 //convert back to array
-                $matchRate = $this->tagsWereStripped ? self::TERMCOLLECTION_TAG_MATCH_VALUE : $this->defaultMatchRate;
+                $matchRate = ($this->tagHandler->getRealTagCount() > 0) ? self::TERMCOLLECTION_TAG_MATCH_VALUE : $this->defaultMatchRate;
                 if($reimportWhitespace) {
-                    $res['term'] = $this->importWhitespaceFromTagLessQuery($res['term']);
+                    $res['term'] = $this->tagHandler->restoreInResult($res['term']);
                 }
                 if(isset($res['language'])){
                     $res['languageRfc'] = $lngs[$res['language']] ?? null;
@@ -249,7 +249,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     
     /***
      * Add/parce tbx file to the exsisting termcollection
-     * 
+     *
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addAdditionalTm()
      */
