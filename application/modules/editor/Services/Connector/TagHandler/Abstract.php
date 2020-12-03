@@ -37,8 +37,6 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Services_Connector_TagHandler_Abstract {
     
-    //FIXME move/reuse here the whitespace handler stuff from tag trait
-    //use editor_Models_Import_FileParser_TagTrait;
     //FIXME original comment: this is just a temporary solution until TagTrait is refactored into smaller reusable classes, see TRANSLATE-1509
     use editor_Models_Import_FileParser_TagTrait;
     
@@ -70,14 +68,20 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
      */
     protected $realTagCount = 0;
     
+    /**
+     * @var ZfExtended_Logger_Queued
+     */
+    public $logger;
+    
     public function __construct() {
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->trackChange = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
         
-        //FIXME refactor away from trait
         $this->initHelper();
         $this->initImageTags();
+        
+        $this->logger = ZfExtended_Factory::get('ZfExtended_Logger_Queued');
         
         //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
         $this->xmlparser->registerOther(function($textNode, $key){
@@ -111,11 +115,10 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
     }
     
     /**
-     * FIXME protected möglich?
      * @param string $text
      * @return string
      */
-    public function importWhitespaceFromTagLessQuery(string $text): string {
+    protected function importWhitespaceFromTagLessQuery(string $text): string {
         $text = $this->whitespaceHelper->protectWhitespace($text, false);
         return $this->whitespaceTagReplacer($text);
     }
@@ -133,5 +136,21 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
      */
     public function getRealTagCount() {
         return $this->realTagCount;
+    }
+    
+    /**
+     * returns the stored map of the internal tags
+     * @return array
+     */
+    public function getTagMap(): array {
+        return $this->map;
+    }
+    
+    /**
+     * set the stored map of the internal tags
+     * @param array $map
+     */
+    public function setTagMap(array $map) {
+        $this->map = $map;
     }
 }

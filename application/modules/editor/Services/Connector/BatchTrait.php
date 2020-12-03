@@ -28,6 +28,10 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Provides reusable batch functionality for LanguageResource Service Connectors
+ * @see editor_Services_Connector_Abstract
+ * @property editor_Services_Connector_TagHandler_Abstract $tagHandler
+ * @property editor_Models_LanguageResources_LanguageResource $languageResource
+ *
  */
 trait editor_Services_Connector_BatchTrait {
     
@@ -48,29 +52,25 @@ trait editor_Services_Connector_BatchTrait {
         //number of temporary cached segments
         $tmpBuffer = 0;
         //holds the query strings for batch request
-        $queryStrings = [];
-        //source query to segment map
-        $querySegmentMap = [];
-        
+        $batchQuery = [];
         foreach ($segments as $segment){
+            $batchQuery[] = [
+                //set the query string to segment map. Later it will be used to reapply the taks
+                'segment' => clone $segment,
+                //collect the source text
+                'query' => $this->tagHandler->prepareQuery($this->getQueryString($segment)),
+                'tagMap' => $this->tagHandler->getTagMap(),
+            ];
             
-            //set the query string to segment map. Later it will be used to reapply the taks
-            $querySegmentMap[] = clone $segment;
-            
-            //collect the source text
-            $queryStrings[] = $this->tagHandler->prepareQuery($this->getQueryString($segment));
-            $tmpBuffer++;
-            
-            if($tmpBuffer != $this->batchQueryBuffer){
+            if(++$tmpBuffer != $this->batchQueryBuffer){
                 continue;
             }
             
             $tmpBuffer=0;
             
             //send batch query request, and save the results to the batch cache
-            $this->handleBatchQuerys($queryStrings, $querySegmentMap);
-            
-            $queryStrings = [];
+            $this->handleBatchQuerys($batchQuery);
+            $batchQuery = [];
         }
     }
     
@@ -78,15 +78,14 @@ trait editor_Services_Connector_BatchTrait {
      * Batch query request for $queryStrings and saving the results for each translation.
      * This is only template function. Override this in each connector if the connector supports batch
      * query requests.
-     * @param array $queryStrings
-     * @param array $querySegmentMap
+     * @param array $batchQuery
      */
-    protected function handleBatchQuerys(array $queryStrings,array $querySegmentMap) {
+    protected function handleBatchQuerys(array $batchQuery) {
         $sourceLang = $this->languageResource->getSourceLangCode();
         $targetLang = $this->languageResource->getTargetLangCode();
         $this->resultList->resetResult();
         
-        if(!$this->batchSearch($queryStrings, $sourceLang, $targetLang)) {
+        if(!$this->batchSearch(array_column($batchQuery, 'query'), $sourceLang, $targetLang)) {
             return;
         }
         
@@ -99,12 +98,16 @@ trait editor_Services_Connector_BatchTrait {
         foreach ($results as $segmentResults) {
             //get the segment from the beginning of the cache
             //we assume that for each requested query string, we get one response back
-            $segment = array_shift($querySegmentMap);
+            $query = array_shift($batchQuery);
             /* @var $segment editor_Models_Segment */
             
-            $this->getQueryStringAndSetAsDefault($segment);
+            $this->getQueryStringAndSetAsDefault($query['segment']);
+            $this->tagHandler->setTagMap($query['tagMap']);
             $this->processBatchResult($segmentResults);
-            $this->saveBatchResults($segment->getId());
+            
+            $this->logForSegment($query['segment']);
+            
+            $this->saveBatchResults($query['segment']->getId());
             $this->resultList->resetResult();
         }
     }

@@ -98,7 +98,11 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
             $target = $this->xmlparser->parse($resultString);
         }
         catch (editor_Models_Import_FileParser_InvalidXMLException $e) {
-//FIXME loggin?
+            $this->logger->exception($e, ['level' => $this->logger::LEVEL_WARN]);
+            //See previous InvalidXMLException
+            $this->logger->warn('E1302', 'The LanguageResource did contain invalid XML, all tags were removed. See also previous InvalidXMLException in Log.',[
+                'givenContent' => $resultString,
+            ]);
             $this->hasRestoreErrors = true;
             return strip_tags($resultString);
         }
@@ -114,6 +118,11 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
     protected function removeTagsWithContent(string $content): string {
         //just concat source and target to check both:
         if(preg_match('#<(it|ph|ept|bpt)[^>]*>#', $content)) {
+            
+            $this->logger->info('E1301', 'The LanguageResource answer did contain it|ph|ept|bpt tags, which are removed since they can not be handled.',[
+                'givenContent' => $content,
+            ]);
+            
             //surround the content with tmp tags(used later as selectors)
             $content = $this->xmlparser->parse('<t5xliffresult>'.$content.'</t5xliffresult>');
             
@@ -135,10 +144,22 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
      * @return string
      */
     protected function replaceAdditionalTags(string $segment, int $mapCount): ?string {
+        $addedTags = false;
         $shortTagNr = $mapCount;
-        return preg_replace_callback('#<(x|ex|bx|g|/g)[^>]*>#', function() use (&$shortTagNr) {
+        
+        $result = preg_replace_callback('#<(x|ex|bx|g|/g)[^>]*>#', function() use (&$shortTagNr, &$addedTags) {
+            $addedTags = true;
             return $this->internalTag->makeAdditionalHtmlTag($shortTagNr++);
         }, $segment);
+        
+        if($addedTags) {
+            //logging as debug only, since in GUI they are removed. FIXME whats with pretranslation?
+            $this->logger->debug('E1300', 'The LanguageResource answer did contain additional tags which were added to the segment, starting with Tag Nr {nr}.',[
+                'nr' => $mapCount,
+                'givenContent' => $segment,
+            ]);
+        }
+        return $result;
     }
     
     /**
@@ -147,13 +168,5 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
      */
     public function hasRemovedContentTags(): bool {
         return $this->removeContentTags;
-    }
-    
-    /**
-     * returns the stored map of the internal tags
-     * @return array
-     */
-    public function getTagMap(): array {
-        return $this->map;
     }
 }

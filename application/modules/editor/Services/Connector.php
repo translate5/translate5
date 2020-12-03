@@ -122,7 +122,10 @@ class editor_Services_Connector {
                 return $serviceResult;
             }
             $serviceResult=$this->adapter->query($segment);
+            $this->adapter->logForSegment($segment);
         } catch (Exception $e) {
+            
+            
             $this->logException($e,$segment->getTaskGuid());
         }
         return $serviceResult;
@@ -208,10 +211,10 @@ class editor_Services_Connector {
     
     /***
      * Load the lates service result cache for the given segment in the current language resource
-     * @param editor_models_segment $segment
+     * @param editor_Models_Segment $segment
      * @return editor_Services_ServiceResult
      */
-    protected function getCachedResult(editor_models_segment $segment) {
+    protected function getCachedResult(editor_Models_Segment $segment) {
         $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
         /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */
         return $model->getResults($segment->getId(),$this->languageResource->getId());
