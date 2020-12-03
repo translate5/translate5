@@ -132,7 +132,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      */
     public function query(editor_Models_Segment $segment) {
         $qs = $this->getQueryStringAndSetAsDefault($segment);
-        return $this->queryCollectionResults($this->tagHandler->prepareQuery($qs)($segment), true);
+        return $this->queryCollectionResults($this->tagHandler->prepareQuery($qs), true);
     }
     
     /**

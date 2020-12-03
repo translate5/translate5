@@ -155,8 +155,7 @@ trait editor_Models_Import_FileParser_TagTrait {
             $p['length'] = $length;
             $p['title'] = $title; //Only translatable with using ExtJS QTips in the frontend, as title attribute not possible!
             
-            $tag = $this->_singleTag->getHtmlTag($p);
-            return $tag;
+            return $this->_singleTag->getHtmlTag($p);
         }, $segment);
     }
     

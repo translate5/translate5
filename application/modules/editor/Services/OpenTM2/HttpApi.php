@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -99,14 +99,11 @@ class editor_Services_OpenTM2_HttpApi {
      * This method imports a memory from a TMX file.
      */
     public function importMemory($tmData) {
-        //In:{ "Method":"import", "Memory":"MyTestMemory", "TMXFile":"C:/FileArea/MyTstMemory.TMX" } 
-        //Out: { "ReturnValue":0, "ErrorMsg":"" } 
+        //In:{ "Method":"import", "Memory":"MyTestMemory", "TMXFile":"C:/FileArea/MyTstMemory.TMX" }
+        //Out: { "ReturnValue":0, "ErrorMsg":"" }
         
         $data = new stdClass();
-	    $tmData = str_replace('xml:lang="mn"','xml:lang="ru"',$tmData);
-        $tmData = str_replace('xml:lang="hi"','xml:lang="ar"',$tmData);
-        $tmData = str_replace('xml:lang="mn-MN"','xml:lang="ru-RU"',$tmData);
-        $tmData = str_replace('xml:lang="hi-IN"','xml:lang="ar"',$tmData);
+        $tmData = $this->fixLangKeyInTM($tmData);
         $data->tmxData = base64_encode($tmData);
 
         $http = $this->getHttpWithMemory('POST', '/import');
@@ -167,16 +164,9 @@ class editor_Services_OpenTM2_HttpApi {
         $response = $this->request($http);
         if($response->getStatus() === 200) {
             $this->result = $response->getBody();
-	    if($mime == "application/xml"){
-		if($this->languageResource->targetLangCode == 'mn') $this->result = str_replace('xml:lang="ru"','xml:lang="mn"',$this->result);
-		if($this->languageResource->targetLangCode == 'mn-MN') $this->result = str_replace('xml:lang="ru"','xml:lang="mn-MN"',$this->result);
-		if($this->languageResource->targetLangCode == 'hi') $this->result = str_replace('xml:lang="ar"','xml:lang="hi"',$this->result);
-		if($this->languageResource->targetLangCode == 'hi-IN') $this->result = str_replace('xml:lang="ar"','xml:lang="hi-IN"',$this->result);
-		if($this->languageResource->targetLangCode == 'mn') $this->result = str_replace('<prop type="tmgr:language">RUSSIAN</prop>','<prop type="tmgr:language">MONGOLIAN</prop>',$this->result);
-		if($this->languageResource->targetLangCode == 'mn-MN') $this->result = str_replace('<prop type="tmgr:language">RUSSIAN</prop>','<prop type="tmgr:language">MONGOLIAN</prop>',$this->result);
-		if($this->languageResource->targetLangCode == 'hi') $this->result = str_replace('<prop type="tmgr:language">ARABIC</prop>','<prop type="tmgr:language">HINDI</prop>',$this->result);
-		if($this->languageResource->targetLangCode == 'hi-IN') $this->result = str_replace('<prop type="tmgr:language">ARABIC</prop>','<prop type="tmgr:language">HINDI</prop>',$this->result);
-	    }
+            if($mime == "application/xml"){
+                $this->result = $this->fixLangKeyGetTM($this->languageResource->targetLangCode, $this->result);
+            }
             return true;
         }
         
@@ -210,17 +200,15 @@ class editor_Services_OpenTM2_HttpApi {
      */
     public function lookup(editor_Models_Segment $segment, string $queryString, string $filename) {
         $json = new stdClass();
-	if($this->languageResource->targetLangCode == 'mn') $this->languageResource->targetLangCode = 'ru';
-        if($this->languageResource->targetLangCode == 'mn-MN') $this->languageResource->targetLangCode = 'ru-RU';
-        if($this->languageResource->targetLangCode == 'hi') $this->languageResource->targetLangCode = 'ar';
-        if($this->languageResource->targetLangCode == 'hi-IN') $this->languageResource->targetLangCode = 'ar';
+        $this->languageResource->targetLangCode = $this->fixLangKey($this->languageResource->targetLangCode);
+
         $json->sourceLang = $this->languageResource->sourceLangCode;
         $json->targetLang = $this->languageResource->targetLangCode;
         $json->source = $queryString;
         //In general OpenTM2 can deal with whole paths, not only with filenames.
-        // But we hold the filepaths in the FileTree JSON, so this value is not easily accessible, 
+        // But we hold the filepaths in the FileTree JSON, so this value is not easily accessible,
         // so we take only the single filename at the moment
-        $json->documentName = $filename; 
+        $json->documentName = $filename;
         
         $json->segmentNumber = ''; //TODO can be used after implementing TRANSLATE-793
         $json->markupTable = 'OTMXUXLF';
@@ -228,17 +216,12 @@ class editor_Services_OpenTM2_HttpApi {
         
         $http = $this->getHttpWithMemory('POST', 'fuzzysearch');
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
-//ob_start();
-        $response1 =  $this->request($http);
-        $response2 =  $this->processResponse($response1);
-//var_dump($json,$response1,$response2);
-//error_log(ob_get_clean());
-         return $response2;
+        return $this->processResponse($this->request($http));
     }
     
     /**
-     * This method searches the given search string in the proposals contained in a memory (concordance search). 
-     * The function returns one proposal per request. 
+     * This method searches the given search string in the proposals contained in a memory (concordance search).
+     * The function returns one proposal per request.
      * The caller has to provide the search position returned by a previous call or an empty search position to start the search at the begin of the memory.
      * Note: Provide the returned search position NewSearchPosition as SearchPosition on subsequenet calls to do a sequential search of the memory.
      */
@@ -257,25 +240,25 @@ class editor_Services_OpenTM2_HttpApi {
     /**
      * This method updates (or adds) a memory proposal in the memory.
      * Note: This method updates an existing proposal when a proposal with the same key information (source text, language, segment number, and document name) exists.
-     * 
+     *
      * @param editor_Models_Segment $segment
      * @return boolean
      */
     public function update(string $source, string $target, editor_Models_Segment $segment, $filename) {
-        /* 
+        /*
          * In:{ "Method":"update", "Memory": "TestMemory", "Proposal": {
-         *  "Source": "This is the source text", 
-         *  "Target": "This is the translated text", 
+         *  "Source": "This is the source text",
+         *  "Target": "This is the translated text",
          *  "Segment":231,
-         *  "DocumentName":"Anothertest.txt", 
-         *  "SourceLanguage":"en-US", 
-         *  "TargetLanguage":"de-de", 
-         *  "Type":"Manual", 
-         *  "Author":"A.Nonymous", 
-         *  "DateTime":"20161013T152948Z", 
-         *  "Markup":"EQFHTML3", 
-         *  "Context":"", 
-         *  "AddInfo":"" }  } 
+         *  "DocumentName":"Anothertest.txt",
+         *  "SourceLanguage":"en-US",
+         *  "TargetLanguage":"de-de",
+         *  "Type":"Manual",
+         *  "Author":"A.Nonymous",
+         *  "DateTime":"20161013T152948Z",
+         *  "Markup":"EQFHTML3",
+         *  "Context":"",
+         *  "AddInfo":"" }  }
          */
         //Out: { "ReturnValue":0, "ErrorMsg":"" }
         $json = $this->json(__FUNCTION__);
@@ -295,19 +278,12 @@ class editor_Services_OpenTM2_HttpApi {
         $json->sourceLang = $this->languageResource->getSourceLangCode();
         $json->targetLang = $this->languageResource->getTargetLangCode();
 
-	if($json->targetLang == 'mn') $json->targetLang = 'ru';
-        if($json->targetLang == 'mn-MN') $json->targetLang = 'ru-RU';
-        if($json->targetLang == 'hi') $json->targetLang = 'ar';
-        if($json->targetLang == 'hi-IN') $json->targetLang = 'ar';
+        $json->targetLang = $this->fixLangKey($json->targetLang);
         
         $http = $this->getHttpWithMemory('POST', 'entry');
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
 
-        $response = $this->processResponse($this->request($http));
-//ob_start();
-//var_dump($json,$response);
-//error_log(ob_get_clean());
-return $response;
+        return $this->processResponse($this->request($http));
     }
 
     /**
@@ -449,5 +425,72 @@ return $response;
     
     public function getLanguageResource() {
         return $this->languageResource;
+    }
+    
+    protected function fixLangKey($key) {
+        $keyMap = [
+            'mn' => 'ru',
+            'mn-MN' => 'ru-RU',
+            'hi' => 'ar',
+            'hi-IN' => 'ar',
+        ];
+        if(empty($keyMap[$key])) {
+            return $key;
+        }
+        return $keyMap[$key];
+    }
+    protected function fixLangKeyInTM($tmData) {
+        $tmData = str_replace([
+            'xml:lang="mn"',
+            'xml:lang="mn-MN"',
+            'xml:lang="hi"',
+            'xml:lang="hi-IN"',
+        ],[
+            'xml:lang="ru"',
+            'xml:lang="ru-RU"',
+            'xml:lang="ar"',
+            'xml:lang="ar"',
+        ],$tmData);
+    }
+    protected function fixLangKeyGetTM($langKey, $tmData) {
+        switch ($langKey) {
+            case 'mn':
+                return str_replace([
+                    'xml:lang="ru"',
+                    '<prop type="tmgr:language">RUSSIAN</prop>'
+                ],[
+                    'xml:lang="mn"',
+                    '<prop type="tmgr:language">MONGOLIAN</prop>'
+                ], $tmData);
+            case 'mn-MN':
+                return str_replace([
+                    'xml:lang="ru"',
+                    'xml:lang="ru-RU"',
+                    '<prop type="tmgr:language">RUSSIAN</prop>'
+                ],[
+                    'xml:lang="mn-MN"',
+                    'xml:lang="mn-MN"',
+                    '<prop type="tmgr:language">MONGOLIAN</prop>'
+                ], $tmData);
+            case 'hi':
+                return str_replace([
+                    'xml:lang="ar"',
+                    '<prop type="tmgr:language">ARABIC</prop>'
+                ],[
+                    'xml:lang="hi"',
+                    '<prop type="tmgr:language">HINDI</prop>'
+                ], $tmData);
+            case 'hi-IN':
+                return str_replace([
+                    'xml:lang="ar"',
+                    '<prop type="tmgr:language">ARABIC</prop>'
+                ],[
+                    'xml:lang="hi-IN"',
+                    '<prop type="tmgr:language">HINDI</prop>'
+                ], $tmData);
+            default:
+                break;
+        }
+        return $tmData;
     }
 }
