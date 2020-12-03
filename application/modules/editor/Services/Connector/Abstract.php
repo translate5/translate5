@@ -118,9 +118,17 @@ abstract class editor_Services_Connector_Abstract {
     protected $tagHandler;
     
     /**
+     * Logger instance
+     * @var ZfExtended_Logger
+     */
+    protected $logger;
+    
+    /**
      * initialises the internal result list
      */
     public function __construct() {
+        //init the default logger, is changed in connectTo
+        $this->logger = Zend_Registry::get('logger');
         $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
         $this->tagHandler = ZfExtended_Factory::get($this->tagHandlerClass);
     }
@@ -163,6 +171,7 @@ abstract class editor_Services_Connector_Abstract {
             $this->languageResource->sourceLangCode=$this->languageResource->getSourceLangCode();
             $this->languageResource->targetLangCode=$this->languageResource->getTargetLangCode();
         }
+        $this->logger = $this->logger->cloneMe('editor.languageresource.'.strtolower($this->resource->getService()).'.connector');
     }
     
     /**
@@ -337,5 +346,19 @@ abstract class editor_Services_Connector_Abstract {
      */
     public function isBatchQuery(): bool {
         return false;
+    }
+    
+    public function logForSegment(editor_Models_Segment $segment) {
+        if(!$this->tagHandler->logger->hasQueuedLogs()) {
+            return;
+        }
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($segment->getTaskGuid());
+        $this->tagHandler->logger->flush([
+            'segmentId' => $segment->getId(),
+            'nrInTask' => $segment->getSegmentNrInTask(),
+            'task' => $task
+        ], $this->logger->getDomain());
     }
 }
