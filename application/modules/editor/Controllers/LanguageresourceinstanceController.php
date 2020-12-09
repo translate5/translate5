@@ -807,7 +807,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         //setting the TM filename here, but can be overwritten in the connectors addTm method
         // for example when we get a new name from the service
-        $this->entity->addSpecificData('fileName', $importInfo[self::FILE_UPLOAD_NAME]['name']);
+        if(is_array($importInfo) && isset($importInfo[self::FILE_UPLOAD_NAME]['name'])) {
+            $filename = $importInfo[self::FILE_UPLOAD_NAME]['name'];
+        }
+        else {
+            $filename = '';
+        }
+        $this->entity->addSpecificData('fileName', $filename);
         
         $this->queueServiceImportWorker($importInfo, true);
     }

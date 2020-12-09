@@ -670,22 +670,32 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function addDefaultLanguageResources(editor_Models_Task $task) {
         $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
+        
         $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsDefault($this->data['customerId']);
+        
         if(empty($allUseAsDefaultCustomers)) {
             return;
         }
-        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
-        /* @var $languages editor_Models_LanguageResources_Languages */
+        
         $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
         /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
+        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $languages editor_Models_LanguageResources_Languages */
+        $language = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $language ZfExtended_Languages */
+        
+        $sourceLanguages = $language->getFuzzyLanguages($task->getSourceLang(),'id',true);
+        $targetLanguages = $language->getFuzzyLanguages($task->getTargetLang(),'id',true);
+        
         foreach ($allUseAsDefaultCustomers as $defaultCustomer) {
             $languageResourceId = $defaultCustomer['languageResourceId'];
-            if ($languages->isInCollection($task->getSourceLang(),'sourceLang',$languageResourceId)
-                && $languages->isInCollection($task->getTargetLang(),'targetLang',$languageResourceId) ) {
-                        $taskAssoc->init();
-                        $taskAssoc->setLanguageResourceId($languageResourceId);
-                        $taskAssoc->setTaskGuid($task->getTaskGuid());
-                        $taskAssoc->save();
+            $sourceLangMatch = $languages->isInCollection($sourceLanguages, 'sourceLang', $languageResourceId);
+            $targetLangMatch = $languages->isInCollection($targetLanguages, 'targetLang', $languageResourceId);
+            if ($sourceLangMatch && $targetLangMatch) {
+                $taskAssoc->init();
+                $taskAssoc->setLanguageResourceId($languageResourceId);
+                $taskAssoc->setTaskGuid($task->getTaskGuid());
+                $taskAssoc->save();
             }
         }
     }
@@ -1044,6 +1054,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $tua=editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //do nothing here
         }
 
         //mayLoadAllTasks is only true, if the current "PM" is not associated to the task directly.
@@ -1069,7 +1080,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->log->info('E9999', 'Debug data to E9999 - Keine Zugriffsberechtigung!',[
                 '$mayLoadAllTasks' => $mayLoadAllTasks,
                 'tua' => $tua ? $tua->getDataObject() : 'no tua',
-                'isPmOver' => $tua ? $tua->getIsPmOverride() : false,
+                'isPmOver' => $tua && $tua->getIsPmOverride(),
                 'loadAllTasks' => $this->isAllowed('backend', 'loadAllTasks'),
                 'isAuthUserTaskPm' => $this->isAuthUserTaskPm($this->entity->getPmGuid()),
                 '$isTaskDisallowEditing' => $isTaskDisallowEditing,
@@ -1465,6 +1476,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //do nothing here
         }
         
         //to access a task the user must either have the loadAllTasks right, or must be the tasks PM, or must be associated to the task
