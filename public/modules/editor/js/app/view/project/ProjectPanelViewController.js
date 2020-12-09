@@ -209,7 +209,10 @@ Ext.define('Editor.view.project.ProjectPanelViewController', {
      * After task remove event handelr
      */
     onAfterTaskDeleteEventHandler:function(task){
+        var me = this, 
+            grid = me.lookup('projectGrid');
         this.checkAndReloadStores();
+        grid && grid.store.load();
     },
     
     onProjectPanelDeactivate:function(){
