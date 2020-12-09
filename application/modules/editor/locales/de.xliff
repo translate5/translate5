@@ -1334,6 +1334,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='d2lyZCBnZWxhZGVuLi4u'><source>wird geladen...</source><target>wird geladen...</target></trans-unit>
 <trans-unit id='RXMgd3VyZGVuIGtlaW5lIEVyZ2Vibmlzc2UgZ2VmdW5kZW4u'><source>Es wurden keine Ergebnisse gefunden.</source><target>Es wurden keine Ergebnisse gefunden.</target></trans-unit>
 <trans-unit id='RGllIEFuZnJhZ2UgYW4gZGllIFNwcmFjaHJlc3NvdXJjZSBkYXVlcnRlIHp1IGxhbmdlLg=='><source>Die Anfrage an die Sprachressource dauerte zu lange.</source><target>Die Anfrage an die Sprachressource dauerte zu lange.</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBQcm9ibGVtZSBtaXQgZGVtIGFuZ2VmcmFndGVuIERpZW5zdC4='><source>Es gibt Probleme mit dem angefragten Dienst.</source><target>Es gibt Probleme mit dem angefragten Dienst.</target></trans-unit>
 <trans-unit id='RGllIEFuZnJhZ2UgZsO8aHJ0ZSB6dSBlaW5lbSBGZWhsZXIgaW0gYW5nZWZyYWd0ZW4gRGllbnN0Lg=='><source>Die Anfrage führte zu einem Fehler im angefragten Dienst.</source><target>Die Anfrage führte zu einem Fehler im angefragten Dienst.</target></trans-unit>
 <trans-unit id='U3ByYWNocmVzc291cmNlIGhpbnp1ZsO8Z2Vu'><source>Sprachressource hinzufügen</source><target>Sprachressource hinzufügen</target></trans-unit>
 <trans-unit id='UmVzc291cmNl'><source>Ressource</source><target>Ressource</target></trans-unit>
