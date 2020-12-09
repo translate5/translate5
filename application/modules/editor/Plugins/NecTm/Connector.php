@@ -464,11 +464,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     protected function handleNecTmError($logMsg) {
         $errors = $this->api->getErrors();
         
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
-        $msg = 'Von NEC-TM gemeldeter Fehler';
-        $messages->addError($msg, 'core', null, $errors);
-        
         throw new editor_Plugins_NecTm_Exception('E1162', [
             'LanguageResource' => print_r($this->languageResource->getDataObject(),1),
             'Error' => print_r($errors,1)
@@ -479,7 +474,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(& $moreInfo){
+    public function getStatus(){
         if($this->api->getStatus()){
             return self::STATUS_AVAILABLE;
         }

@@ -477,15 +477,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             try {
                 $connector=$manager->getConnector($languageresource,$this->task->getSourceLang(),$this->task->getTargetLang());
 
-                $moreInfo='';
                 //throw a worning if the language resource is not available
-                $status = $connector->getStatus($moreInfo);
+                $status = $connector->getStatus();
                 if(!in_array($status, $availableConnectorStatus)){
                     $this->log->warn('E1239','MatchAnalysis Plug-In: The associated language resource "{name}" is not available for match analysis and pre-translations.',[
                         'task' => $this->task,
                         'name' => $languageresource->getName(),
                         'status' => $status,
-                        'moreInfo' => $moreInfo,
+                        'moreInfo' => $connector->getLastStatusInfo(),
                         'languageResource' => $languageresource,
                     ]);
                     continue;

@@ -111,7 +111,7 @@ class editor_Plugins_ZDemoMT_Connector extends editor_Services_Connector_Abstrac
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(& $moreInfo){
+    public function getStatus(){
         return self::STATUS_AVAILABLE;
     }
 }

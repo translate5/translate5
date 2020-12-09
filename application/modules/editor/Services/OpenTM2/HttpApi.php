@@ -36,6 +36,7 @@ END LICENSE AND COPYRIGHT
  * OpenTM2 HTTP Connection API
  */
 class editor_Services_OpenTM2_HttpApi {
+    const MAX_STR_LENGTH = 2048;
     /**
      * @var editor_Models_LanguageResources_LanguageResource
      */
@@ -54,13 +55,11 @@ class editor_Services_OpenTM2_HttpApi {
     protected $error = array();
     
     /**
-     * For logging purposes
      * @var Zend_Http_Client
      */
     protected $http;
     
     /**
-     * For logging purposes
      * @var string
      */
     protected $httpMethod;
@@ -75,8 +74,7 @@ class editor_Services_OpenTM2_HttpApi {
         
         $http = $this->getHttp('POST');
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
-        $res = $this->request($http);
-        return $this->processResponse($res);
+        return $this->processResponse($http->request());
     }
     
     /**
@@ -91,8 +89,7 @@ class editor_Services_OpenTM2_HttpApi {
         $http = $this->getHttp('POST');
         $http->setConfig(['timeout' => 1200]);
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
-        $res = $this->request($http);
-        return $this->processResponse($res);
+        return $this->processResponse($http->request());
     }
     
     /**
@@ -110,8 +107,7 @@ class editor_Services_OpenTM2_HttpApi {
         $http->setConfig(['timeout' => 1200]);
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         
-        $res = $this->request($http);
-        return $this->processResponse($res);
+        return $this->processResponse($http->request());
     }
     
     /**
@@ -121,7 +117,6 @@ class editor_Services_OpenTM2_HttpApi {
      * @return Zend_Http_Client
      */
     protected function getHttp($method, $urlSuffix = '') {
-        //TODO: here we need only the resource. No lr is required.
         $url = rtrim($this->languageResource->getResource()->getUrl(), '/');
         $urlSuffix = ltrim($urlSuffix, '/');
         $this->http = ZfExtended_Factory::get('Zend_Http_Client');
@@ -161,7 +156,7 @@ class editor_Services_OpenTM2_HttpApi {
         $http = $this->getHttpWithMemory('GET');
         $http->setConfig(['timeout' => 1200]);
         $http->setHeaders('Accept', $mime);
-        $response = $this->request($http);
+        $response = $http->request();
         if($response->getStatus() === 200) {
             $this->result = $response->getBody();
             if($mime == "application/xml"){
@@ -180,7 +175,7 @@ class editor_Services_OpenTM2_HttpApi {
     public function status() {
         $http = $this->getHttpWithMemory('GET', '/status');
         $http->setConfig(['timeout' => 3]);
-        return $this->processResponse($this->request($http));
+        return $this->processResponse($http->request());
     }
 
     /**
@@ -188,7 +183,7 @@ class editor_Services_OpenTM2_HttpApi {
      */
     public function delete() {
         $http = $this->getHttpWithMemory('DELETE');
-        return $this->processResponse($this->request($http));
+        return $this->processResponse($http->request());
     }
     
     /**
@@ -204,6 +199,12 @@ class editor_Services_OpenTM2_HttpApi {
 
         $json->sourceLang = $this->languageResource->sourceLangCode;
         $json->targetLang = $this->languageResource->targetLangCode;
+        
+        if($this->isToLong($queryString)) {
+            $this->result = json_decode('{"ReturnValue":0,"ErrorMsg":"","NumOfFoundProposals":0}');
+            return true;
+        }
+        
         $json->source = $queryString;
         //In general OpenTM2 can deal with whole paths, not only with filenames.
         // But we hold the filepaths in the FileTree JSON, so this value is not easily accessible,
@@ -216,7 +217,7 @@ class editor_Services_OpenTM2_HttpApi {
         
         $http = $this->getHttpWithMemory('POST', 'fuzzysearch');
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
-        return $this->processResponse($this->request($http));
+        return $this->processResponse($http->request());
     }
     
     /**
@@ -226,6 +227,10 @@ class editor_Services_OpenTM2_HttpApi {
      * Note: Provide the returned search position NewSearchPosition as SearchPosition on subsequenet calls to do a sequential search of the memory.
      */
     public function search($queryString, $field, $searchPosition = null) {
+        if($this->isToLong($queryString)) {
+            $this->result = json_decode('{"results":[]}');
+            return true;
+        }
         $data = new stdClass();
         $data->searchString = $queryString;
         $data->searchType = $field;
@@ -234,7 +239,7 @@ class editor_Services_OpenTM2_HttpApi {
         $data->msSearchAfterNumResults = 250;
         $http = $this->getHttpWithMemory('POST', 'concordancesearch');
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
-        return $this->processResponse($this->request($http));
+        return $this->processResponse($http->request());
     }
 
     /**
@@ -262,6 +267,16 @@ class editor_Services_OpenTM2_HttpApi {
          */
         //Out: { "ReturnValue":0, "ErrorMsg":"" }
         $json = $this->json(__FUNCTION__);
+        $http = $this->getHttpWithMemory('POST', 'entry');
+        
+        if($this->isToLong($source) || $this->isToLong($target)) {
+            $this->error = new stdClass();
+            $this->error->method = $this->httpMethod;
+            $this->error->url = $this->http->getUri(true);
+            $this->error->type = 'TO_LONG';
+            $this->error->error = 'The given segment data is to long and would crash OpenTM2 on saving it.';
+            return false;
+        }
         
         $json->source = $source;
         $json->target = $target;
@@ -280,16 +295,15 @@ class editor_Services_OpenTM2_HttpApi {
 
         $json->targetLang = $this->fixLangKey($json->targetLang);
         
-        $http = $this->getHttpWithMemory('POST', 'entry');
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
 
-        return $this->processResponse($this->request($http));
+        return $this->processResponse($http->request());
     }
 
     /**
      * returns the found errors
      */
-    public function getErrors() {
+    public function getError() {
         return $this->error;
     }
     
@@ -320,93 +334,49 @@ class editor_Services_OpenTM2_HttpApi {
     }
     
     /**
-     * wraps the http request call to catch connection exceptions
-     * @param Zend_Http_Client $http
-     * @return Zend_Http_Response
-     */
-    protected function request(Zend_Http_Client $http) {
-        //exceptions with one of that messages are leading to badgateway exceptions
-        $badGatewayMessages = [
-            'stream_socket_client(): php_network_getaddresses: getaddrinfo failed: Name or service not known',
-            'stream_socket_client(): unable to connect to tcp',
-            'Unable to Connect to tcp'
-        ];
-        
-        try {
-            return $http->request();
-        }
-        catch (Zend_Exception $e) {
-            foreach ($badGatewayMessages as $msg) {
-                if(strpos($e->getMessage(), $msg) === false){
-                    //check next message
-                    continue;
-                }
-                $this->badGateway($e, $http);
-            }
-            throw $e;
-        }
-    }
-    
-    protected function badGateway(Zend_Exception $e, Zend_Http_Client $http) {
-        $badGateway = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz ist nicht erreichbar', 0, $e);
-        $badGateway->setDomain('LanguageResources');
-        
-        $error = new stdClass();
-        $error->type = 'HTTP';
-        $error->error = $e->getMessage();
-        $error->url = $http->getUri(true);
-        $error->method = $this->httpMethod;
-        
-        $badGateway->setErrors([$error]);
-        throw $badGateway;
-    }
-    
-    /**
      * parses and processes the response of OpenTM2, and handles the errors
      * @param Zend_Http_Response $response
      * @return boolean
      */
     protected function processResponse(Zend_Http_Response $response) {
-        $this->error = [];
+        $this->error = null;
         $this->response = $response;
         $validStates = [200, 201];
         
         $url = $this->http->getUri(true);
         
+        //prepare data in case of an error
+        $error = new stdClass();
+        $error->method = $this->httpMethod;
+        $error->url = $url;
+        
         //check for HTTP State (REST errors)
         if(!in_array($response->getStatus(), $validStates)) {
-            $error = new stdClass();
-            $error->type = 'HTTP';
-            $error->error = $response->getStatus();
-            $error->url = $url;
-            $error->method = $this->httpMethod;
-            $this->error[] = $error;
+            $error->type = 'HTTP '.$response->getStatus();
+            $error->error = $response->getStatus(); //is normally overwritten later
+            $this->error = $error;
         }
         
         $responseBody = trim($response->getBody());
         $result = (empty($responseBody)) ? '' : json_decode($responseBody);
         
         //check for JSON errors
-        if(json_last_error() > 0){
-            $error = new stdClass();
-            $error->type = 'JSON';
-            $error->error = json_last_error_msg();
-            $error->url = $url;
-            $error->method = $this->httpMethod;
-            $this->error[] = $error;
-            return false;
+        if(json_last_error() != JSON_ERROR_NONE){
+            throw new editor_Services_Exceptions_InvalidResponse('E1315',[
+                'errorMsg' => json_last_error_msg(),
+                'method' => $this->httpMethod,
+                'url' => $url,
+                'rawanswer' => $responseBody,
+            ]);
         }
         
         $this->result = $result;
         
         //check for error messages from body
         if(!empty($result->ReturnValue) && $result->ReturnValue > 0) {
-            $error = new stdClass();
-            $error->type = 'Error Nr. '.$result->ReturnValue;
+            $error->code = 'Error Nr. '.$result->ReturnValue;
             $error->error = $result->ErrorMsg;
-            $error->url = $url;
-            $error->method = $this->httpMethod;
-            $this->error[] = $error;
+            $this->error = $error;
         }
         
         return empty($this->error);
@@ -427,6 +397,27 @@ class editor_Services_OpenTM2_HttpApi {
         return $this->languageResource;
     }
     
+    /**
+     * returns true if string is to long for OpenTM2
+     * According some research, it seems that the magic border to crash OpenTM2 is on 2048 characters, but:
+     * 1,2 and 3 Byte long characters are counting as 1 character, while 4Byte Characters are counting as 2 Characters.
+     * There fore the below special count is needed.
+     * @param string $string
+     * @return bool
+     */
+    protected function isToLong(string $string): bool {
+        $realCharLength = mb_strlen($string);
+        if($realCharLength < (self::MAX_STR_LENGTH / 2)) {
+            // we do not have to make the regex stuff,
+            // if the real char length is shorter as half of the max count
+            return false;
+        }
+        //since for OpenTM2 4Byte characters seems to count 2 characters,
+        // we have to count and add them to get the real count
+        $smileyCount = preg_match_all('/[\x{10000}-\x{10FFFF}]/mu', $string);
+        return ($realCharLength + $smileyCount) > self::MAX_STR_LENGTH;
+    }
+    
     protected function fixLangKey($key) {
         $keyMap = [
             'mn' => 'ru',
@@ -439,8 +430,9 @@ class editor_Services_OpenTM2_HttpApi {
         }
         return $keyMap[$key];
     }
+    
     protected function fixLangKeyInTM($tmData) {
-        $tmData = str_replace([
+        return str_replace([
             'xml:lang="mn"',
             'xml:lang="mn-MN"',
             'xml:lang="hi"',
@@ -452,6 +444,7 @@ class editor_Services_OpenTM2_HttpApi {
             'xml:lang="ar"',
         ],$tmData);
     }
+    
     protected function fixLangKeyGetTM($langKey, $tmData) {
         switch ($langKey) {
             case 'mn':

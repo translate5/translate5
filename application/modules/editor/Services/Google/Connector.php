@@ -127,14 +127,14 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(& $moreInfo){
-        
+    public function getStatus(){
+        $this->lastStatusInfo = '';
         try {
             if($this->api->getStatus()){
                 return self::STATUS_AVAILABLE;
             }
         }catch (ZfExtended_BadGateway $e){
-            $moreInfo = $e->getMessage();
+            $this->lastStatusInfo = $e->getMessage();
             $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource.service.connector');
             /* @var $logger ZfExtended_Logger */
             $logger->warn('E1282','Language resource communication error.',

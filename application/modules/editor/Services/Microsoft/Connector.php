@@ -152,14 +152,15 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(& $moreInfo){
+    public function getStatus(){
+        $this->lastStatusInfo = '';
         try {
             if($this->api->getStatus()){
                 return self::STATUS_AVAILABLE;
             }
             return self::STATUS_NOCONNECTION;
         }catch (ZfExtended_ErrorCodeException $e){
-            $moreInfo = $e->getMessage();
+            $this->lastStatusInfo = $e->getMessage();
             $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource.service.connector');
             /* @var $logger ZfExtended_Logger */
             $logger->warn('E1282','Language resource communication error.',

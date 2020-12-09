@@ -94,14 +94,15 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(& $moreInfo){
+    public function getStatus(){
+        $this->lastStatusInfo = '';
         try {
             $this->api->getStatus();
         }catch (ZfExtended_BadGateway $e){
-            $moreInfo = $e->getMessage();
+            $this->lastStatusInfo = $e->getMessage();
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
-            $log->logError($moreInfo, $this->languageResource->getResource()->getUrl());
+            $log->logError($this->lastStatusInfo, $this->languageResource->getResource()->getUrl());
             return self::STATUS_NOCONNECTION;
         }
         
@@ -114,11 +115,11 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         // - the requested TM is currently not loaded, so there is no info about the existence
         // - So we display the STATUS_NOT_LOADED instead
         if($this->api->getResponse()->getStatus() == 404) {
-            $moreInfo = 'Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.';
+            $this->lastStatusInfo = 'Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.';
             return self::STATUS_NOT_LOADED;
         }
         
-        $moreInfo = join("<br/>\n", array_map(function($item) {
+        $this->lastStatusInfo = join("<br/>\n", array_map(function($item) {
             return $item->type.': '.$item->error;
         }, $this->api->getErrors()));
             

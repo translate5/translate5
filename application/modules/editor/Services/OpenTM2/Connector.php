@@ -61,6 +61,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     protected $tagHandler;
     
+    public function __construct() {
+        editor_Services_Connector_Exception::addCodes([
+            'E1314' => 'The queried OpenTM2 TM "{tm}" is corrupt and must be reorganized before usage!',
+        ]);
+        parent::__construct();
+    }
+    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
@@ -108,7 +115,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 }
                 return true;
             }
-            $this->handleOpenTm2Error('LanguageResources - could not create TM in OpenTM2'." LanguageResource: \n");
+            $this->logger->error('E1305', 'OpenTM2: could not create TM', [
+                'languageResource' => $this->languageResource,
+                'apiError' => $this->api->getError(),
+            ]);
             return false;
         }
         
@@ -117,7 +127,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->languageResource->addSpecificData('fileName',$this->api->getResult()->name);
             return true;
         }
-        $this->handleOpenTm2Error('LanguageResources - could not create prefilled TM in OpenTM2'." LanguageResource: \n");
+        $this->logger->error('E1304', 'OpenTM2: could not create prefilled TM', [
+            'languageResource' => $this->languageResource,
+            'apiError' => $this->api->getError(),
+        ]);
         return false;
         
     }
@@ -131,7 +144,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
             return true;
         }
-        $this->handleOpenTm2Error('LanguageResources - could not add TMX data to OpenTM2'." LanguageResource: \n");
+        $this->logger->error('E1303', 'OpenTM2: could not add TMX data to TM', [
+            'languageResource' => $this->languageResource,
+            'apiError' => $this->api->getError(),
+        ]);
         return false;
     }
     
@@ -182,19 +198,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return;
         }
         
-        $errors = $this->api->getErrors();
-        //$messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
+        $error = $this->api->getError();
 
         $msg = 'Das Segment konnte nicht ins TM gespeichert werden! Bitte kontaktieren Sie Ihren Administrator! <br />Gemeldete Fehler:';
-        $messages->addError($msg, 'core', null, $errors);
-        $log = ZfExtended_Factory::get('ZfExtended_Log');
-        /* @var $log ZfExtended_Log */
-        $msg = 'LanguageResources - could not save segment to TM'." LanguageResource: \n";
-        $data  = print_r($this->languageResource->getDataObject(),1);
-        $data .= " \nSegment\n".print_r($segment->getDataObject(),1);
-        $data .= " \nError\n".print_r($errors,1);
-        $log->logError($msg, $data);
+        $messages->addError($msg, 'core', null, [$error]);
+        
+        $this->logger->error('E1306', 'OpenTM2: could not save segment to TM', [
+            'languageResource' => $this->languageResource,
+            'segment' => $segment,
+            'apiError' => $error,
+        ]);
     }
     
     /**
@@ -362,35 +375,23 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
     
     /**
-     * Throws a ZfExtended_BadGateway exception containing the underlying errors
-     * @throws ZfExtended_BadGateway
+     * Throws a service connector exception
+     * @throws editor_Services_Connector_Exception
      */
     protected function throwBadGateway() {
-        $e = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz meldete folgenden Fehler:');
-        $e->setDomain('LanguageResources');
-        $e->setErrors($this->api->getErrors());
-        throw $e;
-    }
-    
-    /**
-     * In difference to $this->throwBadGateway this method generates an 400 error
-     *   which shows additional error information in the frontend
-     *
-     * @param string $logMsg
-     */
-    protected function handleOpenTm2Error($logMsg) {
-        $errors = $this->api->getErrors();
+        $ecode = 'E1313';
+        $error = $this->api->getError();
+        $data = [
+            'service' => $this->getResource()->getName(),
+            'languageResource' => $this->languageResource,
+            'error' => $error,
+        ];
+        if(strpos($error->error ?? '', 'needs to be organized') !== false) {
+            $ecode = 'E1314';
+            $data['tm'] = $this->languageResource->getName();
+        }
         
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
-        $msg = 'Von OpenTM2 gemeldeter Fehler';
-        $messages->addError($msg, 'core', null, $errors);
-        
-        $log = ZfExtended_Factory::get('ZfExtended_Log');
-        /* @var $log ZfExtended_Log */
-        $data  = print_r($this->languageResource->getDataObject(),1);
-        $data .= " \nError\n".print_r($errors,1);
-        $log->logError($logMsg, $data);
+        throw new editor_Services_Connector_Exception($ecode, $data);
     }
     
     /**
@@ -411,9 +412,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(& $moreInfo){
-        $langaugeResourceNotSet = empty($this->languageResource);
-        if($langaugeResourceNotSet){
+    public function getStatus(){
+        $this->lastStatusInfo = '';
+        $languageResourceNotSet = empty($this->languageResource);
+        if($languageResourceNotSet){
             $this->languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
             $this->languageResource->setServiceType($this->resource->getServiceType());
             $this->languageResource->setResourceId($this->resource->getId());
@@ -421,42 +423,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
         $name = $this->languageResource->getSpecificData('fileName');
         
-        if(!$langaugeResourceNotSet && empty($name)) {
-            $moreInfo = 'The internal stored filename is invalid';
+        if(!$languageResourceNotSet && empty($name)) {
+            $this->lastStatusInfo = 'The internal stored filename is invalid';
             return self::STATUS_NOCONNECTION;
         }
         
-        try {
-            $apiResult = $this->api->status();
-        }catch (ZfExtended_BadGateway $e){
-            $moreInfo = $e->getMessage();
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $log->logError($moreInfo, $this->languageResource->getResource()->getUrl());
-            return self::STATUS_NOCONNECTION;
+        if($this->api->status()) {
+            return $this->processImportStatus();
         }
-        
-        if($apiResult) {
-            $status = $this->api->getResult()->tmxImportStatus;
-            switch($status) {
-                case 'available':
-                    return self::STATUS_AVAILABLE;
-                case 'import':
-                    $moreInfo = 'TMX wird importiert, TM kann trotzdem benutzt werden';
-                    return self::STATUS_IMPORT;
-                case 'error':
-                case 'failed':
-                    $moreInfo = $this->api->getResult()->ErrorMsg;
-                    return self::STATUS_ERROR;
-            }
-            $moreInfo = 'original OpenTM2 status '.$status;
-            return self::STATUS_UNKNOWN;
-        }
+        //down here the result contained an error, the json was invalid or HTTP Status was not 20X
         
         //lets check the internal state before we just print the 404 default:
         $status = $this->languageResource->getSpecificData('status') ?? '';
         if($status == self::STATUS_IMPORT) {
-            $moreInfo = 'TM wird noch importiert und ist daher auch noch nicht nutzbar.';
+            $this->lastStatusInfo = 'TM wird noch importiert und ist daher auch noch nicht nutzbar.';
             //FIXME thats not 100% correct here, since when it was crashed while the import it may stay on status import
             return self::STATUS_IMPORT;
         }
@@ -467,15 +447,38 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // - the requested TM is currently not loaded, so there is no info about the existence
         // - So we display the STATUS_NOT_LOADED instead
         if($this->api->getResponse()->getStatus() == 404) {
-            $moreInfo = 'Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.';
+            $this->lastStatusInfo = 'Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.';
             return self::STATUS_NOT_LOADED;
         }
         
-        $moreInfo = join("<br/>\n", array_map(function($item) {
+        $this->lastStatusInfo = join("<br/>\n", array_map(function($item) {
             return $item->type.': '.$item->error;
-        }, $this->api->getErrors()));
+        }, $this->api->getError()));
             
         return self::STATUS_NOCONNECTION;
+    }
+    
+    /**
+     * processes the import state
+     * @return string
+     */
+    protected function processImportStatus() {
+        $status = $this->api->getResult()->tmxImportStatus;
+        switch($status) {
+            case 'available':
+                return self::STATUS_AVAILABLE;
+            case 'import':
+                $this->lastStatusInfo = 'TMX wird importiert, TM kann trotzdem benutzt werden';
+                return self::STATUS_IMPORT;
+            case 'error':
+            case 'failed':
+                $this->lastStatusInfo = $this->api->getResult()->ErrorMsg;
+                return self::STATUS_ERROR;
+            default:
+                break;
+        }
+        $this->lastStatusInfo = 'original OpenTM2 status '.$status;
+        return self::STATUS_UNKNOWN;
     }
     
     /***
