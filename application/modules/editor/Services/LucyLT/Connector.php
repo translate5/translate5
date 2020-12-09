@@ -223,7 +223,8 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
         return $this->defaultMatchRate;
     }
     
-    public function getStatus(& $moreInfo){
+    public function getStatus(){
+        $this->lastStatusInfo = '';
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
         
@@ -239,7 +240,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
         try {
             $response = $http->request('OPTIONS');
         }catch (Exception $e){
-            $moreInfo = $e->getMessage();
+            $this->lastStatusInfo = $e->getMessage();
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
             $log->logException($e);
@@ -255,10 +256,10 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
                 }
                 break;
             case 401:
-                $moreInfo = 'Translate5 can not authenticate itself at the Lucy LT server.';
+                $this->lastStatusInfo = 'Translate5 can not authenticate itself at the Lucy LT server.';
                 return self::STATUS_NOCONNECTION;
         }
-        $moreInfo = 'The answer received from the Lucy LT Server is not as expected!';
+        $this->lastStatusInfo = 'The answer received from the Lucy LT Server is not as expected!';
         return self::STATUS_NOCONNECTION;
     }
 }

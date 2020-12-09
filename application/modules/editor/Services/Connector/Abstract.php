@@ -118,10 +118,15 @@ abstract class editor_Services_Connector_Abstract {
     protected $tagHandler;
     
     /**
+     * @var string
+     */
+    protected $lastStatusInfo = '';
+    
+    /**
      * Logger instance
      * @var ZfExtended_Logger
      */
-    protected $logger;
+    public $logger;
     
     /**
      * initialises the internal result list
@@ -141,10 +146,9 @@ abstract class editor_Services_Connector_Abstract {
      */
     public function ping(editor_Models_LanguageResources_Resource $resource){
         $this->resource = $resource;
-        $moreInfo = "";
         //the valid api response statuses
         $isValidFor = [self::STATUS_AVAILABLE,self::STATUS_NOT_LOADED];
-        return in_array($this->getStatus($moreInfo), $isValidFor);
+        return in_array($this->getStatus(), $isValidFor);
     }
     
     /**
@@ -192,11 +196,19 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /***
-     * Get the connector language ressource
+     * Get the connector language resource
      * @return editor_Models_LanguageResources_LanguageResource
      */
     public function getLanguageResource(){
         return $this->languageResource;
+    }
+    
+    /***
+     * Get the connector service resource
+     * @return editor_Models_LanguageResources_Resource
+     */
+    public function getResource(){
+        return $this->resource;
     }
     
     /***
@@ -263,9 +275,27 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /**
-     * @return editor_Services_ServiceResult the status of the connected resource and additional information if there is some
+     * Check the status of the language resource. If using a the HttpClient,
+     *  the handling of general service down and timeout as no connection, is done in the connector wrapper.
+     * @return string the status of the connected resource and additional information if there is some
      */
-    abstract public function getStatus(& $moreInfo);
+    abstract public function getStatus();
+    
+    /**
+     * returns the last stored additional info string from the last getStatus call
+     * @return string
+     */
+    public function getLastStatusInfo(): string {
+        return $this->lastStatusInfo;
+    }
+    
+    /**
+     * set the last stored additional info string for the last getStatus call from outside
+     * @param string $info
+     */
+    public function setLastStatusInfo(string $info) {
+        return $this->lastStatusInfo = $info;
+    }
     
     /***
      * Search the resource for available translation. Where the source text is in resource source language and the received results
@@ -348,6 +378,10 @@ abstract class editor_Services_Connector_Abstract {
         return false;
     }
     
+    /**
+     * Logs all queued log entries, adding segment data on each log entry
+     * @param editor_Models_Segment $segment
+     */
     public function logForSegment(editor_Models_Segment $segment) {
         if(!$this->tagHandler->logger->hasQueuedLogs()) {
             return;

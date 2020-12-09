@@ -137,7 +137,8 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(& $moreInfo){
+    public function getStatus(){
+        $this->lastStatusInfo = '';
         //TODO: change the usage of resource in each connector in all lr
         $res = $this->resource;
         /* @var $res editor_Services_Moses_Resource */
@@ -150,7 +151,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
         try {
             $response = $http->request('GET');
         }catch (Exception $e){
-            $moreInfo = $e->getMessage();
+            $this->lastStatusInfo = $e->getMessage();
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
             $log->logException($e);
@@ -162,7 +163,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
         if($response->getStatus() === 405) {
             return self::STATUS_AVAILABLE;
         }
-        $moreInfo = 'The answer received from Moses is not as expected!';
+        $this->lastStatusInfo = 'The answer received from Moses is not as expected!';
         return self::STATUS_NOCONNECTION;
     }
 }

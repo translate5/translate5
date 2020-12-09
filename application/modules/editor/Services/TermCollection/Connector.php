@@ -213,7 +213,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(& $moreInfo){
+    public function getStatus(){
         if(!isset($this->languageResource)){
             //this should come from the resource status check in the resources api request
             return self::STATUS_AVAILABLE;
@@ -268,11 +268,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @param string $logMsg
      */
     protected function handleError($logMsg) {
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
-        $msg = 'Von Termcollection gemeldeter Fehler';
-        $messages->addError($msg, 'core', null);
-        
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         /* @var $log ZfExtended_Log */
         $data  = print_r($this->languageResource->getDataObject(),1);
