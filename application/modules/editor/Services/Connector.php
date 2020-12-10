@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
  * @method editor_Services_ServiceResult query() query(editor_Models_Segment $segment)
  * @method editor_Services_ServiceResult search() search(string $searchString, $field = 'source', $offset = null)
  * @method editor_Services_ServiceResult translate() translate(string $searchString)
- * @method string getStatus() getStatus() returns the LanguageResource status
+ * @method string getStatus() getStatus(editor_Models_LanguageResources_Resource $resource) returns the LanguageResource status
  * @method string getLastStatusInfo() getLastStatusInfo() returns the last store status info from the last getStatus call
  */
 class editor_Services_Connector {
@@ -86,13 +86,21 @@ class editor_Services_Connector {
     protected $batchQuery = false;
     
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang = null, $targetLang = null){
-        $serviceType = $languageResource->getServiceType();
-        $connector = ZfExtended_Factory::get($serviceType.editor_Services_Manager::CLS_CONNECTOR);
-        /* @var $connector editor_Services_Connector_Abstract */
-        $connector->connectTo($languageResource, $sourceLang, $targetLang);
-        $this->adapter = $connector;
+        $this->connectToResourceOnly($languageResource->getResource());
+        $this->adapter->connectTo($languageResource, $sourceLang, $targetLang);
         $this->sourceLang = $sourceLang;
         $this->targetLang = $targetLang;
+    }
+    
+    /**
+     * Connects to a given resource only, for requests not using a concrete language resource (ping calls for example)
+     * @param editor_Models_LanguageResources_Resource $resource
+     */
+    protected function connectToResourceOnly(editor_Models_LanguageResources_Resource $resource){
+        $connector = ZfExtended_Factory::get($resource->getServiceType().editor_Services_Manager::CLS_CONNECTOR);
+        /* @var $connector editor_Services_Connector_Abstract */
+        $connector->setResource($resource);
+        $this->adapter = $connector;
     }
     
     /**
@@ -158,7 +166,9 @@ class editor_Services_Connector {
      */
     public function __call($method, $arguments){
         $toThrow = null;
-        $status = '';
+        // if is called getStatus, the determined status is calculated there.
+        // If there is an error in getStatus, this is either handled there, or in doubt we set NO_CONNECTION
+        $status = editor_Services_Connector_Abstract::STATUS_NOCONNECTION;
         try {
             $internalMethod = '_'.$method;
             //check if method is wrapped here, then call it
@@ -170,7 +180,6 @@ class editor_Services_Connector {
                 return call_user_func_array([$this->adapter, $method], $arguments);
             }
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut | ZfExtended_Zendoverwrites_Http_Exception_Down $e) {
-            $status = editor_Services_Connector_Abstract::STATUS_NOCONNECTION;
             if($e instanceof  ZfExtended_Zendoverwrites_Http_Exception_Down) {
                 $ecode = 'E1311';
             }
@@ -186,6 +195,7 @@ class editor_Services_Connector {
         //IMPORTANT: getStatus must not throw an exception! Instead return the status in case of a here handled exception
         if($method == 'getStatus') {
             $this->adapter->setLastStatusInfo($this->adapter->logger->formatMessage($toThrow->getMessage(), $toThrow->getErrors()));
+            $this->adapter->logger->exception($toThrow);
             return $status;
         }
         
@@ -193,6 +203,18 @@ class editor_Services_Connector {
             $toThrow = new BadMethodCallException('Method '.$method.' does not exist in '.__CLASS__.' or its adapter.');
         }
         throw $toThrow;
+    }
+    
+    /**
+     * Check the resource connection. Returns true, if a connection with the resource can be established
+     * @param editor_Models_LanguageResources_Resource $resource
+     * @return boolean
+     */
+    public function ping(editor_Models_LanguageResources_Resource $resource){
+        $this->connectToResourceOnly($resource);
+        //a ping is successfull if the status of the resource is available or not loaded
+        $isValidFor = [editor_Services_Connector_Abstract::STATUS_AVAILABLE, editor_Services_Connector_Abstract::STATUS_NOT_LOADED];
+        return in_array($this->getStatus($resource), $isValidFor);
     }
     
     /***

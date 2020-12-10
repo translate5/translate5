@@ -43,6 +43,7 @@ abstract class editor_Services_Connector_Abstract {
     const STATUS_NOCONNECTION = 'noconnection';
     const STATUS_NOVALIDLICENSE = 'novalidlicense';
     const STATUS_NOT_LOADED = 'notloaded';
+    const STATUS_QUOTA_EXCEEDED = 'quotaexceeded';
     
     const FUZZY_SUFFIX = '-fuzzy-';
     
@@ -138,19 +139,6 @@ abstract class editor_Services_Connector_Abstract {
         $this->tagHandler = ZfExtended_Factory::get($this->tagHandlerClass);
     }
     
-    /***
-     * Check the resource connection. This will return true conection with the resource can
-     * be established
-     * @param editor_Models_LanguageResources_Resource $resource
-     * @return boolean
-     */
-    public function ping(editor_Models_LanguageResources_Resource $resource){
-        $this->resource = $resource;
-        //the valid api response statuses
-        $isValidFor = [self::STATUS_AVAILABLE,self::STATUS_NOT_LOADED];
-        return in_array($this->getStatus(), $isValidFor);
-    }
-    
     /**
      * Just for logging the called methods
      * @param string $msg
@@ -176,6 +164,14 @@ abstract class editor_Services_Connector_Abstract {
             $this->languageResource->targetLangCode=$this->languageResource->getTargetLangCode();
         }
         $this->logger = $this->logger->cloneMe('editor.languageresource.'.strtolower($this->resource->getService()).'.connector');
+    }
+    
+    /**
+     * Sets the internal stored resource, needed for connections without a concrete language resource (pinging for example)
+     * @param editor_Models_LanguageResources_Resource $resource
+     */
+    public function setResource(editor_Models_LanguageResources_Resource $resource) {
+        $this->resource = $resource;
     }
     
     /**
@@ -275,11 +271,12 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /**
-     * Check the status of the language resource. If using a the HttpClient,
+     * Check the status of the language resource. If using the HttpClient,
      *  the handling of general service down and timeout as no connection, is done in the connector wrapper.
+     * @param editor_Models_LanguageResources_Resource $resource the resource which should be used for connection
      * @return string the status of the connected resource and additional information if there is some
      */
-    abstract public function getStatus();
+    abstract public function getStatus(editor_Models_LanguageResources_Resource $resource);
     
     /**
      * returns the last stored additional info string from the last getStatus call

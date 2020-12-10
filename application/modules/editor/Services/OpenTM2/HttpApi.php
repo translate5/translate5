@@ -35,34 +35,13 @@ END LICENSE AND COPYRIGHT
 /**
  * OpenTM2 HTTP Connection API
  */
-class editor_Services_OpenTM2_HttpApi {
+class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiAbstract {
     const MAX_STR_LENGTH = 2048;
+    
     /**
      * @var editor_Models_LanguageResources_LanguageResource
      */
     protected $languageResource;
-    
-    /**
-     * @var Zend_Http_Response
-     */
-    protected $response;
-    
-    /**
-     * @var stdClass
-     */
-    protected $result;
-    
-    protected $error = array();
-    
-    /**
-     * @var Zend_Http_Client
-     */
-    protected $http;
-    
-    /**
-     * @var string
-     */
-    protected $httpMethod;
     
     /**
      * This method creates a new memory.
@@ -117,7 +96,7 @@ class editor_Services_OpenTM2_HttpApi {
      * @return Zend_Http_Client
      */
     protected function getHttp($method, $urlSuffix = '') {
-        $url = rtrim($this->languageResource->getResource()->getUrl(), '/');
+        $url = rtrim($this->resource->getUrl(), '/');
         $urlSuffix = ltrim($urlSuffix, '/');
         $this->http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
@@ -136,11 +115,14 @@ class editor_Services_OpenTM2_HttpApi {
      * @return Zend_Http_Client
      */
     protected function getHttpWithMemory($method, $urlSuffix = '') {
-        $fileName=isset($this->languageResource) ?  $this->languageResource->getSpecificData('fileName') : false;
-        $url = '/'.ltrim($urlSuffix, '/');
-        if(!empty($fileName)){
-            $url = urlencode($fileName).'/'.ltrim($urlSuffix, '/');
+        $fileName = $this->languageResource->getSpecificData('fileName') ?? false;
+        if(empty($fileName)){
+            // if filename would be empty, it would be possible to make a GET / to OpenTM2, which would list all TMs in an invalid JSON
+            // this invalid JSON would then be logged to all error receivers, this is something we do not want to!
+            // so we ensure that there is a path, although this would lead to an 404
+            $fileName = 'i/do/not/exist';
         }
+        $url = urlencode($fileName).'/'.ltrim($urlSuffix, '/');
         return $this->getHttp($method, $url);
     }
     
@@ -169,21 +151,35 @@ class editor_Services_OpenTM2_HttpApi {
     }
     
     /**
-     * retrieves the TM as TM file
+     * checks the status of a language resource (if set), or just of the server (if no concrete language resource is given)
      * @return boolean
      */
     public function status() {
-        $http = $this->getHttpWithMemory('GET', '/status');
-        $http->setConfig(['timeout' => 3]);
-        return $this->processResponse($http->request());
+        if(empty($this->languageResource)) {
+            $this->getHttp('GET', '/');
+        }
+        else {
+            $this->getHttpWithMemory('GET', '/status');
+        }
+        $this->http->setConfig(['timeout' => 3]);
+        try {
+            //OpenTM2 returns invalid JSON on calling "/", so we have to fix this here by catching the invalid JSON Exception.
+            // Also this would send a list of all TMs to all error receivers, which must also prevented
+            return $this->processResponse($this->http->request());
+        } catch(editor_Services_Exceptions_InvalidResponse $e) {
+            if(empty($this->languageResource) && $e->getErrorCode() == 'E1315') {
+                return true;
+            }
+            throw $e;
+        }
     }
 
     /**
      * This method deletes a memory.
      */
     public function delete() {
-        $http = $this->getHttpWithMemory('DELETE');
-        return $this->processResponse($http->request());
+        $this->getHttpWithMemory('DELETE');
+        return $this->processResponse($this->http->request());
     }
     
     /**
@@ -299,27 +295,6 @@ class editor_Services_OpenTM2_HttpApi {
 
         return $this->processResponse($http->request());
     }
-
-    /**
-     * returns the found errors
-     */
-    public function getError() {
-        return $this->error;
-    }
-    
-    /**
-     * returns the raw response
-     */
-    public function getResponse() {
-        return $this->response;
-    }
-    
-    /**
-     * returns the decoded JSON result
-     */
-    public function getResult() {
-        return $this->result;
-    }
     
     /**
      * Creates a stdClass Object which is later converted to JSON for communication
@@ -338,45 +313,16 @@ class editor_Services_OpenTM2_HttpApi {
      * @param Zend_Http_Response $response
      * @return boolean
      */
-    protected function processResponse(Zend_Http_Response $response) {
-        $this->error = null;
-        $this->response = $response;
-        $validStates = [200, 201];
-        
-        $url = $this->http->getUri(true);
-        
-        //prepare data in case of an error
-        $error = new stdClass();
-        $error->method = $this->httpMethod;
-        $error->url = $url;
-        
-        //check for HTTP State (REST errors)
-        if(!in_array($response->getStatus(), $validStates)) {
-            $error->type = 'HTTP '.$response->getStatus();
-            $error->error = $response->getStatus(); //is normally overwritten later
-            $this->error = $error;
-        }
-        
-        $responseBody = trim($response->getBody());
-        $result = (empty($responseBody)) ? '' : json_decode($responseBody);
-        
-        //check for JSON errors
-        if(json_last_error() != JSON_ERROR_NONE){
-            throw new editor_Services_Exceptions_InvalidResponse('E1315',[
-                'errorMsg' => json_last_error_msg(),
-                'method' => $this->httpMethod,
-                'url' => $url,
-                'rawanswer' => $responseBody,
-            ]);
-        }
-        
-        $this->result = $result;
+    protected function processResponse(Zend_Http_Response $response): bool {
+        parent::processResponse($response);
         
         //check for error messages from body
-        if(!empty($result->ReturnValue) && $result->ReturnValue > 0) {
-            $error->code = 'Error Nr. '.$result->ReturnValue;
-            $error->error = $result->ErrorMsg;
-            $this->error = $error;
+        if(!empty($this->result->ReturnValue) && $this->result->ReturnValue > 0) {
+            $this->error = new stdClass();
+            $this->error->method = $this->httpMethod;
+            $this->error->url = $this->http->getUri(true);
+            $this->error->code = 'Error Nr. '.$this->result->ReturnValue;
+            $this->error->error = $this->result->ErrorMsg;
         }
         
         return empty($this->error);
@@ -389,7 +335,12 @@ class editor_Services_OpenTM2_HttpApi {
         return gmdate('Ymd\THis\Z');
     }
     
+    /**
+     * Sets internally the used language resource (and service resource)
+     * @param editor_Models_LanguageResources_LanguageResource $languageResource
+     */
     public function setLanguageResource(editor_Models_LanguageResources_LanguageResource $languageResource) {
+        $this->resource = $languageResource->getResource();
         $this->languageResource = $languageResource;
     }
     

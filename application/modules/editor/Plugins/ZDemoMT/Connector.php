@@ -111,7 +111,7 @@ class editor_Plugins_ZDemoMT_Connector extends editor_Services_Connector_Abstrac
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource){
         return self::STATUS_AVAILABLE;
     }
 }

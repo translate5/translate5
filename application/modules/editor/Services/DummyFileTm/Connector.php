@@ -242,7 +242,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
     public function getValidExportTypes()
     {}
 
-    public function getStatus()
+    public function getStatus(editor_Models_LanguageResources_Resource $resource)
     {}
 
     public function translate(string $searchString){

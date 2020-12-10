@@ -94,17 +94,9 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource){
         $this->lastStatusInfo = '';
-        try {
-            $this->api->getStatus();
-        }catch (ZfExtended_BadGateway $e){
-            $this->lastStatusInfo = $e->getMessage();
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $log->logError($this->lastStatusInfo, $this->languageResource->getResource()->getUrl());
-            return self::STATUS_NOCONNECTION;
-        }
+        $this->api->getStatus();
         
         if($this->api->getResponse()->getStatus()==200) {
             return self::STATUS_AVAILABLE;

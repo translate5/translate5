@@ -94,8 +94,8 @@ class editor_Services_Manager {
 
             //for the resource check the connection
             if(!empty($resource)){
-                $connector = ZfExtended_Factory::get($resource->serviceType.editor_Services_Manager::CLS_CONNECTOR);
-                /* @var $connector editor_Services_Connector_Abstract */
+                $connector = ZfExtended_Factory::get('editor_Services_Connector');
+                /* @var $connector editor_Services_Connector */
                 
                 //the service is also not available when connection cannot be established
                 if($connector && !$connector->ping($resource)){

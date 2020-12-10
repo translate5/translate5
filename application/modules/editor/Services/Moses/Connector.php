@@ -137,26 +137,14 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource){
         $this->lastStatusInfo = '';
-        //TODO: change the usage of resource in each connector in all lr
-        $res = $this->resource;
-        /* @var $res editor_Services_Moses_Resource */
-        
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         $http->setConfig(['timeout' => 3]);
         /* @var $http Zend_Http_Client */
-        $http->setUri($res->getUrl());
+        $http->setUri($resource->getUrl());
         
-        try {
-            $response = $http->request('GET');
-        }catch (Exception $e){
-            $this->lastStatusInfo = $e->getMessage();
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $log->logException($e);
-            return self::STATUS_NOCONNECTION;
-        }
+        $response = $http->request('GET');
         
         //making a plain GET request produces a 405 state since it is not allowed.
         // This is OK, since we want just test the connectivity
