@@ -118,7 +118,6 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
     protected function removeTagsWithContent(string $content): string {
         //just concat source and target to check both:
         if(preg_match('#<(it|ph|ept|bpt)[^>]*>#', $content)) {
-            
             $this->logger->info('E1301', 'The LanguageResource answer did contain it|ph|ept|bpt tags, which are removed since they can not be handled.',[
                 'givenContent' => $content,
             ]);
@@ -149,7 +148,7 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         
         $result = preg_replace_callback('#<(x|ex|bx|g|/g)[^>]*>#', function() use (&$shortTagNr, &$addedTags) {
             $addedTags = true;
-            return $this->internalTag->makeAdditionalHtmlTag($shortTagNr++);
+            return $this->internalTag->makeAdditionalHtmlTag(++$shortTagNr);
         }, $segment);
         
         if($addedTags) {

@@ -276,7 +276,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->eventsCount = isset($eventLoggerGroupped[$this->entity->getId()]) ? (integer)$eventLoggerGroupped[$this->entity->getId()] : 0;
         
         $connector = $serviceManager->getConnector($this->entity);
-        $this->view->rows->status = $connector->getStatus();
+        $this->view->rows->status = $connector->getStatus($this->entity->getResource());
         $this->view->rows->statusInfo = $t->_($connector->getLastStatusInfo());
     }
     

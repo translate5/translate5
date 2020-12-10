@@ -474,7 +474,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource){
         if($this->api->getStatus()){
             return self::STATUS_AVAILABLE;
         }

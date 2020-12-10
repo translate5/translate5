@@ -223,7 +223,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
         return $this->defaultMatchRate;
     }
     
-    public function getStatus(){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource){
         $this->lastStatusInfo = '';
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
@@ -237,15 +237,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
         $http->setHeaders('Content-Type: application/json');
         $http->setHeaders('Accept: application/json');
         
-        try {
-            $response = $http->request('OPTIONS');
-        }catch (Exception $e){
-            $this->lastStatusInfo = $e->getMessage();
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $log->logException($e);
-            return self::STATUS_NOCONNECTION;
-        }
+        $response = $http->request('OPTIONS');
         
         $status = $response->getStatus();
         

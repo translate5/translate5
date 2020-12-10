@@ -383,7 +383,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $error = $this->api->getError();
         $data = [
             'service' => $this->getResource()->getName(),
-            'languageResource' => $this->languageResource,
+            'languageResource' => $this->languageResource ?? '',
             'error' => $error,
         ];
         if(strpos($error->error ?? '', 'needs to be organized') !== false) {
@@ -412,18 +412,17 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource){
         $this->lastStatusInfo = '';
-        $languageResourceNotSet = empty($this->languageResource);
-        if($languageResourceNotSet){
-            $this->languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-            $this->languageResource->setServiceType($this->resource->getServiceType());
-            $this->languageResource->setResourceId($this->resource->getId());
-            $this->connectTo($this->languageResource, 'en', 'de');
+        if(empty($this->languageResource)) {
+            //ping call
+            $this->api = ZfExtended_Factory::get('editor_Services_OpenTM2_HttpApi');
+            $this->api->setResource($resource);
+            return $this->api->status();
         }
-        $name = $this->languageResource->getSpecificData('fileName');
         
-        if(!$languageResourceNotSet && empty($name)) {
+        $name = $this->languageResource->getSpecificData('fileName');
+        if(empty($name)) {
             $this->lastStatusInfo = 'The internal stored filename is invalid';
             return self::STATUS_NOCONNECTION;
         }
