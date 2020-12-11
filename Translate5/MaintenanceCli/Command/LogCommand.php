@@ -254,8 +254,13 @@ the format is:
                 $this->showDetail($row);
             }
             else {
+                $idBlock = '(# '.$row['id'];
+                if($row['duplicates'] > 0) {
+                    $idBlock .= ' <options=bold>*'.$row['duplicates'].'</>';
+                }
+                $idBlock .= ') ';
                 $this->io->text($row['created'].' '.
-                    $this->levels[$row['level']].' <options=bold>'.$row['eventCode'].'</> (# '.$row['id'].') '.
+                    $this->levels[$row['level']].' <options=bold>'.$row['eventCode'].'</> '.$idBlock.
                     OutputFormatter::escape((string) $row['domain']).' → '.
                     OutputFormatter::escape((string)str_replace("\n", ' ', $row['message'])));
             }
@@ -451,12 +456,20 @@ the format is:
             '         <info>id:</> '.(string) $row['id'],
             '      <info>level:</> '.(string) $this->levels[$row['level']],
             '    <info>created:</> '.(string) $row['created'],
+            ' <info>duplicates:</> <options=bold>'.(string) $row['duplicates'].'</>',
+            '       <info>last:</> '.(string) $row['last'],
             '      <info>ecode:</> <options=bold>'.OutputFormatter::escape((string) $row['eventCode']).'</>',
             '     <info>domain:</> '.OutputFormatter::escape((string) $row['domain']),
             '    <info>message:</> '.OutputFormatter::escape((string) $row['message']),
             ' <info>appVersion:</> '.OutputFormatter::escape((string) $row['appVersion']),
             '<info>file (line):</> '.OutputFormatter::escape((string) $row['file'].' ('.$row['line'].')'),
         ];
+
+        if($row['duplicates'] == 0) {
+            unset($out[3]);
+            unset($out[4]);
+        }
+        
         if(!empty($row['httpHost'])) {
             $out[] = '       <info>Host:</> '.OutputFormatter::escape((string) $row['httpHost']);
         }
