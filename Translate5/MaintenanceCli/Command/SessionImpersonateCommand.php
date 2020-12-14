@@ -31,6 +31,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Translate5\MaintenanceCli\WebAppBridge\Application;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 
 class SessionImpersonateCommand extends Translate5AbstractCommand
@@ -49,6 +50,12 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
         ->setHelp('Generates a new session for the given user and returns a URL to use that session in a browser.');
         
         $this->addArgument('login', InputArgument::REQUIRED, 'The login (username) to generate a session for.');
+        
+        $this->addOption(
+            'segment-id',
+            's',
+            InputOption::VALUE_REQUIRED,
+            'Give a segment ID to generate a URL pointing directly to that segment.');
     }
 
     /**
@@ -88,7 +95,7 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
             '        <info>E-Mail:</info> '.$userModel->getEmail(),
             '',
             'Navigate to the following URL in your browser to authenticate as the desired User: ',
-            '  <options=bold>'.$config->runtimeOptions->server->protocol.$this->translate5->getHostname().'/editor?sessionToken='.$token.'</>',
+            '  <options=bold>'.$config->runtimeOptions->server->protocol.$this->makeUrlPath($token).'</>',
             ''
         ]);
         
@@ -96,5 +103,23 @@ class SessionImpersonateCommand extends Translate5AbstractCommand
         //set a flag to identify that this session was started by API
         $userSession->loginByApiAuth = true;
         return 0;
+    }
+    
+    protected function makeUrlPath(string $token) {
+        $url = $this->translate5->getHostname().'/editor?sessionToken='.$token;
+        $segmentId = $this->input->getOption('segment-id');
+        if(empty($segmentId)) {
+            return $url;
+        }
+        
+        $segment = \ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment \editor_Models_Segment */
+        $segment->load($segmentId);
+        
+        $task = \ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task \editor_Models_Task */
+        $task->loadByTaskGuid($segment->getTaskGuid());
+        
+        return $url.'#task/'.$task->getId().'/'.$segment->getSegmentNrInTask().'/edit';
     }
 }
