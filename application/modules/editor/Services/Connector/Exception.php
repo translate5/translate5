@@ -42,4 +42,9 @@ class editor_Services_Connector_Exception extends ZfExtended_BadGateway {
         'E1312' => 'Could not connect to language resource {service}: timeout on connection to server',
         'E1313' => 'The queried language resource {service} returns an error.',
     ];
+    
+    protected function setDuplication() {
+        parent::setDuplication();
+        ZfExtended_Logger::addDuplicatesByMessage('E1311', 'E1312');
+    }
 }

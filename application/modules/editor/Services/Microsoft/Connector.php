@@ -128,7 +128,11 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
         return $this->resultList;
     }
     
-    public function languages(){
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::languages()
+     */
+    public function languages(): array{
         return array_keys($this->api->getLanguages());
     }
     

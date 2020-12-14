@@ -25,7 +25,8 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
+use Google\Cloud\Translate\V2\TranslateClient;
+use Google\Cloud\Core\Exception\BadRequestException;
 /**
  */
 class editor_Services_Google_Connector extends editor_Services_Connector_Abstract {
@@ -33,9 +34,9 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
     use editor_Services_Connector_BatchTrait;
     
     /**
-     * @var editor_Services_Google_HttpApi
+     * @var editor_Services_Google_ApiWrapper
      */
-    protected $api;
+    protected $apiWrapper;
 
     /**
      * Using Xliff based tag handler here
@@ -55,11 +56,27 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      */
     public function __construct() {
         parent::__construct();
-        $this->api = ZfExtended_Factory::get('editor_Services_Google_HttpApi');
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
         $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->google->matchrate;
         $this->batchQueryBuffer = 50;
+        
+        
+        editor_Services_Connector_Exception::addCodes([
+            'E1319' => 'Google Translate authorization failed. Please supply a valid API Key.',
+            'E1320' => 'Google Translate daily limit exceeded.',
+        ]);
+        
+        ZfExtended_Logger::addDuplicatesByMessage('E1319', 'E1320');
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_FilebasedAbstract::connectTo()
+     */
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
+        parent::connectTo($languageResource, $sourceLang, $targetLang);
+        $this->apiWrapper = ZfExtended_Factory::get('editor_Services_Google_ApiWrapper', [$languageResource->getResource()]);
     }
     
     /**
@@ -68,12 +85,14 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryStringAndSetAsDefault($segment);
-        if(!$this->api->search($this->tagHandler->prepareQuery($queryString), $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode())){
+        $result = $this->apiWrapper->translate($this->tagHandler->prepareQuery($queryString), $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode());
+        if($result === false) {
+            throw $this->createConnectorException();
+        }
+        if(empty($result)){
             return $this->resultList;
         }
-        $result=$this->api->getResult();
-        $translation = $result['text'] ?? "";
-        $this->resultList->addResult($this->tagHandler->restoreInResult($translation), $this->defaultMatchRate);
+        $this->resultList->addResult($this->tagHandler->restoreInResult($result['text'] ?? ""), $this->defaultMatchRate);
         return $this->resultList;
     }
     
@@ -88,14 +107,15 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
             return $this->resultList;
         }
         
-        $result=null;
-        if($this->api->search($searchString,$this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode())){
-            $result=$this->api->getResult();
+        $result = $this->apiWrapper->translate($searchString, $this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode());
+        if($result === false) {
+            throw $this->createConnectorException();
+        }
+        if(empty($result)){
+            return $this->resultList;
         }
         
-        $translation = $result['text'] ?? "";
-        
-        $this->resultList->addResult($translation, $this->defaultMatchRate);
+        $this->resultList->addResult($result['text'] ?? "", $this->defaultMatchRate);
         return $this->resultList;
     }
 
@@ -103,8 +123,12 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::languages()
      */
-    public function languages(){
-        return $this->api->getLanguages();
+    public function languages(): array {
+        //if empty api wrapper
+        if(empty($this->apiWrapper)) {
+            $this->apiWrapper = ZfExtended_Factory::get('editor_Services_Google_ApiWrapper', [$this->resource]);
+        }
+        return $this->apiWrapper->getLanguages();
     }
     
     /**
@@ -112,7 +136,11 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * @see editor_Services_Connector_BatchTrait::batchSearch()
      */
     protected function batchSearch(array $queryStrings, string $sourceLang, string $targetLang): bool {
-        return $this->api->searchBatch($queryStrings, $sourceLang, $targetLang);
+        $result = $this->apiWrapper->translateBatch($queryStrings, $sourceLang, $targetLang);
+        if($result === false) {
+            throw $this->createConnectorException();
+        }
+        return $result;
     }
     
     /**
@@ -120,7 +148,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * @see editor_Services_Connector_BatchTrait::processBatchResult()
      */
     protected function processBatchResult($segmentResults) {
-        $this->resultList->addResult($this->tagHandler->restoreInResult($segmentResults['text']), $this->defaultMatchRate);
+        $this->resultList->addResult($this->tagHandler->restoreInResult($segmentResults['text'] ?? ''), $this->defaultMatchRate);
     }
     
     /**
@@ -129,9 +157,54 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      */
     public function getStatus(editor_Models_LanguageResources_Resource $resource){
         $this->lastStatusInfo = '';
-        if($this->api->getStatus()){
+        $languages = $this->languages();
+        if(empty($languages)) {
+            
+            //we also log below errors
+            $e = $this->createConnectorException();
+            $this->logger->exception($e);
+            
+            if($e->getErrorCode() === 'E1319') {
+                $this->lastStatusInfo = 'Anmeldung bei Google Translate fehlgeschlagen. Bitte verwenden Sie einen gültigen API Key.';
+                return self::STATUS_NOVALIDLICENSE;
+            }
+            if($e->getErrorCode() === 'E1320') {
+                $this->lastStatusInfo = 'Das Nutzungslimit wurde erreicht.';
+                return self::STATUS_QUOTA_EXCEEDED;
+            }
+            $this->lastStatusInfo = 'Keine Verbindung zu Google Translate!';
+        }
+        else {
             return self::STATUS_AVAILABLE;
         }
         return self::STATUS_NOCONNECTION;
+    }
+    
+    /**
+     * Creates a service connector exception
+     * @return editor_Services_Connector_Exception
+     */
+    protected function createConnectorException(): editor_Services_Connector_Exception {
+        $badRequestException = $this->apiWrapper->getError();
+        $msg = $badRequestException->getMessage();
+        if(stripos($msg, 'Daily Limit Exceeded') !== false) {
+            $ecode = 'E1320'; //'Google Translate quota exceeded. The character limit has been reached.',
+        }
+        elseif(stripos($msg, 'API key not valid. Please pass a valid API key.') !== false) {
+            $ecode = 'E1319'; //'Google Translate authorization failed. Please supply a valid API Key.',
+        }
+        elseif(strpos($msg, 'cURL error') !== false) {
+            $ecode = 'E1311'; //server not reachable
+        }
+        else {
+            $ecode = 'E1313'; //'The queried language resource {service} returns an error.'
+        }
+        $data = [
+            'service' => $this->getResource()->getName(),
+            'languageResource' => $this->languageResource ?? '',
+            'error' => $this->apiWrapper->getError(),
+        ];
+        
+        return new editor_Services_Connector_Exception($ecode, $data, $badRequestException);
     }
 }

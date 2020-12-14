@@ -77,7 +77,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
         $res = $this->languageResource->getResource();
         /* @var $res editor_Services_Moses_Resource */
         
-        $rpc = new Zend_XmlRpc_Client($res->getUrl());
+        $rpc = new Zend_XmlRpc_Client($res->getUrl(), ZfExtended_Factory::get('Zend_Http_Client'));
         $proxy = $rpc->getProxy();
         $params = array(
             //for the "es ist ein kleines haus" Moses sample data the requests work only with lower case requests:
