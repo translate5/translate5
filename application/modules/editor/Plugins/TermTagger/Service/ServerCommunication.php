@@ -31,16 +31,29 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_TermTagger_Service_ServerCommunication {
     
-    // REQUIRED FIELDS:
-    // *****************************************************
     /**
      * TBX file / hash
      * @var string
      */
     public $tbxFile = NULL;
-    
+    /**
+     * @var string
+     */
     public $sourceLang = NULL;
+    /**
+     * @var string
+     */
     public $targetLang = NULL;
+    /**
+     * Stores the segment context to be able to know where to write back
+     * @var string
+     */
+    public $sourceFieldName = NULL;
+    /**
+     * tores the segment context to be able to know where to write back
+     * @var string
+     */
+    public $sourceFieldNameOriginal = NULL;
     
     /**
      * {

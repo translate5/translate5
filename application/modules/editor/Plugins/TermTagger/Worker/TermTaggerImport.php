@@ -27,169 +27,178 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * editor_Plugins_TermTagger_Worker_TermTaggerImport Class
+ * 
+ * Tags the segments on task import and also handles the segment saving (the class-name is historical)
+ * @FIXME: This class should better be called editor_Plugins_TermTagger_Worker what requires renaming the dependencies in all Plugins
  */
-class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_TermTagger_Worker_Abstract {
-    /**
-     * To much segments are causing timeouts when segments are longer
-     */
-    const SEGMENTS_PER_CALL = 5;
+class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Quality_SegmentWorker {
     
     /**
-     * Defines the timeout in seconds how long a termtag call with multiple segments may need
-     * @var integer
+     * Allowd values for setting resourcePool
+     * @var array(strings)
      */
-    const TIMEOUT_REQUEST = 300;
-    
+    protected static $allowedResourcePools = array('default', 'gui', 'import');
     /**
-     * Defines the timeout in seconds how long the upload and parse request of a TBX may need
-     * @var integer
-     */
-    const TIMEOUT_TBXIMPORT = 600;
-    
-    /**
-     * Logger Domain
+     * Praefix for workers resource-name
      * @var string
      */
-    const LOGGER_DOMAIN = 'editor.terminology.import';
+    protected static $praefixResourceName = 'TermTagger_';
+    
     
     /**
-     * Fieldname of the source-field of this task
+     * overwrites $this->workerModel->maxLifetime
+     */
+    protected $maxLifetime = '2 HOUR';
+    /**
+     * Multiple workers are allowed to run simultaneously per task
      * @var string
      */
-    private $sourceFieldName = '';
-        
-    
+    protected $onlyOncePerTask = false;
     /**
-     * Flag to use the target original field for tagging instead edited
-     * @var boolean
+     * resourcePool for the different TermTagger-Operations;
+     * Possible Values: $this->allowdResourcePools = array('default', 'gui', 'import');
+     * @var string
      */
-    private $useTargetOriginal = false;
-    
+    protected $resourcePool = 'default';
+
     /**
-     * Flag to keep target original field untouched, must be disabled for import (default false)
-     * Must be enabled for (true) for retagging segments!
-     * @var boolean
+     * @var string
      */
-    private $keepTargetOriginal = false;
-    
-    public function __construct() {
-        parent::__construct();
-        $this->logger = Zend_Registry::get('logger')->cloneMe(self::LOGGER_DOMAIN);
-    }
-    
+    private $loggerDomain;
     /**
-     * Special Paramters:
-     *
-     * $parameters['resourcePool']
-     * sets the resourcePool for slot-calculation depending on the context.
-     * Possible values are all values out of $this->allowedResourcePool
-     *
-     * $parameters['useTargetOriginal']
-     * set to true to use the target original field instead of the target edited field
-     * default is false
-     *
-     * $parameters['keepTargetOriginal']
-     * set to true to leave the target original field unmodified!
-     * default is false, since not needed for import, but for retagging of segments
-     *
-     * On very first init:
-     * seperate data from parameters which are needed while processing queued-worker.
-     * All informations which are only relevant in 'normal processing (not queued)'
-     * are not needed to be saved in DB worker-table (aka not send to parent::init as $parameters)
-     *
-     * ATTENTION:
-     * for queued-operating $parameters saved in parent::init MUST have all necessary paramters
-     * to call this init function again on instanceByModel
-     *
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::init()
+     * @var ZfExtended_Logger
      */
+    private $logger = null;
+    /**
+     * @var editor_Plugins_TermTagger_Configuration
+     */
+    private $config;
+    /**
+     * @var string
+     */
+    private $malfunctionState;
+    /**
+     * @var array
+     */
+    private $loadedSegmentIds;
+    
+    
     public function init($taskGuid = NULL, $parameters = array()) {
-        $this->useTargetOriginal = !empty($parameters['useTargetOriginal']);
-        $parameters['useTargetOriginal'] = $this->useTargetOriginal;
-        $this->keepTargetOriginal = !empty($parameters['keepTargetOriginal']);
-        $parameters['keepTargetOriginal'] = $this->keepTargetOriginal;
-        
-        return parent::init($taskGuid, $parameters);
+        $return = parent::init($taskGuid, $parameters);
+        $this->config = new editor_Plugins_TermTagger_Configuration($this->task);
+        $this->loggerDomain = null;
+        $this->logger = null;
+        return $return;
     }
-    
     /**
-     * Method for CallBack Workers to reset the termtag state
-     * @param string $taskGuid
+     *
+     * @return string
      */
-    public function resetTermtagState($taskGuid) {
-        $segMetaDb = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
-        /* @var $segMetaDb editor_Models_Db_SegmentMeta */
-        $segMetaDb->update(['termtagState' => self::SEGMENT_STATE_UNTAGGED], ['taskGuid = ?' => $taskGuid]);
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::run()
-     */
-    public function run() {
-        return parent::run();
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work() {
-        $taskGuid = $this->workerModel->getTaskGuid();
-        $segmentIds = $this->loadUntaggedSegmentIds();
-        
-        if (empty($segmentIds)) {
-            $segmentIds = $this->loadNextRetagSegmentId();
-            $state = self::SEGMENT_STATE_DEFECT;
-            if(empty($segmentIds)) {
-                $this->reportDefectSegments($taskGuid);
-                return false;
-            }
+    protected function getLoggerDomain() : string {
+        if(empty($this->loggerDomain)){
+            $this->loggerDomain = ($this->isWorkerThread) ? editor_Plugins_TermTagger_Configuration::IMPORT_LOGGER_DOMAIN : editor_Plugins_TermTagger_Configuration::EDITOR_LOGGER_DOMAIN;
         }
-        
-        $serverCommunication = $this->fillServerCommunication($segmentIds);
-        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain(), self::TIMEOUT_REQUEST, self::TIMEOUT_TBXIMPORT]);
-        /* @var $termTagger editor_Plugins_TermTagger_Service */
-        
-        $slot = $this->workerModel->getSlot();
-        if(empty($slot)) {
+        return $this->loggerDomain;
+    }
+    /**
+     *
+     * @return ZfExtended_Logger
+     */
+    protected function getLogger() : ZfExtended_Logger {
+        if($this->logger == null){
+            $this->logger = Zend_Registry::get('logger')->cloneMe($this->getLoggerDomain());
+        }
+        return $this->logger;
+    }
+    /**
+     * Needed Implementation for editor_Models_Import_Worker_ResourceAbstract
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::validateParameters()
+     */
+    protected function validateParameters($parameters = array()) {
+        return true;
+    }
+    /**
+     * Needed Implementation for editor_Models_Import_Worker_ResourceAbstract
+     * {@inheritDoc}
+     * @see editor_Models_Import_Worker_ResourceAbstract::getAvailableSlots()
+     */
+    protected function getAvailableSlots($resourcePool = 'default') : array {
+        return $this->config->getAvailableResourceSlots($resourcePool);
+    }
+    /**
+     * Deactivates maintenance in editor-save mode / non-threaded run
+     * {@inheritDoc}
+     * @see editor_Models_Import_Worker_Abstract::isMaintenanceScheduled()
+     */   
+    protected function isMaintenanceScheduled() : bool {
+        // non-threaded running shall not have dependencies to maintenance scheduling
+        if(!$this->isWorkerThread){
             return false;
         }
+        return parent::isMaintenanceScheduled();
+    }
+    
+    /*************************** THREADED MULTI-SEGMENT PROCESSING ***************************/
+    
+    protected function loadNextSegments(string $slot) : array {
+        $this->malfunctionState = editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_RETAG;
+        $this->loadedSegmentIds = $this->loadUntaggedSegmentIds();
+        if (empty($this->loadedSegmentIds)) {
+            $this->loadedSegmentIds = $this->loadNextRetagSegmentId();
+            // if the loading of retagged segments does not work we need to set them to be defect ...
+            $this->malfunctionState = editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_DEFECT;
+            if(empty($this->loadedSegmentIds)) {
+                $this->reportDefectSegments();
+                return [];
+            }
+        }
+        $segments = [];
+        foreach ($this->loadedSegmentIds as $segmentId) {
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            /* @var $segment editor_Models_Segment */
+            $segment->load($segmentId);
+            $segments[] = $segment;
+        }
+        return $segments;
+    }
+    
+    protected function processSegments(array $segments, string $slot) : bool {
+        
+        error_log('editor_Plugins_TermTagger_Worker_TermTaggerImport::processSegments, slot: '.$slot);
+
+        $communicationService = $this->config->createServerCommunicationService($segments, false);
+        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service',
+                [$this->getLoggerDomain(), $this->config->getRequestTimeout($this->isWorkerThread), editor_Plugins_TermTagger_Configuration::TIMEOUT_TBXIMPORT]);
+        /* @var $termTagger editor_Plugins_TermTagger_Service */
         try {
-            $this->checkTermTaggerTbx($termTagger, $slot, $serverCommunication->tbxFile);
-            $result = $termTagger->tagterms($slot, $serverCommunication);
-            $this->saveSegments($this->markTransFound($result->segments));
+            $this->config->checkTermTaggerTbx($termTagger, $slot, $communicationService->tbxFile);
+            $result = $termTagger->tagterms($slot, $communicationService);
+            $this->saveSegments($this->config->markTransFound($result->segments), $communicationService->sourceFieldName);
         }
         //Malfunction means the termtagger is up, but the send data produces an error in the tagger.
         // 1. we set the segment satus to retag, so each segment is tagged again, segment by segment, not in a bulk manner
         // 2. we log all the data producing the error
         catch(editor_Plugins_TermTagger_Exception_Malfunction $exception) {
-            if (empty($state)) {
-                $state = self::SEGMENT_STATE_RETAG;
-            }
-            $this->setTermtagState($segmentIds, $state);
+            $this->setTermtagState($this->loadedSegmentIds, $this->malfunctionState);
             $exception->addExtraData([
                 'task' => $this->task
             ]);
-            $this->logger->exception($exception, [
+            $this->getLogger()->exception($exception, [
                 'level' => ZfExtended_Logger::LEVEL_WARN,
-                'domain' => self::LOGGER_DOMAIN
+                'domain' => $this->getLoggerDomain()
             ]);
         }
         catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
             if($exception instanceof editor_Plugins_TermTagger_Exception_Down) {
-                $this->disableSlot($slot);
+                $this->config->disableResourceSlot($slot);
             }
-            $this->setTermtagState($segmentIds, self::SEGMENT_STATE_UNTAGGED);
+            $this->setTermtagState($this->loadedSegmentIds, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED);
             $exception->addExtraData([
                 'task' => $this->task
             ]);
-            $this->logger->exception($exception, [
-                'domain' => self::LOGGER_DOMAIN
+            $this->getLogger()->exception($exception, [
+                'domain' => $this->getLoggerDomain()
             ]);
             if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
                 //editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data
@@ -199,26 +208,8 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                 return false;
             }
         }
-        
-        // initialize an new worker-queue-entry to continue 'chained'-import-process
-        $this->createNewWorkerChainEntry($taskGuid);
+        return true;
     }
-    
-    
-    private function createNewWorkerChainEntry($taskGuid) {
-        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
-        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
-        
-        if (!$worker->init($taskGuid, $this->workerModel->getParameters())) {
-            $this->logger->error('E1122', 'TermTaggerImport Worker can not be initialized!', [
-                'taskGuid' => $taskGuid,
-                'parameters' => $this->workerModel->getParameters(),
-            ]);
-            return false;
-        }
-        $worker->queue($this->workerModel->getParentId());
-    }
-    
     /**
      * Loads a list of segmentIds where terms are not tagged yet.
      * @return array
@@ -229,12 +220,12 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         
         $db->getAdapter()->beginTransaction();
         $sql = $db->select()
-        ->from($db, ['segmentId'])
-        ->where('taskGuid = ?', $this->task->getTaskGuid())
-        ->where('termtagState IS NULL OR termtagState IN (?)', [$this::SEGMENT_STATE_UNTAGGED])
-        ->order('id')
-        ->limit(self::SEGMENTS_PER_CALL)
-        ->forUpdate(true);
+            ->from($db, ['segmentId'])
+            ->where('taskGuid = ?', $this->task->getTaskGuid())
+            ->where('termtagState IS NULL OR termtagState IN (?)', [editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED])
+            ->order('id')
+            ->limit(editor_Plugins_TermTagger_Configuration::IMPORT_SEGMENTS_PER_CALL)
+            ->forUpdate(true);
         $segmentIds = $db->fetchAll($sql)->toArray();
         $segmentIds = array_column($segmentIds, 'segmentId');
         
@@ -243,7 +234,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             return $segmentIds;
         }
         
-        $db->update(['termtagState' => $this::SEGMENT_STATE_INPROGRESS], [
+        $db->update(['termtagState' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_INPROGRESS], [
             'taskGuid = ?' => $this->task->getTaskGuid(),
             'segmentId in (?)' => $segmentIds,
         ]);
@@ -253,10 +244,9 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     }
     
     /**
-     * returns a list with the next segmentId where terms are marked as to be "retag"ged
+     * returns a list with the next segmentId where terms are marked as to be "retagged"
      * returns only one segment since this segments has to be single tagged
      *
-     * @param string $taskGuid
      * @return array
      */
     private function loadNextRetagSegmentId(): array {
@@ -265,57 +255,19 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         /* @var $dbMeta editor_Models_Db_SegmentMeta */
         
         $sql = $dbMeta->select()
-        ->from($dbMeta, ['segmentId'])
-        ->where('taskGuid = ?', $this->task->getTaskGuid())
-        ->where('termtagState IS NULL OR termtagState = ?', [$this::SEGMENT_STATE_RETAG])
-        ->limit(1);
+            ->from($dbMeta, ['segmentId'])
+            ->where('taskGuid = ?', $this->task->getTaskGuid())
+            ->where('termtagState IS NULL OR termtagState = ?', [editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_RETAG])
+            ->limit(1);
         
         return array_column($dbMeta->fetchAll($sql)->toArray(), 'segmentId');
     }
-    
-    /**
-     * Creates a ServerCommunication-Object initialized with $task
-     * inclusive all field of alls segments provided in $segmentIds
-     *
-     * @param array $segmentIds
-     * @return editor_Plugins_TermTagger_Service_ServerCommunication
-     */
-    private function fillServerCommunication (array $segmentIds) {
-        
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($this->task));
-        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        
-        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $fieldManager editor_Models_SegmentFieldManager */
-        $fieldManager->initFields($this->workerModel->getTaskGuid());
-        $segmentFields = $fieldManager->getFieldList();
-        $this->sourceFieldName = $fieldManager->getFirstSourceName();
-        
-        foreach ($segmentIds as $segmentId) {
-            $segment = ZfExtended_Factory::get('editor_Models_Segment');
-            /* @var $segment editor_Models_Segment */
-            $segment->load($segmentId);
-            
-            $sourceText = $segment->get($this->sourceFieldName);
-            
-            foreach ($segmentFields as $field) {
-                if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
-                    continue;
-                }
-                $targetText = $this->useTargetOriginal ? $segment->getTarget() : $segment->getTargetEdit();
-                $serverCommunication->addSegment($segment->getId(), $field->name, $sourceText, $targetText);
-            }
-        }
-        
-        return $serverCommunication;
-    }
-    
     /**
      * Save TermTagged-segments for $task povided in $segments
-     *
      * @param array $segments
+     * @param string $sourceFieldName
      */
-    private function saveSegments($segments) {
+    private function saveSegments(array $segments, string $sourceFieldName) {
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         /* @var $fieldManager editor_Models_SegmentFieldManager */
         $fieldManager->initFields($this->workerModel->getTaskGuid());
@@ -327,23 +279,16 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         foreach ($responses as $segmentId => $responseGroup) {
             $segment->load($segmentId);
         
-            $segment->set($this->sourceFieldName, $responseGroup[0]->source);
+            $segment->set($sourceFieldName, $responseGroup[0]->source);
             if ($this->task->getEnableSourceEditing()) {
-                $segment->set($fieldManager->getEditIndex($this->sourceFieldName), $responseGroup[0]->source);
+                $segment->set($fieldManager->getEditIndex($sourceFieldName), $responseGroup[0]->source);
             }
-        
             foreach ($responseGroup as $response) {
-                if(! $this->keepTargetOriginal) {
-                    $segment->set($response->field, $response->target);
-                }
-                if(! $this->useTargetOriginal) {
-                    $segment->set($fieldManager->getEditIndex($response->field), $response->target);
-                }
+                $segment->set($response->field, $response->target);
+                $segment->set($fieldManager->getEditIndex($response->field), $response->target);
             }
-        
             $segment->save();
-        
-            $segment->meta()->setTermtagState($this::SEGMENT_STATE_TAGGED);
+            $segment->meta()->setTermtagState(editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_TAGGED);
             $segment->meta()->save();
         }
     }
@@ -362,7 +307,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             'segmentId in (?)' => $segments,
         ]);
     }
-    
     /**
      * In case of multiple target-fields in one segment, there are multiple responses for the same segment.
      * This function groups this different responses under the same segmentId
@@ -379,23 +323,22 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         
         return $return;
     }
-    
-    private function reportDefectSegments($taskGuid) {
+    /**
+     * 
+     */
+    private function reportDefectSegments() {
         // get list of defect segments
         $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
         /* @var $dbMeta editor_Models_Db_SegmentMeta */
-        
         $sql = $dbMeta->select()
-        ->from($dbMeta, ['segmentId', 'termtagState'])
-        ->where('taskGuid = ?', $this->task->getTaskGuid())
-        ->where('termtagState IS NULL OR termtagState IN (?)', [$this::SEGMENT_STATE_DEFECT, $this::SEGMENT_STATE_OVERSIZE]);
+            ->from($dbMeta, ['segmentId', 'termtagState'])
+            ->where('taskGuid = ?', $this->task->getTaskGuid())
+            ->where('termtagState IS NULL OR termtagState IN (?)', [editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_DEFECT, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE]);
         
         $defectSegments = $dbMeta->fetchAll($sql)->toArray();
-        
         if (empty($defectSegments)) {
             return;
         }
-        
         $segmentsToLog = [];
         foreach ($defectSegments as $defectsegment) {
             $segment = ZfExtended_Factory::get('editor_Models_Segment');
@@ -404,19 +347,79 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             
             $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
             /* @var $fieldManager editor_Models_SegmentFieldManager */
-            $fieldManager->initFields($taskGuid);
+            $fieldManager->initFields($this->workerModel->getTaskGuid());
             
-            if($defectsegment['termtagState'] == $this::SEGMENT_STATE_DEFECT) {
+            if($defectsegment['termtagState'] == editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_DEFECT) {
                 $segmentsToLog[] = $segment->getSegmentNrInTask().'; Source-Text: '.strip_tags($segment->get($fieldManager->getFirstSourceName()));
             }
             else {
                 $segmentsToLog[] = $segment->getSegmentNrInTask().': Segment to long for TermTagger';
             }
         }
-        
-        $this->logger->warn('E1123', 'Some segments could not be tagged by the TermTagger.', [
+        $this->getLogger()->warn('E1123', 'Some segments could not be tagged by the TermTagger.', [
             'task' => $this->task,
             'untaggableSegments' => $segmentsToLog,
         ]);
+    }
+
+    /*************************** SINGLE SEGMENT PROCESSING ***************************/
+
+    /**
+     * This API will only be called via ::segmentEdited (when segment was edited) not on import via ::processSegments
+     * {@inheritDoc}
+     * @see editor_Segment_Quality_SegmentWorker::processSegment()
+     */
+    protected function processSegment(editor_Models_Segment $segment, string $slot) : bool {
+        
+        error_log('editor_Plugins_TermTagger_Worker_TermTaggerImport::processSegments, slot: '.$slot);
+        
+        $communicationService = $this->config->createServerCommunicationService([$segment], true);
+        
+        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->getLoggerDomain(), $this->config->getRequestTimeout($this->isWorkerThread), editor_Plugins_TermTagger_Configuration::TIMEOUT_TBXIMPORT]);
+        /* @var $termTagger editor_Plugins_TermTagger_Service */
+        
+        $result = '';
+        try {
+            $this->config->checkTermTaggerTbx($termTagger, $slot, $communicationService->tbxFile);
+            $result = $termTagger->tagterms($slot, $communicationService);
+        }
+        catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
+            if($exception instanceof editor_Plugins_TermTagger_Exception_Down) {
+                $this->config->disableResourceSlot($slot);
+            }
+            $communicationService->task = '- see directly in event -';
+            $exception->addExtraData([
+                'task' => $this->task,
+                'termTagData' => $communicationService,
+            ]);
+            $this->getLogger()->exception($exception, [
+                'domain' => $this->getLoggerDomain()
+            ]);
+            if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
+                //editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data
+                //so we have to disable termtagging for this task, otherwise on each segment save we will get such a warning
+                $this->task->setTerminologie(0);
+                $this->task->save();
+                return false;
+            }
+        }
+        // on error return false and store original untagged data
+        if (empty($result) && $result !== '0') {
+            return false;
+        }
+        $results = $this->config->markTransFound($result->segments);
+        $sourceTextTagged = false;
+        foreach ($results as $result){
+            if($result->field == 'SourceOriginal') {
+                $segment->set($communicationService->sourceFieldNameOriginal, $result->source);
+                continue;
+            }
+            if(!$sourceTextTagged){
+                $segment->set($communicationService->sourceFieldName, $result->source);
+                $sourceTextTagged = true;
+            }
+            $segment->set($result->field, $result->target);
+        }
+        return true;
     }
 }
