@@ -181,9 +181,11 @@ class editor_Services_Connector {
             }
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut | ZfExtended_Zendoverwrites_Http_Exception_Down $e) {
             if($e instanceof  ZfExtended_Zendoverwrites_Http_Exception_Down) {
+                //'E1311' => 'Could not connect to language resource {service}: server not reachable',
                 $ecode = 'E1311';
             }
             else {
+                //'E1312' => 'Could not connect to language resource {service}: timeout on connection to server',
                 $ecode = 'E1312';
             }
             $toThrow = new editor_Services_Connector_Exception($ecode, [
@@ -203,6 +205,23 @@ class editor_Services_Connector {
             $toThrow = new BadMethodCallException('Method '.$method.' does not exist in '.__CLASS__.' or its adapter.');
         }
         throw $toThrow;
+    }
+    
+    /**
+     * Returns the languages for the given resource
+     * @param editor_Models_LanguageResources_Resource $resource
+     * @return array
+     */
+    public function languages(editor_Models_LanguageResources_Resource $resource): array{
+        $this->connectToResourceOnly($resource);
+        try {
+            return $this->__call('languages', []);
+        }
+        catch(editor_Services_Connector_Exception $e) {
+            //since is called without a connected resource, we can not use the adapter logger here
+            Zend_Registry::get('logger')->exception($e);
+            return [];
+        }
     }
     
     /**

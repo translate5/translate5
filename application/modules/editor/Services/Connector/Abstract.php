@@ -335,11 +335,15 @@ abstract class editor_Services_Connector_Abstract {
      * Return the available language codes for the current resource endpoint(api)
      * Use SOURCE_LANGUAGES_KEY and TARGET_LANGUAGES_KEY as languages grouped results when
      * the resource does not support same from - to language combinations
+     *
+     * MAY NOT THROW EXCEPTIONS! But return empty list on errors.
+     *
+     * @return string[]
      */
-    public function languages(){
+    public function languages(): array {
         $languages = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languages editor_Models_Languages*/
-        $ret=$languages->loadAllKeyValueCustom('id','rfc5646');
+        $ret = $languages->loadAllKeyValueCustom('id','rfc5646');
         return array_values($ret);
     }
     

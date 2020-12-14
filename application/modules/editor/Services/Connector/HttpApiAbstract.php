@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Reusable HTTP Connection API code
+ * Reusable HTTP Connection API code for HTTP with JSON based APIs
  */
 abstract class editor_Services_Connector_HttpApiAbstract {
     const ENC_TYPE = 'application/json; charset=utf-8';
@@ -130,16 +130,22 @@ abstract class editor_Services_Connector_HttpApiAbstract {
         }
         
         $responseBody = trim($response->getBody());
-        $result = (empty($responseBody)) ? '' : json_decode($responseBody);
         
-        //check for JSON errors
-        if(json_last_error() != JSON_ERROR_NONE){
-            throw new editor_Services_Exceptions_InvalidResponse('E1315',[
-                'errorMsg' => json_last_error_msg(),
-                'method' => $this->httpMethod,
-                'url' => $url,
-                'rawanswer' => $responseBody,
-            ]);
+        if(empty($responseBody)) {
+            $result = '';
+        }
+        else {
+            $result = json_decode($responseBody);
+            
+            //check for JSON errors
+            if(json_last_error() != JSON_ERROR_NONE){
+                throw new editor_Services_Exceptions_InvalidResponse('E1315',[
+                    'errorMsg' => json_last_error_msg(),
+                    'method' => $this->httpMethod,
+                    'url' => $url,
+                    'rawanswer' => $responseBody,
+                ]);
+            }
         }
         
         $this->result = $result;

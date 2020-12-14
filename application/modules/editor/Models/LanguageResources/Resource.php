@@ -232,11 +232,11 @@ class editor_Models_LanguageResources_Resource {
      * @param int $langauge
      * @return string
      */
-    protected function getLanguageCode(int $langaugeId) {
-        $langauge = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langauge editor_Models_Languages */
-        $langauge->load($langaugeId);
-        return $langauge->getRfc5646();
+    protected function getLanguageCode(int $languageId) {
+        $language = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $language editor_Models_Languages */
+        $language->load($languageId);
+        return $language->getRfc5646();
     }
     
     /**
