@@ -140,15 +140,122 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
         //HTTP result 200
         // POST https://api.deepl.com:443/v2/translate?auth_key=xxxx
         
-            $demomt = new editor_Plugins_ZDemoMT_Connector();
+        if(is_array($_POST['text'])) {
+            $translations = $_POST['text'];
+        }
+        else {
+            $translations = [$_POST['text']];
+        }
+        $demomt = new editor_Plugins_ZDemoMT_Connector();
+        $result = new stdClass();
+        $result->translations = [];
+        foreach($translations as $text) {
+            $translated = new stdClass();
+            $translated->detected_source_language = strtoupper($_POST['source_lang']);
+            //additional tag:
+            //$text = '<g id="1">'.$demomt->translateToRot13($_POST['text']);
+            
+            //remove a specific tag
+            //$text = str_replace('<x id="6"/>', '', $demomt->translateToRot13($_POST['text']));
+            //normal content:
+            $translated->text = $demomt->translateToRot13($text);
+            $result->translations[] = $translated;
+        }
+        
+        echo json_encode($result);
+    }
+    
+    /**
+     * Faking DeepL requests, translating with rot13.
+     * Supports the following calls: get languages, get usage and translate
+     * @throws Exception
+     */
+    public function pangeamtAction() {
+        //for deepl we expect always that requests:
+        $this->expectHeader('accept-charset', 'UTF-8');
+        $this->expectHeader('accept', 'application/json; charset=utf-8');
+        $this->expectHeader('content-type', 'application/json; charset=utf-8');
+        
+        /* FIXME is this also the same for pangea????
+         ** to test not authenticated requests:
+         */
+        //         header('HTTP/1.0 403 Forbidden');
+        //         exit;
+        
+        header('Content-Type: application/json;charset=UTF-8', true);
+        
+        $calledUrl = $this->getUriApiPart();
+        switch ($calledUrl) {
+//             //Requesting which languages do exist:
+//             //GET https://api.deepl.com:443/v2/languages?auth_key=xxxx
+//             // [{"language":"DE","name":"German"},{"language":"EN","name":"English"},{"language":"ES","name":"Spanish"},{"language":"FR","name":"French"},{"language":"IT","name":"Italian"},{"language":"JA","name":"Japanese"},{"language":"NL","name":"Dutch"},{"language":"PL","name":"Polish"},{"language":"PT","name":"Portuguese"},{"language":"RU","name":"Russian"},{"language":"ZH","name":"Chinese"}]
+//             case 'v2/languages' :
+//                 echo '[{"language":"DE","name":"German"},{"language":"EN","name":"English"},{"language":"ES","name":"Spanish"},{"language":"FR","name":"French"},{"language":"IT","name":"Italian"},{"language":"JA","name":"Japanese"},{"language":"NL","name":"Dutch"},{"language":"PL","name":"Polish"},{"language":"PT","name":"Portuguese"},{"language":"RU","name":"Russian"},{"language":"ZH","name":"Chinese"}]';
+//                 return;
+                
+//                 //Requesting how the usage is:
+//                 //GET https://api.deepl.com:443/v2/usage?auth_key=xxxx
+//                 //{"character_count":75323,"character_limit":3000000}
+//             case 'v2/usage' :
+//                     echo '{"character_count":75323,"character_limit":3000000}';
+//                     return;
+            case 'NexRelay/v1/corp/engines' :
+                $data = $this->getInputFromRawJson();
+                if(($data[0]->apikey ?? '') !== Zend_Registry::get('config')->runtimeOptions->plugins->PangeaMt->apikey) {
+                    throw new Exception('Auth Key is not as expected');
+                }
+                echo '{"engines":[{"id":1,"processid":1,"serviceid":1,"inserviceid":0,"src":"en","tgt":"es","descr":"ENES_B_plain","domain":"","flavor":"","status":0},{"id":2,"processid":1,"serviceid":2,"inserviceid":0,"src":"auto","tgt":"en","descr":"intoEN_generic TEST","domain":"","flavor":"intoEN_generic","status":0},{"id":3,"processid":1,"serviceid":3,"inserviceid":0,"src":"de","tgt":"en","descr":"DEEN_generic TEST","domain":"","flavor":"DEEN_generic","status":0}]}';
+                return;
+            case 'NexRelay/v1/translate' :
+                $this->expectHttpMethod('POST');
+                $data = $this->getInputFromRawJson();
+                if($data->src != 'de') {
+                    throw new Exception('Input language expected "de".');
+                }
+                if($data->tgt != 'en') {
+                    throw new Exception('Input language expected "de".');
+                }
+                if(!is_numeric($data->engine)) {
+                    throw new Exception('Engine is not INT');
+                }
+                if(($data->{'0'}->apikey ?? '') !== Zend_Registry::get('config')->runtimeOptions->plugins->PangeaMt->apikey) {
+                    throw new Exception('Auth Key is not as expected');
+                }
+                    
+                //{"src":"de","tgt":"en","engine":"22","text":["ein"],"0":{"apikey":"cOrtesvalenc1anas"}}
+                
+                /* FIXME something similar for pangea???
+                 ** enable this two lines to test Quota Exceeded
+                 */
+                //                 header('HTTP/1.0 456 Quota exceeded');
+                //                 echo '{"message":"Quota Exceeded"}';
+                //                 return;
+                break;
+            default:
+                throw new Exception("Unknown PangeaMT endpoint requested: ".$calledUrl);
+        }
+        
+        //FIXME produce an error???
+        /*
+         * Error Example!
+         */
+        $result = [];
+        //HTTP result 200
+        $demomt = new editor_Plugins_ZDemoMT_Connector();
             //additional tag:
             //$text = json_encode('<g id="1">'.$demomt->translateToRot13($_POST['text']));
             
             //remove a specific tag
             //$text = json_encode(str_replace('<x id="6"/>', '', $demomt->translateToRot13($_POST['text'])));
             //normal content:
-            $text = json_encode('<g id="1">'.$demomt->translateToRot13($_POST['text']));
-        echo '{"translations":[{"detected_source_language":"'.strtoupper($_POST['source_lang']).'","text":'.$text.'}]}';
+        foreach($data->text as $text) {
+            $oneResult = new stdClass();
+            $oneResult->src = $text;
+            $oneResult->tgt = $demomt->translateToRot13($text);
+            $result[] = [$oneResult];
+        }
+            //[[{"src":"ein","tgt":"A"}],[{"src":"test","tgt":"Test"}]]
+        echo json_encode($result);
     }
     
     /**
@@ -191,6 +298,25 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
         if(!isset($_POST[$key]) || !in_array($_POST[$key], $expected, true)) {
             throw new Exception('POST '.$key.' should be one of '.join(',', $expected).' but is '.$_POST[$key]);
         }
+    }
+    
+    /**
+     * Verifies the HTTP Method
+     * @throws Exception
+     */
+    protected function expectHttpMethod(string $method) {
+        $method = strtoupper($method);
+        if($_SERVER['REQUEST_METHOD'] !== $method) {
+            throw new Exception('HTTP Method should be '.$method.' but is '.$_SERVER['REQUEST_METHOD']);
+        }
+    }
+    
+    protected function getInputFromRawJson() {
+        $rawInput = file_get_contents('php://input');
+        if(empty($rawInput)) {
+            throw new Exception('Raw Input was empty.');
+        }
+        return json_decode($rawInput);
     }
 }
 

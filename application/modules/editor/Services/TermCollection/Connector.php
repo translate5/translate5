@@ -63,7 +63,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         
         //import the term collection
         if(!$import->parseTbxFile([$fileinfo],$this->languageResource->getId())){
-            $this->handleError("LanguageResources - Error on termcollection import \n");
+            $this->logger->error('E1321', 'Term Collection Import: Errors on parsing the TBX, the file could not be imported.');
             return false;
         }
         
@@ -259,18 +259,5 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
 
     public function getTm($mime){
         
-    }
-    
-    /**
-     * This method generates an 400 error
-     *   which shows additional error information in the frontend
-     *
-     * @param string $logMsg
-     */
-    protected function handleError($logMsg) {
-        $log = ZfExtended_Factory::get('ZfExtended_Log');
-        /* @var $log ZfExtended_Log */
-        $data  = print_r($this->languageResource->getDataObject(),1);
-        $log->logError($logMsg, $data);
     }
 }

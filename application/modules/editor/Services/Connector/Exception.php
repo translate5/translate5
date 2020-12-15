@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Evaluates to a ZfExtended_BadGateway exception!
  */
-class editor_Services_Connector_Exception extends ZfExtended_BadGateway {
+class editor_Services_Connector_Exception extends ZfExtended_BadGatewayErrorCode {
     /**
      * @var string
      */
