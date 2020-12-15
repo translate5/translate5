@@ -67,9 +67,9 @@ trait editor_Models_Import_FileParser_TagTrait {
         '#<(hardReturn)/>#',
         '#<(softReturn)/>#',
         '#<(macReturn)/>#',
-        '#<(char) ts="[^"]*"( length="([0-9]+)")?/>#',
-        '#<(tab) ts="[^"]*"( length="([0-9]+)")?/>#',
-        '#<(space) ts="[^"]*"( length="([0-9]+)")?/>#',
+        '#<(char) ts="([^"]*)"( length="([0-9]+)")?/>#',
+        '#<(tab) ts="([^"]*)"( length="([0-9]+)")?/>#',
+        '#<(space) ts="([^"]*)"( length="([0-9]+)")?/>#',
     ];
     
     protected function initHelper(){
@@ -90,21 +90,32 @@ trait editor_Models_Import_FileParser_TagTrait {
     /**
      * replaces whitespace placeholder tags with internal tags
      * @param string $segment
+     * @param array $tagShortcutNumberMap
      * @return string
      */
-    protected function whitespaceTagReplacer($segment) {
-        return preg_replace_callback($this->whitespaceTagList, function($match) use ($segment) {
+    protected function whitespaceTagReplacer($segment, array $tagShortcutNumberMap = []) {
+        //$tagShortcutNumberMap must be given explicitly here as non referenced variable from outside,
+        // so that each call of the whitespaceTagReplacer function has its fresh list of tag numbers
+        return preg_replace_callback($this->whitespaceTagList, function($match) use (&$tagShortcutNumberMap) {
             $tag = $match[0];
             $tagName = $match[1];
             $cls = ' '.$tagName;
-            $title = '&lt;'.$this->shortTagIdent.'/&gt;: ';
+            
+            //either we get a reusable shortcut number in the map, or we have to increment one
+            if(empty($tagShortcutNumberMap) || empty($tagShortcutNumberMap[$tag])) {
+                $shortTagNumber = $this->shortTagIdent++;
+            }
+            else {
+                $shortTagNumber = array_shift($tagShortcutNumberMap[$tag]);
+            }
+            $title = '&lt;'.$shortTagNumber.'/&gt;: ';
             
             //if there is no length attribute, use length = 1
-            if(empty($match[2])) {
+            if(empty($match[3])) {
                 $length = 1;
             }
             else {
-                $length = $match[3]; //else use the stored length value
+                $length = $match[4]; //else use the stored length value
             }
             //generate the html tag for the editor
             switch ($match[1]) {
@@ -149,7 +160,7 @@ trait editor_Models_Import_FileParser_TagTrait {
                         $title .= 'protected Special-Character';
                     }
             }
-            $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $text);
+            $p = $this->getTagParams($tag, $shortTagNumber, $tagName, $text);
             //FIXME refactor whole tagparams stuff!
             $p['class'] .= $cls;
             $p['length'] = $length;

@@ -68,6 +68,9 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
      */
     protected $realTagCount = 0;
     
+    protected $highestTagShortCutNumber = 0;
+    protected $tagShortCutSpecialCharMap = [];
+    
     /**
      * @var ZfExtended_Logger_Queued
      */
@@ -85,9 +88,11 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
         
         //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
         $this->xmlparser->registerOther(function($textNode, $key){
-            //for communication with OpenTM2 we assume that the segment content is XML/XLIFF therefore we assume xmlBased here
             $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true);
-            $textNode = $this->whitespaceTagReplacer($textNode);
+            
+            //set shortTagIdent of the tagTrait to the next usable number if there are new tags
+            $this->shortTagIdent = $this->highestTagShortCutNumber + 1;
+            $textNode = $this->whitespaceTagReplacer($textNode, $this->tagShortCutSpecialCharMap);
             $this->xmlparser->replaceChunk($key, $textNode);
         });
     }
@@ -120,13 +125,15 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
      */
     protected function importWhitespaceFromTagLessQuery(string $text): string {
         $text = $this->whitespaceHelper->protectWhitespace($text, false);
-        return $this->whitespaceTagReplacer($text);
+        return $this->whitespaceTagReplacer($text, $this->tagShortCutSpecialCharMap);
     }
 
     protected function restoreWhitespaceForQuery (string $queryString): string {
+        $this->highestTagShortCutNumber = 0;
+        $this->tagShortCutSpecialCharMap = [];
         $qs = $this->trackChange->removeTrackChanges($queryString);
         //restore the whitespaces to real characters
-        $qs = $this->internalTag->restore($qs, true);
+        $qs = $this->internalTag->restore($qs, true, $this->highestTagShortCutNumber, $this->tagShortCutSpecialCharMap);
         return $this->whitespaceHelper->unprotectWhitespace($qs);
     }
     
