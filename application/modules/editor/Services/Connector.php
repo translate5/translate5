@@ -179,6 +179,8 @@ class editor_Services_Connector {
             if(method_exists($this->adapter, $method)) {
                 return call_user_func_array([$this->adapter, $method], $arguments);
             }
+        } catch (ZfExtended_BadGateway $toThrow) {
+            //handle legacy BadGateway messages, see below
         } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut | ZfExtended_Zendoverwrites_Http_Exception_Down $e) {
             if($e instanceof  ZfExtended_Zendoverwrites_Http_Exception_Down) {
                 //'E1311' => 'Could not connect to language resource {service}: server not reachable',

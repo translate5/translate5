@@ -72,6 +72,11 @@ trait editor_Services_Connector_BatchTrait {
             $this->handleBatchQuerys($batchQuery);
             $batchQuery = [];
         }
+        
+        //query the rest, if there are any:
+        if(!empty($batchQuery)) {
+            $this->handleBatchQuerys($batchQuery);
+        }
     }
     
     /**

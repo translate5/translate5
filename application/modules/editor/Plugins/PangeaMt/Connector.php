@@ -77,7 +77,7 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
         $targetLang = $this->languageResource->getTargetLangCode();// = e.g. "en"; TODO: validate against $this->targetLang (e.g. 5)
         $engineId = $this->languageResource->getSpecificData('engineId');
         
-        if($this->api->search($qs, $sourceLang, $targetLang, $engineId)){
+        if($this->api->search($this->tagHandler->prepareQuery($qs), $sourceLang, $targetLang, $engineId)){
             $results = $this->api->getResult();
             if(empty($results)) {
                 return $this->resultList;
