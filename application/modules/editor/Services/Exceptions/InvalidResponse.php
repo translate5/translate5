@@ -27,24 +27,15 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Evaluates to a ZfExtended_BadGateway exception!
+ * Several errors about using a language resource result
  */
-class editor_Services_Connector_Exception extends ZfExtended_BadGatewayErrorCode {
+class editor_Services_Exceptions_InvalidResponse extends ZfExtended_ErrorCodeException {
     /**
      * @var string
      */
     protected $domain = 'editor.languageresource.service.connector';
     
     static protected $localErrorCodes = [
-        'E1282' => 'Language resource communication error.',
-        'E1288' => 'The language code [{languageCode}] from resource [{resourceName}] is not valid or does not exist in the translate5 language code collection.',
-        'E1311' => 'Could not connect to language resource {service}: server not reachable',
-        'E1312' => 'Could not connect to language resource {service}: timeout on connection to server',
-        'E1313' => 'The queried language resource {service} returns an error.',
+        'E1315' => 'JSON decode error: {errorMsg}',
     ];
-    
-    protected function setDuplication() {
-        parent::setDuplication();
-        ZfExtended_Logger::addDuplicatesByMessage('E1311', 'E1312');
-    }
 }
