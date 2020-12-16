@@ -79,7 +79,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         //Out: { "ReturnValue":0, "ErrorMsg":"" }
         
         $data = new stdClass();
-        $tmData = $this->fixLangKeyInTM($tmData);
+        $tmData = $this->fixTmxData($tmData);
         $data->tmxData = base64_encode($tmData);
 
         $http = $this->getHttpWithMemory('POST', '/import');
@@ -382,7 +382,15 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         return $keyMap[$key];
     }
     
-    protected function fixLangKeyInTM($tmData) {
+    /**
+     * Applies several fixes to the uploaded TM data
+     * @param string $tmData
+     * @return string
+     */
+    protected function fixTmxData($tmData) {
+        
+        $tmData = preg_replace('#(<header[^>]+)datatype="unknown"([^>]+/>)#i', '${1}datatype="plaintext"${2}', $tmData, 1);
+        
         return str_replace([
             'xml:lang="mn"',
             'xml:lang="mn-MN"',
