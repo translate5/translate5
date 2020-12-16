@@ -77,6 +77,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         searchResultGridTitle: '#UT#{0} Ergebnisse',
         serverErrorMsgDefault: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.',
         serverErrorMsg500: '#UT#Die Anfrage führte zu einem Fehler im angefragten Dienst.',
+        serverErrorMsg502: '#UT#Es gibt Probleme mit dem angefragten Dienst.',
         serverErrorMsg408: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.'
     },
     assocStore : null,
@@ -268,6 +269,8 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
                 state: me.SERVER_STATUS.SERVER_STATUS_SERVERERROR
             },
             errors = [errorEntry];
+        //no more loadings in the case of an error
+        me.offset.add(languageResourceid, null);
         switch(response.status){
             case -1:
                 errorEntry.source = me.strings.serverErrorMsgDefault;
@@ -280,26 +283,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
             case 502:
                 json = Ext.JSON.decode(response.responseText);
                 errorEntry.source = me.strings.serverErrorMsg500;
-                if(json.errors && json.errors[0] && json.errors[0]._errorMessage) {
-                    errorEntry.target = json.errors[0]._errorMessage;
-                }
-                else if(json.errors && json.errors.message) {
-                    //is this code even possible?
-                    errorEntry.target = json.errors.message;
-                }
-                else if(json.errors && json.errors.length > 0) {
-                    errors = [];//remove errorEntry
-                    for(var i = 0;i<json.errors.length;i++){
-                        //create one error entry per error message
-                        errors.push(Ext.applyIf({
-                            source: json.errors[i].msg,
-                            target: Editor.MessageBox.dataTable(json.errors[i].data)
-                        },errorEntry));
-                    }
-                }
-                else {
-                    errorEntry.target = response.responseText;
-                }
+                errorEntry.target = json.errorMessage;
                 break;
         }
         me.loadDataIntoGrid({rows: errors});
