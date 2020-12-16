@@ -411,8 +411,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         }
         
         foreach($results as $result) {
-            $this->resultList->addResult($this->highlight($searchString, strip_tags($result['target']), $field == 'target'));
-            $this->resultList->setSource($this->highlight($searchString, strip_tags($result['source']), $field == 'source'));
+            $this->resultList->addResult($this->highlight($searchString, $this->tagHandler->restoreInResult($result['target']), $field == 'target'));
+            $this->resultList->setSource($this->highlight($searchString, $this->tagHandler->restoreInResult($result['source']), $field == 'source'));
         }
         return $this->resultList;
     }

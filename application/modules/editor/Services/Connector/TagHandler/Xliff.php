@@ -41,12 +41,12 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
      * Contains the tag map of the prepared query
      * @var array
      */
-    protected $map;
+    protected $map = [];
     
     /**
      * @var integer
      */
-    protected $mapCount;
+    protected $mapCount = 0;
     
     /**
      * Flag if the restoreInResult call removed some content tags, reset on prepareQuery
