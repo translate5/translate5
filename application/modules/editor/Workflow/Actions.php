@@ -154,13 +154,11 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $role = $workflow::ROLE_REVIEWER;
             $stepName = $workflow::STEP_REVIEWING;
         }
-        $task->updateWorkflowStep($stepName, false);
         
         $states = $workflow->getInitialStates();
         $state = $states[$stepName][$role];
         
         $users = $user->loadAllByLanguages($sourceLang, $targetLang);
-        
         
         foreach($users as $data) {
             $roles = explode(',', $data['roles']);
@@ -181,6 +179,11 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             //entity version?
             $tua->save();
             $workflow->doUserAssociationAdd($tua);
+        }
+        
+        //if at least one task user association was added, then we have to update the workflowstep too
+        if(!empty($tua)) {
+            $task->updateWorkflowStep($stepName, false);
         }
     }
     
