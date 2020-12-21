@@ -53,7 +53,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * Using Xliff based tag handler here
      * @var string
      */
-    protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_Xliff';
+    protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_OpenTM2Xliff';
     
     /**
      * Just overwrite the class var hint here
