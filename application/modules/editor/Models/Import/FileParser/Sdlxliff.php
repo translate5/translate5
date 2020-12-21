@@ -485,7 +485,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             
             //after defining the MID segment we have the mid and can access the attributes object,
             // to set the length attributes
-            $this->processCxtMetaTagsForSegment($groupCxtIds);
+            $attributes = $this->processCxtMetaTagsForSegment($groupCxtIds);
+            $attributes->transunitId = $this->transunitParser->getTransunitId();
             
             $this->segmentData[$sourceName] = ['original' => $this->parseSegment($source,true)];
             $this->segmentData[$targetName] = ['original' => $this->parseSegment($target,true)];
@@ -504,11 +505,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * Parameters are given by the current segment
      * @return editor_Models_Import_FileParser_SegmentAttributes
      */
-    protected function processCxtMetaTagsForSegment(array $groupCxtIds) {
-        if(empty($groupCxtIds)) {
-            return;
-        }
+    protected function processCxtMetaTagsForSegment(array $groupCxtIds): editor_Models_Import_FileParser_SegmentAttributes {
         $attributes = $this->createSegmentAttributes($this->_mid);
+        if(empty($groupCxtIds)) {
+            return $attributes;
+        }
         foreach($groupCxtIds as $cxtId) {
             $cxtDef = $this->cxtDefinitions[$cxtId] ?? null;
             if(empty($cxtDef)) {
@@ -518,11 +519,13 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             //the following are collection too, but currently we do not know how to use them:
             //  cxt-def[type=fieldlength], cxt-def[type=linelength], cxt-def[type=linecount]'
             
-            $this->logger->info('E1322', 'A CXT tag type x-tm-length-info with a unknown prop type "{propType}" was found.', [
-                'propType' => $cxtDef['_prop_length_type'],
-                'task' => $this->task,
-                'filename' => $this->_fileName,
-            ]);
+            if($cxtDef['type'] == 'x-tm-length-info' && $cxtDef['_prop_length_type'] != 'chars') {
+                $this->logger->info('E1322', 'A CXT tag type x-tm-length-info with a unknown prop type "{propType}" was found.', [
+                    'propType' => $cxtDef['_prop_length_type'],
+                    'task' => $this->task,
+                    'filename' => $this->_fileName,
+                ]);
+            }
             if($cxtDef['type'] == 'x-tm-length-info' && $cxtDef['_prop_length_type'] == 'chars' && $cxtDef['_prop_length_max_value'] > 1) {
 //                 CXT DEF: Array
 //                 (
@@ -569,6 +572,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
 //                 [purpose] => Match
 //             )
         }
+        return $attributes;
     }
 
     /**
