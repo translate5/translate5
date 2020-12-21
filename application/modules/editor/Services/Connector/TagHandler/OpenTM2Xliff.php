@@ -34,8 +34,11 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * protects the translate5 internal tags as XLIFF for language resource processing,
- * for OpenTM2 communication we convert line breaks to <ph type="lb"/> tags for better matching
- * since in OpenTM2 line breaks are handled as such tags
+ * - for OpenTM2 communication we convert line breaks to <ph type="lb"/> tags for better matching
+ *   since in OpenTM2 line breaks are handled as such tags
+ * - Also we decode single tags instead with an id with an mid, this improves matchrates in single tag matching.
+ *   It seems that a <x id="123"/> here does not match an <it type="struct"/> tag in the imported TMX,
+ *   a <x mid="123"/> instead does match the it tag.
  */
 class editor_Services_Connector_TagHandler_OpenTM2Xliff extends editor_Services_Connector_TagHandler_Xliff {
 
@@ -44,7 +47,9 @@ class editor_Services_Connector_TagHandler_OpenTM2Xliff extends editor_Services_
      * @see editor_Services_Connector_TagHandler_Xliff::prepareQuery()
      */
     public function prepareQuery(string $queryString): string {
-        return str_replace(["\r\n","\n","\r"], '<ph type="lb"/>', parent::prepareQuery($queryString));
+        $queryString = parent::prepareQuery($queryString);
+        $queryString = str_replace('<x id="', '<x mid="', $queryString);
+        return str_replace(["\r\n","\n","\r"], '<ph type="lb"/>', $queryString);
     }
     
     /**
@@ -52,6 +57,10 @@ class editor_Services_Connector_TagHandler_OpenTM2Xliff extends editor_Services_
      * @see editor_Services_Connector_TagHandler_Xliff::restoreInResult()
      */
     public function restoreInResult(string $resultString): ?string {
-        return parent::restoreInResult(str_replace(['<ph type="lb"/>', '<ph type="lb" />'], "\n", $resultString));
+        return parent::restoreInResult(str_replace([
+            '<x mid="',
+            '<ph type="lb"/>',
+            '<ph type="lb" />'
+        ], ['<x id="', "\n","\n"], $resultString));
     }
 }
