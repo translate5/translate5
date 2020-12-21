@@ -374,14 +374,15 @@ Ext.define('Editor.view.admin.config.Grid', {
         html.push('<i>');
         var levels = [];
         Ext.Object.each(Editor.data.frontend.config.configLabelMap, function(property, v){
-            if(record.get('level')<=property && property != record.CONFIG_LEVEL_USER){//ignore user level in the list
+            if(record.get('level')<=property && property != record.CONFIG_LEVEL_USER && property != record.CONFIG_LEVEL_INSTANCE){//ignore user level in the list
                 levels.push(v);
             }
         });
         
         html.push('<small>');
         html.push(me.strings.overwriteLevelList);
-        html.push(levels.join(","));
+        html.push(' ');
+        html.push(levels.join(", "));
         html.push('</small>');
         
         html.push('</i>');
