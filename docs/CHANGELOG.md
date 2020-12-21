@@ -6,8 +6,7 @@ For a reference to the issue keys see http://jira.translate5.net
 
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-
-
+All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
 ## [5.0.13] - 2020-11-17
