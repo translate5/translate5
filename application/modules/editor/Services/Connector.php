@@ -197,7 +197,7 @@ class editor_Services_Connector {
         }
         
         //IMPORTANT: getStatus must not throw an exception! Instead return the status in case of a here handled exception
-        if($method == 'getStatus') {
+        if($method == 'getStatus' || $method == 'batchQuery') {
             $this->adapter->setLastStatusInfo($this->adapter->logger->formatMessage($toThrow->getMessage(), $toThrow->getErrors()));
             $this->adapter->logger->exception($toThrow);
             return $status;
