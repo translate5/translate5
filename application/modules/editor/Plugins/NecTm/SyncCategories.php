@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -33,13 +33,7 @@ class editor_Plugins_NecTm_SyncCategories {
      */
     protected $api;
     
-    /**
-     * @var editor_Plugins_NecTm_Service
-     */
-    protected $service;
-    
-    public function __construct(editor_Plugins_NecTm_Service $service) {
-        $this->service = $service;
+    public function __construct() {
         $this->api = ZfExtended_Factory::get('editor_Plugins_NecTm_HttpApi');
     }
     
@@ -48,7 +42,7 @@ class editor_Plugins_NecTm_SyncCategories {
      * Queries NEC TM for all categories (= there: "tags") that can be accessed
      * with the system credentials in NEC TM. The existing NEC-TM-tags are saved
      * as categories in the translate5 DB. Categories that already exist in the
-     * translate5 DB, but do not exist any more in NEC TM, are removed from the 
+     * translate5 DB, but do not exist any more in NEC TM, are removed from the
      * DB and from all language resource associations.
      * @param bool $withMutex
      */
@@ -78,7 +72,7 @@ class editor_Plugins_NecTm_SyncCategories {
         unset($allAvailable);
         
         // all categories that we stored from NEC-TM
-        $allStored = $categoriesEntity->loadByOrigin($this->service->getCategoryOrigin());
+        $allStored = $categoriesEntity->loadByOrigin(editor_Plugins_NecTm_Service::CATEGORY_ORIGIN);
         foreach ($allStored as $storedCategory) {
             $categoriesEntity->load($storedCategory);
             $categoryId = $categoriesEntity->getOriginalCategoryId();
@@ -127,7 +121,7 @@ class editor_Plugins_NecTm_SyncCategories {
         $categorySpecificData  = array('type' => $necTmCategory->type);
         $categoriesEntity = ZfExtended_Factory::get('editor_Models_Categories');
         /* @var $categoriesEntity editor_Models_Categories */
-        $categoriesEntity->setOrigin($this->service->getCategoryOrigin());
+        $categoriesEntity->setOrigin(editor_Plugins_NecTm_Service::CATEGORY_ORIGIN);
         $categoriesEntity->setLabel($necTmCategory->name);
         $categoriesEntity->setOriginalCategoryId($necTmCategory->id);
         $categoriesEntity->setSpecificData($categorySpecificData);

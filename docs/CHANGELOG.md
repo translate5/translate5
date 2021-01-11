@@ -6,8 +6,58 @@ For a reference to the issue keys see http://jira.translate5.net
 
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+All updates are (downwards) compatible! If not this is listed in the important release notes.
 
 
+
+## [5.0.15] - 2020-12-21
+
+### Important Notes:
+#### [TRANSLATE-2336](https://jira.translate5.net/browse/TRANSLATE-2336)
+Now language resources of the same customer and with a sub-language (de-de, de-at) are also added automatically to tasks using only the base language (de).
+ 
+
+
+### Added
+**[TRANSLATE-2249](https://jira.translate5.net/browse/TRANSLATE-2249): Length restriction for sdlxliff files** <br>
+SDLXLIFF specific length restrictions are now read out and used for internal processing.
+
+
+### Changed
+**[TRANSLATE-2343](https://jira.translate5.net/browse/TRANSLATE-2343): Enhance links from default skin to www.translate5.net** <br>
+Change links from default skin to www.translate5.net
+
+**[TRANSLATE-390](https://jira.translate5.net/browse/TRANSLATE-390): Prevent that the same error creates a email on each request to prevent log spam** <br>
+Implemented the code base to recognize duplicated errors and prevent sending error mails.
+
+
+### Bugfixes
+**[TRANSLATE-2353](https://jira.translate5.net/browse/TRANSLATE-2353): OpenTM2 strange matching of single tags** <br>
+In the communication with OpenTM2 the used tags are modified to improve found matches.
+
+**[TRANSLATE-2346](https://jira.translate5.net/browse/TRANSLATE-2346): Wrong Tag numbering on using language resources** <br>
+If a segment containing special characters and is taken over from a language resource, the tag numbering could be messed up. This results then in false positive tag errors.
+
+**[TRANSLATE-2339](https://jira.translate5.net/browse/TRANSLATE-2339): OpenTM2 can not handle  datatype="unknown" in TMX import** <br>
+OpenTM2 does not import any segments from a TMX, that has  datatype="unknown" in its header tag, this is fixed by modifying the TMX on upload.
+
+**[TRANSLATE-2338](https://jira.translate5.net/browse/TRANSLATE-2338): Use ph tag in OpenTM2 to represent line-breaks** <br>
+In the communication with OpenTM2 line-breaks are converted to ph type="lb" tags, this improves the matchrates for affected segments.
+
+**[TRANSLATE-2336](https://jira.translate5.net/browse/TRANSLATE-2336): Auto association of language resources does not use language fuzzy match** <br>
+Now language resources with a sub-language (de-de, de-at) are also added to tasks using only the base language (de). 
+
+**[TRANSLATE-2334](https://jira.translate5.net/browse/TRANSLATE-2334): Pressing ESC while task is uploading results in task stuck in status import** <br>
+Escaping from task upload window while uploading is now prevented.
+
+**[TRANSLATE-2332](https://jira.translate5.net/browse/TRANSLATE-2332): Auto user association on task import does not work anymore** <br>
+Auto associated users are added now again, either as translators or as revieweres depending on the nature of the task.
+
+**[TRANSLATE-2328](https://jira.translate5.net/browse/TRANSLATE-2328): InstantTranslate: File upload will not work behind a proxy** <br>
+InstantTranslate file upload may not work behind a proxy, depending on the network configuration. See config worker.server.
+
+**[TRANSLATE-2294](https://jira.translate5.net/browse/TRANSLATE-2294): Additional tags from language resources are not handled properly** <br>
+The tag and whitespace handling of all language resources are unified and fixed, regarding to missing or additional tags.
 
 
 ## [5.0.13] - 2020-11-17

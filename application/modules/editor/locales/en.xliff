@@ -2779,6 +2779,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Die Anfrage an die Sprachressource dauerte zu lange.</source>
   <target>The language resource did not respond in a reasonable time.</target>
 </trans-unit>
+<trans-unit id='RXMgZ2lidCBQcm9ibGVtZSBtaXQgZGVtIGFuZ2VmcmFndGVuIERpZW5zdC4='>
+  <source>Es gibt Probleme mit dem angefragten Dienst.</source>
+  <target>There are problems with the queried service.</target>
+</trans-unit>
 <trans-unit id='RGllIEFuZnJhZ2UgZsO8aHJ0ZSB6dSBlaW5lbSBGZWhsZXIgaW0gYW5nZWZyYWd0ZW4gRGllbnN0Lg=='>
   <source>Die Anfrage führte zu einem Fehler im angefragten Dienst.</source>
   <target>The request produced an error in the queried service.</target>

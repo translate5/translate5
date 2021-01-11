@@ -130,6 +130,9 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             parse_url($url, PHP_URL_SCHEME).'://'.parse_url($url, PHP_URL_HOST).'/issues/?jql=project%20%3D%20'.self::PROJECT_KEY.'%20and%20fixVersion%20%3D%20%22'.$this->releaseVersion->id.'%22'
         ]);
         
+        if(!$this->io->confirm('Does the important release notes contain all API / GUI relevant changes?', false)) {
+            return 0;
+        }
         if(!$this->io->confirm('Create the SQL and Update the change log (or modify them in JIRA again)?', false)) {
             return 0;
         }
