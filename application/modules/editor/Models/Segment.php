@@ -75,7 +75,7 @@ END LICENSE AND COPYRIGHT
  * @method void setWorkflowStep() setWorkflowStep(string $name)
  *
  * this are just some helper for the always existing segment fields, similar named methods exists for all segment fields:
- * @method string getSource() setSource()
+ * @method string getSource() getSource()
  * @method void setSource() setSource(string $content)
  * @method void setSourceEdit() setSourceEdit(string $content)
  * @method void setSourceMd5() setSourceMd5(string $md5hash)

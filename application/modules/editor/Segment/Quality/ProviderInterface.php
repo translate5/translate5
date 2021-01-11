@@ -38,6 +38,8 @@ interface editor_Segment_Quality_ProviderInterface {
     
     public function hasWorker() : bool;
     
-    public function getWorker() : string;
+    public function processSegment(editor_Models_Task $task, editor_Models_Segment $segment, editor_Segment_FieldTags $tags, $forImport);
+    
+    public function addImportWorker(editor_Models_Task $task, int $parentWorkerId);
 
 }

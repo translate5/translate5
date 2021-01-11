@@ -32,19 +32,19 @@
  END LICENSE AND COPYRIGHT
  */
 
-class editor_Segment_Quality_Dispatcher {
+class editor_Segment_Quality_Manager {
     
     /**
-     * @var editor_Segment_Quality_Dispatcher
+     * @var editor_Segment_Quality_Manager
      */
     private static $_instance = null;
     /**
      *
-     * @return editor_Segment_Quality_Dispatcher
+     * @return editor_Segment_Quality_Manager
      */
     public static function instance(){
         if(self::$_instance == null){
-            self::$_instance = new editor_Segment_Quality_Dispatcher();
+            self::$_instance = new editor_Segment_Quality_Manager();
         }
         return self::$_instance;
     }
@@ -59,11 +59,15 @@ class editor_Segment_Quality_Dispatcher {
      */
     private $locked = false;
     
+    
     private function __construct(){
         
     }
     
     public function register(editor_Segment_Quality_ProviderInterface $provider){
+        if($this->locked){
+            throw new ZfExtended_Exception('Adding Quality Provider after app bootstrapping is not allowed.');
+        }
         $this->registry[$provider->getType()] = $provider;
     }
     
@@ -71,19 +75,20 @@ class editor_Segment_Quality_Dispatcher {
         return array_key_exists($type, $this->registry);
     }
     
-    public function processAllSegments(){
+    public function processImport(){
         
     }
     
-    public function processSegment(){
+    public function processEditing(){
         
     }
-    
+    /*
     public function createStatisticsData(){
-        
+       
     }
     
     public function createGridFilterData(){
         
     }
+    */
 }

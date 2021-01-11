@@ -176,28 +176,27 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
     }
     /**
      * 
-     * @return editor_Segment_Tags
+     * @return editor_Segment_FieldTags
      */
-    private function createTags() : editor_Segment_Tags{
+    private function createTags() : editor_Segment_FieldTags{
         $segmentId = 1234567;
         $segmentText = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'; // 80 characters
-        $field = 'source';
-        return new editor_Segment_Tags($segmentId, $segmentText, $field);
+        return new editor_Segment_FieldTags($segmentId, $segmentText, 'target', 'targetEdit');
     }
     /**
      * 
-     * @param editor_Segment_Tags $tags
+     * @param editor_Segment_FieldTags $tags
      * @param string $expectedMarkup
      */
-    private function createTagsTest(editor_Segment_Tags $tags, string $expectedMarkup){
+    private function createTagsTest(editor_Segment_FieldTags $tags, string $expectedMarkup){
         // compare rendered Markup
         $this->assertEquals($tags->render(), $expectedMarkup);
         // re-create from JSON
         $expectedJSON = $tags->toJson();
-        $jsonTags = editor_Segment_Tags::fromJson($expectedJSON);
+        $jsonTags = editor_Segment_FieldTags::fromJson($expectedJSON);
         $this->assertEquals($jsonTags->toJson(), $expectedJSON);
         // unparse test
-        $unparseTags = new editor_Segment_Tags($tags->getSegmentId(), $tags->getSegmentText(), $tags->getField());
+        $unparseTags = new editor_Segment_FieldTags($tags->getSegmentId(), $tags->getFieldText(), $tags->getFieldTo(), $tags->getFieldFrom());
         $unparseTags->unparse($expectedMarkup);
         $this->assertEquals($unparseTags->render(), $expectedMarkup);
     }
