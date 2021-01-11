@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.model.Config', {
   extend: 'Ext.data.Model',
+  CONFIG_LEVEL_SYSTEM : 1,
   CONFIG_LEVEL_INSTANCE : 2,
   CONFIG_LEVEL_USER : 32,
   fields: [
