@@ -26,25 +26,37 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Evaluates to a ZfExtended_BadGateway exception!
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-class editor_Services_Connector_Exception extends ZfExtended_BadGatewayErrorCode {
+/**
+ * protects the translate5 internal tags by removing for language resource processing
+ */
+class editor_Services_Connector_TagHandler_Remover extends editor_Services_Connector_TagHandler_Abstract {
     /**
-     * @var string
+     * protects the internal tags as xliff tags x,bx,ex and g pair
+     * @param string $queryString
+     * @return string
      */
-    protected $domain = 'editor.languageresource.service.connector';
+    public function prepareQuery(string $queryString): string {
+        $this->realTagCount = 0;
+        
+        //1. whitespace preparation
+        $queryString = $this->restoreWhitespaceForQuery($queryString);
+        
+        //2. strip all tags and set real tag count
+        return strip_tags($this->internalTag->replace($queryString, '', -1, $this->realTagCount));
+    }
     
-    static protected $localErrorCodes = [
-        'E1282' => 'Language resource communication error.',
-        'E1288' => 'The language code [{languageCode}] from resource [{resourceName}] is not valid or does not exist in the translate5 language code collection.',
-        'E1311' => 'Could not connect to language resource {service}: server not reachable',
-        'E1312' => 'Could not connect to language resource {service}: timeout on connection to server',
-        'E1313' => 'The queried language resource {service} returns an error.',
-    ];
-    
-    protected function setDuplication() {
-        parent::setDuplication();
-        ZfExtended_Logger::addDuplicatesByMessage('E1311', 'E1312');
+    /**
+     * protects the internal tags for language resource processing as defined in the class
+     * @param string $queryString
+     * @return string
+     */
+    public function restoreInResult(string $resultString): string {
+        return $this->importWhitespaceFromTagLessQuery($resultString);
     }
 }

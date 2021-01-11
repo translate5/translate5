@@ -26,6 +26,10 @@
  */
 class editor_Logger_LanguageResourcesWriter extends ZfExtended_Logger_Writer_Abstract {
     public function write(ZfExtended_Logger_Event $event) {
+        //currently we just do not write duplicates and duplicate info to the lang res log → the duplicate data is kept in the main log
+        if($this->getDuplicateCount($event) > 0) {
+            return;
+        }
         $languageResource = $event->extra['languageResource'];
         /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
         

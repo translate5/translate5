@@ -25,24 +25,17 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+
 /**
+ * Several errors about using a language resource result
  */
-class editor_Models_Import_FileParser_Sdlxliff_Exception extends editor_Models_Import_FileParser_Exception {
+class editor_Services_Exceptions_InvalidResponse extends ZfExtended_ErrorCodeException {
     /**
      * @var string
      */
-    protected $domain = 'editor.import.fileparser.sdlxliff';
+    protected $domain = 'editor.languageresource.service.connector';
     
     static protected $localErrorCodes = [
-        'E1001' => 'The opening tag "{tagName}" contains the tagId "{tagId}" which is no valid SDLXLIFF!',
-        'E1002' => 'Found a closing tag without an opening one. Segment MID: "{mid}".',
-        'E1003' => 'There are change-markers in the sdlxliff-file "{filename}", but the import of change-markers is disabled.',
-        'E1004' => 'Locked-tag-content was requested but tag does not contain a xid attribute.',
-        'E1005' => '<sdl:seg-defs was not found in the current transunit: "{transunit}"',
-        'E1006' => 'Loading the tag information from the SDLXLIFF header has failed!',
-        'E1007' => 'The tag "{tagname}" is not defined in the "_tagDefMapping" list.',
-        'E1009' => 'The source and target segment count does not match in transunit: "{transunit}".',
-        'E1010' => 'The tag "{tagname}" was used in the segment but is not defined in the "_tagDefMapping" list!',
-        'E1323' => 'The transUnit contains sdl:cxt tags, but we assume that tags only in the group tag!',
+        'E1315' => 'JSON decode error: {errorMsg}',
     ];
 }
