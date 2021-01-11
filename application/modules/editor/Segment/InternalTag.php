@@ -90,12 +90,12 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
      */
     public $endIndex = 0;
     /**
-     * Set by editor_Segment_Tags to indicate the index in the sequence of tags
+     * Set by editor_Segment_FieldTags to indicate the index in the sequence of tags
      * @var int
      */
     public $tagIndex;
     /**
-     * Set by editor_Segment_Tags to indicate that the Tag spans the complete segment text
+     * Set by editor_Segment_FieldTags to indicate that the Tag spans the complete segment text
      * @var bool
      */
     public $isFullLength;
@@ -241,9 +241,9 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
     /**
      * After the nested structure of tags is set this fills in the text-chunks of the segments text
      * CRUCIAL: at this point only editor_Segment_InternalTag must be added as children !
-     * @param editor_Segment_Tags $tags
+     * @param editor_Segment_FieldTags $tags
      */
-    public function addSegmentText(editor_Segment_Tags $tags){
+    public function addSegmentText(editor_Segment_FieldTags $tags){
         if($this->startIndex < $this->endIndex){
             if($this->hasChildren()){
                 // fil the text-gaps around our children with text-parts of the segments & fill our children with text
@@ -253,7 +253,7 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
                     if(is_a($child, 'editor_Segment_InternalTag')){
                         /* @var $child editor_Segment_InternalTag */
                         if($last < $child->startIndex){
-                            $chldrn[] = editor_Tag::createText($tags->getSegmentTextPart($last, $child->startIndex));
+                            $chldrn[] = editor_Tag::createText($tags->getFieldTextPart($last, $child->startIndex));
                         }
                         $child->addSegmentText($tags);
                         $chldrn[] = $child;
@@ -261,27 +261,27 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
                     }
                 }
                 if($last < $this->endIndex){
-                    $chldrn[] = editor_Tag::createText($tags->getSegmentTextPart($last, $this->endIndex));
+                    $chldrn[] = editor_Tag::createText($tags->getFieldTextPart($last, $this->endIndex));
                 }
                 $this->children = $chldrn;
             } else {
-                $this->addText($tags->getSegmentTextPart($this->startIndex, $this->endIndex));
+                $this->addText($tags->getFieldTextPart($this->startIndex, $this->endIndex));
             }
         }
     }
     /**
      * Adds us and all our children to the segment tags
-     * @param editor_Segment_Tags $tags
+     * @param editor_Segment_FieldTags $tags
      */
-    public function sequence(editor_Segment_Tags $tags){
+    public function sequence(editor_Segment_FieldTags $tags){
         $tags->addTag($this);
         $this->sequenceChildren($tags);
     }
     /**
      * Adds all our children to the segment tags
-     * @param editor_Segment_Tags $tags
+     * @param editor_Segment_FieldTags $tags
      */
-    public function sequenceChildren(editor_Segment_Tags $tags){
+    public function sequenceChildren(editor_Segment_FieldTags $tags){
         if($this->hasChildren()){
             foreach($this->children as $child){
                 if(is_a($child, 'editor_Segment_InternalTag')){

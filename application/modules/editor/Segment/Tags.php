@@ -33,141 +33,239 @@
  */
 
 /**
- * Holds a segment and the internal tags as objects and provide to render this structure or to recreate it from the rendered markup
- */
-/**
- * Abstraction to bundle the segment's text and it's internal tags
- * The structure of the tags in this class is a simple sequence, any nesting / interleaving ic covered with rendering / unparsing
- * The rendering will take care about interleaving and nested tags and may part a tag into chunks
- * When Markup is unserialized multiple chunks in a row of an internal tag will be joined to a single tag and the structure will be re-sequencialized
- * Keep in mind that start & end-index work just like counting chars or the substr API in php, the tag starts BEFORE the start index and ends BEFORE the index of the end index, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
- * To identify the Types of Internal tags a general API editor_Segment_TagCreator is provided
+ * Abstraction to bundle the segment's internal tags per field to have a model to be passed across the quality providers
  */
 class editor_Segment_Tags implements JsonSerializable {
-        
+    
     /**
      * The counterpart to ::toJson: creates the tags from the serialized json data
      * @param string $jsonString
      * @throws Exception
      * @return editor_Segment_Tags
      */
-    public static function fromJson($jsonString) : editor_Segment_Tags {
+    public static function fromJson(editor_Models_Task $task, bool $editorMode, string $jsonString) : editor_Segment_Tags {
         try {
             $data = json_decode($jsonString);
-            $tags = new editor_Segment_Tags($data->segmentId, $data->segmentText, $data->field);
-            foreach($data->tags as $tag){
-                $tags->addTag(editor_Segment_TagCreator::instance()->fromJsonData($tag));
+            if($data->taskGuid != $task->getTaskGuid()){
+                throw new Exception('Deserialization of editor_Segment_Tags from JSON-Object failed because of task-guid mismatch: '.json_encode($data));
             }
+            $tags = new editor_Segment_Tags($task, $editorMode, null, null, $data);
+            $tags->initFromJson($data);
             return $tags;
         } catch (Exception $e) {
             throw new Exception('Could not deserialize editor_Segment_Tags from JSON-Object '.json_encode($data));
         }
     }
+    
     /**
-     * Helper to sort Internal tags or rendered tags by startIndex
-     * @param editor_Segment_InternalTag $a
-     * @param editor_Segment_InternalTag $b
-     * @return int
+     *
+     * @var editor_Segment_FieldTags[]
      */
-    public static function compare(editor_Segment_InternalTag $a, editor_Segment_InternalTag $b){
-        if($a->startIndex === $b->startIndex){
-            // crucial: we must make sure, that a "normal" tag may contain a single tag all at the same index (no text-content). Thius, the normal tags always must weight less
-            if($a->isSingular() && !$b->isSingular()){
-                return 1;
-            } else if(!$a->isSingular() && $b->isSingular()){
-                return -1;
-            }
-            return $b->endIndex - $a->endIndex;
-        }
-        return $a->startIndex - $b->startIndex;
-    }
+    private $targets;
     /**
-     * The relevant segment-text
+     *
+     * @var editor_Segment_FieldTags
+     */
+    private $source;
+    /**
+     *
+     * @var editor_Segment_FieldTags
+     */
+    private $sourceOriginal = NULL;
+    /**
+     *
+     * @var editor_Models_Task
+     */
+    private $task;
+    /**
+     *
+     * @var bool
+     */
+    private $editorMode;
+    /**
+     *
+     * @var bool
+     */
+    private $sourceEditingEnabled;
+    /**
+     * 
+     * @var string[]
+     */
+    private $fields;
+    /**
+     *
      * @var int
      */
     private $segmentId;
     /**
-     * The text of the relevant segment
-     * @var string
-     */
-    private $segmentText;
-    /**
-     * The field of the segment's data we refer to
-     * @var string
-     */
-    private $field;
-    /**
-     * The tags and their positions within the segment
-     * @var editor_Segment_InternalTag[]
-     */
-    private $tags = [];
-    
-    public function __construct(int $segmentId, string $segmentText, string $field) {
-        $this->segmentId = $segmentId;
-        $this->segmentText = $segmentText;
-        $this->field = $field;
-    } 
-    /**
-     * 
-     * @return number
-     */
-    public function getSegmentId(){
-        return $this->segmentId;
-    }
-    /**
-     * 
-     * @return string
-     */
-    public function getSegmentText(){
-        return $this->segmentText;
-    }
-    /**
-     * 
-     * @return string
-     */
-    public function getField(){
-        return $this->field;
-    }
-    /**
      *
-     * @param editor_Segment_InternalTag $tag
+     * @var editor_Models_Segment
      */
-    public function addTag(editor_Segment_InternalTag $tag){
-        $tag->tagIndex = count($this->tags);
-        $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= mb_strlen($this->segmentText));
-        $this->tags[] = $tag;
-    }
+    public $segment;
+    
     /**
-     * Retrieves the tag at a certain index
-     * @param int $index
-     * @return editor_Segment_InternalTag|NULL
+     * 
+     * @param editor_Models_Task $task
+     * @param bool $isEditor
      */
-    public function getAt($index){
-        if($index < count($this->tags)){
-            return $this->tags[$index];
+    public function __construct(editor_Models_Task $task, bool $isEditor, editor_Models_Segment $segment=NULL, editor_Models_SegmentFieldManager $fieldManager=NULL, stdClass $serializedData=NULL) {
+        $this->task = $task;
+        $this->editorMode = $isEditor;
+        if($serializedData != NULL){            
+            $this->initFromJson($serializedData);
+        } else if($segment != NULL){
+            $this->segment = $segment;
+            $this->segmentId = $segment->getId();
+            if(empty($fieldManager)){
+                $fieldManager = editor_Models_SegmentFieldManager::getForTaskGuid($this->task->getTaskGuid());
+            }
+            $this->init($fieldManager);
+        } else {
+            throw new Exception('editor_Segment_Tags needs either a segment-instance or serialized data for instantiation');
         }
-        return NULL;
     }
     /**
-     * Retrieves the tags of a certain type
-     * @param string $type
-     * @return editor_Segment_InternalTag[]
+     * 
+     * @param editor_Models_SegmentFieldManager $fieldManager
      */
-    public function getByType(string $type){
-        $result = array();
-        foreach($this->tags as $tag){
-            if($tag->getType() == $type){
-                $result[] = $tag;
+    private function init(editor_Models_SegmentFieldManager $fieldManager){
+        $this->sourceEditingEnabled = ($this->editorMode && $this->task->getEnableSourceEditing());
+        $this->fields = [];
+
+    }
+    
+    private function __tmp(){
+        
+        // fetch editor & import
+        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        /* @var $fieldManager editor_Models_SegmentFieldManager */
+        $fieldManager->initFields($this->task->getTaskGuid());
+        $segmentFields = $fieldManager->getFieldList();
+        $enableSourceEditing = ($isEditor && $this->task->getEnableSourceEditing());
+        
+        if($enableSourceEditing){
+            $service->sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
+            $service->sourceFieldNameOriginal = $fieldManager->getFirstSourceName();
+        } else {
+            $service->sourceFieldName = $fieldManager->getFirstSourceName();
+        }
+        foreach ($segments as $segment) { /* @var $segment editor_Models_Segment */
+            
+            $sourceText = $segment->get($service->sourceFieldName);
+            $sourceTextOriginal = ($enableSourceEditing) ? $segment->get($service->sourceFieldNameOriginal) : $sourceText;
+            $firstField = true;
+            
+            foreach ($segmentFields as $field) {
+                if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
+                    continue;
+                }
+                $targetFieldName = ($isEditor) ? $fieldManager->getEditIndex($field->name) : $field->name;
+                if ($enableSourceEditing && $firstField) {
+                    $service->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($targetFieldName));
+                    $firstField = false;
+                }
+                if($isEditor){
+                    $targetText = $segment->get($targetFieldName);
+                } else {
+                    $targetText = $segment->getTargetEdit();
+                }
+                $service->addSegment($segment->getId(), $targetFieldName, $sourceText, $targetText);
             }
         }
-        return $result;
+        // save editor
+        foreach ($results as $result){
+            if($result->field == 'SourceOriginal') {
+                $segment->set($communicationService->sourceFieldNameOriginal, $result->source);
+                continue;
+            }
+            if(!$sourceTextTagged){
+                $segment->set($communicationService->sourceFieldName, $result->source);
+                $sourceTextTagged = true;
+            }
+            $segment->set($result->field, $result->target);
+        }
+        // save import
+        foreach ($responses as $segmentId => $responseGroup) {
+            $segment->load($segmentId);
+            
+            $segment->set($sourceFieldName, $responseGroup[0]->source);
+            if ($this->task->getEnableSourceEditing()) {
+                $segment->set($fieldManager->getEditIndex($sourceFieldName), $responseGroup[0]->source);
+            }
+            foreach ($responseGroup as $response) {
+                $segment->set($response->field, $response->target);
+                $segment->set($fieldManager->getEditIndex($response->field), $response->target);
+            }
+            $segment->save();
+            $segment->meta()->setTermtagState(editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_TAGGED);
+            $segment->meta()->save();
+        }
+    }
+    private function __init(editor_Models_SegmentFieldManager $fieldManager){
+        $this->sourceEditingEnabled = ($this->editorMode && $this->task->getEnableSourceEditing());
+        // evaluate the fields we have to deal with
+        if($this->sourceEditingEnabled){
+            $this->sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
+            $this->sourceFieldNameOriginal = $fieldManager->getFirstSourceName();
+        } else {
+            $this->sourceFieldName = $fieldManager->getFirstSourceName();
+        }
+        $segmentFields = $fieldManager->getFieldList();
+        foreach ($segmentFields as $field) {
+            if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
+                continue;
+            }
+            $targetFieldName = ($this->editorMode) ? $fieldManager->getEditIndex($field->name) : $field->name;
+            if ($enableSourceEditing && $firstField) {
+                $service->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($targetFieldName));
+                $firstField = false;
+            }
+            if($isEditor){
+                $targetText = $segment->get($targetFieldName);
+            } else {
+                $targetText = $segment->getTargetEdit();
+            }
+            $service->addSegment($segment->getId(), $targetFieldName, $sourceText, $targetText);
+        }
+    }
+    
+    
+    /**
+     * 
+     * @return boolean
+     */
+    public function isEditor(){
+        return $this->editorMode;
     }
     /**
-     * Sorts the items ascending, takes the second index into account when items have the same startIndex
+     * 
+     * @return boolean
      */
-    public function sort(){
-        usort($this->tags, array($this, 'compare'));
+    public function isSourceEditingEnabled(){
+        return $this->sourceEditingEnabled;
     }
+    /**
+     * 
+     * @return editor_Segment_FieldTags
+     */
+    public function getSource(){
+        return $this->source;
+    }
+    /**
+     * 
+     * @return editor_Segment_FieldTags
+     */
+    public function getOriginalSource(){
+        return $this->sourceOriginal;
+    }
+    /**
+     * 
+     * @return editor_Segment_FieldTags[]
+     */
+    public function getTargets(){
+        return $this->targets;
+    }
+
     
     /* Serialization API */
     
@@ -178,159 +276,46 @@ class editor_Segment_Tags implements JsonSerializable {
     public function toJson(){
         return json_encode($this->jsonSerialize(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
-    
-    
+    /**
+     * 
+     * {@inheritDoc}
+     * @see JsonSerializable::jsonSerialize()
+     */
     public function jsonSerialize(){
         $data = new stdClass();
-        $this->sort();
-        $data->tags = [];
-        foreach($this->tags as $tag){
-            $data->tags[] = $tag->jsonSerialize();
-        }
+        $data->taskGuid = $this->task->getTaskGuid();
         $data->segmentId = $this->segmentId;
-        $data->segmentText = $this->segmentText;
-        $data->field = $this->field;
-        return $data;        
-    }
-    
-    /* Rendering API */
-    
-    public function render(){
-        $numTags = count($this->tags);
-        if($numTags == 0){
-            return $this->segmentText;
+        $data->targets = [];
+        foreach($this->targets as $tag){
+            $data->targets[] = $tag->jsonSerialize();
         }
-        $this->sort();
-        $rtags = [];
-        /* @var $rtags editor_Segment_InternalTag[] */
-        $numRtags = 0;
-        // creating a datamodel where the overlapping tags are segmented to pieces that do not overlap
-        // therefore, all tags are compared with the tags after them and are cut into pieces if needed
-        // this will lead to tags being cut into pieces not necceccarily in the order as they have been added but in the order of their start-indexes / weight
-        if($numTags > 1){
-            for($i = 0; $i < $numTags; $i++){
-                $tag = $this->tags[$i];
-                $last = $tag->clone(true);
-                $rtags[$numRtags] = $last;
-                $numRtags++;
-                if(($i + 1) < $numTags){
-                    for($j = $i + 1; $j < $numTags; $j++){
-                        $compare = $this->tags[$j];
-                        // if the tag to compare overlaps we cut at the start-index
-                        if($compare->startIndex < $tag->endIndex && $compare->endIndex > $tag->endIndex){
-                            $cut = $compare->startIndex;
-                            $last->endIndex = $cut;
-                            $last = $tag->clone(false);
-                            $last->startIndex = $cut;
-                            $rtags[$numRtags] = $last;
-                            $numRtags++;
-                        }
-                    }
-                }
+        $data->source = $this->source->jsonSerialize();
+        $data->sourceOriginal = ($this->sourceOriginal == NULL) ? false : $this->sourceOriginal->jsonSerialize();
+        $data->editorMode = $this->editorMode;
+        $data->sourceEditingEnabled = $this->sourceEditingEnabled;
+        $data->fields = $this->fields;
+        return $data;
+    }
+    /**
+     * 
+     * @param stdClass $data
+     * @throws Exception
+     */
+    private function initFromJson(stdClass $data){
+        try {
+            $this->segmentId = $data->segmentId;
+            $this->sourceEditingEnabled = ($this->editorMode && $data->sourceEditingEnabled);
+            $this->source = editor_Segment_FieldTags::fromJsonData($data->source);
+            $this->targets = [];
+            foreach($data->targets as $targetData){
+                $this->targets[] = editor_Segment_FieldTags::fromJsonData($targetData);
             }
-            usort($rtags, array($this, 'compare'));
-         
-        } else {
-            
-            $rtags[$numRtags] = $this->tags[0]->clone(true);
-            $numRtags++;
-        }
-        // now we create the nested data-model from the up to now sequential but sorted $rtags model. We also add the text-portions of the segment as text nodes
-        // this container just acts as the master container 
-        $holder = new editor_Segment_AnyInternalTag(0, mb_strlen($this->segmentText));
-        $container = $holder;
-        foreach($rtags as $tag){
-            $container->getNearestContainer($tag)->addChild($tag);
-            $container = $tag;
-        }
-        $holder->addSegmentText($this);
-        // finally, render the holder's children
-        return $holder->renderChildren();
-    }
-    /**
-     * Retrieves a part of the segment-text by start & end index
-     * Used by editor_Segment_InternalTag to fill in the segment-texts
-     * @param int $start
-     * @param int $end
-     * @return string
-     */
-    public function getSegmentTextPart(int $start, int $end) : string {
-        return substr($this->segmentText, $start, ($end - $start));
-    }
-    
-    /* Unparsing API */
-
-    public function unparse(string $html) {
-        $dom = new editor_Utils_Dom();
-        // to make things easier we add a wrapper to hold all tags and only use it's children
-        $element = $dom->loadUnicodeElement('<div>'.$html.'</div>');
-        if($element != NULL){
-            $wrapper = $this->fromDomElement($element, 0);
-            // sequence the nested tags as our children
-            $wrapper->sequenceChildren($this);
-            $this->consolidate();
-            // Crucial: finalize, set the tag-props
-            $this->addTagProps();
-        } else {
-            throw new Exception('Could not unparse Internal Tags from Markup '.$html);
-        }        
-    }
-    /**
-     * Creates a nested structure of Internal tags & text-nodes recursively out of a n DOMElement structure
-     * @param DOMElement $element
-     * @param int $startIndex
-     * @return editor_Segment_InternalTag
-     */
-    private function fromDomElement(DOMElement $element, int $startIndex){
-        $tag = editor_Segment_TagCreator::instance()->fromDomElement($element, $startIndex);
-        if($element->hasChildNodes()){
-            for($i = 0; $i < $element->childNodes->length; $i++){
-                $child = $element->childNodes->item($i);
-                if($child->nodeType == XML_TEXT_NODE){
-                    $tag->addText($child->nodeValue);
-                } else if($child->nodeType == XML_ELEMENT_NODE){
-                    $tag->addChild($this->fromDomElement($child, $startIndex));
-                }
-                $startIndex += $tag->getLastChild()->getTextLength();
+            if($this->sourceEditingEnabled && property_exists($data, 'sourceOriginal')){
+                $this->sourceOriginal = editor_Segment_FieldTags::fromJsonData($data->sourceOriginal);
             }
-        }
-        $tag->endIndex = $startIndex;
-        return $tag;
-    }
-    /**
-     * Joins Tags that are equal and directly beneath each other
-     * Also removes any internal connections between the tags
-     */
-    private function consolidate(){
-        $this->sort();
-        $numTags = count($this->tags);
-        if($numTags > 1){
-            $tags = [];
-            $last = $this->tags[0];
-            $last->resetChildren();
-            $tags[] = $last;
-            for($i=1; $i < $numTags; $i++){
-                $tag = $this->tags[$i];
-                if($tag->isEqual($last) && $last->endIndex == $tag->startIndex){
-                    $last->endIndex = $tag->endIndex;
-                } else {
-                    $last = $tag;
-                    $last->resetChildren();
-                    $tags[] = $last;
-                }
-            }
-            $this->tags = $tags;
-        }
-    }
-    /**
-     * Adds the properties 'tagIndex' and 'isFullLength' to the tags, which are needed by consuming APIs
-     */
-    private function addTagProps(){
-        $num = count($this->tags);
-        $textLength = mb_strlen($this->segmentText);
-        for($i=0; $i < $num; $i++){
-            $this->tags[$i]->tagIndex = $i;
-            $this->tags[$i]->isFullLength = ($this->tags[$i]->startIndex == 0 && $this->tags[$i]->endIndex >= $textLength);
+            $this->fields = $data->fields;
+        } catch (Exception $e) {
+            throw new Exception('Deserialization of editor_Segment_Tags from JSON-Object failed because of invalid data: '.json_encode($data));
         }
     }
 }

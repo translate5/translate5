@@ -264,7 +264,7 @@ class editor_Plugins_TermTagger_Configuration {
         try {
             return $tbxParser->assertTbxExists($this->task, $tbxFileInfo);
         }
-        catch (editor_Models_Term_TbxCreationException $e) {
+        catch (editor_Models_Term_TbxCreationException $e){
             //'E1116' => 'Could not load TBX into TermTagger: TBX hash is empty.',
             throw new editor_Plugins_TermTagger_Exception_Open('E1116', [], $e);
         }
