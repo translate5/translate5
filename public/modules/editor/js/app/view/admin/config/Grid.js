@@ -357,13 +357,17 @@ Ext.define('Editor.view.admin.config.Grid', {
      */
     guiNameCellRenderer:function(value, meta, record) {
         var me=this,
-            html = ['<b>'];
+            desc = record && record.get('description'),
+            html = ['<b>'],
+            levels = [],
+            labelLevel = 0,
+            recordLevel = 0,
+            ignoreLevels = [record.CONFIG_LEVEL_USER,record.CONFIG_LEVEL_INSTANCE,record.CONFIG_LEVEL_SYSTEM];//"don't render" levels
         
         html.push(value);
         html.push('</b>');
         html.push('</br>');
         
-        var desc = record && record.get('description');
         if(desc){
             html.push('<i>');
             html.push(desc);
@@ -371,22 +375,28 @@ Ext.define('Editor.view.admin.config.Grid', {
             html.push('</br>');
         }
         
-        html.push('<i>');
-        var levels = [];
         Ext.Object.each(Editor.data.frontend.config.configLabelMap, function(property, v){
-            if(record.get('level')<=property && property != record.CONFIG_LEVEL_USER && property != record.CONFIG_LEVEL_INSTANCE){//ignore user level in the list
-                levels.push(v);
+            try {
+                labelLevel = parseInt(property);
+                recordLevel = parseInt(record.get('level'));
+                if(labelLevel<=recordLevel && !Ext.Array.contains(ignoreLevels,labelLevel)){//ignore user level in the list
+                    levels.push(v);
+                }
+            } catch (e) {
+                Ext.Logger.warn("Unable to parse levels: ["+labelLevel+"],["+recordLevel+"]")
             }
         });
         
-        html.push('<small>');
-        html.push(me.strings.overwriteLevelList);
-        html.push(' ');
-        html.push(levels.join(", "));
-        html.push('</small>');
-        
-        html.push('</i>');
-        html.push('</br>');
+        if(levels.length>0){
+            html.push('<i>');
+            html.push('<small>');
+            html.push(me.strings.overwriteLevelList);
+            html.push(' ');
+            html.push(levels.join(", "));
+            html.push('</small>');
+            html.push('</i>');
+            html.push('</br>');
+        }
         
         return html.join("");
     },
