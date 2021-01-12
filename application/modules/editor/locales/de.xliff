@@ -1898,7 +1898,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U3RhbmRhcmRrb25maWd1cmF0aW9uIGRlcyBTeXN0ZW1z'><source>Standardkonfiguration des Systems</source><target>Konfiguration Kunde (überschreibt Systemkonfiguration)</target></trans-unit>
 <trans-unit id='w5xiZXJzY2hyaWViZW4='><source>Überschrieben</source><target>Überschrieben</target></trans-unit>
 <trans-unit id='QXVmIGViZW5lIGdlc2V0enQ='><source>Auf ebene gesetzt</source><target>Auf Ebene gesetzt</target></trans-unit>
-<trans-unit id='S3VyemVyIE5hbWU='><source>Konfigurationsoption</source><target>Konfiugrationsoption</target></trans-unit>
+<trans-unit id='S3VyemVyIE5hbWU='><source>Konfigurationsoption</source><target>Konfigurationsoptionen</target></trans-unit>
 <trans-unit id='QWt0aXZpZXJ0'><source>Aktiviert</source><target>Aktiviert</target></trans-unit>
 <trans-unit id='RGVha3RpdmllcnQ='><source>Deaktiviert</source><target>Deaktiviert</target></trans-unit>
 <trans-unit id='w5xiZXJzY2hyZWliYmFyIGF1ZiBFYmVuZTo='><source>Überschreibbar auf Ebene:</source><target>Überschreibbar auf Ebene:</target></trans-unit>
