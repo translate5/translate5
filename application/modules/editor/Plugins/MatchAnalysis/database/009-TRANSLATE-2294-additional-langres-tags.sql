@@ -25,5 +25,4 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_acl_rules` (`id`, `module`, `role`, `resource`, `right`)
-VALUES (null, 'editor', 'noRights', 'editor_fakelang', 'all');
+ALTER TABLE `LEK_match_analysis_batchresults` MODIFY `result` MEDIUMBLOB;
