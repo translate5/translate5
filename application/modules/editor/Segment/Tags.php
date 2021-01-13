@@ -56,12 +56,11 @@ class editor_Segment_Tags implements JsonSerializable {
             throw new Exception('Could not deserialize editor_Segment_Tags from JSON-Object '.json_encode($data));
         }
     }
-    
     /**
      *
-     * @var editor_Segment_FieldTags[]
+     * @var editor_Segment_FieldTags
      */
-    private $targets;
+    private $sourceOriginal = NULL;
     /**
      *
      * @var editor_Segment_FieldTags
@@ -69,9 +68,9 @@ class editor_Segment_Tags implements JsonSerializable {
     private $source;
     /**
      *
-     * @var editor_Segment_FieldTags
+     * @var editor_Segment_FieldTags[]
      */
-    private $sourceOriginal = NULL;
+    private $targets;
     /**
      *
      * @var editor_Models_Task
@@ -88,11 +87,6 @@ class editor_Segment_Tags implements JsonSerializable {
      */
     private $sourceEditingEnabled;
     /**
-     * 
-     * @var string[]
-     */
-    private $fields;
-    /**
      *
      * @var int
      */
@@ -101,7 +95,7 @@ class editor_Segment_Tags implements JsonSerializable {
      *
      * @var editor_Models_Segment
      */
-    public $segment;
+    private $segment = null;
     
     /**
      * 
@@ -113,123 +107,79 @@ class editor_Segment_Tags implements JsonSerializable {
         $this->editorMode = $isEditor;
         if($serializedData != NULL){            
             $this->initFromJson($serializedData);
-        } else if($segment != NULL){
+        } else if($segment != NULL && $fieldManager != NULL){
             $this->segment = $segment;
             $this->segmentId = $segment->getId();
-            if(empty($fieldManager)){
-                $fieldManager = editor_Models_SegmentFieldManager::getForTaskGuid($this->task->getTaskGuid());
-            }
             $this->init($fieldManager);
         } else {
-            throw new Exception('editor_Segment_Tags needs either a segment-instance or serialized data for instantiation');
+            throw new Exception('editor_Segment_Tags needs either a segment-instance with field manager or serialized data for instantiation');
+        }
+    }
+    /** 
+     * Initializes from scratch (used in the initial quality worker), creates the inital data structure
+     * @param editor_Models_SegmentFieldManager $fieldManager
+     */ 
+    private function init(editor_Models_SegmentFieldManager $fieldManager){
+        $this->sourceEditingEnabled = $this->task->getEnableSourceEditing();
+
+        $sourceField = $fieldManager->getFirstSourceName();
+        $sourceFieldEditIndex = $fieldManager->getEditIndex($sourceField);
+        // in case of an editing process the original source will be handled seperately
+        // if we are an import, the original source and source will be handled identically - the "normal"  source is the edited source then
+        if($this->editorMode && $this->sourceEditingEnabled){
+            // original source (what is the source in all other cases)
+            $this->sourceOriginal = new editor_Segment_FieldTags($this->segmentId, $this->segment->get($sourceField), $sourceField, $sourceField);
+            // source here is the editable source
+            $this->source = new editor_Segment_FieldTags($this->segmentId, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceFieldEditIndex);
+        } else {
+            $this->source = new editor_Segment_FieldTags($this->segmentId, $this->segment->get($sourceField), $sourceField, $sourceFieldEditIndex);
+        }
+        $this->targets = [];
+        foreach ($fieldManager->getFieldList() as $field) {
+            /* @var $field Zend_Db_Table_Row */
+            if($field->type == editor_Models_SegmentField::TYPE_TARGET && $field->editable) {
+                // for unknown reasos, the termtagger uses different field-names on import then when editing
+                $to = $fieldManager->getEditIndex($field->name);
+                $from = ($this->editorMode) ? $to : $field->name;
+                $text = ($this->editorMode) ? $this->segment->get($to) : $this->segment->getTargetEdit();
+                $target = new editor_Segment_FieldTags($this->segmentId, $text, $to, $from);
+                $this->targets[] = $target;
+            }
         }
     }
     /**
-     * 
-     * @param editor_Models_SegmentFieldManager $fieldManager
+     * Saves the current state to the database during the import
      */
-    private function init(editor_Models_SegmentFieldManager $fieldManager){
-        $this->sourceEditingEnabled = ($this->editorMode && $this->task->getEnableSourceEditing());
-        $this->fields = [];
-
+    public function save(){
+        $this->getSegment()->setSegmentTagsJSON($this->toJson());
     }
-    
-    private function __tmp(){
-        
-        // fetch editor & import
-        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $fieldManager editor_Models_SegmentFieldManager */
-        $fieldManager->initFields($this->task->getTaskGuid());
-        $segmentFields = $fieldManager->getFieldList();
-        $enableSourceEditing = ($isEditor && $this->task->getEnableSourceEditing());
-        
-        if($enableSourceEditing){
-            $service->sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
-            $service->sourceFieldNameOriginal = $fieldManager->getFirstSourceName();
-        } else {
-            $service->sourceFieldName = $fieldManager->getFirstSourceName();
-        }
-        foreach ($segments as $segment) { /* @var $segment editor_Models_Segment */
-            
-            $sourceText = $segment->get($service->sourceFieldName);
-            $sourceTextOriginal = ($enableSourceEditing) ? $segment->get($service->sourceFieldNameOriginal) : $sourceText;
-            $firstField = true;
-            
-            foreach ($segmentFields as $field) {
-                if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
-                    continue;
-                }
-                $targetFieldName = ($isEditor) ? $fieldManager->getEditIndex($field->name) : $field->name;
-                if ($enableSourceEditing && $firstField) {
-                    $service->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($targetFieldName));
-                    $firstField = false;
-                }
-                if($isEditor){
-                    $targetText = $segment->get($targetFieldName);
-                } else {
-                    $targetText = $segment->getTargetEdit();
-                }
-                $service->addSegment($segment->getId(), $targetFieldName, $sourceText, $targetText);
-            }
-        }
-        // save editor
-        foreach ($results as $result){
-            if($result->field == 'SourceOriginal') {
-                $segment->set($communicationService->sourceFieldNameOriginal, $result->source);
-                continue;
-            }
-            if(!$sourceTextTagged){
-                $segment->set($communicationService->sourceFieldName, $result->source);
-                $sourceTextTagged = true;
-            }
-            $segment->set($result->field, $result->target);
-        }
-        // save import
-        foreach ($responses as $segmentId => $responseGroup) {
-            $segment->load($segmentId);
-            
-            $segment->set($sourceFieldName, $responseGroup[0]->source);
-            if ($this->task->getEnableSourceEditing()) {
-                $segment->set($fieldManager->getEditIndex($sourceFieldName), $responseGroup[0]->source);
-            }
-            foreach ($responseGroup as $response) {
-                $segment->set($response->field, $response->target);
-                $segment->set($fieldManager->getEditIndex($response->field), $response->target);
-            }
-            $segment->save();
-            $segment->meta()->setTermtagState(editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_TAGGED);
-            $segment->meta()->save();
-        }
-    }
-    private function __init(editor_Models_SegmentFieldManager $fieldManager){
-        $this->sourceEditingEnabled = ($this->editorMode && $this->task->getEnableSourceEditing());
-        // evaluate the fields we have to deal with
+    /**
+     * Saves all fields back to the segment when the 
+     */
+    public function flush(){
         if($this->sourceEditingEnabled){
-            $this->sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
-            $this->sourceFieldNameOriginal = $fieldManager->getFirstSourceName();
-        } else {
-            $this->sourceFieldName = $fieldManager->getFirstSourceName();
-        }
-        $segmentFields = $fieldManager->getFieldList();
-        foreach ($segmentFields as $field) {
-            if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
-                continue;
-            }
-            $targetFieldName = ($this->editorMode) ? $fieldManager->getEditIndex($field->name) : $field->name;
-            if ($enableSourceEditing && $firstField) {
-                $service->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($targetFieldName));
-                $firstField = false;
-            }
-            if($isEditor){
-                $targetText = $segment->get($targetFieldName);
+            if($this->editorMode){
+                $this->getSegment()->set($this->sourceOriginal->getFieldTo(), $this->sourceOriginal->render());
             } else {
-                $targetText = $segment->getTargetEdit();
+                // Ugly Trick: we save the edit-index in the TO-field
+                $this->getSegment()->set($this->source->getFieldTo(), $this->source->render());
             }
-            $service->addSegment($segment->getId(), $targetFieldName, $sourceText, $targetText);
+        }
+        // save source, we save always to the "from" field as the "to" field is maybe used to save the edit-index when importing
+        $this->getSegment()->set($this->source->getFieldFrom(), $this->source->render());
+        // save targets
+        foreach($this->targets as $target){
+            /* @var $target editor_Segment_FieldTags */
+            if($this->editorMode){
+                $this->getSegment()->set($target->getFieldTo(), $target->render());
+            } else {
+                // when importing, we write to the target as well (encoded in the from field)
+                $renderedTarget = $target->render();
+                $this->getSegment()->set($target->getFieldFrom(), $renderedTarget);
+                $this->getSegment()->set($target->getFieldTo(), $renderedTarget);
+            }
         }
     }
-    
-    
     /**
      * 
      * @return boolean
@@ -265,7 +215,32 @@ class editor_Segment_Tags implements JsonSerializable {
     public function getTargets(){
         return $this->targets;
     }
-
+    /**
+     * 
+     * @return editor_Segment_FieldTags[]
+     */
+    public function getFieldTags(){
+        $tags = $this->getTargets();
+        if($this->source != null){
+            array_unshift($tags, $this->source);
+        }
+        if($this->sourceEditingEnabled && $this->sourceOriginal != null){
+            array_unshift($tags, $this->sourceOriginal);
+        }
+        return $tags;
+    }
+    /**
+     * 
+     * @return editor_Models_Segment
+     */
+    public function getSegment(){
+        if($this->segment == null){
+            $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
+            /* @var $segment editor_Models_Segment */
+            $this->segment->load($this->segmentId);
+        }
+        return $this->segment;
+    }
     
     /* Serialization API */
     
@@ -293,7 +268,6 @@ class editor_Segment_Tags implements JsonSerializable {
         $data->sourceOriginal = ($this->sourceOriginal == NULL) ? false : $this->sourceOriginal->jsonSerialize();
         $data->editorMode = $this->editorMode;
         $data->sourceEditingEnabled = $this->sourceEditingEnabled;
-        $data->fields = $this->fields;
         return $data;
     }
     /**
@@ -304,16 +278,15 @@ class editor_Segment_Tags implements JsonSerializable {
     private function initFromJson(stdClass $data){
         try {
             $this->segmentId = $data->segmentId;
-            $this->sourceEditingEnabled = ($this->editorMode && $data->sourceEditingEnabled);
+            $this->sourceEditingEnabled = $data->sourceEditingEnabled;
             $this->source = editor_Segment_FieldTags::fromJsonData($data->source);
             $this->targets = [];
             foreach($data->targets as $targetData){
                 $this->targets[] = editor_Segment_FieldTags::fromJsonData($targetData);
             }
-            if($this->sourceEditingEnabled && property_exists($data, 'sourceOriginal')){
+            if($this->editorMode && $this->sourceEditingEnabled){
                 $this->sourceOriginal = editor_Segment_FieldTags::fromJsonData($data->sourceOriginal);
             }
-            $this->fields = $data->fields;
         } catch (Exception $e) {
             throw new Exception('Deserialization of editor_Segment_Tags from JSON-Object failed because of invalid data: '.json_encode($data));
         }

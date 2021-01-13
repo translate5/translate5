@@ -161,6 +161,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected $whitespaceHelper;
     
     /**
+     * @var Zend_Db_Table_Row_Abstract
+     */
+    protected $segmentTags = null;
+    
+    /**
      * static so that only one instance is used, for performance and logging issues
      * @var editor_Models_Segment_PixelLength
      */
@@ -1791,5 +1796,48 @@ order by date desc, segmentId asc limit 1';
         $stmt = $this->db->getAdapter()->query($sql,[$taskGuid,$taskGuid,$userGuid]);
         $result = $stmt->fetchAll();
         return $result[0]['segmentId'] ?? -1;
+    }
+    /**
+     * 
+     * @return Zend_Db_Table_Row_Abstract
+     */
+    protected function createSegmentTags() : Zend_Db_Table_Row_Abstract {
+        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentTags');
+        /* @var $db editor_Models_Db_SegmentTags */
+        $select = $db->select()->where('segmentId = ?', $this->getId());
+        $tagsRow = $db->fetchRow($select);
+        if(empty($tagsRow)){
+            $tagsRow = $db->createRow();
+            $tagsRow->segmentId = $this->getId();
+            $tagsRow->taskGuid = $this->getTaskGuid();
+            $tagsRow->tags = '';
+        }
+        return $tagsRow;
+    }
+    /**
+     * 
+     * @return Zend_Db_Table_Row_Abstract
+     */
+    public function getSegmentTags() : Zend_Db_Table_Row_Abstract {
+        if($this->segmentTags == NULL){
+            $this->segmentTags = $this->createSegmentTags();
+        }
+        return $this->segmentTags;
+    }
+    /**
+     * 
+     * @return string
+     */
+    public function getSegmentTagsJSON() : string {
+        return $this->getSegmentTags()->tags;
+    }
+    /**
+     * 
+     * @param string $json
+     */
+    public function setSegmentTagsJSON(string $json){
+        $row = $this->getSegmentTags();
+        $row->tags = $json;
+        $row->save();
     }
 }
