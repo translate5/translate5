@@ -54,6 +54,10 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
      */
     const TYPE_ANY = 'any';
     /**
+     * @var string
+     */
+    const TYPE_TERM = 'term';
+    /**
      * The counterpart to ::toJson: creates the tag from the serialized json data
      * @param string $jsonString
      * @throws Exception

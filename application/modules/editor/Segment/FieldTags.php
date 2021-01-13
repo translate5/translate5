@@ -37,7 +37,7 @@
  */
 /**
  * Abstraction to bundle the segment's text and it's internal tags
- * The structure of the tags in this class is a simple sequence, any nesting / interleaving ic covered with rendering / unparsing
+ * The structure of the tags in this class is a simple sequence, any nesting / interleaving is covered with rendering / unparsing
  * The rendering will take care about interleaving and nested tags and may part a tag into chunks
  * When Markup is unserialized multiple chunks in a row of an internal tag will be joined to a single tag and the structure will be re-sequencialized
  * Keep in mind that start & end-index work just like counting chars or the substr API in php, the tag starts BEFORE the start index and ends BEFORE the index of the end index, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
@@ -111,11 +111,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     private $fieldTo;
     /**
-     * 
+     * Only neccessary for the termtagger, will be used as the fieldname there. A target will be sent with it original field name (but saved to the edit-field) when importing
+     * TODO: there is no obvious reason why this is done and this may is obsolete ...
      * @var string
      */
     private $fieldFrom;
-    
     /**
      * The tags and their positions within the segment
      * @var editor_Segment_InternalTag[]
@@ -123,7 +123,6 @@ class editor_Segment_FieldTags implements JsonSerializable {
     private $tags = [];
     
     /**
-     * // $tags = new editor_Segment_FieldTags($data->segmentId, $data->fieldText, $data->fieldTo, $data->fieldFrom);
      * 
      * @param int $segmentId
      * @param string $fieldText
@@ -135,6 +134,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
         $this->fieldText = $fieldText;
         $this->fieldTo = $fieldTo;
         $this->fieldFrom = (empty($fieldFrom)) ? $fieldTo : $fieldFrom;
+        // if HTML was passed as field text we have to unparse it
+        if(!empty($fieldText) && $fieldText != strip_tags($fieldText)){
+            $this->fieldText = '';
+            $this->unparse($fieldText);
+        }
     } 
     /**
      * 
@@ -303,6 +307,8 @@ class editor_Segment_FieldTags implements JsonSerializable {
         $element = $dom->loadUnicodeElement('<div>'.$html.'</div>');
         if($element != NULL){
             $wrapper = $this->fromDomElement($element, 0);
+            // set our field text
+            $this->fieldText = $wrapper->getText();
             // sequence the nested tags as our children
             $wrapper->sequenceChildren($this);
             $this->consolidate();
