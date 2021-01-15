@@ -63,7 +63,7 @@ UPDATE `Zf_configuration` SET `description`='If set to active, translate5 shows 
 UPDATE `Zf_configuration` SET `description`='If set to active, the segment comments will be exported into the exported bilingual file (if this is supported by the implementation for that file type).' WHERE `name`='runtimeOptions.editor.export.exportComments';
 UPDATE `Zf_configuration` SET `description`='If set to active, error-logging in the graphical user interface is activated. Errors will be send to translate5s developers via theRootCause.io. Users can decide on every single occurence of an error, if they want to report it.' WHERE `name`='runtimeOptions.debug.enableJsLogger';
 UPDATE `Zf_configuration` SET `description`='If set to active, if the generated XLIFF will be in XLIFF 2 format. Else XLIFF 1.2' WHERE `name`='runtimeOptions.editor.notification.xliff2Active';
-UPDATE `Zf_configuration` SET `description`='If set to active, 100% matches can be edited in the task.' WHERE `name`='runtimeOptions.frontend.importTask.edit100PercentMatch';
+UPDATE `Zf_configuration` SET `description`='If set to active, the import option that decides, if 100% matches can be edited in the task is activated by default. Else it is disabled by default (but can be enabled in the import settings).' WHERE `name`='runtimeOptions.frontend.importTask.edit100PercentMatch';
 UPDATE `Zf_configuration` SET `description`='If set to active, spell- grammar and style check is active (based on languagetool)' WHERE `name`='runtimeOptions.plugins.SpellCheck.active';
 UPDATE `Zf_configuration` SET `description`='If this is set to disabled, for 100%-Matches that differ in the target, the target of the match with the highest match rate is shown. If the match rate is the same, the match with the newest change date is shown.If set to active, all 100%-Matches that differ in the target are shown.' WHERE `name`='runtimeOptions.LanguageResources.opentm2.showMultiple100PercentMatches';
 UPDATE `Zf_configuration` SET `description`='If set to active and only a TermCollection and no MT or TM language resource is assigned to the task, the fuzzy match panel will not be shown in translate5s editor.' WHERE `name`='runtimeOptions.editor.LanguageResources.disableIfOnlyTermCollection';
@@ -87,7 +87,7 @@ UPDATE `Zf_configuration` SET `description`='If set to active, In the source/tar
 UPDATE `Zf_configuration` SET `default`=`value` 
 WHERE `name`='runtimeOptions.extJs.cssFile';
 
-UPDATE `Zf_configuration` SET `default`='1' 
+UPDATE `Zf_configuration` SET `default`='1',`description`='If activated, the import option that decides, if the editing of the source text in the editor is possible is by default active. Else it is disabled by default (but can be enabled in the import settings). Please note: The export of the changed source text is only possible for CSV so far. '
 WHERE `name`='runtimeOptions.import.enableSourceEditing';
 
 UPDATE `Zf_configuration` SET `default`='1' 
