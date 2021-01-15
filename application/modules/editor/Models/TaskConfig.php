@@ -57,10 +57,14 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
      *
      * @param string $taskGuid
      * @param string $name
-     * @param string $value
+     * @param mixed $value
      * @return number
      */
-    public function updateInsertConfig(string $taskGuid,string $name,string $value) {
+    public function updateInsertConfig(string $taskGuid,string $name, $value) {
+        if(is_array($value)){
+            $value = implode('","', $value);
+            $value = '["'.$value.'"]';
+        }
         $sql="INSERT INTO LEK_task_config(taskGuid,name,value) ".
             " VALUES (?,?,?) ".
             " ON DUPLICATE KEY UPDATE value = ? ";

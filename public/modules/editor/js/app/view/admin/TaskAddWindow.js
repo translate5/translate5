@@ -253,21 +253,29 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     fieldLabel: me.strings.orderdate
                                 },(Editor.data.enableSourceEditing  ? {
                                     xtype: 'checkbox',
-                                    value: 1,
+                                    inputValue:1,
+                                    uncheckedValue:0,
+                                    checked:1,
                                     name: 'enableSourceEditing',
                                     fieldLabel: me.strings.sourceEditLabel
                                 } : {
                                     xtype: 'hidden',
-                                    value: 0,
+                                    inputValue:1,
+                                    uncheckedValue:0,
+                                    checked:0,
                                     name: 'enableSourceEditing'
                                 }),(Editor.data.frontend.importTask.edit100PercentMatch  ? {
                                     xtype: 'checkbox',
-                                    value: 1,
+                                    inputValue:1,
+                                    uncheckedValue:0,
+                                    checked:1,
                                     name: 'edit100PercentMatch',
                                     fieldLabel: me.strings.fullMatchLabel
                                 } : {
                                     xtype: 'hidden',
-                                    value: 0,
+                                    inputValue:1,
+                                    uncheckedValue:0,
+                                    checked:0,
                                     name: 'edit100PercentMatch'
                                 }),{
                                     xtype: 'checkbox',

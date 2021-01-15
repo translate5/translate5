@@ -98,6 +98,8 @@ class editor_ConfigController extends ZfExtended_RestController {
         
         $this->checkConfigUpdateAllowed($level);
         $row = [];
+        $logMessage = '';
+        $logData = [];
         switch ($level) {
             case $this->entity::CONFIG_LEVEL_USER:
                 $userConfig=ZfExtended_Factory::get('editor_Models_UserConfig');
@@ -108,10 +110,10 @@ class editor_ConfigController extends ZfExtended_RestController {
 
                 $row['userGuid'] = $userGuid;
                 
-                $this->log->debug('E0000', 'Updated user GUI state "{name}" to "{value}"', [
-                    'name' => $this->data->name,
-                    'value' => $value,
-                ]);
+                $logMessage='Updated user GUI state "{name}" to "{value}"';
+                $logData = [
+                    'userGuid' => $userGuid
+                ];
                 break;
             case $this->entity::CONFIG_LEVEL_TASK:
                 
@@ -136,11 +138,10 @@ class editor_ConfigController extends ZfExtended_RestController {
                 $this->entity->setValue($value);
                 
                 $row['taskGuid'] = $taskGuid;
-                
-                $this->log->debug('E0000', 'Updated task config value "{name}" to "{value}"', [
-                    'name' => $this->data->name,
-                    'value' => $value,
-                ]);
+                $logMessage='Updated task'.($task->isImporting() ? '-import' : '').' config value "{name}" to "{value}"';
+                $logData = [
+                    'taskGuid' => $taskGuid
+                ];
                 break;
             case $this->entity::CONFIG_LEVEL_CUSTOMER:
                 $customerConfig=ZfExtended_Factory::get('editor_Models_CustomerConfig');
@@ -151,24 +152,31 @@ class editor_ConfigController extends ZfExtended_RestController {
                 
                 $row['customerId'] = $customerId;
                 
-                $this->log->debug('E0000', 'Updated customer config value "{name}" to "{value}"', [
-                    'name' => $this->data->name,
-                    'value' => $value,
-                ]);
+                $logMessage='Updated customer config value "{name}" to "{value}"';
+                $logData = [
+                    'customerId' => $customerId
+                ];
+                
                 break;
             case $this->entity::CONFIG_LEVEL_INSTANCE:
                 //update system config
                 $this->entity->setValue($value);
                 $this->entity->save();
-                $this->log->debug('E0000', 'Updated task config value "{name}" to "{value}"', [
-                    'name' => $this->data->name,
-                    'value' => $value,
-                ]);
+                $logMessage = 'Updated instance config value "{name}" to "{value}"';
                 break;
             default:
                 break;
         }
 
+        //log the change if there is one
+        if(!empty($logMessage)){
+            $this->log->info('E1324',$logMessage,
+                array_merge([
+                    'name' => $this->data->name,
+                    'value' => $value
+                ],$logData));
+        }
+        
         //merge the current entity with the custom config data ($row)
         $this->view->rows = array_merge($row, $this->entity->toArray());
     }
