@@ -255,7 +255,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('segments.subSegment.tagPath', $tagPath);
       
       $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$rop->loginUrl);
-      $this->view->Php2JsVars()->set('logoutOnWindowClose', APPLICATION_RUNDIR.$rop->logoutOnWindowClose);
+      $this->view->Php2JsVars()->set('logoutOnWindowClose', $rop->logoutOnWindowClose);
       
       $this->view->Php2JsVars()->set('errorCodesUrl',$rop->errorCodesUrl);
       
@@ -302,6 +302,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->setLanguageResourceJsVars();
       
       $this->view->Php2JsVars()->set('editor.editorBrandingSource',$rop->editor->editorBrandingSource);
+      
+      $this->view->Php2JsVars()->set('editor.htmleditorCss', [
+          APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module').'/css/htmleditor.css'
+      ]);
 
       $helpWindowConfig=[];
       if(isset($rop->frontend->helpWindow)){
@@ -576,8 +580,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     public function localizedjsstringsAction() {
-      $this->getResponse()->setHeader('Content-Type', 'text/javascript', TRUE);
-      $this->_helper->layout->disableLayout();
+        $this->getResponse()->setHeader('Content-Type', 'text/javascript', TRUE);
+        $this->_helper->layout->disableLayout();
     }
     
     public function wdhehelpAction() {

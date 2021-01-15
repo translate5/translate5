@@ -9,8 +9,8 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU LESSER GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file lgpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file lgpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU LESSER GENERAL PUBLIC LICENSE version 3.0 requirements will be met:
 https://www.gnu.org/licenses/lgpl-3.0.txt
 
@@ -30,7 +30,7 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
     
     /***
      * String wich will be applied as prefix to the user login
-     *  
+     *
      * @var string
      */
     const IP_BASED_USER_LOGIN_PREFIX = 'tmp-ip-based-user';
@@ -42,8 +42,8 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
     protected $ip;
     
     /***
-     * 
-     * @var 
+     *
+     * @var
      */
     protected $config;
     
@@ -112,7 +112,7 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
     
     /***
      * Init ip based user model and set the ip based specific user data from the config
-     *  
+     *
      * @throws editor_Plugins_IpAuthentication_Models_IpBaseException
      * @return editor_Plugins_IpAuthentication_Models_IpBaseUser
      */
@@ -209,4 +209,11 @@ class editor_Plugins_IpAuthentication_Models_IpBaseUser extends ZfExtended_Model
         return self::IP_BASED_USER_LOGIN_PREFIX.$this->_session->internalSessionUniqId;
     }
     
+    /**
+     * returns the currently used IP Adress
+     * @return string
+     */
+    public function getIp() {
+        return $this->ip;
+    }
 }

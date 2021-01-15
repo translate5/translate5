@@ -312,27 +312,6 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
     
     /***
-     * Add language to the language resources assoc table.
-     * When the language does not exisit for the columng(source/target), entry with null as pair value will be inserted.
-     * @param int $language
-     * @param int $collectionId
-     */
-    public function addCollectionLanguage($language,$collectionId){
-        $lngAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
-        /* @var $lngAssoc editor_Models_LanguageResources_Languages */
-        
-        //if the language does not exist in the assoc as source, add entry with the source as $language and empty as target
-        if(!$lngAssoc->isInCollection($language, 'sourceLang', $collectionId)){
-            $lngAssoc->saveLanguagesWithRfcCode($language, null, $collectionId);
-        }
-        
-        //if the language does not exist in the assoc as target, add entry with the target as $language and empty as source
-        if(!$lngAssoc->isInCollection($language, 'targetLang', $collectionId)){
-            $lngAssoc->saveLanguagesWithRfcCode(null, $language, $collectionId);
-        }
-    }
-    
-    /***
      * Get the available collections for the currently logged user
      *
      * @return array

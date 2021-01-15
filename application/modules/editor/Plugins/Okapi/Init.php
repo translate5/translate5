@@ -144,7 +144,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     );
     /**
      * Ignored filetypes if a custom bconf is provided (which skips the check for supported files)
-     * 
+     *
      * @var array
      */
     private $okapiCustomBconfIgnoredFileTypes = array(
@@ -226,10 +226,15 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $params = $event->getParams();
         $filelist = $params['filelist'];
         $importFolder = $params['importFolder'];
+        
+        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
+        /* @var $fileFilter editor_Models_File_FilterManager */
 
         foreach($filelist as $fileId => $filePath) {
             $fileInfo = new SplFileInfo($importFolder.'/'.ZfExtended_Utils::filesystemEncode($filePath));
-            if(!$this->isProcessable($fileInfo)) {
+
+            //if there is a filefilter or a fileparser (isProcessable) we do not process the file with Okapi
+            if($fileFilter->hasFilter($fileId, $fileFilter::TYPE_IMPORT) || !$this->isProcessable($fileInfo)) {
                 continue;
             }
             $this->queueWorker($fileId, $fileInfo, $params);
@@ -311,7 +316,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     }
 
     /**
-     * Checks if the given file processable by okapi
+     * Checks if the given file should be processed by okapi
      * @param SplFileInfo $fileinfo
      * @return boolean
      */

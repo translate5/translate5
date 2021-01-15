@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -94,7 +94,7 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
     }
     
     /**
-     * This init code may throw exceptions which are then handled by the calling place 
+     * This init code may throw exceptions which are then handled by the calling place
      */
     protected function initThrowable() {
         $this->serviceType         = $this->service->getServiceNamespace();
@@ -131,7 +131,7 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         $view = $event->getParam('view');
         $allCategories = $view->rows;
         foreach ($allCategories as $key => $category) {
-            if ($category['origin'] != $this->service->getCategoryOrigin()) {
+            if ($category['origin'] != $this->service::CATEGORY_ORIGIN) {
                 unset($allCategories[$key]);
             }
         }
@@ -153,10 +153,7 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         // Run the snych as worker to not block other processes, especially if the api-server is slow or even down.
         $worker = ZfExtended_Factory::get('editor_Plugins_NecTm_Worker');
         /* @var $worker editor_Plugins_NecTm_Worker */
-        $params=[
-            'service' => $this->service
-        ];
-        if (!$worker->init(NULL, $params)) {
+        if (!$worker->init()) {
             $logger = Zend_Registry::get('logger');
             /* @var $logger ZfExtended_Logger */
             $logger->error('E1180', 'NEC-TM: Worker could not be initialized');

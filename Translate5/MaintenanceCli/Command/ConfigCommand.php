@@ -70,6 +70,12 @@ Modified values are shown bold in the simple listing.');
             null,
             InputOption::VALUE_NONE,
             'Set the value to an empty string (which can not be given as set argument).');
+        
+        $this->addOption(
+            'comment',
+            'c',
+            InputOption::VALUE_REQUIRED,
+            'Add a comment for this config value');
     }
 
     /**
@@ -152,6 +158,8 @@ Modified values are shown bold in the simple listing.');
             return 1;
         }
         
+        $config->init($exactConfig);
+        
         $exactConfig['oldvalue'] = $exactConfig['value'];
         
         if($setEmpty) {
@@ -162,7 +170,11 @@ Modified values are shown bold in the simple listing.');
             $exactConfig['value'] = $newValue;
             $msg = 'The value was updated!';
         }
-        $config->update($exactConfig['name'], $exactConfig['value']);
+        if(!$config->isValidInDefaults($exactConfig['value'])) {
+            $this->io->error(sprintf('The given value "%s" is not valid, only the following values are allowed: %s', $exactConfig['value'], $config->getDefaults()));
+            return 1;
+        }
+        $config->update($exactConfig['name'], $exactConfig['value'], $this->input->getOption('comment'));
         $this->showDetail($exactConfig);
         if(array_key_exists('overwritten', $exactConfig)) {
             $this->io->warning($msg.' (in the DB only - change/remove it manually in/from the installation.ini)');

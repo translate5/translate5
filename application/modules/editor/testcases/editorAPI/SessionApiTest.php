@@ -72,7 +72,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testWrongCredentials() {
         $response = $this->api()->request('editor/session', 'POST', ['login' => 'wrongUsername', 'passwd' => 'wrongPassword']);
-        $msg403 = '{"errorCode":null,"httpStatus":403,"errorMessage":"Keine Zugriffsberechtigung!","message":"Forbidden","success":false,"messages":[]}';
+        $msg403 = '{"errorCode":null,"httpStatus":403,"errorMessage":"Keine Zugriffsberechtigung!","message":"Forbidden","success":false}';
         
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());
