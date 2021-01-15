@@ -41,5 +41,6 @@ class editor_Models_ConfigException extends ZfExtended_ErrorCodeException {
         'E1297'=> 'Unable to load task config. "taskGuid" is not set for this entity.',
         'E1298'=> 'Unable to load task customer config. "customerId" not set for this entity.',
         'E1299'=> 'Not allowed to load user config for different user.',
+        'E1324'=>'Updated config with name "{name}" to "{value}"'
     ];
 }

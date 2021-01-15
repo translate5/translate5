@@ -331,24 +331,31 @@ Ext.define('Editor.view.admin.config.Grid', {
      * Grid value cell renderer
      */
     getValueRenderer:function (value, metaData, record) {
-        var me=this;
+        var me=this,
+            isValueChanged = record.get('default') != value,
+            returnValue = value;
         switch (record.get('type')) {
             case 'boolean': // bool
+                var defaultVal = !/^(?:f(?:alse)?|no?|0+)$/i.test(record.get('default')) && !!record.get('default');
+                isValueChanged = defaultVal !== value;
                 if(value == true){
-                    return me.strings.configActiveColumn;
+                    returnValue = me.strings.configActiveColumn;
                 }
                 if(value == false){
-                    return me.strings.configDeactiveColumn;
+                    returnValue = me.strings.configDeactiveColumn;
                 }
             break;
             case 'map':
                 if(Ext.isObject(value)) {
-                    return Ext.JSON.encode(value);
+                    returnValue = Ext.JSON.encode(value);
                 }
             break;
         }
-        
-        return value;
+        //mark the value with bold if the value is different as the default value
+        if(isValueChanged && returnValue){
+            returnValue = '<b>'+returnValue+'</b>';
+        }
+        return returnValue;
     },
     
     /***
