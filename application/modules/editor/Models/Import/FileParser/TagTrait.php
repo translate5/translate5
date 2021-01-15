@@ -67,9 +67,9 @@ trait editor_Models_Import_FileParser_TagTrait {
         '#<(hardReturn)/>#',
         '#<(softReturn)/>#',
         '#<(macReturn)/>#',
-        '#<(char) ts="[^"]*"( length="([0-9]+)")?/>#',
-        '#<(tab) ts="[^"]*"( length="([0-9]+)")?/>#',
-        '#<(space) ts="[^"]*"( length="([0-9]+)")?/>#',
+        '#<(char) ts="([^"]*)"( length="([0-9]+)")?/>#',
+        '#<(tab) ts="([^"]*)"( length="([0-9]+)")?/>#',
+        '#<(space) ts="([^"]*)"( length="([0-9]+)")?/>#',
     ];
     
     protected function initHelper(){
@@ -90,21 +90,32 @@ trait editor_Models_Import_FileParser_TagTrait {
     /**
      * replaces whitespace placeholder tags with internal tags
      * @param string $segment
+     * @param array $tagShortcutNumberMap
      * @return string
      */
-    protected function whitespaceTagReplacer($segment) {
-        return preg_replace_callback($this->whitespaceTagList, function($match) use ($segment) {
+    protected function whitespaceTagReplacer($segment, array $tagShortcutNumberMap = []) {
+        //$tagShortcutNumberMap must be given explicitly here as non referenced variable from outside,
+        // so that each call of the whitespaceTagReplacer function has its fresh list of tag numbers
+        return preg_replace_callback($this->whitespaceTagList, function($match) use (&$tagShortcutNumberMap) {
             $tag = $match[0];
             $tagName = $match[1];
             $cls = ' '.$tagName;
-            $title = '&lt;'.$this->shortTagIdent.'/&gt;: ';
+            
+            //either we get a reusable shortcut number in the map, or we have to increment one
+            if(empty($tagShortcutNumberMap) || empty($tagShortcutNumberMap[$tag])) {
+                $shortTagNumber = $this->shortTagIdent++;
+            }
+            else {
+                $shortTagNumber = array_shift($tagShortcutNumberMap[$tag]);
+            }
+            $title = '&lt;'.$shortTagNumber.'/&gt;: ';
             
             //if there is no length attribute, use length = 1
-            if(empty($match[2])) {
+            if(empty($match[3])) {
                 $length = 1;
             }
             else {
-                $length = $match[3]; //else use the stored length value
+                $length = $match[4]; //else use the stored length value
             }
             //generate the html tag for the editor
             switch ($match[1]) {
@@ -149,14 +160,13 @@ trait editor_Models_Import_FileParser_TagTrait {
                         $title .= 'protected Special-Character';
                     }
             }
-            $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $text);
+            $p = $this->getTagParams($tag, $shortTagNumber, $tagName, $text);
             //FIXME refactor whole tagparams stuff!
             $p['class'] .= $cls;
             $p['length'] = $length;
             $p['title'] = $title; //Only translatable with using ExtJS QTips in the frontend, as title attribute not possible!
             
-            $tag = $this->_singleTag->getHtmlTag($p);
-            return $tag;
+            return $this->_singleTag->getHtmlTag($p);
         }, $segment);
     }
     
@@ -166,14 +176,15 @@ trait editor_Models_Import_FileParser_TagTrait {
      * @param string $shortTag
      * @param string $tagId
      * @param string $text
+     * @param boolean $xmlTags optional, by default true, may be disabled for example if no XML content should be replaced by regex with a custom tag
      */
-    protected function getTagParams($tag, $shortTag, $tagId, $text) {
-        return array(
-            'class' => $this->parseSegmentGetStorageClass($tag),
+    protected function getTagParams($tag, $shortTag, $tagId, $text, $xmlTags = true) {
+        return [
+            'class' => $this->parseSegmentGetStorageClass($tag, $xmlTags),
             'text' => $text,
             'shortTag' => $shortTag,
             'id' => $tagId, //mostly original tag id
-        );
+        ];
     }
     
     /**
@@ -181,15 +192,19 @@ trait editor_Models_Import_FileParser_TagTrait {
      * checks if $tag starts with < and ends with >
      *
      * @param string $tag contains the tag
+     * @param boolean $xmlTags true if the tags are XMLish (so starting and ending with < and >)
      * @return string encoded tag content
      */
-    protected function parseSegmentGetStorageClass($tag) {
-        if(substr($tag, 0, 1) !== '<' || substr($tag, -1) !== '>'){
-            trigger_error('The Tag ' . $tag . ' has not the structure of a tag.', E_USER_ERROR);
+    protected function parseSegmentGetStorageClass(string $tag, bool $xmlTags): string {
+        if($xmlTags) {
+            if(substr($tag, 0, 1) !== '<' || substr($tag, -1) !== '>'){
+                trigger_error('The Tag ' . $tag . ' has not the structure of a tag.', E_USER_ERROR);
+            }
+            //we store the tag content without leading < and trailing >
+            //since we expect to cut of just two ascii characters no mb_ function is needed, the UTF8 content inbetween is untouched
+            $tag = substr($tag, 1, -1);
         }
-        //we store the tag content without leading < and trailing >
-        //since we expect to cut of just two ascii characters no mb_ function is needed, the UTF8 content inbetween is untouched
-        return implode('', unpack('H*', substr($tag, 1, -1)));
+        return implode('', unpack('H*', $tag));
     }
     
     /**

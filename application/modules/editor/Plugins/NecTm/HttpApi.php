@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -316,7 +316,7 @@ class editor_Plugins_NecTm_HttpApi {
     }
     
     /**
-     * Add new translation memory unit. 
+     * Add new translation memory unit.
      * If source and target are the same, NEC-TM updates the data (tags, dates, ...). Otherwise
      * a new unit will be created.
      * @param string $sourceText
@@ -390,7 +390,7 @@ class editor_Plugins_NecTm_HttpApi {
      * A job is successful if the NEC-TM-Api returns the corresponding status within
      * a given time. (for the NEC-TM-Api, every import or export is a "Job".)
      * @param string $jobId
-     * @return boolean 
+     * @return boolean
      */
     protected function isSuccessfulJob($jobId) {
         $jobIsSucceeded = '';
@@ -405,10 +405,10 @@ class editor_Plugins_NecTm_HttpApi {
         return $jobIsSucceeded == self::JOB_STATUS_SUCCEEDED;
     }
     
-    /** 
+    /**
      * Returns the status for the given job-Id.
      * @param string $jobId
-     * @return string status 
+     * @return string status
      */
     protected function getJobStatus($jobId){
         $method = 'GET';
@@ -419,7 +419,7 @@ class editor_Plugins_NecTm_HttpApi {
         return $this->result->jobs[0]->status;
     }
     
-    /** 
+    /**
      * Check the api status.
      * @return boolean
      */
@@ -428,7 +428,7 @@ class editor_Plugins_NecTm_HttpApi {
         // TODO: NEC-TM-Api also returns 404 if a user doesn't exist. The Api itself might be available!
     }
     
-    /** 
+    /**
      * Get user details.
      * NEC-TM-Api returns 404 if user doesn't exist.
      * @return boolean
@@ -486,7 +486,7 @@ class editor_Plugins_NecTm_HttpApi {
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
         $this->http->setHeaders('Accept', self::ENC_TYPE);
-        $this->http->setRemoveArrayIndexInUrlEncode(true);
+        $this->http->setConfig(['removeArrayIndexInUrlEncode' => true]);
         return $this->http;
     }
     

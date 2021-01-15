@@ -25,4 +25,16 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+
+$translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+$youtubeUrl = $translate->_("{EditorYoutubeVideoGuideUrl}");
+//{ProjectOverviewYoutubeVideoGuideUrl} and {ProjectOverviewYoutubeVideoGuideDescriptionContent} are used as static source text for producing translatable content
+//in de/en .xliff files.
+//The content can be found in the de.xliff and en.xliff locales files for the default module.
 ?>
+<iframe name="youtubevideoframe" width="100%" height="70%" src="<?php echo $youtubeUrl; ?>" 
+frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+allowfullscreen >
+</iframe>
+<?php echo $translate->_("{EditorYoutubeVideoGuideDescriptionContent}"); ?>

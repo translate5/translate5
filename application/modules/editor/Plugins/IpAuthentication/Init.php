@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 
 /***
- * For certain roles where it makes sense it should be possible to authenticate at translate5 only by the fact, 
+ * For certain roles where it makes sense it should be possible to authenticate at translate5 only by the fact,
  * that the user comes from a certain IP address. Currently this makes sense for the roles termSearch and InstantTranslate (the user must have no other roles).
  */
 class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
@@ -55,12 +55,24 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
      * The LoginController will handle the redirect
      */
     public function onLoginBeforeIndexAction() {
-        $user=ZfExtended_Factory::get('editor_Plugins_IpAuthentication_Models_IpBaseUser');
+        $logger = Zend_Registry::get('logger')->cloneMe('plugin.ipAuthentication');
+        /* @var $logger ZfExtended_Logger */
+        
+        $user = ZfExtended_Factory::get('editor_Plugins_IpAuthentication_Models_IpBaseUser');
         /* @var $user editor_Plugins_IpAuthentication_Models_IpBaseUser */
+        
         if(!$user->isIpBasedRequest()){
+            $logger->debug('E0000', 'Login denied from {ip}', [
+                'ip' => $user->getIp(),
+            ]);
             return;
         }
+        
         $user->handleIpBasedUser();
+        $logger->info('E0000', 'Logged in as {user} from {ip}', [
+            'user' => $user->getLogin(),
+            'ip' => $user->getIp(),
+        ]);
         $user->setUserSessionNamespaceWithoutPwCheck($user->getLogin());
     }
     /**
@@ -87,7 +99,7 @@ class editor_Plugins_IpAuthentication_Init extends ZfExtended_Plugin_Abstract {
     
     /***
      * Delete the given user(temporarary user) with all associations
-     * 
+     *
      *   1. load all tasks where the given user is pm
      *   2. remove all user associations from those tasks
      *   3. remove all of those tasks

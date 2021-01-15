@@ -150,7 +150,7 @@ abstract class editor_Models_Import_FileParser {
      */
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task){
         $this->config = $task->getConfig();
-        $this->_origFile = file_get_contents($path);
+        $this->loadOriginalFile($path);
         $this->_path = $path;
         $this->_fileName = $fileName;
         $this->_fileId = $fileId;
@@ -159,6 +159,14 @@ abstract class editor_Models_Import_FileParser {
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         $this->matchRateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
         $this->updateFile(get_class($this));
+    }
+    
+    /**
+     * Loads the file into the fileparser
+     * @param string $path
+     */
+    protected function loadOriginalFile(string $path) {
+        $this->_origFile = file_get_contents($path);
     }
     
     /**
