@@ -386,7 +386,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         // protect regExes
         $segment = $this->parseSegmentRegEx($segment,  $this->replaceRegularExpressionsBeforeTagParsing);
         // add tag-protection
-        $segment =  $this->parseSegmentProtectTags($segment);
+        //FIXME Problem here: the new protectTags is IN protectWhitespace, but this breaks the before and after tag parsings here
+        //$segment =  $this->parseSegmentProtectTags($segment);
         // protect regExes
         $segment = $this->parseSegmentRegEx($segment,  $this->replaceRegularExpressionsAfterTagParsing);
         
@@ -456,127 +457,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         return $segment;
     }
 
-    //TODO_ move this to whitespace helper: see todo there
-    private function parseSegmentProtectTags($segment) {
-        
-        //TODO this gos to whispace helper
-        if (strpos($segment, '<')=== false || !$this->tagProtection) {
-            return $segment;
-        }
-        
-        try {
-            $tempXml = qp('<?xml version="1.0"?><segment>'.$segment.'</segment>', NULL, array('format_output' => false));
-        }
-        catch (Exception $e) {
-            return $this->parseSegmentProtectInvalidHtml5($segment);
-        }
-        
-        // mark single- or paired-tags
-        foreach ($tempXml->find('segment *') as $element) {
-            $tagType = 'singleTag';
-            if (!empty($element->innerXml())) {
-                $tagType = 'pairedTag';
-            }
-            
-            $element->wrap('<'.$tagType.'_'.$this->shortTagIdent++.' data-tagname="'.$element->tag().'" />');
-        }
-        $r= $tempXml->find('segment')->innerXml();
-        
-        //TODO: The stuff from those 3 functions this is done by the tag trait
-        // replace single-, left- and right-tags
-        $r = $this->parseReplaceSingleTags($r);
-        $r = $this->parseReplaceLeftTags($r);
-        $r = $this->parseReplaceRightTags($r);
-        
-        //TODO: This needs to be ignored
-        return $this->parseSegmentInsertPlaceholders($r,$this->regexInternalTags);
-    }
-
-    private function parseSegmentProtectInvalidHtml5($segment) {
-        $replacer = function ($matches){
-            $tagName = preg_replace('/<[\/]*([^ ]*).*>/i', '$1', $matches[0]);
-            // only replace HTML5 tags
-            if (!in_array($tagName, $this->html5Tags)) {
-                return $matches[0];
-            }
-            $tagId = $this->shortTagIdent++;
-            $tag = $matches[0];
-            
-            $p = $this->getTagParams($tag, $tagId, $tagName, $this->encodeTagsForDisplay($tag));
-            $r = $this->_singleTag->getHtmlTag($p);
-            return $r;
-        };
-        
-        $segment = preg_replace_callback('/(<[^><]+>)/is', $replacer, $segment);
-        
-        return $this->parseSegmentInsertPlaceholders($segment,$this->regexInternalTags);
-    }
-    
-    /**
-     * Replace all special marked single-tags in $text.
-     *
-     * @param string $text
-     * @return string
-     */
-    private function parseReplaceSingleTags($text) {
-        if (preg_match_all('/<singleTag_([0-9]+).*?data-tagname="([^"]*)"[^>]*>(<[^>]+>)<\/singleTag_[0-9]+>/is', $text, $matches, PREG_SET_ORDER)) {
-            
-            foreach ($matches as $match) {
-                $tag = $match[3];
-                $tagId = $match[1];
-                $tagName = $match[2];
-                $p = $this->getTagParams($tag, $tagId, $tagName, $this->encodeTagsForDisplay($tag));
-                $replace = $this->_singleTag->getHtmlTag($p);
-                $text = str_replace($match[0], $replace, $text);
-            }
-        }
-        return $text;
-    }
-    
-    /**
-     * Replace all special marked left-tags in $text.
-     *
-     * @param string $text
-     * @return string
-     */
-    private function parseReplaceLeftTags($text) {
-        if (preg_match_all('/<pairedTag_([0-9]+).*?data-tagname="([^"]*)"[^>]*>(<[^>]+>)/is', $text, $matches, PREG_SET_ORDER)) {
-            
-            foreach ($matches as $match) {
-                $tag = $match[3];
-                $tagId = $match[1];
-                $tagName = $match[2];
-                $p = $this->getTagParams($tag, $tagId, $tagName, $this->encodeTagsForDisplay($tag));
-                $replace = $this->_leftTag->getHtmlTag($p);
-                $text = str_replace($match[0], $replace, $text);
-            }
-        }
-        return $text;
-    }
-    
-    /**
-     * Replace all special marked right-tags in $text.
-     *
-     * @param string $text
-     * @return string
-     */
-    private function parseReplaceRightTags($text) {
-        if (preg_match_all('/(<[^>]+>)<\/pairedTag_([0-9]+)>/is', $text, $matches, PREG_SET_ORDER)) {
-            
-            foreach ($matches as $match) {
-                $tag = $match[1];
-                $tagId = $match[2];
-                $tagName = preg_replace('/<[\/]*([^ ]*).*>/i', '$1', $tag);
-                
-                $p = $this->getTagParams($tag, $tagId, $tagName, $this->encodeTagsForDisplay($tag));
-                $replace = $this->_rightTag->getHtmlTag($p);
-                $text = str_replace($match[0], $replace, $text);
-            }
-        }
-        return $text;
-    }
-    
-    
     /**
      * Mask all regular expressions $this->replaceRegularExpressions with internal tag <regex ...>
      *
