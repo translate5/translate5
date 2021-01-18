@@ -348,7 +348,7 @@ abstract class editor_Models_Export_FileParser {
         $edited = $this->revertNonBreakingSpaces($edited);
         
         if(!$this->_diff){
-            return $this->whitespaceHelper->unprotectWhitespace($edited);
+            return $this->unprotectHtml($this->whitespaceHelper->unprotectWhitespace($edited));
         }
         
         $original = (string) $segment->getFieldOriginal($field);
@@ -367,7 +367,7 @@ abstract class editor_Models_Export_FileParser {
             
         }
         // unprotectWhitespace must be done after diffing!
-        return $this->whitespaceHelper->unprotectWhitespace($diffed);
+        return $this->unprotectHtml($this->whitespaceHelper->unprotectWhitespace($diffed));
     }
     
     /**
@@ -484,6 +484,22 @@ abstract class editor_Models_Export_FileParser {
         $this->disableMqmExport = true;
         $segment = $this->parseSegment($segment);
         $segment = $this->revertNonBreakingSpaces($segment);
-        return $this->whitespaceHelper->unprotectWhitespace($segment);
+        return $this->unprotectHtml($this->whitespaceHelper->unprotectWhitespace($segment));
+    }
+    
+    protected function unprotectHtml($segment) {
+        //FIXME must go into tagProtection class, called at same places as unprotectWhitespace here in export
+        $htmlProtect = true;
+        if($htmlProtect) {
+            $chunks = preg_split('/(<[^>]*>)/', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+            $count = count($chunks);
+            for ($i = 0; $i < $count; $i++) {
+                //the imported content contained encoded HTML specialchars and te following characters as encoded entities
+                $chunks[$i] = str_replace([' ', '"', "'"], ['&nbsp;','&quot;','&#039;'], $chunks[$i]);
+                $i++; //get only the odd elements which contain the textual content
+            }
+            $segment = htmlspecialchars(implode('', $chunks), ENT_XML1);
+        }
+        return $segment;
     }
 }

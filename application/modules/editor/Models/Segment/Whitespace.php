@@ -86,45 +86,27 @@ class editor_Models_Segment_Whitespace {
      */
     public function protectWhitespace($textNode, $xmlBased = true, $protectHtml = false) {//TODO this should be set from the protectTags config (this should be off for language resources)
         
-        $tp = new editor_Models_Segment_TagProtection();
-        $textNode = $tp->protectTags($textNode);
-        
-        if(false){
-            //Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
-            if($protectHtml){
-                
-                //TODO: move this to separate class : TagProtection
-                // reuse there the whgole stuff with regex protection
-                
-                
-                //TODO: this goes in the new class
-                //TODO: new tags: singleTag and pairedTagOpen, pairedTagClose
-                //pairedTagOpen need id, thay need to be somehow connected together
-                
-                $textNode = html_entity_decode($textNode);
-                //Dies <strong>ist ein</strong> Test. &nbsp;
-                $textNode = $this->entityCleanup($textNode, $xmlBased);
-                //at the end of the string there is nbsp character not whitespace
-                //the nbsp will be handled bellow
-                //Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test.  
-                $textNode = str_replace(['&lt;','&gt;'], ['<','>'], $textNode);
-                //Dies <strong>ist ein</strong> Test.  
-                
-                //TODO: here replace tags like in csv tag protection
-                
-                $tempXml = qp('<?xml version="1.0"?><segment>'.$textNode.'</segment>', NULL, array('format_output' => false));
-                
-                // mark single- or paired-tags
-                foreach ($tempXml->find('segment *') as $element) {
-                    $tagType = 'htmlTag';
-                    
-                    $element->wrap('<'.$tagType.' data-tagname="'.$element->tag().'" />');
-                }
-                $textNode = $tempXml->find('segment')->innerXml();
-                
-            }else{
-                $textNode = $this->entityCleanup($textNode, $xmlBased);
+        //FIXME aufräumen, muss nach tagProtection, welches aber wg dem entityCleanup wieder ein Whitespace braucht! !
+        if($protectHtml){
+            //$textNode is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
+            $tp = new editor_Models_Segment_TagProtection();
+            $textNode = html_entity_decode($textNode);
+            //$textNode is now: Dies <strong>ist ein</strong> Test. &nbsp;
+
+            $chunks = preg_split('/(<[^>]*>)/', $textNode, NULL, PREG_SPLIT_DELIM_CAPTURE);
+            $count = count($chunks);
+            for ($i = 0; $i < $count; $i++) {
+                //the imported content contained encoded HTML specialchars and te following characters as encoded entities
+                $chunks[$i] = $this->entityCleanup($chunks[$i], $xmlBased);
+                $i++; //get only the odd elements which contain the textual content
             }
+            //$textNode is now: Dies <strong>ist ein</strong> Test. _
+            
+            $textNode = $tp->protectTags(implode('', $chunks));
+            //$textNode is now: Dies <intTag>ist ein</intTag> Test. _ (Where _ is the nbsp as character!)
+            
+        }else{
+            $textNode = $this->entityCleanup($textNode, $xmlBased);
         }
         
         //replace only on real text

@@ -70,8 +70,6 @@ trait editor_Models_Import_FileParser_TagTrait {
         '#<(char) ts="([^"]*)"( length="([0-9]+)")?/>#',
         '#<(tab) ts="([^"]*)"( length="([0-9]+)")?/>#',
         '#<(space) ts="([^"]*)"( length="([0-9]+)")?/>#',
-        '#<(pairedTag).*#',
-        '#<(singleTag).*#',
     ];
     
     protected function initHelper(){
@@ -90,12 +88,49 @@ trait editor_Models_Import_FileParser_TagTrait {
     }
     
     /**
+     *
+     * @param string $segment
+     * @return string
+     */
+    protected function protectedTagReplacer(string $segment): string {
+        $shortTagNrMap = [];
+        return preg_replace_callback('#<protectedTag data-type="([^"]*)" data-id="([0-9]+)" data-content="([^"]*)"/>#', function($match) use (&$shortTagNrMap) {
+            $type = $match[1];
+            $id = $match[2];
+            $content = pack('H*', $match[3]);
+            
+            $p = $this->getTagParams($content, 0, $id, htmlspecialchars($content));
+            //$p['class'] .= $cls;
+            
+            //generate the html tag for the editor
+            switch ($type) {
+                case 'open':
+                    $p['shortTag'] = $this->shortTagIdent++;
+                    $shortTagNrMap[$id] = $p['shortTag'];
+                    return $this->_leftTag->getHtmlTag($p);
+                case 'close':
+                    //on tag protection it is ensured that tag pairs are wellformed, so on close we can rely that open nr exists:
+                    $p['shortTag'] = $shortTagNrMap[$id];
+                    return $this->_rightTag->getHtmlTag($p);
+                case 'single':
+                default:
+                    $p['shortTag'] = $this->shortTagIdent++;
+                    return $this->_singleTag->getHtmlTag($p);
+            }
+        }, $segment);
+    }
+    
+    /**
      * replaces whitespace placeholder tags with internal tags
      * @param string $segment
      * @param array $tagShortcutNumberMap
      * @return string
      */
     protected function whitespaceTagReplacer($segment, array $tagShortcutNumberMap = []) {
+        
+        //FIXME should be called separatly
+        $segment = $this->protectedTagReplacer($segment);
+        
         //$tagShortcutNumberMap must be given explicitly here as non referenced variable from outside,
         // so that each call of the whitespaceTagReplacer function has its fresh list of tag numbers
         return preg_replace_callback($this->whitespaceTagList, function($match) use (&$tagShortcutNumberMap,$segment) {
@@ -120,22 +155,9 @@ trait editor_Models_Import_FileParser_TagTrait {
             else {
                 $length = $match[4]; //else use the stored length value
             }
-            //TODO: the content produced by the (parseSegmentProtectTags from the csv parser, now moved to whitespace helper), needs to be replaced here
-            //use static place holders, the csv method wil generate dynamic (sugestion from Thomas)
             
             //generate the html tag for the editor
             switch ($match[1]) {
-                case 'pairedTag':
-                    $class = new editor_Models_Segment_TagProtection();
-                    $ret = $class->parseReplaceLeftTags($segment);
-                    $ret = $class->parseReplaceRightTags($ret);
-                    return $ret;
-                    break;
-                case 'singleTag':
-                    $class = new editor_Models_Segment_TagProtection();
-                    $ret = $class->parseReplaceSingleTags($segment);
-                    return $ret;
-                    break;
                 // ↵    U+21B5      e2 86 b5    &crarr;     &#8629;     DOWNWARDS ARROW WITH CORNER LEFTWARDS
                 //'hardReturn' => ['text' => '&lt;↵ hardReturn/&gt;'], //in title irgendwas mit <hardReturn/>
                 //'softReturn' => ['text' => '&lt;↵ softReturn/&gt;'], //in title irgendwas mit <softReturn/>

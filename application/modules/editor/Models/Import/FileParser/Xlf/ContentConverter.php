@@ -361,7 +361,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         //we have to decode entities here, otherwise our generated XLF wont be valid
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters,
         // we have to protect them here
-        $text = $this->whitespaceHelper->protectWhitespace($text);
+        $text = $this->whitespaceHelper->protectWhitespace($text, true, true); //FIXME protectHtml from config!
         $text = $this->whitespaceTagReplacer($text);
         $this->result[] = $text;
     }

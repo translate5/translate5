@@ -122,14 +122,10 @@ abstract class editor_Models_Import_FileParser {
     
     /**
      * Protect html tags. This flag is set via zf configuration (runtimeOptions->import->fileparser->csv->options->protectTag)
-     * 
+     *
      * @var boolean
      */
     protected $tagProtection = true;
-    
-    
-    protected $html5Tags = array();
-    
     
     /**
      * returns the file extensions (in lower case) parsable by this fileparser
@@ -160,15 +156,10 @@ abstract class editor_Models_Import_FileParser {
      * @param editor_Models_Task $task
      */
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task){
-        $this->config = $task->getConfig();
-        $this->tagProtection = (boolean)$this->config->runtimeOptions->import->fileparser->csv->options->protectTags;
-        if ($this->tagProtection) {
-            $ds = DIRECTORY_SEPARATOR;
-            $html5TagFile = APPLICATION_PATH.$ds.'modules'.$ds.'editor'.
-                $ds.'Models'.$ds.'Import'.$ds.'FileParser'.$ds.
-                'html5-tags.txt';
-                $this->html5Tags = file($html5TagFile, FILE_IGNORE_NEW_LINES);
-        }
+        //$this->config = $task->getConfig(); //after merge of Config feature!
+        $this->config = Zend_Registry::get('config');
+        //$this->tagProtection = (boolean)$this->config->runtimeOptions->import->fileparser->csv->options->protectTags;
+        $this->tagProtection = true;
         $this->loadOriginalFile($path);
         $this->_path = $path;
         $this->_fileName = $fileName;
