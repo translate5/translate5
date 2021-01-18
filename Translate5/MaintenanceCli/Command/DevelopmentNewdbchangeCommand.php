@@ -177,7 +177,7 @@ class DevelopmentNewdbchangeCommand extends Translate5AbstractCommand
     protected function makeSql($dir, $name) {
         $file = $dir.'/'.$name.'.sql';
         $this->io->success('Created file '.$file);
-        file_put_contents($file, '-- /*
+        file_put_contents($file, "-- /*
 -- START LICENSE AND COPYRIGHT
 --
 --  This file is part of translate5
@@ -204,7 +204,20 @@ class DevelopmentNewdbchangeCommand extends Translate5AbstractCommand
 -- END LICENSE AND COPYRIGHT
 -- */
 
-');
+Reminder:
+CREATE TABLE Statements
+  without DB name
+  without charset and without collation, unless you know exactly what you do!
+
+Template Config:
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`)
+VALUES ('runtimeOptions.xxx.yyy', '1', 'app', 'system', 'VALUE', 'DEFAULT', '', 'string', 'DESC.', 2);
+
+Template ACL:
+INSERT INTO `Zf_acl_rules` (`id`, `module`, `role`, `resource`, `right`)
+VALUES (null, 'editor', 'noRights', 'editor_fakelang', 'all');
+
+");
     }
 
     protected function makePhp($dir, $name) {

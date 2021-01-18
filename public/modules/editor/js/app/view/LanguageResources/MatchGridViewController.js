@@ -44,6 +44,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
         noresults: '#UT#Es wurden keine Ergebnisse gefunden.',
         serverErrorMsgDefault: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.',
         serverErrorMsg500: '#UT#Die Anfrage führte zu einem Fehler im angefragten Dienst.',
+        serverErrorMsg502: '#UT#Es gibt Probleme mit dem angefragten Dienst.',
         serverErrorMsg408: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.',
         delInsTagTooltip:'#UT#Unterschied zu Quellsegment'
     },
@@ -286,6 +287,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
             respStatusMsg = me.strings.serverErrorMsgDefault,
             strState = me.SERVER_STATUS &&  me.SERVER_STATUS.SERVER_STATUS_SERVERERROR,
             targetMsg = '',
+            responseText = '',
             result = {},
             store = me.getView() && me.getView().getStore('editorquery'),
             json = null,
@@ -307,33 +309,26 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
                 respStatusMsg = me.strings.serverErrorMsg408;
                 strState = me.SERVER_STATUS.SERVER_STATUS_CLIENTTIMEOUT;
                 break;
-            case 500:
             case 502:
+                respStatusMsg = me.strings.serverErrorMsg502;
+                responseText = response.responseText;
+                break;
+            case 500:
                 respStatusMsg = me.strings.serverErrorMsg500;
-                if (response.responseText != "") { // don't try to decode an invalid JSON String
-                    json = Ext.JSON.decode(response.responseText);
-                    if(json.errors && json.errors[0] && json.errors[0]._errorMessage) {
-                        targetMsg = json.errors[0]._errorMessage;
-                    }
-                    else if(json.errors && json.errors[0] && json.errors[0].msg) {
-                        respStatusMsg = json.errors[0].msg;
-                        if(json.errors[0].data) {
-                            targetMsg = Editor.MessageBox.dataTable(json.errors[0].data);
-                        }
-                    }
-                    else if(json.errors && json.errors.message) {
-                        targetMsg = json.errors.message;
-                    }else if(json.errorMessage){
-                        targetMsg = json.errorMessage;
-                    }
-                    else {
-                        targetMsg = response.responseText;
-                    }
-                }
-                //;
+                responseText = response.responseText;
                 break;
         }
         
+        if (responseText != "") {
+            json = Ext.JSON.decode(response.responseText);
+            if(json.errorMessage){
+                targetMsg = json.errorMessage;
+            }
+            else {
+                targetMsg = response.responseText;
+            }
+        }
+
         result.rows = [{
             source: respStatusMsg,
             target: targetMsg,

@@ -204,7 +204,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     displayField: 'label',
                                     forceSelection: true,
                                     //encodeSubmitValue: true, // → as JSON
-                                    //anyMatch: true,
+                                    anyMatch: true,
                                     queryMode: 'local',
                                     valueField: 'id',
                                     allowBlank: false
@@ -387,5 +387,15 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
             nextItem=winLayout.getNext();
         
         return nextItem.getXType()=="taskUpload";
+    },
+    
+    /**
+     * we may only close the window when it is not in loading state. 
+     * Otherwise the task model instance is not properly set in the window.
+     */
+    close: function() {
+        if(!this.loadMask || !this.loadMask.isVisible()) {
+            this.callParent([]);
+        }
     }
 });

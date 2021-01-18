@@ -130,6 +130,9 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
             parse_url($url, PHP_URL_SCHEME).'://'.parse_url($url, PHP_URL_HOST).'/issues/?jql=project%20%3D%20'.self::PROJECT_KEY.'%20and%20fixVersion%20%3D%20%22'.$this->releaseVersion->id.'%22'
         ]);
         
+        if(!$this->io->confirm('Does the important release notes contain all API / GUI relevant changes?', false)) {
+            return 0;
+        }
         if(!$this->io->confirm('Create the SQL and Update the change log (or modify them in JIRA again)?', false)) {
             return 0;
         }
@@ -332,6 +335,7 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
         
         $version = str_replace(['translate5 - ', ' '], ['', '-'], $this->releaseVersion->name).'-'.date('Y-m-d', time());
         $filename = APPLICATION_ROOT.'/application/modules/editor/database/sql-changelog-'.$version.'.sql';
+        $this->io->success('Created SQL changelog file '.$filename);
         file_put_contents($filename, $sql);
     }
     
@@ -383,6 +387,7 @@ INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `de
             $this->io->warning('Check the changelog! A version '.$version.' does exist already!');
         }
         $lastPos = mb_strpos($content, "\n## [");
+        $this->io->success('Updated changelog file '.$filename);
         file_put_contents($filename, substr_replace($content, $md, $lastPos, 0));
     }
     

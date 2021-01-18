@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -72,7 +72,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testWrongCredentials() {
         $response = $this->api()->request('editor/session', 'POST', ['login' => 'wrongUsername', 'passwd' => 'wrongPassword']);
-        $msg403 = '{"httpStatus":403,"errorMessage":"Keine Zugriffsberechtigung!","message":"Forbidden","success":false,"messages":[]}';
+        $msg403 = '{"errorCode":null,"httpStatus":403,"errorMessage":"Keine Zugriffsberechtigung!","message":"Forbidden","success":false}';
         
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());
@@ -88,7 +88,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
     
     /**
      * Test login with correct credentials
-     * Test afterwards if the logout call is working 
+     * Test afterwards if the logout call is working
      */
     public function testLogin() {
         $this->api()->login('testlector');
@@ -145,7 +145,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         
         //since default customer id changes on testsystems we have to test it via regex and remove it for next test
         if(!empty($sessionData->user->customers)) {
-            //if a customer is set, it must like the following regex 
+            //if a customer is set, it must like the following regex
             //but customers are not mandatory, so empty check before
             $this->assertRegExp('/^,[0-9]+,$/', $sessionData->user->customers);
         }

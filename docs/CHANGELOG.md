@@ -6,6 +6,181 @@ For a reference to the issue keys see http://jira.translate5.net
 
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+All updates are (downwards) compatible! If not this is listed in the important release notes.
+
+
+
+## [5.0.15] - 2020-12-21
+
+### Important Notes:
+#### [TRANSLATE-2336](https://jira.translate5.net/browse/TRANSLATE-2336)
+Now language resources of the same customer and with a sub-language (de-de, de-at) are also added automatically to tasks using only the base language (de).
+ 
+
+
+### Added
+**[TRANSLATE-2249](https://jira.translate5.net/browse/TRANSLATE-2249): Length restriction for sdlxliff files** <br>
+SDLXLIFF specific length restrictions are now read out and used for internal processing.
+
+
+### Changed
+**[TRANSLATE-2343](https://jira.translate5.net/browse/TRANSLATE-2343): Enhance links from default skin to www.translate5.net** <br>
+Change links from default skin to www.translate5.net
+
+**[TRANSLATE-390](https://jira.translate5.net/browse/TRANSLATE-390): Prevent that the same error creates a email on each request to prevent log spam** <br>
+Implemented the code base to recognize duplicated errors and prevent sending error mails.
+
+
+### Bugfixes
+**[TRANSLATE-2353](https://jira.translate5.net/browse/TRANSLATE-2353): OpenTM2 strange matching of single tags** <br>
+In the communication with OpenTM2 the used tags are modified to improve found matches.
+
+**[TRANSLATE-2346](https://jira.translate5.net/browse/TRANSLATE-2346): Wrong Tag numbering on using language resources** <br>
+If a segment containing special characters and is taken over from a language resource, the tag numbering could be messed up. This results then in false positive tag errors.
+
+**[TRANSLATE-2339](https://jira.translate5.net/browse/TRANSLATE-2339): OpenTM2 can not handle  datatype="unknown" in TMX import** <br>
+OpenTM2 does not import any segments from a TMX, that has  datatype="unknown" in its header tag, this is fixed by modifying the TMX on upload.
+
+**[TRANSLATE-2338](https://jira.translate5.net/browse/TRANSLATE-2338): Use ph tag in OpenTM2 to represent line-breaks** <br>
+In the communication with OpenTM2 line-breaks are converted to ph type="lb" tags, this improves the matchrates for affected segments.
+
+**[TRANSLATE-2336](https://jira.translate5.net/browse/TRANSLATE-2336): Auto association of language resources does not use language fuzzy match** <br>
+Now language resources with a sub-language (de-de, de-at) are also added to tasks using only the base language (de). 
+
+**[TRANSLATE-2334](https://jira.translate5.net/browse/TRANSLATE-2334): Pressing ESC while task is uploading results in task stuck in status import** <br>
+Escaping from task upload window while uploading is now prevented.
+
+**[TRANSLATE-2332](https://jira.translate5.net/browse/TRANSLATE-2332): Auto user association on task import does not work anymore** <br>
+Auto associated users are added now again, either as translators or as revieweres depending on the nature of the task.
+
+**[TRANSLATE-2328](https://jira.translate5.net/browse/TRANSLATE-2328): InstantTranslate: File upload will not work behind a proxy** <br>
+InstantTranslate file upload may not work behind a proxy, depending on the network configuration. See config worker.server.
+
+**[TRANSLATE-2294](https://jira.translate5.net/browse/TRANSLATE-2294): Additional tags from language resources are not handled properly** <br>
+The tag and whitespace handling of all language resources are unified and fixed, regarding to missing or additional tags.
+
+
+## [5.0.13] - 2020-11-17
+
+### Important Notes:
+#### [TRANSLATE-2312](https://jira.translate5.net/browse/TRANSLATE-2312)
+Re-enabled full text search in the target language field of the task creation wizard.
+
+#### [TRANSLATE-2306](https://jira.translate5.net/browse/TRANSLATE-2306)
+The button in the editor to leave a task (formerly "Leave task"), which is currently labeled "Continue task later" is renamed to "Back to task list" as agreed in monthly meeting.
+ 
+
+
+### Added
+**[TRANSLATE-2225](https://jira.translate5.net/browse/TRANSLATE-2225): Import filter for special Excel file format containing texts with special length restriction needs** <br>
+A client specific import filter for a data in a client specific excel file format.
+
+
+### Changed
+**[TRANSLATE-2296](https://jira.translate5.net/browse/TRANSLATE-2296): Improve Globalese integration to work with project feature** <br>
+Fix Globalese integration with latest translate5.
+
+
+### Bugfixes
+**[TRANSLATE-2313](https://jira.translate5.net/browse/TRANSLATE-2313): InstantTranslate: new users sometimes can not use InstantTranslate** <br>
+New users are sometimes not able to use instanttranslate. That depends on the showSubLanguages config and the available languages.
+
+**[TRANSLATE-2312](https://jira.translate5.net/browse/TRANSLATE-2312): Can't use "de" anymore to select a target language** <br>
+In project creation target language field type "(de)" and you get no results. Instead typing "Ger" works. The first one is working now again.
+
+**[TRANSLATE-2311](https://jira.translate5.net/browse/TRANSLATE-2311): Cookie Security** <br>
+Set the authentication cookie according to the latest security recommendations.
+
+**[TRANSLATE-2308](https://jira.translate5.net/browse/TRANSLATE-2308): Disable webserver directory listing** <br>
+The apache directory listing is disabled for security reasons in the .htaccess file.
+
+**[TRANSLATE-2307](https://jira.translate5.net/browse/TRANSLATE-2307): Instanttranslate documents were accessable for other users** <br>
+Instanttranslate documents could be accessed from other users by guessing the task id in the URL.
+
+**[TRANSLATE-2306](https://jira.translate5.net/browse/TRANSLATE-2306): Rename "Continue task later" button** <br>
+The button in the editor to leave a task (formerly "Leave task"), which is currently labeled "Continue task later" is renamed to "Back to task list" as agreed in monthly meeting.
+
+**[TRANSLATE-2293](https://jira.translate5.net/browse/TRANSLATE-2293): Custom panel is not state full** <br>
+The by default disabled custom panel is now also stateful.
+
+**[TRANSLATE-2288](https://jira.translate5.net/browse/TRANSLATE-2288): Reduce translate5.zip size to decrease installation time** <br>
+The time needed for an update of translate5 depends also on the package size. The package was blown up in the last time, now the size is reduced again.
+
+**[TRANSLATE-2287](https://jira.translate5.net/browse/TRANSLATE-2287): Styles coming from plugins are added multiple times to the HtmlEditor** <br>
+Sometimes the content styles of the HTML Editor are added multiple times, this is fixed.
+
+**[TRANSLATE-2265](https://jira.translate5.net/browse/TRANSLATE-2265): Microsoft translator directory lookup change** <br>
+Solves the problem that microsoft translator does not provide results when searching text in instant translate with more then 5 characters.
+
+**[TRANSLATE-2224](https://jira.translate5.net/browse/TRANSLATE-2224): Deleted tags in TrackChanges do not really look deleted** <br>
+FIX: Deleted tags in TrackChanges in the HTML-Editor now look deleted as well (decorated with a strike-through)
+
+**[TRANSLATE-2172](https://jira.translate5.net/browse/TRANSLATE-2172): maxNumberOfLines currently only works for pixel-length and not char-length checks** <br>
+Enabling line based length check also for length unit character.
+
+**[TRANSLATE-2151](https://jira.translate5.net/browse/TRANSLATE-2151): Visual Editing: If page grows to large (gets blue footer) and had  been zoomed, some visual effects do not work, as they should** <br>
+Fixed inconsistencies with the Text-Reflow and especially the page-growth colorization when zooming the visual review. Pages now keep their grown size  when scrolling them out of view & back.
+
+**[TRANSLATE-1034](https://jira.translate5.net/browse/TRANSLATE-1034): uploading file bigger as post_max_size or upload_max_filesize gives no error message, just a empty window** <br>
+If uploading a file bigger as post_max_size or upload_max_filesize gives an error message is given now.
+
+
+## [5.0.12] - 2020-10-21
+
+### Important Notes:
+-  
+
+
+### Changed
+**[TRANSLATE-2279](https://jira.translate5.net/browse/TRANSLATE-2279): Integrate git hook checks** <br>
+Development: Integrate git hooks to validate source code.
+
+
+### Bugfixes
+**[TRANSLATE-2282](https://jira.translate5.net/browse/TRANSLATE-2282): Mixing XLF id and rid values led to wrong tag numbering** <br>
+When in some paired XLF tags the rid was used, and in others the id to pair the tags, this could lead to duplicated tag numbers.
+
+**[TRANSLATE-2280](https://jira.translate5.net/browse/TRANSLATE-2280): OpenTM2 is not reachable anymore if TMPrefix configuration is empty** <br>
+OpenTM2 installations were not reachable anymore from the application if the tmprefix was not configured. Empty tmprefixes are valid again.
+
+**[TRANSLATE-2278](https://jira.translate5.net/browse/TRANSLATE-2278): Check if the searched text is valid for segmentation** <br>
+Text segmentation and text segmentation search in instant-translate only will be done only when for the current search TM is available or risk-predictor (ModelFront) is enabled.
+
+**[TRANSLATE-2277](https://jira.translate5.net/browse/TRANSLATE-2277): UserConfig value does not respect config data type** <br>
+The UserConfig values did not respect the underlying configs data type, therefore the preferences of the repetition editor were not loaded correctly and the repetition editor did not come up.
+
+**[TRANSLATE-2265](https://jira.translate5.net/browse/TRANSLATE-2265): Microsoft translator directory lookup change** <br>
+Solves the problem that microsoft translator does not provide results when searching text in instant translate with more then 5 characters.
+
+**[TRANSLATE-2264](https://jira.translate5.net/browse/TRANSLATE-2264): Relative links for instant-translate file download** <br>
+Fixed file file download link in instant translate when the user is accessing translate5 from different domain.
+
+**[TRANSLATE-2263](https://jira.translate5.net/browse/TRANSLATE-2263): Do not use ExtJS debug anymore** <br>
+Instead of using the debug version of ExtJS now the normal one is used. This reduces the initial load from 10 to 2MB.
+
+**[TRANSLATE-2262](https://jira.translate5.net/browse/TRANSLATE-2262): Remove sensitive data of API endpoint task/userlist** <br>
+The userlst needed for filtering in the task management exposes the encrypted password.
+
+**[TRANSLATE-2261](https://jira.translate5.net/browse/TRANSLATE-2261): Improve terminology import performance** <br>
+The import performance of large terminology was really slow, by adding some databases indexes the imported was boosted. 
+
+**[TRANSLATE-2260](https://jira.translate5.net/browse/TRANSLATE-2260): Visual Review: Normalizing whitespace when comparing segments for content-align / pivot-language** <br>
+Whitespace will now be normalized when aligned visuals in the visual review or pivot languages are validated against the segments 
+
+**[TRANSLATE-2252](https://jira.translate5.net/browse/TRANSLATE-2252): Reapply tooltip over processing status column** <br>
+The tool-tips were changed accidentally and are restored now.
+
+**[TRANSLATE-2251](https://jira.translate5.net/browse/TRANSLATE-2251): Reapply "Red bubble" to changed segments in left side layout of split screen** <br>
+The red bubble representing edited segments will now also show in the left (unedited) frame of the split-view of the visual review
+
+**[TRANSLATE-2250](https://jira.translate5.net/browse/TRANSLATE-2250): Also allow uploading HTML for VisualReview** <br>
+Since it is possible to put HTML files as layout source in the visual folder of the zip import package, selecting an HTML file in the GUI should be allowed, too.
+
+**[TRANSLATE-2245](https://jira.translate5.net/browse/TRANSLATE-2245): Switch analysis to batch mode, where language resources support it** <br>
+Sending multiple segment per request when match analysis and pre-translation is running now can be configured in (default enabled): runtimeOptions.plugins.MatchAnalysis.enableBatchQuery; Currently this is supported by the following language resources: Nectm, PangeaMt, Microsoft, Google, DeepL
+
+**[TRANSLATE-2220](https://jira.translate5.net/browse/TRANSLATE-2220): XML/XSLT import for visual review: Filenames may not be suitable for OKAPI processing** <br>
+FIX: Any filenames e.g. like "File (Kopie)" now can be processed, either as aligned XML/XSLT file or with a direct XML/XSL import 
 
 
 ## [5.0.11] - 2020-10-14

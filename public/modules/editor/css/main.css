@@ -355,6 +355,9 @@ table.message-box-data .error {}
     font-weight:bold;
     padding:0.1em 0.3em;
 }
+#segment-grid .segment-min-max .warning {
+    background-color: #ffba42;
+}
 #segment-grid .segment-min-max .invalid-length {
     background-color: #ff4242;
 }

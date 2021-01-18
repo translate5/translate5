@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -31,8 +31,11 @@ END LICENSE AND COPYRIGHT
  * - provides a connection to a concrete language resource, via the internal adapter (which contains the concrete connector instance)
  * - intercepts some calls to the adapter to provide unified logging etc per each call
  * - all non intercepted methods are passed directly to the underlying adapter
- * 
- * FIXME add __called function names from underlying adapter (ABstractConnector)
+ * @method editor_Services_ServiceResult query() query(editor_Models_Segment $segment)
+ * @method editor_Services_ServiceResult search() search(string $searchString, $field = 'source', $offset = null)
+ * @method editor_Services_ServiceResult translate() translate(string $searchString)
+ * @method string getStatus() getStatus(editor_Models_LanguageResources_Resource $resource) returns the LanguageResource status
+ * @method string getLastStatusInfo() getLastStatusInfo() returns the last store status info from the last getStatus call
  */
 class editor_Services_Connector {
     
@@ -57,7 +60,7 @@ class editor_Services_Connector {
     
     
     /***
-     * 
+     *
      * @var editor_Models_LanguageResources_LanguageResource
      */
     protected $languageResource;
@@ -82,15 +85,22 @@ class editor_Services_Connector {
      */
     protected $batchQuery = false;
     
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null){
-        $serviceType = $languageResource->getServiceType();
-        $connector = ZfExtended_Factory::get($serviceType.editor_Services_Manager::CLS_CONNECTOR);
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang = null, $targetLang = null){
+        $this->connectToResourceOnly($languageResource->getResource());
+        $this->adapter->connectTo($languageResource, $sourceLang, $targetLang);
+        $this->sourceLang = $sourceLang;
+        $this->targetLang = $targetLang;
+    }
+    
+    /**
+     * Connects to a given resource only, for requests not using a concrete language resource (ping calls for example)
+     * @param editor_Models_LanguageResources_Resource $resource
+     */
+    protected function connectToResourceOnly(editor_Models_LanguageResources_Resource $resource){
+        $connector = ZfExtended_Factory::get($resource->getServiceType().editor_Services_Manager::CLS_CONNECTOR);
         /* @var $connector editor_Services_Connector_Abstract */
-        $connector->connectTo($languageResource,$sourceLang,$targetLang);
-        $this->adapter=$connector;
-        $this->languageResource=$languageResource;
-        $this->sourceLang=$sourceLang;
-        $this->targetLang=$targetLang;
+        $connector->setResource($resource);
+        $this->adapter = $connector;
     }
     
     /**
@@ -110,21 +120,18 @@ class editor_Services_Connector {
      * @param editor_Models_Segment $segment
      * @return editor_Services_ServiceResult
      */
-    public function query(editor_Models_Segment $segment) {
-        try {
-            $serviceResult = null;
-            //if thje batch query is enabled, get the results from the cache
-            if($this->batchQuery && $this->adapter->isBatchQuery()){
-                $serviceResult = $this->getCachedResult($segment);
-            }
-            //if there is no service results, try the query
-            if(!empty($serviceResult)){
-                return $serviceResult;
-            }
-            $serviceResult=$this->adapter->query($segment);
-        } catch (Exception $e) {
-            $this->logException($e,$segment->getTaskGuid());
+    protected function _query(editor_Models_Segment $segment) {
+        $serviceResult = null;
+        //if thje batch query is enabled, get the results from the cache
+        if($this->batchQuery && $this->adapter->isBatchQuery()){
+            $serviceResult = $this->getCachedResult($segment);
         }
+        //if there is no service results, try the query
+        if(!empty($serviceResult)){
+            return $serviceResult;
+        }
+        $serviceResult = $this->adapter->query($segment);
+        $this->adapter->logForSegment($segment);
         return $serviceResult;
     }
     
@@ -135,39 +142,19 @@ class editor_Services_Connector {
      * @param integer $offset
      * @return editor_Services_ServiceResult
      */
-    public function search(string $searchString, $field = 'source', $offset = null) {
-        try {
-            $serviceResult=$this->adapter->search($searchString,$field,$offset);
-        } catch (Exception $e) {
-            $this->logException($e);
-        }
-        return $serviceResult;
+    protected function _search(string $searchString, $field = 'source', $offset = null) {
+        //searches are always with out tags
+        return $this->adapter->search(strip_tags($searchString), $field, $offset);
     }
-
+    
     /***
      * Invoke the translate resource action so the MT logger can be used
      * @param string $searchString
      * @return editor_Services_ServiceResult
      */
-    public function translate(string $searchString){
-        try {
-            $serviceResult=$this->adapter->translate($searchString);
-        } catch (Exception $e) {
-            $this->logException($e);
-        }
-        return $serviceResult;
-    }
-    
-    /***
-     * Invoke the getStatus function since it is used by reference
-     * @param string $moreInfo
-     */
-    public function getStatus(&$moreInfo){
-        try {
-            return $this->adapter->getStatus($moreInfo);
-        } catch (Exception $e) {
-            $this->logException($e);
-        }
+    protected function _translate(string $searchString){
+        //instant translate calls are always with out tags
+        return $this->adapter->translate(strip_tags($searchString));
     }
     
     /***
@@ -177,44 +164,89 @@ class editor_Services_Connector {
      * @param mixed $arguments
      * @return mixed
      */
-    public function __call($method,$arguments){
-        if(method_exists($this->adapter, $method)) {
-            return call_user_func_array([$this->adapter, $method], $arguments);
+    public function __call($method, $arguments){
+        $toThrow = null;
+        // if is called getStatus, the determined status is calculated there.
+        // If there is an error in getStatus, this is either handled there, or in doubt we set NO_CONNECTION
+        $status = editor_Services_Connector_Abstract::STATUS_NOCONNECTION;
+        try {
+            $internalMethod = '_'.$method;
+            //check if method is wrapped here, then call it
+            if(method_exists($this, $internalMethod)) {
+                return call_user_func_array([$this, $internalMethod], $arguments);
+            }
+            //if not call it directly in the adapter
+            if(method_exists($this->adapter, $method)) {
+                return call_user_func_array([$this->adapter, $method], $arguments);
+            }
+        } catch (ZfExtended_BadGateway $toThrow) {
+            //handle legacy BadGateway messages, see below
+        } catch (ZfExtended_Zendoverwrites_Http_Exception_TimeOut | ZfExtended_Zendoverwrites_Http_Exception_Down $e) {
+            if($e instanceof  ZfExtended_Zendoverwrites_Http_Exception_Down) {
+                //'E1311' => 'Could not connect to language resource {service}: server not reachable',
+                $ecode = 'E1311';
+            }
+            else {
+                //'E1312' => 'Could not connect to language resource {service}: timeout on connection to server',
+                $ecode = 'E1312';
+            }
+            $toThrow = new editor_Services_Connector_Exception($ecode, [
+                'service' => $this->adapter->getResource()->getName(),
+                'languageResource' => $this->languageResource,
+            ], $e);
         }
+        
+        //IMPORTANT: getStatus must not throw an exception! Instead return the status in case of a here handled exception
+        if($method == 'getStatus' || $method == 'batchQuery') {
+            $this->adapter->setLastStatusInfo($this->adapter->logger->formatMessage($toThrow->getMessage(), $toThrow->getErrors()));
+            $this->adapter->logger->exception($toThrow);
+            return $status;
+        }
+        
+        if(empty($toThrow)) {
+            $toThrow = new BadMethodCallException('Method '.$method.' does not exist in '.__CLASS__.' or its adapter.');
+        }
+        throw $toThrow;
     }
     
-    /***
-     * Logs the given exception (writes log entry in language resources log table and if 
-     * the task is available, writes log entry in the task log table to)
-     * 
-     * @param Exception $e
-     * @param string $taskGuid
+    /**
+     * Returns the languages for the given resource
+     * @param editor_Models_LanguageResources_Resource $resource
+     * @return array
      */
-    protected function logException(Exception $e,string $taskGuid=''){
-        $session = new Zend_Session_Namespace();
-        $taskGuid=$taskGuid ?? $session->taskGuid;
-        $extra=[];
-        $extra['languageResource']=$this->languageResource;
-        if(!empty($taskGuid)){
-            $task=ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->loadByTaskGuid($taskGuid);
-            $extra['task']=$task;
+    public function languages(editor_Models_LanguageResources_Resource $resource): array{
+        $this->connectToResourceOnly($resource);
+        try {
+            return $this->__call('languages', []);
         }
-        $extra['message']=$e->getMessage();
-        throw new editor_Services_Connector_Exception('E1282',$extra);
+        catch(editor_Services_Connector_Exception $e) {
+            //since is called without a connected resource, we can not use the adapter logger here
+            Zend_Registry::get('logger')->exception($e);
+            return [];
+        }
     }
     
+    /**
+     * Check the resource connection. Returns true, if a connection with the resource can be established
+     * @param editor_Models_LanguageResources_Resource $resource
+     * @return boolean
+     */
+    public function ping(editor_Models_LanguageResources_Resource $resource){
+        $this->connectToResourceOnly($resource);
+        //a ping is successfull if the status of the resource is available or not loaded
+        $isValidFor = [editor_Services_Connector_Abstract::STATUS_AVAILABLE, editor_Services_Connector_Abstract::STATUS_NOT_LOADED];
+        return in_array($this->getStatus($resource), $isValidFor);
+    }
     
     /***
      * Load the lates service result cache for the given segment in the current language resource
-     * @param editor_models_segment $segment
+     * @param editor_Models_Segment $segment
      * @return editor_Services_ServiceResult
      */
-    protected function getCachedResult(editor_models_segment $segment) {
+    protected function getCachedResult(editor_Models_Segment $segment) {
         $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
         /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */
-        return $model->getResults($segment->getId(),$this->languageResource->getId());
+        return $model->getResults($segment->getId(), $this->adapter->getLanguageResource()->getId());
     }
     
     /***
@@ -225,7 +257,7 @@ class editor_Services_Connector {
     }
     
     /***
-     * Load the results with calling the adapters query action 
+     * Load the results with calling the adapters query action
      */
     public function disableBatch() {
         $this->batchQuery = false;
@@ -238,12 +270,12 @@ class editor_Services_Connector {
 //      */
 //     protected function logMtUsage($querySource,$requestSource){
 //         //use the logger only for MT resoruces
-//         if($this->languageResource->getResourceType()!=editor_Models_Segment_MatchRateType::TYPE_MT){
+//         if($this->adapter->getLanguageResource()->getResourceType()!=editor_Models_Segment_MatchRateType::TYPE_MT){
 //             return;
 //         }
 //         $mtlogger=ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageLogger');
 //         /* @var $mtlogger editor_Models_LanguageResources_MtUsageLogger */
-//         $mtlogger->setLanguageResourceId($this->languageResource->getId());
+//         $mtlogger->setLanguageResourceId($this->adapter->getLanguageResource()->getId());
 //         $mtlogger->setSourceLang($this->sourceLang);
 //         $mtlogger->setTargetLang($this->targetLang);
 //         $mtlogger->setQueryString($this->getQueryString($querySource));
@@ -305,7 +337,7 @@ class editor_Services_Connector {
         
 //         $la=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
 //         /* @var $la editor_Models_LanguageResources_CustomerAssoc */
-//         $resourceCustomers=$la->loadByLanguageResourceId($this->languageResource->getId());
+//         $resourceCustomers=$la->loadByLanguageResourceId($this->adapter->getLanguageResource()->getId());
 //         $resourceCustomers=array_column($resourceCustomers,'customerId');
 //         $return=array_intersect($userCustomers,$resourceCustomers);
 //         if(empty($return)){

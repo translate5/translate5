@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -15,8 +15,9 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -26,24 +27,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
+@CHARSET "UTF-8";
 
-/**
- * is thrown if a service is accessed, which does not exist any more, or where the corresponding plug-in was disabled.
- */
-class editor_Services_NoServiceException extends ZfExtended_ErrorCodeException {
-    /**
-     * @var string
-     */
-    protected $domain = 'editor.languageresource.service';
-    
-    static protected $localErrorCodes = [
-        'E1106' => 'Given Language-Resource-Service "{serviceType}." is not registered in the Language-Resource-Service-Manager!',
-        'E1257' => 'The LanguageResource-Service "{service}" is not configured. Please check this confluence-page for more details: "{helpPage}"',
-    ];
-}
+.spellcheck {cursor: pointer;}
+.spellcheck, .spellcheck .trackchanges {border-bottom: 3px dotted; border-color: red;}
+.spellcheck.grammarError, .spellcheck.grammarError .trackchanges {border-color: #ab8906;} /* dark yellow */
+.spellcheck.suggestion, .spellcheck.suggestion .trackchanges {border-color: #458fe6;}     /* blue */
+.spellcheck.spellError, .spellcheck.spellError .trackchanges {border-color: #e645a8;}     /* red-violet */
