@@ -2779,6 +2779,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Die Anfrage an die Sprachressource dauerte zu lange.</source>
   <target>The language resource did not respond in a reasonable time.</target>
 </trans-unit>
+<trans-unit id='RXMgZ2lidCBQcm9ibGVtZSBtaXQgZGVtIGFuZ2VmcmFndGVuIERpZW5zdC4='>
+  <source>Es gibt Probleme mit dem angefragten Dienst.</source>
+  <target>There are problems with the queried service.</target>
+</trans-unit>
 <trans-unit id='RGllIEFuZnJhZ2UgZsO8aHJ0ZSB6dSBlaW5lbSBGZWhsZXIgaW0gYW5nZWZyYWd0ZW4gRGllbnN0Lg=='>
   <source>Die Anfrage führte zu einem Fehler im angefragten Dienst.</source>
   <target>The request produced an error in the queried service.</target>
@@ -3581,9 +3585,9 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Sonderzeichen hinzufügen:</source>
     <target>Add special characters:</target>
 </trans-unit>
-<trans-unit id='U3DDpHRlciB3ZWl0ZXIgYXJiZWl0ZW4='>
-	<source>Später weiter arbeiten</source>
-	<target>Continue task later</target>
+<trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZW7DvGJlcnNpY2h0'>
+    <source>Zurück zur Aufgabenübersicht</source>
+    <target>Back to task list</target>
 </trans-unit>
 <trans-unit id='QWxsZXMgZmVydGlnIC0gQXVmZ2FiZSBhYnNjaGxpZcOfZW4='>
 	<source>Alles fertig - Aufgabe abschließen</source>
@@ -3903,6 +3907,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv'><source>PM lektoriert, unverändert, auto</source><target>PM reviewed, unchanged, auto-set</target></trans-unit>
 <trans-unit id='U3VjaGUgaW0gQXVzZ2FuZ3N0ZXh0'><source>Suche im Ausgangstext</source><target>Search in the source text</target></trans-unit>
 <trans-unit id='U3VjaGUgaW0gWmllbHRleHQ='><source>Suche im Zieltext</source><target>Search in the target text</target></trans-unit>
+<trans-unit id='RsO8ciBqZWRlbiBTYXR6IHd1cmRlIGRhcyBiZXN0ZSB2ZXJmw7xnYmFyZSBUcmFuc2xhdGlvbi1NZW1vcnktTWF0Y2ggdmVyd2VuZGV0ICgxMDAlIG9kZXIgYmVzc2VyKS4gV2VubiBrZWluZSAxMDAlaWdlIMOcYmVyZWluc3RpbW11bmcgaW0gVHJhbnNsYXRpb24gTWVtb3J5IGdlZnVuZGVuIHd1cmRlLCB3aXJkIGRpZSBtYXNjaGluZWxsZSDDnGJlcnNldHp1bmcgdmVyd2VuZGV0Lg=='><source>Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet.</source><target>For each sentence the best available translation memory match has been used (100% or better). If not translation memory 100% match was found, machine translation is used.</target></trans-unit>
 </body>
   </file>
 </xliff>

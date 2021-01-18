@@ -1041,7 +1041,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               autoStartImport: 0
           },
           timeout: 3600,
-          url: Editor.data.restpath+'task',
+          url: Editor.data.restpath+'task?format=json', //to fix POST_MAX_SIZE problems, see TRANSLATE-1034
           scope: this,
           success: function(form, submit) {
               var task = me.getModel('admin.Task').create(submit.result.rows);

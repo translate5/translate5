@@ -4,8 +4,8 @@
 segmentSource.b=true
 segmentTarget.b=false
 renumberCodes.b=false
-sourceSrxPath=/home/marc/Schreibtisch/data/okapi-import-bconf-generation/test-ausgepackt/languages.srx
-targetSrxPath=/home/marc/Schreibtisch/data/okapi-import-bconf-generation/test-ausgepackt/languages.srx
+sourceSrxPath=languages.srx
+targetSrxPath=languages.srx
 copySource.b=false
 checkSegments.b=false
 trimSrcLeadingWS.i=-1

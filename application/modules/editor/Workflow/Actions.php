@@ -132,7 +132,6 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     public function autoAssociateEditorUsers() {
         $task = $this->config->task;
         $workflow = $this->config->workflow;
-        $stepName = $task->getWorkflowStepName();
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         
@@ -145,15 +144,21 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $sourceLang = $task->getSourceLang();
         $targetLang = $task->getTargetLang();
         
-        $role = $workflow->getRoleOfStep($stepName);
-        if(!$role) {
-            return;
+        //since the initial workflow step is no_workflow,
+        // we have to decide here hardcoded between the wanted roles:
+        if($task->getEmptyTargets()) {
+            $role = $workflow::ROLE_TRANSLATOR;
+            $stepName = $workflow::STEP_TRANSLATION;
         }
+        else {
+            $role = $workflow::ROLE_REVIEWER;
+            $stepName = $workflow::STEP_REVIEWING;
+        }
+        
         $states = $workflow->getInitialStates();
         $state = $states[$stepName][$role];
         
         $users = $user->loadAllByLanguages($sourceLang, $targetLang);
-        
         
         foreach($users as $data) {
             $roles = explode(',', $data['roles']);
@@ -174,6 +179,11 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             //entity version?
             $tua->save();
             $workflow->doUserAssociationAdd($tua);
+        }
+        
+        //if at least one task user association was added, then we have to update the workflowstep too
+        if(!empty($tua)) {
+            $task->updateWorkflowStep($stepName, false);
         }
     }
     

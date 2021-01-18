@@ -48,7 +48,7 @@ Ext.define('Editor.view.segments.column.InfoToolTipMixin', {
 
         me.tableTpl = new Ext.XTemplate(me.tableTpl);
         me.otherRenderers = {};
-        Ext.Array.each(grid.columns, function(item) {
+        Ext.Array.each(grid.getColumns(), function(item) {
             if(!item.showInMetaTooltip) {
                 return;
             }
