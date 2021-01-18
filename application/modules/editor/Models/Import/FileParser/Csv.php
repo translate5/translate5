@@ -74,11 +74,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     protected $_enclosure;
     
     /**
-     * @var boolean
-     */
-    protected $tagProtection = false;
-    
-    /**
      * @var array
      */
     protected $replaceRegularExpressionsBeforeTagParsing = array();
@@ -106,7 +101,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      */
     protected $protectedStrings = array();
     
-    protected $html5Tags = array();
+    
 
     /**
      * (non-PHPdoc)
@@ -126,23 +121,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
         $this->regexInternalTags = editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS;
         
-        // check taskTemplate for options (check if tag-protection or regExes-protection is set)
-        $taskConfig = Zend_Registry::get('taskTemplate');
-        $className = __CLASS__;
-        
-        if (!isset($taskConfig->import->fileparser->$className)) {
-            return;
-        }
-        $options = $taskConfig->import->fileparser->$className->options;
-        
-        if (isset($options->protectTags)) {
-            $this->tagProtection = $options->protectTags;
-            $ds = DIRECTORY_SEPARATOR;
-            $html5TagFile = APPLICATION_PATH.$ds.'modules'.$ds.'editor'.
-                    $ds.'Models'.$ds.'Import'.$ds.'FileParser'.$ds.
-                    'html5-tags.txt';
-            $this->html5Tags = file($html5TagFile, FILE_IGNORE_NEW_LINES);
-        }
+        $options = $this->config->runtimeOptions->import->fileparser->csv->options;
         if (isset($options->regexes->beforeTagParsing->regex)) {
             $this->addReplaceRegularExpression($options->regexes->beforeTagParsing->regex,'replaceRegularExpressionsBeforeTagParsing');
         }
@@ -477,8 +456,10 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         return $segment;
     }
 
+    //TODO_ move this to whitespace helper: see todo there
     private function parseSegmentProtectTags($segment) {
         
+        //TODO this gos to whispace helper
         if (strpos($segment, '<')=== false || !$this->tagProtection) {
             return $segment;
         }
@@ -501,11 +482,13 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         }
         $r= $tempXml->find('segment')->innerXml();
         
+        //TODO: The stuff from those 3 functions this is done by the tag trait
         // replace single-, left- and right-tags
         $r = $this->parseReplaceSingleTags($r);
         $r = $this->parseReplaceLeftTags($r);
         $r = $this->parseReplaceRightTags($r);
         
+        //TODO: This needs to be ignored
         return $this->parseSegmentInsertPlaceholders($r,$this->regexInternalTags);
     }
 

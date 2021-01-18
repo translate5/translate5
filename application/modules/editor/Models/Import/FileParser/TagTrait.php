@@ -70,6 +70,8 @@ trait editor_Models_Import_FileParser_TagTrait {
         '#<(char) ts="([^"]*)"( length="([0-9]+)")?/>#',
         '#<(tab) ts="([^"]*)"( length="([0-9]+)")?/>#',
         '#<(space) ts="([^"]*)"( length="([0-9]+)")?/>#',
+        '#<(pairedTag).*#',
+        '#<(singleTag).*#',
     ];
     
     protected function initHelper(){
@@ -96,7 +98,7 @@ trait editor_Models_Import_FileParser_TagTrait {
     protected function whitespaceTagReplacer($segment, array $tagShortcutNumberMap = []) {
         //$tagShortcutNumberMap must be given explicitly here as non referenced variable from outside,
         // so that each call of the whitespaceTagReplacer function has its fresh list of tag numbers
-        return preg_replace_callback($this->whitespaceTagList, function($match) use (&$tagShortcutNumberMap) {
+        return preg_replace_callback($this->whitespaceTagList, function($match) use (&$tagShortcutNumberMap,$segment) {
             $tag = $match[0];
             $tagName = $match[1];
             $cls = ' '.$tagName;
@@ -110,6 +112,7 @@ trait editor_Models_Import_FileParser_TagTrait {
             }
             $title = '&lt;'.$shortTagNumber.'/&gt;: ';
             
+            
             //if there is no length attribute, use length = 1
             if(empty($match[3])) {
                 $length = 1;
@@ -117,8 +120,22 @@ trait editor_Models_Import_FileParser_TagTrait {
             else {
                 $length = $match[4]; //else use the stored length value
             }
+            //TODO: the content produced by the (parseSegmentProtectTags from the csv parser, now moved to whitespace helper), needs to be replaced here
+            //use static place holders, the csv method wil generate dynamic (sugestion from Thomas)
+            
             //generate the html tag for the editor
             switch ($match[1]) {
+                case 'pairedTag':
+                    $class = new editor_Models_Segment_TagProtection();
+                    $ret = $class->parseReplaceLeftTags($segment);
+                    $ret = $class->parseReplaceRightTags($ret);
+                    return $ret;
+                    break;
+                case 'singleTag':
+                    $class = new editor_Models_Segment_TagProtection();
+                    $ret = $class->parseReplaceSingleTags($segment);
+                    return $ret;
+                    break;
                 // ↵    U+21B5      e2 86 b5    &crarr;     &#8629;     DOWNWARDS ARROW WITH CORNER LEFTWARDS
                 //'hardReturn' => ['text' => '&lt;↵ hardReturn/&gt;'], //in title irgendwas mit <hardReturn/>
                 //'softReturn' => ['text' => '&lt;↵ softReturn/&gt;'], //in title irgendwas mit <softReturn/>
@@ -224,7 +241,7 @@ trait editor_Models_Import_FileParser_TagTrait {
                 continue;
             }
             
-            $split[$idx] = $this->whitespaceHelper->protectWhitespace($chunk, true);
+            $split[$idx] = $this->whitespaceHelper->protectWhitespace($chunk, true,true);
             if(!empty($textNodeCallback)) {
                 $split[$idx] = call_user_func($textNodeCallback, $split[$idx]);
             }
