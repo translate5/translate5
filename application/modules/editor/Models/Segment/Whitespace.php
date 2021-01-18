@@ -84,8 +84,48 @@ class editor_Models_Segment_Whitespace {
      * @param string $textNode should not contain tags, since special characters in the tag content would also be protected then
      * @param bool $xmlBased defaults to true, decides how XML Entities are encoded, see inline comments
      */
-    public function protectWhitespace($textNode, $xmlBased = true) {
-        $textNode = $this->entityCleanup($textNode, $xmlBased);
+    public function protectWhitespace($textNode, $xmlBased = true, $protectHtml = false) {//TODO this should be set from the protectTags config (this should be off for language resources)
+        
+        $tp = new editor_Models_Segment_TagProtection();
+        $textNode = $tp->protectTags($textNode);
+        
+        if(false){
+            //Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
+            if($protectHtml){
+                
+                //TODO: move this to separate class : TagProtection
+                // reuse there the whgole stuff with regex protection
+                
+                
+                //TODO: this goes in the new class
+                //TODO: new tags: singleTag and pairedTagOpen, pairedTagClose
+                //pairedTagOpen need id, thay need to be somehow connected together
+                
+                $textNode = html_entity_decode($textNode);
+                //Dies <strong>ist ein</strong> Test. &nbsp;
+                $textNode = $this->entityCleanup($textNode, $xmlBased);
+                //at the end of the string there is nbsp character not whitespace
+                //the nbsp will be handled bellow
+                //Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test.  
+                $textNode = str_replace(['&lt;','&gt;'], ['<','>'], $textNode);
+                //Dies <strong>ist ein</strong> Test.  
+                
+                //TODO: here replace tags like in csv tag protection
+                
+                $tempXml = qp('<?xml version="1.0"?><segment>'.$textNode.'</segment>', NULL, array('format_output' => false));
+                
+                // mark single- or paired-tags
+                foreach ($tempXml->find('segment *') as $element) {
+                    $tagType = 'htmlTag';
+                    
+                    $element->wrap('<'.$tagType.' data-tagname="'.$element->tag().'" />');
+                }
+                $textNode = $tempXml->find('segment')->innerXml();
+                
+            }else{
+                $textNode = $this->entityCleanup($textNode, $xmlBased);
+            }
+        }
         
         //replace only on real text
         $textNode = str_replace($this->protectedWhitespaceMap['search'], $this->protectedWhitespaceMap['replace'], $textNode);

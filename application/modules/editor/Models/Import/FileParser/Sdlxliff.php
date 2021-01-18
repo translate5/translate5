@@ -79,6 +79,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         'ph' => 'x',
         'st' => 'x',
         'mrk' => 'mrk',
+        'pairedTag' => 'pairedTag'
         );
 
     /**
@@ -124,6 +125,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         //add sdlxliff tagMapping
         $this->addSldxliffTagMappings();
         parent::__construct($path, $fileName, $fileId, $task);
+//         if(!empty($this->html5Tags)){
+//             $this->_tagDefMapping = array_merge($this->_tagDefMapping,array_combine($this->html5Tags, $this->html5Tags));
+//         }
         $this->initImageTags();
         $this->initHelper();
         $this->checkForSdlChangeMarker();
@@ -273,6 +277,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             //reduziere
             $groupLevel = $groupLevel - substr_count($units[0], '</group>');
             for ($i = 1; $i < $count; $i++) {
+                //TODO: find content with mrk tag in it!!!! 
                 $translate = $translateGroupLevels[$groupLevel];
                 if (preg_match('"^[^<>]*translate=\"no\""i', $units[$i])) {
                     $translate = false;
@@ -809,11 +814,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->verifyTagName($tagName, $data);
         $tagId = $this->parseSegmentGetTagId($tag, $tagName);
         $shortTagIdent = $data->j;
-        $locked = false;
         if (strpos($tagId, 'locked')!== false) {
             $this->setLockedTagContent($tag, $tagId);
             $shortTagIdent = 'locked' . $data->j;
-            $locked = true;
         }
 
         //generate the html tag for the editor
