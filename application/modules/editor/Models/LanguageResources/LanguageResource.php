@@ -447,4 +447,20 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         }
         return $categoriesOriginalIds;
     }
+    
+    /***
+     * Is the current resource of type MT (maschine translation)
+     * @return boolean
+     */
+    public function isMt() {
+        return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_MT;
+    }
+    
+    /***
+     * Is the current resource type of TM (translation memory)
+     * @return boolean
+     */
+    public function isTm() {
+        return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM;
+    }
 }

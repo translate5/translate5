@@ -54,6 +54,14 @@ trait editor_Services_Connector_BatchTrait {
         //holds the query strings for batch request
         $batchQuery = [];
         foreach ($segments as $segment){
+            
+            //For pre-translation only those segments should be send to the MT, that have an empty target.-> https://jira.translate5.net/browse/TRANSLATE-2335
+            //For analysis, the mt matchrate will always be the same.So it make no difference here if it is pretranslation
+            //or analysis, the empty target segments for mt resources should not be send to batch processor
+            //TODO: in future, when the matchrate is provided/calculated for mt, this should be changed
+            if(!empty($segment->getTarget()) && $this->languageResource->isMt()){
+                continue;
+            }
             $batchQuery[] = [
                 //set the query string to segment map. Later it will be used to reapply the taks
                 'segment' => clone $segment,
