@@ -1048,13 +1048,18 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $segment editor_Models_Segment */
         $segment->load((int) $this->_getParam('segmentId'));
         
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_task */
+        $task->loadByTaskGuid((string) $session->taskGuid);
+        
         //check taskGuid of segment against loaded taskguid for security reasons
         //checks if the current task is associated to the languageResource
-        $this->entity->checkTaskAndLanguageResourceAccess((string) $session->taskGuid,$languageResourceId, $segment);
+        $this->entity->checkTaskAndLanguageResourceAccess($task->getTaskGuid(),$languageResourceId, $segment);
         
         $this->entity->load($languageResourceId);
 
         $connector = $this->getConnector();
+        $connector->setConfig($task->getConfig());
 
         $result = $connector->query($segment);
         
