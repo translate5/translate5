@@ -136,6 +136,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Currently only used for getConfig, should be used for all relevant customer stuff in this class
      */
     protected static $customerCache = [];
+    
+    /***
+     * Internal cache task config cache
+     * @var Zend_Config
+     */
+    protected static $taskCustomerConfig=[];
 
     protected $dbInstanceClass = 'editor_Models_Db_Task';
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
@@ -155,6 +161,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var string
      */
     protected $taskDataPath;
+
     
     /**
      * On cloning we need a new taskGuid and id
@@ -172,26 +179,40 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Returns a Zend_Config Object; if task specific settings exist, they are set now.
+     * This will load only the task specific configs. It will not load all other 
+     * system-wide configs.
      * @return Zend_Config
      */
-    protected function getConfig() {
-        // This is a temporary preparation for implementing TRANSLATE-471.
-        if (empty($this->getCustomerId())) {
-            // Step 1a: start with systemwide config
-            $config = new Zend_Config(Zend_Registry::get('config')->toArray(), true);
+    public function getConfig() {
+        if(empty($this->getTaskGuid())){
+            throw new editor_Models_ConfigException('E1297');
         }
-        else {
-            // Step 1b: anything customer-specific for this task?
-            $config = $this->_getCachedCustomer($this->getCustomerId())->getConfig();
+        if(isset(self::$taskCustomerConfig[$this->getTaskGuid()])){
+            return self::$taskCustomerConfig[$this->getTaskGuid()];
         }
-
-        // Step 2: anything task-specific for this task?
-        // TODO...
-
-        $config->setReadOnly();
-        return $config;
+        $configModel = ZfExtended_Factory::get('editor_Models_Config');
+        /* @var $configModel editor_Models_Config */
+        
+        //fetch all config from DB
+        $dbConfig = ZfExtended_Factory::get('ZfExtended_Models_Config');
+        /* @var $dbConfig ZfExtended_Models_Config */
+        $base = $dbConfig->loadAll();
+        //for merge set config name as array key
+        $base = $configModel->nameAsKey($base);
+        
+        //merge task overwrites with task customer overwrites
+        $result = $configModel->mergeTaskValues($this->getTaskGuid(),$base);
+        
+        $configOperator = ZfExtended_Factory::get('ZfExtended_Resource_DbConfig');
+        /* @var $configOperator ZfExtended_Resource_DbConfig */
+        $configOperator->initDbOptionsTree($result);
+        $taskConfig = new Zend_Config($configOperator->getDbOptionTree());
+        $taskConfig->setReadOnly();
+        //cache the config for this request
+        self::$taskCustomerConfig[$this->getTaskGuid()] = $taskConfig;
+        return self::$taskCustomerConfig[$this->getTaskGuid()];
     }
-
+    
     /**
      * Add a tasktype for the validation.
      * @param string $taskType
@@ -310,7 +331,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function loadUserList(string $userGuid) {
-        $quoted = $this->db->getAdapter()->quote($userGuid);
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
 
@@ -318,21 +338,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $loadAll = $userModel->isAllowed('backend', 'loadAllTasks');
         $ignoreAnonStuff = $userModel->readAnonymizedUsers();
 
-        //FIXME in future the customer  config and task config must respected here too,
-        // means a complete refactoring probably with the anon flag into the job table (also for filtering!!!)
-        $config = Zend_Registry::get('config');
-        if($ignoreAnonStuff) {
-            //the current user may see all user data
-            $anonSql = '';
-        }
-        elseif($config->runtimeOptions->customers->anonymizeUsers) {
-            //if we get here, the user may only see the user for the task he is pm and himself
-            $anonSql = ' AND filter.pmGuid = "'.$quoted.'" OR LEK_taskUserAssoc.userGuid = "'.$quoted.'" ';
-        }
-        else {
-            //the user may see only the user data from customers where the anon flag is false and where he is pm and himself
-            $anonSql = ' INNER JOIN LEK_customer ON LEK_customer.id=filter.customerId AND LEK_customer.anonymizeUsers=0 ';
-            $anonSql .= ' OR filter.pmGuid = "'.$quoted.'" OR LEK_taskUserAssoc.userGuid = "'.$quoted.'" ';
+        $anonSql = '';
+        if(!$ignoreAnonStuff) {
+            //filter out all anonymited tasks
+            //task is anonymized if runtimeOptions.customers.anonymizeUsers is set to 1 on task level
+            //if anonymizeUsers is not defined on taks level, the task customer anonymizeUsers value is used
+            //if anonymizeUsers is also not defined on customer level, then the instance anonymizeUsers value is used
+            $anonSql = 'AND filter.taskGuid NOT IN(SELECT IF((SELECT IF(t.value IS NOT NULL,t.value, if(c.value IS NOT NULL,c.value,z.value = 1)) FROM Zf_configuration z
+                        LEFT JOIN LEK_customer_config c on z.name = c.name
+                        LEFT JOIN LEK_task_config t on t.name = z.name
+                        WHERE (t.taskGuid = LEK_task.taskGuid OR c.customerId = LEK_task.customerId)
+                        AND z.name =  "runtimeOptions.customers.anonymizeUsers") = 1,LEK_task.taskGuid,NULL) AS s
+                        FROM LEK_task 
+                        GROUP BY LEK_task.taskGuid
+                        HAVING s IS NOT NULL) ';
         }
 
         if($loadAll){
@@ -340,7 +359,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         } else {
             $s = $this->getSelectByUserAssocSql($userGuid, '*', $loadAll);
         }
-
         //apply the frontend task filters
         $this->applyFilterAndSort($s);
         //the inner query is the current task list with activ filters
@@ -348,8 +366,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $sql = ' SELECT '.$userCols.',filter.taskGuid from Zf_users, '.
             ' ('.$s->assemble().') as filter '.
              ' INNER JOIN LEK_taskUserAssoc ON LEK_taskUserAssoc.taskGuid=filter.taskGuid '.
-             $anonSql.
              ' WHERE Zf_users.userGuid = LEK_taskUserAssoc.userGuid '.
+             $anonSql.
              ' GROUP BY Zf_users.id '.
              ' ORDER BY Zf_users.surName; ';
 
@@ -624,9 +642,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         if(empty($session)) {
             $session = new Zend_Session_Namespace();
         }
+        
         $session->taskGuid = $this->getTaskGuid();
-        //FIXME very evil! No data should be put into the session, the session is no cache!
-        $session->task = $this->getAsConfig();
         $session->taskOpenState = $openState;
         $session->taskWorkflow = $this->getWorkflow();
         $session->taskWorkflowStepNr = $this->getWorkflowStep();
@@ -642,7 +659,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $session = new Zend_Session_Namespace();
         }
         $session->taskGuid = null;
-        $session->task = null;
         $session->taskOpenState = null;
         $session->taskWorkflowStepNr = null;
     }

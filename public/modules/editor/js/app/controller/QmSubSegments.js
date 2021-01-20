@@ -93,6 +93,9 @@ Ext.define('Editor.controller.QmSubSegments', {
         controller: {
             '#Editor': {
                 'assignMQMTag': 'handleAddQmFlagKey'
+            },
+            '#Editor.$application': {
+                editorConfigLoaded:'onEditorConfigLoaded'
             }
         },
         component: {
@@ -114,6 +117,17 @@ Ext.define('Editor.controller.QmSubSegments', {
     	buttonTooltip10: '#UT# (ALT+{0})',
     	buttonTooltip20: '#UT# (ALT+SHIFT+{0})'
     },
+    
+    /***
+     * After task config load event handler.
+     */
+    onEditorConfigLoaded:function(app, task){
+        var me=this,
+            isControllerActive = app.getTaskConfig('editor.enableQmSubSegments');
+        //this controller is active when enableQmSubSegments is enabled
+        me.setActive(isControllerActive);
+    },
+    
     handleInitEditor: function() {
         this.initFieldSet();
         var combo = this.getMetaSevCombo(),

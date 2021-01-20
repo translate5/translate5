@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -30,7 +30,8 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
     extend: 'Ext.tab.Panel',
     requires: [
         'Editor.view.admin.preferences.OverviewPanelViewController',
-        'Editor.view.admin.preferences.User'
+        'Editor.view.admin.preferences.User',
+        'Editor.view.admin.config.Grid'
     ],
     alias: 'widget.preferencesOverviewPanel',
     itemId: 'preferencesOverviewPanel',
@@ -55,6 +56,7 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
         },
         activate: function(view, opts){
             this.forwardActiveTabEvent('activate');
+            this.handleConfigPanelReadOnly();
         },
         beforehide: function(view, opts){
             this.forwardActiveTabEvent('beforehide');
@@ -86,13 +88,19 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
             configSections.push({xtype: 'preferencesUser'});
         }
         
+        if(user.isAllowed('configOverwriteGrid')) {
+            configSections.push({
+                xtype: 'adminConfigGrid'
+            });
+        }
+        
         /**
          * Other planned config sections:
          * [{
-				xtype: 'panel',
-				title: 'System',
-				glyph: 'xf013@FontAwesome',
-			}]
+                xtype: 'panel',
+                title: 'System',
+                glyph: 'xf013@FontAwesome',
+            }]
          */
         
         if (instanceConfig) {
@@ -103,6 +111,15 @@ Ext.define('Editor.view.admin.preferences.OverviewPanel', {
     initComponent: function() {
         var me = this;
         me.callParent(arguments);
-        this.setVisible(this.items.length > 0); //if there are any sub modules
+        me.setVisible(me.items.length > 0); //if there are any sub modules
+    },
+    
+    /***
+     * Trigger the viewmodel binding for hasReadOnly propertie
+     */
+    handleConfigPanelReadOnly:function(){
+        var me=this,
+            configPanel = me.down('adminConfigGrid');
+        configPanel && configPanel.getController().handleHasReadOnly();
     }
 });
