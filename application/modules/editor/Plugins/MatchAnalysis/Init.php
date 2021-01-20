@@ -286,7 +286,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             /* @var $manager editor_Services_Manager */
             $resource=$manager->getResource($languageresource);
             
-            $connector=$manager->getConnector($languageresource,$task->getSourceLang(),$task->getTargetLang());
+            $connector=$manager->getConnector($languageresource,$task->getSourceLang(),$task->getTargetLang(),$task->getConfig());
             /* @var $connector editor_Services_Connector */
             //collect all connectors which are supporting batch query
             if($connector->isBatchQuery()){
