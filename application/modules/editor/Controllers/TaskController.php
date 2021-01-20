@@ -1109,6 +1109,11 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
     }
     
+    /**
+     * Checks the task access by workflow
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     * @throws ZfExtended_Models_Entity_Conflict
+     */
     protected function checkTaskAccess() {
         $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         
@@ -1123,15 +1128,16 @@ class editor_TaskController extends ZfExtended_RestController {
         // If it is (pm override false) directly associated, the workflow must be considered it the task is openable / writeable.
         $mayLoadAllTasks = $mayLoadAllTasks && (empty($tua) || $tua->getIsPmOverride());
         
-        $isTaskDisallowEditing = $this->isEditTaskRequest() && !$this->workflow->isWriteable($tua);
-        $isTaskDisallowReading = $this->isViewTaskRequest() && !$this->workflow->isReadable($tua);
-        
         //if the user may load all tasks, check workflow access is non sense
         if($mayLoadAllTasks) {
             return;
         }
         
-        //if now there is no tua, that means it was deleted in the meantime, a editor user may not access the task anymore
+        $isTaskDisallowEditing = $this->isEditTaskRequest() && !$this->workflow->isWriteable($tua);
+        $isTaskDisallowReading = $this->isViewTaskRequest() && !$this->workflow->isReadable($tua);
+        
+        //if now there is no tua, that means it was deleted in the meantime.
+        // A PM will not reach here, a editor user may not access the task then anymore
         if(empty($tua)) {
             //if the task was already in session, we must delete it.
             //If not the user will always receive an error in JS, and would not be able to do anything.
