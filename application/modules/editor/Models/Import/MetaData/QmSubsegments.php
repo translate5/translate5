@@ -58,7 +58,7 @@ END LICENSE AND COPYRIGHT
      * @throws Zend_Exception
      */
     public function importFromXml(editor_Models_Task $task,string $importPath) {
-        $config = Zend_Registry::get('config');
+        $config = $task->getConfig();
         if(! $config->runtimeOptions->editor->enableQmSubSegments) {
             return;
         }

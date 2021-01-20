@@ -108,7 +108,7 @@ class editor_Models_Export_FileParser_TransitInfoField {
 
     public function __construct(editor_Models_Task $task, Zend_Config $config, editor_Models_Segment $segment, ZfExtended_Zendoverwrites_Translate $translate) {
         $this->task = $task;
-        $this->config = $config;
+        $this->config = $task->getConfig();
         $this->segment = $segment;
         $this->translate = $translate;
         $this->debug = ZfExtended_Debug::hasLevel('plugin', 'transit');

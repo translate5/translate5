@@ -1,4 +1,4 @@
-mid,quelle,target
+id,source,target
 1,Das ist eine rotes Haus,This is a red house
 2,Hier ist das <b>Alignment</b> noch in Ordnung.,Here the alignment is OK.
 3,"Falscher Source Text, MID OK. <br> single tag zum inc der tag ID","Wrong Source Text here, MID OK."

@@ -81,7 +81,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     public function indexAction() {
         $taskGuid = $this->session->taskGuid;
-        
         $rows = $this->entity->loadByTaskGuid($taskGuid);
         $this->view->rows = $rows;
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
@@ -122,6 +121,21 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         }
         
         // ----- Specific handling of rows (end) -----
+    }
+    
+    protected function setJsSegmentFlags($type, array $qualityFlags) {
+        $result = [];
+        foreach($qualityFlags as $key => $value){
+            if(empty($value)){
+                continue;
+            }
+            $flag = new stdClass();
+            $flag->id = $key;
+            $flag->label = $this->translate->_($value);
+            $result[] = $flag;
+        }
+        
+        $this->view->Php2JsVars()->set($type, $result);
     }
     
     public function nextsegmentsAction() {

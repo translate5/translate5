@@ -48,33 +48,33 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
     protected static $nonStandardXliffAttributes = ['size-unit' =>        ['inUnit' => 'size-unit',                   'inSegmentAttr' => 'sizeUnit'],
                                                     'maxNumberOfLines' => ['inUnit' => 'translate5:maxNumberOfLines', 'inSegmentAttr' => 'maxNumberOfLines'] ];
     
+    /***
+     * 
+     * @var Zend_Config
+     */
+    protected $config;
     
-    public function __construct() {
+    
+    public function __construct(Zend_Config $taskConfig) {
         $this->pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
+        $this->config = $taskConfig;
         $this->initLengthRestrictionAttributes();
     }
     
     /**
-     * overwrite default values for length-Restriction-Attributes from task template (sizeUnit, minWidth, maxWidth, maxNumberOfLines, font, fontSize):
+     * overwrite default values for length-Restriction-Attributes from task config(sizeUnit, minWidth, maxWidth, maxNumberOfLines, font, fontSize):
      */
     protected function initLengthRestrictionAttributes () {
-        if(!Zend_Registry::isRegistered('taskTemplate')) {
-            return;
-        }
+        $config = $this->config->runtimeOptions->lengthRestriction;
         $keys = array_keys($this->lengthRestrictionDefaults);
-        $taskTemplate = Zend_Registry::get('taskTemplate');
-        $taskTemplateConf = $taskTemplate->lengthRestriction ?? null;
         foreach($keys as $key) {
             switch ($key) {
                 case 'font':
                 case 'fontSize':
-                    $conf = $taskTemplateConf->pixelmapping->$key ?? null;
-                    break;
-                case 'maxNumberOfLines':
-                    $conf = $taskTemplateConf->$key ?? null;
+                    $conf = $config->pixelmapping->$key ?? null;
                     break;
                 default:
-                    $conf = $taskTemplateConf->$key ?? null;
+                    $conf = $config->$key ?? null;
                     break;
             }
             if(is_null($conf)) {
@@ -95,7 +95,7 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
      * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes
      */
     public function addAttributes(editor_Models_Import_FileParser_XmlParser $xmlparser, array $unitAttributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
-        // Length-Restriction-Attributes (as set in xliff's trans-unit; fallback: task-template); optional
+        // Length-Restriction-Attributes (as set in xliff's trans-unit; fallback: task config); optional
         $unit = $xmlparser->getAttribute($unitAttributes, 'size-unit', $this->lengthRestrictionDefaults['size-unit']);
         if($unit == 'char' || $unit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING) {
             foreach ($this->lengthRestrictionDefaults as $key => $defaultValue) {
