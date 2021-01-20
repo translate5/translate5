@@ -74,7 +74,7 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Import_Worker
         
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
-        $connector = $manager->getConnector($languageresource);
+        $connector = $manager->getConnector($languageresource,null,null,$task->getConfig());
         
         foreach($segments as $segment) {
             if(empty($segment->getTargetEdit()) || mb_strpos($segment->getTargetEdit(), "\n") !== false){

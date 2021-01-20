@@ -130,7 +130,8 @@ abstract class editor_Services_Connector_Abstract {
     public $logger;
     
     /***
-     * 
+     * By default the config values are all overwritten by instance (level 2).
+     * Depending on the context, this config can be overwritten on level 4,8,16 (client,task-import,task).
      * @var Zend_Config
      */
     protected $config;

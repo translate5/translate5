@@ -475,7 +475,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             
             $connector=null;
             try {
-                $connector=$manager->getConnector($languageresource,$this->task->getSourceLang(),$this->task->getTargetLang());
+                $connector=$manager->getConnector($languageresource,$this->task->getSourceLang(),$this->task->getTargetLang(),$this->task->getConfig());
 
                 //throw a worning if the language resource is not available
                 $status = $connector->getStatus($resource);
