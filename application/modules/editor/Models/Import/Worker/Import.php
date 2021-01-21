@@ -30,10 +30,11 @@ END LICENSE AND COPYRIGHT
  * Encapsulates the part of the import logic which is intended to be run in a worker
  */
 class editor_Models_Import_Worker_Import {
-    /**
+    /***
+     * 
      * @var string
      */
-    const TASK_TEMPLATE = 'task-template.xml';
+    const CONFIG_TEMPLATE = 'task-config.ini';
     
     /**
      * @var editor_Models_Task
@@ -91,7 +92,8 @@ class editor_Models_Import_Worker_Import {
     public function import(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig) {
         $this->task = $task;
         $this->importConfig = $importConfig;
-        $this->importTaskTemplateXml();
+        
+        $this->loadConfigTemplate();
         
         $importConfig->isValid($task->getTaskGuid());
         $this->filelist = ZfExtended_Factory::get('editor_Models_Import_FileList', array($this->importConfig, $this->task));
@@ -172,37 +174,6 @@ class editor_Models_Import_Worker_Import {
         $mqmProc->handleErrors();
         
         $this->task->setReferenceFiles($this->filelist->hasReferenceFiles());
-    }
-    
-    /**
-     * import task-template.xml file
-     * if exist save it to Zend_Registry::get('taskTemplate');
-     */
-    protected function importTaskTemplateXml() {
-        Zend_Registry::set('taskTemplate', array());
-        $templateFilename = $this->importConfig->importFolder.'/'.self::TASK_TEMPLATE;
-        
-        if (file_exists($templateFilename)) {
-            try {
-                $config = new Zend_Config_Xml($templateFilename);
-                Zend_Registry::set('taskTemplate', $config);
-            }
-            catch (Exception $e) {
-                throw new Exception('.. invalid '.self::TASK_TEMPLATE.' detected at '.__CLASS__.' -> '.__FUNCTION__);
-            }
-            //WARNING: this is NOT the implementation of TRANSLATE-471!
-            // This code is just a "schmalspur" solution to enable the idea behind TRANSLATE-471 for our API testing
-            if(isset($config->runtimeOptions)) {
-                $origConfig = Zend_Registry::get('config');
-                /* @var $origConfig Zend_Config */
-                $newConfig = new Zend_Config([], true);
-                $newConfig->merge($origConfig);
-                $newConfig->runtimeOptions = [];
-                $newConfig->runtimeOptions->merge($config->runtimeOptions);
-                $newConfig->setReadOnly();
-                Zend_Registry::set('config', $newConfig);
-            }
-        }
     }
     
     /**
@@ -338,5 +309,31 @@ class editor_Models_Import_Worker_Import {
         /* @var $segment editor_Models_Segment */
         //dont update view here, since it is not existing yet!
         $segment->syncFileOrderFromFiles($this->task->getTaskGuid(), true);
+    }
+    
+    /***
+     * Load the config template for the task if it is provided in the import package
+     * @throws Exception
+     */
+    protected function loadConfigTemplate() {
+        $template = $this->importConfig->importFolder.'/'.self::CONFIG_TEMPLATE;
+        if (!file_exists($template)) {
+            return;
+        }
+        try {
+            $config = parse_ini_file($template);
+            foreach ($config as $name => $value){
+                $taskConfig=ZfExtended_Factory::get('editor_Models_TaskConfig');
+                /* @var $taskConfig editor_Models_TaskConfig */
+                $taskConfig->updateInsertConfig($this->task->getTaskGuid(),$name,$value);
+            }
+        }
+        catch (Exception $e) {
+            throw new editor_Models_Import_FileParser_Exception('E1325',[
+                'filename' => self::CONFIG_TEMPLATE,
+                'errorMessage' => $e->getMessage(),
+                'task' => $this->task
+            ]);
+        }
     }
 }

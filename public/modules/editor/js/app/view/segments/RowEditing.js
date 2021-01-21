@@ -104,8 +104,7 @@ Ext.define('Editor.view.segments.RowEditing', {
      * @returns booelean|void
      */
     startEdit: function(record, columnHeader, mode) {
-        var me = this,
-            started = false;
+        var me = this;
 
         if (me.context && me.context.record && me.context.record === record) {
             //startEdit by actionable is called twice because of different events
@@ -132,7 +131,7 @@ Ext.define('Editor.view.segments.RowEditing', {
         if (!me.editingAllowed || !record.get('editable')) {
             return false;
         }
-        if (record.get('matchRate') == 100 && Editor.data.enable100pEditWarning) {
+        if (record.get('matchRate') == 100 && Editor.app.getTaskConfig('editor.enable100pEditWarning')) {
             Editor.MessageBox.addInfo(me.messages.edit100pWarning, 1.4);
         }
         me.editor.setMode(mode);

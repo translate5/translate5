@@ -70,7 +70,7 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         parent::__construct($task);
         $this->importConfig = $config;
         $this->db = Zend_Registry::get('db');
-        $this->taskConf = $this->task->getAsConfig();
+        $this->taskConf = $this->task->getConfig();
 
         //init word counter
         $langModel = ZfExtended_Factory::get('editor_Models_Languages');
@@ -109,6 +109,7 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         $seg->setFieldContents($sfm, $parser->getFieldContents());
         
         $this->events->trigger("process", $this, [
+            'config'=>$this->taskConf,
             'segment' => $seg, //editor_Models_Segment
             'segmentAttributes' => $attributes, //editor_Models_Import_FileParser_SegmentAttributes
             'importConfig' => $this->importConfig //editor_Models_Import_Configuration

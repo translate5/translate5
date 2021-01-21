@@ -590,8 +590,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   insertWhitespaceInEditor: function (whitespaceType, tagNr) {
       var me = this,
-          userCanModifyWhitespaceTags = Editor.data.segments.userCanModifyWhitespaceTags,
-          userCanInsertWhitespaceTags = Editor.data.segments.userCanInsertWhitespaceTags,
+          userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
+          userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
           classNameForTagType,
           data,
           className,

@@ -180,13 +180,14 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
     public static function setUpBeforeClass():void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
-        $task = array(
+        $task =[
             'sourceLang' => 'en',
             'targetLang' => 'de',
             'edit100PercentMatch' => true,
             'enableSourceEditing' => static::$useSourceEditing,
             'lockLocked' => 1,
-        );
+            'autoStartImport'=>0
+        ];
         
         $appState = self::assertAppState();
         self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
@@ -195,12 +196,11 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         
-        $api->addImportTaskTemplate('editorAPI/TaskTemplateTestCaseCSVTagProtect.xml');
-        
         $api->addImportArray(self::$dummyData);
         $api->import($task);
         
         $task = $api->getTask();
+   
         //open task for whole testcase
         $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
     }

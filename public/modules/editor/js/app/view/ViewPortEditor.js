@@ -197,9 +197,8 @@ Ext.define('Editor.view.ViewPortEditor', {
     			}]
     		});
     	}
-    	
 		return  Ext.Object.merge(config,{
-			html: Editor.data.app.customHtmlContainer,
+			html: Editor.app.getTaskConfig('editor.customHtmlContainer'),
 		});
     }
 });
