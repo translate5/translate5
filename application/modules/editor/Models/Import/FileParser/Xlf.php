@@ -901,10 +901,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function setCalculatedSegmentAttributes() {
         $attributes = parent::setCalculatedSegmentAttributes();
-        if($attributes->editable) {
-            if(strpos($attributes->matchRateType, editor_Models_Segment_MatchRateType::TYPE_MISSING_TARGET_MRK) !== false){
-                $attributes->editable = false; //if its a missing target the segment is not editable
-            }
+        if($attributes->editable && strpos($attributes->matchRateType, editor_Models_Segment_MatchRateType::TYPE_MISSING_TARGET_MRK) !== false){
+            $attributes->editable = false; //if its a missing target the segment is not editable
         }
         return $attributes;
     }
