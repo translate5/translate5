@@ -60,8 +60,9 @@ class editor_Models_Export_FileParser_Xlf_Namespaces_Across extends editor_Model
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         //a little bit hackish but the easiest way to get the task
         $task = func_get_arg(1);
+        /* @var $task editor_Models_Task */
 
-        $config = Zend_Registry::get('config');
+        $config = $task->getConfig();
         if(! $config->runtimeOptions->editor->export->exportComments) {
             //currently only the comment export feature is implemented in the across XLF,
             // so if exporting comments is disabled we disable just the whole function

@@ -129,6 +129,13 @@ abstract class editor_Services_Connector_Abstract {
      */
     public $logger;
     
+    /***
+     * By default the config values are all overwritten by instance (level 2).
+     * Depending on the context, this config can be overwritten on level 4,8,16 (client,task-import,task).
+     * @var Zend_Config
+     */
+    protected $config;
+    
     /**
      * initialises the internal result list
      */
@@ -137,6 +144,7 @@ abstract class editor_Services_Connector_Abstract {
         $this->logger = Zend_Registry::get('logger');
         $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
         $this->tagHandler = ZfExtended_Factory::get($this->tagHandlerClass);
+        $this->config = Zend_Registry::get('config');
     }
     
     /**
@@ -395,5 +403,13 @@ abstract class editor_Services_Connector_Abstract {
             'nrInTask' => $segment->getSegmentNrInTask(),
             'task' => $task
         ], $this->logger->getDomain());
+    }
+    
+    public function setConfig(Zend_Config $config) {
+        $this->config = $config;
+    }
+    
+    public function getConfig() {
+        return $this->config;
     }
 }

@@ -156,10 +156,12 @@ abstract class editor_Models_Import_FileParser {
      * @param editor_Models_Task $task
      */
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task){
-        //$this->config = $task->getConfig(); //after merge of Config feature!
-        $this->config = Zend_Registry::get('config');
+
+        //FIXME introduce config and use it here!
+        $this->config = $task->getConfig();
         //$this->tagProtection = (boolean)$this->config->runtimeOptions->import->fileparser->csv->options->protectTags;
         $this->tagProtection = true;
+        
         $this->loadOriginalFile($path);
         $this->_path = $path;
         $this->_fileName = $fileName;

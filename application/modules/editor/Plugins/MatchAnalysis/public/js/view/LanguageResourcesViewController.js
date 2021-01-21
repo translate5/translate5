@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -35,36 +35,36 @@ Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResourcesViewController', 
     alias: 'controller.languageResourcesWizardPanel',
 
     handleNextCardClick:function(){
-    	this.checkAndFinish(null);
+        this.checkAndFinish(null);
     },
     
     handleSkipCardClick:function(){
-        this.checkAndFinish(3);
-	},
-	
-	/***
-	 * Check the match analysis and pretranslation status(run or go to next step)
-	 */
-	checkAndFinish:function(skipSteps){
-    	var me=this,
-			view=me.getView(),
-			pretranslateMt=view.down('#pretranslateMt'),
-			pretranslateTmAndTerm=view.down('#pretranslateTmAndTerm');
-		
-		if(!pretranslateMt || !pretranslateTmAndTerm){
-			view.fireEvent('wizardCardFinished', skipSteps);
-			return;
-		}
-		
-		//if one of the pretranslation priority cb is checked, run the pretranslations
-		if((!pretranslateMt.isDisabled() && pretranslateMt.checked) || (!pretranslateTmAndTerm.isDisabled() && pretranslateTmAndTerm.checked)){
-			view.fireEvent('startMatchAnalysis',view.task.get('id'),"pretranslation");
-			view.fireEvent('wizardCardFinished', skipSteps);
-			return;
-		}
-		
-		//always start analysis
-		view.fireEvent('startMatchAnalysis',view.task.get('id'),"analysis");
-		view.fireEvent('wizardCardFinished', skipSteps);
-	}
+        this.checkAndFinish(4);
+    },
+    
+    /***
+     * Check the match analysis and pretranslation status(run or go to next step)
+     */
+    checkAndFinish:function(skipSteps){
+        var me=this,
+            view=me.getView(),
+            pretranslateMt=view.down('#pretranslateMt'),
+            pretranslateTmAndTerm=view.down('#pretranslateTmAndTerm');
+        
+        if(!pretranslateMt || !pretranslateTmAndTerm){
+            view.fireEvent('wizardCardFinished', skipSteps);
+            return;
+        }
+        
+        //if one of the pretranslation priority cb is checked, run the pretranslations
+        if((!pretranslateMt.isDisabled() && pretranslateMt.checked) || (!pretranslateTmAndTerm.isDisabled() && pretranslateTmAndTerm.checked)){
+            view.fireEvent('startMatchAnalysis',view.task.get('id'),"pretranslation");
+            view.fireEvent('wizardCardFinished', skipSteps);
+            return;
+        }
+        
+        //always start analysis
+        view.fireEvent('startMatchAnalysis',view.task.get('id'),"analysis");
+        view.fireEvent('wizardCardFinished', skipSteps);
+    }
 });
