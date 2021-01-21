@@ -285,22 +285,51 @@ Ext.application({
         });
     },
     /**
-     * Used to open a task directly without administration panel
+     * Used to open a task directly by URL / page reload with already opened task / sessionAuth and not over task overview
      */
     openTaskDirect: function(){
         var me = this;
         Editor.model.admin.Task.load(Editor.data.task.id, {
+            preventDefaultHandler: true,
+            scope: me,
             success: function(task) {
                 task.set('userState',Editor.data.app.initState);
                 task.save({
                     scope: me,
-                    success: me.openEditor
+                    preventDefaultHandler: true,
+                    success: me.openEditor,
+                    failure: me.handleOpenTaskDirectError
                 });
             },
-            failure: function(record, op, success) {
-                Editor.app.getController('ServerException').handleException(op.error.response);
-            }
+            failure: me.handleOpenTaskDirectError
         });
+    },
+    handleOpenTaskDirectError: function(record, op, success) {
+        if(!Editor.data.editor.toolbar.hideLeaveTaskButton) {
+            this.openAdministration();
+            if(op.error.status == 404 && record.get('taskGuid') == '') {
+                Editor.MessageBox.getInstance().showDirectError('The requested task does not exist anymore.');
+            } else {
+                Editor.app.getController('ServerException').handleFailedRequest(op.error.status, op.error.statusText, op.error.response);
+            }
+            return;
+        }
+        var loadBox = Ext.select("body > div.loading"),
+            msg = '<div id="head-panel"></div>',
+            response = op.error.response,
+            title = 'Uups... The requested task could not be opened',
+            respText = response && response.responseText;
+
+        if(op.error.status == 404 && record.get('taskGuid') == '') {
+            msg += '<h1>'+title+'</h1>The requested task does not exist anymore.';
+        }else if(respText) {
+            msg += Editor.app.getController('ServerException').renderHtmlMessage(title, Ext.JSON.decode(respText));
+        }
+        
+        if(loadBox) {
+            loadBox.setCls('loading-error');
+            loadBox.update(msg);
+        }
     },
     /**
      * opens the admin viewport
