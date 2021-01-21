@@ -30,6 +30,6 @@ END LICENSE AND COPYRIGHT
  * DB Access for Segment Tags (only used when importing a task)
  */
 class editor_Models_Db_SegmentTags extends Zend_Db_Table_Abstract {
-    protected $_name = 'LEK_segments_tags';
+    protected $_name = 'LEK_segment_tags';
     public $_primary = 'id';
 }

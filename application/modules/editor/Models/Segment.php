@@ -103,6 +103,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     const DEFAULT_SEARCH_FIELD='source';
     
+    public static function createSegmentTagsStatusColumn(string $providerKey) : string{
+        return 'status_'.$providerKey;
+    }
+    
     
     protected $dbInstanceClass          = 'editor_Models_Db_Segments';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Segment';
@@ -163,7 +167,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * @var Zend_Db_Table_Row_Abstract
      */
-    protected $segmentTags = null;
+    protected $tagsModel = null;
     
     /**
      * static so that only one instance is used, for performance and logging issues
@@ -1798,46 +1802,48 @@ order by date desc, segmentId asc limit 1';
         return $result[0]['segmentId'] ?? -1;
     }
     /**
-     * 
+     *
      * @return Zend_Db_Table_Row_Abstract
      */
-    protected function createSegmentTags() : Zend_Db_Table_Row_Abstract {
-        $db = ZfExtended_Factory::get('editor_Models_Db_SegmentTags');
-        /* @var $db editor_Models_Db_SegmentTags */
-        $select = $db->select()->where('segmentId = ?', $this->getId());
-        $tagsRow = $db->fetchRow($select);
-        if(empty($tagsRow)){
-            $tagsRow = $db->createRow();
-            $tagsRow->segmentId = $this->getId();
-            $tagsRow->taskGuid = $this->getTaskGuid();
-            $tagsRow->tags = '';
+    private function getTagsModel() : Zend_Db_Table_Row_Abstract {
+        if($this->tagsModel == null){
+            $db = ZfExtended_Factory::get('editor_Models_Db_SegmentTags');
+            /* @var $db editor_Models_Db_SegmentTags */
+            $select = $db->select()->where('segmentId = ?', $this->getId());
+            $this->tagsModel = $db->fetchRow($select);
+            if($this->tagsModel == null){
+                $this->tagsModel = $db->createRow();
+                $this->tagsModel->segmentId = $this->getId();
+                $this->tagsModel->taskGuid = $this->getTaskGuid();
+                $this->tagsModel->tags = '';
+            }
         }
-        return $tagsRow;
+        return $this->tagsModel;
     }
     /**
-     * 
-     * @return Zend_Db_Table_Row_Abstract
+     *
+     * @return bool
      */
-    public function getSegmentTags() : Zend_Db_Table_Row_Abstract {
-        if($this->segmentTags == NULL){
-            $this->segmentTags = $this->createSegmentTags();
-        }
-        return $this->segmentTags;
+    public function hasSegmentTagsJSON() : bool {
+        return !empty($this->getTagsModel()->tags);
     }
     /**
-     * 
+     *
      * @return string
      */
     public function getSegmentTagsJSON() : string {
-        return $this->getSegmentTags()->tags;
+        return $this->getTagsModel()->tags;
     }
     /**
-     * 
+     * Saves the segment tags during an import and sets the status-flag for the given provider
      * @param string $json
+     * @param string $providerKey
      */
-    public function setSegmentTagsJSON(string $json){
-        $row = $this->getSegmentTags();
+    public function saveSegmentTagsJSON(string $json, string $providerKey){
+        $row = $this->getTagsModel();
+        $statusColumn = self::createSegmentTagsStatusColumn($providerKey);
         $row->tags = $json;
+        $row->$statusColumn = 1;
         $row->save();
     }
 }

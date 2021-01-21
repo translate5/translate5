@@ -43,7 +43,7 @@
  * Keep in mind that start & end-index work just like counting chars or the substr API in php, the tag starts BEFORE the start index and ends BEFORE the index of the end index, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
  * To identify the Types of Internal tags a general API editor_Segment_TagCreator is provided
  * 
- * TODO/FIXME the prop "fieldFrom" (representing the source field of the text in the datamodel) is used by the Termtagger only. Neccessary ??
+ * TODO/FIXME the prop "ttName" (representing the source field of the text in the datamodel) is used by the Termtagger only. Neccessary ??
  */
 class editor_Segment_FieldTags implements JsonSerializable {
        
@@ -68,7 +68,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     public static function fromJsonData(stdClass $data) : editor_Segment_FieldTags {
         try {
-            $tags = new editor_Segment_FieldTags($data->segmentId, $data->fieldText, $data->fieldTo, $data->fieldFrom);
+            $tags = new editor_Segment_FieldTags($data->segmentId, $data->fieldText, $data->saveTo, $data->ttName);
             foreach($data->tags as $tag){
                 $tags->addTag(editor_Segment_TagCreator::instance()->fromJsonData($tag));
             }
@@ -109,13 +109,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * The field of the segment's data we will be saved to
      * @var string
      */
-    private $fieldTo;
+    private $saveTo;
     /**
      * Only neccessary for the termtagger, will be used as the fieldname there. A target will be sent with it original field name (but saved to the edit-field) when importing
      * TODO: there is no obvious reason why this is done and this may is obsolete ...
      * @var string
      */
-    private $fieldFrom;
+    private $ttName;
     /**
      * The tags and their positions within the segment
      * @var editor_Segment_InternalTag[]
@@ -126,47 +126,96 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * 
      * @param int $segmentId
      * @param string $fieldText
-     * @param string $fieldTo
-     * @param string $fieldFrom
+     * @param string | string[] $saveTo
+     * @param string $ttName
      */
-    public function __construct(int $segmentId, string $fieldText, string $fieldTo, string $fieldFrom=null) {
+    public function __construct(int $segmentId, string $fieldText, $saveTo, string $ttName=null) {
         $this->segmentId = $segmentId;
-        $this->fieldText = $fieldText;
-        $this->fieldTo = $fieldTo;
-        $this->fieldFrom = (empty($fieldFrom)) ? $fieldTo : $fieldFrom;
+        $this->fieldText = '';
+        $this->saveTo = is_array($saveTo) ? implode(',', $saveTo) : $saveTo;
+        $this->ttName = (empty($ttName)) ? $this->getFirstSaveToField() : $ttName;
         // if HTML was passed as field text we have to unparse it
         if(!empty($fieldText) && $fieldText != strip_tags($fieldText)){
-            $this->fieldText = '';
             $this->unparse($fieldText);
+        } else {
+            $this->fieldText = $fieldText;
+        }
+        // TODO FIXME: remove
+        if($this->fieldText != strip_tags($fieldText)){
+            error_log('=======================================');
+            error_log('FAULTY FIELDTAGS FOR SEGMENT '.$this->segmentId.':');
+            error_log('IN:  '.str_replace(array("\r","\n","\t"), '', htmlspecialchars($fieldText)));
+            error_log('OUT: '.str_replace(array("\r","\n","\t"), '', htmlspecialchars($this->render())));
+            error_log('TAGS: '.$this->toJson());
+            error_log('=======================================');
         }
     } 
     /**
      * 
      * @return number
      */
-    public function getSegmentId(){
+    public function getSegmentId() : int {
         return $this->segmentId;
     }
     /**
      * 
      * @return string
      */
-    public function getFieldText(){
+    public function getFieldText() : string {
         return $this->fieldText;
     }
     /**
      *
      * @return string
      */
-    public function getFieldTo(){
-        return $this->fieldTo;
+    public function getTermtaggerName() : string {
+        return $this->ttName;
     }
     /**
      *
+     * @return string[]
+     */
+    public function getSaveToFields() : array {
+        if(empty($this->saveTo)){
+            return [];
+        }
+        return explode(',', $this->saveTo);
+    }
+    /**
+     * return string
+     */
+    public function getFirstSaveToField(){
+        return $this->getSaveToFields()[0];
+    }
+    /**
+     * 
+     * @param string $fieldName
+     */
+    public function addSaveToField($fieldName){
+        $fields = $this->getSaveToFields();
+        $fields[] = $fieldName;
+        $this->saveTo = implode(',', $fields);
+    }
+    /**
+     * We expect the passed text to be identical
+     * @param string $text
      * @return string
      */
-    public function getFieldFrom(){
-        return $this->fieldFrom;
+    public function setTagsByText(string $text){
+        // $textBefore = $this->fieldText;
+        $this->fieldText = '';
+        $this->tags = [];
+        $this->unparse($text);
+        /*
+        if(false && $this->fieldText != $textBefore){
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.fieldtags');
+            $logger->warn(
+                'E9999',
+                'setting the FieldTags tags by text led to a changed text-content !',
+                ['segmentId' => $this->segmentId, 'textBefore' => $textBefore, 'textAfter' => $this->fieldText ]
+            );
+        }
+        */
     }
     /**
      *
@@ -229,8 +278,8 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
         $data->segmentId = $this->segmentId;
         $data->fieldText = $this->fieldText;
-        $data->fieldTo = $this->fieldTo;
-        $data->fieldFrom = $this->fieldFrom;
+        $data->saveTo = $this->saveTo;
+        $data->ttName = $this->ttName;
         return $data;
     }
     
@@ -296,7 +345,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return string
      */
     public function getFieldTextPart(int $start, int $end) : string {
-        return substr($this->fieldText, $start, ($end - $start));
+        return mb_substr($this->fieldText, $start, ($end - $start));
     }
     
     /* Unparsing API */
@@ -330,7 +379,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
             for($i = 0; $i < $element->childNodes->length; $i++){
                 $child = $element->childNodes->item($i);
                 if($child->nodeType == XML_TEXT_NODE){
-                    $tag->addText($child->nodeValue);
+                    $tag->addText(htmlspecialchars($child->nodeValue, ENT_COMPAT));
                 } else if($child->nodeType == XML_ELEMENT_NODE){
                     $tag->addChild($this->fromDomElement($child, $startIndex));
                 }

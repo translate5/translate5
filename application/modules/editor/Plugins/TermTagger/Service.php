@@ -304,6 +304,7 @@ class editor_Plugins_TermTagger_Service {
      * @return Zend_Http_Response or null on error
      */
     public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
+
         $data = $this->encodeSegments($data);
         
         //test term tagger errors, start a dummy netcat server in the commandline: nc -l -p 8080

@@ -37,24 +37,54 @@
  * It in some kinds is a simpler & easier seriazable version of DOMElement
  * The classname-attribute has an own datamodel that resembles it's array nature
  * Expects all string values to be UTF-8 encoded
+ * All Attribute-values will be unescaped when setting and rendered escaped that means the internal data is always unescaped
  */
 class editor_Tag {
    
     /**
-     * Escapes an CDATA attribute-value according to the HTML-Spec, replaces all tabs & newlines with blanks
-     * NOTE that not all HTML attributes are CDATA and thus the using code is responsible not to produce illegal attributes
+     * Escapes an CDATA attribute-value according to the HTML-Spec
      * @param string $text
      * @return string
      */
     public static function escapeAttribute($text) : string {
+        return self::escapeHTML($text);
+    }
+    /**
+     * Unscapes an CDATA attribute-value according to the HTML-Spec, replaces all tabs & newlines with blanks
+     * NOTE that not all HTML attributes are CDATA and thus the using code is responsible not to produce illegal attributes
+     * @param string $text
+     * @return string
+     */
+    public static function unescapeAttribute($text) : string {
         if(empty($text)){
             return '';
         }
-        $text = str_replace("\r\n", ' ', $text);
-        $text = str_replace("\n", ' ', $text);
-        $text = str_replace("\r", ' ', $text);
-        $text = str_replace("\t", ' ', $text);
-        return str_replace(['"','&','<','>'],['&quot;','&amp;','&lt;','&gt;'], $text);
+        $text = str_replace(["\r\n","\n","\r","\t"], ' ', $text);
+        return self::unescapeHTML($text);
+    }
+    /**
+     * Escapes Markup according to the HTML-Spec
+     * All attributes will be saved with their unescaped values to avoid double-encodings & the like
+     * @param string $text
+     * @return string
+     */
+    public static function escapeHTML($text) : string {
+        if(empty($text)){
+            return '';
+        }
+        return str_replace(['&','"','<','>'],['&amp;','&quot;','&lt;','&gt;'], $text);
+    }
+    /**
+     * Unscapes Markup according to the HTML-Spec
+     * All attributes will be saved with their unescaped values to avoid double-encodings & the like
+     * @param string $text
+     * @return string
+     */
+    public static function unescapeHTML($text) : string {
+        if(empty($text)){
+            return '';
+        }
+        return str_replace(['&quot;','&lt;','&gt;','&amp;'], ['"','<','>','&'], $text);
     }
     /**
      * creates the id-attribute for use in html-tags. Leading blank is added
@@ -65,7 +95,7 @@ class editor_Tag {
         if(empty(trim($id))){
             return '';
         }
-        return ' id="'.trim($id).'"';
+        return self::createAttribute('id', trim($id));
     }
     /**
      * creates the class-attribute for use in html-tags. Leading blank is added
@@ -76,6 +106,7 @@ class editor_Tag {
         if(empty(trim($classnames))){
             return '';
         }
+        
         return ' class="'.trim($classnames).'"';
     }
     /**
@@ -205,7 +236,8 @@ class editor_Tag {
             for($i = 0; $i < $node->childNodes->length; $i++){
                 $child = $node->childNodes->item($i);
                 if($child->nodeType == XML_TEXT_NODE){
-                    $tag->addText($child->nodeValue);
+                    // CRUCIAL: the nodeValue always is unescaped Markup!
+                    $tag->addText(htmlspecialchars($child->nodeValue, ENT_COMPAT));
                 } else if($child->nodeType == XML_ELEMENT_NODE){
                     $tag->addChild(static::fromDomElement($child));
                 }
@@ -485,6 +517,22 @@ class editor_Tag {
         if($name == 'class'){
             return $this->setClasses($val);
         }
+        $this->attribs[$name] = self::unescapeAttribute(trim($val));
+        return $this;
+    }
+    /**
+     * Sets an attribute with the given name to the RAW given value without escaping. An existing attribute will be overwritten
+     * @param string $name
+     * @param string $val
+     * @return editor_Tag
+     */
+    public function setUnescapedAttribute($name, $val) : editor_Tag {
+        if(empty($name)){
+            return $this;
+        }
+        if($name == 'class'){
+            return $this->setClasses($val);
+        }
         $this->attribs[$name] = trim($val);
         return $this;
     }
@@ -497,7 +545,7 @@ class editor_Tag {
     public function setData($name, $val) : editor_Tag {
         if($name == '')
             return $this;
-        $this->attribs['data-'.$name] = trim($val);
+        $this->attribs['data-'.$name] = self::unescapeAttribute(trim($val));
         return $this;
     }
     /**
@@ -533,10 +581,10 @@ class editor_Tag {
         }
         if(array_key_exists($name, $this->attribs)){
             if(!empty($val)){
-                $this->attribs[$name] .= ' '.trim($val);
+                $this->attribs[$name] .= ' '.self::unescapeAttribute(trim($val));
             }
         } else {
-            $this->attribs[$name] = (empty($val)) ? '' : trim($val);
+            $this->attribs[$name] = (empty($val)) ? '' : self::unescapeAttribute(trim($val));
         }
         return $this;
     }    
@@ -552,11 +600,22 @@ class editor_Tag {
         return $this;
     }
     /**
-     * retrieves the given attribute-value. An empty string is returned, if there is no attribute with the given name
+     * retrieves the given attribute-value. NULL is returned, if there is no attribute with the given name
      * @param string $name
      * @return string|NULL
      */
     public function getAttribute($name){
+        if(array_key_exists($name, $this->attribs)){
+            return self::escapeAttribute($this->attribs[$name]);
+        }
+        return null;
+    }
+    /**
+     * retrieves the given raw attribute-value. NULL is returned, if there is no attribute with the given name
+     * @param string $name
+     * @return string|NULL
+     */
+    public function getUnescapedAttribute($name){
         if(array_key_exists($name, $this->attribs)){
             return $this->attribs[$name];
         }
@@ -644,7 +703,7 @@ class editor_Tag {
             return false;
         }
         foreach($this->attribs as $key => $val){
-            if(substr($key, 0, 5) != 'data-' && (!$tag->hasAttribute($key) || $tag->getAttribute($key) != $val)){
+            if(substr($key, 0, 5) != 'data-' && (!$tag->hasAttribute($key) || $tag->getUnescapedAttribute($key) != $val)){
                 return false;
             }
         }
@@ -677,7 +736,7 @@ class editor_Tag {
         $tag->setClasses($this->getClasses());
         foreach($this->attribs as $name => $val){
             if(($withDataAttribs || substr($name, 0, 5) != 'data-') && $name != 'id'){
-                $tag->setAttribute($name, $val);
+                $tag->setUnescapedAttribute($name, $val);
             }
         }
         return $tag;

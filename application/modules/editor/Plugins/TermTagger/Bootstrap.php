@@ -170,7 +170,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->lockOversizedSegments($task, $meta, $config);
         
         // init worker and queue it
-        $params = ['resourcePool' => 'import'];
+        $params = ['resourcePool' => 'import', 'processSegmentsDirectly' => true];
         if (!$worker->init($task->getTaskGuid(), $params)) {
             $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [
                 'parameters' => $params,
@@ -232,16 +232,23 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
         
-        $params = ['resourcePool' => 'gui'];
+        $params = ['resourcePool' => 'gui', 'processSegmentsDirectly' => true];
         if (!$worker->init($taskGuid, $params)) {
             $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', ['parameters' => $params]);
             return false;
         }
-        if (!$worker->segmentEdited($segment)) {
-            $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
-            return false;
+        $segmentTags = editor_Segment_Tags::fromSegment($task, true, $segment, false);
+        if($worker->segmentTagsEdited($segmentTags)){
+            $segmentTags = $worker->getProcessedTags();
+            // TODO FIXME: this should be a reference to the tags above, so this assignment should be obsolete. Can the case be, segmentTagsEdited returns true but no tag is available ??
+            if($segmentTags != null){
+                // save the segment back to it's origin
+                $segmentTags->flush();
+                return true;
+            }
         }
-        return true;
+        $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
+        return false;
     }
     /**
      * is called periodically to check the term tagger instances
@@ -300,7 +307,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleBeforeSaveAlike(Zend_EventManager_Event $event) {
-        $isSourceEditable = (boolean) $event->getParam('isSourceEditable');
         $masterSegment = $event->getParam('masterSegment');
         /* @var $masterSegment editor_Models_Segment */
         $alikeSegment = $event->getParam('alikeSegment');
