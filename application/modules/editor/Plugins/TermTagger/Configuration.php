@@ -269,49 +269,33 @@ class editor_Plugins_TermTagger_Configuration {
             throw new editor_Plugins_TermTagger_Exception_Open('E1116', [], $e);
         }
     }
+    
     /**
-     * Creates the server communication service for the current task
-     * @param editor_Models_Segment[] $segments
-     * @param bool $isEditor: if set, the communication is created for the purpose of segment saving when editing, otherwise for import
+     * Creates the server communication service for the current task and the given segment-tags
+     * @param editor_Segment_Tags[] $segmentsTags
+     * @param bool $isEditor
      * @return editor_Plugins_TermTagger_Service_ServerCommunication
      */
-    public function createServerCommunicationService(array $segments, bool $isEditor) : editor_Plugins_TermTagger_Service_ServerCommunication {
+    public function createServerCommunicationServiceFromTags(array $segmentsTags, bool $isEditor) : editor_Plugins_TermTagger_Service_ServerCommunication {
         
         $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($this->task));
         /* @var $service editor_Plugins_TermTagger_Service_ServerCommunication */
-        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $fieldManager editor_Models_SegmentFieldManager */
-        $fieldManager->initFields($this->task->getTaskGuid());
-        $segmentFields = $fieldManager->getFieldList();
-        $enableSourceEditing = ($isEditor && $this->task->getEnableSourceEditing());
         
-        if($enableSourceEditing){
-            $service->sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
-            $service->sourceFieldNameOriginal = $fieldManager->getFirstSourceName();
-        } else {
-            $service->sourceFieldName = $fieldManager->getFirstSourceName();
-        }
-        foreach ($segments as $segment) { /* @var $segment editor_Models_Segment */
+        foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
             
-            $sourceText = $segment->get($service->sourceFieldName);
-            $sourceTextOriginal = ($enableSourceEditing) ? $segment->get($service->sourceFieldNameOriginal) : $sourceText;
-            $firstField = true;
-            
-            foreach ($segmentFields as $field) {
-                if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
-                    continue;
+            $source = $tags->getSource();
+            $sourceText = $source->render();
+            $firstTargetText = null;
+
+            foreach($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
+                $service->addSegment($target->getSegmentId(), $target->getTermtaggerName(), $sourceText, $target->render());
+                if($firstTargetText === null){
+                    $firstTargetText = $target->render();
                 }
-                $targetFieldName = ($isEditor) ? $fieldManager->getEditIndex($field->name) : $field->name;
-                if ($enableSourceEditing && $firstField) {
-                    $service->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($targetFieldName));
-                    $firstField = false;
-                }
-                if($isEditor){
-                    $targetText = $segment->get($targetFieldName);
-                } else {
-                    $targetText = $segment->getTargetEdit();
-                }
-                $service->addSegment($segment->getId(), $targetFieldName, $sourceText, $targetText);
+            }
+            if($tags->hasOriginalSource()){
+                $sourceOriginal = $tags->getOriginalSource();
+                $service->addSegment($sourceOriginal->getSegmentId(), $sourceOriginal->getTermtaggerName(), $sourceOriginal->render(), $firstTargetText);
             }
         }
         return $service;

@@ -34,35 +34,55 @@
 
 /**
  * This class is meant as the blueprint for any worker to process quality tags for segments on import or when editing
- *
+ * It is expected, that the property 
  */
 abstract class editor_Segment_Quality_SegmentWorker extends editor_Models_Import_Worker_ResourceAbstract {
     
     /**
-     *
-     * @var editor_Models_Segment
+     * Holds the segment to process in case of a non-threaded single segment edit
+     * @var editor_Segment_Tags
      */
-    private $currentSegment;
+    private $currentSegmentTags;
+    
     /**
-     * To be implemented in inheriting classes to process a single segment
+     * Processes a single segment, just a plugin-method for workers that may need to process the segments with additional logic
      * @param editor_Models_Segment $segment
      * @return bool
      */
-    abstract protected function processSegment(editor_Models_Segment $segment, string $slot) : bool;
+    protected function processSegment(editor_Models_Segment $segment, string $slot){
+        return $this->processSegmentTags(editor_Segment_Tags::fromSegment($this->task, !$this->isWorkerThread, $segment, $this->isWorkerThread), $slot);
+    }
     /**
      * Process multiple segments as a batch
-     * This is just a default-implementation that nees to be overwritten in implementing classes e.g. because the segments may be requested via Request from a serveice
+     * This is just a plugin function in case additional logic is needed creating the segment-tags out of the segments
      * @param editor_Models_Segment[] $segments
+     * @param string $slot
      * @return bool
      */
     protected function processSegments(array $segments, string $slot) : bool {
-        foreach($segments as $segment){
-            if(!$this->processSegment($segment, $slot)){
+        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, !$this->isWorkerThread, $segments, $this->isWorkerThread), $slot);
+    }
+    /**
+     * Processes the segment-tags and write them back to the segment-tags-model
+     * @param editor_Segment_Tags[] $tags
+     * @param string $slot
+     * @return bool
+     */
+    protected function processSegmentsTags(array $segmentsTags, string $slot) : bool {
+        foreach($segmentsTags as $tags){
+            if(!$this->processSegmentTags($tags, $slot)){
                 return false;
             }
         }
         return true;
     }
+    /**
+     * Processes a single segment-tags
+     * @param editor_Segment_Tags $tags
+     * @param string $slot
+     * @return bool
+     */
+    abstract protected function processSegmentTags(editor_Segment_Tags $tags, string $slot) : bool;
     /**
      * To be implemented in inheriting classes to load the segments for a threaded run
      * @param string $slot
@@ -82,7 +102,7 @@ abstract class editor_Segment_Quality_SegmentWorker extends editor_Models_Import
             }
             return $this->processSegments($segments, $slot);
         } else {
-            return $this->processSegment($this->currentSegment, $slot);
+            return $this->processSegmentTags($this->currentSegmentTags, $slot);
         }
     }
     /**
@@ -90,8 +110,13 @@ abstract class editor_Segment_Quality_SegmentWorker extends editor_Models_Import
      * @param editor_Models_Segment $segment
      * @return boolean
      */
-    public function segmentEdited(editor_Models_Segment $segment){
-        $this->currentSegment = $segment;
+    public function segmentTagsEdited(editor_Segment_Tags $tags){
+        $this->currentSegmentTags = $tags;
         return $this->run();
     }
+    /**
+     * Accessor for the processed tag when using a direct run
+     * @return editor_Segment_Tags | NULL
+     */
+    abstract public function getProcessedTags();
 }

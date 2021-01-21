@@ -68,7 +68,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
     /**
      * @var ZfExtended_Logger
      */
-    private $logger = null;
+    private $logger;
     /**
      * @var editor_Plugins_TermTagger_Configuration
      */
@@ -81,6 +81,21 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
      * @var array
      */
     private $loadedSegmentIds;
+    /**
+     * @var editor_Plugins_TermTagger_Service_ServerCommunication
+     */
+    private $communicationService;
+    /**
+     * 
+     * @var editor_Segment_Tags
+     */
+    private $proccessedTags;
+    /**
+     * This is only needed because the Match nalysis uses this worker to work on the segments directly ...
+     * It results in the thrreaded multi-segment processing also saves back the segment directly and uses the direct segment data to instantiate the segment-tags
+     * @var boolean
+     */
+    private $directSegmentProcessing = false;
     
     
     public function init($taskGuid = NULL, $parameters = array()) {
@@ -88,7 +103,21 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
         $this->config = new editor_Plugins_TermTagger_Configuration($this->task);
         $this->loggerDomain = null;
         $this->logger = null;
+        $this->proccessedTags = null;
         return $return;
+    }
+    /**
+     * Needed Implementation for editor_Models_Import_Worker_ResourceAbstract
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::validateParameters()
+     */
+    protected function validateParameters($parameters = array()) {
+        // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
+        if(array_key_exists('processSegmentsDirectly', $parameters)){
+            $this->directSegmentProcessing = $parameters['processSegmentsDirectly'];
+            return true;
+        }
+        return false;
     }
     /**
      *
@@ -109,15 +138,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
             $this->logger = Zend_Registry::get('logger')->cloneMe($this->getLoggerDomain());
         }
         return $this->logger;
-    }
-    /**
-     * Needed Implementation for editor_Models_Import_Worker_ResourceAbstract
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = array()) {
-        return true;
-    }
+    }    
     /**
      * Needed Implementation for editor_Models_Import_Worker_ResourceAbstract
      * {@inheritDoc}
@@ -164,17 +185,12 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
     }
     
     protected function processSegments(array $segments, string $slot) : bool {
-        
-        error_log('editor_Plugins_TermTagger_Worker_TermTaggerImport::processSegments, slot: '.$slot);
-
-        $communicationService = $this->config->createServerCommunicationService($segments, false);
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service',
-                [$this->getLoggerDomain(), $this->config->getRequestTimeout($this->isWorkerThread), editor_Plugins_TermTagger_Configuration::TIMEOUT_TBXIMPORT]);
-        /* @var $termTagger editor_Plugins_TermTagger_Service */
+        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, !$this->isWorkerThread, $segments, !$this->directSegmentProcessing), $slot);
+    }
+    
+    protected function processSegmentsTags(array $segmentsTags, string $slot) : bool {
         try {
-            $this->config->checkTermTaggerTbx($termTagger, $slot, $communicationService->tbxFile);
-            $result = $termTagger->tagterms($slot, $communicationService);
-            $this->saveSegments($this->config->markTransFound($result->segments), $communicationService->sourceFieldName);
+            $this->tagSegmentsTags($segmentsTags, $slot, true);
         }
         //Malfunction means the termtagger is up, but the send data produces an error in the tagger.
         // 1. we set the segment satus to retag, so each segment is tagged again, segment by segment, not in a bulk manner
@@ -209,6 +225,46 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
             }
         }
         return true;
+    }
+    /**
+     * Tags the passed segment tags using the given slots, applies the fetched data and save the tags (if wanted)
+     * @param editor_Segment_Tags[] $segmentsTags
+     * @param string $slot
+     * @throws ZfExtended_Exception
+     */
+    private function tagSegmentsTags(array $segmentsTags, string $slot, bool $doSaveTags) {
+        $this->proccessedTags = [];
+        $this->communicationService = $this->config->createServerCommunicationServiceFromTags($segmentsTags, !$this->isWorkerThread);
+        $termTagger = ZfExtended_Factory::get(
+            'editor_Plugins_TermTagger_Service',
+            [$this->getLoggerDomain(),
+            $this->config->getRequestTimeout($this->isWorkerThread),
+            editor_Plugins_TermTagger_Configuration::TIMEOUT_TBXIMPORT]);
+        /* @var $termTagger editor_Plugins_TermTagger_Service */
+        $this->config->checkTermTaggerTbx($termTagger, $slot, $this->communicationService->tbxFile);
+        $result = $termTagger->tagterms($slot, $this->communicationService);
+        $taggedSegments = $this->config->markTransFound($result->segments);
+        $taggedSegmentsById = $this->groupResponseById($taggedSegments);
+        foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
+            $segmentId = $tags->getSegmentId();
+            if(array_key_exists($segmentId, $taggedSegmentsById)){
+                $this->applyResponseToTags($taggedSegmentsById[$segmentId], $tags);
+                // save the tags, either to the tags-model or back to the segment if configured
+                if($doSaveTags){
+                    if($this->directSegmentProcessing){
+                        $tags->flush();
+                    } else {
+                        $tags->save(editor_Plugins_TermTagger_QualityProvider::TYPE);
+                    }
+                } else {
+                    // makes the currently proccessed tags accessible
+                    $this->proccessedTags = $tags;
+                }
+            } else {
+                // TODO FIXME: proper exception
+                throw new ZfExtended_Exception('Response of termtagger did not contain the sent segment with ID '.$segmentId);
+            }
+        }
     }
     /**
      * Loads a list of segmentIds where terms are not tagged yet.
@@ -263,38 +319,44 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
         return array_column($dbMeta->fetchAll($sql)->toArray(), 'segmentId');
     }
     /**
-     * Save TermTagged-segments for $task povided in $segments
-     * @param array $segments
-     * @param string $sourceFieldName
+     * Transfers a single termtagger response to the corresponding tags-model
+     * @param array $responseGroup
+     * @param editor_Segment_Tags $tags
+     * @throws ZfExtended_Exception
      */
-    private function saveSegments(array $segments, string $sourceFieldName) {
-        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $fieldManager editor_Models_SegmentFieldManager */
-        $fieldManager->initFields($this->workerModel->getTaskGuid());
-        
-        $responses = $this->groupResponseById($segments);
-        
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
-        foreach ($responses as $segmentId => $responseGroup) {
-            $segment->load($segmentId);
-        
-            $segment->set($sourceFieldName, $responseGroup[0]->source);
-            if ($this->task->getEnableSourceEditing()) {
-                $segment->set($fieldManager->getEditIndex($sourceFieldName), $responseGroup[0]->source);
-            }
-            foreach ($responseGroup as $response) {
-                $segment->set($response->field, $response->target);
-                $segment->set($fieldManager->getEditIndex($response->field), $response->target);
-            }
-            $segment->save();
-            $segment->meta()->setTermtagState(editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_TAGGED);
-            $segment->meta()->save();
+    private function applyResponseToTags(array $responseGroup, editor_Segment_Tags $tags) {
+        // UGLY: this should better be done by adding real tag-objects instead of setting the tags via text
+        if(count($responseGroup) < 1){
+            // TODO FIXME: proper exception
+            throw new ZfExtended_Exception('Response of termtagger did not contain data for the segment ID '.$tags->getSegmentId());
         }
+        $responseFields = $this->groupResponseByField($responseGroup);
+        $sourceText = null;
+        if($tags->hasOriginalSource()){
+            if(!array_key_exists('SourceOriginal', $responseFields)){
+                // TODO FIXME: proper exception
+                throw new ZfExtended_Exception('Response of termtagger did not contain data for the original source for the segment ID '.$tags->getSegmentId());
+            }
+            $source = $tags->getOriginalSource();
+            $source->setTagsByText($responseFields[$source->getTermtaggerName()]->source);            
+        }
+        foreach($tags->getTargets() as $target){ /* @var $target editor_Segment_FieldTags */
+            if($sourceText === null){
+                $sourceText = $target->getFieldText();
+            }
+            $field = $target->getTermtaggerName();
+            if(!array_key_exists($field, $responseFields)){
+                // TODO FIXME: proper exception
+                throw new ZfExtended_Exception('Response of termtagger did not contain the field "'.$field.'" for the segment ID '.$tags->getSegmentId());
+            }
+            $target->setTagsByText($responseFields[$field]->target);
+        }
+        $source = $tags->getSource();
+        $source->setTagsByText($sourceText);
+        
     }
-    
     /**
-     * sets the meta TermtagState of the given segment ids to SEGMENT_STATE_RETAG
+     * sets the meta TermtagState of the given segment ids to the given state
      * @param editor_Models_Task $task
      * @param array $segments
      * @param string $state
@@ -312,16 +374,29 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
      * This function groups this different responses under the same segmentId
      *
      * @param array $responses
-     * @return array grouped
+     * @return array
      */
     private function groupResponseById($responses) {
-        $return = array();
-        
+        $result = [];
         foreach ($responses as $response) {
-            $return[$response->id][] = $response;
+            if(!array_key_exists($response->id, $result)){
+                $result[$response->id] = [];
+            }
+            $result[$response->id][] = $response;
         }
-        
-        return $return;
+        return $result;
+    }
+    /**
+     * 
+     * @param array $responseGroup
+     * @return array
+     */
+    private function groupResponseByField($responseGroup) {
+        $result = [];
+        foreach ($responseGroup as $fieldData) {
+            $result[$fieldData->field] = $fieldData;
+        }
+        return $result;
     }
     /**
      * 
@@ -363,34 +438,20 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
     }
 
     /*************************** SINGLE SEGMENT PROCESSING ***************************/
-
-    /**
-     * This API will only be called via ::segmentEdited (when segment was edited) not on import via ::processSegments
-     * {@inheritDoc}
-     * @see editor_Segment_Quality_SegmentWorker::processSegment()
-     */
-    protected function processSegment(editor_Models_Segment $segment, string $slot) : bool {
-        
-        error_log('editor_Plugins_TermTagger_Worker_TermTaggerImport::processSegments, slot: '.$slot);
-        
-        $communicationService = $this->config->createServerCommunicationService([$segment], true);
-        
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->getLoggerDomain(), $this->config->getRequestTimeout($this->isWorkerThread), editor_Plugins_TermTagger_Configuration::TIMEOUT_TBXIMPORT]);
-        /* @var $termTagger editor_Plugins_TermTagger_Service */
-        
-        $result = '';
+    
+    protected function processSegmentTags(editor_Segment_Tags $tags, string $slot) : bool {
+        // processes a single tag withot saving it, this is done in the Quaity provider
         try {
-            $this->config->checkTermTaggerTbx($termTagger, $slot, $communicationService->tbxFile);
-            $result = $termTagger->tagterms($slot, $communicationService);
+            $this->tagSegmentsTags([ $tags ], $slot, false);
         }
         catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
             if($exception instanceof editor_Plugins_TermTagger_Exception_Down) {
                 $this->config->disableResourceSlot($slot);
             }
-            $communicationService->task = '- see directly in event -';
+            $this->communicationService->task = '- see directly in event -';
             $exception->addExtraData([
                 'task' => $this->task,
-                'termTagData' => $communicationService,
+                'termTagData' => $this->communicationService,
             ]);
             $this->getLogger()->exception($exception, [
                 'domain' => $this->getLoggerDomain()
@@ -403,23 +464,11 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
                 return false;
             }
         }
-        // on error return false and store original untagged data
-        if (empty($result) && $result !== '0') {
-            return false;
-        }
-        $results = $this->config->markTransFound($result->segments);
-        $sourceTextTagged = false;
-        foreach ($results as $result){
-            if($result->field == 'SourceOriginal') {
-                $segment->set($communicationService->sourceFieldNameOriginal, $result->source);
-                continue;
-            }
-            if(!$sourceTextTagged){
-                $segment->set($communicationService->sourceFieldName, $result->source);
-                $sourceTextTagged = true;
-            }
-            $segment->set($result->field, $result->target);
-        }
         return true;
     }
+
+    public function getProcessedTags(){
+        return $this->proccessedTags;
+    }
+
 }

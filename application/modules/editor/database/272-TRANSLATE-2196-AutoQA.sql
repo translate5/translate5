@@ -28,17 +28,18 @@
 INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES
     ('editor_Segment_Quality_ImportWorker',  'editor_Models_Import_Worker'),
     ('editor_Segment_Quality_ImportFinishingWorker',  'editor_Segment_Quality_ImportWorker'),
-    ('editor_Models_Import_Worker_SetTaskToOpen',  'editor_Segment_Quality_ImportFinishingWorker');
-
+    ('editor_Models_Import_Worker_SetTaskToOpen',  'editor_Segment_Quality_ImportFinishingWorker'),
+    ('editor_Segment_Quality_ImportFinishingWorker',  'editor_Plugins_TermTagger_Worker_TermTaggerImport');
+    
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) VALUES
     ('runtimeOptions.worker.editor_Segment_Quality_ImportFinishingWorker.maxParallelWorkers', 1, 'editor', 'worker', '1', '1', '', 'integer', 'Max parallel running workers of the global quality check finishing worker', 1),
     ('runtimeOptions.worker.editor_Segment_Quality_ImportWorker.maxParallelWorkers', 1, 'editor', 'worker', '1', '1', '', 'integer', 'Max parallel running workers of the global quality check import worker.', 1);
     
-CREATE TABLE IF NOT EXISTS `LEK_segments_tags` (
+CREATE TABLE IF NOT EXISTS `LEK_segment_tags` (
     `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
     `segmentId` int(11) NOT NULL COMMENT 'Foreign Key to LEK_segments',
-    `tags` longtext NOT NULL,
+    `tags` longtext NOT NULL default '',
     PRIMARY KEY (`id`),
     UNIQUE (`segmentId`),
     CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
