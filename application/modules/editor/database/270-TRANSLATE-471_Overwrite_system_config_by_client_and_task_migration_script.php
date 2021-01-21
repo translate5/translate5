@@ -46,14 +46,10 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
 
 //load the installation ini file
 $filePath = APPLICATION_PATH.'/config/installation.ini';
-
-if (!copy($filePath, $filePath.'.bak')) {
-    error_log("Failed to create a copy of $filePath ...\n");
-}
-
 $file = parse_ini_file($filePath);
 
 if (!copy($filePath, $filePath.'.bak')) {
+    echo "Failed to create a copy of [ $filePath ] File content was: \n";
     error_log("Failed to create a copy of [ $filePath ] File content was: \n");
     error_log(print_r($file,1));
 }
@@ -81,6 +77,7 @@ foreach ($file as $key=>$value){
 }
 if(!empty($notFound)){
     error_log("Configs not found in zf_configuration table : [".implode(',', $notFound)."]");
+    echo "Configs not found in zf_configuration table : [".implode(',', $notFound)."]";
 }
 
 function startsWith($string, $startString){
@@ -100,6 +97,7 @@ foreach( $file as $key=>$line ) {
 }
 if(!empty($collectedComments)){
     error_log("Comments removed from installation.ini : \n".print_r($collectedComments,1));
+    echo "Comments removed from installation.ini : \n".print_r($collectedComments,1);
 }
 file_put_contents($filePath, implode("", $file));
 

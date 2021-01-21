@@ -33,9 +33,6 @@ Ext.define('Editor.view.help.HelpWindow', {
     stateId:'helpWindow',
     reference: 'helpWindow',
     cls: 'helpWindow',
-    minHeight : 750,
-    width : 1024,
-    autoHeight: true,
     autoScroll: true,
     modal : true,
     layout:'fit',
@@ -63,7 +60,11 @@ Ext.define('Editor.view.help.HelpWindow', {
         var me = this,
             url=Ext.String.format(me.getLoaderUrl(), Editor.data.helpSection, Editor.data.locale),
             isRemote=url.match(/^(http:\/\/|https:\/\/|ftp:\/\/|\/\/)([-a-zA-Z0-9@:%_\+.~#?&//=])+$/)!==null,
-            config={
+            config = {
+                //max height 750, if viewport is smaller use max 95% of the viewport. 
+                height: Math.min(750, parseInt(Editor.app.viewport.getHeight() * 0.95)), 
+                //max width 1024, if viewport is smaller use max 95% of the viewport. 
+                width: Math.min(1024, parseInt(Editor.app.viewport.getWidth() * 0.95)), 
                 dockedItems: [{
                     xtype: 'toolbar',
                     dock: 'bottom',

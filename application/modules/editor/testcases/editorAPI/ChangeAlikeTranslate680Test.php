@@ -201,14 +201,6 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         
         $task = $api->getTask();
    
-//         $api->addTaskImportConfig($task->taskGuid, 'runtimeOptions.import.fileparser.csv.options.protectTags', 1);
-        
-//         //start the task import
-//         $api->requestJson('editor/task/'.$task->id.'/import', 'GET');
-        
-//         //manualy check for task state, since the import autostart is set to 0
-//         $api->checkTaskStateLoop();
-        
         //open task for whole testcase
         $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
     }
