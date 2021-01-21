@@ -189,7 +189,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               click: 'handleKPIShow'
           },
           '#adminTaskAddWindow': {
-              show: 'onAdminTaskAddWindowShow',
               close: 'onAdminTaskAddWindowClose'
            },
           '#adminTaskAddWindow #add-task-btn': {
@@ -960,14 +959,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   
   /**
-   * On admin add task window show handler
-   */
-  onAdminTaskAddWindowShow:function(win){
-      //set the default values for the window fields
-      this.setTaskAddFieldDefaults(win);
-  },
-  
-  /**
    * On admin add task window close handler
    */
   onAdminTaskAddWindowClose:function(win){
@@ -999,25 +990,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
             }
           });
       }
-  },
-
-  /***
-   * Set the default values for the add task window fields. The values are configured zf config
-   */
-  setTaskAddFieldDefaults:function(win){
-    var key, fieldDefaults=[];
-
-    if(Editor.data.frontend.importTask && Editor.data.frontend.importTask.fieldsDefaultValue){
-        fieldDefaults=Editor.data.frontend.importTask.fieldsDefaultValue;
-    }
-    if(fieldDefaults.length<1){
-        return;
-    }
-    var field=null;
-    for(key in fieldDefaults){
-        field=win.down('field[name="'+key+'"]');
-        field && field.setValue(fieldDefaults[key]);
-    }
   },
 
   /***

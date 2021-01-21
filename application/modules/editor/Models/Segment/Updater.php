@@ -68,6 +68,8 @@ class editor_Models_Segment_Updater {
      */
     public function update(editor_Models_Segment $segment, editor_Models_SegmentHistory $history) {
         $this->segment = $segment;
+        $this->segment->setConfig($this->task->getConfig());
+        
         $allowedAlternatesToChange = $this->segment->getEditableDataIndexList();
         $updateSearchAndSort = array_intersect(array_keys($this->segment->getModifiedValues()), $allowedAlternatesToChange);
         

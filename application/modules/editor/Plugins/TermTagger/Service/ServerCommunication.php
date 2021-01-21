@@ -77,6 +77,9 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
         
         $this->targetStringMatch = 0;
         
+        $customerConfig = $task->getConfig();
+        $customerConfig = $customerConfig->runtimeOptions->termTagger;
+        
         $this->tbxFile = $task->meta()->getTbxHash();
         
         $langModel = ZfExtended_Factory::get('editor_Models_Languages');
@@ -85,8 +88,9 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
         $this->sourceLang = $langModel->getRfc5646();
         $langModel->load($task->getTargetLang());
         $this->targetLang = $langModel->getRfc5646();
-        $this->targetStringMatch = (int) in_array($this->targetLang, $taggerConfig->targetStringMatch->toArray(), true);
-        $this->task = $task;
+        $this->targetStringMatch = (int) in_array($this->targetLang, $customerConfig->targetStringMatch->toArray(), true);
+
+		$this->task = $task;
     }
     
     /**

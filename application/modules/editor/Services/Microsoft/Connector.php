@@ -62,9 +62,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
     public function __construct() {
         parent::__construct();
         $this->api = ZfExtended_Factory::get('editor_Services_Microsoft_HttpApi');
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->microsoft->matchrate;
+        $this->defaultMatchRate = $this->config->runtimeOptions->LanguageResources->microsoft->matchrate;
         $this->batchQueryBuffer = 30;
     }
     

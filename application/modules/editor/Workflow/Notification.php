@@ -94,7 +94,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $stepNr = $task->getWorkflowStep();
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
-        return $segment->loadByWorkflowStep($task->getTaskGuid(), $step, $stepNr);
+        return $segment->loadByWorkflowStep($task, $step, $stepNr);
     }
     
     /**
@@ -590,9 +590,12 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param string $currentStep
      */
     protected function attachXliffSegmentList($segmentHash, array $segments,$currentStep) {
-        $config = Zend_Registry::get('config');
+        $config = $this->config->task->getConfig();
         $notifyConfig = $config->runtimeOptions->editor->notification;
-        $xlfAttachment = (boolean) $notifyConfig->enableSegmentXlfAttachment;
+        
+        //load the customer specific config
+        $xlfAttachment = (boolean) $config->runtimeOptions->editor->notification->enableSegmentXlfAttachment;
+        
         $xlfFile =       (boolean) $notifyConfig->saveXmlToFile;
         
         if(empty($segments) || (!$xlfAttachment && !$xlfFile)) {
