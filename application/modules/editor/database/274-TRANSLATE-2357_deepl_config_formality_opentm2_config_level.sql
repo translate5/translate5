@@ -28,5 +28,5 @@
 -- with the fixes in TRANSLATE-2357 we are able to overwrite configs in connector context
 -- update showMultiple100PercentMatches to task level as requested in TRANSLATE-471
 
-UPDATE `Zf_configuration` SET `level`=`16` 
+UPDATE `Zf_configuration` SET `level` = 16
 WHERE `name`='runtimeOptions.LanguageResources.opentm2.showMultiple100PercentMatches';
