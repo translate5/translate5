@@ -41,6 +41,33 @@ class editor_Models_CustomerConfig extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = "editor_Models_Db_CustomerConfig";
     protected $validatorInstanceClass = "editor_Models_Validator_CustomerConfig";
     
+    
+    /***
+     * Get the customer specific config for given customer id.
+     * If there is no customer overwritte for the config, the instance level value will be used.
+     * @param int $customerId
+     * @throws editor_Models_ConfigException
+     * @return Zend_Config
+     */
+    public function getCustomerConfig(int $customerId) {
+        if(empty($customerId)){
+            throw new editor_Models_ConfigException('E1298');
+        }
+        
+        // Step 1: start with systemwide config as base
+        $config = new Zend_Config(Zend_Registry::get('config')->toArray(), true);
+        
+        // Step 2: anything customer-specific?
+        $model = ZfExtended_Factory::get('editor_Models_Config');
+        /* @var $model editor_Models_Config */
+        $result = $model->mergeCustomerValues($customerId);
+        $configOperator = ZfExtended_Factory::get('ZfExtended_Resource_DbConfig');
+        /* @var $configOperator ZfExtended_Resource_DbConfig */
+        $configOperator->initDbOptionsTree($result);
+        $config->merge(new Zend_Config($configOperator->getDbOptionTree(),true));
+        
+        return $config;
+    }
     /***
      * Update or insert new config for given customerId
      *

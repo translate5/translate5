@@ -399,14 +399,13 @@ class editor_TaskController extends ZfExtended_RestController {
             if(empty($this->entity->getTaskGuid())){
                 $this->entity->init($row);
             }
+            //TODO: for now we leave this as it is, if this produces performance problems, find better way for loading this config
             $taskConfig = $this->entity->getConfig();
             //adding QM SubSegment Infos to each Task
             $row['qmSubEnabled'] = false;
-            if($taskConfig->runtimeOptions->editor->enableQmSubSegments &&
-                !empty($row['qmSubsegmentFlags'])) {
-                    $row['qmSubEnabled'] = true;
+            if($taskConfig->runtimeOptions->editor->enableQmSubSegments && !empty($row['qmSubsegmentFlags'])) {
+                $row['qmSubEnabled'] = true;
             }
-                
             $this->addMissingSegmentrangesToResult($row);
         }
         return $rows;

@@ -110,7 +110,7 @@ class editor_ConfigController extends ZfExtended_RestController {
 
                 $row['userGuid'] = $userGuid;
                 
-                $logMessage='Updated user GUI state "{name}" to "{value}"';
+                $logMessage='Updated user GUI state "{name}" to "{value}" . Old value was:"{oldValue}"';
                 $logData = [
                     'userGuid' => $userGuid
                 ];
@@ -138,7 +138,7 @@ class editor_ConfigController extends ZfExtended_RestController {
                 $this->entity->setValue($value);
                 
                 $row['taskGuid'] = $taskGuid;
-                $logMessage='Updated task'.($task->isImporting() ? '-import' : '').' config value "{name}" to "{value}"';
+                $logMessage='Updated task'.($task->isImporting() ? '-import' : '').' config value "{name}" to "{value}" . Old value was:"{oldValue}" ';
                 $logData = [
                     'taskGuid' => $taskGuid
                 ];
@@ -152,7 +152,7 @@ class editor_ConfigController extends ZfExtended_RestController {
                 
                 $row['customerId'] = $customerId;
                 
-                $logMessage='Updated customer config value "{name}" to "{value}"';
+                $logMessage='Updated customer config value "{name}" to "{value}" . Old value was:"{oldValue}" ';
                 $logData = [
                     'customerId' => $customerId
                 ];
@@ -162,7 +162,7 @@ class editor_ConfigController extends ZfExtended_RestController {
                 //update system config
                 $this->entity->setValue($value);
                 $this->entity->save();
-                $logMessage = 'Updated instance config value "{name}" to "{value}"';
+                $logMessage = 'Updated instance config value "{name}" to "{value}" . Old value was:"{oldValue}" ';
                 break;
             default:
                 break;
@@ -173,7 +173,8 @@ class editor_ConfigController extends ZfExtended_RestController {
             $this->log->info('E1324',$logMessage,
                 array_merge([
                     'name' => $this->data->name,
-                    'value' => $value
+                    'value' => $value,
+                    'oldValue' => $this->entity->getOldValue('value')
                 ],$logData));
         }
         

@@ -28,7 +28,7 @@ class editor_Models_ConfigException extends ZfExtended_ErrorCodeException {
     /**
      * @var string
      */
-    protected $domain = 'configuration';
+    protected $domain = 'core.configuration';
     
     /**
      * @var integer
