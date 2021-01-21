@@ -137,12 +137,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     protected static $customerCache = [];
     
-    /***
-     * Internal cache task config cache
-     * @var Zend_Config
-     */
-    protected static $taskCustomerConfig=[];
-
     protected $dbInstanceClass = 'editor_Models_Db_Task';
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
 
@@ -178,39 +172,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Returns a Zend_Config Object; if task specific settings exist, they are set now.
-     * This will load only the task specific configs. It will not load all other 
-     * system-wide configs.
+     *  Return all task specific configs for the current task.
+     *  For all configs for which there is not task specific overwrite, the overwrite for the task client will be used as a value.
+     *  For all configs for which there is no task customer specific overwrite, the instance-level config value will be used
      * @return Zend_Config
      */
     public function getConfig() {
-        if(empty($this->getTaskGuid())){
-            throw new editor_Models_ConfigException('E1297');
-        }
-        if(isset(self::$taskCustomerConfig[$this->getTaskGuid()])){
-            return self::$taskCustomerConfig[$this->getTaskGuid()];
-        }
-        $configModel = ZfExtended_Factory::get('editor_Models_Config');
-        /* @var $configModel editor_Models_Config */
-        
-        //fetch all config from DB
-        $dbConfig = ZfExtended_Factory::get('ZfExtended_Models_Config');
-        /* @var $dbConfig ZfExtended_Models_Config */
-        $base = $dbConfig->loadAll();
-        //for merge set config name as array key
-        $base = $configModel->nameAsKey($base);
-        
-        //merge task overwrites with task customer overwrites
-        $result = $configModel->mergeTaskValues($this->getTaskGuid(),$base);
-        
-        $configOperator = ZfExtended_Factory::get('ZfExtended_Resource_DbConfig');
-        /* @var $configOperator ZfExtended_Resource_DbConfig */
-        $configOperator->initDbOptionsTree($result);
-        $taskConfig = new Zend_Config($configOperator->getDbOptionTree());
-        $taskConfig->setReadOnly();
-        //cache the config for this request
-        self::$taskCustomerConfig[$this->getTaskGuid()] = $taskConfig;
-        return self::$taskCustomerConfig[$this->getTaskGuid()];
+        $taskConfig = ZfExtended_Factory::get('editor_Models_TaskConfig');
+        /* @var $taskConfig editor_Models_TaskConfig */
+        return $taskConfig->getTaskConfig($this->getTaskGuid());
     }
     
     /**

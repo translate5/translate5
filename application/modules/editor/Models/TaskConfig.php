@@ -41,6 +41,51 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = "editor_Models_Db_TaskConfig";
     protected $validatorInstanceClass = "editor_Models_Validator_TaskConfig";
     
+    
+    /***
+     * Internal cache task config cache
+     * @var Zend_Config
+     */
+    protected static $taskCustomerConfig=[];
+    
+    /***
+     *  Return all task specific configs for the given task guid.
+     *  For all configs for which there is not task specific overwrite, the overwrite for the task client will be used as a value.
+     *  For all configs for which there is no task customer specific overwrite, the instance-level config value will be used
+     * @param string $taskGuid
+     * @throws editor_Models_ConfigException
+     * @return Zend_Config
+     */
+    public function getTaskConfig(string $taskGuid){
+        if(empty($taskGuid)){
+            throw new editor_Models_ConfigException('E1297');
+        }
+        if(isset(self::$taskCustomerConfig[$taskGuid])){
+            return self::$taskCustomerConfig[$taskGuid];
+        }
+        $configModel = ZfExtended_Factory::get('editor_Models_Config');
+        /* @var $configModel editor_Models_Config */
+        
+        //fetch all config from DB
+        $dbConfig = ZfExtended_Factory::get('ZfExtended_Models_Config');
+        /* @var $dbConfig ZfExtended_Models_Config */
+        $base = $dbConfig->loadAll();
+        //for merge set config name as array key
+        $base = $configModel->nameAsKey($base);
+        
+        //merge task overwrites with task customer overwrites
+        $result = $configModel->mergeTaskValues($taskGuid,$base);
+        
+        $configOperator = ZfExtended_Factory::get('ZfExtended_Resource_DbConfig');
+        /* @var $configOperator ZfExtended_Resource_DbConfig */
+        $configOperator->initDbOptionsTree($result);
+        $taskConfig = new Zend_Config($configOperator->getDbOptionTree());
+        $taskConfig->setReadOnly();
+        //cache the config for this request
+        self::$taskCustomerConfig[$taskGuid] = $taskConfig;
+        return self::$taskCustomerConfig[$taskGuid];
+    }
+    
     /***
      * Load all configs for given taskGuid
      * @param string $taskGuid
