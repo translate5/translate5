@@ -422,7 +422,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             $stateText =  $this->data['autostates'][$segment['autoStateId']];
         }
         
-        $this->result[] = '<segment id="'.$this->escape(self::SEGMENT_ID_PREFIX.$segment['segmentNrInTask']).'" state="'.$this->segmentStateMap[$segment['autoStateId']].'" subState="translate5Autostate:'.$this->escape($stateText).'">';
+        $this->result[] = '<segment id="'.$this->escape(self::SEGMENT_ID_PREFIX.$segment['segmentNrInTask']).'" translate5:matchRate="'.$this->escape($segment['matchRate']).'"  state="'.$this->segmentStateMap[$segment['autoStateId']].'" subState="translate5Autostate:'.$this->escape($stateText).'">';
         
         
         //add the comment only once
