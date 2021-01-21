@@ -99,15 +99,15 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
      * @var Zend_Config
      */
     protected $config;
-    
+
     /**
      * Transuntit ID
      * @var string
      */
     protected $transunitId = null;
     
-    public function __construct() {
-        $this->config = Zend_Registry::get('config');
+    public function __construct(Zend_Config $config) {
+        $this->config = $config;
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
     }
     

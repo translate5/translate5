@@ -375,12 +375,7 @@ class editor_TaskController extends ZfExtended_RestController {
         foreach ($rows as &$row) {
             $row['lastErrors'] = $this->getLastErrorMessage($row['taskGuid'], $row['state']);
             $this->initWorkflow($row['workflow']);
-            //adding QM SubSegment Infos to each Task
-            $row['qmSubEnabled'] = false;
-            if($this->config->runtimeOptions->editor->enableQmSubSegments &&
-                    !empty($row['qmSubsegmentFlags'])) {
-                $row['qmSubEnabled'] = true;
-            }
+            
             unset($row['qmSubsegmentFlags']);
 
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
@@ -401,6 +396,16 @@ class editor_TaskController extends ZfExtended_RestController {
                 $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
             }
             
+            if(empty($this->entity->getTaskGuid())){
+                $this->entity->init($row);
+            }
+            //TODO: for now we leave this as it is, if this produces performance problems, find better way for loading this config
+            $taskConfig = $this->entity->getConfig();
+            //adding QM SubSegment Infos to each Task
+            $row['qmSubEnabled'] = false;
+            if($taskConfig->runtimeOptions->editor->enableQmSubSegments && !empty($row['qmSubsegmentFlags'])) {
+                $row['qmSubEnabled'] = true;
+            }
             $this->addMissingSegmentrangesToResult($row);
         }
         return $rows;
@@ -1444,7 +1449,8 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function addQmSubToResult() {
         $qmSubFlags = $this->entity->getQmSubsegmentFlags();
         $this->view->rows->qmSubEnabled = false;
-        if($this->config->runtimeOptions->editor->enableQmSubSegments &&
+        $taskConfig = $this->entity->getConfig();
+        if($taskConfig->runtimeOptions->editor->enableQmSubSegments &&
                 !empty($qmSubFlags)) {
             $this->view->rows->qmSubFlags = $this->entity->getQmSubsegmentIssuesTranslated(false);
             $this->view->rows->qmSubSeverities = $this->entity->getQmSubsegmentSeveritiesTranslated(false);

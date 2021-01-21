@@ -69,7 +69,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             },
             '#Editor.$application': {
                 // editorViewportOpened: 'initSpellCheckPlugin' // NOW VIA #segmentStatusStrip afterRender (= comes first and needs this infos already)
-                editorViewportClosed: 'onDestroy'
+                editorViewportClosed: 'onDestroy',
+                editorConfigLoaded:'onEditorConfigLoaded'
             }
         },
         component: {
@@ -142,14 +143,21 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // Init
     // =========================================================================
     
-    /**
-     * 
-     */
     init: function(){
         var me = this;
         this.callParent(arguments);
         me.consoleLog('0.1 init Editor.plugins.SpellCheck.controller.Editor');
     },
+    
+    /***
+     * After task config load event handler.
+     */
+    onEditorConfigLoaded:function(app, task){
+        var me=this,
+            isPluginActive = app.getTaskConfig('plugins.SpellCheck.active');
+        me.setActive(isPluginActive);
+    },
+    
     onDestroy:function(){
         var me=this;
         if(me.spellCheckTooltip){

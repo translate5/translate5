@@ -130,7 +130,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->prepareTagMapping();
         $this->readCxtMetaDefinitions();
         $this->logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.sdlxliff');
-        $this->transunitParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_TransunitParser');
+        $this->transunitParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_TransunitParser',[
+            $this->config
+        ]);
         //diff export for this task can be used
         $this->task->setDiffExportUsable(1);
         //here would be the right place to set the import map,

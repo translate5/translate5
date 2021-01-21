@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,34 +36,34 @@ Ext.define('Editor.view.StatefulWindow', {
     /**
      * @cfg {Boolean} doNotShowAgain
      */
-	doNotShowAgain:false,
-	
+    doNotShowAgain:false,
+    
     publishes: {
-    	//publish this field so it is bindable
-    	doNotShowAgain: true
-	},
-	
-	//events to trigger the sataet update
-	stateEvents:['doNotShowAgainChange'],
+        //publish this field so it is bindable
+        doNotShowAgain: true
+    },
+    
+    //events to trigger the sataet update
+    stateEvents:['doNotShowAgainChange'],
 
-	stateful:{
-    	doNotShowAgain:true,
-    	//Info: those fields are enabled by default when a window is set to statefull
-    	//we do not need them so far, since it will make the the databadse configuration dificult (more properties to handle)
-    	width:false,
-    	height:false,
-    	maximized:false,
-    	size:false,
-    	pos:false
+    stateful:{
+        doNotShowAgain:true,
+        //Info: those fields are enabled by default when a window is set to statefull
+        //we do not need them so far, since it will make the the databadse configuration dificult (more properties to handle)
+        width:false,
+        height:false,
+        maximized:false,
+        size:false,
+        pos:false
     },
     
     /***
      * add our custom config to the state return object
      */
     getState: function() {
-		var me = this,
-			state = me.callParent() || {};
-		state = me.addPropertyToState(state, 'doNotShowAgain');
+        var me = this,
+            state = me.callParent() || {};
+        state = me.addPropertyToState(state, 'doNotShowAgain');
         return state;
     },
     
@@ -71,27 +71,27 @@ Ext.define('Editor.view.StatefulWindow', {
      * After applying the default component states, add the custom one
      */
     applyState: function(state) {
-    	if(Ext.isEmpty(state) || Ext.Object.isEmpty(state)){
-    		return;
-    	}
-    	//INFO: do not call parent, since all default state properties are disabled(see stateful object above)
-    	//if we want to save the other state props, enable call parent and remove the disabled object from stateful
-    	//this.callParent(arguments)
-    	this.setDoNotShowAgain(state.doNotShowAgain);
+        if(Ext.isEmpty(state) || Ext.Object.isEmpty(state)){
+            return;
+        }
+        //INFO: do not call parent, since all default state properties are disabled(see stateful object above)
+        //if we want to save the other state props, enable call parent and remove the disabled object from stateful
+        //this.callParent(arguments)
+        this.setDoNotShowAgain(state.doNotShowAgain);
     },
     
-	setDoNotShowAgain:function(value){
-		var me=this;
+    setDoNotShowAgain:function(value){
+        var me=this;
         if (me.doNotShowAgain != value) {
             me.doNotShowAgain = value;
-	        if (me.rendered && me.isVisible()) {
-	        	//trigger the state update
-	        	me.fireEvent('doNotShowAgainChange',value);
-	        }
+            if (me.rendered && me.isVisible()) {
+                //trigger the state update
+                me.fireEvent('doNotShowAgainChange',value);
+            }
         }
-	},
-	
-	getDoNotShowAgain:function(){
-		return this.doNotShowAgain;
-	}
+    },
+    
+    getDoNotShowAgain:function(){
+        return this.doNotShowAgain;
+    }
 });
