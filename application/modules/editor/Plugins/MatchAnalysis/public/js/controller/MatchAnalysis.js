@@ -63,8 +63,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         ref: 'taskAssocGrid',
         selector: '#languageResourcesTaskAssocGrid'
     },{
-	  ref:'projectPanel',
-	  selector:'#projectPanel'
+      ref:'projectPanel',
+      selector:'#projectPanel'
     },{
         ref:'projectTaskGrid',
         selector:'#projectTaskGrid'
@@ -104,15 +104,15 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 render:'onLanguageResourcesPanelRender'
             },
             '#languageResourcesWizardPanel':{
-            	startMatchAnalysis:'onStartMatchAnalysis'
+                startMatchAnalysis:'onStartMatchAnalysis'
             },
             'taskActionMenu': {
                 itemsinitialized: 'onTaskActionColumnItemsInitialized'
             }
         },
         controller:{
-        	'#admin.TaskOverview':{
-        		taskCreated:'onTaskCreated'
+            '#admin.TaskOverview':{
+                taskCreated:'onTaskCreated'
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -148,17 +148,17 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * Task action column items initialized event handler.
      */
     onTaskActionColumnItemsInitialized: function(items) {
-    	var me=this;
+        var me=this;
         items.push({
             text:this.strings.taskGridIconTooltip,
             glyph: 'f200@FontAwesome5FreeSolid',
             action: 'editorAnalysisTask',
             hidden:true,
-	        bind:{
-	        	hidden:'{!isNotErrorImportPendingCustom}'
-	        },
-	        scope:me,
-	        handler:me.onMatchAnalysisMenuClick,
+            bind:{
+                hidden:'{!isNotErrorImportPendingCustom}'
+            },
+            scope:me,
+            handler:me.onMatchAnalysisMenuClick,
             sortIndex:8
         });
     },
@@ -173,8 +173,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             groupIndex:1,
             listeners:{
                 activate:{
-                	fn:me.onLanguageResourcesWizardPanelActivate,
-                	scope:me
+                    fn:me.onLanguageResourcesWizardPanelActivate,
+                    scope:me
                 }
             }
         },'postimport');
@@ -191,18 +191,18 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },
 
     onLanguageResourcesPanelRender:function(panel){
-    	var me=this,
-    		storeData=[];
-    	
-    	//init the pretranslate matchrate options (from 0-103)
-    	for(var i=0;i<=103;i++){
-    		storeData.push({
-    			id:i,
-    			value:i+"%"
-    		});
-    	}
-    	
-    	panel.addDocked([{
+        var me=this,
+            storeData=[];
+        
+        //init the pretranslate matchrate options (from 0-103)
+        for(var i=0;i<=103;i++){
+            storeData.push({
+                id:i,
+                value:i+"%"
+            });
+        }
+        
+        panel.addDocked([{
             xtype : 'toolbar',
             dock : 'bottom',
             ui: 'footer',
@@ -242,9 +242,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             items : [{
                 xtype:'checkbox',
                 value: 1,
-    			boxLabel:this.strings.internalFuzzy,
-    			itemId:'cbInternalFuzzy',
-    			dock:'bottom'
+                boxLabel:this.strings.internalFuzzy,
+                itemId:'cbInternalFuzzy',
+                dock:'bottom'
             },{
                 dock:'bottom',
                 xtype:'container',
@@ -318,21 +318,21 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * Event handler after a task was successfully created
      */
     onTaskCreated:function(task){
-    	this.loadTaskAssoc(task);
+        this.loadTaskAssoc(task);
     },
     
     onLanguageResourcesWizardPanelActivate:function(panel){
-    	if(!panel.task){
-    		return;
-    	}
-    	var me=this;
-    	me.loadTaskAssoc(panel.task);
+        if(!panel.task){
+            return;
+        }
+        var me=this;
+        me.loadTaskAssoc(panel.task);
     },
     
     onMatchAnalysisMenuClick:function(item){
-    	var me=this,
-    		task=item.lookupViewModel(true).get('task');
-    	me.getProjectPanel().getController().redirectFocus(task,true);
+        var me=this,
+            task=item.lookupViewModel(true).get('task');
+        me.getProjectPanel().getController().redirectFocus(task,true);
         me.getAdminTaskPreferencesWindow().down('tabpanel').setActiveTab('matchAnalysisPanel');
     },
     
@@ -341,9 +341,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     loadTaskAssoc:function(task){
         var taskAssoc=Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc');
-	    //load the task assoc store
-	    taskAssoc.handleLoadPreferences(taskAssoc,task);
-	    
+        //load the task assoc store
+        taskAssoc.handleLoadPreferences(taskAssoc,task);
+        
     },
     
     /***
@@ -354,18 +354,18 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },
 
     onStartMatchAnalysis:function(taskId,operation){
-    	this.startAnalysis(taskId,operation);
+        this.startAnalysis(taskId,operation);
     },
     
     matchAnalysisButtonHandler:function(button){
-    	var me=this,
+        var me=this,
             win=button.up('#adminTaskPreferencesWindow'),
-            tmAndTermChecked=me.getComponentByItemId('pretranslateTmAndTerm').checked,
-            mTChecked=me.getComponentByItemId('pretranslateMt').checked,
-			task=win.getCurrentTask(),
-			operation=(mTChecked || tmAndTermChecked) ? "pretranslation" : "analysis";
-    	
-    	me.startAnalysis(task.get('id'),operation);
+            tmAndTermChecked=me.isCheckboxChecked('pretranslateTmAndTerm'),
+            mTChecked=me.isCheckboxChecked('pretranslateMt'),
+            task=win.getCurrentTask(),
+            operation=(mTChecked || tmAndTermChecked) ? "pretranslation" : "analysis";
+        
+        me.startAnalysis(task.get('id'),operation);
     },
     
     /***
@@ -384,7 +384,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
             method: "PUT",
             params: {
-            	internalFuzzy: me.isCheckboxChecked('cbInternalFuzzy'),
+                internalFuzzy: me.isCheckboxChecked('cbInternalFuzzy'),
                 pretranslateMatchrate: me.getComponentByItemId('cbMinMatchrate').getValue(),
                 pretranslateTmAndTerm: me.isCheckboxChecked('pretranslateTmAndTerm'),
                 pretranslateMt: me.isCheckboxChecked('pretranslateMt'),
@@ -394,7 +394,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },
             scope: this,
             failure: function(response){
-            	Editor.app.getController('ServerException').handleException(response);
+                Editor.app.getController('ServerException').handleException(response);
             }
         })
     },
@@ -411,16 +411,16 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     updateTaskAssocPanelViewModel:function(assocStore){
         var me=this,
-        	panels=Ext.ComponentQuery.query('languageResourceTaskAssocPanel'),
+            panels=Ext.ComponentQuery.query('languageResourceTaskAssocPanel'),
             store=assocStore ? assocStore : (me.getTaskAssocGrid() ? me.getTaskAssocGrid() : null);
         if(!panels || panels.length<1 || !store){
             return;
         }
         for(var i=0;i<panels.length;i++){
-        	var pnl=panels[i],
-        		vm=pnl.getViewModel();
-    		//set the view model items variable
-    		vm && vm.set('items',(store.getData().getSource() || store.getData()).getRange());
+            var pnl=panels[i],
+                vm=pnl.getViewModel();
+            //set the view model items variable
+            vm && vm.set('items',(store.getData().getSource() || store.getData()).getRange());
         }
     },
     
@@ -428,11 +428,11 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * Get component by itemId
      */
     getComponentByItemId:function(itemId){
-    	var cmp=Ext.ComponentQuery.query('#'+itemId);
-    	if(cmp.length<1){
-    		return null;
-    	}
-    	return cmp[0];
+        var cmp=Ext.ComponentQuery.query('#'+itemId);
+        if(cmp.length<1){
+            return null;
+        }
+        return cmp[0];
     },
 
     /***

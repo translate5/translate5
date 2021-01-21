@@ -58,7 +58,7 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Import_Work
         /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
         $languageResource->load($params['languageResourceId']);
         
-        $connector = $manager->getConnector($languageResource, $this->task->getSourceLang(), $this->task->getTargetLang());
+        $connector = $manager->getConnector($languageResource, $this->task->getSourceLang(), $this->task->getTargetLang(),$this->task->getConfig());
         /* @var $connector editor_Services_Connector */
         $connector->batchQuery($this->taskGuid);
         return true;

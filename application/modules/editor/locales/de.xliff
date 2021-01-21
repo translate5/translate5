@@ -1881,6 +1881,27 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U3VjaGUgaW0gQXVzZ2FuZ3N0ZXh0'><source>Suche im Ausgangstext</source><target>Suche im Ausgangstext</target></trans-unit>
 <trans-unit id='U3VjaGUgaW0gWmllbHRleHQ='><source>Suche im Zieltext</source><target>Suche im Zieltext</target></trans-unit>
 <trans-unit id='RsO8ciBqZWRlbiBTYXR6IHd1cmRlIGRhcyBiZXN0ZSB2ZXJmw7xnYmFyZSBUcmFuc2xhdGlvbi1NZW1vcnktTWF0Y2ggdmVyd2VuZGV0ICgxMDAlIG9kZXIgYmVzc2VyKS4gV2VubiBrZWluZSAxMDAlaWdlIMOcYmVyZWluc3RpbW11bmcgaW0gVHJhbnNsYXRpb24gTWVtb3J5IGdlZnVuZGVuIHd1cmRlLCB3aXJkIGRpZSBtYXNjaGluZWxsZSDDnGJlcnNldHp1bmcgdmVyd2VuZGV0Lg=='><source>Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet.</source><target>Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet.</target></trans-unit>
+<trans-unit id='S29uZmlndXJhdGlvbiBiZWFyYmVpdGVu'><source>Konfiguration bearbeiten</source><target>Konfiguration bearbeiten</target></trans-unit>
+<trans-unit id='S29uZmlndXJhdGlvbg=='><source>Konfiguration</source><target>Systemkonfiguration</target></trans-unit>
+<trans-unit id='RGllIMOEbmRlcnVuZyB3aXJkIGJlaW0gbsOkY2hzdGVuIExvZ2luIHdpcmtzYW0uIERpZXMgZ2lsdCBhdWNoIGbDvHIgYW5kZXJlIGRlcnplaXQgZWluZ2Vsb2dndGUgQmVudXR6ZXIu'><source>Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.</source><target>Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.</target></trans-unit>
+<trans-unit id='QWxsZXMgenVrbGFwcGVu'><source>Alles zuklappen</source><target>Alles zuklappen</target></trans-unit>
+<trans-unit id='QWxsZXMgYXVma2xhcHBlbg=='><source>Alles aufklappen</source><target>Alles aufklappen</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRrb25maWd1cmF0aW9uIEt1bmRlIMO8YmVyc2NocmVpYmVu'><source>Standardkonfiguration Kunde überschreiben</source><target>Konfiguration</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRrb25maWd1cmF0aW9uIGRlcyBTeXN0ZW1z'><source>Standardkonfiguration des Systems</source><target>Konfiguration Kunde (überschreibt Systemkonfiguration)</target></trans-unit>
+<trans-unit id='w5xiZXJzY2hyaWViZW4='><source>Überschrieben</source><target>Überschrieben</target></trans-unit>
+<trans-unit id='QXVmIGViZW5lIGdlc2V0enQ='><source>Auf ebene gesetzt</source><target>Auf Ebene gesetzt</target></trans-unit>
+<trans-unit id='S3VyemVyIE5hbWU='><source>Konfigurationsoption</source><target>Konfigurationsoptionen</target></trans-unit>
+<trans-unit id='QWt0aXZpZXJ0'><source>Aktiviert</source><target>Aktiviert</target></trans-unit>
+<trans-unit id='RGVha3RpdmllcnQ='><source>Deaktiviert</source><target>Deaktiviert</target></trans-unit>
+<trans-unit id='w5xiZXJzY2hyZWliYmFyIGF1ZiBFYmVuZTo='><source>Überschreibbar auf Ebene:</source><target>Überschreibbar auf Ebene:</target></trans-unit>
+<trans-unit id='U2NocmVpYmdlc2Now7x0enRlIEtvbmZpZ3VyYXRpb25lbiBzaWNodGJhcjo='><source>Schreibgeschützte Konfigurationen sichtbar:</source><target>Schreibgeschützte anzeigen</target></trans-unit>
+<trans-unit id='Q29kZSBJRA=='><source>Code ID</source><target>Code ID</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV9pbnN0YW5jZQ=='><source>config_overwrite_instance</source><target>System</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV9jdXN0b21lcg=='><source>config_overwrite_customer</source><target>Kunde</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV90YXNrSW1wb3J0'><source>config_overwrite_taskImport</source><target>Import</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV90YXNr'><source>config_overwrite_task</source><target>Aufgabe</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV91c2Vy'><source>config_overwrite_user</source><target>Benutzer</target></trans-unit>
+<trans-unit id='V2VydA=='><source>Wert</source><target>Wert</target></trans-unit>
 <trans-unit id='QW53ZW5kdW5nIHZlcmxhc3Nlbg=='><source>Anwendung verlassen</source><target>Anwendung verlassen</target></trans-unit>
 <trans-unit id='U3DDpHRlciB3ZWl0ZXIgYXJiZWl0ZW4='><source>Später weiter arbeiten</source><target>Später weiter arbeiten</target></trans-unit>
   </body>

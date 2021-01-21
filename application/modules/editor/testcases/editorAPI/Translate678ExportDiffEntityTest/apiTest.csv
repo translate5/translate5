@@ -1,4 +1,4 @@
-"mid","quelle","Target text"
+"id","source","Target text"
 "1","Nice Source Text","Target with ""special"" 'chars' & greaters < and > lessers"
 "2","This row contains normal text entities which should make no problems","How are uml öüüß é encoded?"
 "3","This row contains already encoded entities which should result in encoded chars","How are entities &szlig; &amp; &gt; &quot; encoded? In CSV they have to remain as they are!"

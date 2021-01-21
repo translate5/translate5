@@ -70,7 +70,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      */
     public function handleSegmentImportProcess(Zend_EventManager_Event $event) {
         $attributes = $event->getParam('segmentAttributes');
-        $config = Zend_Registry::get('config');
+        $config = $event->getParam('config');
         
         /* @var $attributes editor_Models_Import_FileParser_SegmentAttributes */
         if(!$attributes->editable && !$config->runtimeOptions->termTagger->tagReadonlySegments) {

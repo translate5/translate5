@@ -164,7 +164,6 @@ class editor_Models_Import {
         $task->setTaskName($params->taskName);
         $task->setTaskGuid($params->taskGuid);
         $task->setPmGuid($params->pmGuid);
-        $task->setEdit100PercentMatch((int)$params->editFullMatch);
         $task->setLockLocked((int)$params->lockLocked);
         $task->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         $task->setUsageMode($config->runtimeOptions->import->initialTaskUsageMode);
@@ -194,6 +193,11 @@ class editor_Models_Import {
         //Task based Source Editing can only be enabled if its allowed in the whole editor instance 
         $enableSourceEditing = (bool) $config->runtimeOptions->import->enableSourceEditing;
         $task->setEnableSourceEditing((int) (! empty($params->enableSourceEditing) && $enableSourceEditing));
+
+        //100% matches editable can be only enabled if it is allowed/defined on system level
+        $edit100PercentMatch = (bool) $config->runtimeOptions->frontend->importTask->edit100PercentMatch;
+        $task->setEdit100PercentMatch((int) (! empty($params->editFullMatch) && $edit100PercentMatch));
+        
         $task->setCustomerId($params->customerId ?? ZfExtended_Factory::get('editor_Models_Customer')->loadByDefaultCustomer()->getId());
         
         $task->validate();

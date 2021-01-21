@@ -38,9 +38,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
     public function __construct() {
         parent::__construct();
         $this->api = ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi');
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->sdllanguagecloud->matchrate;
+        $this->defaultMatchRate = $this->config->runtimeOptions->LanguageResources->sdllanguagecloud->matchrate;
     }
     
     /**
