@@ -116,7 +116,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         /* @var $entity editor_Models_Segment */
         $result = array();
         
-        $config = Zend_Registry::get('config');
+        $config = $task->getConfig();
         $qmSubsegmentAlikes = array();
         if($config->runtimeOptions->editor->enableQmSubSegments) {
             $qmSubsegmentAlikes = $this->fieldLoop(function($field, $editField, $getter, $setter) use ($editedSegmentId){
@@ -136,6 +136,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         
         $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [
             $this->entity,
+            $config,
             $qmSubsegmentAlikes
         ]);
         /* @var $repetitionUpdater editor_Models_Segment_RepetitionUpdater */

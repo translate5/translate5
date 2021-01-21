@@ -1233,8 +1233,9 @@ Ext.override(Ext.panel.Table, {
         this.callParent([
             config
         ]);
-
-        this.store.trackStateChanges = false;
+        if(this.store){
+            this.store.trackStateChanges = false;
+        }
     }
 });
 

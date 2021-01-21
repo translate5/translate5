@@ -290,14 +290,14 @@ Ext.define('Editor.view.segments.Grid', {
             width: 200
         }]);
 
-        if(Editor.data.segments.showStatus){
+        if(Editor.app.getTaskConfig('segments.showStatus')){
             columns.push({
                 xtype: 'stateColumn',
                 itemId: 'stateColumn',
                 stateId:'stateColumn',
             });
         }
-        if(Editor.data.segments.showQM){
+        if(Editor.app.getTaskConfig('segments.showQM')){
             columns.push({
                 xtype: 'qualityColumn',
                 itemId: 'qualityColumn',

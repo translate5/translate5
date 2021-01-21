@@ -163,14 +163,18 @@ class editor_Services_Manager {
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
      * @param int $sourceLang
      * @param int $targetLang
+     * @param Zend_Config $config : this will overwritte the default connector config value
      * @return editor_Services_Connector
      */
-    public function getConnector(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
+    public function getConnector(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null,Zend_Config $config = null) {
         $serviceType = $languageResource->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get('editor_Services_Connector');
         /* @var $connector editor_Services_Connector */
         $connector->connectTo($languageResource,$sourceLang,$targetLang);
+        if(isset($config)){
+            $connector->setConfig($config);
+        }
         return $connector;
     }
     
@@ -209,13 +213,13 @@ class editor_Services_Manager {
     }
     
     public function openForTask(editor_Models_Task $task) {
-        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Services_Connector $connector){
+        $this->visitAllAssociatedTms($task, function(editor_Services_Connector $connector){
             $connector->open();
         });
     }
     
     public function closeForTask(editor_Models_Task $task) {
-        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Services_Connector $connector){
+        $this->visitAllAssociatedTms($task, function(editor_Services_Connector $connector){
             $connector->close();
         });
     }
@@ -224,32 +228,32 @@ class editor_Services_Manager {
         if(empty($segment->getTargetEdit())&&$segment->getTargetEdit()!=="0"){
             return;
         }
-        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Services_Connector $connector, $languageResource, $assoc) use ($segment) {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($segment->getTaskGuid());
+        $this->visitAllAssociatedTms($task, function(editor_Services_Connector $connector, $languageResource, $assoc) use ($segment) {
             if(!empty($assoc['segmentsUpdateable'])) {
                 $connector->update($segment);
             }
         });
     }
     
-    protected function visitAllAssociatedTms($taskGuid, Closure $todo) {
+    protected function visitAllAssociatedTms(editor_Models_Task $task, Closure $todo) {
         $languageResources = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
-        $list = $languageResources->loadByAssociatedTaskGuid($taskGuid);
+        $list = $languageResources->loadByAssociatedTaskGuid($task->getTaskGuid());
         foreach($list as $one){
             $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
             /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
             $languageResource->init($one);
             try {
-                $connector = $this->getConnector($languageResource);
+                $connector = $this->getConnector($languageResource,null,null,$task->getConfig());
                 /* @var $connector editor_Services_Connector */
                 $todo($connector, $languageResource, $one);
             }
             catch(editor_Services_Exceptions_NoService $e) {
                 $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource.service');
                 /* @var $logger ZfExtended_Logger */
-                $task = ZfExtended_Factory::get('editor_Models_Task');
-                /* @var $task editor_Models_Task */
-                $task->loadByTaskGuid($taskGuid);
                 $e->addExtraData(['task' => $task]);
                 $logger->exception($e,[
                     'level' => $logger::LEVEL_WARN

@@ -76,7 +76,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     /**
      * @var boolean
      */
-    protected $tagProtection = false;
+    protected $tagProtection = true;
     
     /**
      * @var array
@@ -126,17 +126,10 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
         $this->regexInternalTags = editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS;
         
-        // check taskTemplate for options (check if tag-protection or regExes-protection is set)
-        $taskConfig = Zend_Registry::get('taskTemplate');
-        $className = __CLASS__;
-        
-        if (!isset($taskConfig->import->fileparser->$className)) {
-            return;
-        }
-        $options = $taskConfig->import->fileparser->$className->options;
-        
-        if (isset($options->protectTags)) {
-            $this->tagProtection = $options->protectTags;
+        $options = $this->config->runtimeOptions->import->fileparser->csv->options;
+        $protectTags = (boolean)$options->protectTags;
+        if ($protectTags) {
+            $this->tagProtection = $protectTags;
             $ds = DIRECTORY_SEPARATOR;
             $html5TagFile = APPLICATION_PATH.$ds.'modules'.$ds.'editor'.
                     $ds.'Models'.$ds.'Import'.$ds.'FileParser'.$ds.
