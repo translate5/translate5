@@ -65,8 +65,8 @@ class editor_Models_Segment_RepetitionUpdater {
      * @param editor_Models_Segment $segment
      * @param array $qmSubsegmentAlikes
      */
-    public function __construct(editor_Models_Segment $segment, array $qmSubsegmentAlikes = null){
-        $this->config = Zend_Registry::get('config');
+    public function __construct(editor_Models_Segment $segment,Zend_Config $config, array $qmSubsegmentAlikes = null){
+        $this->config = $config;
         $this->originalSegment = $segment;
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');

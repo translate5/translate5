@@ -965,7 +965,7 @@ Ext.define('Editor.controller.Editor', {
             }
         });
         // tag-errors: check if user is allowed to save anyway
-        if(isTagError && Editor.data.segments.userCanIgnoreTagValidation) {
+        if(isTagError && Editor.app.getTaskConfig('segments.userCanIgnoreTagValidation')) {
             msgBox.confirm(me.messages.errorTitle, msg, function(btn) {
                 if(btn === 'no') {
                     me.saveAndIgnoreContentErrors();
@@ -1440,8 +1440,8 @@ Ext.define('Editor.controller.Editor', {
     },
     insertWhitespace: function(key,e,whitespaceType) {
         var me = this,
-            userCanModifyWhitespaceTags = Editor.data.segments.userCanModifyWhitespaceTags,
-            userCanInsertWhitespaceTags = Editor.data.segments.userCanInsertWhitespaceTags,
+            userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
+            userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
             tagNr,
             plug,
             editor;
@@ -1664,7 +1664,7 @@ Ext.define('Editor.controller.Editor', {
     
     handleReferenceFilesMessage:function(){
         //if there are reference files for the task and if it is show reference files is alowed from config
-        if(Editor.data.task.get('referenceFiles') && Editor.data.frontend.showReferenceFilesPopup===true){
+        if(Editor.data.task.get('referenceFiles') && Editor.app.getTaskConfig('editor.showReferenceFilesPopup')===true){
             var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
             task = new Ext.util.DelayedTask(function(){
                 referenceInfoMessage.destroy();

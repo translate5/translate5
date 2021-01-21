@@ -106,8 +106,8 @@ class CsvMqmTest extends \ZfExtended_Test_ApiTestcase {
         $tests = array(
             'runtimeOptions.import.csv.delimiter' => ',',
             'runtimeOptions.import.csv.enclosure' => '"',
-            'runtimeOptions.import.csv.fields.mid' => 'mid',
-            'runtimeOptions.import.csv.fields.source' => 'quelle',
+            'runtimeOptions.import.csv.fields.mid' => 'id',
+            'runtimeOptions.import.csv.fields.source' => 'source',
         );
         self::$api->testConfig($tests);
     }

@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -32,7 +32,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         'Editor.view.admin.TaskUpload',
         'Editor.view.admin.TaskAddWindowViewModel',
         'Editor.view.admin.customer.UserCustomersCombo',
-        'Editor.view.LanguageCombo'
+        'Editor.view.LanguageCombo',
+        'Editor.view.admin.config.ConfigWizard'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -91,33 +92,39 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                 itemId:'taskUploadCard',
                 groupIndex:4,
             },'postimport');
+            
+            win.insertCard({
+                xtype:'adminConfigWizard', 
+                itemId:'adminConfigWizard',
+                groupIndex:2,//index 1 is language resources assoc
+            },'postimport');
         },
         render:function(win){
-        	
-        	//sort the group by group index
-        	win.groupCards['preimport'].sort(function (a, b) {
-        		return a.groupIndex - b.groupIndex;
-    		});
-        	
+            
+            //sort the group by group index
+            win.groupCards['preimport'].sort(function (a, b) {
+                return a.groupIndex - b.groupIndex;
+            });
+            
             //add all of the cards in the window by order: preimport, import, postimport
             for(var i=0;i<win.groupCards['preimport'].length;i++){
                 win.add(win.groupCards['preimport'][i]);
             }
             
             //sort the group by group index
-        	win.groupCards['import'].sort(function (a, b) {
-        		return a.groupIndex - b.groupIndex;
-    		});
-        	
-            for(var i=0;i<win.groupCards['import'].length;i++){
+            win.groupCards['import'].sort(function (a, b) {
+                return a.groupIndex - b.groupIndex;
+            });
+            
+            for(i=0;i<win.groupCards['import'].length;i++){
                 win.add(win.groupCards['import'][i]);
             }
             //sort the group by group index
-        	win.groupCards['postimport'].sort(function (a, b) {
-        		return a.groupIndex - b.groupIndex;
-    		});
-        	
-            for(var i=0;i<win.groupCards['postimport'].length;i++){
+            win.groupCards['postimport'].sort(function (a, b) {
+                return a.groupIndex - b.groupIndex;
+            });
+            
+            for(i=0;i<win.groupCards['postimport'].length;i++){
                 win.add(win.groupCards['postimport'][i]);
             }
         },
@@ -132,15 +139,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     
     initConfig: function(instanceConfig) {
         var me = this,
-            langCombo = {
-                xtype: 'combo',
-                typeAhead: false,
-                displayField: 'label',
-                forceSelection: true,
-                anyMatch: true,
-                queryMode: 'local',
-                valueField: 'id'
-            },
             now = new Date(),
             config;
         
@@ -255,19 +253,31 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     fieldLabel: me.strings.orderdate
                                 },(Editor.data.enableSourceEditing  ? {
                                     xtype: 'checkbox',
-                                    inputValue: 1,
+                                    inputValue:1,
+                                    uncheckedValue:0,
+                                    checked:1,
                                     name: 'enableSourceEditing',
                                     fieldLabel: me.strings.sourceEditLabel
                                 } : {
                                     xtype: 'hidden',
-                                    value: 0,
+                                    inputValue:1,
+                                    uncheckedValue:0,
+                                    checked:0,
                                     name: 'enableSourceEditing'
-                                }),{
+                                }),(Editor.data.frontend.importTask.edit100PercentMatch  ? {
                                     xtype: 'checkbox',
-                                    inputValue: 1,
+                                    inputValue:1,
+                                    uncheckedValue:0,
+                                    checked:1,
                                     name: 'edit100PercentMatch',
                                     fieldLabel: me.strings.fullMatchLabel
-                                },{
+                                } : {
+                                    xtype: 'hidden',
+                                    inputValue:1,
+                                    uncheckedValue:0,
+                                    checked:0,
+                                    name: 'edit100PercentMatch'
+                                }),{
                                     xtype: 'checkbox',
                                     inputValue: 1,
                                     name: 'lockLocked',

@@ -1,4 +1,4 @@
-"mid","quelle","target","",""
+"id","source","target","",""
 "1","this file is to test special characters for CSV import","Mit dieser Datei soll der Import spezieller Zeichen in CSV getestet werden","Fields without a header won't be imported, the below content is used in the test to compare against and used as data from browser","same for target"
 "2","Text containing an & ampersand","Text mit einem & Ampersand - edited","Text containing an &amp; ampersand","Text mit einem &amp; Ampersand"
 "3","Text containing two & ampersands &","Text mit zwei & Ampersands & - edited","Text containing two &amp; ampersands &amp;","Text mit zwei &amp; Ampersands &amp;"
