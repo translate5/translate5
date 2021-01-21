@@ -329,7 +329,11 @@ class editor_Models_Import_Worker_Import {
             }
         }
         catch (Exception $e) {
-            throw new Exception('.. invalid '.self::CONFIG_TEMPLATE.' detected at '.__CLASS__.' -> '.__FUNCTION__);
+            throw new editor_Models_Import_FileParser_Exception('E1325',[
+                'filename' => self::CONFIG_TEMPLATE,
+                'errorMessage' => $e->getMessage(),
+                'task' => $this->task
+            ]);
         }
     }
 }
