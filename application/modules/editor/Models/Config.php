@@ -73,9 +73,11 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         if(!empty($excludeType)){
             $s->where('type NOT IN(?)',$excludeType);
         }
-       
+        $pm = Zend_Registry::get('PluginManager');
+        /* @var $pm ZfExtended_Plugin_Manager */
+        
         //filter out all inactive plugins
-        foreach ($this->getInactivePluginsConfigPrefix() as $filter) {
+        foreach ($pm->getInactivePluginsConfigPrefix() as $filter) {
             $s->where('lower(name) NOT LIKE ?',strtolower($filter).'%');
         }
         $dbResults = $this->loadFilterdCustom($s);
@@ -276,31 +278,6 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         return 0;
     }
     
-    /***
-     * Update the user config and the default zf_config value for given user and config name
-     * @param ZfExtended_Models_User $user
-     * @param string $configName
-     * @param string $configValue
-     */
-    public function xxxupdateConfig(ZfExtended_Models_User $user,string $configName,string $configValue){
-        /* @var $acl ZfExtended_Acl */
-        //Info: uncomment this when the frontend config managment will be available.
-        //from the frontend, an level is required also as additional param, so the decision here can be made
-        //where and for who the config will be saved
-//         if($acl->isInAllowedRoles($user->getRoles(),'stateconfig',$this->configLabel[self::CONFIG_LEVEL_SYSTEM])){
-//             //$this->update($configName, $configValue);
-//         }
-        
-        $acl = ZfExtended_Acl::getInstance();
-        //update the user config if the current user is allowed
-        if($acl->isInAllowedRoles($user->getRoles(),ZfExtended_Models_User::APPLICATION_CONFIG_LEVEL,$this->configLabel[self::CONFIG_LEVEL_USER])){
-            $userConfig=ZfExtended_Factory::get('editor_Models_UserConfig');
-            /* @var $userConfig editor_Models_UserConfig */
-            $userConfig->updateInsertConfig($user->getUserGuid(),$configName,$configValue);
-        }
-    }
-    
-    
     /**
      * Merges the ini config values into the DB result
      * @param array $root
@@ -356,26 +333,6 @@ class editor_Models_Config extends ZfExtended_Models_Config {
     
     public function getConfigLevelLabel(int $level){
         return $this->configLabel[$level] ?? null;
-    }
-    
-    /***
-     * Return plugin config prefix for all inactive plugins
-     * @return array
-     */
-    protected function getInactivePluginsConfigPrefix() {
-        $pm = Zend_Registry::get('PluginManager');
-        /* @var $pm ZfExtended_Plugin_Manager */
-        $allNames = $pm->getAllPluginNames();
-        $active = $pm->getActive();
-        $filtered = array_map(function($item)use($active){
-            $initClass = 'editor_Plugins_'.ucfirst($item).'_Init';
-            $bootstrapClass = 'editor_Plugins_'.ucfirst($item).'_Bootstrap';
-            if(!in_array($initClass,$active) && !in_array($bootstrapClass, $active)){
-                return 'runtimeOptions.plugins.'.$item;
-            }
-            return '';
-        }, $allNames);
-        return array_filter($filtered);
     }
     
     /***
