@@ -56,9 +56,7 @@ class editor_Plugins_PangeaMt_Connector extends editor_Services_Connector_Abstra
     public function __construct() {
         parent::__construct();
         $this->api = ZfExtended_Factory::get('editor_Plugins_PangeaMt_HttpApi');
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $this->defaultMatchRate = $config->runtimeOptions->plugins->PangeaMt->matchrate;
+        $this->defaultMatchRate = $this->config->runtimeOptions->plugins->PangeaMt->matchrate;
         $this->batchQueryBuffer=30;
     }
     

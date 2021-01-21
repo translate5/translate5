@@ -166,7 +166,7 @@ abstract class editor_Models_Export_FileParser {
         $this->_task = $task;
         $this->_taskGuid = $task->getTaskGuid();
         $this->path = $path;
-        $this->config = Zend_Registry::get('config');
+        $this->config = $task->getConfig();
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.export.fileparser');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         

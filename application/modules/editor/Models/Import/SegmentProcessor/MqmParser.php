@@ -79,7 +79,7 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         $this->sfm = $sfm;
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
         $this->segment->setTaskGuid($task->getTaskGuid());
-        $config = Zend_Registry::get('config');
+        $config = $task->getConfig();
         $this->mqmEnabled = $config->runtimeOptions->editor->enableQmSubSegments;
         if(! $this->mqmEnabled) {
             return;

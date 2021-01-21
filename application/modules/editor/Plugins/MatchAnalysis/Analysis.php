@@ -180,7 +180,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         //lazy init, we need only instance, the here given $segment will be overwritten wuth the updateRepetition call
         if(empty($this->repetitionUpdater)) {
-            $this->repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [$segment]);
+            $this->repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [$segment,$this->task->getConfig()]);
         }
         
         //check if the segment source hash exist in the repetition array
@@ -475,7 +475,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             
             $connector=null;
             try {
-                $connector=$manager->getConnector($languageresource,$this->task->getSourceLang(),$this->task->getTargetLang());
+                $connector=$manager->getConnector($languageresource,$this->task->getSourceLang(),$this->task->getTargetLang(),$this->task->getConfig());
 
                 //throw a worning if the language resource is not available
                 $status = $connector->getStatus($resource);

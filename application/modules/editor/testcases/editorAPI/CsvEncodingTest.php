@@ -71,8 +71,8 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         $tests = array(
             'runtimeOptions.import.csv.delimiter' => ',',
             'runtimeOptions.import.csv.enclosure' => '"',
-            'runtimeOptions.import.csv.fields.mid' => 'mid',
-            'runtimeOptions.import.csv.fields.source' => 'quelle',
+            'runtimeOptions.import.csv.fields.mid' => 'id',
+            'runtimeOptions.import.csv.fields.source' => 'source',
             'runtimeOptions.editor.notification.saveXmlToFile' => 1,
         );
         self::$api->testConfig($tests);

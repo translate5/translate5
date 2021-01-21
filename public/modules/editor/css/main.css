@@ -429,14 +429,18 @@ body.loading {
     line-height: 17px;
     font-weight: 300;
     font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana, sans-serif;
+    background-color: #ffffff !important;
 }
+body.loading > div.loading-error,
 body.loading > div.loading {
     height:100px;
     width:450px;
     margin:auto;
     margin-top:120px;
     text-align:left;
-    padding-left: 35px;
+}
+body.loading > div.loading {
+    padding-left: 35px;    
     background: url("../images/loading_ico.gif") left 8px no-repeat;
 }
 div.loading div#loading-indicator-text {
@@ -821,7 +825,15 @@ a.x-btn span.task-confirmation {
 .ico-finish-task {background-image: url(../images/tick.png);}
 .ico-add-filter {background-image: url("../images/funnel--plus.png");}
 .gridColumnInfoIconTooltipLeft {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:left center;}
+.gridColumnInfoIconTooltipCenter {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:center center;}
 .gridColumnInfoIconTooltipLeft .x-column-header-text-inner {padding-left: 10px;}
 .redTextColumn{
 	color:#ff0000;
+}
+.disabled-row .x-grid-cell {
+	color: #acacac !important;
+}
+.grid-cell-text-center{
+    vertical-align: middle;
+    text-align: center;
 }

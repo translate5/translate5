@@ -87,9 +87,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
 
         //to ensure that we get unique TMs Names although of the above stripped content,
         // we add the LanguageResource ID and a prefix which can be configured per each translate5 instance
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $prefix = $config->runtimeOptions->LanguageResources->opentm2->tmprefix;
+        $prefix = $this->config->runtimeOptions->LanguageResources->opentm2->tmprefix;
         if(!empty($prefix)) {
             $prefix .= '-';
         }
@@ -215,7 +213,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        
         if(!isset($this->fileNameCache[$segment->getFileId()])){
             $file = ZfExtended_Factory::get('editor_Models_File');
             /* @var $file editor_Models_File */
@@ -554,6 +551,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $connector = ZfExtended_Factory::get(get_class($this));
         /* @var $connector editor_Services_Connector */
         $connector->connectTo($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());
+        //copy the current config (for task specific config)
+        $connector->setConfig($this->getConfig());
         $connector->isInternalFuzzy = true;
         return $connector;
     }
@@ -568,9 +567,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return $this->resultList;
         }
         
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $showMultiple100PercentMatches = $config->runtimeOptions->LanguageResources->opentm2->showMultiple100PercentMatches;
+        $showMultiple100PercentMatches = $this->config->runtimeOptions->LanguageResources->opentm2->showMultiple100PercentMatches;
         
         $other=array();
         $differentTargetResult=array();
