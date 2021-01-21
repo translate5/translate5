@@ -100,7 +100,6 @@ trait editor_Models_Import_FileParser_TagTrait {
             $content = pack('H*', $match[3]);
             
             $p = $this->getTagParams($content, 0, $id, htmlspecialchars($content));
-            //$p['class'] .= $cls;
             
             //generate the html tag for the editor
             switch ($type) {
