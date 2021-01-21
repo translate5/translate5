@@ -147,7 +147,6 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         
         //enable bath query via config
         $eventParams['batchQuery'] = (boolean)$this->config->enableBatchQuery;
-        
         $parentWorkerId=null;
         if(!empty($this->batchAssocs) && $eventParams['batchQuery']){
             $parentWorkerId=$this->queueBatchWorker($taskGuid, $eventParams);
@@ -225,11 +224,22 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      */
     protected function queueBatchWorker(string $taskGuid,array $eventParams){
         $parentWorkerId = null;
-        foreach ($this->batchAssocs as $langResId){
+        $isPretranslateMt = (boolean) $eventParams['pretranslateMt'];
+        $isPretranslate = (boolean) $eventParams['pretranslate'];
+        foreach ($this->batchAssocs as $lr){
+            /* @var $lr editor_Models_LanguageResources_LanguageResource */
             $batchWorker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_BatchWorker');
             /* @var $batchWorker editor_Plugins_MatchAnalysis_BatchWorker */
             
-            if (!$batchWorker->init($taskGuid, ['languageResourceId' => $langResId])) {
+            //do not use this resource when it is a mt and the pretranslateMt is disabled
+            //if the pretranslation is disabled(the current request is for analysis only), 
+            //do not use this resource for batch query. For analysis only, the results from the resource
+            //are not relevant, since always the same matchrate is received
+            if((!$isPretranslateMt || !$isPretranslate) && $lr->isMt()){
+                continue;
+            }
+            
+            if (!$batchWorker->init($taskGuid, ['languageResourceId' => $lr->getId()])) {
                 $task=ZfExtended_Factory::get('editor_Models_Task');
                 /* @var $task editor_Models_Task */
                 $task->loadByTaskGuid($taskGuid);
@@ -290,7 +300,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             /* @var $connector editor_Services_Connector */
             //collect all connectors which are supporting batch query
             if($connector->isBatchQuery()){
-                $this->batchAssocs[] = $languageresource->getId();
+                $this->batchAssocs[] = clone $languageresource;
             }
             
             //analysable language resource is found
