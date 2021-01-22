@@ -32,12 +32,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Zend_Db_Table;
 
 
 /***
- * Quick create of zend model with database and validator file.
+ * Quick create of zend model with database and validator file. The mysql table must exist in the database so the files are generated.
+ * The field types and names are loaded from the given mysql table.
  * Example of creating TaskConfig model:
- * ./translate5.sh dev:newmodel -N TaskConfig -T LEK_task_config -K id -F id:int -F taskGuid:string:255 -F name:stringLength:255 -F value:string
+ * ./translate5.sh dev:newmodel -N TaskConfig -T Zf_task_config
  * TODO: test me for plugins. not testet may not work
  */
 class DevelopmentNewModelCommand extends Translate5AbstractCommand
@@ -65,6 +67,12 @@ class DevelopmentNewModelCommand extends Translate5AbstractCommand
      * @var string
      */
     protected $classNamePrefix="editor_Models_";
+    
+    /***
+     * 
+     * @var Zend_Db_Table
+     */
+    protected $table;
     
     protected function configure()
     {
@@ -94,22 +102,10 @@ class DevelopmentNewModelCommand extends Translate5AbstractCommand
             'Force to enter database table name');
         
         $this->addOption(
-            'key',
-            'K',
-            InputOption::VALUE_OPTIONAL,
-            'Optional table primary key. By default id.');
-        
-        $this->addOption(
             'plugin',
             'P',
             InputOption::VALUE_OPTIONAL,
             'Plugin name when the current files are create in plugin contenxt.');
-
-        $this->addOption(
-            'fields',
-            'F',
-            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-            'Table fields and field properties separated with ":". The first element is the field name, secound is the field type, third is the field size(for strings only for now).');
     }
 
     /**
@@ -130,18 +126,25 @@ class DevelopmentNewModelCommand extends Translate5AbstractCommand
         
         $name = $input->getOption('name');
         $this->checkFile($dbDirectory, $name);
-        $fields = $input->getOption('fields');
-        $fields = $this->converFields($fields);
-        $this->makePhp($dbDirectory, $name,$fields);
-        
-        $validatorDir = $this->getDirectoryValidator($dbDirectory);
-        $this->makePhpValidator($validatorDir, $name,$fields);
         
         $table = $input->getOption('table');
-        $key = $input->getOption('key');
+        $this->loadTable($table);
+
+        $this->makePhp($dbDirectory, $name,$this->table->info($this->table::METADATA));
+        
+        $validatorDir = $this->getDirectoryValidator($dbDirectory);
+        $this->makePhpValidator($validatorDir, $name,$this->table->info($this->table::METADATA));
+        
         $dbDir = $this->getDirectoryDb($dbDirectory);
-        $this->makeModelDbClass($dbDir, $name, $table,$key);
+        $this->makeModelDbClass($dbDir, $name, $this->table->info());
+        
         return 0;
+    }
+    
+    protected function loadTable(string $tableName){
+        $this->table = \ZfExtended_Factory::get('Zend_Db_Table',[
+            'name' => $tableName
+        ]);
     }
     
     /**
@@ -213,40 +216,10 @@ class DevelopmentNewModelCommand extends Translate5AbstractCommand
         return true;
     }
     
-    /***
-     * Convert the files parametar to key value pair array. 
-     * @param array $fields
-     * @return array
-     */
-    protected function converFields($fields){
-        $return = [];
-        foreach ($fields as $f) {
-            $keyvalue = explode(':', $f);
-            //for additional field params (length for example we can add more fields as value param)
-            if(count($keyvalue)>2){
-                $return[$keyvalue[0]] = $keyvalue;
-            }else{
-                $return[$keyvalue[0]] = $keyvalue[1];
-            }
-        }
-        return $return;
-    }
-    
-    protected function getFieldRenderFunction ($field,$type) {
+    protected function getFieldRenderFunction ($field,$fieldInfo) {
         $return = [];
         $ufirst = ucfirst($field);
-        switch ($type) {
-            case "stringLength":
-                $type = "string";
-            break;
-            case "integer":
-                $type = "int";
-                break;
-            case "date":
-            case "timestamp":
-                $type = "string";
-                break;
-        }
+        $type = $this->getFieldType($fieldInfo['DATA_TYPE']);
         $return[]='* @method void set'.$ufirst.'() set'.$ufirst.'('.$type.' $'.$field.')';
         $return[]='* @method '.$type.' get'.$ufirst.'() get'.$ufirst.'()';
         return join(PHP_EOL,$return);
@@ -256,34 +229,65 @@ class DevelopmentNewModelCommand extends Translate5AbstractCommand
      * Get render validator for given field and type.
      * TODO: add more validator types here
      * @param string $field
-     * @param mixed $type
+     * @param array $fieldInfo : contains the info about the field
      * @return string
      */
-    protected function getFieldValidatorRenderFunction ($field,$type) {
+    protected function getFieldValidatorRenderFunction ($field,$fieldInfo) {
         $return = "";
-        $fieldType = $type;
-        $length = null;
-        if(is_array($type)){
-            $fieldType = $type[1];
-            $length = $type[2];
-        }
+        $fieldType = $this->getFieldType($fieldInfo['DATA_TYPE']);;
         switch ($fieldType) {
             case 'int':
-            case 'integer':
                 $return = '$this->addValidator("'.$field.'", "int");';
             break;
-            case 'stringLength':
+            case 'string':
                 $return = '$this->addValidator("'.$field.'","stringLength"';
-                if(!empty($length)){
-                    $return.=', array("min" => 0, "max" => '.$length.')';
+                if(!empty($fieldInfo['LENGTH'])){
+                    $return.=', array("min" => '.abs($fieldInfo['NULLABLE']-=1).', "max" => '.$fieldInfo['LENGTH'].')';
                 }
                 $return.=');';
+                break;
+            case 'float':
+                $return = '$this->addValidator("'.$field.'", "float");';
                 break;
             default:
                 $return = '$this->addValidator("'.$field.'","'.$fieldType.'");';
             break;
         }
         return $return;
+    }
+    
+    /***
+     * Return field php type based on the field mysql type
+     * @param string $metadataType
+     * @return string
+     */
+    protected function getFieldType(string $metadataType){
+        switch ($metadataType) {
+            case "char":
+            case "varchar":
+            case "binary":
+            case "varbinary":
+            case "blob":
+            case "text":
+            case "enum":
+            case "set":
+                return "string";
+            case "tinyint":
+            case "smallint":
+            case "mediumint":
+            case "integer":
+            case "int":
+            case "bigint":
+                return "int";
+            case "float":
+            case "double":
+                return "float";
+            case "date":
+            case "datetime":
+            case "timestamp":
+                return "string";
+        }
+        return "string";
     }
     
     protected function setClassNamePrefix($pluginName="") {
@@ -299,21 +303,18 @@ class DevelopmentNewModelCommand extends Translate5AbstractCommand
      * Create database model file
      * 
      * @param string $dir
-     * @param string $name
-     * @param string $table
-     * @param string $key
      */
-    protected function makeModelDbClass($dir,$name,$table,$key='id'){
+    protected function makeModelDbClass(string $dir,string $name, array $info){
         $name = ucfirst($name);
         $file = $dir.'/'.$name.'.php';
         $this->io->success('Created file '.$file);
-        
+        $primary = array_shift(array_values($info[$this->table::PRIMARY])) ?? 'id';
         file_put_contents($file, '<?php '
             .$this->getTranslate5LicenceText().'
 
 class '.$this->classNamePrefix.'Db_'.$name.' extends Zend_Db_Table_Abstract {
-    protected $_name  = "'.$table.'";
-    public $_primary = "'.$key.'";
+    protected $_name  = "'.$info[$this->table::NAME].'";
+    public $_primary = "'.$primary.'";
 }
 ');
     }
@@ -329,8 +330,8 @@ class '.$this->classNamePrefix.'Db_'.$name.' extends Zend_Db_Table_Abstract {
         $file = $dir.'/'.$name.'.php';
         $this->io->success('Created file '.$file);
         $validators = [];
-        foreach ($fields as $field => $type){
-            $validators[] = $this->getFieldValidatorRenderFunction($field, $type);
+        foreach ($fields as $field => $fieldInfo){
+            $validators[] = $this->getFieldValidatorRenderFunction($field, $fieldInfo);
         }
         //add the validators wit 2 tabs
         file_put_contents($file, '<?php '
@@ -355,11 +356,8 @@ class '.$this->classNamePrefix.'Validator_'.$name.' extends ZfExtended_Models_Va
         $file = $dir.'/'.$name.'.php';
         $this->io->success('Created file '.$file);
         $settersGetters = [];
-        foreach ($fields as $field => $type){
-            if(is_array($type)){
-                $type = $type[1];
-            }
-            $settersGetters[] = $this->getFieldRenderFunction($field, $type);
+        foreach ($fields as $field => $info){
+            $settersGetters[] = $this->getFieldRenderFunction($field, $info);
         }
         
         file_put_contents($file, '<?php '
