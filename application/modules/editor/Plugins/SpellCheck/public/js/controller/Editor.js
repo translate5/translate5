@@ -69,7 +69,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             },
             '#Editor.$application': {
                 // editorViewportOpened: 'initSpellCheckPlugin' // NOW VIA #segmentStatusStrip afterRender (= comes first and needs this infos already)
-                editorViewportClosed: 'onDestroy'
+                editorViewportClosed: 'onDestroy',
+                editorConfigLoaded:'onEditorConfigLoaded'
             }
         },
         component: {
@@ -142,14 +143,21 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // Init
     // =========================================================================
     
-    /**
-     * 
-     */
     init: function(){
         var me = this;
         this.callParent(arguments);
         me.consoleLog('0.1 init Editor.plugins.SpellCheck.controller.Editor');
     },
+    
+    /***
+     * After task config load event handler.
+     */
+    onEditorConfigLoaded:function(app, task){
+        var me=this,
+            isPluginActive = app.getTaskConfig('plugins.SpellCheck.active');
+        me.setActive(isPluginActive);
+    },
+    
     onDestroy:function(){
         var me=this;
         if(me.spellCheckTooltip){
@@ -187,7 +195,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     initSpellCheckInEditor: function() {
         var me = this;
         me.consoleLog('0.4 SpellCheck: initSpellCheckInEditor.');
-        me.injectCSSForEditor();
         me.initTooltips();
         me.initEvents();
         me.setBrowserSpellcheck();
@@ -839,20 +846,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     	} else {
             me.consoleLog('Spellcheck activateSnapshotHistory: no');
     	}
-    },
-    /**
-     * Inject CSS into the Editor
-     */
-    injectCSSForEditor: function() {
-        var me = this;
-        Ext.util.CSS.createStyleSheetToWindow(
-                me.getEditorDoc(),
-                '.'+me.self.CSS_CLASSNAME_MATCH+' {cursor: pointer;}' + "\n" +
-                '.'+me.self.CSS_CLASSNAME_MATCH+', .'+me.self.CSS_CLASSNAME_MATCH+' .trackchanges {border-bottom: 3px dotted; border-color: red;}' + "\n" +
-                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_GRAMMERERROR+', .'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_GRAMMERERROR+' .trackchanges {border-color: #ab8906;}' + "\n" + // dark yellow
-                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SUGGESTION+', .'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SUGGESTION+' .trackchanges {border-color: #458fe6;}' + "\n" +     // blue
-                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SPELLERROR+', .'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SPELLERROR+' .trackchanges {border-color: #e645a8;}' + "\n"       // red-violet
-            );
     },
     
     // =========================================================================

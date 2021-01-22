@@ -74,6 +74,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         'LanguageResources' => false,            //disabled by default, controlled by ACL
         'TmOverview' => false,                   //disabled by default, controlled by ACL
         'Localizer' => true,
+        'QmSubSegments' => true//the check if this controller is active is task specific(runtimeOptions.editor.enableQmSubSegments flag is task specific)
     ];
     
     public function init() {
@@ -234,11 +235,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $manualStates = $rop->segments->stateFlags->toArray();
       $manualStates[0] = $this->translate->_('Nicht gesetzt');
       $this->setJsSegmentFlags('segments.stateFlags', $manualStates);
-      $this->view->Php2JsVars()->set('segments.showStatus', (bool)$rop->segments->showStatus);
-      $this->view->Php2JsVars()->set('segments.showQM', (bool)$rop->segments->showQM);
-      $this->view->Php2JsVars()->set('segments.userCanIgnoreTagValidation', (bool)$rop->segments->userCanIgnoreTagValidation);
-      $this->view->Php2JsVars()->set('segments.userCanModifyWhitespaceTags', (bool)$rop->segments->userCanModifyWhitespaceTags);
-      $this->view->Php2JsVars()->set('segments.userCanInsertWhitespaceTags', (bool)$rop->segments->userCanInsertWhitespaceTags);
       $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
       /* @var $states editor_Models_Segment_AutoStates */
       $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
@@ -256,13 +252,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       $this->view->Php2JsVars()->set('segments.matchratetypes', $typesWihtIcons); //needed to give plugins the abilty to add own icons as matchrate types
       
-      if($rop->editor->enableQmSubSegments) {
-          $this->view->Php2JsVars()->set('segments.subSegment.tagPath', $tagPath);
-      }
-      $this->view->Php2JsVars()->set('enable100pEditWarning', (bool) $rop->editor->enable100pEditWarning);
+      $this->view->Php2JsVars()->set('segments.subSegment.tagPath', $tagPath);
       
       $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$rop->loginUrl);
-      $this->view->Php2JsVars()->set('logoutOnWindowClose', APPLICATION_RUNDIR.$rop->logoutOnWindowClose);
+      $this->view->Php2JsVars()->set('logoutOnWindowClose', $rop->logoutOnWindowClose);
       
       $this->view->Php2JsVars()->set('errorCodesUrl',$rop->errorCodesUrl);
       
@@ -295,10 +288,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //create mailto link in the task list grid pm name column
       $this->view->Php2JsVars()->set('frontend.tasklist.pmMailTo', (boolean)$rop->frontend->tasklist->pmMailTo);
       
-      $this->view->Php2JsVars()->set('frontend.importTask.fieldsDefaultValue', $rop->frontend->importTask->fieldsDefaultValue->toArray());
-      
-      //disable language resources match panel in editor when only termcollection is assigned to the task
-      $this->view->Php2JsVars()->set('editor.LanguageResources.disableIfOnlyTermCollection',(boolean)$rop->editor->LanguageResources->disableIfOnlyTermCollection);
+      $this->view->Php2JsVars()->set('frontend.importTask.edit100PercentMatch',(bool) $rop->frontend->importTask->edit100PercentMatch);
       
       //is the openid data visible for the default customer
       $this->view->Php2JsVars()->set('customers.openid.showOpenIdDefaultCustomerData',(boolean)$rop->customers->openid->showOpenIdDefaultCustomerData);
@@ -312,10 +302,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->setLanguageResourceJsVars();
       
       $this->view->Php2JsVars()->set('editor.editorBrandingSource',$rop->editor->editorBrandingSource);
-
-      $this->view->Php2JsVars()->set('customPanel.title',$this->translate->_($rop->editor->customPanel->title));
-      $this->view->Php2JsVars()->set('customPanel.url',$rop->editor->customPanel->url);
       
+      $this->view->Php2JsVars()->set('editor.htmleditorCss', [
+          APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module').'/css/htmleditor.css'
+      ]);
+
       $helpWindowConfig=[];
       if(isset($rop->frontend->helpWindow)){
           $helpWindowConfig=$rop->frontend->helpWindow->toArray() ?? [];
@@ -335,13 +326,15 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
 
       //show references files popup
       $this->view->Php2JsVars()->set('frontend.showReferenceFilesPopup',$rop->editor->showReferenceFilesPopup);
-      //show confirm finish task popup
-      $this->view->Php2JsVars()->set('frontend.showConfirmFinishTaskPopup',$rop->editor->showConfirmFinishTaskPopup);
       
       $db = Zend_Db_Table::getDefaultAdapter();
       //set db version as frontend param
       $this->view->Php2JsVars()->set('dbVersion',$db->getServerVersion());
 
+      $config = ZfExtended_Factory::get('editor_Models_Config');
+      /* @var $config editor_Models_Config */
+      $this->view->Php2JsVars()->set('frontend.config.configLabelMap',$config->getLabelMap());
+      
       $this->setJsAppData();
     }
 
@@ -418,7 +411,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.branding', (string) $this->translate->_($ed->branding));
         $php2js->set('app.company', $this->config->runtimeOptions->companyName);
         $php2js->set('app.name', $this->config->runtimeOptions->appName);
-        $php2js->set('app.customHtmlContainer', (string) $this->translate->_($ed->customHtmlContainer));
         $php2js->set('app.user', $userSession->data);
         $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));
         $php2js->set('app.sessionKey', session_name());
@@ -459,13 +451,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         //set frontend array from the config data
         //the array is used as initial user config store data
         $php2js->set('app.configData', $config->loadAllMerged($user, 'runtimeOptions.frontend.defaultState.%'));
-        
-        //TODO currently the single preference is the alike Behaviour and showOnEmptyTarget,
-        // if there will be more we should consider to:
-        // either make an own preferences API which internally then maps to merge config
-        // or provide all preferences on a bulk way (similar to the defaultState.% loading)
-        $php2js->set('preferences.alikeBehaviour', $config->loadAllMerged($user, 'runtimeOptions.alike.defaultBehaviour')[0]);
-        $php2js->set('preferences.showOnEmptyTarget', $config->loadAllMerged($user, 'runtimeOptions.alike.showOnEmptyTarget')[0]);
     }
     
     protected function getAppVersion() {
@@ -482,11 +467,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
         
-        $ed = $this->config->runtimeOptions->editor;
-
-        if($ed->enableQmSubSegments){
-            $this->frontendEndControllers['QmSubSegments'] = true;
-        }
         if($acl->isInAllowedRoles($userSession->data->roles,'frontend','taskOverviewFrontendController')){
             $this->frontendEndControllers['admin.TaskOverview'] = true;
             $this->frontendEndControllers['admin.TaskPreferences'] = true;
@@ -600,8 +580,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     public function localizedjsstringsAction() {
-      $this->getResponse()->setHeader('Content-Type', 'text/javascript', TRUE);
-      $this->_helper->layout->disableLayout();
+        $this->getResponse()->setHeader('Content-Type', 'text/javascript', TRUE);
+        $this->_helper->layout->disableLayout();
     }
     
     public function wdhehelpAction() {

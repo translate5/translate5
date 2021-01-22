@@ -37,17 +37,12 @@
  */
 class editor_Plugins_NecTm_Connector extends editor_Services_Connector_FilebasedAbstract {
     
+    use editor_Services_Connector_BatchTrait;
+    
     /**
      * @var editor_Plugins_NecTm_HttpApi
      */
     protected $api;
-    
-    /***
-     * Filename by file id cache
-     * @var array
-     */
-    public $fileNameCache=array();
-    
     
     /**
      * @var editor_Models_Import_FileParser_XmlParser
@@ -77,7 +72,23 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     protected $sourceLangForNecTm;
     protected $targetLangForNecTm;
     
+    /**
+     * Using Xliff based tag handler here
+     * @var string
+     */
+    protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_Xliff';
     
+    /**
+     * Just overwrite the class var hint here
+     * @var editor_Services_Connector_TagHandler_Xliff
+     */
+    protected $tagHandler;
+    
+    /***
+     * Filename by file id cache
+     * @var array
+     */
+    public $fileNameCache=array();
     
     /**
      * {@inheritDoc}
@@ -179,22 +190,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::open()
-     */
-    public function open() {
-        //This call is not necessary, since this resource is opened automatically.
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::close()
-     */
-    public function close() {
-        //This call is not necessary, since this resource is closed automatically.
-    }
-    
-    /**
-     * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
     public function addTm(array $fileinfo = null, array $params=null) {
@@ -290,8 +285,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             //replace non-alpha-numeric characters
             $filename = preg_replace('/[^a-z0-9]+/', '_', strtolower($serverName)).'.tmx';
         }
-        $source= $this->prepareSegmentContent($this->getQueryString($segment));
-        $target= $this->prepareSegmentContent($segment->getTargetEdit());
+        $source= $this->tagHandler->prepareQuery($this->getQueryString($segment));
+        $target= $this->tagHandler->prepareQuery($segment->getTargetEdit());
 
         if($this->api->addTMUnit($source, $target, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories, $filename)) {
             return;
@@ -316,12 +311,11 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        
-        $this->initAndPrepareQueryString($segment);
+        $qs = $this->getQueryStringAndSetAsDefault($segment);
         
         $results = null;
         $this->validateLanguages($this->sourceLang, $this->targetLang);
-        if($this->api->search($this->searchQueryString, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
+        if($this->api->search($this->tagHandler->prepareQuery($qs), $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
             $results = $this->api->getResult();
             if(empty($results)) {
                 return $this->resultList;
@@ -329,50 +323,33 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             foreach($results as $result) {
                 $source=$result->tu->source_text ?? "";
                 $target = $result->tu->target_text ?? "";
-                $this->resultList->addResult($this->prepareTranslatedText($target), $result->match, $this->getMetaData($result));
-                $this->resultList->setSource($this->prepareTranslatedText($source));
+                $this->resultList->addResult($this->tagHandler->restoreInResult($target), $result->match, $this->getMetaData($result));
+                $this->resultList->setSource($this->tagHandler->restoreInResult($source));
             }
         }
         return $this->resultList;
     }
     
-    /***
-     * Send batch query request to the remote endpoint. For each segment, save one cache entry in the batch cache database
-     * where the result will be serialized editor_Services_ServiceResult.
-     * @param array $queryStrings
-     * @param array $querySegmentMap
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_BatchTrait::batchSearch()
      */
-    public function handleBatchQuerys(array $queryStrings,array $querySegmentMap){
-        $sourceLang = $this->languageResource->getSourceLangCode();
-        $targetLang = $this->languageResource->getTargetLangCode();
+    protected function batchSearch(array $queryStrings, string $sourceLang, string $targetLang): bool {
         $engineId = $this->languageResource->getSpecificData('engineId');
-        $this->resultList->resetResult();
-        if(!$this->api->searchBatch($queryStrings, $sourceLang, $targetLang, $engineId,$this->batchQueryBuffer)){
-            return;
-        }
-        $results = $this->api->getResult();
-        if(empty($results)) {
-            return;
-        }
-        //for each segment, one result is available
-        foreach ($results as $segmentResults) {
-            //get the segment from the beginning of the cache
-            //we assume that for each requested query string, we get one response back
-            $seg =array_shift($querySegmentMap);
-            /* @var $seg editor_Models_Segment */
-            
-            $this->initAndPrepareQueryString($seg);
-            
-            $tmResults = $segmentResults->results ?? [];
-            foreach ($tmResults as $tmRes){
-                $source=$tmRes->tu->source_text ?? "";
-                $target = $tmRes->tu->target_text ?? "";
-                $this->resultList->addResult($this->prepareTranslatedText($target), $tmRes->match, $this->getMetaData($tmRes));
-                $this->resultList->setSource($this->prepareTranslatedText($source));
-            }
-            
-            $this->saveBatchResults($seg);
-            $this->resultList->resetResult();
+        return $this->api->searchBatch($queryStrings, $sourceLang, $targetLang, $engineId, $this->batchQueryBuffer);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_BatchTrait::processBatchResult()
+     */
+    protected function processBatchResult($segmentResults) {
+        $tmResults = $segmentResults->results ?? [];
+        foreach ($tmResults as $tmRes){
+            $source=$tmRes->tu->source_text ?? "";
+            $target = $tmRes->tu->target_text ?? "";
+            $this->resultList->addResult($this->tagHandler->restoreInResult($target), $tmRes->match, $this->getMetaData($tmRes));
+            $this->resultList->setSource($this->tagHandler->restoreInResult($source));
         }
     }
     
@@ -434,8 +411,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         }
         
         foreach($results as $result) {
-            $this->resultList->addResult($this->highlight($searchString, strip_tags($result['target']), $field == 'target'));
-            $this->resultList->setSource($this->highlight($searchString, strip_tags($result['source']), $field == 'source'));
+            $this->resultList->addResult($this->highlight($searchString, $this->tagHandler->restoreInResult($result['target']), $field == 'target'));
+            $this->resultList->setSource($this->highlight($searchString, $this->tagHandler->restoreInResult($result['source']), $field == 'source'));
         }
         return $this->resultList;
     }
@@ -460,8 +437,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             foreach($results as $result) {
                 $source=$result->tu->source_text ?? "";
                 $target = $result->tu->target_text ?? "";
-                $this->resultList->addResult($target, $result->match, $this->getMetaData($result));
-                $this->resultList->setSource($source);
+                $this->resultList->addResult(strip_tags($target), $result->match, $this->getMetaData($result));
+                $this->resultList->setSource(strip_tags($source));
             }
         }
         return $this->resultList;
@@ -487,11 +464,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     protected function handleNecTmError($logMsg) {
         $errors = $this->api->getErrors();
         
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
-        $msg = 'Von NEC-TM gemeldeter Fehler';
-        $messages->addError($msg, 'core', null, $errors);
-        
         throw new editor_Plugins_NecTm_Exception('E1162', [
             'LanguageResource' => print_r($this->languageResource->getDataObject(),1),
             'Error' => print_r($errors,1)
@@ -502,26 +474,11 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(& $moreInfo){
+    public function getStatus(editor_Models_LanguageResources_Resource $resource){
         if($this->api->getStatus()){
             return self::STATUS_AVAILABLE;
         }
         return self::STATUS_NOCONNECTION;
-    }
-    
-    /***
-     * Calculate the new matchrate value.
-     * Check if the current match is of type context-match or exact-exact match
-     *
-     * @param int $matchRate
-     * @param array $metaData
-     * @param editor_Models_Segment $segment
-     * @param string $filename
-     *
-     * @return integer
-     */
-    protected function calculateMatchRate($matchRate,$metaData,$segment,$filename){
-        // TODO (context-matches not supported by DeepL-Api so far)
     }
     
     /***
@@ -554,15 +511,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         $connector = ZfExtended_Factory::get(get_class($this));
         /* @var $connector editor_Services_Connector */
         $connector->connectTo($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());
+        $connector->setConfig($this->getConfig());
         $connector->isInternalFuzzy = true;
         return $connector;
-    }
-    
-    /***
-     * Get the result list where the >=100 matches with the same target are grouped as 1 match.
-     * @return editor_Services_ServiceResult|number
-     */
-    public function getResultListGrouped() {
-        // TODO (check if results can contain multiple 100%-matches)
     }
 }

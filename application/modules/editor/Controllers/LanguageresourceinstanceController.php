@@ -275,10 +275,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $eventLoggerGroupped=$eventLogger->getEventsCountGrouped([$this->entity->getId()]);
         $this->view->rows->eventsCount = isset($eventLoggerGroupped[$this->entity->getId()]) ? (integer)$eventLoggerGroupped[$this->entity->getId()] : 0;
         
-        $moreInfo = ''; //init as empty string, filled on demand by reference
         $connector = $serviceManager->getConnector($this->entity);
-        $this->view->rows->status = $connector->getStatus($moreInfo);
-        $this->view->rows->statusInfo = $t->_($moreInfo);
+        $this->view->rows->status = $connector->getStatus($this->entity->getResource());
+        $this->view->rows->statusInfo = $t->_($connector->getLastStatusInfo());
     }
     
     /**
@@ -807,7 +806,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         //setting the TM filename here, but can be overwritten in the connectors addTm method
         // for example when we get a new name from the service
-        $this->entity->addSpecificData('fileName', $importInfo[self::FILE_UPLOAD_NAME]['name']);
+        if(is_array($importInfo) && isset($importInfo[self::FILE_UPLOAD_NAME]['name'])) {
+            $filename = $importInfo[self::FILE_UPLOAD_NAME]['name'];
+        }
+        else {
+            $filename = '';
+        }
+        $this->entity->addSpecificData('fileName', $filename);
         
         $this->queueServiceImportWorker($importInfo, true);
     }
@@ -1050,7 +1055,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->load($languageResourceId);
 
         $connector = $this->getConnector();
-
         $result = $connector->query($segment);
         
         if($this->entity->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM){
@@ -1112,7 +1116,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $task=ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($session->taskGuid);
-        return $manager->getConnector($this->entity,$task->getSourceLang(),$task->getTargetLang());
+        return $manager->getConnector($this->entity,$task->getSourceLang(),$task->getTargetLang(),$task->getConfig());
     }
     
     /***

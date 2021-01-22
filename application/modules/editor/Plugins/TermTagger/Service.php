@@ -250,6 +250,10 @@ class editor_Plugins_TermTagger_Service {
         $this->lastStatus = false;
         $start = microtime(true);
         try {
+            $extraData = [
+                'httpMethod' => $method,
+                'termTaggerUrl' => $client->getUri(true),
+            ];
             $result = $client->request($method);
             if(ZfExtended_Debug::hasLevel('plugin', 'TermTagger')) {
                 $rand = rand();
@@ -259,37 +263,24 @@ class editor_Plugins_TermTagger_Service {
             }
             $this->lastStatus = $result->getStatus();
             return $result;
-        } catch(Exception $httpException) {
-            $isInAdapter = $httpException instanceof Zend_Http_Client_Adapter_Exception;
-            $msg = $httpException->getMessage();
-            $extraData = [
-                'httpMethod' => $method,
-                'termTaggerUrl' => $client->getUri(true),
-            ];
-            
+        } catch(ZfExtended_Zendoverwrites_Http_Exception_TimeOut $httpException) {
+            //if the error is one of the following, we have a request timeout
+            //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Read timed out after 10 seconds
+            throw new editor_Plugins_TermTagger_Exception_TimeOut('E1240', $extraData, $httpException);
+        } catch(ZfExtended_Zendoverwrites_Http_Exception_Down $httpException) {
             //if the error is one of the following, we have a connection problem
             //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://localhost:8080. Error #111: Connection refused
             //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://michgibtesdefinitivnichtalsdomain.com:8080. Error #0: php_network_getaddresses: getaddrinfo failed: Name or service not known
+
             //the following IP is not routed, so it trigers a timeout on connection connect, which must result in "Unable to connect" too and not in a request timeout below
             //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://10.255.255.1:8080. Error #111: Connection refused
-            //if the error is one of the following, we have a request timeout
-            //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Read timed out after 10 seconds
-            if($isInAdapter) {
-                if(strpos($msg, 'Read timed out after') === 0) {
-                    throw new editor_Plugins_TermTagger_Exception_TimeOut('E1240', $extraData, $httpException);
-                }elseif(strpos($msg, 'Unable to Connect to') === 0) {
-                    throw new editor_Plugins_TermTagger_Exception_Down('E1129', $extraData, $httpException);
-                }
-            }
-            
-            //Error in communication with TermTagger
-            $ecode = 'E1119';
+            throw new editor_Plugins_TermTagger_Exception_Down('E1129', $extraData, $httpException);
+        } catch(ZfExtended_Zendoverwrites_Http_Exception_NoResponse $httpException) {
             //This error points to an crash of the termtagger, so we can log additional data here
-            if($httpException instanceof Zend_Http_Client_Exception && strpos($msg, 'Unable to read response, or response is empty') === 0) {
-                $ecode = 'E1130';
-            }
-            
-            throw new editor_Plugins_TermTagger_Exception_Request($ecode, $extraData, $httpException);
+            throw new editor_Plugins_TermTagger_Exception_Request('E1130', $extraData, $httpException);
+        } catch(Exception $httpException) {
+            //Error in communication with TermTagger
+            throw new editor_Plugins_TermTagger_Exception_Request('E1119', $extraData, $httpException);
         }
     }
     
@@ -299,7 +290,7 @@ class editor_Plugins_TermTagger_Service {
      * @return Zend_Http_Client
      */
     protected function getHttpClient($uri) {
-        $client = new Zend_Http_Client();
+        $client = ZfExtended_Factory::get('Zend_Http_Client');
         $client->setUri($uri);
         return $client;
     }

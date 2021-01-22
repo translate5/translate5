@@ -1233,8 +1233,9 @@ Ext.override(Ext.panel.Table, {
         this.callParent([
             config
         ]);
-
-        this.store.trackStateChanges = false;
+        if(this.store){
+            this.store.trackStateChanges = false;
+        }
     }
 });
 
@@ -1335,3 +1336,41 @@ Ext.override(Ext.grid.filters.filter.List, {
     updateBuffer:2000
 });
 
+/**
+ * Problem: When using Tag field with anymatch, the entered characters remain in the input when selecting a matching value.
+ * The problem is in the original method, that only Ext.String.startsWith(lastDisplayValue, inputValue, true) which is NOT anymatch.
+ * This problem persists at least until ExtJS 7.3.1
+ */
+Ext.override(Ext.form.field.Tag, {
+    clearInput: function() {
+        var me = this,
+            valueRecords = me.getValueRecords(),
+            inputValue = me.inputEl && me.inputEl.dom.value,
+            matcher,
+            lastDisplayValue;
+ 
+        if (valueRecords.length && inputValue) {
+            lastDisplayValue = valueRecords[valueRecords.length-1].get(me.displayField);
+ 
+            if(me.anyMatch) {
+                matcher = Ext.String.createRegex(inputValue, false, false, !me.caseSensitive);
+                if(!(matcher ? matcher.test(lastDisplayValue) : (lastDisplayValue == null))) {
+                    return;
+                }
+            } else {
+                if(!Ext.String.startsWith(lastDisplayValue, inputValue, true)) {
+                    return;
+                }
+            }
+            
+            me.inputEl.dom.value = '';
+            
+            if (me.queryMode == 'local') {
+                me.clearLocalFilter();
+                // we need to refresh the picker after removing 
+                // the local filter to display the updated data
+                me.getPicker().refresh();
+            }
+        }
+    }
+});

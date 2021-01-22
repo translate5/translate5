@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -36,10 +36,6 @@ END LICENSE AND COPYRIGHT
  * Abstract Base Connector
  */
 abstract class editor_Services_Connector_Abstract {
-    
-    //FIXME this is just a temporary solution until TagTrait is refactored into smaller reusable classes, see TRANSLATE-1509 
-    use editor_Models_Import_FileParser_TagTrait;
-    
     const STATUS_NOTCHECKED = 'notchecked';
     const STATUS_ERROR = 'error';
     const STATUS_AVAILABLE = 'available';
@@ -47,13 +43,14 @@ abstract class editor_Services_Connector_Abstract {
     const STATUS_NOCONNECTION = 'noconnection';
     const STATUS_NOVALIDLICENSE = 'novalidlicense';
     const STATUS_NOT_LOADED = 'notloaded';
+    const STATUS_QUOTA_EXCEEDED = 'quotaexceeded';
     
     const FUZZY_SUFFIX = '-fuzzy-';
     
     /***
      * Source languages array key for the languages result.
      * In some of the resources the supported "from-to" languages are not the same.
-     * That is why the languages grouping is required in some of them. 
+     * That is why the languages grouping is required in some of them.
      * @var string
      */
     const SOURCE_LANGUAGES_KEY = 'sourceLanguages';
@@ -66,7 +63,7 @@ abstract class editor_Services_Connector_Abstract {
      */
     const TARGET_LANGUAGES_KEY = 'targetLanguages';
     
-    /*** 
+    /***
      * Default resource matchrate
      * @var integer
      */
@@ -104,82 +101,50 @@ abstract class editor_Services_Connector_Abstract {
      */
     protected $isInternalFuzzy = false;
     
-    /**
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $internalTag;
-    
-    /**
-     * @var editor_Models_Segment_Whitespace
-     */
-    protected $whitespaceHelper;
-    
-    /**
-     * @var editor_Models_Segment_TrackChangeTag
-     */
-    protected $trackChange;
-    
-    /**
-     * Internal flag which stores the info if tags where stripped by the query call or not
-     * @var string
-     */
-    protected $tagsWereStripped = true;
-    
     /***
      * @var editor_Models_LanguageResources_Resource
      */
     protected $resource;
     
-    /***
-     * Number of segments wich the batch query sedns at once
-     * @var integer
-     */
-    protected $batchQueryBuffer=1;
-    
-    /***
-     * 
-     * @var editor_Models_Import_FileParser_XmlParser
-     */
-    protected $xmlParser;
-    
-    /***
-     * 
-     * @var array
-     */
-    protected $queryStringTagMap = [];
-    
-    /***
-     * Query string prepared for api search. This value is generated after initAndPrepareQueryString call
+    /**
+     * Using Remover Tag Handler class as default. If needed other, set the class here in the concrete implementation class
      * @var string
      */
-    protected $searchQueryString;
+    protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_Remover';
+    
+    /**
+     * Tag Handler instance as needed by the concrete Connector
+     * @var editor_Services_Connector_TagHandler_Abstract
+     */
+    protected $tagHandler;
+    
+    /**
+     * @var string
+     */
+    protected $lastStatusInfo = '';
+    
+    /**
+     * Logger instance
+     * @var ZfExtended_Logger
+     */
+    public $logger;
+    
+    /***
+     * By default the config values are all overwritten by instance (level 2).
+     * Depending on the context, this config can be overwritten on level 4,8,16 (client,task-import,task).
+     * @var Zend_Config
+     */
+    protected $config;
     
     /**
      * initialises the internal result list
      */
     public function __construct() {
+        //init the default logger, is changed in connectTo
+        $this->logger = Zend_Registry::get('logger');
         $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
-        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        $this->trackChange = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-        $this->xmlParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        
-        $this->initHelper();
-            //$this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
-        $this->initImageTags();
-    }
-    
-    /***
-     * Check the resource connection. This will return true conection with the resource can
-     * be established
-     * @param editor_Models_LanguageResources_Resource $resource
-     * @return boolean
-     */
-    public function ping(editor_Models_LanguageResources_Resource $resource){
-        $this->resource = $resource;
-        $moreInfo = "";
-        //the valid api response statuses
-        $isValidFor = [self::STATUS_AVAILABLE,self::STATUS_NOT_LOADED];
-        return in_array($this->getStatus($moreInfo), $isValidFor);
+        $this->tagHandler = ZfExtended_Factory::get($this->tagHandlerClass);
+        $this->config = Zend_Registry::get('config');
     }
     
     /**
@@ -193,8 +158,8 @@ abstract class editor_Services_Connector_Abstract {
     /**
      * Link this Connector Instance to the given LanguageResource and its resource, in the given language combination
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
-     * @param int $sourceLang language id 
-     * @param int $targetLang language id 
+     * @param int $sourceLang language id
+     * @param int $targetLang language id
      */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
         $this->sourceLang = $sourceLang;
@@ -206,6 +171,15 @@ abstract class editor_Services_Connector_Abstract {
             $this->languageResource->sourceLangCode=$this->languageResource->getSourceLangCode();
             $this->languageResource->targetLangCode=$this->languageResource->getTargetLangCode();
         }
+        $this->logger = $this->logger->cloneMe('editor.languageresource.'.strtolower($this->resource->getService()).'.connector');
+    }
+    
+    /**
+     * Sets the internal stored resource, needed for connections without a concrete language resource (pinging for example)
+     * @param editor_Models_LanguageResources_Resource $resource
+     */
+    public function setResource(editor_Models_LanguageResources_Resource $resource) {
+        $this->resource = $resource;
     }
     
     /**
@@ -226,11 +200,19 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /***
-     * Get the connector language ressource
+     * Get the connector language resource
      * @return editor_Models_LanguageResources_LanguageResource
      */
     public function getLanguageResource(){
         return $this->languageResource;
+    }
+    
+    /***
+     * Get the connector service resource
+     * @return editor_Models_LanguageResources_Resource
+     */
+    public function getResource(){
+        return $this->resource;
     }
     
     /***
@@ -243,69 +225,12 @@ abstract class editor_Services_Connector_Abstract {
 
     /**
      * makes a tm / mt / file query to find a match / translation
-     * returns an array with stdObjects, each stdObject contains the fields: 
-     * 
+     * returns an array with stdObjects, each stdObject contains the fields:
+     *
      * @param editor_Models_Segment $segment
      * @return editor_Services_ServiceResult
      */
     abstract public function query(editor_Models_Segment $segment);
-    
-    
-    /***
-     * Query the resource with multiple segments at once, and save the results in the database.
-     * @param string $taskGuid
-     */
-    public function batchQuery(string $taskGuid){
-        $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$taskGuid]);
-        /* @var $segments editor_Models_Segment_Iterator */
-        
-        //number of temporary cached segments
-        $tmpBuffer = 0;
-        //holds the query strings for batch request
-        $queryStrings = [];
-        //source query to segment map
-        $querySegmentMap = [];
-        
-        foreach ($segments as $segment){
-            
-            //build the query without registering xml parser
-            $this->initAndPrepareQueryString($segment,false);
-            
-            //set the query string to segment map. Later it will be used to reapply the taks
-            $querySegmentMap[] = clone $segment;
-            
-            //collect the source text
-            $queryStrings[]=$this->searchQueryString;
-            $tmpBuffer++;
-            
-            if($tmpBuffer != $this->batchQueryBuffer){
-                continue;
-            }
-            
-            $tmpBuffer=0;
-            
-            //send batch query request, and save the results to the batch cache
-            $this->handleBatchQuerys($queryStrings,$querySegmentMap);
-            
-            $querySegmentMap = [];
-            $queryStrings = [];
-        }
-        
-        if(!empty($queryStrings)){
-            $this->handleBatchQuerys($queryStrings,$querySegmentMap);
-        }
-    }
-    /***
-     * Batch query request for $queryStrings and saving the results for each translation.
-     * This is only template function. Override this in each connector if the connector supports batch
-     * query requests.
-     * @param array $queryStrings
-     * @param array $querySegmentMap
-     */
-    public function handleBatchQuerys(array $queryStrings,array $querySegmentMap) {
-        
-    }
-    
 
     /**
      * returns the original or edited source content to be queried, depending on source edit
@@ -318,7 +243,7 @@ abstract class editor_Services_Connector_Abstract {
     
     /***
      * returns the original or edited $segmentField content to be queried, depending on source edit
-     * 
+     *
      * @param editor_Models_Segment $segment
      * @param string $segmentField: segmentField (source or target)
      * @return string
@@ -328,73 +253,6 @@ abstract class editor_Services_Connector_Abstract {
         $sourceMeta = $sfm->getByName($segmentField);
         $isSourceEdit = ($sourceMeta !== false && $sourceMeta->editable == 1);
         return $isSourceEdit ? $segment->getFieldEdited($segmentField) : $segment->getFieldOriginal($segmentField);
-    }
-    
-    /**
-     * prepares and gets the query string in a default manner:
-     * - restore whitespace
-     * - remove all translate5 tags 
-     * the single steps from that function can be reused if needed the query string in a different way 
-     * @param editor_Models_Segment $segment
-     * @return string 
-     */
-    protected function prepareDefaultQueryString(editor_Models_Segment $segment) {
-        //1. organizational preparation
-        $qs = $this->getQueryString($segment);
-        $this->resultList->setDefaultSource($qs);
-        if(empty($qs) && $qs !== "0") {
-            return $qs;
-        }
-        
-        //2. whitespace preparation
-        $qs = $this->restoreWhitespaceForQuery($qs);
-        
-        //3. set flag if tags were removed or not (= if the segment was containing flags)
-        $this->tagsWereStripped = $this->internalTag->count($qs) > 0;
-        
-        //4. strip tags
-        return $segment->stripTags($qs);
-    }
-    
-    /**
-     * Prepare sources and targets for being handled by the LanguageResource:
-     * - removeTrackChanges
-     * - restore whitespaces to real characters
-     * @param string $contentString
-     * @return string $preparedString
-     */
-    protected function prepareSegmentContent(string $contentString) {
-        $preparedString = $contentString;
-        // removeTrackChanges
-        $preparedString = $this->trackChange->removeTrackChanges($preparedString);
-        //restore the whitespaces to real characters
-        $preparedString = $this->internalTag->restore($preparedString, true);
-        $preparedString = $this->whitespaceHelper->unprotectWhitespace($preparedString);
-        $preparedString = $this->internalTag->toXliffPaired($preparedString);
-        return $preparedString;
-    }
-    
-    /**
-     * restores whitespace in segment content and removes track changes before
-     * @param string $queryString
-     * @return string
-     */
-    protected function restoreWhitespaceForQuery($queryString) {
-        $qs = $this->trackChange->removeTrackChanges($queryString);
-        //restore the whitespaces to real characters
-        $qs = $this->internalTag->restore($qs, true);
-        return $this->whitespaceHelper->unprotectWhitespace($qs);
-    }
-    
-    /**
-     * converts whitespace coming from the connected resource to translate5 usable whitespace tags
-     * Warning: text may not contain other tags - they will be destroyed! For more complex solution see OpenTM2
-     * 
-     * @param string $textNode
-     */
-    protected function importWhitespaceFromTagLessQuery($textNode) {
-        $textNode = $this->whitespaceHelper->protectWhitespace($textNode, false);
-        return $this->whitespaceTagReplacer($textNode);
     }
     
     /**
@@ -410,84 +268,58 @@ abstract class editor_Services_Connector_Abstract {
         return preg_replace('/('.preg_quote($searchString, '/').')/i', '<span class="highlight">\1</span>', $haystack);
     }
     
-    protected function saveBatchResults(editor_Models_Segment $seg) {
-        $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
-        /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */
-        $model->setLanguageResource($this->languageResource->getId());
-        $model->setSegmentId($seg->getId());
-        $model->setResult(serialize($this->resultList));
-        $model->save();
-    }
-    
     /**
      * makes a tm / mt / file concordance search
      * @param string $queryString
      * @param string $field
      * @return editor_Services_ServiceResult
      */
-    abstract public function search(string $searchString, $field = 'source', $offset = null);
+    public function search(string $searchString, $field = 'source', $offset = null) {
+        throw new BadMethodCallException("This Service Connector does not support search requests!");
+    }
     
     /**
-     * @return editor_Services_ServiceResult the status of the connected resource and additional information if there is some
+     * Check the status of the language resource. If using the HttpClient,
+     *  the handling of general service down and timeout as no connection, is done in the connector wrapper.
+     * @param editor_Models_LanguageResources_Resource $resource the resource which should be used for connection
+     * @return string the status of the connected resource and additional information if there is some
      */
-    abstract public function getStatus(& $moreInfo);
+    abstract public function getStatus(editor_Models_LanguageResources_Resource $resource);
+    
+    /**
+     * returns the last stored additional info string from the last getStatus call
+     * @return string
+     */
+    public function getLastStatusInfo(): string {
+        return $this->lastStatusInfo;
+    }
+    
+    /**
+     * set the last stored additional info string for the last getStatus call from outside
+     * @param string $info
+     */
+    public function setLastStatusInfo(string $info) {
+        return $this->lastStatusInfo = $info;
+    }
     
     /***
      * Search the resource for available translation. Where the source text is in resource source language and the received results
-     * are in the resource target language 
-     * 
+     * are in the resource target language
+     *
      * @param string $searchString plain text without tags
      * @return editor_Services_ServiceResult
      */
     abstract public function translate(string $searchString);
     
-    
-    /***
-     * Prepares the search query string for api search. 
-     * Sets the search query string as default source result.
-     * Handles the white spaces and track changes for the search query string.
-     * Stores internal tag map, so later the tags can be reapplied to the received translation.
-     * This function only should be used with prepareTranslatedText combination 
-     *
+    /**
+     * get query string from segment and set it as result default source
      * @param editor_Models_Segment $segment
-     * @param bool $useXmlParser
-     */
-    protected function initAndPrepareQueryString(editor_Models_Segment $segment,bool $useXmlParser = true) {
-        
-        $this->searchQueryString = $this->getQueryString($segment);
-        $this->resultList->setDefaultSource($this->searchQueryString);
-        $this->searchQueryString = $this->restoreWhitespaceForQuery($this->searchQueryString);
-        
-        //$queryStringTagMap is set by reference
-        $this->queryStringTagMap = [];
-        $this->searchQueryString = $this->internalTag->toXliffPaired($this->searchQueryString, true, $this->queryStringTagMap);
-        if(!$useXmlParser){
-            return;
-        }
-        $mapCount = count($this->queryStringTagMap);
-        
-        //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
-        $xmlParser = $this->xmlParser;
-        
-        $this->shortTagIdent = $mapCount + 1;
-        $this->xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
-            $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true);
-            $textNode = $this->whitespaceTagReplacer($textNode);
-            $xmlParser->replaceChunk($key, $textNode);
-        });
-    }
-    
-    /***
-     * Parses the received text translation and reapply the internal tags.
-     * This should be called only after initAndPrepareQueryString
-     * @param string $translatedText
      * @return string
      */
-    protected function prepareTranslatedText(string $translatedText) {
-        //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied,
-        // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
-        $target = $this->xmlParser->parse($translatedText);
-        return $this->internalTag->reapply2dMap($target, $this->queryStringTagMap);
+    protected function getQueryStringAndSetAsDefault(editor_Models_Segment $segment): string {
+        $qs = $this->getQueryString($segment);
+        $this->resultList->setDefaultSource($qs);
+        return $qs;
     }
     
     /**
@@ -509,13 +341,17 @@ abstract class editor_Services_Connector_Abstract {
     
     /***
      * Return the available language codes for the current resource endpoint(api)
-     * Use SOURCE_LANGUAGES_KEY and TARGET_LANGUAGES_KEY as languages grouped results when 
+     * Use SOURCE_LANGUAGES_KEY and TARGET_LANGUAGES_KEY as languages grouped results when
      * the resource does not support same from - to language combinations
+     *
+     * MAY NOT THROW EXCEPTIONS! But return empty list on errors.
+     *
+     * @return string[]
      */
-    public function languages(){
+    public function languages(): array {
         $languages = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languages editor_Models_Languages*/
-        $ret=$languages->loadAllKeyValueCustom('id','rfc5646');
+        $ret = $languages->loadAllKeyValueCustom('id','rfc5646');
         return array_values($ret);
     }
     
@@ -543,11 +379,37 @@ abstract class editor_Services_Connector_Abstract {
         return $this->isInternalFuzzy;
     }
     
-    /***
-     * If the batch query buffer is set for more then 1 segment, then this connector should support batch query requests
+    /**
+     * By default batch queries are not supported. The according editor_Services_Connector_BatchTrait trait must be used in the connector in order to enable batch queries.
      * @return boolean
      */
-    public function isBatchQuery() {
-        return $this->batchQueryBuffer>1;
+    public function isBatchQuery(): bool {
+        return false;
+    }
+    
+    /**
+     * Logs all queued log entries, adding segment data on each log entry
+     * @param editor_Models_Segment $segment
+     */
+    public function logForSegment(editor_Models_Segment $segment) {
+        if(!$this->tagHandler->logger->hasQueuedLogs()) {
+            return;
+        }
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($segment->getTaskGuid());
+        $this->tagHandler->logger->flush([
+            'segmentId' => $segment->getId(),
+            'nrInTask' => $segment->getSegmentNrInTask(),
+            'task' => $task
+        ], $this->logger->getDomain());
+    }
+    
+    public function setConfig(Zend_Config $config) {
+        $this->config = $config;
+    }
+    
+    public function getConfig() {
+        return $this->config;
     }
 }

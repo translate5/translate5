@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -82,7 +82,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
                 return $this->validateLength($value, $edit);
             },true);
             //by default the edited and toSort fields don't have a length restriction, so we add it to the addDontValidateField
-            // (ok, the MySQL length restriction for longtext fields, 
+            // (ok, the MySQL length restriction for longtext fields,
             // but that should not bother the user in the frontend, since a segment will never get so long)
             $this->addDontValidateField($toSort);
         }
@@ -147,10 +147,8 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           return true;
       }
       
-      $sizeUnit = empty($meta['sizeUnit']) ? editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT : $meta['sizeUnit'];
-      $isPixelBased = ($sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING);
       
-      if ($isPixelBased && array_key_exists('maxNumberOfLines',$meta) && !is_null($meta['maxNumberOfLines'])) {
+      if (array_key_exists('maxNumberOfLines',$meta) && !is_null($meta['maxNumberOfLines'])) {
           return $this->validateLengthForLines($value, $field);
       } else {
           return $this->validateLengthForSegmentAndSiblings($value, $field);
@@ -239,11 +237,11 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           if($id == $this->entity->getId()) {
               //if the found sibling is the segment itself, use the length of the value to be stored
               $length += (int)$this->entity->textLengthByMeta($value, $this->entity->meta(), $this->entity->getFileId());
-              //normally, the length of one segment contains also the additionalMrkLength, 
+              //normally, the length of one segment contains also the additionalMrkLength,
               //for the current segment this is added below, the siblings in the next line contain their additionalMrk data already
           }
           else {
-              //add the text length of desired field 
+              //add the text length of desired field
               $length += (int)$data['length'][$field];
           }
       }

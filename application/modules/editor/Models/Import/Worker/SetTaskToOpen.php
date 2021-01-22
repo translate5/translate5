@@ -68,7 +68,7 @@ class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Import_Wor
      * @return string
      */
     protected function getInitialTaskState(editor_Models_Task $task) {
-        $config = Zend_Registry::get('config');
+        $config = $task->getConfig();
         $status = $config->runtimeOptions->import->initialTaskState;
         $reflection = new ReflectionObject($task);
         $constants = $reflection->getConstants();

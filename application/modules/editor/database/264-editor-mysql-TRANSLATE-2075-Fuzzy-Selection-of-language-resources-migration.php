@@ -45,7 +45,7 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-$sql = 'SELECT ll.*,lr.serviceType,lr.name,lr.serviceName FROM LEK_languageresources_languages ll
+$sql = 'SELECT ll.*,lr.serviceType,lr.name,lr.serviceName, lr.resourceId FROM LEK_languageresources_languages ll
 INNER JOIN LEK_languageresources lr ON ll.languageResourceId = lr.id
 WHERE lr.resourceType = "mt";';
 
@@ -61,7 +61,7 @@ if(empty($result)){
 $languagesCache=[];
 /***
  * Convert from sub to mayor if the language if the sublanguage is not supported by the remote resource
- * 
+ *
  * @param string $needle
  * @param array $haystack
  * @return string
@@ -87,14 +87,24 @@ function convertLanguage(string $needle,array $haystack) {
     }
     return $return;
 }
+
+$manager = ZfExtended_Factory::get('editor_Services_Manager');
+/* @var $manager editor_Services_Manager */
+
 foreach ($result as $res){
     echo "To check : ".$res['name']. ' Service:'.$res['serviceName'] .'<br/>'. PHP_EOL;
     if(!isset($languagesCache[$res['languageResourceId']])){
         try {
-        $connector = ZfExtended_Factory::get($res['serviceType'].editor_Services_Manager::CLS_CONNECTOR);
-        /* @var $connector editor_Services_Connector_Abstract */
-        $languages=$connector->languages();
-        $languagesCache[$res['languageResourceId']]=$languages;
+            $resource = $manager->getResourceById($res['serviceType'], $res['resourceId']);
+            if(empty($resource)){
+                throw new ZfExtended_Exception("Resource not found.");
+            }
+            //add languages to usable resources
+            $connector = ZfExtended_Factory::get('editor_Services_Connector');
+            /* @var $connector editor_Services_Connector */
+            $languages = $connector->languages($resource);
+            
+            $languagesCache[$res['languageResourceId']] = $languages;
         } catch (Exception $e) {
             echo "Resource with name: ".$res['name']. ' ignored because of error. Error was:'.$e->getMessage() .'<br/>'. PHP_EOL;
             continue;
@@ -103,7 +113,7 @@ foreach ($result as $res){
     
     
     $languages = $languagesCache[$res['languageResourceId']];
-    $s = convertLanguage($res['sourceLangCode'], $languages[editor_Services_Connector_Abstract::SOURCE_LANGUAGES_KEY] ??  $languages);
+    $s = convertLanguage($res['sourceLangCode'], $languages[editor_Services_Connector_Abstract::SOURCE_LANGUAGES_KEY] ?? $languages);
     
     $modelLanguages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
     /* @var $modelLanguages editor_Models_LanguageResources_Languages */
@@ -120,7 +130,7 @@ foreach ($result as $res){
         echo "Unsupported language found for resource: [".$res['name']."] . Old value :[".$res['sourceLangCode'].'] ; Changed to: ['.$s.']'.'<br/>'. PHP_EOL;
     }
     
-    $t = convertLanguage($res['targetLangCode'], $languages[editor_Services_Connector_Abstract::TARGET_LANGUAGES_KEY] ??  $languages);
+    $t = convertLanguage($res['targetLangCode'], $languages[editor_Services_Connector_Abstract::TARGET_LANGUAGES_KEY] ?? $languages);
     
     if(!empty($t)){
         $model = ZfExtended_Factory::get('editor_Models_Languages');

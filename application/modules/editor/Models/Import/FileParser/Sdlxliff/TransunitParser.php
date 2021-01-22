@@ -99,9 +99,15 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
      * @var Zend_Config
      */
     protected $config;
+
+    /**
+     * Transuntit ID
+     * @var string
+     */
+    protected $transunitId = null;
     
-    public function __construct() {
-        $this->config = Zend_Registry::get('config');
+    public function __construct(Zend_Config $config) {
+        $this->config = $config;
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
     }
     
@@ -242,6 +248,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
         $this->init();
         $transUnit = $this->handleEmptyTarget($transUnit);
         $this->initMrkHandler();
+        $this->transunitId = null;
 
         //parse the trans-unit
         //trigger segment save on the end of an transunit
@@ -263,6 +270,8 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
                     'transunit' => $transUnit
                 ]);
             }
+            
+            $this->transunitId = $this->xmlparser->getAttribute($opener['attributes'], 'id');
             
             //in the old parser, the mid's of source and target mrks were not compared, so we do not that here either:
             $mrkMids = array_keys($this->sourceMrkContent);
@@ -312,5 +321,13 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
             }
         });
         return $this->xmlparser->parse($transUnit);
+    }
+    
+    /**
+     * returns the found trans-unit id
+     * @return string|NULL
+     */
+    public function getTransunitId(): ?string {
+        return $this->transunitId;
     }
 }

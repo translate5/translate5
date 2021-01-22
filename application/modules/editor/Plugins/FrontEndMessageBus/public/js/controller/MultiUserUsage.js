@@ -451,6 +451,10 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
     },
     onResyncSession: function() {
         var sessionId = Ext.util.Cookies.get(Editor.data.app.sessionKey);
+        if(!sessionId) {
+            //if there is no session id, we can not resync it
+            return; 
+        }
         Ext.Ajax.request({
             url: Editor.data.restpath+'session/'+sessionId+'/resync/operation',
             method: "POST",
@@ -581,7 +585,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
     updateOnlineUsers: function() {
         var me = this, 
             store = Editor.data.task && Editor.data.task.userTracking && Editor.data.task.userTracking();
-        if(!store) {
+        if(!store || !me.onlineUsers) {
             return;
         }
         Ext.Object.each(me.onlineUsers.onlineInTask, function(key, val){

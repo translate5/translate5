@@ -351,12 +351,6 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      * @return boolean
      */
     protected function isAttachOriginalAsReference() {
-        $config = Zend_Registry::get('config')->runtimeOptions->import;
-        if(!isset($config->fileconverters->attachOriginalFileAsReference)) {
-            //default is true
-            return true;
-        }
-        $attach = $config->fileconverters->attachOriginalFileAsReference->toArray();
-        return $attach['okapi'] ?? false;
+        return (boolean)Zend_Registry::get('config')->runtimeOptions->plugins->Okapi->import->fileconverters->attachOriginalFileAsReference;
     }
 }

@@ -6,20 +6,20 @@ START LICENSE AND COPYRIGHT
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
- This file is part of a plug-in for translate5. 
+ This file is part of a plug-in for translate5.
  translate5 can be optained via the instructions that are linked at http://www.translate5.net
  For the license of translate5 itself please see http://www.translate5.net/license.txt
  For the license of this plug-in, please see below.
  
  This file is part of a plug-in for translate5 and may be used under the terms of the
- GNU GENERAL PUBLIC LICENSE version 3 as published by the Free Software Foundation and 
+ GNU GENERAL PUBLIC LICENSE version 3 as published by the Free Software Foundation and
  appearing in the file gpl3-license.txt included in the packaging of the translate5 plug-in
- to which this file belongs. Please review the following information to ensure the 
+ to which this file belongs. Please review the following information to ensure the
  GNU GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/gpl.html
    
- There is a plugin exception available for use with this release of translate5 for 
- translate5 plug-ins that are distributed under GNU GENERAL PUBLIC LICENSE version 3: 
+ There is a plugin exception available for use with this release of translate5 for
+ translate5 plug-ins that are distributed under GNU GENERAL PUBLIC LICENSE version 3:
  Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the
  root folder of translate5.
   
@@ -45,7 +45,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     protected $localePath = 'locales';
     
     /***
-     * 
+     *
      * @var array
      */
     protected $assocs=[];
@@ -124,7 +124,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     
     /***
      * Queue the match analysis worker
-     * 
+     *
      * @param string $taskGuid
      * @param bool $pretranlsate
      * @param array $eventParams
@@ -147,7 +147,6 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         
         //enable bath query via config
         $eventParams['batchQuery'] = (boolean)$this->config->enableBatchQuery;
-        
         $parentWorkerId=null;
         if(!empty($this->batchAssocs) && $eventParams['batchQuery']){
             $parentWorkerId=$this->queueBatchWorker($taskGuid, $eventParams);
@@ -185,7 +184,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     
     /***
      * Operation action handler. Run analysis and pretranslate if $pretranslate is true.
-     * 
+     *
      * @param Zend_EventManager_Event $event
      * @param bool $pretranlsate
      */
@@ -225,11 +224,22 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      */
     protected function queueBatchWorker(string $taskGuid,array $eventParams){
         $parentWorkerId = null;
-        foreach ($this->batchAssocs as $batchConnector){
+        $isPretranslateMt = (boolean) $eventParams['pretranslateMt'];
+        $isPretranslate = (boolean) $eventParams['pretranslate'];
+        foreach ($this->batchAssocs as $lr){
+            /* @var $lr editor_Models_LanguageResources_LanguageResource */
             $batchWorker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_BatchWorker');
             /* @var $batchWorker editor_Plugins_MatchAnalysis_BatchWorker */
             
-            if (!$batchWorker->init($taskGuid, ['connector'=>$batchConnector])) {
+            //do not use this resource when it is a mt and the pretranslateMt is disabled
+            //if the pretranslation is disabled(the current request is for analysis only), 
+            //do not use this resource for batch query. For analysis only, the results from the resource
+            //are not relevant, since always the same matchrate is received
+            if((!$isPretranslateMt || !$isPretranslate) && $lr->isMt()){
+                continue;
+            }
+            
+            if (!$batchWorker->init($taskGuid, ['languageResourceId' => $lr->getId()])) {
                 $task=ZfExtended_Factory::get('editor_Models_Task');
                 /* @var $task editor_Models_Task */
                 $task->loadByTaskGuid($taskGuid);
@@ -286,11 +296,11 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             /* @var $manager editor_Services_Manager */
             $resource=$manager->getResource($languageresource);
             
-            $connector=$manager->getConnector($languageresource,$task->getSourceLang(),$task->getTargetLang());
+            $connector=$manager->getConnector($languageresource,$task->getSourceLang(),$task->getTargetLang(),$task->getConfig());
             /* @var $connector editor_Services_Connector */
             //collect all connectors which are supporting batch query
             if($connector->isBatchQuery()){
-                $this->batchAssocs[]=clone $connector;
+                $this->batchAssocs[] = clone $languageresource;
             }
             
             //analysable language resource is found

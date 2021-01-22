@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -75,19 +75,13 @@ class editor_Models_Import_FileParser_XmlParser {
     
     protected $nonXmlBlocks = [];
     
-    /***
-     * Used for string as valid xml check
-     * @var DOMDocument
-     */
-    protected $domDocument;
-    
     /**
-     * walks through the given XML string and fires the registered callbacks for each found node 
-     * Preserving whitespace in XML is defined by the xml:space attribute on each node. 
+     * walks through the given XML string and fires the registered callbacks for each found node
+     * Preserving whitespace in XML is defined by the xml:space attribute on each node.
      *  If the attribute is not given, the parent node is considered.
-     *  The initial root value (preserve or ignore) is given here as boolean parameter 
+     *  The initial root value (preserve or ignore) is given here as boolean parameter
      * @param string $xml
-     * @param bool $preserveWhitespaceRoot 
+     * @param bool $preserveWhitespaceRoot
      * @return string the parsed string with all callbacks applied
      */
     public function parse($xml, $preserveWhitespaceRoot = false) {
@@ -108,13 +102,15 @@ class editor_Models_Import_FileParser_XmlParser {
     }
     
     /**
-     * walks through the given XML chunk array and fires the registered callbacks for each found node 
+     * walks through the given XML chunk array and fires the registered callbacks for each found node
      * @param array $chunks
      * @param bool $preserveWhitespaceRoot see method parse
      */
     public function parseList(array $chunks, $preserveWhitespaceRoot = false) {
-        $this->preserveWhitespace = $preserveWhitespaceRoot;
+        $this->xmlStack = [];
         $this->xmlChunks = $chunks;
+        $this->preserveWhitespace = $preserveWhitespaceRoot;
+        $this->disableHandlerCount = 0;
         foreach($this->xmlChunks as $key => $chunk) {
             $this->currentOffset = $key;
             if(!empty($chunk) && $chunk[0] === '<') {
@@ -127,7 +123,7 @@ class editor_Models_Import_FileParser_XmlParser {
                     continue;
                 }
                 
-                //due the the $matches structure of preg_match_all the array_merge of both results is much easier 
+                //due the the $matches structure of preg_match_all the array_merge of both results is much easier
                 //  as trying to use the result of a combined regex
                 $attributes = array_merge(
                 //find attributes with " quotes:
@@ -236,7 +232,7 @@ class editor_Models_Import_FileParser_XmlParser {
      * @param string $tag CSS selector like tag definition, see $this->parseSelector
      * @param callable $opener Parameters: string $tag, array $attributes, int $key, bool $isSingle
      * @param callable $closer Parameters: string $tag, int $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes]
-     * @return [int] a list of the indizes of the added handlers 
+     * @return [int] a list of the indizes of the added handlers
      */
     public function registerElement($tag, callable $opener = null, callable $closer = null) {
         //splits the tag selector into multiple handlers if a , is given
@@ -280,11 +276,11 @@ class editor_Models_Import_FileParser_XmlParser {
     }
     
     /**
-     * Registers a handler for XML structure errors. If no handler is registered, a exception is thrown instead 
+     * Registers a handler for XML structure errors. If no handler is registered, a exception is thrown instead
      * leave $handler empty to unregister it
      * @param callable $handler Parameters: $currentOpener, $receivedTag, $currentKey
      *                          Result: If handler returns false, the processing of the current end tag is stopped as there was no tag in the chunk
-     *                                  Otherwise the returned value is used as new current tag value. 
+     *                                  Otherwise the returned value is used as new current tag value.
      *                                  The returned value is NOT added to the chunklist automatically, this must be done by hand in the handler!
      */
     public function registerError(callable $handler = null) {
@@ -315,7 +311,7 @@ class editor_Models_Import_FileParser_XmlParser {
         $selectorParts = [];
         $tag = $this->parseSelector($selector, $selectorParts);
         $result = [];
-        if($stackIndex <= 0 || empty($selectorParts)) { 
+        if($stackIndex <= 0 || empty($selectorParts)) {
             //if current node is root node, there is no parent
             return $result;
         }
@@ -329,7 +325,7 @@ class editor_Models_Import_FileParser_XmlParser {
             //for the selector match the Index has to be increased again, since the doesSelectorMatch decreases it
             if($this->doesSelectorMatch($selectorParts, $stackIndex + 1)) {
                 $result[] = $node;
-                $i++; //faster as count($result) 
+                $i++; //faster as count($result)
                 if($limit > 0 && $limit >= $i) {
                     return $result;
                 }
@@ -348,8 +344,8 @@ class editor_Models_Import_FileParser_XmlParser {
     }
     
     /**
-     * parses the CSS like selector 
-     * currently supported: 
+     * parses the CSS like selector
+     * currently supported:
      *    element                   a simple type selector
      *    elementA elementB         the descendant selector
      *    elementA > elementB       the direct descendant selector
@@ -359,7 +355,7 @@ class editor_Models_Import_FileParser_XmlParser {
      *    → all other selectors (especially about attributes must be developed as they are needed!)
      
      * returns the last matched tag as string, needed for our streamed based parsing
-     * 
+     *
      * @param string $tagSelector
      * @param array $selectorParts
      * @return string
@@ -418,7 +414,7 @@ class editor_Models_Import_FileParser_XmlParser {
         }
         while($startStackIndex && !empty($selector)) {
             $node = $this->xmlStack[--$startStackIndex];
-            $match = $node['tag'] == $selector['tag'] 
+            $match = $node['tag'] == $selector['tag']
                 && $this->doesAttributesFilterMatch($node['attributes'], $selector['attrFilter']);
             
             if($match) {
@@ -436,12 +432,12 @@ class editor_Models_Import_FileParser_XmlParser {
             }
             //bubble up in the XML Stack, keep the selector
         }
-        //if we bubbled up without a match, we return false 
+        //if we bubbled up without a match, we return false
         return false;
     }
     
     /**
-     * converts the result of the preg match to a usable structure 
+     * converts the result of the preg match to a usable structure
      * @param array $selector
      * @return string[]|null
      */
@@ -478,7 +474,7 @@ class editor_Models_Import_FileParser_XmlParser {
         else {
             //empty filter is excluded above, so reaching here can mean only the "existence" operator
             $attribute = $filter;
-            $operator = 'has'; 
+            $operator = 'has';
         }
         
         if(!array_key_exists($attribute, $attributes)) {
@@ -614,31 +610,6 @@ class editor_Models_Import_FileParser_XmlParser {
             call_user_func($this->handlerOther, $other, $key);
         }
         $this->log("Other#".$other.'#');
-    }
-    
-    /***
-     * Check if the given string is valid xml
-     * @param string $string
-     * @return boolean
-     */
-    public function isStringValidXml($string){
-        libxml_clear_errors();
-        libxml_use_internal_errors(true);
-        
-        //surround with dummy tags so the string validation can be done with domdocument
-        $testString='<dummytag>'.$string.'</dummytag>';
-        if(!isset($this->domDocument)){
-            $this->domDocument=new DOMDocument('1.0', 'utf-8');
-        }
-        $this->domDocument->loadXML($testString);
-        
-        $errors = libxml_get_errors();
-        
-        if(empty($errors)){
-            return true;
-        }
-        
-        return $errors[0]->level < 3;
     }
     
     /**

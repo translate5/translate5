@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -25,47 +25,55 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
 /**
  */
 class editor_Services_Google_Connector extends editor_Services_Connector_Abstract {
 
+    use editor_Services_Connector_BatchTrait;
+    
     /**
-     * @var editor_Services_Google_HttpApi
+     * @var editor_Services_Google_ApiWrapper
      */
-    protected $api;
+    protected $apiWrapper;
 
+    /**
+     * Using Xliff based tag handler here
+     * @var string
+     */
+    protected $tagHandlerClass = 'editor_Services_Connector_TagHandler_Xliff';
+    
+    /**
+     * Just overwrite the class var hint here
+     * @var editor_Services_Connector_TagHandler_Xliff
+     */
+    protected $tagHandler;
+    
+    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::__construct()
      */
     public function __construct() {
         parent::__construct();
-        $this->api = ZfExtended_Factory::get('editor_Services_Google_HttpApi');
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->google->matchrate;
+        $this->defaultMatchRate = $this->config->runtimeOptions->LanguageResources->google->matchrate;
         $this->batchQueryBuffer = 50;
+        
+        
+        editor_Services_Connector_Exception::addCodes([
+            'E1319' => 'Google Translate authorization failed. Please supply a valid API Key.',
+            'E1320' => 'Google Translate daily limit exceeded.',
+        ]);
+        
+        ZfExtended_Logger::addDuplicatesByMessage('E1319', 'E1320');
     }
     
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::open()
+     * @see editor_Services_Connector_FilebasedAbstract::connectTo()
      */
-    public function open() {
-        //This call is not necessary, since TMs are opened automatically.
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::open()
-     */
-    public function close() {
-    /*
-     * This call deactivated, since openTM2 has a access time based garbage collection
-     * If we close a TM and another Task still uses this TM this bad for performance,
-     *  since the next request to the TM has to reopen it
-     */
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
+        parent::connectTo($languageResource, $sourceLang, $targetLang);
+        $this->apiWrapper = ZfExtended_Factory::get('editor_Services_Google_ApiWrapper', [$languageResource->getResource()]);
     }
     
     /**
@@ -73,121 +81,127 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $this->initAndPrepareQueryString($segment);
-        if(!$this->api->search($this->searchQueryString,$this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode())){
+        $queryString = $this->getQueryStringAndSetAsDefault($segment);
+        $result = $this->apiWrapper->translate($this->tagHandler->prepareQuery($queryString), $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode());
+        if($result === false) {
+            throw $this->createConnectorException();
+        }
+        if(empty($result)){
             return $this->resultList;
         }
-        $result=$this->api->getResult();
-        $translation = $result['text'] ?? "";
-        $this->resultList->addResult($this->prepareTranslatedText($translation), $this->defaultMatchRate);
+        $this->resultList->addResult($this->tagHandler->restoreInResult($result['text'] ?? ""), $this->defaultMatchRate);
         return $this->resultList;
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_Connector_Abstract::search()
-     */
-    public function search(string $searchString, $field = 'source', $offset = null) {
-        throw new BadMethodCallException("The Google Translation Connector does not support search requests");
     }
     
     /***
      * Search the resource for available translation. Where the source text is in resource source language and the received results
-     * are in the resource target language 
+     * are in the resource target language
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::translate()
      */
     public function translate(string $searchString){
-        return $this->queryGoogleApi($searchString);
+        if(empty($searchString) && $searchString !== "0") {
+            return $this->resultList;
+        }
+        
+        $result = $this->apiWrapper->translate($searchString, $this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode());
+        if($result === false) {
+            throw $this->createConnectorException();
+        }
+        if(empty($result)){
+            return $this->resultList;
+        }
+        
+        $this->resultList->addResult($result['text'] ?? "", $this->defaultMatchRate);
+        return $this->resultList;
     }
 
     /***
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::languages()
      */
-    public function languages(){
-        return $this->api->getLanguages();
+    public function languages(): array {
+        //if empty api wrapper
+        if(empty($this->apiWrapper)) {
+            $this->apiWrapper = ZfExtended_Factory::get('editor_Services_Google_ApiWrapper', [$this->resource]);
+        }
+        return $this->apiWrapper->getLanguages();
     }
     
-    /***
-     * Send batch query request to the remote endpoint. For each segment, save one cache entry in the batch cache database
-     * where the result will be serialized editor_Services_ServiceResult.
-     * @param array $queryStrings
-     * @param array $querySegmentMap
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_BatchTrait::batchSearch()
      */
-    public function handleBatchQuerys(array $queryStrings,array $querySegmentMap){
-        $sourceLang = $this->languageResource->getSourceLangCode();
-        $targetLang = $this->languageResource->getTargetLangCode();
-        $this->resultList->resetResult();
-        if(!$this->api->searchBatch($queryStrings, $sourceLang, $targetLang)){
-            return;
+    protected function batchSearch(array $queryStrings, string $sourceLang, string $targetLang): bool {
+        $result = $this->apiWrapper->translateBatch($queryStrings, $sourceLang, $targetLang);
+        if($result === false) {
+            throw $this->createConnectorException();
         }
-        $results = $this->api->getResult();
-        if(empty($results)) {
-            return;
-        }
-        
-        //for each segment, one result is available
-        foreach ($results as $segmentResults) {
-            //get the segment from the beginning of the cache
-            //we assume that for each requested query string, we get one response back
-            $seg =array_shift($querySegmentMap);
-            /* @var $seg editor_Models_Segment */
-            
-            $this->initAndPrepareQueryString($seg);
-
-            $this->resultList->addResult($this->prepareTranslatedText($segmentResults['text']), $this->defaultMatchRate);
-            $this->saveBatchResults($seg);
-            $this->resultList->resetResult();
-        }
+        return $result;
     }
     
-    /***
-     * Query the google cloud api for the search string
-     * @param string $searchString
-     * @param bool $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
-     * @return editor_Services_ServiceResult
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_BatchTrait::processBatchResult()
      */
-    protected function queryGoogleApi($searchString, $reimportWhitespace = false){
-        if(empty($searchString) && $searchString !== "0") {
-            return $this->resultList;
-        }
-        
-        
-        $result=null;
-        if($this->api->search($searchString,$this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode())){
-            $result=$this->api->getResult();
-        }
-        
-        $translation = $result['text'] ?? "";
-        if($reimportWhitespace) {
-            $translation = $this->importWhitespaceFromTagLessQuery($translation);
-        }
-        
-        $this->resultList->addResult($translation, $this->defaultMatchRate);
-        return $this->resultList;
+    protected function processBatchResult($segmentResults) {
+        $this->resultList->addResult($this->tagHandler->restoreInResult($segmentResults['text'] ?? ''), $this->defaultMatchRate);
     }
     
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::getStatus()
      */
-    public function getStatus(& $moreInfo){
-        
-        try {
-            if($this->api->getStatus()){
-                return self::STATUS_AVAILABLE;
+    public function getStatus(editor_Models_LanguageResources_Resource $resource){
+        $this->lastStatusInfo = '';
+        $languages = $this->languages();
+        if(empty($languages)) {
+            
+            //we also log below errors
+            $e = $this->createConnectorException();
+            $this->logger->exception($e);
+            
+            if($e->getErrorCode() === 'E1319') {
+                $this->lastStatusInfo = 'Anmeldung bei Google Translate fehlgeschlagen. Bitte verwenden Sie einen gültigen API Key.';
+                return self::STATUS_NOVALIDLICENSE;
             }
-        }catch (ZfExtended_BadGateway $e){
-            $moreInfo = $e->getMessage();
-            $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource.service.connector');
-            /* @var $logger ZfExtended_Logger */
-            $logger->warn('E1282','Language resource communication error.',
-            array_merge($e->getErrors(),[
-                'languageResource'=>$this->languageResource,
-                'message'=>$e->getMessage()
-            ]));
+            if($e->getErrorCode() === 'E1320') {
+                $this->lastStatusInfo = 'Das Nutzungslimit wurde erreicht.';
+                return self::STATUS_QUOTA_EXCEEDED;
+            }
+            $this->lastStatusInfo = 'Keine Verbindung zu Google Translate!';
+        }
+        else {
+            return self::STATUS_AVAILABLE;
         }
         return self::STATUS_NOCONNECTION;
+    }
+    
+    /**
+     * Creates a service connector exception
+     * @return editor_Services_Connector_Exception
+     */
+    protected function createConnectorException(): editor_Services_Connector_Exception {
+        $badRequestException = $this->apiWrapper->getError();
+        $msg = $badRequestException->getMessage();
+        if(stripos($msg, 'Daily Limit Exceeded') !== false) {
+            $ecode = 'E1320'; //'Google Translate quota exceeded. The character limit has been reached.',
+        }
+        elseif(stripos($msg, 'API key not valid. Please pass a valid API key.') !== false) {
+            $ecode = 'E1319'; //'Google Translate authorization failed. Please supply a valid API Key.',
+        }
+        elseif(strpos($msg, 'cURL error') !== false) {
+            $ecode = 'E1311'; //server not reachable
+        }
+        else {
+            $ecode = 'E1313'; //'The queried language resource {service} returns an error.'
+        }
+        $data = [
+            'service' => $this->getResource()->getName(),
+            'languageResource' => $this->languageResource ?? '',
+            'error' => $this->apiWrapper->getError(),
+        ];
+        
+        return new editor_Services_Connector_Exception($ecode, $data, $badRequestException);
     }
 }
