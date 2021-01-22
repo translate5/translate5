@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -64,7 +64,7 @@ class editor_Models_LanguageResources_Resource {
     
     /***
      * Flag if the resource can be used by match analysis
-     * 
+     *
      * @var string
      */
     protected $analysable=true;
@@ -95,6 +95,12 @@ class editor_Models_LanguageResources_Resource {
      * @var string
      */
     protected $url;
+    
+    /**
+     * Resource Authorization Key
+     * @var string
+     */
+    protected $authKey;
     
     public function __construct($id, $name, $url) {
         $this->id = $id;
@@ -201,7 +207,7 @@ class editor_Models_LanguageResources_Resource {
     /***
      * Get the source language code for given source language id.
      * The language code is used as source language api parameter.
-     * 
+     *
      * @param int $sourceLanguageId
      * @return string
      */
@@ -212,7 +218,7 @@ class editor_Models_LanguageResources_Resource {
     /***
      * Get the target language code for given target language id.
      * The language code is used as target language api parameter.
-     * 
+     *
      * @param int $targetLanguageId
      * @return string
      */
@@ -226,11 +232,11 @@ class editor_Models_LanguageResources_Resource {
      * @param int $langauge
      * @return string
      */
-    protected function getLanguageCode(int $langaugeId) {
-        $langauge = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langauge editor_Models_Languages */
-        $langauge->load($langaugeId);
-        return $langauge->getRfc5646();
+    protected function getLanguageCode(int $languageId) {
+        $language = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $language editor_Models_Languages */
+        $language->load($languageId);
+        return $language->getRfc5646();
     }
     
     /**
@@ -250,6 +256,14 @@ class editor_Models_LanguageResources_Resource {
      */
     public function getUrl() {
         return $this->url;
+    }
+    
+    /**
+     * returns the configured authentication key, if the resources provides and needs one
+     * must be loaded in the services resource class
+     */
+    public function getAuthenticationKey() {
+        return $this->authKey;
     }
     
     /**

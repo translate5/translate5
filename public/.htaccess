@@ -1,4 +1,5 @@
 #php_value session.auto_start 0
+Options -Indexes
 RewriteEngine On
 #RewriteRule ^v-[0-9]\.[0-9]\.[0-9]/(.*)$ $1 [NC,L]
 

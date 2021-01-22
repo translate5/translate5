@@ -59,6 +59,11 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     const IGNORE_CLASS = 'ignoreInEditor';
     const IGNORE_ID_PREFIX = 'toignore-';
     
+    /**
+     * Used as tag id for regex based internal tags
+     */
+    const TYPE_REGEX = 'regex';
+    
     public function __construct($replacerTemplate = null){
         $this->replacerRegex = self::REGEX_INTERNAL_TAGS;
         $this->placeholderTemplate = $replacerTemplate ?? self::PLACEHOLDER_TEMPLATE;
@@ -192,12 +197,18 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * restores the original escaped tag
      * @param string $segment
      * @param bool $whitespaceOnly optional, if true restore whitespace tags only
+     * @param int &$highestTagNr if provided, it will be filled with the highest short tag number of all tags in $segment
+     * @param array $whitespaceMap if provided, it will be filled with a 2d map of replaced whitespace/special characters and their used tag numbers
      * @return mixed
      */
-    public function restore(string $segment, $whitespaceOnly = false) {
+    public function restore(string $segment, $whitespaceOnly = false, &$highestTagNr = 0, array &$whitespaceMap = []) {
         //TODO extend $whitespaceOnly filter so that we can filter for one ore more of the CSS classes (nbsp, newline, tab, space)
-        return $this->replace($segment, function($match) use ($whitespaceOnly) {
+        return $this->replace($segment, function($match) use ($whitespaceOnly, &$highestTagNr, &$whitespaceMap) {
             $id = $match[3];
+            $tagNr = $this->getTagNumber($match[0]);
+            
+            //determine the highest used short tag number
+            $highestTagNr = max($tagNr, $highestTagNr);
             
             //FIXME HERE das auskommentieren um den Okapi Export Fehler Bug zu testen!
             //if the tag is tag to be ignored, we just remove it
@@ -214,7 +225,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             $result = pack('H*', $data);
             
             //if single-tag is regex-tag no <> encapsulation is needed
-            if ($id === "regex") {
+            if ($id === self::TYPE_REGEX) {
                 return $result;
             }
             
@@ -224,8 +235,14 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             $replace = array('hardReturn/','softReturn/','macReturn/');
             $result = str_replace($search, $replace, $result);
             
+            
             //the original data is without <>
-            return '<' . $result .'>';
+            $result = '<' . $result .'>';
+            if(!array_key_exists($result, $whitespaceMap)) {
+                $whitespaceMap[$result] = [];
+            }
+            $whitespaceMap[$result][] = $tagNr;
+            return $result;
         });
     }
     
@@ -312,24 +329,21 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         $result = $this->replace($segment, function($match) use (&$replaceMap) {
             //original id coming from import format
             $type = $match[1];
-            $innerMatch = [];
+            $shortCutNr = $this->getTagNumber($match[0]);
             switch($type) {
                 case 'single':
-                    preg_match(self::REGEX_SINGLETAG, $match[0], $innerMatch);
-                    $result = sprintf('<excel %s />', $innerMatch[1]);
-                    $resultId = sprintf('<%s />', $innerMatch[1]);
+                    $result = sprintf('<excel %s />', $shortCutNr);
+                    $resultId = sprintf('<%s />', $shortCutNr);
                     break;
                 
                 case 'open':
-                    preg_match(self::REGEX_STARTTAG, $match[0], $innerMatch);
-                    $result = sprintf('<excel %s>', $innerMatch[1]);
-                    $resultId = sprintf('<%s>', $innerMatch[1]);
+                    $result = sprintf('<excel %s>', $shortCutNr);
+                    $resultId = sprintf('<%s>', $shortCutNr);
                     break;
                 
                 case 'close':
-                    preg_match(self::REGEX_ENDTAG, $match[0], $innerMatch);
-                    $result = sprintf('<excel /%s>', $innerMatch[1]);
-                    $resultId = sprintf('</%s>', $innerMatch[1]);
+                    $result = sprintf('<excel /%s>', $shortCutNr);
+                    $resultId = sprintf('</%s>', $shortCutNr);
                 break;
             }
             
@@ -584,6 +598,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @return int|NULL
      */
     public function getTagNumber(string $tag): ?int {
+        $match = null;
         if(preg_match('#class="short">&lt;/?([0-9]+)/?&gt;</span#', $tag, $match)) {
             return (int) $match[1];
         }

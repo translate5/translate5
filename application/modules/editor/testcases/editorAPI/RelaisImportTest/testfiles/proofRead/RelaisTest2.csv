@@ -1,4 +1,4 @@
-mid,quelle,target
+id,source,target
 1,Das ist eine rotes Haus,Questo e un casa roso.
 2,Hier ist das <b>Alignment</b> noch in Ordnung.,RELAIS - Here the alignment is OK.
 3,"Falscher Source Text, MID OK. FALSCH!","RELAIS – Wrong Source Text here, MID OK."

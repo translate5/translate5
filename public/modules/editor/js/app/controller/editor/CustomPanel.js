@@ -40,21 +40,25 @@ Ext.define('Editor.controller.editor.CustomPanel', {
             }
         }
     },
-    init: function() {
-        //if no panel is configured we do nothing!
-        this.setActive(!!Editor.data.customPanel.url);
-    },
+    
     filePanelBeforeRender:function(filepanel){
-        var title = Editor.data.customPanel.title,
-            url = Editor.data.customPanel.url;
+        var title = Editor.app.getTaskConfig('editor.customPanel.title'),
+            url = Editor.app.getTaskConfig('editor.customPanel.url');
         
+        //if the url is not configured, do nothing
+        if(!url){
+            return;
+        }
         if(title) {
             filepanel.setTitle(filepanel.getTitle() + ' &amp; ' + title);
         }
         filepanel.add({
             title: title,
             xtype: 'panel',
-            html: '<iframe src="' + url + '" width="100%" height="100%"></iframe>'
+            html: '<iframe src="' + url + '" width="100%" height="100%"></iframe>',
+            stateId: 'editor.customWestPanel',
+            stateEvents: ['collapse', 'expand'],
+            stateful: true
         });
     }
 });

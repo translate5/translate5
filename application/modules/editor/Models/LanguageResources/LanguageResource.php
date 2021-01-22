@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -28,20 +28,20 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Languageresources Entity Object
- * 
+ *
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
  * @method string getName() getName()
  * @method void setName() setName(string $name)
  * @method string getColor() getColor()
  * @method void setColor() setColor(string $color)
- * @method integer getResourceId() getResourceId()
+ * @method string getResourceId() getResourceId() The id of the used resource
  * @method void setResourceId() setResourceId(int $resourceId)
- * @method string getServiceType() getServiceType()
+ * @method string getServiceType() getServiceType() The PHP class name for the service
  * @method void setServiceType() setServiceType(string $type)
- * @method string getServiceName() getServiceName()
+ * @method string getServiceName() getServiceName() The speakable name of the service as configured in the resource
  * @method void setServiceName() setServiceName(string $resName)
- * @method string getResourceType() getResourceType()
+ * @method string getResourceType() getResourceType()  tm or mt
  * @method void setResourceType() setResourceType(string $resourceType)
  */
 class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract {
@@ -70,7 +70,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public $targetLang;
     
     /***
-     * Source language code value helper property 
+     * Source language code value helper property
      * @var String
      */
     public $sourceLangCode;
@@ -85,7 +85,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     
     /***
      * Load all resources for all available services
-     * 
+     *
      * @return array
      */
     public function loadAllByServices(){
@@ -108,7 +108,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     /***
      * Get all available language resources for customers of loged user
      * The result data will in custom format(used in instanttranslate frontend)
-     * 
+     *
      * @param bool $addArrayId : if true(default true), the array key will be the language resource id
      * @param string $resourceType : when given, only available resources of this type will be returned
      * @return array
@@ -145,11 +145,11 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     
     /***
      * Load all resources associated customers of a user
-     * 
+     *
      * @param array $serviceNames: add service name as filter
      * @param array $sourceLang: add source languages as filter
      * @param array $targetLang: add target languages as filter
-     * 
+     *
      * @return array|array
      */
     public function loadByUserCustomerAssocs($serviceNames=array(),$sourceLang=array(),$targetLang=array()){
@@ -209,7 +209,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             ->setIntegrityCheck(false)
             ->join($assocName, $assocName.'.`languageResourceId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
             ->where($assocName.'.`taskGuid` in (?)', $taskGuidList);
-        return $this->db->fetchAll($s)->toArray(); 
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /**
@@ -241,7 +241,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     public function loadByResourceId(string $serviceResourceId) {
         $s = $this->db->select()->where('resourceId = ?', $serviceResourceId);
-        return $this->db->fetchAll($s)->toArray(); 
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /**
@@ -252,25 +252,23 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
         $res = $manager->getResource($this);
-        if(empty($res)) {
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $msg = 'Configured LanguageResource Resource not found for LanguageResource '.$this->getName().' with ID '.$this->getId().' the resource id was: '.$this->getResourceId();
-            $msg .= "\n".'Maybe the resource config of the underlying Language Resource Service was changed / removed.';
-            $log->logError('Configured LanguageResource Resource not found', $msg);
-            throw new ZfExtended_Models_Entity_NotFoundException('Die ursprünglich konfigurierte TM / MT Resource ist nicht mehr vorhanden!');
+        if(!empty($res)) {
+            return $res;
         }
-        return $res;
+        throw new editor_Services_Exceptions_NoService('E1316', [
+            'service' => $this->getServiceName(),
+            'languageResource' => $this,
+        ]);
     }
     
     /**
      * checks if the given languageResource (and segmentid - optional) is usable by the given task
-     * 
+     *
      * @param string $taskGuid
      * @param int $languageResourceId
      * @param editor_Models_Segment $segment
      * @throws ZfExtended_Models_Entity_NoAccessException
-     * 
+     *
      */
     public function checkTaskAndLanguageResourceAccess(string $taskGuid,int $languageResourceId, editor_Models_Segment $segment = null) {
         
@@ -373,10 +371,10 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
     
     /***
-     * Merge the group the languages by language resource. In the return array for each language resource, all available languages ids and 
+     * Merge the group the languages by language resource. In the return array for each language resource, all available languages ids and
      * language code values will be in separate array.
      * NOTE: the function is used to merge the languages from ungrouped results from "loadByUserCustomerAssocs" function.
-     * 
+     *
      * @param array $languageResources
      * @return array
      */
@@ -448,5 +446,21 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             $categoriesOriginalIds[] = $m->getOriginalCategoryId();
         }
         return $categoriesOriginalIds;
+    }
+    
+    /***
+     * Is the current resource of type MT (maschine translation)
+     * @return boolean
+     */
+    public function isMt() {
+        return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_MT;
+    }
+    
+    /***
+     * Is the current resource type of TM (translation memory)
+     * @return boolean
+     */
+    public function isTm() {
+        return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM;
     }
 }

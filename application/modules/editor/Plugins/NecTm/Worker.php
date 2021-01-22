@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -34,27 +34,11 @@ class editor_Plugins_NecTm_Worker extends ZfExtended_Worker_Abstract {
     protected $logger;
     
     /**
-     * @var editor_Plugins_NecTm_Service
-     */
-    protected $service;
-    
-    /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if(empty($parameters['service'])){
-                return false;
-        }
         return true;
-    }
-    
-    /**
-     * sets the service from the models parameters
-     */
-    protected function setService() {
-        $parameters = $this->workerModel->getParameters();
-        $this->service = $parameters['service'];
     }
     
     /**
@@ -63,7 +47,6 @@ class editor_Plugins_NecTm_Worker extends ZfExtended_Worker_Abstract {
      */
     public function work() {
         $this->logger = Zend_Registry::get('logger')->cloneMe('plugin.necTm');
-        $this->setService();
         $this->synchronizeNecTmCategories();
     }
 
@@ -74,7 +57,7 @@ class editor_Plugins_NecTm_Worker extends ZfExtended_Worker_Abstract {
      */
     protected function synchronizeNecTmCategories() {
         try {
-            $sync = ZfExtended_Factory::get('editor_Plugins_NecTm_SyncCategories', [$this->service]);
+            $sync = ZfExtended_Factory::get('editor_Plugins_NecTm_SyncCategories');
             /* @var $sync editor_Plugins_NecTm_SyncCategories */
             $sync->synchronize(false); //without mutex, since we call it explicitly via parameter
         } catch (Exception $e){

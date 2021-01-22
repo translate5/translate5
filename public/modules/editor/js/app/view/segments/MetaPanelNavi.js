@@ -75,8 +75,8 @@ Ext.define('Editor.view.segments.MetaPanelNavi', {
           //fields = Editor.data.task.segmentFields(),
           //editableCnt = 0,
           useHNavArrow = false,
-          userCanModifyWhitespaceTags = Editor.data.segments.userCanModifyWhitespaceTags,
-          userCanInsertWhitespaceTags = Editor.data.segments.userCanInsertWhitespaceTags,
+          userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
+          userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
           items=[],
           tooltip = function(text) {
               return {

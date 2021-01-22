@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -64,7 +64,7 @@ abstract class editor_Models_Export_FileParser {
      */
     protected $_classNameDifftagger = NULL;
     /**
-     * @var object 
+     * @var object
      */
     protected $_difftagger = NULL;
     /**
@@ -156,11 +156,11 @@ abstract class editor_Models_Export_FileParser {
     protected $segmentFieldManager;
     
     /**
-     * 
+     *
      * @param int $fileId
      * @param bool $diff
      * @param editor_Models_Task $task
-     * @param string $path 
+     * @param string $path
      * @throws Zend_Exception
      */
     public function __construct(int $fileId,bool $diff,editor_Models_Task $task, string $path) {
@@ -176,7 +176,7 @@ abstract class editor_Models_Export_FileParser {
         $this->_task = $task;
         $this->_taskGuid = $task->getTaskGuid();
         $this->path = $path;
-        $this->config = Zend_Registry::get('config');
+        $this->config = $task->getConfig();
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.export.fileparser');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
@@ -190,10 +190,10 @@ abstract class editor_Models_Export_FileParser {
 
     /**
      * Gibt eine zu exportierende Datei bereits korrekt für den Export geparsed zurück
-     * 
+     *
      * @return string file
      */
-    public function getFile() {
+    protected function getFile() {
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $file->load($this->_fileId);
@@ -304,11 +304,11 @@ abstract class editor_Models_Export_FileParser {
     /**
      * the browser adds non-breaking-spaces instead of normal spaces, if the user
      * types more than one space directly after eachother. For the GUI this
-     * makes sense, because this way the whitespace can be presented in the 
+     * makes sense, because this way the whitespace can be presented in the
      * correct visual form to the user (normal spaces would be shown as one
-     * space in HTML). For the export they have to be reconverted to normal 
+     * space in HTML). For the export they have to be reconverted to normal
      * spaces
-     * 
+     *
      * @param int $segmentId
      * @param string $segment
      * @return string $segment
@@ -339,9 +339,9 @@ abstract class editor_Models_Export_FileParser {
         $edited = $this->tagHelper->unprotect($edited);
         $this->compareTags($segment, $edited, $field);
         
-        //count length after removing removeTrackChanges and removeTermTags 
+        //count length after removing removeTrackChanges and removeTermTags
         // so that the same remove must not be done again inside of textLength
-        //also add additionalMrkLength to the segment length for final length calculation 
+        //also add additionalMrkLength to the segment length for final length calculation
         $this->lastSegmentLength = $segment->textLengthByMeta($edited,$segmentMeta,$segment->getFileId()) + $segmentMeta->getAdditionalMrkLength();
         
         $edited = $this->parseSegment($edited);
@@ -403,7 +403,7 @@ abstract class editor_Models_Export_FileParser {
     }
     
     /**
-     * loads the segment to the given Id, caches a limited count of segments internally 
+     * loads the segment to the given Id, caches a limited count of segments internally
      * to prevent loading again while switching between fields
      * @param int $segmentId
      * @return editor_Models_Segment
@@ -426,14 +426,14 @@ abstract class editor_Models_Export_FileParser {
     }
     
     /**
-     * creates termMarkup according to xliff-Syntax (<mrk ...) 
-     * 
+     * creates termMarkup according to xliff-Syntax (<mrk ...)
+     *
      * converts from:
      * <div class="term admittedTerm transNotFound" id="term_05_1_de_1_00010-0" title="">Hause</div>
      * to:
      * <mrk mtype="x-term-admittedTerm" mid="term_05_1_de_1_00010">Hause</mrk>
      * and removes the information about trans[Not]Found
-     * 
+     *
      * @param string $segment
      * @param bool $removeTermTags, default = true
      * @return string $segment
@@ -454,7 +454,7 @@ abstract class editor_Models_Export_FileParser {
      * Rekonstruiert in einem Segment die ursprüngliche Form der enthaltenen Tags
      *
      * @param string $segment
-     * @return string $segment 
+     * @return string $segment
      */
     protected function parseSegment($segment) {
         return $this->tagHelper->restore($segment);
@@ -475,7 +475,7 @@ abstract class editor_Models_Export_FileParser {
     /**
      * Exports a single segment content, without MQM support!
      * Term Tags remains in the content and are not touched.
-     * 
+     *
      * @param string $segment
      * @return string
      */

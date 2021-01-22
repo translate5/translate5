@@ -2779,6 +2779,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Die Anfrage an die Sprachressource dauerte zu lange.</source>
   <target>The language resource did not respond in a reasonable time.</target>
 </trans-unit>
+<trans-unit id='RXMgZ2lidCBQcm9ibGVtZSBtaXQgZGVtIGFuZ2VmcmFndGVuIERpZW5zdC4='>
+  <source>Es gibt Probleme mit dem angefragten Dienst.</source>
+  <target>There are problems with the queried service.</target>
+</trans-unit>
 <trans-unit id='RGllIEFuZnJhZ2UgZsO8aHJ0ZSB6dSBlaW5lbSBGZWhsZXIgaW0gYW5nZWZyYWd0ZW4gRGllbnN0Lg=='>
   <source>Die Anfrage führte zu einem Fehler im angefragten Dienst.</source>
   <target>The request produced an error in the queried service.</target>
@@ -3581,9 +3585,9 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
     <source>Sonderzeichen hinzufügen:</source>
     <target>Add special characters:</target>
 </trans-unit>
-<trans-unit id='U3DDpHRlciB3ZWl0ZXIgYXJiZWl0ZW4='>
-	<source>Später weiter arbeiten</source>
-	<target>Continue task later</target>
+<trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZW7DvGJlcnNpY2h0'>
+    <source>Zurück zur Aufgabenübersicht</source>
+    <target>Back to task list</target>
 </trans-unit>
 <trans-unit id='QWxsZXMgZmVydGlnIC0gQXVmZ2FiZSBhYnNjaGxpZcOfZW4='>
 	<source>Alles fertig - Aufgabe abschließen</source>
@@ -3904,6 +3908,29 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='U3VjaGUgaW0gQXVzZ2FuZ3N0ZXh0'><source>Suche im Ausgangstext</source><target>Search in the source text</target></trans-unit>
 <trans-unit id='U3VjaGUgaW0gWmllbHRleHQ='><source>Suche im Zieltext</source><target>Search in the target text</target></trans-unit>
 <trans-unit id='RsO8ciBqZWRlbiBTYXR6IHd1cmRlIGRhcyBiZXN0ZSB2ZXJmw7xnYmFyZSBUcmFuc2xhdGlvbi1NZW1vcnktTWF0Y2ggdmVyd2VuZGV0ICgxMDAlIG9kZXIgYmVzc2VyKS4gV2VubiBrZWluZSAxMDAlaWdlIMOcYmVyZWluc3RpbW11bmcgaW0gVHJhbnNsYXRpb24gTWVtb3J5IGdlZnVuZGVuIHd1cmRlLCB3aXJkIGRpZSBtYXNjaGluZWxsZSDDnGJlcnNldHp1bmcgdmVyd2VuZGV0Lg=='><source>Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet.</source><target>For each sentence the best available translation memory match has been used (100% or better). If not translation memory 100% match was found, machine translation is used.</target></trans-unit>
+<trans-unit id='S29uZmlndXJhdGlvbiBiZWFyYmVpdGVu'><source>Konfiguration bearbeiten</source><target>Edit configuration</target></trans-unit>
+<trans-unit id='S29uZmlndXJhdGlvbg=='><source>Konfiguration</source><target>System configuration</target></trans-unit>
+<trans-unit id='RGllIMOEbmRlcnVuZyB3aXJkIGJlaW0gbsOkY2hzdGVuIExvZ2luIHdpcmtzYW0uIERpZXMgZ2lsdCBhdWNoIGbDvHIgYW5kZXJlIGRlcnplaXQgZWluZ2Vsb2dndGUgQmVudXR6ZXIu'><source>Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.</source><target>This change will take effect on next login. This also applies to other users who are currently logged in.</target></trans-unit>
+<trans-unit id='QWxsZXMgenVrbGFwcGVu'><source>Alles zuklappen</source><target>Collapse all</target></trans-unit>
+<trans-unit id='QWxsZXMgYXVma2xhcHBlbg=='><source>Alles aufklappen</source><target>Expand all</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRrb25maWd1cmF0aW9uIEt1bmRlIMO8YmVyc2NocmVpYmVu'><source>Standardkonfiguration Kunde überschreiben</source><target>Configuration</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRrb25maWd1cmF0aW9uIGRlcyBTeXN0ZW1z'><source>Standardkonfiguration des Systems</source><target>Client configuration (overwrites system configuration)</target></trans-unit>
+<trans-unit id='w5xiZXJzY2hyaWViZW4='><source>Überschrieben</source><target>Overwrite</target></trans-unit>
+<trans-unit id='QXVmIGViZW5lIGdlc2V0enQ='><source>Auf ebene gesetzt</source><target>Set on level</target></trans-unit>
+<trans-unit id='S3VyemVyIE5hbWU='><source>Konfigurationsoption</source><target>Configuration option</target></trans-unit>
+<trans-unit id='QWt0aXZpZXJ0'><source>Aktiviert</source><target>Activated</target></trans-unit>
+<trans-unit id='RGVha3RpdmllcnQ='><source>Deaktiviert</source><target>Disabled</target></trans-unit>
+<trans-unit id='UU0='><source>QM</source><target>QA</target></trans-unit>
+<trans-unit id='S2FubiBhdWYgRWJlbmUgw7xiZXJzY2hyaWViZW4gd2VyZGVuOg=='><source>Kann auf Ebene überschrieben werden:</source><target>Kann auf Ebene überschrieben werden:</target></trans-unit>
+<trans-unit id='w5xiZXJzY2hyZWliYmFyIGF1ZiBFYmVuZTo='><source>Überschreibbar auf Ebene:</source><target>Overwrite levels:</target></trans-unit>
+<trans-unit id='U2NocmVpYmdlc2Now7x0enRlIEtvbmZpZ3VyYXRpb25lbiBzaWNodGJhcjo='><source>Schreibgeschützte Konfigurationen sichtbar:</source><target>Show write-protected</target></trans-unit>
+<trans-unit id='Q29kZSBJRA=='><source>Code ID</source><target>Code ID</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV9pbnN0YW5jZQ=='><source>config_overwrite_instance</source><target>System</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV9jdXN0b21lcg=='><source>config_overwrite_customer</source><target>Client</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV90YXNrSW1wb3J0'><source>config_overwrite_taskImport</source><target>Import</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV90YXNr'><source>config_overwrite_task</source><target>Task</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV91c2Vy'><source>config_overwrite_user</source><target>User</target></trans-unit>
+<trans-unit id='V2VydA=='><source>Wert</source><target>Value</target></trans-unit>
 </body>
   </file>
 </xliff>

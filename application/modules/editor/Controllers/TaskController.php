@@ -375,12 +375,7 @@ class editor_TaskController extends ZfExtended_RestController {
         foreach ($rows as &$row) {
             $row['lastErrors'] = $this->getLastErrorMessage($row['taskGuid'], $row['state']);
             $this->initWorkflow($row['workflow']);
-            //adding QM SubSegment Infos to each Task
-            $row['qmSubEnabled'] = false;
-            if($this->config->runtimeOptions->editor->enableQmSubSegments &&
-                    !empty($row['qmSubsegmentFlags'])) {
-                $row['qmSubEnabled'] = true;
-            }
+            
             unset($row['qmSubsegmentFlags']);
 
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
@@ -401,6 +396,16 @@ class editor_TaskController extends ZfExtended_RestController {
                 $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
             }
             
+            if(empty($this->entity->getTaskGuid())){
+                $this->entity->init($row);
+            }
+            //TODO: for now we leave this as it is, if this produces performance problems, find better way for loading this config
+            $taskConfig = $this->entity->getConfig();
+            //adding QM SubSegment Infos to each Task
+            $row['qmSubEnabled'] = false;
+            if($taskConfig->runtimeOptions->editor->enableQmSubSegments && !empty($row['qmSubsegmentFlags'])) {
+                $row['qmSubEnabled'] = true;
+            }
             $this->addMissingSegmentrangesToResult($row);
         }
         return $rows;
@@ -670,22 +675,32 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function addDefaultLanguageResources(editor_Models_Task $task) {
         $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
+        
         $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsDefault($this->data['customerId']);
+        
         if(empty($allUseAsDefaultCustomers)) {
             return;
         }
-        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
-        /* @var $languages editor_Models_LanguageResources_Languages */
+        
         $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
         /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
+        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $languages editor_Models_LanguageResources_Languages */
+        $language = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $language ZfExtended_Languages */
+        
+        $sourceLanguages = $language->getFuzzyLanguages($task->getSourceLang(),'id',true);
+        $targetLanguages = $language->getFuzzyLanguages($task->getTargetLang(),'id',true);
+        
         foreach ($allUseAsDefaultCustomers as $defaultCustomer) {
             $languageResourceId = $defaultCustomer['languageResourceId'];
-            if ($languages->isInCollection($task->getSourceLang(),'sourceLang',$languageResourceId)
-                && $languages->isInCollection($task->getTargetLang(),'targetLang',$languageResourceId) ) {
-                        $taskAssoc->init();
-                        $taskAssoc->setLanguageResourceId($languageResourceId);
-                        $taskAssoc->setTaskGuid($task->getTaskGuid());
-                        $taskAssoc->save();
+            $sourceLangMatch = $languages->isInCollection($sourceLanguages, 'sourceLang', $languageResourceId);
+            $targetLangMatch = $languages->isInCollection($targetLanguages, 'targetLang', $languageResourceId);
+            if ($sourceLangMatch && $targetLangMatch) {
+                $taskAssoc->init();
+                $taskAssoc->setLanguageResourceId($languageResourceId);
+                $taskAssoc->setTaskGuid($task->getTaskGuid());
+                $taskAssoc->save();
             }
         }
     }
@@ -1037,47 +1052,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->validate();
         $this->initWorkflow();
 
-        $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
-
-        $tua = null;
-        try {
-            $tua=editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
-        }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-        }
-
-        //mayLoadAllTasks is only true, if the current "PM" is not associated to the task directly.
-        // If it is (pm override false) directly associated, the workflow must be considered it the task is openable / writeable.
-        $mayLoadAllTasks = $mayLoadAllTasks && (empty($tua) || $tua->getIsPmOverride());
-        $isTaskDisallowEditing = $this->isEditTaskRequest() && !$this->workflow->isWriteable($tua);
-        $isTaskDisallowReading = $this->isViewTaskRequest() && !$this->workflow->isReadable($tua);
-        if(!$mayLoadAllTasks && ($isTaskDisallowEditing || $isTaskDisallowReading)){
-            //if the task was already in session, we must delete it.
-            //If not the user will always receive an error in JS, and would not be able to do anything.
-            $this->unregisterTask(); //FIXME XXX the changes in the session made by this method is not stored in the session!
-            if(empty($tua)) {
-                throw ZfExtended_Models_Entity_Conflict::createResponse('E1163',[
-                    'userState' => 'Ihre Zuweisung zur Aufgabe wurde entfernt, daher können Sie diese nicht mehr zur Bearbeitung öffnen.',
-                ]);
-            }
-            if($isTaskDisallowEditing && $this->data->userStatePrevious != $tua->getState()) {
-                throw ZfExtended_Models_Entity_Conflict::createResponse('E1164',[
-                    'userState' => 'Sie haben versucht die Aufgabe zur Bearbeitung zu öffnen. Das ist in der Zwischenzeit nicht mehr möglich.',
-                ]);
-            }
-            //no access as generic fallback
-            $this->log->info('E9999', 'Debug data to E9999 - Keine Zugriffsberechtigung!',[
-                '$mayLoadAllTasks' => $mayLoadAllTasks,
-                'tua' => $tua ? $tua->getDataObject() : 'no tua',
-                'isPmOver' => $tua ? $tua->getIsPmOverride() : false,
-                'loadAllTasks' => $this->isAllowed('backend', 'loadAllTasks'),
-                'isAuthUserTaskPm' => $this->isAuthUserTaskPm($this->entity->getPmGuid()),
-                '$isTaskDisallowEditing' => $isTaskDisallowEditing,
-                '$isTaskDisallowReading' => $isTaskDisallowReading,
-            ]);
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
-
+        //throws exceptions if task not accessable
+        $this->checkTaskAccess();
+        
         //opening a task must be done before all workflow "do" calls which triggers some events
         $this->openAndLock();
 
@@ -1135,6 +1112,69 @@ class editor_TaskController extends ZfExtended_RestController {
         // We do this here to have it immediately available e.g. when opening segments.
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
+    }
+    
+    /**
+     * Checks the task access by workflow
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     * @throws ZfExtended_Models_Entity_Conflict
+     */
+    protected function checkTaskAccess() {
+        $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
+        
+        try {
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            $tua = null;
+        }
+        
+        //mayLoadAllTasks is only true, if the current "PM" is not associated to the task directly.
+        // If it is (pm override false) directly associated, the workflow must be considered it the task is openable / writeable.
+        $mayLoadAllTasks = $mayLoadAllTasks && (empty($tua) || $tua->getIsPmOverride());
+        
+        //if the user may load all tasks, check workflow access is non sense
+        if($mayLoadAllTasks) {
+            return;
+        }
+        
+        $isTaskDisallowEditing = $this->isEditTaskRequest() && !$this->workflow->isWriteable($tua);
+        $isTaskDisallowReading = $this->isViewTaskRequest() && !$this->workflow->isReadable($tua);
+        
+        //if now there is no tua, that means it was deleted in the meantime.
+        // A PM will not reach here, a editor user may not access the task then anymore
+        if(empty($tua)) {
+            //if the task was already in session, we must delete it.
+            //If not the user will always receive an error in JS, and would not be able to do anything.
+            $this->unregisterTask();
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1163',[
+                'userState' => 'Ihre Zuweisung zur Aufgabe wurde entfernt, daher können Sie diese nicht mehr zur Bearbeitung öffnen.',
+            ]);
+        }
+        
+        //the tua state was changed by a PM, then the task may not be edited anymore by the user
+        if($isTaskDisallowEditing && $this->data->userStatePrevious != $tua->getState()) {
+            $this->unregisterTask();
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1164',[
+                'userState' => 'Sie haben versucht die Aufgabe zur Bearbeitung zu öffnen. Das ist in der Zwischenzeit nicht mehr möglich.',
+            ]);
+        }
+        //if reading is allowed the edit request is converted to a read request later by openAndLock
+        //if reading is also disabled, we have to throw no access here
+        if($isTaskDisallowEditing && $isTaskDisallowReading) {
+            $this->unregisterTask();
+            //no access as generic fallback
+            $this->log->info('E9999', 'Debug data to E9999 - Keine Zugriffsberechtigung!',[
+                '$mayLoadAllTasks' => $mayLoadAllTasks,
+                'tua' => $tua ? $tua->getDataObject() : 'no tua',
+                'isPmOver' => $tua && $tua->getIsPmOverride(),
+                'loadAllTasks' => $this->isAllowed('backend', 'loadAllTasks'),
+                'isAuthUserTaskPm' => $this->isAuthUserTaskPm($this->entity->getPmGuid()),
+                '$isTaskDisallowEditing' => $isTaskDisallowEditing,
+                '$isTaskDisallowReading' => $isTaskDisallowReading,
+            ]);
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
     }
 
     /**
@@ -1409,7 +1449,8 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function addQmSubToResult() {
         $qmSubFlags = $this->entity->getQmSubsegmentFlags();
         $this->view->rows->qmSubEnabled = false;
-        if($this->config->runtimeOptions->editor->enableQmSubSegments &&
+        $taskConfig = $this->entity->getConfig();
+        if($taskConfig->runtimeOptions->editor->enableQmSubSegments &&
                 !empty($qmSubFlags)) {
             $this->view->rows->qmSubFlags = $this->entity->getQmSubsegmentIssuesTranslated(false);
             $this->view->rows->qmSubSeverities = $this->entity->getQmSubsegmentSeveritiesTranslated(false);
@@ -1458,7 +1499,23 @@ class editor_TaskController extends ZfExtended_RestController {
 
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj;
-        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($row['pmGuid']);
+
+        $isTaskPm = $this->isAuthUserTaskPm($this->entity->getPmGuid());
+        $tua = null;
+        try {
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($this->user->data->userGuid, $this->entity);
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //do nothing here
+        }
+        
+        //to access a task the user must either have the loadAllTasks right, or must be the tasks PM, or must be associated to the task
+        $isTaskAccessable = $this->isAllowed('backend', 'loadAllTasks') || $isTaskPm || !is_null($tua);
+        if(!$isTaskAccessable) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        
+        $isEditAll = $this->isAllowed('backend', 'editAllTasks') || $isTaskPm;
         $this->_helper->TaskUserInfo->initForTask($this->workflow, $this->entity);
         $this->_helper->TaskUserInfo->addUserInfos($row, $isEditAll);
         $this->addMissingSegmentrangesToResult($row);
@@ -1501,7 +1558,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * does the export as zip file.
      */
     public function exportAction() {
-        parent::getAction();
+        $this->getAction();
         $diff = (boolean)$this->getRequest()->getParam('diff');
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
 
@@ -1573,9 +1630,16 @@ class editor_TaskController extends ZfExtended_RestController {
         else {
             $suffix = '.zip';
         }
+        
+        $languages = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languages editor_Models_Languages */
+        $languages = $languages->loadAllKeyValueCustom('id','rfc5646');
+        
+        $downloadName = ['',$languages[$this->entity->getSourceLang()],$languages[$this->entity->getTargetLang()]];
+        $downloadName = implode('_', $downloadName).$suffix;
 
         $this->logInfo('Task exported', ['context' => $context, 'diff' => $diff]);
-        $this->provideZipDownload($zipFile, $suffix);
+        $this->provideZipDownload($zipFile, $downloadName);
 
         //rename file after usage to export.zip to keep backwards compatibility
         rename($zipFile, dirname($zipFile).DIRECTORY_SEPARATOR.'export.zip');

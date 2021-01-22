@@ -31,22 +31,9 @@ END LICENSE AND COPYRIGHT
  * and save the result in separate table in the database. Later those results will be used for match analysis and pre-translation.
  */
 class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Import_Worker_Abstract {
-    
-    /***
-     *
-     * @var ZfExtended_Logger
-     */
-    protected $log;
-    
-    /***
-     * @var editor_Services_Connector_Abstract
-     */
-    protected $connector;
-    
-    
     public function __construct() {
         parent::__construct();
-        $this->log=Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
+        $this->log = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
     }
     
     /**
@@ -54,7 +41,7 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Import_Work
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        return !empty($parameters['connector']);
+        return !empty($parameters['languageResourceId']);
     }
     
     /**
@@ -63,8 +50,17 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Import_Work
      */
     public function work() {
         $params = $this->workerModel->getParameters();
-        $this->connector = $params['connector'];
-        $this->connector->batchQuery($this->taskGuid);
+        
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $manager editor_Services_Manager */
+
+        $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
+        $languageResource->load($params['languageResourceId']);
+        
+        $connector = $manager->getConnector($languageResource, $this->task->getSourceLang(), $this->task->getTargetLang(),$this->task->getConfig());
+        /* @var $connector editor_Services_Connector */
+        $connector->batchQuery($this->taskGuid);
         return true;
     }
 }

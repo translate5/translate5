@@ -67,7 +67,9 @@ Ext.define('Editor.util.HttpStateProvider',{
         Ext.apply(me, config);
 
         if (!me.store) {
-            me.store = Ext.create('Editor.store.UserConfig');
+            me.store = Ext.create('Editor.store.UserConfig',{
+                autoLoad:true
+            });
         }
         
         me.callParent(arguments);

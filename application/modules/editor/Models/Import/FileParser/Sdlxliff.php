@@ -104,6 +104,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     protected $logger;
     
     /**
+     * Needed CXT meta Definitions in the SDLXLIFF file
+     * @var array
+     */
+    protected $cxtDefinitions = [];
+    
+    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
      */
@@ -122,8 +128,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->initHelper();
         $this->checkForSdlChangeMarker();
         $this->prepareTagMapping();
+        $this->readCxtMetaDefinitions();
         $this->logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.sdlxliff');
-        $this->transunitParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_TransunitParser');
+        $this->transunitParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_TransunitParser',[
+            $this->config
+        ]);
         //diff export for this task can be used
         $this->task->setDiffExportUsable(1);
         //here would be the right place to set the import map,
@@ -248,6 +257,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $groups = explode('<group', $this->_origFile);
         $counterTrans = 0;
         foreach ($groups as &$group) {
+            //we assume that in one group all <sdl:cxt id="1"/> tags belong to the group and not to single trans units.
+            $cxtGroupDefinitions = [];
+            preg_match_all('#<sdl:cxt[^<>]+id="([^"]+)"#', $group, $cxtGroupDefinitions);
             //übernimm den Default-Wert für $translateGroupLevels von der einer Ebene niedriger
             $translateGroupLevels[$groupLevel] = $translateGroupLevels[$groupLevel - 1];
             //falls die Gruppe den translate-Default für trans-units auf no stellt
@@ -285,7 +297,17 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                     $this->parseSegmentAttributes($units[$i]);
                     //since </group> closing tags can be after the trans-unit we have to split them away and them to the parsed result again
                     $transUnit = explode('</trans-unit>', $units[$i]);
-                    $units[$i] = $this->extractSegment($transUnit[0].'</trans-unit>').$transUnit[1];
+                    
+                    //The transUnit contains sdl:cxt tags, but we assume that tags only in the group tag!
+                    if(strpos($transUnit[0], '<sdl:cxt') !== false) {
+                        throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1323', [
+                            'task' => $this->task,
+                            'filename' => $this->_fileName,
+                            'transunit' => $transUnit,
+                        ]);
+                    }
+                    
+                    $units[$i] = $this->extractSegment($transUnit[0].'</trans-unit>', $cxtGroupDefinitions[1]).$transUnit[1];
                 }
             }
             $group = implode('<trans-unit', $units);
@@ -360,6 +382,46 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         }
     }
 
+    protected function readCxtMetaDefinitions() {
+        $startMeta = strpos($this->_origFile, '<cxt-defs ');
+        $endMeta = strpos($this->_origFile, '</cxt-defs>') + 11; //add the length of the end tag itself
+        if($startMeta === false || $endMeta === false) {
+            return;
+        }
+        $cxtDefs = substr($this->_origFile, $startMeta, $endMeta - $startMeta);
+        $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
+        
+        //collect infos about the following cxt nodes
+        $xmlparser->registerElement('cxt-def[type=x-tm-length-info], cxt-def[type=fieldlength], cxt-def[type=linelength], cxt-def[type=linecount]', function($tag, $attributes) use ($xmlparser){
+            $id = $xmlparser->getAttribute($attributes, 'id');
+            //since most info is in the attributes, we just save them as cxt entry, and add additional info as new fields later
+            $this->cxtDefinitions[$id] = $attributes;
+//             <cxt-def id="2" type="fieldlength" code="FL" name="Fieldlength" descr="1500" purpose="Match">
+//             <cxt-def id="3" type="linelength" code="LL" name="Linelength" descr="1500" purpose="Match">
+//             <cxt-def id="4" type="linecount" code="LC" name="Linecount" descr="1" purpose="Match">
+        });
+        
+        //add specific length info to x-tm-length-info node
+        $xmlparser->registerElement('cxt-def[type=x-tm-length-info] props value', null, function($tag, $key, $opener) use ($xmlparser){
+            $valKey = $xmlparser->getAttribute($opener['attributes'], 'key');
+            $value = $xmlparser->getRange($opener['openerKey']+1, $key-1, true);
+            
+            $cxt = $xmlparser->getParent('cxt-def');
+            $id = $xmlparser->getAttribute($cxt['attributes'], 'id');
+            
+            if($valKey == 'length_type') {
+                $this->cxtDefinitions[$id]['_prop_length_type'] = $value;
+            }
+            
+            if($valKey == 'length_max_value') {
+                $this->cxtDefinitions[$id]['_prop_length_max_value'] = $value;
+            }
+        });
+        
+        $xmlparser->parse($cxtDefs);
+    }
+    
     /**
      * extrahiert die Tags aus den einzelnen Tag-Defs Abschnitten
      *
@@ -413,15 +475,21 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @param string $transUnit
      * @return string contains the teplacement-Tags <lekTargetSeg id=""/> instead the content, where id is the DB segment ID
      */
-    protected function extractSegment($transUnit) {
+    protected function extractSegment($transUnit, array $groupCxtIds) {
         $this->segmentData = array();
-        $result = $this->transunitParser->parse('<trans-unit'.$transUnit, function($mid, $source, $target, $comments) {
+        $result = $this->transunitParser->parse('<trans-unit'.$transUnit, function($mid, $source, $target, $comments) use ($groupCxtIds) {
             if(strlen(trim(strip_tags($source))) === 0 && strlen(trim(strip_tags($target))) === 0){
                 return null;
             }
             $sourceName = $this->segmentFieldManager->getFirstSourceName();
             $targetName = $this->segmentFieldManager->getFirstTargetName();
             $this->setMid($mid);
+            
+            //after defining the MID segment we have the mid and can access the attributes object,
+            // to set the length attributes
+            $attributes = $this->processCxtMetaTagsForSegment($groupCxtIds);
+            $attributes->transunitId = $this->transunitParser->getTransunitId();
+            
             $this->segmentData[$sourceName] = ['original' => $this->parseSegment($source,true)];
             $this->segmentData[$targetName] = ['original' => $this->parseSegment($target,true)];
             $segmentId = $this->setAndSaveSegmentValues();
@@ -431,6 +499,82 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
 
         // add leading <trans-unit for parsing, then strip it again (we got the $transUnit without it, so we return it without it)
         return substr($result, 11);
+    }
+    
+    /**
+     * calculates and sets segment attributes needed by us, this info doesnt exist directly in the segment.
+     * These are currently: pretrans, editable, autoStateId
+     * Parameters are given by the current segment
+     * @return editor_Models_Import_FileParser_SegmentAttributes
+     */
+    protected function processCxtMetaTagsForSegment(array $groupCxtIds): editor_Models_Import_FileParser_SegmentAttributes {
+        $attributes = $this->createSegmentAttributes($this->_mid);
+        if(empty($groupCxtIds)) {
+            return $attributes;
+        }
+        foreach($groupCxtIds as $cxtId) {
+            $cxtDef = $this->cxtDefinitions[$cxtId] ?? null;
+            if(empty($cxtDef)) {
+                continue;
+            }
+            //currently we use only type x-tm-length-info for length restrictions.
+            //the following are collection too, but currently we do not know how to use them:
+            //  cxt-def[type=fieldlength], cxt-def[type=linelength], cxt-def[type=linecount]'
+            
+            if($cxtDef['type'] == 'x-tm-length-info' && $cxtDef['_prop_length_type'] != 'chars') {
+                $this->logger->info('E1322', 'A CXT tag type x-tm-length-info with a unknown prop type "{propType}" was found.', [
+                    'propType' => $cxtDef['_prop_length_type'],
+                    'task' => $this->task,
+                    'filename' => $this->_fileName,
+                ]);
+            }
+            if($cxtDef['type'] == 'x-tm-length-info' && $cxtDef['_prop_length_type'] == 'chars' && $cxtDef['_prop_length_max_value'] > 1) {
+//                 CXT DEF: Array
+//                 (
+//                     [id] => 1
+//                     [type] => x-tm-length-info
+//                     [purpose] => Match
+//                     [_prop_length_type] => chars
+//                     [_prop_length_max_value] => 1500
+//                 )
+                $attributes->sizeUnit = 'char';
+                $attributes->maxWidth = $cxtDef['_prop_length_max_value'];
+            }
+            
+            if($cxtDef['type'] == 'linecount' && $cxtDef['descr'] > 1) {
+//                 CXT DEF: Array
+//                 (
+//                     [id] => 4
+//                     [type] => linecount
+//                     [code] => LC
+//                     [name] => Linecount
+//                     [descr] => 1
+//                     [purpose] => Match
+//                 )
+                $attributes->maxNumberOfLines = (int) $cxtDef['descr'];
+            }
+
+            //also known DEFs, but currently unknown how and when to use (seems to be duplicating x-tm-length-info
+//                 CXT DEF: Array
+//                 (
+//                     [id] => 3
+//                     [type] => linelength
+//                     [code] => LL
+//                     [name] => Linelength
+//                     [descr] => 1500
+//                     [purpose] => Match
+//                 )
+//             CXT DEF: Array
+//             (
+//                 [id] => 2
+//                 [type] => fieldlength
+//                 [code] => FL
+//                 [name] => Fieldlength
+//                 [descr] => 1500
+//                 [purpose] => Match
+//             )
+        }
+        return $attributes;
     }
 
     /**

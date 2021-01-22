@@ -1164,15 +1164,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * Loads segments by a specific workflowStep, fetch only specific fields.
-     * @param string $taskGuid
+     * @param editor_Models_Task $task
      * @param string $workflowStep
      * @param int $workflowStepNr
      */
-    public function loadByWorkflowStep(string $taskGuid, string $workflowStep, $workflowStepNr) {
-        $config = Zend_Registry::get('config');
-        $pmChanges = $config->runtimeOptions->editor->notification->pmChanges;
-        $this->segmentFieldManager->initFields($taskGuid);
-        $this->reInitDb($taskGuid);
+    public function loadByWorkflowStep(editor_Models_Task $task, string $workflowStep, $workflowStepNr) {
+        $this->setConfig($task->getConfig());
+        $pmChanges =$this->config->runtimeOptions->editor->notification->pmChanges;
+        $this->segmentFieldManager->initFields($task->getTaskGuid());
+        $this->reInitDb($task->getTaskGuid());
         
         $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments', 'fileId', 'userGuid', 'userName', 'timestamp');
         $fields = array_merge($fields, $this->segmentFieldManager->getDataIndexList());
@@ -1182,7 +1182,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $db = $this->db;
         $s->from($this->db, $fields);
         $s = $this->addWatchlistJoin($s);
-        $s = $this->addWhereTaskGuid($s, $taskGuid);
+        $s = $this->addWhereTaskGuid($s, $task->getTaskGuid());
         switch ($pmChanges) {
             case self::PM_ALL_INCLUDED:
                 $s->where('('.$this->tableName.'.workflowStep = ?', $workflowStep);
@@ -1464,8 +1464,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function updateQmSubSegments(string $dataindex) {
         $field = $this->segmentFieldManager->getDataLocationByKey($dataindex);
-        $config = Zend_Registry::get('config');
-        if(! $config->runtimeOptions->editor->enableQmSubSegments) {
+        if(! $this->getConfig()->runtimeOptions->editor->enableQmSubSegments) {
             return;
         }
         $qmsubsegments = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
@@ -1791,5 +1790,27 @@ order by date desc, segmentId asc limit 1';
         $stmt = $this->db->getAdapter()->query($sql,[$taskGuid,$taskGuid,$userGuid]);
         $result = $stmt->fetchAll();
         return $result[0]['segmentId'] ?? -1;
+    }
+    
+    /***
+     * The input config must be task specific.
+     * @param Zend_Config $taskSpecificConfig
+     */
+    public function setConfig(Zend_Config $taskSpecificConfig) {
+        $this->config = $taskSpecificConfig;
+    }
+    
+    /***
+     * Set the class config. If the config is not set, the taskspecific config will be loaded.
+     * @return Zend_Config
+     */
+    public function getConfig() {
+        if(!isset($this->config)){
+            $task=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($this->getTaskGuid());
+            $this->setConfig($task->getConfig());
+        }
+        return $this->config;
     }
 }

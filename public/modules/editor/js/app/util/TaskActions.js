@@ -128,7 +128,7 @@ Ext.define('Editor.util.TaskActions', {
         }
 
         //do not show the confirmation window if it is configured so
-        if(Editor.data.frontend.showConfirmFinishTaskPopup!==true){
+        if(Editor.app.getTaskConfig('editor.showConfirmFinishTaskPopup')!==true){
             me._doFinish(callback);
             return;
         }
@@ -231,7 +231,6 @@ Ext.define('Editor.util.TaskActions', {
         if(task && initialState == task.USER_STATE_EDIT && task.get('userState') == task.USER_STATE_VIEW && confirmed) {
             Editor.MessageBox.addInfo(Ext.String.format(me.strings.forcedReadOnly, task.get('lockingUsername')));
         }
-        app.unmask();
         app.openEditor(task);
     }
 });

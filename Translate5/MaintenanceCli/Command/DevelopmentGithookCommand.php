@@ -114,10 +114,41 @@ class DevelopmentGithookCommand extends Translate5AbstractCommand
                     'Inform client-specific users about the change if needed (via special release note in issue)!',
                     'Consider implementing a precondition check or alter script which checks for the existence of your change in the client-specific overwrite!'
                 ]);
-                return 0;
+            }
+            if(preg_match('/\.sql$/i', $line)) {
+                if(!$this->sqlCreateTable($line)) {
+                    return 1;
+                }
             }
         }
         return 0;
+    }
+    
+    protected function sqlCreateTable($file) {
+        $content = file_get_contents($file);
+        $matches = null;
+        $result = true;
+
+        //if we have no charset at all, this is fine
+        if(!preg_match_all('/CHARSET[\s]*=[\s]*([^,;]+)/i', $content, $matches)) {
+            return true;
+        }
+        
+        foreach($matches[1] as $part) {
+            $partList = explode(' ', $part);
+            $charset = reset($partList);
+            //if the found charset string is not starting with utf8mb4 this is wrong
+            if($charset !== 'utf8mb4') {
+                $this->io->error('Wrong charset "'.$charset.'" used instead of utf8mb4 in file '.$file);
+                $result = false;
+            }
+            elseif(stripos($part, ' collate ') === false) {
+                $this->io->error(['A charset '.$charset.' was provided but the collation is missing.', 'Provide both or omit both!','Alter file: '.$file]);
+                $result = false;
+            }
+        }
+        
+        return $result;
     }
     
     protected function commitMsg($commitMsgFile) {

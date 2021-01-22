@@ -9,8 +9,8 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
@@ -37,17 +37,13 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     protected $frontendControllers = array(
-        'pluginSpellCheck' => 'Editor.plugins.SpellCheck.controller.Editor',
-        'pluginSpellCheckSpellCheckQuery' => 'Editor.plugins.SpellCheck.controller.SpellCheckQuery'
+        'pluginSpellCheck' => 'Editor.plugins.SpellCheck.controller.Editor'
     );
     
     protected $localePath = 'locales';
     
     public function getFrontendControllers() {
-        if(!empty($this->config) && $this->getConfig()->active) {
-            return $this->getFrontendControllersFromAcl();
-        }
-        return [];
+        return $this->getFrontendControllersFromAcl();
     }
     
     public function init() {
@@ -67,6 +63,7 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
         //To set config values:
         //$view->Php2JsVars()->set('plugins.SpellCheck.XXX', $this->getConfig()->preloadedTranslationSegments);
         $view->headLink()->appendStylesheet($this->getResourcePath('plugin.css'));
+        $view->Php2JsVars()->get('editor')->htmleditorCss[] = $this->getResourcePath('htmleditor.css');
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {

@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -75,7 +75,7 @@ class editor_Services_Manager {
     }
     
     /**
-     * Returns all services (= their name and helppage) that are not configured 
+     * Returns all services (= their name and helppage) that are not configured
      * or that don't have any resources embedded. (If the configuration is set,
      * but wrong, then no resources might be embedded although the service is configured.)
      * @return array
@@ -94,8 +94,8 @@ class editor_Services_Manager {
 
             //for the resource check the connection
             if(!empty($resource)){
-                $connector = ZfExtended_Factory::get($resource->serviceType.editor_Services_Manager::CLS_CONNECTOR);
-                /* @var $connector editor_Services_Connector_Abstract */
+                $connector = ZfExtended_Factory::get('editor_Services_Connector');
+                /* @var $connector editor_Services_Connector */
                 
                 //the service is also not available when connection cannot be established
                 if($connector && !$connector->ping($resource)){
@@ -159,18 +159,22 @@ class editor_Services_Manager {
     
     /***
      * returns the desired connector, connection to the given resource
-     * 
+     *
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
      * @param int $sourceLang
      * @param int $targetLang
+     * @param Zend_Config $config : this will overwritte the default connector config value
      * @return editor_Services_Connector
      */
-    public function getConnector(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
+    public function getConnector(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null,Zend_Config $config = null) {
         $serviceType = $languageResource->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get('editor_Services_Connector');
         /* @var $connector editor_Services_Connector */
         $connector->connectTo($languageResource,$sourceLang,$targetLang);
+        if(isset($config)){
+            $connector->setConfig($config);
+        }
         return $connector;
     }
     
@@ -182,7 +186,7 @@ class editor_Services_Manager {
     protected function checkService(string $serviceType) { // TODO is similar to isConfigured(), and why here in manager?
         if(!$this->hasService($serviceType)) {
             //Given Language-Resource-Service "{serviceType}." is not registered in the Language-Resource-Service-Manager!
-            throw new editor_Services_NoServiceException('E1106', [
+            throw new editor_Services_Exceptions_NoService('E1106', [
                 'serviceType' => $serviceType,
             ]);
         }
@@ -209,13 +213,13 @@ class editor_Services_Manager {
     }
     
     public function openForTask(editor_Models_Task $task) {
-        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Services_Connector $connector){
+        $this->visitAllAssociatedTms($task, function(editor_Services_Connector $connector){
             $connector->open();
         });
     }
     
     public function closeForTask(editor_Models_Task $task) {
-        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Services_Connector $connector){
+        $this->visitAllAssociatedTms($task, function(editor_Services_Connector $connector){
             $connector->close();
         });
     }
@@ -224,32 +228,32 @@ class editor_Services_Manager {
         if(empty($segment->getTargetEdit())&&$segment->getTargetEdit()!=="0"){
             return;
         }
-        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Services_Connector $connector, $languageResource, $assoc) use ($segment) {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($segment->getTaskGuid());
+        $this->visitAllAssociatedTms($task, function(editor_Services_Connector $connector, $languageResource, $assoc) use ($segment) {
             if(!empty($assoc['segmentsUpdateable'])) {
                 $connector->update($segment);
             }
         });
     }
     
-    protected function visitAllAssociatedTms($taskGuid, Closure $todo) {
+    protected function visitAllAssociatedTms(editor_Models_Task $task, Closure $todo) {
         $languageResources = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
-        $list = $languageResources->loadByAssociatedTaskGuid($taskGuid);
+        $list = $languageResources->loadByAssociatedTaskGuid($task->getTaskGuid());
         foreach($list as $one){
             $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
             /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
             $languageResource->init($one);
             try {
-                $connector = $this->getConnector($languageResource);
+                $connector = $this->getConnector($languageResource,null,null,$task->getConfig());
                 /* @var $connector editor_Services_Connector */
                 $todo($connector, $languageResource, $one);
             }
-            catch(editor_Services_NoServiceException $e) {
+            catch(editor_Services_Exceptions_NoService $e) {
                 $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource.service');
                 /* @var $logger ZfExtended_Logger */
-                $task = ZfExtended_Factory::get('editor_Models_Task');
-                /* @var $task editor_Models_Task */
-                $task->loadByTaskGuid($taskGuid);
                 $e->addExtraData(['task' => $task]);
                 $logger->exception($e,[
                     'level' => $logger::LEVEL_WARN

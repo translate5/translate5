@@ -84,6 +84,7 @@ Ext.define('Editor.view.segments.StatusStrip', {
             //check if the element needs to be visible, if no visibility handler is defined
             //hide the component
             item.updateSegment && item.updateSegment(record, fieldName);
-        });  
+        });
+        me.fireEvent('afterSegmentUpdate', me, record, fieldName);
     }
 });

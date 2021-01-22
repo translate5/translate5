@@ -18646,7 +18646,7 @@ For more detailed license information, see COPYING.txt and README.md.
     <afterbreak>\s</afterbreak>
   </rule>
   <rule break="no">
-    <beforebreak>\b[Ss]([Dd][Zz]\.</beforebreak>
+    <beforebreak>\b[Ss]([Dd][Zz])\.</beforebreak>
     <afterbreak>\s</afterbreak>
   </rule>
   <rule break="no">

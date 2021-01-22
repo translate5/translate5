@@ -57,3 +57,7 @@ body.segment-size-3 img {height: 19px;}
 body.segment-size-4 img {height: 23px;}
 body.segment-size-5 img {height: 26px;}
 body.segment-size-6 img {height: 30px;}
+
+.searchreplace-active-match {background-color: rgb(255, 0, 0) !important;}
+/* this class exist also in t5 main css. It is used also by the segment grid */
+.searchreplace-hide-element {display: none !important;}

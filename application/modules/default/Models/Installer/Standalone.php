@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -100,6 +100,11 @@ class Models_Installer_Standalone {
     protected $preconditonChecker;
     
     /**
+     * @var Symfony\Component\Console\Application
+     */
+    protected $cli;
+    
+    /**
      * Options:
      * mysql_bin => path to mysql binary
      * @param array $options
@@ -107,15 +112,16 @@ class Models_Installer_Standalone {
     public static function mainLinux(array $options = null) {
         $saInstaller = new self(getcwd(), $options);
         $saInstaller->checkAndCallTools();
-        $saInstaller->checkEnvironment();
+        $saInstaller->checkGitAndInit();
         $saInstaller->processDependencies();
+        $saInstaller->checkEnvironment();
         $saInstaller->addZendToIncludePath();
         $saInstaller->installation();//checks internally if steps are already done
         $saInstaller->cleanUpDeletedFiles(); //must be before initApplication!
         $saInstaller->initApplication();
         $saInstaller->postInstallation();
-        $saInstaller->checkDb();
         $saInstaller->updateDb(); //this does also cache cleaning!
+        $saInstaller->checkDb();
         $saInstaller->done();
     }
     
@@ -241,10 +247,27 @@ class Models_Installer_Standalone {
         };
     }
     
-    protected function checkEnvironment() {
+    protected function checkGitAndInit() {
         $this->installerFile = __FILE__;
         $this->installerHash = md5_file($this->installerFile);
-        $this->preconditonChecker->checkEnvironment();
+        if(file_exists('.git')) {
+            die("\n\n A .git file/directory does exist in the project root!
+    Please use git to update your installation and call ./translate5.sh database:update \n\n");
+        }
+    }
+    
+    protected function checkEnvironment() {
+        require_once $this->currentWorkingDir.'/vendor/autoload.php';
+        $this->cli = new Symfony\Component\Console\Application();
+        $this->cli->setAutoExit(false);
+        $this->cli->add(new Translate5\MaintenanceCli\Command\SystemCheckCommand());
+        $input = new Symfony\Component\Console\Input\ArrayInput([
+            'command' => 'system:check',
+            '--pre-installation' => null,
+            '--ansi' => null,
+        ]);
+        $this->cli->run($input);
+        $this->log('');
     }
     
     protected function checkMyselfForUpdates() {
@@ -284,16 +307,22 @@ class Models_Installer_Standalone {
         if(is_array($options) && isset($options['mysql_bin']) && $options['mysql_bin'] != self::MYSQL_BIN) {
             $this->dbCredentials['executable'] = $options['mysql_bin'];
         }
-        if(!is_array($options) || empty($options['db::username']) || empty($options['db::password']) || empty($options['db::database'])) {
+        if(!is_array($options) || empty($options['db::host']) || empty($options['db::username']) || empty($options['db::password']) || empty($options['db::database'])) {
             while(! $this->promptDbCredentials());
         } else {
+            $this->dbCredentials['host']     = $options['db::host'];
             $this->dbCredentials['username'] = $options['db::username'];
             $this->dbCredentials['password'] = $options['db::password'];
             $this->dbCredentials['database'] = $options['db::database'];
         }
         
-        $this->initDb();
         $this->createInstallationIni();
+        if(! $this->checkDb()) {
+            unlink($this->currentWorkingDir.self::INSTALL_INI);
+            $this->log("\nFix the above errors and restart the installer! DB Config ".self::INSTALL_INI." was automatically removed therefore.\n");
+            exit;
+        }
+        $this->initDb();
         $this->promptHostname();
         $this->moveClientSpecific();
     }
@@ -535,11 +564,38 @@ class Models_Installer_Standalone {
         } else {
             $this->log("\nDB Config could NOT be stored in .".self::INSTALL_INI."!\n");
         }
+        
+        Zend_Registry::set('config', new Zend_Config([
+            'resources' => new Zend_Config([
+                'db' => new Zend_Config([
+                    'adapter' => "PDO_MYSQL",
+                    'isDefaultTableAdapter' => 1,
+                    'params' => new Zend_Config([
+                        'charset' => "utf8mb4",
+                        'host' => $this->dbCredentials['host'],
+                        'username' => $this->dbCredentials['username'],
+                        'password' => $this->dbCredentials['password'],
+                        'dbname' => $this->dbCredentials['database'],
+                    ])
+                ])
+            ])
+        ]));
+        
         return ($bytes > 0);
     }
     
-    protected function checkDb() {
-        $this->preconditonChecker->checkDb();
+    /**
+     * returns true if the DB is OK
+     * @return bool
+     */
+    protected function checkDb(): bool {
+        $input = new Symfony\Component\Console\Input\ArrayInput([
+            'command' => 'system:check',
+            'module' => 'database',
+            '--pre-installation' => null,
+            '--ansi' => null,
+        ]);
+        return $this->cli->run($input) === 0;
     }
     
     /**

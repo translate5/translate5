@@ -234,8 +234,7 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
 <trans-unit id='SWhyIFdlYmJyb3dzZXIgd2lyZCBuaWNodCBtZWhyIHVudGVyc3TDvHR6dA=='><source>Ihr Webbrowser wird nicht mehr unterstützt</source><target>Ihr Webbrowser wird nicht mehr unterstützt</target></trans-unit>
 <trans-unit id='TGVpZGVyIHdpcmQgZGVyIE1pY3Jvc29mdCBJbnRlcm5ldCBFeHBsb3JlciB2b24gdHJhbnNsYXRlNSBuaWNodCBtZWhyIHVudGVyc3TDvHR6dC4gQml0dGUgYmVudXR6ZW4gU2llIGVpbmVuIGFuZGVyZW4gV2ViYnJvd3NlciB3aWUgei5CLiBHb29nbGUgQ2hyb21lLCBNb3ppbGxhIEZpcmVGb3gsIEFwcGxlIFNhZmFyaSBvZGVyIE1pY3Jvc29mdCBFZGdlLg=='><source>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</source><target>Leider wird der Microsoft Internet Explorer von translate5 nicht mehr unterstützt. Bitte benutzen Sie einen anderen Webbrowser wie z.B. Google Chrome, Mozilla FireFox, Apple Safari oder Microsoft Edge.</target></trans-unit>
 <trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{ProjectOverviewYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/1TkBCfo9ovw</target></trans-unit>
-<trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{ProjectOverviewYoutubeVideoGuideDescriptionContent}</source>
-<target><br/>
+<trans-unit id='e1Byb2plY3RPdmVydmlld1lvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{ProjectOverviewYoutubeVideoGuideDescriptionContent}</source><target><br/>
 <figure>
     <figcaption><b>Übersicht:</b></figcaption>
       <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
@@ -248,8 +247,31 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
       <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=176&amp;autoplay=1" dir="auto">2:56</a> Editor<br/>
       <a target="youtubevideoframe" href="https://www.youtube.com/embed/1TkBCfo9ovw?start=223&amp;autoplay=1" dir="auto">3:43</a> Kontaktinformationen<br/>
 </figure>
-</target>
-</trans-unit>
+</target></trans-unit>
+<trans-unit id='e0VkaXRvcllvdXR1YmVWaWRlb0d1aWRlVXJsfQ=='><source>{EditorYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/fERwuq1yXUM</target></trans-unit>
+<trans-unit id='e0VkaXRvcllvdXR1YmVWaWRlb0d1aWRlRGVzY3JpcHRpb25Db250ZW50fQ=='><source>{EditorYoutubeVideoGuideDescriptionContent}</source><target><br/>
+<figure>
+    <figcaption><b>Übersicht:</b></figcaption>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=9&amp;autoplay=1" dir="auto">0:09</a> Interface<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=66&amp;autoplay=1" dir="auto">1:06</a> Ansicht ändern<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=85&amp;autoplay=1" dir="auto">1:25</a> Bearbeitung<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=108&amp;autoplay=1" dir="auto">1:48</a> Konkordanzsuche<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=121&amp;autoplay=1" dir="auto">2:01</a> Schaltflächen für die Segmentbearbeitung<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=138&amp;autoplay=1" dir="auto">2:18</a> Lesezeichen<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=154&amp;autoplay=1" dir="auto">2:34</a> Tastenkürzel<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=175&amp;autoplay=1" dir="auto">2:55</a> Segmentscrollen und TrackChanges-Funktion<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=210&amp;autoplay=1" dir="auto">3:30</a> Wiederholungseditor<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=224&amp;autoplay=1" dir="auto">3:44</a> Farbliche Markierung von Wörtern<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=267&amp;autoplay=1" dir="auto">4:27</a> Tags<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=289&amp;autoplay=1" dir="auto">4:49</a> Bearbeitungsstatus<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=308&amp;autoplay=1" dir="auto">5:08</a> Suchen und Ersetzen<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=323&amp;autoplay=1" dir="auto">5:23</a> Segment-Metadaten<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=341&amp;autoplay=1" dir="auto">5:41</a> Dateinbaum<br/>
+    <a target="youtubevideoframe" href="https://www.youtube.com/embed/fERwuq1yXUM?start=369&amp;autoplay=1" dir="auto">6:09</a> Kontaktinformationen<br/>
+</figure>
+</target></trans-unit>
+<trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IG1hdGNoIHRoZSBleHBlY3RlZCBzdHJ1Y3R1cmUgZm9yIGEgRE5TIGhvc3RuYW1l'><source>'%value%' does not match the expected structure for a DNS hostname</source><target>'%value%' does not match the expected structure for a DNS hostname</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -39,7 +39,7 @@ END LICENSE AND COPYRIGHT
  * @method void setTargetLangCode() setTargetLangCode(string $lang)
  * @method integer getLanguageResourceId getLanguageResourceId()
  * @method void setLanguageResourceId() setLanguageResourceId(int $languageResourceId)
- * 
+ *
  */
 class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity_Abstract {
     
@@ -121,17 +121,19 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
         return $this->db->fetchAll($s)->toArray();
     }
     
-    /***
+    /**
      * Check if language for $field exist for the $languageResourceId
-     * @param mixed $language
+     * @param array $language array of language ids or codes (depending on $field)
      * @param string $field : sourceLang, targetLang, sourceLangCode, targetLangCode
      * @param int $languageResourceId
      * @return boolean
      */
-    public function isInCollection($language,$field,$languageResourceId){
-        $s=$this->db->select()
-        ->where($field.'=?',$language)
-        ->where('languageResourceId=?',$languageResourceId);
+    public function isInCollection(array $languages, string $field, $languageResourceId): bool{
+        $field = $this->db->getAdapter()->quoteIdentifier($field);
+        $s = $this->db->select()
+            ->where($field.' in (?)', $languages)
+            ->where('languageResourceId = ?', $languageResourceId);
+
         return !empty($this->db->fetchAll($s)->toArray());
     }
     
@@ -246,7 +248,7 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
     /**
      * Get all available target locales for a source locale.
      * The locales are based on available mt language resources.
-     * 
+     *
      * @returns {Array}
      */
     public function getTargetsForSources() {

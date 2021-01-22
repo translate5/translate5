@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+ 
+/**#@+
  * Resources are no valid Models/Entitys, we support only a generated Resource listing
  * One Resource is one available configured connector, Languages and Title can be customized in the TM Overview List
  */
@@ -35,7 +35,7 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::init()
-     * 
+     *
      * copied the init method, parent can not be used, since no real entity is used here
      */
     public function init() {
@@ -54,20 +54,30 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
         $isAllowedFilebased = $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesAddFilebased');
         $isAllowedNonFilebased = $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesAddNonFilebased');
         
-        // (1) the resources of the configured services 
+        // (1) the resources of the configured services
         $resources = $serviceManager->getAllResources();
         foreach($resources as $resource) {
             /* @var $resource editor_Models_LanguageResources_Resource */
             $isFilebased = $resource->getFilebased();
-            if($isFilebased && $isAllowedFilebased || !$isFilebased && $isAllowedNonFilebased) {
-                $result[$resource->getid()] = $resource->getDataObject();
+            if($isFilebased ? !$isAllowedFilebased : !$isAllowedNonFilebased) {
+                continue;
             }
+            $id = $resource->getid();
+            $result[$id] = $resource->getDataObject();
+            
+            //add languages to usable resources
+            $connector = ZfExtended_Factory::get('editor_Services_Connector');
+            /* @var $connector editor_Services_Connector */
+            
+            $languages = $connector->languages($resource);
+            $result[$id]->sourceLanguages =$this->handleLanguageCodes($languages[editor_Services_Connector_Abstract::SOURCE_LANGUAGES_KEY] ?? $languages);
+            $result[$id]->targetLanguages =$this->handleLanguageCodes($languages[editor_Services_Connector_Abstract::TARGET_LANGUAGES_KEY] ?? $languages);
         }
         
-        // (2)  the unconfigured services 
+        // (2)  the unconfigured services
         $allUnconfiguredServices = $serviceManager->getAllUnconfiguredServices();
         foreach ($allUnconfiguredServices as $unconfiguredService) {
-            //filter out all configured but not reachable services(the api status request returns different status from available) 
+            //filter out all configured but not reachable services(the api status request returns different status from available)
             if(isset($unconfiguredService->id) && isset($result[$unconfiguredService->id])){
                 unset($result[$unconfiguredService->id]);
                 unset($unconfiguredService->id);
@@ -81,24 +91,6 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
             $result[] = $uninstalledService;
         }
         
-        // (4) load the resource available languages for each service resource
-        foreach ($result as &$r){
-            // if there is no id set, the service is unconfigured
-            if(!isset($r->id) || !isset($r->serviceType)){
-                continue;
-            }
-            $service = ZfExtended_Factory::get($r->serviceType.editor_Services_Manager::CLS_SERVICE);
-            /* @var $service editor_Services_ServiceAbstract */
-            $resource = $service->getResources()[0] ?? false;
-            if(!empty($resource)){
-                $connector = ZfExtended_Factory::get($r->serviceType.editor_Services_Manager::CLS_CONNECTOR);
-                /* @var $connector editor_Services_Connector_Abstract */
-                $languages=$connector->languages();
-                $r->sourceLanguages =$this->handleLanguageCodes($languages[editor_Services_Connector_Abstract::SOURCE_LANGUAGES_KEY] ??  $languages);
-                $r->targetLanguages =$this->handleLanguageCodes($languages[editor_Services_Connector_Abstract::TARGET_LANGUAGES_KEY] ?? $languages);
-            }
-        }
-
         //remove the resource id as array key (it is not required)
         $result = array_values($result);
         
@@ -110,7 +102,7 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
             return ($a->name<$b->name) ? -1 : 1;
         };
         usort($result,$customSort);
-		$this->view->rows = array_values($result);
+        $this->view->rows = array_values($result);
         $this->view->total = count($result);
     }
     public function getAction() {

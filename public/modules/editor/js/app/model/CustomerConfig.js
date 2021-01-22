@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,24 +26,23 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-
-/**
- * is thrown if a service is accessed, which does not exist any more, or where the corresponding plug-in was disabled.
- */
-class editor_Services_NoServiceException extends ZfExtended_ErrorCodeException {
-    /**
-     * @var string
-     */
-    protected $domain = 'editor.languageresource.service';
-    
-    static protected $localErrorCodes = [
-        'E1106' => 'Given Language-Resource-Service "{serviceType}." is not registered in the Language-Resource-Service-Manager!',
-        'E1257' => 'The LanguageResource-Service "{service}" is not configured. Please check this confluence-page for more details: "{helpPage}"',
-    ];
-}
+Ext.define('Editor.model.CustomerConfig', {
+  extend: 'Editor.model.Config',
+  fields: [
+    {name: 'customerId', type: 'int',critical: true},//critical: true -> send this param always when save 
+  ],
+  idProperty: 'name',
+  proxy : {
+    type : 'rest',
+    url: Editor.data.restpath+'config',
+    reader : {
+      rootProperty: 'rows',
+      type : 'json'
+    },
+    writer: {
+      encode: true,
+      rootProperty: 'data',
+      writeAllFields: false
+    }
+  }
+});

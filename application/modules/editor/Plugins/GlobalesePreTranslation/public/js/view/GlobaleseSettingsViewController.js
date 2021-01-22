@@ -93,7 +93,6 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewCon
             globaleseEngine=view.down('#globaleseEngine').getValue(),
             globaleseGroup=view.down('#globaleseGroup').getValue(),
             url = Editor.data.restpath+'plugins_globalesepretranslation_globalese',
-            params = {},
             extraData = Ext.JSON.encode({
                 apiUsername: apiusername,
                 apiKey: apipassword,
@@ -116,19 +115,3 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewCon
         });
     }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

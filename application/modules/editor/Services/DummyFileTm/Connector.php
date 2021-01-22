@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * reactivate me for pretranslation and analysis tests!
+ * FIXME reactivate me for pretranslation and analysis tests!
  *
  * The dummy CSV file must be:
  * , separated
@@ -120,8 +120,8 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @see editor_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $queryString = $this->getQueryString($segment);
-        return $this->loopData($segment->stripTags($queryString));
+        $queryString = $this->getQueryStringAndSetAsDefault($segment);
+        return $this->loopData($this->tagHandler->prepareQuery($queryString));
     }
     
     /**
@@ -134,8 +134,8 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
     }
     
     /**
-     * loops through the dummy data and performs a match / search 
-     * 
+     * loops through the dummy data and performs a match / search
+     *
      * @param string $queryString
      * @param string $field
      * @throws ZfExtended_NotFoundException
@@ -177,7 +177,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
             // - get data from storage with limit + 1 to see if there are more results
             //   → but send only limit * results to the GUI not limit + 1
             // - if count(results) <= limit, that means we are on the last page.
-            // - for total count we use just offset + count(results) and thats it 
+            // - for total count we use just offset + count(results) and thats it
             $this->resultList->setNextOffset(min($this->searchCount, $this->limit + $this->offset + 1));
         }
 
@@ -191,10 +191,9 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @param string $target
      */
     protected function makeMatch($queryString, $source, $target) {
-        $queryString = strip_tags($queryString);
-        $source = strip_tags($source);
-        $target = strip_tags($target);
-        
+        $source = $this->tagHandler->restoreInResult($source);
+        $target = $this->tagHandler->restoreInResult($target);
+        $percent = 0;
         similar_text($queryString, $source, $percent);
         if($percent < 80) {
             return;
@@ -243,11 +242,11 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
     public function getValidExportTypes()
     {}
 
-    public function getStatus($moreInfo)
+    public function getStatus(editor_Models_LanguageResources_Resource $resource)
     {}
 
     public function translate(string $searchString){
-        throw new BadMethodCallException("DummyFileTm Connector does not support search requests");
+        return $this->search($searchString);
     }
 
 }

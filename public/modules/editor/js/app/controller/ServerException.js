@@ -285,8 +285,8 @@ Ext.define('Editor.controller.ServerException', {
         if(response.errorMessage && response.errorMessage.length > 0) {
             result += '<p>'+response.errorMessage+'</p>';
         }
-        if(response.messages && response.messages.length > 0) {
-            Ext.Array.each(response.messages, function(item){
+        if(response.errors && response.errors.length > 0) {
+            Ext.Array.each(response.errors, function(item){
                 result += '<p>'+item+'</p>';
             });
         }

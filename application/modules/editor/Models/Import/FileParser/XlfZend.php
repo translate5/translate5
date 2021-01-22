@@ -91,6 +91,7 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
     
     protected function parse() {
         //force preserve Whitespace
+        //this->config is task specific config
         $this->config = new Zend_Config($this->config->toArray(), true);
         $this->config->runtimeOptions->import->xlf->preserveWhitespace = true;
         $this->config->setReadOnly();

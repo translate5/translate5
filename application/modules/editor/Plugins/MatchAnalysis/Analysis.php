@@ -180,7 +180,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         //lazy init, we need only instance, the here given $segment will be overwritten wuth the updateRepetition call
         if(empty($this->repetitionUpdater)) {
-            $this->repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [$segment]);
+            $this->repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [$segment,$this->task->getConfig()]);
         }
         
         //check if the segment source hash exist in the repetition array
@@ -471,21 +471,20 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             
             $manager = ZfExtended_Factory::get('editor_Services_Manager');
             /* @var $manager editor_Services_Manager */
-            $resource=$manager->getResource($languageresource);
+            $resource = $manager->getResource($languageresource);
             
             $connector=null;
             try {
-                $connector=$manager->getConnector($languageresource,$this->task->getSourceLang(),$this->task->getTargetLang());
+                $connector=$manager->getConnector($languageresource,$this->task->getSourceLang(),$this->task->getTargetLang(),$this->task->getConfig());
 
-                $moreInfo='';
                 //throw a worning if the language resource is not available
-                $status = $connector->getStatus($moreInfo);
+                $status = $connector->getStatus($resource);
                 if(!in_array($status, $availableConnectorStatus)){
-                    $this->log->warn('E1239','MatchAnalysis Plug-In: The associated language resource "{name}" is not available for match analysis and pre-translations.',[
+                    $this->log->warn('E1239','MatchAnalysis Plug-In: Language resource "{name}" has status "{status}" and is not available for match analysis and pre-translations.',[
                         'task' => $this->task,
                         'name' => $languageresource->getName(),
                         'status' => $status,
-                        'moreInfo' => $moreInfo,
+                        'moreInfo' => $connector->getLastStatusInfo(),
                         'languageResource' => $languageresource,
                     ]);
                     continue;
@@ -498,6 +497,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 //store the languageResource
                 $this->resources[$languageresource->getId()] = $languageresource;
             } catch (Exception $e) {
+                
+    //FIXME this try catch should not be needed anymore, after refactoring of December 2020
+                
                 $errors = [];
                 //if the exception is of type ZfExtended_ErrorCodeException, get the additional exception info, and log it
                 if($e instanceof ZfExtended_ErrorCodeException){

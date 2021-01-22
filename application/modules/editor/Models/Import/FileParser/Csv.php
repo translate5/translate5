@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -64,19 +64,19 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     protected $break;
     
     /**
-     * @var string 
+     * @var string
      */
     protected $_delimiter;
     
     /**
-     * @var string 
+     * @var string
      */
     protected $_enclosure;
     
     /**
      * @var boolean
      */
-    protected $tagProtection = false;
+    protected $tagProtection = true;
     
     /**
      * @var array
@@ -126,17 +126,10 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
         $this->regexInternalTags = editor_Models_Segment_InternalTag::REGEX_INTERNAL_TAGS;
         
-        // check taskTemplate for options (check if tag-protection or regExes-protection is set)
-        $taskConfig = Zend_Registry::get('taskTemplate');
-        $className = __CLASS__;
-        
-        if (!isset($taskConfig->import->fileparser->$className)) {
-            return;
-        }
-        $options = $taskConfig->import->fileparser->$className->options;
-        
-        if (isset($options->protectTags)) {
-            $this->tagProtection = $options->protectTags;
+        $options = $this->config->runtimeOptions->import->fileparser->csv->options;
+        $protectTags = (boolean)$options->protectTags;
+        if ($protectTags) {
+            $this->tagProtection = $protectTags;
             $ds = DIRECTORY_SEPARATOR;
             $html5TagFile = APPLICATION_PATH.$ds.'modules'.$ds.'editor'.
                     $ds.'Models'.$ds.'Import'.$ds.'FileParser'.$ds.
@@ -151,7 +144,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         }
     }
     /**
-     * 
+     *
      * @param mixed $regExes object or string
      * @param string $regexArrayName
      * @return void
@@ -179,7 +172,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             }
             if(preg_match($regEx, $this->placeholderCSV)===1){
                 throw new editor_Models_Import_FileParser_Csv_Exception('E1017', [
-                    'regex' => $regEx, 
+                    'regex' => $regEx,
                     'placeholder' => $this->placeholderCSV,
                     'task' => $this->task,
                 ]);
@@ -308,8 +301,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             }
             
             //we ensure that columns with the same name in one csv file are made unique
-            // this is needed by addfield to map fields between different files 
-            // if mid exists multiple times in the header, only the last one is used. 
+            // this is needed by addfield to map fields between different files
+            // if mid exists multiple times in the header, only the last one is used.
             if(isset($foundHeader[$colHead]) && strlen($foundHeader[$colHead]) > 0) {
                 $colHead .= '_'.($foundHeader[$colHead]++);
             }
@@ -421,7 +414,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      *
      * @param string $segment
      * @param callable $textNodeCallback not used in CSV Fileparsing!
-     * 
+     *
      * @return string $segment
      */
     protected function parseSegmentProtectWhitespace($segment, callable $textNodeCallback = null) {
@@ -434,9 +427,9 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     }
     
     /**
-     * 
+     *
      * @param string $segment
-     * @return string 
+     * @return string
      */
     protected function parseSegmentReplacePlaceholders($segment){
         $placeholders = array_keys($this->protectedStrings);
@@ -449,7 +442,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * be careful: if segment does not contain a "<", this method will simply return the segment (for performance reasons)
      * @param string $segment
      * @param string $tagToReplaceRegex - should contain a regex, that stands for a tag, that should be hidden for parsing reasons by a placeholder.
-     * @return string 
+     * @return string
      */
     protected function parseSegmentInsertPlaceholders($segment,$tagToReplaceRegex){
         if(strpos($segment, '<')===false){
@@ -531,7 +524,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     
     /**
      * Replace all special marked single-tags in $text.
-     * 
+     *
      * @param string $text
      * @return string
      */
@@ -552,7 +545,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     
     /**
      * Replace all special marked left-tags in $text.
-     * 
+     *
      * @param string $text
      * @return string
      */
@@ -573,7 +566,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     
     /**
      * Replace all special marked right-tags in $text.
-     * 
+     *
      * @param string $text
      * @return string
      */
@@ -612,16 +605,8 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 return $tag;
             }
             $tagId = $this->shortTagIdent++;
-            $p = array(
-                'class' => implode('', unpack('H*', $tag)),
-                'text' => $this->encodeTagsForDisplay($tag),
-                'shortTag' => $tagId,
-                'id' => 'regex',
-            );
-            
-            $r = $this->_singleTag->getHtmlTag($p);
-            
-            return $r;
+            $p = $this->getTagParams($tag, $tagId, editor_Models_Segment_InternalTag::TYPE_REGEX, $this->encodeTagsForDisplay($tag), false);
+            return $this->_singleTag->getHtmlTag($p);
         };
         foreach ($regexToUse as $regEx) {
             $text = preg_replace_callback($regEx, $mask, $text);
@@ -630,7 +615,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     }
     
     /**
-     * counterpart of str_getcsv, because there is no php-func like that 
+     * counterpart of str_getcsv, because there is no php-func like that
      * (function taken from php.net-comments)
      * @param array $array
      * @param string $delimiter
@@ -638,37 +623,37 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @param string $terminator
      * @return string
      */
-    protected function str_putcsv($array, $delimiter = ',', $enclosure = '"', $terminator = "\n") { 
-        # First convert associative array to numeric indexed array 
-        foreach ($array as $key => $value) $workArray[] = $value; 
+    protected function str_putcsv($array, $delimiter = ',', $enclosure = '"', $terminator = "\n") {
+        # First convert associative array to numeric indexed array
+        foreach ($array as $key => $value) $workArray[] = $value;
 
-        $returnString = '';                 # Initialize return string 
-        $arraySize = count($workArray);     # Get size of array 
+        $returnString = '';                 # Initialize return string
+        $arraySize = count($workArray);     # Get size of array
         
-        for ($i=0; $i<$arraySize; $i++) { 
-            # Nested array, process nest item 
-            if (is_array($workArray[$i])) { 
-                $returnString .= str_putcsv($workArray[$i], $delimiter, $enclosure, $terminator); 
-            } else { 
-                switch (gettype($workArray[$i])) { 
-                    # Manually set some strings 
-                    case "NULL":     $_spFormat = ''; break; 
-                    case "boolean":  $_spFormat = ($workArray[$i] == true) ? 'true': 'false'; break; 
-                    # Make sure sprintf has a good datatype to work with 
-                    case "integer":  $_spFormat = '%i'; break; 
-                    case "double":   $_spFormat = '%0.2f'; break; 
-                    case "string":   $_spFormat = '%s'; break; 
-                    # Unknown or invalid items for a csv - note: the datatype of array is already handled above, assuming the data is nested 
-                    case "object": 
-                    case "resource": 
-                    default:         $_spFormat = ''; break; 
-                } 
+        for ($i=0; $i<$arraySize; $i++) {
+            # Nested array, process nest item
+            if (is_array($workArray[$i])) {
+                $returnString .= str_putcsv($workArray[$i], $delimiter, $enclosure, $terminator);
+            } else {
+                switch (gettype($workArray[$i])) {
+                    # Manually set some strings
+                    case "NULL":     $_spFormat = ''; break;
+                    case "boolean":  $_spFormat = ($workArray[$i] == true) ? 'true': 'false'; break;
+                    # Make sure sprintf has a good datatype to work with
+                    case "integer":  $_spFormat = '%i'; break;
+                    case "double":   $_spFormat = '%0.2f'; break;
+                    case "string":   $_spFormat = '%s'; break;
+                    # Unknown or invalid items for a csv - note: the datatype of array is already handled above, assuming the data is nested
+                    case "object":
+                    case "resource":
+                    default:         $_spFormat = ''; break;
+                }
                 $workArray[$i] = str_replace($enclosure, $enclosure.$enclosure, $workArray[$i]);
-                $returnString .= sprintf('%2$s'.$_spFormat.'%2$s', $workArray[$i], $enclosure); 
-                $returnString .= ($i < ($arraySize-1)) ? $delimiter : $terminator; 
-            } 
-        } 
-        # Done the workload, return the output information 
-        return $returnString; 
-    } 
+                $returnString .= sprintf('%2$s'.$_spFormat.'%2$s', $workArray[$i], $enclosure);
+                $returnString .= ($i < ($arraySize-1)) ? $delimiter : $terminator;
+            }
+        }
+        # Done the workload, return the output information
+        return $returnString;
+    }
 }

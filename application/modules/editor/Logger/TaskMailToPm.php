@@ -31,6 +31,10 @@ class editor_Logger_TaskMailToPm extends ZfExtended_Logger_Writer_Abstract {
      * @see ZfExtended_Logger_Writer_Abstract::write()
      */
     public function write(ZfExtended_Logger_Event $event) {
+        //we do not send duplicates
+        if($this->getDuplicateCount($event) > 0) {
+            return;
+        }
         $task = $event->extra['task'];
         /* @var $task editor_Models_Task */
         

@@ -159,7 +159,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
         //INFO: the class htmlEditor has no function expect for the check if the body classes are loaded
         body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;" class="htmlEditor {3}"></body></html>',
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v='+version+'" />'; //disable Img resizing
+        additionalCss = Editor.data.editor.htmleditorCss.map(function(css){
+            return '<link type="text/css" rel="stylesheet" href="'+css+'?v='+version+'" />';
+        }).join("\n");
     return Ext.String.format(body, me.iframePad, additionalCss, dir, me.currentSegmentSize);
   },
   /**
@@ -588,8 +590,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   insertWhitespaceInEditor: function (whitespaceType, tagNr) {
       var me = this,
-          userCanModifyWhitespaceTags = Editor.data.segments.userCanModifyWhitespaceTags,
-          userCanInsertWhitespaceTags = Editor.data.segments.userCanInsertWhitespaceTags,
+          userCanModifyWhitespaceTags = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags'),
+          userCanInsertWhitespaceTags = Editor.app.getTaskConfig('segments.userCanInsertWhitespaceTags'),
           classNameForTagType,
           data,
           className,

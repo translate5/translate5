@@ -36,7 +36,7 @@ CREATE TABLE `LEK_match_analysis_batchresults` (
   KEY `fk_LEK_match_analysis_batchresults_2_idx` (`segmentId`),
   CONSTRAINT `fk_LEK_match_analysis_batchresults_1` FOREIGN KEY (`languageResource`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_LEK_match_analysis_batchresults_2` FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES 
 ('editor_Plugins_MatchAnalysis_BatchWorker',  'editor_Models_Import_Worker'),

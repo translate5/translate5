@@ -289,7 +289,6 @@
 <trans-unit id='QXVmZ2FiZSB3aXJkIGJlZW5kZXQgdW5kIHZlcmxhc3Nlbi4uLg=='><source>Aufgabe wird beendet und verlassen...</source><target>Aufgabe wird beendet und verlassen...</target></trans-unit>
 <trans-unit id='QXVmZ2FiZQ=='><source>Aufgabe</source><target>Aufgabe</target></trans-unit>
 <trans-unit id='QWJtZWxkZW4='><source>Abmelden</source><target>Abmelden</target></trans-unit>
-<trans-unit id='QXVmZ2FiZW4='><source>Aufgaben</source><target>Aufgaben</target></trans-unit>
 <trans-unit id='TWVpbmUgRWluc3RlbGx1bmdlbg=='><source>Meine Einstellungen</source><target>Meine Einstellungen</target></trans-unit>
 <trans-unit id='RWluZ2Vsb2dndGVyIEJlbnV0emVy'><source>Eingeloggter Benutzer</source><target>Eingeloggter Benutzer</target></trans-unit>
 <trans-unit id='TG9naW5uYW1l'><source>Loginname</source><target>Loginname</target></trans-unit>
@@ -300,7 +299,6 @@
 <trans-unit id='UGFzc3dvcnQgenVyw7xja3NldHplbj8='><source>Passwort zurücksetzen?</source><target>Passwort zurücksetzen?</target></trans-unit>
 <trans-unit id='U29sbCBkYXMgUGFzc3dvcnQgZGVzIEJlbnV0emVycyAiezB9IiB3aXJrbGljayB6dXLDvGNrZ2VzZXR6dCB3ZXJkZW4/PGJyIC8+IERlciBCZW51dHplciB3aXJkIHBlciBFLU1haWwgYmVuYWNocmljaHRpZ3QsIGRhc3MgZXIgZWluIG5ldWVzIFBhc3N3b3J0IGFuZm9yZGVybiBtdXNzLg=='><source>Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.</source><target>Soll das Passwort des Benutzers "{0}" wirklick zurückgesetzt werden?<br /> Der Benutzer wird per E-Mail benachrichtigt, dass er ein neues Passwort anfordern muss.</target></trans-unit>
 <trans-unit id='RGVyIMOEbmRlcnVuZ2VuIGFuIEJlbnV0emVyICJ7MH0iIHd1cmRlbiBlcmZvbGdyZWljaCBnZXNwZWljaGVydC4='><source>Der Änderungen an Benutzer "{0}" wurden erfolgreich gespeichert.</source><target>Der Änderungen an Benutzer "{0}" wurden erfolgreich gespeichert.</target></trans-unit>
-<trans-unit id='QmVudXR6ZXI='><source>Benutzer</source><target>Benutzer</target></trans-unit>
 <trans-unit id='RGVyIEJlbnV0emVyICJ7MH0iIHd1cmRlIGVyZm9sZ3JlaWNoIGVyc3RlbGx0Lg=='><source>Der Benutzer "{0}" wurde erfolgreich erstellt.</source><target>Der Benutzer "{0}" wurde erfolgreich erstellt.</target></trans-unit>
 <trans-unit id='QmVudXR6ZXLDvGJlcnNpY2h0'><source>Benutzerübersicht</source><target>Benutzerübersicht</target></trans-unit>
 <trans-unit id='QW5yZWRl'><source>Anrede</source><target>Anrede</target></trans-unit>
@@ -1297,9 +1295,6 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='bWlu'><source>min</source><target>min</target></trans-unit>
 <trans-unit id='bWF4'><source>max</source><target>max</target></trans-unit>
 <trans-unit id='WmVpbGU='><source>Zeile</source><target>Zeile</target></trans-unit>
-<trans-unit id='WmVpbGVu'><source>Zeilen</source><target>Zeilen</target></trans-unit>
-<trans-unit id='QWt0dWVsbA=='><source>Aktuell</source><target>Aktuell</target></trans-unit>
-<trans-unit id='aW5zZ2VzYW10'><source>insgesamt</source><target>insgesamt</target></trans-unit>
 <trans-unit id='U2VnLjoge3NpYmxpbmdzfQ=='><source>Seg.: {siblings}</source><target>Seg.: {siblings}</target></trans-unit>
 <trans-unit id='RXMga29ubnRlbiBuaWNodCBhbGxlIHdpZWRlcmhvbHRlbiBTZWdtZW50ZSBnZXNwZWljaGVydCB3ZXJkZW4hIERpZXMga2FubiB1bnRlcnNjaGllZGxpY2hlIFVyc2FjaGVuIGhhYmVuLiBCaXR0ZSBzcGVpY2hlcm4gU2llIGRhcyB6dWxldHp0IGJlYXJiZWl0ZXRlIFNlZ21lbnQgZXJuZXV0IHVuZCB2ZXJ3ZW5kZW4gU2llIGRlbiBtYW51ZWxsZW4gTW9kdXMgZGVzIFdpZWRlcmhvbHVuZ3NlZGl0b3IgdW0gZGllIGJldHJvZmZlbmVuIFNlZ21lbnRlIHp1IGlkZW50aWZpemllcmVuIHVtIHNpZSBkYW5hY2ggaMOkbmRpc2NoIHp1IGJlYXJiZWl0ZW4u'><source>Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.</source><target>Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.</target></trans-unit>
 <trans-unit id='RGllIGF1dG9tYXRpc2NoZW4gRXJzZXR6dW5nZW4ga29ubnRlbiBuaWNodCBpbiBhbGxlbiBnZWZ1bmRlbmVuIFNlZ21lbnRlbiBkdXJjaGdlZsO8aHJ0IHdlcmRlbi4gRGllcyBrYW5uIHVudGVyc2NoaWVkbGljaGUgVXJzYWNoZW4gaGFiZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU3VjaGUgdW5kIEVyc2V0emVuIG9obmUgZGllICdBbGxlcyBFcnNldHplbicgRnVua3Rpb25hbGl0w6R0IHVtIGRpZSBiZXRyb2ZmZW5lbiBTZWdtZW50ZSBlaW56ZWxuIHp1IGZpbmRlbiB1bmQgenUgYmVhcmJlaXRlbi4='><source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die 'Alles Ersetzen' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source><target>Es konnten nicht in allen gefundenen Segmente der Inhalt automatisch ersetzt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die 'Alles Ersetzen' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</target></trans-unit>
@@ -1339,6 +1334,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='d2lyZCBnZWxhZGVuLi4u'><source>wird geladen...</source><target>wird geladen...</target></trans-unit>
 <trans-unit id='RXMgd3VyZGVuIGtlaW5lIEVyZ2Vibmlzc2UgZ2VmdW5kZW4u'><source>Es wurden keine Ergebnisse gefunden.</source><target>Es wurden keine Ergebnisse gefunden.</target></trans-unit>
 <trans-unit id='RGllIEFuZnJhZ2UgYW4gZGllIFNwcmFjaHJlc3NvdXJjZSBkYXVlcnRlIHp1IGxhbmdlLg=='><source>Die Anfrage an die Sprachressource dauerte zu lange.</source><target>Die Anfrage an die Sprachressource dauerte zu lange.</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBQcm9ibGVtZSBtaXQgZGVtIGFuZ2VmcmFndGVuIERpZW5zdC4='><source>Es gibt Probleme mit dem angefragten Dienst.</source><target>Es gibt Probleme mit dem angefragten Dienst.</target></trans-unit>
 <trans-unit id='RGllIEFuZnJhZ2UgZsO8aHJ0ZSB6dSBlaW5lbSBGZWhsZXIgaW0gYW5nZWZyYWd0ZW4gRGllbnN0Lg=='><source>Die Anfrage führte zu einem Fehler im angefragten Dienst.</source><target>Die Anfrage führte zu einem Fehler im angefragten Dienst.</target></trans-unit>
 <trans-unit id='U3ByYWNocmVzc291cmNlIGhpbnp1ZsO8Z2Vu'><source>Sprachressource hinzufügen</source><target>Sprachressource hinzufügen</target></trans-unit>
 <trans-unit id='UmVzc291cmNl'><source>Ressource</source><target>Ressource</target></trans-unit>
@@ -1516,7 +1512,6 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='U3VjaGU='><source>Suche</source><target>Suche</target></trans-unit>
 <trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChTZXJiaWVuKQ=='><source>Serbisch (Kyrillisch) (Serbien)</source><target>Serbisch (Kyrillisch) (Serbien)</target></trans-unit>
 <trans-unit id='U2VyYmlzY2ggKExhdGVpbikgKFNlcmJpZW4p'><source>Serbisch (Latein) (Serbien)</source><target>Serbisch (Latein) (Serbien)</target></trans-unit>
-<trans-unit id='SW5zdGFudFRyYW5zbGF0ZQ=='><source>InstantTranslate</source><target>InstantTranslate</target></trans-unit>
 <trans-unit id='VHJ5IG9ubGluZQ=='><source>Try online</source><target>Try online</target></trans-unit>
 <trans-unit id='Q3Jvd2Qgb2YgY29tcGFuaWVz'><source>Crowd of companies</source><target>Crowd of companies</target></trans-unit>
 <trans-unit id='U3VwcG9ydCB0aGUgcHJvamVjdA=='><source>Support the project</source><target>Support the project</target></trans-unit>
@@ -1663,7 +1658,7 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscyBha3R1ZWxsZXIgSW1wb3J0'><source>Vorschläge löschen älter als aktueller Import</source><target>Vorschläge löschen älter als aktueller Import</target></trans-unit>
 <trans-unit id='QXVzbG9nZ2Vu'><source>Ausloggen</source><target>Ausloggen</target></trans-unit>
 <trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Sonderzeichen hinzufügen:</target></trans-unit>
-<trans-unit id='U3DDpHRlciB3ZWl0ZXIgYXJiZWl0ZW4='><source>Später weiter arbeiten</source><target>Später weiter arbeiten</target></trans-unit>
+<trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZW7DvGJlcnNpY2h0'><source>Zurück zur Aufgabenübersicht</source><target>Zurück zur Aufgabenübersicht</target></trans-unit>
 <trans-unit id='QWxsZXMgZmVydGlnIC0gQXVmZ2FiZSBhYnNjaGxpZcOfZW4='><source>Alles fertig - Aufgabe abschließen</source><target>Alles fertig - Aufgabe abschließen</target></trans-unit>
 <trans-unit id='Tm9jaCBldHdhcyB6dSB0dW4/IDxici8+RG9jaCBub2NoIHNww6R0ZXIgd2VpdGVyIGFyYmVpdGVuPw=='><source>Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?</source><target>Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Nur Segmente mit Lesezeichen anzeigen</target></trans-unit>
@@ -1851,7 +1846,6 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='TWFkYWdhc3Npc2No'><source>Madagassisch</source><target>Madagassisch</target></trans-unit>
 <trans-unit id='TXlhbm1hciAoQmlybWFuaXNjaCk='><source>Myanmar (Birmanisch)</source><target>Myanmar (Birmanisch)</target></trans-unit>
 <trans-unit id='TmVwYWxp'><source>Nepali</source><target>Nepali</target></trans-unit>
-<trans-unit id='Tm9yd2VnaXNjaA=='><source>Norwegisch</source><target>Norwegisch</target></trans-unit>
 <trans-unit id='TnlhbmphIChDaGljaGV3YSk='><source>Nyanja (Chichewa)</source><target>Nyanja (Chichewa)</target></trans-unit>
 <trans-unit id='T2RpYSAoT3JpeWEp'><source>Odia (Oriya)</source><target>Odia (Oriya)</target></trans-unit>
 <trans-unit id='S2lueWFyd2FuZGE='><source>Kinyarwanda</source><target>Kinyarwanda</target></trans-unit>
@@ -1875,20 +1869,41 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='WXVjYXRlYyBNYXlh'><source>Yucatec Maya</source><target>Yucatec Maya</target></trans-unit>
 <trans-unit id='S2FudG9uZXNpc2NoICh0cmFkaXRpb25lbGwp'><source>Kantonesisch (traditionell)</source><target>Kantonesisch (traditionell)</target></trans-unit>
 <trans-unit id='RnJlaWdhYmVzdGF0dXM='><source>Freigabestatus</source><target>Freigabestatus</target></trans-unit>
-<trans-unit id='RXJzdGVsbHVuZw=='><source>Erstellung</source><target>Erstellung</target></trans-unit>
 <trans-unit id='RXJsYXVidGVzIFN5bm9ueW0='><source>Erlaubtes Synonym</source><target>Erlaubtes Synonym</target></trans-unit>
 <trans-unit id='VmVyYm90ZW5lIEJlbmVubnVuZw=='><source>Verbotene Benennung</source><target>Verbotene Benennung</target></trans-unit>
 <trans-unit id='RGVtby1RTS1GZWhsZXIgMQ=='><source>Demo-QM-Fehler 1</source><target>Demo-QM-Fehler 1</target></trans-unit>
 <trans-unit id='RmFsc2NoZSDDnGJlcnNldHp1bmc='><source>Falsche Übersetzung</source><target>Falsche Übersetzung</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ2llcHJvYmxlbQ=='><source>Terminologieproblem</source><target>Terminologieproblem</target></trans-unit>
 <trans-unit id='RmxpZcOfZW5kZXMgUHJvYmxlbQ=='><source>Fließendes Problem</source><target>Fließendes Problem</target></trans-unit>
-<trans-unit id='SW5rb25zaXN0ZW56'><source>Inkonsistenz</source><target>Inkonsistenz</target></trans-unit>
 <trans-unit id='TWFudWVsbGVyIERlbW8gU3RhdHVzIDE='><source>Manueller Demo Status 1</source><target>Manueller Demo Status 1</target></trans-unit>
 <trans-unit id='TXVzcyBlcm5ldXQgw7xiZXJwcsO8ZnQgd2VyZGVu'><source>Muss erneut überprüft werden</source><target>Muss erneut überprüft werden</target></trans-unit>
 <trans-unit id='S2VpbiBTdGF0dXMgZmVzdGdlbGVndA=='><source>Kein Status festgelegt</source><target>Kein Status festgelegt</target></trans-unit>
 <trans-unit id='U3VjaGUgaW0gQXVzZ2FuZ3N0ZXh0'><source>Suche im Ausgangstext</source><target>Suche im Ausgangstext</target></trans-unit>
 <trans-unit id='U3VjaGUgaW0gWmllbHRleHQ='><source>Suche im Zieltext</source><target>Suche im Zieltext</target></trans-unit>
 <trans-unit id='RsO8ciBqZWRlbiBTYXR6IHd1cmRlIGRhcyBiZXN0ZSB2ZXJmw7xnYmFyZSBUcmFuc2xhdGlvbi1NZW1vcnktTWF0Y2ggdmVyd2VuZGV0ICgxMDAlIG9kZXIgYmVzc2VyKS4gV2VubiBrZWluZSAxMDAlaWdlIMOcYmVyZWluc3RpbW11bmcgaW0gVHJhbnNsYXRpb24gTWVtb3J5IGdlZnVuZGVuIHd1cmRlLCB3aXJkIGRpZSBtYXNjaGluZWxsZSDDnGJlcnNldHp1bmcgdmVyd2VuZGV0Lg=='><source>Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet.</source><target>Für jeden Satz wurde das beste verfügbare Translation-Memory-Match verwendet (100% oder besser). Wenn keine 100%ige Übereinstimmung im Translation Memory gefunden wurde, wird die maschinelle Übersetzung verwendet.</target></trans-unit>
+<trans-unit id='S29uZmlndXJhdGlvbiBiZWFyYmVpdGVu'><source>Konfiguration bearbeiten</source><target>Konfiguration bearbeiten</target></trans-unit>
+<trans-unit id='S29uZmlndXJhdGlvbg=='><source>Konfiguration</source><target>Systemkonfiguration</target></trans-unit>
+<trans-unit id='RGllIMOEbmRlcnVuZyB3aXJkIGJlaW0gbsOkY2hzdGVuIExvZ2luIHdpcmtzYW0uIERpZXMgZ2lsdCBhdWNoIGbDvHIgYW5kZXJlIGRlcnplaXQgZWluZ2Vsb2dndGUgQmVudXR6ZXIu'><source>Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.</source><target>Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.</target></trans-unit>
+<trans-unit id='QWxsZXMgenVrbGFwcGVu'><source>Alles zuklappen</source><target>Alles zuklappen</target></trans-unit>
+<trans-unit id='QWxsZXMgYXVma2xhcHBlbg=='><source>Alles aufklappen</source><target>Alles aufklappen</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRrb25maWd1cmF0aW9uIEt1bmRlIMO8YmVyc2NocmVpYmVu'><source>Standardkonfiguration Kunde überschreiben</source><target>Konfiguration</target></trans-unit>
+<trans-unit id='U3RhbmRhcmRrb25maWd1cmF0aW9uIGRlcyBTeXN0ZW1z'><source>Standardkonfiguration des Systems</source><target>Konfiguration Kunde (überschreibt Systemkonfiguration)</target></trans-unit>
+<trans-unit id='w5xiZXJzY2hyaWViZW4='><source>Überschrieben</source><target>Überschrieben</target></trans-unit>
+<trans-unit id='QXVmIGViZW5lIGdlc2V0enQ='><source>Auf ebene gesetzt</source><target>Auf Ebene gesetzt</target></trans-unit>
+<trans-unit id='S3VyemVyIE5hbWU='><source>Konfigurationsoption</source><target>Konfigurationsoptionen</target></trans-unit>
+<trans-unit id='QWt0aXZpZXJ0'><source>Aktiviert</source><target>Aktiviert</target></trans-unit>
+<trans-unit id='RGVha3RpdmllcnQ='><source>Deaktiviert</source><target>Deaktiviert</target></trans-unit>
+<trans-unit id='w5xiZXJzY2hyZWliYmFyIGF1ZiBFYmVuZTo='><source>Überschreibbar auf Ebene:</source><target>Überschreibbar auf Ebene:</target></trans-unit>
+<trans-unit id='U2NocmVpYmdlc2Now7x0enRlIEtvbmZpZ3VyYXRpb25lbiBzaWNodGJhcjo='><source>Schreibgeschützte Konfigurationen sichtbar:</source><target>Schreibgeschützte anzeigen</target></trans-unit>
+<trans-unit id='Q29kZSBJRA=='><source>Code ID</source><target>Code ID</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV9pbnN0YW5jZQ=='><source>config_overwrite_instance</source><target>System</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV9jdXN0b21lcg=='><source>config_overwrite_customer</source><target>Kunde</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV90YXNrSW1wb3J0'><source>config_overwrite_taskImport</source><target>Import</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV90YXNr'><source>config_overwrite_task</source><target>Aufgabe</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV91c2Vy'><source>config_overwrite_user</source><target>Benutzer</target></trans-unit>
+<trans-unit id='V2VydA=='><source>Wert</source><target>Wert</target></trans-unit>
+<trans-unit id='QW53ZW5kdW5nIHZlcmxhc3Nlbg=='><source>Anwendung verlassen</source><target>Anwendung verlassen</target></trans-unit>
+<trans-unit id='U3DDpHRlciB3ZWl0ZXIgYXJiZWl0ZW4='><source>Später weiter arbeiten</source><target>Später weiter arbeiten</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -73,6 +73,12 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             'i',
             InputOption::VALUE_NONE,
             'Imports all new database files or a single file if a filename / hash was given.');
+        
+        $this->addOption(
+            'assume-imported',
+            null,
+            InputOption::VALUE_NONE,
+            'WARNING: Instead of importing the selected file it is just marked as imported without applying the content to the DB!');
     }
 
     /**
@@ -122,6 +128,10 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             return 0;
         }
         
+        if($this->input->getOption('assume-imported')) {
+            $this->io->warning('--assume-imported can only be used on one single file! Nothing is assumed as imported.');
+            return 1;
+        }
         if($this->input->getOption('import')) {
             $dbupdater->applyNew($toProcess);
             $dbupdater->updateModified($toProcess);
@@ -168,6 +178,11 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             return 1;
         }
         $this->output->writeln(file_get_contents($file['absolutePath']));
+        if($this->input->getOption('assume-imported')) {
+            $this->io->success('Marked file as already imported: '.$file['relativeToOrigin'].'!');
+            $dbupdater->assumeImported([$file['entryHash'] => 1]);
+            return 0;
+        }
         if(! $this->input->getOption('import')) {
             return 0;
         }
