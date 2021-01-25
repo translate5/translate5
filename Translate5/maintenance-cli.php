@@ -54,13 +54,13 @@ $commands = [
     new LogCommand(),
     new SessionImpersonateCommand(),
     new ChangelogCommand(),
-    new DevelopmentNewModelCommand(),
     new SystemCheckCommand(),
 ];
 if(file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
     $commands[] = new DevelopmentNewdbchangeCommand();
     $commands[] = new ReleaseNotesCommand();
+    $commands[] = new DevelopmentNewModelCommand();
 }
 $app->addCommands($commands);
 $app->run();
