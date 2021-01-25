@@ -72,6 +72,14 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
         }
     }
     /**
+     * Evaluates if the passed nodename matches our nodename
+     * @param string $nodeName
+     * @return bool
+     */
+    public static function hasNodeName(string $name) : bool {
+        return ($name == static::$nodeName);
+    }
+    /**
      * The type of Internal tag (e.g, QC for Quality Control), to be set via inheritance
      * @var string
      */

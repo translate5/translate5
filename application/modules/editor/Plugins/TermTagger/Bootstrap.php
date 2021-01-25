@@ -45,12 +45,12 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         if(!$this->assertConfig()) {
             return false;
         }
+        // Adds our Quality Provider to the global Quality Manager
+        editor_Segment_Quality_Manager::registerProvider('editor_Plugins_TermTagger_QualityProvider');
         
         // event-listeners
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleAfterTaskImport'),100);
         $this->eventManager->attach('editor_Models_Import_SegmentProcessor_Review', 'process', array($this, 'handleSegmentImportProcess'));
         $this->eventManager->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
-        $this->eventManager->attach('editor_Models_Segment_Updater', 'beforeSegmentUpdate', array($this, 'handleBeforeSegmentUpdate'));
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
         
@@ -139,116 +139,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
             return false;
         }
         return true;
-    }
-    
-    /**
-     * Queues the termtagger worker after import
-     *
-     * @param Zend_EventManager_Event $event
-     * @return void|boolean
-     */
-    public function handleAfterTaskImport(Zend_EventManager_Event $event) {
-        $config = Zend_Registry::get('config');
-        $c = $config->runtimeOptions->termTagger->switchOn->import;
-        if((boolean)$c === false) {
-            return;
-        }
-        $task = $event->getParam('task');
-        /* @var $task editor_Models_Task */
-        if (!$task->getTerminologie()) {
-            return;
-        }
-        
-        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
-        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
-        
-        // Create segments_meta-field 'termtagState' if not exists
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-        /* @var $meta editor_Models_Segment_Meta */
-        $meta->addMeta('termtagState', $meta::META_TYPE_STRING, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
-        
-        $this->lockOversizedSegments($task, $meta, $config);
-        
-        // init worker and queue it
-        $params = ['resourcePool' => 'import', 'processSegmentsDirectly' => true];
-        if (!$worker->init($task->getTaskGuid(), $params)) {
-            $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [
-                'parameters' => $params,
-            ]);
-            return false;
-        }
-        $worker->queue($event->getParam('parentWorkerId'));
-    }
-    
-    /**
-     * Find oversized segments and mark them as oversized
-     *
-     * @param editor_Models_Task $task
-     * @param editor_Models_Segment_Meta $meta
-     * @param Zend_Config $config
-     */
-    protected function lockOversizedSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta, Zend_Config $config) {
-        $maxWordCount = $config->runtimeOptions->termTagger->maxSegmentWordCount ?? 150;
-        $meta->db->update([
-            'termtagState' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE
-        ], [
-            'taskGuid = ?' => $task->getTaskGuid(),
-            'sourceWordCount >= ?' => $maxWordCount,
-        ]);
-    }
-    
-    /**
-     * Re-TermTag the (modified) segment-text.
-     */
-    public function handleBeforeSegmentUpdate(Zend_EventManager_Event $event) {
-        
-        $config = Zend_Registry::get('config');
-        $c = $config->runtimeOptions->termTagger->switchOn->GUI;
-        if((boolean)$c === false) {
-            return;
-        }
-        
-        $segment = $event->getParam('entity');
-        
-        /* @var $segment editor_Models_Segment */
-        $taskGuid = $segment->getTaskGuid();
-        
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        
-        // stop if task has no terminologie
-        if (!$task->getTerminologie() || !$segment->isDataModified()) {
-            return;
-        }
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
-        
-        if($segment->meta()->getTermtagState() == editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE) {
-            $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden: Das Segment ist zu lang.');
-            return false;
-        }
-        
-        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
-        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
-        
-        $params = ['resourcePool' => 'gui', 'processSegmentsDirectly' => true];
-        if (!$worker->init($taskGuid, $params)) {
-            $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', ['parameters' => $params]);
-            return false;
-        }
-        $segmentTags = editor_Segment_Tags::fromSegment($task, true, $segment, false);
-        if($worker->segmentTagsEdited($segmentTags)){
-            $segmentTags = $worker->getProcessedTags();
-            // TODO FIXME: this should be a reference to the tags above, so this assignment should be obsolete. Can the case be, segmentTagsEdited returns true but no tag is available ??
-            if($segmentTags != null){
-                // save the segment back to it's origin
-                $segmentTags->flush();
-                return true;
-            }
-        }
-        $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
-        return false;
     }
     /**
      * is called periodically to check the term tagger instances

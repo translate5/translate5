@@ -34,12 +34,20 @@
 
 class editor_Segment_Quality_ImportWorker extends editor_Models_Import_Worker_Abstract {
     
-    protected function validateParameters($parameters = []){
+    protected function validateParameters($parameters=[]){
         return true;
     }
     
     protected function work(){
+        
+        // TODO REMOVE
         error_log("editor_Segment_Quality_ImportWorker::work");
-        return true;
+        
+        $workerId = $this->workerModel->getId();
+
+        // add the dependant workers
+        editor_Segment_Quality_Manager::instance()->prepareImport($this->task, $workerId);
+        
+        return $workerId;
     }
 }

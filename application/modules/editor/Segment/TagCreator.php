@@ -59,7 +59,7 @@ class editor_Segment_TagCreator {
     }
     /**
      * Tries to evaluate an Internal tag out of given JSON Data
-     * To make this happen all availaable Internal Tag Identifiers must be registered with this class
+     * To make this happen all available Internal Tag Identifiers must be registered with this class
      * The default is a 'editor_Segment_AnyInternalTag' representing an uncategorized internal tag
      * NOTE: This API does not care about the children contained in the tag nor the text-length
      * @param stdClass $data
@@ -97,7 +97,7 @@ class editor_Segment_TagCreator {
                 }
             }
         }
-        $tag = $this->evaluate(null, $element->nodeName, $classNames, $attributes, $startIndex, $endIndex);
+        $tag = $this->evaluate('', $element->nodeName, $classNames, $attributes, $startIndex, $endIndex);
         if(count($classNames) > 0){
             foreach($classNames as $cname){
                 $tag->addClass($cname);
@@ -118,12 +118,15 @@ class editor_Segment_TagCreator {
      * @param string[] $attributes
      * @param int $startIndex
      * @param int $endIndex
-     * @param string $nodeName
      * @return editor_Segment_InternalTag
      */
-    private function evaluate($type, $nodeName, $classNames, $attributes, $startIndex, $endIndex){
-        // TODO: add Identifyer-API
-
+    private function evaluate(string $type, string $nodeName, array $classNames, array $attributes, int $startIndex, int $endIndex){
+        // try to let the quality manager find a tag
+        $tag = editor_Segment_Quality_Manager::instance()->evaluateInternalTag($type, $nodeName, $classNames, $attributes, $startIndex, $endIndex);
+        if($tag != null){
+            return $tag;
+        }
+        // the default is the "any" tag
         return new editor_Segment_AnyInternalTag($startIndex, $endIndex, '', $nodeName);
     }
 }

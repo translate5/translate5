@@ -39,6 +39,10 @@
  */
 class  editor_Plugins_TermTagger_InternalTag extends editor_Segment_InternalTag {
     
+    /**
+     * The central UNIQUE amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_QualityProvider::$type
+     * @var string
+     */
     protected static $type = 'term';
 
     protected static $nodeName = 'div';
