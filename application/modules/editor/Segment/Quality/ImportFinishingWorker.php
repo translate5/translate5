@@ -34,12 +34,18 @@
 
 class editor_Segment_Quality_ImportFinishingWorker extends editor_Models_Import_Worker_Abstract {
     
-    protected function validateParameters($parameters = []){
+    protected function validateParameters($parameters=[]){
         return true;
     }
     
     protected function work(){
+        
+        // TODO REMOVE
         error_log("editor_Segment_Quality_ImportFinishingWorker::work");
+
+        // add the dependant workers
+        editor_Segment_Quality_Manager::instance()->finishImport($this->task);
+        
         return true;
     }
 }

@@ -100,7 +100,10 @@ class editor_Models_Segment_Updater {
                 $this->segment->updateQmSubSegments($field);
             }
         }
+        // Update the Quality Tags
+        editor_Segment_Quality_Manager::instance()->processEditing($this->segment, $this->task);
         
+        // TODO: this event is unused, remove it 
         $this->events->trigger("beforeSegmentUpdate", $this, array(
             'entity' => $this->segment,
             'history' => $history

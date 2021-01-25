@@ -187,6 +187,8 @@ class editor_Segment_Tags implements JsonSerializable {
      * Saves all fields back to the segment when the import is finished or when editing segments
      */
     public function flush(){
+        // TODO REMOVE
+        // error_log('SEGMENT '.$this->getSegment()->getId().': FLUSH');
         if($this->hasOriginalSource()){
              // we do know that the original source just has a single save-to field
              $this->getSegment()->set($this->sourceOriginal->getFirstSaveToField(), $this->sourceOriginal->render());
@@ -201,6 +203,7 @@ class editor_Segment_Tags implements JsonSerializable {
                 $this->getSegment()->set($saveTo, $target->render());
             }
         }
+        $this->getSegment()->save();
     }
     /**
      * Saves the current state to the segment-tags cache. This API is used while the threaded import
