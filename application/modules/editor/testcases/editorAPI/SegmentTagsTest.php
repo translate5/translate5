@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+require_once __DIR__.'/../../../../../vendor/autoload.php';
+
+use PHPHtmlParser\Dom;
+
 /**
  * Empty dummy test to test the surrounding test framework
  */
@@ -40,6 +44,8 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         require_once 'Segment/Tags.php';
         require_once 'Segment/FieldTags.php';
         require_once 'Segment/TagCreator.php';
+        require_once 'Segment/Quality/Manager.php';
+        require_once 'Segment/Quality/Provider.php';
         require_once 'Utils/Dom.php';
         parent::setUpBeforeClass();
     }
@@ -235,6 +241,20 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
      *
      */
     public function testRealDataTags5(){
+        // testing "real" segment content. keep in mind when doing this, that rendered attributes in tags may have a different order so the input needs to be ordered when comparing rendered stuff
+        $segmentId = 677867;
+        $original = '&lt;FilesMatch "\\.phps$"&gt;<div class="736f667452657475726e2f internal-tag newline ownttip single"><span class="short" title="&lt;1/&gt;: Newline">&lt;1/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">\xe2\x86\xb5</span></div> <div class="73706163652074733d2232303230323022206c656e6774683d2233222f internal-tag ownttip single space"><span class="short" title="&lt;2/&gt;: 3 whitespace characters">&lt;2/&gt;</span><span class="full" data-originalid="space" data-length="3">\xc2\xb7\xc2\xb7\xc2\xb7</span></div>SetHandler application/x-httpd-php-source<div class="736f667452657475726e2f internal-tag newline ownttip single"><span class="short" title="&lt;3/&gt;: Newline">&lt;3/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">\xe2\x86\xb5</span></div>&lt;/FilesMatch&gt;';
+        $markup = '&lt;FilesMatch "\\.phps$"&gt;<div class="single 736f667452657475726e2f newline internal-tag ownttip"><span title="&lt;1/&gt;: Newline" class="short">&lt;1/&gt;</span><span data-originalid="softReturn" data-length="1" class="full">\xe2\x86\xb5</span></div> <div class="single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip"><span title="&lt;2/&gt;: 3 whitespace characters" class="short">&lt;2/&gt;</span><span data-originalid="space" data-length="3" class="full">\xc2\xb7\xc2\xb7\xc2\xb7</span></div>SetHandler application/x-httpd-php-source<div class="single 736f667452657475726e2f newline internal-tag ownttip"><span title="&lt;3/&gt;: Newline" class="short">&lt;3/&gt;</span><span data-originalid="softReturn" data-length="1" class="full">\xe2\x86\xb5</span></div>&lt;/FilesMatch&gt;';
+        $originalTags = new editor_Segment_FieldTags($segmentId, $original, 'target', 'target');
+        $tags = new editor_Segment_FieldTags($segmentId, $markup, 'target', 'target');
+        $this->assertEquals($markup, $tags->render());
+        $this->assertEquals($originalTags->getFieldText(), $tags->getFieldText());
+        $this->assertEquals(strip_tags($markup), $tags->getFieldText());
+    }
+    /**
+     *
+     */
+    public function testRealDataTags6(){
         // testing "real" segment content
         $segmentId = 677867;
         $markup = 'This file is a based on a part of the php-online-Documentation. It\'s translation is done by a pretranslation based on a very fast winalign-Project and is not at all state of the translation art. It\'s only purpose is the generation of demo-data for translate5.';
