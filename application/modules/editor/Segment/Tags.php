@@ -343,7 +343,7 @@ class editor_Segment_Tags implements JsonSerializable {
     
     function __originalCode(){
         
-        // FOR REFERENCE THE ORIGINAL CODE OF THE FOLOW OF FIELDS WHEN IMPORTING OR EDITING ...
+        // FOR REFERENCE THE ORIGINAL CODE OF THE SEQUENCE OF FIELDS WHEN IMPORTING OR EDITING ...
         // TODO FIXME: remove
         
         
