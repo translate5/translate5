@@ -28,8 +28,6 @@ END LICENSE AND COPYRIGHT
 
 require_once __DIR__.'/../../../../../vendor/autoload.php';
 
-use PHPHtmlParser\Dom;
-
 /**
  * Empty dummy test to test the surrounding test framework
  */
