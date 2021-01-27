@@ -548,5 +548,15 @@ Ext.application({
             return row;
         }
         return row.get('value');
+    },
+    
+    /***
+     * Workaround for missing date time localized format
+     */
+    getDateTimeFormat:function(){
+        if(Editor.data.locale == 'de'){
+            return Ext.Date.defaultFormat+' H:i';
+        }
+        return Ext.Date.defaultFormat+' h:i A';
     }
 });
