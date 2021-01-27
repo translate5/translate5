@@ -60,5 +60,34 @@ class editor_Models_LanguageResources_MtUsageLogger extends ZfExtended_Models_En
         ->where('customers LIKE %,?,%',$this->db->getAdapter()->quote($customerId));
         return $this->db->fetchAll($s)->toArray();
     }
+    
+    public function save() {
+        parent::save();
+        //update the totals
+        $this->updateSumTable();
+    }
+    
+    /***
+     * Update the total sum collection after the current entity is saved.
+     */
+    protected function updateSumTable() {
+        $sum = ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageSumLogger');
+        /* @var $sum editor_Models_LanguageResources_MtUsageSumLogger */
+        $sum->updateSumTable($this);
+    }
+    
+    /***
+     * Delete log entries for the given customerId. 
+     * For log entires with multiple customers, only the given customer will be removed.
+     * @param int $customerId
+     */
+    public function deleteByCustomer(int $customerId) {
+        $sql = "UPDATE `LEK_languageresources_mt_usage_log` SET `customers` = replace(customers, ',?,', ',')";
+        $this->db->getAdapter()->query($sql,$customerId);
+        $this->db->delete([
+            'customers = ? OR customers="," ' => $customerId // Check for empty rows. The above query can leave single , as value
+        ]);
+        
+    }
 }
 

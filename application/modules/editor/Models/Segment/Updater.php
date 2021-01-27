@@ -189,6 +189,8 @@ class editor_Models_Segment_Updater {
         
         //save the type
         $segment->setMatchRateType((string) $matchrateType);
+        
+        //TODO: collect the log here
     }
     
     /**

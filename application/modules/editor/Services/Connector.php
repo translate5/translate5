@@ -122,15 +122,22 @@ class editor_Services_Connector {
      */
     protected function _query(editor_Models_Segment $segment) {
         $serviceResult = null;
-        //if thje batch query is enabled, get the results from the cache
+        //if the batch query is enabled, get the results from the cache
         if($this->batchQuery && $this->adapter->isBatchQuery()){
-            $serviceResult = $this->getCachedResult($segment);
+            //TODO: why just not return the result ? If batch query returns no result
+            //then there are no result for this query, no need to query again
+            return $this->getCachedResult($segment);
+            //$serviceResult = $this->getCachedResult($segment);
         }
         //if there is no service results, try the query
-        if(!empty($serviceResult)){
-            return $serviceResult;
-        }
+        //TODO: this make no sence ? Why is this check inplemented
+//         if(!empty($serviceResult)){
+//             return $serviceResult;
+//         }
         $serviceResult = $this->adapter->query($segment);
+        if(!empty($serviceResult)){
+            $this->logAdapterUsage($segment, self::REQUEST_SOURCE_EDITOR);
+        }
         $this->adapter->logForSegment($segment);
         return $serviceResult;
     }
@@ -154,7 +161,12 @@ class editor_Services_Connector {
      */
     protected function _translate(string $searchString){
         //instant translate calls are always with out tags
-        return $this->adapter->translate(strip_tags($searchString));
+        $searchString = strip_tags($searchString);
+        $serviceResult = $this->adapter->translate($searchString);
+        if(!empty($serviceResult)){
+            $this->logAdapterUsage($searchString, self::REQUEST_SOURCE_INSTANT_TRANSLATE);
+        }
+        return $serviceResult;
     }
     
     /***
@@ -263,87 +275,94 @@ class editor_Services_Connector {
         $this->batchQuery = false;
     }
     
-//     /***
-//      * Log MT language resources ussage
-//      * @param mixed $queryString
-//      * @param string $requestSource
-//      */
-//     protected function logMtUsage($querySource,$requestSource){
-//         //use the logger only for MT resoruces
-//         if($this->adapter->getLanguageResource()->getResourceType()!=editor_Models_Segment_MatchRateType::TYPE_MT){
-//             return;
-//         }
-//         $mtlogger=ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageLogger');
-//         /* @var $mtlogger editor_Models_LanguageResources_MtUsageLogger */
-//         $mtlogger->setLanguageResourceId($this->adapter->getLanguageResource()->getId());
-//         $mtlogger->setSourceLang($this->sourceLang);
-//         $mtlogger->setTargetLang($this->targetLang);
-//         $mtlogger->setQueryString($this->getQueryString($querySource));
-//         $mtlogger->setRequestSource($requestSource);
-//         $mtlogger->setTranslatedCharacterCount($this->getCharacterCount($querySource));
+    
+    /***
+     * Log how many characters are used/translated from the current adapter request
+     * 
+     * @param mixed $queryString
+     * @param string $requestSource
+     */
+     public function logAdapterUsage($querySource,$requestSource){
+        //use the logger only for MT resoruces
+        if($this->adapter->getLanguageResource()->getResourceType()!=editor_Models_Segment_MatchRateType::TYPE_MT){
+            return;
+        }
+        $mtlogger=ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageLogger');
+        /* @var $mtlogger editor_Models_LanguageResources_MtUsageLogger */
+        $mtlogger->setLanguageResourceId($this->adapter->getLanguageResource()->getId());
+        $mtlogger->setSourceLang($this->sourceLang);
+        $mtlogger->setTargetLang($this->targetLang);
         
-//         //the request is triggered via editor, save the task customers as customers
-//         if($requestSource==self::REQUEST_SOURCE_EDITOR){
-//             $task=ZfExtended_Factory::get('editor_Models_Task');
-//             /* @var $task editor_Models_Task */
-//             $task->loadByTaskGuid($querySource->getTaskGuid());
-//             $mtlogger->setCustomers($task->getCustomerId());
+        $logQueryString =$this->toLogQueryString($querySource);
+        
+        $mtlogger->setQueryString($logQueryString);
+        $mtlogger->setRequestSource($requestSource);
+        $mtlogger->setTranslatedCharacterCount($this->getCharacterCount($logQueryString));
+        
+        //the request is triggered via editor, save the task customers as customers
+        if($requestSource==self::REQUEST_SOURCE_EDITOR){
+            $task=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($querySource->getTaskGuid());
+            $mtlogger->setCustomers($task->getCustomerId());
             
-//         }
+        }
+        //the request is triggered via instanttranslate, save the languageresource customers of user customers
+        if($requestSource==self::REQUEST_SOURCE_INSTANT_TRANSLATE){
+            $mtlogger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
+        }
         
-//         //the request is triggered via instanttranslate, save the languageresource customers of user customers
-//         if($requestSource==self::REQUEST_SOURCE_INSTANT_TRANSLATE){
-//             $mtlogger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
-//         }
-        
-//         $mtlogger->save();
-//     }
+        $mtlogger->save();
+    }
     
-//     /***
-//      * Count characters in the requested language resources query string/segment
-//      * @param mixed $query
-//      * @return integer
-//      */
-//     protected function getCharacterCount($query){
-//         return mb_strlen($this->getQueryString($query));
-//     }
+    /***
+     * Count characters in the requested language resources query string. The input string should not contains any tags
+     * @param string $query
+     * @return integer
+     */
+    protected function getCharacterCount(string $query){
+        return mb_strlen($query);
+    }
     
-//     /***
-//      * Get the query string and removes the tags from it
-//      */
-//     protected function getQueryString($query){
-//         if($query instanceof editor_Models_Segment){
-//             $queryString=$this->adapter->getQueryString($query);
-//             //remove all tags, since the mt engines are ignoring the tags
-//             $queryString=$query->stripTags($queryString);
-//             $query=$queryString;
-//         }
-//         return $query;
-//     }
+    /***
+     * Prepare the query string for saveing in the log table
+     * @param mixed $query
+     * @return string
+     */
+    protected function toLogQueryString($query){
+        //if the query is segment, get the query string fron the segment
+        if($query instanceof editor_Models_Segment){
+            $queryString=$this->adapter->getQueryString($query);
+            //remove all tags, since the mt engines are ignoring the tags
+            return $query->stripTags($queryString);
+        }
+        //INFO: remove the tags when the string is saved to the log table
+        return strip_tags($query);
+    }
     
-//     /***
-//      * Get customers when InstantTranslate is used as request source.
-//      * The return value will be the intersection of the customers of the language resource and the customers of the current user
-//      * @return NULL|array
-//      */
-//     protected function getInstantTranslateRequestSourceCustomers(){
-//         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-//         /* @var $userModel ZfExtended_Models_User */
-//         $userCustomers=$userModel->getUserCustomersFromSession();
+    /***
+     * Get customers when InstantTranslate is used as request source.
+     * The return value will be the intersection of the customers of the language resource and the customers of the current user
+     * @return NULL|array
+     */
+    protected function getInstantTranslateRequestSourceCustomers(){
+        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        $userCustomers=$userModel->getUserCustomersFromSession();
         
-//         if(empty($userCustomers)){
-//             return null;
-//         }
+        if(empty($userCustomers)){
+            return null;
+        }
         
-//         $la=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-//         /* @var $la editor_Models_LanguageResources_CustomerAssoc */
-//         $resourceCustomers=$la->loadByLanguageResourceId($this->adapter->getLanguageResource()->getId());
-//         $resourceCustomers=array_column($resourceCustomers,'customerId');
-//         $return=array_intersect($userCustomers,$resourceCustomers);
-//         if(empty($return)){
-//             return null;
-//         }
-//         //return with leading and trailing comma so the customers are searchable
-//         return ','.implode(',', $return).',';
-//     }
+        $la=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $la editor_Models_LanguageResources_CustomerAssoc */
+        $resourceCustomers=$la->loadByLanguageResourceId($this->adapter->getLanguageResource()->getId());
+        $resourceCustomers=array_column($resourceCustomers,'customerId');
+        $return=array_intersect($userCustomers,$resourceCustomers);
+        if(empty($return)){
+            return null;
+        }
+        //return with leading and trailing comma so the customers are searchable
+        return ','.implode(',', $return).',';
+    }
 }
