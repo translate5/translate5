@@ -39,7 +39,7 @@ CREATE TABLE `LEK_languageresources_mt_usage_log_sum` (
   UNIQUE KEY `monthlySummaryKey` (`langageResourceId`,`sourceLang`,`targetLang`,`customerId`,`yearAndMonth`),
   KEY `fk_LEK_languageresources_mt_usage_log_sum_1_idx` (`customerId`),
   CONSTRAINT `fk_LEK_languageresources_mt_usage_log_sum_customer` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 ALTER TABLE `LEK_languageresources_mt_usage_log` 
 ADD INDEX `fk_LEK_languageresources_mt_usage_log_1_idx` (`languageResourceId` ASC);
@@ -63,4 +63,4 @@ CREATE TABLE `LEK_documents_usage_log` (
   UNIQUE KEY `document_type_count` (`taskType`,`customerId`,`yearAndMonth`),
   KEY `fk_customer_idx` (`customerId`),
   CONSTRAINT `fk_customer` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
