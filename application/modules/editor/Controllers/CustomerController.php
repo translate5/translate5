@@ -94,45 +94,10 @@ class Editor_CustomerController extends ZfExtended_RestController {
     }
     
     public function exportAction(){
-        $exportModel=ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageLogger');
-        /* @var $exportModel editor_Models_LanguageResources_MtUsageLogger */
-        $rows=$exportModel->loadByCustomer($this->getParam('customerId'));
-        
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        
-        $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
-        /* @var $excel ZfExtended_Models_Entity_ExcelExport */
-        
-        // set property for export-filename
-        $excel->setProperty('filename', 'Mt engine ussage export data');
-        
-        //TODO: find the language text and display it
-        $excel->setCallback('sourceLang',function($sourceLang) use ($languages){
-        });
-        $excel->setCallback('targetLang',function($targetLang) use ($languages){
-        });
-        
-        $excel->setLabel('serviceName', $translate->_("Ressource"));
-        $excel->setLabel('languageResourceName', $translate->_("Name"));
-        $excel->setLabel('timestamp', $translate->_("Erstellungsdatum"));
-        //TODO: devide the character count with customer number
-        $excel->setLabel('translatedCharacterCount', 'Übersetzte Zeichen');
-        
-        //set the cell autosize
-        $excel->simpleArrayToExcel($rows,function($phpExcel){
-            foreach ($phpExcel->getWorksheetIterator() as $worksheet) {
-                
-                $phpExcel->setActiveSheetIndex($phpExcel->getIndex($worksheet));
-                
-                $sheet = $phpExcel->getActiveSheet();
-                $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
-                $cellIterator->setIterateOnlyExistingCells(true);
-                /** @var PHPExcel_Cell $cell */
-                foreach ($cellIterator as $cell) {
-                    $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
-                }
-            }
-        });
+        $customerId = $this->getRequest()->getParam('customerId',null);
+        $export = ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageExporter');
+        /* @var $export editor_Models_LanguageResources_MtUsageExporter */
+        $export->excel($customerId);
     }
     
     protected function decodePutData(){
