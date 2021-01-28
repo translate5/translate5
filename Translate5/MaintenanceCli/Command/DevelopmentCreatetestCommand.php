@@ -180,7 +180,7 @@ class '.$name.' extends \ZfExtended_Test_ApiTestcase {
         );
         self::$api->testConfig($tests);
         
-        $zipfile = $api->zipTestFiles(\'testfiles/\',\'XLF-test.zip\');
+        $zipfile = $api->zipTestFiles(\'testfiles/\',\'testTask.zip\');
         
         $api->addImportFile($zipfile);
         $api->import($task);
@@ -203,11 +203,61 @@ class '.$name.' extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson(\'editor/segment?page=1&start=0&limit=10\');
         
         $data = array_map([self::$api,\'removeUntestableSegmentContent\'], $segments);
-//TODO FOR TEST USAGE: the following file_put_contents can be used to create / update the expectedSegments.json
-        //file_put_contents($this->api()->getFile(\'/expectedSegments.json\', null, false), json_encode($data,JSON_PRETTY_PRINT));
+//TODO FOR TEST USAGE: run the test, the next line creates the expected content json, comment the line out, validate if the produced JSON is as expected
+        file_put_contents($this->api()->getFile(\'/expectedSegments.json\', null, false), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent(\'expectedSegments.json\'), $data, \'Imported segments are not as expected!\');
     }
     
+    /**
+//TODO FOR TEST USAGE: adjust your tests, here is a simple example of editing a segment value
+     * @depends testSegmentValuesAfterImport
+     */
+    public function testSegmentEditing() {
+        //get segment list
+        $segments = $this->api()->requestJson(\'editor/segment?page=1&start=0&limit=10\');
+        
+        //test editing a prefilled segment
+        $segToTest = $segments[0];
+        
+//TODO FOR TEST USAGE: adjust your segment editings here
+        $segToTest->targetEdit = str_replace([\'cool.\', \'is &lt; a\'], [\'cool &amp; cööler.\', \'is &gt; a\'], $segToTest->targetEdit);
+        
+        $segmentData = $this->api()->prepareSegmentPut(\'targetEdit\', $segToTest->targetEdit, $segToTest->id);
+        $this->api()->requestJson(\'editor/segment/\'.$segToTest->id, \'PUT\', $segmentData);
+        
+        //check direct PUT result
+        $segments = $this->api()->requestJson(\'editor/segment?page=1&start=0&limit=10\');
+        $data = array_map([self::$api,\'removeUntestableSegmentContent\'], $segments);
+//TODO FOR TEST USAGE: run the test, the next line creates the expected content json, comment the line out, validate if the produced JSON is as expected
+        file_put_contents($this->api()->getFile(\'/expectedSegments-edited.json\', null, false), json_encode($data,JSON_PRETTY_PRINT));
+        $this->assertEquals(self::$api->getFileContent(\'expectedSegments-edited.json\'), $data, \'Edited segments are not as expected!\');
+    }
+    
+    /**
+//TODO FOR TEST USAGE: adjust your tests, here is a simple example of export the edited task
+     * tests the export results
+     * @depends testSegmentEditing
+     */
+    public function testExport() {
+        self::$api->login(\'testmanager\');
+        $task = $this->api()->getTask();
+        //start task export
+        
+        $this->api()->request(\'editor/task/export/id/\'.$task->id);
+        
+        //get the exported file content
+        $path = $this->api()->getTaskDataDirectory();
+        $pathToZip = $path.\'export.zip\';
+        $this->assertFileExists($pathToZip);
+        
+        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.\'/'.$issue.'-de-en.xlf\');
+//TODO FOR TEST USAGE: run the test, the next line creates the expected export file, comment the line out, validate if the produced export is as expected
+        file_put_contents($this->api()->getFile(\'export-'.$issue.'-de-en.xlf\', null, false), $exportedFile);
+        $expectedResult = $this->api()->getFileContent(\'export-'.$issue.'-de-en.xlf\');
+        
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), \'Exported result does not equal to export-'.$issue.'-de-en.xlf\');
+    }
+
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
@@ -222,7 +272,7 @@ class '.$name.' extends \ZfExtended_Test_ApiTestcase {
     
     protected function makeTestFiles($path, $name, $issue) {
         $testpath = $path.'/'.$name.'/';
-        $proofread = $path.'/'.$name.'/testfiles/proofread/';
+        $proofread = $path.'/'.$name.'/testfiles/proofRead/';
         mkdir($proofread, 0755, true);
         
         //make a sample task-config.ini
