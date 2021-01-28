@@ -229,6 +229,11 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
         
+        // stop if task has equal source/target languages
+        if(editor_Plugins_TermTagger_Worker_Abstract::isSourceAndTargetLanguageEqual($task)){
+            return;
+        }
+        
         // stop if task has no terminologie
         if (!$task->getTerminologie()||!$segment->isDataModified()) {
             return;
