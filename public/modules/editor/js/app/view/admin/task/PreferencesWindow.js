@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,13 +36,15 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
        'Editor.view.admin.task.Preferences',
        'Editor.view.admin.task.TaskAttributes',
        'Editor.view.admin.task.LogGrid',
-       'Editor.view.admin.task.LogWindow'
+       'Editor.view.admin.task.LogWindow',
+       'Editor.view.admin.config.Grid'
     ],
     itemId: 'adminTaskPreferencesWindow',
     header:false,
     strings: {
         close: '#UT#Fenster schließen',
-        events: '#UT#Ereignisse'
+        events: '#UT#Ereignisse',
+        config : '#UT#Standardkonfiguration Kunde überschreiben'
     },
     layout: 'fit',
     viewModel: {
@@ -62,9 +64,9 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
         }
         
         if(auth.isAllowed('languageResourcesTaskassoc')) {
-	        tabs.push({
-	        	xtype: 'languageResourceTaskAssocPanel'
-	        });
+            tabs.push({
+                xtype: 'languageResourceTaskAssocPanel'
+            });
         }
         
         if(auth.isAllowed('editorEditTaskPm') || 
@@ -76,12 +78,26 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
         
+        
+        if(auth.isAllowed('configOverwriteGrid')) {
+            tabs.push({
+                xtype: 'adminConfigGrid',
+                store:'admin.task.Config',
+                title:me.strings.config,
+                bind:{
+                    extraParams:{
+                        taskGuid : '{projectTaskSelection.taskGuid}'
+                    }
+                }
+            });
+        }
+        
         if(auth.isAllowed('editorTaskLog')) {
             tabs.push({
                 xtype: 'editorAdminTaskLogGrid',
                 title: this.strings.events,
                 bind:{
-                	task:'{currentTask}'
+                    task:'{currentTask}'
                 }
             });
         }

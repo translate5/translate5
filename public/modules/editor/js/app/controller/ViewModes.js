@@ -147,7 +147,7 @@ Ext.define('Editor.controller.ViewModes', {
             readonly = grid.lookupViewModel().get('taskIsReadonly');
 
         //start editor in normal(ergonomic) mode if configured
-        if(Editor.data.app.startViewMode == 'normal') {
+        if(Editor.app.getTaskConfig('editor.startViewMode') == 'normal') {
             me.loadErgonomicModePresets(readonly, true);
         }
         else {

@@ -262,7 +262,7 @@ Ext.define('Editor.controller.LanguageResources', {
    * Check if the language resources match grid should be/is disabled
    */
   isLanguageResourcesDisabled: function(){
-      var disableIfTermCollectionOnly = Editor.data.editor.LanguageResources.disableIfOnlyTermCollection,
+      var disableIfTermCollectionOnly =Editor.app.getTaskConfig('editor.LanguageResources.disableIfOnlyTermCollection'),
           assoc = Editor.data.task.get('taskassocs') ? Editor.data.task.get('taskassocs') : null,
           assocCount = assoc ? assoc.length : 0,
           termCollectionCount = 0;

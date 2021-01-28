@@ -511,6 +511,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         $connector = ZfExtended_Factory::get(get_class($this));
         /* @var $connector editor_Services_Connector */
         $connector->connectTo($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());
+        $connector->setConfig($this->getConfig());
         $connector->isInternalFuzzy = true;
         return $connector;
     }

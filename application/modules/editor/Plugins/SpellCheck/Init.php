@@ -37,17 +37,13 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     protected $frontendControllers = array(
-        'pluginSpellCheck' => 'Editor.plugins.SpellCheck.controller.Editor',
-        'pluginSpellCheckSpellCheckQuery' => 'Editor.plugins.SpellCheck.controller.SpellCheckQuery'
+        'pluginSpellCheck' => 'Editor.plugins.SpellCheck.controller.Editor'
     );
     
     protected $localePath = 'locales';
     
     public function getFrontendControllers() {
-        if(!empty($this->config) && $this->getConfig()->active) {
-            return $this->getFrontendControllersFromAcl();
-        }
-        return [];
+        return $this->getFrontendControllersFromAcl();
     }
     
     public function init() {

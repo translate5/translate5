@@ -36,6 +36,7 @@ Ext.define('Editor.model.admin.Task', {
       'Editor.model.segment.Field',
       'Editor.model.admin.task.UserPref',
       'Editor.model.admin.TaskUserTracking',
+      'Editor.model.TaskConfig',
   ],
   //currently we have 3 places to define userStates: IndexController for translation, JS Task Model and PHP TaskUserAssoc Model for programmatic usage
   USER_STATE_OPEN: 'open',
@@ -332,6 +333,7 @@ Ext.define('Editor.model.admin.Task', {
       }
       return this.get('taskName');
   },
+  
   /**
    * @todo improve workflow handling in Javascript, => adapt the php workflow in js, a class with same methods (like getNextStep step2Role etc)
    * actually all workflow information is encapsulated in frontendRights (thats OK) 
