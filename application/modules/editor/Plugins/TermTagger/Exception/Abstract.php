@@ -54,5 +54,6 @@ abstract class editor_Plugins_TermTagger_Exception_Abstract extends ZfExtended_E
         'E1129' => 'TermTagger DOWN: The configured TermTagger "{termTaggerUrl}" is not reachable and is deactivated in translate5 temporary.',
         'E1131' => 'TermTagger DOWN: No TermTagger instances are available, please enable them and reimport this task.',
         'E1240' => 'TermTagger TIMEOUT: The configured TermTagger "{termTaggerUrl}" did not respond in an appropriate time.',
+        'E1326' => 'TermTagger can not work when source and target language are equal.',
     ];
 }
