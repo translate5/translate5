@@ -107,7 +107,7 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
         if(empty($availableSlots)) {
             return ['resource' => self::$resourceName, 'slot' => null];
         }
-        // all slotes in use
+        // all slots in use
         if (count($usedSlots) == count($availableSlots)) {
             // take first slot in list of usedSlots which is the one with the min. number of counts
             return ['resource' => self::$resourceName, 'slot' => $usedSlots[0]['slot']];
@@ -159,4 +159,8 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
      * @return array
      */
     abstract protected function getAvailableSlots($resourcePool = 'default') : array;
+    /**
+     * @throws Exception
+     */    
+    abstract protected function raiseNoAvailableResourceException();
 }
