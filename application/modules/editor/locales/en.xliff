@@ -3718,7 +3718,7 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 </trans-unit>
 <trans-unit id='U2VnbWVudGFuemFobA=='><source>Segmentanzahl</source><target>Segment count</target></trans-unit>
 <trans-unit id='WndlaXRlcyBMZWt0b3JhdA=='><source>Zweites Lektorat</source><target>Second Review</target></trans-unit>
-<trans-unit id='U3RhdHVzIChBdWZnYmUp'><source>Status (Aufgbe)</source><target>Status (task)</target></trans-unit>
+<trans-unit id='U3RhdHVzIChBdWZnYWJlKQ=='><source>Status (Aufgabe)</source><target>Status (task)</target></trans-unit>
 <trans-unit id='TWVpbiBKb2ItU3RhdHVz'><source>Mein Job-Status</source><target>My job status</target></trans-unit>
 <trans-unit id='WnV3ZWlzdW5n'><source>Zuweisung</source><target>Assignment</target></trans-unit>
 <trans-unit id='QWJnZXNjaGxvc3Nlbg=='><source>Abgeschlossen</source><target>Finished</target></trans-unit>
