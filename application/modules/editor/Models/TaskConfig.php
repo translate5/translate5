@@ -115,4 +115,17 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
             " ON DUPLICATE KEY UPDATE value = ? ";
         return $this->db->getAdapter()->query($sql,[$taskGuid,$name,$value,$value]);
     }
+    
+    /***
+     * Copy all task specific config from $odlTaskGuid to $newTaskGuid
+     * @param string $sourceTaskGuid
+     * @param string $targetTaskGuid
+     */
+    public function cloneTaskConfig(string $odlTaskGuid, string $newTaskGuid) {
+        $adapter = $this->db->getAdapter();
+        $sql = "INSERT INTO LEK_task_config (taskGuid, name, value) 
+        SELECT ".$adapter->quote($newTaskGuid).", name, value 
+        FROM  LEK_task_config WHERE taskGuid = ".$adapter->quote($odlTaskGuid)."; ";
+        $adapter->query($sql);
+    }
 }
