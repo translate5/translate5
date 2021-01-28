@@ -40,9 +40,6 @@ class editor_Segment_Quality_ImportWorker extends editor_Models_Import_Worker_Ab
     
     protected function work(){
         
-        // TODO REMOVE
-        error_log("editor_Segment_Quality_ImportWorker::work");
-        
         $workerId = $this->workerModel->getId();
 
         // add the dependant workers
