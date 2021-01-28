@@ -91,19 +91,26 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
      */
     private $proccessedTags;
     /**
+     * the termtagger will hang if source and target language are identical, so we skip work in that case
+     * see TRANSLATE-2373
+     * @var boolean
+     */
+    private $skipDueToEqualLangs = false;
+    /**
      * This is only needed because the Match nalysis uses this worker to work on the segments directly ...
      * It results in the thrreaded multi-segment processing also saves back the segment directly and uses the direct segment data to instantiate the segment-tags
      * @var boolean
      */
     private $directSegmentProcessing = false;
     
-    
+   
     public function init($taskGuid = NULL, $parameters = array()) {
         $return = parent::init($taskGuid, $parameters);
         $this->config = new editor_Plugins_TermTagger_Configuration($this->task);
         $this->loggerDomain = null;
         $this->logger = null;
         $this->proccessedTags = null;
+        $this->skipDueToEqualLangs = ($this->task->getSourceLang() === $this->task->getTargetLang());
         return $return;
     }
     /**
@@ -159,7 +166,14 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
         }
         return parent::isMaintenanceScheduled();
     }
-    
+
+    protected function raiseNoAvailableResourceException(){
+        // E1131 No TermTaggers available, please enable term taggers to import this task.
+        throw new editor_Plugins_TermTagger_Exception_Down('E1131', [
+            'task' => $this->task
+        ]);
+    }
+
     /*************************** THREADED MULTI-SEGMENT PROCESSING ***************************/
     
     protected function loadNextSegments(string $slot) : array {
@@ -185,6 +199,13 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
     }
     
     protected function processSegments(array $segments, string $slot) : bool {
+        if($this->skipDueToEqualLangs){
+            if($this->isWorkerThread){
+                $this->getLogger()->error('E1326', 'TermTagger can not work when source and target language are equal.', ['task' => $this->task]);
+                return false;
+            }
+            return true;
+        }
         return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, !$this->isWorkerThread, $segments, !$this->directSegmentProcessing), $slot);
     }
     
@@ -440,6 +461,10 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
     /*************************** SINGLE SEGMENT PROCESSING ***************************/
     
     protected function processSegmentTags(editor_Segment_Tags $tags, string $slot) : bool {
+        // skip processing when source & target language are equal
+        if($this->skipDueToEqualLangs){
+            return true;
+        }
         // processes a single tag withot saving it, this is done in the Quaity provider
         try {
             $this->tagSegmentsTags([ $tags ], $slot, false);

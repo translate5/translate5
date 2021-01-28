@@ -139,7 +139,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
         } else {
             $this->fieldText = $fieldText;
         }
-        // TODO FIXME: remove
+        // TODO REMOVE
         if($this->fieldText != strip_tags($fieldText)){
             error_log('=======================================');
             error_log('FAULTY FIELDTAGS FOR SEGMENT '.$this->segmentId.':');
