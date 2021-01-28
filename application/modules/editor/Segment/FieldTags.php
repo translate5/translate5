@@ -32,9 +32,8 @@
  END LICENSE AND COPYRIGHT
  */
 
-/**
- * Holds a segment and the internal tags as objects and provide to render this structure or to recreate it from the rendered markup
- */
+use PHPHtmlParser\Dom\Node\HtmlNode;
+
 /**
  * Abstraction to bundle the segment's text and it's internal tags
  * The structure of the tags in this class is a simple sequence, any nesting / interleaving is covered with rendering / unparsing
@@ -351,37 +350,34 @@ class editor_Segment_FieldTags implements JsonSerializable {
     /* Unparsing API */
 
     public function unparse(string $html) {
-        $dom = new editor_Utils_Dom();
+        $dom = editor_Tag::createDomParser();
         // to make things easier we add a wrapper to hold all tags and only use it's children
-        $element = $dom->loadUnicodeElement('<div>'.$html.'</div>');
-        if($element != NULL){
-            $wrapper = $this->fromDomElement($element, 0);
-            // set our field text
-            $this->fieldText = $wrapper->getText();
-            // sequence the nested tags as our children
-            $wrapper->sequenceChildren($this);
-            $this->consolidate();
-            // Crucial: finalize, set the tag-props
-            $this->addTagProps();
-        } else {
+        $dom->loadStr('<div>'.$html.'</div>');
+        if($dom->countChildren() != 1){
             throw new Exception('Could not unparse Internal Tags from Markup '.$html);
-        }        
+        }
+        $wrapper = $this->fromHtmlNode($dom->firstChild(), 0);
+        $this->fieldText = $wrapper->getText();
+        // sequence the nested tags as our children
+        $wrapper->sequenceChildren($this);
+        $this->consolidate();
+        // Crucial: finalize, set the tag-props
+        $this->addTagProps();
     }
     /**
-     * Creates a nested structure of Internal tags & text-nodes recursively out of a n DOMElement structure
-     * @param DOMElement $element
+     * Creates a nested structure of Internal tags & text-nodes recursively out of a HtmlNode structure
+     * @param HtmlNode $node
      * @param int $startIndex
      * @return editor_Segment_InternalTag
      */
-    private function fromDomElement(DOMElement $element, int $startIndex){
-        $tag = editor_Segment_TagCreator::instance()->fromDomElement($element, $startIndex);
-        if($element->hasChildNodes()){
-            for($i = 0; $i < $element->childNodes->length; $i++){
-                $child = $element->childNodes->item($i);
-                if($child->nodeType == XML_TEXT_NODE){
-                    $tag->addText(htmlspecialchars($child->nodeValue, ENT_COMPAT));
-                } else if($child->nodeType == XML_ELEMENT_NODE){
-                    $tag->addChild($this->fromDomElement($child, $startIndex));
+    private function fromHtmlNode(HtmlNode $node, int $startIndex){
+        $tag = editor_Segment_TagCreator::instance()->fromHtmlNode($node, $startIndex);
+        if($node->hasChildren()){
+            foreach($node->getChildren() as $childNode){
+                if($childNode->isTextNode() && !empty($childNode->text())){
+                    $tag->addText($childNode->text());
+                } else if(is_a($childNode, 'PHPHtmlParser\Dom\Node\HtmlNode')){
+                    $tag->addChild($this->fromHtmlNode($childNode, $startIndex));
                 }
                 $startIndex += $tag->getLastChild()->getTextLength();
             }
@@ -403,7 +399,8 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $tags[] = $last;
             for($i=1; $i < $numTags; $i++){
                 $tag = $this->tags[$i];
-                if($tag->isEqual($last) && $last->endIndex == $tag->startIndex){
+                // TODO: me only must compare the type and make sure it's not the "ANY" type to make tags equal
+                if($tag->isEqualType($tag) && $tag->isEqual($last) && $last->endIndex == $tag->startIndex){
                     $last->endIndex = $tag->endIndex;
                 } else {
                     $last = $tag;

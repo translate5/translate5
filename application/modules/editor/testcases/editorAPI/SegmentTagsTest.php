@@ -48,15 +48,6 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         parent::setUpBeforeClass();
     }
     /**
-     * 
-     */
-    public function testSimpleTag(){
-        $expected = '<a href="http://www.google.de" target="blank" data-test="42"><span>Link Text</span> <img class="link-img" src="/some/icon.svg"/></a>';
-        $tag = editor_Tag::unparse($expected);
-        $result = $tag->render();
-        $this->assertEquals($result, $expected);
-    }
-    /**
      *
      */
     public function testUnicodeTag(){
@@ -90,10 +81,28 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         $this->assertEquals($expected, $result);
     }
     /**
+     *
+     */
+    public function testSimpleTag(){
+        $expected = '<a href="http://www.google.de" target="blank" data-test="42"><span>Link Text</span> <img class="link-img" src="/some/icon.svg"/></a>';
+        $tag = editor_Tag::unparse($expected);
+        $result = $tag->render();
+        $this->assertEquals($result, $expected);
+    }
+    /**
      * 
      */
     public function testTagWithAttributes(){
         $expected = '<a href="http://www.google.de" target="blank" data-test="42"><span>Link Text</span> <img class="link-img" src="/some/icon.svg"/></a>';
+        $tag = editor_Tag::unparse($expected);
+        $result = $tag->render();
+        $this->assertEquals($expected, $result);
+    }
+    /**
+     *
+     */
+    public function testTagWithUnescapedChars(){
+        $expected = '<a href="http://www.google.de" target="blank" data-test="42">"Somethig" is &lt "Something" else</a>';
         $tag = editor_Tag::unparse($expected);
         $result = $tag->render();
         $this->assertEquals($expected, $result);
@@ -241,8 +250,8 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
     public function testRealDataTags5(){
         // testing "real" segment content. keep in mind when doing this, that rendered attributes in tags may have a different order so the input needs to be ordered when comparing rendered stuff
         $segmentId = 677867;
-        $original = '&lt;FilesMatch "\\.phps$"&gt;<div class="736f667452657475726e2f internal-tag newline ownttip single"><span class="short" title="&lt;1/&gt;: Newline">&lt;1/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">\xe2\x86\xb5</span></div> <div class="73706163652074733d2232303230323022206c656e6774683d2233222f internal-tag ownttip single space"><span class="short" title="&lt;2/&gt;: 3 whitespace characters">&lt;2/&gt;</span><span class="full" data-originalid="space" data-length="3">\xc2\xb7\xc2\xb7\xc2\xb7</span></div>SetHandler application/x-httpd-php-source<div class="736f667452657475726e2f internal-tag newline ownttip single"><span class="short" title="&lt;3/&gt;: Newline">&lt;3/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">\xe2\x86\xb5</span></div>&lt;/FilesMatch&gt;';
-        $markup = '&lt;FilesMatch "\\.phps$"&gt;<div class="single 736f667452657475726e2f newline internal-tag ownttip"><span title="&lt;1/&gt;: Newline" class="short">&lt;1/&gt;</span><span data-originalid="softReturn" data-length="1" class="full">\xe2\x86\xb5</span></div> <div class="single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip"><span title="&lt;2/&gt;: 3 whitespace characters" class="short">&lt;2/&gt;</span><span data-originalid="space" data-length="3" class="full">\xc2\xb7\xc2\xb7\xc2\xb7</span></div>SetHandler application/x-httpd-php-source<div class="single 736f667452657475726e2f newline internal-tag ownttip"><span title="&lt;3/&gt;: Newline" class="short">&lt;3/&gt;</span><span data-originalid="softReturn" data-length="1" class="full">\xe2\x86\xb5</span></div>&lt;/FilesMatch&gt;';
+        $original = '&lt;FilesMatch "\.phps$"&gt;<div class="single 736f667452657475726e2f newline internal-tag ownttip"><span title="&lt;1/&gt;: Newline" class="short">&lt;1/&gt;</span><span data-originalid="softReturn" data-length="1" class="full">\xe2\x86\xb5</span></div> <div class="single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip"><span title="&lt;2/&gt;: 3 whitespace characters" class="short">&lt;2/&gt;</span><span data-originalid="space" data-length="3" class="full">\xc2\xb7\xc2\xb7\xc2\xb7</span></div>SetHandler application/x-httpd-php-source<div class="single 736f667452657475726e2f newline internal-tag ownttip"><span title="&lt;3/&gt;: Newline" class="short">&lt;3/&gt;</span><span data-originalid="softReturn" data-length="1" class="full">\xe2\x86\xb5</span></div>&lt;/FilesMatch&gt;';
+        $markup = '&lt;FilesMatch "\.phps$"&gt;<div class="736f667452657475726e2f internal-tag newline ownttip single"><span class="short" title="&lt;1/&gt;: Newline">&lt;1/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">\xe2\x86\xb5</span></div> <div class="73706163652074733d2232303230323022206c656e6774683d2233222f internal-tag ownttip single space"><span class="short" title="&lt;2/&gt;: 3 whitespace characters">&lt;2/&gt;</span><span class="full" data-originalid="space" data-length="3">\xc2\xb7\xc2\xb7\xc2\xb7</span></div>SetHandler application/x-httpd-php-source<div class="736f667452657475726e2f internal-tag newline ownttip single"><span class="short" title="&lt;3/&gt;: Newline">&lt;3/&gt;</span><span class="full" data-originalid="softReturn" data-length="1">\xe2\x86\xb5</span></div>&lt;/FilesMatch&gt;';
         $originalTags = new editor_Segment_FieldTags($segmentId, $original, 'target', 'target');
         $tags = new editor_Segment_FieldTags($segmentId, $markup, 'target', 'target');
         $this->assertEquals($markup, $tags->render());
@@ -259,6 +268,17 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         $tags = new editor_Segment_FieldTags($segmentId, $markup, 'target', 'target');
         $this->assertEquals($markup, $tags->render());
         $this->assertEquals(strip_tags($markup), $tags->getFieldText());
+    }
+    /**
+     *
+     */
+    public function testUnescapedChars(){
+        // testing "real" segment content
+        $segmentId = 677867;
+        $markup = '<a href="http://www.google.de" target="blank" data-test="42">"Somethig" is &lt "Something" else</a>';
+        $tags = new editor_Segment_FieldTags($segmentId, $markup, 'target', 'target');
+        $this->assertEquals($markup, $tags->render());
+        $this->assertEquals('"Somethig" is &lt "Something" else', $tags->getFieldText());
     }
     /**
      * 

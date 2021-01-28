@@ -65,4 +65,12 @@ class editor_Segment_AnyInternalTag extends editor_Segment_InternalTag {
     protected function createBaseClone(){
         return new editor_Segment_AnyInternalTag($this->startIndex, $this->endIndex, $this->category, $this->name);
     }
+    /**
+     * ANY Internal tags shall not be be consolidated
+     * {@inheritDoc}
+     * @see editor_Segment_InternalTag::isEqualType()
+     */
+    public function isEqualType(editor_Tag $tag) : bool {
+        return false;
+    }
 }

@@ -303,4 +303,15 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
             }
         }
     }
+    /**
+     * Determines, if Internal tags are of an equal type
+     * {@inheritDoc}
+     * @see editor_Tag::isEqualType()
+     */
+    public function isEqualType(editor_Tag $tag) : bool {
+        if(is_a($tag, 'editor_Segment_InternalTag') && $tag->getType() == $this->getType()){
+            return true;
+        }
+        return false;
+    }
 }

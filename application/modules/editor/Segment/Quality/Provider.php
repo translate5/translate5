@@ -84,7 +84,7 @@ abstract class editor_Segment_Quality_Provider {
         return $tags;
     }
     /**
-     * Evaluates, if the DOM-Tag with the passed props match the providers quality tag
+     * Evaluates, if the Dom-Tag with the passed props match the providers quality tag
      * @param string $type
      * @param string $nodeName
      * @param array $classNames

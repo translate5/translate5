@@ -61,6 +61,10 @@ final class editor_TextNode extends editor_Tag {
         $this->name = '';
         $this->singular = true;
     }
+    
+    public function isText() : bool {
+        return true;
+    }
 
     public function getText(){
         return $this->text;
@@ -90,7 +94,7 @@ final class editor_TextNode extends editor_Tag {
         throw new Exception('Text nodes can not have attributes');
     }
 
-    public function isEqual(editor_Tag $tag){
+    public function isEqual(editor_Tag $tag) : bool {
         if(get_class($tag) == 'editor_TextNode' && $tag->getText() == $this->text){
             return true;
         }

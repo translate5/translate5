@@ -32,9 +32,15 @@
  END LICENSE AND COPYRIGHT
  */
 
+use PHPHtmlParser\Dom;
+use PHPHtmlParser\Options;
+use PHPHtmlParser\Dom\Node\HtmlNode;
+use PHPHtmlParser\Dom\Node\AbstractNode;
+use PHPHtmlParser\DTO\Tag\AttributeDTO;
+
 /**
  * represents a HTML-Tag as PHP-Object
- * It in some kinds is a simpler & easier seriazable version of DOMElement
+ * It in some kinds is a simpler & easier seriazable version of DOMElement or PHPHtmlParser\Dom
  * The classname-attribute has an own datamodel that resembles it's array nature
  * Expects all string values to be UTF-8 encoded
  * All Attribute-values will be unescaped when setting and rendered escaped that means the internal data is always unescaped
@@ -207,39 +213,68 @@ class editor_Tag {
         return $tag;
     }
     /**
-     * Unparses an HTML-String to an editor_Tag
-     * IMPORTANT: This will handle the tags inner content as TEXT, so no nested tags will be parsed !
+     * Creates a Dom Object and sets some crucial options. This API should always be used to 
+     * @return \PHPHtmlParser\Dom
+     */
+    public static function createDomParser(){
+        $dom = new Dom();
+        $options = new Options();
+        $options->isCleanupInput(false);
+        $dom->setOptions($options);
+        return $dom;
+    }
+    /**
+     * Unparses an HTML-String to an editor_Tag. If pure text is passed, a text-node will be returned. If markup with multiple tags is returned, only the first tag is returned
      * @param string $html
      * @return editor_Tag|NULL
      */
     public static function unparse($html){
-        $dom = new editor_Utils_Dom();
-        $node = $dom->loadUnicodeElement($html);
-        if($node != NULL){
-            return static::fromDomElement($node);
+        $dom = self::createDomParser();
+        $dom->loadStr($html);
+        if($dom->countChildren() != 1){
+            return NULL;
+        }
+        $node = $dom->firstChild();
+        if(is_a($node, 'PHPHtmlParser\Dom\Node\HtmlNode')){
+            return static::fromHtmlNode($node);
+        }
+        if($node->isTextNode() && !empty($node->text())){
+            return new editor_TextNode($node->text());
         }
         return NULL;
     }
     /**
-     * Creates a editor_Tag out of a DOMElement
-     * @param DOMElement $node
+     * Creates a editor_Tag out of a AbstractNode
+     * @param HtmlNode $node
+     * @return editor_Tag|NULL
+     */
+    protected static function fromNode(AbstractNode $node){
+        if(is_a($node, 'PHPHtmlParser\Dom\Node\HtmlNode')){
+            return static::fromHtmlNode($node);
+        }
+        if($node->isTextNode() && !empty($node->text())){
+            return new editor_TextNode($node->text());
+        }
+        return NULL;
+    }
+    /**
+     * Creates a editor_Tag out of a HtmlNode
+     * @param HtmlNode $node
      * @return editor_Tag
      */
-    protected static function fromDomElement(DOMElement $node){
-        $tag = editor_Tag::create($node->nodeName);
-        if($node->hasAttributes()){
-            foreach($node->attributes as $attr){
-                $tag->addAttribute($attr->nodeName, $attr->nodeValue);
-            }
+    protected static function fromHtmlNode(HtmlNode $node){
+        $domTag = $node->getTag();
+        $tag = editor_Tag::create($domTag->name());
+        foreach($domTag->getAttributes() as $name => $attrib){
+            /* @var $attrib AttributeDTO */
+            $tag->addAttribute($name, $attrib->getValue());
         }
-        if($node->hasChildNodes()){
-            for($i = 0; $i < $node->childNodes->length; $i++){
-                $child = $node->childNodes->item($i);
-                if($child->nodeType == XML_TEXT_NODE){
-                    // CRUCIAL: the nodeValue always is unescaped Markup!
-                    $tag->addText(htmlspecialchars($child->nodeValue, ENT_COMPAT));
-                } else if($child->nodeType == XML_ELEMENT_NODE){
-                    $tag->addChild(static::fromDomElement($child));
+        if($node->hasChildren()){
+            foreach($node->getChildren() as $childNode){
+                /* @var $childNode AbstractNode */
+                $child = static::fromNode($childNode);
+                if($child != NULL){
+                    $tag->addChild($child);
                 }
             }
         }
@@ -666,6 +701,13 @@ class editor_Tag {
         return $this->name;
     }
     /**
+     * checks, if the actual Tag is a Text-Node (editor_TextNode)
+     * @return boolean
+     */
+    public function isText() : bool {
+        return false;
+    }
+    /**
      * checks, if the actual Tag is a link
      * @return boolean
      */
@@ -698,7 +740,7 @@ class editor_Tag {
      * The data-attributes and the children of the tag will not count for comparision
      * @return boolean
      */
-    public function isEqual(editor_Tag $tag){
+    public function isEqual(editor_Tag $tag) : bool {
         if($tag->getName() != $this->getName() || $tag->getClasses() != $this->getClasses()){
             return false;
         }
@@ -708,6 +750,13 @@ class editor_Tag {
             }
         }
         return true;
+    }
+    /**
+     * Implementation used only for Internal tag
+     * @param editor_Tag $tag
+     */
+    public function isEqualType(editor_Tag $tag) : bool {
+        return false;
     }
     /**
      * Creates a clone of the tag. Does not copy/clone the children and if not specified otherwise does not copy data-attributes
