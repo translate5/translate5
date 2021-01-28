@@ -121,11 +121,9 @@ abstract class editor_Models_Import_FileParser {
     protected $config;
     
     /**
-     * Protect html tags. This flag is set via zf configuration (runtimeOptions->import->fileparser->csv->options->protectTag)
-     *
-     * @var boolean
+     * @var editor_Models_Segment_UtilityBroker
      */
-    protected $tagProtection = true;
+    protected $utilities;
     
     /**
      * returns the file extensions (in lower case) parsable by this fileparser
@@ -156,11 +154,7 @@ abstract class editor_Models_Import_FileParser {
      * @param editor_Models_Task $task
      */
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task){
-
-        //FIXME introduce config and use it here!
         $this->config = $task->getConfig();
-        //$this->tagProtection = (boolean)$this->config->runtimeOptions->import->fileparser->csv->options->protectTags;
-        $this->tagProtection = true;
         
         $this->loadOriginalFile($path);
         $this->_path = $path;
@@ -171,6 +165,8 @@ abstract class editor_Models_Import_FileParser {
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         $this->matchRateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
         $this->updateFile(get_class($this));
+        
+        $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
     }
     
     /**
@@ -368,7 +364,9 @@ abstract class editor_Models_Import_FileParser {
      * @return string encoding | false if encoding is none of utf-8, 'iso-8859-1', 'windows-1251'
      */
     protected function checkAndConvert2utf8() {
-        if(mb_detect_encoding($this->_origFile, 'UTF-8', true))return 'UTF-8';
+        if(mb_detect_encoding($this->_origFile, 'UTF-8', true)) {
+            return 'UTF-8';
+        }
         
         $list = array('iso-8859-1', 'windows-1251');
      
