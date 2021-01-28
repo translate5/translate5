@@ -41,7 +41,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     
     /***
      * How frequent do cron periodical action is triggered. This is required
-     * for the deadline periodical notification so we adjast the deadline date select arount 
+     * for the deadline periodical notification so we adjast the deadline date select arount
      * this periond
      * @var integer
      */
@@ -594,8 +594,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $notifyConfig = $config->runtimeOptions->editor->notification;
         
         //load the customer specific config
-        $xlfAttachment = (boolean) $config->runtimeOptions->editor->notification->enableSegmentXlfAttachment;
-        
+        $xlfAttachment = (boolean) $notifyConfig->enableSegmentXlfAttachment;
         $xlfFile =       (boolean) $notifyConfig->saveXmlToFile;
         
         if(empty($segments) || (!$xlfAttachment && !$xlfFile)) {
@@ -777,7 +776,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     
     /***
      * Deadline notifier. It will send notification to the configured user assocs days before or after the current day (days +/- can be defined in config default to 1)
-     * When the trignotification trigger is periodical, the deadline date select will be between "CRON_PERIODICAL_CALL_FREQUENCY_MIN" minutes period of time 
+     * When the trignotification trigger is periodical, the deadline date select will be between "CRON_PERIODICAL_CALL_FREQUENCY_MIN" minutes period of time
      * @param string $triggerConfig
      * @param string $template: template to be used for the mail
      * @param bool $isApproaching: default will notify daysOffset before deadline
@@ -839,7 +838,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     
     /***
      * Get the deadline not notified assocs
-     * 
+     *
      * @param int $daysOffset
      * @param bool $isApproaching
      * @param $role
@@ -922,7 +921,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
     
     /***
-     * Write deadline notifiead log entry into task log table 
+     * Write deadline notifiead log entry into task log table
      * @param array $tua
      * @param string $message
      */
