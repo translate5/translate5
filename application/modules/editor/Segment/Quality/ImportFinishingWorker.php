@@ -39,9 +39,6 @@ class editor_Segment_Quality_ImportFinishingWorker extends editor_Models_Import_
     }
     
     protected function work(){
-        
-        // TODO REMOVE
-        error_log("editor_Segment_Quality_ImportFinishingWorker::work");
 
         // add the dependant workers
         editor_Segment_Quality_Manager::instance()->finishImport($this->task);

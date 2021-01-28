@@ -120,9 +120,6 @@ final class editor_Segment_Quality_Manager {
      */
     public function prepareImport(editor_Models_Task $task, int $parentWorkerId){
         
-        // TODO REMOVE
-        error_log("editor_Segment_Quality_Manager::prepareImport");
-        
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
             if($provider->hasImportWorker()){
@@ -135,9 +132,6 @@ final class editor_Segment_Quality_Manager {
      * @param editor_Models_Task $task
      */
     public function finishImport(editor_Models_Task $task){
-        
-        // TODO REMOVE
-        error_log("editor_Segment_Quality_Manager::finishImport");
         
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $db editor_Models_Db_Segments */
@@ -171,9 +165,6 @@ final class editor_Segment_Quality_Manager {
      * @param editor_Models_Task $task
      */
     public function processEditing(editor_Models_Segment $segment, editor_Models_Task $task){
-        
-        // TODO REMOVE
-        error_log("editor_Segment_Quality_Manager::processEditing");
         
         $tags = editor_Segment_Tags::fromSegment($task, true, $segment, false);
         foreach($this->registry as $type => $provider){

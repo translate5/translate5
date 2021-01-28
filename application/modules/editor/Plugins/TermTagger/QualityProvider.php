@@ -46,9 +46,6 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     
     public function addImportWorker(editor_Models_Task $task, int $parentWorkerId) {
         
-        // TODO REMOVE
-        error_log("editor_Plugins_TermTagger_QualityProvider::addImportWorker");
-        
         // if the import is not switched on we return
         $config = Zend_Registry::get('config');
         $importSwitchedOn = $config->runtimeOptions->termTagger->switchOn->import;
@@ -81,9 +78,6 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     }
     
     public function processSegment(editor_Models_Task $task, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
-        
-        // TODO REMOVE
-        error_log("editor_Plugins_TermTagger_QualityProvider::processSegment ".$tags->getSegmentId());
         
         // this API does not process the import
         if($forImport){
