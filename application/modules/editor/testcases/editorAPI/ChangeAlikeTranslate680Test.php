@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -29,18 +29,18 @@ END LICENSE AND COPYRIGHT
 /**
  * This test covers if the repetition editor can deal with tags inside of segments.
  * Details are described in TRANSLATE-680: Automatic substituations of tags for repetitions
- * Behaviour before implementing this issue: 
+ * Behaviour before implementing this issue:
  * Identical Segments with tags are not recognized by the repetition editor,
  *   since the tags are containing IDs which are preventing the recognition.
- * After implementing this feature: 
- *   Tag Content and position does not matter, only the tag count must be 
- *   equal in the segments (and the text of course) to be recognized as repetition.  
+ * After implementing this feature:
+ *   Tag Content and position does not matter, only the tag count must be
+ *   equal in the segments (and the text of course) to be recognized as repetition.
  */
 class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
     protected static $useSourceEditing = false;
     
     /**
-     * the strings to be compared on testing change alike source matching 
+     * the strings to be compared on testing change alike source matching
      * [0] = source
      * [1] = target
      * @var array
@@ -142,8 +142,8 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         so dass keine WDHs gefunden werden wenn die Tag Anzahl unterschiedlich ist.
         NEU hier: Whitespace Tags gehören nicht zur Anzahl dazu!
         
-        Logisch bedeutet das für Source Wiederholungen: 
-            Eine Wiederholung ist eine Wiederholung wenn, 
+        Logisch bedeutet das für Source Wiederholungen:
+            Eine Wiederholung ist eine Wiederholung wenn,
                 - der Source Text gleich ist
                 - wenn die Source Tags an der gleichen Stelle stehen
                 - Was es für Source Tags sind ist egal
@@ -156,23 +156,23 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
             Eine Wiederholung ist eine Wiederholung wenn,
                 - der Target Text gleich ist
                 - wenn die Target Tags an der gleichen Stelle stehen (impliziert gleiche Anzahl im Target)
-                - Die Anzahl / Struktur der Source Tags interessiert nicht 
+                - Die Anzahl / Struktur der Source Tags interessiert nicht
                 - Was es für Tags sind ist egal
                     → md5 hash auf segment mit neutralen tag placeholdern
                     → Tags im Source interessieren hier nicht, da Inhalt komplett unterschiedlich sein kann und Source nicht modifiziert wird!
                 
-        Wie sieht es mit Source Editing aus: 
+        Wie sieht es mit Source Editing aus:
             - Theoretisch dürften mit aktiviertem Source Editing ebenfalls keine Wiederholungen gefunden werden,
-                in denen die Tag Anzahl im Source unterschiedlich ist, da die Source ebenfalls modifiziert wird.  
+                in denen die Tag Anzahl im Source unterschiedlich ist, da die Source ebenfalls modifiziert wird.
 
                 
                 
         Für die relais md5 Spalte ist es prinzipiell ebenfalls Egal, da auch hier keine Wiederholungen genutzt werden könne, dennoch nehmen wir der Konsistenz wegen den gleichen Algorithmus als für die Source Splate
                 
-        Fragen: 
+        Fragen:
         - Wieso hatten wir definiert, dass die Tags einer Wiederholung an der gleichen Stelle stehen müssen?
             → Immerhin ist ja der Tag Inhalt unerheblich, ist dann die Position soviel wichtiger?
-            Antwort: Position spielt explizit eine Rolle, 
+            Antwort: Position spielt explizit eine Rolle,
 
      */
     
@@ -186,7 +186,6 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
             'edit100PercentMatch' => true,
             'enableSourceEditing' => static::$useSourceEditing,
             'lockLocked' => 1,
-            'autoStartImport'=>0
         ];
         
         $appState = self::assertAppState();
@@ -213,7 +212,7 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         $this->assertCount(count(self::$dummyData), $segments);
         
-        //test source editing 
+        //test source editing
         $isSE = $this->api()->getTask()->enableSourceEditing;
         
         //test editing a prefilled segment
@@ -315,12 +314,12 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         $segmentsAfterChange = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segmentsAfterChange);
         //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/ChangeAlikeTranslate680Test/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
-        //In Segment 15 the macReturn is changed correctly to a softReturn, since the whitespace tags belong to the content right now. 
+        //In Segment 15 the macReturn is changed correctly to a softReturn, since the whitespace tags belong to the content right now.
         $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
         
-        //seg 14 has seg 16 as alike, although the target tag count differs. 
-        // But thats ok since target of 16 is empty, and will be filled with one tag from the source on editing. 
-        // So after editing, tags are equal again. 
+        //seg 14 has seg 16 as alike, although the target tag count differs.
+        // But thats ok since target of 16 is empty, and will be filled with one tag from the source on editing.
+        // So after editing, tags are equal again.
         $segToTest = $segments[13]; //segmentNrInTask 14
         //fetch alikes and assert correct segments found by segmentNrInTask
         $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
@@ -340,7 +339,7 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         /*
          * segmentNrInTask 18 - remove whitespace tag the other tags must remain in the alikes
          */
-        $segToTest = $segments[17]; 
+        $segToTest = $segments[17];
         $newTarget = preg_replace('/Test<.*>word/', 'Test Word', $segToTest->targetEdit);
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $newTarget, $segToTest->id);
