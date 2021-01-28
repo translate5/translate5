@@ -32,8 +32,11 @@
  END LICENSE AND COPYRIGHT
  */
 
+use PHPHtmlParser\Dom\Node\HtmlNode;
+use PHPHtmlParser\DTO\Tag\AttributeDTO;
+
 /**
- * This API creates the types of Internal tags either fromn a DOMElement or JSON serialization
+ * This API creates the types of Internal tags either from a Dom Node or JSON serialization
  * WORK IN PROGRESS
  */
 class editor_Segment_TagCreator {
@@ -76,28 +79,28 @@ class editor_Segment_TagCreator {
         }        
     }
     /**
-     * Tries to evaluate an Internal tag out of a given DOM Element
+     * Tries to evaluate an Internal tag out of a given HtmlNode
      * To make this happen all availaable Internal Tag Identifiers must be registered with this class
      * The default is a 'editor_Segment_AnyInternalTag' representing an uncategorized internal tag
      * NOTE: This API does not care about the children contained in the tag nor the text-length
-     * @param DOMElement $element
+     * @param HtmlNode $node
      * @param int $startIndex
      * @param int $endIndex
      * @return editor_Segment_InternalTag
      */
-    public function fromDomElement(DOMElement $element, int $startIndex=0, int $endIndex=0){
+    public function fromHtmlNode(HtmlNode $node, int $startIndex=0, int $endIndex=0){
         $classNames = [];
         $attributes = [];
-        if($element->hasAttributes()){
-            foreach ($element->attributes as $attr) {
-                if($attr->nodeName == 'class'){
-                    $classNames = explode(' ', trim($attr->nodeValue));
-                } else {
-                    $attributes[$attr->nodeName] = $attr->nodeValue;
-                }
+        $domTag = $node->getTag();
+        foreach($domTag->getAttributes() as $name => $attrib){
+            /* @var $attrib AttributeDTO */
+            if($name == 'class'){
+                $classNames = explode(' ', trim($attrib->getValue()));
+            } else {
+                $attributes[$name] = $attrib->getValue();
             }
         }
-        $tag = $this->evaluate('', $element->nodeName, $classNames, $attributes, $startIndex, $endIndex);
+        $tag = $this->evaluate('', $domTag->name(), $classNames, $attributes, $startIndex, $endIndex);
         if(count($classNames) > 0){
             foreach($classNames as $cname){
                 $tag->addClass($cname);
