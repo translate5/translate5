@@ -165,9 +165,11 @@ Ext.define('Editor.controller.ViewModes', {
         me.gridPreset = [];
         Ext.Array.each(columns, function(column){
             var conf = {},
-                columnProto = Ext.ClassManager.getByAlias('widget.'+column.xtype).prototype;
+                columnProto = Ext.ClassManager.getByAlias('widget.'+column.xtype).prototype,
+                isEditCol = column.isEditableContentColumn;
             //calculate if column should be hidden in readonly mode:
-            conf.isContentColumnWithEditablePendant = (column.isContentColumn && !column.isEditableContentColumn && column.segmentField.get('editable'));
+            //true if it is the non editable column but the field is editable (left part of or), or if it is the editable column
+            conf.isContentColumnWithEditablePendant = (column.isContentColumn && !isEditCol && column.segmentField.get('editable')) || isEditCol;
             
             //the following values may be set either in the column class or in the column config in the grid
             // so if in the config they are missing, they have to fetched from the class
