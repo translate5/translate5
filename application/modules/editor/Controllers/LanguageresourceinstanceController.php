@@ -1055,7 +1055,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->load($languageResourceId);
 
         $connector = $this->getConnector();
-
         $result = $connector->query($segment);
         
         if($this->entity->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM){
@@ -1117,7 +1116,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $task=ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($session->taskGuid);
-        return $manager->getConnector($this->entity,$task->getSourceLang(),$task->getTargetLang());
+        return $manager->getConnector($this->entity,$task->getSourceLang(),$task->getTargetLang(),$task->getConfig());
     }
     
     /***

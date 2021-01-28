@@ -53,7 +53,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       // sorted by appearance
       workflow: '#UT#Workflow',
       taskActions: '#UT#Aktionen',
-      state: '#UT#Status (Aufgbe)',
+      state: '#UT#Status (Aufgabe)',
       customerId: '#UT#Endkunde',
       taskName: '#UT#Name',
       taskNr: '#UT#Auftragsnr.',

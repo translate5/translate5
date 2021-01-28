@@ -96,7 +96,9 @@ foreach ($result as $res){
     if(!isset($languagesCache[$res['languageResourceId']])){
         try {
             $resource = $manager->getResourceById($res['serviceType'], $res['resourceId']);
-            
+            if(empty($resource)){
+                throw new ZfExtended_Exception("Resource not found.");
+            }
             //add languages to usable resources
             $connector = ZfExtended_Factory::get('editor_Services_Connector');
             /* @var $connector editor_Services_Connector */

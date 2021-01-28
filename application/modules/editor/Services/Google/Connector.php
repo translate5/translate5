@@ -25,8 +25,6 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-use Google\Cloud\Translate\V2\TranslateClient;
-use Google\Cloud\Core\Exception\BadRequestException;
 /**
  */
 class editor_Services_Google_Connector extends editor_Services_Connector_Abstract {
@@ -50,15 +48,14 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      */
     protected $tagHandler;
     
+    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::__construct()
      */
     public function __construct() {
         parent::__construct();
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->google->matchrate;
+        $this->defaultMatchRate = $this->config->runtimeOptions->LanguageResources->google->matchrate;
         $this->batchQueryBuffer = 50;
         
         
