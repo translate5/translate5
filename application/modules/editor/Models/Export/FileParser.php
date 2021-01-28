@@ -483,7 +483,6 @@ abstract class editor_Models_Export_FileParser {
      * @return string
      */
     protected function unprotectContent(string $segment): string {
-        $segment = $this->utilities->whitespace->unprotectWhitespace($segment);
-        return $this->utilities->tagProtection->unprotect($segment);
+        return $this->utilities->whitespace->unprotectWhitespace($segment);
     }
 }

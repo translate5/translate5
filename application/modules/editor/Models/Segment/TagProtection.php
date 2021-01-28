@@ -27,6 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * Protects XML/HTML content / tags as internal tags
  */
 class editor_Models_Segment_TagProtection {
     
@@ -46,8 +47,25 @@ class editor_Models_Segment_TagProtection {
      */
     protected $tagId = 0;
     
-    public function protectTags(string $textNode) {
+    /**
+     * decodes encoded entities, and protects the resulting tags then
+     * @param string $textNode A string plain containing XML/HTML
+     * @param bool $entityCleanup
+     * @return string
+     */
+    public function protectTags(string $textNode, bool $entityCleanup = true) {
+        //$textNode is now: Dies <strong>ist ein</strong> Test. &nbsp;
+        if($entityCleanup) {
+            $textNode = editor_Models_Segment_Utility::foreachSegmentTextNode($textNode, function($text){
+                return editor_Models_Segment_Utility::entityCleanup($text);
+                //$text is now: Dies <strong>ist ein</strong> Test. _
+            });
+        }
         
+        if (strpos($textNode, '<') === false) {
+            return $textNode;
+        }
+            
         $this->tagId = 1;
         
         try {
@@ -67,7 +85,9 @@ class editor_Models_Segment_TagProtection {
             $element->wrap('<'.$tagType.'_'.$this->tagId++.'/>');
         }
         $textNode = $tempXml->find('segment')->innerXml();
+        
         return $this->convertToPlaceholderTag($textNode);
+        //result is now: Dies <protectedTag>ist ein</protectedTag> Test. _ (Where _ is the nbsp as character!)
     }
     
     /**
@@ -95,8 +115,7 @@ class editor_Models_Segment_TagProtection {
                         $id = $match[1];
                         $originalTag = $match[2];
                     }
-//FIXME this unpack is used multiple times at multiple places!
-                    $originalTag = implode('', unpack('H*', $originalTag));
+                    $originalTag = editor_Models_Segment_InternalTag::encodeTagContent($originalTag);
                     $text = str_replace($match[0], sprintf($placeholder, $type, $id, $originalTag), $text);
                 }
             }
@@ -104,6 +123,9 @@ class editor_Models_Segment_TagProtection {
         return $text;
     }
     
+    /**
+     * Fallback if content is not wellformed
+     */
     protected function parseSegmentProtectInvalidHtml5($segment) {
         $replacer = function ($matches){
             $tagName = preg_replace('/<[\/]*([^ ]*).*>/i', '$1', $matches[0]);
@@ -112,11 +134,26 @@ class editor_Models_Segment_TagProtection {
                 return $matches[0];
             }
             $id = $this->tagId++;
-//FIXME this unpack is used multiple times at multiple places!
-            $originalTag = implode('', unpack('H*', $matches[0]));
+            
+            $originalTag = editor_Models_Segment_InternalTag::encodeTagContent($matches[0]);
             return str_replace($matches[0], '<protectedTag data-type="single" data-id="'.$id.'" data-content="'.$originalTag.'"/>', $matches[0]);
         };
         
         return preg_replace_callback('/(<[^><]+>)/is', $replacer, $segment);
+    }
+    
+    /**
+     * restores the protected entities (tags are restored automatically from the tags)
+     * ONLY NEEDED FOR XLF BASED FORMATS!
+     */
+    public function unprotect($segment) {
+        $chunks = preg_split('/(<[^>]*>)/', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);
+        $count = count($chunks);
+        for ($i = 0; $i < $count; $i++) {
+            //the imported content contained encoded HTML specialchars and te following characters as encoded entities
+            $chunks[$i] = str_replace([' ', '"', "'"], ['&nbsp;','&quot;','&#039;'], $chunks[$i]);
+            $i++; //get only the odd elements which contain the textual content
+        }
+        return htmlspecialchars(implode('', $chunks), ENT_XML1);
     }
 }
