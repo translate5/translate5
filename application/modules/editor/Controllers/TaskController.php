@@ -567,8 +567,8 @@ class editor_TaskController extends ZfExtended_RestController {
                     $this->processUploadedFile($task, $dpFactory->createFromTask($this->entity));
                     $this->addDefaultLanguageResources($task);
                     
-                    //update the document usage log for the this project-task
-                    $this->insertDocumentUsageLog($task);
+                    //update the task usage log for the this project-task
+                    $this->insertTaskUsageLog($task);
                 }
                 
                 $this->entity->setState($this->entity::INITIAL_TASKTYPE_PROJECT);
@@ -585,8 +585,8 @@ class editor_TaskController extends ZfExtended_RestController {
                 // are associated automatically with tasks for this client.
                 $this->addDefaultLanguageResources($this->entity);
                 
-                //update the document usage log for the current task
-                $this->insertDocumentUsageLog($this->entity);
+                //update the task usage log for the current task
+                $this->insertTaskUsageLog($this->entity);
             }
 
             //warn the api user for the targetDeliveryDate ussage
@@ -1935,19 +1935,20 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /***
-     * Handle the document usage log for given entity. This will update the sum counter or insert new record 
+     * Handle the task usage log for given entity. This will update the sum counter or insert new record 
      * based on the unique key of `taskType`,`customerId`,`yearAndMonth` 
      * 
+     * @param editor_Models_task $task
      */
-    protected function insertDocumentUsageLog(editor_Models_task $task) {
-        $log = ZfExtended_Factory::get('editor_Models_DocumentUsageLog');
-        /* @var $log editor_Models_DocumentUsageLog */
+    protected function insertTasktUsageLog(editor_Models_task $task) {
+        $log = ZfExtended_Factory::get('editor_Models_TaskUsageLog');
+        /* @var $log editor_Models_TaskUsageLog */
         #id, taskType, sourceLang, targetLang, customerId, yearAndMonth, taskCount
         $log->setTaskType($task->getTaskType());
         $log->setSourceLang($task->getSourceLang());
         $log->setTargetLang($task->getTargetLang());
         $log->setCustomerId($task->getCustomerId());
         $log->setYearAndMonth(date('Y-m'));
-        $log->updateInsertDocumentCount();
+        $log->updateInsertTaskCount();
     }
 }

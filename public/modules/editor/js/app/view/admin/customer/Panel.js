@@ -147,18 +147,16 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 filter: {
                                     type: 'string'
                                 }
-                            },
-                            /*{
+                            },{
                                 xtype: 'actioncolumn',
                                 text:  me.strings.export,
                                 menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
                                 sortable: false,
                                 items:[{
-                                    iconCls: 'ico-customer-mt-export',
+                                    glyph: 'f1c3@FontAwesome5FreeSolid',
                                     handler:me.onTmExportClick
                                 }]
                             }
-                            */
                         ],
                         listeners: {
                             itemdblclick: {
@@ -461,6 +459,13 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         scope: 'controller'
                                     }
                                 }
+                            },{
+                                xtype: 'button',
+                                glyph: 'f1c3@FontAwesome5FreeSolid',
+                                text: me.strings.export,
+                                listeners: {
+                                    click: me.onTmExportClick
+                                }
                             }
                         ]
                     }
@@ -509,12 +514,24 @@ Ext.define('Editor.view.admin.customer.Panel', {
     /***
      * On export action column click handler
      */
-    onTmExportClick:function(view, cell, row, col, ev, evObj) {
-        var row = view.getStore().getAt(row);
-        if(!row){
-            return;
+    onTmExportClick:function(view, cell, row, col, ev, record) {
+        var me=this.up('customerPanel');
+        me.exportCustomerResourceUsage(record && record.get('id'));
+    },
+    
+    /***
+     * Generate excel for resource usage for the given customer. If the customer is not defined,
+     * summ excel for all customers will be generated.
+     */
+    exportCustomerResourceUsage:function(id){
+        var me = this,
+            params = {},
+            method = 'POST',
+            url = Editor.data.restpath+'customer/exportresource';
+        if(id){
+            url=url+'?'+Ext.urlEncode({customerId: id});
         }
-        //TODO: implement me
+        window.open(url); 
     }
 
 });

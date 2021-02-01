@@ -124,18 +124,13 @@ class editor_Services_Connector {
         $serviceResult = null;
         //if the batch query is enabled, get the results from the cache
         if($this->batchQuery && $this->adapter->isBatchQuery()){
-            //TODO: why just not return the result ? If batch query returns no result
-            //then there are no result for this query, no need to query again
-            return $this->getCachedResult($segment);
-            //$serviceResult = $this->getCachedResult($segment);
+            $serviceResult = $this->getCachedResult($segment);
+        }else{
+            $serviceResult = $this->adapter->query($segment);
         }
-        //if there is no service results, try the query
-        //TODO: this make no sence ? Why is this check inplemented
-//         if(!empty($serviceResult)){
-//             return $serviceResult;
-//         }
-        $serviceResult = $this->adapter->query($segment);
-        if(!empty($serviceResult)){
+        //log the MT ussage when there are mt results
+        //Info: for loggin TM results, the result is logged only when the result is used (segment save/update , matchrate >=100)
+        if(!empty($serviceResult) && $this->isMtAdapter()){
             $this->logAdapterUsage($segment, self::REQUEST_SOURCE_EDITOR);
         }
         $this->adapter->logForSegment($segment);
@@ -161,9 +156,11 @@ class editor_Services_Connector {
      */
     protected function _translate(string $searchString){
         //instant translate calls are always with out tags
-        $searchString = strip_tags($searchString);
+        $searchString = trim(strip_tags($searchString));
         $serviceResult = $this->adapter->translate($searchString);
-        if(!empty($serviceResult)){
+        //log the instant translate results, when the adapter is of mt type or when the result set
+        //contains result with matchrate >=100
+        if(!empty($serviceResult) && ($this->isMtAdapter() || $serviceResult->has100PercentMatch())){
             $this->logAdapterUsage($searchString, self::REQUEST_SOURCE_INSTANT_TRANSLATE);
         }
         return $serviceResult;
@@ -282,19 +279,15 @@ class editor_Services_Connector {
      * @param mixed $queryString
      * @param string $requestSource
      */
-     public function logAdapterUsage($querySource,$requestSource){
-        //use the logger only for MT resoruces
-        if($this->adapter->getLanguageResource()->getResourceType()!=editor_Models_Segment_MatchRateType::TYPE_MT){
-            return;
-        }
-        $mtlogger=ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageLogger');
-        /* @var $mtlogger editor_Models_LanguageResources_MtUsageLogger */
+    public function logAdapterUsage($querySource,$requestSource){
+        $mtlogger=ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
+        /* @var $mtlogger editor_Models_LanguageResources_UsageLogger */
         $mtlogger->setLanguageResourceId($this->adapter->getLanguageResource()->getId());
         $mtlogger->setSourceLang($this->sourceLang);
         $mtlogger->setTargetLang($this->targetLang);
         
         $logQueryString =$this->toLogQueryString($querySource);
-        
+
         $mtlogger->setQueryString($logQueryString);
         $mtlogger->setRequestSource($requestSource);
         $mtlogger->setTranslatedCharacterCount($this->getCharacterCount($logQueryString));
@@ -364,5 +357,16 @@ class editor_Services_Connector {
         }
         //return with leading and trailing comma so the customers are searchable
         return ','.implode(',', $return).',';
+    }
+
+    /***
+     * Is the current adapter of mt type
+     * @return boolean
+     */
+    protected function isMtAdapter(){
+        if(!isset($this->adapter)){
+            return false;
+        }
+        return $this->adapter->getLanguageResource()->isMt();
     }
 }

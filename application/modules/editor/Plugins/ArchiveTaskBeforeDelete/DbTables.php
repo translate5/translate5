@@ -66,7 +66,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_languageresources_customerassoc' => false,
             'LEK_languageresources_languages' => false,
             'LEK_languageresources_log' => false,
-            'LEK_languageresources_mt_usage_log' => false,
+            'LEK_languageresources_usage_log' => false,
             'LEK_languageresources_taskassoc' => false,
             'LEK_languageresources' => false,
             'LEK_match_analysis' => 'taskGuid',

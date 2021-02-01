@@ -45,22 +45,44 @@ END LICENSE AND COPYRIGHT
  * @method string getCustomers() getCustomers()
  * @method void setCustomers() setCustomers(string $customerId)
  * 
- * 
  */
-class editor_Models_LanguageResources_MtUsageLogger extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_MtUsageLogger';
-    protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_MtUsageLogger';
+class editor_Models_LanguageResources_UsageLogger extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_UsageLogger';
+    protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_UsageLogger';
     
     
-    public function loadByCustomer($customerId){
+    /***
+     * Load all usage log data for given customer. If the customer is not provided,
+     * the data for all customers will be loaded.
+     * The result array will contain the field charactersPerCustomer -> characters for the request devided by the number of customers for the request
+     * @param int $customerId
+     * @return array
+     */
+    public function loadByCustomer(int $customerId = null) : array{
         $s=$this->db->select()
-        ->from(array("ul" => "LEK_languageresources_mt_usage_log"), array("ul.*"))
         ->setIntegrityCheck(false)
-        ->join(array("lr" => "LEK_languageresources"),"lr.id = ul.languageResouceId","lr.name AS languageResourceName","lr.serviceName AS serviceName")
-        ->where('customers LIKE %,?,%',$this->db->getAdapter()->quote($customerId));
+        ->from(['log'=>'LEK_languageresources_usage_log'],[
+            'lr.name AS langageResourceName',
+            'lr.resourceType AS langageResourceType',
+            'log.sourceLang',
+            'log.targetLang',
+            'log.timestamp',
+            'log.customers',
+            //devide the row characters count with the number of assigned characters for the row. This field represents characters per customer
+            'ROUND((log.translatedCharacterCount  / (CHAR_LENGTH(TRIM( BOTH  "," FROM  log.customers )) - CHAR_LENGTH(REPLACE(log.customers, ",", "")) + 1))) as charactersPerCustomer'
+        ])
+        ->join(["lr"=>"LEK_languageresources"], 'lr.id=log.languageResourceId',[]);
+        if(!empty($customerId)){
+            $s->where('customers LIKE "%,?,%"',$customerId);
+        }
         return $this->db->fetchAll($s)->toArray();
     }
     
+    /***
+     * Saves the current entity and updates the totals for it
+     * {@inheritDoc}
+     * @see ZfExtended_Models_Entity_Abstract::save()
+     */
     public function save() {
         parent::save();
         //update the totals
@@ -71,8 +93,8 @@ class editor_Models_LanguageResources_MtUsageLogger extends ZfExtended_Models_En
      * Update the total sum collection after the current entity is saved.
      */
     protected function updateSumTable() {
-        $sum = ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageSumLogger');
-        /* @var $sum editor_Models_LanguageResources_MtUsageSumLogger */
+        $sum = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageSumLogger');
+        /* @var $sum editor_Models_LanguageResources_UsageSumLogger */
         $sum->updateSumTable($this);
     }
     
@@ -82,12 +104,26 @@ class editor_Models_LanguageResources_MtUsageLogger extends ZfExtended_Models_En
      * @param int $customerId
      */
     public function deleteByCustomer(int $customerId) {
-        $sql = "UPDATE `LEK_languageresources_mt_usage_log` SET `customers` = replace(customers, ',?,', ',')";
+        $sql = "UPDATE `LEK_languageresources_usage_log` SET `customers` = replace(customers, ',?,', ',')";
         $this->db->getAdapter()->query($sql,$customerId);
         $this->db->delete([
             'customers = ? OR customers="," ' => $customerId // Check for empty rows. The above query can leave single , as value
         ]);
         
+    }
+    
+    /**
+     * Remove logs which are older then logLifetime configuration value.
+     * If the config value is empty, nothing is removed
+     * @return boolean
+     */
+    public function removeOldLogs(){
+        $config = Zend_Registry::get('config');
+        $olderThen = $config->runtimeOptions->LanguageResources->usageLogger->logLifetime ?? 0;
+        if(empty($olderThen)){
+            return false;
+        }
+        return $this->db->delete(['timestamp < NOW() - INTERVAL ? DAY'=>$olderThen])>0;
     }
 }
 

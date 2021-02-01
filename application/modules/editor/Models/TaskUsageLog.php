@@ -43,17 +43,34 @@ END LICENSE AND COPYRIGHT
 * @method int getTaskCount() getTaskCount()
 */
 
-class editor_Models_DocumentUsageLog extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = "editor_Models_Db_DocumentUsageLog";
-    protected $validatorInstanceClass = "editor_Models_Validator_DocumentUsageLog";
-    
+class editor_Models_TaskUsageLog extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = "editor_Models_Db_TaskUsageLog";
+    protected $validatorInstanceClass = "editor_Models_Validator_TaskUsageLog";
     
     /***
-     * Update or increse the document count for the current entity.
+     * Load task usage by taskType and customer.
+     * 
+     * @param int $customerId
+     * @param string $taskType
+     * @return array
+     */
+    public function loadByTypeAndCustomer(int $customerId = null,string $taskType = null){
+        $s=$this->db->select()
+        ->from('LEK_task_usage_log',['customerId','sourceLang','targetLang','yearAndMonth','taskCount']);
+        if(!empty($customerId)){
+            $s->where('customerId = ?',$customerId);
+        }
+        if(!empty($taskType)){
+            $s->where('taskType = ?',$taskType);
+        }
+        return $this->db->fetchAll($s)->toArray();
+    }
+    /***
+     * Update or increse the task count for the current entity.
      * The unique key is: taskType, customerId and yearAndMonth
      */
-    public function updateInsertDocumentCount() {
-        $sql = "INSERT INTO LEK_documents_usage_log (taskType, sourceLang, targetLang, customerId, yearAndMonth,taskCount)
+    public function updateInsertTaskCount() {
+        $sql = "INSERT INTO LEK_task_usage_log (taskType, sourceLang, targetLang, customerId, yearAndMonth,taskCount)
                 VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE taskCount=taskCount+1;";
         $this->db->getAdapter()->query($sql,[
             $this->getTaskType(),

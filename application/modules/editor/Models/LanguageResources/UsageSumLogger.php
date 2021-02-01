@@ -47,18 +47,58 @@ END LICENSE AND COPYRIGHT
 * @method int getTotalCharacters() getTotalCharacters()
 */
 
-class editor_Models_LanguageResources_MtUsageSumLogger extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = "editor_Models_Db_LanguageResources_MtUsageSumLogger";
-    protected $validatorInstanceClass = "editor_Models_Validator_LanguageResources_MtUsageSumLogger";
-    
+class editor_Models_LanguageResources_UsageSumLogger extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = "editor_Models_Db_LanguageResources_UsageSumLogger";
+    protected $validatorInstanceClass = "editor_Models_Validator_LanguageResources_UsageSumLogger";
     
     /***
-     * Update sum record for given mt usage log entry. For each customer in the $log entry, separate
+     * Load resource resources and year month summary log data
+     * @param int $customerId
+     * @return array
+     */
+    public function loadMonthlySummaryByResource(int $customerId = null) : array {
+        $fields = [
+            'log.langageResourceType',
+            'log.sourceLang',
+            'log.targetLang',
+            'log.yearAndMonth',
+            'SUM(log.totalCharacters) AS totalCharacters'
+        ];
+        if(!empty($customerId)){
+            array_unshift($fields,'log.customerId');
+        }
+        $s=$this->db->select()
+        ->from(['log'=>'LEK_languageresources_usage_log_sum'],[
+            'log.customerId',
+            'log.langageResourceName',
+            'log.langageResourceType',
+            'log.sourceLang',
+            'log.targetLang',
+            'log.yearAndMonth',
+            'SUM(log.totalCharacters) AS totalCharacters'
+        ]);
+        if(!empty($customerId)){
+            $s->where('log.customerId = ?',$customerId);
+        }
+        $s->group(['log.customerId','log.langageResourceId','log.yearAndMonth']);
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    public function loadByCustomer(int $customerId = null) : array{
+        $s=$this->db->select();
+        if(!empty($customerId)){
+            $s->where('customerId == ?',$customerId);
+        }
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /***
+     * Update sum record for given resource usage log entry. For each customer in the $log entry, separate
      * update/insert is executed (see updateInsertTotalCharacters function)
      * 
-     * @param editor_Models_LanguageResources_MtUsageLogger $log
+     * @param editor_Models_LanguageResources_UsageLogger $log
      */
-    public function updateSumTable(editor_Models_LanguageResources_MtUsageLogger $log) {
+    public function updateSumTable(editor_Models_LanguageResources_UsageLogger $log) {
         //for each customer, we update separate row
         $customers = explode(',',$log->getCustomers());
         $customers = array_filter($customers);
@@ -95,7 +135,7 @@ class editor_Models_LanguageResources_MtUsageSumLogger extends ZfExtended_Models
      * already exist, the total characters will be added to the current row characters.
      */
     public function updateInsertTotalCharacters() {
-        $sql = "INSERT INTO LEK_languageresources_mt_usage_log_sum (langageResourceId, langageResourceName, langageResourceType, sourceLang, targetLang, customerId, yearAndMonth, totalCharacters) 
+        $sql = "INSERT INTO LEK_languageresources_usage_log_sum (langageResourceId, langageResourceName, langageResourceType, sourceLang, targetLang, customerId, yearAndMonth, totalCharacters) 
                 VALUES (?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE totalCharacters=totalCharacters+?;";
         $this->db->getAdapter()->query($sql,[
             $this->getLangageResourceId(),
