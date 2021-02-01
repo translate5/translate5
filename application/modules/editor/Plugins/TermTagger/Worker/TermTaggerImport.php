@@ -137,6 +137,13 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
+        
+        // Equal Languages from source & target: prevent the termtagger to process and add further workers
+        if(static::isSourceAndTargetLanguageEqual($this->task)){
+            $this->logger->error('E1326', 'TermTagger can not work when source and target language are equal.', ['task' => $this->task]);
+            return false;
+        }
+        
         $taskGuid = $this->workerModel->getTaskGuid();
         $segmentIds = $this->loadUntaggedSegmentIds();
         

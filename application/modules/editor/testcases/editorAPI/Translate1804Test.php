@@ -110,9 +110,6 @@ class Translate1804Test extends \ZfExtended_Test_ApiTestcase {
     /**
      * tests the export results
      * @depends testSegmentValuesAfterImport
-     * @param stdClass $task
-     * @param string $exportUrl
-     * @param string $fileToCompare
      */
     public function testExport() {
         self::$api->login('testmanager');

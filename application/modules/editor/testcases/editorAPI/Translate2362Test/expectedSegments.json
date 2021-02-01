@@ -1,0 +1,29 @@
+[
+    {
+        "segmentNrInTask": "1",
+        "mid": "1_1",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
+        "editable": "1",
+        "pretrans": "0",
+        "matchRate": "0",
+        "matchRateType": "import;none",
+        "qmId": null,
+        "stateId": "0",
+        "autoStateId": "0",
+        "fileOrder": "0",
+        "comments": null,
+        "workflowStepNr": "0",
+        "workflowStep": null,
+        "source": "Dies <div class=\"open 7374726f6e672069643d2231323322 internal-tag ownttip\"><span title=\"&lt;strong id=&quot;123&quot;&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;strong id=&quot;123&quot;&gt;<\/span><\/div>ist &lt; ein<div class=\"close 2f7374726f6e67 internal-tag ownttip\"><span title=\"&lt;\/strong&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;\/strong&gt;<\/span><\/div> \"Test\" &amp; Cool. <div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Non breaking space\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div>",
+        "sourceMd5": "51574741a4435c8587109f9442e68f95",
+        "sourceToSort": "Dies ist &lt; ein \"Test\" &amp; Cool. ",
+        "target": "This <div class=\"open 7374726f6e672069643d2231323322 internal-tag ownttip\"><span title=\"&lt;strong id=&quot;123&quot;&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;strong id=&quot;123&quot;&gt;<\/span><\/div>is &lt; a<div class=\"close 2f7374726f6e67 internal-tag ownttip\"><span title=\"&lt;\/strong&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;\/strong&gt;<\/span><\/div> \"test\" &amp; cool. <div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Non breaking space\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div>",
+        "targetMd5": "0be1d7cfc2563257bd4828661745eb4d",
+        "targetToSort": "This is &lt; a \"test\" &amp; cool. ",
+        "targetEdit": "This <div class=\"open 7374726f6e672069643d2231323322 internal-tag ownttip\"><span title=\"&lt;strong id=&quot;123&quot;&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;strong id=&quot;123&quot;&gt;<\/span><\/div>is &lt; a<div class=\"close 2f7374726f6e67 internal-tag ownttip\"><span title=\"&lt;\/strong&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;\/strong&gt;<\/span><\/div> \"test\" &amp; cool. <div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Non breaking space\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div>",
+        "targetEditToSort": "This is &lt; a \"test\" &amp; cool. ",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":28}}}}",
+        "isWatched": false
+    }
+]
