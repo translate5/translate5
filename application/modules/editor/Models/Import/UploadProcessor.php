@@ -37,6 +37,7 @@ class editor_Models_Import_UploadProcessor {
      * @var string
      */
     const FIELD_TBX = 'importTbx';
+    const FIELD_CONFIG = 'taskConfig';
 
     const ERROR_INVALID_FILE = 'noValidUploadFile';
     const ERROR_EMPTY_FILE = 'emptyUploadFile';
@@ -84,6 +85,9 @@ class editor_Models_Import_UploadProcessor {
 
         //add the optional TBX file
         self::addUploadProcessor(ZfExtended_Factory::get('editor_Models_Import_UploadProcessor_GenericUpload', [self::FIELD_TBX]));
+        
+        //add the optional Task Config File
+        self::addUploadProcessor(ZfExtended_Factory::get('editor_Models_Import_UploadProcessor_GenericUpload', [self::FIELD_CONFIG]));
 
         //examples for adding relais and reference files to single upload too
         //$config = Zend_Registry::get('config')->runtimeOptions->import;
