@@ -79,6 +79,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         'ph' => 'x',
         'st' => 'x',
         'mrk' => 'mrk',
+        'pairedTag' => 'pairedTag'
         );
 
     /**
@@ -124,8 +125,10 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         //add sdlxliff tagMapping
         $this->addSldxliffTagMappings();
         parent::__construct($path, $fileName, $fileId, $task);
+//         if(!empty($this->html5Tags)){
+//             $this->_tagDefMapping = array_merge($this->_tagDefMapping,array_combine($this->html5Tags, $this->html5Tags));
+//         }
         $this->initImageTags();
-        $this->initHelper();
         $this->checkForSdlChangeMarker();
         $this->prepareTagMapping();
         $this->readCxtMetaDefinitions();
@@ -275,6 +278,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             //reduziere
             $groupLevel = $groupLevel - substr_count($units[0], '</group>');
             for ($i = 1; $i < $count; $i++) {
+                //TODO: find content with mrk tag in it!!!!
                 $translate = $translateGroupLevels[$groupLevel];
                 if (preg_match('"^[^<>]*translate=\"no\""i', $units[$i])) {
                     $translate = false;
@@ -677,9 +681,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @return string $segment enthält anstelle der Tags die vom JS benötigten Replacement-Tags
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */
-    protected function parseSegment($segment,$isSource) {
-        $segment = $this->parseSegmentProtectWhitespace($segment);
-        if (strpos($segment, '<')=== false) {
+    protected function parseSegment($segment,$isSource): string {
+        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function($text){
+            return $this->utilities->whitespace->protectWhitespace($text);
+        });
+        if (strpos($segment, '<') === false) {
             return $segment;
         }
         $segment = $this->parseSegmentUnifyInternalTags($segment);
@@ -801,21 +807,19 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $tag = &$data->segment[$data->i];
         $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
 
-        $whitespaceTags = ['hardReturn' , 'softReturn', 'macReturn', 'space', 'char', 'tab'];
+        $whitespaceTags = ['hardReturn' , 'softReturn', 'macReturn', 'space', 'char', 'tab', 'protectedTag'];
         if (in_array($tagName, $whitespaceTags)) {
             //tagtrait is working with shortTagIdent internally, so we have to feed it here
             $this->shortTagIdent = $data->j++;
-            $tag = $this->whitespaceTagReplacer($tag);
+            $tag = $this->replacePlaceholderTags($tag);
             return $data;
         }
         $this->verifyTagName($tagName, $data);
         $tagId = $this->parseSegmentGetTagId($tag, $tagName);
         $shortTagIdent = $data->j;
-        $locked = false;
         if (strpos($tagId, 'locked')!== false) {
             $this->setLockedTagContent($tag, $tagId);
             $shortTagIdent = 'locked' . $data->j;
-            $locked = true;
         }
 
         //generate the html tag for the editor

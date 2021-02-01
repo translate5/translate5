@@ -121,6 +121,11 @@ abstract class editor_Models_Import_FileParser {
     protected $config;
     
     /**
+     * @var editor_Models_Segment_UtilityBroker
+     */
+    protected $utilities;
+    
+    /**
      * returns the file extensions (in lower case) parsable by this fileparser
      * @return array;
      */
@@ -150,6 +155,7 @@ abstract class editor_Models_Import_FileParser {
      */
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task){
         $this->config = $task->getConfig();
+        
         $this->loadOriginalFile($path);
         $this->_path = $path;
         $this->_fileName = $fileName;
@@ -159,6 +165,8 @@ abstract class editor_Models_Import_FileParser {
         $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         $this->matchRateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
         $this->updateFile(get_class($this));
+        
+        $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
     }
     
     /**
@@ -356,7 +364,9 @@ abstract class editor_Models_Import_FileParser {
      * @return string encoding | false if encoding is none of utf-8, 'iso-8859-1', 'windows-1251'
      */
     protected function checkAndConvert2utf8() {
-        if(mb_detect_encoding($this->_origFile, 'UTF-8', true))return 'UTF-8';
+        if(mb_detect_encoding($this->_origFile, 'UTF-8', true)) {
+            return 'UTF-8';
+        }
         
         $list = array('iso-8859-1', 'windows-1251');
      

@@ -53,11 +53,6 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
     protected $hasRestoreErrors = false;
     
     /**
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $internalTag;
-    
-    /**
      * @var editor_Models_Segment_TrackChangeTag
      */
     protected $trackChange;
@@ -72,23 +67,27 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
     protected $tagShortCutSpecialCharMap = [];
     
     /**
+     * @var editor_Models_Segment_UtilityBroker
+     */
+    protected $utilities;
+    
+    /**
      * @var ZfExtended_Logger_Queued
      */
     public $logger;
     
     public function __construct() {
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->trackChange = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         
-        $this->initHelper();
         $this->initImageTags();
         
         $this->logger = ZfExtended_Factory::get('ZfExtended_Logger_Queued');
         
         //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
         $this->xmlparser->registerOther(function($textNode, $key){
-            $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true);
+            $textNode = $this->utilities->whitespace->protectWhitespace($textNode);
             
             //set shortTagIdent of the tagTrait to the next usable number if there are new tags
             $this->shortTagIdent = $this->highestTagShortCutNumber + 1;
@@ -124,7 +123,8 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
      * @return string
      */
     protected function importWhitespaceFromTagLessQuery(string $text): string {
-        $text = $this->whitespaceHelper->protectWhitespace($text, false);
+        $wh = $this->utilities->whitespace;
+        $text = $wh->protectWhitespace($text, $wh::ENTITY_MODE_KEEP);
         return $this->whitespaceTagReplacer($text, $this->tagShortCutSpecialCharMap);
     }
 
@@ -133,8 +133,8 @@ abstract class editor_Services_Connector_TagHandler_Abstract {
         $this->tagShortCutSpecialCharMap = [];
         $qs = $this->trackChange->removeTrackChanges($queryString);
         //restore the whitespaces to real characters
-        $qs = $this->internalTag->restore($qs, true, $this->highestTagShortCutNumber, $this->tagShortCutSpecialCharMap);
-        return $this->whitespaceHelper->unprotectWhitespace($qs);
+        $qs = $this->utilities->internalTag->restore($qs, true, $this->highestTagShortCutNumber, $this->tagShortCutSpecialCharMap);
+        return $this->utilities->whitespace->unprotectWhitespace($qs);
     }
     
     /**
