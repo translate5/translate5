@@ -116,6 +116,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @return integer returns the length of the tag or -1 of no length configured
      */
     public function getLength($tag) {
+        $matches = [];
         if(preg_match('/<span[^>]+data-length="([^"]*)"[^>]+>/', $tag, $matches)) {
             return $matches[1];
         }
@@ -331,20 +332,19 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
             $type = $match[1];
             $shortCutNr = $this->getTagNumber($match[0]);
             switch($type) {
-                case 'single':
-                    $result = sprintf('<excel %s />', $shortCutNr);
-                    $resultId = sprintf('<%s />', $shortCutNr);
-                    break;
-                
                 case 'open':
                     $result = sprintf('<excel %s>', $shortCutNr);
                     $resultId = sprintf('<%s>', $shortCutNr);
                     break;
-                
                 case 'close':
                     $result = sprintf('<excel /%s>', $shortCutNr);
                     $resultId = sprintf('</%s>', $shortCutNr);
-                break;
+                    break;
+                case 'single':
+                default:
+                    $result = sprintf('<excel %s />', $shortCutNr);
+                    $resultId = sprintf('<%s />', $shortCutNr);
+                    break;
             }
             
             $replaceMap[$resultId] = [$resultId, $match[0]];
@@ -628,5 +628,14 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     public function getTagNumbers(array $tags) {
         return array_map([$this, 'getTagNumber'], $tags);
+    }
+
+    /**
+     * Encodes a raw tag so that it can be stored internally
+     * @param string $originalTag
+     * @return string
+     */
+    public static function encodeTagContent(string $originalTag): string {
+        return implode('', unpack('H*', $originalTag));
     }
 }
