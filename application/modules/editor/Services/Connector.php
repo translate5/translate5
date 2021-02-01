@@ -203,10 +203,11 @@ class editor_Services_Connector {
             return $status;
         }
         
-        if(empty($toThrow)) {
-            $toThrow = new BadMethodCallException('Method '.$method.' does not exist in '.__CLASS__.' or its adapter.');
+        if(!empty($toThrow)) {
+            throw $toThrow;
         }
-        throw $toThrow;
+        
+        //do nothing if the method does not exist in the underyling adapter.
     }
     
     /**
