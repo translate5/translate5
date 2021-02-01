@@ -93,10 +93,13 @@ class Editor_CustomerController extends ZfExtended_RestController {
         }
     }
     
-    public function exportAction(){
+    /***
+     * Export language resources usage as excel document
+     */
+    public function exportresourceAction(){
         $customerId = $this->getRequest()->getParam('customerId',null);
-        $export = ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageExporter');
-        /* @var $export editor_Models_LanguageResources_MtUsageExporter */
+        $export = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageExporter');
+        /* @var $export editor_Models_LanguageResources_UsageExporter */
         $export->excel($customerId);
     }
     

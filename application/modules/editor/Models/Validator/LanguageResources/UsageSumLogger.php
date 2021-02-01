@@ -27,7 +27,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Db_DocumentUsageLog extends Zend_Db_Table_Abstract {
-    protected $_name  = "LEK_documents_usage_log";
-    public $_primary = "id";
+class editor_Models_Validator_LanguageResources_UsageSumLogger extends ZfExtended_Models_Validator_Abstract {
+    protected function defineValidators() {
+        $this->addValidator("id", "int");
+        $this->addValidator("langageResourceId", "int");
+        $this->addValidator("langageResourceName","stringLength", array("min" => 1, "max" => 1024));
+        $this->addValidator("langageResourceType","stringLength", array("min" => 1, "max" => 45));
+        $this->addValidator("sourceLang", "int");
+        $this->addValidator("targetLang", "int");
+        $this->addValidator("customerId", "int");
+        $this->addValidator("yearAndMonth","stringLength", array("min" => 1, "max" => 45));
+        $this->addValidator("totalCharacters", "int");
+    }
 }

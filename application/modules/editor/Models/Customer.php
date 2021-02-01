@@ -91,8 +91,8 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     public function delete() {
         $customerId = $this->getId();
         parent::delete();
-        $logger = ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageLogger');
-        /* @var $logger editor_Models_LanguageResources_MtUsageLogger */
+        $logger = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
+        /* @var $logger editor_Models_LanguageResources_UsageLogger */
         //remove the log data for the deleted customer
         $logger->deleteByCustomer($customerId);
     }

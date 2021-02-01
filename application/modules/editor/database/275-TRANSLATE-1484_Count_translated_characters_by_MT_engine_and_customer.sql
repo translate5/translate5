@@ -25,7 +25,10 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-CREATE TABLE `LEK_languageresources_mt_usage_log_sum` (
+ALTER TABLE `LEK_languageresources_mt_usage_log` 
+RENAME TO `LEK_languageresources_usage_log` ;
+
+CREATE TABLE `LEK_languageresources_usage_log_sum` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `langageResourceId` int(11) NOT NULL,
   `langageResourceName` varchar(1024) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -37,21 +40,21 @@ CREATE TABLE `LEK_languageresources_mt_usage_log_sum` (
   `totalCharacters` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `monthlySummaryKey` (`langageResourceId`,`sourceLang`,`targetLang`,`customerId`,`yearAndMonth`),
-  KEY `fk_LEK_languageresources_mt_usage_log_sum_1_idx` (`customerId`),
-  CONSTRAINT `fk_LEK_languageresources_mt_usage_log_sum_customer` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `fk_LEK_languageresources_usage_log_sum_1_idx` (`customerId`),
+  CONSTRAINT `fk_LEK_languageresources_resource_usage_log_sum_customer` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-ALTER TABLE `LEK_languageresources_mt_usage_log` 
-ADD INDEX `fk_LEK_languageresources_mt_usage_log_1_idx` (`languageResourceId` ASC);
-ALTER TABLE `LEK_languageresources_mt_usage_log` 
-ADD CONSTRAINT `fk_LEK_languageresources_mt_usage_log_1`
+ALTER TABLE `LEK_languageresources_usage_log` 
+ADD INDEX `fk_LEK_languageresources_usage_log_1_idx` (`languageResourceId` ASC);
+ALTER TABLE `LEK_languageresources_usage_log` 
+ADD CONSTRAINT `fk_LEK_languageresources_usage_log_1`
   FOREIGN KEY (`languageResourceId`)
   REFERENCES `LEK_languageresources` (`id`)
   ON DELETE CASCADE
   ON UPDATE CASCADE;
   
   
-CREATE TABLE `LEK_documents_usage_log` (
+CREATE TABLE `LEK_task_usage_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `taskType` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   `sourceLang` int(11) NOT NULL,
@@ -60,7 +63,14 @@ CREATE TABLE `LEK_documents_usage_log` (
   `yearAndMonth` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   `taskCount` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `document_type_count` (`taskType`,`customerId`,`yearAndMonth`),
+  UNIQUE KEY `task_type_count` (`taskType`,`customerId`,`yearAndMonth`),
   KEY `fk_customer_idx` (`customerId`),
   CONSTRAINT `fk_customer` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) 
+VALUES ('runtimeOptions.LanguageResources.usageLogger.logLifetime', '1', 'editor', 'system', '', '30', '', 'integer', 'How many days the resource usage logs will be keeped in the database.', '2', 'Resource usage log lifetime', 'Language resources', '');
+
+INSERT INTO `LEK_workflow_action` (`workflow`, `trigger`, `actionClass`, `action`) 
+VALUES ('default', 'doCronPeriodical', 'editor_Workflow_Actions', 'removeOldConnectorUsageLog');
+

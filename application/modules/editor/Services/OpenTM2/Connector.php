@@ -546,7 +546,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $fuzzyLanguageResourceName = $this->renderFuzzyLanguageResourceName($this->languageResource->getName(), $analysisId);
         $fuzzyLanguageResource->setName($fuzzyLanguageResourceName);
         $fuzzyLanguageResource->addSpecificData('fileName', $fuzzyFileName);
-        $fuzzyLanguageResource->setId(null);
+        //TODO: why we set the id to null ? This makes the fuzzy language resource in the adapter unusable
+        //$fuzzyLanguageResource->setId(null);
         
         $connector = ZfExtended_Factory::get(get_class($this));
         /* @var $connector editor_Services_Connector */
