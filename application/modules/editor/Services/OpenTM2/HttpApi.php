@@ -396,11 +396,17 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
             'xml:lang="mn-MN"',
             'xml:lang="hi"',
             'xml:lang="hi-IN"',
+            'xml:lang="de-CH"',
+            'xml:lang="fr-CH"',
+            'xml:lang="it-CH"',
         ],[
             'xml:lang="ru"',
             'xml:lang="ru-RU"',
             'xml:lang="ar"',
             'xml:lang="ar"',
+            'xml:lang="de"',
+            'xml:lang="fr"',
+            'xml:lang="it"',
         ],$tmData);
     }
     
@@ -439,6 +445,30 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
                 ],[
                     'xml:lang="hi-IN"',
                     '<prop type="tmgr:language">HINDI</prop>'
+                ], $tmData);
+            case 'de-CH':
+                return str_replace([
+                    'xml:lang="de"',
+                    '<prop type="tmgr:language">GERMAN</prop>'
+                ],[
+                    'xml:lang="de-CH"',
+                    '<prop type="tmgr:language">SWISS GERMAN</prop>'
+                ], $tmData);
+            case 'fr-CH':
+                return str_replace([
+                    'xml:lang="fr"',
+                    '<prop type="tmgr:language">FRENCH</prop>'
+                ],[
+                    'xml:lang="fr-CH"',
+                    '<prop type="tmgr:language">SWISS FRENCH</prop>'
+                ], $tmData);
+            case 'it-CH':
+                return str_replace([
+                    'xml:lang="it"',
+                    '<prop type="tmgr:language">ITALIAN</prop>'
+                ],[
+                    'xml:lang="it-CH"',
+                    '<prop type="tmgr:language">SWISS ITALIAN</prop>'
                 ], $tmData);
             default:
                 break;
