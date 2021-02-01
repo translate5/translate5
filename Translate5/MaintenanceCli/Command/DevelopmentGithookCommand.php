@@ -111,6 +111,7 @@ class DevelopmentGithookCommand extends Translate5AbstractCommand
             if(preg_match('/\.phtml$/i', $line)) {
                 $this->io->warning([
                     'PHTML file modified!',
+                    'File: '.$line,
                     'Inform client-specific users about the change if needed (via special release note in issue)!',
                     'Consider implementing a precondition check or alter script which checks for the existence of your change in the client-specific overwrite!'
                 ]);
@@ -142,7 +143,7 @@ class DevelopmentGithookCommand extends Translate5AbstractCommand
                 $this->io->error('Wrong charset "'.$charset.'" used instead of utf8mb4 in file '.$file);
                 $result = false;
             }
-            elseif(stripos($part, ' collate ') === false) {
+            elseif(stripos($part, ' collate ') === false && stripos($part, ' collate=') === false) {
                 $this->io->error(['A charset '.$charset.' was provided but the collation is missing.', 'Provide both or omit both!','Alter file: '.$file]);
                 $result = false;
             }
