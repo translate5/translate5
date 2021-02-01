@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -113,7 +113,12 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
         $sql="INSERT INTO LEK_task_config(taskGuid,name,value) ".
             " VALUES (?,?,?) ".
             " ON DUPLICATE KEY UPDATE value = ? ";
-        return $this->db->getAdapter()->query($sql,[$taskGuid,$name,$value,$value]);
+        try {
+            return $this->db->getAdapter()->query($sql,[$taskGuid,$name,$value,$value]);
+        }
+        catch (Zend_Db_Statement_Exception $e) {
+            $this->handleIntegrityConstraintException($e);
+        }
     }
     
     /***
@@ -123,8 +128,8 @@ class editor_Models_TaskConfig extends ZfExtended_Models_Entity_Abstract {
      */
     public function cloneTaskConfig(string $odlTaskGuid, string $newTaskGuid) {
         $adapter = $this->db->getAdapter();
-        $sql = "INSERT INTO LEK_task_config (taskGuid, name, value) 
-        SELECT ".$adapter->quote($newTaskGuid).", name, value 
+        $sql = "INSERT INTO LEK_task_config (taskGuid, name, value)
+        SELECT ".$adapter->quote($newTaskGuid).", name, value
         FROM  LEK_task_config WHERE taskGuid = ".$adapter->quote($odlTaskGuid)."; ";
         $adapter->query($sql);
     }

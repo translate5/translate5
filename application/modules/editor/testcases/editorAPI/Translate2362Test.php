@@ -4,7 +4,7 @@ START LICENSE AND COPYRIGHT
 
  This file is part of translate5
  
- Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ Copyright (c) 2013 - 2021 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
@@ -27,34 +27,29 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Testcase for TRANSLATE-1804 Segments containing only 0 are not imported
+ * Testcase for TRANSLATE-2362 Mixing XLF id and rid values led to wrong tag numbering
+ * For details see the issue.
  */
-class Translate1804Test extends \ZfExtended_Test_ApiTestcase {
+class Translate2362Test extends \ZfExtended_Test_ApiTestcase {
     public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(get_called_class());
-        
-        //$api->xdebug = true;
+        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
-            'sourceLang' => 'en',
-            'targetLang' => 'de',
+            'sourceLang' => 'de',
+            'targetLang' => 'en',
             'edit100PercentMatch' => true,
             'lockLocked' => 1,
         );
         
         $appState = self::assertAppState();
+
         self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig should not be activated for this test case!');
         self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology should not be activated for this test case!');
         
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         
-        $tests = array(
-            'runtimeOptions.import.xlf.preserveWhitespace' => 0,
-        );
-        self::$api->testConfig($tests);
-        
-        $zipfile = $api->zipTestFiles('testfiles/','XLF-test.zip');
+        $zipfile = $api->zipTestFiles('testfiles/','testTask.zip');
         
         $api->addImportFile($zipfile);
         $api->import($task);
@@ -75,41 +70,36 @@ class Translate1804Test extends \ZfExtended_Test_ApiTestcase {
     public function testSegmentValuesAfterImport() {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
         
-        //we need a copy of the segmentIds, since removeUntestableSegmentContent would remove them
-        $ids = array_column($segments, 'id');
-        
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents($this->api()->getFile('expectedSegments-new.json', null, false), json_encode($data, JSON_PRETTY_PRINT));
-        
+        //file_put_contents($this->api()->getFile('/expectedSegments.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
-        $testContent = '<ins class="trackchanges ownttip" data-usertrackingid="2330" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2020-05-14T12:30:33+02:00">0</ins>';
-        
-        //saving a plain 0
-        $segment = $this->api()->prepareSegmentPut('targetEdit', "0", $ids[3]);
-        $this->api()->requestJson('editor/segment/'.$ids[3], 'PUT', $segment);
-        
-        //saving a 0 with track changes
-        $segment = $this->api()->prepareSegmentPut('targetEdit', $testContent, $ids[4]);
-        $this->api()->requestJson('editor/segment/'.$ids[4], 'PUT', $segment);
-        
-        //saving a plain 0
-        $segment = $this->api()->prepareSegmentPut('targetEdit', "0", $ids[6]);
-        $this->api()->requestJson('editor/segment/'.$ids[6], 'PUT', $segment);
-        //saving a 0 with track changes
-        $segment = $this->api()->prepareSegmentPut('targetEdit', $testContent, $ids[7]);
-        $this->api()->requestJson('editor/segment/'.$ids[7], 'PUT', $segment);
-        
+    }
+    
+    /**
+     * @depends testSegmentValuesAfterImport
+     */
+    public function testSegmentEditing() {
+        //get segment list
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
         
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        //file_put_contents($this->api()->getFile('expectedSegments-edited-new.json', null, false), json_encode($data, JSON_PRETTY_PRINT));
+        //test editing a prefilled segment
+        $segToTest = $segments[0];
         
-        $this->assertEquals(self::$api->getFileContent('expectedSegments-edited.json'), $data, 'Imported segments are not as expected!');
+        $segToTest->targetEdit = str_replace(['cool.', 'is &lt; a'], ['cool &amp; cööler.', 'is &gt; a'], $segToTest->targetEdit);
+        
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit, $segToTest->id);
+        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        
+        //check direct PUT result
+        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
+        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
+        file_put_contents($this->api()->getFile('/expectedSegments-edited.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
+        $this->assertEquals(self::$api->getFileContent('expectedSegments-edited.json'), $data, 'Edited segments are not as expected!');
     }
     
     /**
      * tests the export results
-     * @depends testSegmentValuesAfterImport
+     * @depends testSegmentEditing
      */
     public function testExport() {
         self::$api->login('testmanager');
@@ -117,22 +107,17 @@ class Translate1804Test extends \ZfExtended_Test_ApiTestcase {
         //start task export
         
         $this->api()->request('editor/task/export/id/'.$task->id);
-        //$fileToCompare;
         
         //get the exported file content
         $path = $this->api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
         
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/02-sdlxliff-en-de.sdlxliff');
-        //file_put_contents($this->api()->getFile('export-02-sdlxliff-en-de-new.sdlxliff', null, false), $exportedFile);
-        $expectedResult = $this->api()->getFileContent('export-02-sdlxliff-en-de.sdlxliff');
+        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/TRANSLATE-2362-de-en.xlf');
+        //file_put_contents($this->api()->getFile('export-TRANSLATE-2362-de-en.xlf', null, false), $exportedFile);
+        $expectedResult = $this->api()->getFileContent('export-TRANSLATE-2362-de-en.xlf');
         
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/03-xlf-en-de.xlf');
-        //file_put_contents($this->api()->getFile('export-03-xlf-en-de-new.xlf', null, false), $exportedFile);
-        $expectedResult = $this->api()->getFileContent('export-03-xlf-en-de.xlf');
-        
-        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.sdlxliff');
+        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-TRANSLATE-2362-de-en.xlf');
     }
     
     public static function tearDownAfterClass(): void {

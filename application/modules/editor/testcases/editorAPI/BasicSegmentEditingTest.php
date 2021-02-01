@@ -48,6 +48,11 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         
+        $tests = [
+            'runtimeOptions.import.fileparser.options.protectTags' => 0,
+        ];
+        self::$api->testConfig($tests);
+        
         $api->addImportFile('editorAPI/MainTest/simple-en-de.zip');
         $api->import($task);
         

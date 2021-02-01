@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -34,11 +34,11 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Parsing of transit-files for the import
- * 
+ *
  * Difference to other importers: We do not use placeholders in skeleton-files
  * due to the way beo transit-classes work (they always generate the whole file
  * from a DOM on save)
- * 
+ *
  * this assumes, that there are no nested internal tags in transit
  *
  */
@@ -78,7 +78,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     protected $targetDOM;
     /**
      *
-     * @var ZfExtended_Log 
+     * @var ZfExtended_Log
      */
     protected $log;
     
@@ -95,7 +95,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         
     /**
      * used for parsing of a segment; endTags contains information about endTags found in a segment
-     * @var array 
+     * @var array
      */
     protected $endTags = array();
 
@@ -108,7 +108,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     }
     
     /**
-     * 
+     *
      * @param string $path
      * @param string $fileName
      * @param int $fileId
@@ -117,7 +117,6 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task){
         parent::__construct($path, $fileName, $fileId, $task);
         $this->initImageTags();
-        $this->initHelper();
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         /* @var $meta editor_Models_Segment_Meta */
         $meta->addMeta('transitLockedForRefMat', editor_Models_Segment_Meta::META_TYPE_BOOLEAN, 0, 'defines, if segment is marked in transitFile as locked for translation memory use');
@@ -185,7 +184,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             $this->setMid($segId);
             //segment-id of transit is used as mid and thus used here
             $attributes = $this->createSegmentAttributes($seg->getId());
-            //from transit we support only the matchRate at the moment, rest is default 
+            //from transit we support only the matchRate at the moment, rest is default
             $attributes->matchRate = (int)$seg->getMatchValue();
             $transUnit = array('source'=>$source,'target'=>$target);
             
@@ -221,7 +220,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     /**
      * @param array $transUnit array('source' => DOM_DOCUMENT,'target' => DOM_DOCUMENT)
      * @param string $targetText
-     * @param int $segmentId 
+     * @param int $segmentId
      */
     protected function addCustomSegmentsMeta(editor_Models_Import_FileParser_SegmentAttributes $attributes, editor_Plugins_Transit_Segment $targetseg,string $targetText) {
         if($targetseg->getAccessStatus()===editor_Plugins_Transit_Segment::ACCESS_NO_REFMAT){
@@ -242,7 +241,9 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */
     protected function parseSegment($segment, $isSource){
-        $segment = $this->parseSegmentProtectWhitespace($segment);
+        $segment = editor_Models_Segment_Utility::foreachSegmentTextNode($segment, function($text){
+            return $this->utilities->whitespace->protectWhitespace($text);
+        });
         if (strpos($segment, '<')=== false) {
             return $segment;
         }
@@ -251,14 +252,14 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         
         $segment = $this->parseTags($segment);
         
-        $segment = $this->whitespaceTagReplacer($segment);
+        $segment = $this->replacePlaceholderTags($segment);
         $this->checkForUndefinedTags($segment);
 
         return $segment;
     }
     
     /**
-     * 
+     *
      * @param string $tag
      * @return integer $tagNr | false if not found
      */
@@ -321,7 +322,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     /**
      * new tags should also be added to containsOnlyTagsOrEmpty
      * this assumes, that there are no nested internal tags in transit
-     * 
+     *
      * @param string $segment
      */
     protected function parseTags(string $segment) {
@@ -341,7 +342,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     }
     
     /**
-     * 
+     *
      * @param \QueryPath\DOMQuery $qp
      * @param string $tagName
      */
@@ -364,11 +365,11 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         $dom = $element->ownerDocument;
         $f = $dom->createDocumentFragment();
         $f->appendXML($xml);
-        $dom->documentElement->replaceChild($f, $element);        
+        $dom->documentElement->replaceChild($f, $element);
     }
     
     /**
-     * 
+     *
      * @param \QueryPath\DOMQuery $qp
      * @param string $tagName
      */
@@ -415,7 +416,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
         }
     }
     /**
-     * 
+     *
      * @param string $tag
      * @param string $tagName
      * @return string
@@ -427,7 +428,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     /**
      * checks if there are any tags not covered by parseTags or "Tag"-Tags or
      * "FontTag"-Tags not covered by their methods. Thus has to be placed before
-     * whitespaceTagReplacer() and after all other tag-parsing methods 
+     * whitespaceTagReplacer() and after all other tag-parsing methods
      */
     protected function checkForUndefinedTags(string $segment){
         $segment = preg_replace('/<div[^>]+class="(open|close|single).*?".*?\/div>/is', '', $segment);
@@ -437,7 +438,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     }
     
     /**
-     * 
+     *
      * @param string $tagName
      */
     protected function parseEndTags(string $tagName, string $tag,$transitTagNr){
