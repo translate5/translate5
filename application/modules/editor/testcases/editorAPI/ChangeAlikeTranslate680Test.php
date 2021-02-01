@@ -196,6 +196,7 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         self::assertLogin('testmanager');
         
         $api->addImportArray(self::$dummyData);
+        $api->addFilePlain('taskConfig', 'runtimeOptions.import.fileparser.options.protectTags = 1', 'text/plain', 'task-config.ini');
         $api->import($task);
         
         $task = $api->getTask();
@@ -313,7 +314,7 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
             
         $segmentsAfterChange = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segmentsAfterChange);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/ChangeAlikeTranslate680Test/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        //file_put_contents($this->api()->getFile('/expectedSegments.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
         //In Segment 15 the macReturn is changed correctly to a softReturn, since the whitespace tags belong to the content right now.
         $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
         
@@ -383,7 +384,7 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
                 
         $segmentsAfterChange = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segmentsAfterChange);
-        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/ChangeAlikeTranslate680Test/expectedSegmentsEditedWhitespace-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        //file_put_contents($this->api()->getFile('/expectedSegmentsEditedWhitespace.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
         //In Segment 15 the macReturn is changed correctly to a softReturn, since the whitespace tags belong to the content right now.
         $this->assertEquals(self::$api->getFileContent('expectedSegmentsEditedWhitespace.json'), $data, 'Imported segments are not as expected!');
     }
