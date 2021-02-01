@@ -31,6 +31,67 @@ END LICENSE AND COPYRIGHT
  *
  * For refactoring the import process to a better understandable structure some code is moved into traits to keep refactoring steps small!
  * TODO instead of using this trait the tag creation should go into editor_Models_Import_FileParser_Tag
+ * @deprecated if using this trait add the usage to the following usage list for easier refactoring to above mentioned tag class
+ *
+TagTrait usage:
+./application/modules/editor/PrivatePlugins/Enssner/Import/MiweXlsxFileparser.php:    use editor_Models_Import_FileParser_TagTrait;
+protected $shortTagIdent = 1;
+_singleTag
+$this->initImageTags();
+$this->replacePlaceholderTags()
+$this->getTagParams()
+
+./application/modules/editor/PrivatePlugins/GroupShare/HttpApiTMResult.php:    use editor_Models_Import_FileParser_TagTrait;
+protected $shortTagIdent = 1;
+$this->initImageTags();
+$this->whitespaceTagReplacer
+
+./application/modules/editor/Models/Import/FileParser/Transit.php:    use editor_Models_Import_FileParser_TagTrait;
+protected $shortTagIdent = 1;
+_leftTag
+_rightTag
+_singleTag
+$this->initImageTags();
+$this->replacePlaceholderTags()
+$this->whitespaceTagReplacer()
+$this->getTagParams()
+
+./application/modules/editor/Models/Import/FileParser/Sdlxliff.php:    use editor_Models_Import_FileParser_TagTrait {
+protected $shortTagIdent = 1;
+_leftTag
+_rightTag
+_singleTag
+$this->initImageTags();
+$this->replacePlaceholderTags()
+$this->getTagParams()
+
+./application/modules/editor/Models/Import/FileParser/Csv.php:    use editor_Models_Import_FileParser_TagTrait;
+protected $shortTagIdent = 1;
+_singleTag
+$this->initImageTags();
+$this->replacePlaceholderTags()
+$this->getTagParams()
+
+./application/modules/editor/Models/Import/FileParser/Xlf/ContentConverter.php:    use editor_Models_Import_FileParser_TagTrait;
+protected $shortTagIdent = 1;
+_leftTag
+_rightTag
+_singleTag
+$this->initImageTags();
+$this->replacePlaceholderTags()
+$this->getTagParams()
+
+./application/modules/editor/Models/Import/FileParser/DisplayTextXml.php:    use editor_Models_Import_FileParser_TagTrait;
+protected $shortTagIdent = 1;
+_singleTag
+$this->initImageTags();
+$this->replacePlaceholderTags()
+$this->getTagParams()
+
+./application/modules/editor/Services/Connector/TagHandler/Abstract.php:    use editor_Models_Import_FileParser_TagTrait;
+protected $shortTagIdent = 1;
+$this->initImageTags();
+$this->whitespaceTagReplacer()
  */
 trait editor_Models_Import_FileParser_TagTrait {
     /**
@@ -55,11 +116,6 @@ trait editor_Models_Import_FileParser_TagTrait {
     protected $_singleTag = NULL;
     
     /**
-     * @var editor_Models_Segment_Whitespace
-     */
-    protected $whitespaceHelper;
-    
-    /**
      *
      * @var array
      */
@@ -72,12 +128,6 @@ trait editor_Models_Import_FileParser_TagTrait {
         '#<(space) ts="([^"]*)"( length="([0-9]+)")?/>#',
     ];
     
-    protected function initHelper(){
-        if(empty($this->whitespaceHelper)) {
-            $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
-        }
-    }
-    
     /**
      * to be called in the constructors
      */
@@ -85,6 +135,51 @@ trait editor_Models_Import_FileParser_TagTrait {
         $this->_leftTag = ZfExtended_Factory::get('editor_ImageTag_Left');
         $this->_rightTag = ZfExtended_Factory::get('editor_ImageTag_Right');
         $this->_singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
+    }
+    
+    /**
+     * replaces protected tag placeholder tags with internal tags
+     * @param string $segment
+     * @return string
+     */
+    protected function protectedTagReplacer(string $segment): string {
+        if(strpos($segment, '<protectedTag ') === false) {
+            return $segment;
+        }
+        $shortTagNrMap = [];
+        return preg_replace_callback('#<protectedTag data-type="([^"]*)" data-id="([0-9]+)" data-content="([^"]*)"/>#', function($match) use (&$shortTagNrMap) {
+            $type = $match[1];
+            $id = $match[2];
+            $content = pack('H*', $match[3]);
+            
+            $p = $this->getTagParams($content, 0, $id, htmlspecialchars($content));
+            
+            //generate the html tag for the editor
+            switch ($type) {
+                case 'open':
+                    $p['shortTag'] = $this->shortTagIdent++;
+                    $shortTagNrMap[$id] = $p['shortTag'];
+                    return $this->_leftTag->getHtmlTag($p);
+                case 'close':
+                    //on tag protection it is ensured that tag pairs are wellformed, so on close we can rely that open nr exists:
+                    $p['shortTag'] = $shortTagNrMap[$id];
+                    return $this->_rightTag->getHtmlTag($p);
+                case 'single':
+                default:
+                    $p['shortTag'] = $this->shortTagIdent++;
+                    return $this->_singleTag->getHtmlTag($p);
+            }
+        }, $segment);
+    }
+    
+    /**
+     * replaces the placeholder tags (<protectedTag> / <hardReturn> / <char> / <space> etc) with an internal tag
+     * @param string $segment
+     * @param array $tagShortcutNumberMap shorttag numbers can be provided from outside (needed for language resource usage)
+     * @return string
+     */
+    protected function replacePlaceholderTags($segment, array $tagShortcutNumberMap = []) {
+        return $this->whitespaceTagReplacer($this->protectedTagReplacer($segment), $tagShortcutNumberMap);
     }
     
     /**
@@ -96,7 +191,7 @@ trait editor_Models_Import_FileParser_TagTrait {
     protected function whitespaceTagReplacer($segment, array $tagShortcutNumberMap = []) {
         //$tagShortcutNumberMap must be given explicitly here as non referenced variable from outside,
         // so that each call of the whitespaceTagReplacer function has its fresh list of tag numbers
-        return preg_replace_callback($this->whitespaceTagList, function($match) use (&$tagShortcutNumberMap) {
+        return preg_replace_callback($this->whitespaceTagList, function($match) use (&$tagShortcutNumberMap, $segment) {
             $tag = $match[0];
             $tagName = $match[1];
             $cls = ' '.$tagName;
@@ -110,6 +205,7 @@ trait editor_Models_Import_FileParser_TagTrait {
             }
             $title = '&lt;'.$shortTagNumber.'/&gt;: ';
             
+            
             //if there is no length attribute, use length = 1
             if(empty($match[3])) {
                 $length = 1;
@@ -117,6 +213,7 @@ trait editor_Models_Import_FileParser_TagTrait {
             else {
                 $length = $match[4]; //else use the stored length value
             }
+            
             //generate the html tag for the editor
             switch ($match[1]) {
                 // ↵    U+21B5      e2 86 b5    &crarr;     &#8629;     DOWNWARDS ARROW WITH CORNER LEFTWARDS
@@ -205,30 +302,5 @@ trait editor_Models_Import_FileParser_TagTrait {
             $tag = substr($tag, 1, -1);
         }
         return implode('', unpack('H*', $tag));
-    }
-    
-    /**
-     * protects whitespace inside a segment with a tag
-     *
-     * @param string $segment
-     * @param callable $textNodeCallback callback which is applied to the text node after protecting the whitespace
-     * @return string $segment
-     */
-    protected function parseSegmentProtectWhitespace($segment, callable $textNodeCallback = null) {
-        $split = preg_split('#(<[^\s][^>]+>)#', $segment, null, PREG_SPLIT_DELIM_CAPTURE);
-        
-        $i = 0;
-        foreach($split as $idx => $chunk) {
-            if($i++ % 2 === 1 || strlen($chunk) == 0) {
-                //ignore found tags in the content or empty chunks
-                continue;
-            }
-            
-            $split[$idx] = $this->whitespaceHelper->protectWhitespace($chunk, true);
-            if(!empty($textNodeCallback)) {
-                $split[$idx] = call_user_func($textNodeCallback, $split[$idx]);
-            }
-        }
-        return join($split);
     }
 }

@@ -28,6 +28,15 @@ END LICENSE AND COPYRIGHT
 
 abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_Import_Worker_Abstract {
     
+    /**
+     * This check prevents the termtagger to process any segments to avoid problems with hanging termtagger
+     * see TRANSLATE-2373
+     * @return bool
+     */
+    public static function isSourceAndTargetLanguageEqual(editor_Models_Task $task) : bool {
+        return ($task->getSourceLang() === $task->getTargetLang());
+    }
+    
     const TERMTAGGER_DOWN_CACHE_KEY = 'TermTaggerDownList';
     
     /**
@@ -121,7 +130,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
     protected function validateParameters($parameters = array()) {
         return true;
     }
-    
+
     /**
      * @todo forking should be transfered to ZfExtended_Worker_Abstract to make it usable for other workers.
      * it should be based on maxParallelProcesses instead of just having one running worker per slot. maxParallelProcesses is ignored so far.
@@ -149,6 +158,10 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
             throw new editor_Plugins_TermTagger_Exception_Down('E1131', [
                 'task' => $this->task
             ]);
+        }
+        // in case of equal languages we only need to start one worker
+        if($workerCountToStart > 1 && static::isSourceAndTargetLanguageEqual($this->task)){
+            $workerCountToStart = 1;
         }
         
         for($i=0;$i<$workerCountToStart;$i++){

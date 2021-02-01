@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file original="word/document.xml" source-language="de" target-language="en" datatype="x-undefined">
+<body>
+<trans-unit id="1">
+<source xml:lang="en">Dies &lt;strong id="123"&gt;ist &amp;lt; ein&lt;/strong&gt; &amp;quot;Test&amp;quot; &amp;amp; Cool. &amp;nbsp;</source>
+<seg-source><mrk mid="0" mtype="seg">Dies &lt;strong id="123"&gt;ist &amp;lt; ein&lt;/strong&gt; &amp;quot;Test&amp;quot; &amp;amp; Cool. &amp;nbsp;</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">This &lt;strong id="123"&gt;is &amp;gt; a&lt;/strong&gt; &amp;quot;test&amp;quot; &amp;amp; cool &amp;amp; cööler. &amp;nbsp;</mrk></target>
+</trans-unit>
+</body>
+</file>
+</xliff>
