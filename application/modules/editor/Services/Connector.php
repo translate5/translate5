@@ -154,7 +154,7 @@ class editor_Services_Connector {
      */
     protected function _translate(string $searchString){
         //instant translate calls are always with out tags
-        return $this->adapter->translate(strip_tags($searchString));
+        return $this->adapter->translate(trim(strip_tags($searchString)));
     }
     
     /***
