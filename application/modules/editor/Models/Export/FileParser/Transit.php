@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * @see readme.md in the transit plugin directory!
- * 
+ *
  * Parsed mit editor_Models_Import_FileParser_Transit geparste Dateien für den Export
  */
 class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileParser {
@@ -61,12 +61,12 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
     protected $targetFileName;
     /**
      *
-     * @var DOMDocument 
+     * @var DOMDocument
      */
     protected $sourceDOM;
     /**
      *
-     * @var DOMDocument 
+     * @var DOMDocument
      */
     protected $targetDOM;
     /**
@@ -74,9 +74,15 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
      * @var integer
      */
     protected $currentId;
-    
-    public function __construct(int $fileId, bool $diff,editor_Models_Task $task,string $path) {
-        parent::__construct($fileId, $diff, $task, $path);
+
+    /**
+     * @param editor_Models_Task $task
+     * @param int $fileId
+     * @param string $path
+     * @param array $options
+     */
+    public function __construct(editor_Models_Task $task, int $fileId, string $path, array $options = []) {
+        parent::__construct($task, $fileId, $path, $options);
         $this->targetFileName = basename($path);
         //stand: herausfinden von source-namen anhand des path und speichern der source-Datei im exportfolder
     }
@@ -166,7 +172,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
         //@TODO: setzen der Zielterme des Infofelds, ; prüfen ob im Transit Änderungen und Tags und Infofeld korrekt drin sind - Infofeld auch mit Umlauten und Termen
     }
     /**
-     * 
+     *
      * @param editor_Plugins_Transit_Segment $transitSegment
      * @param int $segId segId from transit-file - identical with mid from db
      */
@@ -194,7 +200,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
     }
     
     /**
-     * 
+     *
      * @return string $extractDir path to dir to which the zip had been extracted
      * @throws Zend_Exception
      */
@@ -219,9 +225,9 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
     }
     
     /**
-     * loads the segment to the given mid, caches a limited count of segments internally 
+     * loads the segment to the given mid, caches a limited count of segments internally
      * to prevent loading again while switching between fields
-     * 
+     *
      * overrides parent, because parent needs id of segment and transit-parser only knows mid
      * @param int $segId as found in untouch transit file - has to be identical with mid of found segment
      * @return editor_Models_Segment
@@ -258,7 +264,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
     }
 
     protected function parseSegment($segment) {
-        //the following line is only necessary, since transit does not support MQM-tags. It can be removed, if this changes. Same is true for the comment in tasks.phtml 
+        //the following line is only necessary, since transit does not support MQM-tags. It can be removed, if this changes. Same is true for the comment in tasks.phtml
         $segment = preg_replace('"<img[^>]*>"','', $segment);
         return parent::parseSegment($segment);
     }
