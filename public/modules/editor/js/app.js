@@ -55,6 +55,7 @@ Ext.Loader.setPath('Editor.plugins', Editor.data.pluginFolder);
 Editor.DATE_ISO_FORMAT = 'Y-m-d H:i:s';
 Editor.DATE_HOUR_MINUTE_ISO_FORMAT = 'Y-m-d H:i';
 Editor.DATEONLY_ISO_FORMAT = 'Y-m-d';
+Editor.DATE_TIME_LOCALIZED_FORMAT = Ext.form.field.Date.prototype.format +' '+ Ext.form.field.Time.prototype.format;//localized date time format
 
 Ext.ClassManager.onCreated(function(className) {
     var boot = Ext.fly('loading-indicator-text');
@@ -548,15 +549,5 @@ Ext.application({
             return row;
         }
         return row.get('value');
-    },
-    
-    /***
-     * Workaround for missing date time localized format
-     */
-    getDateTimeFormat:function(){
-        if(Editor.data.locale == 'de'){
-            return Ext.Date.defaultFormat+' H:i';
-        }
-        return Ext.Date.defaultFormat+' h:i A';
     }
 });

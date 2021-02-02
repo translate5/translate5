@@ -259,9 +259,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 '<td class="">{userName}</td>',
                 '<td class="">{[this.getRole(parent, values)]}</td>',
                 '<td class="">{[this.getState(parent, values)]}</td>',
-                '<td class="">{[Ext.util.Format.date(values.assignmentDate,Editor.app.getDateTimeFormat())]}</td>',
+                '<td class="">{[Ext.util.Format.date(values.assignmentDate,Editor.DATE_TIME_LOCALIZED_FORMAT)]}</td>',
                 '<td class="">{[this.getDeadlineDate(values.deadlineDate)]}</td>',
-                '<td class="">{[Ext.util.Format.date(values.finishedDate,Editor.app.getDateTimeFormat())]}</td>',
+                '<td class="">{[Ext.util.Format.date(values.finishedDate,Editor.DATE_TIME_LOCALIZED_FORMAT)]}</td>',
             '</tr>',
             '</tpl>',
             '</table>',
@@ -284,7 +284,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
                         return '';
                     }
                     if(deadlineDate < new Date()){
-                        return '<span class="redTextColumn">'+Ext.util.Format.date(deadlineDate,Editor.app.getDateTimeFormat())+'</span>';
+                        return '<span class="redTextColumn">'+Ext.util.Format.date(deadlineDate,Editor.DATE_TIME_LOCALIZED_FORMAT)+'</span>';
                     }
                     return Ext.util.Format.date(deadlineDate);
                 }
@@ -989,7 +989,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             if(deadlineDate < new Date()){
                 redClass="redTextColumn"
             }
-            values.push('<span class="'+redClass+'">'+Ext.util.Format.date(deadlineDate,Editor.app.getDateTimeFormat())+'</span>');
+            values.push('<span class="'+redClass+'">'+Ext.util.Format.date(deadlineDate,Editor.DATE_TIME_LOCALIZED_FORMAT)+'</span>');
         }
         return values.join(', ');
     },

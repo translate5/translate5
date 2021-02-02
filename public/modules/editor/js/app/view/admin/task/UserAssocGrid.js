@@ -123,19 +123,19 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           xtype: 'datecolumn',
           width: 90,
           dataIndex: 'assignmentDate',
-          format:Editor.app.getDateTimeFormat(),
+          format:Editor.DATE_TIME_LOCALIZED_FORMAT,
           text: me.strings.assignmentDateLable
       },{
           xtype: 'datecolumn',
           width: 90,
           dataIndex: 'finishedDate',
-          format:Editor.app.getDateTimeFormat(),
+          format:Editor.DATE_TIME_LOCALIZED_FORMAT,
           text: me.strings.finishedDateLabel
       },{
           xtype: 'datecolumn',
           width: 90,
           dataIndex: 'deadlineDate',
-          format:Editor.app.getDateTimeFormat(),
+          format:Editor.DATE_TIME_LOCALIZED_FORMAT,
           text: me.strings.deadlineDateLable
       }],
       dockedItems: [{
