@@ -421,9 +421,11 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         if(isset($this->data['autostates'][$segment['autoStateId']])) {
             $stateText =  $this->data['autostates'][$segment['autoStateId']];
         }
+
+        $this->result[] = '<segment id="'.$this->escape(self::SEGMENT_ID_PREFIX.$segment['segmentNrInTask']).'" translate5:matchRate="'.$this->escape($segment['matchRate']).'" state="'.$this->segmentStateMap[$segment['autoStateId']].'" subState="translate5Autostate:'.$this->escape($stateText).'">';
         
-        $this->result[] = '<segment id="'.$this->escape(self::SEGMENT_ID_PREFIX.$segment['segmentNrInTask']).'" translate5:matchRate="'.$this->escape($segment['matchRate']).'"  state="'.$this->segmentStateMap[$segment['autoStateId']].'" subState="translate5Autostate:'.$this->escape($stateText).'">';
-        
+        //add the comment only once
+        $this->addComments('translate5:matchRate');
         
         //add the comment only once
         $this->addComments('mrkTagComment');
@@ -929,6 +931,9 @@ The value of translate5:date is in the format  "2017-12-06 13:12:34"
                 break;
             case 'qmComment':
                 $unitComment[]='<!--  The attribute its:locQualityIssueType holds as value the qm flag value text from translate5. To be valid xliff 2.1, the used qm flags in translate5 must be ITS localization quality issues as listed at https://www.w3.org/TR/its20/#lqissue-typevalues -->';
+                break;
+            case 'translate5:matchRate':
+                $unitComment[]='<!-- The translate5:matchRate attribute contains the current matchrate for the segment. -->';
                 break;
                 
         }
