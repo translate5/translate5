@@ -195,6 +195,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
         //Archives the temporary data folder again after converting the files with okapi:
         $this->eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'handleAfterImport'));
+        
+        //allows the manipulation of the export fileparser configuration
+        $this->eventManager->attach('editor_Models_Export', 'exportFileParserConfiguration', [$this, 'handleExportFileparserConfig']);
 
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
@@ -265,14 +268,25 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $bilingualSourceFile = str_replace($relaisDirectory, $review, $fullpath);
 
             //check for manifest file, to ensure that the file was processed via Okapi:
-            $path = $this->task->getAbsoluteTaskDataPath().'/'.editor_Plugins_Okapi_Worker::OKAPI_REL_DATA_DIR.'/';
-            $okapiManifestFile = new SplFileInfo($path.sprintf(editor_Plugins_Okapi_Worker::MANIFEST_FILE, $child->id));
-
-            if(file_exists($fullpath) && file_exists($bilingualSourceFile) && $okapiManifestFile->isReadable()) {
+            if(file_exists($fullpath) && file_exists($bilingualSourceFile) && $this->wasImportedWithOkapi($this->task, $child->id)) {
                 $child->filename .= $suffix;
                 $child->relaisFileStatus = editor_Models_RelaisFoldertree::RELAIS_NOT_IMPORTED;
             }
         }
+    }
+    
+    /**
+     * Checks if the file was imported via Okapi (via existence of the manifest file).
+     * This gives no information if the import via Okapi was successful!
+     *
+     * @param editor_Models_Import $task
+     * @param int $fileId
+     * @return bool
+     */
+    protected function wasImportedWithOkapi(editor_Models_Task $task, int $fileId): bool {
+        $path = $task->getAbsoluteTaskDataPath().'/'.editor_Plugins_Okapi_Worker::OKAPI_REL_DATA_DIR.'/';
+        $okapiManifestFile = new SplFileInfo($path.sprintf(editor_Plugins_Okapi_Worker::MANIFEST_FILE, $fileId));
+        return $okapiManifestFile->isReadable();
     }
 
     /**
@@ -403,5 +417,23 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $connector = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
         /* @var $connector editor_Plugins_Okapi_Connector */
         $applicationState->okapi->server = $connector->ping();
+    }
+    
+    /**
+     * Sets additional file parser configurations if file was imported with Okapi
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleExportFileparserConfig(Zend_EventManager_Event $event) {
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
+        $file = $event->getParam('file');
+        /* @var $file editor_Models_File */
+        $config = $event->getParam('config');
+        /* @var $config stdClass */
+        
+        if($this->wasImportedWithOkapi($task, $file->getId())) {
+            //files imported with okapi have always source to empty target on (TRANSLATE-2384)
+            $config->options['sourcetoemptytarget'] = true;
+        }
     }
 }

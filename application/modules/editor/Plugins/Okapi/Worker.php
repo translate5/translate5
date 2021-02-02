@@ -189,7 +189,18 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             $originalFile = $this->findOriginalFile($fileId);
             $api->uploadOriginalFile($originalFile, new SplFileInfo($this->getDataDir().'/'.$originalFile));
             $this->xliffExportPreValidation($workFile, $fileId);
-            $api->uploadWorkFile($originalFile.$api::OUTPUT_FILE_EXTENSION, $workFile);
+            
+            //if a file with source in empty targets exists, take that for okapi reconvertion
+            $workfile2 = new SplFileInfo($workFile.editor_Models_Export_FileParser_Xlf::SOURCE_TO_EMPTY_TARGET_SUFFIX);
+            if($workfile2->isFile()) {
+                $api->uploadWorkFile($originalFile.$api::OUTPUT_FILE_EXTENSION, $workfile2);
+                unlink($workfile2); //we remove that file from the export, bad for debugging but keep things clean
+                //workfile (.xlf) is kept in export for further processing of the XLF
+            }
+            else {
+                $api->uploadWorkFile($originalFile.$api::OUTPUT_FILE_EXTENSION, $workFile);
+            }
+            
             $api->executeTask($sourceLang, $targetLang);
             //the exported work file (containing xlf) must be renamed so that
             // the merged file can be saved under the original file name
