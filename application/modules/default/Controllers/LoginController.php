@@ -224,10 +224,22 @@ class LoginController extends ZfExtended_Controllers_Login {
                 $this->initDataAndRedirect();
             }
         } catch (ZfExtended_OpenIDConnectClientException $e) {
-            //when an openid exceptions happens so send the user simplified info message, more should be found in the error log
             $this->view->errors = true;
+            //when an openid exceptions happens so send the user simplified info message, more should be found in the error log
             $this->_form->addError($this->_translate->_('Anmeldung mit Single Sign On schlug fehl, bitte versuchen Sie es erneut.'));
-            return;
+            $log = Zend_Registry::get('logger');
+            /* @var $log ZfExtended_Logger */
+            
+            switch ($e->getErrorCode()) {
+                case 'E1165':
+                    $log->exception($e, ['level' => $log::LEVEL_INFO]);
+                    return;
+                case 'E1328':
+                    $this->_form->addError($e->getMessage());
+                default:
+                    $log->exception($e);
+                    return;
+            }
         }
     }
     
