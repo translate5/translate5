@@ -92,13 +92,13 @@
     {
         "segmentNrInTask": "6",
         "internalFuzzy": "0",
-        "matchRate": "90",
+        "matchRate": "87",
         "wordCount": "26"
     },
     {
         "segmentNrInTask": "6",
         "internalFuzzy": "0",
-        "matchRate": "90",
+        "matchRate": "87",
         "wordCount": "26"
     },
     {
@@ -164,13 +164,13 @@
     {
         "segmentNrInTask": "10",
         "internalFuzzy": "0",
-        "matchRate": "88",
+        "matchRate": "83",
         "wordCount": "15"
     },
     {
         "segmentNrInTask": "10",
         "internalFuzzy": "0",
-        "matchRate": "88",
+        "matchRate": "83",
         "wordCount": "15"
     },
     {
@@ -620,13 +620,13 @@
     {
         "segmentNrInTask": "36",
         "internalFuzzy": "0",
-        "matchRate": "34",
+        "matchRate": "30",
         "wordCount": "3"
     },
     {
         "segmentNrInTask": "36",
         "internalFuzzy": "0",
-        "matchRate": "34",
+        "matchRate": "30",
         "wordCount": "3"
     },
     {
@@ -752,13 +752,13 @@
     {
         "segmentNrInTask": "44",
         "internalFuzzy": "0",
-        "matchRate": "92",
+        "matchRate": "88",
         "wordCount": "19"
     },
     {
         "segmentNrInTask": "44",
         "internalFuzzy": "0",
-        "matchRate": "92",
+        "matchRate": "88",
         "wordCount": "19"
     },
     {
@@ -896,13 +896,13 @@
     {
         "segmentNrInTask": "52",
         "internalFuzzy": "0",
-        "matchRate": "78",
+        "matchRate": "73",
         "wordCount": "11"
     },
     {
         "segmentNrInTask": "52",
         "internalFuzzy": "0",
-        "matchRate": "78",
+        "matchRate": "73",
         "wordCount": "11"
     },
     {
@@ -1274,13 +1274,13 @@
     {
         "segmentNrInTask": "75",
         "internalFuzzy": "1",
-        "matchRate": "77",
+        "matchRate": "63",
         "wordCount": "4"
     },
     {
         "segmentNrInTask": "75",
         "internalFuzzy": "1",
-        "matchRate": "77",
+        "matchRate": "63",
         "wordCount": "4"
     },
     {
@@ -1628,13 +1628,13 @@
     {
         "segmentNrInTask": "98",
         "internalFuzzy": "1",
-        "matchRate": "63",
+        "matchRate": "47",
         "wordCount": "2"
     },
     {
         "segmentNrInTask": "98",
         "internalFuzzy": "1",
-        "matchRate": "63",
+        "matchRate": "47",
         "wordCount": "2"
     },
     {
@@ -2216,13 +2216,13 @@
     {
         "segmentNrInTask": "132",
         "internalFuzzy": "0",
-        "matchRate": "47",
+        "matchRate": "37",
         "wordCount": "3"
     },
     {
         "segmentNrInTask": "132",
         "internalFuzzy": "0",
-        "matchRate": "47",
+        "matchRate": "37",
         "wordCount": "3"
     },
     {

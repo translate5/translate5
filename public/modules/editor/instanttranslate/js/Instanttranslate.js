@@ -197,7 +197,7 @@ function checkInstantTranslation() {
         showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
         return;
     }
-    if($('#sourceText').val().length > 0 && $('#sourceText').val() === latestTextToTranslate) {
+    if(getInputTextValueTrim().length > 0 && getInputTextValueTrim() === latestTextToTranslate) {
         return;
     }
     // Translations can be submitted:
@@ -375,16 +375,16 @@ function startTranslation() {
         return;
     }
     // otherwise: translate Text
-    if ($('#sourceText').val().length === 0) {
+    if (getInputTextValueTrim().length === 0) {
         // no text given
         $('#translations').hide();
         return;
     }
-    if ($('#sourceText').val() === latestTextToTranslate) {
+    if (getInputTextValueTrim() === latestTextToTranslate) {
         return;
     }
     terminateTranslation();
-    textToTranslate = $('#sourceText').val();
+    textToTranslate = getInputTextValueTrim();
     translationInProgressID = new Date().getTime();
     // store both for comparison on other places
     latestTextToTranslate = textToTranslate;
@@ -937,7 +937,7 @@ function drawTermPortalIntegration(termToPropose) {
  * events
  */
 $(document).on('click', '.term-proposal' , function() {
-    var text = $('#sourceText').val(),
+    var text = getInputTextValueTrim(),
         lang = $("#sourceLocale").val(),
         textProposal = $(this).attr('data-term'),
         langProposal = $("#targetLocale").val(),
@@ -988,7 +988,7 @@ function showSource() {
     }
 }
 function showTranslations() {
-    if ($('#sourceText').val().length === 0) {
+    if (getInputTextValueTrim().length === 0) {
         $('#translations').html('');
     }
     $('#translations').show();
@@ -1046,4 +1046,13 @@ function startLoadingState() {
 }
 function stopLoadingState() {
     $('.loadingSpinnerLayer').hide();
+}
+
+/***
+ * This function removes all newlines, spaces (including non-breaking spaces), and tabs from the beginning and end of the sourceText input. 
+ * If these whitespace characters occur in the middle of the string, they are preserved.
+ * @returns
+ */
+function getInputTextValueTrim(){
+    return $('#sourceText').val().trim();
 }

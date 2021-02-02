@@ -37,6 +37,8 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParser {
 
+    const SOURCE_TO_EMPTY_TARGET_SUFFIX = '.sourceInEmptyTarget.xlf';
+    
     /**
      * @var string Klassenname des Difftaggers
      */
@@ -54,6 +56,27 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
     protected $segmentIdsPerUnit = [];
     
     protected $segmentsToLog = [];
+    
+    /**
+     * If feature copy source to empty target is enabled,
+     * this string is filled with a  export duplicate containing source content in untranslated (empty) targets
+     * @var array
+     */
+    protected $_exportChunksWithSourceFallback = [];
+    
+    /**
+     * @param editor_Models_Task $task
+     * @param int $fileId
+     * @param string $path The absolute path to the file where the content is written to
+     * @param array $options see $this->options for available options
+     */
+    public function __construct(editor_Models_Task $task, int $fileId, string $path, array $options = []) {
+        //TODO let me come from a task level config, currently overwritten by extending fileparser
+        //set the sourcetoemptytarget default value, may be overwritten via $options then
+        $this->options['sourcetoemptytarget'] = false;
+        
+        parent::__construct($task, $fileId, $path, $options);
+    }
     
     /**
      * übernimmt das eigentliche FileParsing
@@ -86,7 +109,11 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
                 $field = editor_Models_SegmentField::TYPE_TARGET;
             }
             //$this->writeMatchRate(); refactor reapplyment of matchratio with XMLParser and namespace specific!
-            $xmlparser->replaceChunk($key, $this->getSegmentContent($id, $field));
+            $segmentContent = $this->getSegmentContent($id, $field);
+            $xmlparser->replaceChunk($key, $segmentContent);
+            if($this->options['sourcetoemptytarget'] && strlen($segmentContent) === 0) {
+                $this->_exportChunksWithSourceFallback[$key] = $this->getSegmentContent($id, editor_Models_SegmentField::TYPE_SOURCE);
+            }
         });
         
         //convert empty <target></target> tags to single ones: <target />
@@ -162,7 +189,24 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
         $this->_exportFile = $xmlparser->parse($this->_skeletonFile, $preserveWhitespaceDefault);
+        
+        if($this->options['sourcetoemptytarget']) {
+            //UGLY: typecast to string here
+            $this->_exportChunksWithSourceFallback = $xmlparser->join(array_replace($xmlparser->getAllChunks(), $this->_exportChunksWithSourceFallback));
+        }
+        
         $this->sendLog();
+    }
+    
+    public function saveFile() {
+        parent::saveFile();
+        if(!$this->options['sourcetoemptytarget']) {
+            return;
+        }
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
+        $file->load($this->_fileId);
+        file_put_contents($this->path.self::SOURCE_TO_EMPTY_TARGET_SUFFIX, $this->convertEncoding($file, $this->_exportChunksWithSourceFallback));
     }
     
     /**
