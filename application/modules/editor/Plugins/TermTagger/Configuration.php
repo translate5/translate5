@@ -283,19 +283,22 @@ class editor_Plugins_TermTagger_Configuration {
         
         foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
             
+            // this is somehow "doppelt gemoppelt"
+            $typesToExclude = [editor_Plugins_TermTagger_QualityProvider::qualityType()];
+            
             $source = $tags->getSource();
             $sourceText = $source->render();
             $firstTargetText = null;
 
             foreach($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
-                $service->addSegment($target->getSegmentId(), $target->getTermtaggerName(), $sourceText, $target->render());
+                $service->addSegment($target->getSegmentId(), $target->getTermtaggerName(), $sourceText, $target->render($typesToExclude));
                 if($firstTargetText === null){
-                    $firstTargetText = $target->render();
+                    $firstTargetText = $target->render($typesToExclude);
                 }
             }
             if($tags->hasOriginalSource()){
                 $sourceOriginal = $tags->getOriginalSource();
-                $service->addSegment($sourceOriginal->getSegmentId(), $sourceOriginal->getTermtaggerName(), $sourceOriginal->render(), $firstTargetText);
+                $service->addSegment($sourceOriginal->getSegmentId(), $sourceOriginal->getTermtaggerName(), $sourceOriginal->render($typesToExclude), $firstTargetText);
             }
         }
         return $service;

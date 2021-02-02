@@ -144,6 +144,7 @@ final class editor_Segment_Quality_Manager {
         $segmentIds = $db->fetchAll($sql)->toArray();
         $segmentIds = array_column($segmentIds, 'id');
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        $qualities = [];
         /* @var $segment editor_Models_Segment */
         foreach($segmentIds as $segmentId){
             $segment->load($segmentId);
@@ -152,12 +153,24 @@ final class editor_Segment_Quality_Manager {
             foreach($this->registry as $type => $provider){
                 /* @var $provider editor_Segment_Quality_Provider */
                 if(!$provider->hasImportWorker()){
+                    $tags->removeInternalTagsByType($provider->getType());
                     $tags = $provider->processSegment($task, $tags, true);
                 }
             }
+            // we save all qualities at once to reduce db-strain
+            $qualities = array_merge($qualities, $tags->getQualities());
             // flush the segment tags content back to the segment
-            $tags->flush();
+            $tags->flush(false);
         }
+        // save qualities
+        editor_Models_Db_SegmentQuality::deleteForSegments($segmentIds);
+        if(count($qualities) > 0){
+            editor_Models_Db_SegmentQuality::saveRows($qualities);
+            
+        }
+        // remove segment tags model
+        editor_Models_Db_SegmentTags::removeByTaskGuid($task->getTaskGuid());
+        
         $db->getAdapter()->commit();
     }
     /**
@@ -169,9 +182,10 @@ final class editor_Segment_Quality_Manager {
         $tags = editor_Segment_Tags::fromSegment($task, true, $segment, false);
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
+            $tags->removeInternalTagsByType($provider->getType());
             $tags = $provider->processSegment($task, $tags, false);
         }
-        $tags->flush();
+        $tags->flush(true);
     }
     /**
      * The central API to identify the needed Tag class by classnames and attributes

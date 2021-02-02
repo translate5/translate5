@@ -795,10 +795,11 @@ class editor_Tag {
 
     /**
      * renders the complete tag with its contents
+     * @param string[] $skippedTypes: meaningful only in inheriting classes
      * @return string
      */
-    public function render() : string {
-        return $this->renderStart().$this->renderChildren().$this->renderEnd();
+    public function render(array $skippedTypes=NULL) : string {
+        return $this->renderStart().$this->renderChildren($skippedTypes).$this->renderEnd();
     }
     /**
      * renders the complete starting tag without inner html
@@ -823,14 +824,14 @@ class editor_Tag {
         return $this->render();
     }
     /**
-     *
+     * @param string[] $skippedTypes: meaningful only in inheriting classes
      * @return string
      */
-    public function renderChildren() : string {
+    public function renderChildren(array $skippedTypes=NULL) : string {
         $html = '';
         if($this->hasChildren()){
             foreach($this->children as $child){
-                $html .= $child->render();
+                $html .= $child->render($skippedTypes);
             }
         }
         return $html;
@@ -866,4 +867,39 @@ class editor_Tag {
         }
         return '</'.$this->getName().'>';
     }
+    
+    /**
+     * ALTERNATIVE IMPLEMENTATION: UNPARSING CODE USING PHP'S DOM
+     
+    public static function unparse($html){
+        $dom = new editor_Utils_Dom();
+        $node = $dom->loadUnicodeElement($html);
+        if($node != NULL){
+            return static::fromDomElement($node);
+        }
+        return NULL;
+    }
+
+    protected static function fromDomElement(DOMElement $node){
+        $tag = editor_Tag::create($node->nodeName);
+        if($node->hasAttributes()){
+            foreach($node->attributes as $attr){
+                $tag->addAttribute($attr->nodeName, $attr->nodeValue);
+            }
+        }
+        if($node->hasChildNodes()){
+            for($i = 0; $i < $node->childNodes->length; $i++){
+                $child = $node->childNodes->item($i);
+                if($child->nodeType == XML_TEXT_NODE){
+                    // CRUCIAL: the nodeValue always is unescaped Markup!
+                    $tag->addText(htmlspecialchars($child->nodeValue, ENT_COMPAT));
+                } else if($child->nodeType == XML_ELEMENT_NODE){
+                    $tag->addChild(static::fromDomElement($child));
+                }
+            }
+        }
+        return $tag;
+    }
+     
+    */
 }

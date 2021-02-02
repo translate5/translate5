@@ -237,18 +237,49 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return NULL;
     }
     /**
-     * Retrieves the tags of a certain type
+     * Retrieves the internal tags of a certain type
      * @param string $type
      * @return editor_Segment_InternalTag[]
      */
-    public function getByType(string $type){
-        $result = array();
+    public function getByType(string $type) : array {
+        $result = [];
         foreach($this->tags as $tag){
             if($tag->getType() == $type){
                 $result[] = $tag;
             }
         }
         return $result;
+    }
+    /**
+     * Removes the internal tags of a certain type
+     * @param string $type
+     */
+    public function removeByType(string $type){
+        $result = [];
+        $replace = false;
+        foreach($this->tags as $tag){
+            if($tag->getType() != $type){
+                $result[] = $tag;
+            } else {
+                $replace = true;
+            }
+        }
+        if($replace){
+            $this->tags = $result;
+        }
+    }
+    /**
+     * Checks if a internal tag of a certain type is present
+     * @param string $type
+     * @return boolean
+     */
+    public function hasType(string $type) : bool {
+        foreach($this->tags as $tag){
+            if($tag->getType() == $type){
+                return true;
+            }
+        }
+        return false;
     }
     /**
      * Sorts the items ascending, takes the second index into account when items have the same startIndex
@@ -284,7 +315,12 @@ class editor_Segment_FieldTags implements JsonSerializable {
     
     /* Rendering API */
     
-    public function render(){
+    /**
+     * 
+     * @param string[] $skippedTypes: if set, internal tags of this type will not be rendered
+     * @return string
+     */
+    public function render(array $skippedTypes=NULL) : string {
         $numTags = count($this->tags);
         if($numTags == 0){
             return $this->fieldText;
@@ -334,7 +370,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
         $holder->addSegmentText($this);
         // finally, render the holder's children
-        return $holder->renderChildren();
+        return $holder->renderChildren($skippedTypes);
     }
     /**
      * Retrieves a part of the segment-text by start & end index
@@ -422,4 +458,45 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $this->tags[$i]->isFullLength = ($this->tags[$i]->startIndex == 0 && $this->tags[$i]->endIndex >= $textLength);
         }
     }
+    
+    
+    /**
+     * ALTERNATIVE IMPLEMENTATION: UNPARSING CODE USING PHP'S DOM
+
+    public function unparse(string $html) {
+        $dom = new editor_Utils_Dom();
+        // to make things easier we add a wrapper to hold all tags and only use it's children
+        $element = $dom->loadUnicodeElement('<div>'.$html.'</div>');
+        if($element != NULL){
+            $wrapper = $this->fromDomElement($element, 0);
+            // set our field text
+            $this->fieldText = $wrapper->getText();
+            // sequence the nested tags as our children
+            $wrapper->sequenceChildren($this);
+            $this->consolidate();
+            // Crucial: finalize, set the tag-props
+            $this->addTagProps();
+        } else {
+            throw new Exception('Could not unparse Internal Tags from Markup '.$html);
+        }        
+    }
+
+    private function fromDomElement(DOMElement $element, int $startIndex){
+        $tag = editor_Segment_TagCreator::instance()->fromDomElement($element, $startIndex);
+        if($element->hasChildNodes()){
+            for($i = 0; $i < $element->childNodes->length; $i++){
+                $child = $element->childNodes->item($i);
+                if($child->nodeType == XML_TEXT_NODE){
+                    $tag->addText(htmlspecialchars($child->nodeValue, ENT_COMPAT));
+                } else if($child->nodeType == XML_ELEMENT_NODE){
+                    $tag->addChild($this->fromDomElement($child, $startIndex));
+                }
+                $startIndex += $tag->getLastChild()->getTextLength();
+            }
+        }
+        $tag->endIndex = $startIndex;
+        return $tag;
+    }
+
+    */
 }

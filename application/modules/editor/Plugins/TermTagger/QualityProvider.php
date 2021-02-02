@@ -38,7 +38,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
      * The central UNIQUE amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_InternalTag::$type
      * @var string
      */
-    static $type = 'term';
+    protected static $type = 'term';
     
     public function hasImportWorker() : bool {
         return true;
@@ -112,7 +112,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
             return false;
         }
         if($worker->segmentTagsEdited($tags)){
-            // TODO FIXME: this should be a reference to the tags above, so this assignment should be obsolete. Can the case be, segmentTagsEdited returns true but no tag is available ??
+            // TODO FIXME: this should be a reference to the tags above, so this assignment should be obsolete. Can the case be, segmentTagsEdited returns true but no tags are available ??
             $tags = $worker->getProcessedTags();
             if($tags != null){
                 return $tags;

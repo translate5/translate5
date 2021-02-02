@@ -109,11 +109,11 @@ final class editor_TextNode extends editor_Tag {
         return editor_Tag::createText($this->text);
     }
 
-    public function render() : string {
+    public function render(array $skippedTypes=NULL) : string {
         return $this->text;
     }
 
-    public function renderChildren() : string {
+    public function renderChildren(array $skippedTypes=NULL) : string {
         return $this->text;
     }
 

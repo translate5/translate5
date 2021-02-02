@@ -132,4 +132,35 @@ class editor_Segment_TagCreator {
         // the default is the "any" tag
         return new editor_Segment_AnyInternalTag($startIndex, $endIndex, '', $nodeName);
     }
+    
+    /**
+     * ALTERNATIVE IMPLEMENTATION: UNPARSING CODE USING PHP'S DOM
+     
+    public function fromDomElement(DOMElement $element, int $startIndex=0, int $endIndex=0){
+        $classNames = [];
+        $attributes = [];
+        if($element->hasAttributes()){
+            foreach ($element->attributes as $attr) {
+                if($attr->nodeName == 'class'){
+                    $classNames = explode(' ', trim($attr->nodeValue));
+                } else {
+                    $attributes[$attr->nodeName] = $attr->nodeValue;
+                }
+            }
+        }
+        $tag = $this->evaluate('', $element->nodeName, $classNames, $attributes, $startIndex, $endIndex);
+        if(count($classNames) > 0){
+            foreach($classNames as $cname){
+                $tag->addClass($cname);
+            }
+        }
+        if(count($attributes) > 0){
+            foreach($attributes as $name => $val){
+                $tag->addAttribute($name, $val);
+            }
+        }
+        return $tag;
+    }
+     
+     */
 }

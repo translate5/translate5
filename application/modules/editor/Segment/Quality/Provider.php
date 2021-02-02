@@ -39,6 +39,13 @@
 abstract class editor_Segment_Quality_Provider {
     
     /**
+     * Retrieves our type
+     * @return string
+     */
+    public static function qualityType(){
+        return static::$type;
+    }
+    /**
      * MUST be set in inheriting classes
      * @var string
      */
