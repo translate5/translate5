@@ -219,11 +219,15 @@ class LoginController extends ZfExtended_Controllers_Login {
                 $invalidLoginCounter = ZfExtended_Factory::get('ZfExtended_Models_Invalidlogin',array($user->getLogin()));
                 /* @var $invalidLoginCounter ZfExtended_Models_Invalidlogin */
                 $invalidLoginCounter->resetCounter(); // bei erfolgreichem login den counter zurücksetzen
+                ZfExtended_Models_LoginLog::addSuccess($user, "openid");
                 $this->_userModel->setUserSessionNamespaceWithoutPwCheck($user->getLogin());
                 $this->getFrontController()->getPlugin('ZfExtended_Controllers_Plugins_SessionRegenerate')->updateSession(true);
                 $this->initDataAndRedirect();
             }
         } catch (ZfExtended_OpenIDConnectClientException $e) {
+            ZfExtended_Models_LoginLog::addFailed($user->getLogin(), "openid");
+            //when an openid exceptions happens so send the user simplified info message, more should be found in the error log
+
             $this->view->errors = true;
             //when an openid exceptions happens so send the user simplified info message, more should be found in the error log
             $this->_form->addError($this->_translate->_('Anmeldung mit Single Sign On schlug fehl, bitte versuchen Sie es erneut.'));
