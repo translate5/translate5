@@ -14,6 +14,15 @@ All updates are (downwards) compatible! If not this is listed in the important r
 ## [5.1.0] - 2021-02-02
 
 ### Important Notes:
+
+#### [TRANSLATE-471](https://jira.translate5.net/browse/TRANSLATE-471)
+VERY IMPORTANT: The configuration of translate5 is changed fundamentally. 
+The installation.ini is cleaned up to the values which are intended to be there: Basic DB, Mailing and Logging configuration.
+All other configurations made in the installation.ini are adopted automatically into the database based configuration, now maintainable via the GUI or the translate5 CLI command. A backup of the installation.ini will be made as installation.ini.bak for reference, since comments and out-commented configurations are not overtaken.
+For CSV Users: 
+For config "runtimeOptions.import.csv.fields.mid" the "value" and the "default" are changed to "id" (default/value was mid). 
+For the config "runtimeOptions.import.csv.fields.source" the "value" and "default" are changed to source (default/value was quelle).
+
 #### [TRANSLATE-2362](https://jira.translate5.net/browse/TRANSLATE-2362)
 For CSV file importers: the protection of HTML tags in the CSV content is now configurable (tag protection config) and is disabled by default.
 
@@ -26,12 +35,6 @@ Important for users which are using an own task administration: test if the inte
 #### [TRANSLATE-929](https://jira.translate5.net/browse/TRANSLATE-929)
 The usage of the task template is not supported any more after the release of this issue. Instead the configurations that so far had been supported by the task template now can be made in the system configuration in the GUI and can be customized/overwritten on client level and task-import level.
 As fallback a task-config.ini file can be placed in the import package, containing task-configuration in an INI style: config.name = value.
-
-#### [TRANSLATE-471](https://jira.translate5.net/browse/TRANSLATE-471)
-For CSV Users: 
-For config "runtimeOptions.import.csv.fields.mid" the "value" and the "default" are changed to "id" (default/value was mid). 
-For the config "runtimeOptions.import.csv.fields.source" the "value" and "default" are changed to source (default/value was quelle).
- 
 
 
 ### Added
