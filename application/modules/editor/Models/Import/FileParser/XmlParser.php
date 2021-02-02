@@ -206,6 +206,14 @@ class editor_Models_Import_FileParser_XmlParser {
     }
     
     /**
+     * returns the internal chunk array
+     * @return array
+     */
+    public function getAllChunks(): array {
+        return $this->xmlChunks;
+    }
+    
+    /**
      * return one or more chunks by start index(offset) and end index(offset)
      * lower end offset as start offset results in empty result
      * @param int $startOffset
