@@ -94,6 +94,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     protected $removeTags = false;
     
     /**
+     * @var editor_Models_Segment_UtilityBroker
+     */
+    protected $utilities;
+    
+    /**
      * @param array $namespaces
      * @param editor_Models_Task $task for debugging reasons only
      * @param string $filename for debugging reasons only
@@ -103,7 +108,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->task = $task;
         $this->filename = $filename;
         $this->initImageTags();
-        $this->initHelper();
+        
+        $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
         
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
         
@@ -361,8 +367,22 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         //we have to decode entities here, otherwise our generated XLF wont be valid
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters,
         // we have to protect them here
-        $text = $this->whitespaceHelper->protectWhitespace($text);
-        $text = $this->whitespaceTagReplacer($text);
+        
+        $wh = $this->utilities->whitespace;
+        if($this->task->getConfig()->runtimeOptions->import->fileparser->options->protectTags ?? false) {
+            //since we are in a XML file format, plain tags in the content are encoded, which we have to undo first
+            //$text is here for example: Dies &lt;strong&gt;ist ein&lt;/strong&gt; Test. &amp;nbsp;
+            $text = html_entity_decode($text);
+            //$text is now: Dies <strong>ist ein</strong> Test. &nbsp;
+            
+            $text = $this->utilities->tagProtection->protectTags($text);
+            $text = $wh->protectWhitespace($text, $wh::ENTITY_MODE_OFF); //disable entity handling here, since already done in tagProtection
+        }
+        else {
+            $text = $wh->protectWhitespace($text);
+        }
+        
+        $text = $this->replacePlaceholderTags($text);
         $this->result[] = $text;
     }
     
@@ -443,7 +463,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             case 'g':
             case 'bx':
             case 'ex':
-            return;
+                return;
+            default:
+                break;
         }
         // The file "{file}" contains "{tag}" tags, which are currently not supported! Stop Import.
         throw new editor_Models_Import_FileParser_Xlf_Exception('E1194', [

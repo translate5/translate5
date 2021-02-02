@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -33,17 +33,19 @@ END LICENSE AND COPYRIGHT
  */
 
 /**
- * 
+ *
  */
 class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParser {
 
+    const SOURCE_TO_EMPTY_TARGET_SUFFIX = '.sourceInEmptyTarget.xlf';
+    
     /**
      * @var string Klassenname des Difftaggers
      */
     protected $_classNameDifftagger = 'editor_Models_Export_DiffTagger_Sdlxliff';
     
     /**
-     * Helper to call namespace specfic parsing stuff 
+     * Helper to call namespace specfic parsing stuff
      * @var editor_Models_Export_FileParser_Xlf_Namespaces
      */
     protected $namespaces;
@@ -54,6 +56,27 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
     protected $segmentIdsPerUnit = [];
     
     protected $segmentsToLog = [];
+    
+    /**
+     * If feature copy source to empty target is enabled,
+     * this string is filled with a  export duplicate containing source content in untranslated (empty) targets
+     * @var array
+     */
+    protected $_exportChunksWithSourceFallback = [];
+    
+    /**
+     * @param editor_Models_Task $task
+     * @param int $fileId
+     * @param string $path The absolute path to the file where the content is written to
+     * @param array $options see $this->options for available options
+     */
+    public function __construct(editor_Models_Task $task, int $fileId, string $path, array $options = []) {
+        //TODO let me come from a task level config, currently overwritten by extending fileparser
+        //set the sourcetoemptytarget default value, may be overwritten via $options then
+        $this->options['sourcetoemptytarget'] = false;
+        
+        parent::__construct($task, $fileId, $path, $options);
+    }
     
     /**
      * übernimmt das eigentliche FileParsing
@@ -86,7 +109,11 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
                 $field = editor_Models_SegmentField::TYPE_TARGET;
             }
             //$this->writeMatchRate(); refactor reapplyment of matchratio with XMLParser and namespace specific!
-            $xmlparser->replaceChunk($key, $this->getSegmentContent($id, $field));
+            $segmentContent = $this->getSegmentContent($id, $field);
+            $xmlparser->replaceChunk($key, $segmentContent);
+            if($this->options['sourcetoemptytarget'] && strlen($segmentContent) === 0) {
+                $this->_exportChunksWithSourceFallback[$key] = $this->getSegmentContent($id, editor_Models_SegmentField::TYPE_SOURCE);
+            }
         });
         
         //convert empty <target></target> tags to single ones: <target />
@@ -116,7 +143,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             if(preg_match_all('/([^\s]+)="([^"]*)"/', $xmlparser->getChunk($opener['openerKey']), $matches)){
                 $originalAttributes = array_combine($matches[1], $matches[2]);
             } else {
-                $originalAttributes = []; 
+                $originalAttributes = [];
             }
             $event->setParams([
                     //just the tag name, should be trans-unit here
@@ -124,10 +151,10 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
                     //the affected segments:
                     'segments' => $segments,
                     //this attributes field should be manipulated by the listeners, since its played back into the transunit
-                    'attributes' => $originalAttributes, 
+                    'attributes' => $originalAttributes,
                     //the chunk key in $xmlparser of the closer tag
                     'key' => $key,
-                    //all chunk information about the opener, for special manipulations in the handler 
+                    //all chunk information about the opener, for special manipulations in the handler
                     'tagOpener' => $opener,
                     //xmlparser for special manipulations in the handler
                     'xmlparser' => $xmlparser,
@@ -142,7 +169,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
                 $originalAttributes = $event->getParam('attributes');
             }
             
-            //reset segments per unit: 
+            //reset segments per unit:
             $this->segmentIdsPerUnit = [];
             
             $sizeUnit = $xmlparser->getAttribute($originalAttributes, 'size-unit');
@@ -162,11 +189,28 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         
         $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
         $this->_exportFile = $xmlparser->parse($this->_skeletonFile, $preserveWhitespaceDefault);
+        
+        if($this->options['sourcetoemptytarget']) {
+            //UGLY: typecast to string here
+            $this->_exportChunksWithSourceFallback = $xmlparser->join(array_replace($xmlparser->getAllChunks(), $this->_exportChunksWithSourceFallback));
+        }
+        
         $this->sendLog();
     }
     
+    public function saveFile() {
+        parent::saveFile();
+        if(!$this->options['sourcetoemptytarget']) {
+            return;
+        }
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
+        $file->load($this->_fileId);
+        file_put_contents($this->path.self::SOURCE_TO_EMPTY_TARGET_SUFFIX, $this->convertEncoding($file, $this->_exportChunksWithSourceFallback));
+    }
+    
     /**
-     * Generates a XML tag 
+     * Generates a XML tag
      * @param string $tag the xml tag
      * @param boolean $single defines, if it should be self closing tag or not, default false
      * @param array $attributes the XML tag attributes, default empty
@@ -232,13 +276,13 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
      * @param array $file that contains file as array as splitted by parse function
      * @param int $i position of current segment in the file array
      * @return string
-     * 
+     *
      */
     protected function writeMatchRate(array $file, int $i) {
-        // FIXME This code is disabled, because: 
+        // FIXME This code is disabled, because:
         //  - the mid is not unique (due multiple files in the XLF) this code is buggy
         //  - the tmgr:matchratio should only be exported for OpenTM2 XLF and not in general
-        //  - the preg_match is leading to above problems, it would be better to use the XMLParser here to, 
+        //  - the preg_match is leading to above problems, it would be better to use the XMLParser here to,
         //    and paste the new attributes on the parent trans-unit to one <lekSegmentPlaceholder>
         //
         //  SEE ALSO TRANSLATE-956
@@ -276,7 +320,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         
         //get the transunit part of the root segment
         $transunitMid = $this->_segmentEntity->getMid();
-        $transunitMid = explode('_', $transunitMid)[0]; 
+        $transunitMid = explode('_', $transunitMid)[0];
         
         $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
@@ -313,24 +357,37 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
     }
     
     /**
-     * returns the parent tag id of the current SUB element, 
+     * returns the parent tag id of the current SUB element,
      *  since this ID is part of the Segment MID of the created segment for the sub element
      * @param editor_Models_Import_FileParser_XmlParser $xmlparser
      * @return string|NULL
      */
     protected function getParentTagId(editor_Models_Import_FileParser_XmlParser $xmlparser) {
-        //loop through all valid parent tags 
+        //loop through all valid parent tags
         $validParents = ['ph[id]','it[id]','bpt[id]','ept[id]'];
         $parent = false;
         while(!$parent && !empty($validParents)) {
             $parent = $xmlparser->getParent(array_shift($validParents));
             if($parent) {
-                //if we have found a valid parent (ID must be given) 
+                //if we have found a valid parent (ID must be given)
                 // we create the same string as it was partly used for the segments MID
                 return $parent['tag'].'-'.$parent['attributes']['id'];
             }
         }
-        //without the parent id no further processing is possible for that segment 
+        //without the parent id no further processing is possible for that segment
         return null;
+    }
+    
+    /**
+     * Since on XLF import with tagprotection we did a html_entity_decode, we have now to htmlspecialchars them again
+     * {@inheritDoc}
+     * @see editor_Models_Export_FileParser::unprotectContent()
+     */
+    protected function unprotectContent(string $segment): string {
+        $segment = parent::unprotectContent($segment);
+        if($this->config->runtimeOptions->import->fileparser->options->protectTags ?? false) {
+            return $this->utilities->tagProtection->unprotect($segment);
+        }
+        return $segment;
     }
 }
