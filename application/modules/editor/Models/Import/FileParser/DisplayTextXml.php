@@ -57,11 +57,6 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
     protected $currentFont;
     
     /**
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $internalTag;
-    
-    /**
      * container for the pixel width of each inset
      * @var array
      */
@@ -120,10 +115,8 @@ class editor_Models_Import_FileParser_DisplayTextXml extends editor_Models_Impor
      */
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
         parent::__construct($path, $fileName, $fileId, $task);
-        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag',['{translate5:escaped id="%s" /}']);
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
         $this->initImageTags();
-        $this->initHelper();
     }
     
     /**
@@ -378,13 +371,13 @@ The German and the English Comment tag of the string must be imported as comment
         $segment = $this->xmlparser->getRange($opener['openerKey'] + 1, $closerKey - 1, true);
         
         //we have to protect internal tags before whitespace handling
-        $segment = $this->internalTag->protect($segment);
+        $segment = $this->utilities->internalTag->protect($segment);
         
-        //since there are no other tags we can just take the string and protect whitespace there
-        $segment = $this->whitespaceHelper->protectWhitespace($segment);
-        $segment = $this->whitespaceTagReplacer($segment);
+        //since there are no other tags we can just take the string and protect whitespace there (no tag protection needed!)
+        $segment = $this->utilities->whitespace->protectWhitespace($segment);
+        $segment = $this->replacePlaceholderTags($segment);
         
-        $segment = $this->internalTag->unprotect($segment);
+        $segment = $this->utilities->internalTag->unprotect($segment);
         
         //define the fieldnames where the data should be stored
         $sourceName = $this->segmentFieldManager->getFirstSourceName();

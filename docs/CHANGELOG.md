@@ -10,6 +10,100 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.1.0] - 2021-02-02
+
+### Important Notes:
+#### [TRANSLATE-2362](https://jira.translate5.net/browse/TRANSLATE-2362)
+For CSV file importers: the protection of HTML tags in the CSV content is now configurable (tag protection config) and is disabled by default.
+
+#### [TRANSLATE-2354](https://jira.translate5.net/browse/TRANSLATE-2354)
+For API Users: ensure that the changed filename has no effect on your api usage. The URL for downloading remains the same.
+
+#### [TRANSLATE-2311](https://jira.translate5.net/browse/TRANSLATE-2311)
+Important for users which are using an own task administration: test if the integration works, if not the samesite cookie config in application.ini must be removed and this issue reopened!
+
+#### [TRANSLATE-929](https://jira.translate5.net/browse/TRANSLATE-929)
+The usage of the task template is not supported any more after the release of this issue. Instead the configurations that so far had been supported by the task template now can be made in the system configuration in the GUI and can be customized/overwritten on client level and task-import level.
+As fallback a task-config.ini file can be placed in the import package, containing task-configuration in an INI style: config.name = value.
+
+#### [TRANSLATE-471](https://jira.translate5.net/browse/TRANSLATE-471)
+For CSV Users: 
+For config "runtimeOptions.import.csv.fields.mid" the "value" and the "default" are changed to "id" (default/value was mid). 
+For the config "runtimeOptions.import.csv.fields.source" the "value" and "default" are changed to source (default/value was quelle).
+ 
+
+
+### Added
+**[TRANSLATE-2385](https://jira.translate5.net/browse/TRANSLATE-2385): introduce user login statistics** <br>
+Now the login usage of the users is tracked in the new Zf_login_log table.
+
+**[TRANSLATE-2374](https://jira.translate5.net/browse/TRANSLATE-2374): Time of deadlines also visible in grid columns and notification mails** <br>
+The date-time is now visible in the translate5 interface for date fields(if the time is relevant for this date field), and also in the mail templates.
+
+**[TRANSLATE-2362](https://jira.translate5.net/browse/TRANSLATE-2362): HTML / XML tag protection of tags in any kind of file format** <br>
+XLF and CSV files can now contain HTML content (CSV: plain, XLF: encoded), the  HTML tags are protected as internal tags. This must be enabled in the config for the affected tasks.
+
+**[TRANSLATE-471](https://jira.translate5.net/browse/TRANSLATE-471): Overwrite system config by client and task** <br>
+Adds possibility to overwrite system configuration on 4 different levels: system, client, task import and task overwrite,
+
+
+### Changed
+**[TRANSLATE-2368](https://jira.translate5.net/browse/TRANSLATE-2368): Add segment matchrate to Xliff 2 export as translate5 namespaced element** <br>
+Each segment in the xliff 2 export will have the segment matchrate as translate5 namespace attribute.
+
+**[TRANSLATE-2357](https://jira.translate5.net/browse/TRANSLATE-2357): introduce DeepL config switch "formality"** <br>
+The "formality" deepl api flag now is available as task import config.
+More about the formality flag:
+
+Sets whether the translated text should lean towards formal or informal language. This feature currently works for all target languages except "EN" (English), "EN-GB" (British English), "EN-US" (American English), "ES" (Spanish), "JA" (Japanese) and "ZH" (Chinese).
+Possible options are:
+"default" (default)
+"more" - for a more formal language
+"less" - for a more informal language
+
+**[TRANSLATE-2354](https://jira.translate5.net/browse/TRANSLATE-2354): Add language code to filename of translate5 export zip** <br>
+When exporting a task, in the exported zip file name, the task source and target language codes are included.
+
+**[TRANSLATE-1120](https://jira.translate5.net/browse/TRANSLATE-1120): Change default values of several configuration parameters** <br>
+The default value in multiple system configurations is changed.
+
+**[TRANSLATE-929](https://jira.translate5.net/browse/TRANSLATE-929): Move old task template values to new system overwrite** <br>
+The task template parameters definition moved to system configuration.
+
+
+### Bugfixes
+**[TRANSLATE-2384](https://jira.translate5.net/browse/TRANSLATE-2384): Okapi does not always fill missing targets with source content** <br>
+In some use cases only a few segments are translated, and on export via Okapi the not translated segments are filled up by copying the source content to target automatically. This copying was failing for specific segments.
+
+**[TRANSLATE-2382](https://jira.translate5.net/browse/TRANSLATE-2382): ERROR in core.api.filter: E1223 - Illegal field "customerUseAsDefaultIds" requested** <br>
+Sometimes it may happen that a filtering for customers used as default in the language resource grid leads to the above error message. This is fixed now.
+
+**[TRANSLATE-2373](https://jira.translate5.net/browse/TRANSLATE-2373): Prevent termtagger usage if source and target language are equal** <br>
+FIX: Prevent termtagger hanging when source and target language of a task are identical. Now in these cases the terms are not tagged anymore
+
+**[TRANSLATE-2372](https://jira.translate5.net/browse/TRANSLATE-2372): Whitespace not truncated InstantTranslate text input field** <br>
+All newlines, spaces (including non-breaking spaces), and tabs are removed from the beginning and the end of the searched string in instant translate.
+
+**[TRANSLATE-2367](https://jira.translate5.net/browse/TRANSLATE-2367): NoAccessException directly after login** <br>
+Opening Translate5 with an URL containing a task to be opened for editing leads to ZfExtended_Models_Entity_NoAccessException exception if the task was already finished or still in state waiting instead of opening the task in read only mode.
+
+**[TRANSLATE-2365](https://jira.translate5.net/browse/TRANSLATE-2365): Help window initial size** <br>
+On smaller screens the close button of the help window (and also the "do not show again" checkbox) were not visible.
+
+**[TRANSLATE-2352](https://jira.translate5.net/browse/TRANSLATE-2352): Visual: Repetitions are linked to wrong position in the layout** <br>
+FIXED: Problem in Visual Review that segments pointing to multiple occurances in the visual review always jumped to the first occurance when clicking on the segment in the segment grid. Now the current context (position of segment before, scroll-position of review) is taken into account
+
+**[TRANSLATE-2351](https://jira.translate5.net/browse/TRANSLATE-2351): Preserve "private use area" of unicode characters in visual review and ensure connecting segments** <br>
+Characters of the Private Use Areas (as used in some symbol fonts e.g.) are now preserved in the Visual Review layout
+
+**[TRANSLATE-2335](https://jira.translate5.net/browse/TRANSLATE-2335): Do not query MT when doing analysis in batch mode without MT pre-translation** <br>
+When the MT pre-translation checkbox is not checked in the match analysis overview, and batch query is enabled, all associated MT resources will not be used for batch query.
+
+**[TRANSLATE-2311](https://jira.translate5.net/browse/TRANSLATE-2311): Cookie Security** <br>
+Set the authentication cookie according to the latest security recommendations.
+
+
 ## [5.0.15] - 2020-12-21
 
 ### Important Notes:

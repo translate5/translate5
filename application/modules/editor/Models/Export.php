@@ -32,11 +32,9 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
 
- /**
- * Kapselt den Export Mechanismus
- *
+/**
+ * entrypoint for the export
  */
-
 class editor_Models_Export {
     /**
      * @var editor_Models_Task
@@ -53,6 +51,15 @@ class editor_Models_Export {
      */
     protected $optionDiff;
 
+    /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events;
+    
+    public function __construct() {
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+    }
+    
     /**
      * @param editor_Models_Task $task
      * @param bool $diff
@@ -151,6 +158,23 @@ class editor_Models_Export {
         if(empty($exportParser) || !class_exists($exportParser)) {
             return null;
         }
-        return ZfExtended_Factory::get($exportParser, array($fileId, $this->optionDiff,  $this->task, $path));
+        
+        //put the fileparser config into an object, so that it can be manipulated in the event handlers
+        $fpConfig = new stdClass();
+        $fpConfig->path = $path;
+        $fpConfig->options = ['diff' => $this->optionDiff];
+        $fpConfig->exportParser = $exportParser;
+        
+        $this->events->trigger('exportFileParserConfiguration', $this, [
+            'task' => $this->task,
+            'file' => $file,
+            'config' => $fpConfig,
+        ]);
+        
+        return ZfExtended_Factory::get($fpConfig->exportParser, [
+            $this->task, $fileId,
+            $fpConfig->path,
+            $fpConfig->options
+        ]);
     }
 }
