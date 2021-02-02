@@ -73,4 +73,12 @@ class editor_Segment_AnyInternalTag extends editor_Segment_InternalTag {
     public function isEqualType(editor_Tag $tag) : bool {
         return false;
     }
+    /**
+     * We do not want "ANY" tags to be skipped
+     * {@inheritDoc}
+     * @see editor_Segment_InternalTag::render()
+     */
+    public function render(array $skippedTypes=NULL) : string {
+        return $this->renderStart().$this->renderChildren($skippedTypes).$this->renderEnd();
+    }
 }

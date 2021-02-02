@@ -249,6 +249,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
     }
     /**
      * Tags the passed segment tags using the given slots, applies the fetched data and save the tags (if wanted)
+     * TODO: add evaluation of qualities !
      * @param editor_Segment_Tags[] $segmentsTags
      * @param string $slot
      * @throws ZfExtended_Exception
@@ -276,6 +277,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
                         $tags->flush();
                     } else {
                         $tags->save(editor_Plugins_TermTagger_QualityProvider::TYPE);
+                        $tags->saveQualities();
                     }
                 } else {
                     // makes the currently proccessed tags accessible

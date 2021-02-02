@@ -127,6 +127,16 @@ class editor_Segment_Tags implements JsonSerializable {
      * @var editor_Models_Segment
      */
     private $segment = null;
+    /**
+     * 
+     * @var editor_Models_Db_SegmentQualityRow[]
+     */
+    private $qualities = [];
+    /**
+     * 
+     * @var editor_Models_Db_SegmentQuality
+     */
+    private $qualityTable = NULL;
     
     /**
      * 
@@ -185,8 +195,9 @@ class editor_Segment_Tags implements JsonSerializable {
     }
     /**
      * Saves all fields back to the segment when the import is finished or when editing segments
+     * @param boolean $flushQualities: whem set to true, the segment-qualities will be saved as well
      */
-    public function flush(){
+    public function flush($saveQualities=true){
 
         if($this->hasOriginalSource()){
              // we do know that the original source just has a single save-to field
@@ -203,6 +214,10 @@ class editor_Segment_Tags implements JsonSerializable {
             }
         }
         $this->getSegment()->save();
+        // save qualities if wanted
+        if($saveQualities){
+            $this->saveQualities();
+        }
     }
     /**
      * Saves the current state to the segment-tags cache. This API is used while the threaded import
@@ -257,7 +272,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * 
      * @return editor_Segment_FieldTags[]
      */
-    public function getFieldTags(){
+    private function getFieldTags(){
         $tags = $this->getTargets();
         if($this->source != null){
             array_unshift($tags, $this->source);
@@ -287,6 +302,87 @@ class editor_Segment_Tags implements JsonSerializable {
         return $this->segment;
     }
     
+    /* Internal Tags API */
+    
+    /**
+     * 
+     * @param string $type
+     * @return bool
+     */
+    public function hasInternalTagsOfType(string $type) : bool {
+        foreach($this->getFieldTags() as $fieldTags){
+            if($fieldTags->hasType($type)){
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Removes the tags of the passed type in all our FieldTags
+     * @param string $type
+     */
+    public function removeInternalTagsByType(string $type){
+        foreach($this->getFieldTags() as $fieldTags){
+            $fieldTags->removeByType($type);
+        }
+    }
+    /**
+     * Retrieves all tags from all our field tags
+     * @param string $type
+     * @return editor_Segment_InternalTag[]
+     */
+    public function getInternalTagsByType(string $type){
+        $result = [];
+        foreach($this->getFieldTags() as $fieldTags){
+            $result = array_merge($result, $fieldTags->getByType($type));
+        }
+        return $result;
+    }
+    
+    /* SegmentQuality API */
+    
+    /**
+     * Adds a quality to the tags (segment-qulity model)
+     * Note, that the qualities will be saved seperately from the tags-model and is NOT serialized
+     * This also means, that during the import-process, the quality-entries will be written before the tags are written AFTER the import
+     * @param string[]|string $fields
+     * @param string $type
+     * @param string $msgkey
+     * @param string $category
+     * @param int $startIndex
+     * @param int $endIndex
+     */
+    public function addQuality($fields, string $type, string $msgkey, string $category=NULL, int $startIndex=0, int $endIndex=-1) {
+        $row = $this->getQualityTable()->createRow();
+        /* @var $row editor_Models_Db_SegmentQualityRow */
+        $row->segmentId = $this->segmentId;
+        $row->taskGuid = $this->task->getTaskGuid();
+        $row->setFields($fields);
+        $row->type = $type;
+        $row->msgkey = $msgkey;
+        $row->category = $category;
+        $row->startIndex = $startIndex;
+        $row->endIndex = $endIndex;
+        $this->qualities[] = $row;
+    }
+    /**
+     * 
+     * @return editor_Models_Db_SegmentQualityRow[]
+     */
+    public function getQualities(){
+        return $this->qualities;
+    }
+    /**
+     * Saves all set qualities to the database after deleting the current ones
+     */
+    public function saveQualities(){
+        editor_Models_Db_SegmentQuality::deleteForSegment($this->segmentId);
+        if(count($this->qualities) > 0){
+            editor_Models_Db_SegmentQuality::saveRows($this->qualities);
+            $this->qualities = [];
+        }
+    }
+    
     /* Serialization API */
     
     /**
@@ -302,7 +398,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * @see JsonSerializable::jsonSerialize()
      */
     public function jsonSerialize(){
-        $data = new stdClass();
+        $data = new stdClass(); 
         $data->taskGuid = $this->task->getTaskGuid();
         $data->segmentId = $this->segmentId;
         $data->targets = [];
@@ -336,123 +432,14 @@ class editor_Segment_Tags implements JsonSerializable {
             throw new Exception('Deserialization of editor_Segment_Tags from JSON-Object failed because of invalid data: '.json_encode($data));
         }
     }
-    
-    // ***************************************************************************************** DEV ***************************************************************************************** //
-    
-    
-    function __originalCode(){
-        
-        // FOR REFERENCE THE ORIGINAL CODE OF THE SEQUENCE OF FIELDS WHEN IMPORTING OR EDITING ...
-        // TODO FIXME: remove
-        
-        
-        // EDITING **********************************************************************
-        
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($task));
-        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        
-        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $fieldManager editor_Models_SegmentFieldManager */
-        $fieldManager->initFields($task->getTaskGuid());
-        
-        $this->sourceFieldName = $fieldManager->getFirstSourceName();
-        $sourceText = $segment->get($this->sourceFieldName);
-        
-        if ($task->getEnableSourceEditing()) {
-            $this->sourceFieldNameOriginal = $this->sourceFieldName;
-            $sourceTextOriginal = $sourceText;
-            $this->sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
-            $sourceText = $segment->get($this->sourceFieldName);
+    /**
+     * 
+     * @return editor_Models_Db_SegmentQuality
+     */
+    private function getQualityTable(){
+        if($this->qualityTable == NULL){
+            $this->qualityTable = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
         }
-        
-        $fields = $fieldManager->getFieldList();
-        $firstField = true;
-        foreach ($fields as $field) {
-            if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
-                continue;
-            }
-            
-            $targetFieldName = $fieldManager->getEditIndex($field->name);
-            
-            // if source is editable compare original Source with first targetField
-            if ($firstField && $task->getEnableSourceEditing()) {
-                $serverCommunication->addSegment($segment->getId(), 'SourceOriginal', $sourceTextOriginal, $segment->get($targetFieldName));
-                $firstField = false;
-            }
-            
-            $serverCommunication->addSegment($segment->getId(), $targetFieldName, $sourceText, $segment->get($targetFieldName));
-        }
-        
-        $results = $worker->getResult();
-        $sourceTextTagged = false;
-        foreach ($results as $result) {
-            if ($result->field == 'SourceOriginal') {
-                $segment->set($this->sourceFieldNameOriginal, $result->source);
-                continue;
-            }
-            
-            if (!$sourceTextTagged) {
-                $segment->set($this->sourceFieldName, $result->source);
-                $sourceTextTagged = true;
-            }
-            
-            $segment->set($result->field, $result->target);
-        }
-        
-        // IMPORT ***************************************************************************
-        
-        $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($this->task));
-        /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        
-        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $fieldManager editor_Models_SegmentFieldManager */
-        $fieldManager->initFields($this->workerModel->getTaskGuid());
-        $segmentFields = $fieldManager->getFieldList();
-        $this->sourceFieldName = $fieldManager->getFirstSourceName();
-        
-        foreach ($segmentIds as $segmentId) {
-            $segment = ZfExtended_Factory::get('editor_Models_Segment');
-            /* @var $segment editor_Models_Segment */
-            $segment->load($segmentId);
-            
-            $sourceText = $segment->get($this->sourceFieldName);
-            
-            foreach ($segmentFields as $field) {
-                if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
-                    continue;
-                }
-                $targetText = $segment->getTargetEdit();
-                $serverCommunication->addSegment($segment->getId(), $field->name, $sourceText, $targetText);
-            }
-        }
-        
-        // --------------------------------
-        
-        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-        /* @var $fieldManager editor_Models_SegmentFieldManager */
-        $fieldManager->initFields($this->workerModel->getTaskGuid());
-        
-        $responses = $this->groupResponseById($segments);
-        
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
-        foreach ($responses as $segmentId => $responseGroup) {
-            $segment->load($segmentId);
-            
-            $segment->set($this->sourceFieldName, $responseGroup[0]->source);
-            if ($this->task->getEnableSourceEditing()) {
-                $segment->set($fieldManager->getEditIndex($this->sourceFieldName), $responseGroup[0]->source);
-            }
-            
-            foreach ($responseGroup as $response) {
-                $segment->set($response->field, $response->target);
-                $segment->set($fieldManager->getEditIndex($response->field), $response->target);
-            }
-            
-            $segment->save();
-            
-            $segment->meta()->setTermtagState($this::SEGMENT_STATE_TAGGED);
-            $segment->meta()->save();
-        }
+        return $this->qualityTable;
     }
 }

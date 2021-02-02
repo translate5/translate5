@@ -30,6 +30,22 @@ END LICENSE AND COPYRIGHT
  * DB Access for Segment Tags (only used when importing a task)
  */
 class editor_Models_Db_SegmentTags extends Zend_Db_Table_Abstract {
+    
+    public static function removeByTaskGuid(string $taskGuid){
+        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentTags');
+        /* @var $table editor_Models_Db_SegmentTags */
+        $db = $table->getAdapter();
+        $db->query('DELETE FROM '.$db->quoteIdentifier($table->getName()).' WHERE taskGuid = ?', $taskGuid);
+    }
+    
     protected $_name = 'LEK_segment_tags';
     public $_primary = 'id';
+    
+    /**
+     *
+     * @return string
+     */
+    protected function getName(){
+        return $this->_name;
+    }
 }
