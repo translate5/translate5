@@ -65,7 +65,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
         customerDeleteMsg:'#UT#Diesen Kunden löschen?',
         customerDeleteTitle:'#UT#Kunden löschen',
         customerDeletedMsg:'#UT#Kunde gelöscht',
-        export:'#UT#Exportieren',
+        export:'#UT#Ressourcen-Nutzung Exportieren',
         domain:'#UT#translate5 Domain',
         openIdServer:'#UT#OpenId server',
         openIdIssuer:'#UT#OpenId Issuer',
@@ -79,7 +79,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
         defaultRolesGroupLabelTooltip: '#UT#Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.',
         serverRolesGroupLabelTooltip: '#UT#Systemrollen, die der OpenID-Server in translate5 festlegen darf.',
         propertiesTabPanelTitle: '#UT#Eigenschaften',
-        configTabTitle:'#UT#Standardkonfiguration des Systems'
+        configTabTitle:'#UT#Standardkonfiguration des Systems',
+        actionColumn:'#UT#Aktionen'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -149,11 +150,12 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 }
                             },{
                                 xtype: 'actioncolumn',
-                                text:  me.strings.export,
+                                text:  me.strings.actionColumn,
                                 menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
                                 sortable: false,
                                 items:[{
                                     glyph: 'f1c3@FontAwesome5FreeSolid',
+                                    tooltip: me.strings.export,
                                     handler:me.onTmExportClick
                                 }]
                             }

@@ -1904,6 +1904,20 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='V2VydA=='><source>Wert</source><target>Wert</target></trans-unit>
 <trans-unit id='QW53ZW5kdW5nIHZlcmxhc3Nlbg=='><source>Anwendung verlassen</source><target>Anwendung verlassen</target></trans-unit>
 <trans-unit id='U3DDpHRlciB3ZWl0ZXIgYXJiZWl0ZW4='><source>Später weiter arbeiten</source><target>Später weiter arbeiten</target></trans-unit>
+<trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIGZ1ZXIgYWxsZSBLdW5kZW4='><source>Ressourcen-Nutzung fuer alle Kunden</source><target>Ressourcen-Nutzung fuer alle Kunden</target></trans-unit>
+<trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIGZ1ZXIgS3VuZGU='><source>Ressourcen-Nutzung fuer Kunde</source><target>Ressourcen-Nutzung fuer Kunde</target></trans-unit>
+<trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIHBybyBNb25hdA=='><source>Ressourcen-Nutzung pro Monat</source><target>Ressourcen-Nutzung pro Monat</target></trans-unit>
+<trans-unit id='TG9nIGRlciBSZXNzb3VyZW4tTnV0enVuZw=='><source>Log der Ressouren-Nutzung</source><target>Log der Ressouren-Nutzung</target></trans-unit>
+<trans-unit id='RG9rdW1lbnRlIHBybyBNb25hdA=='><source>Dokumente pro Monat</source><target>Dokumente pro Monat</target></trans-unit>
+<trans-unit id='RGllc2UgRGF0ZW4gZW50aGFsdGVuIGFsbGUgQW5mcmFnZW4gYW4gU3ByYWNocmVzc291cmNlbiwgZWdhbCBvYiBkdXJjaCBBdWZnYWJlbiBvZGVyIHZpYSBJbnN0YW50VHJhbnNsYXRlLg=='><source>Diese Daten enthalten alle Anfragen an Sprachressourcen, egal ob durch Aufgaben oder via InstantTranslate.</source><target>Diese Daten enthalten alle Anfragen an Sprachressourcen, egal ob durch Aufgaben oder via InstantTranslate.</target></trans-unit>
+<trans-unit id='SmVkZSBaZWlsZSBrb3JyZXNwb25kaWVydCBtaXQgZWluZXIgQW5mcmFnZSBhbiBlaW5lIFNwcmFjaHJlc3NvdXJjZS4='><source>Jede Zeile korrespondiert mit einer Anfrage an eine Sprachressource.</source><target>Jede Zeile korrespondiert mit einer Anfrage an eine Sprachressource.</target></trans-unit>
+<trans-unit id='VHlwIGRlciBSZXNzb3VyY2U='><source>Typ der Ressource</source><target>Typ der Ressource</target></trans-unit>
+<trans-unit id='TmFtZSBkZXIgUmVzc291cmNl'><source>Name der Ressource</source><target>Name der Ressource</target></trans-unit>
+<trans-unit id='SmFoci9Nb25hdA=='><source>Jahr/Monat</source><target>Jahr/Monat</target></trans-unit>
+<trans-unit id='w5xiZXJzZXR6dGUgWmVpY2hlbg=='><source>Übersetzte Zeichen</source><target>Übersetzte Zeichen</target></trans-unit>
+<trans-unit id='WmVpdHN0ZW1wZWw='><source>Zeitstempel</source><target>Zeitstempel</target></trans-unit>
+<trans-unit id='QW56YWhsIGRlciBtaXQgSW5zdGFudFRyYW5zbGF0ZSDDvGJlcnNldHp0ZW4gRG9rdW1lbnRl'><source>Anzahl der mit InstantTranslate übersetzten Dokumente</source><target>Anzahl der mit InstantTranslate übersetzten Dokumente</target></trans-unit>
+<trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIEV4cG9ydGllcmVu'><source>Ressourcen-Nutzung Exportieren</source><target>Ressourcen-Nutzung Exportieren</target></trans-unit>
   </body>
  </file>
 </xliff>
