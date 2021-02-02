@@ -268,6 +268,10 @@ class editor_ConfigController extends ZfExtended_RestController {
         }
         $customerId = $this->getParam('customerId');
         if(!empty($customerId)){
+            //ignore invalid customer ids
+            if(!is_numeric($customerId)){
+                return [];
+            }
             return array_values($this->entity->mergeCustomerValues($customerId));
         }
         $userGuid = $this->getParam('userGuid');

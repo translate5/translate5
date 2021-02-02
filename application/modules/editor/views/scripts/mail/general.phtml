@@ -61,7 +61,7 @@ $dateFormater=function($date){
     if(!isset($date) || empty($date)){
         return '-';
     }
-    return $this->workflowNotifyMail()->dateFormat($date);
+    return $this->workflowNotifyMail()->dateFormat($date,true);
 };
 
 if(isset($this->taskUserAssoc)){

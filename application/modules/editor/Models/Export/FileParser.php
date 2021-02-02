@@ -67,11 +67,15 @@ abstract class editor_Models_Export_FileParser {
      * @var object
      */
     protected $_difftagger = NULL;
+    
     /**
-     * @var boolean wether or not to include a diff about the changes in the exported segments
-     *
+     * fluent container of flags controlling the export parser, may be set from config or via param or whatever
+     * @var array
      */
-    protected $_diff= false;
+    protected $options = [
+        'diff' => false,
+    ];
+    
     /**
      * @var editor_Models_Task current task
      */
@@ -146,14 +150,12 @@ abstract class editor_Models_Export_FileParser {
     protected $segmentFieldManager;
     
     /**
-     *
-     * @param int $fileId
-     * @param bool $diff
      * @param editor_Models_Task $task
-     * @param string $path
-     * @throws Zend_Exception
+     * @param int $fileId
+     * @param string $path The absolute path to the file where the content is written to
+     * @param array $options see $this->options for available options
      */
-    public function __construct(int $fileId,bool $diff,editor_Models_Task $task, string $path) {
+    public function __construct(editor_Models_Task $task, int $fileId, string $path, array $options = []) {
         if(is_null($this->_classNameDifftagger)){
             //this->_classNameDifftagger must be defined in the child class.
             throw new editor_Models_Export_FileParser_Exception('E1085', [
@@ -162,7 +164,7 @@ abstract class editor_Models_Export_FileParser {
         }
         $this->_fileId = $fileId;
         $this->_diffTagger = ZfExtended_Factory::get($this->_classNameDifftagger);
-        $this->_diff = $diff;
+        $this->options = array_replace($this->options, $options);
         $this->_task = $task;
         $this->_taskGuid = $task->getTaskGuid();
         $this->path = $path;
@@ -190,8 +192,7 @@ abstract class editor_Models_Export_FileParser {
         
         $this->getSkeleton($file);
         $this->parse();
-        $this->convertEncoding($file);
-        return $this->_exportFile;
+        return $this->_exportFile = $this->convertEncoding($file, $this->_exportFile);
     }
     
     public function saveFile() {
@@ -337,7 +338,7 @@ abstract class editor_Models_Export_FileParser {
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);
         
-        if(!$this->_diff){
+        if(!$this->options['diff']){
             return $this->unprotectContent($edited);
         }
         
@@ -454,12 +455,12 @@ abstract class editor_Models_Export_FileParser {
      * converts $this->_exportFile back to the original encoding registered in the LEK_files
      * @param editor_Models_File $file
      */
-    protected function convertEncoding(editor_Models_File $file){
+    protected function convertEncoding(editor_Models_File $file, string $data): string{
         $enc = $file->getEncoding();
         if(is_null($enc) || $enc === '' || strtolower($enc) === 'utf-8'){
-            return;
+            return $data;
         }
-        $this->_exportFile = iconv('utf-8', $enc, $this->_exportFile);
+        return iconv('utf-8', $enc, $data);
     }
     
     /**
