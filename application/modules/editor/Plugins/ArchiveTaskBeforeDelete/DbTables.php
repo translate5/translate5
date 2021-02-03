@@ -58,6 +58,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_change_log' => false,
             'LEK_comments' => 'taskGuid',
             'LEK_comment_meta' => 'taskGuid',
+            'LEK_customer_config' => false,
             'LEK_files' => 'taskGuid',
             'LEK_file_filter' => 'taskGuid',
             'LEK_foldertree' => 'taskGuid',
@@ -87,6 +88,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             //not needed anymore, but keeping as reference how to to implement filters
             //'LEK_skeletonfiles' => array('--single-transaction', "--where=fileId in (select id from LEK_files where taskGuid = '{TASKGUID}')"),
             'LEK_task' => 'taskGuid',
+            'LEK_task_config' => 'taskGuid',
             'LEK_task_excelexport' => 'taskGuid',
             'LEK_taskUserAssoc' => 'taskGuid',
             'LEK_taskUserTracking' => 'taskGuid',
@@ -121,10 +123,34 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
     public static function runFromCLI($projectRoot, $zendLib) {
         self::initCliRuntime($projectRoot, $zendLib);
         $instance = ZfExtended_Factory::get(__CLASS__);
-        $instance->checkMissingInList();
+        $missing = $instance->checkMissingInList();
+        if(empty($missing)) {
+            //since other checks will follow we can not exit(0) here
+            return;
+        }
+        if(!empty($missing['addedToSystem'])) {
+            echo 'The following DB tables are not listed in '.__CLASS__.PHP_EOL;
+            print_r($missing['addedToSystem']);
+        }
+        if(!empty($missing['missingInSystem'])) {
+            echo 'The following DB tables are not in the DB but listed in '.__CLASS__.PHP_EOL;
+            echo 'Did you forgot to apply the tables to your local DB?'.PHP_EOL;
+            print_r($missing['missingInSystem']);
+        }
+        exit(1); //since used as CLI use CLI exit codes here, 0 is true, other than 0 is error
     }
     
-    protected function checkMissingInList() {
+    /**
+     * This method is intended to be called directly from CLI, in the build scripts of translate5.
+     * So it is ensured, that no new LEK table (relating to tasks) is forgotten in the archive plugin
+     */
+    public static function run($projectRoot, $zendLib): array {
+        self::initCliRuntime($projectRoot, $zendLib);
+        $instance = ZfExtended_Factory::get(__CLASS__);
+        return $instance->checkMissingInList();
+    }
+    
+    protected function checkMissingInList(): array {
         $config = Zend_Registry::get('config');
         $db = Zend_Db::factory($config->resources->db);
         
@@ -142,19 +168,13 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
         $missingInSystem = array_diff($configuredTables, $filtered);  //gib die vom ersten die nicht im zweiten
         
         if(empty($addedToSystem) && empty($missingInSystem)){
-            return; //since other checks will follow we can not exit(0) here
+            return [];
         }
         
-        if(!empty($addedToSystem)) {
-            echo 'The following DB tables are not listed in '.__CLASS__.PHP_EOL;
-            print_r($addedToSystem);
-        }
-        if(!empty($missingInSystem)) {
-            echo 'The following DB tables are not in the DB but listed in '.__CLASS__.PHP_EOL;
-            echo 'Did you forgot to apply the tables to your local DB?'.PHP_EOL;
-            print_r($missingInSystem);
-        }
-        exit(1); //since used as CLI use CLI exit codes here, 0 is true, other than 0 is error
+        return [
+            'addedToSystem' => $addedToSystem,
+            'missingInSystem' => $missingInSystem,
+        ];
     }
     
     /**
