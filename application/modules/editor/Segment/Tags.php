@@ -442,4 +442,21 @@ class editor_Segment_Tags implements JsonSerializable {
         }
         return $this->qualityTable;
     }
+    /**
+     * Debug output
+     * @return string
+     */
+    public function debug(){
+        $debug = '';
+        if($this->source != NULL){
+            $debug .= 'SOURCE: '.htmlspecialchars($this->source->render())."\n";
+        }
+        if($this->sourceOriginal != NULL){
+            $debug .= 'SOURCE ORIGINAL: '.htmlspecialchars($this->sourceOriginal->render())."\n";
+        }
+        for($i=0; $i < count($this->targets); $i++){
+            $debug .= 'TARGET '.$i.': '.htmlspecialchars($this->targets[$i]->render())."\n";
+        }
+        return $debug;
+    }
 }

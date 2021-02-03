@@ -376,7 +376,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
         }
         $source = $tags->getSource();
         $source->setTagsByText($sourceText);
-        
     }
     /**
      * sets the meta TermtagState of the given segment ids to the given state

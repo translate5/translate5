@@ -90,7 +90,7 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
         $this->targetLang = $langModel->getRfc5646();
         $this->targetStringMatch = (int) in_array($this->targetLang, $customerConfig->targetStringMatch->toArray(), true);
 
-		$this->task = $task;
+		$this->task = $task->getTaskGuid();
     }
     
     /**

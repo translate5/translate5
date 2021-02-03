@@ -291,9 +291,11 @@ class editor_Plugins_TermTagger_Configuration {
             $firstTargetText = null;
 
             foreach($tags->getTargets() as $target) { /* @var $target editor_Segment_FieldTags */
-                $service->addSegment($target->getSegmentId(), $target->getTermtaggerName(), $sourceText, $target->render($typesToExclude));
+                
+                $targetText = $target->render($typesToExclude);
+                $service->addSegment($target->getSegmentId(), $target->getTermtaggerName(), $sourceText, $targetText);
                 if($firstTargetText === null){
-                    $firstTargetText = $target->render($typesToExclude);
+                    $firstTargetText = $targetText;
                 }
             }
             if($tags->hasOriginalSource()){
