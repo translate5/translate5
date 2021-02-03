@@ -42,7 +42,7 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
      /** 
       * parses qm-subsegment-img-Tags in segment and saves new once in the database and sets their id correctly in returned segment
       * 
-      * - example for img-Tag: <img data-seq="ext-123123" data-comment="Kommentar" class="minor qmflag ownttip open qmflag-2" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png">
+      * - example for img-Tag: <img data-seq="ext-123123" data-comment="Kommentar" class="minor qmflag ownttip open qmflag-2" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />
       * 
       * Warning, in Frontend duplicated IDs are fixed by the editor.
       * That means that existing ids (data-seqs) are wandering forward: 
