@@ -29,22 +29,71 @@ END LICENSE AND COPYRIGHT
 /**
  * Tests the User Auth API
  */
-class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
+class AaaPrebuildTest extends \ZfExtended_Test_ApiTestcase {
     
+    protected static $appRoot;
     
     public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
+        self::$appRoot = explode('/', getcwd());
+        self::$appRoot = join('/', array_splice(self::$appRoot, 0, -4));
     }
     
     public function testTables() {
-        $appRoot = explode('/', getcwd());
-        $appRoot = join('/', array_splice($appRoot, 0, -4));
-        $zend = $appRoot.'/vendor/shardj/zf1-future/library/';
-        $dbTables = $appRoot.'/application/modules/editor/Plugins/ArchiveTaskBeforeDelete/DbTables.php';
+        
+        $zend = self::$appRoot.'/vendor/shardj/zf1-future/library/';
+        $dbTables = self::$appRoot.'/application/modules/editor/Plugins/ArchiveTaskBeforeDelete/DbTables.php';
         require $dbTables;
-        $result = editor_Plugins_ArchiveTaskBeforeDelete_DbTables::run($appRoot, $zend);
+        $result = editor_Plugins_ArchiveTaskBeforeDelete_DbTables::run(self::$appRoot, $zend);
         $msg = 'The following tables are not in sync with the table list in editor_Plugins_ArchiveTaskBeforeDelete_DbTables!';
         $msg .= "\n".print_r($result,1);
         $this->assertEmpty($result, $msg);
+    }
+    
+    public function testEcodesUsed() {
+        /*
+         ** Check the used error numbers
+         */
+        chdir(self::$appRoot);
+        $cmd = 'find -iname "*.php" -or -iname "*.phtml" | xargs grep --colour=auto -E "[\\"\']E[0-9]{4,4}[\\"\']"';
+        $result = null;
+        $matches = [];
+        exec($cmd, $result);
+        
+        //duplication recognition not possible in source code since error codes are used multiple times: on usage place and on definition place
+        $collectedCodes = [];
+        $collectedLines = [];
+        foreach ($result as $line) {
+            preg_match_all('/["\'](E[0-9]{4,4})["\']/', $line, $matches);
+            foreach($matches[1] as $code) {
+                $collectedCodes[] = $code;
+                settype($collectedLines[$code], 'array');
+                $collectedLines[$code][] = $line;
+            }
+        }
+        
+        $collectedCodes = array_unique($collectedCodes);
+        $docuUrl = "https://confluence.translate5.net/display/TAD/EventCodes";
+        $text = file_get_contents($docuUrl);
+        $codes = [];
+        preg_match_all("/(E[0-9]{4})/", $text, $codes);
+        $documentedCodes = array_unique($codes[0]);
+        
+        $unusedInDocu = array_diff($documentedCodes, $collectedCodes);
+        $notFoundInDocu = array_diff($collectedCodes, $documentedCodes);
+        
+        if(!empty($unusedInDocu)) {
+            $this->addWarning("\n\nWarning: the following Errorcodes are in the docu, but not in the PHP code:\n".print_r($unusedInDocu,1));
+        }
+        
+        if(!empty($notFoundInDocu)) {
+            $msg = "\n\nError: the following Errorcodes are in the PHP Code, but not found in the Online Documentation:\n";
+            $msg .= $docuUrl."\n\n";
+            foreach($notFoundInDocu as $notFound) {
+                $msg .= $notFound." => ";
+                $msg .= print_r($collectedLines[$notFound],1);
+                $msg .= "\n\n";
+            }
+            $this->fail($msg);
+        }
     }
 }
