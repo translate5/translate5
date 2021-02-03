@@ -75,7 +75,7 @@ class editor_Models_Segment_Utility {
      * @return string $segment
      */
     public static function foreachSegmentTextNode($segment, callable $textNodeCallback) {
-        $split = preg_split('#(<[^\s][^>]+>)#', $segment, null, PREG_SPLIT_DELIM_CAPTURE);
+        $split = preg_split('#(<[^\s][^>]*>)#', $segment, null, PREG_SPLIT_DELIM_CAPTURE);
         
         $i = 0;
         foreach($split as $idx => $chunk) {
