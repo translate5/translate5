@@ -60,7 +60,8 @@ PM reviewed, unchanged			->	reviewed_pm_unchanged		->	final
 PM reviewed, unchanged, auto-set->	reviewed_pm_unchanged_auto	->	final
 		
 -->
-<segment id="seg1" state="reviewed" subState="translate5Autostate:reviewed">
+<segment id="seg1" translate5:matchRate="0" state="reviewed" subState="translate5Autostate:reviewed">
+<!-- The translate5:matchRate attribute contains the current matchrate for the segment. -->
 <!-- The translate5:translated attribut on mrk-tags of type="term" shows, if the marked term has been found as translated in the corresponding target segment or not.
  The allowed values are "found", "notfound" and "undefined". Undefined usually means, that no term has been defined in the target language of the terminology.
  The translate5:translated attribute can only occur inside of the source-tag.
@@ -90,7 +91,7 @@ The value of translate5:date is in the format  "2017-12-06 13:12:34"
 </segment>
 </unit>
 <unit id="unit2" its:revPerson="test lector" translate5:revPersonGuid="{00000000-0000-0000-C100-CCDDEE000002}">
-<segment id="seg2" state="reviewed" subState="translate5Autostate:reviewed">
+<segment id="seg2" translate5:matchRate="0" state="reviewed" subState="translate5Autostate:reviewed">
 <source><pc id="1">das Haus</pc> ist zurück</source>
 <target>
 <sc id="1"/>the house<mrk id="4" translate="no" translate5:trackChanges="del" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:52:14+01:00" ><ec id="1" startRef="1" /></mrk>\u00a0is<mrk id="3" translate="yes" translate5:trackChanges="ins" translate5:username="lector test" translate5:userGuid="{00000000-0000-0000-C100-CCDDEE000002}" translate5:date="2020-02-26T10:52:15+01:00" ><ec id="1" startRef="1" /></mrk> back
@@ -98,7 +99,7 @@ The value of translate5:date is in the format  "2017-12-06 13:12:34"
 </segment>
 </unit>
 <unit id="unit3" its:revPerson="test lector" translate5:revPersonGuid="{00000000-0000-0000-C100-CCDDEE000002}">
-<segment id="seg3" state="translated" subState="translate5Autostate:translated">
+<segment id="seg3" translate5:matchRate="0" state="translated" subState="translate5Autostate:translated">
 <source><pc id="1">aus die maus</pc>ENDE</source>
 <target>
 <pc id="1">off the mouse</pc>ENDE
