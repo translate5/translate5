@@ -26,27 +26,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-require_once __DIR__.'/../../../../../vendor/autoload.php';
-
 /**
  * Empty dummy test to test the surrounding test framework
  */
 class SegmentTagsTest extends \ZfExtended_Test_Testcase {
     
-    public static function setUpBeforeClass(): void {
-        // TODO: Why is that neccessary ???
-        require_once 'Tag.php';
-        require_once 'TextNode.php';
-        require_once 'Segment/InternalTag.php';
-        require_once 'Segment/AnyInternalTag.php';
-        require_once 'Segment/Tags.php';
-        require_once 'Segment/FieldTags.php';
-        require_once 'Segment/TagCreator.php';
-        require_once 'Segment/Quality/Manager.php';
-        require_once 'Segment/Quality/Provider.php';
-        require_once 'Utils/Dom.php';
-        parent::setUpBeforeClass();
-    }
     /**
      *
      */
@@ -284,7 +268,7 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
      * 
      * @return editor_Segment_FieldTags
      */
-    private function createTags() : editor_Segment_FieldTags{
+    private function createTags() : editor_Segment_FieldTags {
         $segmentId = 1234567;
         $segmentText = 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod.'; // 80 characters
         return new editor_Segment_FieldTags($segmentId, $segmentText, 'target', 'targetEdit');
