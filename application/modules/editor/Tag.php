@@ -457,8 +457,15 @@ class editor_Tag {
      * @return string
      */
     public function getClasses(){
-        sort($this->classes);
         return implode(' ', $this->classes);
+    }
+    /**
+     * Retrieves the sorted classnames, can be used to compare tags by classnames
+     */
+    public function getSortedClasses(){
+        $classes = $this->classes;
+        sort($classes);
+        return implode(' ', $classes);
     }
 
     /* attribute API */
@@ -741,7 +748,7 @@ class editor_Tag {
      * @return boolean
      */
     public function isEqual(editor_Tag $tag) : bool {
-        if($tag->getName() != $this->getName() || $tag->getClasses() != $this->getClasses()){
+        if($tag->getName() != $this->getName() || $tag->getSortedClasses() != $this->getSortedClasses()){
             return false;
         }
         foreach($this->attribs as $key => $val){
@@ -853,7 +860,8 @@ class editor_Tag {
             }
         }
         if($this->isSingular()){
-            return $tag.'/>';
+            // QUIRK: The blank before the space is against the HTML-Spec and superflous BUT termtagger does double img-tags if they do not have a blank before the trailing slash ...
+            return $tag.' />';
         }
         return $tag.'>';
     }

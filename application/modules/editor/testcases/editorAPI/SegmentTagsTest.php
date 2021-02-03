@@ -68,7 +68,7 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
      *
      */
     public function testSimpleTag(){
-        $expected = '<a href="http://www.google.de" target="blank" data-test="42"><span>Link Text</span> <img class="link-img" src="/some/icon.svg"/></a>';
+        $expected = '<a href="http://www.google.de" target="blank" data-test="42"><span>Link Text</span> <img class="link-img" src="/some/icon.svg" /></a>';
         $tag = editor_Tag::unparse($expected);
         $result = $tag->render();
         $this->assertEquals($result, $expected);
@@ -77,10 +77,21 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
      * 
      */
     public function testTagWithAttributes(){
-        $expected = '<a href="http://www.google.de" target="blank" data-test="42"><span>Link Text</span> <img class="link-img" src="/some/icon.svg"/></a>';
+        $expected = '<a href="http://www.google.de" target="blank" data-test="42"><span>Link Text</span> <img class="link-img" src="/some/icon.svg" /></a>';
         $tag = editor_Tag::unparse($expected);
         $result = $tag->render();
         $this->assertEquals($expected, $result);
+    }
+    /**
+     *
+     */
+    public function testClassOrder(){
+        $expected = '<div class="zzz 12wer www aaa sss">Some Content</div>';
+        $tag = editor_Tag::unparse($expected);
+        $result = $tag->render();
+        $this->assertEquals($result, $expected);
+        $tag2 = editor_Tag::unparse($expected);
+        $this->assertTrue($tag2->isEqual($tag));
     }
     /**
      *
@@ -155,7 +166,7 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         $tags->addTag(new editor_Segment_AnyInternalTag(5, 5, 'test', 'img'));
         $tags->addTag(new editor_Segment_AnyInternalTag(50, 50, 'test', 'img'));
         $tags->addTag(new editor_Segment_AnyInternalTag(50, 50, 'test', 'div'));
-        $markup = 'Lorem<div><img/></div> ipsum dolor sit amet, consetetur sadipscing <div><img/></div>elitr, sed diam nonumy eirmod.';
+        $markup = 'Lorem<div><img /></div> ipsum dolor sit amet, consetetur sadipscing <div><img /></div>elitr, sed diam nonumy eirmod.';
         $this->createTagsTest($tags, $markup);
     }
     /**
@@ -169,7 +180,7 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         $tags->addTag(new editor_Segment_AnyInternalTag(50, 50, 'test', 'div'));
         $tags->addTag(new editor_Segment_AnyInternalTag(0, 80, 'test', 'a'));
         $tags->addTag(new editor_Segment_AnyInternalTag(0, 80, 'test', 'b'));
-        $markup = '<a><b>Lorem<div><img/></div> ipsum dolor sit amet, consetetur sadipscing <div><img/></div>elitr, sed diam nonumy eirmod.</b></a>';
+        $markup = '<a><b>Lorem<div><img /></div> ipsum dolor sit amet, consetetur sadipscing <div><img /></div>elitr, sed diam nonumy eirmod.</b></a>';
         $this->createTagsTest($tags, $markup);
     }
     /**
