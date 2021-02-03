@@ -189,7 +189,7 @@ final class editor_Segment_Quality_Manager {
     }
     /**
      * The central API to identify the needed Tag class by classnames and attributes
-     * @param string $type
+     * @param string $tagType
      * @param string $nodeName
      * @param string[] $classNames
      * @param string[] $attributes
@@ -197,16 +197,16 @@ final class editor_Segment_Quality_Manager {
      * @param int $endIndex
      * @return editor_Segment_InternalTag | NULL
      */
-    public function evaluateInternalTag(string $type, string $nodeName, array $classNames, array $attributes, int $startIndex, int $endIndex){
-        if(!empty($type) && array_key_exists($type, $this->registry)){
-            if($this->registry[$type]->isInternalTag($type, $nodeName, $classNames, $attributes)){
-                return $this->registry[$type]->createInternalTag($startIndex, $endIndex, $nodeName);
+    public function evaluateInternalTag(string $tagType, string $nodeName, array $classNames, array $attributes, int $startIndex, int $endIndex){
+        if(!empty($tagType) && array_key_exists($tagType, $this->registry)){
+            if($this->registry[$tagType]->isInternalTag($tagType, $nodeName, $classNames, $attributes)){
+                return $this->registry[$tagType]->createInternalTag($startIndex, $endIndex, $nodeName);
             }            
             return NULL;
         }
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
-            if($provider->isInternalTag($type, $nodeName, $classNames, $attributes)){
+            if($provider->isInternalTag($tagType, $nodeName, $classNames, $attributes)){
                 return $provider->createInternalTag($startIndex, $endIndex, $nodeName);
             }
         }

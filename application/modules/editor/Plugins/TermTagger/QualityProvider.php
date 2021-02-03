@@ -123,8 +123,8 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     }
 
     public function isInternalTag(string $type, string $nodeName, array $classNames, array $attributes) : bool {
-        // if the data says it's a term-tag or the class is term
-        return (($type == self::$type || in_array(self::$type, $classNames)) && editor_Plugins_TermTagger_InternalTag::hasNodeName($nodeName));
+        // if the data says it's a term-tag or the class is 'term'
+        return (($type == static::$type || in_array(static::$type, $classNames)) && editor_Plugins_TermTagger_InternalTag::hasNodeName($nodeName));
     }
 
     public function createInternalTag(int $startIndex, int $endIndex, string $nodeName=NULL) : editor_Segment_InternalTag {
