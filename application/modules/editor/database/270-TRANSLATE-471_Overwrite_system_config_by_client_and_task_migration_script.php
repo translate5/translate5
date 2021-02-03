@@ -90,8 +90,12 @@ $collectedComments = [];
 //remove the configs from the ini file
 foreach( $file as $key=>$line ) {
     $line = trim($line);
-    if(startsWith($line,'runtimeOptions') || startsWith($line,';')){
+    if(startsWith($line,';')) {
         $collectedComments[] = $line;
+        unset($file[$key]);
+        continue;
+    }
+    if(startsWith($line,'runtimeOptions')) {
         unset($file[$key]);
     }
 }
