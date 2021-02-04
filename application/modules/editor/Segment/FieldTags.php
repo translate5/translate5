@@ -78,11 +78,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
     }
     /**
      * Helper to sort Internal tags or rendered tags by startIndex
-     * @param editor_Segment_InternalTag $a
-     * @param editor_Segment_InternalTag $b
+     * @param editor_Segment_Tag $a
+     * @param editor_Segment_Tag $b
      * @return int
      */
-    public static function compare(editor_Segment_InternalTag $a, editor_Segment_InternalTag $b){
+    public static function compare(editor_Segment_Tag $a, editor_Segment_Tag $b){
         if($a->startIndex === $b->startIndex){
             // crucial: we must make sure, that a "normal" tag may contain a single tag all at the same index (no text-content). Thus, the normal tags always must weight less
             if($a->isSingular() && !$b->isSingular()){
@@ -117,7 +117,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
     private $ttName;
     /**
      * The tags and their positions within the segment
-     * @var editor_Segment_InternalTag[]
+     * @var editor_Segment_Tag[]
      */
     private $tags = [];
     
@@ -218,9 +218,9 @@ class editor_Segment_FieldTags implements JsonSerializable {
     }
     /**
      *
-     * @param editor_Segment_InternalTag $tag
+     * @param editor_Segment_Tag $tag
      */
-    public function addTag(editor_Segment_InternalTag $tag){
+    public function addTag(editor_Segment_Tag $tag){
         $tag->tagIndex = count($this->tags);
         $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= mb_strlen($this->fieldText));
         $this->tags[] = $tag;
@@ -228,7 +228,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
     /**
      * Retrieves the tag at a certain index
      * @param int $index
-     * @return editor_Segment_InternalTag|NULL
+     * @return editor_Segment_Tag|NULL
      */
     public function getAt($index){
         if($index < count($this->tags)){
@@ -239,7 +239,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
     /**
      * Retrieves the internal tags of a certain type
      * @param string $type
-     * @return editor_Segment_InternalTag[]
+     * @return editor_Segment_Tag[]
      */
     public function getByType(string $type) : array {
         $result = [];
@@ -327,7 +327,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
         $this->sort();
         $rtags = [];
-        /* @var $rtags editor_Segment_InternalTag[] */
+        /* @var $rtags editor_Segment_Tag[] */
         $numRtags = 0;
         // creating a datamodel where the overlapping tags are segmented to pieces that do not overlap
         // therefore, all tags are compared with the tags after them and are cut into pieces if needed
@@ -362,7 +362,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
         // now we create the nested data-model from the up to now sequential but sorted $rtags model. We also add the text-portions of the segment as text nodes
         // this container just acts as the master container 
-        $holder = new editor_Segment_AnyInternalTag(0, mb_strlen($this->fieldText));
+        $holder = new editor_Segment_AnyTag(0, mb_strlen($this->fieldText));
         $container = $holder;
         foreach($rtags as $tag){
             $container->getNearestContainer($tag)->addChild($tag);
@@ -374,7 +374,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
     }
     /**
      * Retrieves a part of the segment-text by start & end index
-     * Used by editor_Segment_InternalTag to fill in the segment-texts
+     * Used by editor_Segment_Tag to fill in the segment-texts
      * @param int $start
      * @param int $end
      * @return string
@@ -404,7 +404,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * Creates a nested structure of Internal tags & text-nodes recursively out of a HtmlNode structure
      * @param HtmlNode $node
      * @param int $startIndex
-     * @return editor_Segment_InternalTag
+     * @return editor_Segment_Tag
      */
     private function fromHtmlNode(HtmlNode $node, int $startIndex){
         $tag = editor_Segment_TagCreator::instance()->fromHtmlNode($node, $startIndex);

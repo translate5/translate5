@@ -329,7 +329,7 @@ class editor_Segment_Tags implements JsonSerializable {
     /**
      * Retrieves all tags from all our field tags
      * @param string $type
-     * @return editor_Segment_InternalTag[]
+     * @return editor_Segment_Tag[]
      */
     public function getInternalTagsByType(string $type){
         $result = [];
