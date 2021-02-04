@@ -36,15 +36,15 @@
  * Abstraction for an Internal tag of variable type. This usually covers Tags, that are no real internal tags or even markup of other source
  * The main use for this class is for testing purposes
  * 
- * @method editor_Segment_AnyInternalTag clone(boolean $withDataAttribs)
- * @method editor_Segment_AnyInternalTag createBaseClone()
- * @method editor_Segment_AnyInternalTag cloneProps(editor_Tag $tag, boolean $withDataAttribs)
+ * @method editor_Segment_AnyTag clone(boolean $withDataAttribs)
+ * @method editor_Segment_AnyTag createBaseClone()
+ * @method editor_Segment_AnyTag cloneProps(editor_Tag $tag, boolean $withDataAttribs)
  */
-class editor_Segment_AnyInternalTag extends editor_Segment_InternalTag {
+class editor_Segment_AnyTag extends editor_Segment_Tag {
     
-    protected static $type = editor_Segment_InternalTag::TYPE_ANY;
+    protected static $type = editor_Segment_Tag::TYPE_ANY;
     /**
-     * The Constructor parameters must match that of editor_Segment_InternalTag, the nodeName may be set later when instantiation from deserialization
+     * The Constructor parameters must match that of editor_Segment_Tag, the nodeName may be set later when instantiation from deserialization
      * @param int $startIndex
      * @param int $endIndex
      * @param string $category
@@ -60,15 +60,15 @@ class editor_Segment_AnyInternalTag extends editor_Segment_InternalTag {
     /**
      * {@inheritDoc}
      * @see editor_Tag::createBaseClone()
-     * @return editor_Segment_AnyInternalTag
+     * @return editor_Segment_AnyTag
      */
     protected function createBaseClone(){
-        return new editor_Segment_AnyInternalTag($this->startIndex, $this->endIndex, $this->category, $this->name);
+        return new editor_Segment_AnyTag($this->startIndex, $this->endIndex, $this->category, $this->name);
     }
     /**
      * ANY Internal tags shall not be be consolidated
      * {@inheritDoc}
-     * @see editor_Segment_InternalTag::isEqualType()
+     * @see editor_Segment_Tag::isEqualType()
      */
     public function isEqualType(editor_Tag $tag) : bool {
         return false;
@@ -76,7 +76,7 @@ class editor_Segment_AnyInternalTag extends editor_Segment_InternalTag {
     /**
      * We do not want "ANY" tags to be skipped
      * {@inheritDoc}
-     * @see editor_Segment_InternalTag::render()
+     * @see editor_Segment_Tag::render()
      */
     public function render(array $skippedTypes=NULL) : string {
         return $this->renderStart().$this->renderChildren($skippedTypes).$this->renderEnd();

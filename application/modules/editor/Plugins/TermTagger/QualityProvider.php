@@ -35,7 +35,7 @@
 class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_Provider {
     
     /**
-     * The central UNIQUE amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_InternalTag::$type
+     * The central UNIQUE amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_Tag::$type
      * @var string
      */
     protected static $type = 'term';
@@ -122,13 +122,13 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         return $tags;
     }
 
-    public function isInternalTag(string $type, string $nodeName, array $classNames, array $attributes) : bool {
+    public function isSegmentTag(string $type, string $nodeName, array $classNames, array $attributes) : bool {
         // if the data says it's a term-tag or the class is 'term'
-        return (($type == static::$type || in_array(static::$type, $classNames)) && editor_Plugins_TermTagger_InternalTag::hasNodeName($nodeName));
+        return (($type == static::$type || in_array(static::$type, $classNames)) && editor_Plugins_TermTagger_Tag::hasNodeName($nodeName));
     }
 
-    public function createInternalTag(int $startIndex, int $endIndex, string $nodeName=NULL) : editor_Segment_InternalTag {
-        return new editor_Plugins_TermTagger_InternalTag($startIndex, $endIndex);
+    public function createSegmentTag(int $startIndex, int $endIndex, string $nodeName, array $classNames) : editor_Segment_Tag {
+        return new editor_Plugins_TermTagger_Tag($startIndex, $endIndex);
     }
     /**
      * Find oversized segments and mark them as oversized

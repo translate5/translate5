@@ -36,7 +36,7 @@
  * Base Implementation for all Quality Providers
  *
  */
-abstract class editor_Segment_Quality_Provider {
+abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProviderInterface {
     
     /**
      * Retrieves our type
@@ -61,6 +61,14 @@ abstract class editor_Segment_Quality_Provider {
      * @return string
      */
     public function getType() : string {
+        return static::$type;
+    }
+    /**
+     * Quality Providers must use the same key to identify the provider & all of it's tags
+     * {@inheritDoc}
+     * @see editor_Segment_TagProviderInterface::getTagType()
+     */    
+    public function getTagType() : string {
         return static::$type;
     }
     /**
@@ -90,25 +98,12 @@ abstract class editor_Segment_Quality_Provider {
     public function processSegment(editor_Models_Task $task, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
         return $tags;
     }
-    /**
-     * Evaluates, if the Dom-Tag with the passed props match the providers quality tag
-     * @param string $type
-     * @param string $nodeName
-     * @param array $classNames
-     * @param array $attributes
-     * @return bool
-     */
-    public function isInternalTag(string $type, string $nodeName, array $classNames, array $attributes) : bool {
+
+    public function isSegmentTag(string $type, string $nodeName, array $classNames, array $attributes) : bool {
         return false;
     }
-    /**
-     * Creates an Internal Tag for the Quality. Will only be called, when ::isInternalTag evaluates "true"
-     * @param int $startIndex
-     * @param int $endIndex
-     * @param string $nodeName
-     * @return editor_Segment_InternalTag
-     */
-    public function createInternalTag(int $startIndex, int $endIndex, string $nodeName=NULL) : editor_Segment_InternalTag {
-        return new editor_Segment_AnyInternalTag($startIndex, $endIndex);
+
+    public function createSegmentTag(int $startIndex, int $endIndex, string $nodeName, array $classNames) : editor_Segment_Tag {
+        return new editor_Segment_AnyTag($startIndex, $endIndex);
     }
 }

@@ -37,37 +37,55 @@ use PHPHtmlParser\DTO\Tag\AttributeDTO;
 
 /**
  * This API creates the types of Internal tags either from a Dom Node or JSON serialization
- * WORK IN PROGRESS
+ * Basic tags will be found in this class (InternalTag, TrackChangesTag)
+ * Tags from Plugins can be added with the QualityProvider-API or by registering a TagProvider with the ::registerProvider API within this class
  */
-class editor_Segment_TagCreator {
-    
+final class editor_Segment_TagCreator {
+
     /**
      * @var editor_Segment_TagCreator
      */
     private static $_instance = null;
-    
     /**
-     * 
+     * @var editor_Segment_TagProviderInterface[]
+     */
+    private static $_provider = [];
+    /**
+     * @var boolean
+     */
+    private static $_locked = false;    
+    /**
+     * Adds a Provider for Tags
+     * @param editor_Segment_TagProviderInterface $provider
+     * @throws ZfExtended_Exception
+     */
+    public static function registerProvider(editor_Segment_TagProviderInterface $provider){
+        if(self::$_locked){
+            throw new ZfExtended_Exception('Registering Segment tag Providers after app bootstrapping is not allowed.');
+        }
+        self::$_provider[$provider->getTagType()] = $provider;
+    }
+    /**
+     *
      * @return editor_Segment_TagCreator
      */
     public static function instance(){
         if(self::$_instance == null){
             self::$_instance = new editor_Segment_TagCreator();
+            self::$_locked = true;
         }
         return self::$_instance;
     }
         
-    private function __construct(){
-        
-    }
+    private function __construct(){ }
     /**
      * Tries to evaluate an Internal tag out of given JSON Data
      * To make this happen all available Internal Tag Identifiers must be registered with this class
-     * The default is a 'editor_Segment_AnyInternalTag' representing an uncategorized internal tag
+     * The default is a 'editor_Segment_AnyTag' representing an uncategorized internal tag
      * NOTE: This API does not care about the children contained in the tag nor the text-length
      * @param stdClass $data
      * @throws Exception
-     * @return editor_Segment_InternalTag
+     * @return editor_Segment_Tag
      */
     public function fromJsonData(stdClass $data){
         try {
@@ -75,18 +93,18 @@ class editor_Segment_TagCreator {
             $tag->jsonUnserialize($data);
             return $tag;
         } catch (Exception $e) {
-            throw new Exception('Could not deserialize editor_Segment_InternalTag from JSON Data '.json_encode($data));
+            throw new Exception('Could not deserialize editor_Segment_Tag from JSON Data '.json_encode($data));
         }        
     }
     /**
      * Tries to evaluate an Internal tag out of a given HtmlNode
      * To make this happen all availaable Internal Tag Identifiers must be registered with this class
-     * The default is a 'editor_Segment_AnyInternalTag' representing an uncategorized internal tag
+     * The default is a 'editor_Segment_AnyTag' representing an uncategorized internal tag
      * NOTE: This API does not care about the children contained in the tag nor the text-length
      * @param HtmlNode $node
      * @param int $startIndex
      * @param int $endIndex
-     * @return editor_Segment_InternalTag
+     * @return editor_Segment_Tag
      */
     public function fromHtmlNode(HtmlNode $node, int $startIndex=0, int $endIndex=0){
         $classNames = [];
@@ -121,16 +139,34 @@ class editor_Segment_TagCreator {
      * @param string[] $attributes
      * @param int $startIndex
      * @param int $endIndex
-     * @return editor_Segment_InternalTag
+     * @return editor_Segment_Tag
      */
     private function evaluate(string $type, string $nodeName, array $classNames, array $attributes, int $startIndex, int $endIndex){
+        
+        // check for Internal tags
+        if((editor_Segment_Internal_Tag::isType($type) || in_array(editor_Segment_Internal_Tag::CSS_CLASS, $classNames)) && editor_Segment_Internal_Tag::hasNodeName($nodeName)){
+            return new editor_Segment_Internal_Tag($startIndex, $endIndex);
+        }
+        // check for TrackChanges tags
+        if((editor_Segment_TrackChanges_InsertTag::isType($type) || in_array(editor_Segment_TrackChanges_InsertTag::CSS_CLASS, $classNames)) && editor_Segment_TrackChanges_InsertTag::hasNodeName($nodeName)){
+            return new editor_Segment_TrackChanges_InsertTag($startIndex, $endIndex);
+        }
+        if((editor_Segment_TrackChanges_DeleteTag::isType($type) || in_array(editor_Segment_TrackChanges_DeleteTag::CSS_CLASS, $classNames)) && editor_Segment_TrackChanges_DeleteTag::hasNodeName($nodeName)){
+            return new editor_Segment_TrackChanges_DeleteTag($startIndex, $endIndex);
+        }
+        // let our providers find a tag
+        foreach(static::$_provider as $type => $tagProvider){
+            if($tagProvider->isSegmentTag($type, $nodeName, $classNames, $attributes)){
+                return $tagProvider->createSegmentTag($startIndex, $endIndex, $nodeName, $classNames);
+            }
+        }
         // try to let the quality manager find a tag
         $tag = editor_Segment_Quality_Manager::instance()->evaluateInternalTag($type, $nodeName, $classNames, $attributes, $startIndex, $endIndex);
         if($tag != null){
             return $tag;
         }
         // the default is the "any" tag
-        return new editor_Segment_AnyInternalTag($startIndex, $endIndex, '', $nodeName);
+        return new editor_Segment_AnyTag($startIndex, $endIndex, '', $nodeName);
     }
     
     /**

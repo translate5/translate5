@@ -39,37 +39,45 @@
  * Keep in mind that start & end-index work just like counting chars or the substr API in php, the tag starts BEFORE the start index and ends BEFORE the index of the end index, if you want to cover the whole segment the indices are 0 and mb_strlen($segment)
  * To identify the Types of Internal tags a general API editor_Segment_TagCreator is provided
  * 
- * @method editor_Segment_InternalTag clone(boolean $withDataAttribs)
- * @method editor_Segment_InternalTag createBaseClone()
- * @method editor_Segment_InternalTag cloneProps(editor_Tag $tag, boolean $withDataAttribs)
+ * @method editor_Segment_Tag clone(boolean $withDataAttribs)
+ * @method editor_Segment_Tag createBaseClone()
+ * @method editor_Segment_Tag cloneProps(editor_Tag $tag, boolean $withDataAttribs)
  */
-class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable {
+class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     
     /**
      * @var string
      */
-    const TYPE_QUALITYCONTROL = 'qc';
+    const TYPE_TRACKCHANGES = 'trackchanges';
+    /**
+     * @var string
+     */
+    const TYPE_INTERNAL = 'internal';
     /**
      * @var string
      */
     const TYPE_ANY = 'any';
     /**
-     * @var string
-     */
-    const TYPE_TERM = 'term';
-    /**
      * The counterpart to ::toJson: creates the tag from the serialized json data
      * @param string $jsonString
      * @throws Exception
-     * @return editor_Segment_InternalTag
+     * @return editor_Segment_Tag
      */
-    public static function fromJson($jsonString) : editor_Segment_InternalTag {
+    public static function fromJson($jsonString) : editor_Segment_Tag {
         try {
             $data = json_decode($jsonString);
             return editor_Segment_TagCreator::instance()->fromJsonData($data);
         } catch (Exception $e) {
-            throw new Exception('Could not deserialize editor_Segment_InternalTag from JSON String '.$jsonString);
+            throw new Exception('Could not deserialize editor_Segment_Tag from JSON String '.$jsonString);
         }
+    }
+    /**
+     * Evaluates if the passed type matches our type
+     * @param string $nodeName
+     * @return bool
+     */
+    public static function isType(string $type) : bool {
+        return ($type == static::$type);
     }
     /**
      * Evaluates if the passed nodename matches our nodename
@@ -127,7 +135,7 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
      */
     public function __construct(int $startIndex, int $endIndex, string $category='') {
         if(static::$type == null || static::$nodeName == null){
-            throw new Exception('Direct instantiation of editor_Segment_InternalTag is not appropriate, type and nodeName must not be NULL');
+            throw new Exception('Direct instantiation of editor_Segment_Tag is not appropriate, type and nodeName must not be NULL');
         }
         parent::__construct(static::$nodeName);
         $this->startIndex = $startIndex;
@@ -155,13 +163,14 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
     /**
      * {@inheritDoc}
      * @see editor_Tag::createBaseClone()
-     * @return editor_Segment_InternalTag
+     * @return editor_Segment_Tag
      */
     protected function createBaseClone(){
-        return ZfExtended_Factory::get(get_class($this), [$this->startIndex, $this->endIndex, $this->category]);
+        $className = get_class($this);
+        return new $className($this->startIndex, $this->endIndex, $this->category);
     }
     /**
-     * Opposing to the base-class the node-name with internal taxt is fixed with the type usually (not with editor_Segment_AnyInternalTag ...)
+     * Opposing to the base-class the node-name with internal taxt is fixed with the type usually (not with editor_Segment_AnyTag ...)
      * {@inheritDoc}
      * @see editor_Tag::getName()
      */
@@ -226,10 +235,10 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
     }
     /**
      * Checks, if this internal tag can contain the passed internal tag
-     * @param editor_Segment_InternalTag $tag
+     * @param editor_Segment_Tag $tag
      * @return boolean
      */
-    public function canContain(editor_Segment_InternalTag $tag){
+    public function canContain(editor_Segment_Tag $tag){
         if(!$this->isSingular()){
             if($this->startIndex <= $tag->startIndex && $this->endIndex >= $tag->endIndex){
                 return true;
@@ -239,31 +248,31 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
     }
     /**
      * Finds the next container that can contain the passed tag
-     * @param editor_Segment_InternalTag $tag
-     * @return editor_Segment_InternalTag|NULL
+     * @param editor_Segment_Tag $tag
+     * @return editor_Segment_Tag|NULL
      */
-    public function getNearestContainer(editor_Segment_InternalTag $tag){
+    public function getNearestContainer(editor_Segment_Tag $tag){
         if($this->canContain($tag)){
             return $this;
         }
-        if($this->parent != null && is_a($this->parent, 'editor_Segment_InternalTag')){
+        if($this->parent != null && is_a($this->parent, 'editor_Segment_Tag')){
             return $this->parent->getNearestContainer($tag);
         }
         return null;
     }
     /**
      * Finds the Topmost container
-     * @return editor_Tag|editor_Segment_InternalTag
+     * @return editor_Tag|editor_Segment_Tag
      */
     public function getTopmostContainer(){
-        if($this->parent != null && is_a($this->parent, 'editor_Segment_InternalTag')){
+        if($this->parent != null && is_a($this->parent, 'editor_Segment_Tag')){
             return $this->parent->getTopmostContainer();
         }
         return $this;
     }
     /**
      * After the nested structure of tags is set this fills in the text-chunks of the segments text
-     * CRUCIAL: at this point only editor_Segment_InternalTag must be added as children !
+     * CRUCIAL: at this point only editor_Segment_Tag must be added as children !
      * @param editor_Segment_FieldTags $tags
      */
     public function addSegmentText(editor_Segment_FieldTags $tags){
@@ -273,8 +282,8 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
                 $chldrn = [];
                 $last = $this->startIndex;
                 foreach($this->children as $child){
-                    if(is_a($child, 'editor_Segment_InternalTag')){
-                        /* @var $child editor_Segment_InternalTag */
+                    if(is_a($child, 'editor_Segment_Tag')){
+                        /* @var $child editor_Segment_Tag */
                         if($last < $child->startIndex){
                             $chldrn[] = editor_Tag::createText($tags->getFieldTextPart($last, $child->startIndex));
                         }
@@ -307,8 +316,8 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
     public function sequenceChildren(editor_Segment_FieldTags $tags){
         if($this->hasChildren()){
             foreach($this->children as $child){
-                if(is_a($child, 'editor_Segment_InternalTag')){
-                    /* @var $child editor_Segment_InternalTag */
+                if(is_a($child, 'editor_Segment_Tag')){
+                    /* @var $child editor_Segment_Tag */
                     $child->sequence($tags);
                 }
             }
@@ -320,7 +329,7 @@ class editor_Segment_InternalTag extends editor_Tag implements JsonSerializable 
      * @see editor_Tag::isEqualType()
      */
     public function isEqualType(editor_Tag $tag) : bool {
-        if(is_a($tag, 'editor_Segment_InternalTag') && $tag->getType() == $this->getType()){
+        if(is_a($tag, 'editor_Segment_Tag') && $tag->getType() == $this->getType()){
             return true;
         }
         return false;

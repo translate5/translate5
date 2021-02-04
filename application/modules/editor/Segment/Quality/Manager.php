@@ -38,12 +38,17 @@
  */
 final class editor_Segment_Quality_Manager {
     
-    private static $_provider = [];
     /**
      * @var editor_Segment_Quality_Manager
      */
     private static $_instance = null;
-    
+    /**
+     * @var string[]
+     */
+    private static $_provider = [];
+    /**
+     * @var boolean
+     */
     private static $_locked = false;
     
     /**
@@ -55,7 +60,9 @@ final class editor_Segment_Quality_Manager {
         if(self::$_locked){
             throw new ZfExtended_Exception('Adding Quality Provider after app bootstrapping is not allowed.');
         }
-        self::$_provider[] = $className;
+        if(!in_array($className, self::$_provider)){
+            self::$_provider[] = $className;
+        }
     }
     /**
      *
@@ -195,19 +202,19 @@ final class editor_Segment_Quality_Manager {
      * @param string[] $attributes
      * @param int $startIndex
      * @param int $endIndex
-     * @return editor_Segment_InternalTag | NULL
+     * @return editor_Segment_Tag | NULL
      */
     public function evaluateInternalTag(string $tagType, string $nodeName, array $classNames, array $attributes, int $startIndex, int $endIndex){
         if(!empty($tagType) && array_key_exists($tagType, $this->registry)){
-            if($this->registry[$tagType]->isInternalTag($tagType, $nodeName, $classNames, $attributes)){
-                return $this->registry[$tagType]->createInternalTag($startIndex, $endIndex, $nodeName);
+            if($this->registry[$tagType]->isSegmentTag($tagType, $nodeName, $classNames, $attributes)){
+                return $this->registry[$tagType]->createSegmentTag($startIndex, $endIndex, $nodeName, $classNames);
             }            
             return NULL;
         }
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
-            if($provider->isInternalTag($tagType, $nodeName, $classNames, $attributes)){
-                return $provider->createInternalTag($startIndex, $endIndex, $nodeName);
+            if($provider->isSegmentTag($tagType, $nodeName, $classNames, $attributes)){
+                return $provider->createSegmentTag($startIndex, $endIndex, $nodeName, $classNames);
             }
         }
         return NULL;
