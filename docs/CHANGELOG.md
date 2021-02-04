@@ -106,6 +106,9 @@ When the MT pre-translation checkbox is not checked in the match analysis overvi
 **[TRANSLATE-2311](https://jira.translate5.net/browse/TRANSLATE-2311): Cookie Security** <br>
 Set the authentication cookie according to the latest security recommendations.
 
+**[TRANSLATE-2383](https://jira.translate5.net/browse/TRANSLATE-2383): OpenTM2 workaround to import swiss languages** <br>
+Since OpenTM2 is not capable of importing sub languages we have to provide fixes on demand. Here de-CH, it-CH and fr-CH are fixed. 
+
 
 ## [5.0.15] - 2020-12-21
 
