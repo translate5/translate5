@@ -966,6 +966,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if($this->validate()) {
             $this->processUploadedFile($this->entity, $dataProvider);
             $this->cloneLanguageResources($oldTaskGuid, $this->entity->getTaskGuid());
+            $this->cloneTaskSpecificConfig($oldTaskGuid,$this->entity->getTaskGuid());
             $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
@@ -1850,6 +1851,17 @@ class editor_TaskController extends ZfExtended_RestController {
         }catch(ZfExtended_Models_Entity_NotFoundException $e){
             return;
         }
+    }
+    
+    /***
+     * Clone all values and configs from $oldTaskGuid to $newTaskGuid
+     * @param string $oldTaskGuid
+     * @param string $newTaskGuid
+     */
+    protected function cloneTaskSpecificConfig(string $oldTaskGuid,string $newTaskGuid) {
+        $taskConfig =ZfExtended_Factory::get('editor_Models_TaskConfig');
+        /* @var $taskConfig editor_Models_TaskConfig */
+        $taskConfig->cloneTaskConfig($oldTaskGuid, $newTaskGuid);
     }
 
     /**

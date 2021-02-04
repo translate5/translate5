@@ -130,7 +130,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertRegExp('/[a-zA-Z0-9]{26}/', $sessionId, 'Login call does not return a valid sessionId!');
         $this->assertRegExp('/[0-9a-fA-F]{32}/', $sessionToken, 'Login call does not return a valid sessionToken!');
         
-        $response = $this->api()->request('editor/?sessionToken='.$sessionToken);
+        $response = $this->api()->request('editor/?sessionToken='.$sessionToken.'&APItest=true');
         $this->assertNotFalse(strpos($response->getBody(), '<div id="loading-indicator-text"></div>'), 'The editor page does not contain the expected content.');
         if($withTask) {
             $this->assertNotFalse(strpos($response->getBody(), '"taskGuid":"'.$taskGuid.'"'), 'The editor page does not contain the expected taskGuid for the opened task.');
@@ -151,7 +151,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         }
         $sessionData->user->customers = null;
         
-        $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"support@translate5.net","roles":["pm","editor","admin","instantTranslate","basic","noRights"],"passwd":"********","editable":0,"locale":"en","sourceLanguage":null,"targetLanguage":null,"parentIds":null,"customers":null,"userName":"manager test"}}';
+        $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"support@translate5.net","roles":["pm","editor","admin","instantTranslate","api","basic","noRights"],"passwd":"********","editable":0,"locale":"en","sourceLanguage":null,"targetLanguage":null,"parentIds":null,"customers":null,"userName":"manager test"}}';
         $this->assertEquals(json_decode($expected), $sessionData, 'User was not properly authenticated via ');
         
         $this->api()->logout();
@@ -159,8 +159,8 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
     
     public function testSingleClickAuthentication() {
         $this->api()->logout();
-        $this->api()->login('testmanager');
-        $this->assertLogin('testmanager');
+        $this->api()->login('testmanager2');
+        $this->assertLogin('testmanager2');
         $this->api()->reloadTask();
         $assoc = $this->api()->addUser('testlector');
         $this->assertFalse(isset($assoc->staticAuthHash), 'staticAuthHash for non API user must be empty!');

@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -28,8 +28,8 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Converts a List with Segments to XML
- * 
- * TODO: MQM and Terminology markup export is missing! 
+ *
+ * TODO: MQM and Terminology markup export is missing!
  * FIXME: use DOMDocument or similar to create the XML to deal correctly with escaping of strings!
  */
 abstract class editor_Models_Converter_SegmentsToXliffAbstract {
@@ -39,7 +39,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
      */
     const CONFIG_INCLUDE_DIFF = 'includeDiff';
     /**
-     * plainInternalTags          = boolean, exports internal tags plain content, 
+     * plainInternalTags          = boolean, exports internal tags plain content,
      *                              currently only needed for BEO export, defaults to false
      * @var string
      */
@@ -169,10 +169,10 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     
     /**
      * Constructor
-     * 
+     *
      * Supported parameters for $config are
      * - includeDiff                = boolean, enable or disable diff generation, defaults to false
-     * - plainInternalTags          = boolean, exports internal tags plain content, 
+     * - plainInternalTags          = boolean, exports internal tags plain content,
      *                                currently only needed for BEO export, defaults to false
      * - addRelaisLanguage          = boolean, add relais language target as alt trans (if available), defaults to true
      * - addComments                = boolean, add comments, defaults to true
@@ -180,7 +180,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
      * - addAlternatives            = boolean, add target alternatives as alt trans, defaults to false
      * - addPreviousVersion         = boolean, add target original as alt trans, defaults to true
      * - addDisclaimer              = boolean, add disclaimer that format is not 100% xliff 1.2, defaults to true
-     * 
+     *
      * @param array $config
      */
     public function __construct(array $config = []){
@@ -202,7 +202,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     
     /**
      * converts a list with segment data to xliff
-     * 
+     *
      * @param editor_Models_Task $task
      * @param array $segments
      */
@@ -332,7 +332,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
         /* @var $file editor_Models_File */
         $file->load($fileId);
         $exportParser = str_replace('_Import_', '_Export_', $file->getFileParser());
-        return ZfExtended_Factory::get($exportParser, array(0, false,  $this->task, $filename));
+        return ZfExtended_Factory::get($exportParser, [$this->task, 0, $filename]);
     }
     
     /**
@@ -353,7 +353,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
         
     /**
      * stores the content tags in the xliff header - omitted with CONFIG_PLAIN_INTERNAL_TAGS
-     * @param int $fileMapKey the index of the filemap placeholder in the result array 
+     * @param int $fileMapKey the index of the filemap placeholder in the result array
      */
     protected function storeTagsInHeader($fileMapKey) {
         if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
@@ -381,7 +381,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     /**
      * converts a 1D array in a 2D array, where the original filenames containing the segments are the keys of the first dimension.
      * returns: array('FILENAME_1' => array(seg1, seg2), 'FILENAME_2' => array(seg3, seg4)
-     * 
+     *
      * @param array $segments
      * @return array
      */

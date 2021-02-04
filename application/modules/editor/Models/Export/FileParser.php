@@ -67,11 +67,15 @@ abstract class editor_Models_Export_FileParser {
      * @var object
      */
     protected $_difftagger = NULL;
+    
     /**
-     * @var boolean wether or not to include a diff about the changes in the exported segments
-     *
+     * fluent container of flags controlling the export parser, may be set from config or via param or whatever
+     * @var array
      */
-    protected $_diff= false;
+    protected $options = [
+        'diff' => false,
+    ];
+    
     /**
      * @var editor_Models_Task current task
      */
@@ -114,19 +118,9 @@ abstract class editor_Models_Export_FileParser {
     protected $comments;
     
     /**
-     * @var editor_Models_Segment_InternalTag
+     * @var editor_Models_Segment_UtilityBroker
      */
-    protected $tagHelper;
-    
-    /**
-     * @var editor_Models_Segment_TermTag
-     */
-    protected $termTagHelper;
-    
-    /**
-     * @var editor_Models_Segment_Whitespace
-     */
-    protected $whitespaceHelper;
+    protected $utilities;
     
     /**
      * @var ZfExtended_EventManager
@@ -156,14 +150,12 @@ abstract class editor_Models_Export_FileParser {
     protected $segmentFieldManager;
     
     /**
-     *
-     * @param int $fileId
-     * @param bool $diff
      * @param editor_Models_Task $task
-     * @param string $path
-     * @throws Zend_Exception
+     * @param int $fileId
+     * @param string $path The absolute path to the file where the content is written to
+     * @param array $options see $this->options for available options
      */
-    public function __construct(int $fileId,bool $diff,editor_Models_Task $task, string $path) {
+    public function __construct(editor_Models_Task $task, int $fileId, string $path, array $options = []) {
         if(is_null($this->_classNameDifftagger)){
             //this->_classNameDifftagger must be defined in the child class.
             throw new editor_Models_Export_FileParser_Exception('E1085', [
@@ -172,16 +164,16 @@ abstract class editor_Models_Export_FileParser {
         }
         $this->_fileId = $fileId;
         $this->_diffTagger = ZfExtended_Factory::get($this->_classNameDifftagger);
-        $this->_diff = $diff;
+        $this->options = array_replace($this->options, $options);
         $this->_task = $task;
         $this->_taskGuid = $task->getTaskGuid();
         $this->path = $path;
         $this->config = $task->getConfig();
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.export.fileparser');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
-        $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
+        
+        $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
+        
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->segmentFieldManager->initFields($this->_taskGuid);
 
@@ -200,8 +192,7 @@ abstract class editor_Models_Export_FileParser {
         
         $this->getSkeleton($file);
         $this->parse();
-        $this->convertEncoding($file);
-        return $this->_exportFile;
+        return $this->_exportFile = $this->convertEncoding($file, $this->_exportFile);
     }
     
     public function saveFile() {
@@ -334,9 +325,9 @@ abstract class editor_Models_Export_FileParser {
         
         $edited= $trackChange->removeTrackChanges($edited);
         
-        $edited = $this->tagHelper->protect($edited);
+        $edited = $this->utilities->internalTag->protect($edited);
         $edited = $this->removeTermTags($edited);
-        $edited = $this->tagHelper->unprotect($edited);
+        $edited = $this->utilities->internalTag->unprotect($edited);
         $this->compareTags($segment, $edited, $field);
         
         //count length after removing removeTrackChanges and removeTermTags
@@ -347,14 +338,14 @@ abstract class editor_Models_Export_FileParser {
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);
         
-        if(!$this->_diff){
-            return $this->whitespaceHelper->unprotectWhitespace($edited);
+        if(!$this->options['diff']){
+            return $this->unprotectContent($edited);
         }
         
         $original = (string) $segment->getFieldOriginal($field);
-        $original = $this->tagHelper->protect($original);
+        $original = $this->utilities->internalTag->protect($original);
         $original = $this->removeTermTags($original);
-        $original = $this->tagHelper->unprotect($original);
+        $original = $this->utilities->internalTag->unprotect($original);
         $original = $this->parseSegment($original);
         try {
             $diffed = $this->_diffTagger->diffSegment($original, $edited, $segment->getTimestamp(), $segment->getUserName());
@@ -367,7 +358,7 @@ abstract class editor_Models_Export_FileParser {
             
         }
         // unprotectWhitespace must be done after diffing!
-        return $this->whitespaceHelper->unprotectWhitespace($diffed);
+        return $this->unprotectContent($diffed);
     }
     
     /**
@@ -385,10 +376,10 @@ abstract class editor_Models_Export_FileParser {
         }
         //if it was a translation task, we have to compare agains the source tags, otherwise against the field original
         $source = $isTranslationTask ? $segment->getSource() : $segment->getFieldOriginal($field);
-        $sourceTags = $this->tagHelper->getRealTags($source);
-        $targetTags = $this->tagHelper->getRealTags($target);
-        $notInTarget = $this->tagHelper->diffArray($sourceTags, $targetTags);
-        $notInSource = $this->tagHelper->diffArray($targetTags, $sourceTags);
+        $sourceTags = $this->utilities->internalTag->getRealTags($source);
+        $targetTags = $this->utilities->internalTag->getRealTags($target);
+        $notInTarget = $this->utilities->internalTag->diffArray($sourceTags, $targetTags);
+        $notInSource = $this->utilities->internalTag->diffArray($targetTags, $sourceTags);
         if(empty($notInSource) && empty($notInTarget)) {
             return;
         }
@@ -439,7 +430,7 @@ abstract class editor_Models_Export_FileParser {
      * @return string $segment
      */
     protected function removeTermTags($segment) {
-        return $this->termTagHelper->remove($segment);
+        return $this->utilities->termTag->remove($segment);
     }
     
     /**
@@ -457,19 +448,19 @@ abstract class editor_Models_Export_FileParser {
      * @return string $segment
      */
     protected function parseSegment($segment) {
-        return $this->tagHelper->restore($segment);
+        return $this->utilities->internalTag->restore($segment);
     }
     
     /**
      * converts $this->_exportFile back to the original encoding registered in the LEK_files
      * @param editor_Models_File $file
      */
-    protected function convertEncoding(editor_Models_File $file){
+    protected function convertEncoding(editor_Models_File $file, string $data): string{
         $enc = $file->getEncoding();
         if(is_null($enc) || $enc === '' || strtolower($enc) === 'utf-8'){
-            return;
+            return $data;
         }
-        $this->_exportFile = iconv('utf-8', $enc, $this->_exportFile);
+        return iconv('utf-8', $enc, $data);
     }
     
     /**
@@ -484,6 +475,15 @@ abstract class editor_Models_Export_FileParser {
         $this->disableMqmExport = true;
         $segment = $this->parseSegment($segment);
         $segment = $this->revertNonBreakingSpaces($segment);
-        return $this->whitespaceHelper->unprotectWhitespace($segment);
+        return $this->unprotectContent($segment);
+    }
+    
+    /**
+     * Some internal tags are standing for placeholder tags, this placeholder tags must also converted back
+     * @param string $segment
+     * @return string
+     */
+    protected function unprotectContent(string $segment): string {
+        return $this->utilities->whitespace->unprotectWhitespace($segment);
     }
 }

@@ -653,7 +653,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      */
     public function loadProposalExportData(array $collectionIds, string $youngerAs = ''){
         $adapter=$this->db->getAdapter();
-        $bindParams = [join(',', $collectionIds)];
+        $bindParams = [];
         $termYoungerSql = $attrYoungerSql = '';
         if(!empty($youngerAs)) {
             $bindParams[] = $youngerAs;
@@ -661,19 +661,21 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             $termYoungerSql = ' and (t.created >=? || tp.created >= ?)';
             $attrYoungerSql = ' and (ta.created >=? || tap.created >=?)';
         }
+        //Info: why collection ids is not in bindParams
+        //binding multiple values to single param is not posible with $adapter->query . For more info see PDOStatement::execute
         $termSql="SELECT
-            		t.termEntryId as 'term-termEntryId',
-            		t.definition as 'term-definition',
-            		l.langName as 'term-language',
-            		t.id as 'term-Id',
-            		t.term as 'term-term',
-            		t.processStatus as 'term-processStatus',
-            		t.userName as 'term-lastEditor',
+                    t.termEntryId as 'term-termEntryId',
+                    t.definition as 'term-definition',
+                    l.langName as 'term-language',
+                    t.id as 'term-Id',
+                    t.term as 'term-term',
+                    t.processStatus as 'term-processStatus',
+                    t.userName as 'term-lastEditor',
                     t.updated as 'term-lastEditedDate',
                     tp.id as 'termproposal-id',
                     tp.term as 'termproposal-term',
-            		tp.created as 'termproposal-lastEditedDate',
-            		tp.userName as 'termproposal-lastEditor',
+                    tp.created as 'termproposal-lastEditedDate',
+                    tp.userName as 'termproposal-lastEditor',
                     null as 'attribute-id',
                     null as 'attribute-name',
                     null as 'attribute-value',
@@ -683,14 +685,13 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                     null as 'attributeproposal-value',
                     null as 'attributeproposal-lastEditedDate',
                     null as 'attributeproposal-lastEditor'
-        			FROM
-        			LEK_terms t
-        			LEFT OUTER JOIN
-        			LEK_term_proposal tp ON tp.termId = t.id
-        			INNER JOIN LEK_languages l ON t.language=l.id
-                where t.collectionId IN(?)".$termYoungerSql."
-        		and (tp.term is not null or t.processStatus='unprocessed')
-        		order by t.groupId,t.term";
+                    FROM LEK_terms t
+                    LEFT OUTER JOIN LEK_term_proposal tp ON tp.termId = t.id
+                    INNER JOIN LEK_languages l ON t.language=l.id
+                WHERE ".$adapter->quoteInto('t.collectionId IN(?)',$collectionIds)
+                .$termYoungerSql."
+                AND (tp.term is not null or t.processStatus='unprocessed')
+                ORDER BY t.groupId,t.term";
         
         $termResult=$adapter->query($termSql,$bindParams)->fetchAll();
         
@@ -719,14 +720,15 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                         tp.term as 'termproposal-term',
                         tp.created as 'termproposal-lastEditedDate',
                         tp.userName as 'termproposal-lastEditor'
-            		FROM LEK_term_attributes ta
-                		LEFT OUTER JOIN LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
+                    FROM LEK_term_attributes ta
+                        LEFT OUTER JOIN LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
                         LEFT OUTER JOIN LEK_terms t on ta.termId=t.id
                         LEFT OUTER JOIN LEK_term_proposal tp on tp.termId=t.id
                         LEFT OUTER JOIN LEK_languages l ON t.language=l.id
-                	where ta.collectionId IN(?)".$attrYoungerSql."
-                	and (tap.value is not null or ta.processStatus='unprocessed')
-                	order by ta.termEntryId,ta.termId";
+                    WHERE ".$adapter->quoteInto('ta.collectionId IN(?)',$collectionIds).
+                    $attrYoungerSql."
+                    AND (tap.value is not null or ta.processStatus='unprocessed')
+                    ORDER BY ta.termEntryId,ta.termId";
         
         $attributeResult=$adapter->query($attributeSql,$bindParams)->fetchAll();
         

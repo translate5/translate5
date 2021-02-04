@@ -76,8 +76,8 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         
         //$map is set by reference
         $this->map = [];
-        $this->realTagCount = $this->internalTag->count($queryString);
-        $queryString = $this->internalTag->toXliffPaired($queryString, true, $this->map);
+        $this->realTagCount = $this->utilities->internalTag->count($queryString);
+        $queryString = $this->utilities->internalTag->toXliffPaired($queryString, true, $this->map);
         $this->mapCount = count($this->map);
         return $queryString;
     }
@@ -106,7 +106,7 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
             $this->hasRestoreErrors = true;
             return strip_tags($resultString);
         }
-        $target = $this->internalTag->reapply2dMap($target, $this->map);
+        $target = $this->utilities->internalTag->reapply2dMap($target, $this->map);
         return $this->replaceAdditionalTags($target, $this->mapCount);
     }
     
@@ -148,7 +148,7 @@ class editor_Services_Connector_TagHandler_Xliff extends editor_Services_Connect
         
         $result = preg_replace_callback('#<(x|ex|bx|g|/g)[^>]*>#', function() use (&$shortTagNr, &$addedTags) {
             $addedTags = true;
-            return $this->internalTag->makeAdditionalHtmlTag(++$shortTagNr);
+            return $this->utilities->internalTag->makeAdditionalHtmlTag(++$shortTagNr);
         }, $segment);
         
         if($addedTags) {

@@ -158,21 +158,21 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
         return $params;
     }
     
-    /**
+    /***
      * returns a date in the locale of the receiver
-     * 
      * @param string/int $date
+     * @param boolean $isDateTime: set to true to include the time
      * @return string
      */
-    public function dateFormat($date) {
+    public function dateFormat($date,$isDateTime=false) {
         if(empty($this->view->receiver->locale)) {
             $locale = $this->view->config->runtimeOptions->translation->fallbackLocale;
         }
         else {
             $locale = $this->view->receiver->locale;
         }
-        $format = Zend_Locale_Format::getDateFormat($locale);
-        $date = new Zend_Date($date, Zend_Date::ISO_8601);
+        $format = $isDateTime ? Zend_Locale_Format::getDateTimeFormat($locale) : Zend_Locale_Format::getDateFormat($locale);
+        $date = new Zend_Date($date,Zend_Date::ISO_8601);
         return $date->toString($format);
     }
 }
