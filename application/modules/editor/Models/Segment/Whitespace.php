@@ -30,6 +30,24 @@ END LICENSE AND COPYRIGHT
  * Helper Class which encapsulates segment whitespace handling
  */
 class editor_Models_Segment_Whitespace {
+    /**
+     * All entities are restored to their applicable characters (&_szlig; => ß), only the XML relevant &<> are encoded (ready for GUI)
+     * @var string
+     */
+    const ENTITY_MODE_RESTORE = 'restore';
+    
+    /**
+     * Nothing is restored, but encoded (&_szlig; => &_amp;szlig;), only the XML relevant &<> are encoded (ready for GUI)
+     * @var string
+     */
+    const ENTITY_MODE_KEEP = 'keep';
+    
+    /**
+     * Entity handling is disabled, entities must be handled elsewhere!
+     * @var string
+     */
+    const ENTITY_MODE_OFF = 'off';
+    
     const WHITESPACE_TAGS = ['hardReturn', 'softReturn', 'macReturn', 'space', 'tab', 'char'];
     
     /**
@@ -84,8 +102,11 @@ class editor_Models_Segment_Whitespace {
      * @param string $textNode should not contain tags, since special characters in the tag content would also be protected then
      * @param bool $xmlBased defaults to true, decides how XML Entities are encoded, see inline comments
      */
-    public function protectWhitespace($textNode, $xmlBased = true) {
-        $textNode = $this->entityCleanup($textNode, $xmlBased);
+    public function protectWhitespace($textNode, $entityHandling = self::ENTITY_MODE_RESTORE) {
+        //definition how entities are handled:
+        if($entityHandling != self::ENTITY_MODE_OFF) {
+            $textNode = editor_Models_Segment_Utility::entityCleanup($textNode, $entityHandling == self::ENTITY_MODE_RESTORE);
+        }
         
         //replace only on real text
         $textNode = str_replace($this->protectedWhitespaceMap['search'], $this->protectedWhitespaceMap['replace'], $textNode);
@@ -105,7 +126,7 @@ class editor_Models_Segment_Whitespace {
         }, $textNode);
             
         //in XML based import formats we have to extend the list about some HTML entities representing some none printable characters in UTF8
-        if($xmlBased) {
+        if($entityHandling == self::ENTITY_MODE_RESTORE) {
             //see https://stackoverflow.com/questions/9587751/decoding-numeric-html-entities-via-php
             // and https://caves.org.uk/charset_test.html  Section: Another Problem with PHP's htmlentities()
             //since entityCleanup was called aready, we have to begin the regex with &amp; instead &
@@ -151,34 +172,6 @@ class editor_Models_Segment_Whitespace {
         return preg_replace_callback('#<(space|char|tab) ts="([A-Fa-f0-9]*)"( length="[0-9]+")?/>#', function ($match) {
             return pack('H*', $match[2]);
         }, $content);
-    }
-    
-    /**
-     * Does the entity encoding, see inline comments
-     * @param string $textNode
-     * @param bool $xmlBased
-     * @return string
-     */
-    public function entityCleanup($textNode, $xmlBased = true) {
-        //FIXME this is not the right place here, but here it is used for all imports.
-        // It is important that we have no entities in our DB but their UTF8 characters instead,
-        // since a XLF export of our segments would not be valid XML with the entities.
-        // And the browsers are converting the entities anyway to UTF8 characters.
-        // Refactor to a better place with TRANSLATE-296
-        if($xmlBased) {
-            // in a XML based format only the defined entities may exist
-            // - for our major XML formats these are: &amp; &lt; &gt; only
-            // - all other entities must be encoded back into their utf8 character: &zslig; into ß
-            //   → otherwise our XLF export will fail with invalid XML
-            //   → also the browser will convert the &zslig; into ß anyway, so we do this directly on the import
-            // why using this encode(decode) see
-            //  https://stackoverflow.com/questions/18039765/php-not-have-a-function-for-xml-safe-entity-decode-not-have-some-xml-entity-dec
-            return htmlentities(html_entity_decode($textNode, ENT_HTML5|ENT_QUOTES), ENT_XML1);
-        }
-        // for non XML based formats (for example CSV) all content and its contained entities are displayed to the user as they were in the import file
-        // therefore we have just to encode the < > & characters.
-        // so if the CSV contains &amp; ß < this would be converted to &amp;amp; ß &gt; to be displayed correctly in the browser
-        return htmlentities($textNode, ENT_XML1);
     }
     
     /**

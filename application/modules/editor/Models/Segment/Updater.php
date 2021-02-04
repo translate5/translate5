@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -28,12 +28,10 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Saving an existing Segment contains a lot of different steps in the business logic, not only just saving the content to the DB
- * Therefore this updater class exists, which provides some functions to update a segment 
+ * Therefore this updater class exists, which provides some functions to update a segment
  *  in the correct way from the business logic view point
  */
 class editor_Models_Segment_Updater {
-    use editor_Models_Import_FileParser_TagTrait;
-    
     /**
      * @var ZfExtended_EventManager
      */
@@ -50,15 +48,14 @@ class editor_Models_Segment_Updater {
     protected $task;
     
     /**
-     * @var editor_Models_Segment_InternalTag
+     * @var editor_Models_Segment_UtilityBroker
      */
-    protected $internalTag;
+    protected $utilities;
     
     public function __construct(editor_Models_Task $task) {
         $this->task = $task;
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
-        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        $this->initHelper();
+        $this->utilities = ZfExtended_Factory::get('editor_Models_Segment_UtilityBroker');
     }
     
     /**
@@ -73,7 +70,7 @@ class editor_Models_Segment_Updater {
         $allowedAlternatesToChange = $this->segment->getEditableDataIndexList();
         $updateSearchAndSort = array_intersect(array_keys($this->segment->getModifiedValues()), $allowedAlternatesToChange);
         
-//HERE sanitizeEditedContent check (ob aufgerufen!) 
+//HERE sanitizeEditedContent check (ob aufgerufen!)
 // Sinnvoll, ja nein? selbes Problem mit dem ENT_XML1 stuff, bei replace all und excel nötig. Wie ists mit der Pretranslation?
 // Wie ist das mit den TMs und en ENT_XML1??
 
@@ -93,7 +90,7 @@ class editor_Models_Segment_Updater {
         $this->segment->validate();
         
         //TODO: Introduced with TRANSLATE-885, but is more a hack as a solution. See Issue comments for more information!
-        $this->updateTargetHashAndOriginal($this->task); 
+        $this->updateTargetHashAndOriginal($this->task);
         
         foreach($allowedAlternatesToChange as $field) {
             if($this->segment->isModified($field)) {
@@ -106,7 +103,7 @@ class editor_Models_Segment_Updater {
             'history' => $history
         ));
         
-        $this->updateMatchRateType(); 
+        $this->updateMatchRateType();
         
         //saving history directly before normal saving,
         // so no exception between can lead to history entries without changing the master segment
@@ -223,21 +220,23 @@ class editor_Models_Segment_Updater {
         $content = trim(str_replace($nbsp, ' ', $content));
         
         //if there are tags to be ignored, we remove them here
-        $oldContent = $content = $this->internalTag->removeIgnoredTags($content);
+        $oldContent = $content = $this->utilities->internalTag->removeIgnoredTags($content);
         
         //since our internal tags are a div span construct with plain content in between, we have to replace them first
-        $content = $this->internalTag->protect($content);
+        $content = $this->utilities->internalTag->protect($content);
         
         //the following call splits the content at tag boundaries, and sanitizes the textNodes only
         // In the textnode additional / new protected characters (whitespace) is converted to internal tags and then removed
         // This is because the user is not allowed to add new internal tags by adding plain special characters directly (only via adding it as tag in the frontend)
-        $content = $this->parseSegmentProtectWhitespace($content, 'strip_tags');
+        $content = editor_Models_Segment_Utility::foreachSegmentTextNode($content, function($text){
+            return strip_tags($this->utilities->whitespace->protectWhitespace($text));
+        });
         
         //revoke the internaltag replacement
-        $content = $this->internalTag->unprotect($content);
+        $content = $this->utilities->internalTag->unprotect($content);
         
         //return true if some whitespace content was changed
-        return $this->whitespaceHelper->entityCleanup($content) !== $this->whitespaceHelper->entityCleanup($oldContent);
+        return editor_Models_Segment_Utility::entityCleanup($content) !== editor_Models_Segment_Utility::entityCleanup($oldContent);
     }
     
     /***

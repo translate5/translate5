@@ -29,7 +29,6 @@ END LICENSE AND COPYRIGHT
 /**
  */
 class editor_Plugins_MatchAnalysis_Pretranslation{
-    use editor_Models_Import_FileParser_TagTrait;
     use ZfExtended_Logger_DebugTrait;
     
     /***

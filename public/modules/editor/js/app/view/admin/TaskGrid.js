@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -78,13 +78,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
       enableSourceEditing: '#UT#Quellsprache bearbeitbar',
       workflowState:'#UT#Workflow-Status',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
       workflowUserRole:'#UT#Benutzer-Rolle',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
-	  userName:'#UT#Benutzer',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
-	  segmentCount:'#UT#Segmentanzahl',
-	  segmentFinishCount:'#UT#% abgeschlossen',
-	  id:'#UT#Id',
-	  taskGuid:'#UT#Task-Guid',
-	  workflowStepName:'#UT#Aktueller Workflow-Schritt',
-	  userState:'#UT#Mein Job-Status',
+      userName:'#UT#Benutzer',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
+      segmentCount:'#UT#Segmentanzahl',
+      segmentFinishCount:'#UT#% abgeschlossen',
+      id:'#UT#Id',
+      taskGuid:'#UT#Task-Guid',
+      workflowStepName:'#UT#Aktueller Workflow-Schritt',
+      userState:'#UT#Mein Job-Status',
       userJobDeadline:'#UT#Meine Deadline',
       assignmentDate:'#UT#Benutzer-Zuweisungsdatum',
       finishedDate:'#UT#Benutzer-Abschlussdatum',
@@ -245,23 +245,23 @@ Ext.define('Editor.view.admin.TaskGrid', {
             '<tpl>',
             '<table class="task-users">',
             '<tr>',
-            	'<th>#</th>',
-	        	'<th>'+me.text_cols.userName+'</th>',
-	        	'<th>'+me.text_cols.workflowUserRole+'</th>',
-	        	'<th>'+me.strings.jobStatus+'</th>',
-	        	'<th>'+me.strings.assignmentDateHeader+'</th>',
-	        	'<th>'+me.strings.deadlineDateHeader+'</th>',
-	        	'<th>'+me.strings.finishedDateHeader+'</th>',
-        	'</tr>',
+                '<th>#</th>',
+                '<th>'+me.text_cols.userName+'</th>',
+                '<th>'+me.text_cols.workflowUserRole+'</th>',
+                '<th>'+me.strings.jobStatus+'</th>',
+                '<th>'+me.strings.assignmentDateHeader+'</th>',
+                '<th>'+me.strings.deadlineDateHeader+'</th>',
+                '<th>'+me.strings.finishedDateHeader+'</th>',
+            '</tr>',
             '<tpl for="users">',
             '<tr>',
-            	'<td class="">{#}</td>',
-	            '<td class="">{userName}</td>',
-	            '<td class="">{[this.getRole(parent, values)]}</td>',
-	            '<td class="">{[this.getState(parent, values)]}</td>',
-	            '<td class="">{[Ext.util.Format.date(values.assignmentDate)]}</td>',
-	            '<td class="">{[this.getDeadlineDate(values.deadlineDate)]}</td>',
-	            '<td class="">{[Ext.util.Format.date(values.finishedDate)]}</td>',
+                '<td class="">{#}</td>',
+                '<td class="">{userName}</td>',
+                '<td class="">{[this.getRole(parent, values)]}</td>',
+                '<td class="">{[this.getState(parent, values)]}</td>',
+                '<td class="">{[Ext.util.Format.date(values.assignmentDate,Editor.DATE_TIME_LOCALIZED_FORMAT)]}</td>',
+                '<td class="">{[this.getDeadlineDate(values.deadlineDate)]}</td>',
+                '<td class="">{[Ext.util.Format.date(values.finishedDate,Editor.DATE_TIME_LOCALIZED_FORMAT)]}</td>',
             '</tr>',
             '</tpl>',
             '</table>',
@@ -277,16 +277,16 @@ Ext.define('Editor.view.admin.TaskGrid', {
                     return data.roles[user.role];
                 },
                 getDeadlineDate: function(date) {
-                	
-                	var deadlineDate=(date && date!='') && new Date(date);
-                	
-                	if(!deadlineDate){
-                		return '';
-                	}
-                	if(deadlineDate < new Date()){
-                		return '<span class="redTextColumn">'+Ext.util.Format.date(deadlineDate)+'</span>';
-                	}
-                	return Ext.util.Format.date(deadlineDate);
+                    
+                    var deadlineDate=(date && date!='') && new Date(date);
+                    
+                    if(!deadlineDate){
+                        return '';
+                    }
+                    if(deadlineDate < new Date()){
+                        return '<span class="redTextColumn">'+Ext.util.Format.date(deadlineDate,Editor.DATE_TIME_LOCALIZED_FORMAT)+'</span>';
+                    }
+                    return Ext.util.Format.date(deadlineDate);
                 }
             }
     );
@@ -296,9 +296,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
     me.availableActions = [];
     if(actions && actions.items.length > 0) {
-    	Ext.Array.each(actions.items, function(item) {
-			me.availableActions=Ext.Array.push(me.availableActions,item.isAllowedFor);
-    	});
+        Ext.Array.each(actions.items, function(item) {
+            me.availableActions=Ext.Array.push(me.availableActions,item.isAllowedFor);
+        });
     }
     this.view.on('afterrender', function(){
         me.tooltip = me.createToolTip();
@@ -318,8 +318,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
               meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text)+'"';
           },
           multiUserTpl = new Ext.XTemplate(
-          	  me.strings.lockedMultiUser,
-          	  '<br>',
+                me.strings.lockedMultiUser,
+                '<br>',
               '<tpl for=".">',
               '{userName} ({login})<br>',
               '</tpl>'
@@ -335,7 +335,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           
           Ext.Array.each(userStates, function(state){
               if(me.states[state]) {
-            	  userStates.push([state, me.states[state]]);
+                  userStates.push([state, me.states[state]]);
               }
           });
         
@@ -343,7 +343,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           Ext.Object.each(Editor.data.app.workflows, function(key, workflow){
               Ext.Object.each(workflow.states, function(key, value){
                   if(!me.states[key]) {
-                	  userStates.push([key, me.states.forMe+' '+value]);
+                      userStates.push([key, me.states.forMe+' '+value]);
                   }
               });
           });
@@ -439,8 +439,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   return allStates[userState];
               }
           },{
-        	  xtype: 'gridcolumn',
-        	  width: 120,
+              xtype: 'gridcolumn',
+              width: 130,
               dataIndex: 'userAssocDeadline',
               stateId: 'userAssocDeadline',
               text: me.text_cols.userJobDeadline,
@@ -462,8 +462,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
               stateId:'workflowStepName',
               tooltip: me.text_cols.workflowStepName,
               renderer: function(v) {
-            	  return me.getWorkflowStepNameTranslated(v);
-            	  
+                  return me.getWorkflowStepNameTranslated(v);
+                  
               },
               filter: {
                   type: 'list',
@@ -628,13 +628,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   type: 'string'
               },
               renderer: function(v, meta,rec) {
-            	  var tooltip=v,
-            	  	  ret=v;
-            	  if(Editor.data.frontend.tasklist.pmMailTo){
-            		  tooltip=rec.get('pmMail');
-            		  ret='<a alt="'+tooltip+'" href="mailto:'+tooltip+'">'+v+'</a>';
-            		  meta.tdAttr = 'data-qtip="'+tooltip+'"';
-            	  }
+                  var tooltip=v,
+                        ret=v;
+                  if(Editor.data.frontend.tasklist.pmMailTo){
+                      tooltip=rec.get('pmMail');
+                      ret='<a alt="'+tooltip+'" href="mailto:'+tooltip+'">'+v+'</a>';
+                      meta.tdAttr = 'data-qtip="'+tooltip+'"';
+                  }
                   return ret;
               },
               text: me.text_cols.pmGuid
@@ -787,7 +787,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             });
         }
         if (instanceConfig) {
-        	config=me.self.getConfigurator().merge(me, config, instanceConfig);
+            config=me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
   },
@@ -796,21 +796,21 @@ Ext.define('Editor.view.admin.TaskGrid', {
    * Set the configured visible columns
    */
   setVisibleColumns:function(){
-  	var me=this,
-		cols = me.getColumns(),
-		colIndex=null;
-	
-  	if(me.visibleColumns.length==0){
-  		return;
-  	}
-  	
-	Ext.each(cols, function(col) {
-		colIndex=col.dataIndex ? col.dataIndex : col.stateId;
-		if(!colIndex){
-			return true;
-		}
-		col.setVisible(Ext.Array.contains(me.visibleColumns, colIndex));
-	});
+      var me=this,
+        cols = me.getColumns(),
+        colIndex=null;
+    
+      if(me.visibleColumns.length==0){
+          return;
+      }
+      
+    Ext.each(cols, function(col) {
+        colIndex=col.dataIndex ? col.dataIndex : col.stateId;
+        if(!colIndex){
+            return true;
+        }
+        col.setVisible(Ext.Array.contains(me.visibleColumns, colIndex));
+    });
   },
   
   /**
@@ -855,10 +855,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
       });
   },
   onDestroy: function() {
-  	if(this.tooltip){
-  		this.tooltip.destroy();
-	}
-	this.callParent(arguments);
+      if(this.tooltip){
+          this.tooltip.destroy();
+    }
+    this.callParent(arguments);
   },
   
   /***
@@ -866,33 +866,33 @@ Ext.define('Editor.view.admin.TaskGrid', {
    * If the filter is not found as grid column, it will only be applied to the store
    */
   activateGridColumnFilter: function(filters,suspendFilterchange) {
-	  var me=this;
-	  if(suspendFilterchange){
-		  me.suspendEvents('filterchange');
-	  }
-	  // for each filter object in the array
-	  Ext.each(filters, function(filter) {
+      var me=this;
+      if(suspendFilterchange){
+          me.suspendEvents('filterchange');
+      }
+      // for each filter object in the array
+      Ext.each(filters, function(filter) {
         var value=filter.get('value'),
-        	operator=filter.get('operator'),
-        	property=filter.get('property'),
-        	gridFilter = me.getColumnFilter(property);
+            operator=filter.get('operator'),
+            property=filter.get('property'),
+            gridFilter = me.getColumnFilter(property);
         
         if(!gridFilter){
-        	//the filter does not exist as column in the grid, filter the store with the filter params
-        	//INFO: this can be the case when the grid is filtered with one of the advanced filters
-        	me.getStore().addFilter({
+            //the filter does not exist as column in the grid, filter the store with the filter params
+            //INFO: this can be the case when the grid is filtered with one of the advanced filters
+            me.getStore().addFilter({
                 "id":property+operator,//use the property and operator as unique id
-        		"operator":operator,
-        		"value":value,
-        		"property":property
-        	});
-        	return true;
+                "operator":operator,
+                "value":value,
+                "property":property
+            });
+            return true;
         }
         gridFilter.setActive(true);
         switch(gridFilter.type) {
             case 'date':
             case 'numeric':
-        	case 'percent':
+            case 'percent':
                 switch (operator) {
                     case 'gt' :
                         value = {gt: value};
@@ -911,85 +911,85 @@ Ext.define('Editor.view.admin.TaskGrid', {
                 gridFilter.setValue(value);
                 break;
         }
-	  });
-	  if(suspendFilterchange){
-		  me.resumeEvents('filterchange');
-	  }
-	},
-	
-	/***
-	 * Get grid column filter by property
-	 */
-	getColumnFilter:function(property){
-		var cols = this.getColumns(),
-			filter=null;
-    	Ext.each(cols, function(col) {
+      });
+      if(suspendFilterchange){
+          me.resumeEvents('filterchange');
+      }
+    },
+    
+    /***
+     * Get grid column filter by property
+     */
+    getColumnFilter:function(property){
+        var cols = this.getColumns(),
+            filter=null;
+        Ext.each(cols, function(col) {
             if(col.filter && col.filter.dataIndex==property) {
-            	filter=col.filter;
-            	return false;
+                filter=col.filter;
+                return false;
             }
         });
-    	return filter;
-	},
-	
-	/***
-	 * Get task grid active filter/s by property
-	 */
-	getActiveFilter:function(property){
-		var me=this,
-		    returnFilter=[],
-			activefilters = me.getStore().getFilters(false);
-		activefilters.each(function(item){
-			if(property==item.getProperty()){
-				returnFilter.push(item);
-			}
-		});
-		return returnFilter;
-	},
-	
-	/***
-	 * Render the progres bar in the segmentFinishCount column
-	 */
-	currentWorkflowStepProgressRenderer:function(value,meta,rec){
-		if(!value || rec.get('segmentCount')<1){
-			value=0;
-		}
-		if(value>0){
-			value=value/rec.get('segmentCount');
-		}
-		value=Ext.util.Format.percent(value);
-		meta.tdAttr = 'data-qtip="'+value+'"';
-		return '<div class="x-progress x-progress-default" style="height: 13px;">'+
-					'<div class="x-progress-bar x-progress-bar-default" style="width: ' + value + '">'+
-					'</div>'+
-			   '</div>';
-	},
-	
-	/***
-	 * Render the deadline dates for the current user.
-	 * Overdued dates will be displayed as red
-	 */
-	userJobDeadlineRenderer:function(v, meta, rec) {
-		if(!rec.get('users')){
-		  return '';
-	  	}
+        return filter;
+    },
+    
+    /***
+     * Get task grid active filter/s by property
+     */
+    getActiveFilter:function(property){
         var me=this,
-        	users=rec.get('users'),
-        	values=[];
+            returnFilter=[],
+            activefilters = me.getStore().getFilters(false);
+        activefilters.each(function(item){
+            if(property==item.getProperty()){
+                returnFilter.push(item);
+            }
+        });
+        return returnFilter;
+    },
+    
+    /***
+     * Render the progres bar in the segmentFinishCount column
+     */
+    currentWorkflowStepProgressRenderer:function(value,meta,rec){
+        if(!value || rec.get('segmentCount')<1){
+            value=0;
+        }
+        if(value>0){
+            value=value/rec.get('segmentCount');
+        }
+        value=Ext.util.Format.percent(value);
+        meta.tdAttr = 'data-qtip="'+value+'"';
+        return '<div class="x-progress x-progress-default" style="height: 13px;">'+
+                    '<div class="x-progress-bar x-progress-bar-default" style="width: ' + value + '">'+
+                    '</div>'+
+               '</div>';
+    },
+    
+    /***
+     * Render the deadline dates for the current user.
+     * Overdued dates will be displayed as red
+     */
+    userJobDeadlineRenderer:function(v, meta, rec) {
+        if(!rec.get('users')){
+          return '';
+          }
+        var me=this,
+            users=rec.get('users'),
+            values=[];
         
         for(var i=0;i<users.length;i++){
-        	var user=users[i],
-        		redClass="",
-        		deadlineDate=user['deadlineDate'] && new Date(user['deadlineDate']);
-        	
-        	if(!deadlineDate || user['userGuid']!=Editor.data.app.user['userGuid']){
-        		continue;
-        	}
-        	
-        	if(deadlineDate < new Date()){
-        		redClass="redTextColumn"
-        	}
-        	values.push('<span class="'+redClass+'">'+Ext.util.Format.date(deadlineDate)+'</span>');
+            var user=users[i],
+                redClass="",
+                deadlineDate=user['deadlineDate'] && new Date(user['deadlineDate']);
+            
+            if(!deadlineDate || user['userGuid']!=Editor.data.app.user['userGuid']){
+                continue;
+            }
+            
+            if(deadlineDate < new Date()){
+                redClass="redTextColumn"
+            }
+            values.push('<span class="'+redClass+'">'+Ext.util.Format.date(deadlineDate,Editor.DATE_TIME_LOCALIZED_FORMAT)+'</span>');
         }
         return values.join(', ');
     },
@@ -998,15 +998,15 @@ Ext.define('Editor.view.admin.TaskGrid', {
      * Return the translated workflowStep name
      */
     getWorkflowStepNameTranslated:function(stepName){
-    	if(!stepName){
-    		return "";
-		}
-    	var store=Ext.StoreManager.get('admin.WorkflowSteps'),
-    		rec=store.getById(stepName);
-    	if(rec){
-    		stepName=rec.get('text');
-		}
-    	return stepName;
+        if(!stepName){
+            return "";
+        }
+        var store=Ext.StoreManager.get('admin.WorkflowSteps'),
+            rec=store.getById(stepName);
+        if(rec){
+            stepName=rec.get('text');
+        }
+        return stepName;
     }
     
 });

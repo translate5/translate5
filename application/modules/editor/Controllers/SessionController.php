@@ -103,8 +103,7 @@ class editor_SessionController extends ZfExtended_SessionController {
      */
     protected function hashauth() {
         if($this->isMaintenanceLoginLock()){
-            throw new ZfExtended_Models_MaintenanceException('Maintenance scheduled in a few minutes: '.$date);
-            return;
+            throw new ZfExtended_Models_MaintenanceException('Maintenance scheduled in a few minutes!');
         }
         
         //FIXME ensure that only PMs may do that stuff! → spearte ACL
@@ -135,6 +134,8 @@ class editor_SessionController extends ZfExtended_SessionController {
         $task->loadByTaskGuid($taskUserAssoc->getTaskGuid());
         
         $user->setUserSessionNamespaceWithoutPwCheck($login);
+        
+        ZfExtended_Models_LoginLog::addSuccess($user, "authhash");
         
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */

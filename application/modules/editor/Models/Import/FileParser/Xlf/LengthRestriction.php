@@ -39,17 +39,17 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
      * Container for the lengthRestriction default values
      * @var array
      */
-    protected $lengthRestrictionDefaults = ['size-unit' => null, 'minWidth' => null, 'maxWidth' => null, 'maxNumberOfLines' => null, 'font' => null, 'fontSize' => null];
-    
-    /**
-     * Some of the keys in $lengthRestrictionDefaults are not standard xliff-Attributes, but named differently in the trans-units and our SegmentAttributes.
-     * @var array
-     */
-    protected static $nonStandardXliffAttributes = ['size-unit' =>        ['inUnit' => 'size-unit',                   'inSegmentAttr' => 'sizeUnit'],
-                                                    'maxNumberOfLines' => ['inUnit' => 'translate5:maxNumberOfLines', 'inSegmentAttr' => 'maxNumberOfLines'] ];
+    protected $lengthRestrictionDefaults = [
+        'sizeUnit' => null,
+        'minWidth' => null,
+        'maxWidth' => null,
+        'maxNumberOfLines' => null,
+        'font' => null,
+        'fontSize' => null
+    ];
     
     /***
-     * 
+     *
      * @var Zend_Config
      */
     protected $config;
@@ -96,22 +96,31 @@ class editor_Models_Import_FileParser_Xlf_LengthRestriction {
      */
     public function addAttributes(editor_Models_Import_FileParser_XmlParser $xmlparser, array $unitAttributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
         // Length-Restriction-Attributes (as set in xliff's trans-unit; fallback: task config); optional
-        $unit = $xmlparser->getAttribute($unitAttributes, 'size-unit', $this->lengthRestrictionDefaults['size-unit']);
+        $unit = $xmlparser->getAttribute($unitAttributes, 'size-unit', $this->lengthRestrictionDefaults['sizeUnit']);
         if($unit == 'char' || $unit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING) {
             foreach ($this->lengthRestrictionDefaults as $key => $defaultValue) {
-                if(array_key_exists($key, self::$nonStandardXliffAttributes)) {
-                    // non-standard xliff-attributes:
-                    $nonStandardKeys = self::$nonStandardXliffAttributes[$key];
-                    $keyInUnitAttributes = $nonStandardKeys['inUnit'];
-                    $keyInSegmentAttributes = $nonStandardKeys['inSegmentAttr'];
-                } else {
-                    // standard xliff-attributes:
-                    $keyInUnitAttributes = $key;
-                    $keyInSegmentAttributes = $key;
+                if($key == 'sizeUnit') {
+                    //size-unit is set later in dependency if needed at all
+                    continue;
                 }
-                $segmentAttributes->$keyInSegmentAttributes = $xmlparser->getAttribute($unitAttributes, $keyInUnitAttributes, $defaultValue);
+                if($key == 'maxNumberOfLines') {
+                    // special handling here, since names are inconsistent
+                    $segmentAttributes->maxNumberOfLines = $xmlparser->getAttribute($unitAttributes, 'translate5:maxNumberOfLines', $defaultValue);
+                }
+                else {
+                    $segmentAttributes->$key = $xmlparser->getAttribute($unitAttributes, $key, $defaultValue);
+                }
             }
         }
+
+        //only if there is a value for one of the restriction values, then we set the size-unit too
+        $useSizeUnit = $segmentAttributes->minWidth . $segmentAttributes->maxWidth . $segmentAttributes->maxNumberOfLines;
+        if(strlen($useSizeUnit) > 0) {
+            $segmentAttributes->sizeUnit = $unit;
+        }
+        
+        //size-unit is set in seg attributes in anycase due the default usage on getAttribute
+        // but setting inthis should only be set,
         
         // When pixelMapping is to be used, the config's defaultPixelWidth for this fontSize must exist.
         // (We cannot assume that every character will have a pixelWidth set in the pixelMapping-table,
