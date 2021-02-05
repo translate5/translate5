@@ -83,6 +83,7 @@ abstract class editor_Services_Connector_HttpApiAbstract {
     
     /**
      * returns the raw response
+     * @return Zend_Http_Response
      */
     public function getResponse() {
         return $this->response;
@@ -113,6 +114,8 @@ abstract class editor_Services_Connector_HttpApiAbstract {
      * @return boolean
      */
     protected function processResponse(Zend_Http_Response $response): bool {
+        //example how to fake a response
+        //$response = new Zend_Http_Response(500, [], '{"ReturnValue":0,"ErrorMsg":"Error: too many open translation memory databases"}');
         $this->error = null;
         $this->response = $response;
         $validStates = [200, 201];
