@@ -251,33 +251,21 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     submitFormat: Editor.DATE_ISO_FORMAT,
                                     value: now,
                                     fieldLabel: me.strings.orderdate
-                                },(Editor.data.enableSourceEditing  ? {
+                                },{
                                     xtype: 'checkbox',
                                     inputValue:1,
                                     uncheckedValue:0,
-                                    checked:1,
+                                    checked:Editor.data.enableSourceEditing,
                                     name: 'enableSourceEditing',
                                     fieldLabel: me.strings.sourceEditLabel
-                                } : {
-                                    xtype: 'hidden',
-                                    inputValue:1,
-                                    uncheckedValue:0,
-                                    checked:0,
-                                    name: 'enableSourceEditing'
-                                }),(Editor.data.frontend.importTask.edit100PercentMatch  ? {
+                                },{
                                     xtype: 'checkbox',
                                     inputValue:1,
                                     uncheckedValue:0,
-                                    checked:1,
+                                    checked:Editor.data.frontend.importTask.edit100PercentMatch,
                                     name: 'edit100PercentMatch',
                                     fieldLabel: me.strings.fullMatchLabel
-                                } : {
-                                    xtype: 'hidden',
-                                    inputValue:1,
-                                    uncheckedValue:0,
-                                    checked:0,
-                                    name: 'edit100PercentMatch'
-                                }),{
+                                },{
                                     xtype: 'checkbox',
                                     inputValue: 1,
                                     name: 'lockLocked',
