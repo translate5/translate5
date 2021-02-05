@@ -96,7 +96,7 @@ class editor_Services_Google_ApiWrapper {
      * @param array $text
      * @param string $sourceLang
      * @param string $targetLang
-     * @return array|null|false
+     * @return boolean
      */
     public function translateBatch(array $text, string $sourceLang, string $targetLang) {
         return $this->callWrapped(__FUNCTION__, [$text, [
