@@ -169,13 +169,13 @@ class editor_Segment_Tags implements JsonSerializable {
         // if we are an import, the original source and source will be handled identically - the "normal"  source is the edited source then
         if($this->editorMode && $this->sourceEditingEnabled){
             // original source (what is the source in all other cases)
-            $this->sourceOriginal = new editor_Segment_FieldTags($this->segmentId, $this->segment->get($sourceField), $sourceField, 'SourceOriginal');
+            $this->sourceOriginal = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $sourceField, 'SourceOriginal');
             // source here is the editable source
-            $this->source = new editor_Segment_FieldTags($this->segmentId, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
+            $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
         } else {
             $saveTo = ($this->sourceEditingEnabled) ? [$sourceField, $sourceFieldEditIndex] : $sourceField;
             // on import with enabled source editing, we copy the source as editedSource as well
-            $this->source = new editor_Segment_FieldTags($this->segmentId, $this->segment->get($sourceField), $saveTo, $sourceField);
+            $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $saveTo, $sourceField);
         }
         $this->targets = [];
         foreach ($fieldManager->getFieldList() as $field) {
@@ -188,7 +188,7 @@ class editor_Segment_Tags implements JsonSerializable {
                 $ttField = ($this->editorMode) ? $editIndex : $field->name;
                 // when importing, we use the target edit
                 $text = ($this->editorMode) ? $this->segment->get($editIndex) : $this->segment->getTargetEdit();
-                $target = new editor_Segment_FieldTags($this->segmentId, $text, $saveTo, $ttField);
+                $target = new editor_Segment_FieldTags($this->segmentId, $field->name, $text, $saveTo, $ttField);
                 $this->targets[] = $target;
             }
         }
@@ -305,11 +305,11 @@ class editor_Segment_Tags implements JsonSerializable {
     /* Internal Tags API */
     
     /**
-     * 
+     * Checks if any fields have one or more tags of the given type
      * @param string $type
      * @return bool
      */
-    public function hasInternalTagsOfType(string $type) : bool {
+    public function hasTagsOfType(string $type) : bool {
         foreach($this->getFieldTags() as $fieldTags){
             if($fieldTags->hasType($type)){
                 return true;
@@ -318,10 +318,97 @@ class editor_Segment_Tags implements JsonSerializable {
         return false;
     }
     /**
+     * Checks if any fields have one or more tags of the given type and classname
+     * @param string $type
+     * @param string $className
+     * @return bool
+     */
+    public function hasTagsOfTypeAndClass(string $type, string $className) : bool {
+        foreach($this->getFieldTags() as $fieldTags){
+            if($fieldTags->hasTypeAndClass($type, $className)){
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Checks if any target fields have one or more tags of the given type and classname
+     * @param string $type
+     * @param string $className
+     * @return bool
+     */
+    public function hasTargetTagsOfTypeAndClass(string $type, string $className) : bool {
+        foreach($this->targets as $fieldTags){
+            if($fieldTags->hasTypeAndClass($type, $className)){
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Checks if any target fields have one or more tags of the given type having at least one of the given classnames
+     * @param string $type
+     * @param string[] $classNames
+     * @return bool
+     */
+    public function hasTargetTagsOfTypeAndClasses(string $type, array $classNames) : bool {
+        foreach($this->targets as $fieldTags){
+            if($fieldTags->hasTypeAndClasses($type, $classNames)){
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Retrieves the field names of any fields that have one or more tags of the given type and classname
+     * @param string $type
+     * @param string $className
+     * @return string[]
+     */
+    public function getFieldsByTagsTypeAndClass(string $type, string $className) : array {
+        $fields = [];
+        foreach($this->getFieldTags() as $fieldTags){
+            if($fieldTags->hasTypeAndClass($type, $className)){
+                $fields[] = $fieldTags->getField();
+            }
+        }
+        return array_unique($fields);
+    }
+    /**
+     * Retrieves the field names of any target fields that have one or more tags of the given type and classname
+     * @param string $type
+     * @param string $className
+     * @return string[]
+     */
+    public function getFieldsByTargetTagsTypeAndClass(string $type, string $className) : array {
+        $fields = [];
+        foreach($this->targets as $fieldTags){
+            if($fieldTags->hasTypeAndClass($type, $className)){
+                $fields[] = $fieldTags->getField();
+            }
+        }
+        return array_unique($fields);
+    }
+    /**
+     * Retrieves the field names of any target fields that have one or more tags of the given type having at least one of the given classnames
+     * @param string $type
+     * @param string[] $classNames
+     * @return string[]
+     */
+    public function getFieldsByTargetTagsTypeAndClasses(string $type, array $classNames) : array {
+        $fields = [];
+        foreach($this->targets as $fieldTags){
+            if($fieldTags->hasTypeAndClasses($type, $classNames)){
+                $fields[] = $fieldTags->getField();
+            }
+        }
+        return array_unique($fields);
+    }
+    /**
      * Removes the tags of the passed type in all our FieldTags
      * @param string $type
      */
-    public function removeInternalTagsByType(string $type){
+    public function removeTagsByType(string $type){
         foreach($this->getFieldTags() as $fieldTags){
             $fieldTags->removeByType($type);
         }
@@ -331,7 +418,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * @param string $type
      * @return editor_Segment_Tag[]
      */
-    public function getInternalTagsByType(string $type){
+    public function getTagsByType(string $type){
         $result = [];
         foreach($this->getFieldTags() as $fieldTags){
             $result = array_merge($result, $fieldTags->getByType($type));
@@ -347,19 +434,17 @@ class editor_Segment_Tags implements JsonSerializable {
      * This also means, that during the import-process, the quality-entries will be written before the tags are written AFTER the import
      * @param string[]|string $fields
      * @param string $type
-     * @param string $msgkey
      * @param string $category
      * @param int $startIndex
      * @param int $endIndex
      */
-    public function addQuality($fields, string $type, string $msgkey, string $category=NULL, int $startIndex=0, int $endIndex=-1) {
+    public function addQuality($fields, string $type, string $category, int $startIndex=0, int $endIndex=-1) {
         $row = $this->getQualityTable()->createRow();
         /* @var $row editor_Models_Db_SegmentQualityRow */
         $row->segmentId = $this->segmentId;
         $row->taskGuid = $this->task->getTaskGuid();
         $row->setFields($fields);
         $row->type = $type;
-        $row->msgkey = $msgkey;
         $row->category = $category;
         $row->startIndex = $startIndex;
         $row->endIndex = $endIndex;
@@ -376,11 +461,8 @@ class editor_Segment_Tags implements JsonSerializable {
      * Saves all set qualities to the database after deleting the current ones
      */
     public function saveQualities(){
-        editor_Models_Db_SegmentQuality::deleteForSegment($this->segmentId);
-        if(count($this->qualities) > 0){
-            editor_Models_Db_SegmentQuality::saveRows($this->qualities);
-            $this->qualities = [];
-        }
+        editor_Models_Db_SegmentQuality::saveRows($this->qualities);
+        $this->qualities = [];
     }
     
     /* Serialization API */

@@ -148,7 +148,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @see editor_Tag::render()
      */
     public function render(array $skippedTypes=NULL) : string {
-        if($skippedTypes != NULL && is_array($skippedTypes) && in_array($skippedTypes, $this->getType())){
+        if($skippedTypes != NULL && is_array($skippedTypes) && in_array($this->getType(), $skippedTypes)){
             return $this->renderChildren($skippedTypes);
         }
         return $this->renderStart().$this->renderChildren($skippedTypes).$this->renderEnd();

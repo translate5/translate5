@@ -32,16 +32,17 @@
  END LICENSE AND COPYRIGHT
  */
 
-/**
- * Represents a termtagger segment tag
- */
-class  editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
+class editor_Segment_Internal_TagCkeck extends editor_Segment_Quality_Provider {
     
     /**
-     * The central unique type amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_QualityProvider::$type
+     * The central UNIQUE amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_Tag::$type
      * @var string
      */
-    protected static $type = editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE;
+    protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
+    
+    public function processSegment(editor_Models_Task $task, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
 
-    protected static $nodeName = 'div';
+        return $tags;
+    }
+
 }

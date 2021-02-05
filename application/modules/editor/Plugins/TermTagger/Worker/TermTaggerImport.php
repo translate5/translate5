@@ -255,6 +255,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
      * @throws ZfExtended_Exception
      */
     private function tagSegmentsTags(array $segmentsTags, string $slot, bool $doSaveTags) {
+        
         $this->proccessedTags = [];
         $this->communicationService = $this->config->createServerCommunicationServiceFromTags($segmentsTags, !$this->isWorkerThread);
         $termTagger = ZfExtended_Factory::get(
@@ -270,13 +271,17 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
         foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
             $segmentId = $tags->getSegmentId();
             if(array_key_exists($segmentId, $taggedSegmentsById)){
+                // bring the tagged segment content back to the tags model
+                // TODO: this is Ugly and counteracts the object-oriented nature of the tags
                 $this->applyResponseToTags($taggedSegmentsById[$segmentId], $tags);
+                     // add qualities if found in the target tags
+                $this->findAndAddQualitiesInTags($tags);
                 // save the tags, either to the tags-model or back to the segment if configured
                 if($doSaveTags){
                     if($this->directSegmentProcessing){
                         $tags->flush();
                     } else {
-                        $tags->save(editor_Plugins_TermTagger_QualityProvider::TYPE);
+                        $tags->save(editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE);
                         $tags->saveQualities();
                     }
                 } else {
@@ -287,6 +292,29 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
                 // TODO FIXME: proper exception
                 throw new ZfExtended_Exception('Response of termtagger did not contain the sent segment with ID '.$segmentId);
             }
+        }
+    }
+    /**
+     * Finds term tags of certain classes (= certain term stati) in the tags that represent a problem
+     * @param editor_Segment_Tags $tags
+     */
+    private function findAndAddQualitiesInTags(editor_Segment_Tags $tags){
+        $providerType = editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE;
+        $fields = $tags->getFieldsByTargetTagsTypeAndClass($providerType, editor_Models_Term::TRANSSTAT_NOT_FOUND);
+        if(count($fields) > 0){
+            $tags->addQuality($fields, $providerType, editor_Models_Term::TRANSSTAT_NOT_FOUND);
+        }
+        $fields = $tags->getFieldsByTargetTagsTypeAndClass($providerType, editor_Models_Term::TRANSSTAT_NOT_DEFINED);
+        if(count($fields) > 0){
+            $tags->addQuality($fields, $providerType, editor_Models_Term::TRANSSTAT_NOT_DEFINED);
+        }
+        $fields = $tags->getFieldsByTargetTagsTypeAndClass($providerType, editor_Models_Term::STAT_SUPERSEDED);
+        if(count($fields) > 0){
+            $tags->addQuality($fields, $providerType, editor_Models_Term::STAT_SUPERSEDED);
+        }
+        $fields = $tags->getFieldsByTargetTagsTypeAndClass($providerType, editor_Models_Term::STAT_DEPRECATED);
+        if(count($fields) > 0){
+            $tags->addQuality($fields, $providerType, editor_Models_Term::STAT_DEPRECATED);
         }
     }
     /**

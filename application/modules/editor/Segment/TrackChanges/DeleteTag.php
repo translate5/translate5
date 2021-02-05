@@ -33,15 +33,13 @@
  */
 
 /**
- * Represents a termtagger segment tag
+ * Represents a TrackChanges Delete Tag like <del class="trackchanges ownttip deleted"> ... </del>
  */
-class  editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
+class  editor_Segment_TrackChanges_DeleteTag extends editor_Segment_Tag {
     
-    /**
-     * The central unique type amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_QualityProvider::$type
-     * @var string
-     */
-    protected static $type = editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE;
+    const CSS_CLASS = 'trackchanges';
+    
+    protected static $type = editor_Segment_Tag::TYPE_TRACKCHANGES;
 
-    protected static $nodeName = 'div';
+    protected static $nodeName = 'del';
 }

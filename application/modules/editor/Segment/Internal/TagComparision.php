@@ -32,16 +32,7 @@
  END LICENSE AND COPYRIGHT
  */
 
-/**
- * Represents a termtagger segment tag
- */
-class  editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
+class editor_Segment_Internal_TagComparision {
     
-    /**
-     * The central unique type amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_QualityProvider::$type
-     * @var string
-     */
-    protected static $type = editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE;
-
-    protected static $nodeName = 'div';
+    
 }

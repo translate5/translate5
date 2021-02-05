@@ -51,12 +51,10 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
     }
     /**
      * 
-     * @param Zend_Db_Table_Row_Abstract[] $rows
+     * @param editor_Models_Db_SegmentQualityRow[] $rows
      */
     public static function saveRows(array $rows){
-        if(count($rows) == 1) {
-            $rows[0]->save();
-        } else if(count($rows) > 1){
+        if(count($rows) > 1){
             $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
             /* @var $table editor_Models_Db_SegmentQuality[] */
             $db = $table->getAdapter();
@@ -67,7 +65,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
                 }
             }
             $rowvals = [];
-            foreach($rows as $row){ /* @var $row Zend_Db_Table_Row_Abstract */
+            foreach($rows as $row){ /* @var $row editor_Models_Db_SegmentQualityRow */
                 $vals = [];
                 foreach($cols as $col){
                     $vals[] = $db->quote($row->$col);
@@ -75,6 +73,8 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
                 $rowvals[] = '('.implode(',', $vals).')';
             }
             $db->query('INSERT INTO '.$db->quoteIdentifier($table->getName()).' (`'.implode('`,`', $cols).'`) VALUES '.implode(',', $rowvals));
+        } else if(count($rows) > 0){
+            $rows[0]->save();
         }
     }
 

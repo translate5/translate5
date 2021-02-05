@@ -81,6 +81,11 @@ final class editor_Segment_Quality_Manager {
      */
     private $registry;
     /**
+     *
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    private $translate = null;
+    /**
      * To prevent any changes during import
      * @var boolean
      */
@@ -160,7 +165,7 @@ final class editor_Segment_Quality_Manager {
             foreach($this->registry as $type => $provider){
                 /* @var $provider editor_Segment_Quality_Provider */
                 if(!$provider->hasImportWorker()){
-                    $tags->removeInternalTagsByType($provider->getType());
+                    $tags->removeTagsByType($provider->getType());
                     $tags = $provider->processSegment($task, $tags, true);
                 }
             }
@@ -170,13 +175,10 @@ final class editor_Segment_Quality_Manager {
             $tags->flush(false);
         }
         // save qualities
-        editor_Models_Db_SegmentQuality::deleteForSegments($segmentIds);
-        if(count($qualities) > 0){
-            editor_Models_Db_SegmentQuality::saveRows($qualities);
-            
-        }
+        editor_Models_Db_SegmentQuality::saveRows($qualities);
         // remove segment tags model
-        editor_Models_Db_SegmentTags::removeByTaskGuid($task->getTaskGuid());
+        // TODO REMOVE OUTCOMMENT
+        // editor_Models_Db_SegmentTags::removeByTaskGuid($task->getTaskGuid());
         
         $db->getAdapter()->commit();
     }
@@ -185,11 +187,12 @@ final class editor_Segment_Quality_Manager {
      * @param editor_Models_Task $task
      */
     public function processEditing(editor_Models_Segment $segment, editor_Models_Task $task){
-        
+        // we remove all qualities as new ones will be written
+        editor_Models_Db_SegmentQuality::deleteForSegment($segment->getId());        
         $tags = editor_Segment_Tags::fromSegment($task, true, $segment, false);
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
-            $tags->removeInternalTagsByType($provider->getType());
+            $tags->removeTagsByType($provider->getType());
             $tags = $provider->processSegment($task, $tags, false);
         }
         $tags->flush(true);
@@ -219,6 +222,41 @@ final class editor_Segment_Quality_Manager {
         }
         return NULL;
     }
+    /**
+     * Translates a Segment Quality Type
+     * @param string $type
+     * @throws ZfExtended_Exception
+     * @return string
+     */
+    public function translateQualityType(string $type) : string {
+        if($this->hasProvider($type)){
+            $translation = $this->getProvider($type)->translateType($this->getTranslate());
+            if(empty($translation)){
+                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+            }
+            return $translation;
+        }
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation for the type".');
+        return NULL;
+    }
+    /**
+     * Translates a Segment Quality Code that is referenced in LEK_segment_quality category in conjunction with type
+     * @param string $type
+     * @param string $category
+     * @throws ZfExtended_Exception
+     * @return string
+     */
+    public function translateQualityCategory(string $type, string $category) : string {
+        if($this->hasProvider($type)){
+            $translation = $this->getProvider($type)->translateCategory($this->getTranslate(), $category);
+            if(empty($translation)){
+                throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
+            }
+            return $translation;
+        }        
+        throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation of category "'.$category.'".');
+        return NULL;
+    }
     
     /*
     public function createStatisticsData(){
@@ -229,4 +267,15 @@ final class editor_Segment_Quality_Manager {
         
     }
     */
+    
+    /**
+     * 
+     * @return ZfExtended_Zendoverwrites_Translate
+     */
+    private function getTranslate(){
+        if($this->translate == null){
+            $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        }
+        return $this->translate;
+    }
 }
