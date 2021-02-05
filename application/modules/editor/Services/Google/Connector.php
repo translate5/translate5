@@ -183,7 +183,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      */
     protected function createConnectorException(): editor_Services_Connector_Exception {
         $badRequestException = $this->apiWrapper->getError();
-        $msg = $badRequestException->getMessage();
+        $msg = $badRequestException->getMessage() ?? '';
         if(stripos($msg, 'Daily Limit Exceeded') !== false) {
             $ecode = 'E1320'; //'Google Translate quota exceeded. The character limit has been reached.',
         }
@@ -199,7 +199,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
         $data = [
             'service' => $this->getResource()->getName(),
             'languageResource' => $this->languageResource ?? '',
-            'error' => $this->apiWrapper->getError(),
+            'error' => $msg,
         ];
         
         return new editor_Services_Connector_Exception($ecode, $data, $badRequestException);
