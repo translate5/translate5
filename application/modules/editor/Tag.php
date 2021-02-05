@@ -453,6 +453,23 @@ class editor_Tag {
         return in_array(trim($classname), $this->classes);
     }
     /**
+     * Checks if at least one of the given classnames is present
+     * If no classnames are passed the evaluation is regarded as positive/match
+     * @param string[] $classNames
+     * @return bool
+     */
+    public function hasClasses(array $classNames) : bool {
+        if(count($classNames) == 0){
+            return true;
+        }
+        foreach($classNames as $classname){
+            if($this->hasClass($classname)){
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
      * Retrieves the classnames
      * @return string
      */

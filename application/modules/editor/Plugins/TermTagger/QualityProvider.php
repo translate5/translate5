@@ -35,10 +35,15 @@
 class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_Provider {
     
     /**
+     * Central Key to identify term tags & qualities
+     * @var string
+     */
+    const PROVIDER_TYPE = 'term';
+    /**
      * The central UNIQUE amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_Tag::$type
      * @var string
      */
-    protected static $type = 'term';
+    protected static $type = self::PROVIDER_TYPE;
     
     public function hasImportWorker() : bool {
         return true;
@@ -67,7 +72,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         $this->lockOversizedSegments($task, $meta, $config);
         
         // init worker and queue it
-        $params = ['resourcePool' => 'import', 'processSegmentsDirectly' => true];
+        $params = ['resourcePool' => 'import', 'processSegmentsDirectly' => false];
         if (!$worker->init($task->getTaskGuid(), $params)) {
             $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [
                 'parameters' => $params,
@@ -120,6 +125,25 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         }
         $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
         return $tags;
+    }
+    
+    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
+        return $translate->_('Terms');
+    }
+    
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category) : string {
+        switch($category){
+            case editor_Models_Term::TRANSSTAT_NOT_FOUND:
+                return $translate->_('Term not found un target language');
+                
+            case editor_Models_Term::TRANSSTAT_NOT_DEFINED:
+                return $translate->_('Term not defined in target language');
+                
+            case editor_Models_Term::STAT_SUPERSEDED:
+            case editor_Models_Term::STAT_DEPRECATED:                
+                return $translate->_('Term superseeded, deprecated or forbidden in target language');
+        }
+        return NULL;
     }
 
     public function isSegmentTag(string $type, string $nodeName, array $classNames, array $attributes) : bool {

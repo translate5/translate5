@@ -67,7 +67,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     public static function fromJsonData(stdClass $data) : editor_Segment_FieldTags {
         try {
-            $tags = new editor_Segment_FieldTags($data->segmentId, $data->fieldText, $data->saveTo, $data->ttName);
+            $tags = new editor_Segment_FieldTags($data->segmentId, $data->field, $data->fieldText, $data->saveTo, $data->ttName);
             foreach($data->tags as $tag){
                 $tags->addTag(editor_Segment_TagCreator::instance()->fromJsonData($tag));
             }
@@ -100,6 +100,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     private $segmentId;
     /**
+     * The field our fieldtext comes from
+     * @var string
+     */
+    private $field;
+    /**
      * The text of the relevant segment field
      * @var string
      */
@@ -124,12 +129,14 @@ class editor_Segment_FieldTags implements JsonSerializable {
     /**
      * 
      * @param int $segmentId
+     * @param string $field
      * @param string $fieldText
      * @param string | string[] $saveTo
      * @param string $ttName
      */
-    public function __construct(int $segmentId, string $fieldText, $saveTo, string $ttName=null) {
+    public function __construct(int $segmentId, string $field, string $fieldText, $saveTo, string $ttName=null) {
         $this->segmentId = $segmentId;
+        $this->field = $field;
         $this->fieldText = '';
         $this->saveTo = is_array($saveTo) ? implode(',', $saveTo) : $saveTo;
         $this->ttName = (empty($ttName)) ? $this->getFirstSaveToField() : $ttName;
@@ -155,6 +162,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     public function getSegmentId() : int {
         return $this->segmentId;
+    }
+    /**
+     *
+     * @return string
+     */
+    public function getField() : string {
+        return $this->field;
     }
     /**
      * 
@@ -281,6 +295,35 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
         return false;
     }
+    
+    /**
+     * Checks if a internal tag of a certain type and class is present
+     * @param string $type
+     * @param string $className
+     * @return bool
+     */
+    public function hasTypeAndClass(string $type, string $className) : bool {
+        foreach($this->tags as $tag){
+            if($tag->getType() == $type && $tag->hasClass($className)){
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Checks if a internal tag of a certain type is present that has at least one of the given classnames
+     * @param string $type
+     * @param string[] $classNames
+     * @return bool
+     */
+    public function hasTypeAndClasses(string $type, array $classNames) : bool {
+        foreach($this->tags as $tag){
+            if($tag->getType() == $type && $tag->hasClasses($classNames)){
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * Sorts the items ascending, takes the second index into account when items have the same startIndex
      */
@@ -307,6 +350,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $data->tags[] = $tag->jsonSerialize();
         }
         $data->segmentId = $this->segmentId;
+        $data->field = $this->field;
         $data->fieldText = $this->fieldText;
         $data->saveTo = $this->saveTo;
         $data->ttName = $this->ttName;

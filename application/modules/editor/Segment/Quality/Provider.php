@@ -63,14 +63,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     public function getType() : string {
         return static::$type;
     }
-    /**
-     * Quality Providers must use the same key to identify the provider & all of it's tags
-     * {@inheritDoc}
-     * @see editor_Segment_TagProviderInterface::getTagType()
-     */    
-    public function getTagType() : string {
-        return static::$type;
-    }
+    
     /**
      * Retrieves if the provider has an own import worker
      * If this API returns false the import is processed via ::processSegment
@@ -98,7 +91,36 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     public function processSegment(editor_Models_Task $task, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
         return $tags;
     }
-
+    /**
+     * Returns a translation for the Provider itself
+     * @param ZfExtended_Zendoverwrites_Translate $translate
+     * @return string
+     */
+    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
+        return NULL;
+    }
+    /**
+     * Returns a translation for a Quality. These Codes are stored in the category column of the LEK_segment_quality model
+     * @param ZfExtended_Zendoverwrites_Translate $translate
+     * @param string $category
+     * @return string
+     */
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category) : string {
+        return NULL;
+    }
+    
+    
+    /* *************** Tag provider API *************** */
+    
+    /**
+     * Quality Providers must use the same key to identify the provider & all of it's tags
+     * {@inheritDoc}
+     * @see editor_Segment_TagProviderInterface::getTagType()
+     */
+    public function getTagType() : string {
+        return static::$type;
+    }
+    
     public function isSegmentTag(string $type, string $nodeName, array $classNames, array $attributes) : bool {
         return false;
     }

@@ -35,7 +35,6 @@ END LICENSE AND COPYRIGHT
  * @property string $taskGuid
  * @property string $fields
  * @property string $type
- * @property string $msgkey
  * @property string $category
  * @property int $startIndex
  * @property int $endIndex
@@ -45,6 +44,8 @@ END LICENSE AND COPYRIGHT
  * @property string $comment
  */
 class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
+    
+    protected $_tableClass = 'editor_Models_Db_SegmentQuality';
     /**
      *
      * @return string[]

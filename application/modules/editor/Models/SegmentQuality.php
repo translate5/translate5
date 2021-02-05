@@ -36,8 +36,6 @@ END LICENSE AND COPYRIGHT
  * @method string getTaskGuid() getTaskGuid()
  * @method void setType() setType(string $type)
  * @method string getType() getType()
- * @method void setMsgkey() setMsgkey(string $msgkey)
- * @method string getMsgkey() getMsgkey()
  * @method void setCategory() setCategory(string $category)
  * @method string getCategory() getCategory()
  * @method void setStartIndex() setStartIndex(int $startIndex)

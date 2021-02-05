@@ -53,8 +53,7 @@ CREATE TABLE `LEK_segment_quality` (
   `taskGuid` varchar(38) NOT NULL,
   `fields` varchar(300) NOT NULL,
   `type` varchar(10) NOT NULL,
-  `msgkey` varchar(64) DEFAULT NULL,
-  `category` varchar(50) DEFAULT NULL,
+  `category` varchar(64) DEFAULT NULL,
   `startIndex` int(11) NOT NULL DEFAULT 0,
   `endIndex` int(11) NOT NULL DEFAULT -1,
   `falsePositive` int(1) NOT NULL DEFAULT 0,
@@ -62,8 +61,10 @@ CREATE TABLE `LEK_segment_quality` (
   `severity` varchar(255) DEFAULT NULL,
   `comment` longtext DEFAULT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
-  CONSTRAINT FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE
+  KEY `segmentId` (`segmentId`),
+  KEY `taskGuid` (`taskGuid`),
+  CONSTRAINT `LEK_segment_quality_ibfk_1` FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `LEK_segment_quality_ibfk_2` FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
 );
 
 INSERT INTO `LEK_segment_quality` (`segmentId`, `taskGuid`, `fields`, `type`, `qmtype`, `severity`, `comment`)
