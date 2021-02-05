@@ -33,6 +33,12 @@ use Google\Cloud\Core\Exception\GoogleException;
  * Wraps the Google Connection and converts the google errors to our internal errors
  */
 class editor_Services_Google_ApiWrapper {
+    
+    /**
+     * @var stdClass
+     */
+    protected $result;
+    
     /**
      * @var GoogleException
      */
@@ -75,7 +81,7 @@ class editor_Services_Google_ApiWrapper {
      * @param string $text
      * @param string $sourceLang
      * @param string $targetLang
-     * @return array|null|false
+     * @return boolean
      */
     public function translate(string $text, string $sourceLang, string $targetLang) {
         return $this->callWrapped(__FUNCTION__, [$text, [
@@ -108,7 +114,7 @@ class editor_Services_Google_ApiWrapper {
         if($result === false) {
             return [];
         }
-        return $result;
+        return $this->getResult();
     }
     
     /***
@@ -122,8 +128,25 @@ class editor_Services_Google_ApiWrapper {
         return in_array($languageCode, $languages);
     }
     
+    /**
+     * Set the response result
+     * @return boolean
+     */
+    protected function processResponse(array $response) {
+        $this->result = $response;
+        return empty($this->error);
+    }
+    
     public function getError(): ?GoogleException {
         return $this->error;
+    }
+    
+    
+    /**
+     * returns the decoded JSON result
+     */
+    public function getResult() {
+        return $this->result;
     }
     
     /**
@@ -136,7 +159,8 @@ class editor_Services_Google_ApiWrapper {
     protected function callWrapped(string $method, array $arguments = []) {
         $this->error = null;
         try {
-            return call_user_func_array([$this->translateClient, $method], $arguments);
+            $response = call_user_func_array([$this->translateClient, $method], $arguments);
+            return $this->processResponse($response);
         } catch (GoogleException $e) {
             $this->error = $e;
             return false;
