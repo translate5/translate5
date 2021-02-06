@@ -104,6 +104,21 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
     /**
      *
      */
+    public function testTagJSON(){
+        $segmentTag = new editor_Segment_AnyTag(6, 11, 'test', 'div');
+        $segmentTag
+            ->addClasses('zclass aclass bclass')
+            ->addOnEvent('click', "window.open('page');")
+            ->addAttribute('rel', 'something')
+            ->setData('some-name', 'some "data"')
+            ->setData('other-name', 12345);
+        $result = $segmentTag->toJson();
+        $expected = '{"type":"any","name":"div","category":"test","startIndex":6,"endIndex":11,"classes":["zclass","aclass","bclass"],"attribs":[{"name":"onclick","value":"window.open(\'page\');"},{"name":"rel","value":"something"},{"name":"data-some-name","value":"some \"data\""},{"name":"data-other-name","value":"12345"}]}';
+        $this->assertEquals($expected, $result);
+    }
+    /**
+     *
+     */
     public function testSingleTags(){
         $tags = $this->createTags();
         $tags->addTag(new editor_Segment_AnyTag(6, 11, 'test', 'a'));

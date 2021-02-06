@@ -283,6 +283,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
     }
     /**
+     * 
+     * @return bool
+     */
+    public function hasTags() : bool {
+        return (count($this->tags) > 0);
+    }
+    /**
      * Checks if a internal tag of a certain type is present
      * @param string $type
      * @return boolean
@@ -295,7 +302,6 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
         return false;
     }
-    
     /**
      * Checks if a internal tag of a certain type and class is present
      * @param string $type

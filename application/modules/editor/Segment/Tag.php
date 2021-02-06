@@ -203,7 +203,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         $data->startIndex = $this->startIndex;
         $data->endIndex = $this->endIndex;
         $data->classes = $this->classes;
-        $data->attribs = $this->attribs;
+        $data->attribs = $this->encodeAttribs();
         $this->furtherSerialize($data);
         return $data;
     }
@@ -216,8 +216,30 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         $this->startIndex = $data->startIndex;
         $this->endIndex = $data->endIndex;
         $this->classes = $data->classes;
-        $this->attribs = $data->attribs;
+        $this->attribs = $this->decodeAttribs($data->attribs);
         $this->furtherUnserialize($data);
+    }
+    /**
+     * 
+     * @return array[][]
+     */
+    private function encodeAttribs(){
+        $data = [];
+        foreach($this->attribs as $key => $val){
+            $data[] = ['name' => $key, 'value' => $val];
+        }
+        return $data;
+    }
+    /**
+     * 
+     * @param stdClass[] $data
+     */
+    private function decodeAttribs(array $data){
+        $attribs = [];
+        foreach($data as $ele){
+            $attribs[$ele->name] = $ele->value;
+        }
+        return $attribs;
     }
     /**
      * Use in inheriting classes for further serialization
