@@ -1827,7 +1827,8 @@ order by date desc, segmentId asc limit 1';
      * @return Zend_Db_Table_Row_Abstract
      */
     private function getTagsModel() : Zend_Db_Table_Row_Abstract {
-        if($this->tagsModel == null){
+        // Crucial: as this model may loads multiple rows we have to make sure the id matches in case
+        if($this->tagsModel == null || $this->tagsModel->segmentId != $this->getId()){
             $db = ZfExtended_Factory::get('editor_Models_Db_SegmentTags');
             /* @var $db editor_Models_Db_SegmentTags */
             $select = $db->select()->where('segmentId = ?', $this->getId());

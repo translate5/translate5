@@ -160,7 +160,7 @@ final class editor_Segment_Quality_Manager {
         /* @var $segment editor_Models_Segment */
         foreach($segmentIds as $segmentId){
             $segment->load($segmentId);
-            $tags = editor_Segment_Tags::fromSegment($task, false, $segment);
+            $tags = editor_Segment_Tags::fromSegment($task, false, $segment, true);
             // process all quality providers that do not have an import worker
             foreach($this->registry as $type => $provider){
                 /* @var $provider editor_Segment_Quality_Provider */
