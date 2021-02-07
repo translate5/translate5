@@ -34,7 +34,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
     /**
      * @var editor_Services_Google_ApiWrapper
      */
-    protected $apiWrapper;
+    protected $api;
 
     /**
      * Using Xliff based tag handler here
@@ -73,7 +73,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
         parent::connectTo($languageResource, $sourceLang, $targetLang);
-        $this->apiWrapper = ZfExtended_Factory::get('editor_Services_Google_ApiWrapper', [$languageResource->getResource()]);
+        $this->api = ZfExtended_Factory::get('editor_Services_Google_ApiWrapper', [$languageResource->getResource()]);
     }
     
     /**
@@ -82,10 +82,11 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryStringAndSetAsDefault($segment);
-        $result = $this->apiWrapper->translate($this->tagHandler->prepareQuery($queryString), $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode());
-        if($result === false) {
+        $success = $this->api->translate($this->tagHandler->prepareQuery($queryString), $this->languageResource->getSourceLangCode(), $this->languageResource->getTargetLangCode());
+        if($success === false) {
             throw $this->createConnectorException();
         }
+        $result = $this->api->getResult();
         if(empty($result)){
             return $this->resultList;
         }
@@ -104,10 +105,11 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
             return $this->resultList;
         }
         
-        $result = $this->apiWrapper->translate($searchString, $this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode());
-        if($result === false) {
+        $success = $this->api->translate($searchString, $this->languageResource->getSourceLangCode(),$this->languageResource->getTargetLangCode());
+        if($success === false) {
             throw $this->createConnectorException();
         }
+        $result = $this->api->getResult();
         if(empty($result)){
             return $this->resultList;
         }
@@ -122,10 +124,10 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      */
     public function languages(): array {
         //if empty api wrapper
-        if(empty($this->apiWrapper)) {
-            $this->apiWrapper = ZfExtended_Factory::get('editor_Services_Google_ApiWrapper', [$this->resource]);
+        if(empty($this->api)) {
+            $this->api = ZfExtended_Factory::get('editor_Services_Google_ApiWrapper', [$this->resource]);
         }
-        return $this->apiWrapper->getLanguages();
+        return $this->api->getLanguages();
     }
     
     /**
@@ -133,11 +135,11 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * @see editor_Services_Connector_BatchTrait::batchSearch()
      */
     protected function batchSearch(array $queryStrings, string $sourceLang, string $targetLang): bool {
-        $result = $this->apiWrapper->translateBatch($queryStrings, $sourceLang, $targetLang);
-        if($result === false) {
+        $success = $this->api->translateBatch($queryStrings, $sourceLang, $targetLang);
+        if($success === false) {
             throw $this->createConnectorException();
         }
-        return $result;
+        return $success;
     }
     
     /**
@@ -182,8 +184,8 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * @return editor_Services_Connector_Exception
      */
     protected function createConnectorException(): editor_Services_Connector_Exception {
-        $badRequestException = $this->apiWrapper->getError();
-        $msg = $badRequestException->getMessage() ?? '';
+        $badRequestException = $this->api->getError();
+        $msg = $badRequestException->getMessage();
         if(stripos($msg, 'Daily Limit Exceeded') !== false) {
             $ecode = 'E1320'; //'Google Translate quota exceeded. The character limit has been reached.',
         }
