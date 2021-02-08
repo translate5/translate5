@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * CsvEncodingTest imports a CSV with several special characters
- * The test task will be edited and exported. The generated changes.xml and 
+ * The test task will be edited and exported. The generated changes.xml and
  * exported file will then be checked for correct encoded content.
  */
 class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
@@ -64,8 +64,8 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
     
     /**
      * tests if config is correct for using our test CSV
-     * and 
-     * tests if config is correct for testing changes.xliff 
+     * and
+     * tests if config is correct for testing changes.xliff
      */
     public function testCsvSettings() {
         $tests = array(
@@ -99,7 +99,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         //open task for whole testcase
         $this->api()->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
         
-        //Testing Reference files. Is a little bit hidden in here, but as separate method we would have to play with logins and the task, 
+        //Testing Reference files. Is a little bit hidden in here, but as separate method we would have to play with logins and the task,
         // in this method we are logged in and the task is opened.
         $res = $this->api()->request('editor/referencefile/Translate%205%20Referenz%20Demonstration.pdf');
         /*@var $res Zend_Http_Response */
@@ -118,7 +118,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         array_shift($csvRows); //remove headers
         array_shift($csvRows); //remove comments like row without testdata
         
-        //remove img tags from compare column, since mqm import is currently not working. 
+        //remove img tags from compare column, since mqm import is currently not working.
         //compare column is used as edited data also, so mqm should remain in there for editing
         $removeImgTags = function($text){
           return preg_replace('#<img class="[^"]+qmflag[^"]+"[^>]+>#', '', $text);
@@ -175,9 +175,9 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testExport() {
         $task = $this->api()->getTask();
-        //start task export 
+        //start task export
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'specialCharactersInCSV-export-assert-equal.csv');
-        //start task export with diff 
+        //start task export with diff
         $this->checkExport($task, 'editor/task/export/id/'.$task->id.'/diff/1', 'specialCharactersInCSV-exportdiff-assert-equal.csv');
     }
     

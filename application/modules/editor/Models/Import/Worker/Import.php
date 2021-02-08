@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_Worker_Import {
     /***
-     * 
+     *
      * @var string
      */
     const CONFIG_TEMPLATE = 'task-config.ini';
@@ -320,20 +320,27 @@ class editor_Models_Import_Worker_Import {
         if (!file_exists($template)) {
             return;
         }
-        try {
-            $config = parse_ini_file($template);
-            foreach ($config as $name => $value){
-                $taskConfig=ZfExtended_Factory::get('editor_Models_TaskConfig');
-                /* @var $taskConfig editor_Models_TaskConfig */
+        $logData = [
+            'filename' => self::CONFIG_TEMPLATE,
+            'task' => $this->task,
+        ];
+        $config = parse_ini_file($template);
+        $log = Zend_Registry::get('logger');
+        /* @var $log ZfExtended_Logger */
+        foreach ($config as $name => $value){
+            $taskConfig=ZfExtended_Factory::get('editor_Models_TaskConfig');
+            /* @var $taskConfig editor_Models_TaskConfig */
+            try {
                 $taskConfig->updateInsertConfig($this->task->getTaskGuid(),$name,$value);
             }
-        }
-        catch (Exception $e) {
-            throw new editor_Models_Import_FileParser_Exception('E1325',[
-                'filename' => self::CONFIG_TEMPLATE,
-                'errorMessage' => $e->getMessage(),
-                'task' => $this->task
-            ]);
+            catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+                $logData['name'] = $name;
+                $log->exception(new editor_Models_Import_FileParser_Exception('E1327', $logData), ['level' => $log::LEVEL_WARN]);
+            }
+            catch (Exception $e) {
+                $logData['errorMessage'] = $e->getMessage();
+                throw new editor_Models_Import_FileParser_Exception('E1325', $logData);
+            }
         }
     }
 }
