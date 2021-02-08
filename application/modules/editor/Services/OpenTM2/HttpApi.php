@@ -44,12 +44,21 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     protected $languageResource;
     
     /**
+     * @var editor_Services_OpenTM2_FixLanguageCodes
+     */
+    protected $fixLanguages;
+
+    public function __construct() {
+        $this->fixLanguages = ZfExtended_Factory::get('editor_Services_OpenTM2_FixLanguageCodes');
+    }
+    
+    /**
      * This method creates a new memory.
      */
     public function createEmptyMemory($memory, $sourceLanguage) {
         $data = new stdClass();
         $data->name = $memory;
-        $data->sourceLang = $sourceLanguage;
+        $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
         
         $http = $this->getHttp('POST');
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
@@ -62,7 +71,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
     public function createMemory($memory, $sourceLanguage, $tmData) {
         $data = new stdClass();
         $data->name = $memory;
-        $data->sourceLang = $sourceLanguage;
+        $data->sourceLang = $this->fixLanguages->key($sourceLanguage);
         $data->data = base64_encode($tmData);
         
         $http = $this->getHttp('POST');
@@ -79,7 +88,7 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         //Out: { "ReturnValue":0, "ErrorMsg":"" }
         
         $data = new stdClass();
-        $tmData = $this->fixTmxData($tmData);
+        $tmData = $this->fixLanguages->tmxOnUpload($tmData);
         $data->tmxData = base64_encode($tmData);
 
         $http = $this->getHttpWithMemory('POST', '/import');
@@ -142,7 +151,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         if($response->getStatus() === 200) {
             $this->result = $response->getBody();
             if($mime == "application/xml"){
-                $this->result = $this->fixLangKeyGetTM($this->languageResource->targetLangCode, $this->result);
+                $targetLang = $this->languageResource->targetLangCode;
+                $sourceLang = $this->languageResource->sourceLangCode;
+                $this->result = $this->fixLanguages->tmxOnDownload($sourceLang, $targetLang, $this->result);
             }
             return true;
         }
@@ -191,10 +202,9 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     public function lookup(editor_Models_Segment $segment, string $queryString, string $filename) {
         $json = new stdClass();
-        $this->languageResource->targetLangCode = $this->fixLangKey($this->languageResource->targetLangCode);
 
-        $json->sourceLang = $this->languageResource->sourceLangCode;
-        $json->targetLang = $this->languageResource->targetLangCode;
+        $json->sourceLang = $this->fixLanguages->key($this->languageResource->sourceLangCode);
+        $json->targetLang = $this->fixLanguages->key($this->languageResource->targetLangCode);
         
         if($this->isToLong($queryString)) {
             $this->result = json_decode('{"ReturnValue":0,"ErrorMsg":"","NumOfFoundProposals":0}');
@@ -286,10 +296,8 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         $json->type = "Manual";
         $json->markupTable = "OTMXUXLF"; //fixed markup table for our XLIFF subset
         
-        $json->sourceLang = $this->languageResource->getSourceLangCode();
-        $json->targetLang = $this->languageResource->getTargetLangCode();
-
-        $json->targetLang = $this->fixLangKey($json->targetLang);
+        $json->sourceLang = $this->fixLanguages->key($this->languageResource->getSourceLangCode());
+        $json->targetLang = $this->fixLanguages->key($this->languageResource->getTargetLangCode());
         
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');
 
@@ -315,9 +323,12 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
      */
     protected function processResponse(Zend_Http_Response $response): bool {
         parent::processResponse($response);
+
+        //Normally the ReturnValue is 0 if there is no error.
+        $returnValueError = !empty($this->result->ReturnValue) && $this->result->ReturnValue > 0;
         
-        //check for error messages from body
-        if(!empty($this->result->ReturnValue) && $this->result->ReturnValue > 0) {
+        //For some errors this is not true, then only a ErrorMsg is set, but return value is 0,
+        if($returnValueError || !empty($this->result->ErrorMsg)) {
             $this->error = new stdClass();
             $this->error->method = $this->httpMethod;
             $this->error->url = $this->http->getUri(true);
@@ -367,112 +378,5 @@ class editor_Services_OpenTM2_HttpApi extends editor_Services_Connector_HttpApiA
         // we have to count and add them to get the real count
         $smileyCount = preg_match_all('/[\x{10000}-\x{10FFFF}]/mu', $string);
         return ($realCharLength + $smileyCount) > self::MAX_STR_LENGTH;
-    }
-    
-    protected function fixLangKey($key) {
-        $keyMap = [
-            'mn' => 'ru',
-            'mn-MN' => 'ru-RU',
-            'hi' => 'ar',
-            'hi-IN' => 'ar',
-        ];
-        if(empty($keyMap[$key])) {
-            return $key;
-        }
-        return $keyMap[$key];
-    }
-    
-    /**
-     * Applies several fixes to the uploaded TM data
-     * @param string $tmData
-     * @return string
-     */
-    protected function fixTmxData($tmData) {
-        
-        $tmData = preg_replace('#(<header[^>]+)datatype="unknown"([^>]+/>)#i', '${1}datatype="plaintext"${2}', $tmData, 1);
-        
-        return str_replace([
-            'xml:lang="mn"',
-            'xml:lang="mn-MN"',
-            'xml:lang="hi"',
-            'xml:lang="hi-IN"',
-            'xml:lang="de-CH"',
-            'xml:lang="fr-CH"',
-            'xml:lang="it-CH"',
-        ],[
-            'xml:lang="ru"',
-            'xml:lang="ru-RU"',
-            'xml:lang="ar"',
-            'xml:lang="ar"',
-            'xml:lang="de"',
-            'xml:lang="fr"',
-            'xml:lang="it"',
-        ],$tmData);
-    }
-    
-    protected function fixLangKeyGetTM($langKey, $tmData) {
-        switch ($langKey) {
-            case 'mn':
-                return str_replace([
-                    'xml:lang="ru"',
-                    '<prop type="tmgr:language">RUSSIAN</prop>'
-                ],[
-                    'xml:lang="mn"',
-                    '<prop type="tmgr:language">MONGOLIAN</prop>'
-                ], $tmData);
-            case 'mn-MN':
-                return str_replace([
-                    'xml:lang="ru"',
-                    'xml:lang="ru-RU"',
-                    '<prop type="tmgr:language">RUSSIAN</prop>'
-                ],[
-                    'xml:lang="mn-MN"',
-                    'xml:lang="mn-MN"',
-                    '<prop type="tmgr:language">MONGOLIAN</prop>'
-                ], $tmData);
-            case 'hi':
-                return str_replace([
-                    'xml:lang="ar"',
-                    '<prop type="tmgr:language">ARABIC</prop>'
-                ],[
-                    'xml:lang="hi"',
-                    '<prop type="tmgr:language">HINDI</prop>'
-                ], $tmData);
-            case 'hi-IN':
-                return str_replace([
-                    'xml:lang="ar"',
-                    '<prop type="tmgr:language">ARABIC</prop>'
-                ],[
-                    'xml:lang="hi-IN"',
-                    '<prop type="tmgr:language">HINDI</prop>'
-                ], $tmData);
-            case 'de-CH':
-                return str_replace([
-                    'xml:lang="de"',
-                    '<prop type="tmgr:language">GERMAN</prop>'
-                ],[
-                    'xml:lang="de-CH"',
-                    '<prop type="tmgr:language">SWISS GERMAN</prop>'
-                ], $tmData);
-            case 'fr-CH':
-                return str_replace([
-                    'xml:lang="fr"',
-                    '<prop type="tmgr:language">FRENCH</prop>'
-                ],[
-                    'xml:lang="fr-CH"',
-                    '<prop type="tmgr:language">SWISS FRENCH</prop>'
-                ], $tmData);
-            case 'it-CH':
-                return str_replace([
-                    'xml:lang="it"',
-                    '<prop type="tmgr:language">ITALIAN</prop>'
-                ],[
-                    'xml:lang="it-CH"',
-                    '<prop type="tmgr:language">SWISS ITALIAN</prop>'
-                ], $tmData);
-            default:
-                break;
-        }
-        return $tmData;
     }
 }

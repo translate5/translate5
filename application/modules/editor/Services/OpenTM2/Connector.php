@@ -64,7 +64,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public function __construct() {
         editor_Services_Connector_Exception::addCodes([
             'E1314' => 'The queried OpenTM2 TM "{tm}" is corrupt and must be reorganized before usage!',
+            'E1333' => 'The queried OpenTM2 server has to many open TMs!',
         ]);
+        
+        //ZfExtended_Logger::addDuplicatesByMessage('E1314');
+        ZfExtended_Logger::addDuplicatesByEcode('E1333');
+        
         parent::__construct();
     }
     
@@ -367,6 +372,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function delete() {
         if(!$this->api->delete()) {
+            $resp = $this->api->getResponse();
+            if($resp->getStatus() == 404) {
+                // if the result was a 404, then there is nothing to delete,
+                // so throw no error then and delete just locally
+                return;
+            }
             $this->throwBadGateway();
         }
     }
@@ -386,6 +397,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         if(strpos($error->error ?? '', 'needs to be organized') !== false) {
             $ecode = 'E1314';
             $data['tm'] = $this->languageResource->getName();
+        }
+        
+        if(strpos($error->error ?? '', 'too many open translation memory databases') !== false) {
+            $ecode = 'E1333';
         }
         
         throw new editor_Services_Connector_Exception($ecode, $data);
@@ -447,11 +462,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return self::STATUS_NOT_LOADED;
         }
         
-        $this->lastStatusInfo = join("<br/>\n", array_map(function($item) {
-            return $item->type.': '.$item->error;
-        }, $this->api->getError()));
-            
-        return self::STATUS_NOCONNECTION;
+        $error = $this->api->getError();
+        if(empty($error->type)) {
+            $this->lastStatusInfo = $error->error;
+        }
+        else {
+            $this->lastStatusInfo = $error->type.': '.$error->error;
+        }
+        return self::STATUS_ERROR;
     }
     
     /**
