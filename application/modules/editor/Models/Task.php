@@ -407,11 +407,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     public function getQmSubsegmentIssuesTranslated($asJson = true){
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
-        $walk = function(array $qmFlagTree)use ($translate,&$walk){
+        $walk = function(array $qmFlagTree) use ($translate, &$walk){
             foreach ($qmFlagTree as $node) {
                 $node->text = $translate->_($node->text);
                 if(isset($node->children) && is_array($node->children)){
-                  $walk($node->children, $walk);
+                    $walk($node->children, $walk);
                 }
             }
             return $qmFlagTree;

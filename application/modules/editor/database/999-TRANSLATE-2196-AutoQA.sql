@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `LEK_segment_tags` (
     CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE,
     CONSTRAINT FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE
 );
-
+-- model for AutoQA
 CREATE TABLE `LEK_segment_quality` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `segmentId` int(11) NOT NULL,
@@ -66,8 +66,14 @@ CREATE TABLE `LEK_segment_quality` (
   CONSTRAINT `LEK_segment_quality_ibfk_1` FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE,
   CONSTRAINT `LEK_segment_quality_ibfk_2` FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
 );
-
+-- migrate data from LEK_qmsubsegments
 INSERT INTO `LEK_segment_quality` (`segmentId`, `taskGuid`, `fields`, `type`, `qmtype`, `severity`, `comment`)
 SELECT `segmentId`,  `taskGuid`, `fieldedited`, 'mqm', `qmtype`, `severity`, `comment` FROM `LEK_qmsubsegments`;
 
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
+('runtimeOptions.autoQA.enableInternalTagCheck', 1, 'editor', 'system', '1', '1', '', 'boolean', 'If activated (default), AutoQA covers checking invalid internal tags', 8, 'Enable internal tag check', 'Editor: QA', '');
+
+
+-- TODO UNCOMMENT
 -- DROP TABLE `LEK_qmsubsegments`;

@@ -32,7 +32,49 @@
  END LICENSE AND COPYRIGHT
  */
 
+/**
+ * Compares two field-tags if they have the same amount of internal tags in the same order
+ */
 class editor_Segment_Internal_TagComparision {
     
-    
+    /**
+     * 
+     * @var string;
+     */
+    private $status = NULL;
+    /**
+     * 
+     * @param editor_Segment_FieldTags $toCheck
+     * @param editor_Segment_FieldTags $against
+     */
+    public function __construct(editor_Segment_FieldTags $toCheck, editor_Segment_FieldTags $against){
+        $toCheck->sort();
+        $against->sort();
+        $this->status = array();
+        $checkTags = $toCheck->getByType(editor_Segment_Tag::TYPE_INTERNAL);
+        /* @var $checkTags editor_Segment_Internal_Tag[] */
+        $againstTags = $against->getByType(editor_Segment_Tag::TYPE_INTERNAL);
+        /* @var $againstTags editor_Segment_Internal_Tag[] */
+        $numCheckTags = count($checkTags);
+        $numAgainstTags = count($checkTags);
+        if($numCheckTags == $numAgainstTags){
+            if($numAgainstTags > 0){
+                for($i=0; $i < $numCheckTags; $i++){
+                    if(!$checkTags[$i]->hasEqualClasses($againstTags[$i]) || !$checkTags[$i]->hasEqualName($againstTags[$i])){
+                        $this->status = editor_Segment_Internal_TagCheck::WRONG_ORDER;
+                        return;
+                    }
+                }
+            }
+        } else {
+            $this->status = editor_Segment_Internal_TagCheck::MISSING;
+        }
+    }
+    /**
+     * 
+     * @return string[]
+     */
+    public function getStatus(){
+        return $this->status;
+    }
 }

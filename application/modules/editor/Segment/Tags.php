@@ -104,6 +104,11 @@ class editor_Segment_Tags implements JsonSerializable {
     private $targets;
     /**
      *
+     * @var editor_Segment_FieldTags[]
+     */
+    private $targetOriginal = null;
+    /**
+     *
      * @var editor_Models_Task
      */
     private $task;
@@ -137,7 +142,6 @@ class editor_Segment_Tags implements JsonSerializable {
      * @var editor_Models_Db_SegmentQuality
      */
     private $qualityTable = NULL;
-    
     /**
      * 
      * @param editor_Models_Task $task
@@ -186,10 +190,14 @@ class editor_Segment_Tags implements JsonSerializable {
                 $saveTo = ($this->editorMode) ? $editIndex : [$field->name, $editIndex];
                 // the field name sent to the termtagger differs between import and editing (WHY?)
                 $ttField = ($this->editorMode) ? $editIndex : $field->name;
-                // when importing, we use the target edit
+                // when importing, we use the target edit for all targets
                 $text = ($this->editorMode) ? $this->segment->get($editIndex) : $this->segment->getTargetEdit();
                 $target = new editor_Segment_FieldTags($this->segmentId, $field->name, $text, $saveTo, $ttField);
                 $this->targets[] = $target;
+                // the first target will be the original target as bneeded for some Quality checks
+                if($this->targetOriginal == null){
+                    $this->targetOriginal = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
+                }
             }
         }
     }
@@ -248,6 +256,13 @@ class editor_Segment_Tags implements JsonSerializable {
         return ($this->sourceOriginal != null);
     }
     /**
+     *
+     * @return boolean
+     */
+    public function hasOriginalTarget(){
+        return ($this->targetOriginal != null);
+    }
+    /**
      * 
      * @return editor_Segment_FieldTags
      */
@@ -267,6 +282,23 @@ class editor_Segment_Tags implements JsonSerializable {
      */
     public function getTargets(){
         return $this->targets;
+    }
+    /**
+     *
+     * @return editor_Segment_FieldTags
+     */
+    public function getOriginalTarget(){
+        return $this->targetOriginal;
+    }
+    /**
+     *
+     * @return editor_Segment_FieldTags|NULL
+     */
+    public function getFirstTarget(){
+        if(count($this->targets) > 0){
+            return $this->targets[0];
+        }
+        return NULL;
     }
     /**
      * 
