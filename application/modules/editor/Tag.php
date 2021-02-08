@@ -765,7 +765,7 @@ class editor_Tag {
      * @return boolean
      */
     public function isEqual(editor_Tag $tag) : bool {
-        if($tag->getName() != $this->getName() || $tag->getSortedClasses() != $this->getSortedClasses()){
+        if(!$this->hasEqualName($tag) || !$this->hasEqualClasses($tag)){
             return false;
         }
         foreach($this->attribs as $key => $val){
@@ -781,6 +781,22 @@ class editor_Tag {
      */
     public function isEqualType(editor_Tag $tag) : bool {
         return false;
+    }
+    /**
+     * Checks if the passed tag has the same classes
+     * @param editor_Tag $tag
+     * @return bool
+     */
+    public function hasEqualClasses(editor_Tag $tag) : bool {
+        return ($tag->getSortedClasses() == $this->getSortedClasses());
+    }
+    /**
+     * Checks if the passed tag has the same node-name
+     * @param editor_Tag $tag
+     * @return bool
+     */
+    public function hasEqualName(editor_Tag $tag) : bool {
+        return ($tag->getName() == $this->getName());
     }
     /**
      * Creates a clone of the tag. Does not copy/clone the children and if not specified otherwise does not copy data-attributes

@@ -105,6 +105,12 @@ final class editor_Segment_Quality_Manager {
                 throw new ZfExtended_Exception('Quality Provider '.$providerClass.' does not exist');
             }
         }
+        // Some Base Providers that does not come from Plugins and may be activated/deactivated by config flags
+        $config = Zend_Registry::get('config');
+        if($config->runtimeOptions->autoQA->enableInternalTagCheck){
+            $provider = new editor_Segment_Internal_TagCheck();
+            $this->registry[$provider->getType()] = $provider;
+        }
     }
     /**
      * 

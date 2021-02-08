@@ -274,8 +274,11 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
                 // bring the tagged segment content back to the tags model
                 // TODO: this is Ugly and counteracts the object-oriented nature of the tags
                 $this->applyResponseToTags($taggedSegmentsById[$segmentId], $tags);
-                     // add qualities if found in the target tags
-                $this->findAndAddQualitiesInTags($tags);
+                // add qualities if found in the target tags
+                $config = Zend_Registry::get('config');
+                if($config->runtimeOptions->termTagger->enableAutoQA){
+                    $this->findAndAddQualitiesInTags($tags);
+                }
                 // save the tags, either to the tags-model or back to the segment if configured
                 if($doSaveTags){
                     if($this->directSegmentProcessing){

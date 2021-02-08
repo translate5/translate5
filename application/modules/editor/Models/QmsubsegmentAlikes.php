@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
  */
 
 /**
+ * TODO Move to Quality Model
  * Methods for Management of QM-Subsegments Alike Segments
  */
 class editor_Models_QmsubsegmentAlikes {

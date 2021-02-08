@@ -32,6 +32,10 @@
  END LICENSE AND COPYRIGHT
  */
 
+/**
+ * 
+ * Provides the tagging when Importing Tasks and tagging edited segments which is integrated in the general quality management
+ */
 class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_Provider {
     
     /**
@@ -134,7 +138,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category) : string {
         switch($category){
             case editor_Models_Term::TRANSSTAT_NOT_FOUND:
-                return $translate->_('Term not found un target language');
+                return $translate->_('Term not found in target language');
                 
             case editor_Models_Term::TRANSSTAT_NOT_DEFINED:
                 return $translate->_('Term not defined in target language');

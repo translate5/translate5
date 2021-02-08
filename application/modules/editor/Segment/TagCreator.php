@@ -143,7 +143,7 @@ final class editor_Segment_TagCreator {
      */
     private function evaluate(string $type, string $nodeName, array $classNames, array $attributes, int $startIndex, int $endIndex){
         
-        // check for Internal tags. This must be done in any case since the Internal TagCheck (as quality provider) can be disabled
+        // check for Internal tags. This must be done in any case since the Internal TagCheck (as quality provider) can be disabled via config
         if((editor_Segment_Internal_Tag::isType($type) || in_array(editor_Segment_Internal_Tag::CSS_CLASS, $classNames)) && editor_Segment_Internal_Tag::hasNodeName($nodeName)){
             return new editor_Segment_Internal_Tag($startIndex, $endIndex);
         }
