@@ -1904,6 +1904,8 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='V2VydA=='><source>Wert</source><target>Wert</target></trans-unit>
 <trans-unit id='QW53ZW5kdW5nIHZlcmxhc3Nlbg=='><source>Anwendung verlassen</source><target>Anwendung verlassen</target></trans-unit>
 <trans-unit id='U3DDpHRlciB3ZWl0ZXIgYXJiZWl0ZW4='><source>Später weiter arbeiten</source><target>Später weiter arbeiten</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSB3dXJkZSBhdWYgZWluZSBuZXVlIFZlcnNpb24gYWt0dWFsaXNpZXJ0'><source>Translate5 wurde auf eine neue Version aktualisiert</source><target>Translate5 wurde auf eine neue Version aktualisiert</target></trans-unit>
+<trans-unit id='RWluIFVwZGF0ZSBhdWYgZGllIFZlcnNpb24gezB9IHd1cmRlIGR1cmNoZ2Vmw7xocnQuIEJpdHRlIGxhZGVuIHNpZSBkaWUgQW53ZW5kdW5nIG5ldSB1bSBGZWhsZXIgaW4gZGVyIEJlbnV0enVuZyB6dSB2ZXJtZWlkZW4u'><source>Ein Update auf die Version {0} wurde durchgeführt. Bitte laden sie die Anwendung neu um Fehler in der Benutzung zu vermeiden.</source><target>Ein Update auf die Version {0} wurde durchgeführt. Bitte laden sie die Anwendung neu um Fehler in der Benutzung zu vermeiden.</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -48,6 +48,8 @@ Ext.define('Editor.controller.ServerException', {
         "409": '#UT#Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!',
         "503_title": '#UT#Es läuft eine Wartung',
         "503_msg": '#UT#Aktuell wird das System gewartet. Sobald die Wartung vorüber ist, können Sie wieder am System arbeiten.',
+        "update_title": '#UT#Translate5 wurde auf eine neue Version aktualisiert',
+        "update_msg": '#UT#Ein Update auf die Version {0} wurde durchgeführt. Bitte laden sie die Anwendung neu um Fehler in der Benutzung zu vermeiden.',
         title: '#UT#Fehler',
         text: '#UT#Fehler beim Speichern oder beim Auslesen von Daten. Bitte wenden Sie sich an unseren Support!',
         timeout: '#UT#Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.',
@@ -315,17 +317,31 @@ Ext.define('Editor.controller.ServerException', {
 function() {
     //override Ext.data.proxy.Server
     Ext.data.proxy.Server.override({
-    	afterRequest: function(request,success) {
-    		this.callOverridden(arguments);
-    		var mntpnl = Ext.first('maintenancePanel'),
-    		    viewport = Ext.first('viewport'), 
-    		    response = request._operation._response,
-    		    data = {
-    		        appName: Editor.data.app.name
-    		    };
-    		if(!response){
-    			return;
-    		}
+        afterRequest: function(request,success) {
+            this.callOverridden(arguments);
+            var mntpnl = Ext.first('maintenancePanel'),
+                viewport = Ext.first('viewport'),
+                response = request._operation._response,
+                version,
+                data = {
+                    appName: Editor.data.app.name
+                },
+                serverException = Editor.controller.ServerException.prototype;
+            if(!response){
+                return;
+            }
+            version = response.getResponseHeader('x-translate5-version');
+            if(!Ext.isEmpty(version) && version != Editor.data.app.version) {
+                Ext.MessageBox.show({
+                     title: serverException.strings.update_title,
+                     msg: Ext.String.format(serverException.strings.update_msg, Editor.data.app.version),
+                     buttons: Ext.MessageBox.OK,
+                     fn: function(){
+                         return serverException.handleMaintenance();
+                     },
+                     icon: Ext.MessageBox.WARNING
+                });
+            }
     		//FIXME neuen WebScoket Issue anlegen, der sammelt was alles auf websockets umgebaut werden kann wenn diese Fix aktiv sind.
     		// Diese Funktionalität gehört da mit dazu!
     		data.date = response.getResponseHeader('x-translate5-shownotice');
