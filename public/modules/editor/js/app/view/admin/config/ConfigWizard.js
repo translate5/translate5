@@ -89,7 +89,7 @@ Ext.define('Editor.view.admin.config.ConfigWizard', {
     },
     //called when skip button is clicked
     triggerSkipCard:function(activeItem){
-        this.fireEvent('wizardCardFinished', 4);
+        this.fireEvent('wizardCardFinished', 2);
     },
 
     disableSkipButton:function(){

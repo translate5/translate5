@@ -244,10 +244,28 @@ class editor_ConfigController extends ZfExtended_RestController {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($taskGuid);
-            if($task->getState()!=$task::STATE_IMPORT){
+            
+            //the task is in import state -> all good
+            if($task->getState() == $task::STATE_IMPORT){
+                return;
+            }
+            
+            //if the requested change is not for project type, throw exception
+            if($task->getState() != $task::INITIAL_TASKTYPE_PROJECT){
                 throw new editor_Models_ConfigException('E1296', [
                     'name' => $this->entity->getName()
                 ]);
+            }
+            
+            //if the current request is for project, all project task should be in state import, if not, throw exception
+            $projectTasks = $task->loadProjectTasks($task->getId(),true);
+            
+            foreach ($projectTasks as $projectTask){
+                if($projectTask['state']!=$task::STATE_IMPORT){
+                    throw new editor_Models_ConfigException('E1296', [
+                        'name' => $this->entity->getName()
+                    ]);
+                }
             }
         }
     }
@@ -268,6 +286,10 @@ class editor_ConfigController extends ZfExtended_RestController {
         }
         $customerId = $this->getParam('customerId');
         if(!empty($customerId)){
+            //ignore invalid customer ids
+            if(!is_numeric($customerId)){
+                return [];
+            }
             return array_values($this->entity->mergeCustomerValues($customerId));
         }
         $userGuid = $this->getParam('userGuid');

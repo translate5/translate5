@@ -47,13 +47,6 @@ class SegmentCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
 
-        $tests = array(
-            'runtimeOptions.editor.export.exportComments' => 1,
-            'runtimeOptions.import.sdlxliff.applyChangeMarks' => 1,
-            'runtimeOptions.import.sdlxliff.importComments' => 1,
-        );
-        self::$api->testConfig($tests);
-
         $zipfile = $api->zipTestFiles('testfiles/','XLF-test.zip');
         $api->addImportFile($zipfile);
         $api->import($task);
@@ -66,6 +59,14 @@ class SegmentCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
         $task = $api->getTask();
         //open task for whole testcase
         $api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'edit', 'id' => $task->id));
+        
+        $tests = array(
+            'runtimeOptions.editor.export.exportComments' => 1,
+            'runtimeOptions.import.sdlxliff.applyChangeMarks' => 1,
+            'runtimeOptions.import.sdlxliff.importComments' => 1,
+            'runtimeOptions.customers.anonymizeUsers' => 0,
+        );
+        self::$api->testConfig($tests, ['taskGuid' => $task->taskGuid]);
     }
 
     /**

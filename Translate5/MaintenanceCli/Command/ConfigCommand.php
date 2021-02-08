@@ -125,7 +125,7 @@ Modified values are shown bold in the simple listing.');
         if(!$isExact) {
             if($listDetails) {
                 foreach($foundConfigs as $configData) {
-                    $this->showDetail($configData);
+                    $this->showDetail($configData, $config);
                 }
             }
             else {
@@ -149,7 +149,7 @@ Modified values are shown bold in the simple listing.');
         if(is_null($newValue) && !$setEmpty) {
             if($isExact) {
                 //show the config details if found exactly one entry
-                $this->showDetail($exactConfig);
+                $this->showDetail($exactConfig, $config);
             }
             return 0;
         }
@@ -174,8 +174,12 @@ Modified values are shown bold in the simple listing.');
             $this->io->error(sprintf('The given value "%s" is not valid, only the following values are allowed: %s', $exactConfig['value'], $config->getDefaults()));
             return 1;
         }
+        $comment = $this->input->getOption('comment');
+        if(!is_null($comment)) {
+            $exactConfig['comment'] = $comment;
+        }
         $config->update($exactConfig['name'], $exactConfig['value'], $this->input->getOption('comment'));
-        $this->showDetail($exactConfig);
+        $this->showDetail($exactConfig, $config);
         if(array_key_exists('overwritten', $exactConfig)) {
             $this->io->warning($msg.' (in the DB only - change/remove it manually in/from the installation.ini)');
         }
@@ -189,7 +193,7 @@ Modified values are shown bold in the simple listing.');
      * Prints a config entry with all details
      * @param array $configData
      */
-    protected function showDetail(array $configData) {
+    protected function showDetail(array $configData, \editor_Models_Config $config) {
         $value = OutputFormatter::escape((string) $configData['value']);
         $hasIni = array_key_exists('overwritten', $configData);
         if($configData['value'] != $configData['default']) {
@@ -199,12 +203,14 @@ Modified values are shown bold in the simple listing.');
         $out = [
             '       <info>name: <options=bold>'.OutputFormatter::escape((string) $configData['name']).'</>',
             '      value: '.$value,
-            '   category: '.OutputFormatter::escape((string) $configData['category']),
             '    default: '.OutputFormatter::escape((string) $configData['default']),
+            '   category: '.OutputFormatter::escape((string) $configData['category']),
+            '        GUI: '.OutputFormatter::escape($configData['guiGroup'] . ' / ' . $configData['guiName']),
             '   defaults: '.OutputFormatter::escape((string) $configData['defaults']),
             '       type: '.$configData['type'],
+            '      level: '.$config->getConfigLevelLabel($configData['level']).' - '.$configData['level'],
             'description: '.OutputFormatter::escape((string) $configData['description']),
-            '      level: '.$configData['level'],
+            '    comment: '.OutputFormatter::escape((string) $configData['comment']),
             '',
         ];
         
