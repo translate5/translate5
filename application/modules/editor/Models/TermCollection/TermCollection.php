@@ -268,7 +268,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      */
     public function loadByName($name){
         $s=$this->db->select()
-        ->where('name=?',$name);
+        ->where('name=?',$name)
+        ->where('serviceName=?','TermCollection');
         $result=$this->db->fetchRow($s);
         if($result){
             return $result->toArray();
