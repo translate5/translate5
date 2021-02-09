@@ -84,14 +84,6 @@ class editor_Models_LanguageResources_UsageSumLogger extends ZfExtended_Models_E
         return $this->db->fetchAll($s)->toArray();
     }
     
-    public function loadByCustomer(int $customerId = null) : array{
-        $s=$this->db->select();
-        if(!empty($customerId)){
-            $s->where('customerId == ?',$customerId);
-        }
-        return $this->db->fetchAll($s)->toArray();
-    }
-    
     /***
      * Update sum record for given resource usage log entry. For each customer in the $log entry, separate
      * update/insert is executed (see updateInsertTotalCharacters function)

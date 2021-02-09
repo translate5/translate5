@@ -98,6 +98,13 @@ class Editor_CustomerController extends ZfExtended_RestController {
      */
     public function exportresourceAction(){
         $customerId = $this->getRequest()->getParam('customerId',null);
+        //InfO:this param is not used for public api access. This is only used for testcases
+        $dataOnly = $this->getRequest()->getParam('dataOnly',null);
+        if(!empty($dataOnly)){
+            $this->setupTextExportResourcesLogData($customerId);
+            return;
+        }
+        
         $export = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageExporter');
         /* @var $export editor_Models_LanguageResources_UsageExporter */
         $export->excel($customerId);
@@ -193,5 +200,20 @@ class Editor_CustomerController extends ZfExtended_RestController {
         throw ZfExtended_UnprocessableEntity::createResponse('E1063', [
             'number' => ['duplicateClientNumber' => 'Diese Kundennummer wird bereits verwendet.']
         ]);
+    }
+    
+    /***
+     * Set the resources log data for the current export request. If the request is from non test user, this will throw an exception.
+     * @param int $customerId
+     */
+    protected function setupTextExportResourcesLogData(int $customerId = null) {
+        $user = new Zend_Session_Namespace('user');
+        $allowed = ['testmanager','testapiuser'];
+        if(!in_array($user->data->login, $allowed)){
+            throw new ZfExtended_Models_Entity_NoAccessException('The current user is not alowed to use the resources log export data.');
+        }
+        $export = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageExporter');
+        /* @var $export editor_Models_LanguageResources_UsageExporter */
+        $this->view->rows = $export->getExportRawData($customerId);
     }
 }

@@ -27,6 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 class editor_Models_LanguageResources_UsageExporter{
     
+    const MONTHLY_SUMMARY_BY_RESOURCE = 'MonthlySummaryByResource';
+    const USAGE_LOG_BY_CUSTOMER = 'UsageLogByCustomer';
+    const DOCUMENT_USAGE = 'DocumentUsage';
+    
     /***
      * 
      * @var ZfExtended_Zendoverwrites_Translate
@@ -138,9 +142,11 @@ class editor_Models_LanguageResources_UsageExporter{
         //add the timestump to the export file
         $this->excel->setProperty('filename', $this->name.'_'.NOW_ISO);
         
-        $this->usageByMonth($customerId);
-        $this->usageLog($customerId);
-        $this->ussageInDocuments($customerId);
+        $data = $this->getExportRawData($customerId);
+        
+        $this->usageByMonth($data[self::MONTHLY_SUMMARY_BY_RESOURCE],$customerId);
+        $this->usageLog($data[self::USAGE_LOG_BY_CUSTOMER],$customerId);
+        $this->usageInDocuments($data[self::DOCUMENT_USAGE],$customerId);
 
         $sp = $this->excel->getSpreadsheet();
         
@@ -160,6 +166,32 @@ class editor_Models_LanguageResources_UsageExporter{
         }
         $sp->setActiveSheetIndex(0);
         $this->excel->sendDownload();
+    }
+
+    /***
+     * Load all required export data
+     * @param int $customerId
+     * @return array[]
+     */
+    public function getExportRawData(int $customerId = null) {
+        $rawData = [];
+        
+        $model = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageSumLogger');
+        /* @var $model editor_Models_LanguageResources_UsageSumLogger */
+        
+        $rawData[self::MONTHLY_SUMMARY_BY_RESOURCE] = $model->loadMonthlySummaryByResource($customerId);
+        
+        $model = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
+        /* @var $model editor_Models_LanguageResources_UsageLogger */
+        
+        $rawData[self::USAGE_LOG_BY_CUSTOMER] = $model->loadByCustomer($customerId);
+        
+        $model = ZfExtended_Factory::get('editor_Models_TaskUsageLog');
+        /* @var $model editor_Models_TaskUsageLog */
+        
+        $rawData[self::DOCUMENT_USAGE] = $model->loadByTypeAndCustomer($customerId,editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE);
+        
+        return $rawData;
     }
     
     /***
@@ -189,12 +221,10 @@ class editor_Models_LanguageResources_UsageExporter{
     
     /***
      * Generate worksheet usage by month
+     * @param array $data
      * @param int $customerId
      */
-    protected function usageByMonth(int $customerId=null) {
-        $model = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageSumLogger');
-        /* @var $model editor_Models_LanguageResources_UsageSumLogger */
-        $data = $model->loadMonthlySummaryByResource($customerId);
+    protected function usageByMonth(array $data,int $customerId=null) {
         //add row wich explains the current worksheet
         $comment = $this->translate->_('Diese Daten enthalten alle Anfragen an Sprachressourcen, egal ob durch Aufgaben oder via InstantTranslate.'); 
         $this->addWorkSheet($data, $this->translate->_('Ressourcen-Nutzung pro Monat'),$comment);
@@ -202,13 +232,11 @@ class editor_Models_LanguageResources_UsageExporter{
     
     /***
      * Generate worksheet character usage per customer
+     * 
+     * @param array $data
      * @param int $customerId
      */
-    protected function usageLog(int $customerId=null) {
-        $model = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
-        /* @var $model editor_Models_LanguageResources_UsageLogger */
-        $data = $model->loadByCustomer($customerId);
-        
+    protected function usageLog(array $data,int $customerId=null) {
         //add row wich explains the current worksheet
         $comment = $this->translate->_('Diese Daten enthalten alle Anfragen an Sprachressourcen, egal ob durch Aufgaben oder via InstantTranslate.');
         $comment.=$this->translate->_('Jede Zeile korrespondiert mit einer Anfrage an eine Sprachressource.');
@@ -217,16 +245,13 @@ class editor_Models_LanguageResources_UsageExporter{
     
     /***
      * Generate worksheet task usage by document type
+     * 
+     * @param array $data
      * @param int $customerId
      */
-    protected function ussageInDocuments(int $customerId=null) {
-        $model = ZfExtended_Factory::get('editor_Models_TaskUsageLog');
-        /* @var $model editor_Models_TaskUsageLog */
-        $data = $model->loadByTypeAndCustomer($customerId,editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE);
-        
+    protected function usageInDocuments(array $data,int $customerId=null) {
         //add row wich explains the current worksheet
         $comment = $this->translate->_('Anzahl der mit InstantTranslate übersetzten Dokumente');
-        
         $this->addWorkSheet($data, $this->translate->_('Dokumente pro Monat'),$comment);
     }
     

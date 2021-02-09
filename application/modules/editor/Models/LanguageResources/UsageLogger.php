@@ -125,5 +125,14 @@ class editor_Models_LanguageResources_UsageLogger extends ZfExtended_Models_Enti
         }
         return $this->db->delete(['timestamp < NOW() - INTERVAL ? DAY'=>$olderThen])>0;
     }
+    
+    /***
+     * Set the customers field in the required format (ex: ,1,2,3, )
+     * @param mixed $customers
+     */
+    public function setCustomers($customers) {
+        $customers = implode(',', explode(',', trim($customers,',')));
+        $this->__call(__FUNCTION__, [','.$customers.',']);
+    }
 }
 
