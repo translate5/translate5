@@ -49,8 +49,7 @@ class editor_Segment_Internal_TagCheck extends editor_Segment_Quality_Provider {
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
     
     public function processSegment(editor_Models_Task $task, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
-        // we only work when editing stuff
-        if(!$forImport){
+        if(true){
             // 1) Tag check: Bei Translation: Internal Tags gegen Source prüfen, bei Review: gegen Target            
             $isTranslationTask = $task->getEmptyTargets();
             $against = ($isTranslationTask) ? ($tags->hasOriginalSource() ? $tags->getOriginalSource() : $tags->getSource()) : $tags->getOriginalTarget();
