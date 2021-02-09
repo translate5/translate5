@@ -1952,7 +1952,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * 
      * @param editor_Models_task $task
      */
-    protected function insertTasktUsageLog(editor_Models_task $task) {
+    protected function insertTaskUsageLog(editor_Models_task $task) {
         $log = ZfExtended_Factory::get('editor_Models_TaskUsageLog');
         /* @var $log editor_Models_TaskUsageLog */
         #id, taskType, sourceLang, targetLang, customerId, yearAndMonth, taskCount

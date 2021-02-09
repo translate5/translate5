@@ -1,0 +1,1483 @@
+{
+    "MonthlySummaryByResource": [
+        {
+            "customerId": "31",
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "yearAndMonth": "2021-02",
+            "totalCharacters": "10508"
+        }
+    ],
+    "UsageLogByCustomer": [
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:30",
+            "customers": ",31,",
+            "charactersPerCustomer": "22"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:32",
+            "customers": ",31,",
+            "charactersPerCustomer": "35"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:34",
+            "customers": ",31,",
+            "charactersPerCustomer": "169"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:35",
+            "customers": ",31,",
+            "charactersPerCustomer": "204"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:35",
+            "customers": ",31,",
+            "charactersPerCustomer": "212"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:36",
+            "customers": ",31,",
+            "charactersPerCustomer": "228"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:37",
+            "customers": ",31,",
+            "charactersPerCustomer": "182"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:37",
+            "customers": ",31,",
+            "charactersPerCustomer": "113"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:38",
+            "customers": ",31,",
+            "charactersPerCustomer": "135"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:38",
+            "customers": ",31,",
+            "charactersPerCustomer": "117"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:38",
+            "customers": ",31,",
+            "charactersPerCustomer": "92"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:39",
+            "customers": ",31,",
+            "charactersPerCustomer": "228"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:40",
+            "customers": ",31,",
+            "charactersPerCustomer": "42"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:40",
+            "customers": ",31,",
+            "charactersPerCustomer": "50"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:41",
+            "customers": ",31,",
+            "charactersPerCustomer": "151"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:41",
+            "customers": ",31,",
+            "charactersPerCustomer": "114"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:42",
+            "customers": ",31,",
+            "charactersPerCustomer": "56"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:42",
+            "customers": ",31,",
+            "charactersPerCustomer": "61"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:43",
+            "customers": ",31,",
+            "charactersPerCustomer": "102"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:43",
+            "customers": ",31,",
+            "charactersPerCustomer": "143"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:44",
+            "customers": ",31,",
+            "charactersPerCustomer": "151"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:44",
+            "customers": ",31,",
+            "charactersPerCustomer": "10"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:45",
+            "customers": ",31,",
+            "charactersPerCustomer": "49"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:45",
+            "customers": ",31,",
+            "charactersPerCustomer": "110"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:45",
+            "customers": ",31,",
+            "charactersPerCustomer": "138"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:46",
+            "customers": ",31,",
+            "charactersPerCustomer": "147"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:46",
+            "customers": ",31,",
+            "charactersPerCustomer": "38"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:46",
+            "customers": ",31,",
+            "charactersPerCustomer": "49"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:46",
+            "customers": ",31,",
+            "charactersPerCustomer": "22"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:46",
+            "customers": ",31,",
+            "charactersPerCustomer": "17"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:46",
+            "customers": ",31,",
+            "charactersPerCustomer": "37"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:47",
+            "customers": ",31,",
+            "charactersPerCustomer": "121"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:47",
+            "customers": ",31,",
+            "charactersPerCustomer": "119"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:47",
+            "customers": ",31,",
+            "charactersPerCustomer": "64"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:47",
+            "customers": ",31,",
+            "charactersPerCustomer": "44"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:48",
+            "customers": ",31,",
+            "charactersPerCustomer": "26"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:48",
+            "customers": ",31,",
+            "charactersPerCustomer": "31"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:48",
+            "customers": ",31,",
+            "charactersPerCustomer": "44"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:48",
+            "customers": ",31,",
+            "charactersPerCustomer": "17"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:49",
+            "customers": ",31,",
+            "charactersPerCustomer": "149"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:49",
+            "customers": ",31,",
+            "charactersPerCustomer": "190"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:49",
+            "customers": ",31,",
+            "charactersPerCustomer": "23"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:49",
+            "customers": ",31,",
+            "charactersPerCustomer": "92"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:50",
+            "customers": ",31,",
+            "charactersPerCustomer": "141"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:50",
+            "customers": ",31,",
+            "charactersPerCustomer": "86"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:50",
+            "customers": ",31,",
+            "charactersPerCustomer": "115"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:50",
+            "customers": ",31,",
+            "charactersPerCustomer": "31"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:51",
+            "customers": ",31,",
+            "charactersPerCustomer": "166"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:51",
+            "customers": ",31,",
+            "charactersPerCustomer": "37"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:51",
+            "customers": ",31,",
+            "charactersPerCustomer": "132"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:51",
+            "customers": ",31,",
+            "charactersPerCustomer": "20"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:51",
+            "customers": ",31,",
+            "charactersPerCustomer": "77"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:52",
+            "customers": ",31,",
+            "charactersPerCustomer": "62"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:52",
+            "customers": ",31,",
+            "charactersPerCustomer": "62"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:52",
+            "customers": ",31,",
+            "charactersPerCustomer": "68"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:52",
+            "customers": ",31,",
+            "charactersPerCustomer": "23"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:52",
+            "customers": ",31,",
+            "charactersPerCustomer": "48"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:53",
+            "customers": ",31,",
+            "charactersPerCustomer": "102"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:53",
+            "customers": ",31,",
+            "charactersPerCustomer": "167"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:53",
+            "customers": ",31,",
+            "charactersPerCustomer": "24"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:53",
+            "customers": ",31,",
+            "charactersPerCustomer": "117"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:53",
+            "customers": ",31,",
+            "charactersPerCustomer": "21"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:54",
+            "customers": ",31,",
+            "charactersPerCustomer": "38"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:54",
+            "customers": ",31,",
+            "charactersPerCustomer": "38"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:54",
+            "customers": ",31,",
+            "charactersPerCustomer": "54"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:54",
+            "customers": ",31,",
+            "charactersPerCustomer": "37"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:54",
+            "customers": ",31,",
+            "charactersPerCustomer": "16"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:55",
+            "customers": ",31,",
+            "charactersPerCustomer": "41"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:55",
+            "customers": ",31,",
+            "charactersPerCustomer": "21"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:55",
+            "customers": ",31,",
+            "charactersPerCustomer": "43"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:55",
+            "customers": ",31,",
+            "charactersPerCustomer": "153"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:56",
+            "customers": ",31,",
+            "charactersPerCustomer": "163"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:57",
+            "customers": ",31,",
+            "charactersPerCustomer": "316"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:57",
+            "customers": ",31,",
+            "charactersPerCustomer": "22"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:57",
+            "customers": ",31,",
+            "charactersPerCustomer": "37"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:57",
+            "customers": ",31,",
+            "charactersPerCustomer": "23"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:57",
+            "customers": ",31,",
+            "charactersPerCustomer": "28"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:57",
+            "customers": ",31,",
+            "charactersPerCustomer": "24"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:58",
+            "customers": ",31,",
+            "charactersPerCustomer": "10"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:58",
+            "customers": ",31,",
+            "charactersPerCustomer": "11"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:58",
+            "customers": ",31,",
+            "charactersPerCustomer": "35"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:58",
+            "customers": ",31,",
+            "charactersPerCustomer": "20"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:58",
+            "customers": ",31,",
+            "charactersPerCustomer": "38"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:58",
+            "customers": ",31,",
+            "charactersPerCustomer": "37"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:59",
+            "customers": ",31,",
+            "charactersPerCustomer": "11"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:59",
+            "customers": ",31,",
+            "charactersPerCustomer": "41"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:59",
+            "customers": ",31,",
+            "charactersPerCustomer": "9"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:59",
+            "customers": ",31,",
+            "charactersPerCustomer": "26"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:59",
+            "customers": ",31,",
+            "charactersPerCustomer": "57"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:13:59",
+            "customers": ",31,",
+            "charactersPerCustomer": "27"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:00",
+            "customers": ",31,",
+            "charactersPerCustomer": "25"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:00",
+            "customers": ",31,",
+            "charactersPerCustomer": "31"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:00",
+            "customers": ",31,",
+            "charactersPerCustomer": "14"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:00",
+            "customers": ",31,",
+            "charactersPerCustomer": "10"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:00",
+            "customers": ",31,",
+            "charactersPerCustomer": "31"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:01",
+            "customers": ",31,",
+            "charactersPerCustomer": "19"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:01",
+            "customers": ",31,",
+            "charactersPerCustomer": "27"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:01",
+            "customers": ",31,",
+            "charactersPerCustomer": "16"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:01",
+            "customers": ",31,",
+            "charactersPerCustomer": "33"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:02",
+            "customers": ",31,",
+            "charactersPerCustomer": "18"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:02",
+            "customers": ",31,",
+            "charactersPerCustomer": "17"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:03",
+            "customers": ",31,",
+            "charactersPerCustomer": "20"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:03",
+            "customers": ",31,",
+            "charactersPerCustomer": "21"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:03",
+            "customers": ",31,",
+            "charactersPerCustomer": "27"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:04",
+            "customers": ",31,",
+            "charactersPerCustomer": "10"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:04",
+            "customers": ",31,",
+            "charactersPerCustomer": "10"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:05",
+            "customers": ",31,",
+            "charactersPerCustomer": "16"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:05",
+            "customers": ",31,",
+            "charactersPerCustomer": "13"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:05",
+            "customers": ",31,",
+            "charactersPerCustomer": "25"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:06",
+            "customers": ",31,",
+            "charactersPerCustomer": "9"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:06",
+            "customers": ",31,",
+            "charactersPerCustomer": "22"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:07",
+            "customers": ",31,",
+            "charactersPerCustomer": "38"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:07",
+            "customers": ",31,",
+            "charactersPerCustomer": "17"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:07",
+            "customers": ",31,",
+            "charactersPerCustomer": "12"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:07",
+            "customers": ",31,",
+            "charactersPerCustomer": "11"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:08",
+            "customers": ",31,",
+            "charactersPerCustomer": "68"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:08",
+            "customers": ",31,",
+            "charactersPerCustomer": "74"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:08",
+            "customers": ",31,",
+            "charactersPerCustomer": "42"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:08",
+            "customers": ",31,",
+            "charactersPerCustomer": "141"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:09",
+            "customers": ",31,",
+            "charactersPerCustomer": "152"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:09",
+            "customers": ",31,",
+            "charactersPerCustomer": "15"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:09",
+            "customers": ",31,",
+            "charactersPerCustomer": "10"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:09",
+            "customers": ",31,",
+            "charactersPerCustomer": "48"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:09",
+            "customers": ",31,",
+            "charactersPerCustomer": "29"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:09",
+            "customers": ",31,",
+            "charactersPerCustomer": "33"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:10",
+            "customers": ",31,",
+            "charactersPerCustomer": "34"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:10",
+            "customers": ",31,",
+            "charactersPerCustomer": "34"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:10",
+            "customers": ",31,",
+            "charactersPerCustomer": "173"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:10",
+            "customers": ",31,",
+            "charactersPerCustomer": "48"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:10",
+            "customers": ",31,",
+            "charactersPerCustomer": "98"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:11",
+            "customers": ",31,",
+            "charactersPerCustomer": "93"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:11",
+            "customers": ",31,",
+            "charactersPerCustomer": "33"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:11",
+            "customers": ",31,",
+            "charactersPerCustomer": "39"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:11",
+            "customers": ",31,",
+            "charactersPerCustomer": "43"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:11",
+            "customers": ",31,",
+            "charactersPerCustomer": "68"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:12",
+            "customers": ",31,",
+            "charactersPerCustomer": "54"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:12",
+            "customers": ",31,",
+            "charactersPerCustomer": "71"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:12",
+            "customers": ",31,",
+            "charactersPerCustomer": "75"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:12",
+            "customers": ",31,",
+            "charactersPerCustomer": "69"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:13",
+            "customers": ",31,",
+            "charactersPerCustomer": "44"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:13",
+            "customers": ",31,",
+            "charactersPerCustomer": "45"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:13",
+            "customers": ",31,",
+            "charactersPerCustomer": "153"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:13",
+            "customers": ",31,",
+            "charactersPerCustomer": "30"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:13",
+            "customers": ",31,",
+            "charactersPerCustomer": "122"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:14",
+            "customers": ",31,",
+            "charactersPerCustomer": "18"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:14",
+            "customers": ",31,",
+            "charactersPerCustomer": "18"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:14",
+            "customers": ",31,",
+            "charactersPerCustomer": "101"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:14",
+            "customers": ",31,",
+            "charactersPerCustomer": "72"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:14",
+            "customers": ",31,",
+            "charactersPerCustomer": "37"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:15",
+            "customers": ",31,",
+            "charactersPerCustomer": "19"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:15",
+            "customers": ",31,",
+            "charactersPerCustomer": "41"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:15",
+            "customers": ",31,",
+            "charactersPerCustomer": "105"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:15",
+            "customers": ",31,",
+            "charactersPerCustomer": "40"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:15",
+            "customers": ",31,",
+            "charactersPerCustomer": "113"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:16",
+            "customers": ",31,",
+            "charactersPerCustomer": "40"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:16",
+            "customers": ",31,",
+            "charactersPerCustomer": "57"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:16",
+            "customers": ",31,",
+            "charactersPerCustomer": "43"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:16",
+            "customers": ",31,",
+            "charactersPerCustomer": "68"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:16",
+            "customers": ",31,",
+            "charactersPerCustomer": "20"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:16",
+            "customers": ",31,",
+            "charactersPerCustomer": "23"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:17",
+            "customers": ",31,",
+            "charactersPerCustomer": "118"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:17",
+            "customers": ",31,",
+            "charactersPerCustomer": "55"
+        },
+        {
+            "langageResourceName": "API Testing::Translate1484Test",
+            "langageResourceType": "mt",
+            "sourceLang": "4",
+            "targetLang": "5",
+            "timestamp": "2021-02-09 12:14:17",
+            "customers": ",31,",
+            "charactersPerCustomer": "71"
+        }
+    ],
+    "DocumentUsage": []
+}
