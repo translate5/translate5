@@ -438,7 +438,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->isDataModified;
     }
-    
+    /**
+     * Convenience API to evaluate if a segment is pretranslated
+     * @return boolean
+     */
+    public function isPretranslated() {
+        return editor_Models_Segment_MatchRateType::isPretranslated($this->getMatchRateType());
+    }
     /**
      * restores segments with content not changed by the user to the original
      * (which contains termTags - this way no new termTagging is necessary, since

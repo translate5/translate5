@@ -641,7 +641,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $session = new Zend_Session_Namespace();
         return !empty($session->taskGuid) && $session->taskGuid == $this->getTaskGuid();
     }
-
+    /**
+     * Convenience API
+     * @return boolean
+     */
+    public function isTranslation() {
+        return $this->getEmptyTargets();
+    }
     /**
      * unlocks all tasks, where the associated session is invalid
      */
