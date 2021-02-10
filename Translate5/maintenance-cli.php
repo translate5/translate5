@@ -41,8 +41,11 @@ use Translate5\MaintenanceCli\Command\{
     ChangelogCommand,
     DevelopmentNewdbchangeCommand,
     DevelopmentCreatetestCommand,
-    DevelopmentGithookCommand,
     DevelopmentNewModelCommand,
+    DevelopmentGithookCommand,
+    PluginListCommand,
+    PluginEnableCommand,
+    PluginDisableCommand,
     SystemCheckCommand
 };
 
@@ -56,6 +59,9 @@ $commands = [
     new SessionImpersonateCommand(),
     new ChangelogCommand(),
     new SystemCheckCommand(),
+    new PluginListCommand(),
+    new PluginEnableCommand(),
+    new PluginDisableCommand(),
 ];
 if(file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();
