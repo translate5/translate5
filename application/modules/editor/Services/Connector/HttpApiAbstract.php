@@ -129,6 +129,7 @@ abstract class editor_Services_Connector_HttpApiAbstract {
             $this->error->method = $this->httpMethod;
             $this->error->url = $url;
             $this->error->type = 'HTTP '.$response->getStatus();
+            $this->error->body = $response->getBody();
             $this->error->error = $response->getStatus(); //is normally overwritten later
         }
         
