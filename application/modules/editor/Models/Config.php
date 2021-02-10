@@ -164,8 +164,9 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         $task=ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-        //when the task is not with state import, change for level task level import and task is allowed
-        $isImportDisabled = $task->getState() != $task::STATE_IMPORT;
+        
+        //when the task is not with state import or project, change for task config and task imort config is alowed
+        $isImportDisabled = !in_array($task->getState(), [$task::STATE_IMPORT,$task::INITIAL_TASKTYPE_PROJECT]);
         
         //load the task customer config as config base for this task
         //on customer level, we can override task specific config. With this, those overrides will be loaded
@@ -174,8 +175,8 @@ class editor_Models_Config extends ZfExtended_Models_Config {
         $customerBase = $this->mergeCustomerValues($task->getCustomerId(),$dbResults);
         array_walk($customerBase, function(&$r) use($taskGuid,$isImportDisabled){
             $r['taskGuid'] = $taskGuid;
-            //it is readonly when the config is inport config and the task is not in inport state
-            //or when the current config is custoler level config
+            //it is readonly when the config is import config and the task is not in import state
+            //or when the current config is customer level config
             $r['isReadOnly'] = ($isImportDisabled && $r['level']==self::CONFIG_LEVEL_TASKIMPORT) || $r['level']==self::CONFIG_LEVEL_CUSTOMER;
         });
         $s = $this->db->select()
