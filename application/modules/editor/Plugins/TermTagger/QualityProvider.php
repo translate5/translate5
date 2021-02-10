@@ -55,12 +55,6 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     
     public function addImportWorker(editor_Models_Task $task, int $parentWorkerId) {
         
-        // if the import is not switched on we return
-        $config = Zend_Registry::get('config');
-        $importSwitchedOn = $config->runtimeOptions->termTagger->switchOn->import;
-        if((boolean)$importSwitchedOn === false) {
-            return;
-        }
         // if no terminology is present we return as well
         /* @var $task editor_Models_Task */
         if (!$task->getTerminologie()) {
@@ -73,7 +67,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         /* @var $meta editor_Models_Segment_Meta */
         $meta->addMeta('termtagState', $meta::META_TYPE_STRING, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
         
-        $this->lockOversizedSegments($task, $meta, $config);
+        $this->lockOversizedSegments($task, $meta);
         
         // init worker and queue it
         $params = ['resourcePool' => 'import', 'processSegmentsDirectly' => false];
@@ -90,12 +84,6 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         
         // this API does not process the import
         if($forImport){
-            return $tags;
-        }
-        // do not process if not configured
-        $config = Zend_Registry::get('config');
-        $guiSwitchedOn = $config->runtimeOptions->termTagger->switchOn->GUI;
-        if((boolean)$guiSwitchedOn === false) {
             return $tags;
         }
         $segment = $tags->getSegment();
@@ -163,9 +151,9 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
      *
      * @param editor_Models_Task $task
      * @param editor_Models_Segment_Meta $meta
-     * @param Zend_Config $config
      */
-    private function lockOversizedSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta, Zend_Config $config) {
+    private function lockOversizedSegments(editor_Models_Task $task, editor_Models_Segment_Meta $meta) {
+        $config = Zend_Registry::get('config');
         $maxWordCount = $config->runtimeOptions->termTagger->maxSegmentWordCount ?? 150;
         $meta->db->update([
             'termtagState' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE
