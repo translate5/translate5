@@ -26,14 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Abstract {
+class editor_Plugins_MatchAnalysis_Worker extends ZfExtended_Worker_Abstract {
     
     /***
      * Task old state before the match analysis were started
      * @var string
      */
     private $taskOldState=null;
-    
     
     /***
      *
@@ -45,6 +44,22 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
     public function __construct() {
         parent::__construct();
         $this->log=Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
+    }
+    
+    /**
+     * @var editor_Models_Task
+     */
+    protected $task;
+    
+    public function init($taskGuid = NULL, $parameters = array()) {
+        $this->task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $ class */
+        $this->task->loadByTaskGuid($taskGuid);
+        
+        if($this->task->isErroneous()) {
+            return false;
+        }
+        return parent::init($taskGuid, $parameters);
     }
     
     /**

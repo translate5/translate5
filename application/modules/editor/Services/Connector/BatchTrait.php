@@ -41,6 +41,21 @@ trait editor_Services_Connector_BatchTrait {
      */
     protected $batchQueryBuffer = 1;
     
+    /**
+     * container for collected exceptions
+     * @var array
+     */
+    protected $batchExceptions = [];
+    
+    /**
+     * returns the collected batchExceptions or an empty array
+     * @return array
+     */
+    public function getBatchExceptions(): array
+    {
+        return $this->batchExceptions;
+    }
+    
     /***
      * Query the resource with multiple segments at once, and save the results in the database.
      * @param string $taskGuid
@@ -53,13 +68,16 @@ trait editor_Services_Connector_BatchTrait {
         $tmpBuffer = 0;
         //holds the query strings for batch request
         $batchQuery = [];
+        $this->batchExceptions = [];
         foreach ($segments as $segment){
             
             //For pre-translation only those segments should be send to the MT, that have an empty target.-> https://jira.translate5.net/browse/TRANSLATE-2335
             //For analysis, the mt matchrate will always be the same.So it make no difference here if it is pretranslation
             //or analysis, the empty target segments for mt resources should not be send to batch processor
             //TODO: in future, when the matchrate is provided/calculated for mt, this should be changed
-            if(!empty($segment->getTarget()) && $this->languageResource->isMt()){
+            
+            $target = $segment->getTarget();
+            if(strlen($target) == 0 && $this->languageResource->isMt()){
                 continue;
             }
             $batchQuery[] = [
@@ -98,7 +116,14 @@ trait editor_Services_Connector_BatchTrait {
         $targetLang = $this->languageResource->getTargetLangCode();
         $this->resultList->resetResult();
         
-        if(!$this->batchSearch(array_column($batchQuery, 'query'), $sourceLang, $targetLang)) {
+        //we handle only our own exceptions, since the connector should only throw such
+        try {
+            if(!$this->batchSearch(array_column($batchQuery, 'query'), $sourceLang, $targetLang)) {
+                return;
+            }
+        } catch(ZfExtended_ErrorCodeException $e) {
+            //we collect the exceptions for further processing
+            $this->batchExceptions[] = $e;
             return;
         }
         
