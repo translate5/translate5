@@ -63,13 +63,22 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     public function getType() : string {
         return static::$type;
     }
-    
     /**
      * Retrieves if the provider has an own import worker
      * If this API returns false the import is processed via ::processSegment
      * @return boolean
      */
     public function hasImportWorker() : bool {
+        return false;
+    }
+    /**
+     * If this API returns true, then the tags of the provider type will be removed before the ::processSegment is called
+     * This expects the processing to 
+     *
+     *these tags !
+     * @return bool
+     */
+    public function removeOwnTagsBeforeProcessing() : bool {
         return false;
     }
     /**

@@ -48,9 +48,9 @@ class editor_Segment_Internal_TagComparision {
      * @param editor_Segment_FieldTags $against
      */
     public function __construct(editor_Segment_FieldTags $toCheck, editor_Segment_FieldTags $against){
+        $this->status = array();
         $toCheck->sort();
         $against->sort();
-        $this->status = array();
         $checkTags = $toCheck->getByType(editor_Segment_Tag::TYPE_INTERNAL);
         /* @var $checkTags editor_Segment_Internal_Tag[] */
         $againstTags = $against->getByType(editor_Segment_Tag::TYPE_INTERNAL);
