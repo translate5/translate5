@@ -236,8 +236,8 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * (non-PHPdoc)
      * @see ZfExtended_Models_Entity_Abstract::init()
      */
-    public function init(array $data = null) {
-        parent::init($data);
+    public function init(array $data = null, $assumeDatabase = false) {
+        parent::init($data, $assumeDatabase);
         $this->taskDataPath = null;
     }
 
@@ -319,7 +319,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
                         LEFT JOIN LEK_task_config t on t.name = z.name
                         WHERE (t.taskGuid = LEK_task.taskGuid OR c.customerId = LEK_task.customerId)
                         AND z.name =  "runtimeOptions.customers.anonymizeUsers") = 1,LEK_task.taskGuid,NULL) AS s
-                        FROM LEK_task 
+                        FROM LEK_task
                         GROUP BY LEK_task.taskGuid
                         HAVING s IS NOT NULL) ';
         }
