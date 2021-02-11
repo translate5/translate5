@@ -46,6 +46,11 @@ use Translate5\MaintenanceCli\Command\{
     PluginListCommand,
     PluginEnableCommand,
     PluginDisableCommand,
+    MaintenanceCommand,
+    MaintenanceSetCommand,
+    MaintenanceDisableCommand,
+    MaintenanceAnnounceCommand,
+    MaintenanceMessageCommand,
     SystemCheckCommand
 };
 
@@ -62,6 +67,11 @@ $commands = [
     new PluginListCommand(),
     new PluginEnableCommand(),
     new PluginDisableCommand(),
+    new MaintenanceCommand(),
+    new MaintenanceSetCommand(),
+    new MaintenanceDisableCommand(),
+    new MaintenanceAnnounceCommand(),
+    new MaintenanceMessageCommand(),
 ];
 if(file_exists('.git')) {
     $commands[] = new DevelopmentGithookCommand();

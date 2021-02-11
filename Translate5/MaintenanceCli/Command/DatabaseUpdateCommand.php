@@ -38,21 +38,6 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'database:update';
     
-    /**
-     * @var InputInterface
-     */
-    protected $input;
-    
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
-    
-    /**
-     * @var SymfonyStyle
-     */
-    protected $io;
-    
     protected function configure()
     {
         $this
