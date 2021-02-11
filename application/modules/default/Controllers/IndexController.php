@@ -50,6 +50,13 @@ class IndexController extends ZfExtended_Controllers_Action {
         //the redirect to the editor module is done in the view script.
         // this default behaviour can then be overwritten in client-specific if needed
     }
+    public function testserverAction(){
+        $id = Models_SystemRequirement_Modules_Configuration::MEMCACHE_ID;
+        $memcache = new ZfExtended_Cache_MySQLMemoryBackend();
+        echo $id.' ';
+        echo $memcache->load($id);
+        exit;
+    }
     /**
      * Shows a simple info page to the user that IE 11 is not supported anymore
      */
