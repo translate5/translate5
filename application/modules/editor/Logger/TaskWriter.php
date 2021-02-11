@@ -28,9 +28,13 @@
 class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
     public function write(ZfExtended_Logger_Event $event) {
         //currently we just do not write duplicates and duplicate info to the task log → the duplicate data is kept in the main log
-        if($this->getDuplicateCount($event) > 0) {
-            return;
-        }
+        //TODO we can not just ignore duplicates, since the error may be task independent, but we should get the error on each affected task!
+        //example: LanguageResource is not available will result in many duplicates, but we should have at least one entry
+        // for each task. Solution: we have to search for the duplication hash in the log of the specific task,
+        // if it does not exist, we add the entry, otherwise we ignore it. So the error is at least once in the log.
+//         if($this->getDuplicateCount($event) > 0) {
+//             return;
+//         }
         
         // we clone the event so that we can delete the task afterwards without modifying the real event perhaps used later in another writer
         $event = clone $event;
