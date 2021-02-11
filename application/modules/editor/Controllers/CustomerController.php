@@ -98,9 +98,11 @@ class Editor_CustomerController extends ZfExtended_RestController {
      */
     public function exportresourceAction(){
         $customerId = $this->getRequest()->getParam('customerId',null);
-        //InfO:this param is not used for public api access. This is only used for testcases
-        $dataOnly = $this->getRequest()->getParam('dataOnly',null);
-        if(!empty($dataOnly)){
+
+        $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
+        //if json is requested, return only the data
+        if($context == 'json'){
+            //INFO: this is currently only available for api testing
             $this->setupTextExportResourcesLogData($customerId);
             return;
         }
@@ -214,6 +216,33 @@ class Editor_CustomerController extends ZfExtended_RestController {
         }
         $export = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageExporter');
         /* @var $export editor_Models_LanguageResources_UsageExporter */
-        $this->view->rows = $export->getExportRawData($customerId);
+        
+        
+        $result = $export->getExportRawData($customerId);
+        
+        $unset = ["customerId","yearAndMonth","timestamp","customers"];
+        $languages = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languages editor_Models_Languages */
+        $languages = $languages->loadAllKeyValueCustom('id','rfc5646');
+        
+        //filter out and convert fields
+        $filterRows = function($needle,&$haystack) use($languages){
+            foreach ($haystack as &$single){
+                foreach ($single as $key=>&$value){
+                    if(in_array($key, $needle)){
+                        unset($single[$key]);
+                    }
+                    //convert the languages to rfc values
+                    if(in_array($key,['sourceLang','targetLang'])){
+                        $value = $languages[$value];
+                    }
+                }
+            }
+        };
+        $filterRows($unset,$result[$export::MONTHLY_SUMMARY_BY_RESOURCE]);
+        $filterRows($unset,$result[$export::USAGE_LOG_BY_CUSTOMER]);
+        $filterRows($unset,$result[$export::DOCUMENT_USAGE]);
+        
+        $this->view->rows = $result;
     }
 }

@@ -34,8 +34,6 @@ END LICENSE AND COPYRIGHT
  */
 class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
     
-    protected static $collectionMap=[];
-    
     protected static $sourceLangRfc='de';
     protected static $targetLangRfc='en';
     
@@ -63,9 +61,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $this->addTm('resource2.tmx',$this->getLrRenderName('resource2'));
         $this->addTermCollection('collection.tbx', $this->getLrRenderName('resource3'));
         $this->createTask();
-        $this->addTaskAssoc($this->getLrRenderName('resource1'));
-        $this->addTaskAssoc($this->getLrRenderName('resource2'));
-        $this->addTaskAssoc($this->getLrRenderName('resource3'));
+        $this->addTaskAssoc();
         $this->queueAnalysys();
         $this->startImport();
         $this->checkTaskState();
@@ -148,38 +144,11 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
             'customerIds' => [$this->api()->getCustomer()->id],
             'customerUseAsDefaultIds' => [],
             'serviceType' => 'editor_Services_OpenTM2',
-            'serviceName'=> 'OpenTM2'
+            'serviceName'=> 'OpenTM2',
+            'name' => $name
         ];
-        
         //create the resource 1 and import the file
-        $params['name']=$name;
-        $this->api()->addFile('tmUpload', $this->api()->getFile($fileName), "application/xml");
-        $resource = $this->api()->requestJson('editor/languageresourceinstance', 'POST',$params);
-        $this->assertTrue(is_object($resource), 'Unable to create the language resource:'.$params['name']);
-        $this->assertEquals($params['name'], $resource->name);
-        self::$collectionMap[$params['name']]=$resource->id;
-        error_log("Language resources created. ".$resource->name);
-        
-        $resp = $this->api()->requestJson('editor/languageresourceinstance/'.$resource->id, 'GET',[]);
-        
-        error_log('Languageresources status check:'.$resp->status);
-        $counter=0;
-        $limitCheck=20;
-        while ($resp->status!='available'){
-            if($resp->status=='error'){
-                break;
-            }
-            //break after 20 trys
-            if($counter==$limitCheck){
-                break;
-            }
-            sleep(5);
-            $resp = $this->api()->requestJson('editor/languageresourceinstance/'.$resp->id, 'GET',[]);
-            error_log('Languageresources status check '.$counter.'/'.$limitCheck.' state: '.$resp->status);
-            $counter++;
-        }
-        
-        $this->assertEquals('available',$resp->status,'Tm import stoped. Tm state is:'.$resp->status);
+        self::$api->addResource($params,$fileName,true);
     }
     
     /***
@@ -199,33 +168,15 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         $params['customerUseAsDefaultIds'] = [];
         $params['serviceName']='TermCollection';
         $params['mergeTerms']=false;
-        //create and import the term collection languageresource
-        $this->api()->addFile('tmUpload', $this->api()->getFile($fileName), "application/xml");
-        $resource = $this->api()->requestJson('editor/languageresourceinstance', 'POST',$params);
-        $this->assertTrue(is_object($resource), 'Unable to create the language resource:'.$name);
-        $this->assertEquals($name, $resource->name);
         
-        //check the response
-        $response=$this->api()->requestJson('editor/termcollection/export', 'POST',['collectionId' =>$resource->id]);
-        $this->assertTrue(is_object($response),"Unable to export the terms by term collection");
-        $this->assertNotEmpty($response->filedata,"The exported tbx file by collection is empty");
-        
-        self::$collectionMap[$name]=$resource->id;
-        error_log("Termcollection created. ".$resource->name);
+        self::$api->addResource($params,$fileName);
     }
     
     /***
-     * Add task to languageresource assoc
-     * @param string $name
+     * Associate all resources to the task
      */
-    protected function addTaskAssoc(string $name){
-        // associate languageresource to task
-        $this->api()->requestJson('editor/languageresourcetaskassoc', 'POST',[
-            'languageResourceId'=>self::$collectionMap[$name],
-            'taskGuid'=>$this->api()->getTask()->taskGuid,
-            'segmentsUpdateable'=>0
-        ]);
-        error_log('Languageresources assoc to task. '.$name.' -> '.$this->api()->getTask()->taskGuid);
+    protected function addTaskAssoc(){
+        self::$api->addTaskAssoc();
     }
     
     /***
@@ -256,25 +207,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
      * Check the task state
      */
     protected function checkTaskState(){
-        $this->api()->reloadTask();
-        error_log('Task status:'.$this->api()->getTask()->state);
-        $counter=0;
-        $limitCheck = 25;
-        while ($this->api()->getTask()->state!='open'){
-            if($this->api()->getTask()->state=='error'){
-                break;
-            }
-            //break after 20 trys
-            if($counter==$limitCheck){
-                break;
-            }
-            sleep(5);
-            $this->api()->reloadTask();
-            error_log('Task state check '.$counter.'/'.$limitCheck.' state: '.$this->api()->getTask()->state);
-            $counter++;
-        }
-        
-        $this->assertEquals('open',$this->api()->getTask()->state,'Pretranslation stopped. Task has state '.$this->api()->getTask()->state.' instead of open.');
+        self::$api->checkTaskStateLoop();
     }
     
     /***
@@ -295,8 +228,7 @@ class MatchAnalysisTest extends \ZfExtended_Test_ApiTestcase {
         self::$api->login('testmanager');
         
         self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
-        self::$api->requestJson('editor/languageresourceinstance/'.self::$collectionMap[self::getLrRenderName('resource1')],'DELETE');
-        self::$api->requestJson('editor/languageresourceinstance/'.self::$collectionMap[self::getLrRenderName('resource2')],'DELETE');
-        self::$api->requestJson('editor/termcollection/'.self::$collectionMap[self::getLrRenderName('resource3')],'DELETE');
+        //remove the created resources
+        self::$api->removeResources();
     }
 }
