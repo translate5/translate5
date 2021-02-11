@@ -90,6 +90,13 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
 //                 header('HTTP/1.0 456 Quota exceeded');
 //                 echo '{"message":"Quota Exceeded"}';
 //                 return;
+                /**
+                 * Enable that for formality error
+                 */
+//                 header('HTTP/1.0 400 Bad Request');
+//                 echo '{"message":"\'formality\' is not supported for given \'target_lang\'."}';
+//                 exit;
+                
                 break;
             default:
                 throw new Exception("Unknown DeepL endpoint requested: ".$calledUrl);
@@ -139,13 +146,17 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
             
         //HTTP result 200
         // POST https://api.deepl.com:443/v2/translate?auth_key=xxxx
-        
-        if(is_array($_POST['text'])) {
-            $translations = $_POST['text'];
+
+        $RAWPOST = null;
+        //deepl uses a non standard way to transport multiple texts:
+        parse_str(str_replace('text=', 'text[]=', $this->_request->getRawBody()), $RAWPOST);
+        if(is_array($RAWPOST) && is_array($RAWPOST['text'])) {
+            $translations = $RAWPOST['text'];
         }
         else {
             $translations = [$_POST['text']];
         }
+        
         $demomt = new editor_Plugins_ZDemoMT_Connector();
         $result = new stdClass();
         $result->translations = [];
@@ -251,7 +262,12 @@ class Editor_FakelangresController extends ZfExtended_Controllers_Action {
         foreach($data->text as $text) {
             $oneResult = new stdClass();
             $oneResult->src = $text;
-            $oneResult->tgt = $demomt->translateToRot13($text);
+            if(strpos($data->text[0] ?? '', 'Good case example:') !== false) {
+                $oneResult->tgt = json_encode('<x id="1"/><g id="2">Good case example:</g><x id="4"/>" cat pools.dat.example |. /<g id="5">check_poolsdat.pl</g><x id="7"/>Lines including comments: 102163<x id="8"/>Lines excluding comments: 95290<x id="9"/>Business: 2658<x id="10"/>Consumer: 92632< x id="11"/>IPv4: 89360<x id="12"/>IPv6: 5930<x id="13"/><g id="14">Bad case example:</g><x id="16"/>" cat pools.dat.example |. /<g id="17">check_poolsdat.pl</g><x id="19"/>error expanding IP XX84.136.177.1, version: 4 at ./check_poolsdat line 58, &lt;&gt; line 9.<x id="20"/>"!/usr/bin/env perl<x id="21"/>use warnings;<x id="22"/> use strict; <x id="23"/>use Net::IP qw( ip_get_version ip_expand_address ip_iptobin ); <x id="24"/>my $lines = 0; <x id="25"/>my $proclines = 0; <x id="26"/>my $business = 0; <x id="27"/>my $consumer = 0; <x id="28"/>my $ipv 4 = 0; <x id="29"/>my $ipv 6 = 0; <x id="30"/>while ( &lt;&gt; ) <x id="31"/>++$lines;<x id="32"/> next unless ( . <x id="33"/>++$proclines; <x id="34"/>if ( s+d+"+s+"+s<+s+"+"-> < > $ipv my ( $dynIP, $PoolPfx, $v 6Pfx, $dynCount, $dmy 1, $dmy 2, $VIP, $RAR, $isBusiness ) = split( / <x id="37"/>my $dynNet = dynNet( $dynIP, 6, $PoolPfx ); <x id="38"/>if ( $isBusiness ) . $business . >#print < . $consumer . Domain: \'VIP\', \'<x id=\'40\'/>\' elsif (\'> < $ipv ><\' my ( $dynIP, $dynCount, $dmy 1, $dmy 2, $VIP, $RAR, $isBusiness ) = split( / <x id="43"/>my $dynNet = dynNet( $dynIP, 4, 24 ); <x id="44"/>if ( $isBusiness ) . $business . $consumer . >#print < . Domain: "VIP", <x id="46"/>" else "<x id="47"/>the "line"lines" is not parsable"<x id="48"/>-<x id="49"/>-<x id="50"/>print "Lines included comments: "lines"/< > print "Lines excluding comments: "proclines"" <x id="52"/>print "Business: "Business", <x id="53"/>print "Consumer: "Consumer" <x id="54"/>print "IPv4: .ipv4", . <x id="55"/> print "IPv6: .ipv6", . <x id="56"/>sub line .<x id="57"/>my $line = shift || ""; <x id="58"/>$line =" s/r?n//; CR (optional) plus newline<x id="59"/>$line ="s/s+//; s >$line< >$line</s+//; s/s+//<; s/s+x id="> return $line; <x id="63"/>-<x id="64"/>sub dynNet <x id="65"/>my $ip = shift;<x id="66"/> my $ver = shift; <x id="67"/>my $prefix = shift; <x id="68"/>$ip = ip_expand_address( $ip, $ver ) || the "error expanding IP $ip, version: $ver"; <x id="69"/>$ip = ip_iptobin( $ip, $ver ) || the "error converting IP $ip, version: $ver"; <x id="70"/>return substr( $ip, 0, $prefix ); <x id="71"/>');
+            }
+            else {
+                $oneResult->tgt = $demomt->translateToRot13($text);
+            }
             $result[] = [$oneResult];
         }
             //[[{"src":"ein","tgt":"A"}],[{"src":"test","tgt":"Test"}]]
