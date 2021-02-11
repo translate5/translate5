@@ -41,7 +41,12 @@ use PHPHtmlParser\DTO\Tag\AttributeDTO;
  * Tags from Plugins can be added with the QualityProvider-API or by registering a TagProvider with the ::registerProvider API within this class
  */
 final class editor_Segment_TagCreator {
-
+    
+    private static $_quality_manager_enabled = true;
+    
+    public static function disableQualityManagerForUnitTests(){
+        self::$_quality_manager_enabled = false;
+    }
     /**
      * @var editor_Segment_TagCreator
      */
@@ -98,7 +103,7 @@ final class editor_Segment_TagCreator {
     }
     /**
      * Tries to evaluate an Internal tag out of a given HtmlNode
-     * To make this happen all availaable Internal Tag Identifiers must be registered with this class
+     * To make this happen all available Internal Tag Identifiers must be registered with this class
      * The default is a 'editor_Segment_AnyTag' representing an uncategorized internal tag
      * NOTE: This API does not care about the children contained in the tag nor the text-length
      * @param HtmlNode $node
@@ -119,6 +124,40 @@ final class editor_Segment_TagCreator {
             }
         }
         $tag = $this->evaluate('', $domTag->name(), $classNames, $attributes, $startIndex, $endIndex);
+        if(count($classNames) > 0){
+            foreach($classNames as $cname){
+                $tag->addClass($cname);
+            }
+        }
+        if(count($attributes) > 0){
+            foreach($attributes as $name => $val){
+                $tag->addAttribute($name, $val);
+            }
+        }
+        return $tag;
+    }
+    /**
+     * Tries to evaluate an Internal tag out of a given Dom Element
+     * This is an alternative implementation using PHP DOM
+     * see editor_Tag::USE_PHP_DOM
+     * @param DOMElement $element
+     * @param int $startIndex
+     * @param int $endIndex
+     * @return editor_Segment_Tag
+     */ 
+    public function fromDomElement(DOMElement $element, int $startIndex=0, int $endIndex=0){
+        $classNames = [];
+        $attributes = [];
+        if($element->hasAttributes()){
+            foreach ($element->attributes as $attr) {
+                if($attr->nodeName == 'class'){
+                    $classNames = explode(' ', trim($attr->nodeValue));
+                } else {
+                    $attributes[$attr->nodeName] = $attr->nodeValue;
+                }
+            }
+        }
+        $tag = $this->evaluate('', $element->nodeName, $classNames, $attributes, $startIndex, $endIndex);
         if(count($classNames) > 0){
             foreach($classNames as $cname){
                 $tag->addClass($cname);
@@ -160,43 +199,14 @@ final class editor_Segment_TagCreator {
                 return $tagProvider->createSegmentTag($startIndex, $endIndex, $nodeName, $classNames);
             }
         }
-        // try to let the quality manager find a tag
-        $tag = editor_Segment_Quality_Manager::instance()->evaluateInternalTag($type, $nodeName, $classNames, $attributes, $startIndex, $endIndex);
-        if($tag != null){
-            return $tag;
+        if(self::$_quality_manager_enabled){
+            // try to let the quality manager find a tag
+            $tag = editor_Segment_Quality_Manager::instance()->evaluateInternalTag($type, $nodeName, $classNames, $attributes, $startIndex, $endIndex);
+            if($tag != null){
+                return $tag;
+            }
         }
         // the default is the "any" tag
         return new editor_Segment_AnyTag($startIndex, $endIndex, '', $nodeName);
     }
-    
-    /**
-     * ALTERNATIVE IMPLEMENTATION: UNPARSING CODE USING PHP'S DOM
-     
-    public function fromDomElement(DOMElement $element, int $startIndex=0, int $endIndex=0){
-        $classNames = [];
-        $attributes = [];
-        if($element->hasAttributes()){
-            foreach ($element->attributes as $attr) {
-                if($attr->nodeName == 'class'){
-                    $classNames = explode(' ', trim($attr->nodeValue));
-                } else {
-                    $attributes[$attr->nodeName] = $attr->nodeValue;
-                }
-            }
-        }
-        $tag = $this->evaluate('', $element->nodeName, $classNames, $attributes, $startIndex, $endIndex);
-        if(count($classNames) > 0){
-            foreach($classNames as $cname){
-                $tag->addClass($cname);
-            }
-        }
-        if(count($attributes) > 0){
-            foreach($attributes as $name => $val){
-                $tag->addAttribute($name, $val);
-            }
-        }
-        return $tag;
-    }
-     
-     */
 }

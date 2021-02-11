@@ -46,6 +46,15 @@ use PHPHtmlParser\DTO\Tag\AttributeDTO;
  * All Attribute-values will be unescaped when setting and rendered escaped that means the internal data is always unescaped
  */
 class editor_Tag {
+    
+    /**
+     * If set to true, PHP DOM is used to parse Markup, otherwise PHPHtmlParser
+     * This affects the handling of double quotes, since PHPHtmlParser leaves them untouched while PHP DOM escapes them
+     * Currently, we can not activate this as some of the TESTs (which are real-world testdata taken from "testfiles-terminology.zip") will not pass
+     * See SegmentTagsTest and editor_Tag::convertDOMText
+     * @var boolean
+     */
+    const USE_PHP_DOM = false;
    
     /**
      * Escapes an CDATA attribute-value according to the HTML-Spec
@@ -229,6 +238,16 @@ class editor_Tag {
      * @return editor_Tag|NULL
      */
     public static function unparse($html){
+        if(self::USE_PHP_DOM){
+            // implementation using PHP DOM
+            $dom = new editor_Utils_Dom();
+            $node = $dom->loadUnicodeElement($html);
+            if($node != NULL){
+                return static::fromDomElement($node);
+            }
+            return NULL;
+        }
+        // implementation using PHPHtmlParser
         $dom = self::createDomParser();
         $dom->loadStr($html);
         if($dom->countChildren() != 1){
@@ -242,6 +261,15 @@ class editor_Tag {
             return new editor_TextNode($node->text());
         }
         return NULL;
+    }
+    /**
+     * If the PHP DOM parser is used, all text-contents will be converted with this method
+     * @param string $text
+     * @return string
+     */
+    public static function convertDOMText(string $text) : string {
+        return htmlspecialchars($text, ENT_XML1, null, false);
+        return $text;
     }
     /**
      * Creates a editor_Tag out of a AbstractNode
@@ -275,6 +303,31 @@ class editor_Tag {
                 $child = static::fromNode($childNode);
                 if($child != NULL){
                     $tag->addChild($child);
+                }
+            }
+        }
+        return $tag;
+    }
+    /**
+     * Creates a editor_Tag out of a HtmlNode
+     * @param DOMElement $node
+     * @return editor_Tag
+     */
+    protected static function fromDomElement(DOMElement $node){
+        $tag = editor_Tag::create($node->nodeName);
+        if($node->hasAttributes()){
+            foreach($node->attributes as $attr){
+                $tag->addAttribute($attr->nodeName, $attr->nodeValue);
+            }
+        }
+        if($node->hasChildNodes()){
+            for($i = 0; $i < $node->childNodes->length; $i++){
+                $child = $node->childNodes->item($i);
+                if($child->nodeType == XML_TEXT_NODE){
+                    // CRUCIAL: the nodeValue always is escaped Markup!
+                    $tag->addText(editor_Tag::convertDOMText($child->nodeValue));
+                } else if($child->nodeType == XML_ELEMENT_NODE){
+                    $tag->addChild(static::fromDomElement($child));
                 }
             }
         }
@@ -908,39 +961,4 @@ class editor_Tag {
         }
         return '</'.$this->getName().'>';
     }
-    
-    /**
-     * ALTERNATIVE IMPLEMENTATION: UNPARSING CODE USING PHP'S DOM
-     
-    public static function unparse($html){
-        $dom = new editor_Utils_Dom();
-        $node = $dom->loadUnicodeElement($html);
-        if($node != NULL){
-            return static::fromDomElement($node);
-        }
-        return NULL;
-    }
-
-    protected static function fromDomElement(DOMElement $node){
-        $tag = editor_Tag::create($node->nodeName);
-        if($node->hasAttributes()){
-            foreach($node->attributes as $attr){
-                $tag->addAttribute($attr->nodeName, $attr->nodeValue);
-            }
-        }
-        if($node->hasChildNodes()){
-            for($i = 0; $i < $node->childNodes->length; $i++){
-                $child = $node->childNodes->item($i);
-                if($child->nodeType == XML_TEXT_NODE){
-                    // CRUCIAL: the nodeValue always is unescaped Markup!
-                    $tag->addText(htmlspecialchars($child->nodeValue, ENT_COMPAT));
-                } else if($child->nodeType == XML_ELEMENT_NODE){
-                    $tag->addChild(static::fromDomElement($child));
-                }
-            }
-        }
-        return $tag;
-    }
-     
-    */
 }
