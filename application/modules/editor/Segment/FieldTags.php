@@ -235,7 +235,6 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @param editor_Segment_Tag $tag
      */
     public function addTag(editor_Segment_Tag $tag){
-        $tag->tagIndex = count($this->tags);
         $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= mb_strlen($this->fieldText));
         $this->tags[] = $tag;
     }
@@ -498,13 +497,12 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
     }
     /**
-     * Adds the properties 'tagIndex' and 'isFullLength' to the tags, which are needed by consuming APIs
+     * Adds the 'isFullLength' prop to the tags, which are needed by consuming APIs
      */
     private function addTagProps(){
         $num = count($this->tags);
         $textLength = mb_strlen($this->fieldText);
         for($i=0; $i < $num; $i++){
-            $this->tags[$i]->tagIndex = $i;
             $this->tags[$i]->isFullLength = ($this->tags[$i]->startIndex == 0 && $this->tags[$i]->endIndex >= $textLength);
         }
     }

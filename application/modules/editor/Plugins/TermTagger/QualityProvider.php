@@ -53,6 +53,10 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         return true;
     }
     
+    public function removeOwnTagsBeforeProcessing() : bool {
+        return true;
+    }
+    
     public function addImportWorker(editor_Models_Task $task, int $parentWorkerId) {
         
         // if no terminology is present we return as well

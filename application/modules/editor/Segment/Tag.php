@@ -110,11 +110,6 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public $endIndex = 0;
     /**
-     * Set by editor_Segment_FieldTags to indicate the index in the sequence of tags
-     * @var int
-     */
-    public $tagIndex;
-    /**
      * Set by editor_Segment_FieldTags to indicate that the Tag spans the complete segment text
      * @var bool
      */

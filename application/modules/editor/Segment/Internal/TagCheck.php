@@ -49,25 +49,24 @@ class editor_Segment_Internal_TagCheck extends editor_Segment_Quality_Provider {
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
     
     public function processSegment(editor_Models_Task $task, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
-        if(true){
-            // 1) Tag check: Bei Translation: Internal Tags gegen Source prüfen, bei Review: gegen Target            
-            $isTranslationTask = $task->getEmptyTargets();
-            $against = ($isTranslationTask) ? ($tags->hasOriginalSource() ? $tags->getOriginalSource() : $tags->getSource()) : $tags->getOriginalTarget();
-            if($against != null){
-                $data = [];
-                foreach($tags->getTargets() as $toCheck){ /* @var $toCheck editor_Segment_Fieldtags */
-                    $comparision = new editor_Segment_Internal_TagComparision($toCheck, $against);
-                    if(!empty($comparision->getStatus())){
-                        if(!array_key_exists($comparision->getStatus(), $data)){
-                            $data[$comparision->getStatus()] = array();
-                        }
-                        // group the fields by category
-                        $data[$comparision->getStatus()][] = $toCheck->getField();
+
+        // 1) Tag check: Bei Translation: Internal Tags gegen Source prüfen, bei Review: gegen Target            
+        $isTranslationTask = $task->getEmptyTargets();
+        $against = ($isTranslationTask) ? ($tags->hasOriginalSource() ? $tags->getOriginalSource() : $tags->getSource()) : $tags->getOriginalTarget();
+        if($against != null){
+            $data = [];
+            foreach($tags->getTargets() as $toCheck){ /* @var $toCheck editor_Segment_Fieldtags */
+                $comparision = new editor_Segment_Internal_TagComparision($toCheck, $against);
+                if(!empty($comparision->getStatus())){
+                    if(!array_key_exists($comparision->getStatus(), $data)){
+                        $data[$comparision->getStatus()] = array();
                     }
+                    // group the fields by category
+                    $data[$comparision->getStatus()][] = $toCheck->getField();
                 }
-                foreach($data as $category => $fields){
-                    $tags->addQuality($fields, editor_Segment_Tag::TYPE_INTERNAL, $category);
-                }
+            }
+            foreach($data as $category => $fields){
+                $tags->addQuality($fields, editor_Segment_Tag::TYPE_INTERNAL, $category);
             }
         }
         return $tags;
