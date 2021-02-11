@@ -3931,6 +3931,14 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='Y29uZmlnX292ZXJ3cml0ZV90YXNr'><source>config_overwrite_task</source><target>Task</target></trans-unit>
 <trans-unit id='Y29uZmlnX292ZXJ3cml0ZV91c2Vy'><source>config_overwrite_user</source><target>User</target></trans-unit>
 <trans-unit id='V2VydA=='><source>Wert</source><target>Value</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSB3dXJkZSBhdWYgZWluZSBuZXVlIFZlcnNpb24gYWt0dWFsaXNpZXJ0'>
+  <source>Translate5 wurde auf eine neue Version aktualisiert</source>
+  <target>Translate5 was updated to a new version</target>
+</trans-unit>
+<trans-unit id='RWluIFVwZGF0ZSBhdWYgZGllIFZlcnNpb24gezB9IHd1cmRlIGR1cmNoZ2Vmw7xocnQuIEJpdHRlIGxhZGVuIHNpZSBkaWUgQW53ZW5kdW5nIG5ldSB1bSBGZWhsZXIgaW4gZGVyIEJlbnV0enVuZyB6dSB2ZXJtZWlkZW4u'>
+  <source>Ein Update auf die Version {0} wurde durchgeführt. Bitte laden sie die Anwendung neu um Fehler in der Benutzung zu vermeiden.</source>
+  <target>An update to version {0} was done. Please reload the application to load the latest version and prevent errors.</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
