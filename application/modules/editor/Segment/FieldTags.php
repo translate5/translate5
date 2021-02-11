@@ -434,20 +434,45 @@ class editor_Segment_FieldTags implements JsonSerializable {
     
     /* Unparsing API */
 
+    /**
+     * Unparses Segment markup into FieldTags
+     * @param string $html
+     * @throws Exception
+     */
     public function unparse(string $html) {
-        $dom = editor_Tag::createDomParser();
-        // to make things easier we add a wrapper to hold all tags and only use it's children
-        $dom->loadStr('<div>'.$html.'</div>');
-        if($dom->countChildren() != 1){
-            throw new Exception('Could not unparse Internal Tags from Markup '.$html);
+        if(editor_Tag::USE_PHP_DOM){
+            // implementation using PHP DOM
+            $dom = new editor_Utils_Dom();
+            // to make things easier we add a wrapper to hold all tags and only use it's children
+            $element = $dom->loadUnicodeElement('<div>'.$html.'</div>');
+            if($element != NULL){
+                $wrapper = $this->fromDomElement($element, 0);
+                // set our field text
+                $this->fieldText = $wrapper->getText();
+                // sequence the nested tags as our children
+                $wrapper->sequenceChildren($this);
+                $this->consolidate();
+                // Crucial: finalize, set the tag-props
+                $this->addTagProps();
+            } else {
+                throw new Exception('Could not unparse Internal Tags from Markup '.$html);
+            }
+        } else {
+            // implementation using PHPHtmlParser
+            $dom = editor_Tag::createDomParser();
+            // to make things easier we add a wrapper to hold all tags and only use it's children
+            $dom->loadStr('<div>'.$html.'</div>');
+            if($dom->countChildren() != 1){
+                throw new Exception('Could not unparse Internal Tags from Markup '.$html);
+            }
+            $wrapper = $this->fromHtmlNode($dom->firstChild(), 0);
+            $this->fieldText = $wrapper->getText();
+            // sequence the nested tags as our children
+            $wrapper->sequenceChildren($this);
+            $this->consolidate();
+            // Crucial: finalize, set the tag-props
+            $this->addTagProps();
         }
-        $wrapper = $this->fromHtmlNode($dom->firstChild(), 0);
-        $this->fieldText = $wrapper->getText();
-        // sequence the nested tags as our children
-        $wrapper->sequenceChildren($this);
-        $this->consolidate();
-        // Crucial: finalize, set the tag-props
-        $this->addTagProps();
     }
     /**
      * Creates a nested structure of Internal tags & text-nodes recursively out of a HtmlNode structure
@@ -463,6 +488,30 @@ class editor_Segment_FieldTags implements JsonSerializable {
                     $tag->addText($childNode->text());
                 } else if(is_a($childNode, 'PHPHtmlParser\Dom\Node\HtmlNode')){
                     $tag->addChild($this->fromHtmlNode($childNode, $startIndex));
+                }
+                $startIndex += $tag->getLastChild()->getTextLength();
+            }
+        }
+        $tag->endIndex = $startIndex;
+        return $tag;
+    }
+    /**
+     * Creates a nested structure of Internal tags & text-nodes recursively out of a DOMElement structure
+     * This is an alternative implementation using PHP DOM
+     * see editor_Tag::USE_PHP_DOM
+     * @param DOMElement $element
+     * @param int $startIndex
+     * @return editor_Segment_Tag
+     */
+    private function fromDomElement(DOMElement $element, int $startIndex){
+        $tag = editor_Segment_TagCreator::instance()->fromDomElement($element, $startIndex);
+        if($element->hasChildNodes()){
+            for($i = 0; $i < $element->childNodes->length; $i++){
+                $child = $element->childNodes->item($i);
+                if($child->nodeType == XML_TEXT_NODE){
+                    $tag->addText(editor_Tag::convertDOMText($child->nodeValue));
+                } else if($child->nodeType == XML_ELEMENT_NODE){
+                    $tag->addChild($this->fromDomElement($child, $startIndex));
                 }
                 $startIndex += $tag->getLastChild()->getTextLength();
             }
@@ -506,45 +555,4 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $this->tags[$i]->isFullLength = ($this->tags[$i]->startIndex == 0 && $this->tags[$i]->endIndex >= $textLength);
         }
     }
-    
-    
-    /**
-     * ALTERNATIVE IMPLEMENTATION: UNPARSING CODE USING PHP'S DOM
-
-    public function unparse(string $html) {
-        $dom = new editor_Utils_Dom();
-        // to make things easier we add a wrapper to hold all tags and only use it's children
-        $element = $dom->loadUnicodeElement('<div>'.$html.'</div>');
-        if($element != NULL){
-            $wrapper = $this->fromDomElement($element, 0);
-            // set our field text
-            $this->fieldText = $wrapper->getText();
-            // sequence the nested tags as our children
-            $wrapper->sequenceChildren($this);
-            $this->consolidate();
-            // Crucial: finalize, set the tag-props
-            $this->addTagProps();
-        } else {
-            throw new Exception('Could not unparse Internal Tags from Markup '.$html);
-        }        
-    }
-
-    private function fromDomElement(DOMElement $element, int $startIndex){
-        $tag = editor_Segment_TagCreator::instance()->fromDomElement($element, $startIndex);
-        if($element->hasChildNodes()){
-            for($i = 0; $i < $element->childNodes->length; $i++){
-                $child = $element->childNodes->item($i);
-                if($child->nodeType == XML_TEXT_NODE){
-                    $tag->addText(htmlspecialchars($child->nodeValue, ENT_COMPAT));
-                } else if($child->nodeType == XML_ELEMENT_NODE){
-                    $tag->addChild($this->fromDomElement($child, $startIndex));
-                }
-                $startIndex += $tag->getLastChild()->getTextLength();
-            }
-        }
-        $tag->endIndex = $startIndex;
-        return $tag;
-    }
-
-    */
 }
