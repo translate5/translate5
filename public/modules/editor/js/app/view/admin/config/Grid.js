@@ -377,7 +377,7 @@ Ext.define('Editor.view.admin.config.Grid', {
         
         if(desc){
             html.push('<i>');
-            html.push(desc);
+            html.push(Ext.String.htmlEncode(desc));
             html.push('</i>');
             html.push('</br>');
         }

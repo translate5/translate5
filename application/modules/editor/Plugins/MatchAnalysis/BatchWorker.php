@@ -30,7 +30,13 @@ END LICENSE AND COPYRIGHT
  * This will send multiple segments at once for translation
  * and save the result in separate table in the database. Later those results will be used for match analysis and pre-translation.
  */
-class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Import_Worker_Abstract {
+class editor_Plugins_MatchAnalysis_BatchWorker extends ZfExtended_Worker_Abstract {
+    
+    /**
+     * @var ZfExtended_Logger
+     */
+    protected $log;
+    
     public function __construct() {
         parent::__construct();
         $this->log = Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
@@ -54,13 +60,23 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Import_Work
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
 
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->taskGuid);
+        
         $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
         $languageResource->load($params['languageResourceId']);
         
-        $connector = $manager->getConnector($languageResource, $this->task->getSourceLang(), $this->task->getTargetLang(),$this->task->getConfig());
+        $connector = $manager->getConnector($languageResource, $task->getSourceLang(), $task->getTargetLang(), $task->getConfig());
         /* @var $connector editor_Services_Connector */
         $connector->batchQuery($this->taskGuid);
+        
+        $exceptions = $connector->getBatchExceptions();
+        foreach($exceptions as $e) {
+            $e->addExtraData(['task' => $task]);
+            $this->log->exception($e);
+        }
         return true;
     }
 }
