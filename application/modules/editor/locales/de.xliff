@@ -1660,7 +1660,7 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <trans-unit id='U29uZGVyemVpY2hlbiBoaW56dWbDvGdlbjo='><source>Sonderzeichen hinzufügen:</source><target>Sonderzeichen hinzufügen:</target></trans-unit>
 <trans-unit id='WnVyw7xjayB6dXIgQXVmZ2FiZW7DvGJlcnNpY2h0'><source>Zurück zur Aufgabenübersicht</source><target>Zurück zur Aufgabenübersicht</target></trans-unit>
 <trans-unit id='QWxsZXMgZmVydGlnIC0gQXVmZ2FiZSBhYnNjaGxpZcOfZW4='><source>Alles fertig - Aufgabe abschließen</source><target>Alles fertig - Aufgabe abschließen</target></trans-unit>
-<trans-unit id='Tm9jaCBldHdhcyB6dSB0dW4/IDxici8+RG9jaCBub2NoIHNww6R0ZXIgd2VpdGVyIGFyYmVpdGVuPw=='><source>Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?</source><target>Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?</target></trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIHNww6R0ZXIgd2VpdGVybWFjaGVuPw=='><source>Möchten Sie später weitermachen?</source><target>Möchten Sie später weitermachen?</target></trans-unit>
 <trans-unit id='TnVyIFNlZ21lbnRlIG1pdCBMZXNlemVpY2hlbiBhbnplaWdlbg=='><source>Nur Segmente mit Lesezeichen anzeigen</source><target>Nur Segmente mit Lesezeichen anzeigen</target></trans-unit>
 <trans-unit id='S1BJ'><source>KPI</source><target>KPI</target></trans-unit>
 <trans-unit id='S2V5IFBlcmZvcm1hbmNlIEluZGljYXRvcnM='><source>Key Performance Indicators</source><target>Key Performance Indicators</target></trans-unit>
@@ -1906,6 +1906,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U3DDpHRlciB3ZWl0ZXIgYXJiZWl0ZW4='><source>Später weiter arbeiten</source><target>Später weiter arbeiten</target></trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSB3dXJkZSBhdWYgZWluZSBuZXVlIFZlcnNpb24gYWt0dWFsaXNpZXJ0'><source>Translate5 wurde auf eine neue Version aktualisiert</source><target>Translate5 wurde auf eine neue Version aktualisiert</target></trans-unit>
 <trans-unit id='RWluIFVwZGF0ZSBhdWYgZGllIFZlcnNpb24gezB9IHd1cmRlIGR1cmNoZ2Vmw7xocnQuIEJpdHRlIGxhZGVuIHNpZSBkaWUgQW53ZW5kdW5nIG5ldSB1bSBGZWhsZXIgaW4gZGVyIEJlbnV0enVuZyB6dSB2ZXJtZWlkZW4u'><source>Ein Update auf die Version {0} wurde durchgeführt. Bitte laden sie die Anwendung neu um Fehler in der Benutzung zu vermeiden.</source><target>Ein Update auf die Version {0} wurde durchgeführt. Bitte laden sie die Anwendung neu um Fehler in der Benutzung zu vermeiden.</target></trans-unit>
+<trans-unit id='Tm9jaCBldHdhcyB6dSB0dW4/'><source>Noch etwas zu tun?</source><target>Noch etwas zu tun?</target></trans-unit>
   </body>
  </file>
 </xliff>

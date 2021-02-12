@@ -3593,9 +3593,9 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 	<source>Alles fertig - Aufgabe abschließen</source>
 	<target>All done - finish task</target>
 </trans-unit>
-<trans-unit id='Tm9jaCBldHdhcyB6dSB0dW4/IDxici8+RG9jaCBub2NoIHNww6R0ZXIgd2VpdGVyIGFyYmVpdGVuPw=='>
-	<source>Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?</source>
-	<target>Still something to do? <br/>Better be able to continue later?</target>
+<trans-unit id='TcO2Y2h0ZW4gU2llIHNww6R0ZXIgd2VpdGVybWFjaGVuPw=='>
+  <source>Möchten Sie später weitermachen?</source>
+  <target>Would you like to continue later?</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSBzcMOkdGVyIHdlaXRlcmJlYXJiZWl0ZW4='>
 	<source>Aufgabe später weiterbearbeiten</source>
@@ -3938,6 +3938,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='RWluIFVwZGF0ZSBhdWYgZGllIFZlcnNpb24gezB9IHd1cmRlIGR1cmNoZ2Vmw7xocnQuIEJpdHRlIGxhZGVuIHNpZSBkaWUgQW53ZW5kdW5nIG5ldSB1bSBGZWhsZXIgaW4gZGVyIEJlbnV0enVuZyB6dSB2ZXJtZWlkZW4u'>
   <source>Ein Update auf die Version {0} wurde durchgeführt. Bitte laden sie die Anwendung neu um Fehler in der Benutzung zu vermeiden.</source>
   <target>An update to version {0} was done. Please reload the application to load the latest version and prevent errors.</target>
+</trans-unit>
+<trans-unit id='Tm9jaCBldHdhcyB6dSB0dW4/'>
+  <source>Noch etwas zu tun?</source>
+  <target>Still something to do?</target>
 </trans-unit>
 </body>
   </file>
