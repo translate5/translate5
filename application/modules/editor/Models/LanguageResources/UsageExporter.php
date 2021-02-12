@@ -195,6 +195,42 @@ class editor_Models_LanguageResources_UsageExporter{
     }
     
     /***
+     * Get the data in format required for the tests. In the returned result, unneeded fields will be filtered.
+     * @param int $customerId
+     * @return array
+     */
+    public function getExportRawDataTests(int $customerId = null) {
+        
+        $result = $this->getExportRawData($customerId);
+        
+        $unset = ["customerId","yearAndMonth","timestamp","customers"];
+        $languages = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languages editor_Models_Languages */
+        $languages = $languages->loadAllKeyValueCustom('id','rfc5646');
+        
+        //filter out and convert fields
+        $filterRows = function($needle,&$haystack) use($languages){
+            foreach ($haystack as &$single){
+                foreach ($single as $key=>&$value){
+                    if(in_array($key, $needle)){
+                        unset($single[$key]);
+                    }
+                    //convert the languages to rfc values
+                    if(in_array($key,['sourceLang','targetLang'])){
+                        $value = $languages[$value];
+                    }
+                }
+            }
+        };
+        
+        $filterRows($unset,$result[self::MONTHLY_SUMMARY_BY_RESOURCE]);
+        $filterRows($unset,$result[self::USAGE_LOG_BY_CUSTOMER]);
+        $filterRows($unset,$result[self::DOCUMENT_USAGE]);
+        
+        return $result;
+    }
+    
+    /***
      * Add worksheet to the current spreedsheet
      * @param array $data
      * @param string $name
