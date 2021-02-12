@@ -69,8 +69,7 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
      */
     public function testExportResourcesLog() {
         $result = self::$api->requestJson('editor/customer/exportresource','GET',[
-            'customerId' =>self::$customerTest->id,
-            'dataOnly' => 1
+            'customerId' =>self::$customerTest->id
         ]);
         
         //file_put_contents(self::$api->getFile('exportResults.txt', null, false), json_encode($result, JSON_PRETTY_PRINT));
