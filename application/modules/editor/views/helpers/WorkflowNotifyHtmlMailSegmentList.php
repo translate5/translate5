@@ -148,6 +148,10 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
      * @return string
      */
     protected function render() {
+        //the segments list should not be send to reviewers when the previous workflow step was translations
+        if(isset($this->view->triggeringRole) && $this->view->triggeringRole == editor_Workflow_Abstract::ROLE_TRANSLATOR){
+            return '';
+        }
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         $stateMap = $states->getLabelMap();
@@ -159,7 +163,10 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
         if(empty($this->segments)) {
             return '<b>'.$t->_('Es wurden keine Segmente verändert!').'</b>';
         }
+        
         $task = $this->view->task;
+        /* @var $task editor_Models_Task */
+        
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         
         $fields = $sfm->getFieldList();
@@ -178,8 +185,14 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             }
         }
         
-        /* @var $task editor_Models_Task */
-        $result = array('<br /><br /><table cellpadding="4">');
+        $result = [];
+        $result[] = '<br/>';
+        $header = $t->_('Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />');
+        $header = str_replace('{previousRole}', $t->_($this->view->triggeringRole), $header);
+        
+        $result[] = $header;
+        
+        $result[] = '<br /><br /><table cellpadding="4">';
         $th = '<th align="left" valign="top">';
         $result[] = '<tr>';
         $result[] = $th.$t->_('Nr.').'</th>';
@@ -213,6 +226,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             $result[] = '</tr>';
         }
         $result[] = '</table>';
+        $result[] = '<br/>';
         return join('', $result);
     }
     
