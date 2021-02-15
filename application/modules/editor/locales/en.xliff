@@ -3931,6 +3931,73 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='Y29uZmlnX292ZXJ3cml0ZV90YXNr'><source>config_overwrite_task</source><target>Task</target></trans-unit>
 <trans-unit id='Y29uZmlnX292ZXJ3cml0ZV91c2Vy'><source>config_overwrite_user</source><target>User</target></trans-unit>
 <trans-unit id='V2VydA=='><source>Wert</source><target>Value</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSB3dXJkZSBhdWYgZWluZSBuZXVlIFZlcnNpb24gYWt0dWFsaXNpZXJ0'>
+  <source>Translate5 wurde auf eine neue Version aktualisiert</source>
+  <target>Translate5 was updated to a new version</target>
+</trans-unit>
+<trans-unit id='RWluIFVwZGF0ZSBhdWYgZGllIFZlcnNpb24gezB9IHd1cmRlIGR1cmNoZ2Vmw7xocnQuIEJpdHRlIGxhZGVuIHNpZSBkaWUgQW53ZW5kdW5nIG5ldSB1bSBGZWhsZXIgaW4gZGVyIEJlbnV0enVuZyB6dSB2ZXJtZWlkZW4u'>
+  <source>Ein Update auf die Version {0} wurde durchgeführt. Bitte laden sie die Anwendung neu um Fehler in der Benutzung zu vermeiden.</source>
+  <target>An update to version {0} was done. Please reload the application to load the latest version and prevent errors.</target>
+<trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIGZ1ZXIgYWxsZSBLdW5kZW4='>
+  <source>Ressourcen-Nutzung fuer alle Kunden</source>
+  <target>Resource usage for all clients</target>
+</trans-unit>
+<trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIGZ1ZXIgS3VuZGU='>
+  <source>Ressourcen-Nutzung fuer Kunde</source>
+  <target>Resource usage for client</target>
+</trans-unit>
+<trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIHBybyBNb25hdA=='>
+  <source>Ressourcen-Nutzung pro Monat</source>
+  <target>Resource usage by month</target>
+</trans-unit>
+<trans-unit id='TG9nIGRlciBSZXNzb3VyZW4tTnV0enVuZw=='>
+  <source>Log der Ressouren-Nutzung</source>
+  <target>Resource usage log</target>
+</trans-unit>
+<trans-unit id='RG9rdW1lbnRlIHBybyBNb25hdA=='>
+  <source>Dokumente pro Monat</source>
+  <target>Documents by month</target>
+</trans-unit>
+<trans-unit id='RGllc2UgRGF0ZW4gZW50aGFsdGVuIGFsbGUgQW5mcmFnZW4gYW4gU3ByYWNocmVzc291cmNlbiwgZWdhbCBvYiBkdXJjaCBBdWZnYWJlbiBvZGVyIHZpYSBJbnN0YW50VHJhbnNsYXRlLg=='>
+  <source>Diese Daten enthalten alle Anfragen an Sprachressourcen, egal ob durch Aufgaben oder via InstantTranslate.</source>
+  <target>This data contains all requests to the language resources, be it from usage in tasks or with InstantTranslate.</target>
+</trans-unit>
+<trans-unit id='SmVkZSBaZWlsZSBrb3JyZXNwb25kaWVydCBtaXQgZWluZXIgQW5mcmFnZSBhbiBlaW5lIFNwcmFjaHJlc3NvdXJjZS4='>
+  <source>Jede Zeile korrespondiert mit einer Anfrage an eine Sprachressource.</source>
+  <target>Each line corresponds to one request to a language resource.</target>
+</trans-unit>
+<trans-unit id='VHlwIGRlciBSZXNzb3VyY2U='>
+  <source>Typ der Ressource</source>
+  <target>Resource type</target>
+</trans-unit>
+<trans-unit id='TmFtZSBkZXIgUmVzc291cmNl'>
+  <source>Name der Ressource</source>
+  <target>Resource name</target>
+</trans-unit>
+<trans-unit id='SmFoci9Nb25hdA=='>
+  <source>Jahr/Monat</source>
+  <target>Year/month</target>
+</trans-unit>
+<trans-unit id='w5xiZXJzZXR6dGUgWmVpY2hlbg=='>
+  <source>Übersetzte Zeichen</source>
+  <target>Characters by request</target>
+</trans-unit>
+<trans-unit id='WmVpdHN0ZW1wZWw='>
+  <source>Zeitstempel</source>
+  <target>Timestamp</target>
+</trans-unit>
+<trans-unit id='QW56YWhsIGRlciBtaXQgSW5zdGFudFRyYW5zbGF0ZSDDvGJlcnNldHp0ZW4gRG9rdW1lbnRl'>
+  <source>Anzahl der mit InstantTranslate übersetzten Dokumente</source>
+  <target>Number of documents translated with InstantTranslate</target>
+</trans-unit>
+<trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIEV4cG9ydGllcmVu'>
+  <source>Ressourcen-Nutzung Exportieren</source>
+  <target>Resource usage export</target>
+</trans-unit>
+<trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='>
+  <source>Kunden bearbeiten</source>
+  <target>Edit client</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

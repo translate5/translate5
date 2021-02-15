@@ -64,7 +64,7 @@ class editor_Models_LanguageResources_LanguagesMapper {
         if(empty($this->languageCollection)){
             $model = ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $model editor_Models_Languages */
-            $this->languageCollection = $model->loadAllKeyCustom('rfc5646');
+            $this->languageCollection = $model->loadAllKeyCustom('rfc5646',true);
         }
         $result = [];
         foreach ($resourceLangauge as $code){

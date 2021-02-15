@@ -1,0 +1,1161 @@
+{
+    "MonthlySummaryByResource": [
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "totalCharacters": "7477"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "totalCharacters": "3010"
+        }
+    ],
+    "UsageLogByCustomer": [
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "22"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "35"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "169"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "204"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "212"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "228"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "182"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "113"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "135"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "117"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "92"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "228"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "42"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "50"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "151"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "114"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "56"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "61"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "102"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "143"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "151"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "10"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "49"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "110"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "138"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "147"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "38"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "49"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "22"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "17"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "37"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "121"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "119"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "64"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "44"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "26"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "31"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "44"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "17"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "149"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "190"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "23"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "92"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "141"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "86"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "115"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "31"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "166"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "37"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "132"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "20"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "77"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "62"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "62"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "68"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "23"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "48"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "102"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "167"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "24"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "117"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "21"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "38"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "38"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "54"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "37"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "16"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "41"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "43"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "153"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "163"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "316"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "22"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "37"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "23"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "28"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "24"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "10"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "11"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "35"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "20"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "38"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "37"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "11"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "41"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "9"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "26"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "57"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "27"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "25"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "31"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "14"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "10"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "31"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "19"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "27"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "16"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "33"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "18"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "17"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "20"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "21"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "27"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "10"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "10"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "16"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "13"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "25"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "9"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "22"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "38"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "17"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "12"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "11"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "68"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "74"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "42"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "141"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "152"
+        },
+        {
+            "langageResourceName": "API Testing::OpenTm2Tm_Translate1484Test",
+            "langageResourceServiceName": "OpenTM2",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "15"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "10"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "48"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "29"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "33"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "34"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "34"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "173"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "48"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "98"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "93"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "33"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "39"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "43"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "68"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "54"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "71"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "75"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "69"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "44"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "45"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "153"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "30"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "122"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "18"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "18"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "101"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "72"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "37"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "19"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "41"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "105"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "40"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "113"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "40"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "57"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "43"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "68"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "20"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "23"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "118"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "55"
+        },
+        {
+            "langageResourceName": "API Testing::MosesMt_Translate1484Test",
+            "langageResourceServiceName": "Moses",
+            "sourceLang": "de",
+            "targetLang": "en",
+            "charactersPerCustomer": "71"
+        }
+    ],
+    "DocumentUsage": [
+        {
+            "sourceLang": "de",
+            "targetLang": "en",
+            "taskCount": "1"
+        }
+    ]
+}

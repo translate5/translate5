@@ -93,46 +93,23 @@ class Editor_CustomerController extends ZfExtended_RestController {
         }
     }
     
-    public function exportAction(){
-        $exportModel=ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageLogger');
-        /* @var $exportModel editor_Models_LanguageResources_MtUsageLogger */
-        $rows=$exportModel->loadByCustomer($this->getParam('customerId'));
+    /***
+     * Export language resources usage as excel document
+     */
+    public function exportresourceAction(){
+        $customerId = $this->getRequest()->getParam('customerId',null);
+
+        $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
+        //if json is requested, return only the data
+        if($context == 'json'){
+            //INFO: this is currently only available for api testing
+            $this->setupTextExportResourcesLogData($customerId);
+            return;
+        }
         
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        
-        $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
-        /* @var $excel ZfExtended_Models_Entity_ExcelExport */
-        
-        // set property for export-filename
-        $excel->setProperty('filename', 'Mt engine ussage export data');
-        
-        //TODO: find the language text and display it
-        $excel->setCallback('sourceLang',function($sourceLang) use ($languages){
-        });
-        $excel->setCallback('targetLang',function($targetLang) use ($languages){
-        });
-        
-        $excel->setLabel('serviceName', $translate->_("Ressource"));
-        $excel->setLabel('languageResourceName', $translate->_("Name"));
-        $excel->setLabel('timestamp', $translate->_("Erstellungsdatum"));
-        //TODO: devide the character count with customer number
-        $excel->setLabel('translatedCharacterCount', 'Übersetzte Zeichen');
-        
-        //set the cell autosize
-        $excel->simpleArrayToExcel($rows,function($phpExcel){
-            foreach ($phpExcel->getWorksheetIterator() as $worksheet) {
-                
-                $phpExcel->setActiveSheetIndex($phpExcel->getIndex($worksheet));
-                
-                $sheet = $phpExcel->getActiveSheet();
-                $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
-                $cellIterator->setIterateOnlyExistingCells(true);
-                /** @var PHPExcel_Cell $cell */
-                foreach ($cellIterator as $cell) {
-                    $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
-                }
-            }
-        });
+        $export = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageExporter');
+        /* @var $export editor_Models_LanguageResources_UsageExporter */
+        $export->excel($customerId);
     }
     
     protected function decodePutData(){
@@ -225,5 +202,20 @@ class Editor_CustomerController extends ZfExtended_RestController {
         throw ZfExtended_UnprocessableEntity::createResponse('E1063', [
             'number' => ['duplicateClientNumber' => 'Diese Kundennummer wird bereits verwendet.']
         ]);
+    }
+    
+    /***
+     * Set the resources log data for the current export request. If the request is from non test user, this will throw an exception.
+     * @param int $customerId
+     */
+    protected function setupTextExportResourcesLogData(int $customerId = null) {
+        $user = new Zend_Session_Namespace('user');
+        $allowed = ['testmanager','testapiuser'];
+        if(!in_array($user->data->login, $allowed)){
+            throw new ZfExtended_Models_Entity_NoAccessException('The current user is not alowed to use the resources log export data.');
+        }
+        $export = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageExporter');
+        /* @var $export editor_Models_LanguageResources_UsageExporter */
+        $this->view->rows = $export->getExportRawDataTests($customerId);
     }
 }
