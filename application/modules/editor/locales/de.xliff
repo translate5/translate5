@@ -1182,20 +1182,12 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle {p
 <hr />
 <br />
 {footer}</target></trans-unit>
-<trans-unit id='e2hlYWRlcn0KSW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZsO8ciBTaWUgZnJlaWdlZ2ViZW4uPGJyIC8+CjxiciAvPgpJbSBmb2xnZW5kZW4gZGllIGdldMOkdGlndGVuIMOEbmRlcnVuZ2VuIGRlciB2b3JoZXJnZWhlbmRlbiBSb2xsZSA8Yj57cHJldmlvdXNSb2xlfTwvYj46PGJyIC8+CntjaGFuZ2VkU2VnbWVudHN9CjxociAvPgo8YnIgLz4Ke2Zvb3Rlcn0='><source>{header}
+<trans-unit id='e2hlYWRlcn0KSW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZsO8ciBTaWUgZnJlaWdlZ2ViZW4uPGJyIC8+CntjaGFuZ2VkU2VnbWVudHN9Cntmb290ZXJ9'><source>{header}
 Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> für Sie freigegeben.<br />
-<br />
-Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />
 {changedSegments}
-<hr />
-<br />
 {footer}</source><target>{header}
 Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> für Sie freigegeben.<br />
-<br />
-Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />
 {changedSegments}
-<hr />
-<br />
 {footer}</target></trans-unit>
 <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gYXVmZ3J1bmQgZWluZXIgVGVybWluw7xiZXJzY2hyZWl0dW5nIGF1dG9tYXRpc2NoIGbDvHIgYWxsZSBCZW51dHplciBkZXIgUm9sbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+IGFiZ2VzY2hsb3NzZW4uPGJyIC8+'><source>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></source><target>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgaXN0IHZvbGxzdMOkbmRpZyBiZWFyYmVpdGV0LCBlcyBzaW5kIGtlaW5lIHdlaXRlcmVuIEJlbnV0emVyIGRlciBBdWZnYWJlIHp1Z2VvcmRuZXQuPGJyIC8+CjxiciAvPgo='><source>Die Aufgabe ist vollständig bearbeitet, es sind keine weiteren Benutzer der Aufgabe zugeordnet.<br />
@@ -1228,24 +1220,18 @@ Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRo
 </source><target>Benutzer der vorherigen Rolle <i>{previousRole}</i>:
 {previousUsers}<br/>
 </target></trans-unit>
-<trans-unit id='e2hlYWRlcn0Ke2FjdGlvbn08YnIgLz4Ke3VzZXJzTm90aWZpZWR9PGJyIC8+Cnt1c2Vyc1ByZXZpb3VzUm9sZX08YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHp1dm9yIGFrdGl2ZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxpPntwcmV2aW91c1JvbGV9PC9pPjo8YnIgLz4Ke2NoYW5nZWRTZWdtZW50c30KPGhyIC8+CjxiciAvPgp7Zm9vdGVyfQ=='><source>{header}
+<trans-unit id='e2hlYWRlcn0Ke2FjdGlvbn08YnIgLz4Ke3VzZXJzTm90aWZpZWR9PGJyIC8+Cnt1c2Vyc1ByZXZpb3VzUm9sZX08YnIgLz4KPGJyIC8+CntjaGFuZ2VkU2VnbWVudHN9Cntmb290ZXJ9'><source>{header}
 {action}<br />
 {usersNotified}<br />
 {usersPreviousRole}<br />
 <br />
-Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i>{previousRole}</i>:<br />
 {changedSegments}
-<hr />
-<br />
 {footer}</source><target>{header}
 {action}<br />
 {usersNotified}<br />
 {usersPreviousRole}<br />
 <br />
-Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i>{previousRole}</i>:<br />
 {changedSegments}
-<hr />
-<br />
 {footer}</target></trans-unit>
 <trans-unit id='w5xiZXJnZW9yZG5ldGVyIEJlbnV0emVy'><source>Übergeordneter Benutzer</source><target>Übergeordneter Benutzer</target></trans-unit>
 <trans-unit id='ezB9IChNaW5kZXN0LiB7MX0p'><source>{0} (Mindest. {1})</source><target>{0} (Mindest. {1})</target></trans-unit>
@@ -1906,6 +1892,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='U3DDpHRlciB3ZWl0ZXIgYXJiZWl0ZW4='><source>Später weiter arbeiten</source><target>Später weiter arbeiten</target></trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSB3dXJkZSBhdWYgZWluZSBuZXVlIFZlcnNpb24gYWt0dWFsaXNpZXJ0'><source>Translate5 wurde auf eine neue Version aktualisiert</source><target>Translate5 wurde auf eine neue Version aktualisiert</target></trans-unit>
 <trans-unit id='RWluIFVwZGF0ZSBhdWYgZGllIFZlcnNpb24gezB9IHd1cmRlIGR1cmNoZ2Vmw7xocnQuIEJpdHRlIGxhZGVuIHNpZSBkaWUgQW53ZW5kdW5nIG5ldSB1bSBGZWhsZXIgaW4gZGVyIEJlbnV0enVuZyB6dSB2ZXJtZWlkZW4u'><source>Ein Update auf die Version {0} wurde durchgeführt. Bitte laden sie die Anwendung neu um Fehler in der Benutzung zu vermeiden.</source><target>Ein Update auf die Version {0} wurde durchgeführt. Bitte laden sie die Anwendung neu um Fehler in der Benutzung zu vermeiden.</target></trans-unit>
+<trans-unit id='SW0gZm9sZ2VuZGVuIGRpZSBnZXTDpHRpZ3RlbiDDhG5kZXJ1bmdlbiBkZXIgdm9yaGVyZ2VoZW5kZW4gUm9sbGUgPGI+e3ByZXZpb3VzUm9sZX08L2I+OjxiciAvPg=='><source>Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br /></source><target>Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br /></target></trans-unit>
 <trans-unit id='Tm9jaCBldHdhcyB6dSB0dW4/'><source>Noch etwas zu tun?</source><target>Noch etwas zu tun?</target></trans-unit>
 <trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIGZ1ZXIgYWxsZSBLdW5kZW4='><source>Ressourcen-Nutzung fuer alle Kunden</source><target>Ressourcen-Nutzung fuer alle Kunden</target></trans-unit>
 <trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIGZ1ZXIgS3VuZGU='><source>Ressourcen-Nutzung fuer Kunde</source><target>Ressourcen-Nutzung fuer Kunde</target></trans-unit>
