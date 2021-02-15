@@ -298,8 +298,15 @@ class editor_Services_Connector {
             $task=ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($querySource->getTaskGuid());
-            $mtlogger->setCustomers($task->getCustomerId());
             
+            //if it is instant-translate file pretranslation,set the requestSource to instant translate
+            //the log customers should be calculated via getInstantTranslateRequestSourceCustomers
+            if($task->getTaskType() == editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE){
+                $requestSource = self::REQUEST_SOURCE_INSTANT_TRANSLATE;
+            }else{
+                //it is default task -> use the task customer
+                $mtlogger->setCustomers($task->getCustomerId());
+            }
         }
         //the request is triggered via instanttranslate, save the languageresource customers of user customers
         if($requestSource==self::REQUEST_SOURCE_INSTANT_TRANSLATE){
