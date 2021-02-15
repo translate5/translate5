@@ -3921,6 +3921,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='RWluIFVwZGF0ZSBhdWYgZGllIFZlcnNpb24gezB9IHd1cmRlIGR1cmNoZ2Vmw7xocnQuIEJpdHRlIGxhZGVuIHNpZSBkaWUgQW53ZW5kdW5nIG5ldSB1bSBGZWhsZXIgaW4gZGVyIEJlbnV0enVuZyB6dSB2ZXJtZWlkZW4u'>
   <source>Ein Update auf die Version {0} wurde durchgeführt. Bitte laden sie die Anwendung neu um Fehler in der Benutzung zu vermeiden.</source>
   <target>An update to version {0} was done. Please reload the application to load the latest version and prevent errors.</target>
+</trans-unit>
 <trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIGZ1ZXIgYWxsZSBLdW5kZW4='>
   <source>Ressourcen-Nutzung fuer alle Kunden</source>
   <target>Resource usage for all clients</target>
