@@ -65,7 +65,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
         customerDeleteMsg:'#UT#Diesen Kunden löschen?',
         customerDeleteTitle:'#UT#Kunden löschen',
         customerDeletedMsg:'#UT#Kunde gelöscht',
-        export:'#UT#Exportieren',
+        export:'#UT#Ressourcen-Nutzung Exportieren',
         domain:'#UT#translate5 Domain',
         openIdServer:'#UT#OpenId server',
         openIdIssuer:'#UT#OpenId Issuer',
@@ -79,7 +79,9 @@ Ext.define('Editor.view.admin.customer.Panel', {
         defaultRolesGroupLabelTooltip: '#UT#Standardsystemrollen werden verwendet, wenn der OpenId-Server keine Systemrollen für den Benutzer übergibt, der sich anmeldet.',
         serverRolesGroupLabelTooltip: '#UT#Systemrollen, die der OpenID-Server in translate5 festlegen darf.',
         propertiesTabPanelTitle: '#UT#Eigenschaften',
-        configTabTitle:'#UT#Standardkonfiguration des Systems'
+        configTabTitle:'#UT#Standardkonfiguration des Systems',
+        actionColumn:'#UT#Aktionen',
+        customerEditActionIcon:'#UT#Kunden bearbeiten'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -147,18 +149,21 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 filter: {
                                     type: 'string'
                                 }
-                            },
-                            /*{
+                            },{
                                 xtype: 'actioncolumn',
-                                text:  me.strings.export,
+                                text:  me.strings.actionColumn,
                                 menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
                                 sortable: false,
                                 items:[{
-                                    iconCls: 'ico-customer-mt-export',
+                                    glyph: 'f044@FontAwesome5FreeSolid',
+                                    tooltip: me.strings.customerEditActionIcon,
+                                    handler:me.onCustomerEditClick
+                                },{
+                                    glyph: 'f1c3@FontAwesome5FreeSolid',
+                                    tooltip: me.strings.export,
                                     handler:me.onTmExportClick
                                 }]
                             }
-                            */
                         ],
                         listeners: {
                             itemdblclick: {
@@ -461,6 +466,13 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         scope: 'controller'
                                     }
                                 }
+                            },{
+                                xtype: 'button',
+                                glyph: 'f1c3@FontAwesome5FreeSolid',
+                                text: me.strings.export,
+                                listeners: {
+                                    click: me.onTmExportClick
+                                }
                             }
                         ]
                     }
@@ -509,12 +521,32 @@ Ext.define('Editor.view.admin.customer.Panel', {
     /***
      * On export action column click handler
      */
-    onTmExportClick:function(view, cell, row, col, ev, evObj) {
-        var row = view.getStore().getAt(row);
-        if(!row){
-            return;
+    onTmExportClick:function(view, cell, row, col, ev, record) {
+        var me=this.up('customerPanel');
+        me.exportCustomerResourceUsage(record && record.get('id'));
+    },
+    
+    /***
+     * Actio icon "edit customer" event handler
+     */
+    onCustomerEditClick:function(view, cell, row, col, ev, record) {
+        var me=this.up('customerPanel'),
+            controller = me.getController();
+        controller.editCustomer(record);
+    },
+    
+    /***
+     * Generate excel for resource usage for the given customer. If the customer is not defined,
+     * summ excel for all customers will be generated.
+     */
+    exportCustomerResourceUsage:function(id){
+        var me = this,
+            params = {},
+            method = 'POST',
+            url = Editor.data.restpath+'customer/exportresource';
+        if(id){
+            url=url+'?'+Ext.urlEncode({customerId: id});
         }
-        //TODO: implement me
+        window.open(url); 
     }
-
 });

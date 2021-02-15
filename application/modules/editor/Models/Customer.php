@@ -87,6 +87,16 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     
     CONST DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
     
+
+    public function delete() {
+        $customerId = $this->getId();
+        parent::delete();
+        $logger = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
+        /* @var $logger editor_Models_LanguageResources_UsageLogger */
+        //remove the log data for the deleted customer
+        $logger->deleteByCustomer($customerId);
+    }
+    
     /**
      *  Get the customer specific config for current customer.
      *  If there is no customer overwritte for the config, the instance level value will be used.

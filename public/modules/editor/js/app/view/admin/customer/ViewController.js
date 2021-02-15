@@ -43,35 +43,7 @@ Ext.define('Editor.view.admin.customer.ViewController', {
      * Set record for editing
      */
     dblclick: function(dataview, record, item, index, e, eOpts) {
-        var me=this,
-        	formPanel = me.getReferences().form,
-            removeButton = me.getReferences().removeButton,
-            vm = me.getViewModel(),
-            isOpenIdHidden=record.get('number')==Editor.model.admin.Customer.DEFAULTCUSTOMER_NUMBER && !Editor.data.customers.openid.showOpenIdDefaultCustomerData;
-
-        vm.set('record', record);
-        vm.set('title', me.getView().strings.editCustomerTitle);
-
-        formPanel.loadRecord(record);
-        
-        var roles = record.get('openIdServerRoles').split(','),
-        	rolesBoxes=me.getView().down('#serverRolesGroup').items.items;
-        Ext.Array.forEach(rolesBoxes, function(item) {
-            item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
-        });
-        
-    	roles = record.get('openIdDefaultServerRoles').split(',');
-    	rolesBoxes=me.getView().down('#defaultRolesGroup').items.items;
-    	
-	    Ext.Array.forEach(rolesBoxes, function(item) {
-	        item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
-	    });
-	    
-        removeButton.setDisabled(false);
-        
-        //hide the openid data for the default customer if it is configured so
-    	formPanel.down('#openIdDomain').setVisible(!isOpenIdHidden);
-    	formPanel.down('#openIdFieldset').setVisible(!isOpenIdHidden);
+        this.editCustomer(record);
     },
 
     /**
@@ -110,7 +82,42 @@ Ext.define('Editor.view.admin.customer.ViewController', {
             }
         });
     },
-
+    
+    /***
+     * Loads the current customer record into the customer edit form
+     */
+    editCustomer:function(record){
+        var me=this,
+            formPanel = me.getReferences().form,
+            removeButton = me.getReferences().removeButton,
+            vm = me.getViewModel(),
+            isOpenIdHidden=record.get('number')==Editor.model.admin.Customer.DEFAULTCUSTOMER_NUMBER && !Editor.data.customers.openid.showOpenIdDefaultCustomerData;
+    
+        vm.set('record', record);
+        vm.set('title', me.getView().strings.editCustomerTitle);
+    
+        formPanel.loadRecord(record);
+        
+        var roles = record.get('openIdServerRoles').split(','),
+            rolesBoxes=me.getView().down('#serverRolesGroup').items.items;
+        Ext.Array.forEach(rolesBoxes, function(item) {
+            item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
+        });
+        
+        roles = record.get('openIdDefaultServerRoles').split(',');
+        rolesBoxes=me.getView().down('#defaultRolesGroup').items.items;
+        
+        Ext.Array.forEach(rolesBoxes, function(item) {
+            item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
+        });
+        
+        removeButton.setDisabled(false);
+        
+        //hide the openid data for the default customer if it is configured so
+        formPanel.down('#openIdDomain').setVisible(!isOpenIdHidden);
+        formPanel.down('#openIdFieldset').setVisible(!isOpenIdHidden);
+    },
+    
     /***
      * Reset the form on escape key press
      */

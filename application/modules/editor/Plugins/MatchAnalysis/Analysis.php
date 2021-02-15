@@ -44,12 +44,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     
     
     /***
-     * Collection of assigned resources to the task
-     * @var array
-     */
-    protected $connectors=array();
-    
-    /***
      * Flag if pretranslations is active
      * @var string
      */
