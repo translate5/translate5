@@ -2327,7 +2327,7 @@ UPDATE Zf_configuration SET
                  `defaults` = "",
                  `guiName` = "",
                  `guiGroup` = "",
-                 `level` = "",
+                 `level` = "1",
                  `description`  = "",
                  `comment` = "deprecated"
                  WHERE `name` = "runtimeOptions.disableErrorMails.all";

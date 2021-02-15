@@ -463,4 +463,12 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function isTm() {
         return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TM;
     }
+    
+    /***
+     * Is the current resource type of term collection
+     * @return boolean
+     */
+    public function isTc() {
+        return $this->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
+    }
 }

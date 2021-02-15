@@ -29,12 +29,102 @@ namespace Translate5\MaintenanceCli\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 class MaintenanceCommand extends Translate5AbstractCommand {
     
-    /*
-     * TODO - just the same as in ServerMaintenance - just for the local instance
+        // the name of the command (the part after "bin/console")
+    protected static $defaultName = 'maintenance:status';
+    
+    /**
+     * @var \ZfExtended_Models_Installer_Maintenance
      */
+    protected $mm = null;
+    
+    protected function configure()
+    {
+        $this
+        // the short description shown while running "php bin/console list"
+        ->setDescription('Returns information about the maintenance mode.')
+        
+        // the full command description shown when running the command with
+        // the "--help" option
+        ->setHelp('Returns information about the maintenance mode.');
+    }
+    
+    /**
+     * Execute the command
+     * {@inheritDoc}
+     * @see \Symfony\Component\Console\Command\Command::execute()
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->initInputOutput($input, $output);
+        $this->initTranslate5();
+        
+        $this->writeTitle('maintenance mode');
+        
+        $this->mm = new \ZfExtended_Models_Installer_Maintenance();
+        if($this->mm->isInIni()) {
+            $this->io->error(['There is some maintenance configuration in the installation.ini, ', 'please remove it for proper usage of this tool!']);
+            return 1;
+        }
+        
+        $this->_execute();
+        
+        $this->showStatus();
+        return 0;
+    }
+    
+    protected function _execute() {
+        //for status do nothing
+    }
+    
+    protected function announce(string $time, string $msg) {
+        $result = $this->mm->announce($time, $msg);
+        if(!empty($result['error'])) {
+            $this->io->error($result['error']);
+        }
+        if(!empty($result['warning'])) {
+            $this->io->warning($result['warning']);
+        }
+        if(!empty($result['sent'])) {
+            $this->io->success('Send maintenance announcement mails to:');
+            $this->output->writeln($result['sent']);
+        }
+        $this->io->text('');
+    }
+    
+    protected function showStatus() {
+        $conf = $this->mm->status();
+        
+        if(empty($conf->startDate)) {
+            $msg = ["  <info>Maintenance mode:</> <fg=green;options=bold>disabled!</>"];
+            if(!empty($conf->message)) {
+                $msg[] = '<info>GUI Message active:</> <options=bold>'.$conf->message.'</>';
+            }
+            $msg[] = '';
+            $this->io->text($msg);
+            return 0;
+        }
+        $startTimeStamp = strtotime($conf->startDate);
+        $now = time();
+        if($startTimeStamp < $now) {
+            $this->io->text("<info>Maintenance mode:</> <fg=red;options=bold>active!</>");
+        }
+        
+        elseif ($startTimeStamp - ($conf->timeToNotify*60) < $now){
+            $this->io->text("<info>Maintenance mode:</> <fg=yellow;options=bold>notified!</>");
+        }
+        
+        $this->output->writeln([
+            '',
+            '            <info>start:</> '.date('Y-m-d H:i (O)', $startTimeStamp),
+            '     <info>start notify:</> '.date('Y-m-d H:i (O)', $startTimeStamp - ($conf->timeToNotify*60)),
+            '       <info>login lock:</> '.date('Y-m-d H:i (O)', $startTimeStamp - ($conf->timeToLoginLock*60)),
+            '          <info>message:</> '.$conf->message,
+            '        <info>receivers:</> '.$conf->announcementMail,
+            '',
+        ]);
+        return 0;
+    }
 }

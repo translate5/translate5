@@ -44,8 +44,8 @@ Ext.define('Editor.util.TaskActions', {
     strings: {
         taskOpening: '#UT#Aufgabe wird im Editor geöffnet...',
         forcedReadOnly: '#UT#Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!',
-        confirmFinish: "#UT#Aufgabe abschließen?",
-        confirmFinishMsg: "#UT#Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?",
+        confirmFinish: "#UT#Noch etwas zu tun?",
+        confirmFinishMsg: "#UT#Möchten Sie später weitermachen?",
         taskClosed: '#UT#Aufgabe wurde erfolgreich verlassen.',
         taskConfirmed: '#UT#Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.',
         taskFinished: '#UT#Aufgabe wurde erfolgreich abgeschlossen.',

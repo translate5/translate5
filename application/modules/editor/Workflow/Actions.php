@@ -234,4 +234,14 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         /* @var $taskModel editor_Models_Task */
         $taskModel->removeOldTasks();
     }
+    
+    /***
+     * Remove old connector usage logs. How old the logs should be is defined in
+     * zf configuration
+     */
+    public function removeOldConnectorUsageLog() {
+        $log = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
+        /* @var $log editor_Models_LanguageResources_UsageLogger */
+        $log->removeOldLogs();
+    }
 }

@@ -99,6 +99,13 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      */
     protected $autoStates;
     
+    
+    /***
+     * Collection of assigned resources to the task
+     * @var array
+     */
+    protected $connectors=array();
+    
     /***
      * Pretranslation mt connectors(the mt resources associated to a task)
      * @var array
@@ -177,7 +184,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         //set the type
         $languageResource = $this->resources[$languageResourceid];
-        /* @var $langRes editor_Models_LanguageResources_LanguageResource */
+        /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
         
         //just to display the TM name too, we add it here to the type
         $type = $languageResource->getServiceName().' - '.$languageResource->getName();
@@ -211,9 +218,13 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             $matchrateType->initPretranslated($matchrateType::TYPE_SOURCE);
             $segment->setEditable(false);
         }
+        
         $segment->setMatchRateType((string) $matchrateType);
         
-        
+        //if it is tm or term collection and the matchrate is >=100, log the usage
+        if(($languageResource->isTm() || $languageResource->isTc()) && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE){
+            $this->connectors[$languageResourceid]->logAdapterUsage($segment,editor_Services_Connector::REQUEST_SOURCE_EDITOR);
+        }
         $segment->set($segmentField,$targetResult); //use sfm->getFirstTargetName here
         $segment->set($segmentFieldEdit,$targetResult); //use sfm->getFirstTargetName here
         

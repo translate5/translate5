@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  */
-class editor_Models_Db_LanguageResources_MtUsageLogger extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_languageresources_mt_usage_log';
+class editor_Models_Db_LanguageResources_UsageLogger extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_languageresources_usage_log';
     public $_primary = 'id';
 }

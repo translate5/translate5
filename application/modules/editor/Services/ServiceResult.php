@@ -178,4 +178,20 @@ class editor_Services_ServiceResult {
         }
         return null;
     }
+    
+    /***
+     * Check if the current result set contains result with matchrate >=100
+     * @return boolean
+     */
+    public function has100PercentMatch() {
+        if(empty($this->getResult())){
+            return false;
+        }
+        foreach ($this->getResult() as $res){
+            if(isset($res->matchrate) && $res->matchrate>=100){
+                return true;
+            }
+        }
+        return false;
+    }
 }
