@@ -63,7 +63,7 @@ class editor_Models_LanguageResources_UsageLogger extends ZfExtended_Models_Enti
         ->setIntegrityCheck(false)
         ->from(['log'=>'LEK_languageresources_usage_log'],[
             'lr.name AS langageResourceName',
-            'lr.resourceType AS langageResourceType',
+            'lr.serviceName as langageResourceServiceName',
             'log.sourceLang',
             'log.targetLang',
             'log.timestamp',
