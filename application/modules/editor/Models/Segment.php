@@ -1183,22 +1183,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $s->from($this->db, $fields);
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $task->getTaskGuid());
-        //required autostates
-        //1 "Reviewed", 2 "Reviewed, auto-set", 8 "2. Review", 9 "2. Review, auto"
-        $autoStates = [
-            editor_Models_Segment_AutoStates::REVIEWED,
-            editor_Models_Segment_AutoStates::REVIEWED_AUTO,
-            editor_Models_Segment_AutoStates::REVIEWED_TRANSLATOR,
-            editor_Models_Segment_AutoStates::REVIEWED_TRANSLATOR_AUTO
-        ];
-        //if pmChanges is active, add additional required autostates
-        //10 PM reviewed,11 PM reviewed, auto-set
-        if(in_array($pmChanges, [self::PM_ALL_INCLUDED,self::PM_SAME_STEP_INCLUDED])){
-            $autoStates = array_merge($autoStates,[
-                editor_Models_Segment_AutoStates::REVIEWED_PM,
-                editor_Models_Segment_AutoStates::REVIEWED_PM_AUTO
-            ]);
-        }
+        
+        $autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        /* @var $autoStates editor_Models_Segment_AutoStates */
+        //get all required autostate ids
+        $autoStates = $autoStates->getForWorkflowStepLoading(in_array($pmChanges, [self::PM_ALL_INCLUDED,self::PM_SAME_STEP_INCLUDED]));
+        
         $s->where($this->tableName.'.autoStateId IN(?)', $autoStates);
         switch ($pmChanges) {
             case self::PM_ALL_INCLUDED:
