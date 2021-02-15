@@ -39,6 +39,8 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Services_Connector {
     
+    use editor_Services_UsageLogerTrait;
+    
     /***
      * The request source when language resources is used is InstantTranslate
      * @var string
@@ -271,100 +273,6 @@ class editor_Services_Connector {
      */
     public function disableBatch() {
         $this->batchQuery = false;
-    }
-    
-    
-    /***
-     * Log how many characters are used/translated from the current adapter request
-     * 
-     * @param mixed $queryString
-     * @param string $requestSource
-     */
-    public function logAdapterUsage($querySource,$requestSource){
-        $mtlogger=ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
-        /* @var $mtlogger editor_Models_LanguageResources_UsageLogger */
-        $mtlogger->setLanguageResourceId($this->adapter->getLanguageResource()->getId());
-        $mtlogger->setSourceLang($this->sourceLang);
-        $mtlogger->setTargetLang($this->targetLang);
-        
-        $logQueryString =$this->toLogQueryString($querySource);
-
-        $mtlogger->setQueryString($logQueryString);
-        $mtlogger->setRequestSource($requestSource);
-        $mtlogger->setTranslatedCharacterCount($this->getCharacterCount($logQueryString));
-        
-        //the request is triggered via editor, save the task customers as customers
-        if($requestSource==self::REQUEST_SOURCE_EDITOR){
-            $task=ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->loadByTaskGuid($querySource->getTaskGuid());
-            
-            //if it is instant-translate file pretranslation,set the requestSource to instant translate
-            //the log customers should be calculated via getInstantTranslateRequestSourceCustomers
-            if($task->getTaskType() == editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE){
-                $requestSource = self::REQUEST_SOURCE_INSTANT_TRANSLATE;
-            }else{
-                //it is default task -> use the task customer
-                $mtlogger->setCustomers($task->getCustomerId());
-            }
-        }
-        //the request is triggered via instanttranslate, save the languageresource customers of user customers
-        if($requestSource==self::REQUEST_SOURCE_INSTANT_TRANSLATE){
-            $mtlogger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
-        }
-        
-        $mtlogger->save();
-    }
-    
-    /***
-     * Count characters in the requested language resources query string. The input string should not contains any tags
-     * @param string $query
-     * @return integer
-     */
-    protected function getCharacterCount(string $query){
-        return mb_strlen($query);
-    }
-    
-    /***
-     * Prepare the query string for saveing in the log table
-     * @param mixed $query
-     * @return string
-     */
-    protected function toLogQueryString($query){
-        //if the query is segment, get the query string fron the segment
-        if($query instanceof editor_Models_Segment){
-            $queryString=$this->adapter->getQueryString($query);
-            //remove all tags, since the mt engines are ignoring the tags
-            return $query->stripTags($queryString);
-        }
-        //INFO: remove the tags when the string is saved to the log table
-        return strip_tags($query);
-    }
-    
-    /***
-     * Get customers when InstantTranslate is used as request source.
-     * The return value will be the intersection of the customers of the language resource and the customers of the current user
-     * @return NULL|array
-     */
-    protected function getInstantTranslateRequestSourceCustomers(){
-        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        $userCustomers=$userModel->getUserCustomersFromSession();
-        
-        if(empty($userCustomers)){
-            return null;
-        }
-        
-        $la=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-        /* @var $la editor_Models_LanguageResources_CustomerAssoc */
-        $resourceCustomers=$la->loadByLanguageResourceId($this->adapter->getLanguageResource()->getId());
-        $resourceCustomers=array_column($resourceCustomers,'customerId');
-        $return=array_intersect($userCustomers,$resourceCustomers);
-        if(empty($return)){
-            return null;
-        }
-        //return with leading and trailing comma so the customers are searchable
-        return ','.implode(',', $return).',';
     }
 
     /***
