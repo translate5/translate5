@@ -32,20 +32,14 @@ END LICENSE AND COPYRIGHT
  * @version 2.0
  *
  */
-
-$session = new Zend_Session_Namespace();
-
+/* @var $this Zend_View */
 $this->subject = $this->translate->_('Translate5 - Aufgabe freigegeben').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
 
 $this->render('general.phtml');
 
 $template = '{header}
 Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> für Sie freigegeben.<br />
-<br />
-Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />
 {changedSegments}
-<hr />
-<br />
 {footer}';
 
 $this->textbody = strip_tags($this->templateApply($template, [
