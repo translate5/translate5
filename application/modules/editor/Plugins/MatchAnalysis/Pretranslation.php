@@ -221,8 +221,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         $segment->setMatchRateType((string) $matchrateType);
         
-        //if it is tm and the matchrate is >=100, log the usage
-        if($languageResource->isTm() && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE){
+        //if it is tm or term collection and the matchrate is >=100, log the usage
+        if(($languageResource->isTm() || $languageResource->isTc()) && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE){
             $this->connectors[$languageResourceid]->logAdapterUsage($segment,editor_Services_Connector::REQUEST_SOURCE_EDITOR);
         }
         $segment->set($segmentField,$targetResult); //use sfm->getFirstTargetName here

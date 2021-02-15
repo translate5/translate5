@@ -57,6 +57,7 @@ class editor_Models_LanguageResources_UsageExporter{
     protected $labels = [
         "langageResourceType"=>"Typ der Ressource",
         "langageResourceName"=>"Name der Ressource",
+        "langageResourceServiceName"=> "Ressource",
         "customerId"=>"Kunde",
         "sourceLang"=>"Quellsprache",
         "targetLang"=>"Zielsprache",
@@ -170,10 +171,12 @@ class editor_Models_LanguageResources_UsageExporter{
 
     /***
      * Load all required export data
+     * 
      * @param int $customerId
-     * @return array[]
+     * @param string $taskType
+     * @return array
      */
-    public function getExportRawData(int $customerId = null) {
+    public function getExportRawData(int $customerId = null,string $taskType = editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE) : array{
         $rawData = [];
         
         $model = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageSumLogger');
@@ -189,19 +192,20 @@ class editor_Models_LanguageResources_UsageExporter{
         $model = ZfExtended_Factory::get('editor_Models_TaskUsageLog');
         /* @var $model editor_Models_TaskUsageLog */
         
-        $rawData[self::DOCUMENT_USAGE] = $model->loadByTypeAndCustomer($customerId,editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE);
+        $rawData[self::DOCUMENT_USAGE] = $model->loadByTypeAndCustomer($customerId,$taskType);
         
         return $rawData;
     }
     
     /***
      * Get the data in format required for the tests. In the returned result, unneeded fields will be filtered.
+     * 
      * @param int $customerId
      * @return array
      */
-    public function getExportRawDataTests(int $customerId = null) {
+    public function getExportRawDataTests(int $customerId = null) : array{
         
-        $result = $this->getExportRawData($customerId);
+        $result = $this->getExportRawData($customerId,editor_Models_Task::INITIAL_TASKTYPE_DEFAULT);
         
         $unset = ["customerId","yearAndMonth","timestamp","customers"];
         $languages = ZfExtended_Factory::get('editor_Models_Languages');

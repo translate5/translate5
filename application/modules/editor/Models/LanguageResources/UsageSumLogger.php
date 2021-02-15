@@ -58,7 +58,8 @@ class editor_Models_LanguageResources_UsageSumLogger extends ZfExtended_Models_E
      */
     public function loadMonthlySummaryByResource(int $customerId = null) : array {
         $fields = [
-            'log.langageResourceType',
+            'log.langageResourceName',
+            'lr.serviceName as langageResourceServiceName',
             'log.sourceLang',
             'log.targetLang',
             'log.yearAndMonth',
@@ -68,15 +69,9 @@ class editor_Models_LanguageResources_UsageSumLogger extends ZfExtended_Models_E
             array_unshift($fields,'log.customerId');
         }
         $s=$this->db->select()
-        ->from(['log'=>'LEK_languageresources_usage_log_sum'],[
-            'log.customerId',
-            'log.langageResourceName',
-            'log.langageResourceType',
-            'log.sourceLang',
-            'log.targetLang',
-            'log.yearAndMonth',
-            'SUM(log.totalCharacters) AS totalCharacters'
-        ]);
+        ->setIntegrityCheck(false)
+        ->from(['log'=>'LEK_languageresources_usage_log_sum'],$fields)
+        ->join(['lr'=>'LEK_languageresources'],'lr.id = log.langageResourceId',[]);
         if(!empty($customerId)){
             $s->where('log.customerId = ?',$customerId);
         }

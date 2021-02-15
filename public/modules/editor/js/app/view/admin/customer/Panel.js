@@ -80,7 +80,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
         serverRolesGroupLabelTooltip: '#UT#Systemrollen, die der OpenID-Server in translate5 festlegen darf.',
         propertiesTabPanelTitle: '#UT#Eigenschaften',
         configTabTitle:'#UT#Standardkonfiguration des Systems',
-        actionColumn:'#UT#Aktionen'
+        actionColumn:'#UT#Aktionen',
+        customerEditActionIcon:'#UT#Kunden bearbeiten'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -154,6 +155,10 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
                                 sortable: false,
                                 items:[{
+                                    glyph: 'f044@FontAwesome5FreeSolid',
+                                    tooltip: me.strings.customerEditActionIcon,
+                                    handler:me.onCustomerEditClick
+                                },{
                                     glyph: 'f1c3@FontAwesome5FreeSolid',
                                     tooltip: me.strings.export,
                                     handler:me.onTmExportClick
@@ -522,6 +527,15 @@ Ext.define('Editor.view.admin.customer.Panel', {
     },
     
     /***
+     * Actio icon "edit customer" event handler
+     */
+    onCustomerEditClick:function(view, cell, row, col, ev, record) {
+        var me=this.up('customerPanel'),
+            controller = me.getController();
+        controller.editCustomer(record);
+    },
+    
+    /***
      * Generate excel for resource usage for the given customer. If the customer is not defined,
      * summ excel for all customers will be generated.
      */
@@ -535,5 +549,4 @@ Ext.define('Editor.view.admin.customer.Panel', {
         }
         window.open(url); 
     }
-
 });

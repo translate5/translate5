@@ -187,8 +187,8 @@ class editor_Models_Segment_Updater {
         //save the type
         $segment->setMatchRateType((string) $matchrateType);
 
-        //if it is tm and the matchrate is >=100, log the usage
-        if($languageresource->isTm() && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE){
+        //if it is tm or term collection and the matchrate is >=100, log the usage
+        if(($languageresource->isTm() || $languageresource->isTc()) && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE){
             $this->logAdapterUsageOnSegmentEdit($languageresource);
         }
     }

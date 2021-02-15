@@ -3987,6 +3987,10 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Ressourcen-Nutzung Exportieren</source>
   <target>Resource usage export</target>
 </trans-unit>
+<trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='>
+  <source>Kunden bearbeiten</source>
+  <target>Edit client</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
