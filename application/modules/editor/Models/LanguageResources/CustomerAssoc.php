@@ -196,5 +196,21 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         }
         return array_column($result, 'languageResourceId');
     }
+    
+    /***
+     * Load all customer ids for the given language resources
+     * @param array $languageResourceIds
+     * @return array
+     */
+    public function loadLanguageResourcesCustomers(array $languageResourceIds) {
+        $s=$this->db->select()
+        ->from('LEK_languageresources_customerassoc',['distinct(customerId) as customers'])
+        ->where('languageResourceId IN(?)',$languageResourceIds);
+        $result=$this->db->fetchAll($s)->toArray();
+        if(empty($result)){
+            return [];
+        }
+        return array_column($result, 'customers');
+    }
 }
 
