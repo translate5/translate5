@@ -584,9 +584,12 @@ class editor_TaskController extends ZfExtended_RestController {
                 // Language resources that are assigned as default language resource for a client,
                 // are associated automatically with tasks for this client.
                 $this->addDefaultLanguageResources($this->entity);
-                
-                //update the task usage log for the current task
-                $this->insertTaskUsageLog($this->entity);
+
+                //if the current task type is for instant translate pretransaltion, the usage log requires different handling
+                if($this->entity->getTaskType()!==editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE){
+                    //update the task usage log for the current task
+                    $this->insertTaskUsageLog($this->entity);
+                }
             }
 
             //warn the api user for the targetDeliveryDate ussage

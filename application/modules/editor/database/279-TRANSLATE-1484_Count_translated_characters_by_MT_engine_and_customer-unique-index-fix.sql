@@ -28,3 +28,6 @@
 ALTER TABLE `LEK_task_usage_log` 
 DROP INDEX `task_type_count` ,
 ADD UNIQUE INDEX `task_type_count` (`taskType` ASC, `customerId` ASC, `yearAndMonth` ASC, `sourceLang` ASC, `targetLang` ASC);
+
+ALTER TABLE `LEK_task_usage_log` 
+CHANGE COLUMN `taskCount` `taskCount` DOUBLE(19,2) NOT NULL;
