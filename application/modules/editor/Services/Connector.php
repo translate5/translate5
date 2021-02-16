@@ -39,8 +39,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Services_Connector {
     
-    use editor_Services_UsageLogerTrait;
-    
     /***
      * The request source when language resources is used is InstantTranslate
      * @var string
@@ -124,17 +122,20 @@ class editor_Services_Connector {
      */
     protected function _query(editor_Models_Segment $segment) {
         $serviceResult = null;
+        $isBatchRequest = $this->batchQuery && $this->adapter->isBatchQuery();
         //if the batch query is enabled, get the results from the cache
-        if($this->batchQuery && $this->adapter->isBatchQuery()){
+        if($isBatchRequest){
             $serviceResult = $this->getCachedResult($segment);
         }else{
             $serviceResult = $this->adapter->query($segment);
         }
         //log the MT ussage when there are mt results
         //Info: for loggin TM results, the result is logged only when the result is used (segment save/update , matchrate >=100)
-        if(!empty($serviceResult) && $this->isMtAdapter()){
-            $this->logAdapterUsage($segment, self::REQUEST_SOURCE_EDITOR);
+        //for batch query, the segments will be loged in the batch proccess
+        if(!$isBatchRequest && !empty($serviceResult) && $this->isMtAdapter()){
+            $this->logAdapterUsage($segment);
         }
+        
         $this->adapter->logForSegment($segment);
         return $serviceResult;
     }
@@ -163,7 +164,7 @@ class editor_Services_Connector {
         //log the instant translate results, when the adapter is of mt type or when the result set
         //contains result with matchrate >=100
         if(!empty($serviceResult) && ($this->isMtAdapter() || $serviceResult->has100PercentMatch())){
-            $this->logAdapterUsage($searchString, self::REQUEST_SOURCE_INSTANT_TRANSLATE);
+            $this->logAdapterUsage($searchString);
         }
         return $serviceResult;
     }

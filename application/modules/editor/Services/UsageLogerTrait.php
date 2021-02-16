@@ -50,52 +50,54 @@ trait editor_Services_UsageLogerTrait {
      * Log how many characters are used/translated from the current adapter request
      *
      * @param mixed $queryString
-     * @param string $requestSource
      */
-    public function logAdapterUsage($querySource,$requestSource){
+    public function logAdapterUsage($querySource){
         $mtlogger=ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
         /* @var $mtlogger editor_Models_LanguageResources_UsageLogger */
-        $mtlogger->setLanguageResourceId($this->adapter->getLanguageResource()->getId());
+        $mtlogger->setLanguageResourceId($this->getLanguageResource()->getId());
         $mtlogger->setSourceLang($this->sourceLang);
         $mtlogger->setTargetLang($this->targetLang);
         
         $logQueryString =$this->toLogQueryString($querySource);
         
         $mtlogger->setQueryString($logQueryString);
-        $mtlogger->setRequestSource($requestSource);
+        
         $mtlogger->setTranslatedCharacterCount($this->getCharacterCount($logQueryString));
         
-        //the request is triggered via editor, save the task customers as customers
-        if($requestSource==self::REQUEST_SOURCE_EDITOR){
+        //if the query source is segment, the context is for task
+        if($querySource instanceof editor_Models_Segment){
             
+            //set the request source to editor
+            $mtlogger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_EDITOR);
+            
+            //load the task for the current request
             if(!isset($this->taskFilePretranslate) || $this->taskFilePretranslate->getTaskGuid()!=$querySource->getTaskGuid()){
                 $this->taskFilePretranslate = ZfExtended_Factory::get('editor_Models_Task');
                 $this->taskFilePretranslate->loadByTaskGuid($querySource->getTaskGuid());
             }
             
-            //if it is instant-translate file pretranslation,set the requestSource to instant translate
-            //the log customers should be calculated via getInstantTranslateRequestSourceCustomers
+            //by default, set the customers to the task customer
+            $mtlogger->setCustomers($this->taskFilePretranslate->getCustomerId());
+            
+            //if the task type is file-pretranslation, we need to load the pre-translation task user, and calculate the customers
             if($this->taskFilePretranslate->getTaskType() == editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE){
-                
-                //set the current source to instant-transalte, and load the user from the current task pm.
-                $requestSource = self::REQUEST_SOURCE_INSTANT_TRANSLATE;
                 
                 if(!isset($this->userFilePretranslate) || $this->userFilePretranslate->getUserGuid() != $this->taskFilePretranslate->getPmGuid()){
                     //when file is being pretranslated in instant translate, the task pm is always the user who runs the pretranslation
                     $this->userFilePretranslate = ZfExtended_Factory::get('ZfExtended_Models_User');
                     $this->userFilePretranslate->loadByGuid($this->taskFilePretranslate->getPmGuid());
                 }
-                
-            }else{
-                //it is default task -> use the task customer
-                $mtlogger->setCustomers($this->taskFilePretranslate->getCustomerId());
+                //for instant translate, calculate the customers
+                $mtlogger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
+                //set the request source to instant-translate
+                $mtlogger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_INSTANT_TRANSLATE);
             }
-        }
-        //the request is triggered via instanttranslate, save the languageresource customers of user customers
-        if($requestSource==self::REQUEST_SOURCE_INSTANT_TRANSLATE){
+        }elseif(is_string($querySource)){//if the the querySource is string, the context is instant-translate (translate request)
+            //calculate the customers for the instant-translate request
             $mtlogger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
+            //set the request source to instant-translate
+            $mtlogger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_INSTANT_TRANSLATE);
         }
-        
         $mtlogger->save();
     }
     
@@ -116,7 +118,7 @@ trait editor_Services_UsageLogerTrait {
     protected function toLogQueryString($query){
         //if the query is segment, get the query string fron the segment
         if($query instanceof editor_Models_Segment){
-            $queryString=$this->adapter->getQueryString($query);
+            $queryString=$this->getQueryString($query);
             //remove all tags, since the mt engines are ignoring the tags
             return $query->stripTags($queryString);
         }
@@ -144,7 +146,7 @@ trait editor_Services_UsageLogerTrait {
         
         $la=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $la editor_Models_LanguageResources_CustomerAssoc */
-        $resourceCustomers=$la->loadByLanguageResourceId($this->adapter->getLanguageResource()->getId());
+        $resourceCustomers=$la->loadByLanguageResourceId($this->getLanguageResource()->getId());
         $resourceCustomers=array_column($resourceCustomers,'customerId');
         $return=array_intersect($userCustomers,$resourceCustomers);
         if(empty($return)){

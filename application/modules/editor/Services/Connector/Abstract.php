@@ -36,6 +36,9 @@ END LICENSE AND COPYRIGHT
  * Abstract Base Connector
  */
 abstract class editor_Services_Connector_Abstract {
+    
+    use editor_Services_UsageLogerTrait;
+    
     const STATUS_NOTCHECKED = 'notchecked';
     const STATUS_ERROR = 'error';
     const STATUS_AVAILABLE = 'available';
