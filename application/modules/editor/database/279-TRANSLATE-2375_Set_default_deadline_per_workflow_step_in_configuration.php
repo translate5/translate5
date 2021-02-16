@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
-//$this->doNotSavePhpForDebugging = false;
+$this->doNotSavePhpForDebugging = false;
 
 //should be not __FILE__ in the case of wanted restarts / renamings etc
 // and must not be a constant since in installation the same named constant would we defined multiple times then
@@ -50,9 +50,6 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-$db = Zend_Db_Table::getDefaultAdapter();
-// $res = $db->query("EXAMPLE");
-
 
 $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
 /* @var $wm editor_Workflow_Manager */
@@ -60,10 +57,38 @@ $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
 $stepToIgnode=['no workflow','workflowEnded'];
 $configs = [];
 foreach ($wm->getWorkflowData() as $workflow){
-    foreach ($workflow->stepChain as $step=>$label) {
+    foreach ($workflow->stepChain as $step) {
         if(!in_array($step, $stepToIgnode)){
-            $configs[] = $workflow->id.'.'.$step;
-            //TODO::
+            $configs[] = '.'.$workflow->id.'.'.$step.'.';
         }
     }
+}
+if(empty($configs)){
+    return;
+}
+$configs=array_map(function($item){
+    return 'runtimeOptions.workflow'.$item.'defaultDeadlineDate';
+}, $configs);
+
+
+foreach ($configs as $config){
+    $model = ZfExtended_Factory::get('editor_Models_Config');
+    /* @var $model editor_Models_Config */
+    $model->setConfirmed(1);
+    $model->setModule('editor');
+    $model->setCategory('workflow');
+    $model->setType('integer');
+    $model->setDescription('');
+    $model->setLevel(editor_Models_Config::CONFIG_LEVEL_TASKIMPORT);
+    $model->setDescription('The config defines, how many days the deadline should be in the future based on the order date');
+    $model->setGuiGroup('Workflow');
+    $model->setValue("");
+    $model->setDefault("");
+    $model->setDefaults("");
+    
+    $tmp = explode('.', str_replace(['runtimeOptions.workflow.','.defaultDeadlineDate'], '',$config ));
+    
+    $model->setGuiName('Default deadline date: workflow:'.$tmp[0].',step:'.$tmp[1]);
+    $model->setName($config);
+    $model->save();
 }

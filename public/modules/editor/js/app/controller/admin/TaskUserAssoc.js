@@ -297,7 +297,11 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           isChanged = stateCombo.getValue() != rec.get('state'),
           meta = task.getWorkflowMetaData(),
           initialStates = meta.initialStates[task.get('workflowStepName')];
+      
       stateCombo.store.clearFilter();
+      
+      me.calculateWorkflowStepDefaultDeadline(task,meta["roles2steps"][newValue]);
+      
       if(!rec.phantom || isChanged) {
           return;
       }
@@ -340,5 +344,30 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           value:tuaUsers,
           operator:'notin'
 	  }],true);
+  },
+  
+  /***
+   * Calculate the default deadline date for a workflow step.
+   */
+  calculateWorkflowStepDefaultDeadline:function(task,step){
+      debugger;
+      var me=this,
+        orderDate = task && task.get('orderdate');
+      
+      if(!orderDate || !step){
+          return null;
+      }
+      var workflow=task.get('workflow'),
+          configName = Ext.String.format('workflow.{0}.{1}.defaultDeadlineDate',workflow,step),
+          configValue = Editor.app.getTaskConfig(configName);
+      
+      if(!configValue){
+          return null;
+      }
+      
+      var add = Ext.Date.add(new Date(orderDate), Ext.Date.DAY, configValue),
+          deadlineDate = me.getUserAssocForm().getForm().findField('deadlineDate');
+      
+      deadlineDate && deadlineDate.setValue(add);
   }
 });
