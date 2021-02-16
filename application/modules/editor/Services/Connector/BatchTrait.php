@@ -147,6 +147,10 @@ trait editor_Services_Connector_BatchTrait {
             $this->logForSegment($query['segment']);
             
             $this->saveBatchResults($query['segment']->getId());
+
+            //log the adapter usage for the batch query segment
+            $this->logAdapterUsage($query['segment']);
+            
             $this->resultList->resetResult();
         }
     }
