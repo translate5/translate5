@@ -107,7 +107,7 @@ class editor_Models_LanguageResources_UsageLogger extends ZfExtended_Models_Enti
         $sql = "UPDATE `LEK_languageresources_usage_log` SET `customers` = replace(customers, ',?,', ',')";
         $this->db->getAdapter()->query($sql,$customerId);
         $this->db->delete([
-            'customers = ? OR customers="," ' => $customerId // Check for empty rows. The above query can leave single , as value
+            'customers = ? OR customers="," OR customers=",," ' => $customerId // Check for empty rows. The above query can leave single , as value
         ]);
         
     }
