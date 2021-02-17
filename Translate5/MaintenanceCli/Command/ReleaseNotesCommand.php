@@ -133,15 +133,13 @@ class ReleaseNotesCommand extends Translate5AbstractCommand
         if(!$this->io->confirm('Does the important release notes contain all API / GUI relevant changes?', false)) {
             return 0;
         }
-        if(!$this->io->confirm('Create the SQL and Update the change log (or modify them in JIRA again)?', false)) {
-            return 0;
+        if($this->io->confirm('Create the SQL and Update the change log (or modify them in JIRA again)?', false)) {
+            $this->createSql();
+            $this->updateChangeLog();
         }
-        $this->createSql();
-        $this->updateChangeLog();
-        
-        $this->io->note('Please modify the userGroup value in the generated SQL manually:
-basic: 1; editor: 2; pm: 4; admin: 8
-Example: for editor and pm (2+4): → 6');
+        if(!$this->releaseVersion->released) {
+            $this->io->note('Please release the version on URL https://jira.translate5.net/projects/TRANSLATE/versions/'.$this->releaseVersion->id);
+        }
         return 0;
     }
     
