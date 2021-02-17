@@ -139,7 +139,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      *
      * @see ZfExtended_Worker_Abstract::queue()
      */
-    public function queue($parentId = 0, $state = NULL) {
+    public function queue($parentId = 0, $state = NULL, $startNext = true) {
         $workerCountToStart = 0;
 
         $usedSlots = count($this->workerModel->getListSlotsCount(self::$resourceName));
