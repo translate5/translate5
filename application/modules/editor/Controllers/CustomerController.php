@@ -46,6 +46,17 @@ class Editor_CustomerController extends ZfExtended_RestController {
      */
     protected $entity;
     
+    public function init() {
+        parent::init();
+        //add context of valid export formats:
+        // currently: xliff2, importArchive, excel
+        $this->_helper->getHelper('contextSwitch')->addContext('importArchive', [
+            'headers' => [
+                'Content-Type'=> 'application/zip',
+            ]
+        ])->addActionContext('exportresource', 'importArchive')->initContext();
+    }
+    
     public function indexAction(){
         //check if the user is allowed to do customer administration
         if(!$this->isAllowed("backend","customerAdministration")){
@@ -106,10 +117,12 @@ class Editor_CustomerController extends ZfExtended_RestController {
             $this->setupTextExportResourcesLogData($customerId);
             return;
         }
-        
         $export = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageExporter');
         /* @var $export editor_Models_LanguageResources_UsageExporter */
-        $export->excel($customerId);
+        if($export->excel($customerId)){
+            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+            $this->view->result = $t->_("Es wurden keine Ergebnisse gefunden");
+        }
     }
     
     protected function decodePutData(){

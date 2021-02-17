@@ -547,6 +547,6 @@ Ext.define('Editor.view.admin.customer.Panel', {
         if(id){
             url=url+'?'+Ext.urlEncode({customerId: id});
         }
-        window.open(url); 
+        window.open(url+'?format=importArchive'); 
     }
 });
