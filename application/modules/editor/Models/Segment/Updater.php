@@ -249,6 +249,6 @@ class editor_Models_Segment_Updater {
         /* @var $manager editor_Services_Manager */
         $connector = $manager->getConnector($adapter,$this->task->getSourceLang(),$this->task->getTargetLang(),$this->task->getConfig());
         /* @var $connector editor_Services_Connector */
-        $connector->logAdapterUsage($this->segment, editor_Services_Connector::REQUEST_SOURCE_EDITOR);
+        $connector->logAdapterUsage($this->segment);
     }
 }

@@ -25,16 +25,29 @@
  
  END LICENSE AND COPYRIGHT
  */
+namespace Translate5\MaintenanceCli\Command;
 
-$translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-$youtubeUrl = $translate->_("{PreferencesYoutubeVideoGuideUrl}");
-//{PreferencesYoutubeVideoGuideUrl} and {PreferencesYoutubeVideoGuideDescriptionContent} are used as static source text for producing translatable content
-//in de/en .xliff files.
-//The content can be found in the de.xliff and en.xliff locales files for the default module.
-?>
-<iframe name="youtubevideoframe" width="100%" height="70%" src="<?php echo $youtubeUrl; ?>"
-frameborder="0"
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-allowfullscreen >
-</iframe>
-<?php echo $translate->_("{PreferencesYoutubeVideoGuideDescriptionContent}"); ?>
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+class MaintenanceDisableCommand extends MaintenanceCommand {
+    
+        // the name of the command (the part after "bin/console")
+    protected static $defaultName = 'maintenance:disable';
+    
+    protected function configure()
+    {
+        $this
+        // the short description shown while running "php bin/console list"
+        ->setDescription('Disable the maintenance mode.')
+        
+        // the full command description shown when running the command with
+        // the "--help" option
+        ->setHelp('Disable the maintenance mode, or removes a scheduled one.');
+    }
+    
+    protected function _execute() {
+        $this->mm->disable();
+    }
+}

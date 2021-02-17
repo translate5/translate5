@@ -65,20 +65,24 @@ class editor_Models_TaskUsageLog extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->db->fetchAll($s)->toArray();
     }
+    
     /***
-     * Update or increse the task count for the current entity.
-     * The unique key is: taskType, customerId and yearAndMonth
+     * Update or insert task count for the current entity.
+     * If the unique key is duplicated(taskType,customerId,sourceLang,targetLang ans yearAndMonth), 
+     * the row taskCount will be incremented by $taskCount
+     * @param float $taskCount
      */
-    public function updateInsertTaskCount() {
+    public function updateInsertTaskCount(float $taskCount = 1) {
         $sql = "INSERT INTO LEK_task_usage_log (taskType, sourceLang, targetLang, customerId, yearAndMonth,taskCount)
-                VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE taskCount=taskCount+1;";
+                VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE taskCount=taskCount+?;";
         $this->db->getAdapter()->query($sql,[
             $this->getTaskType(),
             $this->getSourceLang(),
             $this->getTargetLang(),
             $this->getCustomerId(),
             $this->getYearAndMonth(),
-            1
+            $taskCount,
+            $taskCount
         ]);
     }
 }

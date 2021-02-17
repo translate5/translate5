@@ -401,4 +401,30 @@ class editor_Models_Segment_AutoStates {
         $editAllTasks = $acl->isInAllowedRoles($userSession->data->roles, 'backend', 'editAllTasks');
         return empty($role) && ($editAllTasks || $sameUserGuid || $systemUser);
     }
+    
+    /***
+     * Get the required auto states for segment workflow step loading.
+     * This specific state is used for changedSegments loading in the workflow mails.
+     * @param bool $withPm: set to true to include the required pm autostates
+     * @return array
+     */
+    public function getForWorkflowStepLoading(bool $withPm = false)  {
+        //required autostates
+        //1 "Reviewed", 2 "Reviewed, auto-set", 8 "2. Review", 9 "2. Review, auto"
+        $autoStates = [
+            editor_Models_Segment_AutoStates::REVIEWED,
+            editor_Models_Segment_AutoStates::REVIEWED_AUTO,
+            editor_Models_Segment_AutoStates::REVIEWED_TRANSLATOR,
+            editor_Models_Segment_AutoStates::REVIEWED_TRANSLATOR_AUTO
+        ];
+        //if pmChanges is active, add additional required autostates
+        //10 PM reviewed,11 PM reviewed, auto-set
+        if($withPm){
+            $autoStates = array_merge($autoStates,[
+                editor_Models_Segment_AutoStates::REVIEWED_PM,
+                editor_Models_Segment_AutoStates::REVIEWED_PM_AUTO
+            ]);
+        }
+        return $autoStates;
+    }
 }
