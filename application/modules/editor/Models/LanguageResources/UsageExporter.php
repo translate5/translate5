@@ -30,6 +30,7 @@ class editor_Models_LanguageResources_UsageExporter{
     const MONTHLY_SUMMARY_BY_RESOURCE = 'MonthlySummaryByResource';
     const USAGE_LOG_BY_CUSTOMER = 'UsageLogByCustomer';
     const DOCUMENT_USAGE = 'DocumentUsage';
+    CONST CHUNKS_BUFFER =1000000;//number of log entries per excel file
     
     /***
      * 
@@ -76,6 +77,16 @@ class editor_Models_LanguageResources_UsageExporter{
     protected $name;
     
     /***
+     * Zip folder location
+     * @var string
+     */
+    protected $zipFolder;
+    
+    /***
+     * Zip file name
+     */
+    protected $zipName;
+    /***
      * 
      * @var integer
      */
@@ -96,9 +107,14 @@ class editor_Models_LanguageResources_UsageExporter{
         /* @var $customers editor_Models_Customer */
         $this->customers = $customers->loadAllKeyCustom('id');
         
+        $this->initExcelExport();
+    }
+    
+    /***
+     * Setup the excel export object, cell value callbacks and lables
+     */
+    protected function initExcelExport(){
         $this->excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
-        
-        $this->name = $this->translate->_("Ressourcen-Nutzung fuer alle Kunden");
         
         //set the spredsheet labels and translate the cell headers
         foreach ($this->labels as $label=>$text){
@@ -117,7 +133,7 @@ class editor_Models_LanguageResources_UsageExporter{
         $this->excel->setCallback('customerId',function($id) use ($customersArray){
             return $customersArray[$id]['name'];
         });
-        
+            
         //set callback for comma separated customers
         $this->excel->setCallback('customers',function($customerIds) use ($customersArray){
             $customerIds = explode(',', trim($customerIds,','));
@@ -133,42 +149,80 @@ class editor_Models_LanguageResources_UsageExporter{
      * Generate mt ussage log excel export. When no customer is provider, it will export the data for all customers.
      * 
      * @param int $customerId
+     * @return boolean
      */
-    public function excel(int $customerId=null) {
+    public function excel(int $customerId=null) :bool{
         
-        if(!empty($customerId)) {
-            $this->name = $this->translate->_("Ressourcen-Nutzung fuer Kunde").' '.$this->customers[$customerId]['name'];
-        }
-        // set property for export-filename
-        //add the timestump to the export file
-        $this->excel->setProperty('filename', $this->name.'_'.NOW_ISO);
-        
+        //load the export data
         $data = $this->getExportRawData($customerId);
         
-        $this->usageByMonth($data[self::MONTHLY_SUMMARY_BY_RESOURCE],$customerId);
-        $this->usageLog($data[self::USAGE_LOG_BY_CUSTOMER],$customerId);
-        $this->usageInDocuments($data[self::DOCUMENT_USAGE],$customerId);
-
-        $sp = $this->excel->getSpreadsheet();
-        
-        //this will adjust the cell size to fit the text
-        foreach ($sp->getWorksheetIterator() as $worksheet) {
-            
-            $sp->setActiveSheetIndex($sp->getIndex($worksheet));
-
-            $sheet = $sp->getActiveSheet();
-            $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(true);
-            
-            /** @var PHPExcel_Cell $cell */
-            foreach ($cellIterator as $cell) {
-                $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
-            }
+        if(empty($data)){
+            return false;
         }
-        $sp->setActiveSheetIndex(0);
-        $this->excel->sendDownload();
-    }
+        
+        //split the usage log by chunks. Each chunk is separate excel in the zip download
+        $chunks =array_chunk($data[self::USAGE_LOG_BY_CUSTOMER], self::CHUNKS_BUFFER);
+        $chunkIndex = 0;
+        
+        if(!empty($customerId)) {
+            $this->name =$this->translate->_("Ressourcen-Nutzung fuer Kunde").' '.$this->customers[$customerId]['name'];
+        }else{
+            $this->name =$this->translate->_("Ressourcen-Nutzung fuer alle Kunden");
+        }
+        
+        //if the export is splited in multiple excels, setup the export zip directory
+        if($hasChunks = count($chunks)>1){
+            $this->setupZip();
+        }
+        
+        foreach ($chunks as $chunk){
+            
+            $chunkIndex++;
 
+            //if we should generate more then 1 excel, add the part number to it
+            if($hasChunks){
+                if(!empty($customerId)) {
+                    $this->name =$this->translate->_("Ressourcen-Nutzung fuer Kunde").' '.$this->customers[$customerId]['name'];
+                }else{
+                    $this->name =$this->translate->_("Ressourcen-Nutzung fuer alle Kunden");
+                }
+                $this->name = $chunkIndex.'-'.$this->name;
+            }
+            
+            // set property for export-filename
+            //add the timestump to the export file
+            $this->excel->setProperty('filename', $this->name);
+            
+            $this->usageByMonth($data[self::MONTHLY_SUMMARY_BY_RESOURCE],$customerId);
+            $this->usageLog($chunk,$customerId);
+            $this->usageInDocuments($data[self::DOCUMENT_USAGE],$customerId);
+    
+            $sp = $this->excel->getSpreadsheet();
+            
+            //this will adjust the cell size to fit the text
+            $this->excel->autosizeColumns($sp);
+            
+            //set the first sheet as active on file open
+            $sp->setActiveSheetIndex(0);
+            //
+            if($hasChunks){
+                $this->excel->saveToDisc($this->zipFolder.$this->name.'.xlsx');
+            }else{
+                $this->excel->sendDownload();
+            }
+            $this->worksheetIndex = 0;
+            
+            //initialize the excel export data for another excel file
+            $this->initExcelExport();
+        }
+        //if it is chunk export, generate the zip and send it to download
+        if($hasChunks){
+            $this->downloadZip($this->zipName,$this->zipFolder);
+        }
+        
+        return true;
+    }
+    
     /***
      * Load all required export data
      * 
@@ -257,6 +311,72 @@ class editor_Models_LanguageResources_UsageExporter{
         }
         $this->excel->loadArrayData($data,$this->worksheetIndex);
         $this->worksheetIndex++;
+    }
+    
+    /***
+     * Setup zip folder for export.
+     * This will also set the zipName and zipFolder properties
+     */
+    protected function setupZip(){
+        //generate unique zip name
+        $this->zipName = $this->name.'_'.NOW_ISO.'.zip';
+        //create the directory where the excel chunks will be saved
+        $this->zipFolder=APPLICATION_PATH.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.$this->zipName.DIRECTORY_SEPARATOR;
+        is_dir($this->zipFolder) || mkdir($this->zipFolder);
+    }
+    
+    /***
+     * Generate the zip from chunk-export files and send the zip for download
+     * @param string $name
+     * @param string $path
+     * @throws ZfExtended_ErrorCodeException
+     */
+    protected function downloadZip(string $name,string $path){
+        $zip = new ZipArchive();
+        $finalZip = $path.$name;
+        $zipStatus = $zip->open($finalZip, ZIPARCHIVE::CREATE);
+        if (!$zipStatus) {
+            throw new editor_Models_LanguageResources_UsageExporterException('E1335',[
+                'path'=>$finalZip,
+                'errorCode' => $zipStatus
+            ]);
+        }
+        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($files as $file) {
+            //ignore dots
+            if( in_array(substr($file, strrpos($file, DIRECTORY_SEPARATOR)+1), array('.', '..'))) {
+                continue;
+            }
+            $zip->addFromString($file->getFileName(), file_get_contents(realpath($file)));
+        }
+        if(!$zip->close()) {
+            throw new editor_Models_LanguageResources_UsageExporterException('E1336',[
+                'path'=>$finalZip
+            ]);
+        }
+        header('Content-Type: application/zip', TRUE);
+        header('Content-Disposition: attachment; filename="'.$name.'"');
+        readfile($finalZip);
+        
+        //clean files
+        $this->cleanExportZip($path);
+    }
+    
+    /***
+     * Remove the all produced files from the disk
+     * @param string $path
+     */
+    protected function cleanExportZip(string $path){
+        $iterator = new DirectoryIterator($path);
+        foreach ($iterator as $fileinfo) {
+            if ($fileinfo->isDot()) {
+                continue;
+            }
+            if ($fileinfo->isFile()) {
+                unlink($path . $fileinfo->getFilename());
+            }
+        }
+        rmdir($path);
     }
     
     /***
