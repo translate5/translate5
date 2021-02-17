@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
  * @deprecated if using this trait add the usage to the following usage list for easier refactoring to above mentioned tag class
  *
 TagTrait usage:
-./application/modules/editor/PrivatePlugins/Enssner/Import/MiweXlsxFileparser.php:    use editor_Models_Import_FileParser_TagTrait;
+./application/modules/editor/PrivatePlugins/EnXXXX/Import/XXXXXlsxFileparser.php:    use editor_Models_Import_FileParser_TagTrait;
 protected $shortTagIdent = 1;
 _singleTag
 $this->initImageTags();
