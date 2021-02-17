@@ -53,7 +53,7 @@ class Models_Installer_Standalone {
      * Increase this value to force a restart of the updater while updating
      * @var integer
      */
-    const INSTALLER_VERSION = 13;
+    const INSTALLER_VERSION = 15;
     
     /**
      * @var string
@@ -221,12 +221,15 @@ class Models_Installer_Standalone {
     }
     
     protected function maintenanceMode() {
-        require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Maintenance.php';
-        //FIXME currently no possibility to set only the message (without a date) - which is possible in the GUI so far
-        $maintenance = new Models_Installer_Maintenance();
+        $this->initTranslate5CliBridge();
+        $this->log(PHP_EOL.'Deprecated - maintain maintenance via ./install-and-update.sh: see ./translate5.[sh|bat] list maintenance !');
         if(!empty($this->options['announceMaintenance'])) {
-            $maintenance->announce($this->options['announceMaintenance'], $this->options['announceMessage']);
-            //FIXME in future set the maintenance here too
+            $input = new Symfony\Component\Console\Input\ArrayInput([
+                'command' => 'maintenance:announce',
+                'timestamp' => $this->options['announceMaintenance'],
+                '--message' => $this->options['announceMessage'],
+            ]);
+            $this->cli->run($input);
             return;
         }
         switch ($this->options['maintenance']) {
@@ -235,15 +238,26 @@ class Models_Installer_Standalone {
             case 'Off':
             case 'OFF':
             case 'off':
-                $maintenance->disable();
+                $input = new Symfony\Component\Console\Input\ArrayInput([
+                    'command' => 'maintenance:disable',
+                ]);
+                $this->cli->run($input);
                 break;
             
             case 'show':
-                $maintenance->status();
+                $input = new Symfony\Component\Console\Input\ArrayInput([
+                    'command' => 'maintenance:status',
+                ]);
+                $this->cli->run($input);
                 break;
             
             default:
-                $maintenance->set($this->options['maintenance'], $this->options['announceMessage']);
+                $input = new Symfony\Component\Console\Input\ArrayInput([
+                'command' => 'maintenance:set',
+                'timestamp' => $this->options['maintenance'],
+                '--message' => $this->options['announceMessage'],
+                ]);
+                $this->cli->run($input);
         };
     }
     
@@ -257,10 +271,7 @@ class Models_Installer_Standalone {
     }
     
     protected function checkEnvironment() {
-        require_once $this->currentWorkingDir.'/vendor/autoload.php';
-        $this->cli = new Symfony\Component\Console\Application();
-        $this->cli->setAutoExit(false);
-        $this->cli->add(new Translate5\MaintenanceCli\Command\SystemCheckCommand());
+        $this->initTranslate5CliBridge();
         $input = new Symfony\Component\Console\Input\ArrayInput([
             'command' => 'system:check',
             '--pre-installation' => null,
@@ -268,6 +279,22 @@ class Models_Installer_Standalone {
         ]);
         $this->cli->run($input);
         $this->log('');
+    }
+    
+    protected function initTranslate5CliBridge()
+    {
+        if(!empty($this->cli)) {
+            return;
+        }
+        require_once $this->currentWorkingDir.'/vendor/autoload.php';
+        $this->cli = new Symfony\Component\Console\Application();
+        $this->cli->setAutoExit(false);
+        $this->cli->add(new Translate5\MaintenanceCli\Command\SystemCheckCommand());
+        $this->cli->add(new Translate5\MaintenanceCli\Command\DatabaseUpdateCommand());
+        $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceAnnounceCommand());
+        $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceSetCommand());
+        $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceDisableCommand());
+        $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceCommand());
     }
     
     protected function checkMyselfForUpdates() {
@@ -589,6 +616,7 @@ class Models_Installer_Standalone {
      * @return bool
      */
     protected function checkDb(): bool {
+        $this->initTranslate5CliBridge();
         $input = new Symfony\Component\Console\Input\ArrayInput([
             'command' => 'system:check',
             'module' => 'database',
@@ -602,28 +630,21 @@ class Models_Installer_Standalone {
      * Applies all DB alter statement files to the DB
      */
     protected function updateDb() {
-        $this->logSection('Updating Translate5 database scheme');
-        
         $changelog = ZfExtended_Factory::get('editor_Models_Changelog');
         /* @var $changelog editor_Models_Changelog */
         $beforeMaxChangeLogId = $changelog->getMaxId();
-        
-        $dbupdater = ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
-        /* @var $dbupdater ZfExtended_Models_Installer_DbUpdater */
-        $stat = $dbupdater->importAll();
+
+        $this->initTranslate5CliBridge();
+        $input = new Symfony\Component\Console\Input\ArrayInput([
+            'command' => 'database:update',
+            '-i' => null,
+        ]);
+        $this->cli->run($input);
         
         $newChangeLogEntries = $changelog->moreChangeLogs($beforeMaxChangeLogId, $changelog::ALL_GROUPS);
         $version = ZfExtended_Utils::getAppVersion();
         $changelog->updateVersion($beforeMaxChangeLogId, $version);
         $this->sendChangeLogs($newChangeLogEntries, $version);
-        
-        $errors = $dbupdater->getErrors();
-        if(!empty($errors)) {
-            $this->log("DB Update not OK\nErrors: \n".print_r($errors,1));
-            return;
-        }
-        
-        $this->log("DB Update OK\n  New statement files: ".$stat['new']."\n  Modified statement files: ".$stat['modified']."\n");
     }
     
     /**

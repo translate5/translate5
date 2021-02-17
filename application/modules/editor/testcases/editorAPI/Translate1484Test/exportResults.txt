@@ -1155,7 +1155,7 @@
         {
             "sourceLang": "de",
             "targetLang": "en",
-            "taskCount": "1"
+            "taskCount": "1.00"
         }
     ]
 }

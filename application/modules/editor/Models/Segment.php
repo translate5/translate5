@@ -1183,6 +1183,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $s->from($this->db, $fields);
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $task->getTaskGuid());
+        
+        $autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+        /* @var $autoStates editor_Models_Segment_AutoStates */
+        //get all required autostate ids
+        $autoStates = $autoStates->getForWorkflowStepLoading(in_array($pmChanges, [self::PM_ALL_INCLUDED,self::PM_SAME_STEP_INCLUDED]));
+        
+        $s->where($this->tableName.'.autoStateId IN(?)', $autoStates);
         switch ($pmChanges) {
             case self::PM_ALL_INCLUDED:
                 $s->where('('.$this->tableName.'.workflowStep = ?', $workflowStep);
