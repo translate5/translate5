@@ -652,6 +652,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param string $youngerAs optional, if omitted all proposals are loaded
      */
     public function loadProposalExportData(array $collectionIds, string $youngerAs = ''){
+        if(empty($collectionIds)){
+            return [];
+        }
         $adapter=$this->db->getAdapter();
         $bindParams = [];
         $termYoungerSql = $attrYoungerSql = '';
