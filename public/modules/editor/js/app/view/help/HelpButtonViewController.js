@@ -109,10 +109,10 @@ Ext.define('Editor.view.help.HelpButtonViewController', {
       Editor.data.helpSection = panel.helpSection || panel.xtype;
       Editor.data.helpSectionTitle = panel.getTitle();
       
-      var me=this,
-          isHelpButtonVisible=me.isHelpButtonVisible();
+      var me = this,
+          sectionConfig = Editor.data.frontend.helpWindow[Editor.data.helpSection];
       
-      if(!isHelpButtonVisible){
+      if(!sectionConfig || sectionConfig.loaderUrl === ""){
           //the button is not visible when there is not url defined for the section
           me.getView().setHidden(true);
           return;
@@ -136,14 +136,5 @@ Ext.define('Editor.view.help.HelpButtonViewController', {
       }
       
       me.showHelpWindow(helpWindowState.doNotShowAgain);
-  },
-  
-  /**
-   * The help button is visible when for the helpwindow there is loaderUrl configured
-   */
-  isHelpButtonVisible:function(){
-      var sectionConfig=Editor.data.frontend.helpWindow[Editor.data.helpSection];
-      return sectionConfig && sectionConfig.loaderUrl!=="";
   }
-  
 });
