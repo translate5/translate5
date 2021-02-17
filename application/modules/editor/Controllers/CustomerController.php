@@ -49,12 +49,12 @@ class Editor_CustomerController extends ZfExtended_RestController {
     public function init() {
         parent::init();
         //add context of valid export formats:
-        // currently: xliff2, importArchive, excel
-        $this->_helper->getHelper('contextSwitch')->addContext('importArchive', [
+        //resourceLogExport
+        $this->_helper->getHelper('contextSwitch')->addContext('resourceLogExport', [
             'headers' => [
                 'Content-Type'=> 'application/zip',
             ]
-        ])->addActionContext('exportresource', 'importArchive')->initContext();
+        ])->addActionContext('exportresource', 'resourceLogExport')->initContext();
     }
     
     public function indexAction(){
