@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -36,6 +36,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   models: ['admin.TaskUserAssoc','admin.Task','admin.task.UserPref'],
   stores: ['admin.Users', 'admin.TaskUserAssocs'],
   views: ['admin.task.PreferencesWindow','admin.task.UserAssocGrid'],
+  mixins:['Editor.util.Util'],
   refs : [{
       ref: 'assocDelBtn',
       selector: '#adminTaskUserAssocGrid #remove-user-btn'
@@ -113,7 +114,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
               click: me.handleCancel
           },
           'adminTaskUserAssoc #userSpecialPropertiesBtn':{
-        	  click:me.onUserSpecialPropertiesBtnClick
+              click:me.onUserSpecialPropertiesBtnClick
           },
           '#adminTaskUserAssocGrid #reload-btn': {
               click: me.reloadTaskUserAssocGrid
@@ -159,7 +160,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       //set the default role to translator when the task is translation task and
       //the workflow name is no workflow
       if(isTranslationTask && task.WORKFLOW_STEP_NO_WORKFLOW == task.get('workflowStepName')){
-    	  role=task.WORKFLOW_USER_ROLE_TRANSLATOR;
+          role=task.WORKFLOW_USER_ROLE_TRANSLATOR;
       }
       newRec = assoc.model.create({
           taskGuid: task.get('taskGuid'),
@@ -264,16 +265,16 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   
   reloadTaskUserAssocGrid:function(){
       var me = this,
-      	store = me.getUserAssocGrid().getStore();
+        store = me.getUserAssocGrid().getStore();
       store.load();
   },
   
   onUserSpecialPropertiesBtnClick:function(){
-	  var me=this,
-	  	preferences=Ext.create('Editor.view.admin.task.Preferences',{
-	  		task:me.getPrefWindow().getViewModel().get('currentTask')
-	  	});
-	  preferences.show();
+      var me=this,
+        preferences=Ext.create('Editor.view.admin.task.Preferences',{
+            task:me.getPrefWindow().getViewModel().get('currentTask')
+        });
+      preferences.show();
   },
   
   clearStores: function() {
@@ -300,7 +301,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       
       stateCombo.store.clearFilter();
       
-      me.calculateWorkflowStepDefaultDeadline(task,meta["roles2steps"][newValue]);
+      me.setWorkflowStepDefaultDeadline(task,meta["roles2steps"][newValue],rec);
       
       if(!rec.phantom || isChanged) {
           return;
@@ -325,13 +326,13 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
    * Filter the user combo store based on the selected user role. The user can be assigned only onece per role.
    */
   filterUserCombo:function(userRole){
-	  var me = this,
-	  	form = me.getUserAssocForm(),
-	  	userAssocGrid=me.getUserAssocGrid(),
-	  	usersCombo=form.down('combo[name="userGuid"]'),
-	  	tuaUsers=[];
-	  
-	  //collect all userGuids for the current role
+      var me = this,
+        form = me.getUserAssocForm(),
+        userAssocGrid=me.getUserAssocGrid(),
+        usersCombo=form.down('combo[name="userGuid"]'),
+        tuaUsers=[];
+      
+      //collect all userGuids for the current role
       userAssocGrid.getStore().each(function(rec){
           if(rec.get('role')==userRole){
             tuaUsers.push(rec.get('userGuid'));
@@ -340,34 +341,41 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       
       //filter out all current assoc users from the usersStore
       usersCombo.getStore().addFilter([{
-    	  property: 'userGuid',
+          property: 'userGuid',
           value:tuaUsers,
           operator:'notin'
-	  }],true);
+      }],true);
   },
   
   /***
-   * Calculate the default deadline date for a workflow step.
+   * Calculate and set the default deadline date from config and order date.
    */
-  calculateWorkflowStepDefaultDeadline:function(task,step){
-      debugger;
+  setWorkflowStepDefaultDeadline:function(task,step,record){
       var me=this,
+        form = me.getUserAssocForm() && me.getUserAssocForm().getForm(),
+        deadlineDate = form && form.findField('deadlineDate'),
+        recordDeadlineDate = record && record.get('deadlineDate'),//the record has deadlineDate
         orderDate = task && task.get('orderdate');
       
-      if(!orderDate || !step){
+      //if order date is not set, no calculation is required
+      //if there is no workflow step defined, no calculation is required
+      //if there is no deadlineDate form field, no calculation is required
+      //if the deadlineDate is already set, no calculation is required
+      if(!orderDate || !step || !deadlineDate || recordDeadlineDate){
           return null;
       }
       var workflow=task.get('workflow'),
           configName = Ext.String.format('workflow.{0}.{1}.defaultDeadlineDate',workflow,step),
-          configValue = Editor.app.getTaskConfig(configName);
+          days = Editor.app.getTaskConfig(configName);
       
-      if(!configValue){
+      if(!days){
           return null;
       }
       
-      var add = Ext.Date.add(new Date(orderDate), Ext.Date.DAY, configValue),
-          deadlineDate = me.getUserAssocForm().getForm().findField('deadlineDate');
-      
-      deadlineDate && deadlineDate.setValue(add);
+      deadlineDate.setValue(Editor.util.Util.addBusinessDays(new Date(orderDate), days));
+      //TODO: update the deadline time to now time and leave the date as it is.
+      //TODO: test it 
+      //update the timestapm to current time in the deadline date
+      deadlineDate.setTime(new Date().getTime());
   }
 });
