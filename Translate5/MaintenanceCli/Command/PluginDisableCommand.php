@@ -77,7 +77,7 @@ class PluginDisableCommand extends Translate5AbstractCommand
         }
         
         foreach($plugins as $plugin) {
-            if($pluginmanager->setActive($plugin, true)) {
+            if($pluginmanager->setActive($plugin, false)) {
                 $this->io->success('Deactivated plug-in '.$plugin);
             }
             else {

@@ -104,6 +104,8 @@ class editor_Models_Import_Worker_Import {
         
         $this->segmentFieldManager->initFields($this->task->getTaskGuid());
 
+        $this->events->trigger('beforeImportFiles', $this, ['task' => $task, 'importConfig' => $importConfig]);
+        
         //call import Methods:
         $this->importFiles();
         $this->syncFileOrder();
@@ -120,7 +122,7 @@ class editor_Models_Import_Worker_Import {
         $workflowManager->getByTask($this->task)->doImport($this->task, $importConfig);
         $workflowManager->initDefaultUserPrefs($this->task);
         
-        $this->events->trigger('importCleanup', $this, array('task' => $task, 'importConfig' => $importConfig));
+        $this->events->trigger('importCleanup', $this, ['task' => $task, 'importConfig' => $importConfig]);
     }
     
     /**
