@@ -53,7 +53,6 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
 
 $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
 /* @var $wm editor_Workflow_Manager */
-
 $stepToIgnode=['no workflow','workflowEnded'];
 $configs = [];
 foreach ($wm->getWorkflowData() as $workflow){
@@ -70,7 +69,12 @@ $configs=array_map(function($item){
     return 'runtimeOptions.workflow'.$item.'defaultDeadlineDate';
 }, $configs);
 
-
+//we do not transalte the zf configuration gui name etc..
+$labels = [
+    'translation'=>'Translation',
+    'reviewing'=>'Review',
+    'translatorCheck'=>'Second review',
+];
 foreach ($configs as $config){
     $model = ZfExtended_Factory::get('editor_Models_Config');
     /* @var $model editor_Models_Config */
@@ -87,8 +91,7 @@ foreach ($configs as $config){
     $model->setDefaults("");
     
     $tmp = explode('.', str_replace(['runtimeOptions.workflow.','.defaultDeadlineDate'], '',$config ));
-    
-    $model->setGuiName('Default deadline date: workflow:'.$tmp[0].',step:'.$tmp[1]);
+    $model->setGuiName('Default deadline date: workflow:'.$tmp[0].',step:'.$labels[$tmp[1]] ?? $tmp[1]);
     $model->setName($config);
     $model->save();
 }

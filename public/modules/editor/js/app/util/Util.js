@@ -46,16 +46,14 @@ Ext.define('Editor.util.Util', {
         * @param {Number} days The amount to add to the current date.
         * @return {Date} The new Date instance.
         */
-        //TODO: test me
         addBusinessDays:function(date,days){
-            var newDate;
             for(var i=1;i<=days;){
-                newDate = Ext.Date.add(date, Ext.Date.DAY, i);
-                if(!Ext.Date.isWeekend(newDate)){
+                date = Ext.Date.add(date, Ext.Date.DAY, 1);
+                if(!Ext.Date.isWeekend(date)){
                     i++;
                 }
             }
-            return newDate;
+            return date;
         }
     }
     
