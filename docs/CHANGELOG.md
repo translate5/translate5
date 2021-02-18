@@ -11,6 +11,61 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.1.1] - 2021-02-17
+
+### Important Notes:
+#### [TRANSLATE-2391](https://jira.translate5.net/browse/TRANSLATE-2391)
+The "Complete task?" text in the pop-up dialog was changed since it was confusing.
+
+#### [TRANSLATE-1484](https://jira.translate5.net/browse/TRANSLATE-1484)
+Attention: The numbers exported by this new feature are only collected from the point in time onwards, when translate5 is updated to the release with this feature.
+To configure log auto clean, define how many days the log should stay in the database in runtimeOptions.LanguageResources.usageLogger.logLifetime.
+ 
+
+
+### Added
+**[TRANSLATE-1484](https://jira.translate5.net/browse/TRANSLATE-1484): Count translated characters by MT engine and customer** <br>
+Enables language resources usage log and statistic export.
+
+
+### Changed
+**[TRANSLATE-2407](https://jira.translate5.net/browse/TRANSLATE-2407): Embed new configuration help window** <br>
+The brand-new help videos about the configuration possibilities are available now and embedded in the application as help pop-up.
+
+**[TRANSLATE-2402](https://jira.translate5.net/browse/TRANSLATE-2402): Remove rights for PMs to change instance defaults for configuration** <br>
+The PM will not longer be able to modify instance level configurations, only admin users may do that.
+
+**[TRANSLATE-2379](https://jira.translate5.net/browse/TRANSLATE-2379): Workflow mails: Show only changed segments** <br>
+Duplicating TRANSLATE-1979
+
+
+### Bugfixes
+**[TRANSLATE-2406](https://jira.translate5.net/browse/TRANSLATE-2406): Translated text is not replaced with translation but concatenated** <br>
+FIX: Solved problem where the Live editing did not remove the original text completely when replacing it with new contents
+
+**[TRANSLATE-2403](https://jira.translate5.net/browse/TRANSLATE-2403): Visual Review: Images are missing, the first Image is not shown in one Iframe** <br>
+FIX: A downloaded Website for the Visual Review may not show responsive images when they had a source set defined
+FIX: Elements with a background-image set by inline style in a downloaded website for the Visual Review may not show the background image
+FIX: Some images were not shown either in the original iframe or the WYSIWIG iframe in a Visual Review
+ENHANCEMENT: Focus-styles made the current page hard to see in the Visual Review pager 
+
+**[TRANSLATE-2401](https://jira.translate5.net/browse/TRANSLATE-2401): DeepL formality fallback** <br>
+Formality will be set to "default" for resources with unsupported target languages.
+
+**[TRANSLATE-2396](https://jira.translate5.net/browse/TRANSLATE-2396): Diverged GUI and Backend version after update** <br>
+The user gets an error message if the version of the GUI is older as the backend - which may happen after an update in certain circumstances. Normally this is handled due the usage of the maintenance mode.
+
+**[TRANSLATE-2391](https://jira.translate5.net/browse/TRANSLATE-2391): "Complete task?". Text in dialog box is confusing.** <br>
+The "Complete task?" text in the pop-up dialog was changed since it was confusing.
+
+**[TRANSLATE-2390](https://jira.translate5.net/browse/TRANSLATE-2390): TermImport plug-in matches TermCollection name to non-Termcollection-type languageresources** <br>
+The termImport plug-in imports a TBX into an existing termCollection, if the name is the same as the one specified in the plug-in config file. Although the language resource type was not checked, so this led to errors if the found language resource was not of type term collection.
+
+**[TRANSLATE-1979](https://jira.translate5.net/browse/TRANSLATE-1979): Do not list "changes" of translator in mail send after finish of translation step** <br>
+The changed segments will not longer be listed in the notification mails after translation step is finished - since all segments were changed here.
+
+
 ## [5.1.0] - 2021-02-02
 
 ### Important Notes:

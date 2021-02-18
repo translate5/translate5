@@ -170,6 +170,7 @@ class Models_Installer_Standalone {
             exit;
         }
         if(!empty($this->options['dbOnly'])) {
+            $this->log(PHP_EOL.'Deprecated - call via ./install-and-update.sh: see ./translate5.[sh|bat] list database !');
             $this->addZendToIncludePath();
             $this->initApplication();
             $this->checkDb();
@@ -204,19 +205,10 @@ class Models_Installer_Standalone {
         echo "  Arguments: \n";
         echo "    ZIPFILE                         Optional, updates the installation with the given release from the ZIP file.";
         echo "    --help                          shows this help text\n";
-        echo "    --database                      just applies all available database updates\n";
-        echo "                                    Does not fetch any updates and does not apply any file change!\n";
         echo "    --check                         shows some status information about the current installation,\n";
         echo "                                    to decide if maintenance mode is needed or not\n";
-        echo "    --maintenance                   shows maintance mode status\n";
-        echo "    --maintenance TIME              time in format 00:00, sets start of maintenance to TODAY TIME \n";
-        echo "    --maintenance TIME \"message\"  optionally a message can be provided \n";
-        echo "    --maintenance off               disables maintenance, must be used after maintenance since\n";
-        echo "                                    there is no automatic maintenance stop functionality!\n\n";
-        echo "    --announceMaintenance TIME \"message\"  Sends an email to specific users (by default the admin users)\n";
-        echo "                                    to announce the maintence mode at the given TIME with the additional MESSAGE.\n";
-        echo "                                    DOES NOT SET THE MAINTENANCE MODE SO FAR! Just sends the email.\n";
-        echo "                                    The group(s) of receivers can be set in the configuration.";
+        echo "\n\n";
+        echo "  For other maintenance tasks call ./translate5.[sh|bat] list! ";
         echo "\n\n";
     }
     
