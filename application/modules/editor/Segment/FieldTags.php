@@ -45,7 +45,12 @@ use PHPHtmlParser\Dom\Node\HtmlNode;
  * TODO/FIXME the prop "ttName" (representing the source field of the text in the datamodel) is used by the Termtagger only. Neccessary ??
  */
 class editor_Segment_FieldTags implements JsonSerializable {
-       
+    
+    /**
+     * Can be used to validate the unparsing-process. Use only for Development !!
+     * @var boolean
+     */
+    const VALIDATION_MODE = false;       
     /**
      * The counterpart to ::toJson: creates the tags from the serialized JSON data
      * @param string $jsonString
@@ -146,14 +151,16 @@ class editor_Segment_FieldTags implements JsonSerializable {
         } else {
             $this->fieldText = $fieldText;
         }
-        // TODO REMOVE
-        if($this->fieldText != strip_tags($fieldText)){
-            error_log('=======================================');
-            error_log('FAULTY FIELDTAGS FOR SEGMENT '.$this->segmentId.':');
-            error_log('IN:  '.str_replace(array("\r","\n","\t"), '', htmlspecialchars($fieldText)));
-            error_log('OUT: '.str_replace(array("\r","\n","\t"), '', htmlspecialchars($this->render())));
-            error_log('TAGS: '.$this->toJson());
-            error_log('=======================================');
+        // This debug can be used to evaluate the quality of the DOM parsing
+        if(self::VALIDATION_MODE && $this->fieldText != strip_tags($fieldText)){
+            error_log('=================== PARSED FIELD TEXT DID NOT MATCH PASSED HTML ===================='."\n");
+            error_log('FAULTY FIELDTAGS FOR SEGMENT '.$this->segmentId."\n");
+            error_log('RAW TEXT: '.strip_tags($fieldText)."\n");
+            error_log('FIELD TEXT: '.$this->fieldText."\n");
+            error_log('IN:  '.$fieldText."\n");
+            error_log('OUT: '.$this->render()."\n");
+            error_log('TAGS: '.$this->toJson()."\n");
+            error_log('======================================='."\n");
         }
     } 
     /**
@@ -176,6 +183,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     public function getFieldText() : string {
         return $this->fieldText;
+    }
+    /**
+     *
+     * @return string
+     */
+    public function getFieldTextLength() : int {
+        return mb_strlen($this->fieldText);
     }
     /**
      *
@@ -215,12 +229,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return string
      */
     public function setTagsByText(string $text){
-        // $textBefore = $this->fieldText;
+        $textBefore = $this->fieldText;
         $this->fieldText = '';
         $this->tags = [];
         $this->unparse($text);
-        /*
-        if(false && $this->fieldText != $textBefore){
+        if($this->fieldText != $textBefore){
             $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.fieldtags');
             $logger->warn(
                 'E9999',
@@ -228,14 +241,13 @@ class editor_Segment_FieldTags implements JsonSerializable {
                 ['segmentId' => $this->segmentId, 'textBefore' => $textBefore, 'textAfter' => $this->fieldText ]
             );
         }
-        */
     }
     /**
      *
      * @param editor_Segment_Tag $tag
      */
     public function addTag(editor_Segment_Tag $tag){
-        $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= mb_strlen($this->fieldText));
+        $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= $this->getFieldTextLength());
         $this->tags[] = $tag;
     }
     /**
@@ -392,12 +404,21 @@ class editor_Segment_FieldTags implements JsonSerializable {
                         $compare = $this->tags[$j];
                         // if the tag to compare overlaps we cut at the start-index
                         if($compare->startIndex < $tag->endIndex && $compare->endIndex > $tag->endIndex){
-                            $cut = $compare->startIndex;
-                            $last->endIndex = $cut;
-                            $last = $tag->clone(false);
-                            $last->startIndex = $cut;
-                            $rtags[$numRtags] = $last;
-                            $numRtags++;
+                            if($tag->isSplitable() || $compare->isSplitable()){
+                                // depending on who is splittable we set the cut
+                                $cut = ($tag->isSplitable()) ? $compare->startIndex : $tag->endIndex;
+                                $last->endIndex = $cut;
+                                $last = $tag->clone(false);
+                                $last->startIndex = $cut;
+                                $rtags[$numRtags] = $last;
+                                $numRtags++;
+                            } else {
+                                // this must not happen.// TODO FIXME: Add Code
+                                $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.tags');
+                                /* @var $logger ZfExtended_Logger */
+                                $logger->error('E9999', 'Two non-splittable tags interleave each other. Segment-ID: '.$this->segmentId);
+                                // we simply do not add the next tag which will not be rendered this way
+                            }
                         }
                     }
                 }
@@ -411,10 +432,21 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
         // now we create the nested data-model from the up to now sequential but sorted $rtags model. We also add the text-portions of the segment as text nodes
         // this container just acts as the master container 
-        $holder = new editor_Segment_AnyTag(0, mb_strlen($this->fieldText));
+        $holder = new editor_Segment_AnyTag(0, $this->getFieldTextLength());
         $container = $holder;
         foreach($rtags as $tag){
-            $container->getNearestContainer($tag)->addChild($tag);
+            $nearest = $container->getNearestContainer($tag);
+            // Will log rendering problems
+            if(self::VALIDATION_MODE && $nearest == null){
+                error_log("\n============== HOLDER =============\n");
+                error_log($holder->toJson());
+                error_log("\n============== CONTAINER =============\n");
+                error_log($container->toJson());
+                error_log("\n============== TAG =============\n");
+                error_log($tag->toJson());
+                error_log("\n========================================\n");
+             }
+            $nearest->addChild($tag);
             $container = $tag;
         }
         $holder->addSegmentText($this);
@@ -445,16 +477,16 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $dom = new editor_Utils_Dom();
             // to make things easier we add a wrapper to hold all tags and only use it's children
             $element = $dom->loadUnicodeElement('<div>'.$html.'</div>');
+            if(self::VALIDATION_MODE && substr($dom->saveHTML($element), 5, -6) != $html){
+                error_log("\n============== UNPARSED PHP DOM DOES NOT MATCH =============\n");
+                error_log(substr($dom->saveHTML($element), 5, -6));
+                error_log("\n========================================\n");
+                error_log($html);
+                error_log("\n========================================\n");
+            }
             if($element != NULL){
                 $wrapper = $this->fromDomElement($element, 0);
-                // set our field text
-                $this->fieldText = $wrapper->getText();
-                // sequence the nested tags as our children
-                $wrapper->sequenceChildren($this);
-                $this->consolidate();
-                // Crucial: finalize, set the tag-props
-                $this->addTagProps();
-            } else {
+             } else {
                 throw new Exception('Could not unparse Internal Tags from Markup '.$html);
             }
         } else {
@@ -465,14 +497,37 @@ class editor_Segment_FieldTags implements JsonSerializable {
             if($dom->countChildren() != 1){
                 throw new Exception('Could not unparse Internal Tags from Markup '.$html);
             }
+            if(self::VALIDATION_MODE &&  $dom->firstChild()->innerHtml() != $html){
+                error_log("\n============== UNPARSED HTML DOM DOES NOT MATCH =============\n");
+                error_log($dom->firstChild()->innerHtml());
+                error_log("\n========================================\n");
+                error_log($html);
+                error_log("\n========================================\n");
+            }
             $wrapper = $this->fromHtmlNode($dom->firstChild(), 0);
-            $this->fieldText = $wrapper->getText();
-            // sequence the nested tags as our children
-            $wrapper->sequenceChildren($this);
-            $this->consolidate();
-            // Crucial: finalize, set the tag-props
-            $this->addTagProps();
         }
+        // set our field text
+        $this->fieldText = $wrapper->getText();
+        if(self::VALIDATION_MODE){
+            if($wrapper->getTextLength() != $this->getFieldTextLength()){ error_log("\n##### WRAPPER TEXT LENGTH ".$wrapper->getTextLength()." DOES NOT MATCH FIELD TEXT LENGTH: ".$this->getFieldTextLength()." #####\n"); }
+            if($wrapper->endIndex != $this->getFieldTextLength()){ error_log("\n##### WRAPPER END INDEX ".$wrapper->endIndex." DOES NOT MATCH FIELD TEXT LENGTH: ".$this->getFieldTextLength()." #####\n"); }
+        }
+        // sequence the nested tags as our children
+        $wrapper->sequenceChildren($this);
+        if(self::VALIDATION_MODE){
+            $this->sort();
+            $length = $this->getFieldTextLength();
+            foreach($this->tags as $tag){
+                if($tag->endIndex > $length){
+                    error_log("\n============== SEGMENT TAG IS OUT OF BOUNDS (TEXT LENGTH: ".$length.") =============\n");
+                    error_log($tag->toJson());
+                    error_log("\n========================================\n");
+                }
+            }
+        }
+        $this->consolidate();
+        // Crucial: finalize, set the tag-props
+        $this->addTagProps();
     }
     /**
      * Creates a nested structure of Internal tags & text-nodes recursively out of a HtmlNode structure
@@ -484,12 +539,17 @@ class editor_Segment_FieldTags implements JsonSerializable {
         $tag = editor_Segment_TagCreator::instance()->fromHtmlNode($node, $startIndex);
         if($node->hasChildren()){
             foreach($node->getChildren() as $childNode){
-                if($childNode->isTextNode() && !empty($childNode->text())){
-                    $tag->addText($childNode->text());
+                if($childNode->isTextNode()){
+                    if($tag->addText($childNode->text())){
+                        $startIndex += $tag->getLastChild()->getTextLength();
+                    }
                 } else if(is_a($childNode, 'PHPHtmlParser\Dom\Node\HtmlNode')){
-                    $tag->addChild($this->fromHtmlNode($childNode, $startIndex));
+                    if($tag->addChild($this->fromHtmlNode($childNode, $startIndex))){
+                        $startIndex += $tag->getLastChild()->getTextLength();
+                    }
+                } else if(self::VALIDATION_MODE){
+                    error_log("\n##### FROM HTML NODE ADDS UNKNOWN NODE TYPE '".get_class($childNode)."' #####\n");
                 }
-                $startIndex += $tag->getLastChild()->getTextLength();
             }
         }
         $tag->endIndex = $startIndex;
@@ -509,11 +569,16 @@ class editor_Segment_FieldTags implements JsonSerializable {
             for($i = 0; $i < $element->childNodes->length; $i++){
                 $child = $element->childNodes->item($i);
                 if($child->nodeType == XML_TEXT_NODE){
-                    $tag->addText(editor_Tag::convertDOMText($child->nodeValue));
+                    if($tag->addText(editor_Tag::convertDOMText($child->nodeValue))){
+                        $startIndex += $tag->getLastChild()->getTextLength();
+                    }
                 } else if($child->nodeType == XML_ELEMENT_NODE){
-                    $tag->addChild($this->fromDomElement($child, $startIndex));
+                    if($tag->addChild($this->fromDomElement($child, $startIndex))){
+                        $startIndex += $tag->getLastChild()->getTextLength();
+                    }
+                } else if(self::VALIDATION_MODE){
+                    error_log("\n##### FROM DOM ELEMENT ADDS UNWANTED ELEMENT TYPE '".$child->nodeType."' #####\n");
                 }
-                $startIndex += $tag->getLastChild()->getTextLength();
             }
         }
         $tag->endIndex = $startIndex;
@@ -533,8 +598,8 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $tags[] = $last;
             for($i=1; $i < $numTags; $i++){
                 $tag = $this->tags[$i];
-                // TODO: me only must compare the type and make sure it's not the "ANY" type to make tags equal
-                if($tag->isEqualType($tag) && $tag->isEqual($last) && $last->endIndex == $tag->startIndex){
+                // we join only tasks that are splitable of course ...
+                if($last->isSplitable() && $tag->isSplitable() && $tag->isEqualType($last) && $tag->isEqual($last) && $last->endIndex == $tag->startIndex){
                     $last->endIndex = $tag->endIndex;
                 } else {
                     $last = $tag;
@@ -550,7 +615,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     private function addTagProps(){
         $num = count($this->tags);
-        $textLength = mb_strlen($this->fieldText);
+        $textLength = $this->getFieldTextLength();
         for($i=0; $i < $num; $i++){
             $this->tags[$i]->isFullLength = ($this->tags[$i]->startIndex == 0 && $this->tags[$i]->endIndex >= $textLength);
         }

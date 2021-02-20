@@ -102,6 +102,38 @@ class editor_Tag {
         return str_replace(['&quot;','&lt;','&gt;','&amp;'], ['"','<','>','&'], $text);
     }
     /**
+     * Enodes our attributes (hashtable) to a json-capable structure
+     * @param string[] $attribs
+     * @return array[][]
+     */
+    public static function encodeAttributes($attribs){
+        $data = [];
+        foreach($attribs as $key => $val){
+            $data[] = ['name' => $key, 'value' => $val];
+        }
+        return $data;
+    }
+    /**
+     * Decodes encoded attributes back to a hashtable
+     * @param stdClass[] $data
+     * return string[]
+     */
+    public static function decodeAttributes(array $data){
+        $attribs = [];
+        foreach($data as $ele){
+            $attribs[$ele->name] = $ele->value;
+        }
+        return $attribs;
+    }
+    /**
+     * Checks if a given text is a text worthy to create a node of
+     * @param string $text
+     * @return boolean
+     */
+    public static function isNodeText(string $text) : bool {
+        return ($text !== NULL && mb_strlen(strval($text)) > 0);
+    }
+    /**
      * creates the id-attribute for use in html-tags. Leading blank is added
      * @param string $id
      * @return string
@@ -272,6 +304,20 @@ class editor_Tag {
         return $text;
     }
     /**
+     * Creates a tag out of a data generated with editor_Tag::serialize
+     * This is a concurrent/simpler implementation to editor_Segment_Tag::fromJson. Do not mix up !
+     * @param stdClass $data
+     * @return editor_Tag
+     */
+    public static function fromObject(stdClass $data) : editor_Tag {
+        if($data->name == editor_TextNode::NODE_NAME){
+            return new editor_TextNode($data->text);
+        } else {
+            $tag = new editor_Tag($data->name);
+            return $tag->unserialize($data);
+        }
+    }
+    /**
      * Creates a editor_Tag out of a AbstractNode
      * @param HtmlNode $node
      * @return editor_Tag|NULL
@@ -380,29 +426,30 @@ class editor_Tag {
     /* child API */
     
     /**
-     * 
+     * Adds a child-node. Returns the success of the action
      * @param editor_Tag $child
      * @throws Exception
-     * @return editor_Tag
+     * @return boolean
      */
-    public function addChild(editor_Tag $child){
+    public function addChild(editor_Tag $child) : bool {
         if($this->isSingular()){
             throw new Exception('Singular Tags can not hold children!');
         }
         $child->setParent($this);
         $this->children[] = $child;
-        return $this;
+        return true;
     }
     /**
-     * Adds text to the tag, which will be encapsulated into an text-node
+     * Adds text to the tag, which will be encapsulated into an text-node.  Returns the success of the action
      * @param string $text
-     * @return editor_Tag
+     * @return boolean
      */
-    public function addText(string $text){
-        if(!empty($text)){
+    public function addText(string $text) : bool {
+        if(self::isNodeText($text)){
             $this->addChild(editor_Tag::createText($text));
+            return true;
         }
-        return $this;
+        return false;
     }
     /**
      * Retrieves the first child if there are any
@@ -803,7 +850,7 @@ class editor_Tag {
      * @return boolean
      */
     public function isEmpty() : bool {
-        return ($this->getName() == '' && $this->html == '');
+        return ($this->getName() == '' && count($this->children) == 0);
     }
     /**
      * Retrieves, if the tag is a sungular tag like <tag /> or a complete tag with opening and closing part
@@ -815,9 +862,11 @@ class editor_Tag {
     /**
      * Tags are seen as equal if they have the same node-name, the same classes & the same attributes apart from data-aatributes
      * The data-attributes and the children of the tag will not count for comparision
-     * @return boolean
+     * @param editor_Tag $tag
+     * @param bool $withDataAttribs
+     * @return bool
      */
-    public function isEqual(editor_Tag $tag) : bool {
+    public function isEqual(editor_Tag $tag, bool $withDataAttribs=true) : bool {
         if(!$this->hasEqualName($tag) || !$this->hasEqualClasses($tag)){
             return false;
         }
@@ -960,5 +1009,32 @@ class editor_Tag {
             return '';
         }
         return '</'.$this->getName().'>';
+    }
+    
+    /* serialization */
+    
+    /**
+     * Serializes a Tag to an object
+     * This is a concurrent/simpler implementation to editor_Segment_Tag::jsonSerialize. Do not mix up !
+     * @return stdClass
+     */
+    public function serialize() : stdClass {
+        $data = new stdClass();
+        $data->name = $this->name;
+        $data->classes = $this->classes;
+        $data->attribs = self::encodeAttributes($this->attribs);
+        return $data;
+    }
+    /**
+     * Recreates the tag from data derived by ::serialize
+     * This is a concurrent/simpler implementation to editor_Segment_Tag::jsonUnserialize. Do not mix up !
+     * @param stdClass $data
+     */
+    public function unserialize(stdClass $data){
+        $this->name = $data->name;
+        $this->classes = $data->classes;
+        $this->attribs = self::decodeAttributes($data->attribs);
+        $this->singular = in_array($data->name, self::$singularTypes);
+        return $this;
     }
 }

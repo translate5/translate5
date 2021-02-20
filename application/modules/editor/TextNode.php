@@ -43,6 +43,7 @@
  */
 final class editor_TextNode extends editor_Tag {
     
+    const NODE_NAME = '_TEXT_';
     /**
      * 
      * @var string
@@ -53,10 +54,10 @@ final class editor_TextNode extends editor_Tag {
      * @param string $text
      */
     public function __construct($text){
-        if(empty($text)){
+        if(!editor_Tag::isNodeText($text)){
             throw new Exception('A text-node must have a non-empty text');
         }
-        parent::__construct('TEXTNODE');
+        parent::__construct(self::NODE_NAME);
         $this->text = $text;
         $this->name = '';
         $this->singular = true;
@@ -74,8 +75,20 @@ final class editor_TextNode extends editor_Tag {
         return mb_strlen($this->text);
     }
     
-    public function addChild(editor_Tag $child){
+    public function addChild(editor_Tag $child) : bool {
         throw new Exception('Text nodes can not hold children!');
+    }
+    /**
+     * In contrast to a "normal" tags addText method this concatenates the given text to our text
+     * {@inheritDoc}
+     * @see editor_Tag::addText()
+     */
+    public function addText(string $text) : bool {
+        if(editor_Tag::isNodeText($text)){
+            $this->text .= $text;
+            return true;
+        }
+        return false;
     }
 
     public function addClass($classname) : editor_Tag {
@@ -94,11 +107,15 @@ final class editor_TextNode extends editor_Tag {
         throw new Exception('Text nodes can not have attributes');
     }
 
-    public function isEqual(editor_Tag $tag) : bool {
+    public function isEqual(editor_Tag $tag, bool $withDataAttribs=true) : bool {
         if(get_class($tag) == 'editor_TextNode' && $tag->getText() == $this->text){
             return true;
         }
         return false;
+    }
+    
+    public function isEmpty() : bool {
+        return empty($this->text);
     }
     /**
      * {@inheritDoc}
@@ -123,5 +140,19 @@ final class editor_TextNode extends editor_Tag {
 
     protected function renderEnd() : string {
         return '';
+    }
+    
+    /* serialization */
+
+    public function serialize() : stdClass {
+        $data = new stdClass();
+        $data->name = self::NODE_NAME;
+        $data->text = $this->text;
+        return $data;
+    }
+
+    public function unserialize(stdClass $data){
+        $this->text = $data->text;
+        return $this;
     }
 }
