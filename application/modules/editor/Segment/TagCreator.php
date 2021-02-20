@@ -108,10 +108,9 @@ final class editor_Segment_TagCreator {
      * NOTE: This API does not care about the children contained in the tag nor the text-length
      * @param HtmlNode $node
      * @param int $startIndex
-     * @param int $endIndex
      * @return editor_Segment_Tag
      */
-    public function fromHtmlNode(HtmlNode $node, int $startIndex=0, int $endIndex=0){
+    public function fromHtmlNode(HtmlNode $node, int $startIndex=0){
         $classNames = [];
         $attributes = [];
         $domTag = $node->getTag();
@@ -123,7 +122,7 @@ final class editor_Segment_TagCreator {
                 $attributes[$name] = $attrib->getValue();
             }
         }
-        $tag = $this->evaluate('', $domTag->name(), $classNames, $attributes, $startIndex, $endIndex);
+        $tag = $this->evaluate('', $domTag->name(), $classNames, $attributes, $startIndex);
         if(count($classNames) > 0){
             foreach($classNames as $cname){
                 $tag->addClass($cname);
@@ -142,10 +141,9 @@ final class editor_Segment_TagCreator {
      * see editor_Tag::USE_PHP_DOM
      * @param DOMElement $element
      * @param int $startIndex
-     * @param int $endIndex
      * @return editor_Segment_Tag
      */ 
-    public function fromDomElement(DOMElement $element, int $startIndex=0, int $endIndex=0){
+    public function fromDomElement(DOMElement $element, int $startIndex=0){
         $classNames = [];
         $attributes = [];
         if($element->hasAttributes()){
@@ -157,7 +155,7 @@ final class editor_Segment_TagCreator {
                 }
             }
         }
-        $tag = $this->evaluate('', $element->nodeName, $classNames, $attributes, $startIndex, $endIndex);
+        $tag = $this->evaluate('', $element->nodeName, $classNames, $attributes, $startIndex);
         if(count($classNames) > 0){
             foreach($classNames as $cname){
                 $tag->addClass($cname);
@@ -177,36 +175,35 @@ final class editor_Segment_TagCreator {
      * @param string[] $classNames
      * @param string[] $attributes
      * @param int $startIndex
-     * @param int $endIndex
      * @return editor_Segment_Tag
      */
-    private function evaluate(string $type, string $nodeName, array $classNames, array $attributes, int $startIndex, int $endIndex){
+    private function evaluate(string $type, string $nodeName, array $classNames, array $attributes, int $startIndex){
         
         // check for Internal tags. This must be done in any case since the Internal TagCheck (as quality provider) can be disabled via config
         if((editor_Segment_Internal_Tag::isType($type) || in_array(editor_Segment_Internal_Tag::CSS_CLASS, $classNames)) && editor_Segment_Internal_Tag::hasNodeName($nodeName)){
-            return new editor_Segment_Internal_Tag($startIndex, $endIndex);
+            return new editor_Segment_Internal_Tag($startIndex, $startIndex);
         }
         // check for TrackChanges tags
         if((editor_Segment_TrackChanges_InsertTag::isType($type) || in_array(editor_Segment_TrackChanges_InsertTag::CSS_CLASS, $classNames)) && editor_Segment_TrackChanges_InsertTag::hasNodeName($nodeName)){
-            return new editor_Segment_TrackChanges_InsertTag($startIndex, $endIndex);
+            return new editor_Segment_TrackChanges_InsertTag($startIndex, $startIndex);
         }
         if((editor_Segment_TrackChanges_DeleteTag::isType($type) || in_array(editor_Segment_TrackChanges_DeleteTag::CSS_CLASS, $classNames)) && editor_Segment_TrackChanges_DeleteTag::hasNodeName($nodeName)){
-            return new editor_Segment_TrackChanges_DeleteTag($startIndex, $endIndex);
+            return new editor_Segment_TrackChanges_DeleteTag($startIndex, $startIndex);
         }
         // let our providers find a tag
         foreach(static::$_provider as $type => $tagProvider){
             if($tagProvider->isSegmentTag($type, $nodeName, $classNames, $attributes)){
-                return $tagProvider->createSegmentTag($startIndex, $endIndex, $nodeName, $classNames);
+                return $tagProvider->createSegmentTag($startIndex, $startIndex, $nodeName, $classNames);
             }
         }
         if(self::$_quality_manager_enabled){
             // try to let the quality manager find a tag
-            $tag = editor_Segment_Quality_Manager::instance()->evaluateInternalTag($type, $nodeName, $classNames, $attributes, $startIndex, $endIndex);
+            $tag = editor_Segment_Quality_Manager::instance()->evaluateInternalTag($type, $nodeName, $classNames, $attributes, $startIndex, $startIndex);
             if($tag != null){
                 return $tag;
             }
         }
         // the default is the "any" tag
-        return new editor_Segment_AnyTag($startIndex, $endIndex, '', $nodeName);
+        return new editor_Segment_AnyTag($startIndex, $startIndex, '', $nodeName);
     }
 }

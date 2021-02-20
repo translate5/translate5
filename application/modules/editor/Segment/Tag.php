@@ -189,7 +189,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     public function getCategory() : string {
         return $this->category;
     }
-    
+
     public function jsonSerialize(){
         $data = new stdClass();
         $data->type = static::$type;
@@ -198,7 +198,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         $data->startIndex = $this->startIndex;
         $data->endIndex = $this->endIndex;
         $data->classes = $this->classes;
-        $data->attribs = $this->encodeAttribs();
+        $data->attribs = editor_Tag::encodeAttributes($this->attribs);
         $this->furtherSerialize($data);
         return $data;
     }
@@ -211,30 +211,8 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         $this->startIndex = $data->startIndex;
         $this->endIndex = $data->endIndex;
         $this->classes = $data->classes;
-        $this->attribs = $this->decodeAttribs($data->attribs);
+        $this->attribs = editor_Tag::decodeAttributes($data->attribs);
         $this->furtherUnserialize($data);
-    }
-    /**
-     * 
-     * @return array[][]
-     */
-    private function encodeAttribs(){
-        $data = [];
-        foreach($this->attribs as $key => $val){
-            $data[] = ['name' => $key, 'value' => $val];
-        }
-        return $data;
-    }
-    /**
-     * 
-     * @param stdClass[] $data
-     */
-    private function decodeAttribs(array $data){
-        $attribs = [];
-        foreach($data as $ele){
-            $attribs[$ele->name] = $ele->value;
-        }
-        return $attribs;
     }
     /**
      * Use in inheriting classes for further serialization
@@ -249,6 +227,24 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     protected function furtherUnserialize(stdClass $data){
         
+    }
+    /**
+     * Determines, if Internal tags are of an equal type
+     * {@inheritDoc}
+     * @see editor_Tag::isEqualType()
+     */
+    public function isEqualType(editor_Tag $tag) : bool {
+        if(is_a($tag, 'editor_Segment_Tag') && $tag->getType() == $this->getType()){
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Evaluates, if the tag can be splitted (interleaved with other tags. Apart from internal tags this is the case for all other tags
+     * @return bool
+     */
+    public function isSplitable() : bool {
+        return true;
     }
     /**
      * Checks, if this internal tag can contain the passed internal tag
@@ -288,6 +284,28 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return $this;
     }
     /**
+     * Adds us and all our children to the segment tags
+     * @param editor_Segment_FieldTags $tags
+     */
+    public function sequence(editor_Segment_FieldTags $tags){
+        $tags->addTag($this);
+        $this->sequenceChildren($tags);
+    }
+    /**
+     * Adds all our children to the segment tags
+     * @param editor_Segment_FieldTags $tags
+     */
+    public function sequenceChildren(editor_Segment_FieldTags $tags){
+        if($this->hasChildren()){
+            foreach($this->children as $child){
+                if(is_a($child, 'editor_Segment_Tag')){
+                    /* @var $child editor_Segment_Tag */
+                    $child->sequence($tags);
+                }
+            }
+        }
+    }
+    /**
      * After the nested structure of tags is set this fills in the text-chunks of the segments text
      * CRUCIAL: at this point only editor_Segment_Tag must be added as children !
      * @param editor_Segment_FieldTags $tags
@@ -317,38 +335,5 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
                 $this->addText($tags->getFieldTextPart($this->startIndex, $this->endIndex));
             }
         }
-    }
-    /**
-     * Adds us and all our children to the segment tags
-     * @param editor_Segment_FieldTags $tags
-     */
-    public function sequence(editor_Segment_FieldTags $tags){
-        $tags->addTag($this);
-        $this->sequenceChildren($tags);
-    }
-    /**
-     * Adds all our children to the segment tags
-     * @param editor_Segment_FieldTags $tags
-     */
-    public function sequenceChildren(editor_Segment_FieldTags $tags){
-        if($this->hasChildren()){
-            foreach($this->children as $child){
-                if(is_a($child, 'editor_Segment_Tag')){
-                    /* @var $child editor_Segment_Tag */
-                    $child->sequence($tags);
-                }
-            }
-        }
-    }
-    /**
-     * Determines, if Internal tags are of an equal type
-     * {@inheritDoc}
-     * @see editor_Tag::isEqualType()
-     */
-    public function isEqualType(editor_Tag $tag) : bool {
-        if(is_a($tag, 'editor_Segment_Tag') && $tag->getType() == $this->getType()){
-            return true;
-        }
-        return false;
     }
 }

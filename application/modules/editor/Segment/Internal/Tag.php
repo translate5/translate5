@@ -35,13 +35,121 @@
 /**
  * Represents an Internal tag
  * Example <div class="single 123 internal-tag ownttip"><span title="&lt;ph ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte, Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;" class="short">&lt;1/&gt;</span><span data-originalid="6f18ea87a8e0306f7c809cb4f06842eb" data-length="-1" class="full">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;</span></div>
- * TODO: we will need to add parsing capabilities & special rules for the content
+ * The inner Markup will be stored as a HTML-String to avoid having those structures in the holding FieldTags
+ * In the Future we may change that and store our inner HTML as Objects
  */
-class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
+final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
     
     const CSS_CLASS = 'internal-tag';
     
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
 
     protected static $nodeName = 'div';
+
+    /**
+     * 
+     * @var string
+     */
+    private $innerHTML = NULL;
+    /**
+     * Needed for cloneing
+     * @param string $html
+     */
+    protected function setInnerHTML($html){
+        $this->innerHTML = $html;
+    }
+    /**
+     * Needed for comparing
+     * @param string $html
+     */
+    protected function getInnerHTML($html){
+        return $this->innerHTML;
+    }
+    
+    
+    /* *************************************** Overwritten Tag API *************************************** */
+    
+    /**
+     * Internal tags must not be splitted nor joined !
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::isSplitable()
+     */
+    public function isSplitable() : bool {
+        return false;
+    }
+    /**
+     * Internal tags are only equal when their content is equal as well
+     * {@inheritDoc}
+     * @see editor_Tag::isEqual()
+     */
+    public function isEqual(editor_Tag $tag, bool $withDataAttribs=true) : bool {
+        if(parent::isEqual($tag, $withDataAttribs) && get_class($tag) == get_class($this)){
+            return $tag->getInnerHTML() == $this->innerHTML;
+        }
+        return false;
+    }
+    
+    public function getText(){
+        if($this->innerHTML !== null){
+            return strip_tags($this->innerHTML);
+        }
+        return parent::getText();
+    }
+    
+    public function getTextLength(){
+        if($this->innerHTML !== null){
+            return mb_strlen(strip_tags($this->innerHTML));
+        }
+        return parent::getTextLength();
+    }
+    /**
+     * This renders our inner HTML
+     * {@inheritDoc}
+     * @see editor_Tag::renderChildren()
+     */
+    public function renderChildren(array $skippedTypes=NULL) : string {
+        return $this->innerHTML;
+    }
+    /**
+     * We do not add children to th etags-container but we build our inner HTML in that case
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::sequenceChildren()
+     */
+    public function sequenceChildren(editor_Segment_FieldTags $tags){
+        $this->innerHTML = '';
+        if($this->hasChildren()){
+            foreach($this->children as $child){
+                $this->innerHTML .= $child->render();
+            }
+        }
+        $this->children = [];
+    }
+    /**
+     * Handled internally
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::addSegmentText()
+     */
+    public function addSegmentText(editor_Segment_FieldTags $tags){
+        if($this->startIndex < $this->endIndex){
+            $this->addText($tags->getFieldTextPart($this->startIndex, $this->endIndex));
+        }
+    }
+    
+    public function clone($withDataAttribs=false){
+        $clone = parent::clone($withDataAttribs);
+        /* @var $clone editor_Segment_Internal_Tag */
+        $clone->setInnerHTML($this->innerHTML);
+        return $clone;
+    }
+    
+    
+    protected function furtherSerialize(stdClass $data){
+        $data->innerHTML = $this->innerHTML;
+    }
+    
+    protected function furtherUnserialize(stdClass $data){
+        if(property_exists($data, 'innerHTML')){
+            $this->innerHTML = $data->innerHTML;
+        }
+    }
 }
