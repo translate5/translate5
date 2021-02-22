@@ -301,8 +301,6 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       
       stateCombo.store.clearFilter();
       
-      me.setWorkflowStepDefaultDeadline(task,meta["roles2steps"][newValue],rec);
-      
       if(!rec.phantom || isChanged) {
           return;
       }
@@ -349,6 +347,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
   
   /***
    * Calculate and set the default deadline date from config and order date.
+   * INFO: for now this is disabled
    */
   setWorkflowStepDefaultDeadline:function(task,step,record){
       var me=this,
@@ -366,16 +365,14 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
       }
       var workflow=task.get('workflow'),
           configName = Ext.String.format('workflow.{0}.{1}.defaultDeadlineDate',workflow,step),
-          days = Editor.app.getTaskConfig(configName);
+          days = Editor.app.getTaskConfig(configName),
+          newValue = null;
       
+      //calculate the new date if config exist
       if(!days){
-          return null;
+          newValue = Editor.util.Util.addBusinessDays(orderDate, days);
       }
       
-      deadlineDate.setValue(Editor.util.Util.addBusinessDays(new Date(orderDate), days));
-      //TODO: update the deadline time to now time and leave the date as it is.
-      //TODO: test it 
-      //update the timestapm to current time in the deadline date
-      deadlineDate.setTime(new Date().getTime());
+      deadlineDate.setValue(newValue);
   }
 });
