@@ -35,37 +35,118 @@
 /**
  * Represents an Internal tag
  * Example <div class="single 123 internal-tag ownttip"><span title="&lt;ph ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte, Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;" class="short">&lt;1/&gt;</span><span data-originalid="6f18ea87a8e0306f7c809cb4f06842eb" data-length="-1" class="full">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;</span></div>
- * The inner Markup will be stored as a HTML-String to avoid having those structures in the holding FieldTags
- * In the Future we may change that and store our inner HTML as Objects
+ * The inner Content Tags are stored as special Tags editor_Segment_Internal_ContentTag
  */
 final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
     
+    /**
+     * @var string
+     */
     const CSS_CLASS = 'internal-tag';
+    /**
+     * @var string
+     */
+    const CSS_CLASS_SINGLE = 'single';
+    /**
+     * @var string
+     */
+    const CSS_CLASS_OPEN = 'open';
+    /**
+     * @var string
+     */
+    const CSS_CLASS_CLOSE = 'close';
     
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
 
     protected static $nodeName = 'div';
-
     /**
      * 
-     * @var string
+     * @var editor_Segment_Internal_ContentTag[]
      */
-    private $innerHTML = NULL;
+    private $contentTags = NULL;
     /**
-     * Needed for cloneing
-     * @param string $html
+     * 
+     * @var editor_Segment_Internal_ContentTag
      */
-    protected function setInnerHTML($html){
-        $this->innerHTML = $html;
+    private $shortTag = NULL;
+    /**
+     *
+     * @var editor_Segment_Internal_ContentTag
+     */
+    private $fullTag = NULL;
+    /**
+     * API needed for cloning
+     * @param editor_Segment_Internal_ContentTag $tag
+     */
+    private function addContentTag(editor_Segment_Internal_ContentTag $tag){
+        if($this->contentTags === NULL){
+            $this->contentTags = [];
+        }
+        $this->contentTags[] = $tag;
+        if($tag->isShort()){
+            $this->shortTag = $tag;
+        } else if($tag->isFull()){
+            $this->fullTag = $tag;
+        }
     }
     /**
-     * Needed for comparing
-     * @param string $html
+     * Evaluates if we wrap/represent a single HTML Tag of the segments content
+     * @return boolean
      */
-    protected function getInnerHTML($html){
-        return $this->innerHTML;
+    public function isSingle(){
+        return $this->hasClass(self::CSS_CLASS_SINGLE);
     }
-    
+    /**
+     * Evaluates if we wrap/represent a opening HTML Tag of the segments content
+     * @return boolean
+     */
+    public function isOpening(){
+        return $this->hasClass(self::CSS_CLASS_OPEN);
+    }
+    /**
+     * Evaluates if we wrap/represent a closing HTML Tag of the segments content
+     * @return boolean
+     */
+    public function isClosing(){
+        return $this->hasClass(self::CSS_CLASS_CLOSE);
+    }
+    /**
+     * Retrieves the original index of the internal tag within the segment
+     * @return int
+     */
+    public function getTagIndex(){
+        if($this->shortTag != NULL){
+            return $this->shortTag->getTagIndex();
+        }
+        return -1;
+    }
+    /**
+     * 
+     * @return string|NULL
+     */
+    public function getOriginalId(){
+        if($this->fullTag != NULL && $this->fullTag->hasData('originalid')){
+            return $this->fullTag->getData('originalid');
+        }
+        return NULL;
+    }
+    /**
+     * 
+     * @return int
+     */
+    public function getContentLength(){
+        if($this->fullTag != NULL && $this->fullTag->hasData('length')){
+            return $this->fullTag->getData('length');
+        }
+        return 0;
+    }
+    /**
+     * Retrieves a hash that can be used to compare tags
+     * @return string
+     */
+    public function getHash(){
+        return md5($this->render());
+    }
     
     /* *************************************** Overwritten Tag API *************************************** */
     
@@ -84,23 +165,31 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      */
     public function isEqual(editor_Tag $tag, bool $withDataAttribs=true) : bool {
         if(parent::isEqual($tag, $withDataAttribs) && get_class($tag) == get_class($this)){
-            return $tag->getInnerHTML() == $this->innerHTML;
+            return $tag->renderChildren() == $this->renderChildren();
         }
         return false;
     }
     
     public function getText(){
-        if($this->innerHTML !== null){
-            return strip_tags($this->innerHTML);
+        if($this->contentTags === null){
+            return parent::getText();
         }
-        return parent::getText();
+        $text = '';
+        foreach($this->contentTags as $contentTag){
+            $text .= $contentTag->getText();
+        }
+        return $text;
     }
-    
+
     public function getTextLength(){
-        if($this->innerHTML !== null){
-            return mb_strlen(strip_tags($this->innerHTML));
+        if($this->contentTags === null){
+            return parent::getTextLength();
         }
-        return parent::getTextLength();
+        $length = 0;
+        foreach($this->contentTags as $contentTag){
+            $length += $contentTag->getTextLength();
+        }
+        return $length;
     }
     /**
      * This renders our inner HTML
@@ -108,21 +197,26 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
      * @see editor_Tag::renderChildren()
      */
     public function renderChildren(array $skippedTypes=NULL) : string {
-        return $this->innerHTML;
+        if($this->contentTags === null){
+            return parent::renderChildren($skippedTypes);
+        }
+        $html = '';
+        foreach($this->contentTags as $contentTag){
+            $html .= $contentTag->render();
+        }
+        return $html;
     }
     /**
-     * We do not add children to th etags-container but we build our inner HTML in that case
+     * We do not add children to the tags-container but we build our inner tags from the tags-structure
      * {@inheritDoc}
      * @see editor_Segment_Tag::sequenceChildren()
      */
     public function sequenceChildren(editor_Segment_FieldTags $tags){
-        $this->innerHTML = '';
         if($this->hasChildren()){
             foreach($this->children as $child){
-                $this->innerHTML .= $child->render();
+                $this->addContentTag(editor_Segment_Internal_ContentTag::fromTag($child));
             }
         }
-        $this->children = [];
     }
     /**
      * Handled internally
@@ -138,18 +232,24 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
     public function clone($withDataAttribs=false){
         $clone = parent::clone($withDataAttribs);
         /* @var $clone editor_Segment_Internal_Tag */
-        $clone->setInnerHTML($this->innerHTML);
+        foreach($this->contentTags as $contentTag){
+            $clone->addContentTag($contentTag->clone(true));
+        }
         return $clone;
     }
-    
-    
+
     protected function furtherSerialize(stdClass $data){
-        $data->innerHTML = $this->innerHTML;
+        $data->contentTags = [];
+        foreach($this->contentTags as $contentTag){
+            $data->contentTags[] = $contentTag->jsonSerialize();
+        }
     }
     
     protected function furtherUnserialize(stdClass $data){
-        if(property_exists($data, 'innerHTML')){
-            $this->innerHTML = $data->innerHTML;
+        if(property_exists($data, 'contentTags')){
+            foreach($data->contentTags as $data){
+                $this->addContentTag(editor_Segment_Internal_ContentTag::fromJsonData($data));
+            }
         }
     }
 }

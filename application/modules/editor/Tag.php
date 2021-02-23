@@ -696,6 +696,14 @@ class editor_Tag {
         return $this;
     }
     /**
+     * Retrieves the value of an data-attribute
+     * @param string $name
+     * @return string
+     */
+    public function getData($name){
+        return $this->getAttribute('data-'.$name);
+    }
+    /**
      * Sets an data-attribute with the given name to the given value. An existing data-attribute will be overwritten
      * @param string $name
      * @param string $val
@@ -708,12 +716,12 @@ class editor_Tag {
         return $this;
     }
     /**
-     * Retrieves the value of an data-attribute
+     * Checks if an data-attribute is set
      * @param string $name
-     * @return string
+     * @return boolean
      */
-    public function getData($name){
-        return $this->getAttribute('data-'.$name);
+    public function hasData($name){
+        return $this->hasAttribute('data-'.$name);
     }
     /**
      * Adds an Event-Handler to the tag. The handler-names are added the jquery-style without the "on", eg "click" or "change"
@@ -901,13 +909,22 @@ class editor_Tag {
         return ($tag->getName() == $this->getName());
     }
     /**
-     * Creates a clone of the tag. Does not copy/clone the children and if not specified otherwise does not copy data-attributes
+     * Creates a clone of the tag. Does not copy/clone the children and if not specified data-attributes
      * This is no deep-clone!
      * @param boolean $withDataAttribs
      * @return editor_Tag
      */
     public function clone($withDataAttribs=false){
         return $this->cloneProps($this->createBaseClone(), $withDataAttribs);
+    }
+    /**
+     * Clones our attributes & classes to a different tag-object
+     * @param editor_Tag $tag
+     * @param boolean $withDataAttribs
+     * @return editor_Tag
+     */
+    public function transferProps(editor_Tag $tag, $withDataAttribs=false){
+        return $this->cloneProps($tag, $withDataAttribs);
     }
     /**
      * Helper to create a basic cloned object (with empty props)
