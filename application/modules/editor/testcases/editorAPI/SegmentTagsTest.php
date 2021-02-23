@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Empty dummy test to test the surrounding test framework
+ * Several "classic" PHPUnit tests to check the OOP Tag-Parsing API againsted selected test data
  */
 class SegmentTagsTest extends \ZfExtended_Test_Testcase {
 

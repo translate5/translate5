@@ -974,7 +974,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function loadByTaskGuidFileId(string $taskGuid, int $fileId, $ignoreLocked=true){
         $s = $this->db->select()
             ->setIntegrityCheck(false)
-            ->from($this->tableName, array('id', 'segmentNrInTask', 'editable', 'pretrans'))
+            ->from($this->tableName, array('id', 'segmentNrInTask', 'editable'))
             ->where($this->tableName.'.taskGuid = ?', $taskGuid)
             ->where($this->tableName.'.fileId = ?', $fileId);
         if($ignoreLocked){

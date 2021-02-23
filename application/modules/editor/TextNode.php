@@ -115,7 +115,7 @@ final class editor_TextNode extends editor_Tag {
     }
     
     public function isEmpty() : bool {
-        return empty($this->text);
+        return ($this->text !== NULL && $this->text !== '');
     }
     /**
      * {@inheritDoc}
