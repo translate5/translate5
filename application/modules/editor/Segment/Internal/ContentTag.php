@@ -50,6 +50,11 @@ final class  editor_Segment_Internal_ContentTag extends editor_Tag implements Js
      */
     const CSS_CLASS_FULL = 'full';
     /**
+     * Extracts the tag-index (order of the tag within the original field) from the raw text
+     * @var string
+     */
+    const PATTERN_INDEX = '~&lt;/*([0-9]+)/*&gt;~';
+    /**
      * 
      * @param editor_Tag $tag
      * @return editor_Segment_Internal_ContentTag
@@ -92,10 +97,8 @@ final class  editor_Segment_Internal_ContentTag extends editor_Tag implements Js
     private function setInnerHTML(string $html) {
         $this->innerHTML = $html;
         if($this->isShort()){
-            // const REGEX_STARTTAG = '#^<div class="open.+class="short">&lt;([0-9]+)&gt;</span>.+</div>$#';
-            // const REGEX_ENDTAG = '#^<div class="close.+class="short">&lt;/([0-9]+)&gt;</span>.+</div>$#';
             $matches = array();
-            if(preg_match('~&lt;/*([0-9]+)&gt;~', $this->innerHTML, $matches)){
+            if(preg_match(self::PATTERN_INDEX, $this->innerHTML, $matches)){
                 $this->tagIndex = intval($matches[1]);
             }
         }

@@ -78,6 +78,9 @@ class editor_Segment_Internal_TagCheck extends editor_Segment_Quality_Provider {
             case editor_Segment_Internal_TagComparision::TAGS_MISSING:
                 return $translate->_('Internal tags are missing');
                 
+            case editor_Segment_Internal_TagComparision::TAGS_ADDED:
+                return $translate->_('Internal tags have been added');
+                
             case editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY:
                 return $translate->_('The internal tags have an incorrect structure');
         }
