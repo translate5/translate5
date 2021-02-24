@@ -311,10 +311,10 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         
         $realFile = $params['file'];
         $refFolder = $params['importFolder'].'/'.$import->referenceDirectory;
-        $reviewFolder = $params['importFolder'].'/'.$import->proofReadDirectory;
+        $workfilesDirectory = $params['importFolder'].'/'.editor_Models_Import_Configuration::getWorkfilesDirectoryName();
         
         //cut off review folder from realfile:
-        $relRealFile = str_replace('#'.realpath($reviewFolder), '', '#'.realpath($realFile));
+        $relRealFile = str_replace('#'.realpath($workfilesDirectory), '', '#'.realpath($realFile));
         $absRefFile = $refFolder.'/'.$relRealFile;
         $absRefDir = dirname($absRefFile);
         
