@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -32,4 +32,22 @@ END LICENSE AND COPYRIGHT
  */
 class editor_WorkerController extends ZfExtended_WorkerController {
     
+    public function putAction() {
+        try {
+            parent::putAction();
+        }
+        catch(ZfExtended_Models_MaintenanceException $e) {
+            $data = [
+                'worker' => $this->entity->getWorker(),
+            ];
+            if(!empty($this->entity->getTaskGuid())) {
+                $task = ZfExtended_Factory::get('editor_Models_Task');
+                /* @var $task editor_Models_Task */
+                $task->loadByTaskGuid($this->entity->getTaskGuid());
+                $data['task'] = $task;
+            }
+            
+            $this->log->error('E1074', 'Worker "{worker}" not started, maintenance is scheduled or in progress!', $data);
+        }
+    }
 }
