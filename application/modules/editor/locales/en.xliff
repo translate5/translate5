@@ -434,23 +434,27 @@
       </trans-unit>
       <trans-unit id='UE0gbGVrdG9yaWVydA=='>
         <source>PM lektoriert</source>
-	<target>PM reviewed</target>
+        <target>PM reviewed</target>
       </trans-unit>
       <trans-unit id='UE0gbGVrdG9yaWVydCwgYXV0bw=='>
         <source>PM lektoriert, auto</source>
-	<target>PM reviewed, auto-set</target>
+        <target>PM reviewed, auto-set</target>
       </trans-unit>
       <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0'>
         <source>PM lektoriert, unverändert</source>
-	<target>PM reviewed, unchanged</target>
+        <target>PM reviewed, unchanged</target>
       </trans-unit>
       <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv='>
         <source>PM lektoriert, unverändert, auto</source>
-	<target>PM reviewed, unchanged, auto-set</target>
+        <target>PM reviewed, unchanged, auto-set</target>
+      </trans-unit>
+      <trans-unit id='Vm9yw7xiZXJzZXR6dA=='>
+        <source>Vorübersetzt</source>
+        <target>Pre-translated</target>
       </trans-unit>
       <trans-unit id='UE0gUHLDvGZ1bmc='>
         <source>PM Prüfung</source>
-	<target>PM review</target>
+        <target>PM review</target>
       </trans-unit>
       <trans-unit id="QnVsZ2FyaXNjaA==">
         <source>Bulgarisch</source>
