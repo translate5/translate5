@@ -42,6 +42,10 @@ class editor_Segment_Internal_TagComparision {
     const TAGS_MISSING = 'internal_tags_missing';
     /**
      * @var string
+     */    
+    const TAGS_ADDED = 'internal_tags_added';
+    /**
+     * @var string
      */
     const TAG_STRUCTURE_FAULTY = 'internal_tag_structure_faulty';
     /**
@@ -103,11 +107,12 @@ class editor_Segment_Internal_TagComparision {
             for($i=0; $i < $this->numCheckTags; $i++){
                 if($checkHashes[$i] != $againstHashes[$i]){
                     $this->stati[] = self::TAGS_MISSING;
+                    $this->stati[] = self::TAGS_ADDED;
                     return;
                 }
             }
         } else {
-            $this->stati[] = self::TAGS_MISSING;
+            $this->stati[] = ($this->numCheckTags < $this->numAgainstTags) ? self::TAGS_MISSING : self::TAGS_ADDED;
         }
     }
     /**
@@ -146,16 +151,20 @@ class editor_Segment_Internal_TagComparision {
         if($start >= $this->numCheckTags){
             return false;
         }
-        for($i=$start; $i < $this->numCheckTags; $i++){
-            $numOpen = 0;
+        $numOpen = 0;
+        for($i=$start; $i < $this->numCheckTags; $i++){            
             if($this->checkTags[$i]->isClosing() && $this->checkTags[$i]->getTagIndex() == $tagIndex){
                 // we only are the "correct" closer if no other tags are open or closed (the value will be negative then)
                 // Note that we do not check the opened/closed tags for validity, this will be handled by the checks for those openers ...
-                return ($numOpen == 0);
+                return ($numOpen === 0);
             } else if($this->checkTags[$i]->isOpening()) {
                 $numOpen++;
             } else if($this->checkTags[$i]->isClosing()){
                 $numOpen--;
+                if($numOpen < 0){
+                    // as soon as we have an closing tag (no the one we are searching for) and no opening tag before this is a structural fault
+                    return false;
+                }
             }
         }
         // closer not found
