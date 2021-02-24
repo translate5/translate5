@@ -112,6 +112,16 @@ class editor_Models_Import_Configuration {
      */
     protected $usedLanguagetype;
     
+    
+    /***
+     * Return the workfilesDirectory config value. In the import package, the import files should be located 
+     * in folder with this name.
+     * @return string
+     */
+    public static function getWorkfilesDirectoryName(string $importFolder = '') {
+        return Zend_Registry::get('config')->runtimeOptions->import->workfilesDirectory;
+    }
+    
     /**
      * populates the language fields
      * @param mixed $source
@@ -167,9 +177,8 @@ class editor_Models_Import_Configuration {
      * @return string
      */
     public function getReviewDir() {
-        $config = Zend_Registry::get('config');
         $prefix = $this->importFolder;
-        $reviewDir = $config->runtimeOptions->import->proofReadDirectory;
+        $reviewDir = self::getWorkfilesDirectoryName();
         return $reviewDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$reviewDir; 
     }
     
@@ -243,6 +252,7 @@ class editor_Models_Import_Configuration {
             //The imported package did not contain any files in the review folder.
             throw new editor_Models_Import_ConfigurationException('E1040', $data);
         }
+        $this->warnImportDirDeprecated();
     }
     
     /**
@@ -259,5 +269,19 @@ class editor_Models_Import_Configuration {
     public function __sleep() {
         $this->sourceLang = $this->targetLang = $this->relaisLang = null;
         return array_keys(get_class_vars(get_class($this)));
+    }
+    
+    
+    /***
+     * Log a warning if the used work files directory is depricated
+     * TODO:(23.02.2021 TRANSLATE-1596) remove me after the depricated support for "proofRead" is removed
+     * @param string $importDir
+     */
+    protected function warnImportDirDeprecated() {
+        if(self::getWorkfilesDirectoryName() == 'proofRead'){
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.import.configuration');
+            /* @var $logger ZfExtended_Logger */
+            $logger->warn('E1338','IMPORTANT: The "proofRead" folder in the zip import package is deprecated from now on. In the future please always use the new folder "workfiles" instead. All files that need to be reviewed or translated will have to be placed in the new folder "workfiles" from now on. In some future version of translate5 the support for "proofRead" folder will be completely removed. Currently it still is supported, but will write a "deprecated" message to the php error-log.');
+        }
     }
 }

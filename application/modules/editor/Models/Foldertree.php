@@ -55,8 +55,7 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract {
   
   public function __construct() {
       parent::__construct();
-      $config = Zend_Registry::get('config');
-      $this->setPathPrefix($config->runtimeOptions->import->proofReadDirectory);
+      $this->setPathPrefix(editor_Models_Import_Configuration::getWorkfilesDirectoryName());
   }
   /**
    * @param string $prefix

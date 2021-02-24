@@ -262,10 +262,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
 
         if($child->relaisFileStatus == editor_Models_RelaisFoldertree::RELAIS_NOT_FOUND) {
             $config = Zend_Registry::get('config');
-            $review = '/'.trim($config->runtimeOptions->import->proofReadDirectory,'/').'/';
+            $workFiles = '/'.trim(editor_Models_Import_Configuration::getWorkfilesDirectoryName(),'/').'/';
             $relaisDirectory = '/'.trim($config->runtimeOptions->import->relaisDirectory,'/').'/';
             $fullpath = $fullpath.$suffix;
-            $bilingualSourceFile = str_replace($relaisDirectory, $review, $fullpath);
+            $bilingualSourceFile = str_replace($relaisDirectory, $workFiles, $fullpath);
 
             //check for manifest file, to ensure that the file was processed via Okapi:
             if(file_exists($fullpath) && file_exists($bilingualSourceFile) && $this->wasImportedWithOkapi($this->task, $child->id)) {

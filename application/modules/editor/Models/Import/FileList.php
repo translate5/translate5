@@ -155,8 +155,8 @@ class editor_Models_Import_FileList {
     public function hasReferenceFiles() {
         $config = Zend_Registry::get('config');
         //If no review directory is set, the reference files must be ignored  
-        $proofDir = $config->runtimeOptions->import->proofReadDirectory;
+        $workfilesDirectory = editor_Models_Import_Configuration::getWorkfilesDirectoryName();
         $refDir = $config->runtimeOptions->import->referenceDirectory;
-        return !empty($proofDir) && is_dir($this->importConfig->importFolder.DIRECTORY_SEPARATOR.$refDir);
+        return !empty($workfilesDirectory) && is_dir($this->importConfig->importFolder.DIRECTORY_SEPARATOR.$refDir);
     }
 }

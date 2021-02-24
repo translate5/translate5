@@ -38,7 +38,7 @@ class editor_Models_Import_UploadProcessor_ImportUpload extends editor_Models_Im
     protected $optional = false;
     
     public function __construct() {
-        $this->targetDirectory = Zend_Registry::get('config')->runtimeOptions->import->proofReadDirectory;
+        $this->targetDirectory = editor_Models_Import_Configuration::getWorkfilesDirectoryName();
     }
     
     /**
