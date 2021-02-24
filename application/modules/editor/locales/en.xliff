@@ -2102,7 +2102,7 @@ The task <b>{task.taskNr} - {task.taskName}</b> was opened for you in the task-p
 </trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgaXN0IHZvbGxzdMOkbmRpZyBiZWFyYmVpdGV0LCBlcyBzaW5kIGtlaW5lIHdlaXRlcmVuIEJlbnV0emVyIGRlciBBdWZnYWJlIHp1Z2VvcmRuZXQuPGJyIC8+CjxiciAvPgo='><source>Die Aufgabe ist vollständig bearbeitet, es sind keine weiteren Benutzer der Aufgabe zugeordnet.<br />
 <br />
-</source><target>The task ist completed, there are no more users associated with the task.<br />
+</source><target>The task is completed, there are no more users associated with the task.<br />
 <br />
 </target></trans-unit>
 <trans-unit id='RGllIFJvbGxlIDxpPntwcmV2aW91c1JvbGV9PC9pPiB3YXIgbmljaHQgVGVpbCBkZXIgV29ya2Zsb3drZXR0ZSwgZGFoZXIgd3VyZGVuIGtlaW5lIEJlbnV0emVyIGJlbmFjaHJpY2h0aWd0LjxiciAvPgo8YnIgLz4K'><source>Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />
