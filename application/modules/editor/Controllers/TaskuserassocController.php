@@ -401,14 +401,12 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     /***
      * Set the default deadline date from the config. How many work days the deadlinde date will be from the task
      * order date can be define in the system configuration.
-     * This is settable via tie api only if the user has api role.
+     * To use the defaultDeadline date, the deadlineDate field should be set to "default" 
      */
     protected function setDefaultDeadlineDate() {
-        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        
-        //check if the deadline date is already defined
-        if(!$userModel->hasRole('api') || isset($this->data->deadlineDate) || !isset($this->data->taskGuid)){
+        //check if default deadline date should be set
+        //To set the defaultDeadline date via the api, the deadlineDate field should be set to "default"
+        if(!isset($this->data->deadlineDate) || $this->data->deadlineDate!=="default" || !isset($this->data->taskGuid)){
             return;
         }
         $model = ZfExtended_Factory::get('editor_Models_Task');
