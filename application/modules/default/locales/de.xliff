@@ -272,7 +272,19 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
 </figure>
 </target></trans-unit>
 <trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IG1hdGNoIHRoZSBleHBlY3RlZCBzdHJ1Y3R1cmUgZm9yIGEgRE5TIGhvc3RuYW1l'><source>'%value%' does not match the expected structure for a DNS hostname</source><target>'%value%' does not match the expected structure for a DNS hostname</target></trans-unit>
-<trans-unit id='VGhlIHR3byBnaXZlbiB0b2tlbnMgZG8gbm90IG1hdGNo'><source>The two given tokens do not match</source><target>The two given tokens do not match</target></trans-unit>
+<trans-unit id='e1ByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVVcmx9'><source>{PreferencesYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/O2Z8wlzC-oo</target></trans-unit>
+<trans-unit id='e1ByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'><source>{PreferencesYoutubeVideoGuideDescriptionContent}</source><target><br/>
+<figure>
+    <figcaption><b>Übersicht:</b></figcaption>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=11&amp;autoplay=1" dir="auto">0:11</a> Systemkonfigurationen<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=83&amp;autoplay=1" dir="auto">1:23</a> Konfigurationen - Kunde<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=105&amp;autoplay=1" dir="auto">1:45</a> Konfigurationen - Aufgabe<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=127&amp;autoplay=1" dir="auto">2:07</a> Konfigurationen - Import<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=141&amp;autoplay=1" dir="auto">2:21</a> In-Context Schriften<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/O2Z8wlzC-oo?start=218&amp;autoplay=1" dir="auto">3:38</a> Kontaktinformationen<br/>
+</figure>
+</target></trans-unit>
   </body>
  </file>
 </xliff>

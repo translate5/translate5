@@ -247,6 +247,19 @@ If you did not send the request yourself, please inform us of this.
 </figure>
 </target>
 </trans-unit>
+<trans-unit id='e1ByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVVcmx9'><source>{PreferencesYoutubeVideoGuideUrl}</source><target>https://www.youtube.com/embed/MhbafT1KBhI</target></trans-unit>
+<trans-unit id='e1ByZWZlcmVuY2VzWW91dHViZVZpZGVvR3VpZGVEZXNjcmlwdGlvbkNvbnRlbnR9'><source>{PreferencesYoutubeVideoGuideDescriptionContent}</source><target><br/>
+<figure>
+    <figcaption><b>Übersicht:</b></figcaption>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/MhbafT1KBhI?start=0&amp;autoplay=1" dir="auto">0:00</a> Intro<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/MhbafT1KBhI?start=11&amp;autoplay=1" dir="auto">0:11</a> System configuration<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/MhbafT1KBhI?start=74&amp;autoplay=1" dir="auto">1:14</a> Configuration - Client<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/MhbafT1KBhI?start=97&amp;autoplay=1" dir="auto">1:37</a> Configuration - Task<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/MhbafT1KBhI?start=118&amp;autoplay=1" dir="auto">1:58</a> Configuration - Import<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/MhbafT1KBhI?start=133&amp;autoplay=1" dir="auto">2:13</a> In-Context Fonts<br/>
+      <a target="youtubevideoframe" href="https://www.youtube.com/embed/MhbafT1KBhI?start=202&amp;autoplay=1" dir="auto">3:22</a> Contactinformation<br/>
+</figure>
+</target></trans-unit>
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>

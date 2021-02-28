@@ -122,15 +122,20 @@ class editor_Services_Connector {
      */
     protected function _query(editor_Models_Segment $segment) {
         $serviceResult = null;
-        //if thje batch query is enabled, get the results from the cache
-        if($this->batchQuery && $this->adapter->isBatchQuery()){
+        $isBatchRequest = $this->batchQuery && $this->adapter->isBatchQuery();
+        //if the batch query is enabled, get the results from the cache
+        if($isBatchRequest){
             $serviceResult = $this->getCachedResult($segment);
+        }else{
+            $serviceResult = $this->adapter->query($segment);
         }
-        //if there is no service results, try the query
-        if(!empty($serviceResult)){
-            return $serviceResult;
+        //log the MT ussage when there are mt results
+        //Info: for loggin TM results, the result is logged only when the result is used (segment save/update , matchrate >=100)
+        //for batch query, the segments will be loged in the batch proccess
+        if(!$isBatchRequest && !empty($serviceResult) && $this->isMtAdapter()){
+            $this->logAdapterUsage($segment);
         }
-        $serviceResult = $this->adapter->query($segment);
+        
         $this->adapter->logForSegment($segment);
         return $serviceResult;
     }
@@ -154,7 +159,14 @@ class editor_Services_Connector {
      */
     protected function _translate(string $searchString){
         //instant translate calls are always with out tags
-        return $this->adapter->translate(trim(strip_tags($searchString)));
+        $searchString = trim(strip_tags($searchString));
+        $serviceResult = $this->adapter->translate($searchString);
+        //log the instant translate results, when the adapter is of mt type or when the result set
+        //contains result with matchrate >=100
+        if(!empty($serviceResult) && ($this->isMtAdapter() || $serviceResult->has100PercentMatch())){
+            $this->logAdapterUsage($searchString);
+        }
+        return $serviceResult;
     }
     
     /***
@@ -263,88 +275,15 @@ class editor_Services_Connector {
     public function disableBatch() {
         $this->batchQuery = false;
     }
-    
-//     /***
-//      * Log MT language resources ussage
-//      * @param mixed $queryString
-//      * @param string $requestSource
-//      */
-//     protected function logMtUsage($querySource,$requestSource){
-//         //use the logger only for MT resoruces
-//         if($this->adapter->getLanguageResource()->getResourceType()!=editor_Models_Segment_MatchRateType::TYPE_MT){
-//             return;
-//         }
-//         $mtlogger=ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageLogger');
-//         /* @var $mtlogger editor_Models_LanguageResources_MtUsageLogger */
-//         $mtlogger->setLanguageResourceId($this->adapter->getLanguageResource()->getId());
-//         $mtlogger->setSourceLang($this->sourceLang);
-//         $mtlogger->setTargetLang($this->targetLang);
-//         $mtlogger->setQueryString($this->getQueryString($querySource));
-//         $mtlogger->setRequestSource($requestSource);
-//         $mtlogger->setTranslatedCharacterCount($this->getCharacterCount($querySource));
-        
-//         //the request is triggered via editor, save the task customers as customers
-//         if($requestSource==self::REQUEST_SOURCE_EDITOR){
-//             $task=ZfExtended_Factory::get('editor_Models_Task');
-//             /* @var $task editor_Models_Task */
-//             $task->loadByTaskGuid($querySource->getTaskGuid());
-//             $mtlogger->setCustomers($task->getCustomerId());
-            
-//         }
-        
-//         //the request is triggered via instanttranslate, save the languageresource customers of user customers
-//         if($requestSource==self::REQUEST_SOURCE_INSTANT_TRANSLATE){
-//             $mtlogger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
-//         }
-        
-//         $mtlogger->save();
-//     }
-    
-//     /***
-//      * Count characters in the requested language resources query string/segment
-//      * @param mixed $query
-//      * @return integer
-//      */
-//     protected function getCharacterCount($query){
-//         return mb_strlen($this->getQueryString($query));
-//     }
-    
-//     /***
-//      * Get the query string and removes the tags from it
-//      */
-//     protected function getQueryString($query){
-//         if($query instanceof editor_Models_Segment){
-//             $queryString=$this->adapter->getQueryString($query);
-//             //remove all tags, since the mt engines are ignoring the tags
-//             $queryString=$query->stripTags($queryString);
-//             $query=$queryString;
-//         }
-//         return $query;
-//     }
-    
-//     /***
-//      * Get customers when InstantTranslate is used as request source.
-//      * The return value will be the intersection of the customers of the language resource and the customers of the current user
-//      * @return NULL|array
-//      */
-//     protected function getInstantTranslateRequestSourceCustomers(){
-//         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-//         /* @var $userModel ZfExtended_Models_User */
-//         $userCustomers=$userModel->getUserCustomersFromSession();
-        
-//         if(empty($userCustomers)){
-//             return null;
-//         }
-        
-//         $la=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-//         /* @var $la editor_Models_LanguageResources_CustomerAssoc */
-//         $resourceCustomers=$la->loadByLanguageResourceId($this->adapter->getLanguageResource()->getId());
-//         $resourceCustomers=array_column($resourceCustomers,'customerId');
-//         $return=array_intersect($userCustomers,$resourceCustomers);
-//         if(empty($return)){
-//             return null;
-//         }
-//         //return with leading and trailing comma so the customers are searchable
-//         return ','.implode(',', $return).',';
-//     }
+
+    /***
+     * Is the current adapter of mt type
+     * @return boolean
+     */
+    protected function isMtAdapter(){
+        if(!isset($this->adapter)){
+            return false;
+        }
+        return $this->adapter->getLanguageResource()->isMt();
+    }
 }

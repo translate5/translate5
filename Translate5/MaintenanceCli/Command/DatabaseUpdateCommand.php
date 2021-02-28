@@ -38,21 +38,6 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'database:update';
     
-    /**
-     * @var InputInterface
-     */
-    protected $input;
-    
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
-    
-    /**
-     * @var SymfonyStyle
-     */
-    protected $io;
-    
     protected function configure()
     {
         $this
@@ -133,19 +118,23 @@ class DatabaseUpdateCommand extends Translate5AbstractCommand
             return 1;
         }
         if($this->input->getOption('import')) {
-            $dbupdater->applyNew($toProcess);
+            $importedCount = $dbupdater->applyNew($toProcess);
             $dbupdater->updateModified($toProcess);
             $errors = $dbupdater->getErrors();
             if(!empty($errors)) {
                 $this->io->error($errors);
             }
-            if(!empty($newFiles)) {
+            if($importedCount > 0) {
                 if(empty($errors)) {
-                    $this->io->success('Imported '.count($newFiles).' files!');
+                    $this->io->success('Imported '.$importedCount.' files!');
                 }
                 else {
-                    $this->io->warning('Imported '.count($newFiles).' files with errors - check them!');
+                    $this->io->success('Imported '.$importedCount.' files successfully before the above error occured!');
                 }
+            }
+            $remaining = count($newFiles) - $importedCount;
+            if($remaining > 0) {
+                $this->io->warning('Remaining '.$remaining.' files to be imported. Fix errors first - call support if in doubt!');
             }
             if(!empty($modified)) {
                 $this->io->warning('Marked '.count($modified).' modified files as up to date - no SQL change was applied to the DB!');
