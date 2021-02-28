@@ -50,7 +50,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * Can be used to validate the unparsing-process. Use only for Development !!
      * @var boolean
      */
-    const VALIDATION_MODE = false;       
+    const VALIDATION_MODE = true;       
     /**
      * The counterpart to ::toJson: creates the tags from the serialized JSON data
      * @param string $jsonString
@@ -193,6 +193,20 @@ class editor_Segment_FieldTags implements JsonSerializable {
     }
     /**
      *
+     * @return bool
+     */
+    public function isFieldTextEmpty() : bool {
+        return mb_strlen($this->fieldText) == 0;
+    }
+    /**
+     * 
+     * @return bool
+     */
+    public function isEmpty() : bool {
+        return ($this->isFieldTextEmpty() && !$this->hasTags());
+    }
+    /**
+     *
      * @return string
      */
     public function getTermtaggerName() : string {
@@ -233,7 +247,9 @@ class editor_Segment_FieldTags implements JsonSerializable {
         $this->fieldText = '';
         $this->tags = [];
         $this->unparse($text);
+        // this checks if the new Tags may changed the text-content which must not happen during quality checks
         if($this->fieldText != $textBefore){
+            // TODO AUTOQA: add proper ERROR_CODE
             $logger = Zend_Registry::get('logger')->cloneMe('editor.segment.fieldtags');
             $logger->warn(
                 'E9999',
@@ -248,6 +264,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      */
     public function addTag(editor_Segment_Tag $tag){
         $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= $this->getFieldTextLength());
+        $tag->field = $this->field; // we transfer our field to the tag for easier handling of our segment-tags
         $this->tags[] = $tag;
     }
     /**
@@ -602,6 +619,17 @@ class editor_Segment_FieldTags implements JsonSerializable {
                 if($last->isSplitable() && $tag->isSplitable() && $tag->isEqualType($last) && $tag->isEqual($last) && $last->endIndex == $tag->startIndex){
                     $last->endIndex = $tag->endIndex;
                 } else {
+                    // when a tag is a paired opener we try to find it's counterpart
+                    if($tag->isPairedOpener() && $i < ($numTags - 1)){
+                        for($j = ($i + 1); $j < $numTags; $j++){
+                            // if we found the counterpart (the opener could pair it) this closer will be removed from our chain
+                            if($this->tags[$j]->isPairedCloser() && $tag->getType() == $this->tags[$j]->getType() && $tag->pairWith($this->tags[$j])){
+                                array_splice($this->tags, $j, 1);
+                                $numTags--;
+                                break;
+                            }
+                        }
+                    }
                     $last = $tag;
                     $last->resetChildren();
                     $tags[] = $last;
@@ -611,13 +639,14 @@ class editor_Segment_FieldTags implements JsonSerializable {
         }
     }
     /**
-     * Adds the 'isFullLength' prop to the tags, which are needed by consuming APIs
+     * Adds the 'isFullLength' and 'field' prop to the tags, which are needed by consuming APIs
      */
     private function addTagProps(){
         $num = count($this->tags);
         $textLength = $this->getFieldTextLength();
         for($i=0; $i < $num; $i++){
             $this->tags[$i]->isFullLength = ($this->tags[$i]->startIndex == 0 && $this->tags[$i]->endIndex >= $textLength);
+            $this->tags[$i]->field = $this->field;
         }
     }
 }

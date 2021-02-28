@@ -96,21 +96,27 @@ final class editor_Segment_Quality_Manager {
      */
     private function __construct(){
         $this->registry = [];
+        $config = Zend_Registry::get('config');
+        $qualityConfig = $config->runtimeOptions->autoQA;
         foreach(self::$_provider as $providerClass){
             try {
-                $provider = new $providerClass();
+                $provider = new $providerClass($qualityConfig);
                 /* @var $provider editor_Segment_Quality_Provider */
                 $this->registry[$provider->getType()] = $provider;
             } catch (Exception $e) {
                 throw new ZfExtended_Exception('Quality Provider '.$providerClass.' does not exist');
             }
         }
-        // Some Base Providers that does not come from Plugins and may be activated/deactivated by config flags
-        $config = Zend_Registry::get('config');
-        if($config->runtimeOptions->autoQA->enableInternalTagCheck){
-            $provider = new editor_Segment_Internal_TagCheck();
-            $this->registry[$provider->getType()] = $provider;
-        }
+        // Some Base Providers that do not come from Plugins
+        // Tag Check
+        $provider = new editor_Segment_Internal_TagCheck($qualityConfig);
+        $this->registry[$provider->getType()] = $provider;
+        // MatchRate
+        $provider = new editor_Segment_MatchRate_EditCheck($qualityConfig);
+        $this->registry[$provider->getType()] = $provider;
+        // MQM
+        $provider = new editor_Segment_ManualQuality_TagCheck($qualityConfig);
+        $this->registry[$provider->getType()] = $provider;
     }
     /**
      * 

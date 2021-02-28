@@ -26,7 +26,7 @@
 -- */
 
 INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES
-    ('editor_Segment_Quality_ImportWorker',  'editor_Models_Import_Worker'),
+	('editor_Segment_Quality_ImportWorker',  'editor_Models_Import_Worker'),
     ('editor_Segment_Quality_ImportFinishingWorker',  'editor_Segment_Quality_ImportWorker'),
     ('editor_Models_Import_Worker_SetTaskToOpen',  'editor_Segment_Quality_ImportFinishingWorker'),
     ('editor_Segment_Quality_ImportFinishingWorker',  'editor_Plugins_TermTagger_Worker_TermTaggerImport');
@@ -57,7 +57,7 @@ CREATE TABLE `LEK_segment_quality` (
   `startIndex` int(11) NOT NULL DEFAULT 0,
   `endIndex` int(11) NOT NULL DEFAULT -1,
   `falsePositive` int(1) NOT NULL DEFAULT 0,
-  `qmtype` int(11) NOT NULL DEFAULT -1,
+  `mqmType` int(11) NOT NULL DEFAULT -1,
   `severity` varchar(255) DEFAULT NULL,
   `comment` longtext DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -72,8 +72,13 @@ SELECT `segmentId`,  `taskGuid`, `fieldedited`, 'mqm', `qmtype`, `severity`, `co
 
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
-('runtimeOptions.autoQA.enableInternalTagCheck', 1, 'editor', 'system', '1', '1', '', 'boolean', 'If activated (default), AutoQA covers checking invalid internal tags', 8, 'Enable internal tag check', 'Editor: QA', '');
+('runtimeOptions.autoQA.enableInternalTagCheck', 1, 'editor', 'system', 1, 1, '', 'boolean', 'If activated (default), AutoQA covers checking invalid internal tags', 8, 'Enable internal tag integrity check', 'Editor: QA', '');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
+('runtimeOptions.autoQA.enableEdited100MatchCheck', 1, 'editor', 'system', 1, 1, '', 'boolean', 'If activated (default), AutoQA covers checking edited 100% matches', 8, 'Enable edited 100% match check', 'Editor: QA', '');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
+('runtimeOptions.autoQA.enableUneditedFuzzyMatchCheck', 1, 'editor', 'system', 1, 1, '', 'boolean', 'If activated (default), AutoQA covers checking not edited fuzzy matches', 8, 'Enable not edited fuzzy match check', 'Editor: QA', '');
 
 
--- TODO UNCOMMENT
+
+-- TODO AUTOQA UNCOMMENT
 -- DROP TABLE `LEK_qmsubsegments`;

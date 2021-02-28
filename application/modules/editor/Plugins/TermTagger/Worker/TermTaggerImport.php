@@ -302,22 +302,20 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
      * @param editor_Segment_Tags $tags
      */
     private function findAndAddQualitiesInTags(editor_Segment_Tags $tags){
-        $providerType = editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE;
-        $fields = $tags->getFieldsByTargetTagsTypeAndClass($providerType, editor_Models_Term::TRANSSTAT_NOT_FOUND);
-        if(count($fields) > 0){
-            $tags->addQuality($fields, $providerType, editor_Models_Term::TRANSSTAT_NOT_FOUND);
-        }
-        $fields = $tags->getFieldsByTargetTagsTypeAndClass($providerType, editor_Models_Term::TRANSSTAT_NOT_DEFINED);
-        if(count($fields) > 0){
-            $tags->addQuality($fields, $providerType, editor_Models_Term::TRANSSTAT_NOT_DEFINED);
-        }
-        $fields = $tags->getFieldsByTargetTagsTypeAndClass($providerType, editor_Models_Term::STAT_SUPERSEDED);
-        if(count($fields) > 0){
-            $tags->addQuality($fields, $providerType, editor_Models_Term::STAT_SUPERSEDED);
-        }
-        $fields = $tags->getFieldsByTargetTagsTypeAndClass($providerType, editor_Models_Term::STAT_DEPRECATED);
-        if(count($fields) > 0){
-            $tags->addQuality($fields, $providerType, editor_Models_Term::STAT_DEPRECATED);
+        
+        $type = editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE;
+        // these are the term states we want to see as qualities and which are also css-classes of the term-tags
+        $termStates = [ editor_Models_Term::STAT_SUPERSEDED, editor_Models_Term::STAT_DEPRECATED, editor_Models_Term::TRANSSTAT_NOT_FOUND, editor_Models_Term::TRANSSTAT_NOT_DEFINED ];
+        
+        foreach($tags->getTagsByType($type) as $termTag){
+            /* @var $termTag editor_Plugins_TermTagger_Tag */
+            foreach($termStates as $state){
+                if($termTag->hasClass($state)){
+                    $tags->addQuality($termTag->field, $type, $state, $termTag->startIndex, $termTag->endIndex);
+                    // we want only the most relevant problem by term
+                    break;
+                }
+            }
         }
     }
     /**
@@ -395,10 +393,10 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
             $source->setTagsByText($responseFields[$source->getTermtaggerName()]->source);            
         }
         foreach($tags->getTargets() as $target){ /* @var $target editor_Segment_FieldTags */
-            if($sourceText === null){
-                $sourceText = $target->getFieldText();
-            }
             $field = $target->getTermtaggerName();
+            if($sourceText === null){
+                $sourceText = $responseFields[$field]->source;
+            }
             if(!array_key_exists($field, $responseFields)){
                 // TODO FIXME: proper exception
                 throw new ZfExtended_Exception('Response of termtagger did not contain the field "'.$field.'" for the segment ID '.$tags->getSegmentId());

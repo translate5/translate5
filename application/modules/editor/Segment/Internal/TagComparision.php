@@ -119,6 +119,9 @@ class editor_Segment_Internal_TagComparision {
      * Checks if the structure of internal tags is correct, every opener has his corresponding closer without overlaps
      */
     private function checkStructure(){
+        if($this->numCheckTags == 0){
+            return;
+        }
         $numOpeners = 0;
         // check every opener if it has a corresponding closer with no overlaps inbetween
         for($i=0; $i < $this->numCheckTags; $i++){

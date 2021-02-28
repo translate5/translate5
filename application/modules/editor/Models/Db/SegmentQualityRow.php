@@ -39,7 +39,7 @@ END LICENSE AND COPYRIGHT
  * @property int $startIndex
  * @property int $endIndex
  * @property int $falsePositive
- * @property string $qmtype
+ * @property int $mqmType
  * @property string $severity
  * @property string $comment
  */

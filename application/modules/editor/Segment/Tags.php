@@ -103,7 +103,7 @@ class editor_Segment_Tags implements JsonSerializable {
      */
     private $targets;
     /**
-     *
+     * A read-only field that is only used as reference for some QA tests
      * @var editor_Segment_FieldTags[]
      */
     private $targetOriginal = null;
@@ -177,11 +177,10 @@ class editor_Segment_Tags implements JsonSerializable {
             // original source (what is the source in all other cases)
             $this->sourceOriginal = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $sourceField, 'SourceOriginal');
             // source here is the editable source
-            $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceFieldEditIndex, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
+            $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
         } else {
-            // in case of an import (not an
-            $saveTo = ($sourceEditingEnabled) ? [$sourceField, $sourceFieldEditIndex] : $sourceField;
             // on import with enabled source editing, we copy the source as editedSource as well
+            $saveTo = ($sourceEditingEnabled) ? [$sourceField, $sourceFieldEditIndex] : $sourceField;
             $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $saveTo, $sourceField);
         }
         $this->targets = [];
@@ -197,19 +196,19 @@ class editor_Segment_Tags implements JsonSerializable {
                         $this->targetOriginal = $target;
                         $this->targetOriginalIdx = count($this->targets);
                     }
-                    $target = new editor_Segment_FieldTags($this->segmentId, $editIndex, $this->segment->get($editIndex), $editIndex, $editIndex);
+                    $target = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($editIndex), $editIndex, $editIndex);
                     $this->targets[] = $target;
                 } else {
                     // when importing, the field will be saved as edit field & as normal field
                     $saveTo = ($this->editorMode) ? $editIndex : [$field->name, $editIndex];
                     // the field name sent to the termtagger differs between import and editing (WHY?)
                     $ttField = ($this->editorMode) ? $editIndex : $field->name;
-                    $target = new editor_Segment_FieldTags($this->segmentId, $editIndex, $this->segment->get($editIndex), $saveTo, $ttField);
+                    $target = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($editIndex), $saveTo, $ttField);
                     $this->targets[] = $target;
-                }
-                // the first target will be the original target as needed for some Quality checks
-                if($this->targetOriginal == null){
-                    $this->targetOriginal = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
+                    // the first target will be the original target as needed for some Quality checks
+                    if($this->targetOriginal == null){
+                        $this->targetOriginal = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
+                    }
                 }
             }
         }
@@ -281,6 +280,16 @@ class editor_Segment_Tags implements JsonSerializable {
      */
     public function getOriginalSource(){
         return $this->sourceOriginal;
+    }
+    /**
+     * Retrieves the original source in case of an editable source or the source otherwise
+     * @return editor_Segment_FieldTags
+     */
+    public function getOriginalOrNormalSource(){
+        if($this->hasOriginalSource()){
+            return $this->sourceOriginal;
+        }
+        return $this->source;
     }
     /**
      * 
@@ -370,34 +379,6 @@ class editor_Segment_Tags implements JsonSerializable {
         return false;
     }
     /**
-     * Checks if any target fields have one or more tags of the given type and classname
-     * @param string $type
-     * @param string $className
-     * @return bool
-     */
-    public function hasTargetTagsOfTypeAndClass(string $type, string $className) : bool {
-        foreach($this->targets as $fieldTags){
-            if($fieldTags->hasTypeAndClass($type, $className)){
-                return true;
-            }
-        }
-        return false;
-    }
-    /**
-     * Checks if any target fields have one or more tags of the given type having at least one of the given classnames
-     * @param string $type
-     * @param string[] $classNames
-     * @return bool
-     */
-    public function hasTargetTagsOfTypeAndClasses(string $type, array $classNames) : bool {
-        foreach($this->targets as $fieldTags){
-            if($fieldTags->hasTypeAndClasses($type, $classNames)){
-                return true;
-            }
-        }
-        return false;
-    }
-    /**
      * Retrieves the field names of any fields that have one or more tags of the given type and classname
      * @param string $type
      * @param string $className
@@ -407,36 +388,6 @@ class editor_Segment_Tags implements JsonSerializable {
         $fields = [];
         foreach($this->getFieldTags() as $fieldTags){
             if($fieldTags->hasTypeAndClass($type, $className)){
-                $fields[] = $fieldTags->getField();
-            }
-        }
-        return array_unique($fields);
-    }
-    /**
-     * Retrieves the field names of any target fields that have one or more tags of the given type and classname
-     * @param string $type
-     * @param string $className
-     * @return string[]
-     */
-    public function getFieldsByTargetTagsTypeAndClass(string $type, string $className) : array {
-        $fields = [];
-        foreach($this->targets as $fieldTags){
-            if($fieldTags->hasTypeAndClass($type, $className)){
-                $fields[] = $fieldTags->getField();
-            }
-        }
-        return array_unique($fields);
-    }
-    /**
-     * Retrieves the field names of any target fields that have one or more tags of the given type having at least one of the given classnames
-     * @param string $type
-     * @param string[] $classNames
-     * @return string[]
-     */
-    public function getFieldsByTargetTagsTypeAndClasses(string $type, array $classNames) : array {
-        $fields = [];
-        foreach($this->targets as $fieldTags){
-            if($fieldTags->hasTypeAndClasses($type, $classNames)){
                 $fields[] = $fieldTags->getField();
             }
         }
@@ -467,7 +418,7 @@ class editor_Segment_Tags implements JsonSerializable {
     /* SegmentQuality API */
     
     /**
-     * Adds a quality to the tags (segment-qulity model)
+     * Adds a general quality to the tags (segment-quality model)
      * Note, that the qualities will be saved seperately from the tags-model and is NOT serialized
      * This also means, that during the import-process, the quality-entries will be written before the tags are written AFTER the import
      * @param string[]|string $fields
@@ -481,12 +432,64 @@ class editor_Segment_Tags implements JsonSerializable {
         /* @var $row editor_Models_Db_SegmentQualityRow */
         $row->segmentId = $this->segmentId;
         $row->taskGuid = $this->task->getTaskGuid();
-        $row->setFields($fields);
+        if(is_array($fields)){
+            $row->setFields(array_unique($fields));
+        } else {
+            $row->setField($fields);
+        }
         $row->type = $type;
         $row->category = $category;
         $row->startIndex = $startIndex;
         $row->endIndex = $endIndex;
+        $row->falsePositive = 0; // TODO AUTOQA: this means, when we re-set qualities a former existing false positive flag will not persist
+        $row->mqmType = -1;
+        $row->severity = NULL;
+        $row->comment = NULL;
         $this->qualities[] = $row;
+    }
+    /**
+     * Adds a quality to the tags (segment-quality model) for all target fields
+     * @param string $type
+     * @param string $category
+     */
+    public function addAllTargetsQuality(string $type, string $category) {
+        $this->addQuality($this->getAllTargetFields(), $type, $category);
+    }
+    /**
+     * Adds a MQM Quality to the tags (segment-quality model)
+     * @param string $field
+     * @param int $typeIndex
+     * @param string $severity
+     * @param string $comment
+     * @param int $startIndex
+     * @param int $endIndex
+     */
+    public function addManualQuality(string $field, int $typeIndex, string $severity, string $comment, int $startIndex=0, int $endIndex=-1) {
+        $row = $this->getQualityTable()->createRow();
+        /* @var $row editor_Models_Db_SegmentQualityRow */
+        $row->segmentId = $this->segmentId;
+        $row->taskGuid = $this->task->getTaskGuid();
+        $row->setField($field);
+        $row->type = editor_Segment_Tag::TYPE_MANUALQUALITY;
+        $row->category = NULL;
+        $row->startIndex = $startIndex;
+        $row->endIndex = $endIndex;
+        $row->falsePositive = 0; // TODO AUTOQA: this means, when we re-set qualities a former existing false positive flag will not persist
+        $row->mqmType = $typeIndex;
+        $row->severity = $severity;
+        $row->comment = $comment;
+        $this->qualities[] = $row;
+    }
+    /**
+     * Returnes the names of all our target fields
+     * @return array
+     */
+    private function getAllTargetFields(){
+        $fields = array();
+        foreach($this->getTargets() as $target){
+            $fields[] = $target->getField();
+        }
+        return array_unique($fields);
     }
     /**
      * 

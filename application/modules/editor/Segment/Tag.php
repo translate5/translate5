@@ -56,6 +56,10 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     /**
      * @var string
      */
+    const TYPE_MANUALQUALITY = 'mqm';
+    /**
+     * @var string
+     */
     const TYPE_ANY = 'any';
     /**
      * The counterpart to ::toJson: creates the tag from the serialized json data
@@ -114,6 +118,12 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @var bool
      */
     public $isFullLength;
+    /**
+     * References the field the Tag belongs to
+     * This property is only set, if the tag is part of a FieldTags container and will not be serialized  !
+     * @var string
+     */
+    public $field = null;
     /**
      * The category of tag we have, a further specification of type
      * might not be used by all internal tags
@@ -245,6 +255,29 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public function isSplitable() : bool {
         return true;
+    }
+    /**
+     * Some Internal Tags are IMG-tags that are paired (parted into an opening and closing tag represented by images)
+     * These tags will be joined to one tag in the consolidation process
+     * @return bool
+     */
+    public function isPairedOpener() : bool {
+        return false;
+    }
+    /**
+     * 
+     * @return bool
+     */
+    public function isPairedCloser() : bool {
+        return false;
+    }
+    /**
+     * In the process of joining paired tags this API will be used. The passed tag will be removed when true is returned
+     * @param editor_Segment_Tag $tag
+     * @return bool
+     */
+    public function pairWith(editor_Segment_Tag $tag) : bool {
+        return false;
     }
     /**
      * Checks, if this internal tag can contain the passed internal tag
