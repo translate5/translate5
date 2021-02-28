@@ -33,64 +33,58 @@
  */
 
 /**
- * Checks Internal tags in the edited Segments for validity (all tags present, structure correct (closing tags following opening tags without interleaves)
- *
+ * TODO ANNOTATE
+ * enableUneditedFuzzyMatchCheck
+ * enableEdited100MatchCheck
  */
-class editor_Segment_Internal_TagCheck extends editor_Segment_Quality_Provider {
-
+class editor_Segment_MatchRate_EditCheck extends editor_Segment_Quality_Provider {
+    
+    /**
+     * @var string
+     */
+    const EDITED_100PERCENT_MATCH = 'edited_100percent_match';
+    /**
+     * @var string
+     */
+    const UNEDITED_FUZZY_MATCH = 'unedited_fuzzy_match';
     /**
      * Using the internal tag type
      * @var string
      */
-    protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
+    protected static $type = 'matchrate';
     
     public function processSegment(editor_Models_Task $task, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
         
-        if(!$this->config->enableInternalTagCheck || $forImport){
+        if((!$this->config->enableUneditedFuzzyMatchCheck && !$this->config->enableEdited100MatchCheck) || ($forImport && !$this->config->enableUneditedFuzzyMatchCheck)){
             return $tags;
         }
-        // 1) Tag check: Bei Translation: Internal Tags gegen Source prüfen, bei Review: gegen original Target  (insofern gesetzt)          
-        $isTranslationTask = $task->getEmptyTargets();
-        $against = $tags->getOriginalOrNormalSource();
-        if(!$isTranslationTask){
-            $originalTarget = $tags->getOriginalTarget();
-            if(!$originalTarget->isEmpty()){
-                $against = $originalTarget;
+        $segment = $tags->getSegment();
+        // no need to check for edited 100% matches on import
+        if($this->config->enableEdited100MatchCheck && !$forImport){
+            // TODO AUTOQA klären: 100% oder >= 100% ???
+            if($segment->isEdited() && $segment->getMatchRate() >= 100){
+                $tags->addAllTargetsQuality(static::$type, self::EDITED_100PERCENT_MATCH);
             }
         }
-        if($against != null){
-            $data = [];
-            foreach($tags->getTargets() as $toCheck){ /* @var $toCheck editor_Segment_Fieldtags */
-                $comparision = new editor_Segment_Internal_TagComparision($toCheck, $against);
-                foreach($comparision->getStati() as $status){
-                    if(!array_key_exists($status, $data)){
-                        $data[$status] = [];
-                    }
-                    // group the fields by category
-                    $data[$status][] = $toCheck->getField();
-                }
-            }
-            foreach($data as $category => $fields){
-                $tags->addQuality($fields, editor_Segment_Tag::TYPE_INTERNAL, $category);
+        if($this->config->enableUneditedFuzzyMatchCheck){
+            if($segment->isPretranslated() && $segment->getMatchRate() < 100){
+                $tags->addAllTargetsQuality(static::$type, self::UNEDITED_FUZZY_MATCH);
             }
         }
         return $tags;
     }
     
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
-        return $translate->_('Internal tags');
+        return $translate->_('MatchRate');
     }
     
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category) : string {
         switch($category){
-            case editor_Segment_Internal_TagComparision::TAGS_MISSING:
+            case editor_Segment_MatchRate_EditCheck::UNEDITED_FUZZY_MATCH:
                 return $translate->_('Internal tags are missing');
                 
-            case editor_Segment_Internal_TagComparision::TAGS_ADDED:
-                return $translate->_('Internal tags have been added');
-                
-            case editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY:
-                return $translate->_('The internal tags have an incorrect structure');
+            case editor_Segment_MatchRate_EditCheck::EDITED_100PERCENT_MATCH:
+                return $translate->_('Edited 100% Match');
         }
         return NULL;
     }

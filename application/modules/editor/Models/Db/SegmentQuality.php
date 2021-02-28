@@ -68,7 +68,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             foreach($rows as $row){ /* @var $row editor_Models_Db_SegmentQualityRow */
                 $vals = [];
                 foreach($cols as $col){
-                    $vals[] = $db->quote($row->$col);
+                    $vals[] = ($row->$col === NULL) ? 'NULL' : $db->quote($row->$col);
                 }
                 $rowvals[] = '('.implode(',', $vals).')';
             }

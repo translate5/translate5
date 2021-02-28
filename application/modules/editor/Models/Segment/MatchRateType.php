@@ -223,9 +223,19 @@ class editor_Models_Segment_MatchRateType {
      * @param string $type
      * @return boolean
      */
-    public static function isPretranslated($type) {
+    public static function isTypePretranslated($type) {
         $type = explode(';', $type);
         return in_array(self::PREFIX_PRETRANSLATED, $type);
+    }
+    
+    /**
+     * Evaluates if a matchRateType reflects a pretranslation
+     * @param string $type
+     * @return boolean
+     */
+    public static function isTypeEdited($type) {
+        $type = explode(';', $type);
+        return in_array(self::PREFIX_EDITED, $type);
     }
     /**
      * generates the matchrate type by imported segment data

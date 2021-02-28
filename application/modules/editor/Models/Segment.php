@@ -443,7 +443,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return boolean
      */
     public function isPretranslated() {
-        return editor_Models_Segment_MatchRateType::isPretranslated($this->getMatchRateType());
+        return editor_Models_Segment_MatchRateType::isTypePretranslated($this->getMatchRateType());
+    }
+    /**
+     * Convenience API to evaluate if a segment is edited
+     * @return boolean
+     */
+    public function isEdited() {
+        return editor_Models_Segment_MatchRateType::isTypeEdited($this->getMatchRateType());
     }
     /**
      * restores segments with content not changed by the user to the original

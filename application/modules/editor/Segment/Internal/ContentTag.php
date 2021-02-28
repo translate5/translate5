@@ -150,7 +150,7 @@ final class  editor_Segment_Internal_ContentTag extends editor_Tag implements Js
      * @return editor_Segment_Internal_ContentTag
      */
     public function clone($withDataAttribs=false){
-        $tag = $this->cloneProps($this->createBaseClone(), $withDataAttribs);
+        $tag = parent::clone($withDataAttribs);
         /* @var $tag editor_Segment_Internal_ContentTag */
         $tag->setInnerHTML($this->innerHTML);
         return $tag;

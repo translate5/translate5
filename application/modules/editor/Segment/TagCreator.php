@@ -190,6 +190,10 @@ final class editor_Segment_TagCreator {
         if((editor_Segment_TrackChanges_DeleteTag::isType($type) || in_array(editor_Segment_TrackChanges_DeleteTag::CSS_CLASS, $classNames)) && editor_Segment_TrackChanges_DeleteTag::hasNodeName($nodeName)){
             return new editor_Segment_TrackChanges_DeleteTag($startIndex, $startIndex);
         }
+        // check for MQM tags
+        if((editor_Segment_ManualQuality_Tag::isType($type) || in_array(editor_Segment_ManualQuality_Tag::CSS_CLASS, $classNames)) && editor_Segment_ManualQuality_Tag::hasNodeName($nodeName)){
+            return new editor_Segment_ManualQuality_Tag($startIndex, $startIndex);
+        }
         // let our providers find a tag
         foreach(static::$_provider as $type => $tagProvider){
             if($tagProvider->isSegmentTag($type, $nodeName, $classNames, $attributes)){

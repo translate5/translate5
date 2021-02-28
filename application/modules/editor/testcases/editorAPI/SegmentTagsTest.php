@@ -275,6 +275,14 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         $this->createInternalTagDataTest($segmentId, $markup, $compareState);
     }
     
+    public function testMQMTags(){
+        // testing "real" segment content
+        $segmentId = 688501;
+        $compareState = '';
+        $markup = '<ins class="trackchanges ownttip" data-usertrackingid="2923" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2021-02-27T23:26:32+01:00">We do <img class="open minor qmflag ownttip qmflag-21" data-seq="631" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-21-left.png" />not <img class="open critical qmflag ownttip qmflag-2" data-seq="629" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />recommend<img class="close critical qmflag ownttip qmflag-2" data-seq="629" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" /> using a <img class="open major qmflag ownttip qmflag-3" data-seq="630" data-comment="Some Other  Comment" src="/modules/editor/images/imageTags/qmsubsegment-3-left.png" />threaded<img class="close major qmflag ownttip qmflag-3" data-seq="630" data-comment="Some Other  Comment" src="/modules/editor/images/imageTags/qmsubsegment-3-right.png" /> MPM in production<img class="close minor qmflag ownttip qmflag-21" data-seq="631" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-21-right.png" /> with Apache 2.</ins>';
+        $this->createInternalTagDataTest($segmentId, $markup, $compareState);
+    }
+    
     public function testTagComparision1(){
         $original = 'Lorem <1>ipsum</1> dolor sit amet, <2>consetetur sadipscing<5/></2> elitr, sed diam nonumy eirmod tempor <3>invidunt ut<6/> labore et <4>dolore magna</4> aliquyam erat</3>, sed diam voluptua.<7/>';
         // simple: if input = output we must get no errors

@@ -217,7 +217,8 @@ class editor_Tag {
      * @return editor_Tag
      */
     public static function link($href=null, $target=null, $text='') : editor_Tag {
-        $tag = editor_Tag::create('a')->addText($text);
+        $tag = editor_Tag::create('a');
+        $tag->addText($text);
         if($href != null){
             $tag->setHref($href);
         }
@@ -232,7 +233,9 @@ class editor_Tag {
      * @return editor_Tag
      */
     public static function div($text='') : editor_Tag {
-        return self::create('div')->addText($text);
+        $tag = self::create('div');
+        $tag->addText($text);
+        return $tag;
     }
     /**
      * Shortcut to create a span-tag
@@ -240,17 +243,20 @@ class editor_Tag {
      * @return editor_Tag
      */
     public static function span($text='') : editor_Tag {
-        return self::create('span')->addText($text);
+        $tag = self::create('span');
+        $tag->addText($text);
+        return $tag;
     }
     /**
      * Shortcut to create an image-tag
-     * @param string $src: the source of the image
+     * @param string $source: the source of the image
      * @return editor_Tag
      */
-    public static function img($src=null) : editor_Tag {
+    public static function img($source=null) : editor_Tag {
         $tag = self::create('img');
-        if($src != null)
-            $tag->src($src);
+        if($source != null){
+            $tag->setSource($source);
+        }
         return $tag;
     }
     /**
@@ -302,20 +308,6 @@ class editor_Tag {
     public static function convertDOMText(string $text) : string {
         return htmlspecialchars($text, ENT_XML1, null, false);
         return $text;
-    }
-    /**
-     * Creates a tag out of a data generated with editor_Tag::serialize
-     * This is a concurrent/simpler implementation to editor_Segment_Tag::fromJson. Do not mix up !
-     * @param stdClass $data
-     * @return editor_Tag
-     */
-    public static function fromObject(stdClass $data) : editor_Tag {
-        if($data->name == editor_TextNode::NODE_NAME){
-            return new editor_TextNode($data->text);
-        } else {
-            $tag = new editor_Tag($data->name);
-            return $tag->unserialize($data);
-        }
     }
     /**
      * Creates a editor_Tag out of a AbstractNode
@@ -433,7 +425,7 @@ class editor_Tag {
      */
     public function addChild(editor_Tag $child) : bool {
         if($this->isSingular()){
-            throw new Exception('Singular Tags can not hold children!');
+            throw new Exception('Singular Tags can not hold children ('.get_class($this).') !');
         }
         $child->setParent($this);
         $this->children[] = $child;
@@ -539,8 +531,38 @@ class editor_Tag {
      */
     public function addClass($classname) : editor_Tag {
         $classname = trim($classname);
-        if(!empty($classname) && !$this->hasClass($classname)){
+        if($classname != '' && !$this->hasClass($classname)){
             $this->classes[] = $classname;
+        }
+        return $this;
+    }
+    /**
+     * Adds a class-attribute. Will be added to an existing class
+     * IF POSSIBLE, DO NOT USE THIS TO KEEP CODE INDEPENDENT OF CLASSNAME-ORDER
+     * @param string $class
+     * @return editor_Tag
+     */
+    public function prependClass($classname) : editor_Tag {
+        $classname = trim($classname);
+        if($classname != '' && !$this->hasClass($classname)){
+            array_unshift($this->classes, $classname);
+        }
+        return $this;
+    }
+    /**
+     * Removes a class
+     * @param string $classname
+     * @return editor_Tag
+     */
+    public function removeClass($classname) : editor_Tag {
+        if($this->hasClass($classname)){
+            $clss = [];
+            foreach($this->classes as $cname){
+                if($cname != $classname){
+                    $clss[] = $cname;
+                }
+            }
+            $this->classes = $clss;
         }
         return $this;
     }
@@ -1026,32 +1048,5 @@ class editor_Tag {
             return '';
         }
         return '</'.$this->getName().'>';
-    }
-    
-    /* serialization */
-    
-    /**
-     * Serializes a Tag to an object
-     * This is a concurrent/simpler implementation to editor_Segment_Tag::jsonSerialize. Do not mix up !
-     * @return stdClass
-     */
-    public function serialize() : stdClass {
-        $data = new stdClass();
-        $data->name = $this->name;
-        $data->classes = $this->classes;
-        $data->attribs = self::encodeAttributes($this->attribs);
-        return $data;
-    }
-    /**
-     * Recreates the tag from data derived by ::serialize
-     * This is a concurrent/simpler implementation to editor_Segment_Tag::jsonUnserialize. Do not mix up !
-     * @param stdClass $data
-     */
-    public function unserialize(stdClass $data){
-        $this->name = $data->name;
-        $this->classes = $data->classes;
-        $this->attribs = self::decodeAttributes($data->attribs);
-        $this->singular = in_array($data->name, self::$singularTypes);
-        return $this;
     }
 }
