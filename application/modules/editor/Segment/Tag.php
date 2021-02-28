@@ -250,22 +250,41 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return false;
     }
     /**
-     * Evaluates, if the tag can be splitted (interleaved with other tags. Apart from internal tags this is the case for all other tags
+     * Evaluates, if the tag can be splitted (interleaved with other tags). Apart from internal tags this is the case for all other tags
+     * API is used in the consolidation phase only
      * @return bool
      */
     public function isSplitable() : bool {
         return true;
     }
     /**
+     * In the consolidation phase all obsolete segment tags will be discarded
+     * API is used after the consolidation phase only
+     * @return bool
+     */
+    public function isObsolete() : bool {
+        return false;
+    }
+    /**
+     * This method is called when in the end of the consolidation phase obsolete tags and paired-closers (that found no openers) are removed
+     * It can be used to log stuff, throw exceptions, etc.
+     * API is used after the consolidation phase only
+     */
+    public function onConsolidationRemoval() {
+        
+    }
+    /**
      * Some Internal Tags are IMG-tags that are paired (parted into an opening and closing tag represented by images)
-     * These tags will be joined to one tag in the consolidation process
+     * These tags will be joined to one tag in the consolidation process.
+     * API is used in the consolidation phase only
      * @return bool
      */
     public function isPairedOpener() : bool {
         return false;
     }
     /**
-     * 
+     * The counterpart to ::isPairedOpener()
+     * API is used in the consolidation phase only
      * @return bool
      */
     public function isPairedCloser() : bool {
@@ -273,6 +292,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     }
     /**
      * In the process of joining paired tags this API will be used. The passed tag will be removed when true is returned
+     * API is used in the consolidation phase only
      * @param editor_Segment_Tag $tag
      * @return bool
      */
@@ -281,6 +301,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     }
     /**
      * Checks, if this internal tag can contain the passed internal tag
+     * API is used in the rendering process only
      * @param editor_Segment_Tag $tag
      * @return boolean
      */
@@ -294,6 +315,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     }
     /**
      * Finds the next container that can contain the passed tag
+     * API is used in the rendering process only
      * @param editor_Segment_Tag $tag
      * @return editor_Segment_Tag|NULL
      */
@@ -307,40 +329,9 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return null;
     }
     /**
-     * Finds the Topmost container
-     * @return editor_Tag|editor_Segment_Tag
-     */
-    public function getTopmostContainer(){
-        if($this->parent != null && is_a($this->parent, 'editor_Segment_Tag')){
-            return $this->parent->getTopmostContainer();
-        }
-        return $this;
-    }
-    /**
-     * Adds us and all our children to the segment tags
-     * @param editor_Segment_FieldTags $tags
-     */
-    public function sequence(editor_Segment_FieldTags $tags){
-        $tags->addTag($this);
-        $this->sequenceChildren($tags);
-    }
-    /**
-     * Adds all our children to the segment tags
-     * @param editor_Segment_FieldTags $tags
-     */
-    public function sequenceChildren(editor_Segment_FieldTags $tags){
-        if($this->hasChildren()){
-            foreach($this->children as $child){
-                if(is_a($child, 'editor_Segment_Tag')){
-                    /* @var $child editor_Segment_Tag */
-                    $child->sequence($tags);
-                }
-            }
-        }
-    }
-    /**
      * After the nested structure of tags is set this fills in the text-chunks of the segments text
      * CRUCIAL: at this point only editor_Segment_Tag must be added as children !
+     * API is used in the rendering process only
      * @param editor_Segment_FieldTags $tags
      */
     public function addSegmentText(editor_Segment_FieldTags $tags){
@@ -366,6 +357,28 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
                 $this->children = $chldrn;
             } else {
                 $this->addText($tags->getFieldTextPart($this->startIndex, $this->endIndex));
+            }
+        }
+    }
+    /**
+     * Adds us and all our children to the segment tags
+     * @param editor_Segment_FieldTags $tags
+     */
+    public function sequence(editor_Segment_FieldTags $tags){
+        $tags->addTag($this);
+        $this->sequenceChildren($tags);
+    }
+    /**
+     * Adds all our children to the segment tags
+     * @param editor_Segment_FieldTags $tags
+     */
+    public function sequenceChildren(editor_Segment_FieldTags $tags){
+        if($this->hasChildren()){
+            foreach($this->children as $child){
+                if(is_a($child, 'editor_Segment_Tag')){
+                    /* @var $child editor_Segment_Tag */
+                    $child->sequence($tags);
+                }
             }
         }
     }

@@ -604,6 +604,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
     /**
      * Joins Tags that are equal and directly beneath each other
      * Also removes any internal connections between the tags
+     * Joins paired tags, removes obsolete tags
      */
     private function consolidate(){
         $this->sort();
@@ -614,28 +615,39 @@ class editor_Segment_FieldTags implements JsonSerializable {
             $last->resetChildren();
             $tags[] = $last;
             for($i=1; $i < $numTags; $i++){
-                $tag = $this->tags[$i];
-                // we join only tasks that are splitable of course ...
-                if($last->isSplitable() && $tag->isSplitable() && $tag->isEqualType($last) && $tag->isEqual($last) && $last->endIndex == $tag->startIndex){
-                    $last->endIndex = $tag->endIndex;
-                } else {
-                    // when a tag is a paired opener we try to find it's counterpart
-                    if($tag->isPairedOpener() && $i < ($numTags - 1)){
-                        for($j = ($i + 1); $j < $numTags; $j++){
-                            // if we found the counterpart (the opener could pair it) this closer will be removed from our chain
-                            if($this->tags[$j]->isPairedCloser() && $tag->getType() == $this->tags[$j]->getType() && $tag->pairWith($this->tags[$j])){
-                                array_splice($this->tags, $j, 1);
-                                $numTags--;
-                                break;
-                            }
+                // when a tag is a paired opener we try to find it's counterpart and remove it from the chain
+                if($last->isPairedOpener()){
+                    for($j = $i; $j < $numTags; $j++){
+                        // if we found the counterpart (the opener could pair it) this closer will be removed from our chain
+                        if($this->tags[$j]->isPairedCloser() && $last->getType() == $this->tags[$j]->getType() && $last->pairWith($this->tags[$j])){
+                            array_splice($this->tags, $j, 1);
+                            $numTags--;
+                            break;
                         }
                     }
-                    $last = $tag;
-                    $last->resetChildren();
-                    $tags[] = $last;
+                }
+                // we may already removed the current elemnt, so check
+                if($i < $numTags){    
+                    $tag = $this->tags[$i];
+                    // we join only tasks that are splitable of course ...
+                    if($last->isSplitable() && $tag->isSplitable() && $tag->isEqualType($last) && $tag->isEqual($last) && $last->endIndex == $tag->startIndex){
+                        $last->endIndex = $tag->endIndex;
+                    } else {
+                        $last = $tag;
+                        $last->resetChildren();
+                        $tags[] = $last;
+                    }
                 }
             }
-            $this->tags = $tags;
+            // last step: remove obsolete tags and paired closers that found no counterpart
+            $this->tags = [];
+            foreach($tags as $tag){
+                if($tag->isObsolete() || $tag->isPairedCloser()){
+                    $tag->onConsolidationRemoval();
+                } else {
+                    $this->tags[] = $tag;
+                }
+            }
         }
     }
     /**

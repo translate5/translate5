@@ -35,9 +35,9 @@
 /**
  * Represents an MQM tag
  * this tag "really" represents two image tags wrapping the content
- * Example:
- * opening tag: <img class="critical qmflag ownttip open qmflag-2" data-seq="ext-490" data-comment="Some comment" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />
- * closing tag: <img class="critical qmflag ownttip close qmflag-2" data-seq="ext-490" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" />
+ * Example as sent from the Frontend:
+ * OPENER: <img class="open minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />
+ * CLOSER: <img class="close minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />
  */
 final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
     
@@ -72,7 +72,7 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
     /**
      * @var string
      */
-    const IMAGE_SRC = '/modules/editor/images/imageTags/qmsubsegment-{0}-{1}.png';
+    const IMAGE_SRC = 'qmsubsegment-{0}-{1}.png';
 
     protected static $type = editor_Segment_Tag::TYPE_MANUALQUALITY;
 
@@ -81,7 +81,7 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
      *
      * @var bool
      */
-    private $isPaired = false;
+    private $paired = false;
     /**
      * 
      * @var int
@@ -124,7 +124,7 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
      * @return bool
      */
     public function isPaired() : bool {
-        return $this->isPaired;
+        return $this->paired;
     }
 
     /* Overwritten API to reflect pairing */
@@ -132,19 +132,19 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
     public function clone($withDataAttribs=false){
         $clone = parent::clone($withDataAttribs);
         /* @var $clone editor_Segment_ManualQuality_Tag */
-        $clone->setMqmProps($this->isPaired, $this->typeIndex, $this->severity, $this->comment);
+        $clone->setMqmProps($this->paired, $this->typeIndex, $this->severity, $this->comment);
         return $clone;
     }
     
     protected function renderStart($withDataAttribs=true) : string {
-        if($this->isPaired){
+        if($this->paired){
             return $this->renderImageTag(true);
         }
         return parent::renderStart($withDataAttribs);
     }
 
     protected function renderEnd() : string {
-        if($this->isPaired){
+        if($this->paired){
             return $this->renderImageTag(false);
         }
         return parent::renderEnd();
@@ -170,23 +170,32 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
      * @return mixed
      */
     private function createImageSrc(int $typeIndex, string $position) : string {
-        return str_replace('{0}', strval($typeIndex), str_replace('{1}', $position, self::IMAGE_SRC));
+        return str_replace('{0}', strval($typeIndex), str_replace('{1}', $position, $this->createImageSrcTemplate()));
     }
     /**
      * Adds additional clone properties
-     * @param bool $isPaired
+     * @param bool $paired
      * @param int $typeIndex
      * @param string $severity
      * @param string $comment
      * @return editor_Segment_ManualQuality_Tag
      */
-    private function setMqmProps(bool $isPaired, int $typeIndex, string $severity, string $comment) : editor_Segment_ManualQuality_Tag{
-        $this->isPaired = $isPaired;
-        $this->singular = !$isPaired;
+    private function setMqmProps(bool $paired, int $typeIndex, string $severity, string $comment) : editor_Segment_ManualQuality_Tag{
+        $this->paired = $paired;
+        $this->singular = !$paired;
         $this->typeIndex = $typeIndex;
         $this->severity = $severity;
         $this->comment = $comment;
         return $this;
+    }
+    
+    private function createImageSrcTemplate(){
+        // when Testing, Zend_Config is not available. TODO: better setup/bootstrapping for classic unit test
+        if(defined('T5_IS_UNIT_TEST')){
+            return '/modules/editor/images/imageTags/'.self::IMAGE_SRC;
+        }
+        $conf = Zend_Registry::get('config');
+        return APPLICATION_RUNDIR.'/'.$conf->runtimeOptions->dir->tagImagesBasePath.'/'.self::IMAGE_SRC;
     }
     
     /* Consolidation API */
@@ -197,6 +206,27 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
 
     public function isPairedCloser() : bool {
         return ($this->hasClass(self::CSS_CLASS_CLOSE));
+    }
+    
+    public function isObsolete() : bool {
+        // we discard any invalid mqm tags, e.g. those spanning no text
+        return (!$this->paired || $this->startIndex == $this->endIndex || $this->typeIndex == -1 || $this->severity == '');
+    }
+    
+    public function onConsolidationRemoval() {
+        // we don't want exceptions on unit tests
+        if(defined('T5_IS_UNIT_TEST')){
+            return;
+        }
+        // TODO AUTOQA: Code is copied from editor_Models_Qmsubsegments, needed ??
+        // tags spanning no text will be removed silently
+        if($this->typeIndex == -1){
+            throw new Zend_Exception('MQM Tag found, but no type index was set in: '.$this->renderStart());
+        } else if($this->severity == ''){
+            throw new Zend_Exception('MQM Tag found, but no severity was set in: '.$this->renderStart());
+        } else if($this->getData('seq') == null){
+            throw new Zend_Exception('MQM Tag found, but no sequence (data-seq) was set in: '.$this->renderStart());
+        }
     }
     /**
      * The passed $tag is a tag if the same type and is a paired closer
@@ -211,7 +241,7 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
         if(editor_Segment_FieldTags::VALIDATION_MODE && $this->endIndex != $this->startIndex || $tag->endIndex != $tag->startIndex){
             error_log("\n##### MQM TAG: INVALID INDEXES FOUND [open: (".$this->startIndex."|".$this->endIndex.") close: (".$tag->startIndex."|".$tag->endIndex.")] #####\n");
         }
-        $this->isPaired = true;
+        $this->paired = true;
         $this->singular = false;
         $this->endIndex = $tag->startIndex;
         $this->removeClass(self::CSS_CLASS_OPEN)->removeClass(self::CSS_CLASS_OPEN);
@@ -228,18 +258,19 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
             $this->typeIndex = intval($matches[1]);
         }
         $this->comment = htmlspecialchars_decode($this->getData('comment'));
+ 
         return true;
     }
     
     protected function furtherSerialize(stdClass $data){
-        $data->isPaired = $this->isPaired;
+        $data->paired = $this->paired;
         $data->typeIndex = $this->typeIndex;
         $data->comment = $this->comment;
         $data->severity = $this->severity;
     }
     
     protected function furtherUnserialize(stdClass $data){
-        $this->isPaired = $data->isPaired;
+        $this->paired = $data->paired;
         $this->typeIndex = $data->typeIndex;
         $this->comment = $data->comment;
         $this->severity = $data->severity;

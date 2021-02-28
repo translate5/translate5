@@ -49,7 +49,9 @@ class editor_Segment_ManualQuality_TagCheck extends editor_Segment_Quality_Provi
         
         foreach($tags->getTagsByType(static::$type) as $mqmTag){
             /* @var $mqmTag editor_Segment_ManualQuality_Tag */
-            $tags->addManualQuality($mqmTag->field, $mqmTag->getTypeIndex(), $mqmTag->getSeverity(), $mqmTag->getComment(), $mqmTag->startIndex, $mqmTag->endIndex);
+            $qualityId = $tags->saveManualQuality($mqmTag->field, $mqmTag->getTypeIndex(), $mqmTag->getSeverity(), $mqmTag->getComment(), $mqmTag->startIndex, $mqmTag->endIndex);
+            // update the sequence-id with the database-id of the bound quality
+            $mqmTag->setData('seq', strval($qualityId));
         }
         return $tags;
     }

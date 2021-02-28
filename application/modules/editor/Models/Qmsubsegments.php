@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
  */
 
 /**
- * TODO Move to Quality Model
+ * TODO AUTOQA Move to Quality Model
  * Methods for Management of QM-Subsegments
  */
 class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {

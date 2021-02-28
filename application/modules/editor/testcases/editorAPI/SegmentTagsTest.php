@@ -275,12 +275,41 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         $this->createInternalTagDataTest($segmentId, $markup, $compareState);
     }
     
-    public function testMQMTags(){
+    public function testMqmTags1(){
         // testing "real" segment content
         $segmentId = 688501;
-        $compareState = '';
         $markup = '<ins class="trackchanges ownttip" data-usertrackingid="2923" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2021-02-27T23:26:32+01:00">We do <img class="open minor qmflag ownttip qmflag-21" data-seq="631" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-21-left.png" />not <img class="open critical qmflag ownttip qmflag-2" data-seq="629" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />recommend<img class="close critical qmflag ownttip qmflag-2" data-seq="629" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" /> using a <img class="open major qmflag ownttip qmflag-3" data-seq="630" data-comment="Some Other  Comment" src="/modules/editor/images/imageTags/qmsubsegment-3-left.png" />threaded<img class="close major qmflag ownttip qmflag-3" data-seq="630" data-comment="Some Other  Comment" src="/modules/editor/images/imageTags/qmsubsegment-3-right.png" /> MPM in production<img class="close minor qmflag ownttip qmflag-21" data-seq="631" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-21-right.png" /> with Apache 2.</ins>';
-        $this->createInternalTagDataTest($segmentId, $markup, $compareState);
+        $this->createMqmDataTest($segmentId, $markup);
+    }
+    
+    public function testMqmTags2(){
+        // testing "real" segment content
+        $segmentId = 688501;
+        $markup = 'Es wird <img class="open minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />empfohlen<img class="close minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />, einen Blick auf die \u00bb<div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Non breaking space">&lt;1/&gt;</span><span class="full" data-originalid="char" data-length="1">\u23b5</span></div>Apache <img class="open critical qmflag ownttip qmflag-20" data-seq="634" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-left.png" />Dokumentation zu werfen, um ein <img class="open major qmflag ownttip qmflag-2" data-seq="635" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />grundlegendes<img class="close major qmflag ownttip qmflag-2" data-seq="635" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" /> Verst\u00e4ndnis <img class="close critical qmflag ownttip qmflag-20" data-seq="634" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-right.png" />des Apache 2.0 Servers zu erhalten.<ins class="trackchanges ownttip" data-usertrackingid="2928" data-usercssnr="usernr1" data-workflowstep="no workflow1" data-timestamp="2021-02-28T17:22:19+01:00"> CHANGED AGAIN<img class="duplicatesavecheck" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-segmentid="721605" data-fieldname="targetEdit" /></ins>';
+        $this->createMqmDataTest($segmentId, $markup);
+    }
+    
+    public function testMqmTags3(){
+        // testing "real" segment content
+        $segmentId = 688501;
+        $markup = 'Es wird <img class="open minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />empfohlen<img class="close minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />, einen Blick auf die \u00bb<div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Non breaking space">&lt;1/&gt;</span><span class="full" data-originalid="char" data-length="1">\u23b5</span></div>Apache <img class="open critical qmflag ownttip qmflag-20" data-seq="634" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-left.png" />Dokumentation zu werfen, um ein <img class="open major qmflag ownttip qmflag-2" data-seq="635" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />grundlegendes<img class="close major qmflag ownttip qmflag-2" data-seq="635" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" /> Verst\u00e4ndnis <img class="close critical qmflag ownttip qmflag-20" data-seq="634" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-right.png" />des Apache 2.0 Servers zu erhalten.';
+        $this->createMqmDataTest($segmentId, $markup);
+    }
+    
+    public function testMqmTags4(){
+        // testing "real" segment content
+        $segmentId = 688501;
+        $markup = 'Es wird empfohlen<img class="close minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />, einen Blick auf die \u00bb<div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Non breaking space">&lt;1/&gt;</span><span class="full" data-originalid="char" data-length="1">\u23b5</span></div>Apache <img class="open critical qmflag ownttip qmflag-20" data-seq="634" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-left.png" />Dokumentation zu werfen, um ein <img class="open major qmflag ownttip qmflag-2" data-seq="635" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />grundlegendes<img class="close major qmflag ownttip qmflag-2" data-seq="635" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" /> Verst\u00e4ndnis <img class="close critical qmflag ownttip qmflag-20" data-seq="634" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-right.png" />des Apache 2.0 Servers zu erhalten.';
+        $compare = 'Es wird empfohlen, einen Blick auf die \u00bb<div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Non breaking space">&lt;1/&gt;</span><span class="full" data-originalid="char" data-length="1">\u23b5</span></div>Apache <img class="open critical qmflag ownttip qmflag-20" data-seq="634" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-left.png" />Dokumentation zu werfen, um ein <img class="open major qmflag ownttip qmflag-2" data-seq="635" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />grundlegendes<img class="close major qmflag ownttip qmflag-2" data-seq="635" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" /> Verst\u00e4ndnis <img class="close critical qmflag ownttip qmflag-20" data-seq="634" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-right.png" />des Apache 2.0 Servers zu erhalten.';
+        $this->createMqmDataTest($segmentId, $markup, $compare);
+    }
+    
+    public function testMqmTags5(){
+        // testing "real" segment content
+        $segmentId = 688501;
+        $markup = 'Es wird <img class="open minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />empfohlen<img class="close minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />, einen Blick auf die \u00bb<div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Non breaking space">&lt;1/&gt;</span><span class="full" data-originalid="char" data-length="1">\u23b5</span></div>Apache <img class="open critical qmflag ownttip qmflag-20" data-seq="634" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-left.png" />Dokumentation zu werfen, um ein <img class="open major qmflag ownttip qmflag-2" data-seq="" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-left.png" />grundlegendes<img class="close major qmflag ownttip qmflag-2" data-seq="635" data-comment="Some Comment" src="/modules/editor/images/imageTags/qmsubsegment-2-right.png" /> Verst\u00e4ndnis <img class="close critical qmflag ownttip qmflag-20" data-seq="634" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-right.png" />des Apache 2.0 Servers zu erhalten.';
+        $compare = 'Es wird <img class="open minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />empfohlen<img class="close minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />, einen Blick auf die \u00bb<div class="single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip"><span class="short" title="&lt;1/&gt;: Non breaking space">&lt;1/&gt;</span><span class="full" data-originalid="char" data-length="1">\u23b5</span></div>Apache <img class="open critical qmflag ownttip qmflag-20" data-seq="634" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-left.png" />Dokumentation zu werfen, um ein grundlegendes Verst\u00e4ndnis <img class="close critical qmflag ownttip qmflag-20" data-seq="634" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-20-right.png" />des Apache 2.0 Servers zu erhalten.';
+        $this->createMqmDataTest($segmentId, $markup, $compare);
     }
     
     public function testTagComparision1(){
@@ -398,8 +427,6 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         $this->assertEquals(strip_tags($markup), $tags->getFieldText());
         // re-create from JSON
         $expectedJSON = $tags->toJson();
-        // error_log($expectedJSON);
-        // error_log("\n==================================\n");
         $jsonTags = editor_Segment_FieldTags::fromJson($expectedJSON);
         $this->assertEquals($expectedJSON, $jsonTags->toJson());
     }
@@ -418,6 +445,31 @@ class SegmentTagsTest extends \ZfExtended_Test_Testcase {
         $this->assertEquals($originalTags->getFieldText(), $tags->getFieldText());
         // compare field-text vs stripped markup
         $this->assertEquals(strip_tags($markup), $tags->getFieldText());
+        // re-create from JSON
+        $expectedJSON = $tags->toJson();
+        $jsonTags = editor_Segment_FieldTags::fromJson($expectedJSON);
+        $this->assertEquals($expectedJSON, $jsonTags->toJson());
+    }
+    /**
+     *
+     * @param int $segmentId
+     * @param string $markup
+     * @param string $compare
+     */
+    private function createMqmDataTest($segmentId, $markup, $compare=null){
+        $tags = new editor_Segment_FieldTags($segmentId, 'target', $markup, 'target', 'target');
+        // compare unparsed markup
+        if($compare == null){
+            $this->assertEquals($markup, $tags->render());
+        } else {
+            // if the markup cpontaines invalid mqm we may need a special compare markup
+            $this->assertEquals($compare, $tags->render());
+        }
+        // compare field-texts vs stripped markup
+        $this->assertEquals(strip_tags($markup), $tags->getFieldText());
+        if($compare != null){
+            $this->assertEquals(strip_tags($compare), $tags->getFieldText());
+        }
         // re-create from JSON
         $expectedJSON = $tags->toJson();
         $jsonTags = editor_Segment_FieldTags::fromJson($expectedJSON);

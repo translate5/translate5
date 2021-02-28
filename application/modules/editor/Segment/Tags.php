@@ -457,14 +457,16 @@ class editor_Segment_Tags implements JsonSerializable {
     }
     /**
      * Adds a MQM Quality to the tags (segment-quality model)
+     * This model will be saved immediately to return the id
      * @param string $field
      * @param int $typeIndex
      * @param string $severity
      * @param string $comment
      * @param int $startIndex
      * @param int $endIndex
+     * @return int
      */
-    public function addManualQuality(string $field, int $typeIndex, string $severity, string $comment, int $startIndex=0, int $endIndex=-1) {
+    public function saveManualQuality(string $field, int $typeIndex, string $severity, string $comment, int $startIndex=0, int $endIndex=-1) {
         $row = $this->getQualityTable()->createRow();
         /* @var $row editor_Models_Db_SegmentQualityRow */
         $row->segmentId = $this->segmentId;
@@ -478,7 +480,9 @@ class editor_Segment_Tags implements JsonSerializable {
         $row->mqmType = $typeIndex;
         $row->severity = $severity;
         $row->comment = $comment;
-        $this->qualities[] = $row;
+        $row->save();
+        
+        return $row->id;
     }
     /**
      * Returnes the names of all our target fields
