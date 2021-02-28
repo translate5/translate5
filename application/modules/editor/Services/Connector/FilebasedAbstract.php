@@ -39,6 +39,12 @@ abstract class editor_Services_Connector_FilebasedAbstract extends editor_Servic
 
     
     /***
+     * 100% match value
+     * @var integer
+     */
+    const EXACT_MATCH_VALUE=100;
+    
+    /***
      * Exact-exact match percent value.
      * An exact-exact match is a 100% match, that has the same document name as the currently translated document.
      * @var integer

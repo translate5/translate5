@@ -177,7 +177,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $ttService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', ['editor.terminology', $testTimeout, $testTimeout]);
         /* @var $ttService editor_Plugins_TermTagger_Service */
         $termtagger->configured = $ttService->getConfiguredUrls();
-        $allUrls = array_unique(call_user_func_array('array_merge', (array)$termtagger->configured));
+        $allUrls = array_unique(call_user_func_array('array_merge', array_values((array)$termtagger->configured)));
         $running = array();
         $version = array();
         $termtagger->runningAll = true;

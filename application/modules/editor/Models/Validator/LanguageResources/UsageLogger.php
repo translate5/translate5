@@ -27,19 +27,8 @@ END LICENSE AND COPYRIGHT
 */
 
 /***
- *   `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `languageResouceId` INT(11) NULL,
-  `sourceLang` INT(11) NULL,
-  `targetLang` INT(11) NULL,
-  `queryString` LONGTEXT NULL,
-  `requestSource` VARCHAR(45) NULL COMMENT 'MT language resource request source. Mt usage can be requested from the translate5 editor, or translate5 apps like InstantTranslate.',
-  `translatedCharacterCount` INT(11) NULL,
-  `timestamp` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-  `customers` VARCHAR(1024) NULL,
- * @author aleksandar
- *
  */
-class editor_Models_Validator_LanguageResources_MtUsageLogger extends ZfExtended_Models_Validator_Abstract {
+class editor_Models_Validator_LanguageResources_UsageLogger extends ZfExtended_Models_Validator_Abstract {
 
     protected function defineValidators() {
         $this->addValidator('id', 'int');

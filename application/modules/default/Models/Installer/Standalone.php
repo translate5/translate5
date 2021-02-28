@@ -53,7 +53,7 @@ class Models_Installer_Standalone {
      * Increase this value to force a restart of the updater while updating
      * @var integer
      */
-    const INSTALLER_VERSION = 13;
+    const INSTALLER_VERSION = 15;
     
     /**
      * @var string
@@ -159,17 +159,16 @@ class Models_Installer_Standalone {
         }
         if(!empty($this->options['maintenance'])) {
             $this->addZendToIncludePath();
-            $this->initApplication();
             $this->maintenanceMode();
             exit;
         }
         if(!empty($this->options['announceMaintenance'])) {
             $this->addZendToIncludePath();
-            $this->initApplication();
             $this->maintenanceMode();
             exit;
         }
         if(!empty($this->options['dbOnly'])) {
+            $this->log(PHP_EOL.'Deprecated - call via ./install-and-update.sh: see ./translate5.[sh|bat] list database !');
             $this->addZendToIncludePath();
             $this->initApplication();
             $this->checkDb();
@@ -204,29 +203,23 @@ class Models_Installer_Standalone {
         echo "  Arguments: \n";
         echo "    ZIPFILE                         Optional, updates the installation with the given release from the ZIP file.";
         echo "    --help                          shows this help text\n";
-        echo "    --database                      just applies all available database updates\n";
-        echo "                                    Does not fetch any updates and does not apply any file change!\n";
         echo "    --check                         shows some status information about the current installation,\n";
         echo "                                    to decide if maintenance mode is needed or not\n";
-        echo "    --maintenance                   shows maintance mode status\n";
-        echo "    --maintenance TIME              time in format 00:00, sets start of maintenance to TODAY TIME \n";
-        echo "    --maintenance TIME \"message\"  optionally a message can be provided \n";
-        echo "    --maintenance off               disables maintenance, must be used after maintenance since\n";
-        echo "                                    there is no automatic maintenance stop functionality!\n\n";
-        echo "    --announceMaintenance TIME \"message\"  Sends an email to specific users (by default the admin users)\n";
-        echo "                                    to announce the maintence mode at the given TIME with the additional MESSAGE.\n";
-        echo "                                    DOES NOT SET THE MAINTENANCE MODE SO FAR! Just sends the email.\n";
-        echo "                                    The group(s) of receivers can be set in the configuration.";
+        echo "\n\n";
+        echo "  For other maintenance tasks call ./translate5.[sh|bat] list! ";
         echo "\n\n";
     }
     
     protected function maintenanceMode() {
-        require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Maintenance.php';
-        //FIXME currently no possibility to set only the message (without a date) - which is possible in the GUI so far
-        $maintenance = new Models_Installer_Maintenance();
+        $this->initTranslate5CliBridge();
+        $this->log(PHP_EOL.'Deprecated - maintain maintenance via ./install-and-update.sh: see ./translate5.[sh|bat] list maintenance !');
         if(!empty($this->options['announceMaintenance'])) {
-            $maintenance->announce($this->options['announceMaintenance'], $this->options['announceMessage']);
-            //FIXME in future set the maintenance here too
+            $input = new Symfony\Component\Console\Input\ArrayInput([
+                'command' => 'maintenance:announce',
+                'timestamp' => $this->options['announceMaintenance'],
+                '--message' => $this->options['announceMessage'],
+            ]);
+            $this->cli->run($input);
             return;
         }
         switch ($this->options['maintenance']) {
@@ -235,15 +228,26 @@ class Models_Installer_Standalone {
             case 'Off':
             case 'OFF':
             case 'off':
-                $maintenance->disable();
+                $input = new Symfony\Component\Console\Input\ArrayInput([
+                    'command' => 'maintenance:disable',
+                ]);
+                $this->cli->run($input);
                 break;
             
             case 'show':
-                $maintenance->status();
+                $input = new Symfony\Component\Console\Input\ArrayInput([
+                    'command' => 'maintenance:status',
+                ]);
+                $this->cli->run($input);
                 break;
             
             default:
-                $maintenance->set($this->options['maintenance'], $this->options['announceMessage']);
+                $input = new Symfony\Component\Console\Input\ArrayInput([
+                'command' => 'maintenance:set',
+                'timestamp' => $this->options['maintenance'],
+                '--message' => $this->options['announceMessage'],
+                ]);
+                $this->cli->run($input);
         };
     }
     
@@ -257,10 +261,7 @@ class Models_Installer_Standalone {
     }
     
     protected function checkEnvironment() {
-        require_once $this->currentWorkingDir.'/vendor/autoload.php';
-        $this->cli = new Symfony\Component\Console\Application();
-        $this->cli->setAutoExit(false);
-        $this->cli->add(new Translate5\MaintenanceCli\Command\SystemCheckCommand());
+        $this->initTranslate5CliBridge();
         $input = new Symfony\Component\Console\Input\ArrayInput([
             'command' => 'system:check',
             '--pre-installation' => null,
@@ -268,6 +269,22 @@ class Models_Installer_Standalone {
         ]);
         $this->cli->run($input);
         $this->log('');
+    }
+    
+    protected function initTranslate5CliBridge()
+    {
+        if(!empty($this->cli)) {
+            return;
+        }
+        require_once $this->currentWorkingDir.'/vendor/autoload.php';
+        $this->cli = new Symfony\Component\Console\Application();
+        $this->cli->setAutoExit(false);
+        $this->cli->add(new Translate5\MaintenanceCli\Command\SystemCheckCommand());
+        $this->cli->add(new Translate5\MaintenanceCli\Command\DatabaseUpdateCommand());
+        $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceAnnounceCommand());
+        $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceSetCommand());
+        $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceDisableCommand());
+        $this->cli->add(new Translate5\MaintenanceCli\Command\MaintenanceCommand());
     }
     
     protected function checkMyselfForUpdates() {
@@ -589,6 +606,7 @@ class Models_Installer_Standalone {
      * @return bool
      */
     protected function checkDb(): bool {
+        $this->initTranslate5CliBridge();
         $input = new Symfony\Component\Console\Input\ArrayInput([
             'command' => 'system:check',
             'module' => 'database',
@@ -602,28 +620,21 @@ class Models_Installer_Standalone {
      * Applies all DB alter statement files to the DB
      */
     protected function updateDb() {
-        $this->logSection('Updating Translate5 database scheme');
-        
         $changelog = ZfExtended_Factory::get('editor_Models_Changelog');
         /* @var $changelog editor_Models_Changelog */
         $beforeMaxChangeLogId = $changelog->getMaxId();
-        
-        $dbupdater = ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
-        /* @var $dbupdater ZfExtended_Models_Installer_DbUpdater */
-        $stat = $dbupdater->importAll();
+
+        $this->initTranslate5CliBridge();
+        $input = new Symfony\Component\Console\Input\ArrayInput([
+            'command' => 'database:update',
+            '-i' => null,
+        ]);
+        $this->cli->run($input);
         
         $newChangeLogEntries = $changelog->moreChangeLogs($beforeMaxChangeLogId, $changelog::ALL_GROUPS);
         $version = ZfExtended_Utils::getAppVersion();
         $changelog->updateVersion($beforeMaxChangeLogId, $version);
         $this->sendChangeLogs($newChangeLogEntries, $version);
-        
-        $errors = $dbupdater->getErrors();
-        if(!empty($errors)) {
-            $this->log("DB Update not OK\nErrors: \n".print_r($errors,1));
-            return;
-        }
-        
-        $this->log("DB Update OK\n  New statement files: ".$stat['new']."\n  Modified statement files: ".$stat['modified']."\n");
     }
     
     /**

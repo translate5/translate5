@@ -76,8 +76,9 @@ trait editor_Services_Connector_BatchTrait {
             //or analysis, the empty target segments for mt resources should not be send to batch processor
             //TODO: in future, when the matchrate is provided/calculated for mt, this should be changed
             
+            
             $target = $segment->getTarget();
-            if(strlen($target) == 0 && $this->languageResource->isMt()){
+            if(strlen($target) > 0 && $this->languageResource->isMt()){
                 continue;
             }
             $batchQuery[] = [
@@ -146,6 +147,10 @@ trait editor_Services_Connector_BatchTrait {
             $this->logForSegment($query['segment']);
             
             $this->saveBatchResults($query['segment']->getId());
+
+            //log the adapter usage for the batch query segment
+            $this->logAdapterUsage($query['segment']);
+            
             $this->resultList->resetResult();
         }
     }

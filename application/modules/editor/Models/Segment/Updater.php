@@ -189,6 +189,11 @@ class editor_Models_Segment_Updater {
         
         //save the type
         $segment->setMatchRateType((string) $matchrateType);
+
+        //if it is tm or term collection and the matchrate is >=100, log the usage
+        if(($languageresource->isTm() || $languageresource->isTc()) && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE){
+            $this->logAdapterUsageOnSegmentEdit($languageresource);
+        }
     }
     
     /**
@@ -235,5 +240,18 @@ class editor_Models_Segment_Updater {
         
         //return true if some whitespace content was changed
         return editor_Models_Segment_Utility::entityCleanup($content) !== editor_Models_Segment_Utility::entityCleanup($oldContent);
+    }
+    
+    /***
+     * This will write a log entry of how many characters are send to the adapter for translation.
+     * 
+     * @param editor_Models_LanguageResources_LanguageResource $adapter
+     */
+    protected function logAdapterUsageOnSegmentEdit(editor_Models_LanguageResources_LanguageResource $adapter) {
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $manager editor_Services_Manager */
+        $connector = $manager->getConnector($adapter,$this->task->getSourceLang(),$this->task->getTargetLang(),$this->task->getConfig());
+        /* @var $connector editor_Services_Connector */
+        $connector->logAdapterUsage($this->segment);
     }
 }

@@ -2085,31 +2085,20 @@ The changes made by the formerly active user of the role <b>{previousRole}</b> a
 <hr />
 <br />
 {footer}</target></trans-unit>
-<trans-unit id='e2hlYWRlcn0KSW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZsO8ciBTaWUgZnJlaWdlZ2ViZW4uPGJyIC8+CjxiciAvPgpJbSBmb2xnZW5kZW4gZGllIGdldMOkdGlndGVuIMOEbmRlcnVuZ2VuIGRlciB2b3JoZXJnZWhlbmRlbiBSb2xsZSA8Yj57cHJldmlvdXNSb2xlfTwvYj46PGJyIC8+CntjaGFuZ2VkU2VnbWVudHN9CjxociAvPgo8YnIgLz4Ke2Zvb3Rlcn0='>
-    <source>{header}
+<trans-unit id='e2hlYWRlcn0KSW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZsO8ciBTaWUgZnJlaWdlZ2ViZW4uPGJyIC8+CntjaGFuZ2VkU2VnbWVudHN9Cntmb290ZXJ9'><source>{header}
 Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> für Sie freigegeben.<br />
-<br />
-Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />
 {changedSegments}
-<hr />
-<br />
-{footer}</source>
-<target>{header}
+{footer}</source><target>{header}
 The task <b>{task.taskNr} - {task.taskName}</b> was opened for you in the task-portal {portalLink}.<br />
-<br />
-The changes made by the formerly active role <b>{previousRole}</b> are listed below:<br />
 {changedSegments}
-<hr />
-<br />
-{footer}</target>
-</trans-unit>
+{footer}</target></trans-unit>
 <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gYXVmZ3J1bmQgZWluZXIgVGVybWluw7xiZXJzY2hyZWl0dW5nIGF1dG9tYXRpc2NoIGbDvHIgYWxsZSBCZW51dHplciBkZXIgUm9sbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+IGFiZ2VzY2hsb3NzZW4uPGJyIC8+'>
     <source>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></source>
     <target>The task <b>{task.taskNr} - {task.taskName}</b> was finished due a missed deadline automatically for all users of the role <i>{previousRole}</i> in the task-portal {portalLink}.<br /></target>
 </trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgaXN0IHZvbGxzdMOkbmRpZyBiZWFyYmVpdGV0LCBlcyBzaW5kIGtlaW5lIHdlaXRlcmVuIEJlbnV0emVyIGRlciBBdWZnYWJlIHp1Z2VvcmRuZXQuPGJyIC8+CjxiciAvPgo='><source>Die Aufgabe ist vollständig bearbeitet, es sind keine weiteren Benutzer der Aufgabe zugeordnet.<br />
 <br />
-</source><target>The task ist completed, there are no more users associated with the task.<br />
+</source><target>The task is completed, there are no more users associated with the task.<br />
 <br />
 </target></trans-unit>
 <trans-unit id='RGllIFJvbGxlIDxpPntwcmV2aW91c1JvbGV9PC9pPiB3YXIgbmljaHQgVGVpbCBkZXIgV29ya2Zsb3drZXR0ZSwgZGFoZXIgd3VyZGVuIGtlaW5lIEJlbnV0emVyIGJlbmFjaHJpY2h0aWd0LjxiciAvPgo8YnIgLz4K'><source>Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />
@@ -2192,26 +2181,20 @@ A task was associated to you in the task-portal {portalLink}.<br />
 </target>
 </trans-unit>
 
-<trans-unit id='e2hlYWRlcn0Ke2FjdGlvbn08YnIgLz4Ke3VzZXJzTm90aWZpZWR9PGJyIC8+Cnt1c2Vyc1ByZXZpb3VzUm9sZX08YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHp1dm9yIGFrdGl2ZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxpPntwcmV2aW91c1JvbGV9PC9pPjo8YnIgLz4Ke2NoYW5nZWRTZWdtZW50c30KPGhyIC8+CjxiciAvPgp7Zm9vdGVyfQ=='>
+<trans-unit id='e2hlYWRlcn0Ke2FjdGlvbn08YnIgLz4Ke3VzZXJzTm90aWZpZWR9PGJyIC8+Cnt1c2Vyc1ByZXZpb3VzUm9sZX08YnIgLz4KPGJyIC8+CntjaGFuZ2VkU2VnbWVudHN9Cntmb290ZXJ9'>
     <source>{header}
 {action}<br />
 {usersNotified}<br />
 {usersPreviousRole}<br />
 <br />
-Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i>{previousRole}</i>:<br />
 {changedSegments}
-<hr />
-<br />
 {footer}</source>
 <target>{header}
 {action}<br />
 {usersNotified}<br />
 {usersPreviousRole}<br />
 <br />
-The changes made by the formerly active user of the role <i>{previousRole}</i> are listed below:<br />
 {changedSegments}
-<hr />
-<br />
 {footer}</target>
 </trans-unit>
 
@@ -3593,9 +3576,9 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 	<source>Alles fertig - Aufgabe abschließen</source>
 	<target>All done - finish task</target>
 </trans-unit>
-<trans-unit id='Tm9jaCBldHdhcyB6dSB0dW4/IDxici8+RG9jaCBub2NoIHNww6R0ZXIgd2VpdGVyIGFyYmVpdGVuPw=='>
-	<source>Noch etwas zu tun? <br/>Doch noch später weiter arbeiten?</source>
-	<target>Still something to do? <br/>Better be able to continue later?</target>
+<trans-unit id='TcO2Y2h0ZW4gU2llIHNww6R0ZXIgd2VpdGVybWFjaGVuPw=='>
+  <source>Möchten Sie später weitermachen?</source>
+  <target>Would you like to continue later?</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSBzcMOkdGVyIHdlaXRlcmJlYXJiZWl0ZW4='>
 	<source>Aufgabe später weiterbearbeiten</source>
@@ -3931,6 +3914,82 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='Y29uZmlnX292ZXJ3cml0ZV90YXNr'><source>config_overwrite_task</source><target>Task</target></trans-unit>
 <trans-unit id='Y29uZmlnX292ZXJ3cml0ZV91c2Vy'><source>config_overwrite_user</source><target>User</target></trans-unit>
 <trans-unit id='V2VydA=='><source>Wert</source><target>Value</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSB3dXJkZSBhdWYgZWluZSBuZXVlIFZlcnNpb24gYWt0dWFsaXNpZXJ0'>
+  <source>Translate5 wurde auf eine neue Version aktualisiert</source>
+  <target>Translate5 was updated to a new version</target>
+</trans-unit>
+<trans-unit id='RWluIFVwZGF0ZSBhdWYgZGllIFZlcnNpb24gezB9IHd1cmRlIGR1cmNoZ2Vmw7xocnQuIEJpdHRlIGxhZGVuIHNpZSBkaWUgQW53ZW5kdW5nIG5ldSB1bSBGZWhsZXIgaW4gZGVyIEJlbnV0enVuZyB6dSB2ZXJtZWlkZW4u'>
+  <source>Ein Update auf die Version {0} wurde durchgeführt. Bitte laden sie die Anwendung neu um Fehler in der Benutzung zu vermeiden.</source>
+  <target>An update to version {0} was done. Please reload the application to load the latest version and prevent errors.</target>
+</trans-unit>
+<trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIGZ1ZXIgYWxsZSBLdW5kZW4='>
+  <source>Ressourcen-Nutzung fuer alle Kunden</source>
+  <target>Resource usage for all clients</target>
+</trans-unit>
+<trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIGZ1ZXIgS3VuZGU='>
+  <source>Ressourcen-Nutzung fuer Kunde</source>
+  <target>Resource usage for client</target>
+</trans-unit>
+<trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIHBybyBNb25hdA=='>
+  <source>Ressourcen-Nutzung pro Monat</source>
+  <target>Resource usage by month</target>
+</trans-unit>
+<trans-unit id='TG9nIGRlciBSZXNzb3VyZW4tTnV0enVuZw=='>
+  <source>Log der Ressouren-Nutzung</source>
+  <target>Resource usage log</target>
+</trans-unit>
+<trans-unit id='RG9rdW1lbnRlIHBybyBNb25hdA=='>
+  <source>Dokumente pro Monat</source>
+  <target>Documents by month</target>
+</trans-unit>
+<trans-unit id='RGllc2UgRGF0ZW4gZW50aGFsdGVuIGFsbGUgQW5mcmFnZW4gYW4gU3ByYWNocmVzc291cmNlbiwgZWdhbCBvYiBkdXJjaCBBdWZnYWJlbiBvZGVyIHZpYSBJbnN0YW50VHJhbnNsYXRlLg=='>
+  <source>Diese Daten enthalten alle Anfragen an Sprachressourcen, egal ob durch Aufgaben oder via InstantTranslate.</source>
+  <target>This data contains all requests to the language resources, be it from usage in tasks or with InstantTranslate.</target>
+</trans-unit>
+<trans-unit id='SmVkZSBaZWlsZSBrb3JyZXNwb25kaWVydCBtaXQgZWluZXIgQW5mcmFnZSBhbiBlaW5lIFNwcmFjaHJlc3NvdXJjZS4='>
+  <source>Jede Zeile korrespondiert mit einer Anfrage an eine Sprachressource.</source>
+  <target>Each line corresponds to one request to a language resource.</target>
+</trans-unit>
+<trans-unit id='VHlwIGRlciBSZXNzb3VyY2U='>
+  <source>Typ der Ressource</source>
+  <target>Resource type</target>
+</trans-unit>
+<trans-unit id='TmFtZSBkZXIgUmVzc291cmNl'>
+  <source>Name der Ressource</source>
+  <target>Resource name</target>
+</trans-unit>
+<trans-unit id='SmFoci9Nb25hdA=='>
+  <source>Jahr/Monat</source>
+  <target>Year/month</target>
+</trans-unit>
+<trans-unit id='w5xiZXJzZXR6dGUgWmVpY2hlbg=='>
+  <source>Übersetzte Zeichen</source>
+  <target>Characters by request</target>
+</trans-unit>
+<trans-unit id='WmVpdHN0ZW1wZWw='>
+  <source>Zeitstempel</source>
+  <target>Timestamp</target>
+</trans-unit>
+<trans-unit id='QW56YWhsIGRlciBtaXQgSW5zdGFudFRyYW5zbGF0ZSDDvGJlcnNldHp0ZW4gRG9rdW1lbnRl'>
+  <source>Anzahl der mit InstantTranslate übersetzten Dokumente</source>
+  <target>Number of documents translated with InstantTranslate</target>
+</trans-unit>
+<trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIEV4cG9ydGllcmVu'>
+  <source>Ressourcen-Nutzung Exportieren</source>
+  <target>Resource usage export</target>
+</trans-unit>
+<trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='>
+  <source>Kunden bearbeiten</source>
+  <target>Edit client</target>
+</trans-unit>
+<trans-unit id='Tm9jaCBldHdhcyB6dSB0dW4/'>
+  <source>Noch etwas zu tun?</source>
+  <target>Still something to do?</target>
+</trans-unit>
+<trans-unit id='SW0gZm9sZ2VuZGVuIGRpZSBnZXTDpHRpZ3RlbiDDhG5kZXJ1bmdlbiBkZXIgdm9yaGVyZ2VoZW5kZW4gUm9sbGUgPGI+e3ByZXZpb3VzUm9sZX08L2I+OjxiciAvPg=='>
+  <source>Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br /></source>
+  <target>The changes made by the formerly active role <b>{previousRole}</b> are listed below:<br /></target>
+</trans-unit>
 </body>
   </file>
 </xliff>

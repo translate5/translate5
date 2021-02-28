@@ -46,7 +46,7 @@ class editor_Plugins_MatchAnalysis_Models_BatchResult extends ZfExtended_Models_
      * @param int $languageResource
      * @return editor_Services_ServiceResult
      */
-    public function getResults(int $segmentId,int $languageResource) {
+    public function getResults(int $segmentId,int $languageResource) :editor_Services_ServiceResult {
         $s = $this->db->select()
         ->where('segmentId = ?',$segmentId)
         ->where('languageResource = ?',$languageResource)
@@ -54,7 +54,7 @@ class editor_Plugins_MatchAnalysis_Models_BatchResult extends ZfExtended_Models_
         ->limit(1);
         $result =$this->db->fetchAll($s)->toArray();
         if(empty($result)){
-            return [];
+            return new editor_Services_ServiceResult();
         }
         $result=reset($result);
         return unserialize($result['result']);

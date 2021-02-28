@@ -44,12 +44,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     
     
     /***
-     * Collection of assigned resources to the task
-     * @var array
-     */
-    protected $connectors=array();
-    
-    /***
      * Flag if pretranslations is active
      * @var string
      */
@@ -358,6 +352,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->log->exception($e, [
             'level' => $this->log::LEVEL_WARN,
             'domain' => $this->log->getDomain(),
+            'task' => $this->task,
         ]);
         settype($this->connectorErrorCount[$id], 'integer');
         $this->connectorErrorCount[$id]++;
