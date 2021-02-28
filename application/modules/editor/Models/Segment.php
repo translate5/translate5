@@ -1487,6 +1487,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
+     * TODO AUTOQA: remove when mqm is completely handled by new quality model
      * Updates - if enabled - the QM Sub Segments with correct IDs in the given String and stores it with the given Method in the entity
      * Also, corrects overlapped image tags between which there is no text node.
      * @param string $field

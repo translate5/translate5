@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * TODO AUTOQA Move to Quality Model
+ * Controler providing view for MQM Statistics
+ */
 class Editor_QmstatisticsController extends ZfExtended_RestController {
     /**
      * @var string
