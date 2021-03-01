@@ -243,11 +243,20 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::postAction()
      */
     public function postAction() {
-        parent::postAction();
-        $this->log->request();
-        $this->addUserInfoToResult();
-        $this->log->info('E1012', 'job created', ['tua' => $this->entity->getSanitizedEntityForLog()]);
-        $this->applyEditableAndDeletable();
+        $this->entity->init();
+        $this->decodePutData();
+        //check and set the default deadline date
+        $this->setDefaultDeadlineDate();
+        $this->processClientReferenceVersion();
+        $this->setDataInEntity($this->postBlacklist);
+        if($this->validate()){
+            $this->entity->save();
+            $this->view->rows = $this->entity->getDataObject();
+            $this->log->request();
+            $this->addUserInfoToResult();
+            $this->log->info('E1012', 'job created', ['tua' => $this->entity->getSanitizedEntityForLog()]);
+            $this->applyEditableAndDeletable();
+        }
     }
     
     public function deleteAction(){
@@ -387,5 +396,46 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             $this->data->assignmentDate=NOW_ISO;
             $this->entity->setAssignmentDate(NOW_ISO);
         }
+    }
+
+    /***
+     * Set the default deadline date from the config. How many work days the deadlinde date will be from the task
+     * order date can be define in the system configuration.
+     * To use the defaultDeadline date, the deadlineDate field should be set to "default" 
+     */
+    protected function setDefaultDeadlineDate() {
+        //check if default deadline date should be set
+        //To set the defaultDeadline date via the api, the deadlineDate field should be set to "default"
+        if(!isset($this->data->deadlineDate) || $this->data->deadlineDate!=="default" || !isset($this->data->taskGuid)){
+            return;
+        }
+        $model = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $model editor_Models_Task */
+        $model->loadByTaskGuid($this->data->taskGuid);
+        //check if the order date is set. With empty order data, no deadline date from config is posible
+        if(empty($model->getOrderdate()) || is_null($model->getOrderdate())){
+            return;
+        }
+        
+        $wm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wm editor_Workflow_Manager */
+        
+        $workflow = $wm->get($model->getWorkflow());
+        /* @var $workflow editor_Workflow_Abstract */
+        $step = $workflow->getStepOfRole($this->data->role);
+        //get the config for the task workflow and the user assoc role workflow step
+        $configValue = $model->getConfig()->runtimeOptions->workflow->{$model->getWorkflow()}->{$step}->defaultDeadlineDate ?? 0;
+        if($configValue<1){
+            return;
+        }
+        //new deadline date = "task order date" + "configured days"
+        $newDeadline =date ('Y-m-d' , strtotime($model->getOrderdate().' +'.$configValue.' Weekday'));
+        //Add the current time to the new deadline. The order date by default is without timestamp (always 0:0:0 as time), and because of that
+        //the new deadline date will always be with 0:0:0 as timestamp. For the deadline date the time is important.
+        $dateAndTime = explode(" ", NOW_ISO);
+        $newDeadline .=' '.array_pop($dateAndTime); 
+        
+        $this->data->deadlineDate = $newDeadline;
+        $this->entity->setDeadlineDate($newDeadline);
     }
 }
