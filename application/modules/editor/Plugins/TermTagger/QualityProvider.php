@@ -84,7 +84,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         $worker->queue($parentWorkerId);
     }
     
-    public function processSegment(editor_Models_Task $task, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
+    public function processSegment(editor_Models_Task $task, Zend_Config $taskConfig, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
         
         // this API does not process the import
         if($forImport){

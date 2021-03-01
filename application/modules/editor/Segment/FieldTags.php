@@ -359,6 +359,20 @@ class editor_Segment_FieldTags implements JsonSerializable {
         return false;
     }
     /**
+     * Transfers (clones) all tags of a certain type to the passed field tags. By default removes existing tags
+     * @param editor_Segment_FieldTags $fieldTags
+     * @param string $type
+     * @param bool $removeExisting
+     */
+    public function transferTagsByType(editor_Segment_FieldTags $fieldTags, string $type, bool $removeExisting=true){
+        if($removeExisting){
+            $fieldTags->removeByType($type);
+        }
+        foreach($this->getByType($type) as $tag){
+            $fieldTags->addTag($tag->clone(true));
+        }
+    }
+    /**
      * Sorts the items ascending, takes the second index into account when items have the same startIndex
      */
     public function sort(){
@@ -425,7 +439,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
                                 // depending on who is splittable we set the cut
                                 $cut = ($tag->isSplitable()) ? $compare->startIndex : $tag->endIndex;
                                 $last->endIndex = $cut;
-                                $last = $tag->clone(false);
+                                $last = $tag->clone(true);
                                 $last->startIndex = $cut;
                                 $rtags[$numRtags] = $last;
                                 $numRtags++;

@@ -41,7 +41,6 @@
  * 
  * @method editor_Segment_Tag clone(boolean $withDataAttribs)
  * @method editor_Segment_Tag createBaseClone()
- * @method editor_Segment_Tag cloneProps(editor_Tag $tag, boolean $withDataAttribs)
  */
 class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     

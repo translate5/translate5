@@ -45,13 +45,16 @@ class editor_Segment_ManualQuality_TagCheck extends editor_Segment_Quality_Provi
      */
     protected static $type = editor_Segment_Tag::TYPE_MANUALQUALITY;
     
-    public function processSegment(editor_Models_Task $task, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
+    public function processSegment(editor_Models_Task $task, Zend_Config $taskConfig, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
         
-        foreach($tags->getTagsByType(static::$type) as $mqmTag){
-            /* @var $mqmTag editor_Segment_ManualQuality_Tag */
-            $qualityId = $tags->saveManualQuality($mqmTag->field, $mqmTag->getTypeIndex(), $mqmTag->getSeverity(), $mqmTag->getComment(), $mqmTag->startIndex, $mqmTag->endIndex);
-            // update the sequence-id with the database-id of the bound quality
-            $mqmTag->setData('seq', strval($qualityId));
+        if($taskConfig->runtimeOptions->editor->enableQmSubSegments == 1){
+        
+            foreach($tags->getTagsByType(static::$type) as $mqmTag){
+                /* @var $mqmTag editor_Segment_ManualQuality_Tag */
+                $qualityId = $tags->saveManualQuality($mqmTag->field, $mqmTag->getTypeIndex(), $mqmTag->getSeverity(), $mqmTag->getComment(), $mqmTag->startIndex, $mqmTag->endIndex);
+                // update the sequence-id with the database-id of the bound quality
+                $mqmTag->setData('seq', strval($qualityId));
+            }
         }
         return $tags;
     }

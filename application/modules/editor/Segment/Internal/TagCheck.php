@@ -44,9 +44,9 @@ class editor_Segment_Internal_TagCheck extends editor_Segment_Quality_Provider {
      */
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
     
-    public function processSegment(editor_Models_Task $task, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
+    public function processSegment(editor_Models_Task $task, Zend_Config $taskConfig, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
         
-        if(!$this->config->enableInternalTagCheck || $forImport){
+        if(!$taskConfig->runtimeOptions->autoQA->enableInternalTagCheck || $forImport){
             return $tags;
         }
         // 1) Tag check: Bei Translation: Internal Tags gegen Source prüfen, bei Review: gegen original Target  (insofern gesetzt)          

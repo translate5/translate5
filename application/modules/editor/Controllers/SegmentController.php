@@ -374,8 +374,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         }
         
         $this->view->rows = $result;
-        $this->view->total=count($result);
-        $this->view->hasMqm=$this->isMqmTask($parameters['taskGuid']);
+        $this->view->total = count($result);
+        $this->view->hasMqm = $this->isMqmTask($parameters['taskGuid']);
     }
     
     /***
@@ -396,14 +396,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         //check if the required search parameters are in the request
         $this->checkRequiredSearchParameters($parameters);
-        $parameters['searchField'] =  htmlentities($parameters['searchField'], ENT_XML1);
-        $parameters['replaceField'] =  htmlentities($parameters['replaceField'], ENT_XML1);
+        $parameters['searchField'] = htmlentities($parameters['searchField'], ENT_XML1);
+        $parameters['replaceField'] = htmlentities($parameters['replaceField'], ENT_XML1);
         
         //check if the task has mqm tags
         //replace all is not supported for tasks with mqm
         if($this->isMqmTask($parameters['taskGuid'])){
-            $this->view->message= $t->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');
-            $this->view->hasMqm=true;
+            $this->view->message = $t->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');
+            $this->view->hasMqm = true;
             return;
         }
         

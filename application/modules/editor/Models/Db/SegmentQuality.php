@@ -43,7 +43,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
     public static function deleteForSegments(array $segmentIds){
         if(count($segmentIds) > 0){
             $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-            /* @var $table editor_Models_Db_SegmentQuality[] */
+            /* @var $table editor_Models_Db_SegmentQuality */
             $db = $table->getAdapter();
             $where = (count($segmentIds) > 1) ? $db->quoteInto('segmentId IN (?)', $segmentIds) : $db->quoteInto('segmentId = ?', $segmentIds[0]);
             $db->delete($table->getName(), $where);
@@ -56,7 +56,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
     public static function saveRows(array $rows){
         if(count($rows) > 1){
             $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-            /* @var $table editor_Models_Db_SegmentQuality[] */
+            /* @var $table editor_Models_Db_SegmentQuality */
             $db = $table->getAdapter();
             $cols = [];
             foreach($table->info(Zend_Db_Table_Abstract::COLS) as $col){
@@ -77,11 +77,73 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             $rows[0]->save();
         }
     }
-
+    /**
+     * 
+     * @param string $taskGuid
+     * @param string $type
+     * @return boolean
+     */
+    public static function hasTypeForTask(string $taskGuid, string $type){
+        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
+        /* @var $table editor_Models_Db_SegmentQuality */
+        $where = $table->select()
+            ->from($table->getName(), ['id'])
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('type = ?', $type);
+        return (count($table->fetchAll($where)) > 0);
+    }
+    
     protected $_name  = 'LEK_segment_quality';
+    
     protected $_rowClass = 'editor_Models_Db_SegmentQualityRow';
+    
     public $_primary = 'id';
     
+    /**
+     * 
+     * @param int $segmentId
+     * @param string $type
+     * @return int
+     */
+    public function removeQualitiesBySegmentAndType(int $segmentId, string $type){
+        $where = array();
+        $where[] = $this->getAdapter()->quoteInto('segmentId = ?', $segmentId);
+        $where[] = $this->getAdapter()->quoteInto('type = ?', $type);
+        return $this->delete($where);
+    }
+    /**
+     * 
+     * @param int $segmentId
+     * @param string $taskGuid
+     * @param string $field
+     * @param string $type
+     * @param string $category
+     * @param int $mqmType
+     * @param string $severity
+     * @param string $comment
+     * @param int $startIndex
+     * @param int $endIndex
+     * @param int $falsePositive
+     * @return number
+     */
+    public function saveQuality(int $segmentId, string $taskGuid, string $field, string $type, string $category=NULL, int $mqmType=-1, string $severity=NULL, string $comment=NULL, int $startIndex=0, int $endIndex=-1, int $falsePositive=0){
+        $row = $this->createRow();
+        /* @var $row editor_Models_Db_SegmentQualityRow */
+        $row->segmentId = $segmentId;
+        $row->taskGuid = $taskGuid;
+        $row->setField($field);
+        $row->type = $type;
+        $row->category = $category;
+        $row->startIndex = $startIndex;
+        $row->endIndex = $endIndex;
+        $row->falsePositive = $falsePositive;
+        $row->mqmType = $mqmType;
+        $row->severity = $severity;
+        $row->comment = $comment;
+        $row->save();
+        
+        return $row->id;
+    }
     /**
      * 
      * @return string

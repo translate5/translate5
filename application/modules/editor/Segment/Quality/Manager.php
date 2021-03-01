@@ -96,11 +96,9 @@ final class editor_Segment_Quality_Manager {
      */
     private function __construct(){
         $this->registry = [];
-        $config = Zend_Registry::get('config');
-        $qualityConfig = $config->runtimeOptions->autoQA;
         foreach(self::$_provider as $providerClass){
             try {
-                $provider = new $providerClass($qualityConfig);
+                $provider = new $providerClass();
                 /* @var $provider editor_Segment_Quality_Provider */
                 $this->registry[$provider->getType()] = $provider;
             } catch (Exception $e) {
@@ -109,13 +107,13 @@ final class editor_Segment_Quality_Manager {
         }
         // Some Base Providers that do not come from Plugins
         // Tag Check
-        $provider = new editor_Segment_Internal_TagCheck($qualityConfig);
+        $provider = new editor_Segment_Internal_TagCheck();
         $this->registry[$provider->getType()] = $provider;
         // MatchRate
-        $provider = new editor_Segment_MatchRate_EditCheck($qualityConfig);
+        $provider = new editor_Segment_MatchRate_EditCheck();
         $this->registry[$provider->getType()] = $provider;
         // MQM
-        $provider = new editor_Segment_ManualQuality_TagCheck($qualityConfig);
+        $provider = new editor_Segment_ManualQuality_TagCheck();
         $this->registry[$provider->getType()] = $provider;
     }
     /**
@@ -157,6 +155,7 @@ final class editor_Segment_Quality_Manager {
      */
     public function finishImport(editor_Models_Task $task){
         
+        $config = $task->getConfig();        
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $db editor_Models_Db_Segments */
         $db->getAdapter()->beginTransaction();
@@ -180,7 +179,7 @@ final class editor_Segment_Quality_Manager {
                     if($provider->removeOwnTagsBeforeProcessing()){
                         $tags->removeTagsByType($provider->getType());
                     }
-                    $tags = $provider->processSegment($task, $tags, true);
+                    $tags = $provider->processSegment($task, $config, $tags, true);
                 }
             }
             // we save all qualities at once to reduce db-strain
@@ -191,7 +190,7 @@ final class editor_Segment_Quality_Manager {
         // save qualities
         editor_Models_Db_SegmentQuality::saveRows($qualities);
         // remove segment tags model
-        // TODO REMOVE OUTCOMMENT
+        // TODO AUTOQA REMOVE OUTCOMMENT
         // editor_Models_Db_SegmentTags::removeByTaskGuid($task->getTaskGuid());
         
         $db->getAdapter()->commit();
@@ -202,14 +201,15 @@ final class editor_Segment_Quality_Manager {
      */
     public function processEditing(editor_Models_Segment $segment, editor_Models_Task $task){
         // we remove all qualities as new ones will be written
-        editor_Models_Db_SegmentQuality::deleteForSegment($segment->getId());        
+        editor_Models_Db_SegmentQuality::deleteForSegment($segment->getId());
+        $config = $task->getConfig(); 
         $tags = editor_Segment_Tags::fromSegment($task, true, $segment, false);
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
             if($provider->removeOwnTagsBeforeProcessing()){
                 $tags->removeTagsByType($provider->getType());
             }
-            $tags = $provider->processSegment($task, $tags, false);
+            $tags = $provider->processSegment($task, $config, $tags, false);
         }
         $tags->flush(true);
     }
