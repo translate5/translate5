@@ -50,17 +50,11 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @var string
      */
     protected static $type = NULL;
-    /**
-     * 
-     * @var Zend_Config
-     */
-    protected $config;
 
-    public function __construct(Zend_Config $qualityConfig){
+    public function __construct(){
         if(static::$type == NULL){
             throw new ZfExtended_Exception(get_class($this).' must have a ::$type property defined');
         }
-        $this->config = $qualityConfig;
     }
     /**
      * Retrieves the provider type that is a system-wide unique string to identify the provider
@@ -103,7 +97,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @param bool $forImport
      * @return editor_Segment_Tags
      */
-    public function processSegment(editor_Models_Task $task, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
+    public function processSegment(editor_Models_Task $task, Zend_Config $taskConfig, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
         return $tags;
     }
     /**

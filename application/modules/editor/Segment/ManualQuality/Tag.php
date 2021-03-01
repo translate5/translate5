@@ -38,6 +38,9 @@
  * Example as sent from the Frontend:
  * OPENER: <img class="open minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />
  * CLOSER: <img class="close minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />
+ * 
+ * @method editor_Segment_ManualQuality_Tag clone(boolean $withDataAttribs)
+ * @method editor_Segment_ManualQuality_Tag createBaseClone()
  */
 final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
     

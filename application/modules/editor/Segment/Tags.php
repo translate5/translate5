@@ -466,23 +466,19 @@ class editor_Segment_Tags implements JsonSerializable {
      * @param int $endIndex
      * @return int
      */
-    public function saveManualQuality(string $field, int $typeIndex, string $severity, string $comment, int $startIndex=0, int $endIndex=-1) {
-        $row = $this->getQualityTable()->createRow();
-        /* @var $row editor_Models_Db_SegmentQualityRow */
-        $row->segmentId = $this->segmentId;
-        $row->taskGuid = $this->task->getTaskGuid();
-        $row->setField($field);
-        $row->type = editor_Segment_Tag::TYPE_MANUALQUALITY;
-        $row->category = NULL;
-        $row->startIndex = $startIndex;
-        $row->endIndex = $endIndex;
-        $row->falsePositive = 0; // TODO AUTOQA: this means, when we re-set qualities a former existing false positive flag will not persist
-        $row->mqmType = $typeIndex;
-        $row->severity = $severity;
-        $row->comment = $comment;
-        $row->save();
-        
-        return $row->id;
+    public function saveManualQuality(string $field, int $typeIndex, string $severity, string $comment, int $startIndex=0, int $endIndex=-1){
+        // TODO AUTOQA: this means, when we re-set qualities a former existing false positive flag will not persist
+        return $this->getQualityTable()->saveQuality(
+            $this->segmentId,
+            $this->task->getTaskGuid(),
+            $field,
+            editor_Segment_Tag::TYPE_MANUALQUALITY,
+            NULL,
+            $typeIndex,
+            $severity,
+            $comment,
+            $startIndex,
+            $endIndex);
     }
     /**
      * Returnes the names of all our target fields
