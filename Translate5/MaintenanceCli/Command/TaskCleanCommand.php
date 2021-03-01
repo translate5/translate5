@@ -80,14 +80,14 @@ class TaskCleanCommand extends Translate5AbstractCommand
             'i',
             InputOption::VALUE_REQUIRED,
             'deletes one task in state import');
-        
-        $this->addOption(
-            'delete-data',
-            'd',
-            InputOption::VALUE_NONE,
-            'deletes all orphaned data folders');
+            
+            $this->addOption(
+                'delete-data',
+                'd',
+                InputOption::VALUE_NONE,
+                'deletes all orphaned data folders');
     }
-
+    
     /**
      * Execute the command
      * {@inheritDoc}
@@ -179,22 +179,33 @@ class TaskCleanCommand extends Translate5AbstractCommand
         }
         $table = new TaskTable($this->output);
         $table->setRows($stateImport);
-        $table->render();
-        $this->output->writeln(['','']);
+        
         
         $toDelete = (int) $this->input->getOption('delete-import');
         if(empty($toDelete)) {
+            $table->render();
+            $this->output->writeln(['','']);
             return;
         }
         if(!$this->isInList($toDelete, $stateImport)) {
+            $table->render();
+            $this->output->writeln(['','']);
             $this->io->error('Given task ID is not in the list of tasks with status "import" and can not be deleted here!');
             return;
         }
+        
         $task = new \editor_Models_Task();
         $task->load((int) $toDelete);
+        $msg = 'The task "'.$task->getTaskName().' ('.$task->getId().' - '.$task->getTaskGuid().') was successfully deleted!';
         $remover = new \editor_Models_Task_Remover($task);
         $remover->remove(true);
-        $this->io->success('The task "'.$task->getTaskName().' ('.$task->getId().' - '.$task->getTaskGuid().') was successfully deleted!');
+        
+        unset($stateImport[$toDelete]);
+        $table->setRows($stateImport);
+        $table->render();
+        $this->output->writeln(['','']);
+        
+        $this->io->success($msg);
     }
     
     /**
@@ -213,7 +224,7 @@ class TaskCleanCommand extends Translate5AbstractCommand
         $taskDirectories = scandir($taskDataPath);
         
         $orphaned = array_diff($taskDirectories, $availableDataDirs);
-
+        
         $delete = $this->input->getOption('delete-data');
         
         $table = new Table($this->output);
@@ -236,7 +247,7 @@ class TaskCleanCommand extends Translate5AbstractCommand
                 /* @var $recursivedircleaner \ZfExtended_Controller_Helper_Recursivedircleaner */
                 $recursivedircleaner = \ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
                     'Recursivedircleaner'
-                );
+                    );
                 $recursivedircleaner->delete($absDir);
             }
         }
