@@ -331,7 +331,5 @@ h4, p {
 
 .termPortalLanguageRfcLabel {
     background-color: #cfcfcf;
-    padding: 2px;
-    font-size: 9px;
-    width: 20px;
+    padding: 0 3px 3px 3px;
 }
