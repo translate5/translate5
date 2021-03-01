@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -36,9 +36,9 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_SegmentProcessor_RepetitionHash extends editor_Models_Import_SegmentProcessor {
     /**
-     * @var boolean
+     * @var editor_Models_SegmentFieldManager
      */
-    protected $hasAlternates;
+    protected $sfm;
     
     /**
      * @var editor_Models_Segment_RepetitionHash
@@ -47,7 +47,7 @@ class editor_Models_Import_SegmentProcessor_RepetitionHash extends editor_Models
     
     public function __construct(editor_Models_Task $task, editor_Models_SegmentFieldManager $sfm) {
         parent::__construct($task);
-        $this->hasAlternates = !$sfm->isDefaultLayout();
+        $this->sfm = $sfm;
         $this->hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash',[$task]);
     }
     
@@ -57,7 +57,7 @@ class editor_Models_Import_SegmentProcessor_RepetitionHash extends editor_Models
      */
     public function process(editor_Models_Import_FileParser $parser){
         $allFields = &$parser->getFieldContents();
-        if($this->hasAlternates) {
+        if(!$this->sfm->isDefaultLayout()) {
             foreach($allFields as $field => &$data) {
                 $data['originalMd5'] = $this->hasher->hashAlternateTarget($data['originalMd5']);
             }
@@ -82,10 +82,10 @@ class editor_Models_Import_SegmentProcessor_RepetitionHash extends editor_Models
         //          Source              Target
         // Seg1     <t>                 <t>         will be edited to: <t>Test
         // Seg1Hash <t>#1               <t>
-        // Seg2     <t>                 - empty -   the 2. Segments target is empty 
+        // Seg2     <t>                 - empty -   the 2. Segments target is empty
         // Seg2Hash <t>                 - empty -   so no tag count or just 0 from target could be added to the sourceHash
-        // 
-        // The result ist Seg1Hash != Seg2Hash although they are the same. 
+        //
+        // The result ist Seg1Hash != Seg2Hash although they are the same.
         // The solution is to use the sourceTagCount for empty targets on import!
         if(empty($target['original'])) {
             $contentToGetTags = $source['original'];
