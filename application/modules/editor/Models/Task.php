@@ -883,7 +883,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * (Further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
      */
     public function isHiddenTask() {
-        return $this->getTaskType() != $this->getDefaultTasktype();
+        return !in_array($this->getTaskType(), [$this->getDefaultTasktype(),self::INITIAL_TASKTYPE_PROJECT_TASK]);
     }
     
     /**
