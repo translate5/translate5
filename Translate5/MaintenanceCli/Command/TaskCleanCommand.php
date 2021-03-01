@@ -82,6 +82,12 @@ class TaskCleanCommand extends Translate5AbstractCommand
             'deletes one task in state import');
         
         $this->addOption(
+            'set-to-error',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'sets a task to status error (for example to gain access to clone/delete/download of a hanging import task)');
+        
+        $this->addOption(
             'delete-data',
             'd',
             InputOption::VALUE_NONE,
@@ -119,10 +125,12 @@ class TaskCleanCommand extends Translate5AbstractCommand
         $this->handleErrorTasks($stateError);
         $this->handleImportTasks($stateImport);
         $this->handleOrphanedTaskData($availableDataDirs);
+        $this->handleSetToError();
         $this->io->section('Use the following option parameters to delete the listed tasks:');
         $this->io->text([
             '--delete-error [ID]  - deletes one (with ID) or all tasks with errors',
             '--delete-import ID   - deletes one task in state import',
+            '--set-to-error ID    - sets a task to status error (for example to gain access to clone/delete/download of a hanging import task)',
             '--delete-data        - deletes all orphaned data folders',
         ]);
         return 0;
@@ -254,6 +262,25 @@ class TaskCleanCommand extends Translate5AbstractCommand
         }
         else {
             $this->io->text('<info>No orphaned data directories found!</>');
+        }
+    }
+    
+    /**
+     * set the task given by ID to status error
+     */
+    protected function handleSetToError() {
+        $taskId = (int) $this->input->getOption('set-to-error');
+        if(empty($taskId)) {
+            return;
+        }
+        
+        $task = new \editor_Models_Task();
+        $task->load((int) $taskId);
+        if($task->setErroneous()) {
+            $this->io->success('The task "'.$task->getTaskName().' ('.$task->getId().' - '.$task->getTaskGuid().') was successfully set to status error!');
+        }
+        else {
+            $this->io->error('The task "'.$task->getTaskName().' ('.$task->getId().' - '.$task->getTaskGuid().') could not be set to status error!');
         }
     }
     
