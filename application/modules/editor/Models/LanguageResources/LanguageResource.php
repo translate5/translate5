@@ -190,17 +190,17 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return array
      */
     public function loadByAssociatedTaskGuid(string $taskGuid) {
-        return $this->loadByAssociatedTaskGuidList(array($taskGuid));
+        return $this->loadByAssociatedTaskGuidList([ $taskGuid ]);
     }
     
     /**
      * loads the task to languageResource assocs by taskguid
-     * @param string $taskGuid
+     * @param string[] $taskGuidList
      * @return array
      */
     public function loadByAssociatedTaskGuidList(array $taskGuidList) {
         if(empty($taskGuidList)){
-            return $taskGuidList;
+            return [];
         }
         $assocDb = new editor_Models_Db_Taskassoc();
         $assocName = $assocDb->info($assocDb::NAME);
