@@ -83,7 +83,7 @@ class editor_Services_Connector {
      * if set to true, it will get the results from the batch cache table when using the query action
      * @var boolean
      */
-    protected $batchQuery = false;
+    protected $batchEnabled = false;
     
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang = null, $targetLang = null){
         $this->connectToResourceOnly($languageResource->getResource());
@@ -122,7 +122,7 @@ class editor_Services_Connector {
      */
     protected function _query(editor_Models_Segment $segment) {
         $serviceResult = null;
-        $isBatchRequest = $this->batchQuery && $this->adapter->isBatchQuery();
+        $isBatchRequest = $this->batchEnabled && $this->adapter->isBatchQuery();
         //if the batch query is enabled, get the results from the cache
         if($isBatchRequest){
             $serviceResult = $this->getCachedResult($segment);
@@ -266,14 +266,14 @@ class editor_Services_Connector {
      * Load the query results from batch query table
      */
     public function enableBatch() {
-        $this->batchQuery = true;
+        $this->batchEnabled = true;
     }
     
     /***
      * Load the results with calling the adapters query action
      */
     public function disableBatch() {
-        $this->batchQuery = false;
+        $this->batchEnabled = false;
     }
 
     /***
