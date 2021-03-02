@@ -35,31 +35,40 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
 
     /**
      * it should be based on maxParallelProcesses instead of just having one running worker per slot. maxParallelProcesses is ignored so far.
-     * @param int $parentId
-     * @param string $state
      *
      * @see ZfExtended_Worker_Abstract::queue()
      */
-    public function queue($parentId = 0, $state = NULL, $startNext = true) {
+    public function queue($parentId=0, $state=NULL, $startNext=true) {
         
-        $workerCountToStart = 0;        
-        $usedSlots = count($this->workerModel->getListSlotsCount(static::$resourceName));        
-        $availableWorkerSlots = count($this->getAvailableSlots($this->resourcePool));
+        // we trigger the parent init WITHOUT starting further workers
+        $idToReturn = parent::queue($parentId, $state, false);
         
-        while(($usedSlots + $workerCountToStart) < ($availableWorkerSlots + 1)){
-            $workerCountToStart++;
+        // if wanted, we create the next workers
+        if($startNext){
+            
+            $workerCountToStart = 0;
+            $usedSlots = count($this->workerModel->getListSlotsCount(static::$resourceName));
+            $availableWorkerSlots = count($this->getAvailableSlots($this->resourcePool));
+            
+            while(($usedSlots + $workerCountToStart) < ($availableWorkerSlots + 1)){
+                $workerCountToStart++;
+            }
+            if(empty($usedSlots)){
+                $workerCountToStart = count($this->getAvailableSlots($this->resourcePool));
+            }
+            if($workerCountToStart == 0) {
+                $this->raiseNoAvailableResourceException();
+            }
+            for($i=0; $i < $workerCountToStart; $i++){
+                $worker = ZfExtended_Factory::get(get_class($this));
+                $worker->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
+                $worker->queue($parentId, $state, false);
+            }
+            // we now can start the queue
+            $this->wakeUpAndStartNextWorkers();
+            $this->emulateBlocking();
         }
-        if(empty($usedSlots)){
-            $workerCountToStart = count($this->getAvailableSlots($this->resourcePool));
-        }
-        if($workerCountToStart == 0) {
-            $this->raiseNoAvailableResourceException();
-        }
-        for($i=0; $i < $workerCountToStart; $i++){
-            $this->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
-            parent::queue($parentId, $state);
-        }
-        return $parentId; //since we can't return multiple ids, we just return the given parent again
+        return $idToReturn;
     }
     /**
      * A Resource worker has the "process" function to replace the "work" API enriched with the slot as param
