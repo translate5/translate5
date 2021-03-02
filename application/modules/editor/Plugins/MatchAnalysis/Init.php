@@ -169,7 +169,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             return false;
         }
         
-        if($parentWorkerId == null){
+        if($parentWorkerId === null){
             $parentWorkerId = $this->fetchImportWorkerId($taskGuid);
         }
         $worker->queue($parentWorkerId);
@@ -242,7 +242,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
                 return false;
             }
             
-            if($parentWorkerId == NULL){
+            if($parentWorkerId === NULL){
                 $parentWorkerId = $this->fetchImportWorkerId($taskGuid);
             }
             $parentWorkerId = $batchWorker->queue($parentWorkerId);
