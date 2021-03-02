@@ -163,6 +163,7 @@ class editor_Workflow_Manager {
             $data->steps = $labelize($wf->getSteps(), $cls);
             $data->assignableSteps = $labelize($wf->getAssignableSteps(), $cls);
             $data->steps2roles = $wf->getSteps2Roles();
+            $data->roles2steps = array_flip($data->steps2roles);
             $data->stepChain = $wf->getStepChain();
             $data->stepsWithFilter = $wf->getStepsWithFilter();
             $data->initialStates = $wf->getInitialStates();
