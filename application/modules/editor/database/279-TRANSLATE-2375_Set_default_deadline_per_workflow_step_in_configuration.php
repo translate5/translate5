@@ -33,6 +33,8 @@ END LICENSE AND COPYRIGHT
  */
 set_time_limit(0);
 
+defined('ZFEXTENDED_IS_WORKER_THREAD') || define('ZFEXTENDED_IS_WORKER_THREAD', true);
+
 //uncomment the following line, so that the file is not marked as processed:
 //$this->doNotSavePhpForDebugging = false;
 
