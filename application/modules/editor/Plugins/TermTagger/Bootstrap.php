@@ -95,14 +95,29 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      */
     public function handleAfterTermCollectionAssocChange(Zend_EventManager_Event $event){
         $entity=$event->getParam('entity');
-        /* @var $entity editor_Models_LanguageResources_Taskassoc */
-        $this->removeTerminologieFile($entity->getTaskGuid());
         
-        $task=ZfExtended_Factory::get('editor_Models_Task');
+        $entityGuid = $entity->getTaskGuid();
+
+        $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        //update the terminologie flag, based on if there is a termcollection
-        //as language resource associated to the task
-        $task->updateIsTerminologieFlag($entity->getTaskGuid());
+        $task->loadByTaskGuid($entityGuid);
+        
+        $taskGuids = [$task->getTaskGuid()];
+        //check if the current task is project.
+        if($task->isProject()){
+            //collect all project tasks to check the terminologie 
+            $taskGuids = $task->loadProjectTasks($task->getProjectId(),true);
+            $taskGuids = array_column($taskGuids, 'taskGuid');
+        }
+        foreach ($taskGuids as $taskGuid) {
+            $this->removeTerminologieFile($taskGuid);
+            
+            $task=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            //update the terminologie flag, based on if there is a termcollection
+            //as language resource associated to the task
+            $task->updateIsTerminologieFlag($taskGuid);
+        }
     }
     
     /***
