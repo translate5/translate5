@@ -788,7 +788,15 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
                 break;
             default:
                 htmlFile += '<a href="' + taskData['downloadUrl'] + '" class="ui-button ui-widget ui-corner-all" target="_blank">Download</a>';
-        } 
+        }
+        htmlFile += '<br/>';
+        
+        htmlFile += '<p>';
+        htmlFile += 'Import progress:'+taskData['importProgress']['progress']
+        htmlFile += '<br/>';
+        htmlFile += 'Running job:'+taskData['importProgress']['running']
+        htmlFile += '</p>';
+        
         htmlFile += '</li>';
         pretranslatedFiles.push(htmlFile);
     });

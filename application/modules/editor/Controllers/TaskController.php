@@ -1828,6 +1828,37 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->view->index = $index;
         unset($this->view->rows);
     }
+    
+    public function importprogressAction() {
+        $taskGuid = $this->getParam('taskGuid');
+        if(empty($taskGuid)){
+            //TODO: error code
+            throw new ZfExtended_ErrorCodeException('');
+        }
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $worker ZfExtended_Models_Worker */
+        //TODO: this here needs to return only the workers qued for the import
+        //from -> editor_Models_Import_Worker_FileTree
+        //to   -> editor_Models_Import_Worker_FinalStep
+        
+        $jobs = $worker->loadByTask($taskGuid);
+        
+        $total = count($jobs);
+        $done = 0;
+        $running = '';
+        foreach ($jobs as $job){
+            if( $job['state'] == 'done'){
+                $done++;
+            }
+            if($job['state'] == 'running'){
+                $running = $job['worker'];
+            }
+        }
+        $this->view->total = $total;
+        $this->view->done = $done;
+        $this->view->running = $running;
+        $this->view->progress = ($done/$total) * 100;
+    }
 
     /***
      * Clone existing language resources from oldTaskGuid for newTaskGuid.
