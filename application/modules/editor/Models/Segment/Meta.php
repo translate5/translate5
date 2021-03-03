@@ -127,13 +127,20 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     
     /**
      * Returns the word count sum of a task as calculated on import
-     * @param string $taskGuid
+     * @param editor_Models_Task $task
      * @return int
      */
-    public function getWordCountSum(string $taskGuid): int {
+    public function getWordCountSum(editor_Models_Task $task): int {
         $s = $this->db->select()
-        ->from($this->db, 'sum(sourceWordCount) as wordCount')
-        ->where('`taskGuid` = ?', $taskGuid);
+        ->from($this->db, 'sum(LEK_segments_meta.sourceWordCount) as wordCount');
+        //blocked segments should not be counted in the task total words sum
+        //if edit 100 matches is disabled, filter out blocked segments from the total sum
+        if(!$task->getEdit100PercentMatch()){
+            $s->setIntegrityCheck(false)
+            ->join('LEK_segments', 'LEK_segments.id = LEK_segments_meta.segmentId',[])
+            ->where('LEK_segments.autoStateId!=?',editor_Models_Segment_AutoStates::BLOCKED);//blocked segments are ignored in the word count sum
+        }
+        $s->where('LEK_segments_meta.taskGuid = ?', $task->getTaskGuid());
         $result = $this->db->fetchRow($s);
         return $result['wordCount'] ?? 0;
     }
