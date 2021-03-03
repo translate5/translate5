@@ -25,7 +25,4 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-UPDATE `Zf_configuration` SET 
-`name`='runtimeOptions.import.workfilesDirectory', 
-`default`='workfiles' 
-WHERE `name`='runtimeOptions.import.proofReadDirectory';
+DELETE FROM `Zf_configuration` WHERE `name`='runtimeOptions.import.proofReadDirectory';
