@@ -38,6 +38,19 @@ END LICENSE AND COPYRIGHT
  *  it must not contain complex data!
  */
 class editor_Models_Import_Configuration {
+    
+    /***
+     * Constant for the import directory folder name
+     * @var string
+     */
+    const WORK_FILES_DIRECTORY = 'workFiles';
+    
+    /***
+     * Old name for the import directory folder name 
+     * @var string
+     * @deprecated
+     */
+    const PROOFREAD_FILES_DIRECTORY = 'proofRead';
     /**
      * @var editor_Models_Languages language entity instance
      */
@@ -119,7 +132,10 @@ class editor_Models_Import_Configuration {
      * @return string
      */
     public static function getWorkfilesDirectoryName(string $importFolder = '') {
-        return Zend_Registry::get('config')->runtimeOptions->import->workfilesDirectory;
+        if(empty($importFolder) || strpos(strtolower($importFolder), strtolower(self::PROOFREAD_FILES_DIRECTORY)) === false){
+            return self::WORK_FILES_DIRECTORY;
+        }
+        return self::PROOFREAD_FILES_DIRECTORY;
     }
     
     /**
