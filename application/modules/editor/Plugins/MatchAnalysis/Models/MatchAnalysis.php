@@ -86,13 +86,23 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      * @param bool $isExport: is the data requested for export
      * @return array
      */
-    public function loadByBestMatchRate($taskGuid,$isExport=false){
+    public function loadByBestMatchRate(string $taskGuid,bool $isExport=false) : array{
         //load the latest analysis for the given taskGuid
         $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc=$analysisAssoc->loadNewestByTaskGuid($taskGuid);
         if(empty($analysisAssoc)) {
             return [];
+        }
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        
+        //if edit 100% matches is disabled for the task, filter out the blocked segments from the analysis 
+        $blockedFilter = '';
+        //TODO: this should be defined as config
+        if(!$task->getEdit100PercentMatch()){
+            $blockedFilter = 'INNER JOIN LEK_segments s ON t1.segmentId = s.id AND s.autoStateId!='.editor_Models_Segment_AutoStates::BLOCKED;
         }
         
         /*
@@ -124,10 +134,12 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         */
         $sqlV3='SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.wordCount) wordCount  FROM (
                 SELECT t1.*
-                	FROM LEK_match_analysis AS t1
-                	LEFT OUTER JOIN LEK_match_analysis AS t2
-                	ON t1.segmentId = t2.segmentId
-                			AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.analysisId =?
+                    FROM LEK_match_analysis AS t1 '
+                    .$blockedFilter.
+                    '
+                    LEFT OUTER JOIN LEK_match_analysis AS t2
+                    ON t1.segmentId = t2.segmentId
+                            AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.analysisId =?
                 	WHERE t2.segmentId IS NULL AND t1.analysisId = ?) bestRates GROUP BY bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate;';
         //$resultArray=$this->db->getAdapter()->query($sqlV2,[$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id']])->fetchAll();
         //$resultArray=$this->db->getAdapter()->query($sqlV1,[$analysisAssoc['id']])->fetchAll();

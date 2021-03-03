@@ -195,7 +195,7 @@ class editor_Models_Import_Worker_Import {
 
         //we may set the tasks wordcount only to our calculated values if there was no count given either by API or by import formats
         if ($this->task->getWordCount() == 0) {
-            $this->task->setWordCount($meta->getWordCountSum($taskGuid));
+            $this->task->setWordCount($meta->getWordCountSum($this->task));
         }
         
         $this->task->setSegmentCount($segment->getTotalSegmentsCount($taskGuid));
