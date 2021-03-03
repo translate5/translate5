@@ -384,7 +384,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         var winLayout=this.getLayout(),
             nextItem=winLayout.getNext();
         
-        return nextItem.getXType()=="taskUpload";
+        return nextItem && nextItem.getXType()=="taskUpload";
     },
     
     /**

@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_Import_Worker_Abstract {
+abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_Task_AbstractWorker {
     
     /**
      * This check prevents the termtagger to process any segments to avoid problems with hanging termtagger
@@ -136,7 +136,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      *
      * @see ZfExtended_Worker_Abstract::queue()
      */
-    public function queue($parentId = 0, $state = NULL, $startNext = true) {
+    public function queue($parentId = 0, $state = NULL, $startNext = true): int {
         $workerCountToStart = 0;
 
         $usedSlots = count($this->workerModel->getListSlotsCount(self::$resourceName));
