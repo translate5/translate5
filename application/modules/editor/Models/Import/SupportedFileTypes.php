@@ -77,6 +77,7 @@ class editor_Models_Import_SupportedFileTypes {
      * @param string $extension
      */
     public function register($extension) {
+        $extension = strtolower($extension);
         //only add if it does not already exist
         if(!in_array($extension, self::$extensionsSupported)) {
             self::$extensionsSupported[] = $extension;
@@ -89,6 +90,7 @@ class editor_Models_Import_SupportedFileTypes {
      * @param string $extension
      */
     public function registerIgnored($extension) {
+        $extension = strtolower($extension);
         //only add if it does not already exist
         if(!in_array($extension, self::$extensionsIgnored)) {
             self::$extensionsIgnored[] = $extension;
@@ -123,6 +125,7 @@ class editor_Models_Import_SupportedFileTypes {
      * @param string $importFileParserClass
      */
     public static function registerFileParser(string $extension, string $importFileParserClass) {
+        $extension = strtolower($extension);
         if(!array_key_exists($extension, self::$extensionsWithParser)) {
             self::$extensionsWithParser[$extension] = [];
         }
@@ -154,6 +157,7 @@ class editor_Models_Import_SupportedFileTypes {
      * @return array possible parser class names
      */
     public function getParser(string $ext): array {
+        $ext = strtolower($ext);
         if(empty(self::$extensionsWithParser[$ext])) {
             return [];
         }
@@ -166,7 +170,7 @@ class editor_Models_Import_SupportedFileTypes {
      * @return bool
      */
     public function hasParser(string $ext) : bool {
-        return !empty(self::$extensionsWithParser[$ext]);
+        return !empty(self::$extensionsWithParser[strtolower($ext)]);
     }
     
     /**
@@ -175,6 +179,6 @@ class editor_Models_Import_SupportedFileTypes {
      * @return boolean
      */
     public function isIgnored(string $ext): bool {
-        return in_array($ext, self::$extensionsIgnored);
+        return in_array(strtolower($ext), self::$extensionsIgnored);
     }
 }
