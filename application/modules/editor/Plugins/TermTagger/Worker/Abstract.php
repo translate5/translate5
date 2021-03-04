@@ -43,10 +43,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      * overwrites $this->workerModel->maxLifetime
      */
     protected $maxLifetime = '2 HOUR';
-    
-    // TEST: setting a different blocking-type
-    // protected $blockingType = ZfExtended_Worker_Abstract::BLOCK_RESOURCE;
-    
+
     /**
      * Multiple workers are allowed to run simultaneously per task
      * @var string

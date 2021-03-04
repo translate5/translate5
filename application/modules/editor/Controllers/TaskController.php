@@ -1536,7 +1536,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //add task assoc to the task
         $languageResourcemodel = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /*@var $languageResourcemodel editor_Models_LanguageResources_LanguageResource */
-        $resultlist =$languageResourcemodel->loadByAssociatedTaskGuidList(array($taskguid));
+        $resultlist = $languageResourcemodel->loadByAssociatedTaskGuid($taskguid);
         $this->view->rows->taskassocs = $resultlist;
 
         // Add pixelMapping-data for the fonts used in the task.
