@@ -93,7 +93,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         
         // init worker and queue it
-        if (!$worker->init($taskGuid, array('resourcePool' => 'import', 'processSegmentsDirectly' => true))) {
+        if (!$worker->init($taskGuid, array('resourcePool' => 'import', 'processingMode' => editor_Segment_Processing::IMPORT))) {
             $this->log('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }

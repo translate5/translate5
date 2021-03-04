@@ -43,14 +43,33 @@ abstract class editor_Segment_Quality_SegmentWorker extends editor_Models_Import
      * @var editor_Segment_Tags
      */
     private $currentSegmentTags;
+    /**
+     * This defines the processing mode for the segments we process
+     * This worker is used in various situations
+     * @var string
+     */
+    protected $processingMode;
     
+    /**
+     * Needed Implementation for editor_Models_Import_Worker_ResourceAbstract
+     * (non-PHPdoc)
+     * @see ZfExtended_Worker_Abstract::validateParameters()
+     */
+    protected function validateParameters($parameters = array()) {
+        // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
+        if(array_key_exists('processingMode', $parameters)){
+            $this->processingMode = $parameters['processingMode'];
+            return true;
+        }
+        return false;
+    }
     /**
      * Processes a single segment, just a plugin-method for workers that may need to process the segments with additional logic
      * @param editor_Models_Segment $segment
      * @return bool
      */
     protected function processSegment(editor_Models_Segment $segment, string $slot){
-        return $this->processSegmentTags(editor_Segment_Tags::fromSegment($this->task, !$this->isWorkerThread, $segment, $this->isWorkerThread), $slot);
+        return $this->processSegmentTags(editor_Segment_Tags::fromSegment($this->task, $this->processingMode, $segment, $this->isWorkerThread), $slot);
     }
     /**
      * Process multiple segments as a batch
@@ -60,7 +79,7 @@ abstract class editor_Segment_Quality_SegmentWorker extends editor_Models_Import
      * @return bool
      */
     protected function processSegments(array $segments, string $slot) : bool {
-        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, !$this->isWorkerThread, $segments, $this->isWorkerThread), $slot);
+        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, $this->processingMode, $segments, $this->isWorkerThread), $slot);
     }
     /**
      * Processes the segment-tags and write them back to the segment-tags-model

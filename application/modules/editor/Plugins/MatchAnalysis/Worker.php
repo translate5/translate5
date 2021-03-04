@@ -179,7 +179,7 @@ class editor_Plugins_MatchAnalysis_Worker extends ZfExtended_Worker_Abstract {
         $meta->addMeta('termtagState', $meta::META_TYPE_STRING, editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
         
         // init worker and queue it
-        if (!$worker->init($taskGuid, array('resourcePool' => 'import', 'processSegmentsDirectly' => true))) {
+        if (!$worker->init($taskGuid, array('resourcePool' => 'import', 'processingMode' => editor_Segment_Processing::ANALYSIS))) {
             $this->log->error('E1168', 'MatchAnalysis Plug-In: TermTagger worker for pre-translation can not be initialized.',['task'=>$this->task]);
             return false;
         }

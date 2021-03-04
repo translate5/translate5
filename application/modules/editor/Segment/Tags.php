@@ -40,15 +40,15 @@ class editor_Segment_Tags implements JsonSerializable {
     /**
      * 
      * @param editor_Models_Task $task
-     * @param bool $editorMode
+     * @param string $processingMode
      * @param editor_Models_Segment[] $segments
      * @param bool $useTagsModel: optional, enables the segment data being taken from the serialized data if available as neccessary in the import-process
      * @return editor_Segment_Tags[]
      */
-    public static function fromSegments(editor_Models_Task $task, bool $editorMode, array $segments, bool $useTagsModel=true) : array {
+    public static function fromSegments(editor_Models_Task $task, string $processingMode, array $segments, bool $useTagsModel=true) : array {
         $tags = [];
         foreach($segments as $segment){
-            $tags[] = self::fromSegment($task, $editorMode, $segment, $useTagsModel);
+            $tags[] = self::fromSegment($task, $processingMode, $segment, $useTagsModel);
         }
         return $tags;
     }
@@ -57,16 +57,16 @@ class editor_Segment_Tags implements JsonSerializable {
      * If the segment already has a tags-model saved, it is created by JSON, otherwise by the current segment data
      * 
      * @param editor_Models_Task $task
-     * @param bool $editorMode
+     * @param string $processingMode
      * @param editor_Models_Segment $segment
      * @param bool $useTagsModel. optional, enables the segment data being taken from the serialized data if available as neccessary in the import-process
      * @return editor_Segment_Tags
      */
-    public static function fromSegment(editor_Models_Task $task, bool $editorMode, editor_Models_Segment $segment, bool $useTagsModel=true) : editor_Segment_Tags {
+    public static function fromSegment(editor_Models_Task $task, string $processingMode, editor_Models_Segment $segment, bool $useTagsModel=true) : editor_Segment_Tags {
         if($useTagsModel && $segment->hasSegmentTagsJSON()){
-            return self::fromJson($task, $editorMode, $segment->getSegmentTagsJSON(), $segment);
+            return self::fromJson($task, $processingMode, $segment->getSegmentTagsJSON(), $segment);
         }
-        return new editor_Segment_Tags($task, $editorMode, $segment);
+        return new editor_Segment_Tags($task, $processingMode, $segment);
     }    
     /**
      * The counterpart to ::toJson: creates the tags from the serialized json data
@@ -74,13 +74,13 @@ class editor_Segment_Tags implements JsonSerializable {
      * @throws Exception
      * @return editor_Segment_Tags
      */
-    public static function fromJson(editor_Models_Task $task, bool $editorMode, string $jsonString, editor_Models_Segment $segment=NULL) : editor_Segment_Tags {
+    public static function fromJson(editor_Models_Task $task, string $processingMode, string $jsonString, editor_Models_Segment $segment=NULL) : editor_Segment_Tags {
         try {
             $data = json_decode($jsonString);
             if($data->taskGuid != $task->getTaskGuid()){
                 throw new Exception('Deserialization of editor_Segment_Tags from JSON-Object failed because of task-guid mismatch: '.json_encode($data));
             }
-            $tags = new editor_Segment_Tags($task, $editorMode, $segment, $data);
+            $tags = new editor_Segment_Tags($task, $processingMode, $segment, $data);
             $tags->initFromJson($data);
             return $tags;
         } catch (Exception $e) {
@@ -119,9 +119,14 @@ class editor_Segment_Tags implements JsonSerializable {
     private $task;
     /**
      *
+     * @var string
+     */
+    private $processingMode;
+    /**
+     *
      * @var bool
      */
-    private $editorMode;
+    private $isImport;
     /**
      *
      * @var int
@@ -145,11 +150,15 @@ class editor_Segment_Tags implements JsonSerializable {
     /**
      * 
      * @param editor_Models_Task $task
-     * @param bool $isEditor
+     * @param string $processingMode
+     * @param editor_Models_Segment $segment
+     * @param stdClass $serializedData
+     * @throws Exception
      */
-    public function __construct(editor_Models_Task $task, bool $isEditor, editor_Models_Segment $segment=NULL, stdClass $serializedData=NULL) {
+    public function __construct(editor_Models_Task $task, string $processingMode, editor_Models_Segment $segment=NULL, stdClass $serializedData=NULL) {
         $this->task = $task;
-        $this->editorMode = $isEditor;
+        $this->processingMode = $processingMode;
+        $this->isImport = ($processingMode == editor_Segment_Processing::IMPORT);
         $this->segment = $segment;
         if($serializedData != NULL){            
             $this->initFromJson($serializedData);
@@ -172,7 +181,7 @@ class editor_Segment_Tags implements JsonSerializable {
         // in case of an editing process the original source will be handled seperately
         // if we are an import, the original source and source will be handled identically - the "normal"  source is the edited source then (exception: the post-import adding of terms via "Analysis" where the source & edited source might already differ)
         // TODO: this assumes, that these fields are already copied at this point of the import
-        $hasOriginalSource = ($sourceEditingEnabled) ? ($this->editorMode || $this->segment->get($sourceFieldEditIndex) != $this->segment->get($sourceField)) : false;
+        $hasOriginalSource = ($sourceEditingEnabled) ? (!$this->isImport || $this->segment->get($sourceFieldEditIndex) != $this->segment->get($sourceField)) : false;
         if($hasOriginalSource){
             // original source (what is the source in all other cases)
             $this->sourceOriginal = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $sourceField, 'SourceOriginal');
@@ -189,7 +198,7 @@ class editor_Segment_Tags implements JsonSerializable {
             if($field->type == editor_Models_SegmentField::TYPE_TARGET && $field->editable) {
                 $editIndex = $fieldManager->getEditIndex($field->name);
                 // special when we have an import but the fields are different this might is 
-                if(!$this->editorMode && $this->segment->get($field->name) != $this->segment->get($editIndex)){
+                if($this->isImport && $this->segment->get($field->name) != $this->segment->get($editIndex)){
                     $target = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
                     $this->targets[] = $target;
                     if($this->targetOriginal == null){
@@ -200,9 +209,9 @@ class editor_Segment_Tags implements JsonSerializable {
                     $this->targets[] = $target;
                 } else {
                     // when importing, the field will be saved as edit field & as normal field
-                    $saveTo = ($this->editorMode) ? $editIndex : [$field->name, $editIndex];
+                    $saveTo = ($this->isImport) ? [$field->name, $editIndex] : $editIndex;
                     // the field name sent to the termtagger differs between import and editing (WHY?)
-                    $ttField = ($this->editorMode) ? $editIndex : $field->name;
+                    $ttField = ($this->isImport) ? $field->name : $editIndex;
                     $target = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($editIndex), $saveTo, $ttField);
                     $this->targets[] = $target;
                     // the first target will be the original target as needed for some Quality checks
@@ -248,10 +257,10 @@ class editor_Segment_Tags implements JsonSerializable {
     }
     /**
      * 
-     * @return boolean
+     * @return string
      */
-    public function isEditor(){
-        return $this->editorMode;
+    public function getProcessingMode(){
+        return $this->processingMode;
     }
     /**
      *
@@ -524,6 +533,7 @@ class editor_Segment_Tags implements JsonSerializable {
         $data = new stdClass(); 
         $data->taskGuid = $this->task->getTaskGuid();
         $data->segmentId = $this->segmentId;
+        $data->processingMode = $this->processingMode;
         $data->targets = [];
         foreach($this->targets as $tag){
             $data->targets[] = $tag->jsonSerialize();
@@ -535,7 +545,6 @@ class editor_Segment_Tags implements JsonSerializable {
         } else if($this->targetOriginal != NULL) {
             $data->targetOriginal = $this->targetOriginal->jsonSerialize();
         }
-        $data->editorMode = $this->editorMode;
         return $data;
     }
     /**
@@ -551,7 +560,7 @@ class editor_Segment_Tags implements JsonSerializable {
             foreach($data->targets as $targetData){
                 $this->targets[] = editor_Segment_FieldTags::fromJsonData($targetData);
             }
-            if($this->editorMode && $this->task->getEnableSourceEditing() && property_exists($data, 'sourceOriginal')){
+            if(!$this->isImport && $this->task->getEnableSourceEditing() && property_exists($data, 'sourceOriginal')){
                 $this->sourceOriginal = editor_Segment_FieldTags::fromJsonData($data->sourceOriginal);
             }
             if(property_exists($data, 'targetOriginalIdx')){

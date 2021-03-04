@@ -33,33 +33,34 @@
  */
 
 /**
- * 
- * Adds the Segment Quality Entries for the MQM tags that may have been added by the frontend only
- * 
+ * Provides  Methods & Flags to Orchestrate the Segment tags Processing
  */
-class editor_Segment_ManualQuality_TagCheck extends editor_Segment_Quality_Provider {
-
+class editor_Segment_Processing {
+    
     /**
-     * Using the internal tag type
+     * Used to indicate an import process
      * @var string
      */
-    protected static $type = editor_Segment_Tag::TYPE_MANUALQUALITY;
-    
-    public function processSegment(editor_Models_Task $task, Zend_Config $taskConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
-        
-        if($taskConfig->runtimeOptions->editor->enableQmSubSegments == 1){
-        
-            foreach($tags->getTagsByType(static::$type) as $mqmTag){
-                /* @var $mqmTag editor_Segment_ManualQuality_Tag */
-                $qualityId = $tags->saveManualQuality($mqmTag->field, $mqmTag->getTypeIndex(), $mqmTag->getSeverity(), $mqmTag->getComment(), $mqmTag->startIndex, $mqmTag->endIndex);
-                // update the sequence-id with the database-id of the bound quality
-                $mqmTag->setData('seq', strval($qualityId));
-            }
-        }
-        return $tags;
-    }
-    
-    public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
-        return $translate->_('MQM');
-    }
+    const IMPORT = 'import';
+    /**
+     * Used to indicate an editing process
+     * @var string
+     */
+    const EDIT = 'edit';
+    /**
+     * #Used to indicate an alike segment copying process
+     * @var string
+     */
+    const ALIKE = 'alike';
+    /**
+     * Used to indicate an retagging process
+     * @var string
+     */
+    const RETAG = 'retag';
+    /**
+     * Used to indicate a match analysis retagging
+     * @var string
+     */
+    const ANALYSIS = 'analysis';
+
 }

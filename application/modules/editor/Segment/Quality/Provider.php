@@ -72,10 +72,7 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
         return false;
     }
     /**
-     * If this API returns true, then the tags of the provider type will be removed before the ::processSegment is called
-     * This expects the processing to 
-     *
-     *these tags !
+     * If this API returns true, then the tags of our provider type will be removed before the ::processSegment is called
      * @return bool
      */
     public function removeOwnTagsBeforeProcessing() : bool {
@@ -85,8 +82,9 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * 
      * @param editor_Models_Task $task
      * @param int $parentWorkerId
+     * @param string $processingMode
      */
-    public function addImportWorker(editor_Models_Task $task, int $parentWorkerId) {
+    public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode) {
   
     }
     /**
@@ -94,10 +92,10 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * Note: the return value is used for further processing so it might even be possible to create a new tags-object though this is highly unwanted
      * @param editor_Models_Task $task
      * @param editor_Segment_Tags $tags
-     * @param bool $forImport
+     * @param string $processingMode: see Modes in editor_Segment_Processing
      * @return editor_Segment_Tags
      */
-    public function processSegment(editor_Models_Task $task, Zend_Config $taskConfig, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
+    public function processSegment(editor_Models_Task $task, Zend_Config $taskConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         return $tags;
     }
     /**
