@@ -53,17 +53,17 @@ class editor_Segment_MatchRate_EditCheck extends editor_Segment_Quality_Provider
      */
     protected static $type = 'matchrate';
     
-    public function processSegment(editor_Models_Task $task, Zend_Config $taskConfig, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
+    public function processSegment(editor_Models_Task $task, Zend_Config $taskConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
         $hasFuzzyMatchCheck = $taskConfig->runtimeOptions->autoQA->enableUneditedFuzzyMatchCheck;
         $hasEdited100MatchCheck = $taskConfig->runtimeOptions->autoQA->enableEdited100MatchCheck;
 
-        if((!$hasFuzzyMatchCheck && !$hasEdited100MatchCheck) || ($forImport && !$hasFuzzyMatchCheck)){
+        if((!$hasFuzzyMatchCheck && !$hasEdited100MatchCheck) || ($processingMode == editor_Segment_Processing::IMPORT && !$hasFuzzyMatchCheck)){
             return $tags;
         }
         $segment = $tags->getSegment();
         // no need to check for edited 100% matches on import
-        if($hasEdited100MatchCheck && !$forImport){
+        if($hasEdited100MatchCheck && $processingMode != editor_Segment_Processing::IMPORT){
             // TODO AUTOQA klären: 100% oder >= 100% ???
             if($segment->isEdited() && $segment->getMatchRate() >= 100){
                 $tags->addAllTargetsQuality(static::$type, self::EDITED_100PERCENT_MATCH);

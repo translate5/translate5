@@ -96,14 +96,8 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
      * @var boolean
      */
     private $skipDueToEqualLangs = false;
-    /**
-     * This is only needed because the Match nalysis uses this worker to work on the segments directly ...
-     * It results in the thrreaded multi-segment processing also saves back the segment directly and uses the direct segment data to instantiate the segment-tags
-     * @var boolean
-     */
-    private $directSegmentProcessing = false;
     
-   
+    
     public function init($taskGuid = NULL, $parameters = array()) {
         $return = parent::init($taskGuid, $parameters);
         $this->config = new editor_Plugins_TermTagger_Configuration($this->task);
@@ -112,19 +106,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
         $this->proccessedTags = null;
         $this->skipDueToEqualLangs = ($this->task->getSourceLang() === $this->task->getTargetLang());
         return $return;
-    }
-    /**
-     * Needed Implementation for editor_Models_Import_Worker_ResourceAbstract
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = array()) {
-        // required param steers the way the segments are processed: either directly or via the LEK_segment_tags
-        if(array_key_exists('processSegmentsDirectly', $parameters)){
-            $this->directSegmentProcessing = $parameters['processSegmentsDirectly'];
-            return true;
-        }
-        return false;
     }
     /**
      *
@@ -206,7 +187,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
             }
             return true;
         }
-        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, !$this->isWorkerThread, $segments, !$this->directSegmentProcessing), $slot);
+        return $this->processSegmentsTags(editor_Segment_Tags::fromSegments($this->task, $this->processingMode, $segments, ($this->processingMode == editor_Segment_Processing::IMPORT)), $slot);
     }
     
     protected function processSegmentsTags(array $segmentsTags, string $slot) : bool {
@@ -281,11 +262,11 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
                 }
                 // save the tags, either to the tags-model or back to the segment if configured
                 if($doSaveTags){
-                    if($this->directSegmentProcessing){
-                        $tags->flush();
-                    } else {
+                    if($this->processingMode == editor_Segment_Processing::IMPORT){
                         $tags->save(editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE);
                         $tags->saveQualities();
+                    } else {
+                        $tags->flush();
                     }
                 } else {
                     // makes the currently proccessed tags accessible

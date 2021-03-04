@@ -57,7 +57,7 @@ class editor_Models_Segment_RepetitionUpdater {
     protected $config = null;
     
     /**
-     * @var array
+     * @var editor_Models_QmsubsegmentAlikes[]
      */
     protected $qmSubsegmentAlikes = null;
     
@@ -103,6 +103,8 @@ class editor_Models_Segment_RepetitionUpdater {
      * @return bool
      */
     public function updateSegmentContent(string $field, string $editField, string $getter, string $setter) : bool {
+        
+        
         $id = $this->repeatedSegment->getId();
         $getOriginal = 'get'.ucfirst($field);
         //get content, dependent on using MQM or not:

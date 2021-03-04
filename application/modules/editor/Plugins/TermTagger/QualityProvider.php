@@ -57,7 +57,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         return true;
     }
     
-    public function addImportWorker(editor_Models_Task $task, int $parentWorkerId) {
+    public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode) {
         
         // if no terminology is present we return as well
         /* @var $task editor_Models_Task */
@@ -74,7 +74,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         $this->lockOversizedSegments($task, $meta);
         
         // init worker and queue it
-        $params = ['resourcePool' => 'import', 'processSegmentsDirectly' => false];
+        $params = ['resourcePool' => 'import', 'processingMode' => $processingMode];
         if (!$worker->init($task->getTaskGuid(), $params)) {
             $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [
                 'parameters' => $params,
@@ -84,10 +84,10 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         $worker->queue($parentWorkerId);
     }
     
-    public function processSegment(editor_Models_Task $task, Zend_Config $taskConfig, editor_Segment_Tags $tags, bool $forImport) : editor_Segment_Tags {
+    public function processSegment(editor_Models_Task $task, Zend_Config $taskConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
         // this API does not process the import
-        if($forImport){
+        if($processingMode == editor_Segment_Processing::IMPORT){
             return $tags;
         }
         $segment = $tags->getSegment();
@@ -106,7 +106,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
         
-        $params = ['resourcePool' => 'gui', 'processSegmentsDirectly' => true];
+        $params = ['resourcePool' => 'gui', 'processingMode' => $processingMode];
         if (!$worker->init($task->getTaskGuid(), $params)) {
             $logger = Zend_Registry::get('logger')->cloneMe('editor.terminology');
             $logger->error('E1128', 'TermTaggerImport Worker can not be initialized!', ['parameters' => $params]);

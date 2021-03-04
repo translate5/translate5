@@ -37,7 +37,7 @@
  *
  */
 final class editor_Segment_Quality_Manager {
-    
+   
     /**
      * @var editor_Segment_Quality_Manager
      */
@@ -145,7 +145,7 @@ final class editor_Segment_Quality_Manager {
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
             if($provider->hasImportWorker()){
-                $provider->addImportWorker($task, $parentWorkerId);
+                $provider->addWorker($task, $parentWorkerId, editor_Segment_Processing::IMPORT);
             }
         }
     }
@@ -171,7 +171,7 @@ final class editor_Segment_Quality_Manager {
         /* @var $segment editor_Models_Segment */
         foreach($segmentIds as $segmentId){
             $segment->load($segmentId);
-            $tags = editor_Segment_Tags::fromSegment($task, false, $segment, true);
+            $tags = editor_Segment_Tags::fromSegment($task, editor_Segment_Processing::IMPORT, $segment, true);
             // process all quality providers that do not have an import worker
             foreach($this->registry as $type => $provider){
                 /* @var $provider editor_Segment_Quality_Provider */
@@ -179,7 +179,7 @@ final class editor_Segment_Quality_Manager {
                     if($provider->removeOwnTagsBeforeProcessing()){
                         $tags->removeTagsByType($provider->getType());
                     }
-                    $tags = $provider->processSegment($task, $config, $tags, true);
+                    $tags = $provider->processSegment($task, $config, $tags, editor_Segment_Processing::IMPORT);
                 }
             }
             // we save all qualities at once to reduce db-strain
@@ -196,20 +196,22 @@ final class editor_Segment_Quality_Manager {
         $db->getAdapter()->commit();
     }
     /**
+     * 
      * @param editor_Models_Segment $segment
      * @param editor_Models_Task $task
+     * @param string $processingMode
      */
-    public function processEditing(editor_Models_Segment $segment, editor_Models_Task $task){
+    public function processSegment(editor_Models_Segment $segment, editor_Models_Task $task, string $processingMode){
         // we remove all qualities as new ones will be written
         editor_Models_Db_SegmentQuality::deleteForSegment($segment->getId());
         $config = $task->getConfig(); 
-        $tags = editor_Segment_Tags::fromSegment($task, true, $segment, false);
+        $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, false);
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
             if($provider->removeOwnTagsBeforeProcessing()){
                 $tags->removeTagsByType($provider->getType());
             }
-            $tags = $provider->processSegment($task, $config, $tags, false);
+            $tags = $provider->processSegment($task, $config, $tags, $processingMode);
         }
         $tags->flush(true);
     }
