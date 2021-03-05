@@ -217,7 +217,7 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
         /* @var $filetree editor_Models_Foldertree */
         
         $files = $filetree->getPaths($taskGuid, $filetree::TYPE_FILE );
-        $workfilesDirectory = editor_Models_Import_Configuration::getWorkfilesDirectoryName();
+        $workfilesDirectory = editor_Models_Import_Configuration::WORK_FILES_DIRECTORY;
         foreach ( $files as $fileid => $file ) {
             $files [$fileid] = trim ( str_replace ( '#!#' . $workfilesDirectory, '', '#!#' . $file ), '/\\' );
         }
