@@ -308,10 +308,12 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         $config=Zend_Registry::get('config')->runtimeOptions;
         $params = $this->workerModel->getParameters();
         $import = $config->import;
+        $importConfig = $params['importConfig'];
+        /* @var $importConfig editor_Models_Import_Configuration */
         
         $realFile = $params['file'];
         $refFolder = $params['importFolder'].'/'.$import->referenceDirectory;
-        $workfilesDirectory = $params['importFolder'].'/'.editor_Models_Import_Configuration::WORK_FILES_DIRECTORY;
+        $workfilesDirectory = $params['importFolder'].'/'.$importConfig->getFilesDirectory();
         
         //cut off review folder from realfile:
         $relRealFile = str_replace('#'.realpath($workfilesDirectory), '', '#'.realpath($realFile));

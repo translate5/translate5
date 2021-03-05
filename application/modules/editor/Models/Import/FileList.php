@@ -82,6 +82,7 @@ class editor_Models_Import_FileList {
         
         $this->treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         /* @var $treeDb editor_Models_Foldertree */
+        $this->treeDb->setPathPrefix($this->importConfig->getFilesDirectory());//TODO: (23.02.2021 TRANSLATE-1596) remove me after the depricated support for "proofRead" is removed
         $this->treeDb->setTree($tree);
         $this->treeDb->setTaskGuid($this->task->getTaskGuid());
         $this->saveAndSyncFileTree();
