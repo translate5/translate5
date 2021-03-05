@@ -254,15 +254,18 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $suffix = '.xlf'; //TODO should come from the worker. there the suffix is determined from the okapi output
         $child = $event->getParam('fileChild'); //children stdClass, containing several information about the file to be parsed
         $fullpath = $event->getParam('fullPath'); //absolute path to the relais file to be parsed
-
+        
+        
+        
+        $importConfig = $event->getParam('importConfig');//INFO:(TRANSLATE-1596) this is the workfiles directory (for now this can be proofRead or workFiles). Afte we remove the depricate support for proofRead this can be removed
+        /* @var $importConfig editor_Models_Import_Configuration */
         if(empty($this->task)) {
             $this->task = ZfExtended_Factory::get('editor_Models_Task');
             $this->task->loadByTaskGuid($event->getParam('taskGuid'));
         }
-
         if($child->relaisFileStatus == editor_Models_RelaisFoldertree::RELAIS_NOT_FOUND) {
             $config = Zend_Registry::get('config');
-            $workFiles = '/'.trim(editor_Models_Import_Configuration::getWorkfilesDirectoryName(),'/').'/';
+            $workFiles = '/'.trim($importConfig->getFilesDirectory(),'/').'/';
             $relaisDirectory = '/'.trim($config->runtimeOptions->import->relaisDirectory,'/').'/';
             $fullpath = $fullpath.$suffix;
             $bilingualSourceFile = str_replace($relaisDirectory, $workFiles, $fullpath);

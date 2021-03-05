@@ -61,13 +61,13 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
     protected $langInfo;
 
     public function init() {
-        $config = Zend_Registry::get('config');
         // event-listeners
         $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'beforeDirectoryParsing', array($this, 'handleTransitImportPreparation'));
         $this->eventManager->attach('editor_Models_Import_Worker', 'beforeWork', array($this, 'handleBeforeImport'));
         $this->eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'handleTransitImportCleanup'), -10);
         // end of event-listeners
-        $this->reviewDirName = editor_Models_Import_Configuration::getWorkfilesDirectoryName();
+
+        $this->reviewDirName = editor_Models_Import_Configuration::WORK_FILES_DIRECTORY;
         $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         /* @var $meta editor_Models_Segment_Meta */
         $meta->addMeta('transitLockedForRefMat', $meta::META_TYPE_BOOLEAN, false, 'Is set to true if segment is locked for reference material in transit file');
@@ -80,7 +80,12 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
         $worker = $event->getParam('worker');
         /* @var $worker editor_Models_Import_Worker */
         $params = $worker->getModel()->getParameters();
-        $this->importFolder = $params['config']->importFolder;
+        
+        $importConfig = $params['config'];
+        /* @var $importConfig editor_Models_Import_Configuration */
+        $this->importFolder = $importConfig->importFolder;
+        $this->reviewDirName = $importConfig->getFilesDirectory();
+        
         $this->initTransitConfig();
     }
     
@@ -91,6 +96,9 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
     public function handleTransitImportPreparation(Zend_EventManager_Event $event) {
         $params = $event->getParams();
         $this->importFolder = $params['importFolder'];
+        $importConfig = $params['importConfig'];
+        /* @var $importConfig editor_Models_Import_Configuration */
+        $this->reviewDirName = $importConfig->getFilesDirectory();
         if($this->initTransitConfig()) {
             $this->renameTargetFiles('preparation');
         }
@@ -114,7 +122,10 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
      */
     public function handleTransitImportCleanup(Zend_EventManager_Event $event) {
         $params = $event->getParams();
-        $this->importFolder = $params['importConfig']->importFolder;
+        $importConfig = $params['importConfig'];
+        /* @var $importConfig editor_Models_Import_Configuration */
+        $this->importFolder = $importConfig->importFolder;
+        $this->reviewDirName = $importConfig->getFilesDirectory();
         $this->renameTargetFiles('cleanup');
     }
     

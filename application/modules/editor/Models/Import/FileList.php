@@ -142,6 +142,7 @@ class editor_Models_Import_FileList {
     public function processRelaisFiles() {
         $tree = ZfExtended_Factory::get('editor_Models_RelaisFoldertree');
         /* @var $tree editor_Models_RelaisFoldertree */
+        $tree->setImportConfig($this->importConfig);
         $tree->getPaths($this->task->getTaskGuid(),'file'); //Aufruf nötig, er initialisiert den Baum
         $relaisFiles = $tree->checkAndGetRelaisFiles($this->importConfig->importFolder);
         $tree->save();
@@ -155,7 +156,7 @@ class editor_Models_Import_FileList {
     public function hasReferenceFiles() {
         $config = Zend_Registry::get('config');
         //If no review directory is set, the reference files must be ignored  
-        $workfilesDirectory = editor_Models_Import_Configuration::getWorkfilesDirectoryName();
+        $workfilesDirectory = $this->importConfig->getFilesDirectory();
         $refDir = $config->runtimeOptions->import->referenceDirectory;
         return !empty($workfilesDirectory) && is_dir($this->importConfig->importFolder.DIRECTORY_SEPARATOR.$refDir);
     }
