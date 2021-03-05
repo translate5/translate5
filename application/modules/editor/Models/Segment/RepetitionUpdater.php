@@ -31,6 +31,7 @@ END LICENSE AND COPYRIGHT
  * when processing repetitions (change alikes) the contained tags in the content must be replaced by the tags which were before in the segment.
  */
 class editor_Models_Segment_RepetitionUpdater {
+    
     /**
      * @var editor_Models_Segment_InternalTag
      */
@@ -57,20 +58,14 @@ class editor_Models_Segment_RepetitionUpdater {
     protected $config = null;
     
     /**
-     * @var editor_Models_QmsubsegmentAlikes[]
-     */
-    protected $qmSubsegmentAlikes = null;
-    
-    /**
      * @param editor_Models_Segment $segment
      * @param array $qmSubsegmentAlikes
      */
-    public function __construct(editor_Models_Segment $segment, Zend_Config $config, array $qmSubsegmentAlikes = null){
+    public function __construct(editor_Models_Segment $segment, Zend_Config $config){
         $this->config = $config;
         $this->originalSegment = $segment;
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-        $this->qmSubsegmentAlikes = $qmSubsegmentAlikes;
     }
     
     /**
@@ -104,16 +99,11 @@ class editor_Models_Segment_RepetitionUpdater {
      */
     public function updateSegmentContent(string $field, string $editField, string $getter, string $setter) : bool {
         
+        // TODO: we could make much more use of the segment-tags code if only it would be clear what this code does ...       
         
         $id = $this->repeatedSegment->getId();
         $getOriginal = 'get'.ucfirst($field);
-        //get content, dependent on using MQM or not:
-        if($this->config->runtimeOptions->editor->enableQmSubSegments && is_array($this->qmSubsegmentAlikes)) {
-            $segmentContent = $this->qmSubsegmentAlikes[$field]->cloneAndUpdate($id, $field);
-        }
-        else {
-            $segmentContent = $this->originalSegment->{$getter}();
-        }
+        $segmentContent = $this->originalSegment->{$getter}();
         
         //replace the repeatedSegment tags with the original repetition ones
         $originalContent = $this->repeatedSegment->{$getOriginal}();

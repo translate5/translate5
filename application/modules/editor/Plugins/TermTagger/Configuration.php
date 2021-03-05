@@ -283,6 +283,11 @@ class editor_Plugins_TermTagger_Configuration {
         
         foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
             
+            // should not happen but who knows in which processingMode the tags have been generated
+            if(!$tags->hasSource()){
+                throw new ZfExtended_Exception('Passed segment tags did not contain a source '.$tags->getSegmentId());
+            }
+            
             // this is somehow "doppelt gemoppelt"
             $typesToExclude = [editor_Plugins_TermTagger_QualityProvider::qualityType()];
             
