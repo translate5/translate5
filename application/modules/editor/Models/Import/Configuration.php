@@ -1,43 +1,56 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
-
+ START LICENSE AND COPYRIGHT
+ 
  This file is part of translate5
  
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
-
+ 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
-
+ 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+ 
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+ 
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
-
-END LICENSE AND COPYRIGHT
-*/
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
 
 /**#@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
  *
-
-/**
+ 
+ /**
  * Contains all parameters for the planned import.
- * Since this class is serialized for the worker table, 
+ * Since this class is serialized for the worker table,
  *  it must not contain complex data!
  */
 class editor_Models_Import_Configuration {
+    
+    /***
+     * Constant for the import directory folder name
+     * @var string
+     */
+    const WORK_FILES_DIRECTORY = 'workfiles';
+    
+    /***
+     * Old name for the import directory folder name
+     * @var string
+     * @deprecated
+     */
+    const PROOFREAD_FILES_DIRECTORY = 'proofRead';
     /**
      * @var editor_Models_Languages language entity instance
      */
@@ -92,7 +105,7 @@ class editor_Models_Import_Configuration {
      * Worker Id of the import worker, usable as parentId for subsequent workers
      * @var integer
      */
-    public $workerId; 
+    public $workerId;
     
     /**
      * if true, the uploaded files are only processed if the file extension is supported. Conversion plug-ins may disable that.
@@ -106,8 +119,19 @@ class editor_Models_Import_Configuration {
      */
     public $ignoredUncheckedExtensions = '';
     
+    /***
+     * The curent import uses depricated directory name
+     * @var string
+     */
+    public $isDeprecatedDirectoryName = false;
+    
+    /***
+     * The current import directory is with depricated lowercase name "proofread"
+     */
+    public $isDeprecatedDirectoryNameLowercase = false;
+    
     /**
-     * needed internally for de/serialization 
+     * needed internally for de/serialization
      * @var string
      */
     protected $usedLanguagetype;
@@ -156,32 +180,43 @@ class editor_Models_Import_Configuration {
     public function hasRelaisLanguage() {
         return !empty($this->relaisLang);
     }
-
+    
     public function isValid($taskGuid) {
         $this->validateParams($taskGuid);
         $this->validateImportFolders();
     }
     
+    /***
+     * Get the required import files directory name.
+     * If isDeprecatedDirectoryName is set to true, the depricated name will be used.
+     * If isDeprecatedDirectoryNameLowercase, the depricate name will be used with lowercase.
+     * @return string
+     */
+    public function getFilesDirectory() {
+        if($this->isDeprecatedDirectoryName){
+            return $this->isDeprecatedDirectoryNameLowercase ? strtolower(self::PROOFREAD_FILES_DIRECTORY) : self::PROOFREAD_FILES_DIRECTORY;
+        }
+        return self::WORK_FILES_DIRECTORY;
+    }
     /**
      * Gibt den absoluten Pfad (inkl. Import Root) zum Verzeichnis mit den zu lektorierenden Dateien zurück, berücksichtigt die review bzw. Relaissprachen Config
      * @return string
      */
     public function getReviewDir() {
-        $config = Zend_Registry::get('config');
         $prefix = $this->importFolder;
-        $reviewDir = $config->runtimeOptions->import->proofReadDirectory;
-        return $reviewDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$reviewDir; 
+        $reviewDir = $this->getFilesDirectory();
+        return $reviewDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$reviewDir;
     }
     
     /**
-     * returns the absolute path (incl. import root) to the reference files 
+     * returns the absolute path (incl. import root) to the reference files
      * @return string
      */
     public function getReferenceFilesDir() {
         $config = Zend_Registry::get('config');
         $prefix = $this->importFolder;
         $refDir = $config->runtimeOptions->import->referenceDirectory;
-        return $refDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$refDir; 
+        return $refDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$refDir;
     }
     
     /**
@@ -234,12 +269,32 @@ class editor_Models_Import_Configuration {
             //The import root folder does not exist.
             throw new editor_Models_Import_ConfigurationException('E1038', ['folder' => $this->importFolder]);
         }
-        $data = ['review' => basename($this->getReviewDir())];
-        if(!is_dir($this->getReviewDir())){
-            //The imported package did not contain a valid review folder.
-            throw new editor_Models_Import_ConfigurationException('E1039', $data);
+        //use the workfiles as review directory
+        $reviewDir = $this->getReviewDir();
+        $data = ['review' => basename($reviewDir)];
+        if(!is_dir($reviewDir)){
+            //workfiles is not valid directory, try the deprecated proofRead
+            $this->isDeprecatedDirectoryName = true;
+            $reviewDir = $this->getReviewDir();
+            $data = ['review' => basename($reviewDir)];
+            
+            //write a warrning that the proofRead is deprecated
+            $this->warnImportDirDeprecated();
+            
+            //if proofRead is not valid, check it with proofread
+            if(!is_dir($reviewDir)){
+                $this->isDeprecatedDirectoryNameLowercase = true;
+                $reviewDir = $this->getReviewDir();
+                $data = ['review' => basename($reviewDir)];
+            }
+            
         }
-        if(empty(glob($this->getReviewDir().'/*'))){
+        if(!is_dir($reviewDir)){
+            $this->isDeprecatedDirectoryName = false;
+            //The imported package did not contain a valid review folder.
+            throw new editor_Models_Import_ConfigurationException('E1039', ['review' => basename($this->getReviewDir())]);
+        }
+        if(empty(glob($reviewDir.'/*'))){
             //The imported package did not contain any files in the review folder.
             throw new editor_Models_Import_ConfigurationException('E1040', $data);
         }
@@ -259,5 +314,17 @@ class editor_Models_Import_Configuration {
     public function __sleep() {
         $this->sourceLang = $this->targetLang = $this->relaisLang = null;
         return array_keys(get_class_vars(get_class($this)));
+    }
+    
+    
+    /***
+     * Log a warning if the used work files directory is depricated
+     * TODO:(23.02.2021 TRANSLATE-1596) remove me after the depricated support for "proofRead" is removed
+     * @param string $importDir
+     */
+    protected function warnImportDirDeprecated() {
+        $logger = Zend_Registry::get('logger')->cloneMe('editor.import.configuration');
+        /* @var $logger ZfExtended_Logger */
+        $logger->warn('E1338','IMPORTANT: The "proofRead" folder in the zip import package is deprecated from now on. In the future please always use the new folder "workfiles" instead. All files that need to be reviewed or translated will have to be placed in the new folder "workfiles" from now on. In some future version of translate5 the support for "proofRead" folder will be completely removed. Currently it still is supported, but will write a "deprecated" message to the php error-log.');
     }
 }
