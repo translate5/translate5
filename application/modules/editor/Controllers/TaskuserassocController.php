@@ -102,6 +102,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             return parent::validate();
         }
         $this->setDefaultAssignmentDate();
+        $this->setDefaultDeadlineDate();
         settype($this->data->taskGuid, 'string');
         $this->task->loadByTaskGuid($this->data->taskGuid);
         
@@ -243,20 +244,11 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::postAction()
      */
     public function postAction() {
-        $this->entity->init();
-        $this->decodePutData();
-        //check and set the default deadline date
-        $this->setDefaultDeadlineDate();
-        $this->processClientReferenceVersion();
-        $this->setDataInEntity($this->postBlacklist);
-        if($this->validate()){
-            $this->entity->save();
-            $this->view->rows = $this->entity->getDataObject();
-            $this->log->request();
-            $this->addUserInfoToResult();
-            $this->log->info('E1012', 'job created', ['tua' => $this->entity->getSanitizedEntityForLog()]);
-            $this->applyEditableAndDeletable();
-        }
+        parent::postAction();
+        $this->log->request();
+        $this->addUserInfoToResult();
+        $this->log->info('E1012', 'job created', ['tua' => $this->entity->getSanitizedEntityForLog()]);
+        $this->applyEditableAndDeletable();
     }
     
     public function deleteAction(){
