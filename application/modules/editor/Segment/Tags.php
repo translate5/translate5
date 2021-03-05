@@ -96,7 +96,7 @@ class editor_Segment_Tags implements JsonSerializable {
      *
      * @var editor_Segment_FieldTags
      */
-    private $source;
+    private $source = NULL;
     /**
      *
      * @var editor_Segment_FieldTags[]
@@ -106,7 +106,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * A read-only field that is only used as reference for some QA tests
      * @var editor_Segment_FieldTags[]
      */
-    private $targetOriginal = null;
+    private $targetOriginal = NULL;
     /**
      *
      * @var int
@@ -136,7 +136,7 @@ class editor_Segment_Tags implements JsonSerializable {
      *
      * @var editor_Models_Segment
      */
-    private $segment = null;
+    private $segment = NULL;
     /**
      * 
      * @var editor_Models_Db_SegmentQualityRow[]
@@ -181,42 +181,51 @@ class editor_Segment_Tags implements JsonSerializable {
         // in case of an editing process the original source will be handled seperately
         // if we are an import, the original source and source will be handled identically - the "normal"  source is the edited source then (exception: the post-import adding of terms via "Analysis" where the source & edited source might already differ)
         // TODO: this assumes, that these fields are already copied at this point of the import
-        $hasOriginalSource = ($sourceEditingEnabled) ? (!$this->isImport || $this->segment->get($sourceFieldEditIndex) != $this->segment->get($sourceField)) : false;
-        if($hasOriginalSource){
-            // original source (what is the source in all other cases)
-            $this->sourceOriginal = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $sourceField, 'SourceOriginal');
-            // source here is the editable source
-            $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
+        if($this->processingMode == editor_Segment_Processing::ALIKE){
+            // in a Alike copying process, the source wil not be processed until it is an editable source and only the first target ...
+            if($sourceEditingEnabled){
+                $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
+            }
+            $firstTarget = $fieldManager->getFirstTargetName();
+            $editIndex = $fieldManager->getEditIndex($firstTarget);
+            $this->targets[] = new editor_Segment_FieldTags($this->segmentId, $firstTarget, $this->segment->get($editIndex), $editIndex, $editIndex);
+            
         } else {
-            // on import with enabled source editing, we copy the source as editedSource as well
-            $saveTo = ($sourceEditingEnabled) ? [$sourceField, $sourceFieldEditIndex] : $sourceField;
-            $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $saveTo, $sourceField);
-        }
-        $this->targets = [];
-        foreach ($fieldManager->getFieldList() as $field) {
-            /* @var $field Zend_Db_Table_Row */
-            if($field->type == editor_Models_SegmentField::TYPE_TARGET && $field->editable) {
-                $editIndex = $fieldManager->getEditIndex($field->name);
-                // special when we have an import but the fields are different this might is 
-                if($this->isImport && $this->segment->get($field->name) != $this->segment->get($editIndex)){
-                    $target = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
-                    $this->targets[] = $target;
-                    if($this->targetOriginal == null){
-                        $this->targetOriginal = $target;
-                        $this->targetOriginalIdx = count($this->targets);
-                    }
-                    $target = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($editIndex), $editIndex, $editIndex);
-                    $this->targets[] = $target;
-                } else {
-                    // when importing, the field will be saved as edit field & as normal field
-                    $saveTo = ($this->isImport) ? [$field->name, $editIndex] : $editIndex;
-                    // the field name sent to the termtagger differs between import and editing (WHY?)
-                    $ttField = ($this->isImport) ? $field->name : $editIndex;
-                    $target = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($editIndex), $saveTo, $ttField);
-                    $this->targets[] = $target;
-                    // the first target will be the original target as needed for some Quality checks
-                    if($this->targetOriginal == null){
-                        $this->targetOriginal = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
+            $hasOriginalSource = ($sourceEditingEnabled) ? (!$this->isImport || $this->segment->get($sourceFieldEditIndex) != $this->segment->get($sourceField)) : false;
+            if($hasOriginalSource){
+                // original source (what is the source in all other cases)
+                $this->sourceOriginal = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $sourceField, 'SourceOriginal');
+                // source here is the editable source
+                $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
+            } else {
+                // on import with enabled source editing, we copy the source as editedSource as well
+                $saveTo = ($sourceEditingEnabled) ? [$sourceField, $sourceFieldEditIndex] : $sourceField;
+                $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $saveTo, $sourceField);
+            }
+            $this->targets = [];
+            foreach ($fieldManager->getFieldList() as $field) {
+                /* @var $field Zend_Db_Table_Row */
+                if($field->type == editor_Models_SegmentField::TYPE_TARGET && $field->editable) {
+                    $editIndex = $fieldManager->getEditIndex($field->name);
+                    // special when we have an import but the fields are different this might is 
+                    if($this->isImport && $this->segment->get($field->name) != $this->segment->get($editIndex)){
+                        $target = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
+                        $this->targets[] = $target;
+                        if($this->targetOriginal == null){
+                            $this->targetOriginal = $target;
+                            $this->targetOriginalIdx = count($this->targets);
+                        }
+                        $this->targets[] = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($editIndex), $editIndex, $editIndex);
+                    } else {
+                        // when importing, the field will be saved as edit field & as normal field
+                        $saveTo = ($this->isImport) ? [$field->name, $editIndex] : $editIndex;
+                        // the field name sent to the termtagger differs between import and editing (WHY?)
+                        $ttField = ($this->isImport) ? $field->name : $editIndex;
+                        $this->targets[] = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($editIndex), $saveTo, $ttField);
+                        // the first target will be the original target as needed for some Quality checks
+                        if($this->targetOriginal == null){
+                            $this->targetOriginal = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
+                        }
                     }
                 }
             }
@@ -233,8 +242,10 @@ class editor_Segment_Tags implements JsonSerializable {
              $this->getSegment()->set($this->sourceOriginal->getFirstSaveToField(), $this->sourceOriginal->render());
         }
         // save source
-        foreach($this->source->getSaveToFields() as $saveTo){
-            $this->getSegment()->set($saveTo, $this->source->render());
+        if($this->hasSource()){
+            foreach($this->source->getSaveToFields() as $saveTo){
+                $this->getSegment()->set($saveTo, $this->source->render());
+            }
         }
         foreach($this->targets as $target){
             /* @var $target editor_Segment_FieldTags */
@@ -261,6 +272,13 @@ class editor_Segment_Tags implements JsonSerializable {
      */
     public function getProcessingMode(){
         return $this->processingMode;
+    }
+    /**
+     *
+     * @return boolean
+     */
+    public function hasSource(){
+        return ($this->source != null);
     }
     /**
      *
@@ -330,10 +348,10 @@ class editor_Segment_Tags implements JsonSerializable {
      */
     private function getFieldTags(){
         $tags = $this->getTargets();
-        if($this->source != null){
+        if($this->hasSource()){
             array_unshift($tags, $this->source);
         }
-        if($this->sourceOriginal != null){
+        if($this->hasOriginalSource()){
             array_unshift($tags, $this->sourceOriginal);
         }
         return $tags;
@@ -538,8 +556,8 @@ class editor_Segment_Tags implements JsonSerializable {
         foreach($this->targets as $tag){
             $data->targets[] = $tag->jsonSerialize();
         }
-        $data->source = $this->source->jsonSerialize();
-        $data->sourceOriginal = ($this->sourceOriginal == NULL) ? false : $this->sourceOriginal->jsonSerialize();
+        $data->source = ($this->hasSource()) ? false : $this->source->jsonSerialize();
+        $data->sourceOriginal = ($this->hasOriginalSource()) ? false : $this->sourceOriginal->jsonSerialize();
         if($this->targetOriginalIdx > -1){
             $data->targetOriginalIdx = $this->targetOriginalIdx;
         } else if($this->targetOriginal != NULL) {
@@ -555,12 +573,12 @@ class editor_Segment_Tags implements JsonSerializable {
     private function initFromJson(stdClass $data){
         try {
             $this->segmentId = $data->segmentId;
-            $this->source = editor_Segment_FieldTags::fromJsonData($data->source);
+            $this->source = ($data->source) ? editor_Segment_FieldTags::fromJsonData($data->source) : NULL;
             $this->targets = [];
             foreach($data->targets as $targetData){
                 $this->targets[] = editor_Segment_FieldTags::fromJsonData($targetData);
             }
-            if(!$this->isImport && $this->task->getEnableSourceEditing() && property_exists($data, 'sourceOriginal')){
+            if(!$this->isImport && $this->task->getEnableSourceEditing() && $data->sourceOriginal){
                 $this->sourceOriginal = editor_Segment_FieldTags::fromJsonData($data->sourceOriginal);
             }
             if(property_exists($data, 'targetOriginalIdx')){

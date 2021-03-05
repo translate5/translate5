@@ -363,6 +363,9 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
             // TODO FIXME: proper exception
             throw new ZfExtended_Exception('Response of termtagger did not contain data for the segment ID '.$tags->getSegmentId());
         }
+        if(!$tags->hasSource()){
+            throw new ZfExtended_Exception('Passed segment tags did not contain a source '.$tags->getSegmentId());
+        }
         $responseFields = $this->groupResponseByField($responseGroup);
         $sourceText = null;
         if($tags->hasOriginalSource()){
