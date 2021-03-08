@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * This will send multiple segments at once for translation
  * and save the result in separate table in the database. Later those results will be used for match analysis and pre-translation.
  */
-class editor_Plugins_MatchAnalysis_BatchWorker extends ZfExtended_Worker_Abstract {
+class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_AbstractWorker {
     
     /**
      * @var ZfExtended_Logger
