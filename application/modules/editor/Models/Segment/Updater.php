@@ -91,13 +91,7 @@ class editor_Models_Segment_Updater {
         
         //TODO: Introduced with TRANSLATE-885, but is more a hack as a solution. See Issue comments for more information!
         $this->updateTargetHashAndOriginal($this->task);
-        
-        // TODO AUTOQA: remove when mqm is completely handled by new quality model
-        foreach($allowedAlternatesToChange as $field) {
-            if($this->segment->isModified($field)) {
-                $this->segment->updateQmSubSegments($field);
-            }
-        }
+
         // Update the Quality Tags
         editor_Segment_Quality_Manager::instance()->processSegment($this->segment, $this->task, editor_Segment_Processing::EDIT);
         

@@ -403,7 +403,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $taskConfig = $this->entity->getConfig();
             //adding QM SubSegment Infos to each Task
             $row['qmSubEnabled'] = false;
-            if($taskConfig->runtimeOptions->editor->enableQmSubSegments && !empty($row['qmSubsegmentFlags'])) {
+            if($taskConfig->runtimeOptions->autoQA->enableMqmTags && !empty($row['qmSubsegmentFlags'])) {
                 $row['qmSubEnabled'] = true;
             }
             $this->addMissingSegmentrangesToResult($row);
@@ -1460,7 +1460,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $qmSubFlags = $this->entity->getQmSubsegmentFlags();
         $this->view->rows->qmSubEnabled = false;
         $taskConfig = $this->entity->getConfig();
-        if($taskConfig->runtimeOptions->editor->enableQmSubSegments &&
+        if($taskConfig->runtimeOptions->autoQA->enableMqmTags &&
                 !empty($qmSubFlags)) {
             $this->view->rows->qmSubFlags = $this->entity->getQmSubsegmentIssuesTranslated(false);
             $this->view->rows->qmSubSeverities = $this->entity->getQmSubsegmentSeveritiesTranslated(false);

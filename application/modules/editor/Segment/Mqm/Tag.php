@@ -38,12 +38,13 @@
  * Example as sent from the Frontend:
  * OPENER: <img class="open minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />
  * CLOSER: <img class="close minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />
+ * TEMPLATE: <img class="%1$s qmflag ownttip %2$s qmflag-%3$d" data-seq="%4$d" data-comment="%5$s" src="%6$s" />
  * 
- * @method editor_Segment_ManualQuality_Tag clone(boolean $withDataAttribs)
- * @method editor_Segment_ManualQuality_Tag createBaseClone()
+ * @method editor_Segment_Mqm_Tag clone(boolean $withDataAttribs)
+ * @method editor_Segment_Mqm_Tag createBaseClone()
  */
-final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
-    
+final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
+
     /**
      * @var string
      */
@@ -77,9 +78,64 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
      */
     const IMAGE_SRC = 'qmsubsegment-{0}-{1}.png';
 
-    protected static $type = editor_Segment_Tag::TYPE_MANUALQUALITY;
+    protected static $type = editor_Segment_Tag::TYPE_MQM;
 
     protected static $nodeName = 'img';
+    
+    /**
+     * @var string
+     */
+    private static $imgSrcTemplate = NULL;
+    /**
+     * 
+     * @return string
+     */
+    private static function createImageSrcTemplate(){
+        // when Testing, Zend_Config is not available. TODO: better setup/bootstrapping for classic unit test
+        if(defined('T5_IS_UNIT_TEST')){
+            return '/modules/editor/images/imageTags/'.self::IMAGE_SRC;
+        }
+        if(self::$imgSrcTemplate == NULL){
+            $conf = Zend_Registry::get('config');
+            self::$imgSrcTemplate = APPLICATION_RUNDIR.'/'.$conf->runtimeOptions->dir->tagImagesBasePath.'/'.self::IMAGE_SRC;
+        }
+        return self::$imgSrcTemplate;
+    }
+    /**
+     *
+     * @param int $typeIndex
+     * @param string $position
+     * @return string
+     */
+    private static function createImageSrc(int $typeIndex, string $position) : string {
+        return str_replace('{0}', strval($typeIndex), str_replace('{1}', $position, self::createImageSrcTemplate()));
+    }
+    /**
+     * Renders a basic MQM tag out of the given properties
+     * 
+     * @param int|string $qualityId
+     * @param bool $isOpen
+     * @param int $typeIndex
+     * @param string $severity
+     * @param string $comment
+     * @return string
+     */
+    public static function renderTag($qualityId, bool $isOpen, int $typeIndex, string $severity, string $comment) : string {
+        // we follow the original code here
+        // <img class="%1$s qmflag ownttip %2$s qmflag-%3$d" data-seq="%4$d" data-comment="%5$s" src="%6$s" />
+        $position = ($isOpen) ? 'left' : 'right';
+        $posClass = ($isOpen) ? self::CSS_CLASS_OPEN : self::CSS_CLASS_CLOSE;
+        $tag = editor_Tag::img(self::createImageSrc($typeIndex, $position));
+        $tag
+            ->addClass($severity)
+            ->addClass(self::CSS_CLASS)
+            ->addClass(editor_Segment_Tag::CSS_CLASS_TOOLTIP)
+            ->addClass($posClass)
+            ->addClass(self::CSS_CLASS.'-'.strval($typeIndex))
+            ->setData('seq', strval($qualityId))
+            ->setData('comment', $comment);
+        return $tag->render();
+    }
     /**
      *
      * @var bool
@@ -134,7 +190,7 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
     
     public function clone($withDataAttribs=false){
         $clone = parent::clone($withDataAttribs);
-        /* @var $clone editor_Segment_ManualQuality_Tag */
+        /* @var $clone editor_Segment_Mqm_Tag */
         $clone->setMqmProps($this->paired, $this->typeIndex, $this->severity, $this->comment);
         return $clone;
     }
@@ -161,19 +217,10 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
         $tag = $this->cloneProps(editor_Tag::img(), true);
         $position = ($isOpener) ? 'left' : 'right';
         $className = ($isOpener) ? self::CSS_CLASS_OPEN : self::CSS_CLASS_CLOSE;
-        $tag->setSource($this->createImageSrc($this->typeIndex, $position));
+        $tag->setSource(self::createImageSrc($this->typeIndex, $position));
         // to resemble the otherwise used structure we prepend this class. In General, CSS-classes should be independent from position ...
         $tag->prependClass($className);
         return $tag->render();
-    }
-    /**
-     * 
-     * @param int $typeIndex
-     * @param string $position
-     * @return mixed
-     */
-    private function createImageSrc(int $typeIndex, string $position) : string {
-        return str_replace('{0}', strval($typeIndex), str_replace('{1}', $position, $this->createImageSrcTemplate()));
     }
     /**
      * Adds additional clone properties
@@ -181,24 +228,15 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
      * @param int $typeIndex
      * @param string $severity
      * @param string $comment
-     * @return editor_Segment_ManualQuality_Tag
+     * @return editor_Segment_Mqm_Tag
      */
-    private function setMqmProps(bool $paired, int $typeIndex, string $severity, string $comment) : editor_Segment_ManualQuality_Tag{
+    private function setMqmProps(bool $paired, int $typeIndex, string $severity, string $comment) : editor_Segment_Mqm_Tag{
         $this->paired = $paired;
         $this->singular = !$paired;
         $this->typeIndex = $typeIndex;
         $this->severity = $severity;
         $this->comment = $comment;
         return $this;
-    }
-    
-    private function createImageSrcTemplate(){
-        // when Testing, Zend_Config is not available. TODO: better setup/bootstrapping for classic unit test
-        if(defined('T5_IS_UNIT_TEST')){
-            return '/modules/editor/images/imageTags/'.self::IMAGE_SRC;
-        }
-        $conf = Zend_Registry::get('config');
-        return APPLICATION_RUNDIR.'/'.$conf->runtimeOptions->dir->tagImagesBasePath.'/'.self::IMAGE_SRC;
     }
     
     /* Consolidation API */
@@ -228,7 +266,7 @@ final class  editor_Segment_ManualQuality_Tag extends editor_Segment_Tag {
         } else if($this->severity == ''){
             throw new Zend_Exception('MQM Tag found, but no severity was set in: '.$this->renderStart());
         } else if($this->getData('seq') == null){
-            throw new Zend_Exception('MQM Tag found, but no sequence (data-seq) was set in: '.$this->renderStart());
+            throw new Zend_Exception('MQM Tag found, but no quality-id (data-seq) was set in: '.$this->renderStart());
         }
     }
     /**

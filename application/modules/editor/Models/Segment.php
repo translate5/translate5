@@ -1485,24 +1485,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return ' = ';
         //return ' like ' bei MSSQL
     }
-
-    /**
-     * TODO AUTOQA: remove when mqm is completely handled by new quality model
-     * Updates - if enabled - the QM Sub Segments with correct IDs in the given String and stores it with the given Method in the entity
-     * Also, corrects overlapped image tags between which there is no text node.
-     * @param string $field
-     */
-    public function updateQmSubSegments(string $dataindex) {
-        $field = $this->segmentFieldManager->getDataLocationByKey($dataindex);
-        if(! $this->getConfig()->runtimeOptions->editor->enableQmSubSegments) {
-            return;
-        }
-        $qmsubsegments = ZfExtended_Factory::get('editor_Models_Qmsubsegments');
-        /* @var $qmsubsegments editor_Models_Qmsubsegments */
-        $withQm = $qmsubsegments->updateQmSubSegments($this->get($dataindex), (int)$this->getId(), $field['field']);
-        $correctedOverlappedTags = $qmsubsegments->correctQmSubSegmentsOverlappedTags($withQm);
-        $this->set($dataindex, $correctedOverlappedTags);
-    }
     
     /**
      * Bulk updating a specific autoState of a task, affects only non edited segments

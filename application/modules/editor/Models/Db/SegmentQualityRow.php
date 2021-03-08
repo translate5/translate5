@@ -31,8 +31,8 @@ END LICENSE AND COPYRIGHT
  * provides the available data fields for convenience and an improved getter/setter for accessing fields
  * 
  * @property int $id
- * @property int $segmentId
  * @property string $taskGuid
+ * @property int $segmentId
  * @property string $fields
  * @property string $type
  * @property string $category
@@ -79,5 +79,13 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
         $fields = $this->getFields();
         $fields[] = $field;
         $this->setFields($fields);
+    }
+    /**
+     * 
+     * @param int $segmentId
+     */
+    public function setSegmentIdAndSave(int $segmentId){
+        $this->segmentId = $segmentId;
+        $this->save();
     }
 }

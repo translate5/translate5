@@ -123,8 +123,8 @@ Ext.define('Editor.controller.QmSubSegments', {
      */
     onEditorConfigLoaded:function(app, task){
         var me=this,
-            isControllerActive = app.getTaskConfig('editor.enableQmSubSegments');
-        //this controller is active when enableQmSubSegments is enabled
+            isControllerActive = app.getTaskConfig('autoQA.enableMqmTags');
+        //this controller is active when enableMqmTags is set
         me.setActive(isControllerActive);
     },
     

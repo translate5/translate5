@@ -55,11 +55,19 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     /**
      * @var string
      */
-    const TYPE_MANUALQUALITY = 'mqm';
+    const TYPE_MQM = 'mqm';
+    /**
+     * @var string
+     */
+    const TYPE_QM = 'qm';
     /**
      * @var string
      */
     const TYPE_ANY = 'any';
+    /**
+     * @var string
+     */
+    const CSS_CLASS_TOOLTIP = 'ownttip';
     /**
      * The counterpart to ::toJson: creates the tag from the serialized json data
      * @param string $jsonString

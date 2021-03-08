@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS `LEK_segment_tags` (
 -- model for AutoQA
 CREATE TABLE `LEK_segment_quality` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `segmentId` int(11) NOT NULL,
   `taskGuid` varchar(38) NOT NULL,
+  `segmentId` int(11) DEFAULT NULL,
   `fields` varchar(300) NOT NULL,
   `type` varchar(10) NOT NULL,
   `category` varchar(64) DEFAULT NULL,
@@ -77,8 +77,16 @@ INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `valu
 ('runtimeOptions.autoQA.enableEdited100MatchCheck', 1, 'editor', 'system', 1, 1, '', 'boolean', 'If activated (default), AutoQA covers checking edited 100% matches', 8, 'Enable edited 100% match check', 'Editor: QA', '');
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
 ('runtimeOptions.autoQA.enableUneditedFuzzyMatchCheck', 1, 'editor', 'system', 1, 1, '', 'boolean', 'If activated (default), AutoQA covers checking not edited fuzzy matches', 8, 'Enable not edited fuzzy match check', 'Editor: QA', '');
-
+UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.autoQA.enableMqmTags', `description` = 'If activated (default), the quality management covers MQM', `guiName` = 'Enable MQM in the quality management' 
+WHERE name = 'runtimeOptions.editor.enableQmSubSegments';
 
 
 -- TODO AUTOQA UNCOMMENT
 -- DROP TABLE `LEK_qmsubsegments`;
+
+-- TODO AUTOQA REMOVE
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
+('runtimeOptions.editor.enableQmSubSegments', 1, 'editor', 'mqm', '1', '1', '', 'boolean', 'If set to active, the MQM quality assurance panel on the right side of the editor is visible', 16, 'MQM panel active', 'Editor: QA', '');
+
+
+
