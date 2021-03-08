@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * editor_Plugins_SegmentStatistics_Worker Class
  */
-class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Import_Worker_Abstract {
+class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_AbstractWorker {
     const TYPE_IMPORT = 'import';
     const TYPE_EXPORT = 'export';
     
