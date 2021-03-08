@@ -272,8 +272,8 @@ class '.$name.' extends \ZfExtended_Test_ApiTestcase {
     
     protected function makeTestFiles($path, $name, $issue) {
         $testpath = $path.'/'.$name.'/';
-        $proofread = $path.'/'.$name.'/testfiles/proofRead/';
-        mkdir($proofread, 0755, true);
+        $workfiles = $path.'/'.$name.'/testfiles/workfiles/';
+        mkdir($workfiles, 0755, true);
         
         //make a sample task-config.ini
         file_put_contents($testpath.'testfiles/task-config.ini', "runtimeOptions.import.fileparser.options.protectTags = 0\n");
@@ -293,7 +293,7 @@ class '.$name.' extends \ZfExtended_Test_ApiTestcase {
 </xliff>
 EOF;
 
-        file_put_contents($proofread.$issue.'-de-en.xlf', $xliff);
+        file_put_contents($workfiles.$issue.'-de-en.xlf', $xliff);
 
 $json = <<<EOF
 [
