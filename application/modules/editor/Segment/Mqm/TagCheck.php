@@ -37,21 +37,21 @@
  * Adds the Segment Quality Entries for the MQM tags that may have been added by the frontend only
  * 
  */
-class editor_Segment_ManualQuality_TagCheck extends editor_Segment_Quality_Provider {
+class editor_Segment_Mqm_TagCheck extends editor_Segment_Quality_Provider {
 
     /**
      * Using the internal tag type
      * @var string
      */
-    protected static $type = editor_Segment_Tag::TYPE_MANUALQUALITY;
+    protected static $type = editor_Segment_Tag::TYPE_MQM;
     
-    public function processSegment(editor_Models_Task $task, Zend_Config $taskConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
+    public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
-        if($taskConfig->runtimeOptions->editor->enableQmSubSegments == 1){
+        if($qualityConfig->enableMqmTags == 1){
         
             foreach($tags->getTagsByType(static::$type) as $mqmTag){
-                /* @var $mqmTag editor_Segment_ManualQuality_Tag */
-                $qualityId = $tags->saveManualQuality($mqmTag->field, $mqmTag->getTypeIndex(), $mqmTag->getSeverity(), $mqmTag->getComment(), $mqmTag->startIndex, $mqmTag->endIndex);
+                /* @var $mqmTag editor_Segment_Mqm_Tag */
+                $qualityId = $tags->saveMqm($mqmTag->field, $mqmTag->getTypeIndex(), $mqmTag->getSeverity(), $mqmTag->getComment(), $mqmTag->startIndex, $mqmTag->endIndex);
                 // update the sequence-id with the database-id of the bound quality
                 $mqmTag->setData('seq', strval($qualityId));
             }

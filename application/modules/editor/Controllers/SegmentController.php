@@ -763,9 +763,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * @return boolean
      */
     private function isMqmTask($taskGuid){
-        $qms=ZfExtended_Factory::get('editor_Models_Qmsubsegments');
-        /* @var $qms  editor_Models_Qmsubsegments */
-        return $qms->hasTaskMqm($taskGuid);
+        return editor_Models_Db_SegmentQuality::hasTypeForTask($taskGuid, editor_Segment_Tag::TYPE_MQM);
     }
     
     /***

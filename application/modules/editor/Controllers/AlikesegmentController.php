@@ -116,17 +116,6 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         /* @var $entity editor_Models_Segment */
         $result = array();
         
-        $config = $task->getConfig();
-        $qmSubsegmentAlikes = array();
-        if($config->runtimeOptions->editor->enableQmSubSegments) {
-            $qmSubsegmentAlikes = $this->fieldLoop(function($field, $editField, $getter, $setter) use ($editedSegmentId){
-                $qmSubsegmentAlikes = ZfExtended_Factory::get('editor_Models_QmsubsegmentAlikes');
-                /* @var $qmSubsegmentAlikesSource editor_Models_QmsubsegmentAlikes */
-                $qmSubsegmentAlikes->parseSegment($this->entity->{$getter}(), $editedSegmentId);
-                return $qmSubsegmentAlikes;
-            });
-        }
-        
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         
@@ -134,11 +123,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         
         $tua = editor_Models_Loaders_Taskuserassoc::loadByTask($userGuid, $task);
         
-        $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [
-            $this->entity,
-            $config,
-            $qmSubsegmentAlikes
-        ]);
+        $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [ $this->entity, $task->getConfig() ]);
         /* @var $repetitionUpdater editor_Models_Segment_RepetitionUpdater */
         
         $alikeCount = count($ids);
@@ -172,8 +157,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     //the segment has to be ignored!
                     continue;
                 }
-                
+                // process all quality related stuff
+                editor_Segment_Quality_Manager::instance()->processSegment($entity, $task, editor_Segment_Processing::ALIKE);
+                // TODO AUTOQA: remove/refactor                
                 $entity->setQmId((string) $this->entity->getQmId());
+
                 if(!is_null($this->entity->getStateId())) {
                     $entity->setStateId($this->entity->getStateId());
                 }

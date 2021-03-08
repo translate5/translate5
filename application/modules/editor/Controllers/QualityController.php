@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * TODO ANNOTATE
+ * TODO AUTOQA ANNOTATE
  *
  *
  */
@@ -43,6 +43,8 @@ class Editor_QualityController extends ZfExtended_RestController {
     protected $entity;
 
     /**
+     * Retrieves all Qualities for the current task. It is impelmented just as a temporary datamodel for the MQM statistics panel
+     * TODO AUTOQA REMOVE
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
@@ -69,18 +71,45 @@ class Editor_QualityController extends ZfExtended_RestController {
         */
         $this->view->text = 'TEST';
     }
-    
+    /**
+     * Retrieves the data for the quality filter-panel in the segment grid
+     */
     public function filterAction(){
-        throw new ZfExtended_BadMethodCallException(__CLASS__.'->get');
+        $this->view->text = 'TEST';
+        // TODO IMPLEMENT
     }
-
-
+    /**
+     * Retrieves the data for the segment's qualities-panel in the segment grid
+     */
+    public function segmentAction(){
+        $this->view->text = 'TEST';
+        // TODO IMPLEMENT
+    }
+    /**
+     * Retrieves the data for the qualities-overview of a task in the task info panel
+     */
+    public function taskAction(){
+        $this->view->text = 'TEST';
+        // TODO IMPLEMENT
+    }
+    /**
+     * Retrieves a single quality
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::getAction()
+     */
     public function getAction(){
-        throw new ZfExtended_BadMethodCallException(__CLASS__.'->get');
+        $this->view->text = 'TEST';
+        // TODO IMPLEMENT
     }
-
+    /**
+     * Sets the false-positive values for a quality
+     * This is somehow a misuse of PUT
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::putAction()
+     */
     public function putAction(){
-        throw new ZfExtended_BadMethodCallException(__CLASS__.'->put');
+        $this->view->text = 'TEST';
+        // TODO IMPLEMENT
     }
 
     public function deleteAction(){

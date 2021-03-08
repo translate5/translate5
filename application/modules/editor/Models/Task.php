@@ -442,7 +442,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function getQmSubsegmentIssuesFlat(){
         $flatTree = array();
-        $walk = function(array $qmFlagTree)use (&$walk,&$flatTree){
+        $walk = function(array $qmFlagTree)use (&$walk, &$flatTree){
             foreach ($qmFlagTree as $node) {
                 $flatTree[$node->id] = $node->text;
                 if(isset($node->children) && is_array($node->children)){

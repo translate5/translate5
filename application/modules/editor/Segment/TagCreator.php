@@ -186,8 +186,8 @@ final class editor_Segment_TagCreator {
             return new editor_Segment_TrackChanges_DeleteTag($startIndex, $startIndex);
         }
         // check for MQM tags
-        if((editor_Segment_ManualQuality_Tag::isType($type) || in_array(editor_Segment_ManualQuality_Tag::CSS_CLASS, $classNames)) && editor_Segment_ManualQuality_Tag::hasNodeName($nodeName)){
-            return new editor_Segment_ManualQuality_Tag($startIndex, $startIndex);
+        if((editor_Segment_Mqm_Tag::isType($type) || in_array(editor_Segment_Mqm_Tag::CSS_CLASS, $classNames)) && editor_Segment_Mqm_Tag::hasNodeName($nodeName)){
+            return new editor_Segment_Mqm_Tag($startIndex, $startIndex);
         }
         // let our providers find a tag
         foreach(static::$_provider as $type => $tagProvider){

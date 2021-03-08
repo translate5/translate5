@@ -112,9 +112,10 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         return $this->delete($where);
     }
     /**
+     * adding a general quality. To add a quality without segment-quality contraint, set segmentId to -1
      * 
-     * @param int $segmentId
      * @param string $taskGuid
+     * @param int $segmentId
      * @param string $field
      * @param string $type
      * @param string $category
@@ -124,13 +125,14 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param int $startIndex
      * @param int $endIndex
      * @param int $falsePositive
-     * @return number
+     * @return editor_Models_Db_SegmentQualityRow
      */
-    public function saveQuality(int $segmentId, string $taskGuid, string $field, string $type, string $category=NULL, int $mqmType=-1, string $severity=NULL, string $comment=NULL, int $startIndex=0, int $endIndex=-1, int $falsePositive=0){
+    public function addQuality(string $taskGuid, int $segmentId, string $field, string $type, string $category=NULL, int $mqmType=-1, string $severity=NULL, string $comment=NULL, int $startIndex=0, int $endIndex=-1, int $falsePositive=0){
         $row = $this->createRow();
         /* @var $row editor_Models_Db_SegmentQualityRow */
-        $row->segmentId = $segmentId;
+        
         $row->taskGuid = $taskGuid;
+        $row->segmentId = ($segmentId == -1) ? NULL : $segmentId;
         $row->setField($field);
         $row->type = $type;
         $row->category = $category;
@@ -142,7 +144,33 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         $row->comment = $comment;
         $row->save();
         
-        return $row->id;
+        return $row;
+    }
+    /**
+     * adding a MQM quality. To add a quality without segment-quality contraint, set segmentId to -1
+     * 
+     * @param string $taskGuid
+     * @param int $segmentId
+     * @param string $field
+     * @param int $typeIndex
+     * @param string $severity
+     * @param string $comment
+     * @param int $startIndex
+     * @param int $endIndex
+     * @return editor_Models_Db_SegmentQualityRow
+     */
+    public function addMqm(string $taskGuid, int $segmentId, string $field, int $typeIndex, string $severity, string $comment, int $startIndex=0, int $endIndex=-1){
+         return $this->addQuality(
+            $taskGuid,
+            $segmentId,
+            $field,
+            editor_Segment_Tag::TYPE_MQM,
+            NULL,
+            $typeIndex,
+            $severity,
+            $comment,
+            $startIndex,
+            $endIndex);
     }
     /**
      * 

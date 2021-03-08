@@ -113,7 +113,7 @@ final class editor_Segment_Quality_Manager {
         $provider = new editor_Segment_MatchRate_EditCheck();
         $this->registry[$provider->getType()] = $provider;
         // MQM
-        $provider = new editor_Segment_ManualQuality_TagCheck();
+        $provider = new editor_Segment_Mqm_TagCheck();
         $this->registry[$provider->getType()] = $provider;
     }
     /**
@@ -204,14 +204,14 @@ final class editor_Segment_Quality_Manager {
     public function processSegment(editor_Models_Segment $segment, editor_Models_Task $task, string $processingMode){
         // we remove all qualities as new ones will be written
         editor_Models_Db_SegmentQuality::deleteForSegment($segment->getId());
-        $config = $task->getConfig(); 
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA; 
         $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, false);
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
             if($provider->removeOwnTagsBeforeProcessing()){
                 $tags->removeTagsByType($provider->getType());
             }
-            $tags = $provider->processSegment($task, $config, $tags, $processingMode);
+            $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
         }
         $tags->flush(true);
     }

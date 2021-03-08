@@ -493,19 +493,18 @@ class editor_Segment_Tags implements JsonSerializable {
      * @param int $endIndex
      * @return int
      */
-    public function saveManualQuality(string $field, int $typeIndex, string $severity, string $comment, int $startIndex=0, int $endIndex=-1){
+    public function saveMqm(string $field, int $typeIndex, string $severity, string $comment, int $startIndex=0, int $endIndex=-1){
         // TODO AUTOQA: this means, when we re-set qualities a former existing false positive flag will not persist
-        return $this->getQualityTable()->saveQuality(
-            $this->segmentId,
+        $qualityRow = $this->getQualityTable()->addMqm(
             $this->task->getTaskGuid(),
+            $this->segmentId,
             $field,
-            editor_Segment_Tag::TYPE_MANUALQUALITY,
-            NULL,
             $typeIndex,
             $severity,
             $comment,
             $startIndex,
             $endIndex);
+        return $qualityRow->id;
     }
     /**
      * Returnes the names of all our target fields
@@ -556,8 +555,8 @@ class editor_Segment_Tags implements JsonSerializable {
         foreach($this->targets as $tag){
             $data->targets[] = $tag->jsonSerialize();
         }
-        $data->source = ($this->hasSource()) ? false : $this->source->jsonSerialize();
-        $data->sourceOriginal = ($this->hasOriginalSource()) ? false : $this->sourceOriginal->jsonSerialize();
+        $data->source = ($this->hasSource()) ? $this->source->jsonSerialize() : false;
+        $data->sourceOriginal = ($this->hasOriginalSource()) ? $this->sourceOriginal->jsonSerialize() : false;
         if($this->targetOriginalIdx > -1){
             $data->targetOriginalIdx = $this->targetOriginalIdx;
         } else if($this->targetOriginal != NULL) {
