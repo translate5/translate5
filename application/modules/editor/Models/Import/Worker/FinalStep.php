@@ -28,14 +28,14 @@ END LICENSE AND COPYRIGHT
 
 /**
  * This Worker is triggered after a task import, regardless if the task was successfully imported or the import did not succeed due errors.
- * Therefore this worker may not be a subclass of the editor_Models_Import_Worker_Abstract
+ * Therefore this worker may not be a subclass of the editor_Models_Task_AbstractWorker
  */
 class editor_Models_Import_Worker_FinalStep extends ZfExtended_Worker_Abstract {
     /**
-     * The final step should run in any case
-     * @var boolean
+     * Defines the behaviour class to be used for this worker
+     * @var string
      */
-    protected $enableParentDefuncCheck = false;
+    protected $behaviourClass = 'editor_Models_Import_Worker_FinalStepBehaviour';
     
     /**
      * (non-PHPdoc)

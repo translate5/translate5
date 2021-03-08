@@ -30,12 +30,15 @@ END LICENSE AND COPYRIGHT
  * Imports the language resource file into the language resource.
  */
 class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
-    use ZfExtended_Controllers_MaintenanceTrait;
-    
     /***
      * @var editor_Models_LanguageResources_LanguageResource
      */
     protected $languageResource;
+    
+    public function init($taskGuid = NULL, $parameters = array()) {
+        $this->behaviour->setConfig(['isMaintenanceScheduled' => true]);
+        return parent::init($taskGuid, $parameters);
+    }
     
     /**
      * (non-PHPdoc)
@@ -46,15 +49,6 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
             return false;
         }
         return true;
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see ZfExtended_Worker_Abstract::isMaintenanceScheduled()
-     */
-    protected function isMaintenanceScheduled(): bool {
-        //additional checks posible here
-        return $this->isMaintenanceLoginLock();
     }
     
     /**

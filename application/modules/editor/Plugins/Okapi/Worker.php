@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
+class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
     
     const TYPE_IMPORT = 'import';
     const TYPE_EXPORT = 'export';
