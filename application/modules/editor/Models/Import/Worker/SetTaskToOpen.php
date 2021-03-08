@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * This Worker reopens the task after the import was successful
  */
-class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Import_Worker_Abstract {
+class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Task_AbstractWorker {
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()

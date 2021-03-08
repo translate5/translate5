@@ -215,7 +215,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
      * @param array $charsNotSet
      * @return int|NULL
      */
-    public function getCharWidth ($char, $pixelMappingForSegment, $fileId, &$charsNotSet) {
+    public function getCharWidth ($char, $pixelMappingForSegment, $fileId, &$charsNotSet): int {
         $unicodeCharNumeric = $this->getNumericValueOfUnicodeChar($char);
         if (array_key_exists($unicodeCharNumeric, $pixelMappingForSegment)) {
             $pixelMappingForCharacter = $pixelMappingForSegment[$unicodeCharNumeric];
@@ -227,8 +227,13 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
             }
         }
         $charsNotSet[] = $unicodeCharNumeric . ' (' . $char. ')';
+        
         if (array_key_exists('default', $pixelMappingForSegment)) {
-            return $pixelMappingForSegment['default'];
+            $default = $pixelMappingForSegment['default'];
+            if(is_array($default) && array_key_exists($fileId, $default)) {
+                return $default[$fileId];
+            }
+            return $default;
         }
         return null;
     }
