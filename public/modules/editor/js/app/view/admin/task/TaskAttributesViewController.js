@@ -79,10 +79,28 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
         }
     },
     
+    /***
+     * On 100 percent match checkbox change
+     */
     onEdit100PercentMatchChange:function(field, newValue, oldValue){
+        if(newValue===oldValue){
+            return;
+        }
+        var me=this,
+            task = me.getCurrentTask(),
+            recordValue = task && task.get('edit100PercentMatch'),
+            isNewValue = recordValue !== newValue,
+            view = me.getView();
+            
+        if(!isNewValue){
+            return;
+        }
+        
+        var message = newValue ? view.strings.edit100PercentMatchEnabledMessage : view.strings.edit100PercentMatchDisabledMessage;
+        
         Ext.MessageBox.show({
-            title: 'Info',
-            msg: 'Translate me',
+            title: '',
+            msg: message,
             buttons: Ext.MessageBox.OK,
             icon: Ext.MessageBox.WARNING
         });
