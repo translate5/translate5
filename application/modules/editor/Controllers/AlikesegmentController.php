@@ -245,7 +245,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         //TODO: change to websocket
         //the alike segment save does not use the segment saver
         //the segment finish count needs to be updated after the allike segments save
-        $task->updateSegmentFinishCount($task);
+        $task->updateSegmentFinishCount();
         //reload the task
         $task->load($task->getId());
         $this->view->segmentFinishCount=$task->getSegmentFinishCount();
