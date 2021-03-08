@@ -210,8 +210,15 @@ CREATE TABLE Statements
   without charset and without collation, unless you know exactly what you do!
 
 Template Config:
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`)
-VALUES ('runtimeOptions.xxx.yyy', '1', 'app', 'system', 'VALUE', 'DEFAULT', '', 'string', 'DESC.', 2);
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`)
+VALUES ('runtimeOptions.xxx.yyy', '1', 'app', 'system', 'VALUE', 'DEFAULT', '', 'string', 'DESC.', 2, 'place me in the GUI', 'place me in the GUI');
+// Choose the guiGroup wisely!
+// CONFIG_LEVEL_SYSTEM      = 1;
+// CONFIG_LEVEL_INSTANCE    = 2;
+// CONFIG_LEVEL_CUSTOMER    = 4;
+// CONFIG_LEVEL_TASKIMPORT  = 8;
+// CONFIG_LEVEL_TASK        = 16;
+// CONFIG_LEVEL_USER        = 32;
 
 Template ACL:
 INSERT INTO `Zf_acl_rules` (`id`, `module`, `role`, `resource`, `right`)
