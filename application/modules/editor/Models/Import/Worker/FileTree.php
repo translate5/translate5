@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Encapsulates the part of the import which looks for the files to be imported
  */
-class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_Abstract {
+class editor_Models_Import_Worker_FileTree extends editor_Models_Task_AbstractWorker {
     
     /**
      * @var ZfExtended_EventManager
@@ -57,7 +57,7 @@ class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_A
             return false;
         }
         
-        $this->registerShutdown();
+        $this->behaviour->registerShutdown();
         
         //also containing an instance of the initial dataprovider.
         // The Dataprovider can itself hook on to several import events
@@ -88,7 +88,7 @@ class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_A
             return true;
         } catch (Exception $e) {
             $task->setErroneous();
-            $this->defuncRemainingOfGroup();
+            $this->behaviour->defuncRemainingOfGroup();
             throw $e;
         }
     }

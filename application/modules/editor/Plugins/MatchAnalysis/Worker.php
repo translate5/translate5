@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_MatchAnalysis_Worker extends ZfExtended_Worker_Abstract {
+class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWorker {
     
     /***
      * Task old state before the match analysis were started
@@ -40,26 +40,9 @@ class editor_Plugins_MatchAnalysis_Worker extends ZfExtended_Worker_Abstract {
      */
     protected $log;
     
-    
     public function __construct() {
         parent::__construct();
         $this->log=Zend_Registry::get('logger')->cloneMe('plugin.matchanalysis');
-    }
-    
-    /**
-     * @var editor_Models_Task
-     */
-    protected $task;
-    
-    public function init($taskGuid = NULL, $parameters = array()) {
-        $this->task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $ class */
-        $this->task->loadByTaskGuid($taskGuid);
-        
-        if($this->task->isErroneous()) {
-            return false;
-        }
-        return parent::init($taskGuid, $parameters);
     }
     
     /**
@@ -87,7 +70,7 @@ class editor_Plugins_MatchAnalysis_Worker extends ZfExtended_Worker_Abstract {
             if($params['termtaggerSegment'] && $params['pretranslate'] && !$params['isTaskImport']){
                 $this->queueTermtagger($this->taskGuid,$this->workerModel->getParentId());
             }
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             //when error happens, revoke the task old state, and unlock the task
             $this->task->setState($this->taskOldState);
             $this->task->save();
