@@ -589,7 +589,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         $this->__call('setWorkflowStepName', [$stepName]);
         $this->db->update($data, ['taskGuid = ?' => $this->getTaskGuid()]);
-        $this->updateSegmentFinishCount($this);
+        $this->updateSegmentFinishCount();
     }
 
     /**
@@ -1169,9 +1169,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Update the segment finish count based on the task workflow step valid autostates
      * @param editor_Models_Task $task
      */
-    public function updateSegmentFinishCount(editor_Models_Task $task){
-        $stateRoles=$this->getTaskStateRoles($task->getTaskGuid(),$task->getWorkflowStepName());
-        $isWorkflowEnded=$task->getWorkflowStepName()==editor_Workflow_Abstract::STEP_WORKFLOW_ENDED;
+    public function updateSegmentFinishCount(){
+        $stateRoles = $this->getTaskStateRoles($this->getTaskGuid(), $this->getWorkflowStepName());
+        $isWorkflowEnded = $this->getWorkflowStepName() == editor_Workflow_Abstract::STEP_WORKFLOW_ENDED;
         if(!$stateRoles && !$isWorkflowEnded){
             return;
         }
@@ -1182,9 +1182,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $expression='segmentCount';
         }else{
             //get the autostates for the valid task workflow states
-            $expression='(SELECT COUNT(*) FROM LEK_segments WHERE autoStateId IN('.implode(',', $stateRoles).') AND taskGuid='.$adapted->quote($task->getTaskGuid()).')';
+            $expression='(SELECT COUNT(*) FROM LEK_segments WHERE autoStateId IN('.implode(',', $stateRoles).') AND taskGuid='.$adapted->quote($this->getTaskGuid()).')';
         }
-        $this->db->update(['segmentFinishCount'=>new Zend_Db_Expr($expression)],['taskGuid=?' => $task->getTaskGuid()]);
+        $this->db->update(['segmentFinishCount'=>new Zend_Db_Expr($expression)],['taskGuid=?' => $this->getTaskGuid()]);
     }
 
     /***
