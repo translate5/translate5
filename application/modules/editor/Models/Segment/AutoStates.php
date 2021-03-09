@@ -126,6 +126,13 @@ class editor_Models_Segment_AutoStates {
     const TRANSLATED_AUTO = 14;
     
     /**
+     * segments pretranslated by translate5 (or external tool and imported with status pretranslated)
+     * This status is a kind of initial status, so it does not belong to role/workflow step translation!
+     * @var integer
+     */
+    const PRETRANSLATED = 15;
+    
+    /**
      * Internal state used to show segment is pending
      * @var integer
      */
@@ -153,6 +160,7 @@ class editor_Models_Segment_AutoStates {
         self::REVIEWED_PM_AUTO => 'PM lektoriert, auto',
         self::REVIEWED_PM_UNCHANGED => 'PM lektoriert, unverändert',
         self::REVIEWED_PM_UNCHANGED_AUTO => 'PM lektoriert, unverändert, auto',
+        self::PRETRANSLATED => 'Vorübersetzt'
     );
     
     /**
@@ -195,8 +203,9 @@ class editor_Models_Segment_AutoStates {
             self::REVIEWED_PM_UNCHANGED_AUTO,
           ),
           editor_Workflow_Abstract::ROLE_TRANSLATOR => [
-            self::TRANSLATED,
-            self::TRANSLATED_AUTO,
+              // may not contain the state PRETRANSLATED, since PRETRANSLATED does not belong (in statistics, workflow etc) to the translators!
+              self::TRANSLATED,
+              self::TRANSLATED_AUTO,
           ],
           editor_Workflow_Abstract::ROLE_REVIEWER => array(
             self::REVIEWED,
@@ -258,7 +267,8 @@ class editor_Models_Segment_AutoStates {
      * @param bool $isTranslated
      * @return integer
      */
-    public function calculateImportState($isEditable, $isTranslated) {
+    public function calculateImportState($isEditable, $isTranslated): int
+    {
         if(! $isEditable) {
             return self::BLOCKED;
         }
@@ -266,6 +276,19 @@ class editor_Models_Segment_AutoStates {
             return self::TRANSLATED;
         }
         return self::NOT_TRANSLATED;
+    }
+    
+    /**
+     * calculates the initial autoStateId of an segment in the import process
+     * @param bool $isEditable
+     * @return integer
+     */
+    public function calculatePretranslationState($isEditable): int
+    {
+        if(! $isEditable) {
+            return self::BLOCKED;
+        }
+        return self::PRETRANSLATED;
     }
     
     /**

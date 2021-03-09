@@ -221,6 +221,11 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         $segment->setMatchRateType((string) $matchrateType);
         
+        //if there is no text, it should be blocked, also if it is not editable
+        $pretrans = $hasText && $segment->isEditable();
+        $segment->setAutoStateId($this->autoStates->calculatePretranslationState($pretrans));
+        $segment->setPretrans($pretrans);
+        
         //if it is tm or term collection and the matchrate is >=100, log the usage
         if(($languageResource->isTm() || $languageResource->isTc()) && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE){
             $this->connectors[$languageResourceid]->logAdapterUsage($segment);
@@ -234,8 +239,6 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $segment->setUserGuid($this->userGuid);//to the authenticated userGuid
         $segment->setUserName($this->userName);//to the authenticated userName
 
-        $this->calculateSegmentAutoState($segment, $hasText);
-        
         //NOTE: remove me if to many problems
         //$segment->validate();
         
@@ -252,8 +255,12 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             $segment->setEditable(false);
         }
 
+        //set the used language resource uuid in the segments meta table
+        $segment->meta()->setPreTransLangResUuid($languageResource->getLangResUuid());
+        $segment->meta()->save();
+        
         //save the segment and history
-        $this->saveSegmentAndHistory($segment,$history);
+        $this->saveSegmentAndHistory($segment, $history);
         
         $this->events->trigger('afterAnalysisSegmentPretranslate', $this, [
             'entity' => $segment,
@@ -261,52 +268,6 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             'languageResourceId' => $languageResourceid,
             'result' => $result
         ]);
-    }
-    
-    /**
-     * calculates the autostate in the given segment
-     * @param editor_Models_Segment $segment
-     * @param bool $hasText
-     */
-    protected function calculateSegmentAutoState(editor_Models_Segment $segment, bool $hasText): void {
-        if(!$hasText) {
-            $segment->setAutoStateId($this->autoStates->calculateImportState(false, true));
-            return;
-        }
-        
-        //if the task is in state import calculate the autostate
-        if($this->taskState == editor_Models_Task::STATE_IMPORT){
-            $segment->setAutoStateId($this->autoStates->calculateImportState($segment->isEditable(), true));
-            return;
-        }
-        
-        //if a user pretranslates an already imported task, we set the autostate and workflow step to values fitting to the user
-        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wfm editor_Workflow_Manager */
-        $activeWorkflow=$wfm->getActive($this->task->getTaskGuid());
-        
-        $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, $segment, $tua) {
-            //sets the calculated autoStateId
-            $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua));
-        };
-        
-        //init the task user association
-        $this->initUsertTaskAssoc();
-        
-        if($this->userTaskAssoc->getIsPmOverride() == 1){
-            $segment->setWorkflowStep(editor_Workflow_Abstract::STEP_PM_CHECK);
-        }
-        else {
-            //sets the actual workflow step
-            $segment->setWorkflowStepNr($this->task->getWorkflowStep());
-            
-            //sets the actual workflow step name, does currently depend only on the userTaskRole!
-            $step = $activeWorkflow->getStepOfRole($this->userTaskAssoc->getRole());
-            $step && $segment->setWorkflowStep($step);
-        }
-        
-        //set the autostate as defined in the given Closure
-        $updateAutoStates($this->autoStates, $segment, $this->userTaskAssoc);
     }
     
     /***
