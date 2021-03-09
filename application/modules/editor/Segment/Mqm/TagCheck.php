@@ -48,7 +48,7 @@ class editor_Segment_Mqm_TagCheck extends editor_Segment_Quality_Provider {
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
         if($qualityConfig->enableMqmTags == 1){
-        
+       
             foreach($tags->getTagsByType(static::$type) as $mqmTag){
                 /* @var $mqmTag editor_Segment_Mqm_Tag */
                 $qualityId = $tags->saveMqm($mqmTag->field, $mqmTag->getTypeIndex(), $mqmTag->getSeverity(), $mqmTag->getComment(), $mqmTag->startIndex, $mqmTag->endIndex);

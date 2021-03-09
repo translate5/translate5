@@ -94,8 +94,8 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterTermCollectionAssocChange(Zend_EventManager_Event $event){
-        $entity=$event->getParam('entity');
         
+        $entity = $event->getParam('entity');        
         $entityGuid = $entity->getTaskGuid();
 
         $task = ZfExtended_Factory::get('editor_Models_Task');

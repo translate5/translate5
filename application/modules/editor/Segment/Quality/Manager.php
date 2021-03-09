@@ -155,7 +155,7 @@ final class editor_Segment_Quality_Manager {
      */
     public function finishImport(editor_Models_Task $task){
         
-        $config = $task->getConfig();        
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA; 
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $db editor_Models_Db_Segments */
         $db->getAdapter()->beginTransaction();
@@ -179,7 +179,7 @@ final class editor_Segment_Quality_Manager {
                     if($provider->removeOwnTagsBeforeProcessing()){
                         $tags->removeTagsByType($provider->getType());
                     }
-                    $tags = $provider->processSegment($task, $config, $tags, editor_Segment_Processing::IMPORT);
+                    $tags = $provider->processSegment($task, $qualityConfig, $tags, editor_Segment_Processing::IMPORT);
                 }
             }
             // we save all qualities at once to reduce db-strain

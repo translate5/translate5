@@ -43,8 +43,7 @@ class Editor_QualityController extends ZfExtended_RestController {
     protected $entity;
 
     /**
-     * Retrieves all Qualities for the current task. It is impelmented just as a temporary datamodel for the MQM statistics panel
-     * TODO AUTOQA REMOVE
+     * Retrieves all Qualities for the current task as used in the quality filter-panel in the segment grid
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
@@ -72,9 +71,9 @@ class Editor_QualityController extends ZfExtended_RestController {
         $this->view->text = 'TEST';
     }
     /**
-     * Retrieves the data for the quality filter-panel in the segment grid
+     * Retrieves the data for the statistics panel
      */
-    public function filterAction(){
+    public function statisticsAction(){
         $this->view->text = 'TEST';
         // TODO IMPLEMENT
     }
@@ -86,24 +85,25 @@ class Editor_QualityController extends ZfExtended_RestController {
         // TODO IMPLEMENT
     }
     /**
+     * Sets the false-positive for a segment
+     */
+    public function falsepositiveAction(){
+        $this->view->text = 'TEST';
+        // TODO IMPLEMENT
+    }
+    /**
      * Retrieves the data for the qualities-overview of a task in the task info panel
      */
     public function taskAction(){
         $this->view->text = 'TEST';
         // TODO IMPLEMENT
     }
-    /**
-     * Retrieves a single quality
-     * {@inheritDoc}
-     * @see ZfExtended_RestController::getAction()
-     */
+
     public function getAction(){
-        $this->view->text = 'TEST';
-        // TODO IMPLEMENT
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->get');
     }
     /**
-     * Sets the false-positive values for a quality
-     * This is somehow a misuse of PUT
+     * Creates a quality, used only to set qm qualities
      * {@inheritDoc}
      * @see ZfExtended_RestController::putAction()
      */

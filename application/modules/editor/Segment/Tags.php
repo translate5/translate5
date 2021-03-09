@@ -181,33 +181,36 @@ class editor_Segment_Tags implements JsonSerializable {
         // in case of an editing process the original source will be handled seperately
         // if we are an import, the original source and source will be handled identically - the "normal"  source is the edited source then (exception: the post-import adding of terms via "Analysis" where the source & edited source might already differ)
         // TODO: this assumes, that these fields are already copied at this point of the import
+        $hasOriginalSource = ($sourceEditingEnabled) ? (!$this->isImport || $this->segment->get($sourceFieldEditIndex) != $this->segment->get($sourceField)) : false;
+        if($hasOriginalSource){
+            // original source (what is the source in all other cases)
+            $this->sourceOriginal = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $sourceField, 'SourceOriginal');
+            // source here is the editable source
+            $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
+        } else {
+            // on import with enabled source editing, we copy the source as editedSource as well
+            $saveTo = ($sourceEditingEnabled) ? [$sourceField, $sourceFieldEditIndex] : $sourceField;
+            $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $saveTo, $sourceField);
+        }
+        $this->targets = [];
+        
         if($this->processingMode == editor_Segment_Processing::ALIKE){
-            // in a Alike copying process, the source wil not be processed until it is an editable source and only the first target ...
-            if($sourceEditingEnabled){
-                $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
-            }
+            
+            // in a Alike copying process, only the first target will be processed.
+            // TODO: this is not compliant with the multitarget tasks but can only be changed when the code in the AlikesegmentConroller is multifield capable
             $firstTarget = $fieldManager->getFirstTargetName();
             $editIndex = $fieldManager->getEditIndex($firstTarget);
-            $this->targets[] = new editor_Segment_FieldTags($this->segmentId, $firstTarget, $this->segment->get($editIndex), $editIndex, $editIndex);
+            $target = new editor_Segment_FieldTags($this->segmentId, $firstTarget, $this->segment->get($editIndex), $editIndex, $editIndex);
+            $this->targets[] = $target;
+            $this->targetOriginal = $target;
+            $this->targetOriginalIdx = 0;
             
         } else {
-            $hasOriginalSource = ($sourceEditingEnabled) ? (!$this->isImport || $this->segment->get($sourceFieldEditIndex) != $this->segment->get($sourceField)) : false;
-            if($hasOriginalSource){
-                // original source (what is the source in all other cases)
-                $this->sourceOriginal = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $sourceField, 'SourceOriginal');
-                // source here is the editable source
-                $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceFieldEditIndex), $sourceFieldEditIndex, $sourceField);
-            } else {
-                // on import with enabled source editing, we copy the source as editedSource as well
-                $saveTo = ($sourceEditingEnabled) ? [$sourceField, $sourceFieldEditIndex] : $sourceField;
-                $this->source = new editor_Segment_FieldTags($this->segmentId, $sourceField, $this->segment->get($sourceField), $saveTo, $sourceField);
-            }
-            $this->targets = [];
             foreach ($fieldManager->getFieldList() as $field) {
                 /* @var $field Zend_Db_Table_Row */
                 if($field->type == editor_Models_SegmentField::TYPE_TARGET && $field->editable) {
                     $editIndex = $fieldManager->getEditIndex($field->name);
-                    // special when we have an import but the fields are different this might is 
+                    // special when we have an import but the fields are different this might is
                     if($this->isImport && $this->segment->get($field->name) != $this->segment->get($editIndex)){
                         $target = new editor_Segment_FieldTags($this->segmentId, $field->name, $this->segment->get($field->name), $field->name, $field->name);
                         $this->targets[] = $target;
@@ -312,7 +315,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * Retrieves the original source in case of an editable source or the source otherwise
      * @return editor_Segment_FieldTags
      */
-    public function getOriginalOrNormalSource(){
+    public function getOriginalOrNormalSource() : ?editor_Segment_FieldTags {
         if($this->hasOriginalSource()){
             return $this->sourceOriginal;
         }
@@ -329,14 +332,14 @@ class editor_Segment_Tags implements JsonSerializable {
      *
      * @return editor_Segment_FieldTags
      */
-    public function getOriginalTarget(){
+    public function getOriginalTarget() : ?editor_Segment_FieldTags {
         return $this->targetOriginal;
     }
-    /**
+    /**?editor_Segment_FieldTags
      *
      * @return editor_Segment_FieldTags|NULL
      */
-    public function getFirstTarget(){
+    public function getFirstTarget() : ?editor_Segment_FieldTags {
         if(count($this->targets) > 0){
             return $this->targets[0];
         }
@@ -367,7 +370,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * 
      * @return editor_Models_Segment
      */
-    public function getSegment(){
+    public function getSegment() : editor_Models_Segment {
         if($this->segment == null){
             $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
             /* @var $segment editor_Models_Segment */

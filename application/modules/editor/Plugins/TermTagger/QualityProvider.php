@@ -86,40 +86,50 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
-        // this API does not process the import
-        if($processingMode == editor_Segment_Processing::IMPORT){
-            return $tags;
-        }
-        $segment = $tags->getSegment();
-        // no need to process if task has no terminologie or is not modified
-        if (!$task->getTerminologie() || !$segment->isDataModified()) {
-            return $tags;
-        }
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
         
-        if($segment->meta()->getTermtagState() == editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE) {
-            $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden: Das Segment ist zu lang.');
-            return $tags;
-        }
-        
-        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
-        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
-        
-        $params = ['resourcePool' => 'gui', 'processingMode' => $processingMode];
-        if (!$worker->init($task->getTaskGuid(), $params)) {
-            $logger = Zend_Registry::get('logger')->cloneMe('editor.terminology');
-            $logger->error('E1128', 'TermTaggerImport Worker can not be initialized!', ['parameters' => $params]);
-            return false;
-        }
-        if($worker->segmentTagsEdited($tags)){
-            // TODO FIXME: this should be a reference to the tags above, so this assignment should be obsolete. Can the case be, segmentTagsEdited returns true but no tags are available ??
-            $tags = $worker->getProcessedTags();
-            if($tags != null){
+        if($processingMode == editor_Segment_Processing::ALIKE){
+            
+            // when copying alike tags, we just save the qualities extracted from the tags
+            
+            editor_Plugins_TermTagger_SegmentProcessor::findAndAddQualitiesInTags($tags);
+            $tags->saveQualities();
+            
+            
+        } else if($processingMode == editor_Segment_Processing::EDIT){
+            
+            // editing process uses a worker to manage resource sharing of the termtagger
+            
+            $segment = $tags->getSegment();
+            // no need to process if task has no terminologie or is not modified
+            if (!$task->getTerminologie() || !$segment->isDataModified()) {
                 return $tags;
             }
+            $messages = Zend_Registry::get('rest_messages');
+            /* @var $messages ZfExtended_Models_Messages */
+            
+            if($segment->meta()->getTermtagState() == editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE) {
+                $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden: Das Segment ist zu lang.');
+                return $tags;
+            }
+            
+            $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
+            /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
+            
+            $params = ['resourcePool' => 'gui', 'processingMode' => $processingMode];
+            if (!$worker->init($task->getTaskGuid(), $params)) {
+                $logger = Zend_Registry::get('logger')->cloneMe('editor.terminology');
+                $logger->error('E1128', 'TermTaggerImport Worker can not be initialized!', ['parameters' => $params]);
+                return false;
+            }
+            if($worker->segmentTagsEdited($tags)){
+                // TODO FIXME: this should be a reference to the tags above, so this assignment should be obsolete. Can the case be, segmentTagsEdited returns true but no tags are available ??
+                $tags = $worker->getProcessedTags();
+                if($tags != null){
+                    return $tags;
+                }
+            }
+            $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
         }
-        $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
         return $tags;
     }
     
