@@ -27,19 +27,14 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * 
- * Tags the segments on task edit and will only be used sequentially via the run()-method
  */
-class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTagger_Worker_Abstract {
-    
-    protected $resourcePool = 'gui';    
+class editor_Models_Import_Worker_FinalStepBehaviour extends ZfExtended_Worker_Behaviour_Default {
     /**
-     * Deactivates maintenance for editor-save mode / non-threaded run
+     * In the final step must not check its parents, since it must run in any case!
      * {@inheritDoc}
-     * @see editor_Plugins_TermTagger_Worker_Abstract::init()
+     * @see ZfExtended_Worker_Behaviour_Default::checkParentDefunc()
      */
-    public function init($taskGuid = NULL, $parameters = array()) {
-        $this->behaviour->setConfig(['isMaintenanceScheduled' => false]);
-        return parent::init($taskGuid, $parameters);
+    public function checkParentDefunc(): bool {
+        return true;
     }
 }

@@ -31,14 +31,14 @@ END LICENSE AND COPYRIGHT
  * unfortunalely / historically the differentiation of the code is not very good since some of the needed functionality is in the base-class without being really needed there
  * The naming "slot" is historically and is used synonymous for "resource" in the end since we save a resource/url as the "slot" (= field in the worker table)
  */
-abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Models_Import_Worker_Abstract {
+abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Models_Task_AbstractWorker {
 
     /**
      * it should be based on maxParallelProcesses instead of just having one running worker per slot. maxParallelProcesses is ignored so far.
      *
      * @see ZfExtended_Worker_Abstract::queue()
      */
-    public function queue($parentId=0, $state=NULL, $startNext=true) {
+    public function queue($parentId=0, $state=NULL, $startNext=true) : int {
         
         // we trigger the parent init WITHOUT starting further workers
         $idToReturn = parent::queue($parentId, $state, false);

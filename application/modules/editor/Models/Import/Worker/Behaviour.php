@@ -30,46 +30,31 @@ END LICENSE AND COPYRIGHT
  * Contains the Import Worker (the scheduling parts)
  * The import process itself is encapsulated in editor_Models_Import_Worker_Import
  */
-abstract class editor_Models_Import_Worker_Abstract extends ZfExtended_Worker_Abstract {
-    use ZfExtended_Controllers_MaintenanceTrait;
+class editor_Models_Import_Worker_Behaviour extends ZfExtended_Worker_Behaviour_Default {
     
     /**
      * @var editor_Models_Task
      */
     protected $task;
+
+    public function __construct() {
+        //in import worker behaviour isMaintenanceScheduled is by default on
+        $this->config['isMaintenanceScheduled'] = true;
+    }
     
-    public function init($taskGuid = NULL, $parameters = array()) {
-        $this->task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $ class */
-        $this->task->loadByTaskGuid($taskGuid);
-        
-        if(!$this->task->isErroneous()) {
-            return parent::init($taskGuid, $parameters);
-        }
-        
-        //we set the worker to defunct when task has errors
-        $wm = $this->workerModel;
-        if(isset($wm)){
-            $wm->setState($wm::STATE_DEFUNCT);
-            $wm->save();
-            //wake up remaining - if any
-            $this->wakeUpAndStartNextWorkers();
-        }
-        //if no worker model is set, we don't have to call parent / init a worker model,
-        // since we don't even need it in the DB when the task already has errors
-        return false;
+    /**
+     * set the taask instance internally
+     * @param editor_Models_Task $task
+     */
+    public function setTask(editor_Models_Task $task) {
+        $this->task = $task;
     }
     
     /**
      * {@inheritDoc}
-     * @see ZfExtended_Worker_Abstract::isMaintenanceScheduled()
+     * @see ZfExtended_Worker_Behaviour_Default::checkParentDefunc()
      */
-    protected function isMaintenanceScheduled(): bool {
-        //additional checks posible here
-        return $this->isMaintenanceLoginLock();
-    }
-    
-    protected function checkParentDefunc() {
+    public function checkParentDefunc(): bool {
         $parentsOk = parent::checkParentDefunc();
         if(!$parentsOk) {
             $this->task->setErroneous();
@@ -80,17 +65,18 @@ abstract class editor_Models_Import_Worker_Abstract extends ZfExtended_Worker_Ab
     
     /**
      * defuncing the tasks import worker group
+     * (no default behaviour, provided by this class)
      */
-    protected function defuncRemainingOfGroup() {
+    public function defuncRemainingOfGroup() {
         //final step must run in any case, so we exclude it here
         $this->workerModel->defuncRemainingOfGroup(['editor_Models_Import_Worker_FinalStep']);
-        $this->wakeUpAndStartNextWorkers();
+        $this->wakeUpAndStartNextWorkers($this->workerModel);
     }
     
     /**
      * basicly sets the task to be imported to state error when a fatal error happens after the work method
      */
-    protected function registerShutdown() {
+    public function registerShutdown() {
         register_shutdown_function(function($task) {
             $error = error_get_last();
             if(!is_null($error) && ($error['type'] & FATAL_ERRORS_TO_HANDLE)) {
