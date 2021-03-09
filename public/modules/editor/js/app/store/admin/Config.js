@@ -57,7 +57,7 @@ Ext.define('Editor.store.admin.Config', {
      */
     getConfig:function(name){
         var me=this,
-            hasFilters=me.filters.length>0;
+            hasFilters = me.filters && me.filters.length > 0;
             
          if(hasFilters){
              return me.searchFiltered(name);

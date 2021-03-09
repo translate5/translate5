@@ -44,6 +44,12 @@ Ext.define('Editor.view.project.ProjectTaskGridViewController', {
         else {
             task = store.findRecord( 'taskGuid', params.taskGuid, 0, false, true, true);
         }
-        task && task.load();
+        if(task && task.isLoading()) {
+            //it may happen that two reloads are triggerd fast after each other, then the second one would not start, 
+            // but the first one receives old data then. Therefore we defer the second call in that situation
+            Ext.defer(task.load, 500, task);
+        } else {
+            task && task.load();
+        }
     }
 });

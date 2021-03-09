@@ -329,3 +329,7 @@ h4, p {
     color: #aaa;
 }
 
+.termPortalLanguageRfcLabel {
+    background-color: #cfcfcf;
+    padding: 0 3px 3px 3px;
+}
