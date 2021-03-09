@@ -129,13 +129,8 @@ abstract class editor_Segment_Quality_SegmentWorker extends editor_Models_Import
      * @param editor_Models_Segment $segment
      * @return boolean
      */
-    public function segmentTagsEdited(editor_Segment_Tags $tags){
+    public function runSegmentTagsProcessing(editor_Segment_Tags $tags){
         $this->currentSegmentTags = $tags;
         return $this->run();
     }
-    /**
-     * Accessor for the processed tag when using a direct run
-     * @return editor_Segment_Tags | NULL
-     */
-    abstract public function getProcessedTags();
 }

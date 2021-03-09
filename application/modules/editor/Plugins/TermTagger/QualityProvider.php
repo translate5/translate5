@@ -53,8 +53,9 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         return true;
     }
     
-    public function removeOwnTagsBeforeProcessing() : bool {
-        return true;
+    public function removeOwnTagsBeforeProcessing(string $processingMode) : bool {
+        // Alike processing just copies the tags and in this case they must be preserved before processing
+        return ($processingMode != editor_Segment_Processing::ALIKE);
     }
     
     public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode) {
@@ -112,23 +113,20 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
                 return $tags;
             }
             
-            $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
-            /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
+            $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
+            /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
             
             $params = ['resourcePool' => 'gui', 'processingMode' => $processingMode];
             if (!$worker->init($task->getTaskGuid(), $params)) {
+                
                 $logger = Zend_Registry::get('logger')->cloneMe('editor.terminology');
                 $logger->error('E1128', 'TermTaggerImport Worker can not be initialized!', ['parameters' => $params]);
-                return false;
+
+            } else if(!$worker->runSegmentTagsProcessing($tags)){
+                
+                $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
             }
-            if($worker->segmentTagsEdited($tags)){
-                // TODO FIXME: this should be a reference to the tags above, so this assignment should be obsolete. Can the case be, segmentTagsEdited returns true but no tags are available ??
-                $tags = $worker->getProcessedTags();
-                if($tags != null){
-                    return $tags;
-                }
-            }
-            $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
+            
         }
         return $tags;
     }

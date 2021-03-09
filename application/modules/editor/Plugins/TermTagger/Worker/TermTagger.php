@@ -28,9 +28,19 @@ END LICENSE AND COPYRIGHT
 
 /**
  * 
- * The Worker to process the termtagging for a import or a subsequent analysis
+ * Tags the segments on task edit and will only be used sequentially via the run()-method
  */
-class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_TermTagger_Worker_Abstract {
+class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTagger_Worker_Abstract {
     
-    protected $resourcePool = 'import';
+    protected $resourcePool = 'gui';
+    
+    /**
+     * Deactivates maintenance in editor-save mode / non-threaded run
+     * {@inheritDoc}
+     * @see editor_Models_Import_Worker_Abstract::isMaintenanceScheduled()
+     */
+    protected function isMaintenanceScheduled() : bool {
+        // non-threaded running shall not have dependencies to maintenance scheduling
+        return false;
+    }
 }
