@@ -32,7 +32,7 @@
  END LICENSE AND COPYRIGHT
  */
 
-class editor_Segment_Quality_ImportWorker extends editor_Models_Import_Worker_Abstract {
+class editor_Segment_Quality_ImportWorker extends editor_Models_Task_AbstractWorker {
     
     protected function validateParameters($parameters=[]){
         return true;
