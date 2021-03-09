@@ -155,7 +155,8 @@ final class editor_Segment_Quality_Manager {
      */
     public function finishImport(editor_Models_Task $task){
         
-        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA; 
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        $processingMode = editor_Segment_Processing::IMPORT;
         $db = ZfExtended_Factory::get('editor_Models_Db_Segments');
         /* @var $db editor_Models_Db_Segments */
         $db->getAdapter()->beginTransaction();
@@ -171,15 +172,15 @@ final class editor_Segment_Quality_Manager {
         /* @var $segment editor_Models_Segment */
         foreach($segmentIds as $segmentId){
             $segment->load($segmentId);
-            $tags = editor_Segment_Tags::fromSegment($task, editor_Segment_Processing::IMPORT, $segment, true);
+            $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, true);
             // process all quality providers that do not have an import worker
             foreach($this->registry as $type => $provider){
                 /* @var $provider editor_Segment_Quality_Provider */
                 if(!$provider->hasImportWorker()){
-                    if($provider->removeOwnTagsBeforeProcessing()){
+                    if($provider->removeOwnTagsBeforeProcessing($processingMode)){
                         $tags->removeTagsByType($provider->getType());
                     }
-                    $tags = $provider->processSegment($task, $qualityConfig, $tags, editor_Segment_Processing::IMPORT);
+                    $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
                 }
             }
             // we save all qualities at once to reduce db-strain
@@ -208,7 +209,7 @@ final class editor_Segment_Quality_Manager {
         $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, false);
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
-            if($provider->removeOwnTagsBeforeProcessing()){
+            if($provider->removeOwnTagsBeforeProcessing($processingMode)){
                 $tags->removeTagsByType($provider->getType());
             }
             $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
