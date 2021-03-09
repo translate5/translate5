@@ -27,7 +27,7 @@
  */
 
 /***
- * 
+ *
  */
 class editor_TermcollectionController extends ZfExtended_RestController  {
     
@@ -58,9 +58,18 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::decodePutData()
+     */
+    protected function decodePutData() {
+        parent::decodePutData();
+        unset($this->data->langResUuid);
+    }
+    
     /***
-     * Info: function incomplete! 
-     * Only used in a test at the moment! 
+     * Info: function incomplete!
+     * Only used in a test at the moment!
      */
     public function exportAction() {
         $this->decodePutData();
@@ -79,7 +88,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
     
     /***
      * Import the terms into the term collection
-     * 
+     *
      * @throws ZfExtended_Exception
      */
     public function importAction(){
@@ -99,7 +108,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
     }
     
     /***
-     * Search terms 
+     * Search terms
      */
     public function searchAction(){
         $params=$this->getRequest()->getParams();
@@ -205,7 +214,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
     }
     
     /***
-     * This action is only used in a test at the moment! 
+     * This action is only used in a test at the moment!
      */
     public function testgetattributesAction(){
         $this->view->rows=$this->entity->getAttributesCountForCollection($this->getParam('collectionId'));
@@ -213,7 +222,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
     
     /***
      * Return the uploaded tbx files paths
-     * 
+     *
      * @throws ZfExtended_FileUploadException
      * @return array
      */

@@ -106,7 +106,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             $this->task->save();
         //else check if we are in import, then no separate lock is needed. Therefore if we are not in import this is an error
         } elseif($this->task->getState() != editor_Models_Task::STATE_IMPORT) {
-            $this->log->error('E1167', 'MatchAnalysis Plug-In: analysis and pre-translation cannot be run.', [
+            $this->log->error('E1167', 'MatchAnalysis Plug-In: task can not be locked for analysis and pre-translation.', [
                 'task' => $this->task
             ]);
             $this->task->setState($this->taskOldState);
