@@ -78,16 +78,21 @@ class editor_Segment_Internal_TagComparision {
      * @param editor_Segment_FieldTags $toCheck
      * @param editor_Segment_FieldTags $against
      */
-    public function __construct(editor_Segment_FieldTags $toCheck, editor_Segment_FieldTags $against){
+    public function __construct(editor_Segment_FieldTags $toCheck, ?editor_Segment_FieldTags $against){
         $this->status = array();
         $toCheck->sort();
-        $against->sort();
         $this->checkTags = $toCheck->getByType(editor_Segment_Tag::TYPE_INTERNAL);
-        $this->againstTags = $against->getByType(editor_Segment_Tag::TYPE_INTERNAL);
         $this->numCheckTags = count($this->checkTags);
-        $this->numAgainstTags = count($this->againstTags);
-        $this->checkCompleteness();
+        // the structural check can be done without against tags
         $this->checkStructure();
+        // there is a against
+        if($against != NULL){
+            $against->sort();
+            $this->againstTags = $against->getByType(editor_Segment_Tag::TYPE_INTERNAL);
+            $this->numAgainstTags = count($this->againstTags);
+            // for the completeness check we need something to check against
+            $this->checkCompleteness();
+        }
     }
     /**
      * Here we check if all tags from checkAgainst are present in the check tags

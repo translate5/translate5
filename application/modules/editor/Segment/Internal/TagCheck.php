@@ -58,21 +58,19 @@ class editor_Segment_Internal_TagCheck extends editor_Segment_Quality_Provider {
                 $against = $originalTarget;
             }
         }
-        if($against != null){
-            $data = [];
-            foreach($tags->getTargets() as $toCheck){ /* @var $toCheck editor_Segment_Fieldtags */
-                $comparision = new editor_Segment_Internal_TagComparision($toCheck, $against);
-                foreach($comparision->getStati() as $status){
-                    if(!array_key_exists($status, $data)){
-                        $data[$status] = [];
-                    }
-                    // group the fields by category
-                    $data[$status][] = $toCheck->getField();
+        $data = [];
+        foreach($tags->getTargets() as $toCheck){ /* @var $toCheck editor_Segment_Fieldtags */
+            $comparision = new editor_Segment_Internal_TagComparision($toCheck, $against);
+            foreach($comparision->getStati() as $status){
+                if(!array_key_exists($status, $data)){
+                    $data[$status] = [];
                 }
+                // group the fields by category
+                $data[$status][] = $toCheck->getField();
             }
-            foreach($data as $category => $fields){
-                $tags->addQuality($fields, editor_Segment_Tag::TYPE_INTERNAL, $category);
-            }
+        }
+        foreach($data as $category => $fields){
+            $tags->addQuality($fields, editor_Segment_Tag::TYPE_INTERNAL, $category);
         }
         return $tags;
     }

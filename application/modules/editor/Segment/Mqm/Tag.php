@@ -255,18 +255,18 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     }
     
     public function onConsolidationRemoval() {
-        // we don't want exceptions on unit tests
-        if(defined('T5_IS_UNIT_TEST')){
+        // we don't want exceptions on empty mqm tags (which do not make sense but also are no real error and will be removed silently) or on unit tests
+        if($this->startIndex == $this->endIndex || defined('T5_IS_UNIT_TEST')){
             return;
         }
         // TODO AUTOQA: Code is copied from editor_Models_Qmsubsegments, needed ??
         // tags spanning no text will be removed silently
-        if($this->typeIndex == -1){
+        if($this->getData('seq') == null){
+            throw new Zend_Exception('MQM Tag found, but no quality-id (data-seq) was set in: '.$this->renderStart());
+        } else if($this->typeIndex == -1){
             throw new Zend_Exception('MQM Tag found, but no type index was set in: '.$this->renderStart());
         } else if($this->severity == ''){
             throw new Zend_Exception('MQM Tag found, but no severity was set in: '.$this->renderStart());
-        } else if($this->getData('seq') == null){
-            throw new Zend_Exception('MQM Tag found, but no quality-id (data-seq) was set in: '.$this->renderStart());
         }
     }
     /**

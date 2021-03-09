@@ -60,11 +60,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
      * @var string
      */
     protected $resourcePool = 'default';
-
-    /**
-     * @var string
-     */
-    private $loggerDomain;
     /**
      * @var ZfExtended_Logger
      */
@@ -101,7 +96,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
     public function init($taskGuid = NULL, $parameters = array()) {
         $return = parent::init($taskGuid, $parameters);
         $this->config = new editor_Plugins_TermTagger_Configuration($this->task);
-        $this->loggerDomain = null;
         $this->logger = null;
         $this->proccessedTags = null;
         $this->skipDueToEqualLangs = ($this->task->getSourceLang() === $this->task->getTargetLang());
@@ -109,21 +103,11 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
     }
     /**
      *
-     * @return string
-     */
-    protected function getLoggerDomain() : string {
-        if(empty($this->loggerDomain)){
-            $this->loggerDomain = ($this->isWorkerThread) ? editor_Plugins_TermTagger_Configuration::IMPORT_LOGGER_DOMAIN : editor_Plugins_TermTagger_Configuration::EDITOR_LOGGER_DOMAIN;
-        }
-        return $this->loggerDomain;
-    }
-    /**
-     *
      * @return ZfExtended_Logger
      */
     protected function getLogger() : ZfExtended_Logger {
         if($this->logger == null){
-            $this->logger = Zend_Registry::get('logger')->cloneMe($this->getLoggerDomain());
+            $this->logger = Zend_Registry::get('logger')->cloneMe($this->config->getLoggerDomain($this->processingMode));
         }
         return $this->logger;
     }    
@@ -132,7 +116,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
      * {@inheritDoc}
      * @see editor_Models_Import_Worker_ResourceAbstract::getAvailableSlots()
      */
-    protected function getAvailableSlots($resourcePool = 'default') : array {
+    protected function getAvailableSlots($resourcePool='default') : array {
         return $this->config->getAvailableResourceSlots($resourcePool);
     }
     /**
@@ -192,7 +176,8 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
     
     protected function processSegmentsTags(array $segmentsTags, string $slot) : bool {
         try {
-            $this->tagSegmentsTags($segmentsTags, $slot, true);
+            $processor = new editor_Plugins_TermTagger_SegmentProcessor($this->task, $this->config, $this->processingMode, $this->isWorkerThread);
+            $processor->process($segmentsTags, $slot, true);
         }
         //Malfunction means the termtagger is up, but the send data produces an error in the tagger.
         // 1. we set the segment satus to retag, so each segment is tagged again, segment by segment, not in a bulk manner
@@ -204,7 +189,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
             ]);
             $this->getLogger()->exception($exception, [
                 'level' => ZfExtended_Logger::LEVEL_WARN,
-                'domain' => $this->getLoggerDomain()
+                'domain' => $this->config->getLoggerDomain($this->processingMode)
             ]);
         }
         catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
@@ -216,7 +201,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
                 'task' => $this->task
             ]);
             $this->getLogger()->exception($exception, [
-                'domain' => $this->getLoggerDomain()
+                'domain' => $this->config->getLoggerDomain($this->processingMode)
             ]);
             if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
                 //editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data
@@ -227,77 +212,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
             }
         }
         return true;
-    }
-    /**
-     * Tags the passed segment tags using the given slots, applies the fetched data and save the tags (if wanted)
-     * TODO: add evaluation of qualities !
-     * @param editor_Segment_Tags[] $segmentsTags
-     * @param string $slot
-     * @throws ZfExtended_Exception
-     */
-    private function tagSegmentsTags(array $segmentsTags, string $slot, bool $doSaveTags) {
-        
-        $this->proccessedTags = [];
-        $this->communicationService = $this->config->createServerCommunicationServiceFromTags($segmentsTags, !$this->isWorkerThread);
-        $termTagger = ZfExtended_Factory::get(
-            'editor_Plugins_TermTagger_Service',
-            [$this->getLoggerDomain(),
-            $this->config->getRequestTimeout($this->isWorkerThread),
-            editor_Plugins_TermTagger_Configuration::TIMEOUT_TBXIMPORT]);
-        /* @var $termTagger editor_Plugins_TermTagger_Service */
-        $this->config->checkTermTaggerTbx($termTagger, $slot, $this->communicationService->tbxFile);
-        $result = $termTagger->tagterms($slot, $this->communicationService);
-        $taggedSegments = $this->config->markTransFound($result->segments);
-        $taggedSegmentsById = $this->groupResponseById($taggedSegments);
-        foreach ($segmentsTags as $tags) { /* @var $tags editor_Segment_Tags */
-            $segmentId = $tags->getSegmentId();
-            if(array_key_exists($segmentId, $taggedSegmentsById)){
-                // bring the tagged segment content back to the tags model
-                // TODO: this is Ugly and counteracts the object-oriented nature of the tags
-                $this->applyResponseToTags($taggedSegmentsById[$segmentId], $tags);
-                // add qualities if found in the target tags
-                $config = Zend_Registry::get('config');
-                if($config->runtimeOptions->termTagger->enableAutoQA){
-                    $this->findAndAddQualitiesInTags($tags);
-                }
-                // save the tags, either to the tags-model or back to the segment if configured
-                if($doSaveTags){
-                    if($this->processingMode == editor_Segment_Processing::IMPORT){
-                        $tags->save(editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE);
-                        $tags->saveQualities();
-                    } else {
-                        $tags->flush();
-                    }
-                } else {
-                    // makes the currently proccessed tags accessible
-                    $this->proccessedTags = $tags;
-                }
-            } else {
-                // TODO FIXME: proper exception
-                throw new ZfExtended_Exception('Response of termtagger did not contain the sent segment with ID '.$segmentId);
-            }
-        }
-    }
-    /**
-     * Finds term tags of certain classes (= certain term stati) in the tags that represent a problem
-     * @param editor_Segment_Tags $tags
-     */
-    private function findAndAddQualitiesInTags(editor_Segment_Tags $tags){
-        
-        $type = editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE;
-        // these are the term states we want to see as qualities and which are also css-classes of the term-tags
-        $termStates = [ editor_Models_Term::STAT_SUPERSEDED, editor_Models_Term::STAT_DEPRECATED, editor_Models_Term::TRANSSTAT_NOT_FOUND, editor_Models_Term::TRANSSTAT_NOT_DEFINED ];
-        
-        foreach($tags->getTagsByType($type) as $termTag){
-            /* @var $termTag editor_Plugins_TermTagger_Tag */
-            foreach($termStates as $state){
-                if($termTag->hasClass($state)){
-                    $tags->addQuality($termTag->field, $type, $state, $termTag->startIndex, $termTag->endIndex);
-                    // we want only the most relevant problem by term
-                    break;
-                }
-            }
-        }
     }
     /**
      * Loads a list of segmentIds where terms are not tagged yet.
@@ -352,45 +266,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
         return array_column($dbMeta->fetchAll($sql)->toArray(), 'segmentId');
     }
     /**
-     * Transfers a single termtagger response to the corresponding tags-model
-     * @param array $responseGroup
-     * @param editor_Segment_Tags $tags
-     * @throws ZfExtended_Exception
-     */
-    private function applyResponseToTags(array $responseGroup, editor_Segment_Tags $tags) {
-        // UGLY: this should better be done by adding real tag-objects instead of setting the tags via text
-        if(count($responseGroup) < 1){
-            // TODO FIXME: proper exception
-            throw new ZfExtended_Exception('Response of termtagger did not contain data for the segment ID '.$tags->getSegmentId());
-        }
-        if(!$tags->hasSource()){
-            throw new ZfExtended_Exception('Passed segment tags did not contain a source '.$tags->getSegmentId());
-        }
-        $responseFields = $this->groupResponseByField($responseGroup);
-        $sourceText = null;
-        if($tags->hasOriginalSource()){
-            if(!array_key_exists('SourceOriginal', $responseFields)){
-                // TODO FIXME: proper exception
-                throw new ZfExtended_Exception('Response of termtagger did not contain data for the original source for the segment ID '.$tags->getSegmentId());
-            }
-            $source = $tags->getOriginalSource();
-            $source->setTagsByText($responseFields[$source->getTermtaggerName()]->source);            
-        }
-        foreach($tags->getTargets() as $target){ /* @var $target editor_Segment_FieldTags */
-            $field = $target->getTermtaggerName();
-            if($sourceText === null){
-                $sourceText = $responseFields[$field]->source;
-            }
-            if(!array_key_exists($field, $responseFields)){
-                // TODO FIXME: proper exception
-                throw new ZfExtended_Exception('Response of termtagger did not contain the field "'.$field.'" for the segment ID '.$tags->getSegmentId());
-            }
-            $target->setTagsByText($responseFields[$field]->target);
-        }
-        $source = $tags->getSource();
-        $source->setTagsByText($sourceText);
-    }
-    /**
      * sets the meta TermtagState of the given segment ids to the given state
      * @param editor_Models_Task $task
      * @param array $segments
@@ -403,35 +278,6 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
             'taskGuid = ?' => $this->task->getTaskGuid(),
             'segmentId in (?)' => $segments,
         ]);
-    }
-    /**
-     * In case of multiple target-fields in one segment, there are multiple responses for the same segment.
-     * This function groups this different responses under the same segmentId
-     *
-     * @param array $responses
-     * @return array
-     */
-    private function groupResponseById($responses) {
-        $result = [];
-        foreach ($responses as $response) {
-            if(!array_key_exists($response->id, $result)){
-                $result[$response->id] = [];
-            }
-            $result[$response->id][] = $response;
-        }
-        return $result;
-    }
-    /**
-     * 
-     * @param array $responseGroup
-     * @return array
-     */
-    private function groupResponseByField($responseGroup) {
-        $result = [];
-        foreach ($responseGroup as $fieldData) {
-            $result[$fieldData->field] = $fieldData;
-        }
-        return $result;
     }
     /**
      * 
@@ -475,25 +321,29 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
     /*************************** SINGLE SEGMENT PROCESSING ***************************/
     
     protected function processSegmentTags(editor_Segment_Tags $tags, string $slot) : bool {
+        
+        $this->proccessedTags = $tags;
+        
         // skip processing when source & target language are equal
         if($this->skipDueToEqualLangs){
             return true;
         }
         // processes a single tag withot saving it, this is done in the Quaity provider
         try {
-            $this->tagSegmentsTags([ $tags ], $slot, false);
+            $processor = new editor_Plugins_TermTagger_SegmentProcessor($this->task, $this->config, $this->processingMode, $this->isWorkerThread);
+            $processor->process([ $tags ], $slot, false);
         }
         catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
             if($exception instanceof editor_Plugins_TermTagger_Exception_Down) {
                 $this->config->disableResourceSlot($slot);
             }
-            $this->communicationService->task = '- see directly in event -';
+            $processor->getCommunicationsService()->task = '- see directly in event -';
             $exception->addExtraData([
                 'task' => $this->task,
-                'termTagData' => $this->communicationService,
+                'termTagData' => $processor->getCommunicationsService(),
             ]);
             $this->getLogger()->exception($exception, [
-                'domain' => $this->getLoggerDomain()
+                'domain' => $this->config->getLoggerDomain($this->processingMode)
             ]);
             if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
                 //editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data
@@ -509,5 +359,4 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Segment_Q
     public function getProcessedTags(){
         return $this->proccessedTags;
     }
-
 }

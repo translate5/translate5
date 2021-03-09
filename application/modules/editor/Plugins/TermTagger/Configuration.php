@@ -26,6 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * Seperate Holder of certain configurations to accompany editor_Plugins_TermTagger_SegmentProcessor and editor_Plugins_TermTagger_Worker_TermTaggerImport
+ * 
+ */
 class editor_Plugins_TermTagger_Configuration {
     
     /**
@@ -89,6 +93,11 @@ class editor_Plugins_TermTagger_Configuration {
      */
     const EDITOR_LOGGER_DOMAIN = 'editor.terminology.segmentediting';
     /**
+     * Logger Domain Manual Analysis
+     * @var string
+     */
+    const ANALYSIS_LOGGER_DOMAIN = 'editor.terminology.analysis';
+    /**
      * 
      * @var string
      */
@@ -126,25 +135,33 @@ class editor_Plugins_TermTagger_Configuration {
      }
     /**
      * 
-     * @param bool $isImport
+     * @param bool $isWorkerThread
      * @return int
      */
-    public function getRequestTimeout(bool $isImport) : int {
-        if($isImport){
+     public function getRequestTimeout(bool $isWorkerThread) : int {
+         if($isWorkerThread){
             return self::IMPORT_TIMEOUT_REQUEST;
         }
         return self::EDITOR_TIMEOUT_REQUEST;
     }
     /**
      * 
-     * @param bool $isImport
+     * @param string $processingType
      * @return string
      */
-    public function getLoggerDomain(bool $isImport) : string {
-        if($isImport){
-            return self::IMPORT_LOGGER_DOMAIN;
+    public function getLoggerDomain(string  $processingType) : string {
+        switch($processingType){
+            
+            case editor_Segment_Processing::IMPORT:
+                return self::IMPORT_LOGGER_DOMAIN;
+                
+            case editor_Segment_Processing::ANALYSIS:
+                return self::ANALYSIS_LOGGER_DOMAIN;
+                
+            case editor_Segment_Processing::EDIT:
+            default:
+                return self::EDITOR_LOGGER_DOMAIN;
         }
-        return self::EDITOR_LOGGER_DOMAIN;
     }
     /**
      * 
@@ -185,7 +202,7 @@ class editor_Plugins_TermTagger_Configuration {
         // no slots for this resourcePool defined
         if (empty($return) && $resourcePool != 'default') {
             // calculate slot from default resourcePool
-            return $this->getAvailableSlots();
+            return $this->getAvailableResourceSlots('default');
         }
         return $return;
     }
@@ -273,10 +290,9 @@ class editor_Plugins_TermTagger_Configuration {
     /**
      * Creates the server communication service for the current task and the given segment-tags
      * @param editor_Segment_Tags[] $segmentsTags
-     * @param bool $isEditor
      * @return editor_Plugins_TermTagger_Service_ServerCommunication
      */
-    public function createServerCommunicationServiceFromTags(array $segmentsTags, bool $isEditor) : editor_Plugins_TermTagger_Service_ServerCommunication {
+    public function createServerCommunicationServiceFromTags(array $segmentsTags) : editor_Plugins_TermTagger_Service_ServerCommunication {
         
         $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($this->task));
         /* @var $service editor_Plugins_TermTagger_Service_ServerCommunication */
