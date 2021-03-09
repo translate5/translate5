@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Reimports the segments of a task back into the chosen TM
  */
-class editor_Models_LanguageResources_Worker extends editor_Models_Import_Worker_Abstract {
+class editor_Models_LanguageResources_Worker extends editor_Models_Task_AbstractWorker {
     const STATE_REIMPORT = 'reimporttm';
     
     /**
