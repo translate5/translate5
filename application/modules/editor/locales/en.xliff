@@ -2982,7 +2982,10 @@ A task was associated to you in the task-portal {portalLink}.<br />
     <source>importiert</source>
     <target>importing</target>
 </trans-unit>
-
+<trans-unit id='SW1wb3J0IGzDpHVmdA=='>
+    <source>Import läuft</source>
+    <target>importing</target>
+</trans-unit>
 <trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'>
     <source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source>
     <target>The queried OpenTM2 instance is not available</target>
