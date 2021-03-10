@@ -1169,6 +1169,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $history->save();
             $segment->save();
         }
+        
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $meta editor_Models_Segment_Meta */
+        //update task word count when 100% matches editable is changed
+        $task->setWordCount($meta->getWordCountSum($task));
     }
 
     /***
