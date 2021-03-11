@@ -67,7 +67,8 @@ class editor_Models_LanguageResources_UsageExporter{
         "timestamp"=>"Zeitstempel",
         "charactersPerCustomer"=>"Übersetzte Zeichen",
         "taskCount"=>"Anzahl der mit InstantTranslate übersetzten Dokumente",
-        "customers" =>"Kunden"
+        "customers" =>"Kunden",
+        "repetition" => "Wiederholung"
     ];
     
     /***
@@ -128,6 +129,11 @@ class editor_Models_LanguageResources_UsageExporter{
         
         $this->excel->setCallback('sourceLang',$langCallback);
         $this->excel->setCallback('targetLang',$langCallback);
+        
+        $this->excel->setCallback('repetition',function($repetition){
+            return $repetition == 1 ? '✓' : '';
+        });
+        
         
         $customersArray = $this->customers;
         $this->excel->setCallback('customerId',function($id) use ($customersArray){

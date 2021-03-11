@@ -70,6 +70,10 @@ trait editor_Services_UsageLogerTrait {
             //set the request source to editor
             $mtlogger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_EDITOR);
             
+            if($querySource->getMatchRate()==editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE){
+                $mtlogger->setRepetition(1);
+            }
+            
             //load the task for the current request
             if(!isset($this->taskFilePretranslate) || $this->taskFilePretranslate->getTaskGuid()!=$querySource->getTaskGuid()){
                 $this->taskFilePretranslate = ZfExtended_Factory::get('editor_Models_Task');
