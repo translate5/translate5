@@ -408,13 +408,13 @@ abstract class editor_Models_Import_FileParser {
         $isAutoprop = $attributes->autopropagated;
         $isLocked = $attributes->locked && (bool) $this->task->getLockLocked();
        
-        $isFullMatch = ($attributes->matchRate >= 100);
+        $isFullMatch = ($attributes->matchRate >= 100 && $attributes->isPreTranslated);
         $attributes->isTranslated = $this->isTranslated();
         
         //calculate isEditable only if it was not explicitly set
         if(!isset($attributes->editable)) {
-            $isEditable  = (!$isFullMatch || (bool) $this->task->getEdit100PercentMatch() || $isAutoprop) && !$isLocked;
-            $attributes->editable = $isEditable;
+            //$isFullMatch implies that the
+            $attributes->editable = (!$isFullMatch || (bool) $this->task->getEdit100PercentMatch() || $isAutoprop) && !$isLocked;
         }
         
         $attributes->autoStateId = $this->autoStates->calculateImportState($attributes);
