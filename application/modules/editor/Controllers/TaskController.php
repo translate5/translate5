@@ -1522,6 +1522,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //to access a task the user must either have the loadAllTasks right, or must be the tasks PM, or must be associated to the task
         $isTaskAccessable = $this->isAllowed('backend', 'loadAllTasks') || $isTaskPm || !is_null($tua);
         if(!$isTaskAccessable) {
+            unset($this->view->rows);
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
