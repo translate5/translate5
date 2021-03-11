@@ -111,6 +111,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     protected $cxtDefinitions = [];
     
     /**
+     * Container to collect previous origins per trans-unit
+     * @var array
+     */
+    protected $previousOrigins;
+    
+    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
      */
@@ -346,12 +352,19 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             ]);
         }
 
+        $this->previousOrigins = [];
         $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
-        $xmlparser->registerElement('sdl:seg', function($tag, $tagAttributes) use ($xmlparser){
+        $xmlparser->registerElement('sdl:seg sdl:prev-origin', function($tag, $tagAttributes) use ($xmlparser){
+            $this->previousOrigins[] = $tagAttributes;
+        });
+        $xmlparser->registerElement('sdl:seg', function(){
+            $this->previousOrigins = [];
+        }, function($tag, $key, $opener) use ($xmlparser){
+            $tagAttributes = $opener['attributes'];
             $id = str_replace(' ', '_x0020_', $tagAttributes['id']);
             $attributes = $this->createSegmentAttributes($id);
-            // falls kein percent gefunden wird, ergibt der int-cast 0, was passt
+            // if there is no attribute percent, the int-cast result 0, what is correct here
             $attributes->matchRate = (int) $xmlparser->getAttribute($tagAttributes, 'percent');
 
             $origin = $xmlparser->getAttribute($tagAttributes, 'origin');
@@ -359,14 +372,42 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             if($origin) {
                 //set original value here, conversion to translate5 syntax is done later
                 $attributes->matchRateType = $origin;
+                
+                //if the direct origin is TM or MT we define that segment as status pretranslated
+                $attributes->isPreTranslated = $this->matchRateType->isPretranslationType($origin);
+                
+                $originSystem = $xmlparser->getAttribute($tagAttributes, 'origin-system', '');
+                if($attributes->isPreTranslated && !empty($originSystem)) {
+                    $attributes->customMetaAttributes[$this->matchRateType::DATA_PREVIOUS_NAME] = str_replace(';', '_', $originSystem);
+                    $this->setPreviousOriginSystemName($attributes, $originSystem);
+                }
             }
 
+            //we store also information about the previous origin, but currently only the first previous origin or the original origin if a pre-translation origin
+            $previousOrigin = array_shift($this->previousOrigins);
+            if(!empty($previousOrigin) && !$attributes->isPreTranslated) {
+                $prevOriginVal = $xmlparser->getAttribute($previousOrigin, 'origin');
+                if($this->matchRateType->isPretranslationType($prevOriginVal)) {
+                    $attributes->customMetaAttributes[$this->matchRateType::DATA_PREVIOUS_ORIGIN] = $prevOriginVal;
+                    $this->setPreviousOriginSystemName($attributes, $xmlparser->getAttribute($previousOrigin, 'origin-system', ''));
+                }
+            }
+            
             $attributes->autopropagated = $origin === 'auto-propagated';
             $attributes->locked = (bool) $xmlparser->getAttribute($tagAttributes, 'locked');
         });
         $xmlparser->parse(substr($transunit, $start, $end - $start));
     }
 
+    /**
+     * sets the origin system name in the attributes
+     * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
+     * @param string $originSystemName
+     */
+    protected function setPreviousOriginSystemName(editor_Models_Import_FileParser_SegmentAttributes $attributes, string $originSystemName) {
+        $attributes->customMetaAttributes[$this->matchRateType::DATA_PREVIOUS_NAME] = str_replace(';', '_', $originSystemName);
+    }
+    
     /**
      * Stellt Tags-Abschnitt im Header als DOM-Objekt bereit
      *

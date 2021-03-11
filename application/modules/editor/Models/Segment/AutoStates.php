@@ -263,11 +263,30 @@ class editor_Models_Segment_AutoStates {
     
     /**
      * calculates the initial autoStateId of an segment in the import process
+     * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes
+     * @return integer
+     */
+    public function calculateImportState(editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes): int
+    {
+        if(! $segmentAttributes->editable) {
+            return self::BLOCKED;
+        }
+        if($segmentAttributes->isPreTranslated) {
+            return self::PRETRANSLATED;
+        }
+        if($segmentAttributes->isTranslated) {
+            return self::TRANSLATED;
+        }
+        return self::NOT_TRANSLATED;
+    }
+    
+    /**
+     * calculates the initial autoStateId of an segment in the import process
      * @param bool $isEditable
      * @param bool $isTranslated
      * @return integer
      */
-    public function calculateImportState($isEditable, $isTranslated): int
+    public function restoreImportState($isEditable, $isTranslated): int
     {
         if(! $isEditable) {
             return self::BLOCKED;

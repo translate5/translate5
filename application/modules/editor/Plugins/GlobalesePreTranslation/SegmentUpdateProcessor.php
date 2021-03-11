@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Stellt Methoden zur Verarbeitung der vom Parser ermittelteten Segment Daten bereit
- * speichert die ermittelten Segment Daten in die Relais Spalte des entsprechenden Segments 
+ * speichert die ermittelten Segment Daten in die Relais Spalte des entsprechenden Segments
  */
 class editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor extends editor_Models_Import_SegmentProcessor {
     /**
@@ -110,7 +110,8 @@ class editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor extends edit
             $this->segment->setTargetMd5($data[$target]["originalMd5"]);
             $this->segment->setTargetEdit($updateContent);
             // set the AutoStatus to translated
-            $this->segment->setAutoStateId(editor_Models_Segment_AutoStates::TRANSLATED);
+            $this->segment->setPretrans(true);
+            $this->segment->setAutoStateId(editor_Models_Segment_AutoStates::PRETRANSLATED);
             $this->segment->setMatchRateType('import;mt;globalese');
             $this->segment->save();
         }
@@ -124,10 +125,10 @@ class editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor extends edit
 
     /**
      * The given segment content is normalized for source comparsion
-     * Currently all tags are removed (means ignored). To keep word boundaries the tags 
+     * Currently all tags are removed (means ignored). To keep word boundaries the tags
      * are replaced with whitespace, multiple whitespaces are replaced to a single one
-     * HTML Entities are decoded to enable comparsion of " and &quot; 
-     *  
+     * HTML Entities are decoded to enable comparsion of " and &quot;
+     *
      * @param string $segmentContent
      * @return string
      */

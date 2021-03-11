@@ -1157,7 +1157,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
 
             //if the autostate does not exist in the history or it is blocked, calculate same as import
             if(!$autoStateId || $autoStateId==$autoState::BLOCKED){
-                $autoStateId=$autoState->calculateImportState($isEditable, $segment->isTargetTranslated());
+                $autoStateId=$autoState->restoreImportState($isEditable, $segment->isTargetTranslated());
             }
             $segment->setAutoStateId($autoStateId);
             $history->save();

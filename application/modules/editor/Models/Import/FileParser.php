@@ -293,7 +293,7 @@ abstract class editor_Models_Import_FileParser {
      * @param string $forMid
      * @return editor_Models_Import_FileParser_SegmentAttributes
      */
-    protected function createSegmentAttributes($forMid) {
+    protected function createSegmentAttributes($forMid): editor_Models_Import_FileParser_SegmentAttributes {
         if(isset($this->segmentAttributes[$forMid])) {
             return $this->segmentAttributes[$forMid];
         }
@@ -408,17 +408,16 @@ abstract class editor_Models_Import_FileParser {
         $isAutoprop = $attributes->autopropagated;
         $isLocked = $attributes->locked && (bool) $this->task->getLockLocked();
        
-        $isFullMatch = ($attributes->matchRate === 100);
-        $isTranslated = $this->isTranslated();
+        $isFullMatch = ($attributes->matchRate >= 100);
+        $attributes->isTranslated = $this->isTranslated();
         
         //calculate isEditable only if it was not explicitly set
         if(!isset($attributes->editable)) {
             $isEditable  = (!$isFullMatch || (bool) $this->task->getEdit100PercentMatch() || $isAutoprop) && !$isLocked;
             $attributes->editable = $isEditable;
         }
-        $attributes->pretrans = $isFullMatch && !$isAutoprop;
-        $attributes->autoStateId = $this->autoStates->calculateImportState($attributes->editable, $isTranslated);
-        $attributes->isTranslated = $isTranslated;
+        
+        $attributes->autoStateId = $this->autoStates->calculateImportState($attributes);
         
         //if there was a matchRateType from the imported segment, then the original value was stored
         $attributes->matchRateType = $this->matchRateType->parseImport($attributes, $this->_mid);
