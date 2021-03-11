@@ -133,6 +133,23 @@ class editor_Models_Segment_MatchRateType {
      */
     const PREFIX_PRETRANSLATED = 'pretranslated';
     
+    /**
+     * Used as key for the flexible customMetaAttributes in segment attributes
+     * @var string
+     */
+    const DATA_PREVIOUS_ORIGIN = 'previousOrigin';
+    
+    /**
+     * Used as key for the flexible customMetaAttributes in segment attributes
+     * @var string
+     */
+    const DATA_PREVIOUS_NAME = 'previousOriginName';
+    
+    /**
+     * Defines the types to be considered as pretranslation sources
+     * @var array
+     */
+    const PRETRANSLATION_TYPES = [self::TYPE_TM, self::TYPE_MT];
     
     /***
      * All match rate types which are requiring an icon
@@ -254,6 +271,14 @@ class editor_Models_Segment_MatchRateType {
             $this->data[] = self::TYPE_UNKNOWN;
         }
         $this->data[] = $value;
+        if(array_key_exists(self::DATA_PREVIOUS_ORIGIN, $attributes->customMetaAttributes)){
+            $this->data[] = strtoupper($attributes->customMetaAttributes[self::DATA_PREVIOUS_ORIGIN]);
+            unset($attributes->customMetaAttributes[self::DATA_PREVIOUS_ORIGIN]);
+        }
+        if(array_key_exists(self::DATA_PREVIOUS_NAME, $attributes->customMetaAttributes)){
+            $this->data[] = $attributes->customMetaAttributes[self::DATA_PREVIOUS_NAME];
+            unset($attributes->customMetaAttributes[self::DATA_PREVIOUS_NAME]);
+        }
         return $this;
     }
     
@@ -393,6 +418,15 @@ class editor_Models_Segment_MatchRateType {
      */
     public function isImported() {
         return isset($this->data[0]) && $this->data[0] == self::PREFIX_IMPORT;
+    }
+    
+    /**
+     * returns true if the given type (as string parameter) is a pretranslation type (currently TM and MT)
+     * @param string $type
+     * @return bool
+     */
+    public function isPretranslationType(string $type): bool {
+        return in_array($type, self::PRETRANSLATION_TYPES);
     }
     
     /**
