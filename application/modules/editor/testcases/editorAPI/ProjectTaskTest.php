@@ -66,6 +66,30 @@ class ProjectTaskTest extends \ZfExtended_Test_ApiTestcase {
     }
     
     /***
+     * Validate the basic project task values
+     */
+    public function testProjectTaskCreation() {
+        self::$api->reloadProjectTasks();
+        self::assertEquals(count(self::$api->getProjectTasks()), 4, 'The number of the project task is not as expected');
+        $languages = self::$api->getLanguages();
+        
+        $getRfc = function($id) use ($languages){
+            foreach ($languages as $lang){
+                if($id == $lang->id){
+                    return $lang->rfc5646;
+                }
+            }
+            return '';
+        };
+        
+        //validate the task target language
+        foreach (self::$api->getProjectTasks() as $task){
+            self::assertEquals($getRfc($task->sourceLang),self::$sourceLangRfc,'The project task does not match the expected source language');
+            self::assertContains($getRfc($task->targetLang), self::$targetLangRfc, 'The task target language ('.$task->targetLang.') can not be found in the expected values.');
+            self::assertEquals($task->taskType, self::$api::INITIAL_TASKTYPE_PROJECT_TASK, 'Project tasktype does not match the expected type.');
+        }
+    }
+    /***
      * For each project task, check the segment content. Some of the segments are with terms.
      */
     public function testProjectTasksSegmentContent() {
@@ -145,12 +169,12 @@ class ProjectTaskTest extends \ZfExtended_Test_ApiTestcase {
         self::$api->login('testmanager');
         
         //when removing the task, all task project will be removed
-        //self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
         
         //remove the created resources
-        //self::$api->removeResources();
+        self::$api->removeResources();
         
         //remove the temp customer
-        //self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
+        self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
     }
 }
