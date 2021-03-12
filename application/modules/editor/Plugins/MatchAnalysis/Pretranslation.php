@@ -223,7 +223,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         //check if the result is valid for log
         if($this->isResourceLogValid($languageResource, $segment->getMatchRate())){
-            $this->connectors[$languageResourceid]->logAdapterUsage($segment);
+            $this->connectors[$languageResourceid]->logAdapterUsage($segment,$result->isRepetition ?? false);
         }
         
         $segment->set($segmentField,$targetResult); //use sfm->getFirstTargetName here

@@ -216,7 +216,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         // to get the correct content for the repetition we get the value from $segment, which was updated by the repetition updater
         $bestRepeatedResult = clone $this->repetitionByHash[$segmentHash];
         $bestRepeatedResult->target = $segment->getTargetEdit();
-        $bestRepeatedResult->matchrate = $repetitionRate; // since it is repetition, update the matchrate to repetition matchrate
+        // the current result is from repetition segment. This is needed for the resources usage log.
+        $bestRepeatedResult->isRepetition = true; 
         return $bestRepeatedResult;
     }
     
