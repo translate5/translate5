@@ -45,12 +45,6 @@ class editor_Models_Import_Configuration {
      */
     const WORK_FILES_DIRECTORY = 'workfiles';
     
-    /***
-     * Old name for the import directory folder name
-     * @var string
-     * @deprecated
-     */
-    const PROOFREAD_FILES_DIRECTORY = 'proofRead';
     /**
      * @var editor_Models_Languages language entity instance
      */
@@ -121,14 +115,11 @@ class editor_Models_Import_Configuration {
     
     /***
      * The curent import uses depricated directory name
+     * TODO:(23.02.2021 TRANSLATE-1596) remove me after the depricated support for "proofRead" is removed
+     * @deprecated
      * @var string
      */
     public $isDeprecatedDirectoryName = false;
-    
-    /***
-     * The current import directory is with depricated lowercase name "proofread"
-     */
-    public $isDeprecatedDirectoryNameLowercase = false;
     
     /**
      * needed internally for de/serialization
@@ -193,16 +184,23 @@ class editor_Models_Import_Configuration {
      * @return string
      */
     public function getFilesDirectory() {
+        /***
+         * Remove this check after no longer proofRead support. This should return workfiles only.
+         * TODO:(23.02.2021 TRANSLATE-1596) remove me after the depricated support for "proofRead" is removed
+         * @deprecated
+         */
         if($this->isDeprecatedDirectoryName){
-            return $this->isDeprecatedDirectoryNameLowercase ? strtolower(self::PROOFREAD_FILES_DIRECTORY) : self::PROOFREAD_FILES_DIRECTORY;
+            $config = Zend_Registry::get('config');
+            return $config->runtimeOptions->import->proofReadDirectory;
         }
+        //this stays after depricated is removed
         return self::WORK_FILES_DIRECTORY;
     }
     /**
      * Gibt den absoluten Pfad (inkl. Import Root) zum Verzeichnis mit den zu lektorierenden Dateien zurück, berücksichtigt die review bzw. Relaissprachen Config
      * @return string
      */
-    public function getReviewDir() {
+    public function getWorkfileDir() {
         $prefix = $this->importFolder;
         $reviewDir = $this->getFilesDirectory();
         return $reviewDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$reviewDir;
@@ -270,29 +268,32 @@ class editor_Models_Import_Configuration {
             throw new editor_Models_Import_ConfigurationException('E1038', ['folder' => $this->importFolder]);
         }
         //use the workfiles as review directory
-        $reviewDir = $this->getReviewDir();
+        $reviewDir = $this->getWorkfileDir();
         $data = ['review' => basename($reviewDir)];
+        
+        /***
+         * Remove this if check after depricated support is removed.
+         * TODO:(23.02.2021 TRANSLATE-1596) remove me after the depricated support for "proofRead" is removed
+         *  @deprecated
+         */
         if(!is_dir($reviewDir)){
             //workfiles is not valid directory, try the deprecated proofRead
             $this->isDeprecatedDirectoryName = true;
-            $reviewDir = $this->getReviewDir();
+            
+            $reviewDir = $this->getWorkfileDir();
             $data = ['review' => basename($reviewDir)];
             
             //write a warrning that the proofRead is deprecated
             $this->warnImportDirDeprecated();
-            
-            //if proofRead is not valid, check it with proofread
-            if(!is_dir($reviewDir)){
-                $this->isDeprecatedDirectoryNameLowercase = true;
-                $reviewDir = $this->getReviewDir();
-                $data = ['review' => basename($reviewDir)];
-            }
-            
         }
         if(!is_dir($reviewDir)){
+            /***
+             * TODO:(23.02.2021 TRANSLATE-1596) remove me after the depricated support for "proofRead" is removed
+             *  @deprecated
+             */
             $this->isDeprecatedDirectoryName = false;
             //The imported package did not contain a valid review folder.
-            throw new editor_Models_Import_ConfigurationException('E1039', ['review' => basename($this->getReviewDir())]);
+            throw new editor_Models_Import_ConfigurationException('E1039', ['review' => basename($this->getWorkfileDir())]);
         }
         if(empty(glob($reviewDir.'/*'))){
             //The imported package did not contain any files in the review folder.

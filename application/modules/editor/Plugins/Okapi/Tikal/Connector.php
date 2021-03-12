@@ -91,7 +91,7 @@ class editor_Plugins_Okapi_Tikal_Connector {
         }
         //move the generated XLF file into the review folder
         rename($xlf, $file.'.xlf');
-        $refFile = str_replace($this->importConfig->getReviewDir(), $this->importConfig->getReferenceFilesDir(), $file);
+        $refFile = str_replace($this->importConfig->getWorkfileDir(), $this->importConfig->getReferenceFilesDir(), $file);
         @mkdir(dirname($refFile), 0777, true);
         //move original file to the reference file folder
         rename($file, $refFile);
