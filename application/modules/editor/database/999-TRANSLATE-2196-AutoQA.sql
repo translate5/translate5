@@ -53,7 +53,7 @@ CREATE TABLE `LEK_segment_quality` (
   `segmentId` int(11) DEFAULT NULL,
   `fields` varchar(300) NOT NULL,
   `type` varchar(10) NOT NULL,
-  `category` varchar(64) DEFAULT NULL,
+  `category` varchar(64) NOT NULL,
   `startIndex` int(11) NOT NULL DEFAULT 0,
   `endIndex` int(11) NOT NULL DEFAULT -1,
   `falsePositive` int(1) NOT NULL DEFAULT 0,
@@ -70,6 +70,9 @@ CREATE TABLE `LEK_segment_quality` (
 INSERT INTO `LEK_segment_quality` (`segmentId`, `taskGuid`, `fields`, `type`, `qmtype`, `severity`, `comment`)
 SELECT `segmentId`,  `taskGuid`, `fieldedited`, 'mqm', `qmtype`, `severity`, `comment` FROM `LEK_qmsubsegments`;
 
+-- ACL for quality
+INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 
+('editor', 'basic', 'editor_quality', 'all');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
 ('runtimeOptions.autoQA.enableInternalTagCheck', 1, 'editor', 'system', 1, 1, '', 'boolean', 'If activated (default), AutoQA covers checking invalid internal tags', 8, 'Enable internal tag integrity check', 'Editor: QA', '');
@@ -80,13 +83,7 @@ INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `valu
 UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.autoQA.enableMqmTags', `description` = 'If activated (default), the quality management covers MQM', `guiName` = 'Enable MQM in the quality management' 
 WHERE name = 'runtimeOptions.editor.enableQmSubSegments';
 
-
--- TODO AUTOQA UNCOMMENT
--- DROP TABLE `LEK_qmsubsegments`;
-
--- TODO AUTOQA REMOVE
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
-('runtimeOptions.editor.enableQmSubSegments', 1, 'editor', 'mqm', '1', '1', '', 'boolean', 'If set to active, the MQM quality assurance panel on the right side of the editor is visible', 16, 'MQM panel active', 'Editor: QA', '');
-
-
-
+-- Remove old statistics Endpoint
+DELETE FROM Zf_acl_rules WHERE `resource` = 'editor_qmstatistics';
+-- Remove old MQM model
+DROP TABLE `LEK_qmsubsegments`;

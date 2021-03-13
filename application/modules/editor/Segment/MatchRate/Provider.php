@@ -37,7 +37,7 @@
  * enableUneditedFuzzyMatchCheck
  * enableEdited100MatchCheck
  */
-class editor_Segment_MatchRate_EditCheck extends editor_Segment_Quality_Provider {
+class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider {
     
     /**
      * @var string
@@ -75,18 +75,21 @@ class editor_Segment_MatchRate_EditCheck extends editor_Segment_Quality_Provider
     }
     
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
-        return $translate->_('MatchRate');
+        return $translate->_('Match-Analyse');
     }
     
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category) : string {
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
         switch($category){
-            case editor_Segment_MatchRate_EditCheck::UNEDITED_FUZZY_MATCH:
-                return $translate->_('Internal tags are missing');
+            case editor_Segment_MatchRate_Provider::UNEDITED_FUZZY_MATCH:
+                return $translate->_('Unbearbeiteter Fuzzy');
                 
-            case editor_Segment_MatchRate_EditCheck::EDITED_100PERCENT_MATCH:
-                return $translate->_('Edited 100% Match');
+            case editor_Segment_MatchRate_Provider::EDITED_100PERCENT_MATCH:
+                return $translate->_('Bearbeiteter 100% Match');
         }
         return NULL;
     }
-
+    
+    public function isFullyChecked(Zend_Config $qualityConfig) : bool {
+        return ($qualityConfig->enableUneditedFuzzyMatchCheck && $qualityConfig->enableEdited100MatchCheck);
+    }
 }

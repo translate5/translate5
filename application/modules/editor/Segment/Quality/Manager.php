@@ -107,13 +107,13 @@ final class editor_Segment_Quality_Manager {
         }
         // Some Base Providers that do not come from Plugins
         // Tag Check
-        $provider = new editor_Segment_Internal_TagCheck();
+        $provider = new editor_Segment_Internal_Provider();
         $this->registry[$provider->getType()] = $provider;
         // MatchRate
-        $provider = new editor_Segment_MatchRate_EditCheck();
+        $provider = new editor_Segment_MatchRate_Provider();
         $this->registry[$provider->getType()] = $provider;
         // MQM
-        $provider = new editor_Segment_Mqm_TagCheck();
+        $provider = new editor_Segment_Mqm_Provider();
         $this->registry[$provider->getType()] = $provider;
     }
     /**
@@ -262,12 +262,13 @@ final class editor_Segment_Quality_Manager {
      * Translates a Segment Quality Code that is referenced in LEK_segment_quality category in conjunction with type
      * @param string $type
      * @param string $category
+     * @param editor_Models_Task $task
      * @throws ZfExtended_Exception
      * @return string
      */
-    public function translateQualityCategory(string $type, string $category) : string {
+    public function translateQualityCategory(string $type, string $category, editor_Models_Task $task) : string {
         if($this->hasProvider($type)){
-            $translation = $this->getProvider($type)->translateCategory($this->getTranslate(), $category);
+            $translation = $this->getProvider($type)->translateCategory($this->getTranslate(), $category, $task);
             if(empty($translation)){
                 throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" not present.');
             }
@@ -276,17 +277,61 @@ final class editor_Segment_Quality_Manager {
         throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation of category "'.$category.'".');
         return NULL;
     }
-    
-    /*
-    public function createStatisticsData(){
-       
+    /**
+     * Evaluates, if a quality of the given type is a type that generally should show up in the filter panel and in the task properties
+     * @param string $type
+     * @return bool
+     */
+    public function isFilterableType(string $type) : bool {
+        return $this->getProvider($type)->isFilterableType();
     }
-    
-    public function createGridFilterData(){
-        
+    /**
+     * Evaluates, if a quality of the given type and category can be false positive
+     * @param string $type
+     * @param string $category
+     * @return bool
+     */
+    public function canBeFalsePositiveCategory(string $type, string $category) : bool {
+        return $this->getProvider($type)->canBeFalsePositiveCategory($category);
     }
-    */
-    
+    /**
+     * Evaluates, if the quality of the given type is fully configured/checked
+     * @param string $type
+     * @param Zend_Config $taskConfig
+     * @return bool
+     */
+    public function isFullyCheckedType(string $type, Zend_Config $taskConfig) : bool {
+        return $this->getProvider($type)->isFullyChecked($taskConfig->runtimeOptions->autoQA);
+    }
+    /**
+     * Retrieves all types of qualities we have. By default only those, that should show up in the filter-panel
+     * @param bool $includeNonFilterableTypes
+     * @return string[]
+     */
+    public function getAllTypes(bool $includeNonFilterableTypes=false){
+        $types = [];
+        foreach($this->registry as $type => $provider){
+            /* @var $provider editor_Segment_Quality_Provider */
+            if($includeNonFilterableTypes || $provider->isFilterableType()){
+                $types[] = $provider->getType();
+            }
+        }
+        return $types;
+    }
+    /**
+     * Retrieves the types of qualities that should not show up in the quality panel & quality task views
+     * @return string[]
+     */
+    public function getFilterTypeBlacklist(){
+        $blacklist = [];
+        foreach($this->registry as $type => $provider){
+            /* @var $provider editor_Segment_Quality_Provider */
+            if(!$provider->isFilterableType()){
+                $blacklist[] = $provider->getType();
+            }
+        }
+        return $blacklist;
+    }
     /**
      * 
      * @return ZfExtended_Zendoverwrites_Translate

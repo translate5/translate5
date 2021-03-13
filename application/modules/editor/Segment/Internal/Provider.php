@@ -36,7 +36,7 @@
  * Checks Internal tags in the edited Segments for validity (all tags present, structure correct (closing tags following opening tags without interleaves)
  *
  */
-class editor_Segment_Internal_TagCheck extends editor_Segment_Quality_Provider {
+class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
 
     /**
      * Using the internal tag type
@@ -76,21 +76,32 @@ class editor_Segment_Internal_TagCheck extends editor_Segment_Quality_Provider {
     }
     
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
-        return $translate->_('Internal tags');
+        return $translate->_('Interne Tags');
     }
     
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category) : string {
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
         switch($category){
             case editor_Segment_Internal_TagComparision::TAGS_MISSING:
-                return $translate->_('Internal tags are missing');
+                return $translate->_('Interne Tags fehlen');
                 
             case editor_Segment_Internal_TagComparision::TAGS_ADDED:
-                return $translate->_('Internal tags have been added');
+                return $translate->_('Interne Tags wurden hinzugefügt');
                 
             case editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY:
-                return $translate->_('The internal tags have an incorrect structure');
+                return $translate->_('Die Internen Tags haben eine ungültige Struktur');
         }
         return NULL;
     }
-
+    /**
+     * The structure of internal tags can not be a false positive
+     * {@inheritDoc}
+     * @see editor_Segment_Quality_Provider::canBeFalsePositiveCategory()
+     */
+    public function canBeFalsePositiveCategory(string $category) : bool {
+        return false;
+    }
+    
+    public function isFullyChecked(Zend_Config $qualityConfig) : bool {
+        return $qualityConfig->enableInternalTagCheck;
+    }
 }

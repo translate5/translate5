@@ -45,7 +45,7 @@ Ext.define('Editor.view.qmsubsegments.Window', {
     layout: 'fit',
     itemId: 'qmsummaryWindow',
     width: 1024,
-    title: '#UT#MQM Statistik',
+    title: '#UT#QA Statistik',
     modal: true,
     tab_title_field: '#UT# In Feld: {0}',
 

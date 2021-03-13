@@ -37,13 +37,24 @@
  * Adds the Segment Quality Entries for the MQM tags that may have been added by the frontend only
  * 
  */
-class editor_Segment_Mqm_TagCheck extends editor_Segment_Quality_Provider {
+class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider {
 
     /**
      * Using the internal tag type
      * @var string
      */
     protected static $type = editor_Segment_Tag::TYPE_MQM;
+    
+    /**
+     * 
+     * @var array
+     */
+    private $typesByIndex = NULL;
+    /**
+     * 
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    private $translate = NULL;
     
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
@@ -61,5 +72,18 @@ class editor_Segment_Mqm_TagCheck extends editor_Segment_Quality_Provider {
     
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
         return $translate->_('MQM');
+    }
+    
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
+        if($this->typesByIndex == NULL){
+            $this->typesByIndex = $task->getQmSubsegmentIssuesFlat();
+            $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        }
+        $mqmType = intval(str_replace(editor_Segment_Tag::TYPE_MQM.'_', '', $category)); // see editor_Models_Db_SegmentQuality::addMqm how we evaluate the index from the category
+        if(isset($this->typesByIndex[$mqmType])){
+            return $this->translate->_($this->typesByIndex[$mqmType]);
+        }
+        // not worth an exception, should not happen if configuration correct
+        return 'UNKNOWN MQM-TYPE '.$mqmType;
     }
 }

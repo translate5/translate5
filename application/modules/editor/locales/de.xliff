@@ -853,7 +853,6 @@
 <trans-unit id='Q2hhbmdl'><source>Change</source><target>Change</target></trans-unit>
 <trans-unit id='IFRlc3Q='><source> Test</source><target> Test</target></trans-unit>
 <trans-unit id='TVFN'><source>MQM</source><target>MQM</target></trans-unit>
-<trans-unit id='TVFNIFN0YXRpc3Rpaw=='><source>MQM Statistik</source><target>MQM Statistik</target></trans-unit>
 <trans-unit id='VGFzdGF0dXJrw7xyemVsIG5hY2hzY2hsYWdlbg=='><source>Tastaturkürzel nachschlagen</source><target>Tastaturkürzel nachschlagen</target></trans-unit>
 <trans-unit id='WmllbHRleHQgKHp1ciBJbXBvcnR6ZWl0KQ=='><source>Zieltext (zur Importzeit)</source><target>Zieltext (zur Importzeit)</target></trans-unit>
 <trans-unit id='U1RSRyArIEVJTkZHIGtvcGllcnQgZGVuIGtvbXBsZXR0ZW4gUXVlbGx0ZXh0IGluIGRlbiBaaWVsdGV4dDxiciAvPlNUUkcgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRlbiBlbnRzcHJlY2hlbmRlbiBUYWcgaW4gZGVuIFppZWx0ZXh0IChOdWxsIGVudHNwcmljaHQgVGFnIE5yLiAxMCk8YnIgLz5TVFJHICsgU0hJRlQgKyAsIChLb21tYSkgKyAmZ3Q7TnVtbWVyJmx0OyBrb3BpZXJ0IGRpZSBUYWdzIG1pdCBkZW4gTnVtbWVybiAxMSBiaXMgMjAgaW4gZGVuIFppZWx0ZXh0Lg=='><source>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</source><target>STRG + EINFG kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.</target></trans-unit>
@@ -1911,6 +1910,16 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='><source>Kunden bearbeiten</source><target>Kunden bearbeiten</target></trans-unit>
 <trans-unit id='V2VubiBha3RpdmllcnQsIHdlcmRlbiBibG9ja2llcnRlIFNlZ21lbnRlIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4='><source>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</source><target>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</target></trans-unit>
 <trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGJsb2NraWVydGUgU2VnbWVudGUgbmljaHQgaW4gZGllIEFuYWx5c2UgdW5kIFdvcnRhbnphaGwgZWluYmV6b2dlbg=='><source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source><target>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</target></trans-unit>
-</body>
+<trans-unit id='TWF0Y2gtQW5hbHlzZQ=='><source>Match-Analyse</source><target>Match-Analyse</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Interne Tags</target></trans-unit>
+<trans-unit id='VGVybSBpc3QgaW4gZGVyIFppZWxzcHJhY2hlIGVyc2V0enQsIHZlcmFsdGV0IG9kZXIgdmVyYm90ZW4='><source>Term ist in der Zielsprache ersetzt, veraltet oder verboten</source><target>Term ist in der Zielsprache ersetzt, veraltet oder verboten</target></trans-unit>
+<trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unbearbeiteter Fuzzy</target></trans-unit>
+<trans-unit id='QmVhcmJlaXRldGVyIDEwMCUgTWF0Y2g='><source>Bearbeiteter 100% Match</source><target>Bearbeiteter 100% Match</target></trans-unit>
+<trans-unit id='VGVybSB3dXJkZSBpbiBkZXIgWmllbHNwcmFjaGUgbmljaHQgZ2VmdW5kZW4='><source>Term wurde in der Zielsprache nicht gefunden</source><target>Term wurde in der Zielsprache nicht gefunden</target></trans-unit>
+<trans-unit id='VGVybSBpc3QgaW4gZGVyIFppZWxzcHJhY2hlIG5pY2h0IGRlZmluaWVydA=='><source>Term ist in der Zielsprache nicht definiert</source><target>Term ist in der Zielsprache nicht definiert</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIGZlaGxlbg=='><source>Interne Tags fehlen</source><target>Interne Tags fehlen</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIHd1cmRlbiBoaW56dWdlZsO8Z3Q='><source>Interne Tags wurden hinzugefügt</source><target>Interne Tags wurden hinzugefügt</target></trans-unit>
+<trans-unit id='RGllIEludGVybmVuIFRhZ3MgaGFiZW4gZWluZSB1bmfDvGx0aWdlIFN0cnVrdHVy'><source>Die Internen Tags haben eine ungültige Struktur</source><target>Die Internen Tags haben eine ungültige Struktur</target></trans-unit>
+  </body>
  </file>
 </xliff>

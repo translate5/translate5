@@ -105,11 +105,10 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     {
         
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
-            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'quality', 'comment',
-                                'qmstatistics', // TODO AUTOQA: remove
+            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                                 'config', 'segmentuserassoc', 'session', 'language','termcollection','languageresourceresource','languageresourcetaskassoc',
-                                'languageresourceinstance','apps','taskusertracking', 'term', 'termattribute', 'category'
+                                'languageresourceinstance','apps','taskusertracking', 'term', 'termattribute', 'category', 'quality'
             ],
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
@@ -466,6 +465,62 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'exportresource'
             ));
         $this->front->getRouter()->addRoute('customer_resourceexport', $customerResourceExport);
+        
+        // quality subroutes
+        $this->front->getRouter()->addRoute(
+            'editorQualityStatistics',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/statistics/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'statistics'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorQualityDownloadStatistics',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/downloadstatistics/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'downloadstatistics'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorSegmentQuality',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/segment/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'segment'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorTaskQuality',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/task/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'task'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorTaskQualityTooltip',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/tasktooltip/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'tasktooltip'
+                )));
+        $this->front->getRouter()->addRoute(
+            'editorQualityFalsepositive',
+            new ZfExtended_Controller_RestLikeRoute(
+                'editor/quality/falsepositive/*',
+                array(
+                    'module' => 'editor',
+                    'controller' => 'quality',
+                    'action' => 'falsepositive'
+                )));
     }
     
     

@@ -145,9 +145,8 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen (nur Lesemodus)');?>';
   	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
   	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
-  	//gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('QM Subsegment Statistik');?>';
-  	gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('MQM');?>';
-  	gridToolbar.item_qmsummaryTooltip = '<?php echo $this->translate->_('MQM Statistik');?>';
+  	gridToolbar.item_qmsummaryBtn = '<?php echo $this->translate->_('QA');?>';
+  	gridToolbar.item_qmsummaryTooltip = '<?php echo $this->translate->_('QA Statistik');?>';
   	gridToolbar.item_optionsTagBtn = '<?php echo $this->translate->_('Einstellungen');?>';
   	gridToolbar.item_zoomIn = '<?php echo $this->translate->_('Segmentschriftgrad vergrößern (STRG + +)');?>';
   	gridToolbar.item_zoomOut = '<?php echo $this->translate->_('Segmentschriftgrad verkleinern (STRG + -)');?>';
@@ -246,7 +245,7 @@ Ext.define('Editor.controller.Localizer', {
 
   	Editor.view.preferences.Window.prototype.title = '<?php echo $this->translate->_('Einstellungen');?>';
     
-    Editor.view.qmsubsegments.Window.prototype.title = '<?php echo $this->translate->_('MQM Statistik');?>';
+    Editor.view.qmsubsegments.Window.prototype.title = '<?php echo $this->translate->_('QA Statistik');?>';
   	Editor.view.qmsubsegments.Window.prototype.tab_title_field = '<?php echo $this->translate->_('In Feld: {0}');?>';
   	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_text = '<?php echo $this->translate->_('Fehlertyp');?>';
   	Editor.view.qmsubsegments.SummaryTree.prototype.treepanel_totalTotal = '<?php echo $this->translate->_('Gesamt');?>';

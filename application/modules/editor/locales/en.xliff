@@ -1614,10 +1614,6 @@
     <source>MQM</source>
     <target>MQM</target>
 </trans-unit>
-<trans-unit id='TVFNIFN0YXRpc3Rpaw=='>
-    <source>MQM Statistik</source>
-    <target>MQM statistics</target>
-</trans-unit>
 <trans-unit id='VGFiZWxsZSB6dXLDvGNrc2V0emVu'>
     <source>Tabelle zurücksetzen</source>
     <target>Reset grid</target>
@@ -3998,6 +3994,16 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source>
   <target>If disabled, blocked segments are not included in the analysis and word count</target>
 </trans-unit>
+<trans-unit id='TWF0Y2gtQW5hbHlzZQ=='><source>Match-Analyse</source><target>Match analysis</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Internal tags</target></trans-unit>
+<trans-unit id='VGVybSBpc3QgaW4gZGVyIFppZWxzcHJhY2hlIGVyc2V0enQsIHZlcmFsdGV0IG9kZXIgdmVyYm90ZW4='><source>Term ist in der Zielsprache ersetzt, veraltet oder verboten</source><target>Term superseded, deprecated or forbidden in target language</target></trans-unit>
+<trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unedited fuzzy match</target></trans-unit>
+<trans-unit id='QmVhcmJlaXRldGVyIDEwMCUgTWF0Y2g='><source>Bearbeiteter 100% Match</source><target>Edited 100% match</target></trans-unit>
+<trans-unit id='VGVybSB3dXJkZSBpbiBkZXIgWmllbHNwcmFjaGUgbmljaHQgZ2VmdW5kZW4='><source>Term wurde in der Zielsprache nicht gefunden</source><target>Term not found in target language</target></trans-unit>
+<trans-unit id='VGVybSBpc3QgaW4gZGVyIFppZWxzcHJhY2hlIG5pY2h0IGRlZmluaWVydA=='><source>Term ist in der Zielsprache nicht definiert</source><target>Term not defined in target language</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIGZlaGxlbg=='><source>Interne Tags fehlen</source><target>Internal tags are missing</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWdzIHd1cmRlbiBoaW56dWdlZsO8Z3Q='><source>Interne Tags wurden hinzugefügt</source><target>Internal tags have been added</target></trans-unit>
+<trans-unit id='RGllIEludGVybmVuIFRhZ3MgaGFiZW4gZWluZSB1bmfDvGx0aWdlIFN0cnVrdHVy'><source>Die Internen Tags haben eine ungültige Struktur</source><target>The internal tags have an incorrect structure</target></trans-unit>
 </body>
   </file>
 </xliff>
