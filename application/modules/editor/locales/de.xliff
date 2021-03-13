@@ -1343,6 +1343,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='S2VpbmUgVmVyYmluZHVuZyE='><source>Keine Verbindung!</source><target>Keine Verbindung!</target></trans-unit>
 <trans-unit id='S2VpbmUgZ8O8bHRpZ2UgTGl6ZW56Lg=='><source>Keine gültige Lizenz.</source><target>Keine gültige Lizenz.</target></trans-unit>
 <trans-unit id='aW1wb3J0aWVydA=='><source>importiert</source><target>importiert</target></trans-unit>
+<trans-unit id='SW1wb3J0IGzDpHVmdA=='><source>Import läuft</source><target>Import läuft</target></trans-unit>
 <trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'><source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source><target>Die angefragte OpenTM2 Instanz ist nicht erreichbar</target></trans-unit>
 <trans-unit id='S3VuZGUgYmVyZWl0cyBkZXIgUmVzc291cmNlIHswfSBhbHMgU3RhbmRhcmQgZsO8ciB7MX0gYmlzIHsyfSB6dWdld2llc2VuIC0gWnVvcmRudW5nIGVudGZlcm5lbiB1bmQgZGVyIGFrdHVlbGxlbiBSZXNzb3VyY2UgenV3ZWlzZW4/'><source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source><target>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRrdW5kZQ=='><source>Standardkunde</source><target>Standardkunde</target></trans-unit>
@@ -1920,6 +1921,11 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='TWlzc2luZw=='><source>Missing</source><target>Missing</target></trans-unit>
 <trans-unit id='SW5jb3JyZWN0'><source>Incorrect</source><target>Incorrect</target></trans-unit>
 <trans-unit id='VW5pbnRlbGxpZ2libGU='><source>Unintelligible</source><target>Unintelligible</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV9zeXN0ZW0='><source>config_overwrite_system</source><target>config_overwrite_system</target></trans-unit>
+<trans-unit id='S29uZmlndXJhdGlvbiBnZXNwZWljaGVydA=='><source>Konfiguration gespeichert</source><target>Konfiguration gespeichert</target></trans-unit>
+<trans-unit id='VmFsdWU='><source>Value</source><target>Value</target></trans-unit>
+<trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse enthalten</source><target>Gesperrte Segmente sind in der Analyse enthalten</target></trans-unit>
+<trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgbmljaHQgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse nicht enthalten</source><target>Gesperrte Segmente sind in der Analyse nicht enthalten</target></trans-unit>
   </body>
  </file>
 </xliff>
