@@ -56,6 +56,18 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $taskConfig;
     /**
+     * @var editor_Segment_Quality_Manager
+     */
+    protected $manager;
+    /**
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    protected $translate;
+    /**
+     * @var editor_Models_Db_SegmentQuality
+     */
+    protected $table;
+    /**
      * @var Zend_Db_Table_Rowset_Abstract
      */
     protected $dbRows;
@@ -68,9 +80,9 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $rowsByType = [];
     /**
-     * @var editor_Segment_Quality_Manager
+     * @var integer
      */
-    protected $manager;
+    protected $numQualities = 0;
     /**
      * @var boolean
      */
@@ -101,7 +113,7 @@ abstract class editor_Models_Quality_AbstractView {
         $this->taskConfig = $this->task->getConfig();
         $this->manager = editor_Segment_Quality_Manager::instance();
         $this->excludeMQM = $excludeMQM;
-        $table = new editor_Models_Db_SegmentQuality();
+        $this->table = new editor_Models_Db_SegmentQuality();
         $blacklist = NULL;
         if($onlyFilterTypes){
             $blacklist = $this->manager->getFilterTypeBlacklist();
@@ -115,7 +127,7 @@ abstract class editor_Models_Quality_AbstractView {
             }
         }
         // ordering is crucial !
-        $this->dbRows = $table->fetchFiltered($task->getTaskGuid(), $segmentId, $field, $blacklist, true, NULL, ['type ASC','category ASC']);
+        $this->dbRows = $this->table->fetchFiltered($task->getTaskGuid(), $segmentId, $field, $blacklist, true, NULL, ['type ASC','category ASC']);
         $this->create();
         
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
@@ -140,11 +152,11 @@ abstract class editor_Models_Quality_AbstractView {
         return $this->rows;
     }
     /**
-     * Retrieves the number of found qualities
+     * Retrieves the number of found qualities (rubrics do not count here)
      * @return int
      */
     public function getNumQualities(){
-        return count($this->dbRows);
+        return $this->numQualities;
     }
     /**
      * Retrieves if there is a structural problem with internal tags
@@ -166,10 +178,17 @@ abstract class editor_Models_Quality_AbstractView {
     protected function create(){
         // create ordered rubrics
         $rubrics = [];
+        $qmRows = $this->fetchQmRows();
+        $qmType = editor_Segment_Tag::TYPE_QM;
         foreach($this->manager->getAllTypes() as $type){
             if(!$this->excludeMQM || $type != editor_Segment_Tag::TYPE_MQM){
                 $rubrics[] = $this->createRubricRow($type);
             }
+        }
+        // since the QM type is not part of the LEK_segment_quality model we have to add it seperately
+        if(count($qmRows) > 0){
+            $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+            $rubrics[] = $this->createQmRow($this->translate->_(strtoupper($qmType)), '', true);
         }
         usort($rubrics, 'editor_Models_Quality_AbstractView::compareByTitle');
         // create intermediate model
@@ -193,6 +212,33 @@ abstract class editor_Models_Quality_AbstractView {
                     if($this->hasSegmentIds){
                         $this->rowsByType[$row->type][$row->category]->segments[] = $row->segmentId;
                     }
+                }
+                $this->numQualities++;
+            }
+        }
+        // add QM entries to our model if there are any
+        if(count($qmRows) > 0){
+            $utility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
+            /* @var $utility editor_Models_Segment_Utility */
+            // add QMs from the segments model
+            foreach($this->fetchQmRows() as $row){
+                $segmentId = $row['id'];
+                foreach($utility->convertQmIds($row['qmId']) as $index => $name){
+                    $category = $qmType.'_'.$index; // analogue to what is made with mqm-categories
+                    $this->rowsByType[$qmType][self::RUBRIC]->count++;
+                    if($this->hasSegmentIds){
+                        $this->rowsByType[$qmType][self::RUBRIC]->segments[] = $segmentId;
+                    }
+                    if($this->hasCategories){
+                        if(!array_key_exists($category, $this->rowsByType[$qmType])){
+                            $this->rowsByType[$qmType][$category] = $this->createQmRow($this->translate->_($name), $category, false);
+                        }
+                        $this->rowsByType[$qmType][$category]->count++;
+                        if($this->hasSegmentIds){
+                            $this->rowsByType[$qmType][$category]->segments[] = $segmentId;
+                        }
+                    }
+                    $this->numQualities++;
                 }
             }
         }
@@ -242,7 +288,7 @@ abstract class editor_Models_Quality_AbstractView {
         return $row;
     }
     /**
-     * Creates a category row and adds it to the rows
+     * Creates a category row
      * @param editor_Models_Db_SegmentQualityRow $dbRow
      * @return stdClass
      */
@@ -261,5 +307,39 @@ abstract class editor_Models_Quality_AbstractView {
         }
         $row->title = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
         return $row;
+    }
+    /**
+     * Creates a QM row
+     * @param editor_Models_Db_SegmentQualityRow $dbRow
+     * @return stdClass
+     */
+    protected function createQmRow(string $title, string $category, bool $isRubric) : stdClass {
+        $row = new stdClass();
+        $row->id = -1;
+        $row->type = editor_Segment_Tag::TYPE_QM;
+        $row->count = 0;
+        $row->checked = true;
+        if($this->hasCategories){
+            $row->category = ($isRubric) ? null : $category;
+            $row->rubric = $isRubric;
+        }
+        if($this->hasSegmentIds){
+            $row->segments = [];
+        }
+        $row->title = $title;
+        return $row;
+    }
+    /**
+     * 
+     * @return array
+     */
+    protected function fetchQmRows(){
+        $select = $this->table->select()
+            ->setIntegrityCheck(false)
+            ->from('LEK_segments', array('id', 'qmId'))
+            ->where('taskGuid = ?', $this->task->getTaskGuid())
+            ->where('qmId != ?', '')
+            ->where('qmId IS NOT NULL');
+        return $this->table->fetchAll($select, 'id ASC')->toArray();
     }
 }

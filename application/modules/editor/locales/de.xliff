@@ -543,26 +543,6 @@
 <trans-unit id='S2VpbmUgVGVybWlub2xvZ2llIHZvcmhhbmRlbiE='><source>Keine Terminologie vorhanden!</source><target>Keine Terminologie vorhanden!</target></trans-unit>
 <trans-unit id='Vm9yenVnc2JlbmVubnVuZw=='><source>Vorzugsbenennung</source><target>Vorzugsbenennung</target></trans-unit>
 <trans-unit id='JyV2YWx1ZSUnIGlzIG1vcmUgdGhhbiAlbWF4JSBjaGFyYWN0ZXJzIGxvbmc='><source>'%value%' is more than %max% characters long</source><target>'%value%' is more than %max% characters long</target></trans-unit>
-<trans-unit id='QWNjdXJhY3k='><source>Accuracy</source><target>Accuracy</target></trans-unit>
-<trans-unit id='T21pc3Npb24='><source>Omission</source><target>Omission</target></trans-unit>
-<trans-unit id='QWRkaXRpb24='><source>Addition</source><target>Addition</target></trans-unit>
-<trans-unit id='TWlzdHJhbnNsYXRpb24='><source>Mistranslation</source><target>Mistranslation</target></trans-unit>
-<trans-unit id='VW50cmFuc2xhdGVk'><source>Untranslated</source><target>Untranslated</target></trans-unit>
-<trans-unit id='Rmx1ZW5jeQ=='><source>Fluency</source><target>Fluency</target></trans-unit>
-<trans-unit id='U3R5bGUvcmVnaXN0ZXI='><source>Style/register</source><target>Style/register</target></trans-unit>
-<trans-unit id='VHlwb2dyYXBoeQ=='><source>Typography</source><target>Typography</target></trans-unit>
-<trans-unit id='U3BlbGxpbmc='><source>Spelling</source><target>Spelling</target></trans-unit>
-<trans-unit id='R3JhbW1hcg=='><source>Grammar</source><target>Grammar</target></trans-unit>
-<trans-unit id='V29yZCBvcmRlcg=='><source>Word order</source><target>Word order</target></trans-unit>
-<trans-unit id='V29yZCBmb3Jt'><source>Word form</source><target>Word form</target></trans-unit>
-<trans-unit id='UGFydCBvZiBzcGVlY2g='><source>Part of speech</source><target>Part of speech</target></trans-unit>
-<trans-unit id='QWdyZWVtZW50'><source>Agreement</source><target>Agreement</target></trans-unit>
-<trans-unit id='VGVuc2UvYXNwZWN0L21vb2Q='><source>Tense/aspect/mood</source><target>Tense/aspect/mood</target></trans-unit>
-<trans-unit id='RnVuY3Rpb24gd29yZHM='><source>Function words</source><target>Function words</target></trans-unit>
-<trans-unit id='RXh0cmFuZW91cw=='><source>Extraneous</source><target>Extraneous</target></trans-unit>
-<trans-unit id='TWlzc2luZw=='><source>Missing</source><target>Missing</target></trans-unit>
-<trans-unit id='SW5jb3JyZWN0'><source>Incorrect</source><target>Incorrect</target></trans-unit>
-<trans-unit id='VW5pbnRlbGxpZ2libGU='><source>Unintelligible</source><target>Unintelligible</target></trans-unit>
 <trans-unit id='S2VpbmUgWnVncmlmZnNiZXJlY2h0aWd1bmch'><source>Keine Zugriffsberechtigung!</source><target>Keine Zugriffsberechtigung!</target></trans-unit>
 <trans-unit id='ZXJsYXVidGUgQmVuZW5udW5n'><source>erlaubte Benennung</source><target>erlaubte Benennung</target></trans-unit>
 <trans-unit id='dmVyYm90ZW5lIEJlbmVubnVuZw=='><source>verbotene Benennung</source><target>verbotene Benennung</target></trans-unit>
@@ -616,16 +596,6 @@
 <trans-unit id='RWludHJhZyBnZWzDtnNjaHQ='><source>Eintrag gelöscht</source><target>Eintrag gelöscht</target></trans-unit>
 <trans-unit id='RGllIEF1c2dhbmdzZGF0ZW4gd3VyZGVuIGluIGRlciBad2lzY2hlbnplaXQgdmVyw6RuZGVydC4gQml0dGUgYWt0dWFsaXNpZXJlbiBTaWUgSWhyZSBBbnNpY2h0IQ=='><source>Die Ausgangsdaten wurden in der Zwischenzeit verändert. Bitte aktualisieren Sie Ihre Ansicht!</source><target>Die Ausgangsdaten wurden in der Zwischenzeit verändert. Bitte aktualisieren Sie Ihre Ansicht!</target></trans-unit>
 <trans-unit id='U2ljaHRiYXJrZWl0IG5pY2h0IGVkaXRpZXJiYXJlciBaaWVsdGV4dHNwYWx0ZW4='><source>Sichtbarkeit nicht editierbarer Zieltextspalten</source><target>Sichtbarkeit nicht editierbarer Zieltextspalten</target></trans-unit>
-<trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>
-<trans-unit id='Q29udGVudA=='><source>Content</source><target>Content</target></trans-unit>
-<trans-unit id='U3R5bGU='><source>Style</source><target>Style</target></trans-unit>
-<trans-unit id='SW5jb25zaXN0ZW5jeQ=='><source>Inconsistency</source><target>Inconsistency</target></trans-unit>
-<trans-unit id='TWVjaGFuaWNhbA=='><source>Mechanical</source><target>Mechanical</target></trans-unit>
-<trans-unit id='TG9jYWxlIHZpb2xhdGlvbg=='><source>Locale violation</source><target>Locale violation</target></trans-unit>
-<trans-unit id='VmVyaXR5'><source>Verity</source><target>Verity</target></trans-unit>
-<trans-unit id='Q29tcGxldGVuZXNz'><source>Completeness</source><target>Completeness</target></trans-unit>
-<trans-unit id='TGVnYWwgcmVxdWlyZW1lbnRz'><source>Legal requirements</source><target>Legal requirements</target></trans-unit>
-<trans-unit id='TG9jYWxlIGFwcGxpY2FiaWxpdHk='><source>Locale applicability</source><target>Locale applicability</target></trans-unit>
 <trans-unit id='IC0gbWl0IEFlbmRlcnVuZ2VuIG5hY2h2ZXJmb2xnZW4uemlw'><source> - mit Aenderungen nachverfolgen.zip</source><target> - mit Aenderungen nachverfolgen.zip</target></trans-unit>
 <trans-unit id='UGFzc3dvcnQgc2V0emVu'><source>Passwort setzen</source><target>Passwort setzen</target></trans-unit>
 <trans-unit id='U2VociBnZWVocnRlIEZyYXU='><source>Sehr geehrte Frau</source><target>Sehr geehrte Frau</target></trans-unit>
@@ -1920,6 +1890,36 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='SW50ZXJuZSBUYWdzIGZlaGxlbg=='><source>Interne Tags fehlen</source><target>Interne Tags fehlen</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdzIHd1cmRlbiBoaW56dWdlZsO8Z3Q='><source>Interne Tags wurden hinzugefügt</source><target>Interne Tags wurden hinzugefügt</target></trans-unit>
 <trans-unit id='RGllIEludGVybmVuIFRhZ3MgaGFiZW4gZWluZSB1bmfDvGx0aWdlIFN0cnVrdHVy'><source>Die Internen Tags haben eine ungültige Struktur</source><target>Die Internen Tags haben eine ungültige Struktur</target></trans-unit>
+<trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>
+<trans-unit id='Q29udGVudA=='><source>Content</source><target>Content</target></trans-unit>
+<trans-unit id='U3R5bGU='><source>Style</source><target>Style</target></trans-unit>
+<trans-unit id='SW5jb25zaXN0ZW5jeQ=='><source>Inconsistency</source><target>Inconsistency</target></trans-unit>
+<trans-unit id='TWVjaGFuaWNhbA=='><source>Mechanical</source><target>Mechanical</target></trans-unit>
+<trans-unit id='TG9jYWxlIHZpb2xhdGlvbg=='><source>Locale violation</source><target>Locale violation</target></trans-unit>
+<trans-unit id='VmVyaXR5'><source>Verity</source><target>Verity</target></trans-unit>
+<trans-unit id='Q29tcGxldGVuZXNz'><source>Completeness</source><target>Completeness</target></trans-unit>
+<trans-unit id='TGVnYWwgcmVxdWlyZW1lbnRz'><source>Legal requirements</source><target>Legal requirements</target></trans-unit>
+<trans-unit id='TG9jYWxlIGFwcGxpY2FiaWxpdHk='><source>Locale applicability</source><target>Locale applicability</target></trans-unit>
+<trans-unit id='QWNjdXJhY3k='><source>Accuracy</source><target>Accuracy</target></trans-unit>
+<trans-unit id='T21pc3Npb24='><source>Omission</source><target>Omission</target></trans-unit>
+<trans-unit id='QWRkaXRpb24='><source>Addition</source><target>Addition</target></trans-unit>
+<trans-unit id='TWlzdHJhbnNsYXRpb24='><source>Mistranslation</source><target>Mistranslation</target></trans-unit>
+<trans-unit id='VW50cmFuc2xhdGVk'><source>Untranslated</source><target>Untranslated</target></trans-unit>
+<trans-unit id='Rmx1ZW5jeQ=='><source>Fluency</source><target>Fluency</target></trans-unit>
+<trans-unit id='U3R5bGUvcmVnaXN0ZXI='><source>Style/register</source><target>Style/register</target></trans-unit>
+<trans-unit id='VHlwb2dyYXBoeQ=='><source>Typography</source><target>Typography</target></trans-unit>
+<trans-unit id='U3BlbGxpbmc='><source>Spelling</source><target>Spelling</target></trans-unit>
+<trans-unit id='R3JhbW1hcg=='><source>Grammar</source><target>Grammar</target></trans-unit>
+<trans-unit id='V29yZCBvcmRlcg=='><source>Word order</source><target>Word order</target></trans-unit>
+<trans-unit id='V29yZCBmb3Jt'><source>Word form</source><target>Word form</target></trans-unit>
+<trans-unit id='UGFydCBvZiBzcGVlY2g='><source>Part of speech</source><target>Part of speech</target></trans-unit>
+<trans-unit id='QWdyZWVtZW50'><source>Agreement</source><target>Agreement</target></trans-unit>
+<trans-unit id='VGVuc2UvYXNwZWN0L21vb2Q='><source>Tense/aspect/mood</source><target>Tense/aspect/mood</target></trans-unit>
+<trans-unit id='RnVuY3Rpb24gd29yZHM='><source>Function words</source><target>Function words</target></trans-unit>
+<trans-unit id='RXh0cmFuZW91cw=='><source>Extraneous</source><target>Extraneous</target></trans-unit>
+<trans-unit id='TWlzc2luZw=='><source>Missing</source><target>Missing</target></trans-unit>
+<trans-unit id='SW5jb3JyZWN0'><source>Incorrect</source><target>Incorrect</target></trans-unit>
+<trans-unit id='VW5pbnRlbGxpZ2libGU='><source>Unintelligible</source><target>Unintelligible</target></trans-unit>
   </body>
  </file>
 </xliff>
