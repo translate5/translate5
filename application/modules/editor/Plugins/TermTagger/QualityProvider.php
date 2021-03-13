@@ -132,20 +132,20 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     }
     
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
-        return $translate->_('Terms');
+        return $translate->_('Terminologie');
     }
     
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category) : string {
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
         switch($category){
             case editor_Models_Term::TRANSSTAT_NOT_FOUND:
-                return $translate->_('Term not found in target language');
+                return $translate->_('Term wurde in der Zielsprache nicht gefunden');
                 
             case editor_Models_Term::TRANSSTAT_NOT_DEFINED:
-                return $translate->_('Term not defined in target language');
+                return $translate->_('Term ist in der Zielsprache nicht definiert');
                 
             case editor_Models_Term::STAT_SUPERSEDED:
             case editor_Models_Term::STAT_DEPRECATED:                
-                return $translate->_('Term superseeded, deprecated or forbidden in target language');
+                return $translate->_('Term ist in der Zielsprache ersetzt, veraltet oder verboten');
         }
         return NULL;
     }

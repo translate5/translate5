@@ -51,7 +51,7 @@ Ext.define('Editor.store.QmSummary', {
         reader: {
             type : 'json'
         },
-        url: Editor.data.restpath+'qmstatistics'
+        url: Editor.data.restpath+'quality/statistics'
     },
     root: {
         expanded: true,

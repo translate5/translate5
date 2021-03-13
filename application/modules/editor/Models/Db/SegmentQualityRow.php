@@ -51,7 +51,7 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
      * @return string[]
      */
     public function getFields(){
-        if(empty($this->get('fields'))){
+        if(empty($this->fields)){
             return [];
         }
         return explode(',', $this->fields);

@@ -126,7 +126,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
               }
               result.push({
                   hrefTarget: '_blank',
-                  href: me.makePath('qmstatistics/index/taskGuid/{1}/?type={2}', field.get('name')),
+                  href: me.makePath('quality/downloadstatistics/taskGuid/{1}/?type={2}', field.get('name')),
                   text : Ext.String.format(me.messages.exportQmField, field.get('label'))
               });
           });

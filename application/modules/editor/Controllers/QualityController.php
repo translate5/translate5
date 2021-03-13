@@ -27,91 +27,148 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * TODO AUTOQA ANNOTATE
- *
+ * The Main Quality Controller
+ * Provides data for all quality related frontends
  *
  */
-class Editor_QualityController extends ZfExtended_RestController {
+class editor_QualityController extends ZfExtended_RestController {
+    
     /**
      * @var string
      */
     protected $entityClass = 'editor_Models_SegmentQuality';
-
     /**
      * @var editor_Models_SegmentQuality
      */
     protected $entity;
-
+    
     /**
      * Retrieves all Qualities for the current task as used in the quality filter-panel in the segment grid
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction(){
-        /*
-        $taskGuid = $this->getRequest()->getParam('taskGuid');
-        if(!is_null($taskGuid)){
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            $task->loadByTaskGuid($taskGuid);
-            $taskname = $task->getTasknameForDownload(' - '.$this->getFieldType($taskGuid).'.xml');
-            
-            header('Content-disposition: attachment; filename="'.$taskname.'"');
-            header('Content-type: "text/xml"; charset="utf8"', TRUE);
+        $task = $this->fetchTask();
+        $view = new editor_Models_Quality_FilterPanelView($task, NULL, true);
+        $this->view->rows = $view->getRows();
+        $this->view->total = count($this->view->rows);
+        $this->view->numQualities = $view->getNumQualities();
+        $this->view->internalTagFaults = $view->hasInternalTagFaults();
+    }
+    /**
+     * Retrieves the data for the statistics panel (which is currently not accessible /active)
+     */
+    public function statisticsAction(){        
+        $task = $this->fetchTask();
+        $field = $this->getRequest()->getParam('type');
+        $statisticsProvider = new editor_Models_Quality_StatisticsView($task, $field);
+        $this->view->text = '.';
+        $this->view->children = $statisticsProvider->getTree();
+    }
+    /**
+     * Retrieves the data for the statistics panel
+     */
+    public function downloadstatisticsAction(){
+        $task = $this->fetchTask();
+        $field = $this->getRequest()->getParam('type');
+        $statisticsProvider = new editor_Models_Quality_StatisticsView($task, $field);
+
+        header('Content-disposition: attachment; filename="'.$statisticsProvider->getDownloadName().'"');
+        header('Content-type: "text/xml"; charset="utf8"', TRUE);
+        
+        $this->view->text = '.';
+        $this->view->children = $statisticsProvider->getTree();
+    }
+    /**
+     * Retrieves the data for the segment's qualities-panel in the segment grid
+     */
+    public function segmentAction(){
+        $task = $this->fetchTask();
+        $segmentId = $this->fetchSegmentId();
+        $view = new editor_Models_Quality_SegmentView($task, $segmentId);
+        $this->view->rows = $view->getRows();
+        $this->view->total = count($this->view->rows);
+    }
+    /**
+     * Sets the false-positive for a segment
+     */
+    public function falsepositiveAction(){
+        $falsePositive = $this->getRequest()->getParam('falsePositive', NULL);
+        $this->entityLoad();
+        if($falsePositive !== NULL && (intval($falsePositive) === 1 || intval($falsePositive) === 0)){
+            $this->entity->setFalsePositive(intval($falsePositive));
+            $this->entity->save();
+        } else {
+            ZfExtended_UnprocessableEntity::addCodes(['E1025' => 'Field "falsePositive" must be provided.']);
+            throw new ZfExtended_UnprocessableEntity('E1025');
         }
-        else{
+    }
+    /**
+     * Retrieves the data for the qualities-overview of a task in the task info panel
+     */
+    public function taskAction(){
+        $task = $this->fetchTask();
+        $view = new editor_Models_Quality_TaskView($task, NULL, true);
+        $this->view->rows = $view->getRows();
+        $this->view->total = count($this->view->rows);
+        $this->view->numQualities = $view->getNumQualities();
+        $this->view->internalTagFaults = $view->hasInternalTagFaults();
+    }
+    /**
+     * Retrieves the data for the qualities tooltip of a task in the task info panel
+     * TODO AUTOQA: REMOVE ?
+     */
+    public function tasktooltipAction(){
+        $this->taskAction();
+    }
+    /**
+     * @throws ZfExtended_Exception
+     * @return editor_Models_Task
+     */
+    private function fetchTask() : editor_Models_Task {
+        $taskGuid = $this->fetchTaskGuid();
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        return $task;
+    }
+    /**
+     *
+     * @throws ZfExtended_NotAuthenticatedException
+     * @return string
+     */
+    private function fetchTaskGuid() : string {
+        $taskGuid = $this->getRequest()->getParam('taskGuid'); //for possiblity to download task outside of editor
+        if(is_null($taskGuid)){
             $session = new Zend_Session_Namespace();
             $taskGuid = $session->taskGuid;
         }
         if(empty($taskGuid)){
             throw new ZfExtended_NotAuthenticatedException();
         }
-        $this->view->text = '.';
-        $this->view->children = $this->entity->getQmStatTreeByTaskGuid($taskGuid, $this->getFieldType($taskGuid));
-        */
-        $this->view->text = 'TEST';
+        return $taskGuid;
     }
     /**
-     * Retrieves the data for the statistics panel
+     *
+     * @throws ZfExtended_Models_Entity_NotFoundException
+     * @return int
      */
-    public function statisticsAction(){
-        $this->view->text = 'TEST';
-        // TODO IMPLEMENT
+    private function fetchSegmentId() : int {
+        $segmentId = $this->getRequest()->getParam('segmentId'); //for possiblity to download task outside of editor
+        if(is_null($segmentId)){
+            throw new ZfExtended_Models_Entity_NotFoundException('parameter segmentId is required.');
+        }
+        return intval($segmentId);
     }
-    /**
-     * Retrieves the data for the segment's qualities-panel in the segment grid
-     */
-    public function segmentAction(){
-        $this->view->text = 'TEST';
-        // TODO IMPLEMENT
-    }
-    /**
-     * Sets the false-positive for a segment
-     */
-    public function falsepositiveAction(){
-        $this->view->text = 'TEST';
-        // TODO IMPLEMENT
-    }
-    /**
-     * Retrieves the data for the qualities-overview of a task in the task info panel
-     */
-    public function taskAction(){
-        $this->view->text = 'TEST';
-        // TODO IMPLEMENT
+    
+    public function putAction(){
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->put');
     }
 
     public function getAction(){
         throw new ZfExtended_BadMethodCallException(__CLASS__.'->get');
     }
-    /**
-     * Creates a quality, used only to set qm qualities
-     * {@inheritDoc}
-     * @see ZfExtended_RestController::putAction()
-     */
-    public function putAction(){
-        $this->view->text = 'TEST';
-        // TODO IMPLEMENT
-    }
-
+    
     public function deleteAction(){
         throw new ZfExtended_BadMethodCallException(__CLASS__.'->delete');
     }

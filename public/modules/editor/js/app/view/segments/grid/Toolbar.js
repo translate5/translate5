@@ -54,7 +54,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_shortTagBtn: '#UT#Tag-Kurzansicht',
     item_fullTagBtn: '#UT#Tag-Vollansicht',
     item_qmsummaryBtn: '#UT#MQM',
-    item_qmsummaryTooltip: '#UT#MQM Statistik',
+    item_qmsummaryTooltip: '#UT#QA Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
     item_zoomIn: '#UT#Segmentschriftgrad vergrößern',
     item_zoomOut: '#UT#Segmentschriftgrad verkleinern',

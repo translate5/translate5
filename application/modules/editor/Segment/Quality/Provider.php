@@ -100,6 +100,9 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         return $tags;
     }
+    
+    /* *************** Translation API *************** */
+    
     /**
      * Returns a translation for the Provider itself
      * @param ZfExtended_Zendoverwrites_Translate $translate
@@ -110,14 +113,41 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     }
     /**
      * Returns a translation for a Quality. These Codes are stored in the category column of the LEK_segment_quality model
+     * Because MQM translations are task-specific, the task is needed
      * @param ZfExtended_Zendoverwrites_Translate $translate
      * @param string $category
+     * @param editor_Models_Task $task
      * @return string
      */
-    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category) : string {
+    public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
         return NULL;
     }
     
+    /* *************** REST view API *************** */
+    
+    /**
+     * Retrieves, if the quality type is filterable (will be shown in the filter panel or task panel)
+     * @return bool
+     */
+    public function isFilterableType() : bool {
+        return true;
+    }
+    /**
+     * Retrieves, if the given category can be a false positive
+     * @param string $category
+     * @return bool
+     */
+    public function canBeFalsePositiveCategory(string $category) : bool {
+        return true;
+    }
+    /**
+     * Retrieves, if the Quality type is properly configured/checked (all configurations active) 
+     * @param Zend_Config $qualityConfig
+     * @return bool
+     */
+    public function isFullyChecked(Zend_Config $qualityConfig) : bool {
+        return true;
+    }
     
     /* *************** Tag provider API *************** */
     

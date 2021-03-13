@@ -83,7 +83,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param string $type
      * @return boolean
      */
-    public static function hasTypeForTask(string $taskGuid, string $type){
+    public static function hasTypeForTask(string $taskGuid, string $type) : bool {
         $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
         /* @var $table editor_Models_Db_SegmentQuality */
         $where = $table->select()
@@ -101,11 +101,74 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
     
     /**
      * 
+     * @param string $field
+     * @return string
+     */
+    public function createFieldCondition($field) : string {
+        $adapter = $this->getAdapter();
+        return
+            '(fields = '.$adapter->quote($field)
+            .' OR fields LIKE '.$adapter->quote($field.',%')
+            .' OR fields LIKE '.$adapter->quote('%,'.$field)
+            .' OR fields LIKE '.$adapter->quote('%,'.$field.',%').')';
+    }
+    /**
+     * 
+     * @param string $taskGuid
+     * @param int|array $segmentIds
+     * @param string $field
+     * @param string|array $types
+     * @param bool $typesIsBlacklist
+     * @param string|array $categories
+     * @param string|array $order
+     * @return Zend_Db_Table_Rowset_Abstract
+     */
+    public function fetchFiltered(string $taskGuid=NULL, $segmentIds=NULL, string $field=NULL, $types=NULL, bool $typesIsBlacklist=false, $categories=NULL, $order=NULL) : Zend_Db_Table_Rowset_Abstract {
+        $select = $this->select();
+        if(!empty($taskGuid)){
+            $select->where('taskGuid = ?', $taskGuid);
+        }
+        if($segmentIds !== NULL){
+            if(is_array($segmentIds) && count($segmentIds) > 1){
+                $select->where('segmentId IN (?)', $segmentIds);
+            } else if(!is_array($segmentIds) || count($segmentIds) == 1){
+                $segmentId = is_array($segmentIds) ? $segmentIds[0] : $segmentIds;
+                $select->where('segmentId = ?', $segmentId);
+            }
+        }
+        if($field != NULL){
+            $select->where($this->createFieldCondition($field));
+        }
+        if(!empty($types)){ // $types can not be "0"...
+            if(is_array($types) && count($types) > 1){
+                $operator = ($typesIsBlacklist) ? 'NOT IN' : 'IN';
+                $select->where('type '.$operator.' (?)', $types);
+            } else {
+                $type = is_array($types) ? $types[0] : $types;
+                $operator = ($typesIsBlacklist) ? '!=' : '=';
+                $select->where('type '.$operator.' ?', $type);
+            }
+        }
+        if(!empty($categories)){ // $categories can not be "0"...
+            if(is_array($categories) && count($categories) > 1){
+                $select->where('category IN (?)', $categories);
+            } else {
+                $category = is_array($categories) ? $categories[0] : $categories;
+                $select->where('category = ?', $category);
+            }
+        }
+        if($order == NULL){
+            $order = [ 'type ASC', 'category ASC' ];
+        }
+        return $this->fetchAll($select, $order);
+    }
+    /**
+     * 
      * @param int $segmentId
      * @param string $type
      * @return int
      */
-    public function removeQualitiesBySegmentAndType(int $segmentId, string $type){
+    public function removeQualitiesBySegmentAndType(int $segmentId, string $type) : int {
         $where = array();
         $where[] = $this->getAdapter()->quoteInto('segmentId = ?', $segmentId);
         $where[] = $this->getAdapter()->quoteInto('type = ?', $type);
@@ -127,7 +190,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param int $falsePositive
      * @return editor_Models_Db_SegmentQualityRow
      */
-    public function addQuality(string $taskGuid, int $segmentId, string $field, string $type, string $category=NULL, int $mqmType=-1, string $severity=NULL, string $comment=NULL, int $startIndex=0, int $endIndex=-1, int $falsePositive=0){
+    public function addQuality(string $taskGuid, int $segmentId, string $field, string $type, string $category=NULL, int $mqmType=-1, string $severity=NULL, string $comment=NULL, int $startIndex=0, int $endIndex=-1, int $falsePositive=0) : editor_Models_Db_SegmentQualityRow {
         $row = $this->createRow();
         /* @var $row editor_Models_Db_SegmentQualityRow */
         
@@ -159,13 +222,13 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param int $endIndex
      * @return editor_Models_Db_SegmentQualityRow
      */
-    public function addMqm(string $taskGuid, int $segmentId, string $field, int $typeIndex, string $severity, string $comment, int $startIndex=0, int $endIndex=-1){
+    public function addMqm(string $taskGuid, int $segmentId, string $field, int $typeIndex, string $severity, string $comment, int $startIndex=0, int $endIndex=-1) : editor_Models_Db_SegmentQualityRow {
          return $this->addQuality(
             $taskGuid,
             $segmentId,
             $field,
             editor_Segment_Tag::TYPE_MQM,
-            NULL,
+            editor_Segment_Tag::TYPE_MQM.'_'.strval($typeIndex),
             $typeIndex,
             $severity,
             $comment,
@@ -176,7 +239,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * 
      * @return string
      */
-    protected function getName(){
+    public function getName() : string {
         return $this->_name;
     }
 }
