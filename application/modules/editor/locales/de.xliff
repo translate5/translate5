@@ -1881,6 +1881,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='><source>Kunden bearbeiten</source><target>Kunden bearbeiten</target></trans-unit>
 <trans-unit id='V2VubiBha3RpdmllcnQsIHdlcmRlbiBibG9ja2llcnRlIFNlZ21lbnRlIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4='><source>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</source><target>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</target></trans-unit>
 <trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGJsb2NraWVydGUgU2VnbWVudGUgbmljaHQgaW4gZGllIEFuYWx5c2UgdW5kIFdvcnRhbnphaGwgZWluYmV6b2dlbg=='><source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source><target>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</target></trans-unit>
+<trans-unit id='UUEgU3RhdGlzdGlr'><source>QA Statistik</source><target>QA Statistik</target></trans-unit>
 <trans-unit id='TWF0Y2gtQW5hbHlzZQ=='><source>Match-Analyse</source><target>Match-Analyse</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Interne Tags</target></trans-unit>
 <trans-unit id='VGVybSBpc3QgaW4gZGVyIFppZWxzcHJhY2hlIGVyc2V0enQsIHZlcmFsdGV0IG9kZXIgdmVyYm90ZW4='><source>Term ist in der Zielsprache ersetzt, veraltet oder verboten</source><target>Term ist in der Zielsprache ersetzt, veraltet oder verboten</target></trans-unit>
