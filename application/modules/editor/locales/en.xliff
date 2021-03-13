@@ -1087,7 +1087,7 @@
       </trans-unit>
       <trans-unit id='RXhwb3J0IFFNLVN0YXRpc3RpayAoWE1MKSBmw7xyIEZlbGQ6IHswfQ=='>
 	<source>Export QM-Statistik (XML) für Feld: {0}</source>
-	<target>Export QM-statistics (XML) for field: {0}</target>
+	<target>Export QA-statistics (XML) for field: {0}</target>
       </trans-unit>
       <trans-unit id='QXVmZ2FiZSB3aXJkIHZlcmxhc3Nlbi4uLg=='>
 	<source>Aufgabe wird verlassen...</source>
@@ -3997,6 +3997,7 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source>
   <target>If disabled, blocked segments are not included in the analysis and word count</target>
 </trans-unit>
+<trans-unit id='UUEgU3RhdGlzdGlr'><source>QA Statistik</source><target>QA Statistics</target></trans-unit>
 <trans-unit id='TWF0Y2gtQW5hbHlzZQ=='><source>Match-Analyse</source><target>Match analysis</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Internal tags</target></trans-unit>
 <trans-unit id='VGVybSBpc3QgaW4gZGVyIFppZWxzcHJhY2hlIGVyc2V0enQsIHZlcmFsdGV0IG9kZXIgdmVyYm90ZW4='><source>Term ist in der Zielsprache ersetzt, veraltet oder verboten</source><target>Term superseded, deprecated or forbidden in target language</target></trans-unit>
