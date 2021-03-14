@@ -182,7 +182,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param string $field
      * @param string $type
      * @param string $category
-     * @param int $mqmType
+     * @param int $categoryIndex
      * @param string $severity
      * @param string $comment
      * @param int $startIndex
@@ -190,7 +190,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param int $falsePositive
      * @return editor_Models_Db_SegmentQualityRow
      */
-    public function addQuality(string $taskGuid, int $segmentId, string $field, string $type, string $category=NULL, int $mqmType=-1, string $severity=NULL, string $comment=NULL, int $startIndex=0, int $endIndex=-1, int $falsePositive=0) : editor_Models_Db_SegmentQualityRow {
+    public function addQuality(string $taskGuid, int $segmentId, string $field, string $type, string $category=NULL, int $categoryIndex=-1, string $severity=NULL, string $comment=NULL, int $startIndex=0, int $endIndex=-1, int $falsePositive=0) : editor_Models_Db_SegmentQualityRow {
         $row = $this->createRow();
         /* @var $row editor_Models_Db_SegmentQualityRow */
         
@@ -202,7 +202,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         $row->startIndex = $startIndex;
         $row->endIndex = $endIndex;
         $row->falsePositive = $falsePositive;
-        $row->mqmType = $mqmType;
+        $row->categoryIndex = $categoryIndex;
         $row->severity = $severity;
         $row->comment = $comment;
         $row->save();

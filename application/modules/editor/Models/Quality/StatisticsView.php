@@ -125,7 +125,7 @@ class editor_Models_Quality_StatisticsView {
                     $typeNode->totalTotal = $row->count;
                     $typeNode->total = 0;
                     $typeNode->expanded = true;                
-                    $typeNode->mqmType = -1;
+                    $typeNode->categoryIndex = -1;
                     $typeNode->children = [];
                     foreach($typeRows as $category => $row){
                         if($category != editor_Models_Quality_FilterPanelView::RUBRIC){
@@ -135,7 +135,7 @@ class editor_Models_Quality_StatisticsView {
                             $catNode->total = $row->count;
                             $catNode->expanded = true;
                             $catNode->leaf = true;
-                            $catNode->mqmType = -1;
+                            $catNode->categoryIndex = -1;
                             $typeNode->children[] = $catNode;
                         }
                     }
@@ -172,7 +172,7 @@ class editor_Models_Quality_StatisticsView {
                     $issue->leaf = !$hasChilds;
                     if(isset($storage->statData[$issue->id])){
                         foreach ($storage->statData[$issue->id] as $k => $v) {
-                            if($k != 'mqmType' && $k != 'sum'){
+                            if($k != 'categoryIndex' && $k != 'sum'){
                                 $k = strtolower($k);
                                 $issue->{$k} = (int)$v;
                                 $severityKey = 'total'.ucfirst($k);
@@ -185,7 +185,7 @@ class editor_Models_Quality_StatisticsView {
                         $issue->totalTotal += $storage->statData[$issue->id]['sum'];
                     }
                 }
-                $issue->mqmType = $issue->id;
+                $issue->categoryIndex = $issue->id;
                 unset($issue->id);
                 
                 if($hasChilds){
@@ -215,14 +215,14 @@ class editor_Models_Quality_StatisticsView {
     }
     /**
      * @param string $field
-     * @return array array() {[mqmType]=>  array(4) { ["mqmType"]=> "asdf", ["severity1"]=> (int)count, ["severity2"]=> (int)count, ... ,["sum"]=>  int()sum of severities }
+     * @return array array() {[categoryIndex]=>  array(4) { ["categoryIndex"]=> "asdf", ["severity1"]=> (int)count, ["severity2"]=> (int)count, ... ,["sum"]=>  int()sum of severities }
      */
     private function fetchStatisticsData(string $field) : array {
         $select = $this->table->getAdapter()->select()
             ->from(
                 array('q' => $this->table->getName()),
-                array('mqmType', 'severity', 'count' => 'COUNT(*)'))
-            ->group('mqmType')
+                array('categoryIndex', 'severity', 'count' => 'COUNT(*)'))
+            ->group('categoryIndex')
             ->group('severity')
             ->where('taskGuid = ?', $this->task->getTaskGuid())
             ->where('type = ?', editor_Segment_Tag::TYPE_MQM)
@@ -230,17 +230,17 @@ class editor_Models_Quality_StatisticsView {
         $data = $this->table->getAdapter()->fetchAll($select);
         $groupedData = [];
         foreach ($data as $d) {
-            $groupedData[$d['mqmType']]['mqmType'] = $d['mqmType'];
-            $groupedData[$d['mqmType']][$d['severity']] = $d['count'];
+            $groupedData[$d['categoryIndex']]['categoryIndex'] = $d['categoryIndex'];
+            $groupedData[$d['categoryIndex']][$d['severity']] = $d['count'];
         }
-        foreach ($groupedData as &$mqmType) {
+        foreach ($groupedData as &$categoryIndex) {
             $sum = 0;
-            foreach ($mqmType as $key => $value) {
-                if ($key !== 'mqmType') {
+            foreach ($categoryIndex as $key => $value) {
+                if ($key !== 'categoryIndex') {
                     $sum += $value;
                 }
             }
-            $mqmType['sum'] = $sum;
+            $categoryIndex['sum'] = $sum;
         }
         return $groupedData;
     }

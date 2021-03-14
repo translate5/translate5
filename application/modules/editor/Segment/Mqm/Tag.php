@@ -103,35 +103,35 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     }
     /**
      *
-     * @param int $typeIndex
+     * @param int $categoryIndex
      * @param string $position
      * @return string
      */
-    private static function createImageSrc(int $typeIndex, string $position) : string {
-        return str_replace('{0}', strval($typeIndex), str_replace('{1}', $position, self::createImageSrcTemplate()));
+    private static function createImageSrc(int $categoryIndex, string $position) : string {
+        return str_replace('{0}', strval($categoryIndex), str_replace('{1}', $position, self::createImageSrcTemplate()));
     }
     /**
      * Renders a basic MQM tag out of the given properties
      * 
      * @param int|string $qualityId
      * @param bool $isOpen
-     * @param int $typeIndex
+     * @param int $categoryIndex
      * @param string $severity
      * @param string $comment
      * @return string
      */
-    public static function renderTag($qualityId, bool $isOpen, int $typeIndex, string $severity, string $comment) : string {
+    public static function renderTag($qualityId, bool $isOpen, int $categoryIndex, string $severity, string $comment) : string {
         // we follow the original code here
         // <img class="%1$s qmflag ownttip %2$s qmflag-%3$d" data-seq="%4$d" data-comment="%5$s" src="%6$s" />
         $position = ($isOpen) ? 'left' : 'right';
         $posClass = ($isOpen) ? self::CSS_CLASS_OPEN : self::CSS_CLASS_CLOSE;
-        $tag = editor_Tag::img(self::createImageSrc($typeIndex, $position));
+        $tag = editor_Tag::img(self::createImageSrc($categoryIndex, $position));
         $tag
             ->addClass($severity)
             ->addClass(self::CSS_CLASS)
             ->addClass(editor_Segment_Tag::CSS_CLASS_TOOLTIP)
             ->addClass($posClass)
-            ->addClass(self::CSS_CLASS.'-'.strval($typeIndex))
+            ->addClass(self::CSS_CLASS.'-'.strval($categoryIndex))
             ->setData('seq', strval($qualityId))
             ->setData('comment', $comment);
         return $tag->render();
@@ -145,7 +145,7 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      * 
      * @var int
      */
-    private $typeIndex = -1;
+    private $categoryIndex = -1;
     /**
      *
      * @var string
@@ -225,15 +225,15 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     /**
      * Adds additional clone properties
      * @param bool $paired
-     * @param int $typeIndex
+     * @param int $categoryIndex
      * @param string $severity
      * @param string $comment
      * @return editor_Segment_Mqm_Tag
      */
-    private function setMqmProps(bool $paired, int $typeIndex, string $severity, string $comment) : editor_Segment_Mqm_Tag{
+    private function setMqmProps(bool $paired, int $categoryIndex, string $severity, string $comment) : editor_Segment_Mqm_Tag{
         $this->paired = $paired;
         $this->singular = !$paired;
-        $this->typeIndex = $typeIndex;
+        $this->typeIndex = $categoryIndex;
         $this->severity = $severity;
         $this->comment = $comment;
         return $this;
