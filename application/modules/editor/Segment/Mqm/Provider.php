@@ -79,11 +79,11 @@ class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider {
             $this->typesByIndex = $task->getQmSubsegmentIssuesFlat();
             $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         }
-        $mqmType = intval(str_replace(editor_Segment_Tag::TYPE_MQM.'_', '', $category)); // see editor_Models_Db_SegmentQuality::addMqm how we evaluate the index from the category
-        if(isset($this->typesByIndex[$mqmType])){
-            return $this->translate->_($this->typesByIndex[$mqmType]);
+        $categoryIndex = intval(str_replace(editor_Segment_Tag::TYPE_MQM.'_', '', $category)); // see editor_Models_Db_SegmentQuality::addMqm how we evaluate the index from the category
+        if(isset($this->typesByIndex[$categoryIndex])){
+            return $this->translate->_($this->typesByIndex[$categoryIndex]);
         }
         // not worth an exception, should not happen if configuration correct
-        return 'UNKNOWN MQM-TYPE '.$mqmType;
+        return 'UNKNOWN MQM-TYPE '.$categoryIndex;
     }
 }

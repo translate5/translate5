@@ -143,9 +143,9 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
                 
                 $tempQualityId = 'ext-'.strval($i);
                 // we resemble quality-ids as if they were be originating in the frontend (using ext-ids). The qualities itself are saved at a later point in the process (see editor_Segment_Quality_Manager::processSegment)
-                $mqmTypeIndex = $this->issueIdsByType[$attributes['type']];
-                $split[$current] = editor_Segment_Mqm_Tag::renderTag($tempQualityId, true, $mqmTypeIndex, $attributes['severity'], $attributes['note']);
-                $closeTags[$attributes['id']] = editor_Segment_Mqm_Tag::renderTag($tempQualityId, false, $mqmTypeIndex, $attributes['severity'], $attributes['note']);
+                $categoryIndex = $this->issueIdsByType[$attributes['type']];
+                $split[$current] = editor_Segment_Mqm_Tag::renderTag($tempQualityId, true, $categoryIndex, $attributes['severity'], $attributes['note']);
+                $closeTags[$attributes['id']] = editor_Segment_Mqm_Tag::renderTag($tempQualityId, false, $categoryIndex, $attributes['severity'], $attributes['note']);
             }
         }
         

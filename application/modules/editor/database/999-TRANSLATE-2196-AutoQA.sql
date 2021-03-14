@@ -57,7 +57,7 @@ CREATE TABLE `LEK_segment_quality` (
   `startIndex` int(11) NOT NULL DEFAULT 0,
   `endIndex` int(11) NOT NULL DEFAULT -1,
   `falsePositive` int(1) NOT NULL DEFAULT 0,
-  `mqmType` int(11) NOT NULL DEFAULT -1,
+  `categoryIndex` int(2) NOT NULL DEFAULT -1,
   `severity` varchar(255) DEFAULT NULL,
   `comment` longtext DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -67,8 +67,8 @@ CREATE TABLE `LEK_segment_quality` (
   CONSTRAINT `LEK_segment_quality_ibfk_2` FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
 );
 -- migrate data from LEK_qmsubsegments
-INSERT INTO `LEK_segment_quality` (`segmentId`, `taskGuid`, `fields`, `type`, `qmtype`, `severity`, `comment`)
-SELECT `segmentId`,  `taskGuid`, `fieldedited`, 'mqm', `qmtype`, `severity`, `comment` FROM `LEK_qmsubsegments`;
+INSERT INTO `LEK_segment_quality` (`segmentId`, `taskGuid`, `fields`, `type`, `category`, `categoryIndex`, `severity`, `comment`)
+SELECT `segmentId`,  `taskGuid`, `fieldedited`, 'mqm', CONCAT('mqm_', `qmtype`), `qmtype`, `severity`, `comment` FROM `LEK_qmsubsegments`;
 
 -- ACL for quality
 INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 

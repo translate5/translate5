@@ -472,7 +472,7 @@ class editor_Segment_Tags implements JsonSerializable {
         $row->startIndex = $startIndex;
         $row->endIndex = $endIndex;
         $row->falsePositive = 0; // TODO AUTOQA: this means, when we re-set qualities a former existing false positive flag will not persist
-        $row->mqmType = -1;
+        $row->categoryIndex = -1;
         $row->severity = NULL;
         $row->comment = NULL;
         $this->qualities[] = $row;
