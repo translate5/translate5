@@ -1,0 +1,6 @@
+{
+    "progress": 1,
+    "jobsDone": 0,
+    "jobsTotal": 6,
+    "jobRunning": ""
+}
