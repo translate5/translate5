@@ -769,7 +769,8 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
     var pretranslatedFiles = [],
         html = '',
         htmlFile,
-        showRefreshButton = false;
+        showRefreshButton = false,
+        importProgress;
     $.each(allPretranslatedFiles, function(taskId, taskData) {
         htmlFile = '<li>';
         htmlFile += taskData['taskName'];
@@ -779,6 +780,12 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
             case 'isImporting':
                 showRefreshButton = true;
                 htmlFile += '<p style="font-size:80%;">' + Editor.data.languageresource.translatedStrings['noDownloadWhileImport'] + '</p>';
+                //add import progres html. For each task separate progress component and progress label.
+                if(taskData['importProgress']){
+                    htmlFile += '<div id="importProgress'+taskId+'" style="width: 150px; position: relative">';
+                    htmlFile += '<div id="importProgressLabel'+taskId+'" style="position: absolute;left: 50%;top: 4px;font-weight: bold;text-shadow: 1px 1px 0 #fff;"></div>';
+                    htmlFile += '</div>';
+                }
                 break;
             case 'isErroneous': 
                 htmlFile += '<p style="font-size:80%;" class="error">' + Editor.data.languageresource.translatedStrings['noDownloadAfterError'] + '</p>';
@@ -791,13 +798,6 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
         }
         htmlFile += '<br/>';
         
-        htmlFile += '<p>';
-        htmlFile += 'Import progress:'+taskData['importProgress']['progress']
-        htmlFile += '<br/>';
-        htmlFile += 'Running job:'+taskData['importProgress']['running']
-        htmlFile += '</p>';
-        
-        htmlFile += '</li>';
         pretranslatedFiles.push(htmlFile);
     });
     if (pretranslatedFiles.length > 0) {
@@ -810,11 +810,46 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
         html += pretranslatedFiles.join(' ');
         html += '</ul>';
     }
+    
     $('#pretranslatedfiles').html(html);
-    // if we are still waiting for a file to be ready: try again after 10 seconds
+    
+    //for each pretranslated files task, update the progress bar
+    //this will be done only if the task is in status import
+    updateImportProgressBar(allPretranslatedFiles);
+    
+    // if we are still waiting for a file to be ready: try again after 50 seconds
     if (showRefreshButton) {
-        setTimeout(function(){ $('#refresh-pretranslations').click(); }, 10000);
+        setTimeout(function(){ $('#refresh-pretranslations').click(); }, 5000);
     }
+}
+
+/***
+ * Update the progress bar for all importing tasks
+ * @param taskData
+ * @returns
+ */
+function updateImportProgressBar(taskData){
+    if(!taskData || taskData.length < 1) {
+        return;
+    }
+    
+    $.each(taskData, function(taskId, taskData) {
+        var taskProgresData = taskData['importProgress'];
+        
+        if(!taskProgresData || taskProgresData.length < 1){
+            return true;
+        }
+        
+        //console.log(taskProgresData);
+        
+        var progressbar =$("#importProgress"+taskId),
+            label = $("#importProgressLabel"+taskId);
+        
+        progressbar.progressbar({
+            value:taskProgresData['progress']
+        });
+        label.text(progressbar.progressbar( "value" ) + "%" );
+    });
 }
 
 $(document).on('click', '.getdownloads' , function(e) {

@@ -135,7 +135,10 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         $analysis->setPretranslateMt($params['pretranslateMt']);
         $analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
         $analysis->setBatchQuery($params['batchQuery']);
-        $return=$analysis->calculateMatchrate();
+        
+        $return=$analysis->calculateMatchrate(function($progress){
+            $this->updateProgres($progress);
+        });
         
         //unlock the state
         if(!empty($newState)){
@@ -168,5 +171,14 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         }
         $worker->queue($workerId);
         return true;
+    }
+    
+    /***
+     * Match analysis and pretranslation takes 92 % of the import time
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::getWeight()
+     */
+    public function getWeight() {
+        return 92;
     }
 }
