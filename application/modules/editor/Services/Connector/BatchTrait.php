@@ -60,9 +60,13 @@ trait editor_Services_Connector_BatchTrait {
      * Query the resource with multiple segments at once, and save the results in the database.
      * @param string $taskGuid
      */
-    public function batchQuery(string $taskGuid){
+    public function batchQuery(string $taskGuid, Closure $progressCallback = null){
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$taskGuid]);
         /* @var $segments editor_Models_Segment_Iterator */
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
         
         //number of temporary cached segments
         $tmpBuffer = 0;
@@ -93,16 +97,19 @@ trait editor_Services_Connector_BatchTrait {
                 continue;
             }
             
-            $tmpBuffer=0;
-            
             //send batch query request, and save the results to the batch cache
             $this->handleBatchQuerys($batchQuery);
+            
+            $progressCallback && $progressCallback(($tmpBuffer / $task->getSegmentCount())*100);
+
             $batchQuery = [];
+            $tmpBuffer=0;
         }
         
         //query the rest, if there are any:
         if(!empty($batchQuery)) {
             $this->handleBatchQuerys($batchQuery);
+            $progressCallback && $progressCallback(($tmpBuffer / $task->getSegmentCount()*100));
         }
     }
     
