@@ -113,13 +113,16 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         }
         $this->initRepetitions();
         
-        //portion on progress whenever segment is analysied/pre-translated
-        $progress = 100 / $this->task->getSegmentCount();
+        $segmentCounter = 0;
         
-        //init the word count calculator
         foreach($segments as $segment) {
             /* @var $segment editor_Models_Segment */
 
+            $segmentCounter++;
+            
+            //progress to update
+            $progress = $segmentCounter / $this->task->getSegmentCount();
+            
             //get the best match rate, respecting repetitions
             $bestMatchRateResult = $this->handleRepetition($segment);
             

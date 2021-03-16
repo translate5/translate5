@@ -82,6 +82,7 @@ class Translate2342Test extends \ZfExtended_Test_ApiTestcase {
         //check for differences between the expected and the actual content
         self::assertEquals($expected, $actual, "The initial queue worker progress an the result file does not match.");
         
+        //run the import workers and check wait for task import
         $this->startImport();
         $this->checkTaskState();
         

@@ -73,7 +73,15 @@ trait editor_Services_Connector_BatchTrait {
         //holds the query strings for batch request
         $batchQuery = [];
         $this->batchExceptions = [];
+        
+        $segmentCounter = 0;
+        $progress = 0;
         foreach ($segments as $segment){
+            
+            $segmentCounter++;
+            
+            //progress to update
+            $progress = $segmentCounter / $task->getSegmentCount();
             
             //For pre-translation only those segments should be send to the MT, that have an empty target.-> https://jira.translate5.net/browse/TRANSLATE-2335
             //For analysis, the mt matchrate will always be the same.So it make no difference here if it is pretranslation
@@ -100,7 +108,7 @@ trait editor_Services_Connector_BatchTrait {
             //send batch query request, and save the results to the batch cache
             $this->handleBatchQuerys($batchQuery);
             
-            $progressCallback && $progressCallback(($tmpBuffer / $task->getSegmentCount())*100);
+            $progressCallback && $progressCallback($progress);
 
             $batchQuery = [];
             $tmpBuffer=0;
@@ -109,7 +117,7 @@ trait editor_Services_Connector_BatchTrait {
         //query the rest, if there are any:
         if(!empty($batchQuery)) {
             $this->handleBatchQuerys($batchQuery);
-            $progressCallback && $progressCallback(($tmpBuffer / $task->getSegmentCount()*100));
+            $progressCallback && $progressCallback($progress);
         }
     }
     

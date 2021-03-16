@@ -72,7 +72,7 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
         /* @var $connector editor_Services_Connector */
         $connector->batchQuery($this->taskGuid,function($progress){
             //update the worker model progress with progress value reported from the batch query
-            $this->updateProgres($progress);
+            $this->updateProgress($progress);
         });
         
         $exceptions = $connector->getBatchExceptions();
