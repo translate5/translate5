@@ -656,7 +656,7 @@ class Task extends Channel {
             }
         }
     }
-    
+
     /**
      * Updates the progress of the task in the GUI
      * @param int $taskGuid
