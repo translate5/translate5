@@ -2982,7 +2982,10 @@ A task was associated to you in the task-portal {portalLink}.<br />
     <source>importiert</source>
     <target>importing</target>
 </trans-unit>
-
+<trans-unit id='SW1wb3J0IGzDpHVmdA=='>
+    <source>Import läuft</source>
+    <target>importing</target>
+</trans-unit>
 <trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'>
     <source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source>
     <target>The queried OpenTM2 instance is not available</target>
@@ -3989,6 +3992,14 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='SW0gZm9sZ2VuZGVuIGRpZSBnZXTDpHRpZ3RlbiDDhG5kZXJ1bmdlbiBkZXIgdm9yaGVyZ2VoZW5kZW4gUm9sbGUgPGI+e3ByZXZpb3VzUm9sZX08L2I+OjxiciAvPg=='>
   <source>Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br /></source>
   <target>The changes made by the formerly active role <b>{previousRole}</b> are listed below:<br /></target>
+</trans-unit>
+<trans-unit id='V2VubiBha3RpdmllcnQsIHdlcmRlbiBibG9ja2llcnRlIFNlZ21lbnRlIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4='>
+  <source>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</source>
+  <target>If enabled, blocked segments are included in the analysis and word count</target>
+</trans-unit>
+<trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGJsb2NraWVydGUgU2VnbWVudGUgbmljaHQgaW4gZGllIEFuYWx5c2UgdW5kIFdvcnRhbnphaGwgZWluYmV6b2dlbg=='>
+  <source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source>
+  <target>If disabled, blocked segments are not included in the analysis and word count</target>
 </trans-unit>
 </body>
   </file>
