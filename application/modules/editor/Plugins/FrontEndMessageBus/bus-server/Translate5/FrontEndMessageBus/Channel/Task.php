@@ -643,7 +643,6 @@ class Task extends Channel {
      * @param int $taskGuid
      * @param int $taskId optional, since not always given in Backend. Since the frontend uses IDs, we also should send the id here where possible, so the lookup in the GUI is faster
      * @param string $excludeConnection optional, a connectionid which should be ignored (mostly the initiator, since he has already the latest task). defaults to null
-     * @param int $recordId
      */
     public function triggerReload(string $taskGuid, int $taskId = 0, string $excludeConnection = null) {
         $msg = FrontendMsg::create(self::CHANNEL_NAME, 'triggerReload', [
@@ -655,6 +654,22 @@ class Task extends Channel {
             if(empty($excludeConnection) || $excludeConnection !== $conn->connectionId) {
                 $conn->send((string) $msg);
             }
+        }
+    }
+
+    /**
+     * Updates the progress of the task in the GUI
+     * @param int $taskGuid
+     * @param float $progress
+     */
+    public function updateProgress(string $taskGuid, float $progress) {
+        $msg = FrontendMsg::create(self::CHANNEL_NAME, 'updateProgress', [
+            'taskGuid' =>  $taskGuid,
+            'progress' =>  $progress,
+        ]);
+        $msg->logSend();
+        foreach($this->instance->getConnections() as $conn) {
+            $conn->send((string) $msg);
         }
     }
     

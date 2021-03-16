@@ -21,7 +21,7 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
@@ -47,7 +47,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     ],
     controller: 'matchAnalysisPanel',
     viewModel:{
-    	type: 'matchAnalysisPanel'
+        type: 'matchAnalysisPanel'
     },
     
     itemId:'matchAnalysisPanel',
@@ -57,18 +57,20 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
       matchCount:'#UT#Gesamtzahl der Wörter',
       tabTitle:"#UT#Analyse",
       exportAnalysis:'#UT#Export',
-	  noAnalysis:'#UT#Start der Analyse im Tab “Sprachressourcen zuweisen“',
-	  languageResources:'#UT#Sprachressourcen',
-	  analysisDate:'#UT#Datum',
-	  languageResourceName: '#UT#Name',
-	  repetitions:'#UT#Wiederholungen:',
-	  totalSum:'#UT#Summe',
-	  internalFuzzy:"#UT#Interne Fuzzy verwendet",
-	  matchRate:"#UT#Match-Rate"
+      noAnalysis:'#UT#Start der Analyse im Tab “Sprachressourcen zuweisen“',
+      languageResources:'#UT#Sprachressourcen',
+      analysisDate:'#UT#Datum',
+      languageResourceName: '#UT#Name',
+      repetitions:'#UT#Wiederholungen:',
+      totalSum:'#UT#Summe',
+      internalFuzzy:"#UT#Interne Fuzzy verwendet",
+      matchRate:"#UT#Match-Rate",
+      edit100PercentMatchEnabledMessage:'#UT#Gesperrte Segmente sind in der Analyse enthalten',
+      edit100PercentMatchDisabledMessage:'#UT#Gesperrte Segmente sind in der Analyse nicht enthalten'
     },
     
     listeners:{
-    	activate:'onMatchAnalysisPanelActivate'
+        activate:'onMatchAnalysisPanelActivate'
     }, 
 
     bind:{
@@ -79,9 +81,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     initConfig: function(instanceConfig) {
         var me = this,
             columnRenderer=function(val, meta, record) {
-        		if(val){
-        			return val;
-        		}
+                if(val){
+                    return val;
+                }
                 return 0;
             },
             
@@ -104,9 +106,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         xtype: 'gridcolumn',
                         text: me.strings.languageResourceName,
                         renderer: function(value, metaData, record) {
-                        	if(!value){
-                        		return me.strings.repetitions;
-                        	}
+                            if(!value){
+                                return me.strings.repetitions;
+                            }
                             return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('resourceColor')+';"></div>'+value;
                         },
                         summaryRenderer: function(value, summaryData, dataIndex) {
@@ -254,10 +256,16 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                             xtype: 'displayfield',
                             fieldLabel: me.strings.analysisDate,
                             itemId:'analysisDatum'
-                        	},{
-	                        xtype: 'displayfield',
-	                        fieldLabel: me.strings.internalFuzzy,
-	                        itemId:'internalFuzzy'
+                        },{
+                            xtype: 'displayfield',
+                            fieldLabel: me.strings.internalFuzzy,
+                            itemId:'internalFuzzy'
+                        },{
+                            xtype: 'displayfield',
+                            bind:{
+                                value:'{getEdit100PercentMatchLableText}',
+                            },
+                            itemId:'edit100PercentMatchLableText'
                         }]
                     
                     }]
