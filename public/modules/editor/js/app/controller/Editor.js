@@ -96,7 +96,7 @@ Ext.define('Editor.controller.Editor', {
                 editorViewportClosed: 'onCloseEditorViewport',
                 editorViewportOpened: 'onOpenEditorViewport'
             },
-            '#QmSubSegments': {
+            '#QualityMqm': {
             	afterInsertMqmTag: 'handleAfterContentChange'
             },
             '#Editor.plugins.TrackChanges.controller.Editor':{

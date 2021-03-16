@@ -53,8 +53,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_hideTagBtn: '#UT#Tags verbergen',
     item_shortTagBtn: '#UT#Tag-Kurzansicht',
     item_fullTagBtn: '#UT#Tag-Vollansicht',
-    item_qmsummaryBtn: '#UT#MQM',
-    item_qmsummaryTooltip: '#UT#QA Statistik',
+    item_qualityStatisticsBtn: '#UT#QA',
+    item_qualityStatisticsTip: '#UT#QA Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
     item_zoomIn: '#UT#Segmentschriftgrad vergrößern',
     item_zoomOut: '#UT#Segmentschriftgrad verkleinern',
@@ -183,16 +183,16 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     icon: Editor.data.moduleFolder+'images/show_bookmarks.png'
                 },{
                     xtype: 'tbseparator',
-                    hidden: !Editor.data.task.hasQmSub()
+                    hidden: !Editor.data.task.hasMqm()
                 },{
                     xtype: 'button',
-                    itemId: 'qmsummaryBtn',
-                    text: me.item_qmsummaryBtn,
+                    itemId: 'qualityStatisticsBtn',
+                    text: me.item_qualityStatisticsBtn,
                     tooltip: {
-                        text: me.item_qmsummaryTooltip,
+                        text: me.item_qualityStatisticsTip,
                         showDelay: 0
                     },
-                    hidden: !Editor.data.task.hasQmSub()
+                    hidden: !Editor.data.task.hasMqm()
                 },{
                 	xtype: 'tbfill'
                 },{

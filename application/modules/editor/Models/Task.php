@@ -404,7 +404,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param bool $asJson if true, json is returned, otherwhise assoc-array
      * @return mixed depending on $asJson
      */
-    public function getQmSubsegmentIssuesTranslated($asJson = true){
+    public function getMqmTypesTranslated($asJson = true){
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */;
         $walk = function(array $qmFlagTree) use ($translate, &$walk){
@@ -430,7 +430,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return array qm-flags as tree array of objects; example in json-notation:
      *      [{"text":"Accuracy","id":1,"children":[{"text":"Terminology","id":2,"children":[]}]}]
      */
-    public function getQmSubsegmentIssues(){
+    public function getMqmTypes(){
         $tree = Zend_Json::decode($this->row->qmSubsegmentFlags, Zend_Json::TYPE_OBJECT);
         if(!isset($tree->qmSubsegmentFlags)){
             throw new Zend_Exception('qmSubsegmentFlags JSON Structure not OK, missing field qmSubsegmentFlags');
@@ -440,7 +440,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * @return array('issueId'=>'issueText',...)
      */
-    public function getQmSubsegmentIssuesFlat(){
+    public function getMqmTypesFlat(){
         $flatTree = array();
         $walk = function(array $qmFlagTree)use (&$walk, &$flatTree){
             foreach ($qmFlagTree as $node) {
@@ -450,13 +450,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
                 }
             }
         };
-        $walk($this->getQmSubsegmentIssues());
+        $walk($this->getMqmTypes());
         return $flatTree;
     }
     /**
      * @return stdClass
      */
-    public function getQmSubsegmentSeverities(){
+    public function getMqmSeverities(){
         $tree = Zend_Json::decode($this->row->qmSubsegmentFlags, Zend_Json::TYPE_OBJECT);
         if(!isset($tree->severities)){
             throw new Zend_Exception('qmSubsegmentFlags JSON Structure not OK, missing field severities');
@@ -477,7 +477,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @param Zend_Db_Table_Row_Abstract $row | null - if null, $this->row is used
      * @return string|array depends on $asJson
      */
-    public function getQmSubsegmentSeveritiesTranslated($asJson = true, array $row = null) {
+    public function getMqmSeveritiesTranslated($asJson = true, array $row = null) {
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $translate ZfExtended_Zendoverwrites_Translate */
         if(is_null($row)) {

@@ -86,9 +86,9 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'edit100PercentMatch', type: 'boolean'},
     {name: 'lockLocked', type: 'boolean'},
     {name: 'enableSourceEditing', type: 'boolean'},
-    {name: 'qmSubEnabled', type: 'boolean'},
-    {name: 'qmSubFlags', type: 'auto'},
-    {name: 'qmSubSeverities', type: 'auto'},
+    {name: 'mqmEnabled', type: 'boolean'},
+    {name: 'mqmFlags', type: 'auto'},
+    {name: 'mqmSeverities', type: 'auto'},
     {name: 'lastErrors', type: 'auto'},
     {name: 'emptyTargets', type: 'boolean', persist: false},
     {name: 'userState', type: 'string', isEqual: function() {
@@ -139,8 +139,8 @@ Ext.define('Editor.model.admin.Task', {
    * returns if QM Subsegments are enabled for this task
    * @returns
    */
-  hasQmSub: function() {
-      return this.get('qmSubEnabled');
+  hasMqm: function() {
+      return this.get('mqmEnabled');
   },
   /**
    * returns if task is editable depending on task locking and usagemode

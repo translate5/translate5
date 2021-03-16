@@ -53,9 +53,9 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
     
     /**
      * This vars are initialized lazy
-     * @var editor_Models_Segment_QmSubsegments
+     * @var editor_Models_Segment_Mqm
      */
-    protected $subSegmentConverter;
+    protected $mqmConverter;
     
     /**
      * replace the comment HTML Tags with <br>
@@ -89,8 +89,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             $parts[$idx] = $this->modifyTermTag($part);
         }
         $content = str_ireplace('</div>', '</span>', join('', $parts));
-        $qmSubFlags = $this->view->task->getQmSubsegmentFlags();
-        return $this->modifyQmSubsegments($content);
+        return $this->modifyMqmTags($content);
     }
     
     /**
@@ -126,7 +125,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
      * @param string $content
      * @return string
      */
-    protected function modifyQmSubsegments($content) {
+    protected function modifyMqmTags($content) {
         $translate = $this->view->translate;
         $resultRenderer = function($tag, $cls, $issueId, $issueName, $sev, $sevName, $comment) use ($translate){
             $title = empty($sevName) ? '' : htmlspecialchars($translate->_($sevName)).': ';
@@ -140,7 +139,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
             return sprintf($span, $title, $issueId.']');
         };
         
-        return $this->subSegmentConverter->replace($this->view->task, $content, $resultRenderer);
+        return $this->mqmConverter->replace($this->view->task, $content, $resultRenderer);
     } 
     
     /**
@@ -156,7 +155,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
         /* @var $states editor_Models_Segment_AutoStates */
         $stateMap = $states->getLabelMap();
         
-        $this->subSegmentConverter = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
+        $this->mqmConverter = ZfExtended_Factory::get('editor_Models_Segment_Mqm');
         $this->segmentUtility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
         
         $t = $this->view->translate;

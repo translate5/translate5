@@ -321,7 +321,7 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * returns all (filtered) tasks with added user data
      * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
-     * set qmSubEnabled for all rows
+     * set mqmEnabled for all rows
      */
     protected function loadAllForProjectOverview() {
         $rows = $this->loadAll();
@@ -335,7 +335,7 @@ class editor_TaskController extends ZfExtended_RestController {
     /**
      * returns all (filtered) tasks with added user data
      * uses $this->entity->loadAll, but unsets qmSubsegmentFlags for all rows and
-     * set qmSubEnabled for all rows
+     * set mqmEnabled for all rows
      */
     protected function loadAllForTaskOverview() {
         $rows = $this->loadAll();
@@ -402,9 +402,9 @@ class editor_TaskController extends ZfExtended_RestController {
             //TODO: for now we leave this as it is, if this produces performance problems, find better way for loading this config
             $taskConfig = $this->entity->getConfig();
             //adding QM SubSegment Infos to each Task
-            $row['qmSubEnabled'] = false;
-            if($taskConfig->runtimeOptions->autoQA->enableMqmTags && !empty($row['qmSubsegmentFlags'])) {
-                $row['qmSubEnabled'] = true;
+            $row['mqmEnabled'] = false;
+            if($taskConfig->runtimeOptions->autoQA->enableMqmTags && !empty($row['qmSubsegmentFlags'])){
+                $row['mqmEnabled'] = true;
             }
             $this->addMissingSegmentrangesToResult($row);
         }
@@ -1457,14 +1457,13 @@ class editor_TaskController extends ZfExtended_RestController {
      * Not usable for indexAction, must be called after entity->save and this->view->rows = Data
      */
     protected function addQmSubToResult() {
-        $qmSubFlags = $this->entity->getQmSubsegmentFlags();
-        $this->view->rows->qmSubEnabled = false;
+        $mqmFlags = $this->entity->getQmSubsegmentFlags();
+        $this->view->rows->mqmEnabled = false;
         $taskConfig = $this->entity->getConfig();
-        if($taskConfig->runtimeOptions->autoQA->enableMqmTags &&
-                !empty($qmSubFlags)) {
-            $this->view->rows->qmSubFlags = $this->entity->getQmSubsegmentIssuesTranslated(false);
-            $this->view->rows->qmSubSeverities = $this->entity->getQmSubsegmentSeveritiesTranslated(false);
-            $this->view->rows->qmSubEnabled = true;
+        if($taskConfig->runtimeOptions->autoQA->enableMqmTags && !empty($mqmFlags)) {
+            $this->view->rows->mqmFlags = $this->entity->getMqmTypesTranslated(false);
+            $this->view->rows->mqmSeverities = $this->entity->getMqmSeveritiesTranslated(false);
+            $this->view->rows->mqmEnabled = true;
         }
         unset($this->view->rows->qmSubsegmentFlags);
     }

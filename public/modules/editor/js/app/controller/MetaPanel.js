@@ -39,7 +39,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.MetaPanel', {
   extend : 'Ext.app.Controller',
-  requires: ['Editor.view.qmsubsegments.AddFlagFieldset'],
+  requires: ['Editor.view.quality.mqm.Fieldset'],
   models: ['SegmentUserAssoc'],
   messages: {
   },

@@ -75,7 +75,7 @@ class editor_Models_Import_SegmentProcessor_MqmParser extends editor_Models_Impo
         if(!$this->mqmEnabled) {
             return;
         }
-        $this->issueIdsByType = array_flip($this->task->getQmSubsegmentIssuesFlat());
+        $this->issueIdsByType = array_flip($this->task->getMqmTypesFlat());
     }
     
     /**
