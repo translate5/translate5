@@ -328,6 +328,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $customerData = $this->getCustomersForRendering($rows);
         foreach ($rows as &$row) {
             $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
+            $this->addImportProgressToResult($row);
         }
         return $rows;
     }
@@ -407,6 +408,8 @@ class editor_TaskController extends ZfExtended_RestController {
                 $row['qmSubEnabled'] = true;
             }
             $this->addMissingSegmentrangesToResult($row);
+            
+            $this->addImportProgressToResult($row);
         }
         return $rows;
     }
@@ -423,6 +426,46 @@ class editor_TaskController extends ZfExtended_RestController {
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         $row['missingsegmentranges'] = $tua->getAllNotAssignedSegments($row['taskGuid']);
+    }
+
+    /***
+     * Add import progres to the given argument(stdClass or array).
+     * This will add the import progress only if the task is in import or matchanalysis state
+     * @param mixed $row
+     */
+    protected function addImportProgressToResult(&$row){
+        $state = '';
+        $taskGuid = '';
+        if(is_object($row)){
+            $state = $row->state;
+            $taskGuid = $row->taskGuid;
+        }
+        if(is_array($row)){
+            $state = $row['state'];
+            $taskGuid = $row['taskGuid'];
+        }
+        
+        $validStates = [$this->entity::STATE_IMPORT];
+
+        //TODO: this should be handled by the analysis plugin
+        if(class_exists('editor_Plugins_MatchAnalysis_Models_MatchAnalysis')){
+            $validStates[] = editor_Plugins_MatchAnalysis_Models_MatchAnalysis::TASK_STATE_ANALYSIS;
+        }
+        if(!in_array($state, $validStates)){
+            return;
+        }
+        
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $worker ZfExtended_Models_Worker */
+        $progress = $worker->calculateProgress($taskGuid);
+        $progress = $progress['progress'] ?? 0;
+        
+        if(is_object($row)){
+            $row->importProgress = $progress;
+        }
+        if(is_array($row)){
+            $row['importProgress'] = $progress;
+        }
     }
 
     /**
@@ -1544,8 +1587,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
 
-        
         $this->view->rows->workflowProgressSummary = $this->_helper->TaskStatistics->getWorkflowProgressSummary($this->entity);
+        
+        $this->addImportProgressToResult($this->view->rows);
     }
 
     public function deleteAction() {

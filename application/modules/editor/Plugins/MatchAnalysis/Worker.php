@@ -136,9 +136,20 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         $analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
         $analysis->setBatchQuery($params['batchQuery']);
         
-        $return=$analysis->calculateMatchrate(function($progress){
-            $this->updateProgres($progress);
+        $updateCounter = 0;
+        $lastProgress=0;
+        $return=$analysis->calculateMatchrate(function($progress) use (&$updateCounter,&$lastProgress){
+            $updateCounter ++;
+            $lastProgress = $progress;
+            //update the progress on each 10 segments (to prevent from possible deadlocks in worker table).
+            if($updateCounter % 10 == 0){
+                $this->updateProgress($progress);
+            }
         });
+        
+        if(!empty($lastProgress)){
+            $this->updateProgress($lastProgress);
+        }
         
         //unlock the state
         if(!empty($newState)){

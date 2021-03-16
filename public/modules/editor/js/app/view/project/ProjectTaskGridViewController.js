@@ -31,11 +31,40 @@ Ext.define('Editor.view.project.ProjectTaskGridViewController', {
     listen: {
         messagebus: {
             '#translate5 task': {
-                triggerReload: 'onTriggerTaskReload'
+                triggerReload: 'onTriggerTaskReload',
+                updateProgress: 'onUpdateProgress'//INFO: the listener and the event handler are also defined in the ProjectGridViewController. To unify this we should use mixins, they are 2 different components and the scope is not the same.
             }
         }
     },
+    
     onTriggerTaskReload: function(params) {
+        var me = this,
+            task = me.getTaskRecordFromParams(params);
+        
+        if(task && task.isLoading()) {
+            //it may happen that two reloads are triggerd fast after each other, then the second one would not start, 
+            // but the first one receives old data then. Therefore we defer the second call in that situation
+            Ext.defer(task.load, 500, task);
+        } else {
+            task && task.load();
+        }
+    },
+    
+    onUpdateProgress: function(params) {
+        var me = this,
+            task = me.getTaskRecordFromParams(params);
+        
+        if(!task){
+            return;
+        }
+        task.set('importProgress',params.progress);
+    },
+    
+    /***
+     * Return task store record from given messagebus params.
+     * For this to work, taskId or taskGuid must exist in the params argument
+     */
+    getTaskRecordFromParams:function(params){
         var store = this.getView().getStore(),
             task;
         if(params.taskId) {
@@ -44,12 +73,6 @@ Ext.define('Editor.view.project.ProjectTaskGridViewController', {
         else {
             task = store.findRecord( 'taskGuid', params.taskGuid, 0, false, true, true);
         }
-        if(task && task.isLoading()) {
-            //it may happen that two reloads are triggerd fast after each other, then the second one would not start, 
-            // but the first one receives old data then. Therefore we defer the second call in that situation
-            Ext.defer(task.load, 500, task);
-        } else {
-            task && task.load();
-        }
+        return task;
     }
 });

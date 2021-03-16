@@ -72,6 +72,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
 
         $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleTaskOperation'));
         $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleTaskOperation'));
+        $this->eventManager->attach('ZfExtended_Models_Worker', 'updateProgress',array($this, 'handleUpdateProgress'));
         
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
@@ -268,6 +269,35 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     public function handleTaskOperation(Zend_EventManager_Event $event) {
         $this->reloadGuiTask($event->getParam('entity'));
     }
+
+    /**
+     * Task get event handler
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleTaskGet(Zend_EventManager_Event $event) {
+        $this->reloadGuiTask($event->getParam('entity'));
+    }
+    
+    /***
+     * Progres update event listener
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleUpdateProgress(Zend_EventManager_Event $event) {
+        $taskGuid = $event->getParam('taskGuid');
+        if(empty($taskGuid)){
+            return;
+        }
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $worker ZfExtended_Models_Worker */
+        $progress = $worker->calculateProgress($taskGuid);
+        
+        $this->bus->notify(self::CHANNEL_TASK, 'updateProgress', [
+            'taskGuid' => $taskGuid, 
+            'progress' => $progress['progress']
+        ]);
+    }
+    
+    
 
     /***
      * Notify the task chanel with fresh task data
