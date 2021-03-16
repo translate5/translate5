@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * TODO convert this class to a "MqmTag" class
  *  TO BE COMPLETED: There are several more places in translate5 which can make use of this class
  */
-class editor_Models_Segment_QmSubsegments {
+class editor_Models_Segment_Mqm {
     
     protected static $issueCache = array();
     protected static $severityCache = array();
@@ -53,8 +53,8 @@ class editor_Models_Segment_QmSubsegments {
      * @param Closure $replacer does the final rendering of the qm tag, Parameters see above
      */
     public function replace(editor_Models_Task $task, string $segment, Closure $replacer) {
-        $qmSubFlags = $task->getQmSubsegmentFlags();
-        if(empty($qmSubFlags)){
+        $mqmFlags = $task->getQmSubsegmentFlags();
+        if(empty($mqmFlags)){
             return $segment;
         }
         $this->initCaches($task);
@@ -110,10 +110,10 @@ class editor_Models_Segment_QmSubsegments {
     protected function initCaches(editor_Models_Task $task) {
         $tg = $task->getTaskGuid();
         if(empty(self::$issueCache[$tg])){
-            self::$issueCache[$tg] = $task->getQmSubsegmentIssuesFlat();
+            self::$issueCache[$tg] = $task->getMqmTypesFlat();
         }
         if(empty(self::$severityCache[$tg])){
-            self::$severityCache[$tg] = $task->getQmSubsegmentSeverities();
+            self::$severityCache[$tg] = $task->getMqmSeverities();
         }
     }
 }

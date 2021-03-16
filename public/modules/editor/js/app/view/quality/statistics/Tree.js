@@ -26,20 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * @class Editor.view.qmsubsegments.Window
+ * @class Editor.view.quality.statistics.Window
  * @extends Ext.window.Window
  * @initalGenerated
  */
-Ext.define('Editor.view.qmsubsegments.SummaryTree', {
+Ext.define('Editor.view.quality.statistics.Tree', {
     extend: 'Ext.tree.TreePanel',
-    alias: 'widget.qmSummaryTree',
+    alias: 'widget.qualityStatisticsTree',
 
     useArrows: true,
     rootVisible: false,
@@ -88,7 +82,7 @@ Ext.define('Editor.view.qmsubsegments.SummaryTree', {
                     align: 'right',
                     sortable: true
                 });
-        var sev = Editor.data.task.get('qmSubSeverities');
+        var sev = Editor.data.task.get('mqmSeverities');
         Ext.each(sev, function(severity,index, myself) {
             this.sevCols.push({
                 text: this.treepanel_total+' '+ severity.text,

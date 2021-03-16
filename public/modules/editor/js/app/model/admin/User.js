@@ -136,7 +136,7 @@ Ext.define('Editor.model.admin.User', {
               }
               break;
           case 'editorShowexportmenuTask':
-              if(!task.hasQmSub() && !me.isAllowed('editorExportTask')){
+              if(!task.hasMqm() && !me.isAllowed('editorExportTask')){
                   return false;
               }
               break;

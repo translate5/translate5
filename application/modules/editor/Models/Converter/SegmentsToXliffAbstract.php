@@ -152,7 +152,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     protected $taghelperTerm;
     
     /**
-     * @var editor_Models_Segment_QmSubsegments
+     * @var editor_Models_Segment_Mqm
      */
     protected $taghelperMqm;
     
@@ -406,7 +406,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
             $this->taghelperTerm = ZfExtended_Factory::get('editor_Models_Segment_TermTag',[$this->taghelperInternal]);
         }
         if(empty($this->taghelperMqm)) {
-            $this->taghelperMqm = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
+            $this->taghelperMqm = ZfExtended_Factory::get('editor_Models_Segment_Mqm');
         }
         if(empty($this->taghelperTrackChanges)) {
             $this->taghelperTrackChanges = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');

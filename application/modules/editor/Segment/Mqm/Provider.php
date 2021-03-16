@@ -76,7 +76,7 @@ class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider {
     
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
         if($this->typesByIndex == NULL){
-            $this->typesByIndex = $task->getQmSubsegmentIssuesFlat();
+            $this->typesByIndex = $task->getMqmTypesFlat();
             $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         }
         $categoryIndex = intval(str_replace(editor_Segment_Tag::TYPE_MQM.'_', '', $category)); // see editor_Models_Db_SegmentQuality::addMqm how we evaluate the index from the category

@@ -114,7 +114,7 @@ trait editor_Models_Export_FileParser_MQMTrait {
             return implode('', $split);
         }
 
-        $this->_issues = $this->_task->getQmSubsegmentIssuesFlat();
+        $this->_issues = $this->_task->getMqmTypesFlat();
         $this->_user = $this->_segmentEntity->getUserName();
         $this->_stack = array();
         

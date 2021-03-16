@@ -33,12 +33,12 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.view.qmsubsegments.AddFlagFieldset
+ * @class Editor.view.quality.mqm.Fieldset
  * @extends Ext.form.FieldSet
  */
-Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
+Ext.define('Editor.view.quality.mqm.Fieldset', {
 	extend : 'Ext.form.FieldSet',
-	alias : 'widget.qmSubsegmentsFlagFieldset',
+	alias : 'widget.qualityMqmFieldset',
 	title : "#UT#MQM",
 	collapsible: true,
 	strings: {
@@ -69,7 +69,7 @@ Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
 			},{
 				xtype: 'combo',
 				anchor: '100%',
-				name: 'qmsubseverity',
+				name: 'mqmseverity',
 				queryMode: 'local',
 				autoSelect: true,
 				fieldLabel: me.strings.severityLabel,
@@ -81,7 +81,7 @@ Ext.define('Editor.view.qmsubsegments.AddFlagFieldset', {
 				xtype: 'textfield',
 				anchor: '100%',
 				fieldLabel: me.strings.commentLabel,
-				name: 'qmsubcomment'
+				name: 'mqmcomment'
 			}]
 		};
         if (instanceConfig) {

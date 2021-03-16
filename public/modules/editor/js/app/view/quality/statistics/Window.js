@@ -33,17 +33,17 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.view.qmsubsegments.Window
+ * @class Editor.view.quality.statistics.Window
  * @extends Ext.window.Window
  * @initalGenerated
  */
-Ext.define('Editor.view.qmsubsegments.Window', {
+Ext.define('Editor.view.quality.statistics.Window', {
     extend: 'Ext.window.Window',
-    alias: 'widget.qmSummaryWindow',
-    requires: ['Editor.view.qmsubsegments.SummaryTree'],
+    alias: 'widget.qualityStatisticsWindow',
+    requires: ['Editor.view.quality.statistics.Tree'],
     height: 612,
     layout: 'fit',
-    itemId: 'qmsummaryWindow',
+    itemId: 'qualityStatisticsWindow',
     width: 1024,
     title: '#UT#QA Statistik',
     modal: true,
@@ -84,15 +84,15 @@ Ext.define('Editor.view.qmsubsegments.Window', {
     getField: function(field) {
         var me = this;
         return {
-            xtype: 'qmSummaryTree',
+            xtype: 'qualityStatisticsTree',
             //creating each time a new store is ugly but simplifies the handling with different tasks and refreshing the store content
-            store: Ext.create('Editor.store.QmSummary',{
-                storeId: 'QmSummary'+field.get('name'),
+            store: Ext.create('Editor.store.quality.Statistics',{
+                storeId: 'QualityStatistics'+field.get('name'),
                 proxy: Ext.applyIf({
                     extraParams: {
                         type: field.get('name')
                     }
-                }, Editor.store.QmSummary.prototype.proxy)
+                }, Editor.store.quality.Statistics.prototype.proxy)
             }),
             title: Ext.String.format(me.tab_title_field, field.get('label'))
         };
