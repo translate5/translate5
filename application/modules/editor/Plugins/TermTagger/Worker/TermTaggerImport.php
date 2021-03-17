@@ -426,4 +426,13 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             'untaggableSegments' => $segmentsToLog,
         ]);
     }
+    
+    /***
+     * Term tagging takes approximately 15 % of the import time
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::getWeight()
+     */
+    public function getWeight() {
+        return 15;
+    }
 }
