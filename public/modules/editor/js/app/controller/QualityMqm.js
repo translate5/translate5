@@ -28,16 +28,17 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Encapsulates all logic for MQM tags processing
+ * The MQM tags adder will be added in the segments editor east panel in the MetaPanel
  */
 Ext.define('Editor.controller.QualityMqm', {
     extend : 'Ext.app.Controller',
     views: ['ToolTip'],
     refs:[{
     	ref : 'addMenuFirstLevel',
-    	selector : 'qualityMqmFieldset button > menu' //first menu level
+    	selector : 'qualityMqmFieldset button > menu'
     },{
     	ref : 'mqmFieldset',
-    	selector : 'qualityMqmFieldset' //first menu level
+    	selector : 'qualityMqmFieldset'
     },{
 	    ref : 'segmentGrid',
 	    selector : '#segmentgrid'
@@ -105,7 +106,7 @@ Ext.define('Editor.controller.QualityMqm', {
     		return;
     	}
     	var mpForm = this.getMetaInfoForm(),
-    		pos = mpForm.items.findIndex('itemId', 'metaQm');
+    		pos = mpForm.items.findIndex('itemId', 'metaQm'); // MQM will be added after QM panel
     	mpForm.insert(pos, {xtype: 'qualityMqmFieldset', menuConfig: this.getMenuConfig()});
     },
     /**

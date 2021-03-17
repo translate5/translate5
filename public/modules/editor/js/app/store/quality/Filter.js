@@ -26,49 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * @class Editor.view.segments.column.Quality
- * @extends Editor.view.ui.segments.column.Quality
- * @initalGenerated
+ * 
  */
-Ext.define('Editor.view.segments.column.Quality', {
-  extend: 'Editor.view.ui.segments.column.Quality',
-  alias: 'widget.qualityColumn',
-  mixins: ['Editor.view.segments.column.BaseMixin'],
-  showInMetaTooltip: true,
-  filter: {
-      type: 'list',
-      labelField: 'label',
-      phpMode: false,
-      options: Editor.data.segments.qualityFlags
-  },
+Ext.define('Editor.store.quality.Filter', {
+    extend : 'Ext.data.store',
 
-  initComponent: function() {
-    var me = this;
-    me.initBaseMixin();
-    me.callParent(arguments);
-  },
-  /**
-   * rendert die Semikolon separierten QM Werte mit Zeilenumbrüchen als Trenner
-   * @param {Integer} value
-   * @param {Object} t
-   * @param {Editor.model.Segment} record
-   * @returns {String}
-   */
-  renderer: function(value,t,record){
-    var me = this, 
-    result = [];
-    Ext.each(value.split(';'), function(item){
-      if(item && item.length > 0 && me.qualityData[item]) {
-        result.push(me.qualityData[item]);
-      }
-    });
-    return result.join('<br />');
-  }
 });

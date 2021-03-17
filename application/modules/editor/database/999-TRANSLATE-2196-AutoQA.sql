@@ -76,12 +76,19 @@ INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
 ('runtimeOptions.autoQA.enableInternalTagCheck', 1, 'editor', 'system', 1, 1, '', 'boolean', 'If activated (default), AutoQA covers checking invalid internal tags', 8, 'Enable internal tag integrity check', 'Editor: QA', '');
+
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
 ('runtimeOptions.autoQA.enableEdited100MatchCheck', 1, 'editor', 'system', 1, 1, '', 'boolean', 'If activated (default), AutoQA covers checking edited 100% matches', 8, 'Enable edited 100% match check', 'Editor: QA', '');
+
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) VALUES
 ('runtimeOptions.autoQA.enableUneditedFuzzyMatchCheck', 1, 'editor', 'system', 1, 1, '', 'boolean', 'If activated (default), AutoQA covers checking not edited fuzzy matches', 8, 'Enable not edited fuzzy match check', 'Editor: QA', '');
+
 UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.autoQA.enableMqmTags', `description` = 'If activated (default), the quality management covers MQM', `guiName` = 'Enable MQM in the quality management' 
 WHERE name = 'runtimeOptions.editor.enableQmSubSegments';
+
+UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.autoQA.enableQm', `description` = 'If activated (default), the quality management for whole segments is active', `guiName` = 'Enable segment QM in the quality management' 
+WHERE name = 'runtimeOptions.segments.showQM';
+
 
 -- Remove old statistics Endpoint
 DELETE FROM Zf_acl_rules WHERE `resource` = 'editor_qmstatistics';

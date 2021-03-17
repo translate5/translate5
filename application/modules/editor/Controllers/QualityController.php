@@ -98,6 +98,7 @@ class editor_QualityController extends ZfExtended_RestController {
         if($falsePositive !== NULL && (intval($falsePositive) === 1 || intval($falsePositive) === 0)){
             $this->entity->setFalsePositive(intval($falsePositive));
             $this->entity->save();
+            $this->view->success = 1;
         } else {
             ZfExtended_UnprocessableEntity::addCodes(['E1025' => 'Field "falsePositive" must be provided.']);
             throw new ZfExtended_UnprocessableEntity('E1025');

@@ -31,11 +31,13 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractView {
     
-    /**
-     * Seperates the type name from the category name
-     * @var string
-     */
-    const SEPERATOR = ' > ';
+    public static function compareByTypeTitle(stdClass $a, stdClass $b){
+        if($a->typeTitle == $b->typeTitle){
+            return strnatcasecmp($a->title, $b->title);
+        }
+        return strnatcasecmp($a->typeTitle, $b->typeTitle);
+    }
+    
     /**
      * Overrides to only supply the qualities for a single segment
      * {@inheritDoc}
@@ -49,10 +51,11 @@ class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractVi
             $row->type = $dbRow->type;
             $row->segmentId = $dbRow->segmentId;
             $row->falsePositive = $dbRow->falsePositive;
-            $row->title = $this->manager->translateQualityType($dbRow->type).self::SEPERATOR.$this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
+            $row->typeTitle = $this->manager->translateQualityType($dbRow->type);
+            $row->title = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
             $row->fields = $dbRow->getFields();
             $this->rows[] = $row;
         }
-        usort($this->rows, 'editor_Models_Quality_AbstractView::compareByTitle');
+        usort($this->rows, 'editor_Models_Quality_SegmentView::compareByTypeTitle');
     }
 }

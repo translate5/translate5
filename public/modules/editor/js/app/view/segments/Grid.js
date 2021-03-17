@@ -46,7 +46,6 @@ Ext.define('Editor.view.segments.Grid', {
         'Editor.view.segments.column.ContentEditable',
         'Editor.view.segments.column.SegmentNrInTask',
         'Editor.view.segments.column.State',
-        'Editor.view.segments.column.Quality',
         'Editor.view.segments.column.MatchrateType',
         'Editor.view.segments.column.Matchrate',
         'Editor.view.segments.column.AutoState',
@@ -297,14 +296,6 @@ Ext.define('Editor.view.segments.Grid', {
                 stateId:'stateColumn',
             });
         }
-        if(Editor.app.getTaskConfig('segments.showQM')){
-            columns.push({
-                xtype: 'qualityColumn',
-                itemId: 'qualityColumn',
-                stateId:'qualityColumn',
-            });
-        }
-    
         columns.push.apply(columns, [{
             xtype: 'usernameColumn',
             itemId: 'usernameColumn',
