@@ -454,18 +454,8 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!in_array($state, $validStates)){
             return;
         }
+        $progress = $this->getTaskImportProgres($taskGuid);
         
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker ZfExtended_Models_Worker */
-        
-        //get the context from the current running worker for the task
-        //the context is the current running worker parentId or id(when the running worker is master worker like editor_Models_Import_Worker)
-        $context = $worker->findFirstRunning($taskGuid);
-        if(empty($context)){
-            return;
-        }
-        $context = $context['parentId'] ? $context['parentId'] : $context['id'];
-        $progress = $worker->calculateProgress($taskGuid,$context);
         $progress = $progress['progress'] ?? 0;
         
         if(is_object($row)){
@@ -1893,9 +1883,28 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $worker ZfExtended_Models_Worker */
-        $this->view->progress = $worker->calculateProgress($taskGuid);
+        
+        $this->view->progress = $worker->calculateProgress($taskGuid,0);
     }
 
+    /***
+     * Get/calculate the taskImport progres for given taskGuid
+     * @param string $taskGuid
+     * @return number]
+     */
+    protected function getTaskImportProgres(string $taskGuid) {
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $worker ZfExtended_Models_Worker */
+        
+        //get the context from the current running worker for the task
+        //the context is the current running worker parentId or id(when the running worker is master worker like editor_Models_Import_Worker)
+        $context = $worker->findWorkerContext($taskGuid);
+        if(empty($context)){
+            return [];
+        }
+        $context = $context['parentId'] ? $context['parentId'] : $context['id'];
+        return $worker->calculateProgress($taskGuid,$context);
+    }
     /***
      * Clone existing language resources from oldTaskGuid for newTaskGuid.
      */
