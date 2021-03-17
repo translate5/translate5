@@ -540,10 +540,10 @@ Ext.define('Editor.view.admin.customer.Panel', {
      * summ excel for all customers will be generated.
      */
     exportCustomerResourceUsage:function(id){
-        var url = Editor.data.restpath+'customer/exportresource';
+        var url = Editor.data.restpath+'customer/exportresource?format=resourceLogExport';
         if(id){
-            url=url+'?'+Ext.urlEncode({customerId: id});
+            url=url+'&'+Ext.urlEncode({customerId: id});
         }
-        window.open(url+'&format=resourceLogExport'); 
+        window.open(url); 
     }
 });
