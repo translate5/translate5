@@ -68,7 +68,8 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             
             //run the term tagger when the termtagger flag is set, it is pretranslation and no terminologie worker is queued
             if($params['termtaggerSegment'] && $params['pretranslate'] && !$params['isTaskImport']){
-                $this->queueTermtagger($this->taskGuid,$this->workerModel->getParentId());
+                $parentId = $this->workerModel->getParentId();
+                $this->queueTermtagger($this->taskGuid,$parentId ? $parentId : $this->workerModel->getId());
             }
         } catch (Throwable $e) {
             //when error happens, revoke the task old state, and unlock the task

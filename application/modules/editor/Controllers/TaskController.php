@@ -457,7 +457,15 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $worker ZfExtended_Models_Worker */
-        $progress = $worker->calculateProgress($taskGuid);
+        
+        //get the context from the current running worker for the task
+        //the context is the current running worker parentId or id(when the running worker is master worker like editor_Models_Import_Worker)
+        $context = $worker->findFirstRunning($taskGuid);
+        if(empty($context)){
+            return;
+        }
+        $context = $context['parentId'] ? $context['parentId'] : $context['id'];
+        $progress = $worker->calculateProgress($taskGuid,$context);
         $progress = $progress['progress'] ?? 0;
         
         if(is_object($row)){
