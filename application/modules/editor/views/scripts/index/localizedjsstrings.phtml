@@ -119,7 +119,7 @@ Ext.define('Editor.controller.Localizer', {
     Ext.app.Application.prototype.browserAdviceTextTitle = '<?php echo $this->translate->_('Nicht unterstützte Browser-Version');?>';
     Ext.app.Application.prototype.browserAdviceText = '<?php echo $disclaimer;?>';
 
-    Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
+    Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien und QA');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
   	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_(' - [LESEMODUS]');?>';
   	Editor.view.segments.Grid.prototype.title_addition_unconfirmed = '<?php echo $this->translate->_(' - [AUFGABE UNBESTÄTIGT]');?>';
@@ -157,8 +157,6 @@ Ext.define('Editor.controller.Localizer', {
   	gridToolbar.item_showBookmarkedSegments = '<?php echo $this->translate->_('Nur Segmente mit Lesezeichen anzeigen');?>';
     gridToolbar.strings.interfaceTranslation = '<?php echo $this->translate->_('Oberfläche');?>';
   	Editor.view.segments.Grid.prototype.column_edited = '<?php echo $this->translate->_('editierbar');?>';
-
-  	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
     
     Ext.define("Editor.locale.view.segments.column.Content", {
@@ -261,6 +259,7 @@ Ext.define('Editor.controller.Localizer', {
     	buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
     	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
     };
+    Editor.view.quality.SegmentQualities.prototype.title = '<?php echo $this->translate->_('QA: Falsch Positive');?>';
     
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';

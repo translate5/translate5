@@ -39,7 +39,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.MetaPanel', {
   extend : 'Ext.app.Controller',
-  requires: ['Editor.view.quality.mqm.Fieldset'],
+  requires: ['Editor.view.quality.mqm.Fieldset', 'Editor.view.quality.SegmentQualities'],
   models: ['SegmentUserAssoc'],
   messages: {
   },
@@ -50,6 +50,12 @@ Ext.define('Editor.controller.MetaPanel', {
     ref : 'metaTermPanel',
     selector : '#metapanel #metaTermPanel'
   },{
+    ref : 'metaQualitiesPanel',
+    selector : '#metapanel #segmentQualities'
+  },{
+    ref : 'segmentMeta',
+    selector : '#metapanel segmentsMetapanel'
+  },{
     ref : 'leftBtn',
     selector : '#metapanel #goAlternateLeftBtn'
   },{
@@ -58,9 +64,6 @@ Ext.define('Editor.controller.MetaPanel', {
   },{
       ref : 'navi',
       selector : '#metapanel #naviToolbar'
-  },{
-      ref : 'segmentMeta',
-      selector : '#metapanel segmentsMetapanel'
   },{
     ref : 'segmentGrid',
     selector : '#segmentgrid'
@@ -144,7 +147,8 @@ Ext.define('Editor.controller.MetaPanel', {
     });
     
     me.record = record;
-    this.loadTermPanel(segmentId);
+    me.loadTermPanel(segmentId);
+    me.loadQualitiesPanel(segmentId);
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
     navi.show();
@@ -152,7 +156,6 @@ Ext.define('Editor.controller.MetaPanel', {
     me.getSegmentMeta().show();
     mp.enable();
   },
-  
   /**
    * @param {Ext.selection.Model} sm current selection model of 
    * @param {Array} selectedRecords 
@@ -163,7 +166,6 @@ Ext.define('Editor.controller.MetaPanel', {
       }
       this.loadTermPanel(selectedRecords[0].get('id'));
   },
-  
   /**
    * @param {Integer} segmentId for which the terms should be loaded 
    */
@@ -174,13 +176,22 @@ Ext.define('Editor.controller.MetaPanel', {
       if(Editor.data.task.get('terminologie') || !panel.html) {
           panel.getLoader().load({
               params: {id: segmentId},
-              callback: function() {
+              callback: function(){
                   me.getSegmentMeta() && me.getSegmentMeta().updateLayout();
               }
           });
       }
   },
-  
+  /**
+   * @param {Integer} segmentId for which the qualities should be loaded 
+   */
+  loadQualitiesPanel: function(segmentId) {
+      var panel = this.getMetaQualitiesPanel();
+      panel.enable();
+      panel.getLoader().load({
+          params: { segmentId: segmentId }
+      });
+  },
   /**
    * opens metapanel for readonly segments
    * @param {Editor.model.Segment} record
@@ -203,6 +214,7 @@ Ext.define('Editor.controller.MetaPanel', {
         form = mp.down('#metaInfoForm'),
         values = record.getQmAsArray(),
         qmBoxes = mp.query('#metaQm checkbox');
+    
     statBoxes = mp.query('#metaStates radio');
     Ext.each(statBoxes, function(box){
       box.setValue(false);
@@ -226,6 +238,15 @@ Ext.define('Editor.controller.MetaPanel', {
     me.record.setQmFromArray(quality);
     //close the metapanel
     mp.disable();
+    me.getMetaQualitiesPanel().disable();
+  },
+  /**
+   * Editor.view.segments.RowEditing canceledit handler
+   * @hint metapanel
+   */
+  cancelEdit: function() {        
+      this.getMetaPanel().disable();
+      this.getMetaQualitiesPanel().disable();
   },
   /**
    * Changes the state box by keyboard shortcut instead of mouseclick
@@ -237,19 +258,9 @@ Ext.define('Editor.controller.MetaPanel', {
         index = 1,
         statBoxes = mp.query('#metaStates radio');
     Ext.each(statBoxes, function(box){
-      if (index++ == param){
-        box.setValue(true);
-      }
+        if (index++ == param){
+            box.setValue(true);
+        }
     });
-  },  
-  /**
-   * Editor.view.segments.RowEditing canceledit handler
-   * @hint metapanel
-   */
-  cancelEdit: function() {
-      var me = this,
-          mp = me.getMetaPanel();
-        
-      mp.disable();
-  }
+  }  
 });

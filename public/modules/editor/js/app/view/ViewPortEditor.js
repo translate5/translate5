@@ -59,7 +59,7 @@ Ext.define('Editor.view.ViewPortEditor', {
 
     //Item Strings:
     items_north_title: 'Header',
-    items_west_title: '#UT#Dateien',
+    items_west_title: '#UT#Dateien und QA',
     initComponent: function() {
       var me = this,
           task = Editor.data.task,
@@ -77,7 +77,7 @@ Ext.define('Editor.view.ViewPortEditor', {
               width: 250,
               collapsible: true,
               layout: {type:'accordion'},
-              animCollapse: !Ext.isIE, //BugID 3
+              animCollapse: true,
               itemId: 'filepanel',
               items: [{
                   xtype: 'fileorder.tree',
@@ -115,7 +115,7 @@ Ext.define('Editor.view.ViewPortEditor', {
               weight: 30,
               collapsible: true,
               layout:'border',
-              animCollapse: !Ext.isIE, //BugID 3
+              animCollapse: true,
               border:0,
               header:{
             	  height:49,

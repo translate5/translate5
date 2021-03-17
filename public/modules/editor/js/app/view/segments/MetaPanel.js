@@ -51,17 +51,17 @@ Ext.define('Editor.view.segments.MetaPanel', {
     },
 
     layout: 'auto',
-    item_metaQm_title: '#UT#QM',
-    //Item Strings:
-    item_metaStates_title: '#UT#Status',
+
     item_metaTerms_title: '#UT#Terminologie',
+    item_metaQm_title: '#UT#QM',
+    item_metaStates_title: '#UT#Status',
     item_metaStates_tooltip: '#UT#Segment auf den ausgewählten Status setzen (ALT + S danach {0})',
     item_metaStates_tooltip_nokey: '#UT#Segment auf den ausgewählten Status setzen',
     
     initComponent: function() {
       var me = this,
           showStatus = Editor.app.getTaskConfig('segments.showStatus'),
-          showQM = Editor.app.getTaskConfig('segments.showQM');
+          showQM = Editor.app.getTaskConfig('autoQA.enableQm');
           
       Ext.applyIf(me, {
         title:me.title,
@@ -76,8 +76,7 @@ Ext.define('Editor.view.segments.MetaPanel', {
                   collapsible: true,
                   title: me.item_metaTerms_title,
                   anchor: '100%',
-                  items: [
-                    {
+                  items: [{
                       autoScroll: true,
                       xtype: 'panel',
                       border: 0,
@@ -85,32 +84,32 @@ Ext.define('Editor.view.segments.MetaPanel', {
                       itemId: 'metaTermPanel',
                       cls: 'metaTermPanel',
                       loader: {
-                        url: Editor.data.restpath+'segment/terms',
-                        loadMask: true,
-                        renderer: 'html'
+                          url: Editor.data.restpath+'segment/terms',
+                          loadMask: true,
+                          renderer: 'html'
                       }
-                    }
-                  ]
-              },
-              {
-                xtype: 'fieldset',
-                itemId: 'metaQm',
-                defaultType: 'radio',
-                collapsible: true,
-                hideable: showQM, 
-                hidden:  !showQM,
-                title: me.item_metaQm_title
-              },
-              {
-                xtype: 'fieldset',
-                itemId: 'metaStates',
-                collapsible: true,
-                defaultType: 'radio',
-                hideable: showStatus, 
-                hidden:  !showStatus,
-                title: me.item_metaStates_title
-              }
-            ]
+                  }]
+              },{
+                  xtype: 'fieldset',
+                  itemId: 'metaQm',
+                  defaultType: 'checkbox',
+                  collapsible: true,
+                  hideable: showQM, 
+                  hidden:  !showQM,
+                  title: me.item_metaQm_title
+              },{
+                  xtype: 'segmentQualities',
+                  itemId: 'segmentQualities',
+                  collapsible: true
+              },{
+                  xtype: 'fieldset',
+                  itemId: 'metaStates',
+                  collapsible: true,
+                  defaultType: 'radio',
+                  hideable: showStatus, 
+                  hidden:  !showStatus,
+                  title: me.item_metaStates_title
+              }]
           }
         ]
       });
