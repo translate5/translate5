@@ -287,9 +287,11 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         if(empty($taskGuid)){
             return;
         }
+        $context = $event->getParam('context');
+        
         $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $worker ZfExtended_Models_Worker */
-        $progress = $worker->calculateProgress($taskGuid);
+        $progress = $worker->calculateProgress($taskGuid,$context);
         
         $this->bus->notify(self::CHANNEL_TASK, 'updateProgress', [
             'taskGuid' => $taskGuid, 
