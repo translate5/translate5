@@ -963,7 +963,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
             if(rec.get('importProgress') == 100){
                 delete rec.data.importProgress;
             }
-            value=rec.get('importProgress')+'%';
+            
+            value=rec.get('importProgress');
+            
+            if(value === undefined){
+                value = 0;
+            }
+            value = value +'%';
             meta.tdAttr = 'data-qtip="'+value+'"';
             return me.getCellProgressBarRenderData(value);
         }
