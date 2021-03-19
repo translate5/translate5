@@ -27,9 +27,21 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- *
+ * The model for a segment's quality entry
  */
-Ext.define('Editor.view.quality.FilterPanelController', {
-    extend: 'Ext.app.ViewController',
-    alias: 'controller.qualityFilterPanel',
+Ext.define('Editor.model.quality.SegmentQuality', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name:'id', type:'int' },
+        { name:'type', type:'string' },
+        { name:'typeTitle', type:'string' },
+        { name:'segmentId', type:'int' },
+        { name:'falsePositive', type:'int' },
+        { name:'title', type:'string' },
+        { name:'fields' }
+    ],
+    idProperty: 'id',
+    getFields: function(){
+        this.get('fields');
+    }    
 });

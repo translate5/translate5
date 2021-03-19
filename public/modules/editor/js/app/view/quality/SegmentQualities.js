@@ -32,9 +32,11 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.quality.SegmentQualities', {
     extend: 'Ext.form.FieldSet',
     alias: 'widget.segmentQualities',
-    title : "#UT#QA: Falsch Positive",
+    title: "#UT#QA: Falsch Positive",
+    requires: [ 'Editor.model.quality.SegmentQuality' ], 
     defaultType: 'checkbox',
     qualities: [],
+    hidden: true,
     loader: {
         url: Editor.data.restpath+'quality/segment',
         loadMask: true,
@@ -42,30 +44,9 @@ Ext.define('Editor.view.quality.SegmentQualities', {
             var me = loader.getTarget();
             var data = Ext.decode(response.responseText);
             if(data.total > 0){
-                me.qualities = data.rows;
-                Ext.each(data.rows, function(row){
-                    me.add({
-                        xtype: 'checkbox',
-                        anchor: '100%',
-                        name: 'segq' + row.id,
-                        inputValue: row.id,
-                        value: (row.falsePositive == '1'),
-                        boxLabel: row.typeTitle + ' > ' + row.title,
-                        // boxLabelAlign: 'before',
-                        handler: function(checkbox, checked){
-                            me.changeFalsePositive(checkbox.inputValue, (checked ? '1' : '0'));
-                        }
-                    });
-                  });
-            } else {
-                me.disable();
+                me.qualitiesLoaded(data.rows);
             }
-            me.fireEvent('segmentQualitiesLoaded', data, me);
         }
-    },
-    disable: function(){
-        this.removeAll();
-        this.callParent(arguments);
     },
     changeFalsePositive: function(qualityId, value){
         var me = this;
@@ -85,9 +66,47 @@ Ext.define('Editor.view.quality.SegmentQualities', {
         for(var i=0; i < this.qualities.length; i++){
             if(this.qualities[i].id == qualityId){
                 this.qualities[i].falsePositive = value;
-                this.fireEvent('segmentQualitiesChanged', [ this.qualities[i] ], this);
+                this.fireEvent('segmentQualitiyChanged', Ext.create('Editor.model.quality.SegmentQuality', this.qualities[i]), this);
                 return;
             }
+        }
+    },
+    qualitiesLoaded: function(qualities){
+        this.qualities = qualities;
+        var me = this;
+        Ext.each(qualities, function(row){
+            me.add({
+                xtype: 'checkbox',
+                anchor: '100%',
+                name: 'segq' + row.id,
+                inputValue: row.id,
+                value: (row.falsePositive == '1'),
+                boxLabel: row.typeTitle + ' > ' + row.title,
+                // boxLabelAlign: 'before',
+                handler: function(checkbox, checked){
+                    me.changeFalsePositive(checkbox.inputValue, (checked ? '1' : '0'));
+                }
+            });
+        });
+        this.show();
+    },
+    /**
+     * Starts editing. Loads the Segment's qualities and shows the GUI if qualities found
+     * @param {Integer} segmentId for which the qualities should be loaded 
+     */
+    startEditing: function(segmentId){
+        this.getLoader().load({
+            params: { segmentId: segmentId }
+        });
+    },
+    /**
+     * Hides the GUI if present
+     */
+    endEditing: function(){
+        if(this.qualities.length > 0){
+            this.removeAll();
+            this.qualities = [];
+            this.hide();            
         }
     }
 });

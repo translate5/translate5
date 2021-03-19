@@ -27,9 +27,20 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * 
+ * The store for the quality filter panel
  */
 Ext.define('Editor.store.quality.Filter', {
-    extend : 'Ext.data.store',
+    extend : 'Ext.data.Store',
+    model: 'Editor.model.quality.Filter',
+    storeId: 'FilterQualities',
+    autoLoad: false,
+    pageSize: 0,    
+    updateQualities:function(records){
 
+        me.fireEvent('recordsChanged', records);
+    },
+    updateQuality:function(record){
+
+        me.fireEvent('recordsChanged', [record]);
+    }
 });

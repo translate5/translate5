@@ -33,6 +33,8 @@ Ext.define('Editor.controller.Quality', {
     extend : 'Ext.app.Controller',
     views: ['quality.statistics.Window'],
     requires: ['Editor.store.quality.Statistics'], // Statistics Store in "requires" instead "stores" to prevent automatic instantiation
+    models: ['Editor.model.quality.Filter'],
+    stores: ['Editor.store.quality.Filter'],
     refs:[{
         ref : 'statisticsWindow',
         selector : '#qualityStatisticsWindow',

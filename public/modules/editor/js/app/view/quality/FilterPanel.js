@@ -31,21 +31,40 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.quality.FilterPanel', {
     extend: 'Ext.grid.Panel',
+    xtype: 'grouped-grid',
     requires: [
-        'Editor.view.quality.FilterPanelController'
-    ],
-    controller: 'qualityFilterPanel',
+        'Editor.view.quality.FilterPanelController',
+    ],    
+     controller: 'qualityFilterPanel',
     alias: 'widget.qualityFilterPanel',
     itemId:'qualityFilterPanel',
     store: 'FilterQualities',
+    title : "#UT#Qualitätssicherung",
     strings:{
           
     },
-
+    listeners:{
+        beforerender: function(view, opts){
+            this.getStore().load();
+        }
+    },
+    initConfig : function(instanceConfig) {
+        var config = { title: this.title };
+        if (instanceConfig) {
+            this.self.getConfigurator().merge(this, config, instanceConfig);
+        }
+        return this.callParent([config]);
+    },
+    // since we do update the rows manually we do not want a dirty-marker ... an API to set an item to not be dirty would be better
+    viewConfig:{
+        markDirty: false
+    },
+    /*
     initComponent: function() {
         var me = this;
 
 
         me.callParent(arguments);
     }
+    */
 });

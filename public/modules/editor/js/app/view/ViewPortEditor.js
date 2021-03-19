@@ -46,7 +46,8 @@ Ext.define('Editor.view.ViewPortEditor', {
         'Editor.view.fileorder.ReferenceTree',
         'Editor.view.segments.Grid',
         'Editor.view.segments.MetaPanelNavi',
-        'Editor.view.segments.MetaPanel'
+        'Editor.view.segments.MetaPanel',
+        'Editor.view.quality.FilterPanel'
     ],
 
     viewModel: {
@@ -89,6 +90,11 @@ Ext.define('Editor.view.ViewPortEditor', {
                   stateId: 'editor.westPanelReferenceFileTree',
                   stateEvents: ['collapse', 'expand'],
                   stateful:true
+              },{
+                  xtype: 'qualityFilterPanel',
+                  stateId: 'editor.westPanelQualityFilter',
+                  stateEvents: ['collapse', 'expand'],
+                  stateful: true
               }]
           },{
               region: 'center',

@@ -27,8 +27,30 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- *
+ * The model for a quality filter entry
  */
-Ext.define('Editor.model.Quality', {
-    extend: 'Ext.data.Model'
+Ext.define('Editor.model.quality.Filter', {
+    extend: 'Ext.data.Model',
+    fields: [
+        { name:'id', type:'int' },
+        { name:'type', type:'string' },
+        { name:'count', type:'int' },
+        { name:'checked', type:'boolean' },
+        { name:'category', type:'string' },
+        { name:'rubric', type:'boolean' },
+        { name:'segmentIds' },
+        { name:'title', type:'string' }
+    ],
+    idProperty: 'id',
+    proxy : {
+        type : 'rest',
+        url: Editor.data.restpath+'quality',
+        reader : {
+            rootProperty: 'rows',
+            type : 'json'
+        }
+    },
+    getSegmentIds: function(){
+        this.get('segmentIds');
+    }    
 });

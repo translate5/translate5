@@ -202,7 +202,7 @@ abstract class editor_Models_Quality_AbstractView {
             if(array_key_exists($row->type, $this->rowsByType)){
                 $this->rowsByType[$row->type][self::RUBRIC]->count++;
                 if($this->hasSegmentIds){
-                    $this->rowsByType[$row->type][self::RUBRIC]->segments[] = $row->segmentId;
+                    $this->rowsByType[$row->type][self::RUBRIC]->segmentIds[] = $row->segmentId;
                 }
                 if($this->hasCategories){
                     if(!array_key_exists($row->category, $this->rowsByType[$row->type])){
@@ -210,7 +210,7 @@ abstract class editor_Models_Quality_AbstractView {
                     }
                     $this->rowsByType[$row->type][$row->category]->count++;
                     if($this->hasSegmentIds){
-                        $this->rowsByType[$row->type][$row->category]->segments[] = $row->segmentId;
+                        $this->rowsByType[$row->type][$row->category]->segmentIds[] = $row->segmentId;
                     }
                 }
                 $this->numQualities++;
@@ -227,7 +227,7 @@ abstract class editor_Models_Quality_AbstractView {
                     $category = $qmType.'_'.$index; // analogue to what is made with mqm-categories
                     $this->rowsByType[$qmType][self::RUBRIC]->count++;
                     if($this->hasSegmentIds){
-                        $this->rowsByType[$qmType][self::RUBRIC]->segments[] = $segmentId;
+                        $this->rowsByType[$qmType][self::RUBRIC]->segmentIds[] = $segmentId;
                     }
                     if($this->hasCategories){
                         if(!array_key_exists($category, $this->rowsByType[$qmType])){
@@ -235,7 +235,7 @@ abstract class editor_Models_Quality_AbstractView {
                         }
                         $this->rowsByType[$qmType][$category]->count++;
                         if($this->hasSegmentIds){
-                            $this->rowsByType[$qmType][$category]->segments[] = $segmentId;
+                            $this->rowsByType[$qmType][$category]->segmentIds[] = $segmentId;
                         }
                     }
                     $this->numQualities++;
@@ -282,7 +282,7 @@ abstract class editor_Models_Quality_AbstractView {
             $row->rubric = true;
         }
         if($this->hasSegmentIds){
-            $row->segments = [];
+            $row->segmentIds = [];
         }
         $row->title = $this->manager->translateQualityType($type);
         return $row;
@@ -303,7 +303,7 @@ abstract class editor_Models_Quality_AbstractView {
             $row->rubric = false;
         }
         if($this->hasSegmentIds){
-            $row->segments = [];
+            $row->segmentIds = [];
         }
         $row->title = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
         return $row;
@@ -324,7 +324,7 @@ abstract class editor_Models_Quality_AbstractView {
             $row->rubric = $isRubric;
         }
         if($this->hasSegmentIds){
-            $row->segments = [];
+            $row->segmentIds = [];
         }
         $row->title = $title;
         return $row;

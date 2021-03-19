@@ -94,7 +94,7 @@ Ext.define('Editor.controller.MetaPanel', {
    * @returns Editor.view.segments.RowEditing
    */
   getEditPlugin: function() {
-    return this.getSegmentGrid().editingPlugin;
+      return this.getSegmentGrid().editingPlugin;
   },
   initEditPluginHandler: function() {
       var me = this, 
@@ -148,7 +148,7 @@ Ext.define('Editor.controller.MetaPanel', {
     
     me.record = record;
     me.loadTermPanel(segmentId);
-    me.loadQualitiesPanel(segmentId);
+    me.getMetaQualitiesPanel().startEditing(segmentId);
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
     navi.show();
@@ -181,16 +181,6 @@ Ext.define('Editor.controller.MetaPanel', {
               }
           });
       }
-  },
-  /**
-   * @param {Integer} segmentId for which the qualities should be loaded 
-   */
-  loadQualitiesPanel: function(segmentId) {
-      var panel = this.getMetaQualitiesPanel();
-      panel.enable();
-      panel.getLoader().load({
-          params: { segmentId: segmentId }
-      });
   },
   /**
    * opens metapanel for readonly segments
@@ -238,7 +228,7 @@ Ext.define('Editor.controller.MetaPanel', {
     me.record.setQmFromArray(quality);
     //close the metapanel
     mp.disable();
-    me.getMetaQualitiesPanel().disable();
+    me.getMetaQualitiesPanel().endEditing();
   },
   /**
    * Editor.view.segments.RowEditing canceledit handler
@@ -246,7 +236,7 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   cancelEdit: function() {        
       this.getMetaPanel().disable();
-      this.getMetaQualitiesPanel().disable();
+      this.getMetaQualitiesPanel().endEditing();
   },
   /**
    * Changes the state box by keyboard shortcut instead of mouseclick
