@@ -94,7 +94,6 @@ Ext.define('Editor.view.segments.MetaPanel', {
                   itemId: 'metaQm',
                   defaultType: 'checkbox',
                   collapsible: true,
-                  hideable: showQM, 
                   hidden:  !showQM,
                   title: me.item_metaQm_title
               },{
@@ -106,7 +105,6 @@ Ext.define('Editor.view.segments.MetaPanel', {
                   itemId: 'metaStates',
                   collapsible: true,
                   defaultType: 'radio',
-                  hideable: showStatus, 
                   hidden:  !showStatus,
                   title: me.item_metaStates_title
               }]

@@ -248,13 +248,17 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.quality.statistics.Tree.prototype.treepanel_text = '<?php echo $this->translate->_('Fehlertyp');?>';
   	Editor.view.quality.statistics.Tree.prototype.treepanel_totalTotal = '<?php echo $this->translate->_('Gesamt');?>';
   	Editor.view.quality.statistics.Tree.prototype.treepanel_total = '<?php echo $this->translate->_('Summe');?>';
-
+  	
+  	Editor.view.quality.FilterPanel.prototype.title = '<?php echo $this->translate->_('Qualitätssicherung');?>';
+	Editor.view.quality.FilterPanel.prototype.strings = {
+    	
+    };
+  	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('MQM');?>';
   	Editor.view.quality.mqm.Fieldset.prototype.strings = {
 		severityLabel: '<?php echo $this->translate->_('Gewichtung');?>',
 		commentLabel: '<?php echo $this->translate->_('Kommentar');?>',
 		qmAddBtn: '<?php echo $this->translate->_('MQM hinzufügen');?>'
 	};
-  	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('MQM');?>';
 	Editor.controller.QualityMqm.prototype.strings = {
     	buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
     	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
