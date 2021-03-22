@@ -245,10 +245,13 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     public function postAction() {
         parent::postAction();
-        $this->log->request();
-        $this->addUserInfoToResult();
-        $this->log->info('E1012', 'job created', ['tua' => $this->entity->getSanitizedEntityForLog()]);
-        $this->applyEditableAndDeletable();
+        //if the validation was successful, log the request and apply additional data 
+        if($this->wasValid){
+            $this->log->request();
+            $this->addUserInfoToResult();
+            $this->log->info('E1012', 'job created', ['tua' => $this->entity->getSanitizedEntityForLog()]);
+            $this->applyEditableAndDeletable();
+        }
     }
     
     public function deleteAction(){
