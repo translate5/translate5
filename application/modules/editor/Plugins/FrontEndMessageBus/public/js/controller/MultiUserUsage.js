@@ -552,8 +552,17 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         });
     },
     onTriggerTaskReload: function(data) {
+        if(!Editor.data.task){
+            return;
+        }
+        var taskGuid = null;
+        if(Editor.data.task.taskGuid){
+            taskGuid = Editor.data.task.taskGuid;
+        }else if(Editor.data.task.get){
+            taskGuid = Editor.data.task.get('taskGuid');
+        }
         //reloads the currently opened task
-        if(Editor.data.task && Editor.data.task.get('taskGuid') == data.taskGuid) {
+        if(taskGuid && taskGuid == data.taskGuid) {
             Editor.data.task.load();
         }
     },
