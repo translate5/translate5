@@ -308,13 +308,15 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         $config=Zend_Registry::get('config')->runtimeOptions;
         $params = $this->workerModel->getParameters();
         $import = $config->import;
+        $importConfig = $params['importConfig'];
+        /* @var $importConfig editor_Models_Import_Configuration */
         
         $realFile = $params['file'];
         $refFolder = $params['importFolder'].'/'.$import->referenceDirectory;
-        $reviewFolder = $params['importFolder'].'/'.$import->proofReadDirectory;
+        $workfilesDirectory = $params['importFolder'].'/'.$importConfig->getFilesDirectory();
         
         //cut off review folder from realfile:
-        $relRealFile = str_replace('#'.realpath($reviewFolder), '', '#'.realpath($realFile));
+        $relRealFile = str_replace('#'.realpath($workfilesDirectory), '', '#'.realpath($realFile));
         $absRefFile = $refFolder.'/'.$relRealFile;
         $absRefDir = dirname($absRefFile);
         
