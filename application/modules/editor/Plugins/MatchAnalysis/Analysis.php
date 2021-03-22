@@ -153,11 +153,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             }
         }
         
-        //remove fuzzy languageResource from opentm2
-        $this->removeFuzzyResources();
-        
-        //clean the batch query cache if there is one
-        $this->removeBatchCache();
+        $this->clean();
 
         return true;
     }
@@ -559,6 +555,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $model->deleteForLanguageresource($connector->getLanguageResource()->getId());
             }
         }
+    }
+    
+    /***
+     * Remove not required analysis object and data
+     */
+    public function clean(){
+        //remove fuzzy languageResource from opentm2
+        $this->removeFuzzyResources();
+        //clean the batch query cache if there is one
+        $this->removeBatchCache();
+        
+        $this->connectors = null;
     }
     
     public function setPretranslate($pretranslate){
