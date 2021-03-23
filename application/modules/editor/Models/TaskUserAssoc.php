@@ -445,16 +445,31 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * loads and returns the currently used associations of the given taskGuid
+     * loads and returns the currently used associations of the given taskGuid.
      * @param string $taskGuid
      * @return array
      */
-    public function loadUsed(string $taskGuid) {
+    public function loadUsed(string $taskGuid) : array {
         $this->cleanupLocked($taskGuid);
         $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
-            ->where('not usedState is null')
-            ->where('not usedInternalSessionUniqId is null');
+            ->where('usedState IS NOT NULL')
+            ->where('usedInternalSessionUniqId IS NOT NULL');
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /**
+     * Check if the given user is in use in one of the tasks
+     * @param string $taskGuid
+     * @param string $userGuid
+     * @return array
+     */
+    public function isUserInUse(string $userGuid) : array {
+        $this->cleanupLocked();
+        $s = $this->db->select()
+        ->where('userGuid = ?', $userGuid)
+        ->where('usedState IS NOT NULL')
+        ->where('usedInternalSessionUniqId IS NOT NULL');
         return $this->db->fetchAll($s)->toArray();
     }
 
