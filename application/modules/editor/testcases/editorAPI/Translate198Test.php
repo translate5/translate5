@@ -104,7 +104,7 @@ class Translate198Test extends \ZfExtended_Test_ApiTestcase {
             'autoStartImport'=>0
         ];
         self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('testcase-de-en.xlf'));
+        self::$api->addImportFile(self::$api->getFile('../TestImportProjects/testcase-de-en.xlf'));
         self::$api->import($task,false,false);
         error_log('Task created. '.self::$api->getTask()->taskName);
     }

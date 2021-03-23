@@ -134,7 +134,7 @@ class KpiTest extends \ZfExtended_Test_ApiTestcase {
             'sourceLang' => 'en',
             'targetLang' => 'de'
         );
-        $this->api()->addImportFile($this->api()->getFile('testcase-de-en.xlf'));
+        $this->api()->addImportFile($this->api()->getFile('../TestImportProjects/testcase-de-en.xlf'));
         $this->api()->import($task);
         
         // store task-id for later deleting
