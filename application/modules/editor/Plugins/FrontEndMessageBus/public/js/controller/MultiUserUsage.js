@@ -558,7 +558,7 @@ return; //FIXME prepare that socket server is only triggered for simultaneous us
         var taskGuid = null;
         if(Editor.data.task.taskGuid){
             taskGuid = Editor.data.task.taskGuid;
-        }else if(Editor.data.task.get){
+        }else if(Editor.data.task.isModel){
             taskGuid = Editor.data.task.get('taskGuid');
         }
         //reloads the currently opened task
