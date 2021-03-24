@@ -158,6 +158,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
                     'tagOpener' => $opener,
                     //xmlparser for special manipulations in the handler
                     'xmlparser' => $xmlparser,
+                    'task'      => $this->_task,
             ]);
             
             //trigger an event to allow custom transunit manipulations

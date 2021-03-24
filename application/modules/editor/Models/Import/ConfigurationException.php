@@ -43,5 +43,6 @@ class editor_Models_Import_ConfigurationException extends ZfExtended_ErrorCodeEx
         'E1038' => 'The import root folder does not exist. Path "{folder}".',
         'E1039' => 'The imported package did not contain a valid "{review}" folder.',
         'E1040' => 'The imported package did not contain any files in the "{review}" folder.',
+        'E1338' => 'IMPORTANT: The "proofRead" folder in the zip import package is deprecated from now on. In the future please always use the new folder "workfiles" instead. All files that need to be reviewed or translated will have to be placed in the new folder "workfiles" from now on. In some future version of translate5 the support for "proofRead" folder will be completely removed. Currently it still is supported, but will write a "deprecated" message to the php error-log.'
     ];
 }

@@ -174,12 +174,11 @@ trait editor_Services_Connector_BatchTrait {
      * @param int $segmentId
      */
     protected function saveBatchResults(int $segmentId) {
-        $model = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
-        /* @var $model editor_Plugins_MatchAnalysis_Models_BatchResult */
-        $model->setLanguageResource($this->languageResource->getId());
-        $model->setSegmentId($segmentId);
-        $model->setResult(serialize($this->resultList));
-        $model->save();
+        Zend_Db_Table::getDefaultAdapter()->insert('LEK_match_analysis_batchresults', [
+            'languageResource' =>$this->languageResource->getId(),
+            'segmentId'=>$segmentId,
+            'result'=>serialize($this->resultList)
+        ]);
     }
     
     /***
