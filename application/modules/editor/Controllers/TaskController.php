@@ -1068,6 +1068,9 @@ class editor_TaskController extends ZfExtended_RestController {
                 'Projekte können nicht bearbeitet werden.'
             ]);
         }
+        
+        // check if the user is allowed to open the task based on the session. The user is not able to open 2 different task in same time. 
+        $this->checkUserSessionAllowsOpen($this->entity->getTaskGuid());
 
         //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
         $this->entity->checkStateAllowsActions([editor_Models_Excel_AbstractExImport::TASK_STATE_ISEXCELEXPORTED]);
@@ -2030,5 +2033,33 @@ class editor_TaskController extends ZfExtended_RestController {
         $log->setCustomerId($task->getCustomerId());
         $log->setYearAndMonth(date('Y-m'));
         $log->updateInsertTaskCount();
+    }
+    
+    /***
+     * Check if the session allows the task to be opened for editing by the current user.
+     * If the user tries to open different task then the one in the session, exception is thrown
+     * INFO: the pmOverride is counted as opened editor
+     *       the user is not able to edit task propertie if he already edits different task
+     * @param string $taskGuid
+     */
+    protected function checkUserSessionAllowsOpen(string $taskGuid) {
+        $session = new Zend_Session_Namespace();
+        // if the task is with already active session for the user, ignore the check
+        if(empty($session->taskGuid) || $session->taskGuid == $taskGuid){
+            return;
+        }
+        $assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $assoc editor_Models_TaskUserAssoc */
+        
+        //check if for the current user, there are task in use
+        if(empty($assoc->isUserInUse($this->user->data->userGuid))){
+            return;
+        }
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1341' => 'You tried to open another task, but you have already opened another one in another window. Please press F5 to open the previous one here, or close this message to stay in the Taskoverview.'
+        ], 'editor.task');
+        throw new ZfExtended_UnprocessableEntity('E1341',[
+            'task' =>$this->entity //TODO: is this realy required ?
+        ]);
     }
 }

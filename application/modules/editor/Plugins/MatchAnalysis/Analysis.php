@@ -165,11 +165,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $progressCallback && $progressCallback($progress);
         }
         
-        //remove fuzzy languageResource from opentm2
-        $this->removeFuzzyResources();
-        
-        //clean the batch query cache if there is one
-        $this->removeBatchCache();
+        $this->clean();
 
         return true;
     }
@@ -228,6 +224,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         // to get the correct content for the repetition we get the value from $segment, which was updated by the repetition updater
         $bestRepeatedResult = clone $this->repetitionByHash[$segmentHash];
         $bestRepeatedResult->target = $segment->getTargetEdit();
+        // the current result is from repetition segment. This is needed for the resources usage log.
+        $bestRepeatedResult->isRepetition = true; 
         return $bestRepeatedResult;
     }
     
@@ -341,9 +339,15 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @return boolean
      */
     protected function isDisabledDueErrors($connector, $id) {
+        //check if the connector itself is disabled
+        if($this->connectors[$id]->isDisabled()){
+            return true;
+        }
+        
         if(!isset($this->connectorErrorCount[$id]) || $this->connectorErrorCount[$id] <= self::MAX_ERROR_PER_CONNECTOR) {
             return false;
         }
+
         $langRes = $connector->getLanguageResource();
         $this->log->warn('E1101', 'Disabled Language Resource {name} ({service}) for analysing and pretranslation due too much errors.',[
             'task' => $this->task,
@@ -351,7 +355,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             'name' => $langRes->getName(),
             'service' => $langRes->getServiceName(),
         ]);
-        unset($this->connectors[$id]);
+        $this->connectors[$id]->disable();
         return true;
     }
     
@@ -571,6 +575,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $model->deleteForLanguageresource($connector->getLanguageResource()->getId());
             }
         }
+    }
+    
+    /***
+     * Remove not required analysis object and data
+     */
+    public function clean(){
+        //remove fuzzy languageResource from opentm2
+        $this->removeFuzzyResources();
+        //clean the batch query cache if there is one
+        $this->removeBatchCache();
+        
+        $this->connectors = null;
     }
     
     public function setPretranslate($pretranslate){
