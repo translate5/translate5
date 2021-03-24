@@ -1374,3 +1374,44 @@ Ext.override(Ext.form.field.Tag, {
         }
     }
 });
+
+/***
+ * This override is for ignoring the isCollapsed flags for filtered groups in grid with grouping feature
+ */
+Ext.override(Ext.grid.feature.Grouping, {
+    /**
+     * Collapse all groups
+     */
+    collapseAll: function() {
+        var me = this,
+            metaGroupCache = me.getCache(),
+            groupName,
+            lockingPartner = me.lockingPartner;
+        // Set all collapsed flags
+        // metaGroupCache is shared between two lockingPartners
+        for (groupName in metaGroupCache) {
+            
+            // INFO :
+            // For some cases when there is active filter on the store, and for the group there are no results,
+            // the group is set to undefined in the metaGroupCache. This will also skip the filtered groups
+            // In the original code, there was no check if the group exist in the metaGroupCache
+            if (metaGroupCache.hasOwnProperty(groupName) && metaGroupCache[groupName]!==undefined) {
+                metaGroupCache[groupName].isCollapsed = true;
+            }
+        }
+        // We do not need to inform our lockingPartner.
+        // It shares the same group cache - it will have the same set of collapsed groups.
+        Ext.suspendLayouts();
+        me.dataSource.onDataChanged();
+        Ext.resumeLayouts(true);
+        // Fire event for all groups post collapse
+        for (groupName in metaGroupCache) {
+            if (metaGroupCache.hasOwnProperty(groupName)) {
+                me.afterCollapseExpand(true, groupName);
+                if (lockingPartner) {
+                    lockingPartner.afterCollapseExpand(true, groupName);
+                }
+            }
+        }
+    }
+});
