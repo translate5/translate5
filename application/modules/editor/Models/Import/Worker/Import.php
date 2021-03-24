@@ -125,6 +125,7 @@ class editor_Models_Import_Worker_Import {
 
         $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         /* @var $treeDb editor_Models_Foldertree */
+        $treeDb->setPathPrefix($this->importConfig->getFilesDirectory());
         $filelist = $treeDb->getPaths($this->task->getTaskGuid(),'file');
         
         $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');

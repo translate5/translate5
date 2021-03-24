@@ -139,6 +139,12 @@ abstract class editor_Services_Connector_Abstract {
      */
     protected $config;
     
+    /***
+     *  Is the current connector disabled for usage.
+     * @var bool
+     */
+    protected $disabled = false;
+    
     /**
      * initialises the internal result list
      */
@@ -414,5 +420,13 @@ abstract class editor_Services_Connector_Abstract {
     
     public function getConfig() {
         return $this->config;
+    }
+    
+    public function isDisabled() {
+        return $this->disabled;
+    }
+    
+    public function disable() {
+        $this->disabled = true;
     }
 }
