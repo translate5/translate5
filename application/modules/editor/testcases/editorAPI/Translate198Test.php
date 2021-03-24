@@ -104,7 +104,7 @@ class Translate198Test extends \ZfExtended_Test_ApiTestcase {
             'autoStartImport'=>0
         ];
         self::assertLogin('testmanager');
-        self::$api->addImportFile(self::$api->getFile('../TestImportProjects/testcase-de-en.xlf'));
+        self::$api->addImportFile(self::$api->getFile('testcase-de-en.xlf','TestImportProjects'));
         self::$api->import($task,false,false);
         error_log('Task created. '.self::$api->getTask()->taskName);
     }
@@ -133,5 +133,8 @@ class Translate198Test extends \ZfExtended_Test_ApiTestcase {
         //remove the 2 tasks
         self::$api->requestJson('editor/task/'.self::$importedTasks[0], 'DELETE');
         self::$api->requestJson('editor/task/'.self::$importedTasks[1], 'DELETE');
+        
+        //remove the temp customer
+        self::$api->requestJson('editor/customer/'.self::$customerTest->id, 'DELETE');
     }
 }
