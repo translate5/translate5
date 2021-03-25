@@ -132,13 +132,12 @@ Ext.define('Editor.view.admin.config.Grid', {
         
         var me=this,
             store = me.getStore(),
-            existing = store.getProxy().getExtraParams(),
-            merged = Ext.Object.merge(existing, newExtra),
             controller = me.getController(),
             cbShowReadOnly = me.down('#showReadOnly'),
             showReadonlyConfig = cbShowReadOnly == null ? true : cbShowReadOnly.checked;
         
-        store.getProxy().setExtraParams(merged);
+        store.setExtraParams(newExtra);
+
         store.load({
             callback:function(){
                 if(!store || !controller){

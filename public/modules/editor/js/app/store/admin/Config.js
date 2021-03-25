@@ -77,8 +77,19 @@ Ext.define('Editor.store.admin.Config', {
      */
     searchFiltered:function(name){
         var me=this,
-            data = Ext.StoreManager.get('admin.task.Config').getData().getSource(),
+            data = me.getData().getSource(),
             record = data && data.getByKey(me.RUNTIMEOPTIONS_CONFIG_PREFIX+name);
         return me.getRecordValue(record);
+    },
+    
+    /***
+     * Add additional params to the store proxy. The newExtra params will be merged into 
+     * the existing proxy extra params
+     */
+    setExtraParams:function(newExtra){
+        var me=this,
+            existing = me.getProxy().getExtraParams(),
+            merged = Ext.Object.merge(existing, newExtra);
+        me.getProxy().setExtraParams(merged);
     }
 });
