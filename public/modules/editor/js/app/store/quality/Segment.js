@@ -27,44 +27,26 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * https://examples.sencha.com/extjs/6.5.3/examples/kitchensink/?classic#grouped-grid
+ * Store for all qualities of a segment
+ * @class Editor.store.quality.Segment
+ * @extends Ext.data.Store
  */
-Ext.define('Editor.view.quality.FilterPanel', {
-    extend: 'Ext.grid.Panel',
-    xtype: 'grouped-grid',
-    requires: [
-        'Editor.view.quality.FilterPanelController',
-    ],    
-    controller: 'qualityFilterPanel',
-    alias: 'widget.qualityFilterPanel',
-    itemId:'qualityFilterPanel',
-    store: 'FilterQualities',
-    title : "#UT#Qualitätssicherung",
-    strings:{
-          
-    },
-    listeners:{
-        beforerender: function(view, opts){
-            this.getStore().load();
+Ext.define('Editor.store.quality.Segment', {
+    extend : 'Ext.data.Store',
+    model: 'Editor.model.quality.Segment',
+    storeId: 'SegmentQualities',
+    autoLoad: false,
+    autoSync: false,
+    isLoaded: false,
+    pageSize: 0,
+    updateRecordProp:function(id, prop, val){
+        var record = this.getById(id);
+        if(record){
+            record.set(prop, val);
+            record.commit();
+            this.fireEvent('recordUpdated', record);
+            return true;
         }
+        return false;
     },
-    initConfig : function(instanceConfig) {
-        var config = { title: this.title };
-        if (instanceConfig) {
-            this.self.getConfigurator().merge(this, config, instanceConfig);
-        }
-        return this.callParent([config]);
-    },
-    // since we do update the rows manually we do not want a dirty-marker ... an API to set an item to not be dirty would be better
-    viewConfig:{
-        markDirty: false
-    },
-    /*
-    initComponent: function() {
-        var me = this;
-
-
-        me.callParent(arguments);
-    }
-    */
 });

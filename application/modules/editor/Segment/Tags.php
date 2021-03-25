@@ -201,6 +201,7 @@ class editor_Segment_Tags implements JsonSerializable {
             $this->targetOriginalIdx = 0;
             
         } else {
+            
             foreach ($fieldManager->getFieldList() as $field) {
                 /* @var $field Zend_Db_Table_Row */
                 if($field->type == editor_Models_SegmentField::TYPE_TARGET && $field->editable) {
