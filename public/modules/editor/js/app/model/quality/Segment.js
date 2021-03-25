@@ -29,19 +29,27 @@ END LICENSE AND COPYRIGHT
 /**
  * The model for a segment's quality entry
  */
-Ext.define('Editor.model.quality.SegmentQuality', {
+Ext.define('Editor.model.quality.Segment', {
     extend: 'Ext.data.Model',
     fields: [
         { name:'id', type:'int' },
+        { name:'segmentId', type:'int' },
+        { name:'field', type:'string' },
         { name:'type', type:'string' },
         { name:'typeTitle', type:'string' },
-        { name:'segmentId', type:'int' },
-        { name:'falsePositive', type:'int' },
+        { name:'category', type:'string' },
         { name:'title', type:'string' },
-        { name:'fields' }
+        { name:'falsePositive', type:'int' },
+        { name:'filterable', type:'boolean' },
+        { name:'falsifiable', type:'boolean' }
     ],
     idProperty: 'id',
-    getFields: function(){
-        this.get('fields');
-    }    
+    proxy : {
+      type : 'rest',
+      url: Editor.data.restpath+'quality/segment',
+      reader : {
+        rootProperty: 'rows',
+        type : 'json'
+      }
+    }
 });

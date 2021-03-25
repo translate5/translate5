@@ -40,7 +40,6 @@ Ext.define('Editor.store.quality.Statistics', {
     isLoaded: false,
     proxy : {
         type : 'rest',
-        appendId: false,
         reader: {
             type : 'json'
         },

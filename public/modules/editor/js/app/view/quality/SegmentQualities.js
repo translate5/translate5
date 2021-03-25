@@ -33,20 +33,17 @@ Ext.define('Editor.view.quality.SegmentQualities', {
     extend: 'Ext.form.FieldSet',
     alias: 'widget.segmentQualities',
     title: "#UT#QA: Falsch Positive",
-    requires: [ 'Editor.model.quality.SegmentQuality' ], 
+    requires: [ 'Editor.store.quality.Segment' ], 
     defaultType: 'checkbox',
-    qualities: [],
     hidden: true,
-    loader: {
-        url: Editor.data.restpath+'quality/segment',
-        loadMask: true,
-        renderer: function(loader, response, active) {
-            var me = loader.getTarget();
-            var data = Ext.decode(response.responseText);
-            if(data.total > 0){
-                me.qualitiesLoaded(data.rows);
-            }
+    initConfig: function(instanceConfig) {
+        var config = {
+            store: Ext.create('Editor.store.quality.Segment')
+        };
+        if (instanceConfig) {
+            this.self.getConfigurator().merge(this, config, instanceConfig);
         }
+        return this.callParent([config]);
     },
     changeFalsePositive: function(qualityId, value){
         var me = this;
@@ -63,25 +60,19 @@ Ext.define('Editor.view.quality.SegmentQualities', {
         });        
     },
     falsePositiveChanged: function(qualityId, value){
-        for(var i=0; i < this.qualities.length; i++){
-            if(this.qualities[i].id == qualityId){
-                this.qualities[i].falsePositive = value;
-                this.fireEvent('segmentQualitiyChanged', Ext.create('Editor.model.quality.SegmentQuality', this.qualities[i]), this);
-                return;
-            }
-        }
+        this.store.updateRecordProp(qualityId, 'falsePositive', value);
     },
     qualitiesLoaded: function(qualities){
-        this.qualities = qualities;
         var me = this;
-        Ext.each(qualities, function(row){
+        this.store.each(function(record, idx){
             me.add({
                 xtype: 'checkbox',
                 anchor: '100%',
-                name: 'segq' + row.id,
-                inputValue: row.id,
-                value: (row.falsePositive == '1'),
-                boxLabel: row.typeTitle + ' > ' + row.title,
+                name: 'segq' + record.get('id'),
+                inputValue: record.get('id'),
+                value: (record.get('falsePositive') == 1),
+                boxLabel: record.get('typeTitle') + ' > ' + record.get('title'),
+                disabled: !record.get('falsifiable'),
                 // boxLabelAlign: 'before',
                 handler: function(checkbox, checked){
                     me.changeFalsePositive(checkbox.inputValue, (checked ? '1' : '0'));
@@ -95,19 +86,19 @@ Ext.define('Editor.view.quality.SegmentQualities', {
      * @param {Integer} segmentId for which the qualities should be loaded 
      */
     startEditing: function(segmentId){
-        this.getLoader().load({
-            params: { segmentId: segmentId }
+        var me = this;
+        this.store.load({
+            scope: this,
+            params: { segmentId: segmentId },
+            callback: function(){ this.qualitiesLoaded(); }
         });
     },
     /**
      * Hides the GUI if present
      */
     endEditing: function(){
-        if(this.qualities.length > 0){
-            this.removeAll();
-            this.qualities = [];
-            this.hide();            
-        }
+        this.removeAll();
+        this.hide();            
     }
 });
 
