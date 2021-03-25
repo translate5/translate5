@@ -33,7 +33,8 @@
  */
 
 /**
- * 
+ * The central Quality Manager
+ * Orchestrates all Quaities via the editor_Segment_Quality_Provider registry
  *
  */
 final class editor_Segment_Quality_Manager {
@@ -184,9 +185,9 @@ final class editor_Segment_Quality_Manager {
                 }
             }
             // we save all qualities at once to reduce db-strain
-            $qualities = array_merge($qualities, $tags->getQualities());
+            $qualities = array_merge($qualities, $tags->extractNewQualities());
             // flush the segment tags content back to the segment
-            $tags->flush(false);
+            $tags->flush();
         }
         // save qualities
         editor_Models_Db_SegmentQuality::saveRows($qualities);
@@ -214,7 +215,7 @@ final class editor_Segment_Quality_Manager {
             }
             $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
         }
-        $tags->flush(true);
+        $tags->flush();
     }
     /**
      * The central API to identify the needed Tag class by classnames and attributes
@@ -276,6 +277,14 @@ final class editor_Segment_Quality_Manager {
         }        
         throw new ZfExtended_Exception('editor_Segment_Quality_Manager::translateQuality: provider of type "'.$type.'" has no translation of category "'.$category.'".');
         return NULL;
+    }
+    /**
+     * Evaluates, if a quality of the given type renders tags in the tags texts
+     * @param string $type
+     * @return bool
+     */
+    public function hasSegmentTags(string $type) : bool {
+        return $this->getProvider($type)->hasSegmentTags();
     }
     /**
      * Evaluates, if a quality of the given type is a type that generally should show up in the filter panel and in the task properties

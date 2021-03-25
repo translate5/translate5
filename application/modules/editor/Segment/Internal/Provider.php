@@ -44,12 +44,14 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
      */
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
     
+    
+    
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
         if(!$qualityConfig->enableInternalTagCheck || $processingMode == editor_Segment_Processing::IMPORT){
             return $tags;
         }
-        // 1) Tag check: Bei Translation: Internal Tags gegen Source prüfen, bei Review: gegen original Target  (insofern gesetzt)          
+        // 1) Tag check: Bei Translation: Internal Tags gegen Source prüfen, bei Review: gegen original Target (insofern gesetzt)          
         $isTranslationTask = $task->getEmptyTargets();
         $against = $tags->getOriginalOrNormalSource();
         if(!$isTranslationTask){
@@ -58,19 +60,11 @@ class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
                 $against = $originalTarget;
             }
         }
-        $data = [];
         foreach($tags->getTargets() as $toCheck){ /* @var $toCheck editor_Segment_Fieldtags */
             $comparision = new editor_Segment_Internal_TagComparision($toCheck, $against);
             foreach($comparision->getStati() as $status){
-                if(!array_key_exists($status, $data)){
-                    $data[$status] = [];
-                }
-                // group the fields by category
-                $data[$status][] = $toCheck->getField();
+                $tags->addQuality($toCheck->getField(), editor_Segment_Tag::TYPE_INTERNAL, $status);
             }
-        }
-        foreach($data as $category => $fields){
-            $tags->addQuality($fields, editor_Segment_Tag::TYPE_INTERNAL, $category);
         }
         return $tags;
     }

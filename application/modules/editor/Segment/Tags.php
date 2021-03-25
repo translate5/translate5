@@ -139,14 +139,9 @@ class editor_Segment_Tags implements JsonSerializable {
     private $segment = NULL;
     /**
      * 
-     * @var editor_Models_Db_SegmentQualityRow[]
+     * @var editor_Segment_Qualities
      */
-    private $qualities = [];
-    /**
-     * 
-     * @var editor_Models_Db_SegmentQuality
-     */
-    private $qualityTable = NULL;
+    private $qualities = NULL;
     /**
      * 
      * @param editor_Models_Task $task
@@ -238,7 +233,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * Saves all fields back to the segment when the import is finished or when editing segments
      * @param boolean $flushQualities: whem set to true, the segment-qualities will be saved as well
      */
-    public function flush($saveQualities=true){
+    public function flush(){
 
         if($this->hasOriginalSource()){
              // we do know that the original source just has a single save-to field
@@ -257,10 +252,8 @@ class editor_Segment_Tags implements JsonSerializable {
             }
         }
         $this->getSegment()->save();
-        // save qualities if wanted
-        if($saveQualities){
-            $this->saveQualities();
-        }
+        // save qualities
+        $this->getQualities()->save();
     }
     /**
      * Saves the current state to the segment-tags cache. This API is used while the threaded import
@@ -273,42 +266,42 @@ class editor_Segment_Tags implements JsonSerializable {
      * 
      * @return string
      */
-    public function getProcessingMode(){
+    public function getProcessingMode() : string {
         return $this->processingMode;
     }
     /**
      *
      * @return boolean
      */
-    public function hasSource(){
+    public function hasSource() : bool {
         return ($this->source != null);
     }
     /**
      *
      * @return boolean
      */
-    public function hasOriginalSource(){
+    public function hasOriginalSource() : bool {
         return ($this->sourceOriginal != null);
     }
     /**
      *
      * @return boolean
      */
-    public function hasOriginalTarget(){
+    public function hasOriginalTarget() : bool {
         return ($this->targetOriginal != null);
     }
     /**
      * 
      * @return editor_Segment_FieldTags
      */
-    public function getSource(){
+    public function getSource() : ?editor_Segment_FieldTags {
         return $this->source;
     }
     /**
      * 
      * @return editor_Segment_FieldTags
      */
-    public function getOriginalSource(){
+    public function getOriginalSource() : ?editor_Segment_FieldTags {
         return $this->sourceOriginal;
     }
     /**
@@ -335,7 +328,7 @@ class editor_Segment_Tags implements JsonSerializable {
     public function getOriginalTarget() : ?editor_Segment_FieldTags {
         return $this->targetOriginal;
     }
-    /**?editor_Segment_FieldTags
+    /**
      *
      * @return editor_Segment_FieldTags|NULL
      */
@@ -457,57 +450,27 @@ class editor_Segment_Tags implements JsonSerializable {
      * @param int $startIndex
      * @param int $endIndex
      */
-    public function addQuality($fields, string $type, string $category, int $startIndex=0, int $endIndex=-1) {
-        $row = $this->getQualityTable()->createRow();
-        /* @var $row editor_Models_Db_SegmentQualityRow */
-        $row->segmentId = $this->segmentId;
-        $row->taskGuid = $this->task->getTaskGuid();
-        if(is_array($fields)){
-            $row->setFields(array_unique($fields));
-        } else {
-            $row->setField($fields);
-        }
-        $row->type = $type;
-        $row->category = $category;
-        $row->startIndex = $startIndex;
-        $row->endIndex = $endIndex;
-        $row->falsePositive = 0; // TODO AUTOQA: this means, when we re-set qualities a former existing false positive flag will not persist
-        $row->categoryIndex = -1;
-        $row->severity = NULL;
-        $row->comment = NULL;
-        $this->qualities[] = $row;
+    public function addQuality(string $field, string $type, string $category, int $startIndex=0, int $endIndex=-1, $falsePositive=-1){
+        $this->getQualities()->add($field, $type, $category, $startIndex, $endIndex, $falsePositive);
     }
     /**
+     * Adds a quality entry by tag
+     * @param editor_Segment_Tag $tag
+     * @param string $field
+     */
+    public function addQualityByTag(editor_Segment_Tag $tag, string $field=NULL){
+        $this->getQualities()->addByTag($tag, $field);
+    }
+    /**
+     * // TODO AUTOQA CHANGE API
      * Adds a quality to the tags (segment-quality model) for all target fields
      * @param string $type
      * @param string $category
      */
-    public function addAllTargetsQuality(string $type, string $category) {
-        $this->addQuality($this->getAllTargetFields(), $type, $category);
-    }
-    /**
-     * Adds a MQM Quality to the tags (segment-quality model)
-     * This model will be saved immediately to return the id
-     * @param string $field
-     * @param int $typeIndex
-     * @param string $severity
-     * @param string $comment
-     * @param int $startIndex
-     * @param int $endIndex
-     * @return int
-     */
-    public function saveMqm(string $field, int $typeIndex, string $severity, string $comment, int $startIndex=0, int $endIndex=-1){
-        // TODO AUTOQA: this means, when we re-set qualities a former existing false positive flag will not persist
-        $qualityRow = $this->getQualityTable()->addMqm(
-            $this->task->getTaskGuid(),
-            $this->segmentId,
-            $field,
-            $typeIndex,
-            $severity,
-            $comment,
-            $startIndex,
-            $endIndex);
-        return $qualityRow->id;
+    public function addAllTargetsQuality(string $type, string $category){
+        foreach($this->getAllTargetFields() as $field){
+            $this->getQualities()->add($field, $type, $category);
+        }
     }
     /**
      * Returnes the names of all our target fields
@@ -524,15 +487,24 @@ class editor_Segment_Tags implements JsonSerializable {
      * 
      * @return editor_Models_Db_SegmentQualityRow[]
      */
-    public function getQualities(){
-        return $this->qualities;
+    public function extractNewQualities(){
+        return $this->getQualities()->extractNewQualities();
     }
     /**
      * Saves all set qualities to the database after deleting the current ones
      */
     public function saveQualities(){
-        editor_Models_Db_SegmentQuality::saveRows($this->qualities);
-        $this->qualities = [];
+        $this->getQualities()->save();
+    }
+    /**
+     * internal
+     * @return editor_Segment_Qualities
+     */
+    private function getQualities(){
+        if($this->qualities == NULL){
+            $this->qualities = new editor_Segment_Qualities($this->segmentId, $this->task->getTaskGuid());
+        }
+        return $this->qualities;
     }
     
     /* Serialization API */

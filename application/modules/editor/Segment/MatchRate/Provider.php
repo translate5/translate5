@@ -74,6 +74,10 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
         return $tags;
     }
     
+    public function hasSegmentTags() : bool {
+        return false;
+    }
+    
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
         return $translate->_('Match-Analyse');
     }

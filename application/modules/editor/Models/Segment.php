@@ -1826,6 +1826,21 @@ order by date desc, segmentId asc limit 1';
         return $this->config;
     }
     /**
+     * Retrieves the Field-tags for a certain field
+     * Keep in mind that the saveTo & termTaggerName fields will be set simply with the field name
+     * @param string $field
+     * @return editor_Segment_FieldTags|NULL
+     */
+    public function getFieldTags($field) : ?editor_Segment_FieldTags {
+        $editField = $this->segmentFieldManager->getEditIndex($field);
+        $location = $this->segmentFieldManager->getDataLocationByKey($editField);
+        if($location !== false && array_key_exists($location['field'], $this->segmentdata)) {
+            $fieldText = $this->segmentdata[$location['field']]->__get($location['column']);
+            return new editor_Segment_FieldTags($this->getId(), $location['field'], $fieldText, $editField);
+        }
+        return NULL;
+    }
+    /**
      *
      * @return Zend_Db_Table_Row_Abstract
      */

@@ -49,11 +49,14 @@ class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractVi
             $row = new stdClass();
             $row->id = $dbRow->id;
             $row->type = $dbRow->type;
+            $row->category = $dbRow->category;
             $row->segmentId = $dbRow->segmentId;
             $row->falsePositive = $dbRow->falsePositive;
             $row->typeTitle = $this->manager->translateQualityType($dbRow->type);
             $row->title = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
-            $row->fields = $dbRow->getFields();
+            $row->field = $dbRow->field;
+            $row->filterable = $this->manager->isFilterableType($dbRow->type);
+            $row->falsifiable = $this->manager->canBeFalsePositiveCategory($dbRow->type, $dbRow->category);
             $this->rows[] = $row;
         }
         usort($this->rows, 'editor_Models_Quality_SegmentView::compareByTypeTitle');

@@ -33,23 +33,33 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_TermTagger_SegmentProcessor {
     
     /**
+     * these are the term states we want to see as qualities and which are also css-classes of the term-tags
+     * @var string[]
+     */
+    static $qualityStates = [ editor_Models_Term::STAT_SUPERSEDED, editor_Models_Term::STAT_DEPRECATED, editor_Models_Term::TRANSSTAT_NOT_FOUND, editor_Models_Term::TRANSSTAT_NOT_DEFINED ];
+    /**
+     * Filters a quality state out of an array of term-entries
+     * Returns an empty string if any found
+     * @param array $cssClasses
+     * @return string
+     */
+    public static function getQualityState(array $cssClasses) : string {
+        foreach($cssClasses as $cssClass){
+            if(in_array($cssClass, self::$qualityStates)){
+                return $cssClass;
+            }
+        }
+        return '';
+    }
+    /**
      * Finds term tags of certain classes (= certain term stati) in the tags that represent a problem
      * @param editor_Segment_Tags $tags
      */
     public static function findAndAddQualitiesInTags(editor_Segment_Tags $tags){
-        
         $type = editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE;
-        // these are the term states we want to see as qualities and which are also css-classes of the term-tags
-        $termStates = [ editor_Models_Term::STAT_SUPERSEDED, editor_Models_Term::STAT_DEPRECATED, editor_Models_Term::TRANSSTAT_NOT_FOUND, editor_Models_Term::TRANSSTAT_NOT_DEFINED ];
-        
         foreach($tags->getTagsByType($type) as $termTag){
-            /* @var $termTag editor_Plugins_TermTagger_Tag */
-            foreach($termStates as $state){
-                if($termTag->hasClass($state)){
-                    $tags->addQuality($termTag->field, $type, $state, $termTag->startIndex, $termTag->endIndex);
-                    // we want only the most relevant problem by term
-                    break;
-                }
+            if($termTag->hasCategory()){
+                $tags->addQualityByTag($termTag);
             }
         }
     }

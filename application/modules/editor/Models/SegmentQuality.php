@@ -32,6 +32,8 @@ END LICENSE AND COPYRIGHT
  * @method int getId() getId()
  * @method void setSegmentId() setSegmentId(int $segmentId)
  * @method int getSegmentId() getSegmentId()
+ * @method void setField() setField(string $field)
+ * @method string getField() getField()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setType() setType(string $type)
@@ -56,33 +58,4 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
     
     protected $dbInstanceClass = 'editor_Models_Db_SegmentQuality';
     protected $validatorInstanceClass = 'editor_Models_Validator_SegmentQuality';
-    
-    /**
-     * 
-     * @return string[]
-     */
-    public function getFields(){
-        return $this->row->getFields();
-    }
-    /**
-     * 
-     * @param array $fields
-     */
-    public function setFields(array $fields){
-        $this->row->setFields($fields);
-    }
-    /**
-     * 
-     * @param string $field
-     */
-    public function setField(string $field){
-        $this->row->fields = empty($field) ? '' : $field;
-    }
-    /**
-     * 
-     * @param string $field
-     */
-    public function addField(string $field){
-        $this->row->addField($field);
-    }
 }

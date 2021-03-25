@@ -98,20 +98,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
     protected $_rowClass = 'editor_Models_Db_SegmentQualityRow';
     
     public $_primary = 'id';
-    
-    /**
-     * 
-     * @param string $field
-     * @return string
-     */
-    public function createFieldCondition($field) : string {
-        $adapter = $this->getAdapter();
-        return
-            '(fields = '.$adapter->quote($field)
-            .' OR fields LIKE '.$adapter->quote($field.',%')
-            .' OR fields LIKE '.$adapter->quote('%,'.$field)
-            .' OR fields LIKE '.$adapter->quote('%,'.$field.',%').')';
-    }
+
     /**
      * 
      * @param string $taskGuid
@@ -137,7 +124,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             }
         }
         if($field != NULL){
-            $select->where($this->createFieldCondition($field));
+            $select->where('field = ?', $field);
         }
         if(!empty($types)){ // $types can not be "0"...
             if(is_array($types) && count($types) > 1){
@@ -165,75 +152,22 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
     /**
      * 
      * @param int $segmentId
+     * @return Zend_Db_Table_Rowset_Abstract
+     */
+    public function fetchBySegment(int $segmentId) : Zend_Db_Table_Rowset_Abstract {
+        return $this->fetchFiltered(NULL, $segmentId);
+    }
+    /**
+     * 
+     * @param int $segmentId
      * @param string $type
      * @return int
      */
-    public function removeQualitiesBySegmentAndType(int $segmentId, string $type) : int {
+    public function removeBySegmentAndType(int $segmentId, string $type) : int {
         $where = array();
         $where[] = $this->getAdapter()->quoteInto('segmentId = ?', $segmentId);
         $where[] = $this->getAdapter()->quoteInto('type = ?', $type);
         return $this->delete($where);
-    }
-    /**
-     * adding a general quality. To add a quality without segment-quality contraint, set segmentId to -1
-     * 
-     * @param string $taskGuid
-     * @param int $segmentId
-     * @param string $field
-     * @param string $type
-     * @param string $category
-     * @param int $categoryIndex
-     * @param string $severity
-     * @param string $comment
-     * @param int $startIndex
-     * @param int $endIndex
-     * @param int $falsePositive
-     * @return editor_Models_Db_SegmentQualityRow
-     */
-    public function addQuality(string $taskGuid, int $segmentId, string $field, string $type, string $category=NULL, int $categoryIndex=-1, string $severity=NULL, string $comment=NULL, int $startIndex=0, int $endIndex=-1, int $falsePositive=0) : editor_Models_Db_SegmentQualityRow {
-        $row = $this->createRow();
-        /* @var $row editor_Models_Db_SegmentQualityRow */
-        
-        $row->taskGuid = $taskGuid;
-        $row->segmentId = ($segmentId == -1) ? NULL : $segmentId;
-        $row->setField($field);
-        $row->type = $type;
-        $row->category = $category;
-        $row->startIndex = $startIndex;
-        $row->endIndex = $endIndex;
-        $row->falsePositive = $falsePositive;
-        $row->categoryIndex = $categoryIndex;
-        $row->severity = $severity;
-        $row->comment = $comment;
-        $row->save();
-        
-        return $row;
-    }
-    /**
-     * adding a MQM quality. To add a quality without segment-quality contraint, set segmentId to -1
-     * 
-     * @param string $taskGuid
-     * @param int $segmentId
-     * @param string $field
-     * @param int $typeIndex
-     * @param string $severity
-     * @param string $comment
-     * @param int $startIndex
-     * @param int $endIndex
-     * @return editor_Models_Db_SegmentQualityRow
-     */
-    public function addMqm(string $taskGuid, int $segmentId, string $field, int $typeIndex, string $severity, string $comment, int $startIndex=0, int $endIndex=-1) : editor_Models_Db_SegmentQualityRow {
-         return $this->addQuality(
-            $taskGuid,
-            $segmentId,
-            $field,
-            editor_Segment_Tag::TYPE_MQM,
-            editor_Segment_Tag::TYPE_MQM.'_'.strval($typeIndex),
-            $typeIndex,
-            $severity,
-            $comment,
-            $startIndex,
-            $endIndex);
     }
     /**
      * 

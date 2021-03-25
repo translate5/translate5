@@ -62,9 +62,8 @@ class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider {
        
             foreach($tags->getTagsByType(static::$type) as $mqmTag){
                 /* @var $mqmTag editor_Segment_Mqm_Tag */
-                $qualityId = $tags->saveMqm($mqmTag->field, $mqmTag->getTypeIndex(), $mqmTag->getSeverity(), $mqmTag->getComment(), $mqmTag->startIndex, $mqmTag->endIndex);
-                // update the sequence-id with the database-id of the bound quality
-                $mqmTag->setData('seq', strval($qualityId));
+                // this will also update the ext-js sequence-id in the tag with the database-id of the bound quality in case of an extJs generated ID
+                $tags->addQualityByTag($mqmTag);
             }
         }
         return $tags;

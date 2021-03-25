@@ -44,4 +44,17 @@ class  editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
     protected static $type = editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE;
 
     protected static $nodeName = 'div';
+    
+    /**
+     * Our css-classes are connected with the category, we must reflect that
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::setCategory()
+     */
+    public function setCategory(string $category) : string {
+        $this
+            ->removeClass($this->category)
+            ->addClass($category);
+        $this->category = $category;
+        return $this;
+    }
 }

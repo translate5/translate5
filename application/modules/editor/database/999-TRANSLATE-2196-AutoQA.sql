@@ -51,7 +51,7 @@ CREATE TABLE `LEK_segment_quality` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `taskGuid` varchar(38) NOT NULL,
   `segmentId` int(11) DEFAULT NULL,
-  `fields` varchar(300) NOT NULL,
+  `field` varchar(120) NOT NULL,
   `type` varchar(10) NOT NULL,
   `category` varchar(64) NOT NULL,
   `startIndex` int(11) NOT NULL DEFAULT 0,
@@ -66,9 +66,9 @@ CREATE TABLE `LEK_segment_quality` (
   CONSTRAINT `LEK_segment_quality_ibfk_1` FOREIGN KEY (`segmentId`) REFERENCES `LEK_segments` (`id`) ON DELETE CASCADE,
   CONSTRAINT `LEK_segment_quality_ibfk_2` FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
 );
--- migrate data from LEK_qmsubsegments
-INSERT INTO `LEK_segment_quality` (`segmentId`, `taskGuid`, `fields`, `type`, `category`, `categoryIndex`, `severity`, `comment`)
-SELECT `segmentId`,  `taskGuid`, `fieldedited`, 'mqm', CONCAT('mqm_', `qmtype`), `qmtype`, `severity`, `comment` FROM `LEK_qmsubsegments`;
+-- migrate data from LEK_qmsubsegments. We need to keep the id's as they're referenced in the MQM-tags in the DB
+INSERT INTO `LEK_segment_quality` (`id`, `segmentId`, `taskGuid`, `field`, `type`, `category`, `categoryIndex`, `severity`, `comment`)
+SELECT `id`, `segmentId`,  `taskGuid`, `fieldedited`, 'mqm', CONCAT('mqm_', `qmtype`), `qmtype`, `severity`, `comment` FROM `LEK_qmsubsegments`;
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) 
 VALUES ('runtimeOptions.frontend.defaultState.editor.westPanelQualityFilter', '1', 'editor', 'system', '{}', '{}', '', 'map', 'Default state configuration for the editor west panel quality filter panel. If this field value is empty ({} is not an empty value!), no state will be applied/saved for this component.', 16);

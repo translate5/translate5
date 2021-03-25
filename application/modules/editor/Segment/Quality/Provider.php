@@ -126,6 +126,13 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     /* *************** REST view API *************** */
     
     /**
+     * Retrieves, if the Quality has tags in the segment texts present
+     * @return bool
+     */
+    public function hasSegmentTags() : bool {
+        return true;
+    }
+    /**
      * Retrieves, if the quality type is filterable (will be shown in the filter panel or task panel)
      * @return bool
      */

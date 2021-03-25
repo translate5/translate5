@@ -32,13 +32,13 @@ class editor_Models_Validator_SegmentQuality extends ZfExtended_Models_Validator
         $this->addValidator('id', 'int');
         $this->addValidator('segmentId', 'int');
         $this->addValidator('taskGuid','stringLength', array('min' => 1, 'max' => 38));
-        $this->addValidator('field','stringLength', array('min' => 1, 'max' => 300));
+        $this->addValidator('field','stringLength', array('min' => 1, 'max' => 120));
         $this->addValidator('type','stringLength', array('min' => 1, 'max' => 10));
         $this->addValidator('category','stringLength', array('min' => 0, 'max' => 64));
         $this->addValidator('startIndex', 'int');
         $this->addValidator('endIndex', 'int');
         $this->addValidator('falsePositive', 'int');
-        $this->addValidator('qmtype', 'int');
+        $this->addValidator('categoryIndex', 'int');
         $this->addValidator('severity','stringLength', array('min' => 0, 'max' => 255));
     }
 }
