@@ -133,6 +133,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     }
     
     /**
+     * Info: the worker progres will be updated after the worker state is set to done
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()
      */
