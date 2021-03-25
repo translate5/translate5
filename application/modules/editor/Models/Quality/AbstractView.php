@@ -129,20 +129,6 @@ abstract class editor_Models_Quality_AbstractView {
         // ordering is crucial !
         $this->dbRows = $this->table->fetchFiltered($task->getTaskGuid(), $segmentId, $field, $blacklist, true, NULL, ['type ASC','category ASC']);
         $this->create();
-        
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $translate->_('MQM');
-        $translate->_('Match-Analyse');
-        $translate->_('Unbearbeiteter Fuzzy');
-        $translate->_('Bearbeiteter 100% Match');
-        $translate->_('Terminologie');
-        $translate->_('Term wurde in der Zielsprache nicht gefunden');
-        $translate->_('Term ist in der Zielsprache nicht definiert');
-        $translate->_('Term ist in der Zielsprache ersetzt, veraltet oder verboten');
-        $translate->_('Interne Tags');        
-        $translate->_('Interne Tags fehlen');        
-        $translate->_('Interne Tags wurden hinzugefügt');        
-        $translate->_('Die Internen Tags haben eine ungültige Struktur');
     }
     /**
      * Retrieves the processed data

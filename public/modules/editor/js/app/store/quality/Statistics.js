@@ -55,7 +55,6 @@ Ext.define('Editor.store.quality.Statistics', {
         Ext.applyIf(config, {
             fields: this.generateFields()
         });
-        //arguments[0] = fields;
         this.callParent(arguments);
     },
     /**

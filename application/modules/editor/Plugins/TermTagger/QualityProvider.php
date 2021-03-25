@@ -126,7 +126,6 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
                 
                 $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden.');
             }
-            
         }
         return $tags;
     }
@@ -156,7 +155,8 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     }
 
     public function createSegmentTag(int $startIndex, int $endIndex, string $nodeName, array $classNames) : editor_Segment_Tag {
-        return new editor_Plugins_TermTagger_Tag($startIndex, $endIndex);
+        // the category is represented by a css-class
+        return new editor_Plugins_TermTagger_Tag($startIndex, $endIndex, editor_Plugins_TermTagger_SegmentProcessor::getQualityState($classNames));
     }
     /**
      * Find oversized segments and mark them as oversized
@@ -169,7 +169,7 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         $maxWordCount = $config->runtimeOptions->termTagger->maxSegmentWordCount ?? 150;
         $meta->db->update([
             'termtagState' => editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE
-        ], [
+        ],[
             'taskGuid = ?' => $task->getTaskGuid(),
             'sourceWordCount >= ?' => $maxWordCount,
         ]);

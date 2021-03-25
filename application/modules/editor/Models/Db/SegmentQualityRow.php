@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  * @property int $id
  * @property string $taskGuid
  * @property int $segmentId
- * @property string $fields
+ * @property string $field
  * @property string $type
  * @property string $category
  * @property int $startIndex
@@ -47,45 +47,8 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
     
     protected $_tableClass = 'editor_Models_Db_SegmentQuality';
     /**
-     *
-     * @return string[]
+     * Used in editor_Segment_Qualities to process the qualities
+     * @var string
      */
-    public function getFields(){
-        if(empty($this->fields)){
-            return [];
-        }
-        return explode(',', $this->fields);
-    }
-    /**
-     *
-     * @param array $fields
-     */
-    public function setFields(array $fields){
-        $val = (empty($fields)) ? '' : (is_array($fields) ? implode(',', $fields) : strval($fields));
-        $this->fields = $val;
-    }
-    /**
-     *
-     * @param string $field
-     */
-    public function setField(string $field){
-        $this->fields = empty($field) ? '' : $field;
-    }
-    /**
-     *
-     * @param string $field
-     */
-    public function addField(string $field){
-        $fields = $this->getFields();
-        $fields[] = $field;
-        $this->setFields($fields);
-    }
-    /**
-     * 
-     * @param int $segmentId
-     */
-    public function setSegmentIdAndSave(int $segmentId){
-        $this->segmentId = $segmentId;
-        $this->save();
-    }
+    public $processingState;
 }

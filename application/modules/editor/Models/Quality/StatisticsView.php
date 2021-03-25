@@ -217,7 +217,7 @@ class editor_Models_Quality_StatisticsView {
      * @param string $field
      * @return array array() {[categoryIndex]=>  array(4) { ["categoryIndex"]=> "asdf", ["severity1"]=> (int)count, ["severity2"]=> (int)count, ... ,["sum"]=>  int()sum of severities }
      */
-    private function fetchStatisticsData(string $field) : array {
+    private function fetchStatisticsData(string $field=NULL) : array {
         $select = $this->table->getAdapter()->select()
             ->from(
                 array('q' => $this->table->getName()),
@@ -225,8 +225,10 @@ class editor_Models_Quality_StatisticsView {
             ->group('categoryIndex')
             ->group('severity')
             ->where('taskGuid = ?', $this->task->getTaskGuid())
-            ->where('type = ?', editor_Segment_Tag::TYPE_MQM)
-            ->where($this->table->createFieldCondition($field));
+            ->where('type = ?', editor_Segment_Tag::TYPE_MQM);
+        if(!empty($field)){
+            $select->where('field = ?', $field);
+        }
         $data = $this->table->getAdapter()->fetchAll($select);
         $groupedData = [];
         foreach ($data as $d) {

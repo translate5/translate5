@@ -43,7 +43,7 @@
  * @method editor_Segment_Mqm_Tag clone(boolean $withDataAttribs)
  * @method editor_Segment_Mqm_Tag createBaseClone()
  */
-final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
+final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
 
     /**
      * @var string
@@ -77,10 +77,23 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      * @var string
      */
     const IMAGE_SRC = 'qmsubsegment-{0}-{1}.png';
+    /**
+     * Creates the category of a MQM tag out of it's category index (which will be saved seperately - what can be seen as a redundancy)
+     * @param int $categoryIndex
+     * @return string
+     */
+    public static function createCategoryVal(int $categoryIndex) : string {
+        return editor_Segment_Tag::TYPE_MQM.'_'.strval($categoryIndex);
+    }
 
     protected static $type = editor_Segment_Tag::TYPE_MQM;
 
     protected static $nodeName = 'img';
+    /**
+     * QUIRK / TODO AUTO QA: historically, the quality-id was encoded as data-seq
+     * @var string
+     */
+    protected static $dataNameQualityId = 'seq';
     
     /**
      * @var string
@@ -132,7 +145,7 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
             ->addClass(editor_Segment_Tag::CSS_CLASS_TOOLTIP)
             ->addClass($posClass)
             ->addClass(self::CSS_CLASS.'-'.strval($categoryIndex))
-            ->setData('seq', strval($qualityId))
+            ->setData(static::$dataNameQualityId, strval($qualityId))
             ->setData('comment', $comment);
         return $tag->render();
     }
@@ -156,13 +169,12 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      * @var string
      */
     private $comment = '';
-    
     /**
      * 
      * @return int
      */
-    public function getTypeIndex() : int {
-        return $this->typeIndex;
+    public function getCategoryIndex() : int {
+        return $this->categoryIndex;
     }
     /**
      * 
@@ -185,13 +197,24 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     public function isPaired() : bool {
         return $this->paired;
     }
+    
+    /* Overwritten API */
+    
+    public function getCategory() : string {
+        return self::createCategoryVal($this->categoryIndex);
+    }
+
+    public function setCategory(string $category) : string {
+        // TODO AUTOQA: we may should raise an exception if this api is called unwantedly
+        return $this;
+    }
 
     /* Overwritten API to reflect pairing */
     
     public function clone($withDataAttribs=false){
         $clone = parent::clone($withDataAttribs);
         /* @var $clone editor_Segment_Mqm_Tag */
-        $clone->setMqmProps($this->paired, $this->typeIndex, $this->severity, $this->comment);
+        $clone->setMqmProps($this->paired, $this->categoryIndex, $this->severity, $this->comment);
         return $clone;
     }
     
@@ -217,7 +240,7 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         $tag = $this->cloneProps(editor_Tag::img(), true);
         $position = ($isOpener) ? 'left' : 'right';
         $className = ($isOpener) ? self::CSS_CLASS_OPEN : self::CSS_CLASS_CLOSE;
-        $tag->setSource(self::createImageSrc($this->typeIndex, $position));
+        $tag->setSource(self::createImageSrc($this->categoryIndex, $position));
         // to resemble the otherwise used structure we prepend this class. In General, CSS-classes should be independent from position ...
         $tag->prependClass($className);
         return $tag->render();
@@ -233,7 +256,7 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     private function setMqmProps(bool $paired, int $categoryIndex, string $severity, string $comment) : editor_Segment_Mqm_Tag{
         $this->paired = $paired;
         $this->singular = !$paired;
-        $this->typeIndex = $categoryIndex;
+        $this->categoryIndex = $categoryIndex;
         $this->severity = $severity;
         $this->comment = $comment;
         return $this;
@@ -251,7 +274,7 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     
     public function isObsolete() : bool {
         // we discard any invalid mqm tags, e.g. those spanning no text
-        return (!$this->paired || $this->startIndex == $this->endIndex || $this->typeIndex == -1 || $this->severity == '');
+        return (!$this->paired || $this->startIndex == $this->endIndex || $this->categoryIndex == -1 || $this->severity == '');
     }
     
     public function onConsolidationRemoval() {
@@ -261,9 +284,9 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         }
         // TODO AUTOQA: Code is copied from editor_Models_Qmsubsegments, needed ??
         // tags spanning no text will be removed silently
-        if($this->getData('seq') == null){
+        if($this->getData(static::$dataNameQualityId) == null){
             throw new Zend_Exception('MQM Tag found, but no quality-id (data-seq) was set in: '.$this->renderStart());
-        } else if($this->typeIndex == -1){
+        } else if($this->categoryIndex == -1){
             throw new Zend_Exception('MQM Tag found, but no type index was set in: '.$this->renderStart());
         } else if($this->severity == ''){
             throw new Zend_Exception('MQM Tag found, but no severity was set in: '.$this->renderStart());
@@ -276,7 +299,7 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      * @see editor_Segment_Tag::pairWith()
      */
     public function pairWith(editor_Segment_Tag $tag) : bool {
-        if($this->getData('seq') == null || $tag->getData('seq') != $this->getData('seq')){
+        if($this->getData(static::$dataNameQualityId) == null || $tag->getData(static::$dataNameQualityId) != $this->getData(static::$dataNameQualityId)){
             return false;
         }
         if(editor_Segment_FieldTags::VALIDATION_MODE && $this->endIndex != $this->startIndex || $tag->endIndex != $tag->startIndex){
@@ -296,7 +319,7 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         $src = $this->getAttribute('src');
         $matches = array();
         if(preg_match(self::PATTERN_INDEX, $src, $matches)){
-            $this->typeIndex = intval($matches[1]);
+            $this->categoryIndex = intval($matches[1]);
         }
         $this->comment = htmlspecialchars_decode($this->getData('comment'));
  
@@ -305,14 +328,14 @@ final class  editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     
     protected function furtherSerialize(stdClass $data){
         $data->paired = $this->paired;
-        $data->typeIndex = $this->typeIndex;
+        $data->categoryIndex = $this->categoryIndex;
         $data->comment = $this->comment;
         $data->severity = $this->severity;
     }
     
     protected function furtherUnserialize(stdClass $data){
         $this->paired = $data->paired;
-        $this->typeIndex = $data->typeIndex;
+        $this->categoryIndex = $data->categoryIndex;
         $this->comment = $data->comment;
         $this->severity = $data->severity;
     }

@@ -69,6 +69,15 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     const CSS_CLASS_TOOLTIP = 'ownttip';
     /**
+     * @var string
+     */
+    const CSS_CLASS_FALSEPOSITIVE = 't5qfalpos';
+    /**
+     * @var string
+     */
+    const DATA_NAME_QUALITYID = 't5qid';
+    
+    /**
      * The counterpart to ::toJson: creates the tag from the serialized json data
      * @param string $jsonString
      * @throws Exception
@@ -108,6 +117,11 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @var string
      */
     protected static $nodeName = null;
+    /**
+     * For compatibility with old code/concepts some quality tags may not use the global date-attribute for the quality ID
+     * @var string
+     */
+    protected static $dataNameQualityId = null;
     /**
      * The start character Index of the Tag in relation to the segment's text
      * The opening tag will be rendered BEFORE this char
@@ -201,10 +215,84 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     }
     /**
      * Retrieves the category
+     * NOTE: any connection between classes and categories must be coded in the inheriting class
      * @return string
      */
     public function getCategory() : string {
         return $this->category;
+    }
+    /**
+     * Sets the category
+     * NOTE: any connection between classes and categories must be coded in the inheriting class
+     * @param string $category
+     * @return string
+     */
+    public function setCategory(string $category) : string {
+        $this->category = $category;
+        return $this;
+    }
+    /**
+     * Retrieves if the tag is of a category that is relevant for quality management
+     * @return boolean
+     */
+    public function hasCategory() : bool {
+        return !empty($this->category);
+    }
+    /**
+     * 
+     * @return bool
+     */
+    public function hasQualityId() : bool {
+        return ($this->hasData($this->getDataNameQualityId()) && ctype_digit($this->getData($this->getDataNameQualityId())));
+    }
+    /**
+     * 
+     * @return int
+     */
+    public function getQualityId() : int {
+        if($this->hasQualityId()){
+            return intval($this->getData($this->getDataNameQualityId()));
+        }
+        return -1;
+    }
+    /**
+     * 
+     * @param int $qualityId
+     * @return editor_Tag|editor_Segment_Tag
+     */
+    public function setQualityId(int $qualityId) {
+        return $this->setData($this->getDataNameQualityId(), strval($qualityId));
+        return $this;
+    }
+    /**
+     * Retrieves the data name for the quality entity id
+     * @return string
+     */
+    private function getDataNameQualityId() : string {
+        if(static::$dataNameQualityId == NULL){
+            return self::DATA_NAME_QUALITYID;
+        }
+        return static::$dataNameQualityId;
+    }
+    /**
+     * 
+     * @return bool
+     */
+    public function isFalsePositive() : bool {
+        return $this->hasClass(self::CSS_CLASS_FALSEPOSITIVE);
+    }
+    /**
+     * 
+     * @param int $falsePositive: database value as from LEK_segment_quality
+     * @return editor_Segment_Tag
+     */
+    public function setFalsePositive(int $falsePositive=1) {
+        if($falsePositive == 1){
+            $this->addClass(self::CSS_CLASS_FALSEPOSITIVE);
+        } else {
+            $this->removeClass(self::CSS_CLASS_FALSEPOSITIVE);
+        }
+        return $this;
     }
 
     public function jsonSerialize(){
