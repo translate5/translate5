@@ -153,9 +153,10 @@ abstract class editor_Services_Connector_HttpApiAbstract {
                 $errorExtra['rawanswerBeforeCtrlCharFix'] = $responseBody;
                 
                 //escape control characters with \u notation
-                $this->result = json_decode(preg_replace_callback('/[[:cntrl:]]/', function($x){
+                $responseBody = preg_replace_callback('/[[:cntrl:]]/', function($x){
                     return substr(json_encode($x[0]), 1, -1);
-                }, $responseBody));
+                }, $responseBody);
+                $this->result = json_decode($responseBody);
                 
                 //get json error to proceed as usual
                 $lastJsonError = json_last_error();
