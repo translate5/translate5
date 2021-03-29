@@ -1983,7 +1983,6 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function insertTaskUsageLog(editor_Models_task $task) {
         $log = ZfExtended_Factory::get('editor_Models_TaskUsageLog');
         /* @var $log editor_Models_TaskUsageLog */
-        #id, taskType, sourceLang, targetLang, customerId, yearAndMonth, taskCount
         $log->setTaskType($task->getTaskType());
         $log->setSourceLang($task->getSourceLang());
         $log->setTargetLang($task->getTargetLang());
@@ -2001,8 +2000,9 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function checkUserSessionAllowsOpen(string $taskGuid) {
         $session = new Zend_Session_Namespace();
+        $sessionGuid = $session->taskGuid ?? null;
         // if the task is with already active session for the user, ignore the check
-        if(empty($session->taskGuid) || $session->taskGuid == $taskGuid){
+        if($sessionGuid == $taskGuid){
             return;
         }
         $assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
