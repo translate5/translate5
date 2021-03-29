@@ -209,6 +209,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                 },{
                                     xtype: 'languagecombo',
                                     name: 'relaisLang',
+                                    visible:Editor.data.frontend.importTask.pivotDropdownVisible, // the default value is system default
                                     getSubmitValue: function() {
                                         return this.getValue();
                                     },
