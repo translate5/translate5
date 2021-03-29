@@ -165,10 +165,17 @@ Ext.define('Editor.view.admin.config.GridViewController', {
     },
     
     onShowReadOnlyChange:function(field, newValue, oldValue, eOpts ){
+        this.handleReadonlyConfig(newValue);
+    },
+    
+    /***
+     * Show or hide readonly configs in the grid, based on the showReadonlyConfig flag
+     */
+    handleReadonlyConfig:function(showReadonlyConfig){
         var me=this,
             store =me.getView().getStore();
-
-        if(newValue){
+    
+        if(showReadonlyConfig){
             store.removeFilter('isReadOnly');
         }else{
             store.addFilter({ 

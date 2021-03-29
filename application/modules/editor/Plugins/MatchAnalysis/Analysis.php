@@ -81,7 +81,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected $repetitionUpdater;
     
-    
     /**
      * @param editor_Models_Task $task
      * @param integer $analysisId
@@ -97,8 +96,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     
     /***
      * Query the language resource service for each segment, calculate the best match rate, and save the match analysis model
+     * 
+     * @param Closure $progressCallback : call to update the workerModel progress. It expects progress as argument (progress = 100 / task segment count)
+     * @return boolean
      */
-    public function calculateMatchrate(){
+    public function calculateMatchrate(Closure $progressCallback = null){
 
         // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$this->task->getTaskGuid()]);
@@ -111,14 +113,22 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         }
         $this->initRepetitions();
         
-        //init the word count calculator
+        $segmentCounter = 0;
+        
         foreach($segments as $segment) {
             /* @var $segment editor_Models_Segment */
 
+            $segmentCounter++;
+            
+            //progress to update
+            $progress = $segmentCounter / $this->task->getSegmentCount();
+            
             //get the best match rate, respecting repetitions
             $bestMatchRateResult = $this->handleRepetition($segment);
             
             if(!$this->pretranslate){
+                //report progress update
+                $progressCallback && $progressCallback($progress);
                 continue;
             }
             //if TM and Term pretranslation should not be used, we set it null here to trigger MT (if enabled)
@@ -151,13 +161,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             if(!empty($bestMatchRateResult)) {
                 $this->updateSegment($segment, $bestMatchRateResult);
             }
+            //report progress update
+            $progressCallback && $progressCallback($progress);
         }
         
-        //remove fuzzy languageResource from opentm2
-        $this->removeFuzzyResources();
-        
-        //clean the batch query cache if there is one
-        $this->removeBatchCache();
+        $this->clean();
 
         return true;
     }
@@ -216,6 +224,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         // to get the correct content for the repetition we get the value from $segment, which was updated by the repetition updater
         $bestRepeatedResult = clone $this->repetitionByHash[$segmentHash];
         $bestRepeatedResult->target = $segment->getTargetEdit();
+        // the current result is from repetition segment. This is needed for the resources usage log.
+        $bestRepeatedResult->isRepetition = true; 
         return $bestRepeatedResult;
     }
     
@@ -329,9 +339,15 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @return boolean
      */
     protected function isDisabledDueErrors($connector, $id) {
+        //check if the connector itself is disabled
+        if($this->connectors[$id]->isDisabled()){
+            return true;
+        }
+        
         if(!isset($this->connectorErrorCount[$id]) || $this->connectorErrorCount[$id] <= self::MAX_ERROR_PER_CONNECTOR) {
             return false;
         }
+
         $langRes = $connector->getLanguageResource();
         $this->log->warn('E1101', 'Disabled Language Resource {name} ({service}) for analysing and pretranslation due too much errors.',[
             'task' => $this->task,
@@ -339,7 +355,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             'name' => $langRes->getName(),
             'service' => $langRes->getServiceName(),
         ]);
-        unset($this->connectors[$id]);
+        $this->connectors[$id]->disable();
         return true;
     }
     
@@ -383,7 +399,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             return $matches;
         }
         
-        // if the current resource type is MT, query the tm or termcollection
+        // if the current resource type is not MT, query the tm or termcollection
         $matches = $connector->query($segment);
         
         //update the segment with custom target in fuzzy tm
@@ -559,6 +575,18 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $model->deleteForLanguageresource($connector->getLanguageResource()->getId());
             }
         }
+    }
+    
+    /***
+     * Remove not required analysis object and data
+     */
+    public function clean(){
+        //remove fuzzy languageResource from opentm2
+        $this->removeFuzzyResources();
+        //clean the batch query cache if there is one
+        $this->removeBatchCache();
+        
+        $this->connectors = null;
     }
     
     public function setPretranslate($pretranslate){

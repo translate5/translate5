@@ -150,4 +150,13 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
         $this->result = $this->markTransFound($this->result);
         return true;
     }
+    
+    /***
+     * Term tagging takes approximately 15 % of the import time
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::getWeight()
+     */
+    public function getWeight() {
+        return 15;
+    }
 }

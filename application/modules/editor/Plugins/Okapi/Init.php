@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
-
+ START LICENSE AND COPYRIGHT
+ 
  This file is part of translate5
-
+ 
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
-
+ 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
-
+ 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
  as published by the Free Software Foundation and appearing in the file agpl3-license.txt
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-
+ 
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-
+ 
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
-
-END LICENSE AND COPYRIGHT
-*/
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
 
 /**
  */
@@ -90,79 +90,79 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         return $bconfPathes;
     }
-
+    
     /**
      * Supported file-types by okapi
      *
      * @var array
      */
     private $okapiFileTypes = array(
-            'okapi', //currently needed, see TRANSLATE-1019
-
-            'pdf',
-
-            'html',
-            'htm',
-            'xml',
-            //'csv' => ['text/csv'], disabled due our own importer
-            'txt',
-            'dita',
-            'ditamap',
-            'c',
-            'h',
-            'cpp',
-            'dtd',
-            'wcml',
-            'idml',
-            'strings',
-            'properties',
-            'json',
-            'catkeys',
-            'md',
-            'xlsx',
-            'xlsm',
-            'xltx',
-            'xltm',
-            'pptx',
-            'pptm',
-            'potx',
-            'potm',
-            'ppsx',
-            'ppsm',
-            'docx',
-            'docm',
-            'dotx',
-            'dotm',
-            'vsdx',
-            'vsdm',
-            'mif',
-            'ods',
-            'ots',
-            'odg',
-            'otg',
-            'odp',
-            'otp',
-            'odt',
-            'ott',
-            'pentm',
-            'php',
-            'po',
-            'rkm',
-            'rdf',
-            'resx',
-            'lang',
-            'srt',
-            'tsv',
-            'tmx',
-            'txp',
-            'rtf',
-            'ts',
-            'ttx',
-            'txml',
-            'vrsz',
-            'wix',
-            'yml',
-            'yaml',
+        'okapi', //currently needed, see TRANSLATE-1019
+        
+        'pdf',
+        
+        'html',
+        'htm',
+        'xml',
+        //'csv' => ['text/csv'], disabled due our own importer
+        'txt',
+        'dita',
+        'ditamap',
+        'c',
+        'h',
+        'cpp',
+        'dtd',
+        'wcml',
+        'idml',
+        'strings',
+        'properties',
+        'json',
+        'catkeys',
+        'md',
+        'xlsx',
+        'xlsm',
+        'xltx',
+        'xltm',
+        'pptx',
+        'pptm',
+        'potx',
+        'potm',
+        'ppsx',
+        'ppsm',
+        'docx',
+        'docm',
+        'dotx',
+        'dotm',
+        'vsdx',
+        'vsdm',
+        'mif',
+        'ods',
+        'ots',
+        'odg',
+        'otg',
+        'odp',
+        'otp',
+        'odt',
+        'ott',
+        'pentm',
+        'php',
+        'po',
+        'rkm',
+        'rdf',
+        'resx',
+        'lang',
+        'srt',
+        'tsv',
+        'tmx',
+        'txp',
+        'rtf',
+        'ts',
+        'ttx',
+        'txml',
+        'vrsz',
+        'wix',
+        'yml',
+        'yaml',
     );
     /**
      * Ignored filetypes if a custom bconf is provided (which skips the check for supported files)
@@ -178,23 +178,23 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @var string
      */
     private $useCustomBconf = true;
-
+    
     /**
      * Container for the found bconf files in the import package
      * @var array
      */
     private $bconfFilePaths = [];
-
+    
     /**
      * @var editor_Models_Task
      */
     protected $task;
-
+    
     /**
      * @var editor_Models_Import_SupportedFileTypes
      */
     protected $fileTypes;
-
+    
     public function init() {
         $this->fileTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $fileTypes editor_Models_Import_SupportedFileTypes */
@@ -203,31 +203,31 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         $this->initEvents();
     }
-
+    
     protected function initEvents() {
         //checks if import contains files for okapi:
         $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'beforeDirectoryParsing', array($this, 'handleBeforeDirectoryParsing'));
         $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'afterDirectoryParsing', array($this, 'handleAfterDirectoryParsing'));
-
+        
         //invokes in the handleFile method of the relais filename match check.
         // Needed since relais files are bilingual (ending on .xlf) and the
         // imported files for Okapi are in the source format and do not end on .xlf.
         // Therefore the filenames do not match, this is corrected here.
         $this->eventManager->attach('editor_Models_RelaisFoldertree', 'customHandleFile', array($this, 'handleCustomHandleFileForRelais'));
-
+        
         //Archives the temporary data folder again after converting the files with okapi:
         $this->eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'handleAfterImport'));
         
         //allows the manipulation of the export fileparser configuration
         $this->eventManager->attach('editor_Models_Export', 'exportFileParserConfiguration', [$this, 'handleExportFileparserConfig']);
-
+        
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
 
         //attach to the config after index to check the confgi values
         $this->eventManager->attach('editor_ConfigController', 'afterIndexAction', [$this, 'handleAfterConfigIndexAction']);
     }
-
+    
     /**
      * Hook on the before import event and check the import files
      *
@@ -248,7 +248,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $config->checkFileType = true;
         }
     }
-
+    
     /**
      * Hook on the before import event and check the import files
      *
@@ -261,10 +261,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         
         $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
         /* @var $fileFilter editor_Models_File_FilterManager */
-
+        
         foreach($filelist as $fileId => $filePath) {
             $fileInfo = new SplFileInfo($importFolder.'/'.ZfExtended_Utils::filesystemEncode($filePath));
-
+            
             //if there is a filefilter or a fileparser (isProcessable) we do not process the file with Okapi
             if($fileFilter->hasFilter($fileId, $fileFilter::TYPE_IMPORT) || !$this->isProcessable($fileInfo)) {
                 continue;
@@ -272,7 +272,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $this->queueWorker($fileId, $fileInfo, $params);
         }
     }
-
+    
     /**
      * Needed since relais files are bilingual (ending on .xlf) and the
      * imported files for Okapi are in the source format (example docx) and do not end on .xlf.
@@ -283,19 +283,20 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $suffix = '.xlf'; //TODO should come from the worker. there the suffix is determined from the okapi output
         $child = $event->getParam('fileChild'); //children stdClass, containing several information about the file to be parsed
         $fullpath = $event->getParam('fullPath'); //absolute path to the relais file to be parsed
-
+        
+        $importConfig = $event->getParam('importConfig');//INFO:(TRANSLATE-1596) this is the workfiles directory (for now this can be proofRead or workfiles). Afte we remove the depricate support for proofRead this can be removed
+        /* @var $importConfig editor_Models_Import_Configuration */
         if(empty($this->task)) {
             $this->task = ZfExtended_Factory::get('editor_Models_Task');
             $this->task->loadByTaskGuid($event->getParam('taskGuid'));
         }
-
         if($child->relaisFileStatus == editor_Models_RelaisFoldertree::RELAIS_NOT_FOUND) {
             $config = Zend_Registry::get('config');
-            $review = '/'.trim($config->runtimeOptions->import->proofReadDirectory,'/').'/';
+            $workfiles = '/'.trim($importConfig->getFilesDirectory(),'/').'/';
             $relaisDirectory = '/'.trim($config->runtimeOptions->import->relaisDirectory,'/').'/';
             $fullpath = $fullpath.$suffix;
-            $bilingualSourceFile = str_replace($relaisDirectory, $review, $fullpath);
-
+            $bilingualSourceFile = str_replace($relaisDirectory, $workfiles, $fullpath);
+            
             //check for manifest file, to ensure that the file was processed via Okapi:
             if(file_exists($fullpath) && file_exists($bilingualSourceFile) && $this->wasImportedWithOkapi($this->task, $child->id)) {
                 $child->filename .= $suffix;
@@ -317,7 +318,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $okapiManifestFile = new SplFileInfo($path.sprintf(editor_Plugins_Okapi_Worker::MANIFEST_FILE, $fileId));
         return $okapiManifestFile->isReadable();
     }
-
+    
     /**
      * Archives the temporary data folder again after converting the files with okapi
      * @param Zend_EventManager_Event $event
@@ -327,12 +328,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         /* @var $task editor_Models_Task */
         $config = $event->getParam('importConfig');
         /* @var $config editor_Models_Import_Configuration */
-
+        
         try {
             $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
             /* @var $worker ZfExtended_Models_Worker */
             $worker->loadFirstOf('editor_Plugins_Okapi_Worker', $task->getTaskGuid());
-
+            
             //proceed with the archive only, if a okapi worker was found for the current task
             $directoryProvider = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Directory', [$config->importFolder]);
             /* @var $directoryProvider editor_Models_Import_DataProvider_Directory */
@@ -342,9 +343,9 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
             //no okapi worker -> do nothing
         }
-
+        
     }
-
+    
     /**
      * looks for bconf files in the import root folder and returns them
      * @param string $importFolder
@@ -374,7 +375,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
         return $filenames;
     }
-
+    
     /**
      * Checks if the given file should be processed by okapi
      * @param SplFileInfo $fileinfo
@@ -397,7 +398,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 return false;
             }
         }
-
+        
         //if there is a custom bconf, this bconf can contain "new" allowed file types.
         // Since we currently can not get the information from the bconf which additional types are allowed,
         // we just pass all filetypes (expect the ones with a native fileparser) to be parsed via Okapi
@@ -410,10 +411,10 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 return true;
             }
         }
-
+        
         return in_array($extension, $this->okapiFileTypes);
     }
-
+    
     /**
      * Run for each file a separate worker, the worker will upload the file to the okapi, convert the file, and download the
      * result
@@ -427,25 +428,26 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $importFolder = $params['importFolder'];
         $task = $params['task'];
         $workerParentId = $params['workerParentId'];
-
+        
         $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
         /* @var $worker editor_Plugins_Okapi_Worker */
-
+        
         $params=[
             'type' => editor_Plugins_Okapi_Worker::TYPE_IMPORT,
             'fileId' => $fileId,
             'file' => (string) $file,
             'importFolder' => $importFolder,
             'bconfFilePaths' => $this->bconfFilePaths,
+            'importConfig' => $params['importConfig']
         ];
-
+        
         // init worker and queue it
         if (!$worker->init($task->getTaskGuid(), $params)) {
             return false;
         }
         $worker->queue($workerParentId);
     }
-
+    
     /**
      * Checks if the configured okapi instance is reachable
      * @param Zend_EventManager_Event $event
