@@ -33,4 +33,13 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_TermTagger_Worker_Abstract {
     
     protected $resourcePool = 'import';
+    
+    /***
+     * Term tagging takes approximately 15 % of the import time
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::getWeight()
+     */
+    public function getWeight() {
+        return 15;
+    }
 }

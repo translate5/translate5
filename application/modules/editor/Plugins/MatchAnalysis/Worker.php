@@ -70,12 +70,13 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
     public function work() {
         try {
             $params = $this->workerModel->getParameters();
-            $ret=$this->doWork();
-            
             //run the term tagger when the termtagger flag is set, it is pretranslation and no terminologie worker is queued
             if($params['termtaggerSegment'] && $params['pretranslate'] && !$params['isTaskImport']){
-                $this->queueTermtagger($this->taskGuid,$this->workerModel->getParentId());
+                $parentId = $this->workerModel->getParentId();
+                $this->queueTermtagger($this->taskGuid,$parentId ? $parentId : $this->workerModel->getId());
             }
+            return $this->doWork();
+            
         } catch (Throwable $e) {
 
             if(isset($this->analysis)){
@@ -97,7 +98,6 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             ]);
             return false;
         }
-        return $ret;
     }
     
     
@@ -125,18 +125,18 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             $this->task->save();
             return false;
         }
-        $this->analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
-        /* @var $this->analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
-        $this->analysisAssoc->setTaskGuid($this->task->getTaskGuid());
+        $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
+        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
+        $analysisAssoc->setTaskGuid($this->task->getTaskGuid());
         
         //set flag for internal fuzzy usage
-        $this->analysisAssoc->setInternalFuzzy($params['internalFuzzy']);
+        $analysisAssoc->setInternalFuzzy($params['internalFuzzy']);
         //set pretranslation matchrate used for the anlysis
-        $this->analysisAssoc->setPretranslateMatchrate($params['pretranslateMatchrate']);
+        $analysisAssoc->setPretranslateMatchrate($params['pretranslateMatchrate']);
         
-        $this->analysisId=$this->analysisAssoc->save();
+        $analysisId=$analysisAssoc->save();
         
-        $this->analysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis', [$this->task, $this->analysisId, $this->taskOldState]);
+        $this->analysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis', [$this->task, $analysisId, $this->taskOldState]);
         
         $this->analysis->setPretranslate($params['pretranslate']);
         $this->analysis->setInternalFuzzy($params['internalFuzzy']);
@@ -146,7 +146,21 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         $this->analysis->setPretranslateMt($params['pretranslateMt']);
         $this->analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
         $this->analysis->setBatchQuery($params['batchQuery']);
-        $return=$this->analysis->calculateMatchrate();
+        
+        $updateCounter = 0;
+        $lastProgress=0;
+        $return=$this->analysis->calculateMatchrate(function($progress) use (&$updateCounter,&$lastProgress){
+            $updateCounter ++;
+            $lastProgress = $progress;
+            //update the progress on each 10 segments (to prevent from possible deadlocks in worker table).
+            if($updateCounter % 10 == 0){
+                $this->updateProgress($progress);
+            }
+        });
+            
+        if(!empty($lastProgress)){
+            $this->updateProgress($lastProgress);
+        }
         
         //unlock the state
         if(!empty($newState)){
@@ -179,5 +193,14 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         }
         $worker->queue($workerId);
         return true;
+    }
+    
+    /***
+     * Match analysis and pretranslation takes 92 % of the import time
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::getWeight()
+     */
+    public function getWeight() {
+        return 92;
     }
 }

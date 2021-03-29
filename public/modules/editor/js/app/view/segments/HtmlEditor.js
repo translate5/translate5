@@ -825,7 +825,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   checkContentTags: function(nodelist) {
       var me = this,
           foundIds = [],
-          ignoreWhitespace = Editor.data.segments.userCanModifyWhitespaceTags;
+          ignoreWhitespace = Editor.app.getTaskConfig('segments.userCanModifyWhitespaceTags');
       me.missingContentTags = [];
       me.duplicatedContentTags = [];
       
