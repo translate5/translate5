@@ -136,23 +136,40 @@ abstract class editor_Services_Connector_HttpApiAbstract {
         $responseBody = trim($response->getBody());
         
         if(empty($responseBody)) {
-            $result = '';
+            $this->result = '';
         }
         else {
-            $result = json_decode($responseBody);
+            $errorExtra = [
+                'method' => $this->httpMethod,
+                'url' => $url,
+            ];
+            $this->result = json_decode($responseBody);
+            
+            $lastJsonError = json_last_error();
+            
+            //if the json string contains unescapd ctrl characters, we escape them and try again the decode:
+            if($lastJsonError == JSON_ERROR_CTRL_CHAR) {
+                //set the previous responseBody in case of an error
+                $errorExtra['rawanswerBeforeCtrlCharFix'] = $responseBody;
+                
+                //escape control characters with \u notation
+                $responseBody = preg_replace_callback('/[[:cntrl:]]/', function($x){
+                    return substr(json_encode($x[0]), 1, -1);
+                }, $responseBody);
+                $this->result = json_decode($responseBody);
+                
+                //get json error to proceed as usual
+                $lastJsonError = json_last_error();
+            }
             
             //check for JSON errors
-            if(json_last_error() != JSON_ERROR_NONE){
-                throw new editor_Services_Exceptions_InvalidResponse('E1315',[
-                    'errorMsg' => json_last_error_msg(),
-                    'method' => $this->httpMethod,
-                    'url' => $url,
-                    'rawanswer' => $responseBody,
-                ]);
+            if($lastJsonError != JSON_ERROR_NONE){
+                $errorExtra['errorMsg'] = json_last_error_msg();
+                $errorExtra['rawanswer'] = $responseBody;
+                throw new editor_Services_Exceptions_InvalidResponse('E1315', $errorExtra);
             }
         }
         
-        $this->result = $result;
         return empty($this->error);
     }
 }
