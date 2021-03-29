@@ -77,6 +77,9 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @return [array] array with Pm User Data Arrays
      */
     protected function getTaskPmUsers(){
+        if(!isset($this->config->task)){
+            return [];
+        }
         $task = $this->config->task;
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
@@ -107,6 +110,12 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->mailer = ZfExtended_Factory::get('ZfExtended_TemplateBasedMail');
         $this->mailer->setParameters($parameters);
         $this->mailer->setTemplate($this->getMailTemplate($role, $template));
+        $pm = $this->getTaskPmUsers();
+        $pm = array_shift($pm);
+        // Add reply-to with project-manager mail to all automated workflow-mails
+        if(!empty($pm)){
+            $this->mailer->setReplyTo($pm['email'],$pm['firstName'].' '.$pm['surName']);
+        }
     }
     
     /**

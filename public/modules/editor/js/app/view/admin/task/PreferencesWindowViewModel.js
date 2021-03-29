@@ -38,6 +38,12 @@ Ext.define('Editor.view.admin.task.PreferencesWindowViewModel', {
             get: function(get) {
                 return this.get('currentTask') && this.get('currentTask').getWorkflowMetaData();
             }
+        },
+        disabledDuringTaskImport:{
+            get: function(task) {
+                return !task || task.isImporting();
+            },
+            bind:{bindTo:'{currentTask}',deep:true}
         }
     }
 });

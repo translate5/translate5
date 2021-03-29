@@ -65,7 +65,7 @@ Ext.define('Editor.view.admin.config.Grid', {
         configActiveColumn:'#UT#Aktiviert',
         configDeactiveColumn:'#UT#Deaktiviert',
         updateConfigSuccessMessage:'#UT#Konfiguration gespeichert',
-        instanceConfigChangeMessageBoxText:'#UT#Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.',
+        configChangeReloadMessageBoxText:'#UT#Die Änderung wird beim nächsten Login wirksam. Dies gilt auch für andere derzeit eingeloggte Benutzer.',
         collapseAll:'#UT#Alles zuklappen',
         expandAll:'#UT#Alles aufklappen',
         toolbarFilter:'#UT#Suche',
@@ -132,13 +132,12 @@ Ext.define('Editor.view.admin.config.Grid', {
         
         var me=this,
             store = me.getStore(),
-            existing = store.getProxy().getExtraParams(),
-            merged = Ext.Object.merge(existing, newExtra),
             controller = me.getController(),
             cbShowReadOnly = me.down('#showReadOnly'),
             showReadonlyConfig = cbShowReadOnly == null ? true : cbShowReadOnly.checked;
         
-        store.getProxy().setExtraParams(merged);
+        store.setExtraParams(newExtra);
+
         store.load({
             callback:function(){
                 if(!store || !controller){

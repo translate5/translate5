@@ -106,8 +106,8 @@ Ext.define('Editor.view.admin.config.GridViewController', {
             return;
         }
         //if the current change is for instance level
-        if(record.get('level') == record.CONFIG_LEVEL_INSTANCE){
-            Ext.Msg.alert('',view.strings.instanceConfigChangeMessageBoxText);
+        if(Ext.Array.contains([record.CONFIG_LEVEL_INSTANCE,record.CONFIG_LEVEL_CLIENT],parseInt(record.get('level')))){
+            Ext.Msg.alert('',view.strings.configChangeReloadMessageBoxText);
         }
         view.getStore().sync({
             success: function(rec, operation){
