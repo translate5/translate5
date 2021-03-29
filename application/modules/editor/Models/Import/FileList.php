@@ -70,7 +70,7 @@ class editor_Models_Import_FileList {
     public function processReviewedFiles() {
         $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles', [$this->importConfig->checkFileType, $this->importConfig->ignoredUncheckedExtensions]);
         /* @var $parser editor_Models_Import_DirectoryParser_WorkingFiles */
-        $tree = $parser->parse($this->importConfig->getReviewDir(), $this->task);
+        $tree = $parser->parse($this->importConfig->getWorkfileDir(), $this->task);
         $notImportedFiles = $parser->getNotImportedFiles();
         if(!empty($notImportedFiles)) {
             $logger = Zend_Registry::get('logger');
@@ -82,6 +82,7 @@ class editor_Models_Import_FileList {
         
         $this->treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         /* @var $treeDb editor_Models_Foldertree */
+        $this->treeDb->setPathPrefix($this->importConfig->getFilesDirectory());//TODO: (23.02.2021 TRANSLATE-1596) remove me after the depricated support for "proofRead" is removed
         $this->treeDb->setTree($tree);
         $this->treeDb->setTaskGuid($this->task->getTaskGuid());
         $this->saveAndSyncFileTree();
@@ -142,6 +143,7 @@ class editor_Models_Import_FileList {
     public function processRelaisFiles() {
         $tree = ZfExtended_Factory::get('editor_Models_RelaisFoldertree');
         /* @var $tree editor_Models_RelaisFoldertree */
+        $tree->setImportConfig($this->importConfig);
         $tree->getPaths($this->task->getTaskGuid(),'file'); //Aufruf nötig, er initialisiert den Baum
         $relaisFiles = $tree->checkAndGetRelaisFiles($this->importConfig->importFolder);
         $tree->save();
@@ -155,8 +157,8 @@ class editor_Models_Import_FileList {
     public function hasReferenceFiles() {
         $config = Zend_Registry::get('config');
         //If no review directory is set, the reference files must be ignored  
-        $proofDir = $config->runtimeOptions->import->proofReadDirectory;
+        $workfilesDirectory = $this->importConfig->getFilesDirectory();
         $refDir = $config->runtimeOptions->import->referenceDirectory;
-        return !empty($proofDir) && is_dir($this->importConfig->importFolder.DIRECTORY_SEPARATOR.$refDir);
+        return !empty($workfilesDirectory) && is_dir($this->importConfig->importFolder.DIRECTORY_SEPARATOR.$refDir);
     }
 }

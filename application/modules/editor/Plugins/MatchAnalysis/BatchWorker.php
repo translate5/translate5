@@ -70,7 +70,10 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
         
         $connector = $manager->getConnector($languageResource, $task->getSourceLang(), $task->getTargetLang(), $task->getConfig());
         /* @var $connector editor_Services_Connector */
-        $connector->batchQuery($this->taskGuid);
+        $connector->batchQuery($this->taskGuid,function($progress){
+            //update the worker model progress with progress value reported from the batch query
+            $this->updateProgress($progress);
+        });
         
         $exceptions = $connector->getBatchExceptions();
         foreach($exceptions as $e) {
@@ -78,5 +81,14 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_Abstra
             $this->log->exception($e);
         }
         return true;
+    }
+    
+    /***
+     * The batch worker takes approximately 50% of the import time
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::getWeight()
+     */
+    public function getWeight() {
+        return 50;
     }
 }

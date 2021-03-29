@@ -40,5 +40,6 @@ class editor_Models_Validator_LanguageResources_UsageLogger extends ZfExtended_M
         $this->addValidator('translatedCharacterCount','int');
         $this->addValidator('timestamp', 'date', array('Y-m-d H:i:s'));
         $this->addValidator('customers', 'stringLength', array('min' => 0, 'max' => 1024));
+        $this->addValidator('repetition','boolean');
     }
 }

@@ -28,7 +28,9 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Initial Class of Plugin "XlfExportTranslateByAutostate"
- * This Plugin is for Across Connection where we have to abuse trans-units
+ * This Plugin is for Across Connection where we have to abuse trans-units,
+ * therefore it works only if in the task a foreignId (acrossId) is set!
+ *
  * translate="yes/no" for filtering changed segments coming from translate5
  *
  * All segments modified are getting translate = yes
@@ -64,6 +66,12 @@ class editor_Plugins_XlfExportTranslateByAutostate_Init extends ZfExtended_Plugi
      * @param Zend_EventManager_Event $event
      */
     public function handleWriteUnit(Zend_EventManager_Event $event) {
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
+        $foreignId = $task->getForeignId();
+        if(empty($foreignId)) {
+            return;
+        }
         $segments = $event->getParam('segments');
         $autoStates = [];
         foreach($segments as $segment) {

@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * @class Editor.controller.admin.Customer
  * @extends Ext.app.Controller
+ * @event filteredCustomerForTaskAdd : It is fired when in the task add window, the customer is set from the global customers dropdown
  */
 Ext.define('Editor.controller.admin.Customer', {
     extend : 'Ext.app.Controller',
@@ -290,6 +291,9 @@ Ext.define('Editor.controller.admin.Customer', {
             customerName = me.getCustomerName(customerId);
             customerNameField.setValue(customerName);
         }
+        
+        // fire event that the customer in the task add window is set by the global customers filter
+        me.fireEvent('filteredCustomerForTaskAdd',customerId);
     },
 
     /**

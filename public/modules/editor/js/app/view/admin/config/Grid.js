@@ -110,19 +110,21 @@ Ext.define('Editor.view.admin.config.Grid', {
     
     /***
      * allow the store extra params to be configurable on grid level. This will enable flexible loads via binding
+     * This function only expects and handles extraParams with valid taskGuid or customerId as parameter.
      */
     setExtraParams:function(newExtra){
         if(!newExtra){
             return;
         }
         
-        //check for empty values, and remove them. Loads for empty values is not required
+        //check for empty values, and remove them. Loading the store when the taskGuid is empty is not required
         Ext.Object.each(newExtra, function(key, value, myself) {
             if(!value || value === "" || value == undefined){
                 delete newExtra[key]
             }
         });
         
+        //if it is an empty object, removes(local only) all unfiltered items from the store. Filtered records will not be removed
         if(Ext.Object.getSize(newExtra) < 1){
             this.getStore().removeAll(true);
             return;
@@ -130,17 +132,21 @@ Ext.define('Editor.view.admin.config.Grid', {
         
         var me=this,
             store = me.getStore(),
-            existing = store.getProxy().getExtraParams(),
-            merged = Ext.Object.merge(existing, newExtra);
-        store.getProxy().setExtraParams(merged);
+            controller = me.getController(),
+            cbShowReadOnly = me.down('#showReadOnly'),
+            showReadonlyConfig = cbShowReadOnly == null ? true : cbShowReadOnly.checked;
+        
+        store.setExtraParams(newExtra);
+
         store.load({
             callback:function(){
-                me.getStore().addFilter({
-                    property: 'isReadOnly',
-                    value   : false
-                });
-                me.getController().onCollapseAll();
-                me.getController().handleHasReadOnly();
+                if(!store || !controller){
+                    return;
+                }
+                
+                controller.handleReadonlyConfig(showReadonlyConfig);
+                controller.onCollapseAll();
+                controller.handleHasReadOnly();
             }
         });
     },
