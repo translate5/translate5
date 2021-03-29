@@ -125,10 +125,17 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
      */
     public function mailSegmentErrors(ZfExtended_Models_User $user) {
         $mailer = ZfExtended_Factory::get('ZfExtended_TemplateBasedMail');
+        /* @var $mailer ZfExtended_TemplateBasedMail */
         $mailer->setParameters([
             'segmentErrors' => $this->getSegmentErrors(),
             'task' => $this->task,
         ]);
+        
+        $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $pm ZfExtended_Models_User */
+        $pm->loadByGuid($this->task->getPmGuid());
+        
+        $mailer->setReplyTo($pm->getEmail(),$pm->getUserName());
         $mailer->setTemplate('workflow/pm/notifyExcelReimportErrors.phtml');
         $mailer->sendToUser($user);
     }
