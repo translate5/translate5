@@ -43,20 +43,29 @@ Ext.define('Editor.view.admin.TaskGridViewController', {
     listen: {
         messagebus: {
             '#translate5 task': {
-                triggerReload: 'onTriggerTaskReload'
+                triggerReload: 'onTriggerTaskReload',
+                updateProgress: 'onUpdateProgress'//INFO: the listener and the event handler are also defined in the ProjectGridViewController. To unify this we should use mixins, they are 2 different components and the scope is not the same.
             }
         }
     },
+    
     onTriggerTaskReload: function(params) {
-        var store = this.getView().getStore(),
-            task;
-        if(params.taskId) {
-            task = store.getById(params.taskId);
-        }
-        else {
-            task = store.findRecord( 'taskGuid', params.taskGuid, 0, false, true, true);
-        }
+        var me = this,
+            task = me.getTaskRecordFromParams(params);
         task && task.load();
+    },
+    
+    /***
+     * Set importProgress task property when the message bus reports import progress change.
+     */
+    onUpdateProgress: function(params) {
+        var me = this,
+            task = me.getTaskRecordFromParams(params);
+        
+        if(!task){
+            return;
+        }
+        task.set('importProgress',params.progress);
     },
     
     onTaskRoute:function(){
@@ -73,5 +82,21 @@ Ext.define('Editor.view.admin.TaskGridViewController', {
             value:id
         });
         Editor.app.openAdministrationSection(me.getView(), route.join('/'));
+    },
+
+    /***
+     * Return task store record from given messagebus params.
+     * For this to work, taskId or taskGuid must exist in the params argument
+     */
+    getTaskRecordFromParams:function(params){
+        var store = this.getView().getStore(),
+            task;
+        if(params.taskId) {
+            task = store.getById(params.taskId);
+        }
+        else {
+            task = store.findRecord( 'taskGuid', params.taskGuid, 0, false, true, true);
+        }
+        return task;
     }
 });

@@ -111,7 +111,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
 
         //check imported segment content against correct encoded strings from CSV in not imported colums 4 and 5
         //MQM is in this file for check correct encoding order, see TRANSLATE-654
-        $approvalFileContent = $this->api()->getFileContent('CSV-testfiles/proofRead/specialCharactersInCSV.csv');
+        $approvalFileContent = $this->api()->getFileContent('CSV-testfiles/workfiles/specialCharactersInCSV.csv');
         
         
         $csvRows = explode("\n", $approvalFileContent);

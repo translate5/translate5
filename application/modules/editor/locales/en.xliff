@@ -1394,9 +1394,9 @@
 </trans-unit>
 <trans-unit id='IChBTFQrezB9KQ=='><source> (ALT+{0})</source><target> (ALT+{0})</target></trans-unit>
 <trans-unit id='IChBTFQrU0hJRlQrezB9KQ=='><source> (ALT+SHIFT+{0})</source><target> (ALT+SHIFT+{0})</target></trans-unit>
-<trans-unit id='SW4gaW1wb3J0aWVydGVyIERhdGVpIGdlc3BlcnJ0ZSBTZWdtZW50ZSBzaW5kIGluIHRyYW5zbGF0ZTUgZ2VzcGVycnQ='>
-  <source>In importierter Datei gesperrte Segmente sind in translate5 gesperrt</source>
-  <target>Locked segments in the imported file are also locked in translate5</target>
+<trans-unit id='TnVyIGbDvHIgU0RMWExJRkYgRGF0ZWllbjogSW4gaW1wb3J0aWVydGVyIERhdGVpIGV4cGxpeml0IGdlc3BlcnJ0ZSBTZWdtZW50ZSBzaW5kIGluIHRyYW5zbGF0ZTUgZWJlbmZhbGxzIGdlc3BlcnJ0'>
+  <source>Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt</source>
+  <target>For SDLXLIFF import files only: Explicitly locked segments in files are also locked in translate5</target>
 </trans-unit>
 <trans-unit id='RGllIFNvcnRpZXJ1bmcgYnp3LiBGaWx0ZXJ1bmcgd3VyZGUgZ2XDpG5kZXJ0LCBlcyBrYW5uIG5pY2h0IHp1bSBha3R1ZWxsZW4gU2VnbWVudCB6dXLDvGNrIGdlc3BydW5nZW4gd2VyZGVuLg=='>
   <source>Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.</source>

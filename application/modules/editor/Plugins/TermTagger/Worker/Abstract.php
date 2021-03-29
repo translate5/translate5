@@ -95,6 +95,17 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Segment_
         $this->skipDueToEqualLangs = ($this->task->getSourceLang() === $this->task->getTargetLang());
         return $return;
     }
+    /***
+     * Update the progres based on the tagged field in lek segments meta
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::updateProgress()
+     */
+    public function updateProgress(float $progress = 1){
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $meta editor_Models_Segment_Meta */
+        $progress = $meta->getTermtaggerSegmentProgress($this->taskGuid);
+        parent::updateProgress($progress);
+    }
     /**
      *
      * @return ZfExtended_Logger
