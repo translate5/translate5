@@ -1547,7 +1547,6 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
 
-        
         $this->view->rows->workflowProgressSummary = $this->_helper->TaskStatistics->getWorkflowProgressSummary($this->entity);
     }
 
@@ -1831,7 +1830,30 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->view->index = $index;
         unset($this->view->rows);
     }
+    
+    
+    /***
+     * Report worker progress for given taskGuid
+     * @throws ZfExtended_ErrorCodeException
+     */
+    public function importprogressAction() {
+        $taskGuid = $this->getParam('taskGuid');
+        if(empty($taskGuid)){
+            throw new editor_Models_Task_Exception('E1339');
+        }
+        $this->view->progress = $this->getTaskImportProgres($taskGuid);
+    }
 
+    /***
+     * Get/calculate the taskImport progres for given taskGuid
+     * @param string $taskGuid
+     * @return number]
+     */
+    protected function getTaskImportProgres(string $taskGuid) {
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $worker ZfExtended_Models_Worker */
+        return $worker->calculateProgress($taskGuid);
+    }
     /***
      * Clone existing language resources from oldTaskGuid for newTaskGuid.
      */

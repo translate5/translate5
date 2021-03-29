@@ -477,7 +477,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               width: 135,
               dataIndex: 'segmentFinishCount',
               stateId:'segmentFinishCount',
-              renderer:me.currentWorkflowStepProgressRenderer,
+              renderer:me.taskProgressRenderer,
               tooltip:me.strings.currentWorkflowStepProgressTooltip,
               filter: {
                   type: 'percent',
@@ -948,19 +948,53 @@ Ext.define('Editor.view.admin.TaskGrid', {
     },
     
     /***
-     * Render the progres bar in the segmentFinishCount column
+     * Renderer for segmetnFinishCount and task importProgress values.
+     * The there is running task worker, this progress bar will be used for displaying the worker progress.
+     * Ex: on import, the progress bar represents the import progress, after the import is done, the progress
+     * bar represents the workflow step progress 
      */
-    currentWorkflowStepProgressRenderer:function(value,meta,rec){
-        if(!value || rec.get('segmentCount')<1){
+    taskProgressRenderer:function(value,meta,rec){
+        var me=this,
+            isImportProgress = Ext.isNumeric(rec.get('importProgress'));
+        
+        //check if it is import progress update
+        if(isImportProgress){
+            //when the importProgress is 100, delete the importProgress from the tas data object
+            if(rec.get('importProgress') == 100){
+                delete rec.data.importProgress;
+            }
+            
+            value=rec.get('importProgress');
+            
+            if(value === undefined){
+                value = 0;
+            }
+            value = value +'%';
+            meta.tdAttr = 'data-qtip="'+value+'"';
+            return me.getCellProgressBarRenderData(value);
+        }
+        
+        if(!Ext.isNumeric(value) || value < 0){
             value=0;
         }
-        if(value>0){
+        
+        if(value>0 && !isImportProgress){
             value=value/rec.get('segmentCount');
         }
-        value=Ext.util.Format.percent(value);
+        
+        value = Ext.util.Format.percent(value);
+        
         meta.tdAttr = 'data-qtip="'+value+'"';
+        return me.getCellProgressBarRenderData(value);
+    },
+    
+    /***
+     * Return html for grid cell progress bar. The imput argument percent
+     * must contain percent value between 0% - 100% 
+     */
+    getCellProgressBarRenderData:function(percent){
         return '<div class="x-progress x-progress-default" style="height: 13px;">'+
-                    '<div class="x-progress-bar x-progress-bar-default" style="width: ' + value + '">'+
+                    '<div class="x-progress-bar x-progress-bar-default" style="width: ' + percent + '">'+
                     '</div>'+
                '</div>';
     },
