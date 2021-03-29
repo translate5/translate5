@@ -1547,7 +1547,6 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
 
-        
         $this->view->rows->workflowProgressSummary = $this->_helper->TaskStatistics->getWorkflowProgressSummary($this->entity);
     }
 
@@ -1831,7 +1830,30 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->view->index = $index;
         unset($this->view->rows);
     }
+    
+    
+    /***
+     * Report worker progress for given taskGuid
+     * @throws ZfExtended_ErrorCodeException
+     */
+    public function importprogressAction() {
+        $taskGuid = $this->getParam('taskGuid');
+        if(empty($taskGuid)){
+            throw new editor_Models_Task_Exception('E1339');
+        }
+        $this->view->progress = $this->getTaskImportProgres($taskGuid);
+    }
 
+    /***
+     * Get/calculate the taskImport progres for given taskGuid
+     * @param string $taskGuid
+     * @return number]
+     */
+    protected function getTaskImportProgres(string $taskGuid) {
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $worker ZfExtended_Models_Worker */
+        return $worker->calculateProgress($taskGuid);
+    }
     /***
      * Clone existing language resources from oldTaskGuid for newTaskGuid.
      */
@@ -1961,7 +1983,6 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function insertTaskUsageLog(editor_Models_task $task) {
         $log = ZfExtended_Factory::get('editor_Models_TaskUsageLog');
         /* @var $log editor_Models_TaskUsageLog */
-        #id, taskType, sourceLang, targetLang, customerId, yearAndMonth, taskCount
         $log->setTaskType($task->getTaskType());
         $log->setSourceLang($task->getSourceLang());
         $log->setTargetLang($task->getTargetLang());
@@ -1979,8 +2000,9 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function checkUserSessionAllowsOpen(string $taskGuid) {
         $session = new Zend_Session_Namespace();
+        $sessionGuid = $session->taskGuid ?? null;
         // if the task is with already active session for the user, ignore the check
-        if(empty($session->taskGuid) || $session->taskGuid == $taskGuid){
+        if($sessionGuid == $taskGuid){
             return;
         }
         $assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');

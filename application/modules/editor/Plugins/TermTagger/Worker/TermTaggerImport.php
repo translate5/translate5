@@ -133,6 +133,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     }
     
     /**
+     * Info: the worker progres will be updated after the worker state is set to done
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()
      */
@@ -425,5 +426,14 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             'task' => $this->task,
             'untaggableSegments' => $segmentsToLog,
         ]);
+    }
+    
+    /***
+     * Term tagging takes approximately 15 % of the import time
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::getWeight()
+     */
+    public function getWeight() {
+        return 15;
     }
 }

@@ -183,7 +183,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
         
         try {
             $api->createProject();
-            $api->uploadOkapiConfig([$plugin->getExportBconf()]);
+
+            $api->uploadOkapiConfig([$plugin::createDefaultBconfPath($this->task,$plugin::OKAPI_BCONF_TARGET_EXPORT)]);
             
             $api->uploadInputFile('manifest.rkm', $manifestFile);
             $originalFile = $this->findOriginalFile($fileId);
@@ -365,5 +366,15 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
      */
     protected function isAttachOriginalAsReference() {
         return (boolean)Zend_Registry::get('config')->runtimeOptions->plugins->Okapi->import->fileconverters->attachOriginalFileAsReference;
+    }
+    
+    /***
+     * The batch worker takes approximately 5% of the import time
+     * 
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::getWeight()
+     */
+    public function getWeight() {
+        return 5;
     }
 }
