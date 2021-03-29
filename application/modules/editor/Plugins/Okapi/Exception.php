@@ -42,5 +42,6 @@ class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
         'E1058' => 'Okapi Plug-In: Error in converting a file: "{message}" on converting file {file}',
         'E1059' => 'Okapi Plug-In: Configuration error - no Okapi server URL is configured!',
         'E1150' => 'Okapi Plug-In: The exported XLIFF contains empty targets, the Okapi process will probably fail then.',
+        'E1340' => 'Okapi Plug-In: The default bconf configuration file-name is not set.',
     ];
 }
