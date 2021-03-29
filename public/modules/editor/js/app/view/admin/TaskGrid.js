@@ -74,7 +74,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       edit100PercentMatch: '#UT#100%-Treffer editierbar',
       fullMatchEdit: '#UT#100% Matches sind editierbar',
       emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
-      lockLocked: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
+      lockLocked: '#UT#Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
       enableSourceEditing: '#UT#Quellsprache bearbeitbar',
       workflowState:'#UT#Workflow-Status',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
       workflowUserRole:'#UT#Benutzer-Rolle',//Info:(This is not task grid column header) this is an advanced filter label text. It is used only for advanced filter label in the tag field
