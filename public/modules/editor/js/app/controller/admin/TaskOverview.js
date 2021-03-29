@@ -444,7 +444,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           vm=win.getViewModel();
       
       if(skipCards){
-          for(var i=1;i < skipCards;i++){
+          for(var i=0;i < skipCards;i++){
         	  if(win.isTaskUploadNext()){
         		  break;
         	  }
