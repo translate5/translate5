@@ -25,8 +25,8 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `translate5`.`Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`) 
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`) 
 VALUES ('runtimeOptions.plugins.Okapi.import.okapiBconfDefaultName', '1', 'editor', 'editor', 'okapi_default_import.bconf', 'okapi_default_import.bconf', '', 'string', 'Name of the default Okapi import-configuration file.', '8', 'Okapi import: Default import bconf file name', 'System setup: General');
 
-INSERT INTO `translate5`.`Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`) 
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`) 
 VALUES ('runtimeOptions.plugins.Okapi.export.okapiBconfDefaultName', '1', 'editor', 'editor', 'okapi_default_export.bconf', 'okapi_default_export.bconf', '', 'string', 'Name of the default Okapi export-configuration file.', '8', 'Okapi export: Default export bconf file name', 'System setup: General');
