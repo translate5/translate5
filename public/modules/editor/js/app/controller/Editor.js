@@ -78,6 +78,12 @@ Ext.define('Editor.controller.Editor', {
     },{
         ref:'segmentsHtmleditor',
         selector:'#segmentsHtmleditor'
+    },{
+        ref: 'languageResourceSearchGrid',
+        selector: 'languageResourceSearchGrid'
+    },{
+        ref: 'languageResourceEditorPanel',
+        selector: 'languageResourceEditorPanel'
     }],
     registeredTooltips: [],
     isEditing: false,
@@ -199,6 +205,7 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-comma':     [188,{ctrl: true, alt: false, shift: false}, me.handleDigitPreparation(me.handleInsertTag), true],
             'ctrl-shift-comma': [188,{ctrl: true, alt: false, shift: true}, me.handleDigitPreparation(me.handleInsertTagShift), true],
             'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
+            'F3':             [Ext.EventObjectImpl.F3,{ctrl: false, alt: false}, me.handleF3KeyPress, true],
             'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
             'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copySourceToTarget], //Mac Alternative key code,
             // DEC_DIGITS:
@@ -1236,6 +1243,26 @@ Ext.define('Editor.controller.Editor', {
                 notScrollCallback: callback
             });
         }
+    },
+    /***
+     * F3 editor event handler.
+     * This will set the focus in the sourceSearch field of concordence search panel
+     */
+    handleF3KeyPress: function() {
+        var me = this,
+            searchGrid = me.getLanguageResourceSearchGrid(),
+            editorPanel = me.getLanguageResourceEditorPanel(),
+            delay;
+        if(!editorPanel || !searchGrid){
+            return;
+        }
+        // expand if collapsed and set the delay to 0.5 sec (delay because of expand animation)
+        if(editorPanel.getCollapsed()){
+            editorPanel.expand();
+            delay = 500;
+        }
+        editorPanel.setActiveTab(searchGrid);
+        searchGrid.down('#sourceSearch').focus(false,delay);
     },
     removeSelectionAfterCut: function(e) {
         if(!e.defaultPrevented || !e.stopped) {
