@@ -53,6 +53,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },{
         ref: 'editorPanel',
         selector:'#SpellCheckEditorPanel'
+    },{
+        ref: 'concordenceSourceSearch',
+        selector:'languageResourceSearchGrid #sourceSearch'
     }],
     listen: {
         // When opening a task (all at once, in this order):
@@ -487,7 +490,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * What to do after the SpellCheck has been run.
      */
     finishSpellCheck: function(spellCheckProcessID) {
-        var me = this;
+        var me = this,
+            sourceSearch = me.getConcordenceSourceSearch();
         
         if (spellCheckProcessID !== me.spellCheckInProgressID) {
             me.consoleLog('do NOT finishSpellCheck...');
@@ -499,7 +503,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.setPositionOfCaret(me.bookmarkForCaret);
             me.bookmarkForCaret = null;
         }
-        me.getEditorBody().focus();
+        // if the user opens segment for editing and immediately after this
+        // uses f3 to focus on concordence search then ignore the editor focus
+        if(!sourceSearch || !sourceSearch.hasFocus){
+            me.getEditorBody().focus();
+        }
         
         me.spellCheckInProgressID = false;
         
