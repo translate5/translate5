@@ -98,14 +98,23 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     protected array $languages;
     /**
+     * All attributes by collectionId from terms_attributes to check if attribute isset in actual collection.
+     * @var array
+     */
+    protected array $attributesCollection;
+    /**
      * All collection from LEK_LanguageResources to check if termEntry isset in actual collection.
      * $termEntriesCollection['collectionId-groupId' => 'id-isProposal-descrip'];
      * @var array
      */
     protected array $termEntriesCollection;
     /**
-     * All terms from LEK_terms to check if term isset.
-     * $termCollection['mid-groupId-collectionId' => $term];
+     * All terms from terms_transacgrp to check if term isset.
+     * @var array
+     */
+    protected array $transacGrpCollection;
+    /**
+     * All terms from terms_term to check if term isset.
      * @var array
      */
     protected array $termCollection;
@@ -166,21 +175,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
     /**
      * In this class is the whole merge logic
-     * @var editor_Models_Terminology_Import_TermMerge|mixed
-     */
-    protected editor_Models_Terminology_Import_TermMerge $termMerge;
-    /**
-     * In this class is the whole merge logic
-     * @var editor_Models_Terminology_Import_AttributeMerge|mixed
-     */
-    protected editor_Models_Terminology_Import_AttributeMerge $attributeMerge;
-    /**
-     * In this class is the whole merge logic
-     * @var editor_Models_Terminology_Import_TransacGrpMerge|mixed
-     */
-    protected editor_Models_Terminology_Import_TransacGrpMerge $transacGrpMerge;
-    /**
-     * In this class is the whole merge logic
      * @var editor_Models_Terminology_Import_TermEntryMerge|mixed
      */
     protected editor_Models_Terminology_Import_TermEntryMerge $termEntryMerge;
@@ -209,11 +203,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $this->termObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_Term');
         $this->attributesObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_Attribute');
         $this->transacGrpObject = ZfExtended_Factory::get('editor_Models_Terminology_TbxObjects_TransacGrp');
-
-        $this->termMerge = ZfExtended_Factory::get('editor_Models_Terminology_Import_TermMerge');
-        $this->termEntryMerge = ZfExtended_Factory::get('editor_Models_Terminology_Import_TermEntryMerge');
-        $this->attributeMerge = ZfExtended_Factory::get('editor_Models_Terminology_Import_AttributeMerge');
-        $this->transacGrpMerge = ZfExtended_Factory::get('editor_Models_Terminology_Import_TransacGrpMerge');
     }
 
     /**
@@ -272,6 +261,9 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
 
         if ($mergeTerms) {
             $this->termEntriesCollection = $this->termEntryModel->getAllTermEntryAndCollection($this->collectionId);
+            $this->attributesCollection = $this->attributeModel->getAttributeByCollectionId($this->collectionId);
+            $this->termCollection = $this->termModel->getAllTermsByCollectionId($this->collectionId);
+            $this->transacGrpCollection = $this->transacGrpModel->getTransacGrpByCollectionId($this->collectionId);
         } else {
             $this->termEntriesCollection = [];
             $this->termCollection = [];
@@ -301,7 +293,8 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             foreach ($termEntry->{$this->tbxMap[$this::TBX_LANGSET]} as $languageGroup) {
                 $this->langSetGuid = '';
                 $this->language = $this->checkIfLanguageIsProceed($languageGroup);
-                if ($this->language) {
+//                if ($this->language) {
+                if (isset($this->language['language'])) {
                     $parsedLangSet = null;
                     $parsedLangSet = $this->handleLanguageGroup($languageGroup, $parsedEntry);
 
@@ -342,24 +335,18 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     private function saveParsedTbx()
     {
-        if ($this->attributes) {
-            $elementCollection = $this->attributeModel->getAttributeCollectionByEntryId($this->collectionId, $this->termEntryDbId);
-            $result = $this->createOrUpdateElement($this->attributes, $elementCollection, $this->mergeTerms);
-            $this->attributeMerge->createOrUpdateAttribute($result);
-            $this->attributes = [];
-        }
-
         if ($this->terms) {
-            $elementCollection = $this->termModel->getAllTermsByCollectionId($this->collectionId);
-            $result = $this->createOrUpdateElement($this->terms, $elementCollection, $this->mergeTerms);
-            $this->termMerge->createOrUpdateTerms($result);
+            $this->createOrUpdateElement($this->termModel, $this->terms, $this->termCollection, $this->mergeTerms);
             $this->terms = [];
         }
 
+        if ($this->attributes) {
+            $this->createOrUpdateElement($this->attributeModel, $this->attributes, $this->attributesCollection, $this->mergeTerms);
+            $this->attributes = [];
+        }
+
         if ($this->transacGrps) {
-            $elementCollection = $this->transacGrpModel->getTransacGrpCollectionByEntryId($this->collectionId, $this->termEntryDbId);
-            $result = $this->createOrUpdateElement($this->transacGrps, $elementCollection, $this->mergeTerms);
-            $this->transacGrpMerge->createOrUpdateTransacGrp($result);
+            $this->createOrUpdateElement($this->transacGrpModel, $this->transacGrps, $this->transacGrpCollection, $this->mergeTerms);
             $this->transacGrps = [];
         }
     }
@@ -428,7 +415,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
         $newLangSet->setEntryId($this->termEntryDbId);
         $newLangSet->setTermEntryGuid($parsedEntry->getEntryGuid());
 
-        // OVO SE JOŠ NE SPREMA
         foreach ($languageGroup->descripGrp as $descripGrp) {
             $this->descripGrpGuid = $this->getGuid();
             $newLangSet->setDescripGrpGuid($this->descripGrpGuid);
@@ -513,9 +499,6 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
      */
     private function setAttributeTypes(SimpleXMLElement $element, bool $addToAttributesCollection = true): array
     {
-        if (!isset($this->language['language'])) {
-            $this->language['language'] = 'none';
-        }
         $attributes = [];
         foreach ($element as $key => $value) {
             /** @var editor_Models_Terminology_TbxObjects_Attribute $attribute */

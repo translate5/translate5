@@ -61,7 +61,21 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
         return $transacGrpByKey;
     }
 
-    public function createTransacGrp(string $sqlParam, string $sqlFields, array $sqlValue)
+    public function getTransacGrpByCollectionId(int $collectionId): array
+    {
+        $transacGrpByKey = [];
+
+        $query = "SELECT * FROM terms_transacgrp WHERE collectionId = :collectionId";
+        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
+
+        foreach ($queryResults as $key => $transacGrp) {
+            $transacGrpByKey[$transacGrp['elementName'].'-'.$transacGrp['transac'].'-'.$transacGrp['ifDescripgrp'].'-'.$transacGrp['termId']] = $transacGrp;
+        }
+
+        return $transacGrpByKey;
+    }
+
+    public function createImportTbx(string $sqlParam, string $sqlFields, array $sqlValue)
     {
         $this->init();
         $insertTerms = rtrim($sqlParam, ',');
@@ -73,7 +87,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
      * @param array $transacGrps
      * @return bool
      */
-    public function updateTransacGrp(array $transacGrps): bool
+    public function updateImportTbx(array $transacGrps): bool
     {
         foreach ($transacGrps as $transacGrp) {
             $this->db->update($transacGrp, ['id=?'=> $transacGrp['id']]);

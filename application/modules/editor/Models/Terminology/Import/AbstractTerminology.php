@@ -10,12 +10,13 @@ class editor_Models_Terminology_Import_AbstractTerminology
 
     /**
      * Iterate over $element from given element and check if merge is set and than check if element to update.
+     * @param object $termsModel
      * @param array $parsedElements
      * @param array $elementCollection
      * @param bool $mergeTerms
      * @return array[]
      */
-    public function createOrUpdateElement(array $parsedElements, array $elementCollection, bool $mergeTerms): array
+    public function createOrUpdateElement(object $termsModel, array $parsedElements, array $elementCollection, bool $mergeTerms): array
     {
         $sqlUpdate = [];
         $sqlInsert = [];
@@ -30,7 +31,7 @@ class editor_Models_Terminology_Import_AbstractTerminology
                 $checked = $this->checkIsForUpdate($element, $elementCollection, $collectionKey);
 
                 if ($checked['isUpdate']) {
-                    $sqlUpdate[] = $this->prepareElementUpdate($element, $elementCollection[$collectionKey]['id']);
+                    $sqlUpdate[] = $this->prepareSqlUpdate($element, $elementCollection[$collectionKey]['id']);
                 }
                 if ($checked['isCreate']) {
                     $sqlInsert = $this->prepareSqlInsert($element, $count);
@@ -41,6 +42,14 @@ class editor_Models_Terminology_Import_AbstractTerminology
                 $sqlParam .= $sqlInsert['tableParam'];
             }
             $count++;
+        }
+
+        if ($sqlUpdate) {
+            $termsModel->updateImportTbx($sqlUpdate);
+        }
+
+        if ($sqlInsert) {
+            $termsModel->createImportTbx($sqlParam, $sqlInsert['tableFields'], $sqlInsert['tableValue']);
         }
 
 
@@ -115,7 +124,7 @@ class editor_Models_Terminology_Import_AbstractTerminology
      * @param int $id
      * @return array
      */
-    public function prepareElementUpdate(object $element, int $id): array
+    public function prepareSqlUpdate(object $element, int $id): array
     {
         $fieldsToUpdate = [];
 

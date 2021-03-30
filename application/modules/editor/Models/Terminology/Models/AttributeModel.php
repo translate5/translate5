@@ -59,7 +59,21 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         return $attributeByKey;
     }
 
-    public function createAttributes(string $sqlParam, string $sqlFields, array $sqlValue)
+    public function getAttributeByCollectionId(int $collectionId): array
+    {
+        $attributeByKey = [];
+
+        $query = "SELECT * FROM terms_attributes WHERE collectionId = :collectionId";
+        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
+
+        foreach ($queryResults as $key => $attribute) {
+            $attributeByKey[$attribute['elementName'].'-'.$attribute['language'].'-'.$attribute['termId']] = $attribute;
+        }
+
+        return $attributeByKey;
+    }
+
+    public function createImportTbx(string $sqlParam, string $sqlFields, array $sqlValue)
     {
         $this->init();
         $insertValues = rtrim($sqlParam, ',');
@@ -73,7 +87,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
      * @param array $attributes
      * @return bool
      */
-    public function updateAttributes(array $attributes): bool
+    public function updateImportTbx(array $attributes): bool
     {
         foreach ($attributes as $attribute) {
             $this->db->update($attribute, ['id=?'=> $attribute['id']]);

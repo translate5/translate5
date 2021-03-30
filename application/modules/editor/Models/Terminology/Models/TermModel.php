@@ -92,7 +92,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         return $this->db->fetchAll($s);
     }
 
-    public function createTerms(string $sqlParam, string $sqlFields, array $sqlValue)
+    public function createImportTbx(string $sqlParam, string $sqlFields, array $sqlValue)
     {
         $this->init();
         $insertTerms = rtrim($sqlParam, ',');
@@ -105,7 +105,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      * @param array $terms
      * @return bool
      */
-    public function updateTerms(array $terms): bool
+    public function updateImportTbx(array $terms): bool
     {
         foreach ($terms as $term) {
             $this->db->update($term, ['id=?'=> $term['id']]);
