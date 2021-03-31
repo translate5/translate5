@@ -125,7 +125,7 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         $this->filter->addTableForField('taskGuid', 'ta');
         $s = $db->select()
         ->setIntegrityCheck(false)
-        ->from(array("languageResource" => "LEK_languageresources"), array(new Zend_Db_Expr('"'.$task->getTaskName().'" as taskName'),new Zend_Db_Expr('"'.$taskGuid.'" as taskGuid'),"languageResource.id AS languageResourceId","languageResource.*","ta.id AS taskassocid", "ta.segmentsUpdateable"))
+        ->from(array("languageResource" => "LEK_languageresources"), array(new Zend_Db_Expr($adapter->quote($task->getTaskName()).' as taskName'),new Zend_Db_Expr($adapter->quote($taskGuid).' as taskGuid'),"languageResource.id AS languageResourceId","languageResource.*","ta.id AS taskassocid", "ta.segmentsUpdateable"))
         ->join(array("la"=>"LEK_languageresources_languages"), 'languageResource.id=la.languageResourceId',array('la.sourceLang AS sourceLang','la.targetlang AS targetLang'))
         ->where('la.sourceLang IN(?)',$sourceLangs)
         ->where('la.targetLang IN(?)',$targetLangs)
