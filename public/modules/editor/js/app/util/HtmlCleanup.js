@@ -37,8 +37,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 	 * entfernt vom Editor / TrackChanges automatisch hinzugefügte unsichtbare Zeichen und alle internen Tags
 	 */
 	cleanForLiveEditing: function(html){
-	    // console.log("cleanForLiveEditing RAW: "+html+" / NICE: "+this.cleanAllEditingTags(this.cleanInvisibleCharacters(html)));
-		return this.cleanAllEditingTags(this.cleanInvisibleCharacters(html));
+	    return this.cleanAllEditingTags(this.cleanInvisibleCharacters(html));
 	},
 	/**
 	 * entfernt vom Editor / TrackChanges automatisch hinzugefügte unsichtbare Zeichen
@@ -52,6 +51,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 	 * The cleaning of the latter expects the contents of those tags not to be complex HTML-structures, if this is the case, the code must be rewritten from a (fast) regex type to a complex markup parser
 	 */
 	cleanAllEditingTags: function(html){
+	    html = this.cleanProtectInternalTags(html); // UGLY: stripping the tags with regex is prone to corrupt the structure of interleaving tags so we protect them
 		html = this.cleanDuplicateSaveImgTags(html);
 		html = this.cleanDeleteTags(html);
 		html = this.cleanInsertTags(html);
@@ -59,6 +59,7 @@ Ext.define('Editor.util.HtmlCleanup', {
 		html = this.cleanQmTags(html);
 		html = this.cleanSpellcheckTags(html);
 		html = this.cleanTermTags(html);
+		html = this.cleanUnprotectInternalTags(html); // undo internal-tag protection
 		return html;
 	},
 	/**
@@ -113,13 +114,29 @@ Ext.define('Editor.util.HtmlCleanup', {
             replacement = '';
         }
         if(!classNames || classNames.length == 0){
-            return html.replace(/<[^>]+internal-tag[^>]+>.+?<\/div>/ig, replacement);
+            return html.replace(/<div[^>]+internal-tag[^>]+>.+?<\/div>/ig, replacement);
         }
         classNames = (classNames.length == 1) ? classNames[0] : classNames.join('[^>]+');
-        var regex = new RegExp('<[^>]+internal-tag[^>]+'+classNames+'[^>]+>.+?</div>', 'ig');
+        var regex = new RegExp('<div[^>]+internal-tag[^>]+'+classNames+'[^>]+>.+?</div>', 'ig');
         html = html.replace(regex, replacement);
-        var regex = new RegExp('<[^>]+'+classNames+'[^>]+internal-tag[^>]+>.+?</div>', 'ig');
+        var regex = new RegExp('<div[^>]+'+classNames+'[^>]+internal-tag[^>]+>.+?</div>', 'ig');
         return html.replace(regex, replacement);
+    },
+    /**
+     * Protects internal tags for further regex-processing by replacing the tag-name
+     * @param string html
+     * @return string
+     */
+    cleanProtectInternalTags: function(html){
+        return html.replace(/<div[^>]+internal-tag[^>]+>.+?<\/div>/ig, function(match){ return ("<t5intag" + match.substring(4, match.length - 6) + "</t5intag>"); });
+    },
+    /**
+     * Reverses internal tags protected with ::cleanProtectInternalTags back to their proper form
+     * @param string html
+     * @return string
+     */
+    cleanUnprotectInternalTags: function(html){
+        return html.split("<t5intag").join("<div").split("</t5intag>").join("</div>");
     },
 	
 	cleanDuplicateSaveImgTags: function(html){

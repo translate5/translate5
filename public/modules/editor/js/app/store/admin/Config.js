@@ -36,23 +36,60 @@ Ext.define('Editor.store.admin.Config', {
     pageSize: 0,
     sorters: ['guiGroup', 'guiName'],
     groupField: 'guiGroup',
+    RUNTIMEOPTIONS_CONFIG_PREFIX: 'runtimeOptions.',
+    
+    /***
+     * Get the config value from given record. Here also custom value convert is applied.
+     */
+    getRecordValue:function(record){
+        if(!record){
+            return null;
+        }
+        //Convert the map types to object (this is not done by the model instance). 
+        if(record.get('type') == 'map'){
+            return Ext.JSON.decode(record.get('value'));
+        }
+        return record.get('value');
+    },
     
     /***
      * Search for config value by given name
      */
     getConfig:function(name){
         var me=this,
-          pos = me.findExact('name','runtimeOptions.'+name),//TODO: get me from const
-          row;
+            hasFilters = me.filters && me.filters.length > 0;
+            
+         if(hasFilters){
+             return me.searchFiltered(name);
+         }   
+            
+        var pos = me.findExact('name',me.RUNTIMEOPTIONS_CONFIG_PREFIX+name),//TODO: get me from const
+            row;
         
         if (pos < 0) {
             return null;
         }
-        row = me.getAt(pos);
-        //Convert the map types to object (this is not done by the model instance). 
-        if(row.get('type') == 'map'){
-            return Ext.JSON.decode(row.get('value'));
-        }
-        return row.get('value');
+        return me.getRecordValue(me.getAt(pos))
+    },
+
+    /***
+     * Search the config by name including the filtered rows
+     */
+    searchFiltered:function(name){
+        var me=this,
+            data = me.getData().getSource(),
+            record = data && data.getByKey(me.RUNTIMEOPTIONS_CONFIG_PREFIX+name);
+        return me.getRecordValue(record);
+    },
+    
+    /***
+     * Add additional params to the store proxy. The newExtra params will be merged into 
+     * the existing proxy extra params
+     */
+    setExtraParams:function(newExtra){
+        var me=this,
+            existing = me.getProxy().getExtraParams(),
+            merged = Ext.Object.merge(existing, newExtra);
+        me.getProxy().setExtraParams(merged);
     }
 });

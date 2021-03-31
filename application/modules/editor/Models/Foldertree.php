@@ -53,10 +53,9 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract {
    */
   protected $_pathPrefix = NULL;
   
-  public function __construct() {
+  public function __construct(string $pathPrefix = null) {
       parent::__construct();
-      $config = Zend_Registry::get('config');
-      $this->setPathPrefix($config->runtimeOptions->import->proofReadDirectory);
+      $this->setPathPrefix(editor_Models_Import_Configuration::WORK_FILES_DIRECTORY);
   }
   /**
    * @param string $prefix
@@ -180,8 +179,8 @@ class editor_Models_Foldertree extends ZfExtended_Models_Entity_Abstract {
    * @param string $path
    */
   protected function handleFile(stdClass $child, $path) {
-      $path = $this->_pathPrefix !==''? $this->_pathPrefix.DIRECTORY_SEPARATOR.$path:$path;
-      $this->_paths[$child->id] = $path.$child->filename;      
+      $path = $this->_pathPrefix !=='' ? $this->_pathPrefix.DIRECTORY_SEPARATOR.$path : $path;
+      $this->_paths[$child->id] = $path.$child->filename;
   }
   
   /**

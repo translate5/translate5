@@ -129,6 +129,9 @@
 		    <source>Analyse läuft</source>
 		    <target>Analysis in progress</target>
 		</trans-unit>
+
+		<trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse enthalten</source><target>Blocked segments are included in the analysis</target></trans-unit>
+		<trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgbmljaHQgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse nicht enthalten</source><target>Blocked segments are not included in the analysis</target></trans-unit>
     </body>
   </file>
 </xliff>

@@ -1,0 +1,50 @@
+[
+    {
+        "resourceName": "API Testing::MosesMt_Translate2428Test_one",
+        "resourceColor": null,
+        "internalFuzzy": "Yes",
+        "104": 0,
+        "103": 0,
+        "102": 0,
+        "101": 0,
+        "100": 0,
+        "99": 0,
+        "89": 0,
+        "79": 0,
+        "69": 0,
+        "59": 0,
+        "noMatch": 0
+    },
+    {
+        "resourceName": "API Testing::MosesMt_Translate2428Test_two",
+        "resourceColor": null,
+        "internalFuzzy": "Yes",
+        "104": 0,
+        "103": 0,
+        "102": 0,
+        "101": 0,
+        "100": 0,
+        "99": 0,
+        "89": 0,
+        "79": 72,
+        "69": 0,
+        "59": 0,
+        "noMatch": 0
+    },
+    {
+        "resourceName": "",
+        "resourceColor": "",
+        "internalFuzzy": "Yes",
+        "104": 0,
+        "103": 0,
+        "102": 0,
+        "101": 0,
+        "100": 0,
+        "99": 0,
+        "89": 0,
+        "79": 0,
+        "69": 0,
+        "59": 0,
+        "noMatch": 0
+    }
+]
