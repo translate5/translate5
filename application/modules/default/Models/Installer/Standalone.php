@@ -53,7 +53,7 @@ class Models_Installer_Standalone {
      * Increase this value to force a restart of the updater while updating
      * @var integer
      */
-    const INSTALLER_VERSION = 15;
+    const INSTALLER_VERSION = 16;
     
     /**
      * @var string
@@ -159,13 +159,11 @@ class Models_Installer_Standalone {
         }
         if(!empty($this->options['maintenance'])) {
             $this->addZendToIncludePath();
-            $this->initApplication();
             $this->maintenanceMode();
             exit;
         }
         if(!empty($this->options['announceMaintenance'])) {
             $this->addZendToIncludePath();
-            $this->initApplication();
             $this->maintenanceMode();
             exit;
         }
@@ -629,7 +627,7 @@ class Models_Installer_Standalone {
         $this->initTranslate5CliBridge();
         $input = new Symfony\Component\Console\Input\ArrayInput([
             'command' => 'database:update',
-            '-i' => null,
+            '--import' => null,
         ]);
         $this->cli->run($input);
         

@@ -109,8 +109,9 @@ function getLanguageFlag(rfcLanguage) {
     	if(Editor.data.apps.termportal.rfcFlags[rfcValue] === ''){
     		return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
     	}
+    	var langTextValue = '<span class="noFlagLanguage termPortalLanguageRfcLabel">'+rfcLanguage+'</span>';
         // TODO: img-html could be reused if already created before
-        return '<img src="' + moduleFolder + 'images/flags/' + Editor.data.apps.termportal.rfcFlags[rfcValue] + '.png" alt="' + rfcValue + '" title="' + rfcValue + '">';
+        return  langTextValue + ' <img src="' + moduleFolder + 'images/flags/' + Editor.data.apps.termportal.rfcFlags[rfcValue] + '.png" alt="' + rfcValue + '" title="' + rfcValue + '">';
     }
     if(!rfcValue || rfcValue == ''){
     	return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';

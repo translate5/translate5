@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_Import_Worker_Abstract {
+abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_Task_AbstractWorker {
     
     /**
      * This check prevents the termtagger to process any segments to avoid problems with hanging termtagger
@@ -43,10 +43,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      * overwrites $this->workerModel->maxLifetime
      */
     protected $maxLifetime = '2 HOUR';
-    
-    // TEST: setting a different blocking-type
-    // protected $blockingType = ZfExtended_Worker_Abstract::BLOCK_RESOURCE;
-    
+
     /**
      * Multiple workers are allowed to run simultaneously per task
      * @var string
@@ -139,7 +136,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      *
      * @see ZfExtended_Worker_Abstract::queue()
      */
-    public function queue($parentId = 0, $state = NULL, $startNext = true) {
+    public function queue($parentId = 0, $state = NULL, $startNext = true): int {
         $workerCountToStart = 0;
 
         $usedSlots = count($this->workerModel->getListSlotsCount(self::$resourceName));
@@ -365,5 +362,17 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
             //'E1116' => 'Could not load TBX into TermTagger: TBX hash is empty.',
             throw new editor_Plugins_TermTagger_Exception_Open('E1116', [], $e);
         }
+    }
+    
+    /***
+     * Update the progres based on the tagged field in lek segments meta
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::updateProgress()
+     */
+    public function updateProgress(float $progress = 1){
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $meta editor_Models_Segment_Meta */
+        $progress = $meta->getTermtaggerSegmentProgress($this->taskGuid);
+        parent::updateProgress($progress);
     }
 }

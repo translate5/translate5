@@ -82,12 +82,18 @@ class TaskCleanCommand extends Translate5AbstractCommand
             'deletes one task in state import');
         
         $this->addOption(
+            'set-to-error',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'sets a task to status error (for example to gain access to clone/delete/download of a hanging import task)');
+        
+        $this->addOption(
             'delete-data',
             'd',
             InputOption::VALUE_NONE,
             'deletes all orphaned data folders');
     }
-
+    
     /**
      * Execute the command
      * {@inheritDoc}
@@ -119,10 +125,12 @@ class TaskCleanCommand extends Translate5AbstractCommand
         $this->handleErrorTasks($stateError);
         $this->handleImportTasks($stateImport);
         $this->handleOrphanedTaskData($availableDataDirs);
+        $this->handleSetToError();
         $this->io->section('Use the following option parameters to delete the listed tasks:');
         $this->io->text([
             '--delete-error [ID]  - deletes one (with ID) or all tasks with errors',
             '--delete-import ID   - deletes one task in state import',
+            '--set-to-error ID    - sets a task to status error (for example to gain access to clone/delete/download of a hanging import task)',
             '--delete-data        - deletes all orphaned data folders',
         ]);
         return 0;
@@ -179,22 +187,33 @@ class TaskCleanCommand extends Translate5AbstractCommand
         }
         $table = new TaskTable($this->output);
         $table->setRows($stateImport);
-        $table->render();
-        $this->output->writeln(['','']);
+        
         
         $toDelete = (int) $this->input->getOption('delete-import');
         if(empty($toDelete)) {
+            $table->render();
+            $this->output->writeln(['','']);
             return;
         }
         if(!$this->isInList($toDelete, $stateImport)) {
+            $table->render();
+            $this->output->writeln(['','']);
             $this->io->error('Given task ID is not in the list of tasks with status "import" and can not be deleted here!');
             return;
         }
+        
         $task = new \editor_Models_Task();
         $task->load((int) $toDelete);
+        $msg = 'The task "'.$task->getTaskName().' ('.$task->getId().' - '.$task->getTaskGuid().') was successfully deleted!';
         $remover = new \editor_Models_Task_Remover($task);
         $remover->remove(true);
-        $this->io->success('The task "'.$task->getTaskName().' ('.$task->getId().' - '.$task->getTaskGuid().') was successfully deleted!');
+        
+        unset($stateImport[$toDelete]);
+        $table->setRows($stateImport);
+        $table->render();
+        $this->output->writeln(['','']);
+        
+        $this->io->success($msg);
     }
     
     /**
@@ -213,7 +232,7 @@ class TaskCleanCommand extends Translate5AbstractCommand
         $taskDirectories = scandir($taskDataPath);
         
         $orphaned = array_diff($taskDirectories, $availableDataDirs);
-
+        
         $delete = $this->input->getOption('delete-data');
         
         $table = new Table($this->output);
@@ -236,7 +255,7 @@ class TaskCleanCommand extends Translate5AbstractCommand
                 /* @var $recursivedircleaner \ZfExtended_Controller_Helper_Recursivedircleaner */
                 $recursivedircleaner = \ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
                     'Recursivedircleaner'
-                );
+                    );
                 $recursivedircleaner->delete($absDir);
             }
         }
@@ -254,6 +273,25 @@ class TaskCleanCommand extends Translate5AbstractCommand
         }
         else {
             $this->io->text('<info>No orphaned data directories found!</>');
+        }
+    }
+    
+    /**
+     * set the task given by ID to status error
+     */
+    protected function handleSetToError() {
+        $taskId = (int) $this->input->getOption('set-to-error');
+        if(empty($taskId)) {
+            return;
+        }
+        
+        $task = new \editor_Models_Task();
+        $task->load((int) $taskId);
+        if($task->setErroneous()) {
+            $this->io->success('The task "'.$task->getTaskName().' ('.$task->getId().' - '.$task->getTaskGuid().') was successfully set to status error!');
+        }
+        else {
+            $this->io->error('The task "'.$task->getTaskName().' ('.$task->getId().' - '.$task->getTaskGuid().') could not be set to status error!');
         }
     }
     

@@ -883,7 +883,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * (Further implementation: https://confluence.translate5.net/display/MI/Task+Typen)
      */
     public function isHiddenTask() {
-        return $this->getTaskType() != $this->getDefaultTasktype();
+        return !in_array($this->getTaskType(), [$this->getDefaultTasktype(),self::INITIAL_TASKTYPE_PROJECT_TASK]);
     }
     
     /**
@@ -1163,6 +1163,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $history->save();
             $segment->save();
         }
+        
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $meta editor_Models_Segment_Meta */
+        //update task word count when 100% matches editable is changed
+        $task->setWordCount($meta->getWordCountSum($task));
     }
 
     /***
@@ -1274,7 +1279,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             'enableSourceEditing' => 'Quellsprache bearbeitbar',
             'fileCount' => 'Dateien',
             'fullMatchEdit' => '100% Matches sind editierbar',
-            'lockLocked' => 'In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
+            'lockLocked' => 'Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
             'orderdate' => 'Bestelldatum',
             'pmGuid' => 'Projektmanager',
             'pmName' => 'Projektmanager',

@@ -213,14 +213,13 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
      * @return [string]
      */
     protected function getFiles($taskGuid) {
-        $config = Zend_Registry::get('config');
         $filetree = ZfExtended_Factory::get ( 'editor_Models_Foldertree' );
         /* @var $filetree editor_Models_Foldertree */
         
         $files = $filetree->getPaths($taskGuid, $filetree::TYPE_FILE );
-        $review = $config->runtimeOptions->import->proofReadDirectory;
+        $workfilesDirectory = editor_Models_Import_Configuration::WORK_FILES_DIRECTORY;
         foreach ( $files as $fileid => $file ) {
-            $files [$fileid] = trim ( str_replace ( '#!#' . $review, '', '#!#' . $file ), '/\\' );
+            $files [$fileid] = trim ( str_replace ( '#!#' . $workfilesDirectory, '', '#!#' . $file ), '/\\' );
         }
         return $files;
     }

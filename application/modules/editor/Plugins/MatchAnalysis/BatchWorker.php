@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * This will send multiple segments at once for translation
  * and save the result in separate table in the database. Later those results will be used for match analysis and pre-translation.
  */
-class editor_Plugins_MatchAnalysis_BatchWorker extends ZfExtended_Worker_Abstract {
+class editor_Plugins_MatchAnalysis_BatchWorker extends editor_Models_Task_AbstractWorker {
     
     /**
      * @var ZfExtended_Logger
@@ -70,7 +70,10 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends ZfExtended_Worker_Abstrac
         
         $connector = $manager->getConnector($languageResource, $task->getSourceLang(), $task->getTargetLang(), $task->getConfig());
         /* @var $connector editor_Services_Connector */
-        $connector->batchQuery($this->taskGuid);
+        $connector->batchQuery($this->taskGuid,function($progress){
+            //update the worker model progress with progress value reported from the batch query
+            $this->updateProgress($progress);
+        });
         
         $exceptions = $connector->getBatchExceptions();
         foreach($exceptions as $e) {
@@ -78,5 +81,14 @@ class editor_Plugins_MatchAnalysis_BatchWorker extends ZfExtended_Worker_Abstrac
             $this->log->exception($e);
         }
         return true;
+    }
+    
+    /***
+     * The batch worker takes approximately 50% of the import time
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::getWeight()
+     */
+    public function getWeight() {
+        return 50;
     }
 }

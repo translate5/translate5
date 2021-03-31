@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
+class editor_Plugins_Okapi_Worker extends editor_Models_Task_AbstractWorker {
     
     const TYPE_IMPORT = 'import';
     const TYPE_EXPORT = 'export';
@@ -183,7 +183,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         
         try {
             $api->createProject();
-            $api->uploadOkapiConfig([$plugin->getExportBconf()]);
+
+            $api->uploadOkapiConfig([$plugin::createDefaultBconfPath($this->task,$plugin::OKAPI_BCONF_TARGET_EXPORT)]);
             
             $api->uploadInputFile('manifest.rkm', $manifestFile);
             $originalFile = $this->findOriginalFile($fileId);
@@ -308,13 +309,15 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         $config=Zend_Registry::get('config')->runtimeOptions;
         $params = $this->workerModel->getParameters();
         $import = $config->import;
+        $importConfig = $params['importConfig'];
+        /* @var $importConfig editor_Models_Import_Configuration */
         
         $realFile = $params['file'];
         $refFolder = $params['importFolder'].'/'.$import->referenceDirectory;
-        $reviewFolder = $params['importFolder'].'/'.$import->proofReadDirectory;
+        $workfilesDirectory = $params['importFolder'].'/'.$importConfig->getFilesDirectory();
         
         //cut off review folder from realfile:
-        $relRealFile = str_replace('#'.realpath($reviewFolder), '', '#'.realpath($realFile));
+        $relRealFile = str_replace('#'.realpath($workfilesDirectory), '', '#'.realpath($realFile));
         $absRefFile = $refFolder.'/'.$relRealFile;
         $absRefDir = dirname($absRefFile);
         
@@ -363,5 +366,15 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      */
     protected function isAttachOriginalAsReference() {
         return (boolean)Zend_Registry::get('config')->runtimeOptions->plugins->Okapi->import->fileconverters->attachOriginalFileAsReference;
+    }
+    
+    /***
+     * The batch worker takes approximately 5% of the import time
+     * 
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::getWeight()
+     */
+    public function getWeight() {
+        return 5;
     }
 }

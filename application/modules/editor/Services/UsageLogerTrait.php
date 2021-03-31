@@ -50,8 +50,9 @@ trait editor_Services_UsageLogerTrait {
      * Log how many characters are used/translated from the current adapter request
      *
      * @param mixed $queryString
+     * @param boolean $isSegmentRepetition : is the queryString segment repetition. If yes, the repetition flag will be set to 1.
      */
-    public function logAdapterUsage($querySource){
+    public function logAdapterUsage($querySource, bool $isSegmentRepetition = false){
         $mtlogger=ZfExtended_Factory::get('editor_Models_LanguageResources_UsageLogger');
         /* @var $mtlogger editor_Models_LanguageResources_UsageLogger */
         $mtlogger->setLanguageResourceId($this->getLanguageResource()->getId());
@@ -69,6 +70,10 @@ trait editor_Services_UsageLogerTrait {
             
             //set the request source to editor
             $mtlogger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_EDITOR);
+            
+            if($isSegmentRepetition){
+                $mtlogger->setRepetition(1);
+            }
             
             //load the task for the current request
             if(!isset($this->taskFilePretranslate) || $this->taskFilePretranslate->getTaskGuid()!=$querySource->getTaskGuid()){

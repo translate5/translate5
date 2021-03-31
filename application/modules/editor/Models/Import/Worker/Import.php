@@ -53,13 +53,6 @@ class editor_Models_Import_Worker_Import {
     protected $segmentFieldManager;
     
     /**
-     * Counter for number of imported words
-     * if set to "false" word-counting will be disabled
-     * @var (int) / boolean
-     */
-    private $wordCount = 0;
-    
-    /**
      * @var editor_Models_Import_FileList
      */
     protected $filelist;
@@ -132,6 +125,7 @@ class editor_Models_Import_Worker_Import {
 
         $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         /* @var $treeDb editor_Models_Foldertree */
+        $treeDb->setPathPrefix($this->importConfig->getFilesDirectory());
         $filelist = $treeDb->getPaths($this->task->getTaskGuid(),'file');
         
         $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
@@ -159,8 +153,6 @@ class editor_Models_Import_Worker_Import {
             $parser->addSegmentProcessor($segProc);
             $parser->parseFile();
             $filesProcessedAtAll++;
-            //wordcount provided by import format
-            $this->countWords($parser->getWordCount());
         }
         
         if($filesProcessedAtAll === 0) {
@@ -170,9 +162,6 @@ class editor_Models_Import_Worker_Import {
             ]);
         }
         
-        if ($this->task->getWordCount() == 0) {
-            $this->task->setWordCount($this->wordCount);
-        }
         $mqmProc->handleErrors();
         
         $this->task->setReferenceFiles($this->filelist->hasReferenceFiles());
@@ -195,29 +184,10 @@ class editor_Models_Import_Worker_Import {
 
         //we may set the tasks wordcount only to our calculated values if there was no count given either by API or by import formats
         if ($this->task->getWordCount() == 0) {
-            $this->task->setWordCount($meta->getWordCountSum($taskGuid));
+            $this->task->setWordCount($meta->getWordCountSum($this->task));
         }
         
         $this->task->setSegmentCount($segment->getTotalSegmentsCount($taskGuid));
-    }
-    
-    /**
-     * Adds up the number of words of the imported files
-     * and saves this into the private variable $this->wordCount
-     *
-     * If this function is once called with "false", the addup-process will be canceled for the whole import-process
-     *
-     * @param int or bool false $count
-     */
-    private function countWords($count)
-    {
-        if ($count === false) {
-            $this->wordCount = false;
-        }
-        
-        if ($this->wordCount !== false) {
-            $this->wordCount += $count;
-        }
     }
     
     /**
