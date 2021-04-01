@@ -176,6 +176,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     itemId: 'watchListFilterBtn',
                     cls: 'watchListFilterBtn',
                     enableToggle: true,
+                    text: me.item_watchListFilterBtn,
                     tooltip: {
                         text: me.item_showBookmarkedSegments,
                         showDelay: 0
