@@ -142,12 +142,12 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
                     //engines exist, set the store from the loaded data
                     var engines = Ext.create('Ext.data.Store', {
                         fields: [
-                            {name: 'id', type: 'int'},
+                            {name: 'id', type: 'string'}, // Engine id can be string or number. Since we are not saving this into the database, we can set the model to string.
                             {name: 'name',  type: 'string'},
                             {name: 'group',  type: 'int'},
                             {name: 'source',  type: 'string'},
                             {name: 'target',  type: 'string'},
-                            {name: 'status',  type: 'string'},
+                            {name: 'status',  type: 'string'}
                             ],
                             data : responsData.rows
                     });
