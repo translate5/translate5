@@ -340,7 +340,7 @@ class editor_Segment_Tags implements JsonSerializable {
         return NULL;
     }
     /**
-     * 
+     * Retrieves ALL our field tags
      * @return editor_Segment_FieldTags[]
      */
     private function getFieldTags(){
@@ -350,6 +350,17 @@ class editor_Segment_Tags implements JsonSerializable {
         }
         if($this->hasOriginalSource()){
             array_unshift($tags, $this->sourceOriginal);
+        }
+        return $tags;
+    }
+    /**
+     * Retrieves all field tags that can be edited
+     * @return editor_Segment_FieldTags[]
+     */
+    private function getEditableFieldTags(){
+        $tags = $this->getTargets();
+        if($this->hasOriginalSource() && $this->hasSource()){
+            array_unshift($tags, $this->source);
         }
         return $tags;
     }
@@ -376,49 +387,7 @@ class editor_Segment_Tags implements JsonSerializable {
     /* Internal Tags API */
     
     /**
-     * Checks if any fields have one or more tags of the given type
-     * @param string $type
-     * @return bool
-     */
-    public function hasTagsOfType(string $type) : bool {
-        foreach($this->getFieldTags() as $fieldTags){
-            if($fieldTags->hasType($type)){
-                return true;
-            }
-        }
-        return false;
-    }
-    /**
-     * Checks if any fields have one or more tags of the given type and classname
-     * @param string $type
-     * @param string $className
-     * @return bool
-     */
-    public function hasTagsOfTypeAndClass(string $type, string $className) : bool {
-        foreach($this->getFieldTags() as $fieldTags){
-            if($fieldTags->hasTypeAndClass($type, $className)){
-                return true;
-            }
-        }
-        return false;
-    }
-    /**
-     * Retrieves the field names of any fields that have one or more tags of the given type and classname
-     * @param string $type
-     * @param string $className
-     * @return string[]
-     */
-    public function getFieldsByTagsTypeAndClass(string $type, string $className) : array {
-        $fields = [];
-        foreach($this->getFieldTags() as $fieldTags){
-            if($fieldTags->hasTypeAndClass($type, $className)){
-                $fields[] = $fieldTags->getField();
-            }
-        }
-        return array_unique($fields);
-    }
-    /**
-     * Removes the tags of the passed type in all our FieldTags
+     * Removes the tags of the passed type in all our field tags
      * @param string $type
      */
     public function removeTagsByType(string $type){
@@ -434,6 +403,28 @@ class editor_Segment_Tags implements JsonSerializable {
     public function getTagsByType(string $type){
         $result = [];
         foreach($this->getFieldTags() as $fieldTags){
+            $result = array_merge($result, $fieldTags->getByType($type));
+        }
+        return $result;
+    }
+    
+    /**
+     * Removes the tags of the passed type in all our editable field tags
+     * @param string $type
+     */
+    public function removeEditableTagsByType(string $type){
+        foreach($this->getEditableFieldTags() as $fieldTags){
+            $fieldTags->removeByType($type);
+        }
+    }
+    /**
+     * Retrieves all tags from all our editable field tags
+     * @param string $type
+     * @return editor_Segment_Tag[]
+     */
+    public function getEditableTagsByType(string $type){
+        $result = [];
+        foreach($this->getEditableFieldTags() as $fieldTags){
             $result = array_merge($result, $fieldTags->getByType($type));
         }
         return $result;

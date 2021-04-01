@@ -27,11 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * https://examples.sencha.com/extjs/6.5.3/examples/kitchensink/?classic#grouped-grid
+ * 
  */
 Ext.define('Editor.view.quality.FilterPanel', {
-    extend: 'Ext.grid.Panel',
-    xtype: 'grouped-grid',
+    extend: 'Ext.tree.Panel',
     requires: [
         'Editor.view.quality.FilterPanelController',
     ],    
@@ -40,12 +39,32 @@ Ext.define('Editor.view.quality.FilterPanel', {
     itemId:'qualityFilterPanel',
     store: 'FilterQualities',
     title : "#UT#Qualitätssicherung",
+    rootVisible: false,
+    useArrows: true,
+
     strings:{
           
     },
-    listeners:{
-        beforerender: function(view, opts){
-            this.getStore().load();
+    columns: [{
+        xtype: 'treecolumn',
+        iconCls: 'x-tree-noicon',
+        dataIndex:'text',
+        sortable: true,
+        flex: 1
+    }],
+    // we catch the beforestaterestore event to load the store when the panel is initially open
+    // Note, that in the global qualities controller Editor.controller.Quality there is a store unload on the global editorViewportClosed event. This cannot be done here since this view is destroyed before that event ...
+    listeners: {
+        beforeexpand: function(comp){
+            comp.loadStore();
+        },
+        collapse: function(comp){
+            comp.unloadStore();
+        },
+        beforestaterestore: function(comp, state){
+            if(state.hasOwnProperty('collapsed') && state.collapsed === false){
+                comp.loadStore();
+            }
         }
     },
     initConfig : function(instanceConfig) {
@@ -55,16 +74,36 @@ Ext.define('Editor.view.quality.FilterPanel', {
         }
         return this.callParent([config]);
     },
-    // since we do update the rows manually we do not want a dirty-marker ... an API to set an item to not be dirty would be better
-    viewConfig:{
-        markDirty: false
+    /**
+     * Loads the qualities before the panel is expanded or if a uncollapsed state is applied (to catch an initiallay open panel)
+     */
+    loadStore: function(){
+        this.store.load({
+            manualLoaded: true,
+            scope: this.store,
+            callback: function(){ 
+                this.getRootNode().expand();
+             }
+        });
+    },
+    /**
+     * Unloads the qualities after the panel is collapsed
+     */
+    unloadStore: function(){
+        this.store.getRootNode().removeAll(false);
     },
     /*
     initComponent: function() {
-        var me = this;
-
-
-        me.callParent(arguments);
-    }
+        Ext.applyIf(this, {
+          viewConfig: {
+            singleSelect: true
+          }
+        });
+        this.callParent(arguments);
+    },
     */
+    // since we do update the rows manually we do not want a dirty-marker ... an API to set an item to not be dirty would be better
+    viewConfig:{
+        markDirty: false
+    }
 });

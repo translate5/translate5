@@ -30,11 +30,32 @@ END LICENSE AND COPYRIGHT
  * The store for the quality filter panel
  */
 Ext.define('Editor.store.quality.Filter', {
-    extend : 'Ext.data.Store',
+    extend : 'Ext.data.TreeStore',
     model: 'Editor.model.quality.Filter',
     storeId: 'FilterQualities',
     autoLoad: false,
-    pageSize: 0,    
+    autoSync: false,
+    folderSort: false,
+    defaultRootId: 'quality',
+    root: {
+        expanded: false,
+        text: 'ROOT'
+    },
+    proxy : {
+        type : 'rest',        
+        reader : {
+            type : 'json',
+            rootProperty: 'children'
+        },
+        url: Editor.data.restpath
+    },
+    sorters: [{
+        property: 'leaf',
+        direction: 'ASC'
+    }, {
+        property: 'title',
+        direction: 'ASC'
+    }],
     updateQualities:function(records){
 
         me.fireEvent('recordsChanged', records);

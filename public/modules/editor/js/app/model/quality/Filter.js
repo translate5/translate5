@@ -32,25 +32,13 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.model.quality.Filter', {
     extend: 'Ext.data.Model',
     fields: [
-        { name:'id', type:'int' },
-        { name:'type', type:'string' },
-        { name:'count', type:'int' },
-        { name:'checked', type:'boolean' },
-        { name:'category', type:'string' },
-        { name:'rubric', type:'boolean' },
-        { name:'segmentIds' },
-        { name:'title', type:'string' }
+        { name:'qid', type:'auto' }, /* TODO AUTOQA FIXME: why must this set to be auto and not int to avoid exception ? */
+        { name:'qtype', type:'string' },
+        { name:'qcount', type:'int' },
+        { name:'qcategory', type:'string' },
+        { name:'segmentIds' }
     ],
-    idProperty: 'id',
-    proxy : {
-        type : 'rest',
-        url: Editor.data.restpath+'quality',
-        reader : {
-            rootProperty: 'rows',
-            type : 'json'
-        }
-    },
     getSegmentIds: function(){
         this.get('segmentIds');
-    }    
+    }
 });

@@ -1882,7 +1882,6 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='V2VubiBha3RpdmllcnQsIHdlcmRlbiBibG9ja2llcnRlIFNlZ21lbnRlIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4='><source>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</source><target>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</target></trans-unit>
 <trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGJsb2NraWVydGUgU2VnbWVudGUgbmljaHQgaW4gZGllIEFuYWx5c2UgdW5kIFdvcnRhbnphaGwgZWluYmV6b2dlbg=='><source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source><target>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</target></trans-unit>
 <trans-unit id='UUEgU3RhdGlzdGlr'><source>QA Statistik</source><target>QA Statistik</target></trans-unit>
-<trans-unit id='TWF0Y2gtQW5hbHlzZQ=='><source>Match-Analyse</source><target>Match-Analyse</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdz'><source>Interne Tags</source><target>Interne Tags</target></trans-unit>
 <trans-unit id='VGVybSBpc3QgaW4gZGVyIFppZWxzcHJhY2hlIGVyc2V0enQsIHZlcmFsdGV0IG9kZXIgdmVyYm90ZW4='><source>Term ist in der Zielsprache ersetzt, veraltet oder verboten</source><target>Term ist in der Zielsprache ersetzt, veraltet oder verboten</target></trans-unit>
 <trans-unit id='VW5iZWFyYmVpdGV0ZXIgRnV6enk='><source>Unbearbeiteter Fuzzy</source><target>Unbearbeiteter Fuzzy</target></trans-unit>
@@ -1927,6 +1926,10 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='VmFsdWU='><source>Value</source><target>Value</target></trans-unit>
 <trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse enthalten</source><target>Gesperrte Segmente sind in der Analyse enthalten</target></trans-unit>
 <trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgbmljaHQgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse nicht enthalten</source><target>Gesperrte Segmente sind in der Analyse nicht enthalten</target></trans-unit>
+<trans-unit id='RGF0ZWllbiB1bmQgUUE='><source>Dateien und QA</source><target>Dateien und QA</target></trans-unit>
+<trans-unit id='UUE='><source>QA</source><target>QA</target></trans-unit>
+<trans-unit id='UXVhbGl0w6R0c3NpY2hlcnVuZw=='><source>Qualitätssicherung</source><target>Qualitätssicherung</target></trans-unit>
+<trans-unit id='UUE6IEZhbHNjaCBQb3NpdGl2ZQ=='><source>QA: Falsch Positive</source><target>QA: Falsch Positive</target></trans-unit>
   </body>
  </file>
 </xliff>
