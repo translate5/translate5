@@ -280,6 +280,9 @@ background-color: #EAF1FB;
 .x-tree-view .x-column-header-align-right .x-column-header-text {
     padding-right: 7px;
 }
+.x-tree-noicon {
+	display:none !important;
+}
 
 /*messagebox*/
 .app-msg .x-icon-text {padding-left:20px;background:no-repeat left center;} 

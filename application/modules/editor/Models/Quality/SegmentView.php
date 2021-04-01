@@ -32,10 +32,10 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractView {
     
     public static function compareByTypeTitle(stdClass $a, stdClass $b){
-        if($a->typeTitle == $b->typeTitle){
-            return strnatcasecmp($a->title, $b->title);
+        if($a->typeText == $b->typeText){
+            return strnatcasecmp($a->text, $b->text);
         }
-        return strnatcasecmp($a->typeTitle, $b->typeTitle);
+        return strnatcasecmp($a->typeText, $b->typeText);
     }
     
     /**
@@ -53,8 +53,8 @@ class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractVi
             $row->type = $dbRow->type;
             $row->category = $dbRow->category;
             $row->falsePositive = $dbRow->falsePositive;
-            $row->typeTitle = $this->manager->translateQualityType($dbRow->type);
-            $row->title = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
+            $row->typeText = $this->manager->translateQualityType($dbRow->type);
+            $row->text = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
             $row->filterable = $this->manager->isFilterableType($dbRow->type);
             $row->falsifiable = $this->manager->canBeFalsePositiveCategory($dbRow->type, $dbRow->category);
             $this->rows[] = $row;

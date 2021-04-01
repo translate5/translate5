@@ -50,8 +50,8 @@ class editor_QualityController extends ZfExtended_RestController {
     public function indexAction(){
         $task = $this->fetchTask();
         $view = new editor_Models_Quality_FilterPanelView($task, NULL, true);
-        $this->view->rows = $view->getRows();
-        $this->view->total = count($this->view->rows);
+        $this->view->text = $task->getTaskGuid();
+        $this->view->children = $view->getRows();
         $this->view->numQualities = $view->getNumQualities();
         $this->view->internalTagFaults = $view->hasInternalTagFaults();
     }

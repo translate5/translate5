@@ -27,9 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- *
+ * View Controller for the quality filter panel
  */
 Ext.define('Editor.view.quality.FilterPanelController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.qualityFilterPanel',
+    alias: 'controller.qualityFilterPanel'
 });

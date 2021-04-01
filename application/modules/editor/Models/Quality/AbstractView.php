@@ -44,7 +44,7 @@ abstract class editor_Models_Quality_AbstractView {
      * @return number
      */
     public static function compareByTitle(stdClass $a, stdClass $b){
-        return strnatcasecmp($a->title, $b->title);
+        return strnatcasecmp($a->text, $b->text);
     }
    
     /**
@@ -86,7 +86,7 @@ abstract class editor_Models_Quality_AbstractView {
     /**
      * @var boolean
      */
-    protected $hasCategories = false;
+    protected $isTree = false;
     /**
      * @var boolean
      */
@@ -129,6 +129,23 @@ abstract class editor_Models_Quality_AbstractView {
         // ordering is crucial !
         $this->dbRows = $this->table->fetchFiltered($task->getTaskGuid(), $segmentId, $field, $blacklist, true, NULL, ['type ASC','category ASC']);
         $this->create();
+    }
+    /**
+     * Retrieves our data as tree. 
+     * @return stdClass
+     */
+    public function getTree(){
+        $root = new stdClass();
+        $root->qid = -1;
+        $root->qtype = '';
+        $root->qcount = $this->numQualities;
+        $root->qcategory = null;
+        $root->expanded = true;
+        $root->checked = false;
+        $root->title = 'ROOT';
+        $root->segmentIds = [];
+        $root->children = $this->rows;
+        return $root;
     }
     /**
      * Retrieves the processed data
@@ -179,22 +196,19 @@ abstract class editor_Models_Quality_AbstractView {
         usort($rubrics, 'editor_Models_Quality_AbstractView::compareByTitle');
         // create intermediate model
         foreach($rubrics as $rubric){
-            $this->rowsByType[$rubric->type] = [];
-            $this->rowsByType[$rubric->type][self::RUBRIC] = $rubric;
+            $this->rowsByType[$rubric->qtype] = [];
+            $this->rowsByType[$rubric->qtype][self::RUBRIC] = $rubric;
         }
         // add categories to intermediate model
         foreach($this->dbRows as $row){
             /* @var $row editor_Models_Db_SegmentQualityRow */
             if(array_key_exists($row->type, $this->rowsByType)){
-                $this->rowsByType[$row->type][self::RUBRIC]->count++;
-                if($this->hasSegmentIds){
-                    $this->rowsByType[$row->type][self::RUBRIC]->segmentIds[] = $row->segmentId;
-                }
-                if($this->hasCategories){
+                $this->rowsByType[$row->type][self::RUBRIC]->qcount++;
+                if($this->isTree){
                     if(!array_key_exists($row->category, $this->rowsByType[$row->type])){
                         $this->rowsByType[$row->type][$row->category] = $this->createCategoryRow($row, false);
                     }
-                    $this->rowsByType[$row->type][$row->category]->count++;
+                    $this->rowsByType[$row->type][$row->category]->qcount++;
                     if($this->hasSegmentIds){
                         $this->rowsByType[$row->type][$row->category]->segmentIds[] = $row->segmentId;
                     }
@@ -211,15 +225,15 @@ abstract class editor_Models_Quality_AbstractView {
                 $segmentId = $row['id'];
                 foreach($utility->convertQmIds($row['qmId']) as $index => $name){
                     $category = $qmType.'_'.$index; // analogue to what is made with mqm-categories
-                    $this->rowsByType[$qmType][self::RUBRIC]->count++;
+                    $this->rowsByType[$qmType][self::RUBRIC]->qcount++;
                     if($this->hasSegmentIds){
                         $this->rowsByType[$qmType][self::RUBRIC]->segmentIds[] = $segmentId;
                     }
-                    if($this->hasCategories){
+                    if($this->isTree){
                         if(!array_key_exists($category, $this->rowsByType[$qmType])){
                             $this->rowsByType[$qmType][$category] = $this->createQmRow($this->translate->_($name), $category, false);
                         }
-                        $this->rowsByType[$qmType][$category]->count++;
+                        $this->rowsByType[$qmType][$category]->qcount++;
                         if($this->hasSegmentIds){
                             $this->rowsByType[$qmType][$category]->segmentIds[] = $segmentId;
                         }
@@ -229,7 +243,7 @@ abstract class editor_Models_Quality_AbstractView {
             }
         }
         // check if we have a structural internal tag problem
-        if(array_key_exists(editor_Segment_Tag::TYPE_INTERNAL, $this->rowsByType) && $this->rowsByType[editor_Segment_Tag::TYPE_INTERNAL][self::RUBRIC]->count > 0){
+        if(array_key_exists(editor_Segment_Tag::TYPE_INTERNAL, $this->rowsByType) && $this->rowsByType[editor_Segment_Tag::TYPE_INTERNAL][self::RUBRIC]->qcount > 0){
             $this->hasFaultyInternalTags = array_key_exists(editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY, $this->rowsByType[editor_Segment_Tag::TYPE_INTERNAL]);
         }
         // create result rows
@@ -241,15 +255,16 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected function createRows(array $rubrics){
         foreach($rubrics as $rubric){
-            $this->rows[] = $rubric;
-            if($this->hasCategories){
-                ksort($this->rowsByType[$rubric->type]);
-                foreach($this->rowsByType[$rubric->type] as $category => $row){
+            if($this->isTree){
+                $rubric->children = [];
+                ksort($this->rowsByType[$rubric->qtype]);
+                foreach($this->rowsByType[$rubric->qtype] as $category => $row){
                     if($category != self::RUBRIC){
-                        $this->rows[] = $row;
+                        $rubric->children[] = $row;
                     }
                 }
             }
+            $this->rows[] = $rubric;
         }
     }
     /**
@@ -259,18 +274,19 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected function createRubricRow(string $type) : stdClass {
         $row = new stdClass();
-        $row->id = -1;
-        $row->type = $type;
-        $row->count = 0;
-        $row->checked = $this->manager->isFullyCheckedType($type, $this->taskConfig);
-        if($this->hasCategories){
-            $row->category = null;
-            $row->rubric = true;
+        $row->qid = -1;
+        $row->qtype = $type;
+        $row->qcount = 0;
+        $row->qchecked = $this->manager->isFullyCheckedType($type, $this->taskConfig);
+        $row->checked = false;        
+        if($this->isTree){
+            $row->qcategory = null;
+            $row->expanded = true;
         }
         if($this->hasSegmentIds){
             $row->segmentIds = [];
         }
-        $row->title = $this->manager->translateQualityType($type);
+        $row->text = $this->manager->translateQualityType($type);
         return $row;
     }
     /**
@@ -280,18 +296,19 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected function createCategoryRow(editor_Models_Db_SegmentQualityRow $dbRow) : stdClass {
         $row = new stdClass();
-        $row->id = $dbRow->id;
-        $row->type = $dbRow->type;
-        $row->count = 0;
-        $row->checked = true; // only rubrics should show a "not checked properly" hint
-        if($this->hasCategories){
-            $row->category = $dbRow->category;
-            $row->rubric = false;
+        $row->qid = $dbRow->id;
+        $row->qtype = $dbRow->type;
+        $row->qcount = 0;
+        $row->qchecked = true;
+        $row->checked = false;
+        if($this->isTree){
+            $row->qcategory = $dbRow->category;
+            $row->leaf = true;
         }
         if($this->hasSegmentIds){
             $row->segmentIds = [];
         }
-        $row->title = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
+        $row->text = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
         return $row;
     }
     /**
@@ -299,20 +316,27 @@ abstract class editor_Models_Quality_AbstractView {
      * @param editor_Models_Db_SegmentQualityRow $dbRow
      * @return stdClass
      */
-    protected function createQmRow(string $title, string $category, bool $isRubric) : stdClass {
+    protected function createQmRow(string $text, string $category, bool $isRubric) : stdClass {
         $row = new stdClass();
-        $row->id = -1;
-        $row->type = editor_Segment_Tag::TYPE_QM;
-        $row->count = 0;
-        $row->checked = true;
-        if($this->hasCategories){
-            $row->category = ($isRubric) ? null : $category;
-            $row->rubric = $isRubric;
+        $row->qid = -1;
+        $row->qtype = editor_Segment_Tag::TYPE_QM;
+        $row->qcount = 0;
+        $row->qchecked = true;
+        $row->checked = false;        
+        if($this->isTree){
+            $row->qcategory = ($isRubric) ? null : $category;
+            if($isRubric){
+                $row->expanded = true;
+            } else {
+                $row->leaf = false;
+            }
+            
+            
         }
         if($this->hasSegmentIds){
             $row->segmentIds = [];
         }
-        $row->title = $title;
+        $row->text = $text;
         return $row;
     }
     /**

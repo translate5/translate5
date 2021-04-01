@@ -64,22 +64,26 @@ Ext.define('Editor.view.quality.SegmentQualities', {
     },
     qualitiesLoaded: function(qualities){
         var me = this;
-        this.store.each(function(record, idx){
-            me.add({
-                xtype: 'checkbox',
-                anchor: '100%',
-                name: 'segq' + record.get('id'),
-                inputValue: record.get('id'),
-                value: (record.get('falsePositive') == 1),
-                boxLabel: record.get('typeTitle') + ' > ' + record.get('title'),
-                disabled: !record.get('falsifiable'),
-                // boxLabelAlign: 'before',
-                handler: function(checkbox, checked){
-                    me.changeFalsePositive(checkbox.inputValue, (checked ? '1' : '0'));
-                }
+        if(this.store.getCount() == 0){
+            this.endEditing();
+        } else {
+            this.store.each(function(record, idx){
+                me.add({
+                    xtype: 'checkbox',
+                    anchor: '100%',
+                    name: 'segq' + record.get('id'),
+                    inputValue: record.get('id'),
+                    value: (record.get('falsePositive') == 1),
+                    boxLabel: record.get('typeText') + ' > ' + record.get('text'),
+                    disabled: !record.get('falsifiable'),
+                    // boxLabelAlign: 'before',
+                    handler: function(checkbox, checked){
+                        me.changeFalsePositive(checkbox.inputValue, (checked ? '1' : '0'));
+                    }
+                });
             });
-        });
-        this.show();
+            this.show();
+        }
     },
     /**
      * Starts editing. Loads the Segment's qualities and shows the GUI if qualities found

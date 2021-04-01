@@ -70,8 +70,8 @@ CREATE TABLE `LEK_segment_quality` (
 INSERT INTO `LEK_segment_quality` (`id`, `segmentId`, `taskGuid`, `field`, `type`, `category`, `categoryIndex`, `severity`, `comment`)
 SELECT `id`, `segmentId`,  `taskGuid`, `fieldedited`, 'mqm', CONCAT('mqm_', `qmtype`), `qmtype`, `severity`, `comment` FROM `LEK_qmsubsegments`;
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`) 
-VALUES ('runtimeOptions.frontend.defaultState.editor.westPanelQualityFilter', '1', 'editor', 'system', '{}', '{}', '', 'map', 'Default state configuration for the editor west panel quality filter panel. If this field value is empty ({} is not an empty value!), no state will be applied/saved for this component.', 16);
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`, `level`, `guiName`, `guiGroup`, `comment`) 
+VALUES ('runtimeOptions.frontend.defaultState.editor.westPanelQualityFilter', '1', 'editor', 'system', '{}', '{}', '', 'map', 'Default state configuration for the editor west panel quality filter panel. If this field value is empty ({} is not an empty value!), no state will be applied/saved for this component.', 32, 'Editor left panel quality filter default configuration', 'Editor: UI layout & more', '');
 
 -- ACL for quality
 INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 

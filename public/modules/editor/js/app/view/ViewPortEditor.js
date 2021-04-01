@@ -84,12 +84,12 @@ Ext.define('Editor.view.ViewPortEditor', {
                   xtype: 'fileorder.tree',
                   stateId: 'editor.westPanelFileorderTree',
                   stateEvents: ['collapse', 'expand'],
-                  stateful:true
+                  stateful: true
               },{
                   xtype: 'referenceFileTree',
                   stateId: 'editor.westPanelReferenceFileTree',
                   stateEvents: ['collapse', 'expand'],
-                  stateful:true
+                  stateful: true
               },{
                   xtype: 'qualityFilterPanel',
                   stateId: 'editor.westPanelQualityFilter',

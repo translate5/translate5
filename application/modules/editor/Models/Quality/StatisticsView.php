@@ -116,13 +116,13 @@ class editor_Models_Quality_StatisticsView {
         $this->createMqmTree();
         if(!$this->onlyMqm){
             // we use the filter-panel-views intermediate model to add the other types
-            $panelView = new editor_Models_Quality_FilterPanelView($this->task, NULL, true, true, $this->field);
+            $panelView = new editor_Models_Quality_FilterPanelView($this->task, NULL, false, true, $this->field);
             foreach($panelView->getRowsByType() as $type => $typeRows){
                 $row = $typeRows[editor_Models_Quality_FilterPanelView::RUBRIC];
-                if($row->count > 0){
+                if($row->qcount > 0){
                     $typeNode = new stdClass();
-                    $typeNode->text = $row->title;
-                    $typeNode->totalTotal = $row->count;
+                    $typeNode->text = $row->text;
+                    $typeNode->totalTotal = $row->qcount;
                     $typeNode->total = 0;
                     $typeNode->expanded = true;                
                     $typeNode->categoryIndex = -1;
@@ -130,9 +130,9 @@ class editor_Models_Quality_StatisticsView {
                     foreach($typeRows as $category => $row){
                         if($category != editor_Models_Quality_FilterPanelView::RUBRIC){
                             $catNode = new stdClass();
-                            $catNode->text = $row->title;
+                            $catNode->text = $row->text;
                             $catNode->totalTotal = $typeNode->totalTotal;
-                            $catNode->total = $row->count;
+                            $catNode->total = $row->qcount;
                             $catNode->expanded = true;
                             $catNode->leaf = true;
                             $catNode->categoryIndex = -1;

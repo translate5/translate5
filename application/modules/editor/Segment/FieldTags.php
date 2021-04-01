@@ -139,7 +139,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @param string | string[] $saveTo
      * @param string $ttName
      */
-    public function __construct(int $segmentId, string $field, string $fieldText, $saveTo, string $ttName=null) {
+    public function __construct(int $segmentId, string $field, ?string $fieldText, $saveTo, string $ttName=null) {
         $this->segmentId = $segmentId;
         $this->field = $field;
         $this->fieldText = '';
@@ -148,7 +148,7 @@ class editor_Segment_FieldTags implements JsonSerializable {
         // if HTML was passed as field text we have to unparse it
         if(!empty($fieldText) && $fieldText != strip_tags($fieldText)){
             $this->unparse($fieldText);
-        } else {
+        } else if($fieldText !== NULL) {
             $this->fieldText = $fieldText;
         }
         // This debug can be used to evaluate the quality of the DOM parsing
