@@ -37,10 +37,10 @@ END LICENSE AND COPYRIGHT
 class Translate2432Test extends \ZfExtended_Test_ApiTestcase {
     
     /***
-     * Currently available bconf files (comma separated) for okapi import/export
-     * @var string
+     * Currently available bconf files for okapi import/export
+     * @var array
      */
-    protected static $validBconfFiles = 'okapi_default_import.bconf,okapi_default_export.bconf';
+    protected static $validBconfFiles = ['okapi_default_export.bconf','okapi_default_import.bconf'];
         
     public static function setUpBeforeClass(): void {
         self::$api = new ZfExtended_Test_ApiHelper(__CLASS__);
@@ -68,8 +68,17 @@ class Translate2432Test extends \ZfExtended_Test_ApiTestcase {
         
         $this->assertEquals(2, count($indexes), 'Missing okapiBconfDefaultName config.');
         
+        // sort the expected array and convert it to string
+        sort(self::$validBconfFiles);
+        $bconfToString = implode(',', self::$validBconfFiles);
+        
         foreach ($indexes as $index){
-            $this->assertEquals(self::$validBconfFiles,$result[$index]['defaults'], 'The defaults for config ['.$result[$index]['name'].'] are not as expected');
+            // sort the defaults and convert it back to string
+            $defaults = explode(',',$result[$index]['defaults']);
+            sort($defaults);
+            $defaults = implode(',', $defaults);
+            
+            $this->assertEquals($bconfToString,$defaults, 'The defaults for config ['.$result[$index]['name'].'] are not as expected');
         }
     }
     

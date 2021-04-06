@@ -2012,7 +2012,7 @@ class editor_TaskController extends ZfExtended_RestController {
             return;
         }
         ZfExtended_UnprocessableEntity::addCodes([
-            'E1341' => 'You tried to open another task, but you have already opened another one in another window. Please press F5 to open the previous one here, or close this message to stay in the Taskoverview.'
+            'E1341' => 'You tried to open or edit another task, but you have already opened another one in another window. Please press F5 to open the previous one here, or close this message to stay in the Taskoverview.'
         ], 'editor.task');
         throw new ZfExtended_UnprocessableEntity('E1341',[
             'task' =>$this->entity //TODO: is this realy required ?
