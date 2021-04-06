@@ -43,6 +43,14 @@ class editor_SessionController extends ZfExtended_SessionController {
         parent::indexAction();
     }
     
+    public function impersonateAction(){
+        $login = $this->getParam('login');
+        $config = Zend_Registry::get('config');
+        $userModel = ZfExtended_Factory::get($config->authentication->userEntityClass);
+        /* @var $userModel \ZfExtended_Models_User */
+        $userModel->setUserSessionNamespaceWithoutPwCheck($login);
+    }
+    
     public function postAction() {
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         /* @var $mv editor_Models_Segment_MaterializedView */
