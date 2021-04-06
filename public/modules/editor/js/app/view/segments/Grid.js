@@ -404,7 +404,7 @@ Ext.define('Editor.view.segments.Grid', {
             me.positionRowAfterScroll(rowindex, row, config);
         };
 
-        view.bufferedRenderer.scrollTo(rowindex, options);
+        me.ensureVisible(rowindex, options);
     },
     /**
      * positions the given row to the given target, for valid targets see scrollTo
