@@ -769,16 +769,15 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
     var pretranslatedFiles = [],
         html = '',
         htmlFile,
-        showRefreshButton = false,
-        importProgress;
+        importProgressUpdate = false;
     $.each(allPretranslatedFiles, function(taskId, taskData) {
         htmlFile = '<li>';
         htmlFile += taskData['taskName'];
-        htmlFile += ' ' + taskData['sourceLang'] +' -> ' + taskData['targetLang'];
+        htmlFile += ' ' + taskData['sourceLang'] +' &rarr; ' + taskData['targetLang'];
         htmlFile += ' (' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] +')<br>';
         switch(taskData['downloadUrl']) {
             case 'isImporting':
-                showRefreshButton = true;
+                importProgressUpdate = true;
                 htmlFile += '<p style="font-size:80%;">' + Editor.data.languageresource.translatedStrings['noDownloadWhileImport'] + '</p>';
                 //add import progres html. For each task separate progress component and progress label.
                 if(taskData['importProgress']){
@@ -803,9 +802,6 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
     if (pretranslatedFiles.length > 0) {
         html += '<h2>' + Editor.data.languageresource.translatedStrings['pretranslatedFiles'] + '</h2>';
         html += '<p style="font-size:small;">(' + Editor.data.languageresource.translatedStrings['asOf'] + ' ' + dateAsOf + '):</p>';
-        if (showRefreshButton) {
-            html += '<p><a href="#" id="refresh-pretranslations" class="getdownloads ui-button ui-widget ui-corner-all">' + Editor.data.languageresource.translatedStrings['refresh'] + '</a></p>';
-        }
         html += '<ul>';
         html += pretranslatedFiles.join(' ');
         html += '</ul>';
@@ -818,8 +814,10 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
     updateImportProgressBar(allPretranslatedFiles);
     
     // if we are still waiting for a file to be ready: try again after 50 seconds
-    if (showRefreshButton) {
-        setTimeout(function(){ $('#refresh-pretranslations').click(); }, 5000);
+    if (importProgressUpdate) {
+        setTimeout(function(){ 
+            getDownloads(); 
+        }, 5000);
     }
 }
 
