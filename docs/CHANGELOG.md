@@ -12,6 +12,151 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.1.2] - 2021-03-31
+
+### Important Notes:
+#### [TRANSLATE-2442](https://jira.translate5.net/browse/TRANSLATE-2442)
+Adding a repetition column in language resource usage log excel.
+
+#### [TRANSLATE-2435](https://jira.translate5.net/browse/TRANSLATE-2435)
+Attention: Backwards-incompatible change: The mail address of the project manager of a task is now added as reply-to mail address to all mails, that are automatically send in the workflow (assignment notifications, mails on workflow step finish, deadline reminders). The main system mail address stays as sender mail address.
+If you  do not want this, do not upgrade, but get in touch with translate5s development team.
+
+#### [TRANSLATE-2432](https://jira.translate5.net/browse/TRANSLATE-2432)
+The default okapi bconf files now can be defined as config:
+ - runtimeOptions.plugins.Okapi.import.okapiBconfDefaultName
+ - runtimeOptions.plugins.Okapi.export.okapiBconfDefaultName
+All bconf files defined in the Okapi/data folder, will be listed as selectable config value.
+
+#### [TRANSLATE-2375](https://jira.translate5.net/browse/TRANSLATE-2375)
+For each workflow step, you can define in the configuration(system, customer and task-import defaults) how many days(weekends will be skipped in the calculation) after the order date, the deadline date will be.
+
+#### [TRANSLATE-2248](https://jira.translate5.net/browse/TRANSLATE-2248)
+IMPORTANT: The "visualReview" folder in the zip import package is deprecated from now on. In the future please always use the new folder "visual" instead. All files that need to be reviewed or translated will have to be placed in the new folder "visual" from now on. In some future version of translate5 the support for "visualReview" folder will be completely removed. Currently it still is supported, but will write a "deprecated" message to the php error-log.
+
+#### [TRANSLATE-1596](https://jira.translate5.net/browse/TRANSLATE-1596)
+IMPORTANT: The "proofRead" folder in the zip import package is deprecated from now on. In the future please always use the new folder "workfiles" instead. All files that need to be reviewed or translated will have to be placed in the new folder "workfiles" from now on. In some future version of translate5 the support for "proofRead" folder will be completely removed. Currently it still is supported, but will write a "deprecated" message to the php error-log.
+ 
+
+
+### Added
+**[TRANSLATE-2412](https://jira.translate5.net/browse/TRANSLATE-2412): Create a shortcut to directly get into the concordance search bar** <br>
+New editor shortcut (F3) to get the cursor in "concordance search" source field.
+
+**[TRANSLATE-2375](https://jira.translate5.net/browse/TRANSLATE-2375): Set default deadline per workflow step in configuration** <br>
+Define default deadline date for task-user association
+
+**[TRANSLATE-2342](https://jira.translate5.net/browse/TRANSLATE-2342): Show progress of document translation** <br>
+Import progress bar in instant translate file translation and in the task overview.
+
+
+### Changed
+
+
+
+FIX: Newlines may have been rendered twice in case of internal tags representing newlines
+
+**[TRANSLATE-2446](https://jira.translate5.net/browse/TRANSLATE-2446): Fonts Management for Visual: Add search capabilities by name / taskname** <br>
+ENHANCEMENT: Added search-field to search for fonts by task name in the font management
+
+**[TRANSLATE-2440](https://jira.translate5.net/browse/TRANSLATE-2440): Project task backend tests** <br>
+Implement API tests testing the import of multiple tasks bundled in a project (one source language, multiple target languages).
+
+**[TRANSLATE-2424](https://jira.translate5.net/browse/TRANSLATE-2424): Add Language as label under Language Flag image** <br>
+TermPortal - added language label to language flag to display RFC language.
+
+**[TRANSLATE-2350](https://jira.translate5.net/browse/TRANSLATE-2350): Make configurable if pivot language should be available in add task wizard** <br>
+The availability / visibility of the pivot language in the add task wizard can be configured in the configuration for each customer now.
+
+**[TRANSLATE-2248](https://jira.translate5.net/browse/TRANSLATE-2248): Change name of "visualReview" folder to "visual"** <br>
+The "visualReview" folder in the zip import package is deprecated from now on. In the future please always use the new folder "visual" instead. All files that need to be reviewed or translated will have to be placed in the new folder "visual" from now on. In some future version of translate5 the support for "visualReview" folder will be completely removed. Currently it still is supported, but will write a "deprecated" message to the php error-log.
+
+**[TRANSLATE-1925](https://jira.translate5.net/browse/TRANSLATE-1925): BUG: Workers running parallelism is not implemented correctly** <br>
+Enhancement: Setting more workers to "waiting" in the "wakeupScheduled" call independently of the calling worker to improve the parallelism of running workers
+
+**[TRANSLATE-1596](https://jira.translate5.net/browse/TRANSLATE-1596): Change name of "proofRead" folder to "workfiles"** <br>
+The "proofRead" folder in the zip import package is deprecated from now on. In the future please always use the new folder "workfiles" instead. All files that need to be reviewed or translated will have to be placed in the new folder "workfiles" from now on. In some future version of translate5 the support for "proofRead" folder will be completely removed. Currently it still is supported, but will write a "deprecated" message to the php error-log.
+
+
+### Bugfixes
+**[TRANSLATE-2456](https://jira.translate5.net/browse/TRANSLATE-2456): Quote in task name produces error** <br>
+Fixed problem with language resources to task association when the task name contains single or double quotes.
+
+**[TRANSLATE-2454](https://jira.translate5.net/browse/TRANSLATE-2454): Configuration userCanModifyWhitespaceTags is not loaded properly** <br>
+Users were not able to save segments with changed whitespace tags, since the corresponding configuration which allows this was not loaded properly.
+
+**[TRANSLATE-2453](https://jira.translate5.net/browse/TRANSLATE-2453): Fix unescaped control characters in language resource answers** <br>
+Solving the the following error coming from OpenTM2: ERROR in editor.languageresource.service.connector: E1315 - JSON decode error: Control character error, possibly incorrectly encoded
+
+**[TRANSLATE-2451](https://jira.translate5.net/browse/TRANSLATE-2451): Fix description text of lock segment checkbox and task column** <br>
+Clarify that feature "Locked segments in the imported file are also locked in translate5" is for SDLXLIFF files only.
+
+**[TRANSLATE-2449](https://jira.translate5.net/browse/TRANSLATE-2449): Grid grouping feature collapse/expand error** <br>
+Fixes error with collapse/expand in locally filtered config grid.
+
+**[TRANSLATE-2448](https://jira.translate5.net/browse/TRANSLATE-2448): Unable to refresh entity after save** <br>
+Fixing an error which may occur when using pre-translation with enabled batch mode of language resources.
+
+**[TRANSLATE-2445](https://jira.translate5.net/browse/TRANSLATE-2445): Unknown bullet prevents proper segmentation** <br>
+FIX: Added some more bullet characters to better filter out list markup during segmentation
+FIX: Priorize longer segments during segmentation to prevent segments containing each other (e.g. "Product XYZ", "Product XYZ is good") can not be found properly.
+
+**[TRANSLATE-2442](https://jira.translate5.net/browse/TRANSLATE-2442): Disabled connectors and repetitions** <br>
+Fixing a problem with repetitions in match analysis and pre-translation context, also a repetition column is added in resource usage log excel export.
+
+**[TRANSLATE-2441](https://jira.translate5.net/browse/TRANSLATE-2441): HTML Cleanup in Visual Review way structurally changed internal tags** <br>
+FIXED: Segments with interleaving term-tags and internal-tags may were not shown properly in the visual review (parts of the text missing).
+
+**[TRANSLATE-2438](https://jira.translate5.net/browse/TRANSLATE-2438): Fix plug-in XlfExportTranslateByAutostate for hybrid usage of translate5** <br>
+The XlfExportTranslateByAutostate plug-in was designed for t5connect only, a hybrid usage of tasks directly uploaded and exported to and from translate5 was not possible. This is fixed now.
+
+**[TRANSLATE-2435](https://jira.translate5.net/browse/TRANSLATE-2435): Add reply-to with project-manager mail to all automated workflow-mails** <br>
+In all workflow mails, the project manager e-mail address is added as reply-to mail address.
+
+**[TRANSLATE-2433](https://jira.translate5.net/browse/TRANSLATE-2433): file extension XLF can not be handled - xlf can** <br>
+Uppercase file extensions (XLF instead xlf) were not imported. This is fixed now.
+
+**[TRANSLATE-2432](https://jira.translate5.net/browse/TRANSLATE-2432): Make default bconf path configurable** <br>
+More flexible configuration for Okapi import/export .bconf files changeable per task import.
+
+**[TRANSLATE-2428](https://jira.translate5.net/browse/TRANSLATE-2428): Blocked segments and task word count** <br>
+Include or exclude the blocked segments from task total word count and match-analysis when enabling or disabling  "100% matches can be edited" task flag.
+
+**[TRANSLATE-2427](https://jira.translate5.net/browse/TRANSLATE-2427): Multiple problems with worker related to match analsis and pretranslation** <br>
+A combination of multiple problems led to hanging workers when importing a project with multiple targets and activated pre-translation.
+
+**[TRANSLATE-2426](https://jira.translate5.net/browse/TRANSLATE-2426): Term-tagging with default term-collection** <br>
+term-tagging was not done with term collection assigned as default for the project-task customer
+
+**[TRANSLATE-2425](https://jira.translate5.net/browse/TRANSLATE-2425): HTML Import does not work properly when directPublicAccess not set** <br>
+FIX: Visual Review does not show files from subfolders of the review-directory when directPublicAccess is not active (Proxy-access)
+
+**[TRANSLATE-2423](https://jira.translate5.net/browse/TRANSLATE-2423): Multicolumn CSV import was not working anymore in some special cases** <br>
+Multicolumn CSV import with multiple files and different target columns was not working anymore, this is fixed now.
+
+**[TRANSLATE-2421](https://jira.translate5.net/browse/TRANSLATE-2421): Worker not started due maintenance should log to the affected task** <br>
+If a worker is not started due maintenance, this should be logged to the affected task if possible.
+
+**[TRANSLATE-2420](https://jira.translate5.net/browse/TRANSLATE-2420): Spelling mistake: Task finished, E-mail template** <br>
+Spelling correction.
+
+**[TRANSLATE-2413](https://jira.translate5.net/browse/TRANSLATE-2413): Wrong E-Mail encoding leads to SMTP error with long segments on some mail servers** <br>
+When finishing a task an email is sent to the PM containing all edited segments. If there are contained long segments, or segments with a lot of tags with long content, this may result on some mail servers in an error. 
+
+**[TRANSLATE-2411](https://jira.translate5.net/browse/TRANSLATE-2411): Self closing g tags coming from Globalese pretranslation can not be resolved** <br>
+Globalese receives a segment with a <g>tag</g> pair, but returns it as self closing <g/> tag, which is so far valid XML but could not be resolved by the reimport of the data.
+
+**[TRANSLATE-2325](https://jira.translate5.net/browse/TRANSLATE-2325): TermPortal: Do not show unknown tag name in the attribute header.** <br>
+Do not show tag name any more in TermPortal for unkown type-attribute values and other attribute values
+
+**[TRANSLATE-2256](https://jira.translate5.net/browse/TRANSLATE-2256): Always activate button "Show/Hide TrackChanges"** <br>
+Show/hide track changes checkbox will always be available (no matter on the workflow step)
+
+**[TRANSLATE-198](https://jira.translate5.net/browse/TRANSLATE-198): Open different tasks if editor is opened in multiple tabs** <br>
+The user will no longer be allowed to edit 2 different tasks using 2 browser tabs. 
+
+
 ## [5.1.1] - 2021-02-17
 
 ### Important Notes:
