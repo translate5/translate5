@@ -27,3 +27,15 @@
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
 VALUES ('editor', 'api', 'editor_session', 'impersonate');
+
+UPDATE `Zf_acl_rules` SET `right`='index' 
+WHERE `module`='editor'
+AND `role`='noRights'
+AND `resource`='editor_session'
+AND `right`='all';
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
+VALUES ('editor', 'noRights', 'editor_session', 'post');
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
+VALUES ('editor', 'noRights', 'editor_session', 'get');

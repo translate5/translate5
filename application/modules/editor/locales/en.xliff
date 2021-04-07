@@ -4001,6 +4001,10 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source>
   <target>If disabled, blocked segments are not included in the analysis and word count</target>
 </trans-unit>
+<trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='>
+  <source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source>
+  <target>The parameter login containing the desired username is missing.</target>
+</trans-unit>
 </body>
   </file>
 </xliff>
