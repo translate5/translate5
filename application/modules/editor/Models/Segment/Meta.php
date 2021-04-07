@@ -153,10 +153,10 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
      */
     public function getTermtaggerSegmentProgress(string $taskGuid): float {
         $states = [
-            editor_Plugins_TermTagger_Worker_Abstract::SEGMENT_STATE_TAGGED,
-            editor_Plugins_TermTagger_Worker_Abstract::SEGMENT_STATE_DEFECT,
-            editor_Plugins_TermTagger_Worker_Abstract::SEGMENT_STATE_OVERSIZE,
-            editor_Plugins_TermTagger_Worker_Abstract::SEGMENT_STATE_IGNORE
+            editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_TAGGED,
+            editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_DEFECT,
+            editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE,
+            editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_IGNORE
         ];
         $adapter = $this->db->getAdapter();
         $sql = "SELECT (SELECT COUNT(*) FROM LEK_segments_meta WHERE ".$adapter->quoteInto('termtagState IN(?)',$states)." AND taskGuid = ?) / COUNT(*) AS 'progress'
