@@ -10,7 +10,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
         'transacType' => true,
         'ifDescripgrp' => false,
         'collectionId' => false,
-        'entryId' => false,
+        'termEntryId' => false,
         'termId' => false,
         'termEntryGuid' => false,
         'langSetGuid' => false,
@@ -18,7 +18,7 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
         'elementName' => true
     ];
     protected int $collectionId = 0;
-    protected string $entryId = '';
+    protected string $termEntryId = '';
     protected string $termId = '';
     protected string $termEntryGuid = '';
     protected string $langSetGuid = '';
@@ -63,18 +63,18 @@ class editor_Models_Terminology_TbxObjects_TransacGrp {
     /**
      * @return string
      */
-    public function getEntryId(): string
+    public function getTermEntryId(): string
     {
-        return $this->entryId;
+        return $this->termEntryId;
     }
 
     /**
-     * @param string $entryId
+     * @param string $termEntryId
      * @return editor_Models_Terminology_TbxObjects_TransacGrp
      */
-    public function setEntryId(string $entryId): self
+    public function setTermEntryId(string $termEntryId): self
     {
-        $this->entryId = $entryId;
+        $this->termEntryId = $termEntryId;
         return $this;
     }
 

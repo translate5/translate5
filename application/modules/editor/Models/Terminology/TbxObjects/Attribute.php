@@ -8,17 +8,18 @@ class editor_Models_Terminology_TbxObjects_Attribute {
         'type' => true,
         'target' => true,
         'collectionId' => true,
-        'entryId' => true,
+        'termEntryId' => true,
         'termEntryGuid' => false,
         'langSetGuid' => false,
         'termId' => false,
+        'labelId' => false,
         'guid' => false,
         'userGuid' => true,
         'userName' => true
     ];
 
     protected int $collectionId = 0;
-    protected int $entryId = 0;
+    protected int $termEntryId = 0;
     protected string $termEntryGuid = '';
     protected string $langSetGuid = '';
     protected string $termId = '';
@@ -28,6 +29,7 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     protected string $value = '';
     protected string $target = '';
     protected string $type = '';
+    protected string $labelId = '';
     protected string $userGuid = '';
     protected string $userName = '';
 
@@ -61,18 +63,18 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     /**
      * @return int
      */
-    public function getEntryId(): int
+    public function getTermEntryId(): int
     {
-        return $this->entryId;
+        return $this->termEntryId;
     }
 
     /**
-     * @param int $entryId
+     * @param int $termEntryId
      * @return editor_Models_Terminology_TbxObjects_Attribute
      */
-    public function setEntryId(int $entryId): self
+    public function setTermEntryId(int $termEntryId): self
     {
-        $this->entryId = $entryId;
+        $this->termEntryId = $termEntryId;
         return $this;
     }
 
@@ -127,6 +129,24 @@ class editor_Models_Terminology_TbxObjects_Attribute {
     public function setTermId(string $termId): self
     {
         $this->termId = $termId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabelId(): string
+    {
+        return $this->labelId;
+    }
+
+    /**
+     * @param string $labelId
+     * @return editor_Models_Terminology_TbxObjects_Attribute
+     */
+    public function setLabelId(string $labelId): self
+    {
+        $this->labelId = $labelId;
         return $this;
     }
 

@@ -34,24 +34,18 @@ use Doctrine\DBAL\Exception;
  *
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
- * @method string getType() getType()
- * @method string setType() setType(string $type)
- * @method string getTarget() getTarget()
- * @method string setTarget() setTarget(string $target)
- * @method string getValue() getValue()
- * @method string setValue() setValue(string $value)
+ * @method string getTargetId() getTargetId()
+ * @method string setTargetId() setTargetId(string $targetId)
+ * @method string getName() getName()
+ * @method string setName() setName(string $name)
+ * @method string getEncoding() getEncoding()
+ * @method string setEncoding() setEncoding(string $encoding)
+ * @method string getFormat() getFormat()
+ * @method string setFormat() setFormat(string $format)
  * @method string getXbase() getXbase()
  * @method string setXbase() setXbase(string $xbase)
  * @method integer getCollectionId() getCollectionId()
  * @method integer setCollectionId() setCollectionId(integer $collectionId)
- * @method string getEntryId() getEntryId()
- * @method string setEntryId() setEntryId(string $entryId)
- * @method string getTermEntryUniqueId() getTermEntryUniqueId()
- * @method string setTermEntryUniqueId() setTermEntryUniqueId(string $termEntryUniqueId)
- * @method string getElementUniqueId() getElementUniqueId()
- * @method string setElementUniqueId() setElementUniqueId(string $elementUniqueId)
- * @method string getUniqueId() getUniqueId()
- * @method string setUniqueId() setUniqueId(string $uniqueId)
  */
 class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Images';
@@ -62,4 +56,38 @@ class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Ent
     public function __construct() {
         parent::__construct();
     }
+
+    /**
+     * $fullResult[$term['mid'].'-'.$term['groupId'].'-'.$term['collectionId']]
+     * $fullResult['termId-termEntryId-collectionId'] = TERM
+     *
+     * $simpleResult[$term['term']]
+     * $simpleResult['term'] = termId
+     * @param int $collectionId
+     * @return array[]
+     */
+    public function getAllImagesByCollectionId(int $collectionId): array
+    {
+        $fullResult = [];
+
+        $query = "SELECT * FROM terms_images WHERE collectionId = :collectionId";
+        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId]);
+
+        foreach ($queryResults as $key => $image) {
+            $fullResult[$image['collectionId'].'-'.$image['targetId']] = $image;
+        }
+
+        return $fullResult;
+    }
+
+    public function createImportTbx(string $sqlParam, string $sqlFields, array $sqlValue)
+    {
+        $this->init();
+        $insertValues = rtrim($sqlParam, ',');
+
+        $query = "INSERT INTO terms_images ($sqlFields) VALUES $insertValues";
+
+        return $this->db->getAdapter()->query($query, $sqlValue);
+    }
+
 }

@@ -24,8 +24,8 @@ use Doctrine\DBAL\Exception;
  * @method string setIfDescripgrp() setIfDescripgrp(string $ifDescripgrp)
  * @method integer getCollectionId() getCollectionId()
  * @method integer setCollectionId() setCollectionId(integer $collectionId)
- * @method string getEntryId() getEntryId()
- * @method string setEntryId() setEntryId(string $entryId)
+ * @method string getTermEntryId() getTermEntryId()
+ * @method string setTermEntryId() setTermEntryId(string $TermEntryId)
  * @method string getTermId() getTermId()
  * @method string setTermId() setTermId(string $termId)
  * @method string getTermEntryGuid() getTermEntryGuid()
@@ -47,12 +47,12 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
         parent::__construct();
     }
 
-    public function getTransacGrpCollectionByEntryId($collectionId, $entryId): array
+    public function getTransacGrpCollectionByEntryId($collectionId, $termEntryId): array
     {
         $transacGrpByKey = [];
 
-        $query = "SELECT * FROM terms_transacgrp WHERE collectionId = :collectionId AND entryId = :entryId";
-        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId, 'entryId' => $entryId]);
+        $query = "SELECT * FROM terms_transacgrp WHERE collectionId = :collectionId AND termEntryId = :termEntryId";
+        $queryResults = $this->db->getAdapter()->query($query, ['collectionId' => $collectionId, 'termEntryId' => $termEntryId]);
 
         foreach ($queryResults as $key => $transacGrp) {
             $transacGrpByKey[$transacGrp['elementName'].'-'.$transacGrp['transac'].'-'.$transacGrp['ifDescripgrp'].'-'.$transacGrp['termId']] = $transacGrp;
@@ -92,6 +92,61 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
         foreach ($transacGrps as $transacGrp) {
             $this->db->update($transacGrp, ['id=?'=> $transacGrp['id']]);
         }
+
+        return true;
+    }
+
+
+    /***
+     * Handle transac attributes group. If no transac group attributes exist for the entity, new one will be created.
+     *
+     * @param editor_Models_Terminology_Models_TermModel|editor_Models_Terminology_Models_TermEntryModel $entity
+     * @return bool
+     */
+    public function handleTransacGroup($entity): bool
+    {
+        if ($entity->getId() === null) {
+            return false;
+        }
+        $ret = $this->getTransacGroup($entity);
+        //if the transac group exist, do nothing
+        if (!empty($ret)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /***
+     * Get transac attribute for the entity and type
+     *
+     * @param editor_Models_Terminology_Models_TermModel|editor_Models_Terminology_Models_TermEntryModel $entity
+     * @param array $types
+     * @return array
+     */
+    public function getTransacGroup($entity): array
+    {
+        $s = $this->db->select();
+        if ($entity instanceof editor_Models_Terminology_Models_TermModel){
+            $s->where('termId=?', $entity->getTermId());
+        }
+
+        if ($entity instanceof editor_Models_Terminology_Models_TermEntryModel){
+            $s->where('termEntryId=?', $entity->getId());
+        }
+
+        return $this->db->fetchAll($s)->toArray();
+    }
+    /***
+     * Create transac group attributes with its values. The type can be creation or modification
+     * Depending on what kind of entity is passed, the appropriate attribute will be created(term attribute or term entry attribute)
+     *
+     * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
+     * @param string $type
+     * @return bool
+     */
+    public function createTransacGroup($entity, string $type): bool
+    {
 
         return true;
     }

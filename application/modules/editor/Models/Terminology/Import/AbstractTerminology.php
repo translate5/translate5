@@ -52,7 +52,6 @@ class editor_Models_Terminology_Import_AbstractTerminology
             $termsModel->createImportTbx($sqlParam, $sqlInsert['tableFields'], $sqlInsert['tableValue']);
         }
 
-
         return ['sqlUpdate' => $sqlUpdate, 'sqlInsert' => $sqlInsert, 'sqlParam' => $sqlParam];
     }
 
@@ -127,7 +126,6 @@ class editor_Models_Terminology_Import_AbstractTerminology
     public function prepareSqlUpdate(object $element, int $id): array
     {
         $fieldsToUpdate = [];
-
         $fieldsToUpdate['id'] = $id;
 
         foreach ($element::TABLE_FIELDS as $field => $isUpdate) {

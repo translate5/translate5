@@ -24,8 +24,9 @@ class editor_Models_Terminology_Import_TermEntryMerge
     public function createOrUpdateTermEntry(editor_Models_Terminology_TbxObjects_TermEntry $parsedTermEntry, array $entryCollection): int
     {
         // check $parsedTermEntry if entry is for update or to create
-        if (isset($entryCollection[$parsedTermEntry->getCollectionId().'-'.$parsedTermEntry->getTermEntryId()])) {
-            $exploded = explode('-', $entryCollection[$parsedTermEntry->getCollectionId().'-'.$parsedTermEntry->getTermEntryId()]);
+        $collectionKey = $parsedTermEntry->getCollectionId().'-'.$parsedTermEntry->getTermEntryTbxId();
+        if (isset($entryCollection[$collectionKey])) {
+            $exploded = explode('-', $entryCollection[$collectionKey]);
             $id = $exploded[0];
             $descrip = $exploded[1];
 
@@ -39,7 +40,7 @@ class editor_Models_Terminology_Import_TermEntryMerge
         } else {
              $this->termEntryModel->init([
                 'collectionId' =>$parsedTermEntry->getCollectionId(),
-                'termEntryId' => $parsedTermEntry->getTermEntryId(),
+                'termEntryTbxId' => $parsedTermEntry->getTermEntryTbxId(),
                 'entryGuid' => $parsedTermEntry->getEntryGuid(),
                 'descrip' => $parsedTermEntry->getDescrip()
             ]);

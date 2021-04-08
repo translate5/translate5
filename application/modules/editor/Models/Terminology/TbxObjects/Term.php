@@ -4,7 +4,8 @@ class editor_Models_Terminology_TbxObjects_Term {
     const TABLE_FIELDS = [
         'termId' => false,
         'collectionId' => false,
-        'entryId' => false,
+        'termEntryId' => false,
+        'termEntryTbxId' => false,
         'termEntryGuid' => false,
         'langSetGuid' => false,
         'guid' => false,
@@ -54,7 +55,8 @@ class editor_Models_Terminology_TbxObjects_Term {
     protected int $collectionId = 0;
     protected array $termNote = [];
     protected array $note = [];
-    protected int $entryId = 0;
+    protected int $termEntryId = 0;
+    protected string $termEntryTbxId = '';
     protected string $termEntryGuid = '';
     protected string $langSetGuid = '';
     protected string $guid = '';
@@ -67,7 +69,7 @@ class editor_Models_Terminology_TbxObjects_Term {
      */
     public function getCollectionKey(editor_Models_Terminology_TbxObjects_Term $element): string
     {
-        return $element->getEntryId().'-'.$element->getLanguage().'-'.$element->getTermId();
+        return $element->getTermEntryId().'-'.$element->getLanguage().'-'.$element->getTermId();
     }
 
     /**
@@ -397,18 +399,36 @@ class editor_Models_Terminology_TbxObjects_Term {
     /**
      * @return int
      */
-    public function getEntryId(): int
+    public function getTermEntryId(): int
     {
-        return $this->entryId;
+        return $this->termEntryId;
     }
 
     /**
-     * @param int $entryId
+     * @param int $termEntryId
      * @return editor_Models_Terminology_TbxObjects_Term
      */
-    public function setEntryId(int $entryId): self
+    public function setTermEntryId(int $termEntryId): self
     {
-        $this->entryId = $entryId;
+        $this->termEntryId = $termEntryId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTermEntryTbxId(): string
+    {
+        return $this->termEntryTbxId;
+    }
+
+    /**
+     * @param string $termEntryTbxId
+     * @return editor_Models_Terminology_TbxObjects_Term
+     */
+    public function setTermEntryTbxId($termEntryTbxId): self
+    {
+        $this->termEntryTbxId = $termEntryTbxId;
         return $this;
     }
 

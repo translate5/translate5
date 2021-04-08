@@ -9,7 +9,7 @@ class editor_Models_Terminology_TbxObjects_TermEntry {
         'descrip'
     ];
     protected int $collectionId = 0;
-    protected string $termEntryId = '';
+    protected string $termEntryTbxId = '';
     protected string $entryGuid = '';
     protected array $descrip = [];
     protected string $descripValue = '';
@@ -38,18 +38,18 @@ class editor_Models_Terminology_TbxObjects_TermEntry {
     /**
      * @return string
      */
-    public function getTermEntryId(): string
+    public function getTermEntryTbxId(): string
     {
-        return $this->termEntryId;
+        return $this->termEntryTbxId;
     }
 
     /**
-     * @param string $termEntryId
+     * @param string $termEntryTbxId
      * @return editor_Models_Terminology_TbxObjects_TermEntry
      */
-    public function setTermEntryId(string $termEntryId): self
+    public function setTermEntryTbxId(string $termEntryTbxId): self
     {
-        $this->termEntryId = $termEntryId;
+        $this->termEntryTbxId = $termEntryTbxId;
         return $this;
     }
 

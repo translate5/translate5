@@ -3,21 +3,21 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -74,10 +74,10 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     const ATTR_LEVEL_ENTRY = 'termEntry';
     const ATTR_LEVEL_LANGSET = 'langSet';
     const ATTR_LEVEL_TERM = 'term';
-    
+
     protected $dbInstanceClass = 'editor_Models_Db_Term_Attribute';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Term_Attribute';
-    
+
     /***
      * Attribute fields which are not updatable
      * @var array
@@ -85,9 +85,9 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     public $unupdatebleField = [
         'transac'
     ];
-    
+
     /***
-     * Available attrType for transac group transac attribute 
+     * Available attrType for transac group transac attribute
      * @var array
      */
     public static $trasacGroupTypes=[
@@ -95,7 +95,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         'origination',//Info:in some tbx files, the value orgination is used for representing creations
         'modification'
     ];
-    
+
     /**
      * creates a new, unsaved term attribute history entity
      * @return editor_Models_Term_AttributeHistory
@@ -105,7 +105,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         /* @var $history editor_Models_Term_AttributeHistory */
         $history->setAttributeId($this->getId());
         $history->setHistoryCreated(NOW_ISO);
-        
+
         $fields = $history->getFieldsToUpdate();
         foreach ($fields as $field) {
             $history->__call('set' . ucfirst($field), array($this->get($field)));
@@ -114,10 +114,10 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     }
 
     /**
-     * returns true if the attribute is proposable according to its values. 
+     * returns true if the attribute is proposable according to its values.
      * Additional ACL checks must be done outside (in the controllers)
-     * @param string $name optional, if both parameters are empty the values from $this are used 
-     * @param string $type optional, if both parameters are empty the values from $this are used 
+     * @param string $name optional, if both parameters are empty the values from $this are used
+     * @param string $type optional, if both parameters are empty the values from $this are used
      */
     public function isProposable($name = null, $type = null) {
         if(empty($name) && empty($type)) {
@@ -130,10 +130,10 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             || $name=='transac' && ($type=='creation' || $type=='origination')
             || $name=='transac' && $type=='modification');
     }
-    
+
     /***
      * Is the user allowed for attribute proposal
-     * 
+     *
      * @return boolean
      */
     public function isProposableAllowed(){
@@ -141,7 +141,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         /* @var $user ZfExtended_Models_User */
         return $user->hasRole('termProposer');
     }
-    
+
     /**
      * Loads an attribute for the given term
      */
@@ -157,7 +157,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         else {
             $s->where('language is null');
         }
-        
+
         if($level == self::ATTR_LEVEL_TERM) {
             $s->where('termId = ?', $term->getId());
         }
@@ -165,7 +165,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             $s->where('termId is null');
         }
         $s->where('name = ?', $name);
-        
+
         $row = $this->db->fetchRow($s);
         if (!$row) {
             $this->notFound(__CLASS__ . '#termAndName', $term->getId().'; '.$name);
@@ -173,7 +173,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         //load implies loading one Row, so use only the first row
         $this->row = $row;
     }
-    
+
     /***
      * Save or update an attribute
      *
@@ -181,7 +181,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
      */
     public function saveOrUpdate(){
         $s = $this->db->select()
-        ->from(['a'=>'LEK_term_attributes']);
+        ->from(['a'=>'LEK_terms_attributes']);
         $toSave=$this->row->toArray();
         $notCheckField=array(
             'id',
@@ -191,7 +191,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             'userName',
             'processStatus'
         );
-        
+
         //check if the field is unupdatable
         $isUnupdatable=in_array($toSave['name'], $this->unupdatebleField);
         foreach ($toSave as $key=>$value){
@@ -199,22 +199,22 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             if(in_array($key, $notCheckField)){
                 continue;
             }
-            
+
             //ignore the value check in all updatable column
             //the value check is needed only in the unupdatable columns
             if(!$isUnupdatable && $key==='value'){
                 continue;
             }
-            
+
             //if the value is null
             if($value==null){
                 $s->where('`a`.'.$key.' IS NULL');
                 continue;
             }
-            
+
             $s->where('`a`.'.$key.'=?',$value);
         }
-        
+
         //check if the field exist
         $checkRow=$this->db->fetchRow($s);
         if(empty($checkRow)){
@@ -222,7 +222,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             //the field does not exist
             return $this->save();
         }
-        
+
         //the field exist, set the id it is needed for parentId
         $this->setId($checkRow['id']);
         if($isUnupdatable){
@@ -234,13 +234,13 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             $this->setUpdated(date("Y-m-d H:i:s"));
             return $this->save();
         }
-        
+
         $proposal=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
         /* @var $proposal editor_Models_Term_AttributeProposal */
         if($proposal->isProposal($checkRow['id'], $toSave['value'])){
             $proposal->removeAttributeProposal($checkRow['id'], $toSave['value']);
         }
-        
+
         //new value is found, update the attribute
         //load the record
         $this->load($checkRow['id']);
@@ -248,7 +248,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->setUpdated(date("Y-m-d H:i:s"));
         return $this->save();
     }
-    
+
     /***
      * Get all attributes for the given term entry (groupId)
      * @param string $termEntryId
@@ -275,7 +275,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             'LEK_term_entry.collectionId AS collectionId',
             new Zend_Db_Expr('"termEntryAttribute" as attributeOriginType')//this is needed as fixed value
         );
-        
+
         $s=$this->db->select()
         ->from($this->db,[])
         ->join('LEK_term_entry', 'LEK_term_entry.id = LEK_term_attributes.termEntryId',$cols)
@@ -287,7 +287,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
                 'LEK_term_attribute_proposal.id as proposalAttributelId',
             ]);
         }
-        
+
         $s->where('LEK_term_attributes.termId is null')
         ->where('LEK_term_entry.id=?',$termEntryId)
         ->where('LEK_term_entry.collectionId IN(?)',$collectionIds);
@@ -315,7 +315,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $rows=array_map($mapProposal, $rows);
         return $this->createChildTree($rows);
     }
-    
+
     /***
      * Update the term transac group attributes from the proposal attributes
      * @param editor_Models_Term $term
@@ -346,7 +346,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             $attribute->setUserGuid($proposal->getUserGuid());
             $attribute->setUserName($proposal->getUserName());
             $attribute->save();
-            
+
         }
         return true;
     }
@@ -366,10 +366,10 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             'attrType=?' => 'processStatus'
         ])>0;
     }
-    
+
     /***
      * Get transac attribute for the entity and type
-     * 
+     *
      * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
      * @param array $types
      * @return array
@@ -387,10 +387,10 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         ->where('attrType IN(?)',$types);
         return $this->db->fetchAll($s)->toArray();
     }
-    
+
     /***
      * Handle transac attributes group. If no transac group attributes exist for the entity, new one will be created.
-     * 
+     *
      * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
      */
     public function handleTransacGroup($entity){
@@ -407,31 +407,31 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->createTransacGroup($entity,'modification');
         return true;
     }
-    
+
     /***
      * Create transac group attributes with its values. The type can be creation or modification
      * Depending on what kind of entity is passed, the appropriate attribute will be created(term attribute or term entry attribute)
-     * 
+     *
      * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
      * @param string $type
      */
     public function createTransacGroup($entity,string $type) {
-        
+
         $labelModel=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
         /* @var $labelModel editor_Models_TermCollection_TermAttributesLabel */
         $labelArray=$labelModel->loadAll();
-        
+
         $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languagesModel editor_Models_Languages */
         $languagesArray=$languagesModel->loadAllKeyValueCustom('id','rfc5646');
-        
+
         $user = new Zend_Session_Namespace('user');
         $fullName = $user->data->firstName.' '.$user->data->surName;
-        
+
         $transacLabelId=null;
         $dateLabelId=null;
         $transacNoteLabelId=null;
-        
+
         foreach ($labelArray as $lbl){
             if($lbl['label']=='transac' && $lbl['type']==$type){
                 $transacLabelId=$lbl['id'];
@@ -443,7 +443,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
                 $transacNoteLabelId=$lbl['id'];
             }
         }
-        
+
         //transac
         $this->init();
         $this->setLabelId($transacLabelId);
@@ -458,7 +458,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         if($entity instanceof editor_Models_TermCollection_TermEntry){
             $this->setTermEntryId($entity->getId());
         }
-        
+
         $this->setName('transac');
         $this->setAttrType($type);
         $this->setValue($type);
@@ -466,22 +466,22 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->setUserName($fullName);
         //save the transac attribute
         $parentId=$this->save();
-        
+
         //date
         $this->init();
         $this->setLabelId($dateLabelId);
         $this->setCollectionId($entity->getCollectionId());
-        
+
         if($entity instanceof editor_Models_Term){
             $this->setTermId($entity->getId());
             $this->setLanguage($languagesArray[$entity->getLanguage()]);
             $this->setAttrLang($languagesArray[$entity->getLanguage()]);
         }
-        
+
         if($entity instanceof editor_Models_TermCollection_TermEntry){
             $this->setTermEntryId($entity->getId());
         }
-        
+
         $this->setParentId($parentId);
         $this->setName('date');
         $this->setValue(time());
@@ -489,12 +489,12 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->setUserName($fullName);
         //save the date attribute
         $this->save();
-        
+
         //responsiblePerson
         $this->init();
         $this->setLabelId($transacNoteLabelId);
         $this->setCollectionId($entity->getCollectionId());
-        
+
         if($entity instanceof editor_Models_Term){
             $this->setTermId($entity->getId());
             $this->setLanguage($languagesArray[$entity->getLanguage()]);
@@ -512,7 +512,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         //save the responsible person attribute
         $this->save();
     }
-    
+
     /***
      * Group the attributes by parent-child
      *
@@ -538,12 +538,12 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         }
         return $tree;
     }
-    
-    
+
+
     /***
      * Update term modification attribute group with the term proposal values.
      * The modification group date and editor will be set as term proposal date an term proposal editor.
-     * 
+     *
      * @param array $attributes
      * @param array $termProposal
      */
@@ -551,19 +551,19 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         if(empty($attributes) || empty($termProposal) || empty($termProposal['created']) || empty($termProposal['userName'])){
             return $attributes;
         }
-        
+
         //foreach term attribute check, find the transac modification attribute
         foreach ($attributes as &$attribute){
-            
+
             if(empty($attribute['children'])){
                 continue;
             }
-            
+
             //ignore non modification tags
             if($attribute['name']!='transac' || $attribute['attrType']!='modification'){
                 continue;
             }
-            
+
             foreach ($attribute['children'] as &$child){
                 if($child['name']=='date'){
                     //convert the date to unix timestamp
@@ -576,7 +576,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         }
         return $attributes;
     }
-    
+
     /***
      * Check if for the current term there is a processStatus attribute. When there is no one, create it.
      * @param int $termId
@@ -587,45 +587,45 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         ->where('termId=?',$termId)
         ->where('name="termNote"')
         ->where('attrType="processStatus"');
-        
+
         $result=$this->db->fetchAll($s)->toArray();
         if(count($result)>0){
             return null;
         }
-        
+
         $term=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
         $term->load($termId);
-        
+
         $language=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $language editor_Models_Languages */
-        
+
         $language->loadById($term->getLanguage());
-        
-        
+
+
         $this->setCollectionId($term->getCollectionId());
         $this->setTermId($term->getId());
-        
+
         $this->setLanguage($language->getRfc5646());
-        
+
         $this->setName('termNote');
         $this->setAttrType('processStatus');
-            
+
         $label = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
         /* @var $label editor_Models_TermCollection_TermAttributesLabel */
         $label->loadOrCreate('termNote', 'processStatus');
         $this->setLabelId($label->getId());
-        
+
         $this->setAttrLang($language->getRfc5646());
-        
+
         $this->setUserGuid($term->getUserGuid());
         $this->setUserName($term->getUserName());
         $this->setProcessStatus($term->getProcessStatus());
         $this->setValue($term->getProcessStatus());
-        
+
         return $this->save();
     }
-    
+
     /***
      * Add comment attribute for given term
      * @param int $termId
@@ -636,15 +636,15 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $term=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
         $term->load($termId);
-        
+
         $lang = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $lang editor_Models_Languages */
         $lang->loadById($term->getLanguage());
-        
+
         $label = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
         /* @var $label editor_Models_TermCollection_TermAttributesLabel */
-        $label->loadOrCreate('note', null);
-        
+        $label->loadOrCreate('note');
+
         $this->init([
             'name' => 'note',
             'created' => NOW_ISO,
@@ -665,7 +665,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->save();
         return $this;
     }
-    
+
     /***
      * Check if the attribute is processStatus attribute
      * @return boolean
@@ -673,7 +673,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     public function isProcessStatusAttribute(){
         return $this->getAttrType()=='processStatus' && $this->getName()=='termNote';
     }
-    
+
     /***
      * Check if given AttrType is for responsable person
      * Info: the responsable person type is saved in with different values in some tbx files
@@ -689,11 +689,11 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         }
         return false;
     }
-    
+
     /***
      * Check if it is date attribute. Can be checked via $name param, or if the attribute row is loaded via
      * $this->getName()
-     * 
+     *
      * @param string $name
      * @return boolean
      */
@@ -706,7 +706,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         }
         return false;
     }
-    
+
     public function getDataObject() {
         $result=parent::getDataObject();
         //TODO: for non proposal users, ignore the custom attribute values for the api

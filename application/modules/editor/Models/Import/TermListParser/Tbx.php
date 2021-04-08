@@ -213,8 +213,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         foreach($tbxfiles as $file) {
             if(!$file->isReadable()){
                 throw new editor_Models_Import_TermListParser_Exception('E1023',[
-                    'filename'=>$file,
-                    'languageResource'=>$this->termCollection
+                    'filename' => $file,
+                    'languageResource' => $this->termCollection
                 ]);
             }
             $this->task->setTerminologie(1);
@@ -380,7 +380,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
 
         //disable terminology when no terms for the term collection are available
         if (empty($collLangs)) {
-            $this->log("Terminologie is disabled because no terms in the termcollection are found. TermcollectionId: ".$this->termCollection->getId());
+            $this->log("Terminology is disabled because no terms in the termcollection are found. TermCollectionId: ".$this->termCollection->getId());
             $this->task->setTerminologie(0);
             return false;
         }
