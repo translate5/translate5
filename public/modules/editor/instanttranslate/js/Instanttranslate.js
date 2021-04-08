@@ -769,16 +769,22 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
     var pretranslatedFiles = [],
         html = '',
         htmlFile,
-        showRefreshButton = false;
+        importProgressUpdate = false;
     $.each(allPretranslatedFiles, function(taskId, taskData) {
         htmlFile = '<li>';
         htmlFile += taskData['taskName'];
-        htmlFile += ' ' + taskData['sourceLang'] +' -> ' + taskData['targetLang'];
+        htmlFile += ' ' + taskData['sourceLang'] +' &rarr; ' + taskData['targetLang'];
         htmlFile += ' (' + Editor.data.languageresource.translatedStrings['availableUntil'] + ' ' + taskData['removeDate'] +')<br>';
         switch(taskData['downloadUrl']) {
             case 'isImporting':
-                showRefreshButton = true;
+                importProgressUpdate = true;
                 htmlFile += '<p style="font-size:80%;">' + Editor.data.languageresource.translatedStrings['noDownloadWhileImport'] + '</p>';
+                //add import progres html. For each task separate progress component and progress label.
+                if(taskData['importProgress']){
+                    htmlFile += '<div id="importProgress'+taskId+'" style="width: 150px; position: relative">';
+                    htmlFile += '<div id="importProgressLabel'+taskId+'" style="position: absolute;left: 50%;top: 4px;font-weight: bold;text-shadow: 1px 1px 0 #fff;"></div>';
+                    htmlFile += '</div>';
+                }
                 break;
             case 'isErroneous': 
                 htmlFile += '<p style="font-size:80%;" class="error">' + Editor.data.languageresource.translatedStrings['noDownloadAfterError'] + '</p>';
@@ -788,25 +794,60 @@ function showDownloads(allPretranslatedFiles, dateAsOf){ // array[taskId] = arra
                 break;
             default:
                 htmlFile += '<a href="' + taskData['downloadUrl'] + '" class="ui-button ui-widget ui-corner-all" target="_blank">Download</a>';
-        } 
-        htmlFile += '</li>';
+        }
+        htmlFile += '<br/>';
+        
         pretranslatedFiles.push(htmlFile);
     });
     if (pretranslatedFiles.length > 0) {
         html += '<h2>' + Editor.data.languageresource.translatedStrings['pretranslatedFiles'] + '</h2>';
         html += '<p style="font-size:small;">(' + Editor.data.languageresource.translatedStrings['asOf'] + ' ' + dateAsOf + '):</p>';
-        if (showRefreshButton) {
-            html += '<p><a href="#" id="refresh-pretranslations" class="getdownloads ui-button ui-widget ui-corner-all">' + Editor.data.languageresource.translatedStrings['refresh'] + '</a></p>';
-        }
         html += '<ul>';
         html += pretranslatedFiles.join(' ');
         html += '</ul>';
     }
+    
     $('#pretranslatedfiles').html(html);
-    // if we are still waiting for a file to be ready: try again after 10 seconds
-    if (showRefreshButton) {
-        setTimeout(function(){ $('#refresh-pretranslations').click(); }, 10000);
+    
+    //for each pretranslated files task, update the progress bar
+    //this will be done only if the task is in status import
+    updateImportProgressBar(allPretranslatedFiles);
+    
+    // if we are still waiting for a file to be ready: try again after 50 seconds
+    if (importProgressUpdate) {
+        setTimeout(function(){ 
+            getDownloads(); 
+        }, 5000);
     }
+}
+
+/***
+ * Update the progress bar for all importing tasks
+ * @param taskData
+ * @returns
+ */
+function updateImportProgressBar(taskData){
+    if(!taskData || taskData.length < 1) {
+        return;
+    }
+    
+    $.each(taskData, function(taskId, taskData) {
+        var taskProgresData = taskData['importProgress'];
+        
+        if(!taskProgresData || taskProgresData.length < 1){
+            return true;
+        }
+        
+        //console.log(taskProgresData);
+        
+        var progressbar =$("#importProgress"+taskId),
+            label = $("#importProgressLabel"+taskId);
+        
+        progressbar.progressbar({
+            value:taskProgresData['progress']
+        });
+        label.text(progressbar.progressbar( "value" ) + "%" );
+    });
 }
 
 $(document).on('click', '.getdownloads' , function(e) {

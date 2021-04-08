@@ -32,5 +32,8 @@ class editor_Plugins_ZDemoMT_Init extends ZfExtended_Plugin_Abstract {
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
         $serviceManager->addService('editor_Plugins_ZDemoMT');
+        
+        //ZDemoMT also provides the dummy TM
+        $serviceManager->addService('editor_Services_DummyFileTm');
     }
 }

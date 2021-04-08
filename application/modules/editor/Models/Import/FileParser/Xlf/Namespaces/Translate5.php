@@ -67,7 +67,6 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Translate5 extends editor_M
             $storedTags = $xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true);
             $givenTagMap = unserialize(base64_decode($storedTags));
             unset($storedTags);
-            $restoreTags = [];
             foreach($givenTagMap as $bptKey => $data) {
                 $gTag = $data[0];
                 $originalTag = $data[1];
@@ -101,10 +100,16 @@ class editor_Models_Import_FileParser_Xlf_Namespaces_Translate5 extends editor_M
     public function getSingleTag($xlfTag){
         //some foreign tools add spaces between the last attribute and the closing />
         $xlfTag = preg_replace('#"[\s]+/>$#', '"/>', $xlfTag);
-        if(empty($this->tagMap[$xlfTag])) {
-            return null;
+        if(!empty($this->tagMap[$xlfTag])) {
+            return $this->tagMap[$xlfTag];
         }
-        return $this->tagMap[$xlfTag];
+        //some tools convert <g> tag pair to just a self closing <g/> tag,
+        // if we got no tagmap match we try to find a g tag without the slash then
+        $xlfTag = preg_replace('#<g([^>]+)/>#', '<g$1>', $xlfTag);
+        if(!empty($this->tagMap[$xlfTag])) {
+            return $this->tagMap[$xlfTag];
+        }
+        return null;
     }
     
     /**

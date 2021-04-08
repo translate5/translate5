@@ -31,6 +31,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class WorkerListCommand extends Translate5AbstractCommand
 {
@@ -67,6 +68,12 @@ class WorkerListCommand extends Translate5AbstractCommand
             InputArgument::OPTIONAL,
             'Worker ID to show details for.'
         );
+        
+        $this->addOption(
+            'all',
+            'a',
+            InputOption::VALUE_NONE,
+            'List also done and defunc workers.');
     }
 
     /**
@@ -105,8 +112,12 @@ class WorkerListCommand extends Translate5AbstractCommand
         ];
         
         $resultNotListed = [];
-        $statesToIgnore = [$worker::STATE_DEFUNCT, $worker::STATE_DONE];
-        $statesToIgnore = [$worker::STATE_DEFUNCT];
+        if($this->input->getOption('all')) {
+            $statesToIgnore = [];
+        }
+        else {
+            $statesToIgnore = [$worker::STATE_DEFUNCT, $worker::STATE_DONE];
+        }
         
         $rows = [];
         foreach($allWorker as $worker) {

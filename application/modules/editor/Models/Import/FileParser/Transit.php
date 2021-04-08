@@ -71,6 +71,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * @var DOMDocument
      */
     protected $sourceDOM;
+    
     /**
      *
      * @var DOMDocument
