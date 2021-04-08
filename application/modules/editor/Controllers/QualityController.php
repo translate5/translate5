@@ -51,9 +51,8 @@ class editor_QualityController extends ZfExtended_RestController {
         $task = $this->fetchTask();
         $view = new editor_Models_Quality_FilterPanelView($task, NULL, true);
         $this->view->text = $task->getTaskGuid();
-        $this->view->children = $view->getRows();
-        $this->view->numQualities = $view->getNumQualities();
-        $this->view->internalTagFaults = $view->hasInternalTagFaults();
+        $this->view->children = $view->getTree();
+        $this->view->metaData = $view->getMetaData();
     }
     /**
      * Retrieves the data for the statistics panel (which is currently not accessible /active)
@@ -62,7 +61,7 @@ class editor_QualityController extends ZfExtended_RestController {
         $task = $this->fetchTask();
         $field = $this->getRequest()->getParam('type');
         $statisticsProvider = new editor_Models_Quality_StatisticsView($task, $field);
-        $this->view->text = '.';
+        $this->view->text = $task->getTaskGuid();
         $this->view->children = $statisticsProvider->getTree();
     }
     /**
@@ -76,7 +75,7 @@ class editor_QualityController extends ZfExtended_RestController {
         header('Content-disposition: attachment; filename="'.$statisticsProvider->getDownloadName().'"');
         header('Content-type: "text/xml"; charset="utf8"', TRUE);
         
-        $this->view->text = '.';
+        $this->view->text = $task->getTaskGuid();
         $this->view->children = $statisticsProvider->getTree();
     }
     /**
@@ -134,8 +133,7 @@ class editor_QualityController extends ZfExtended_RestController {
         $view = new editor_Models_Quality_TaskView($task, NULL, true);
         $this->view->rows = $view->getRows();
         $this->view->total = count($this->view->rows);
-        $this->view->numQualities = $view->getNumQualities();
-        $this->view->internalTagFaults = $view->hasInternalTagFaults();
+        $this->view->metaData = $view->getMetaData();
     }
     /**
      * Retrieves the data for the qualities tooltip of a task in the task info panel

@@ -37,9 +37,18 @@ Ext.define('Editor.store.quality.Filter', {
     autoSync: false,
     folderSort: false,
     defaultRootId: 'quality',
+    listeners: {
+        metachange: function (store, meta) {
+            console.log("FilterQualities: metachange", meta);
+        },
+        load : function (store, records) {
+            console.log("FilterQualities: load", records);
+        }
+    },
     root: {
-        expanded: false,
-        text: 'ROOT'
+        expanded: true,
+        text: 'ROOT',
+        children: []
     },
     proxy : {
         type : 'rest',        
@@ -49,13 +58,6 @@ Ext.define('Editor.store.quality.Filter', {
         },
         url: Editor.data.restpath
     },
-    sorters: [{
-        property: 'leaf',
-        direction: 'ASC'
-    }, {
-        property: 'title',
-        direction: 'ASC'
-    }],
     updateQualities:function(records){
 
         me.fireEvent('recordsChanged', records);

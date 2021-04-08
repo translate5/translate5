@@ -46,11 +46,6 @@ Ext.define('Editor.controller.Quality', {
             '#segmentgrid #qualityStatisticsBtn': {
                 click:'showStatistics'
             }
-        },
-        controller: {
-            '#Editor.$application': {
-                editorViewportClosed: 'onEditorViewportClosed'
-            }
         }
     },
     /**
@@ -58,12 +53,5 @@ Ext.define('Editor.controller.Quality', {
      */
     showStatistics: function() {
         this.getStatisticsWindow().show();
-    },
-    /**
-     * unloads the Quality Filter Store. This can't be done in the view because the view get's destroyed before the editorViewportClosed event is thrown
-     */
-    onEditorViewportClosed: function(){
-        var store = Ext.getStore('FilterQualities');
-        store.getRootNode().removeAll(false);
     }
 });

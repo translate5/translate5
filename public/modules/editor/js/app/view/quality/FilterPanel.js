@@ -27,7 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * 
+ * Filter Panel for qualities
+ * TODO FIXME: why does the store need tpo be created explicitly instead of config option ?
+ * Ext.util.Observable.capture('your store reference here', function(evname) {console.log(evname, arguments);})
  */
 Ext.define('Editor.view.quality.FilterPanel', {
     extend: 'Ext.tree.Panel',
@@ -36,74 +38,61 @@ Ext.define('Editor.view.quality.FilterPanel', {
     ],    
     controller: 'qualityFilterPanel',
     alias: 'widget.qualityFilterPanel',
-    itemId:'qualityFilterPanel',
-    store: 'FilterQualities',
-    title : "#UT#Qualitätssicherung",
+    itemId: 'qualityFilterPanel',
+    cls: 'qualityFilterPanel',
+    title: '#UT#Qualitätssicherung',
+    checkPropagation: 'both',
     rootVisible: false,
     useArrows: true,
-
-    strings:{
-          
-    },
-    columns: [{
-        xtype: 'treecolumn',
-        iconCls: 'x-tree-noicon',
-        dataIndex:'text',
-        sortable: true,
-        flex: 1
-    }],
     // we catch the beforestaterestore event to load the store when the panel is initially open
-    // Note, that in the global qualities controller Editor.controller.Quality there is a store unload on the global editorViewportClosed event. This cannot be done here since this view is destroyed before that event ...
     listeners: {
-        beforeexpand: function(comp){
-            comp.loadStore();
-        },
-        collapse: function(comp){
-            comp.unloadStore();
-        },
-        beforestaterestore: function(comp, state){
-            if(state.hasOwnProperty('collapsed') && state.collapsed === false){
-                comp.loadStore();
-            }
-        }
+        beforeexpand: 'onBeforeExpand',
+        collapse: 'onCollapse',
+        beforestaterestore: 'onBeforeStateRestore',
+        beforecheckchange: 'onBeforeCheckChange',
+        checkchange: 'onCheckChange',
+        removed: 'onRemoved'
     },
     initConfig : function(instanceConfig) {
-        var config = { title: this.title };
+        var me = this, config = {
+            title: this.title,
+            store: Ext.create('Editor.store.quality.Filter'),
+            columns: [{
+                xtype: 'treecolumn',
+                iconCls: 'x-tree-noicon',
+                dataIndex:'text',
+                renderer: function (text, meta, record){
+                    if(record.get('qroot')){
+                        meta.tdCls = Ext.String.trim(meta.tdCls + ' x-tree-root');
+                    }
+                    if(record.get('qcount') == 0){
+                        meta.tdCls = Ext.String.trim(meta.tdCls + ' x-tree-check-disabled');
+                    }
+                    return text + ' ('+record.get('qcount')+')';
+                },
+                sortable: true,
+                flex: 1
+            }]                
+        };
         if (instanceConfig) {
-            this.self.getConfigurator().merge(this, config, instanceConfig);
+            me.self.getConfigurator().merge(me, config, instanceConfig);
         }
-        return this.callParent([config]);
-    },
-    /**
-     * Loads the qualities before the panel is expanded or if a uncollapsed state is applied (to catch an initiallay open panel)
-     */
-    loadStore: function(){
-        this.store.load({
-            manualLoaded: true,
-            scope: this.store,
-            callback: function(){ 
-                this.getRootNode().expand();
-             }
-        });
-    },
-    /**
-     * Unloads the qualities after the panel is collapsed
-     */
-    unloadStore: function(){
-        this.store.getRootNode().removeAll(false);
+        return me.callParent([config]);
     },
     /*
     initComponent: function() {
         Ext.applyIf(this, {
-          viewConfig: {
-            singleSelect: true
-          }
+            viewConfig: {
+                 singleSelect: true
+            }
         });
         this.callParent(arguments);
     },
     */
     // since we do update the rows manually we do not want a dirty-marker ... an API to set an item to not be dirty would be better
+    /*
     viewConfig:{
         markDirty: false
     }
+    */
 });

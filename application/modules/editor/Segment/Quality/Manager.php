@@ -345,7 +345,7 @@ final class editor_Segment_Quality_Manager {
      * 
      * @return ZfExtended_Zendoverwrites_Translate
      */
-    private function getTranslate(){
+    public function getTranslate(){
         if($this->translate == null){
             $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         }
