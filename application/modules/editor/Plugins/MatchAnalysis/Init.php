@@ -173,6 +173,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             //you can not run analysis without resources to be associated to the task
             return false;
         }
+        
         $valid = $this->checkLanguageResources($taskGuid);
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
