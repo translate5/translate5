@@ -636,7 +636,6 @@
 <trans-unit id='QWNjdXJlZWVlZWVlYWN5'><source>Accureeeeeeeacy</source><target>Accureeeeeeeacy</target></trans-unit>
 <trans-unit id='RmlsZSAnJXZhbHVlJScgd2FzIG5vdCB1cGxvYWRlZA=='><source>File '%value%' was not uploaded</source><target>File '%value%' was not uploaded</target></trans-unit>
 <trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IG1hdGNoIHRoZSBleHBlY3RlZCBzdHJ1Y3R1cmUgZm9yIGEgRE5TIGhvc3RuYW1l'><source>'%value%' does not match the expected structure for a DNS hostname</source><target>'%value%' does not match the expected structure for a DNS hostname</target></trans-unit>
-<trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>Alle Kategorien</target></trans-unit>
 <trans-unit id='dGVzdA=='><source>test</source><target>test</target></trans-unit>
 <trans-unit id='a3Vyeg=='><source>kurz</source><target>kurz</target></trans-unit>
 <trans-unit id='bGFuZ2xhbmdsYW5nbGFuZ2xhbmdsYW5nbGFuZw=='><source>langlanglanglanglanglanglang</source><target>langlanglanglanglanglanglang</target></trans-unit>
@@ -1891,6 +1890,12 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='SW50ZXJuZSBUYWdzIGZlaGxlbg=='><source>Interne Tags fehlen</source><target>Interne Tags fehlen</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdzIHd1cmRlbiBoaW56dWdlZsO8Z3Q='><source>Interne Tags wurden hinzugefügt</source><target>Interne Tags wurden hinzugefügt</target></trans-unit>
 <trans-unit id='RGllIEludGVybmVuIFRhZ3MgaGFiZW4gZWluZSB1bmfDvGx0aWdlIFN0cnVrdHVy'><source>Die Internen Tags haben eine ungültige Struktur</source><target>Die Internen Tags haben eine ungültige Struktur</target></trans-unit>
+<trans-unit id='RGF0ZWllbiB1bmQgUUE='><source>Dateien und QA</source><target>Dateien und QA</target></trans-unit>
+<trans-unit id='UUE='><source>QA</source><target>QA</target></trans-unit>
+<trans-unit id='UXVhbGl0w6R0c3NpY2hlcnVuZw=='><source>Qualitätssicherung</source><target>Qualitätssicherung</target></trans-unit>
+<trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>Alle Kategorien</target></trans-unit>
+<trans-unit id='UUE6IEZhbHNjaCBQb3NpdGl2ZQ=='><source>QA: Falsch Positive</source><target>QA: Falsch Positive</target></trans-unit>
+
 <trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>
 <trans-unit id='Q29udGVudA=='><source>Content</source><target>Content</target></trans-unit>
 <trans-unit id='U3R5bGU='><source>Style</source><target>Style</target></trans-unit>
@@ -1926,10 +1931,6 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='VmFsdWU='><source>Value</source><target>Value</target></trans-unit>
 <trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse enthalten</source><target>Gesperrte Segmente sind in der Analyse enthalten</target></trans-unit>
 <trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgbmljaHQgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse nicht enthalten</source><target>Gesperrte Segmente sind in der Analyse nicht enthalten</target></trans-unit>
-<trans-unit id='RGF0ZWllbiB1bmQgUUE='><source>Dateien und QA</source><target>Dateien und QA</target></trans-unit>
-<trans-unit id='UUE='><source>QA</source><target>QA</target></trans-unit>
-<trans-unit id='UXVhbGl0w6R0c3NpY2hlcnVuZw=='><source>Qualitätssicherung</source><target>Qualitätssicherung</target></trans-unit>
-<trans-unit id='UUE6IEZhbHNjaCBQb3NpdGl2ZQ=='><source>QA: Falsch Positive</source><target>QA: Falsch Positive</target></trans-unit>
   </body>
  </file>
 </xliff>

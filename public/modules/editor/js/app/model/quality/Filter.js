@@ -32,10 +32,12 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.model.quality.Filter', {
     extend: 'Ext.data.Model',
     fields: [
-        { name:'qid', type:'auto' }, /* TODO AUTOQA FIXME: why must this set to be auto and not int to avoid exception ? */
+        { name:'qid', type:'int' },
         { name:'qtype', type:'string' },
         { name:'qcount', type:'int' },
         { name:'qcategory', type:'string' },
+        { name:'qroot', type:'boolean' },
+        { name:'qchecked', type:'boolean' },
         { name:'segmentIds' }
     ],
     getSegmentIds: function(){

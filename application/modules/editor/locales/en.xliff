@@ -4008,6 +4008,11 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='SW50ZXJuZSBUYWdzIGZlaGxlbg=='><source>Interne Tags fehlen</source><target>Internal tags are missing</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBUYWdzIHd1cmRlbiBoaW56dWdlZsO8Z3Q='><source>Interne Tags wurden hinzugefügt</source><target>Internal tags have been added</target></trans-unit>
 <trans-unit id='RGllIEludGVybmVuIFRhZ3MgaGFiZW4gZWluZSB1bmfDvGx0aWdlIFN0cnVrdHVy'><source>Die Internen Tags haben eine ungültige Struktur</source><target>The internal tags have an incorrect structure</target></trans-unit>
+<trans-unit id='RGF0ZWllbiB1bmQgUUE='><source>Dateien und QA</source><target>Dateien und QA</target></trans-unit>
+<trans-unit id='UUE='><source>QA</source><target>QA</target></trans-unit>
+<trans-unit id='UXVhbGl0w6R0c3NpY2hlcnVuZw=='><source>Qualitätssicherung</source><target>Quality assurance</target></trans-unit>
+<trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>All categories</target></trans-unit>
+<trans-unit id='UUE6IEZhbHNjaCBQb3NpdGl2ZQ=='><source>QA: Falsch Positive</source><target>QA: False positives</target></trans-unit>
 </body>
   </file>
 </xliff>

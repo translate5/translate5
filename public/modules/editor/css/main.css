@@ -808,6 +808,13 @@ a.x-btn span.task-confirmation {
     white-space: nowrap;
 }
 
+.qualityFilterPanel .x-grid-cell-inner-treecolumn > .x-tree-elbow-empty:first-child { display:none; }
+.qualityFilterPanel .x-tree-root .x-grid-cell-inner-treecolumn > .x-tree-elbow-img.x-tree-elbow-end { display:none; }
+.qualityFilterPanel .x-tree-check-disabled .x-tree-checkbox { color:#acacac; }
+.qualityFilterPanel .x-grid-cell-inner { display:flex; white-space:normal; }
+.qualityFilterPanel .x-grid-cell-inner > div { flex:none; }
+.qualityFilterPanel .x-grid-cell-inner .x-tree-node-text { padding-left:0; white-space:normal; }
+
 /**
  * FIXME must be removed with next ext update, fixes T5DEV-181 / https://www.sencha.com/forum/showthread.php?330718-6-2-ColorField-color-preview-doesn-t-match-color
  */

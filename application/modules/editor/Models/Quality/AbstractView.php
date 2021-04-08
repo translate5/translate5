@@ -37,6 +37,8 @@ abstract class editor_Models_Quality_AbstractView {
      * @var string
      */
     const RUBRIC = '__RUBRIC__';
+    
+    const CHECKED_DEFAULT = false;
     /**
      * 
      * @param stdClass $a
@@ -131,8 +133,8 @@ abstract class editor_Models_Quality_AbstractView {
         $this->create();
     }
     /**
-     * Retrieves our data as tree. 
-     * @return stdClass
+     * Retrieves the root node for the quality filter store wrapped in an array
+     * @return array
      */
     public function getTree(){
         $root = new stdClass();
@@ -140,12 +142,25 @@ abstract class editor_Models_Quality_AbstractView {
         $root->qtype = '';
         $root->qcount = $this->numQualities;
         $root->qcategory = null;
+        $root->qchecked = true;
+        $root->qroot = true;
         $root->expanded = true;
-        $root->checked = false;
-        $root->title = 'ROOT';
+        $root->expandable = false;
+        $root->checked = self::CHECKED_DEFAULT;
+        $root->text = $this->manager->getTranslate()->_('Alle Kategorien');
         $root->segmentIds = [];
         $root->children = $this->rows;
-        return $root;
+        return [ $root ];
+    }
+    /**
+     * Retrieves the metadata for the qualities (cleaned overall count, info about internal tag faults)
+     * @return stdClass
+     */
+    public function getMetaData(){
+        $metadata = new stdClass();
+        $metadata->numQualities = $this->numQualities;
+        $metadata->hasFaultyInternalTags = $this->hasFaultyInternalTags;
+        return $metadata;
     }
     /**
      * Retrieves the processed data
@@ -153,20 +168,6 @@ abstract class editor_Models_Quality_AbstractView {
      */
     public function getRows(){
         return $this->rows;
-    }
-    /**
-     * Retrieves the number of found qualities (rubrics do not count here)
-     * @return int
-     */
-    public function getNumQualities(){
-        return $this->numQualities;
-    }
-    /**
-     * Retrieves if there is a structural problem with internal tags
-     * @return boolean
-     */
-    public function hasInternalTagFaults(){
-        return $this->hasFaultyInternalTags;
     }
     /**
      * Retrieves the intermediate internal model
@@ -263,6 +264,10 @@ abstract class editor_Models_Quality_AbstractView {
                         $rubric->children[] = $row;
                     }
                 }
+                if(count($rubric->children) == 0){
+                    $rubric->leaf = true;
+                    $rubric->checked = false;
+                }
             }
             $this->rows[] = $rubric;
         }
@@ -278,9 +283,10 @@ abstract class editor_Models_Quality_AbstractView {
         $row->qtype = $type;
         $row->qcount = 0;
         $row->qchecked = $this->manager->isFullyCheckedType($type, $this->taskConfig);
-        $row->checked = false;        
+        $row->checked = self::CHECKED_DEFAULT;        
         if($this->isTree){
             $row->qcategory = null;
+            $row->qroot = false;
             $row->expanded = true;
         }
         if($this->hasSegmentIds){
@@ -300,9 +306,10 @@ abstract class editor_Models_Quality_AbstractView {
         $row->qtype = $dbRow->type;
         $row->qcount = 0;
         $row->qchecked = true;
-        $row->checked = false;
+        $row->checked = self::CHECKED_DEFAULT;
         if($this->isTree){
             $row->qcategory = $dbRow->category;
+            $row->qroot = false;
             $row->leaf = true;
         }
         if($this->hasSegmentIds){
@@ -322,16 +329,15 @@ abstract class editor_Models_Quality_AbstractView {
         $row->qtype = editor_Segment_Tag::TYPE_QM;
         $row->qcount = 0;
         $row->qchecked = true;
-        $row->checked = false;        
+        $row->checked = self::CHECKED_DEFAULT;        
         if($this->isTree){
             $row->qcategory = ($isRubric) ? null : $category;
+            $row->qroot = false;
             if($isRubric){
                 $row->expanded = true;
             } else {
                 $row->leaf = false;
             }
-            
-            
         }
         if($this->hasSegmentIds){
             $row->segmentIds = [];
