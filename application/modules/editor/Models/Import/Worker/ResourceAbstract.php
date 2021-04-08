@@ -68,7 +68,7 @@ abstract class editor_Models_Import_Worker_ResourceAbstract extends editor_Model
             $this->wakeUpAndStartNextWorkers();
             $this->emulateBlocking();
         }
-        return $idToReturn;
+        return (int) $idToReturn;
     }
     /**
      * A Resource worker has the "process" function to replace the "work" API enriched with the slot as param

@@ -474,6 +474,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'exportresource'
             ));
         $this->front->getRouter()->addRoute('customer_resourceexport', $customerResourceExport);
+
+        $sessionImpersonate = new ZfExtended_Controller_RestLikeRoute(
+            'editor/session/impersonate',
+            array(
+                'module' => 'editor',
+                'controller' => 'session',
+                'action' => 'impersonate'
+            ));
+        $this->front->getRouter()->addRoute('editorSessionImpersonate', $sessionImpersonate);
         
         // quality subroutes
         $this->front->getRouter()->addRoute(

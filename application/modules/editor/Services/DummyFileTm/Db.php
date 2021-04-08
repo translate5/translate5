@@ -26,14 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-
-class editor_Plugins_ZDemoMT_Init extends ZfExtended_Plugin_Abstract {
-    public function init() {
-        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $serviceManager editor_Services_Manager */
-        $serviceManager->addService('editor_Plugins_ZDemoMT');
-        
-        //ZDemoMT also provides the dummy TM
-        $serviceManager->addService('editor_Services_DummyFileTm');
-    }
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
+/**
+ */
+class editor_Services_DummyFileTm_Db extends Zend_Db_Table_Abstract {
+    protected $_name = 'LEK_languageresources_internal_tm';
+    public $_primary = 'id';
 }

@@ -4013,6 +4013,10 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='UXVhbGl0w6R0c3NpY2hlcnVuZw=='><source>Qualitätssicherung</source><target>Quality assurance</target></trans-unit>
 <trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>All categories</target></trans-unit>
 <trans-unit id='UUE6IEZhbHNjaCBQb3NpdGl2ZQ=='><source>QA: Falsch Positive</source><target>QA: False positives</target></trans-unit>
+<trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='>
+  <source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source>
+  <target>The parameter login containing the desired username is missing.</target>
+</trans-unit>
 </body>
   </file>
 </xliff>

@@ -43,6 +43,26 @@ class editor_SessionController extends ZfExtended_SessionController {
         parent::indexAction();
     }
     
+    /***
+     * Will relplace the current user session with the provided login.
+     * The current user must have api rights to be able to call this action.
+     */
+    public function impersonateAction(){
+        $login = $this->getParam('login');
+        if(empty($login)){
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1342' => 'The parameter login containing the desired username is missing.'
+            ], 'core.authentication.session');
+            throw ZfExtended_UnprocessableEntity::createResponse('E1342',
+                ['login' => 'Der Parameter login mit dem gewünschten Benutzernamen fehlt.']
+            );
+        }
+        $config = Zend_Registry::get('config');
+        $userModel = ZfExtended_Factory::get($config->authentication->userEntityClass);
+        /* @var $userModel \ZfExtended_Models_User */
+        $userModel->setUserSessionNamespaceWithoutPwCheck($login);
+    }
+    
     public function postAction() {
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         /* @var $mv editor_Models_Segment_MaterializedView */
