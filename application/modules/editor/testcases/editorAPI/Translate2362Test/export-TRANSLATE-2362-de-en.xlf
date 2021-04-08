@@ -10,7 +10,7 @@
 <trans-unit id="2">
 <source xml:lang="en">Dies &lt;!--&lt;strong id="123"&gt;ist &amp;lt; ein&lt;/strong&gt;--&gt; &amp;quot;Test mit Kommentaren und CDATA: &lt;![CDATA[ TEST ]]&gt;.</source>
 <seg-source><mrk mid="0" mtype="seg">Dies &lt;!--&lt;strong id="123"&gt;ist &amp;lt; ein&lt;/strong&gt;--&gt; &amp;quot;Test mit Kommentaren und CDATA: &lt;![CDATA[ TEST ]]&gt;.</mrk></seg-source>
-<target xml:lang="de"><mrk mtype="seg" mid="0">This &lt;!--&lt;strong id="123"&gt;is &amp;lt; a&lt;/strong&gt;--&gt; &amp;quot;test with comments and CDATA: &lt;![CDATA[ TEST ]]&gt;.</mrk></target>
+<target xml:lang="de"><mrk mtype="seg" mid="0">This &lt;!--&lt;strong id="123"&gt;is &amp;lt; a&lt;/strong&gt;--&gt; &amp;quot;test with CDATA and comments: &lt;![CDATA[ TEST ]]&gt;.</mrk></target>
 </trans-unit>
 </body>
 </file>

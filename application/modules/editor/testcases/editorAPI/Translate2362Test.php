@@ -71,7 +71,7 @@ class Translate2362Test extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
         
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        file_put_contents($this->api()->getFile('/expectedSegments.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
+        //file_put_contents($this->api()->getFile('/expectedSegments.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
     }
     
@@ -91,7 +91,7 @@ class Translate2362Test extends \ZfExtended_Test_ApiTestcase {
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
         $segToTest = $segments[1];
-        $segToTest->targetEdit = str_replace(['Kommentaren und CDATA.'], ['CDATA und Kommentaren'], $segToTest->targetEdit);
+        $segToTest->targetEdit = str_replace(['comments and CDATA'], ['CDATA and comments'], $segToTest->targetEdit);
         
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit, $segToTest->id);
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
@@ -99,7 +99,7 @@ class Translate2362Test extends \ZfExtended_Test_ApiTestcase {
         //check direct PUT result
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        file_put_contents($this->api()->getFile('/expectedSegments-edited.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
+        //file_put_contents($this->api()->getFile('/expectedSegments-edited.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegments-edited.json'), $data, 'Edited segments are not as expected!');
     }
     
@@ -120,7 +120,7 @@ class Translate2362Test extends \ZfExtended_Test_ApiTestcase {
         $this->assertFileExists($pathToZip);
         
         $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/TRANSLATE-2362-de-en.xlf');
-        file_put_contents($this->api()->getFile('export-TRANSLATE-2362-de-en.xlf', null, false), $exportedFile);
+        //file_put_contents($this->api()->getFile('export-TRANSLATE-2362-de-en.xlf', null, false), $exportedFile);
         $expectedResult = $this->api()->getFileContent('export-TRANSLATE-2362-de-en.xlf');
         
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-TRANSLATE-2362-de-en.xlf');

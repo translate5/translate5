@@ -37,7 +37,7 @@
         "matchRateType": "import;none",
         "qmId": null,
         "stateId": "0",
-        "autoStateId": "6",
+        "autoStateId": "1",
         "fileOrder": "0",
         "comments": null,
         "workflowStepNr": "1",
@@ -48,8 +48,8 @@
         "target": "This <div class=\"single 212d2d3c7374726f6e672069643d22313233223e697320266c743b20613c2f7374726f6e673e2d2d internal-tag ownttip\"><span title=\"&lt;!--&lt;strong id=&quot;123&quot;&gt;is &amp;lt; a&lt;\/strong&gt;--&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;!--&lt;strong id=&quot;123&quot;&gt;is &amp;lt; a&lt;\/strong&gt;--&gt;<\/span><\/div> \"test with comments and CDATA: <div class=\"single 215b43444154415b2054455354205d5d internal-tag ownttip\"><span title=\"&lt;![CDATA[ TEST ]]&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"2\" data-length=\"-1\" class=\"full\">&lt;![CDATA[ TEST ]]&gt;<\/span><\/div>.",
         "targetMd5": "6bc1823651883d00f006d70fb4c3a50a",
         "targetToSort": "This  \"test with comments and CDATA: .",
-        "targetEdit": "This <div class=\"single 212d2d3c7374726f6e672069643d22313233223e697320266c743b20613c2f7374726f6e673e2d2d internal-tag ownttip\"><span title=\"&lt;!--&lt;strong id=&quot;123&quot;&gt;is &amp;lt; a&lt;\/strong&gt;--&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;!--&lt;strong id=&quot;123&quot;&gt;is &amp;lt; a&lt;\/strong&gt;--&gt;<\/span><\/div> \"test with comments and CDATA: <div class=\"single 215b43444154415b2054455354205d5d internal-tag ownttip\"><span title=\"&lt;![CDATA[ TEST ]]&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"2\" data-length=\"-1\" class=\"full\">&lt;![CDATA[ TEST ]]&gt;<\/span><\/div>.",
-        "targetEditToSort": "This  \"test with comments and CDATA: .",
+        "targetEdit": "This <div class=\"single 212d2d3c7374726f6e672069643d22313233223e697320266c743b20613c2f7374726f6e673e2d2d internal-tag ownttip\"><span title=\"&lt;!--&lt;strong id=&quot;123&quot;&gt;is &amp;lt; a&lt;\/strong&gt;--&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"1\" data-length=\"-1\" class=\"full\">&lt;!--&lt;strong id=&quot;123&quot;&gt;is &amp;lt; a&lt;\/strong&gt;--&gt;<\/span><\/div> \"test with CDATA and comments: <div class=\"single 215b43444154415b2054455354205d5d internal-tag ownttip\"><span title=\"&lt;![CDATA[ TEST ]]&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"2\" data-length=\"-1\" class=\"full\">&lt;![CDATA[ TEST ]]&gt;<\/span><\/div>.",
+        "targetEditToSort": "This  \"test with CDATA and comments: .",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"maxNumberOfLines\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":38}}}}",
         "isWatched": false
     }
