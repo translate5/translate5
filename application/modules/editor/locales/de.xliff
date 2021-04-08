@@ -1931,6 +1931,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='VmFsdWU='><source>Value</source><target>Value</target></trans-unit>
 <trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse enthalten</source><target>Gesperrte Segmente sind in der Analyse enthalten</target></trans-unit>
 <trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgbmljaHQgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse nicht enthalten</source><target>Gesperrte Segmente sind in der Analyse nicht enthalten</target></trans-unit>
+<trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='><source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source><target>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</target></trans-unit>
   </body>
  </file>
 </xliff>
