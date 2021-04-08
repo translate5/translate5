@@ -267,7 +267,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         if(count($result) > 0){
             return $result[0]['id'];
         }
-        return NULL;
+        return 0;
     }
     /***
      * Check if the given task has associated language resources
@@ -291,6 +291,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
+        
+        $this->resetBatchAssocs();
         
         $valid=[];
         foreach ($this->assocs as $assoc){
@@ -317,6 +319,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             
         }
         return $valid;
+    }
+    
+    /***
+     * Reset the collected batch language resources
+     */
+    protected function resetBatchAssocs() {
+        $this->batchAssocs = [];
     }
     
     /**
