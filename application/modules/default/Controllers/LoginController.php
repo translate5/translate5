@@ -225,8 +225,7 @@ class LoginController extends ZfExtended_Controllers_Login {
                 $this->initDataAndRedirect();
             }
         } catch (ZfExtended_OpenIDConnectClientException $e) {
-            ZfExtended_Models_LoginLog::addFailed($user->getLogin(), "openid");
-            //when an openid exceptions happens so send the user simplified info message, more should be found in the error log
+            ZfExtended_Models_LoginLog::addFailed(empty($user) ? 'No User given' : $user->getLogin(), "openid");
 
             $this->view->errors = true;
             //when an openid exceptions happens so send the user simplified info message, more should be found in the error log

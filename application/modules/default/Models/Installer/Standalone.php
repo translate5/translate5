@@ -159,13 +159,11 @@ class Models_Installer_Standalone {
         }
         if(!empty($this->options['maintenance'])) {
             $this->addZendToIncludePath();
-            $this->initApplication();
             $this->maintenanceMode();
             exit;
         }
         if(!empty($this->options['announceMaintenance'])) {
             $this->addZendToIncludePath();
-            $this->initApplication();
             $this->maintenanceMode();
             exit;
         }
