@@ -57,13 +57,5 @@ Ext.define('Editor.store.quality.Filter', {
             rootProperty: 'children'
         },
         url: Editor.data.restpath
-    },
-    updateQualities:function(records){
-
-        me.fireEvent('recordsChanged', records);
-    },
-    updateQuality:function(record){
-
-        me.fireEvent('recordsChanged', [record]);
     }
 });

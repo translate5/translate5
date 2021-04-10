@@ -711,6 +711,7 @@ Ext.define('Editor.controller.Segments', {
   onQualityFilterChanged: function(filter, doReloadStore){
       var store = this.getSegmentsStore();
       if(store.setQualityFilter(filter) && doReloadStore){
+          // TODO AUTOQA: remove
           console.log("QUALITIES CHANGED, RELOAD GRID !!");
           // this.clearSegmentSort();
           store.removeAll();
