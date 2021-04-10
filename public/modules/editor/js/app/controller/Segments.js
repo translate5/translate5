@@ -102,6 +102,9 @@ Ext.define('Editor.controller.Segments', {
   },{
 	  ref:'segmentsToolbar',
 	  selector:'segmentsToolbar'
+  },{
+      ref:'qualityFilterPanel',
+      selector:'qualityFilterPanel'
   }],
   listen: {
       controller: {
@@ -121,6 +124,9 @@ Ext.define('Editor.controller.Segments', {
           },
           '#Fileorder': {
               itemsaved: 'handleFileSaved'
+          },
+          'qualityFilterPanel': {
+              qualityFilterChanged: 'onQualityFilterChanged'
           }
       },
       component: {
@@ -192,13 +198,14 @@ Ext.define('Editor.controller.Segments', {
     btn_text = Ext.String.format('{0} ({1})', btn_text, newTotal);
     this.getResetFilterBtn().setText(btn_text);
   },
+  /**
+   * 
+   */
   gridAfterRender: function(grid) {
       var me = this,
-          params = [],
           task = Editor.data.task,
           title = Ext.String.ellipsis(task.get('taskName'), 60),
           store = grid.store,
-          proxy = store.getProxy(),
           initialGridFilters = Editor.data.initialGridFilters;
       
       grid.getHeader().getTitle().getEl().set({
@@ -227,8 +234,7 @@ Ext.define('Editor.controller.Segments', {
               grid.down('gridcolumn[dataIndex="'+item.dataIndex+'"]').show();
           });
           grid.filters.addFilters(initialGridFilters);
-          params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
-          me.reloadFilemap(params);
+          me.reloadFilemap(store.getFilterParams());
       }
       else {
         //reset suppressNextFilter to reenable normal filtering (suppressNextFilter needed for initialGridFilters)
@@ -260,12 +266,15 @@ Ext.define('Editor.controller.Segments', {
         filters = me.getSegmentGrid().filters;
     grid.selModel.deselectAll();
     me.clearSegmentSort();
+    // reset the quality filter and uncheck any checked qualities
+    store.setQualityFilter('');
+    me.getQualityFilterPanel().uncheckAll();
+    
     store.removeAll();
     if(store.getFilters().length > 0){
       //reloading of the store is caused by clearFilter call
       filters.clearFilters();
-    }
-    else {
+    } else {
       store.reload();
     }
   },
@@ -349,20 +358,16 @@ Ext.define('Editor.controller.Segments', {
           gridFilters = grid.filters,
           store = gridFilters.store,
           filters = store.filters,
-          proxy = store.getProxy(),
           btn = me.getWatchListFilterBtn(),
           found = false,
           params = {};
-          
+
       filters.each(function(filter, index, len){
          found = found || (filter.getProperty() == 'isWatched');
       });
       btn.toggle(found);
-
-      params[proxy.getFilterParam()] = proxy.encodeFilters(store.getFilters().items);
-
       filters && me.styleResetFilterButton(filters);
-      me.reloadFilemap(params);
+      me.reloadFilemap(grid.getStore().getFilterParams());
   },
   /**
    * reloads the filemap with the given sort and filter parameters
@@ -690,7 +695,7 @@ Ext.define('Editor.controller.Segments', {
       }
   },
   
-  /***
+  /**
    * Update the segmentFinishCount segments grid view model.
    */
   updateSegmentFinishCountViewModel:function(record){
@@ -699,5 +704,17 @@ Ext.define('Editor.controller.Segments', {
 	  	vm=grid.getViewModel(),
 	  	value=Ext.isNumber(record) ? record : record.get('segmentFinishCount');
 	  vm.set('segmentFinishCount',value);
+  },
+  /**
+   * Listens to the filter panel controller and delegates it to our store
+   */
+  onQualityFilterChanged: function(filter, doReloadStore){
+      var store = this.getSegmentsStore();
+      if(store.setQualityFilter(filter) && doReloadStore){
+          console.log("QUALITIES CHANGED, RELOAD GRID !!");
+          // this.clearSegmentSort();
+          store.removeAll();
+          store.reload();
+      }
   }
 });

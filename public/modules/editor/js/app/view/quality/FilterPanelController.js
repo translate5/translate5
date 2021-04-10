@@ -33,6 +33,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.qualityFilterPanel',
     delayedChange: null,
+    hasQualities: false,
     /**
      * When the view is expanded we load/reload the store
      */
@@ -43,13 +44,13 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      * When the view is collapsed we unload store to be clean
      */
     onCollapse: function(){
-        this.unloadStore();
+        this.unloadStore(true);
     },
     /**
      * When the view is unloaded we unload store to be clean
      */
     onRemoved: function(){
-        this.unloadStore();
+        this.unloadStore(false);
     },
     /**
      * When the state is applied we load the store. This is neccessary to catch an initially open qualities panel when a task is edited. TODO: isn't there a better event ?
@@ -71,6 +72,14 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         });
     },
     /**
+     * Unloads the qualities after the panel is collapsed
+     */
+    unloadStore: function(doReloadStore){
+        this.getView().getStore().getRootNode().removeAll(false);
+        this.fireEvent('qualityFilterChanged', '', doReloadStore);
+        this.hasQualities = false;
+    },
+    /**
      * Handles showing the loaded store & firing the filter event
      */
     storeLoaded: function(){
@@ -78,15 +87,10 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         var me = this;
         me.delayedChange = new Ext.util.DelayedTask(function(){
             me.delayedChange = null;
-            me.updateFilter();
+            me.updateFilter(true);
         });
         me.delayedChange.delay(250);
-    },
-    /**
-     * Unloads the qualities after the panel is collapsed
-     */
-    unloadStore: function(){
-        this.getView().getStore().getRootNode().removeAll(false);
+        this.hasQualities = true;
     },
     /**
      * Prevents an item being checked when it has no qualities
@@ -105,21 +109,35 @@ Ext.define('Editor.view.quality.FilterPanelController', {
             var me = this;
             me.delayedChange = new Ext.util.DelayedTask(function(){
                 me.delayedChange = null;
-                me.updateFilter();
+                me.updateFilter(true);
             });
             me.delayedChange.delay(50);
         }
     },
     /**
-     * Updates the list of filtered segment Ids and fires the filter changed event
+     * Creates the filter and fires the filter update event
      */
-    updateFilter: function(){
-        var segmentIds = [];
+    updateFilter: function(doReloadStore){
+        var filterVals = [];
         Ext.Array.each(this.getView().getChecked(), function(record){
-            Ext.Array.push(segmentIds, record.get('segmentIds'));
+            // the rubrics will have an empty category, this will filter them out
+            if(record.get('qcategory') != ''){
+                filterVals.push(record.get('qtype') + ':' + record.get('qcategory'));
+            }
         });
-        segmentIds = Ext.Array.unique(segmentIds);
-        this.fireEvent('qualityFilterChanged', segmentIds);
-        console.log('qualityFilterChanged', segmentIds);
+        // just in Case
+        filterVals = Ext.Array.unique(filterVals);
+        this.fireEvent('qualityFilterChanged', filterVals.join(','), doReloadStore);
+    },
+    /**
+     * Unchecks all Checkboxes
+     */
+    uncheckAll: function(){
+        if(this.hasQualities){
+            console.log("UNCHECK ALL!!!");
+            Ext.Array.each(this.getView().getChecked(), function(record){
+                record.set('checked', false);
+            });
+        }
     }
 });
