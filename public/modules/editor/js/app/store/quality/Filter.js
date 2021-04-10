@@ -40,10 +40,10 @@ Ext.define('Editor.store.quality.Filter', {
     listeners: {
         metachange: function (store, meta) {
             console.log("FilterQualities: metachange", meta);
-        },
+        }/*,
         load : function (store, records) {
             console.log("FilterQualities: load", records);
-        }
+        }*/
     },
     root: {
         expanded: true,

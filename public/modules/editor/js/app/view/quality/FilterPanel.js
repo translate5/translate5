@@ -53,7 +53,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
         checkchange: 'onCheckChange',
         removed: 'onRemoved'
     },
-    initConfig : function(instanceConfig) {
+    initConfig: function(instanceConfig) {
         var me = this, config = {
             title: this.title,
             store: Ext.create('Editor.store.quality.Filter'),
@@ -79,6 +79,9 @@ Ext.define('Editor.view.quality.FilterPanel', {
         }
         return me.callParent([config]);
     },
+    uncheckAll: function(){
+        this.getController().uncheckAll();
+    }
     /*
     initComponent: function() {
         Ext.applyIf(this, {

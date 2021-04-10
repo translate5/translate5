@@ -33,5 +33,5 @@ class editor_Models_Quality_FilterPanelView extends editor_Models_Quality_Abstra
     
     protected $isTree = true;
 
-    protected $hasSegmentIds = true;
+    protected $hasSegmentIds = false;
 }
