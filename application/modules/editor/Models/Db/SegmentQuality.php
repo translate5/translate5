@@ -92,6 +92,34 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             ->where('type = ?', $type);
         return (count($table->fetchAll($where)) > 0);
     }
+    /**
+     * Generates a list of segmentIds to be used as filter in the segment controller's quality filtering
+     * @param array $filter: a structure like ['mqm' => ['mqm_1', 'mqm_3], 'term' => ['term_superseded']]
+     * @param string $taskGuid
+     * @return int[]
+     */
+    public static function getSegmentIdsForQualityFilter(array $filter, string $taskGuid) : array {
+        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
+        /* @var $table editor_Models_Db_SegmentQuality */
+        $adapter = $table->getAdapter();
+        $nested = $table->select();
+        foreach($filter as $type => $categories){
+            $condition = $adapter->quoteInto('type = ?', $type).' AND ';
+            $condition .= (count($categories) == 1) ? $adapter->quoteInto('category = ?', $categories[0]) : $adapter->quoteInto('category IN (?)', $categories);
+            $nested->orWhere($condition);
+        }
+        $nested = $nested->getPart(Zend_Db_Select::WHERE);
+        
+        $select = $table->select()
+            ->from($table->getName(), ['segmentId'])
+            ->where('taskGuid = ?', $taskGuid)
+            ->where(implode(' ',$nested));
+        $segmentIds = [];
+        foreach($table->fetchAll($select, 'segmentId')->toArray() as $row){
+            $segmentIds[] = $row['segmentId'];
+        }
+        return $segmentIds;
+    }
     
     protected $_name  = 'LEK_segment_quality';
     
