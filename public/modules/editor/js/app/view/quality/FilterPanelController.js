@@ -33,7 +33,15 @@ Ext.define('Editor.view.quality.FilterPanelController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.qualityFilterPanel',
     delayedChange: null,
-    hasQualities: false,
+    qualitiesShown: false,
+    preventNextFilterUpdate: false, // prevents the next filter update
+    listen: {
+        controller: {
+            '#Segments': {
+                chainEnd: 'onSegmentSaved'
+            }
+        }
+    },
     /**
      * When the view is expanded we load/reload the store
      */
@@ -59,7 +67,45 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         if(state.hasOwnProperty('collapsed') && state.collapsed === false){
             this.loadStore();
         }
+    },    
+    /**
+     * Prevents an item being checked when it has no qualities
+     * QUIRK: the "qroot" item (= All categories) can not be activated/deactivated more then once. Why ? Bug in ExtJS check propagation ?
+     */
+    onBeforeCheckChange (record, checkedState, e){
+        if(record.get('qcount') == 0){
+            return false;
+        }
     },
+    /**
+     * Called onsaving of segments (incl. alikes). We refresh our store then without updating the filtered grid if we are visible /show qualities
+     */
+    onSegmentSaved: function(){
+        // we only refresh when being shown
+        if(this.qualitiesShown){
+            this.preventNextFilterUpdate = true;
+            this.getView().getStore().reload({
+                params: {
+                    checked: this.getFilterValue(true)
+                }
+            });
+            // TODO AUTOQA: remove
+            console.log("SEGMENT SAVED, RELOAD QUALITIES STORE");
+        }
+    },
+    /**
+     * Called for each checkbox when it is Changed, This makes a delayed update neccessaray to unify multiple changes to one
+     */
+    onCheckChange: function(record, checkedState, e){
+        if(this.delayedChange == null){
+            var me = this;
+            me.delayedChange = new Ext.util.DelayedTask(function(){
+                me.delayedChange = null;
+                me.updateFilter(true);
+            });
+            me.delayedChange.delay(50);
+        }
+    },    
     /**
      * Loads the qualities before the panel is expanded or if a uncollapsed state is applied (to catch an initially open panel)
      */
@@ -77,7 +123,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
     unloadStore: function(doReloadStore){
         this.getView().getStore().getRootNode().removeAll(false);
         this.fireEvent('qualityFilterChanged', '', doReloadStore);
-        this.hasQualities = false;
+        this.qualitiesShown = false;
     },
     /**
      * Handles showing the loaded store & firing the filter event
@@ -90,54 +136,43 @@ Ext.define('Editor.view.quality.FilterPanelController', {
             me.updateFilter(true);
         });
         me.delayedChange.delay(250);
-        this.hasQualities = true;
+        this.qualitiesShown = true;
     },
     /**
-     * Prevents an item being checked when it has no qualities
-     * QUIRK: the "qroot" item (= All categories) can not be activated/deactivated more then once. Why ? Bug in ExtJS check propagation ?
-     */
-    onBeforeCheckChange (record, checkedState, e){
-        if(record.get('qcount') == 0){
-            return false;
-        }
-    },
-    /**
-     * Called for each checkbox when it is chnaged, This makes a delayed update neccessaray to unify multiple changes to one
-     */
-    onCheckChange: function(record, checkedState, e){
-        if(this.delayedChange == null){
-            var me = this;
-            me.delayedChange = new Ext.util.DelayedTask(function(){
-                me.delayedChange = null;
-                me.updateFilter(true);
-            });
-            me.delayedChange.delay(50);
-        }
-    },
-    /**
-     * Creates the filter and fires the filter update event
+     * Fires the filter update event
      */
     updateFilter: function(doReloadStore){
-        var filterVals = [];
-        Ext.Array.each(this.getView().getChecked(), function(record){
-            // the rubrics will have an empty category, this will filter them out
-            if(record.get('qcategory') != ''){
-                filterVals.push(record.get('qtype') + ':' + record.get('qcategory'));
-            }
-        });
-        // just in Case
-        filterVals = Ext.Array.unique(filterVals);
-        this.fireEvent('qualityFilterChanged', filterVals.join(','), doReloadStore);
+        if(this.preventNextFilterUpdate){
+            this.preventNextFilterUpdate = false;
+        } else {
+            this.fireEvent('qualityFilterChanged', this.getFilterValue(false), doReloadStore);
+        }
     },
     /**
      * Unchecks all Checkboxes
      */
     uncheckAll: function(){
-        if(this.hasQualities){
-            console.log("UNCHECK ALL!!!");
+        if(this.qualitiesShown){
             Ext.Array.each(this.getView().getChecked(), function(record){
                 record.set('checked', false);
             });
         }
+    },
+    /**
+     * Creates the filte value
+     */
+    getFilterValue: function(includeRubrics){
+        var filterVals = [];
+        Ext.Array.each(this.getView().getChecked(), function(record){
+            // the rubrics will have an empty category, this will filter them out
+            if(record.get('qcategory') != ''){
+                filterVals.push(record.get('qtype') + ':' + record.get('qcategory'));
+            } else if(includeRubrics){
+                filterVals.push(record.get('qtype'));
+            }
+        });
+        // just in Case
+        filterVals = Ext.Array.unique(filterVals);
+        return filterVals.join(',');
     }
 });

@@ -68,19 +68,21 @@ Ext.define('Editor.view.quality.SegmentQualities', {
             this.endEditing();
         } else {
             this.store.each(function(record, idx){
-                me.add({
-                    xtype: 'checkbox',
-                    anchor: '100%',
-                    name: 'segq' + record.get('id'),
-                    inputValue: record.get('id'),
-                    value: (record.get('falsePositive') == 1),
-                    boxLabel: record.get('typeText') + ' > ' + record.get('text'),
-                    disabled: !record.get('falsifiable'),
-                    // boxLabelAlign: 'before',
-                    handler: function(checkbox, checked){
-                        me.changeFalsePositive(checkbox.inputValue, (checked ? '1' : '0'));
-                    }
-                });
+                if(record.get('falsifiable')){
+                    me.add({
+                        xtype: 'checkbox',
+                        anchor: '100%',
+                        name: 'segq' + record.get('id'),
+                        inputValue: record.get('id'),
+                        value: (record.get('falsePositive') == 1),
+                        boxLabel: record.get('typeText') + ' > ' + record.get('text'),
+                        // disabled: !record.get('falsifiable'),
+                        // boxLabelAlign: 'before',
+                        handler: function(checkbox, checked){
+                            me.changeFalsePositive(checkbox.inputValue, (checked ? '1' : '0'));
+                        }
+                    });
+                }
             });
             this.show();
         }

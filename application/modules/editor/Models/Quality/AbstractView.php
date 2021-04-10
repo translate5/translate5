@@ -101,21 +101,32 @@ abstract class editor_Models_Quality_AbstractView {
      * @var boolean
      */
     protected $excludeMQM;
+    /**
+     * @var array
+     */
+    protected $checkedQualities = null;
     
     /**
      * 
      * @param editor_Models_Task $task
      * @param int $segmentId
      * @param bool $onlyFilterTypes
+     * @param string $checkedList: The format of the value equals that of the filter-value $type:$category for the qualities-grid-filter but may has additional entries for types only
      * @param bool $excludeMQM: only needed for Statistics view
      * @param string $field: only needed for Statistics view
      */
-    public function __construct(editor_Models_Task $task, int $segmentId=NULL, bool $onlyFilterTypes=false, bool $excludeMQM=false, $field=NULL){
+    public function __construct(editor_Models_Task $task, int $segmentId=NULL, bool $onlyFilterTypes=false, string $checkedList=NULL, bool $excludeMQM=false, $field=NULL){
         $this->task = $task;
         $this->taskConfig = $this->task->getConfig();
         $this->manager = editor_Segment_Quality_Manager::instance();
         $this->excludeMQM = $excludeMQM;
         $this->table = new editor_Models_Db_SegmentQuality();
+        // generate hashtable of filtered qualities if sent
+        if($checkedList !== NULL){
+            foreach(explode(',', $checkedList) as $typeCat){
+                $this->checkedQualities[$typeCat] = true;
+            }
+        }
         $blacklist = NULL;
         if($onlyFilterTypes){
             $blacklist = $this->manager->getFilterTypeBlacklist();
@@ -139,14 +150,14 @@ abstract class editor_Models_Quality_AbstractView {
     public function getTree(){
         $root = new stdClass();
         $root->qid = -1;
-        $root->qtype = '';
+        $root->qtype = 'root'; // QUIRK: must not become a real quality ... highly unlikely, as we define the quality-types by code :-)
         $root->qcount = $this->numQualities;
         $root->qcategory = null;
         $root->qchecked = true;
         $root->qroot = true;
         $root->expanded = true;
         $root->expandable = false;
-        $root->checked = self::CHECKED_DEFAULT;
+        $root->checked = $this->getCheckedVal($root->qtype, $root->qcategory);
         $root->text = $this->manager->getTranslate()->_('Alle Kategorien');
         $root->segmentIds = [];
         $root->children = $this->rows;
@@ -283,7 +294,7 @@ abstract class editor_Models_Quality_AbstractView {
         $row->qtype = $type;
         $row->qcount = 0;
         $row->qchecked = $this->manager->isFullyCheckedType($type, $this->taskConfig);
-        $row->checked = self::CHECKED_DEFAULT;        
+        $row->checked = $this->getCheckedVal($type);
         if($this->isTree){
             $row->qcategory = null;
             $row->qroot = false;
@@ -306,7 +317,7 @@ abstract class editor_Models_Quality_AbstractView {
         $row->qtype = $dbRow->type;
         $row->qcount = 0;
         $row->qchecked = true;
-        $row->checked = self::CHECKED_DEFAULT;
+        $row->checked = $this->getCheckedVal($dbRow->type, $dbRow->category);
         if($this->isTree){
             $row->qcategory = $dbRow->category;
             $row->qroot = false;
@@ -329,7 +340,7 @@ abstract class editor_Models_Quality_AbstractView {
         $row->qtype = editor_Segment_Tag::TYPE_QM;
         $row->qcount = 0;
         $row->qchecked = true;
-        $row->checked = self::CHECKED_DEFAULT;        
+        $row->checked = $this->getCheckedVal(editor_Segment_Tag::TYPE_QM, $category);
         if($this->isTree){
             $row->qcategory = ($isRubric) ? null : $category;
             $row->qroot = false;
@@ -357,5 +368,20 @@ abstract class editor_Models_Quality_AbstractView {
             ->where('qmId != ?', '')
             ->where('qmId IS NOT NULL');
         return $this->table->fetchAll($select, 'id ASC')->toArray();
+    }
+    /**
+     * Evaluates the checked-value, if request-vals have been sent by request or by default-value otherwise
+     * @param string $type
+     * @param string $category
+     * @return bool
+     */
+    protected function getCheckedVal(string $type, string $category=null) : bool {
+        if($this->checkedQualities == null){
+            return self::CHECKED_DEFAULT;
+        }
+        if($category === null || $category === ''){
+            return array_key_exists($type, $this->checkedQualities);
+        }
+        return array_key_exists($type.':'.$category, $this->checkedQualities);
     }
 }

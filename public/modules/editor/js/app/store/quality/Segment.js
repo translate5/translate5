@@ -44,7 +44,7 @@ Ext.define('Editor.store.quality.Segment', {
         if(record){
             record.set(prop, val);
             record.commit();
-            this.fireEvent('recordUpdated', record);
+            // this.fireEvent('recordUpdated', record);
             return true;
         }
         return false;

@@ -268,7 +268,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         }
 
         if(!isset($this->view->metaData)){
-            //since we dont use metaData otherwise, we can overwrite it completly:
+            //since we dont use metaData otherwise, we can overwrite it completly
             $this->view->metaData = new stdClass();
         }
         
