@@ -94,29 +94,32 @@ class editor_QualityController extends ZfExtended_RestController {
     public function falsepositiveAction(){
         $falsePositive = $this->getRequest()->getParam('falsePositive', NULL);
         $this->entityLoad();
+        $tagAdjusted = true;
         if($falsePositive !== NULL && (intval($falsePositive) === 1 || intval($falsePositive) === 0)){
             // update in quality model
             $this->entity->setFalsePositive(intval($falsePositive));
             $this->entity->save();
-            // update in segment content
-            $tagAdjusted = false;
-            $segment = ZfExtended_Factory::get('editor_Models_Segment');
-            /* @var $segment editor_Models_Segment */
-            $segment->load($this->entity->getSegmentId());
-            $fieldTags = $segment->getFieldTags($this->entity->getField());
-            if($fieldTags != NULL){
-                $tags = $fieldTags->getByType($this->entity->getType());
-                foreach($tags as $tag){
-                    if($tag->getQualityId() == $this->entity->getId()){
-                        $tag->setFalsePositive($this->entity->getFalsePositive());
-                        $segment->set($fieldTags->getFirstSaveToField(), $tag->render());
-                        $tagAdjusted = true;
-                        break;
+            if(editor_Segment_Quality_Manager::instance()->hasSegmentTags($this->entity->getType())){
+                // update tag in segment content
+                $tagAdjusted = false;
+                $segment = ZfExtended_Factory::get('editor_Models_Segment');
+                /* @var $segment editor_Models_Segment */
+                $segment->load($this->entity->getSegmentId());
+                $fieldTags = $segment->getFieldTags($this->entity->getField());
+                if($fieldTags != NULL){
+                    $tags = $fieldTags->getByType($this->entity->getType());
+                    foreach($tags as $tag){
+                        if($tag->getQualityId() == $this->entity->getId()){
+                            $tag->setFalsePositive($this->entity->getFalsePositive());
+                            $segment->set($fieldTags->getFirstSaveToField(), $tag->render());
+                            $tagAdjusted = true;
+                            break;
+                        }
                     }
                 }
-            }
-            if(!$tagAdjusted){
-                // TODO AUTOQA: we should write some kind of warning here
+                if(!$tagAdjusted){
+                    // TODO AUTOQA: we should write some kind of warning here
+                }
             }
             $this->view->segmentTagAdjusted = ($tagAdjusted) ? 1 : 0;
             $this->view->success = 1;
