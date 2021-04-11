@@ -42,4 +42,6 @@ class  editor_Segment_TrackChanges_DeleteTag extends editor_Segment_Tag {
     protected static $type = editor_Segment_Tag::TYPE_TRACKCHANGES;
 
     protected static $nodeName = 'del';
+    
+    protected static $identificationClass = self::CSS_CLASS;
 }

@@ -39,15 +39,12 @@
 class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_Provider {
     
     /**
-     * Central Key to identify term tags & qualities
+     * The central UNIQUE amongst quality providersKey to identify termtagger-related stuff.
      * @var string
      */
-    const PROVIDER_TYPE = 'term';
-    /**
-     * The central UNIQUE amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_Tag::$type
-     * @var string
-     */
-    protected static $type = self::PROVIDER_TYPE;
+    protected static $type = editor_Plugins_TermTagger_Tag::TYPE;
+    
+    protected static $segmentTagClass = 'editor_Plugins_TermTagger_Tag';
     
     public function hasImportWorker() : bool {
         return true;

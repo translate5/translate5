@@ -342,6 +342,20 @@ final class editor_Segment_Quality_Manager {
         return $blacklist;
     }
     /**
+     * Retrieves the types of qualities that have tags in the segment texts
+     * @return string[] hashtable type => cssClass
+     */
+    public function getAllSegmentTagTypeClasses(){
+        $data = [];
+        foreach($this->registry as $type => $provider){
+            /* @var $provider editor_Segment_Quality_Provider */
+            if($provider->hasSegmentTags()){
+                $data[$provider->getType()] = $provider->getTagIndentificationClass();
+            }
+        }
+        return $data;
+    }
+    /**
      * 
      * @return ZfExtended_Zendoverwrites_Translate
      */

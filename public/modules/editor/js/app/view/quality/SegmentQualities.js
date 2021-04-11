@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.quality.SegmentQualities', {
     extend: 'Ext.form.FieldSet',
     alias: 'widget.segmentQualities',
-    title: "#UT#QA: Falsch Positive",
+    title: "#UT#QA: Falsch-Positive",
     requires: [ 'Editor.store.quality.Segment' ], 
     defaultType: 'checkbox',
     hidden: true,
@@ -45,28 +45,41 @@ Ext.define('Editor.view.quality.SegmentQualities', {
         }
         return this.callParent([config]);
     },
-    changeFalsePositive: function(qualityId, value){
-        var me = this;
+    /**
+     * Changes a false positive value, via request and via GUI
+     */
+    changeFalsePositive: function(qualityId, checked, record){
+        if(record.get('hasTag')){
+            this.decoratefalsePositive(qualityId, checked, record);
+        }
         Ext.Ajax.request({
             url: Editor.data.restpath+'quality/falsepositive',
             method: 'GET',
-            params: { id: qualityId, falsePositive: value },
+            params: { id: qualityId, falsePositive: (checked ? '1' : '0') },
             success: function(response){
-                me.falsePositiveChanged(qualityId, value);             
+                // TODO AUTOQA: remove
+                console.log('CHANGED FALSE POSITIVE!!', qualityId, checked, record.get('type'));
             },
             failure: function(response){
                 Editor.app.getController('ServerException').handleException(response);
             }
         });        
     },
-    falsePositiveChanged: function(qualityId, value){
-        this.store.updateRecordProp(qualityId, 'falsePositive', value);
+    /**
+     * Changes the decoration-class in the editor of the tag
+     */
+    decoratefalsePositive: function(qualityId, checked, record){
+     // TODO AUTOQA: implement
+        console.log('decoratefalsePositive: ', qualityId, checked, record);
+        // CSS_CLASS_FALSEPOSITIVE = 't5qfalpos'
+        // DATA_NAME_QUALITYID = 't5qid'; with MQM: seq
     },
+    /**
+     * Creates the view from the loaded data. Note, that QM qualities are not falsifyable
+     */
     qualitiesLoaded: function(qualities){
-        var me = this;
-        if(this.store.getCount() == 0){
-            this.endEditing();
-        } else {
+        var me = this, added = false;
+        if(this.store.getCount() > 0){
             this.store.each(function(record, idx){
                 if(record.get('falsifiable')){
                     me.add({
@@ -75,16 +88,21 @@ Ext.define('Editor.view.quality.SegmentQualities', {
                         name: 'segq' + record.get('id'),
                         inputValue: record.get('id'),
                         value: (record.get('falsePositive') == 1),
+                        qrecord: record,
                         boxLabel: record.get('typeText') + ' > ' + record.get('text'),
-                        // disabled: !record.get('falsifiable'),
-                        // boxLabelAlign: 'before',
                         handler: function(checkbox, checked){
-                            me.changeFalsePositive(checkbox.inputValue, (checked ? '1' : '0'));
+                            me.changeFalsePositive(checkbox.inputValue, checked, checkbox.qrecord);
                         }
                     });
+                    added = true;
                 }
             });
+        }
+        if(added){
             this.show();
+        } else {
+            this.removeAll();
+            this.hide();
         }
     },
     /**

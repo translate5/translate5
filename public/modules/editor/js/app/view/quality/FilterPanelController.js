@@ -34,6 +34,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
     alias: 'controller.qualityFilterPanel',
     delayedChange: null,
     qualitiesShown: false,
+    currentFilterMode: 'all', // the mode of shown qualities: all, just errors, just false positives
     preventNextFilterUpdate: false, // prevents the next filter update
     listen: {
         controller: {
@@ -78,19 +79,26 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         }
     },
     /**
+     * Changes the filter-mode initiated by the radio on top
+     */
+    onFilterModeChanged: function(comp, newVal, oldVal){
+        if(newVal != oldVal){
+            this.currentFilterMode = newVal;
+            this.reloadStore();
+            // TODO AUTOQA: remove
+            console.log("FILTER MODE CHANGED, RELOAD QUALITIES STORE AND UPDATE GRID");
+        }
+    },
+    /**
      * Called onsaving of segments (incl. alikes). We refresh our store then without updating the filtered grid if we are visible /show qualities
      */
     onSegmentSaved: function(){
         // we only refresh when being shown
         if(this.qualitiesShown){
             this.preventNextFilterUpdate = true;
-            this.getView().getStore().reload({
-                params: {
-                    checked: this.getFilterValue(true)
-                }
-            });
+            this.reloadStore();
             // TODO AUTOQA: remove
-            console.log("SEGMENT SAVED, RELOAD QUALITIES STORE");
+            console.log("SEGMENT SAVED, RELOAD QUALITIES STORE WITHOUT UPDATING GRID");
         }
     },
     /**
@@ -114,6 +122,16 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         this.getView().getStore().load({
             callback: function(){
                 me.storeLoaded();
+            }
+        });
+    },
+    /**
+     * Reloads the store and keeps the current selection
+     */
+    reloadStore: function(){
+        this.getView().getStore().reload({
+            params: {
+                currentstate: this.getFilterValue(true)
             }
         });
     },
@@ -161,18 +179,26 @@ Ext.define('Editor.view.quality.FilterPanelController', {
     /**
      * Creates the filte value
      */
-    getFilterValue: function(includeRubrics){
+    getFilterValue: function(forStoreReload){
         var filterVals = [];
         Ext.Array.each(this.getView().getChecked(), function(record){
             // the rubrics will have an empty category, this will filter them out
             if(record.get('qcategory') != ''){
                 filterVals.push(record.get('qtype') + ':' + record.get('qcategory'));
-            } else if(includeRubrics){
+            } else if(forStoreReload){
                 filterVals.push(record.get('qtype'));
             }
         });
-        // just in Case
-        filterVals = Ext.Array.unique(filterVals);
-        return filterVals.join(',');
+        if(filterVals.length > 0){
+            filterVals = Ext.Array.unique(filterVals); // just in Case
+        }
+        // crucial: without checked categories we must not return the filter mode when evaluating the filter for a grid update!
+        // Otherwise the filter comparision in the Grid controller will not work properly
+        if(filterVals.length > 0){            
+            return filterVals.join(',') + '|' + this.currentFilterMode;
+        } else if(forStoreReload) {
+            return 'NONE|' + this.currentFilterMode;
+        }
+        return '';
     }
 });

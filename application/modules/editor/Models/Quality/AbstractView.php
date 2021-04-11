@@ -37,8 +37,16 @@ abstract class editor_Models_Quality_AbstractView {
      * @var string
      */
     const RUBRIC = '__RUBRIC__';
-    
+    /**
+     * The initial value for the tree-nodes checked prop
+     * @var boolean
+     */
     const CHECKED_DEFAULT = false;
+    /**
+     * the initially shown filter
+     * @var string
+     */
+    const FILTER_MODE_DEFAULT = 'all';
     /**
      * 
      * @param stdClass $a
@@ -102,30 +110,35 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $excludeMQM;
     /**
+     * May be set by request and holds the list of checked tree nodes
      * @var array
      */
     protected $checkedQualities = null;
-    
+    /**
+     * The current restriction for the falsePositive column. NULL means no restriction
+     * @var int
+     */
+    protected $falsePositiveRestriction = NULL;
     /**
      * 
      * @param editor_Models_Task $task
      * @param int $segmentId
      * @param bool $onlyFilterTypes
-     * @param string $checkedList: The format of the value equals that of the filter-value $type:$category for the qualities-grid-filter but may has additional entries for types only
+     * @param string $currentState: The format of the value equals that of the filter-value $type:$category for the qualities-grid-filter but may has additional entries for types only
      * @param bool $excludeMQM: only needed for Statistics view
      * @param string $field: only needed for Statistics view
      */
-    public function __construct(editor_Models_Task $task, int $segmentId=NULL, bool $onlyFilterTypes=false, string $checkedList=NULL, bool $excludeMQM=false, $field=NULL){
+    public function __construct(editor_Models_Task $task, int $segmentId=NULL, bool $onlyFilterTypes=false, string $currentState=NULL, bool $excludeMQM=false, $field=NULL){
         $this->task = $task;
         $this->taskConfig = $this->task->getConfig();
         $this->manager = editor_Segment_Quality_Manager::instance();
         $this->excludeMQM = $excludeMQM;
         $this->table = new editor_Models_Db_SegmentQuality();
-        // generate hashtable of filtered qualities if sent
-        if($checkedList !== NULL){
-            foreach(explode(',', $checkedList) as $typeCat){
-                $this->checkedQualities[$typeCat] = true;
-            }
+        // generate hashtable of filtered qualities and respect filter mode if the current state was sent
+        if($currentState !== NULL){
+            $requestState = new editor_Models_Quality_RequestState($currentState);
+            $this->checkedQualities = $requestState->getCheckedList();
+            $this->falsePositiveRestriction = $requestState->getFalsePositiveRestriction();
         }
         $blacklist = NULL;
         if($onlyFilterTypes){
@@ -140,7 +153,11 @@ abstract class editor_Models_Quality_AbstractView {
             }
         }
         // ordering is crucial !
-        $this->dbRows = $this->table->fetchFiltered($task->getTaskGuid(), $segmentId, $field, $blacklist, true, NULL, ['type ASC','category ASC']);
+        $this->dbRows = $this->table->fetchFiltered($task->getTaskGuid(), $segmentId, $field, $blacklist, true, NULL, $this->falsePositiveRestriction, ['type ASC','category ASC']);
+        
+        // TODO AUTOQA: remove
+        // error_log('PRESETS: '.print_r($this->checkedQualities, true).' / falsePositives:'.$this->falsePositiveRestriction.' / DBrows: '.count($this->dbRows));
+        
         $this->create();
     }
     /**
@@ -153,7 +170,7 @@ abstract class editor_Models_Quality_AbstractView {
         $root->qtype = 'root'; // QUIRK: must not become a real quality ... highly unlikely, as we define the quality-types by code :-)
         $root->qcount = $this->numQualities;
         $root->qcategory = null;
-        $root->qchecked = true;
+        $root->qcomplete = true;
         $root->qroot = true;
         $root->expanded = true;
         $root->expandable = false;
@@ -293,7 +310,7 @@ abstract class editor_Models_Quality_AbstractView {
         $row->qid = -1;
         $row->qtype = $type;
         $row->qcount = 0;
-        $row->qchecked = $this->manager->isFullyCheckedType($type, $this->taskConfig);
+        $row->qcomplete = $this->manager->isFullyCheckedType($type, $this->taskConfig);
         $row->checked = $this->getCheckedVal($type);
         if($this->isTree){
             $row->qcategory = null;
@@ -316,7 +333,7 @@ abstract class editor_Models_Quality_AbstractView {
         $row->qid = $dbRow->id;
         $row->qtype = $dbRow->type;
         $row->qcount = 0;
-        $row->qchecked = true;
+        $row->qcomplete = true;
         $row->checked = $this->getCheckedVal($dbRow->type, $dbRow->category);
         if($this->isTree){
             $row->qcategory = $dbRow->category;
@@ -339,7 +356,7 @@ abstract class editor_Models_Quality_AbstractView {
         $row->qid = -1;
         $row->qtype = editor_Segment_Tag::TYPE_QM;
         $row->qcount = 0;
-        $row->qchecked = true;
+        $row->qcomplete = true;
         $row->checked = $this->getCheckedVal(editor_Segment_Tag::TYPE_QM, $category);
         if($this->isTree){
             $row->qcategory = ($isRubric) ? null : $category;
@@ -361,6 +378,10 @@ abstract class editor_Models_Quality_AbstractView {
      * @return array
      */
     protected function fetchQmRows(){
+        // since QMs can not be false positive we exclude them when filtering for false positives
+        if($this->falsePositiveRestriction === 1){
+            return [];
+        }
         $select = $this->table->select()
             ->setIntegrityCheck(false)
             ->from('LEK_segments', array('id', 'qmId'))

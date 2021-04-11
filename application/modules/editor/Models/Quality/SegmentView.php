@@ -57,6 +57,19 @@ class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractVi
             $row->text = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
             $row->filterable = $this->manager->isFilterableType($dbRow->type);
             $row->falsifiable = $this->manager->canBeFalsePositiveCategory($dbRow->type, $dbRow->category);
+            $provider = $this->manager->getProvider($dbRow->type);
+            // add props to identify the tags in the editor
+            if($provider == NULL || !$provider->hasSegmentTags()){
+                $row->hasTag = false;
+                $row->tagName = '';
+                $row->cssClass = '';
+                $row->dataNameId = '';
+            } else {
+                $row->hasTag = true;
+                $row->tagName = $provider->getTagNodeName();
+                $row->cssClass = $provider->getTagIndentificationClass();
+                $row->dataNameId = $provider->getTagQualityIdDataName();
+            }
             $this->rows[] = $row;
         }
         usort($this->rows, 'editor_Models_Quality_SegmentView::compareByTypeTitle');

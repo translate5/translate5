@@ -43,8 +43,9 @@
 class editor_Segment_AnyTag extends editor_Segment_Tag {
     
     protected static $type = editor_Segment_Tag::TYPE_ANY;
+    
+    protected static $identificationClass = editor_Segment_Tag::TYPE_ANY;
     /**
-     * The Constructor parameters must match that of editor_Segment_Tag, the nodeName may be set later when instantiation from deserialization
      * @param int $startIndex
      * @param int $endIndex
      * @param string $category

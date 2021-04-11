@@ -108,6 +108,28 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return ($name == static::$nodeName);
     }
     /**
+     * Creates a new instance of the Tag.
+     * For Segment-tags always use ::createNew for creating a fresh instance with the neccessary props set (identification-class, nade-name), never use ::create()
+     * @param int $startIndex
+     * @param int $endIndex
+     * @param string $category
+     * @return editor_Segment_Tag
+     */
+    public static function createNew(int $startIndex=0, int $endIndex=0, string $category='') : editor_Segment_Tag {
+        $tag = new self($startIndex, $endIndex, $category);
+        $tag->addClass($tag->getIdentificationClass());
+        return $tag;
+    }
+    /**
+     * @deprecated: do not use with segment tags
+     * @param string $tagName
+     * @throws Exception
+     * @return editor_Tag
+     */
+    public static function create($tagName) : editor_Tag {
+        throw new Exception('Direct instantiation via ::create is not appropriate, use ::createNew instead');
+    }
+    /**
      * The type of Internal tag (e.g, QC for Quality Control), to be set via inheritance
      * @var string
      */
@@ -117,6 +139,11 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @var string
      */
     protected static $nodeName = null;
+    /**
+     * Defines the identifying class name for the tag, that all tags of this type must have
+     * @var string
+     */
+    protected static $identificationClass = null;
     /**
      * For compatibility with old code/concepts some quality tags may not use the global date-attribute for the quality ID
      * @var string
@@ -196,7 +223,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return new $className($this->startIndex, $this->endIndex, $this->category);
     }
     /**
-     * Opposing to the base-class the node-name with internal taxt is fixed with the type usually (not with editor_Segment_AnyTag ...)
+     * Opposing to the base-class the node-name with internal text is fixed with the type usually (not with editor_Segment_AnyTag ...)
      * {@inheritDoc}
      * @see editor_Tag::getName()
      */
@@ -220,6 +247,13 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public function getCategory() : string {
         return $this->category;
+    }
+    /**
+     * All tags of this type must have this class, but note, that this may not be a undoubtable way to identify tags of this type
+     * @return string
+     */
+    public function getIdentificationClass() : string {
+        return static::$identificationClass;
     }
     /**
      * Sets the category
@@ -268,7 +302,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * Retrieves the data name for the quality entity id
      * @return string
      */
-    private function getDataNameQualityId() : string {
+    public function getDataNameQualityId() : string {
         if(static::$dataNameQualityId == NULL){
             return self::DATA_NAME_QUALITYID;
         }

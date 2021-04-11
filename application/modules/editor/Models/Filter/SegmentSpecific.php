@@ -38,14 +38,14 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
     protected $segmentFields = null;
     /**
      * used to filter for qualities
-     * @var array
+     * @var editor_Models_Quality_RequestState
      */
-    protected $segmentIdFilter = null;
+    protected $qualityState = NULL;
     /**
-     * used to filter for qualities
-     * @var array
+     * 
+     * @var string
      */
-    protected $qmFilter = null;
+    protected $taskGuid = NULL;
     
     /**
      * sets the fields which should be filtered lowercase
@@ -59,39 +59,47 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
      * @param array $segmentIds
      * @param array $qmIds
      */
-    public function setQualityFilter(array $segmentIds, array $qmIds) {
-        $this->segmentIdFilter = $segmentIds;
-        $this->qmFilter = $qmIds;
+    public function setQualityFilter(editor_Models_Quality_RequestState $requestState, string $taskGuid) {
+        $this->qualityState = $requestState;
+        $this->taskGuid = $taskGuid;
     }
     /**
-     * Applies the additional qualities filter
+     * Overwritten to apply the additional qualities filter
      * {@inheritDoc}
-     * @see ZfExtended_Models_Filter::applyFurtherFilters()
+     * @see ZfExtended_Models_Filter::applyToSelect()
      */
     public function applyToSelect(Zend_Db_Select $select, $applySort = true) {
         
         parent::applyToSelect($select, $applySort);
         
-        $colPrefix = (empty($this->defaultTable)) ? '' : '`'.$this->defaultTable.'`.';
-        $adapter = $this->entity->db->getAdapter();
-        $conditions = [];
-        if($this->qmFilter != null && count($this->qmFilter) > 0){
-            foreach($this->qmFilter as $qmId){
-                $conditions[] = $adapter->quoteInto($colPrefix.'qmId = ?', $qmId);
-                $conditions[] = $adapter->quoteInto($colPrefix.'qmId LIKE ?', '%;'.$qmId);
-                $conditions[] = $adapter->quoteInto($colPrefix.'qmId LIKE ?', $qmId.';%');
-                $conditions[] = $adapter->quoteInto($colPrefix.'qmId LIKE ?', '%;'.$qmId.';%');
+        if($this->qualityState != NULL){
+            $colPrefix = (empty($this->defaultTable)) ? '' : '`'.$this->defaultTable.'`.';
+            $adapter = $this->entity->db->getAdapter();
+            $conditions = [];
+            if($this->qualityState->hasCheckedQmIds()){
+                foreach($this->qualityState->getCheckedQmIds() as $qmId){
+                    $conditions[] = $adapter->quoteInto($colPrefix.'qmId = ?', $qmId);
+                    $conditions[] = $adapter->quoteInto($colPrefix.'qmId LIKE ?', '%;'.$qmId);
+                    $conditions[] = $adapter->quoteInto($colPrefix.'qmId LIKE ?', $qmId.';%');
+                    $conditions[] = $adapter->quoteInto($colPrefix.'qmId LIKE ?', '%;'.$qmId.';%');
+                }
+            }
+            if($this->qualityState->hasCheckedCategoriesByType()){
+                $segmentIds = editor_Models_Db_SegmentQuality::getSegmentIdsForQualityFilter($this->qualityState, $this->taskGuid);
+                if(count($segmentIds) > 1){
+                    $conditions[] = $adapter->quoteInto($colPrefix.'id IN (?)', $segmentIds, Zend_Db::INT_TYPE);
+                } else if(count($segmentIds) == 1){
+                    $conditions[] = $adapter->quoteInto($colPrefix.'id = ?', $segmentIds[0], Zend_Db::INT_TYPE);
+                } else {
+                    // no segment ids, trigger empty result
+                    error_log('editor_Models_Filter_SegmentSpecific: TRIGGER EMPTY SEGMENT-IDs');
+                    $conditions[] = '1 = 0';
+                }
+            }
+            if(count($conditions) > 0){
+                $this->select->where(implode(' OR ', $conditions));
             }
         }
-        if($this->segmentIdFilter != null && count($this->segmentIdFilter) > 0){
-            $conditions[] = (count($this->segmentIdFilter) == 1) ?
-                $adapter->quoteInto($colPrefix.'id = ?', $this->segmentIdFilter[0], 'INTEGER')
-                : $adapter->quoteInto($colPrefix.'id IN (?)', $this->segmentIdFilter, 'INTEGER');
-        }
-        if(count($conditions) > 0){            
-            $this->select->where(implode(' OR ', $conditions));
-        }
-        
         return $this->select;
     }
     /**

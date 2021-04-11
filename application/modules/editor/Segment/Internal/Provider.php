@@ -38,14 +38,10 @@
  */
 class editor_Segment_Internal_Provider extends editor_Segment_Quality_Provider {
 
-    /**
-     * Using the internal tag type
-     * @var string
-     */
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
     
-    
-    
+    protected static $segmentTagClass = 'editor_Segment_Internal_Tag';
+
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
         
         if(!$qualityConfig->enableInternalTagCheck || $processingMode == editor_Segment_Processing::IMPORT){

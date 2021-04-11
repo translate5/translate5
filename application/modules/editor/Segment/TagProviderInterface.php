@@ -61,4 +61,19 @@ interface editor_Segment_TagProviderInterface {
      * @return editor_Segment_Tag
      */
     public function createSegmentTag(int $startIndex, int $endIndex, string $nodeName, array $classNames) : editor_Segment_Tag;
+    /**
+     * Retrieves a CSS class, that identifies the tag (may not be the only identifying prop, but all of the tags have this class) or NULL, if the quality has no related tag
+     * @return string
+     */
+    public function getTagIndentificationClass() : ?string;
+    /**
+     * Retrieves the name of the data-property for the quality id (like data-NAME) or NULL, if the quality has no related tag
+     * @return string
+     */
+    public function getTagQualityIdDataName() : ?string;
+    /**
+     * Retrieves the node-name of the related segment tag or NULL, if the quality has no related tag
+     * @return string
+     */
+    public function getTagNodeName() : ?string;    
 }

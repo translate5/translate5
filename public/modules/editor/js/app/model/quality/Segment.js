@@ -41,7 +41,11 @@ Ext.define('Editor.model.quality.Segment', {
         { name:'title', type:'string' },
         { name:'falsePositive', type:'int' },
         { name:'filterable', type:'boolean' },
-        { name:'falsifiable', type:'boolean' }
+        { name:'falsifiable', type:'boolean' },
+        { name:'hasTag', type:'boolean' },
+        { name:'tagName', type:'string' },
+        { name:'cssClass', type:'string' },
+        { name:'dataNameId', type:'string' }
     ],
     idProperty: 'id',
     proxy : {

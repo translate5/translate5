@@ -70,35 +70,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $filter->setSegmentFields(array_keys($this->_sortColMap));
         // apply quality filter
         if($this->getRequest()->getActionName() == 'index' && $this->getRequest()->getParam('qualities', '') != ''){
-            $this->addQualitiesFilter($filter, $this->getRequest()->getParam('qualities'));
+            $qualityState = new editor_Models_Quality_RequestState($this->getRequest()->getParam('qualities'));
+            $filter->setQualityFilter($qualityState, $this->session->taskGuid);
         }
     }
-    /**
-     * Converts the seperately sent qualities filter to "normal" filter values
-     * @param string $filter
-     */
-    private function addQualitiesFilter(editor_Models_Filter_SegmentSpecific $filter, string $qualities){
-        // example for a typical quality filter as set in the frontend:
-        // "term:transNotFound,term:transNotDefined,term:supersededTerm,qm:qm_4,qm:qm_2,mqm:mqm_4,internal:internal_tags_missing"
-        $catsByType = [];
-        $qmIds = [];
-        foreach(explode(',', $qualities) as $quality){
-            list($type, $category) = explode(':', $quality);
-            if($type == editor_Segment_Tag::TYPE_QM){
-                // the qm-category is assembled as 'qm_'.$qmId
-                list($prefix, $qmId) = explode('_', $category);
-                $qmIds[] = $qmId;
-            } else {
-                if(!array_key_exists($type, $catsByType)){
-                    $catsByType[$type] = [];
-                }
-                $catsByType[$type][] = $category;
-            }
-        }
-        $filter->setQualityFilter(
-            editor_Models_Db_SegmentQuality::getSegmentIdsForQualityFilter($catsByType, $this->session->taskGuid),
-            $qmIds);
-    }    
     /**
      * initiates the internal SegmentFieldManager
      * @param string $taskGuid
@@ -548,6 +523,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             }
             //search for the img tag, get the data and remove it
             $regex = '#<img[^>]+class="duplicatesavecheck"[^>]+data-segmentid="([0-9]+)" data-fieldname="([^"]+)"[^>]*>#';
+            $match = [];
             if(! preg_match($regex, $value, $match)) {
                 continue;
             }

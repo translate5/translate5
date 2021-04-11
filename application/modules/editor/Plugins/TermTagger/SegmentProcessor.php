@@ -56,7 +56,7 @@ class editor_Plugins_TermTagger_SegmentProcessor {
      * @param editor_Segment_Tags $tags
      */
     public static function findAndAddQualitiesInTags(editor_Segment_Tags $tags){
-        $type = editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE;
+        $type = editor_Plugins_TermTagger_Tag::TYPE;
         foreach($tags->getTagsByType($type) as $termTag){
             if($termTag->hasCategory()){
                 $tags->addQualityByTag($termTag);
@@ -122,7 +122,7 @@ class editor_Plugins_TermTagger_SegmentProcessor {
                 // save the tags, either to the tags-model or back to the segment if configured
                 if($doSaveTags){
                     if($this->processingMode == editor_Segment_Processing::IMPORT){
-                        $tags->save(editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE);
+                        $tags->save(editor_Plugins_TermTagger_Tag::TYPE);
                         $tags->saveQualities();
                     } else {
                         $tags->flush();

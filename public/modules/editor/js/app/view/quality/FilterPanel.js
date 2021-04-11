@@ -35,6 +35,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
     extend: 'Ext.tree.Panel',
     requires: [
         'Editor.view.quality.FilterPanelController',
+        'Editor.store.quality.Filter'
     ],    
     controller: 'qualityFilterPanel',
     alias: 'widget.qualityFilterPanel',
@@ -52,6 +53,11 @@ Ext.define('Editor.view.quality.FilterPanel', {
         beforecheckchange: 'onBeforeCheckChange',
         checkchange: 'onCheckChange',
         removed: 'onRemoved'
+    },
+    strings: {
+        modeAll: '#UT#Alle zeigen',
+        modeErrors: '#UT#Nur Fehler',
+        modeFalsePositives: '#UT#Nur Falsch-Positive'
     },
     initConfig: function(instanceConfig) {
         var me = this, config = {
@@ -72,7 +78,44 @@ Ext.define('Editor.view.quality.FilterPanel', {
                 },
                 sortable: true,
                 flex: 1
-            }]                
+            }],
+            dockedItems: [{
+                xtype: 'toolbar',
+                dock: 'top',
+                items: [
+                    {
+                        xtype: 'combo',
+                        displayField: 'text',
+                        valueField: 'mode',
+                        queryMode:'local',
+                        forceSelection: true,
+                        // selectOnFocus: true,
+                        value: 'all',
+                        listeners:{
+                            change: 'onFilterModeChanged'
+                        },
+                        store: Ext.create('Ext.data.Store', {
+                            fields: [ 'text', 'mode' ],
+                            data : [
+                                { 'text': me.strings.modeAll, 'mode': 'all' },
+                                { 'text': me.strings.modeErrors, 'mode': 'error' },
+                                { 'text': me.strings.modeFalsePositives, 'mode': 'falsepositive' }
+                            ]
+                        })
+                    }
+                ]
+            },{
+                // TODO: this will become the UI to refresh the qualities
+                xtype: 'toolbar',
+                dock: 'bottom',
+                hidden: true,
+                items: [
+                    {
+                        xtype: 'button',
+                        text: 'JUST A DUMMY'
+                    }
+                ]
+            }]
         };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
@@ -92,7 +135,6 @@ Ext.define('Editor.view.quality.FilterPanel', {
         this.callParent(arguments);
     },
     */
-    // since we do update the rows manually we do not want a dirty-marker ... an API to set an item to not be dirty would be better
     /*
     viewConfig:{
         markDirty: false

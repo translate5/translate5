@@ -248,8 +248,12 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.quality.statistics.Tree.prototype.treepanel_text = '<?php echo $this->translate->_('Fehlertyp');?>';
   	Editor.view.quality.statistics.Tree.prototype.treepanel_totalTotal = '<?php echo $this->translate->_('Gesamt');?>';
   	Editor.view.quality.statistics.Tree.prototype.treepanel_total = '<?php echo $this->translate->_('Summe');?>';
-  	
   	Editor.view.quality.FilterPanel.prototype.title = '<?php echo $this->translate->_('Qualitätssicherung');?>';
+  	Editor.view.quality.FilterPanel.prototype.strings = {
+		modeAll: '<?php echo $this->translate->_('Alle zeigen');?>',
+		modeErrors: '<?php echo $this->translate->_('Nur Fehler');?>',
+		modeFalsePositives: '<?php echo $this->translate->_('Nur Falsch-Positive');?>'
+	};
   	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('MQM');?>';
   	Editor.view.quality.mqm.Fieldset.prototype.strings = {
 		severityLabel: '<?php echo $this->translate->_('Gewichtung');?>',
@@ -260,7 +264,7 @@ Ext.define('Editor.controller.Localizer', {
     	buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
     	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
     };
-    Editor.view.quality.SegmentQualities.prototype.title = '<?php echo $this->translate->_('QA: Falsch Positive');?>';
+    Editor.view.quality.SegmentQualities.prototype.title = '<?php echo $this->translate->_('QA: Falsch-Positive');?>';
     
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';

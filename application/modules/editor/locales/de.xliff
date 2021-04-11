@@ -1893,9 +1893,11 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='RGF0ZWllbiB1bmQgUUE='><source>Dateien und QA</source><target>Dateien und QA</target></trans-unit>
 <trans-unit id='UUE='><source>QA</source><target>QA</target></trans-unit>
 <trans-unit id='UXVhbGl0w6R0c3NpY2hlcnVuZw=='><source>Qualitätssicherung</source><target>Qualitätssicherung</target></trans-unit>
+<trans-unit id='QWxsZSB6ZWlnZW4='><source>Alle zeigen</source><target>Alle zeigen</target></trans-unit>
+<trans-unit id='TnVyIEZlaGxlcg=='><source>Nur Fehler</source><target>Nur Fehler</target></trans-unit>
+<trans-unit id='TnVyIEZhbHNjaC1Qb3NpdGl2ZQ=='><source>Nur Falsch-Positive</source><target>Nur Falsch-Positive</target></trans-unit>
 <trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>Alle Kategorien</target></trans-unit>
-<trans-unit id='UUE6IEZhbHNjaCBQb3NpdGl2ZQ=='><source>QA: Falsch Positive</source><target>QA: Falsch Positive</target></trans-unit>
-
+<trans-unit id='UUE6IEZhbHNjaC1Qb3NpdGl2ZQ=='><source>QA: Falsch-Positive</source><target>QA: Falsch-Positive</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>
 <trans-unit id='Q29udGVudA=='><source>Content</source><target>Content</target></trans-unit>
 <trans-unit id='U3R5bGU='><source>Style</source><target>Style</target></trans-unit>
