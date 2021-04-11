@@ -39,11 +39,9 @@
  */
 class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider {
 
-    /**
-     * Using the internal tag type
-     * @var string
-     */
     protected static $type = editor_Segment_Tag::TYPE_MQM;
+    
+    protected static $segmentTagClass = 'editor_Segment_Mqm_Tag';
     
     /**
      * 

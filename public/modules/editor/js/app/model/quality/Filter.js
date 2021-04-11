@@ -37,7 +37,7 @@ Ext.define('Editor.model.quality.Filter', {
         { name:'qcount', type:'int' },
         { name:'qcategory', type:'string' },
         { name:'qroot', type:'boolean' },
-        { name:'qchecked', type:'boolean' },
+        { name:'qcomplete', type:'boolean' },
         { name:'segmentIds' }
     ],
     getSegmentIds: function(){

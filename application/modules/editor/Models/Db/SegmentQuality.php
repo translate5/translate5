@@ -94,26 +94,30 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
     }
     /**
      * Generates a list of segmentIds to be used as filter in the segment controller's quality filtering
-     * @param array $filter: a structure like ['mqm' => ['mqm_1', 'mqm_3], 'term' => ['term_superseded']]
+     * @param editor_Models_Quality_RequestState $state
      * @param string $taskGuid
      * @return int[]
      */
-    public static function getSegmentIdsForQualityFilter(array $filter, string $taskGuid) : array {
+    public static function getSegmentIdsForQualityFilter(editor_Models_Quality_RequestState $state, string $taskGuid) : array {
         $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
         /* @var $table editor_Models_Db_SegmentQuality */
         $adapter = $table->getAdapter();
-        $nested = $table->select();
-        foreach($filter as $type => $categories){
-            $condition = $adapter->quoteInto('type = ?', $type).' AND ';
-            $condition .= (count($categories) == 1) ? $adapter->quoteInto('category = ?', $categories[0]) : $adapter->quoteInto('category IN (?)', $categories);
-            $nested->orWhere($condition);
-        }
-        $nested = $nested->getPart(Zend_Db_Select::WHERE);
-        
         $select = $table->select()
             ->from($table->getName(), ['segmentId'])
-            ->where('taskGuid = ?', $taskGuid)
-            ->where(implode(' ',$nested));
+            ->where('taskGuid = ?', $taskGuid);
+        if($state->hasCheckedCategoriesByType()){
+            $nested = $table->select();
+            foreach($state->getCheckedCategoriesByType() as $type => $categories){
+                $condition = $adapter->quoteInto('type = ?', $type).' AND ';
+                $condition .= (count($categories) == 1) ? $adapter->quoteInto('category = ?', $categories[0]) : $adapter->quoteInto('category IN (?)', $categories);
+                $nested->orWhere($condition);
+            }
+            $select->where(implode(' ', $nested->getPart(Zend_Db_Select::WHERE)));
+            // false positives only if filtered at all
+            if($state->hasFalsePositiveRestriction()){
+                $select->where('falsePositive = ?', $state->getFalsePositiveRestriction(), Zend_Db::INT_TYPE);
+            }
+        }
         $segmentIds = [];
         foreach($table->fetchAll($select, 'segmentId')->toArray() as $row){
             $segmentIds[] = $row['segmentId'];
@@ -135,20 +139,21 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param string|array $types
      * @param bool $typesIsBlacklist
      * @param string|array $categories
+     * @param int $falsePositive
      * @param string|array $order
      * @return Zend_Db_Table_Rowset_Abstract
      */
-    public function fetchFiltered(string $taskGuid=NULL, $segmentIds=NULL, string $field=NULL, $types=NULL, bool $typesIsBlacklist=false, $categories=NULL, $order=NULL) : Zend_Db_Table_Rowset_Abstract {
+    public function fetchFiltered(string $taskGuid=NULL, $segmentIds=NULL, string $field=NULL, $types=NULL, bool $typesIsBlacklist=false, $categories=NULL, int $falsePositive=NULL, $order=NULL) : Zend_Db_Table_Rowset_Abstract {
         $select = $this->select();
         if(!empty($taskGuid)){
             $select->where('taskGuid = ?', $taskGuid);
         }
         if($segmentIds !== NULL){
             if(is_array($segmentIds) && count($segmentIds) > 1){
-                $select->where('segmentId IN (?)', $segmentIds);
+                $select->where('segmentId IN (?)', $segmentIds, Zend_Db::INT_TYPE);
             } else if(!is_array($segmentIds) || count($segmentIds) == 1){
                 $segmentId = is_array($segmentIds) ? $segmentIds[0] : $segmentIds;
-                $select->where('segmentId = ?', $segmentId);
+                $select->where('segmentId = ?', $segmentId, Zend_Db::INT_TYPE);
             }
         }
         if($field != NULL){
@@ -171,6 +176,9 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
                 $category = is_array($categories) ? $categories[0] : $categories;
                 $select->where('category = ?', $category);
             }
+        }
+        if($falsePositive !== NULL){
+            $select->where('falsePositive = ?', $falsePositive, Zend_Db::INT_TYPE);
         }
         if($order == NULL){
             $order = [ 'type ASC', 'category ASC' ];

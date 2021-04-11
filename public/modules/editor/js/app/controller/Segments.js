@@ -263,13 +263,15 @@ Ext.define('Editor.controller.Segments', {
     var me = this,
         store = me.getSegmentsStore(),
         grid = me.getSegmentGrid(),
-        filters = me.getSegmentGrid().filters;
+        filters = me.getSegmentGrid().filters,
+        qualityPanel = me.getQualityFilterPanel();
     grid.selModel.deselectAll();
     me.clearSegmentSort();
     // reset the quality filter and uncheck any checked qualities
     store.setQualityFilter('');
-    me.getQualityFilterPanel().uncheckAll();
-    
+    if(qualityPanel){
+        qualityPanel.uncheckAll();
+    }
     store.removeAll();
     if(store.getFilters().length > 0){
       //reloading of the store is caused by clearFilter call

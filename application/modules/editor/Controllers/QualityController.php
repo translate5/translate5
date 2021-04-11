@@ -49,7 +49,7 @@ class editor_QualityController extends ZfExtended_RestController {
      */
     public function indexAction(){
         $task = $this->fetchTask();
-        $view = new editor_Models_Quality_FilterPanelView($task, NULL, true, $this->getRequest()->getParam('checked', NULL));
+        $view = new editor_Models_Quality_FilterPanelView($task, NULL, true, $this->getRequest()->getParam('currentstate', NULL));
         $this->view->text = $task->getTaskGuid();
         $this->view->children = $view->getTree();
         $this->view->metaData = $view->getMetaData();

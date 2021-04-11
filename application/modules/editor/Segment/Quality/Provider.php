@@ -50,6 +50,11 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
      * @var string
      */
     protected static $type = NULL;
+    /**
+     * MUST be set in inheriting classes if there is a related segment tag
+     * @var string
+     */
+    protected static $segmentTagClass = 'editor_Segment_AnyTag';
 
     public function __construct(){
         if(static::$type == NULL){
@@ -172,6 +177,29 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
     }
 
     public function createSegmentTag(int $startIndex, int $endIndex, string $nodeName, array $classNames) : editor_Segment_Tag {
-        return new editor_Segment_AnyTag($startIndex, $endIndex);
+        $className = static::$segmentTagClass;
+        return new $className($startIndex, $endIndex);
+    }
+    
+    public function getTagIndentificationClass() : ?string {
+        if($this->hasSegmentTags()){
+            return $this->createSegmentTag(0, 0, 'span', [])->getIdentificationClass();
+        }
+        return NULL;
+    }
+    
+    public function getTagQualityIdDataName() : ?string {
+        if($this->hasSegmentTags()){
+            return $this->createSegmentTag(0, 0, 'span', [])->getDataNameQualityId();
+        }
+        return NULL;
+    }
+    
+    public function getTagNodeName() : ?string {
+        // Quirk: we must pass a node-name & classes here just to fulfill the interface which is meant to identify the class, those props are usually overwritten in the class
+        if($this->hasSegmentTags()){
+            return $this->createSegmentTag(0, 0, 'span', [])->getName();
+        }
+        return NULL;
     }
 }

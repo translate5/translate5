@@ -62,6 +62,8 @@ final class  editor_Segment_Internal_Tag extends editor_Segment_Tag {
     protected static $type = editor_Segment_Tag::TYPE_INTERNAL;
 
     protected static $nodeName = 'div';
+    
+    protected static $identificationClass = self::CSS_CLASS;
     /**
      * 
      * @var editor_Segment_Internal_ContentTag[]

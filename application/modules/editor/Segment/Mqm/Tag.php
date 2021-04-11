@@ -89,6 +89,8 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     protected static $type = editor_Segment_Tag::TYPE_MQM;
 
     protected static $nodeName = 'img';
+    
+    protected static $identificationClass = self::CSS_CLASS;
     /**
      * QUIRK / TODO AUTO QA: historically, the quality-id was encoded as data-seq
      * @var string

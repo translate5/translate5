@@ -42,4 +42,6 @@ class  editor_Segment_TrackChanges_InsertTag extends editor_Segment_Tag {
     protected static $type = editor_Segment_Tag::TYPE_TRACKCHANGES;
 
     protected static $nodeName = 'ins';
+    
+    protected static $identificationClass = self::CSS_CLASS;
 }

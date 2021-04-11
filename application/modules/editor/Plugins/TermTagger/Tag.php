@@ -35,15 +35,22 @@
 /**
  * Represents a termtagger segment tag
  */
-class  editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
+class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
     
+    /**
+     * Central Key to identify term tags & qualities
+     * @var string
+     */
+    const TYPE = 'term';
     /**
      * The central unique type amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_QualityProvider::$type
      * @var string
      */
-    protected static $type = editor_Plugins_TermTagger_QualityProvider::PROVIDER_TYPE;
+    protected static $type = self::TYPE;
 
     protected static $nodeName = 'div';
+    
+    protected static $identificationClass = self::TYPE;
     
     /**
      * Our css-classes are connected with the category, we must reflect that

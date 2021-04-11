@@ -38,15 +38,5 @@ Ext.define('Editor.store.quality.Segment', {
     autoLoad: false,
     autoSync: false,
     isLoaded: false,
-    pageSize: 0,
-    updateRecordProp:function(id, prop, val){
-        var record = this.getById(id);
-        if(record){
-            record.set(prop, val);
-            record.commit();
-            // this.fireEvent('recordUpdated', record);
-            return true;
-        }
-        return false;
-    },
+    pageSize: 0
 });
