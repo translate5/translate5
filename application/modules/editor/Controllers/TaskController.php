@@ -586,7 +586,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 $this->addDefaultLanguageResources($this->entity);
 
                 //if the current task type is for instant translate pretransaltion, the usage log requires different handling
-                if($this->entity->getTaskType()!==editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE){
+                if($this->entity->isHiddenTask() == false){
                     //update the task usage log for the current task
                     $this->insertTaskUsageLog($this->entity);
                 }
