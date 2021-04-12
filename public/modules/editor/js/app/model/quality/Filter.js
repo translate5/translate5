@@ -57,8 +57,17 @@ Ext.define('Editor.model.quality.Filter', {
     isRubric: function(){
         return (this.get('qcategory') == '' && this.get('qtype') != 'root');
     },
+    isEmptyQuality: function(){
+        return (this.isQuality() && this.get('qcount') == 0);
+    },
     isEmptyRubric: function(){
         return (this.isRubric() && this.get('qtotal') == 0);
+    },
+    isEmpty(){
+        if(this.get('qtype') == 'root' || this.get('qcategory') == ''){
+            return (this.get('qtotal') == 0);
+        }
+        return (this.get('qcount') == 0);
     },
     isIncomplete: function(){
         return (this.get('qcomplete') == false);
@@ -82,7 +91,9 @@ Ext.define('Editor.model.quality.Filter', {
         if(this.childNodes && this.childNodes.length > 0){
             for(var i=0; i < this.childNodes.length; i++){
                 if(!this.childNodes[i].isEmptyRubric()){
-                    this.childNodes[i].set('checked', checked);
+                    if(!this.childNodes[i].isEmptyQuality()){
+                        this.childNodes[i].set('checked', checked);
+                    }
                     this.childNodes[i].propagateCheckedDown(checked);
                 }
             }
@@ -115,7 +126,7 @@ Ext.define('Editor.model.quality.Filter', {
         if(this.childNodes && this.childNodes.length > 0){
             for(var i=0; i < this.childNodes.length; i++){
                 if(!this.childNodes[i].isEmptyRubric() && id !== this.childNodes[i].internalId){
-                    if(!this.childNodes[i].get('checked') || (deep && !this.childNodes[i].allChildrenChecked(deep, id))){
+                    if((!this.childNodes[i].get('checked') && !this.childNodes[i].isEmptyQuality()) || (deep && !this.childNodes[i].allChildrenChecked(deep, id))){
                         return false;
                     }
                 }

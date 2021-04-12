@@ -106,7 +106,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      * Prevents an item being checked when it has no qualities
      */
     onBeforeCheckChange (record, checked, e){
-        if(record.isEmptyRubric()){
+        if(record.isEmpty()){
             return false;
         }
     },
