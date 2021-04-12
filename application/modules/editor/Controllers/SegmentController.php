@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -34,8 +34,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * @var string
      */
     protected $filterClass = 'editor_Models_Filter_SegmentSpecific';
-    
-    
+
+
     /**
      * @var editor_Models_Segment
      */
@@ -49,14 +49,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     protected $_filterTypeMap = [
         'qmId' => ['list' => 'listAsString']
     ];
-    
+
     /***
      * Number to divide the segment duration
      *
      * @var integer
      */
     protected $durationsDivisor=1;
-    
+
     public function preDispatch() {
         parent::preDispatch();
         $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
@@ -69,7 +69,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $filter->setMappings($this->_sortColMap, $this->_filterTypeMap);
         $filter->setSegmentFields(array_keys($this->_sortColMap));
     }
-    
+
     /**
      * initiates the internal SegmentFieldManager
      * @param string $taskGuid
@@ -78,37 +78,37 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     protected function initSegmentFieldManager($taskGuid) {
         return editor_Models_SegmentFieldManager::getForTaskGuid($taskGuid);
     }
-    
+
     public function indexAction() {
         $taskGuid = $this->session->taskGuid;
         $rows = $this->entity->loadByTaskGuid($taskGuid);
         $this->view->rows = $rows;
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
-        
+
         $this->addIsWatchedFlag();
         $this->addFirstEditable();
         $this->addIsFirstFileInfo($taskGuid);
         $this->addJumpToSegmentIndex();
-        
+
         // ----- Specific handling of rows (start) -----
 
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-        
+
         $handleSegmentranges = $this->checkAndGetSegmentsRange($task);
         if (is_array($handleSegmentranges)) {
             $assignedSegments = $handleSegmentranges;
             $handleSegmentranges = true;
         }
-        
+
         // - Anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
         $handleAnonymizeUsers = $task->anonymizeUsers();
         if ($handleAnonymizeUsers) {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
             /* @var $workflowAnonymize editor_Workflow_Anonymize */
         }
-        
+
         if ($handleSegmentranges || $handleAnonymizeUsers) {
             foreach ($this->view->rows as &$row) {
                 if ($handleSegmentranges && $row['editable']) { // a segment that is not editable already must stay not editable!
@@ -119,10 +119,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                 }
             }
         }
-        
+
         // ----- Specific handling of rows (end) -----
     }
-    
+
     protected function setJsSegmentFlags($type, array $qualityFlags) {
         $result = [];
         foreach($qualityFlags as $key => $value){
@@ -134,10 +134,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $flag->label = $this->translate->_($value);
             $result[] = $flag;
         }
-        
+
         $this->view->Php2JsVars()->set($type, $result);
     }
-    
+
     public function nextsegmentsAction() {
         $segmentId = (int) $this->_getParam('segmentId');
         if($this->_getParam('nextFiltered', false) || $this->_getParam('prevFiltered', false)){
@@ -146,7 +146,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->entity->load($segmentId);
         $this->checkTaskGuidAndEditable();
         $result = array();
-        
+
         //load only the requested editable segment
         if($this->_getParam('next', false)) {
             $result['next'] = $this->entity->findSurroundingEditables(true);
@@ -162,7 +162,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         }
         echo Zend_Json::encode((object)$result, Zend_Json::TYPE_OBJECT);
     }
-    
+
     /**
      * returns the index (position) of the requested segment (by segmentId) in the filtered segment list (as it would be given by indexAction)
      * if index is null, that means the segment is not given in the filtered list
@@ -181,26 +181,26 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             throw $e;
         }
         $this->view->segmentNrInTask= $segmentNrInTask;
-        
+
         $this->view->index = $index;
     }
-    
+
     /**
      * returns a list of autoStateIds, belonging to the users role in the currently loaded task
      * is neede for the autostate filter in the frontend
      */
     protected function getUsersAutoStateIds() {
         $sessionUser = new Zend_Session_Namespace('user');
-        
+
         $taskUserAssoc=editor_Models_Loaders_Taskuserassoc::loadByTaskGuid($sessionUser->data->userGuid,$this->session->taskGuid);
-        
+
         if($taskUserAssoc->getIsPmOverride()) {
             $userRole = 'pm';
         }
         else {
             $userRole = $taskUserAssoc->getRole();
         }
-        
+
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         $autoStateMap = $states->getRoleToStateMap();
@@ -209,7 +209,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         }
         return $autoStateMap[$userRole];
     }
-    
+
     /**
      * adds the optional is first of file info to the affected segments
      * @param string $taskGuid
@@ -228,7 +228,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $this->view->rows[$idx]['isFirstofFile'] = true;
         }
     }
-    
+
     /**
      * Adds the first editable segments rowindex for f2 usage in the frontend
      */
@@ -242,7 +242,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             //since we dont use metaData otherwise, we can overwrite it completly:
             $this->view->metaData = new stdClass();
         }
-        
+
         //loop over the loaded segments, if there is an editable use that
         foreach($this->view->rows as $idx => $segment) {
             if($segment['editable']) {
@@ -253,7 +253,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->entity->init($segment);
         $this->view->metaData->firstEditable = $this->entity->findSurroundingEditables(true);
     }
-    
+
     /**
      * For performance Reasons we are calculating the isWatched info this way.
      * A table join is only done if we are filtering for isWatched,
@@ -270,17 +270,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $ids = array_map(function($seg){
             return $seg['id'];
         }, $this->view->rows);
-        
+
         $assoc = ZfExtended_Factory::get('editor_Models_SegmentUserAssoc');
         /* @var $assoc editor_Models_SegmentUserAssoc */
-        
+
         $sessionUser = new Zend_Session_Namespace('user');
         $watched = $assoc->loadIsWatched($ids, $sessionUser->data->userGuid);
         $watchedById = array();
         array_map(function($assoc) use (&$watchedById){
             $watchedById[$assoc['segmentId']] = $assoc['id'];
         }, $watched);
-        
+
         foreach($this->view->rows as &$row) {
             $row['isWatched'] = !empty($watchedById[$row['id']]);
             if($row['isWatched']) {
@@ -307,14 +307,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$task]);
 
         $this->decodePutData();
-        
+
         //set the editing durations for time tracking into the segment object
         settype($this->data->durations, 'object');
         $this->entity->setTimeTrackData($this->data->durations,$this->durationsDivisor);
         $this->convertQmId();
 
         $allowedToChange = array('qmId', 'stateId', 'autoStateId', 'matchRate', 'matchRateType');
-        
+
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
 
         $this->checkPlausibilityOfPut($allowedAlternatesToChange);
@@ -323,12 +323,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
         $this->entity->setUserGuid($sessionUser->data->userGuid);
         $this->entity->setUserName($sessionUser->data->userName);
-        
+
         /* @var $updater editor_Models_Segment_Updater */
         $updater->update($this->entity, $history);
-        
+
         $this->view->rows = $this->entity->getDataObject();
-        
+
         // anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
         if ($task->anonymizeUsers()) {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
@@ -336,48 +336,48 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $row = json_decode(json_encode($this->view->rows), true); // = for anonymizeUserdata(): argument 3 must be of the type array
             $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $row['userGuid'], $row);
         }
-        
+
         //reload the task so the segment finish count is updated
         $task->load($task->getId());
-        
+
         //set the segmentFinishCount so the frontend viewmodel is updated
         //TODO: this should be updated from the websockets
         $this->view->segmentFinishCount=$task->getSegmentFinishCount();
     }
-    
+
     /***
      * Search segment action.
      */
     public function searchAction(){
         $parameters=$this->getAllParams();
-        
+
         //set the default search parameters if no values are given
         $parameters=$this->entity->setDefaultSearchParameters($parameters);
-        
+
         //check if the required search parameters are in the request
         $this->checkRequiredSearchParameters($parameters);
         $parameters['searchField'] =  htmlentities($parameters['searchField'], ENT_XML1);
-        
+
         //check character number limit
         if(!$this->checkSearchStringLength($parameters['searchField'])){
             return;
         }
-        
+
         //find all segments for the search parameters
         $result=$this->entity->search($parameters);
-        
+
         if(!$result|| empty($result)){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
             /* @var $t ZfExtended_Zendoverwrites_Translate */;
             $this->view->message= $t->_('Keine Ergebnisse für die aktuelle Suche!');
             return;
         }
-        
+
         $this->view->rows = $result;
         $this->view->total=count($result);
         $this->view->hasMqm=$this->isMqmTask($parameters['taskGuid']);
     }
-    
+
     /***
      * Replace all search matches and save the new segment content to the database.
      * Return the modified segments
@@ -393,12 +393,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         if($task->getUsageMode()==$task::USAGE_MODE_SIMULTANEOUS){
             throw new editor_Models_SearchAndReplace_Exception('E1192',['task'=>$task]);
         }
-        
+
         //check if the required search parameters are in the request
         $this->checkRequiredSearchParameters($parameters);
         $parameters['searchField'] =  htmlentities($parameters['searchField'], ENT_XML1);
         $parameters['replaceField'] =  htmlentities($parameters['replaceField'], ENT_XML1);
-        
+
         //check if the task has mqm tags
         //replace all is not supported for tasks with mqm
         if($this->isMqmTask($parameters['taskGuid'])){
@@ -406,19 +406,19 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $this->view->hasMqm=true;
             return;
         }
-        
+
         //check character number limit
         if(!$this->checkSearchStringLength($parameters['searchField'])){
             return;
         }
-        
+
         //find all segments for the search parameters
         $results=$this->entity->search($parameters);
-        
+
         $searchInField=$parameters['searchInField'];
         $searchType = $parameters['searchType'] ?? $this->entity::DEFAULT_SEARCH_TYPE;
         $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true') : false;
-        
+
         if(!$results || empty($results)){
             $this->view->message= $t->_('Keine Ergebnisse für die aktuelle Suche!');
             return;
@@ -431,7 +431,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                     $result['id']//segment id
             ]);
             /* @var $replace editor_Models_SearchAndReplace_ReplaceMatchesSegment */
-            
+
             //if the trackchanges are active, setup some trackchanges parameters
             if(isset($parameters['isActiveTrackChanges']) && $parameters['isActiveTrackChanges']){
                 $replace->trackChangeTag->attributeWorkflowstep=$parameters['attributeWorkflowstep'];
@@ -439,35 +439,35 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                 $replace->trackChangeTag->userTrackingId=$parameters['userTrackingId'];
                 $replace->isActiveTrackChanges=$parameters['isActiveTrackChanges'];
             }
-            
+
             //find matches in the html text and replace them
             $replace->replaceText($parameters['searchField'], $parameters['replaceField'],$searchType,$matchCase);
-            
+
             //init the entity
             $this->entity = ZfExtended_Factory::get($this->entityClass);
-            
+
             //set the segment id
             $this->getRequest()->setParam('id', $result['id']);
-            
+
             //create the object for the data parameters
             $ob=new stdClass();
             $ob->$searchInField=$replace->segmentText;
             $ob->autoStateId=999;
-            
+
             //create duration for modefied field
             $duration=new stdClass();
             $duration->$searchInField=$parameters['durations'];
             $ob->durations=$duration;
-            
+
             //set the duration devisor to the number of the results so the duration is splitted equally for each replaced result
             $this->durationsDivisor=$resultsCount;
-            
+
             $this->getRequest()->setParam('data',null);
             $this->getRequest()->setParam('data',json_encode((array)$ob));
-            
+
             //trigger the before put action
             $this->beforeActionEvent('put');
-            
+
             try {
                 // call the put action so the segment is modefied and saved
                 $this->putAction();
@@ -489,22 +489,22 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                     'loadedSegment' => $this->entity->getDataObject(),
                 ]);
             }
-            
+
             //do not return the segment text, it will be loaded by the segments store
             $result[$searchInField]='';
         }
-        
+
         //return the modefied segments
         $this->view->rows = $results;
-        
+
         //TODO: this should be implemented via websokets
         //reload the task and get the lates segmentFinishCount
         $task->loadByTaskGuid($this->entity->getTaskGuid());
         $this->view->segmentFinishCount=$task->getSegmentFinishCount();
-        
+
         $this->view->total=count($results);
     }
-    
+
     /**
      * checks if current put makes sense to save
      * @param array $fieldnames allowed fieldnames to be saved
@@ -531,10 +531,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         if(empty($error)) {
             return;
         }
-        
+
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         /* @var $log ZfExtended_Log */
-        
+
         $logText = 'Error on saving a segment!!! Parts of the content in the PUT request ';
         $logText .= 'delivered the following segmentId(s) and fieldName(s):'."\n";
         $logText .= print_r($error, 1)."\n";
@@ -544,14 +544,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $logText .= 'Actually saved Segment PUT data and data to be saved in DB:'."\n";
         $logText .= print_r($this->data,1)."\n".print_r($this->entity->getDataObject(),1)."\n\n";
         $logText .= 'Content of $_SERVER had been: '.  print_r($_SERVER,true);
-        
+
         $log->logError('Possible Error on saving a segment!', $logText);
-        
+
         $e = new ZfExtended_Exception();
         $e->setMessage('Aufgrund der langsamen Verarbeitung von Javascript im Internet Explorer konnte das Segment nicht korrekt gespeichert werden. Bitte öffnen Sie das Segment nochmals und speichern Sie es erneut. Sollte das Problem bestehen bleiben, drücken Sie bitte F5 und bearbeiten dann das Segment erneut. Vielen Dank!',true);
         throw $e;
     }
-   
+
     /**
      * Applies the import whitespace replacing to the edited user by the content
      * @param array $fieldnames
@@ -570,7 +570,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $this->restMessages->addWarning('Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!');
         }
     }
-    
+
     /**
      * checks if current session taskguid matches to loaded segment taskguid
      * and if the user is allowed to edit the segment at all
@@ -579,14 +579,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      */
     protected function checkTaskGuidAndEditable() {
         $isTaskGuidAndEditable = true;
-        
+
         $session = new Zend_Session_Namespace();
         $editable = $this->entity->getEditable();
 
         if (empty($editable) || $session->taskGuid !== $this->entity->getTaskGuid()) {
             $isTaskGuidAndEditable = false;
         }
-        
+
         if ($isTaskGuidAndEditable && $editable) {
             // if the user can edit only segmentranges, we must also check if s/he is allowed to edit and save this segment
             $sessionUser = new Zend_Session_Namespace('user');
@@ -604,13 +604,13 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                 }
             }
         }
-        
+
         if (!$isTaskGuidAndEditable) {
             //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
     }
-    
+
     /**
      * checks if current task state allows editing
      * @throws ZfExtended_Models_Entity_NoAccessException
@@ -626,7 +626,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         }
         return $task;
     }
-    
+
     protected function isEditable(){
         return empty($this->entity->getEditable());
     }
@@ -640,7 +640,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $this->data->qmId = ';' . join(';', $this->data->qmId) . ';';
         }
     }
-    
+
     public function getAction() {
         $this->entity->load($this->_getParam('id'));
         $session = new Zend_Session_Namespace();
@@ -688,14 +688,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
 
         //Erstellung und Setzen der Nutzdaten:
         $session = new Zend_Session_Namespace();
-        $terms = ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $terms editor_Models_Term */
+        $terms = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $terms editor_Models_Terminology_Models_TermModel */
         $this->view->publicModulePath = APPLICATION_RUNDIR . '/modules/' . Zend_Registry::get('module');
         $this->view->termGroups = $terms->getByTaskGuidAndSegment($session->taskGuid, (int) $this->_getParam('id'));
-        $this->view->termStatMap = editor_Models_Term::getTermStatusMap();
+        $this->view->termStatMap = editor_Models_Terminology_Models_TermModel::getTermStatusMap();
         $this->view->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     }
-    
+
     /**
      * generates a list of available matchratetypes in this task. Mainly for frontend filtering.
      */
@@ -705,42 +705,42 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         /* @var $mv editor_Models_Segment_MaterializedView */
         $db = ZfExtended_Factory::get(get_class($this->entity->db), array(array(), $mv->getName()));
         $sql = $db->select()->from($db, 'matchrateType')->distinct();
-        
+
         echo Zend_Json::encode($db->fetchAll($sql)->toArray(), Zend_Json::TYPE_ARRAY);
     }
-    
+
     /***
      * Check if the search string length is in between 0 and 1024 characters long
      */
     private function checkSearchStringLength($searchField){
-        
+
         $isValid=true;
         if(empty($searchField) && strlen($searchField===0)){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
             /* @var $t ZfExtended_Zendoverwrites_Translate */
-            
+
             $errors = array('searchField' => $t->_('Das Suchfeld ist leer.'));
             $e = new ZfExtended_ValidateException();
             $e->setErrors($errors);
             $this->handleValidateException($e);
             $isValid=false;
         }
-        
+
         $length=strlen(utf8_decode($searchField));
         if($length>1024){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
             /* @var $t ZfExtended_Zendoverwrites_Translate */
-            
+
             $errors = array('searchField' => $t->_('Der Suchbegriff ist zu groß.'));
             $e = new ZfExtended_ValidateException();
             $e->setErrors($errors);
             $this->handleValidateException($e);
             $isValid=false;
         }
-        
+
         return $isValid;
     }
-    
+
     /**
      * Check if the required search parameters are provided
      *
@@ -756,7 +756,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             throw $e;
         }
     }
-    
+
     /***
      * Check if the task contains mqm tags for some of the segments
      * @param string $taskGuid
@@ -767,7 +767,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         /* @var $qms  editor_Models_Qmsubsegments */
         return $qms->hasTaskMqm($taskGuid);
     }
-    
+
     /***
      * Check if the segments range feature is active for the given task. If the feature is not active boolean false will be returned.
      * If the feature is active, the assigned segments as array will be returned.

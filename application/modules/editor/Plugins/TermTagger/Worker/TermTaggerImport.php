@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -34,50 +34,50 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * To much segments are causing timeouts when segments are longer
      */
     const SEGMENTS_PER_CALL = 5;
-    
+
     /**
      * Defines the timeout in seconds how long a termtag call with multiple segments may need
      * @var integer
      */
     const TIMEOUT_REQUEST = 300;
-    
+
     /**
      * Defines the timeout in seconds how long the upload and parse request of a TBX may need
      * @var integer
      */
     const TIMEOUT_TBXIMPORT = 600;
-    
+
     /**
      * Logger Domain
      * @var string
      */
     const LOGGER_DOMAIN = 'editor.terminology.import';
-    
+
     /**
      * Fieldname of the source-field of this task
      * @var string
      */
     private $sourceFieldName = '';
-        
-    
+
+
     /**
      * Flag to use the target original field for tagging instead edited
      * @var boolean
      */
     private $useTargetOriginal = false;
-    
+
     /**
      * Flag to keep target original field untouched, must be disabled for import (default false)
      * Must be enabled for (true) for retagging segments!
      * @var boolean
      */
     private $keepTargetOriginal = false;
-    
+
     public function __construct() {
         parent::__construct();
         $this->logger = Zend_Registry::get('logger')->cloneMe(self::LOGGER_DOMAIN);
     }
-    
+
     /**
      * Special Paramters:
      *
@@ -110,10 +110,10 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $parameters['useTargetOriginal'] = $this->useTargetOriginal;
         $this->keepTargetOriginal = !empty($parameters['keepTargetOriginal']);
         $parameters['keepTargetOriginal'] = $this->keepTargetOriginal;
-        
+
         return parent::init($taskGuid, $parameters);
     }
-    
+
     /**
      * Method for CallBack Workers to reset the termtag state
      * @param string $taskGuid
@@ -123,7 +123,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         /* @var $segMetaDb editor_Models_Db_SegmentMeta */
         $segMetaDb->update(['termtagState' => self::SEGMENT_STATE_UNTAGGED], ['taskGuid = ?' => $taskGuid]);
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::run()
@@ -131,23 +131,23 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     public function run() {
         return parent::run();
     }
-    
+
     /**
      * Info: the worker progres will be updated after the worker state is set to done
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        
+
         // Equal Languages from source & target: prevent the termtagger to process and add further workers
         if(static::isSourceAndTargetLanguageEqual($this->task)){
             $this->logger->error('E1326', 'TermTagger can not work when source and target language are equal.', ['task' => $this->task]);
             return false;
         }
-        
+
         $taskGuid = $this->workerModel->getTaskGuid();
         $segmentIds = $this->loadUntaggedSegmentIds();
-        
+
         if (empty($segmentIds)) {
             $segmentIds = $this->loadNextRetagSegmentId();
             $state = self::SEGMENT_STATE_DEFECT;
@@ -156,15 +156,15 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                 return false;
             }
         }
-        
+
         $serverCommunication = $this->fillServerCommunication($segmentIds);
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        
+
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain(), self::TIMEOUT_REQUEST, self::TIMEOUT_TBXIMPORT]);
         /* @var $termTagger editor_Plugins_TermTagger_Service */
-        
+
         $slot = $this->workerModel->getSlot();
-        if(empty($slot)) {
+        if (empty($slot)) {
             return false;
         }
         try {
@@ -207,16 +207,16 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                 return false;
             }
         }
-        
+
         // initialize an new worker-queue-entry to continue 'chained'-import-process
         $this->createNewWorkerChainEntry($taskGuid);
     }
-    
-    
+
+
     private function createNewWorkerChainEntry($taskGuid) {
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
-        
+
         if (!$worker->init($taskGuid, $this->workerModel->getParameters())) {
             $this->logger->error('E1122', 'TermTaggerImport Worker can not be initialized!', [
                 'taskGuid' => $taskGuid,
@@ -226,7 +226,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         }
         $worker->queue($this->workerModel->getParentId());
     }
-    
+
     /**
      * Loads a list of segmentIds where terms are not tagged yet.
      * @return array
@@ -234,7 +234,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     private function loadUntaggedSegmentIds(): array {
         $db = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
         /* @var $db editor_Models_Db_SegmentMeta */
-        
+
         $db->getAdapter()->beginTransaction();
         $sql = $db->select()
         ->from($db, ['segmentId'])
@@ -245,21 +245,21 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         ->forUpdate(true);
         $segmentIds = $db->fetchAll($sql)->toArray();
         $segmentIds = array_column($segmentIds, 'segmentId');
-        
+
         if(empty($segmentIds)) {
             $db->getAdapter()->commit();
             return $segmentIds;
         }
-        
+
         $db->update(['termtagState' => $this::SEGMENT_STATE_INPROGRESS], [
             'taskGuid = ?' => $this->task->getTaskGuid(),
             'segmentId in (?)' => $segmentIds,
         ]);
         $db->getAdapter()->commit();
-        
+
         return $segmentIds;
     }
-    
+
     /**
      * returns a list with the next segmentId where terms are marked as to be "retag"ged
      * returns only one segment since this segments has to be single tagged
@@ -271,16 +271,16 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         // get list of untagged segments
         $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
         /* @var $dbMeta editor_Models_Db_SegmentMeta */
-        
+
         $sql = $dbMeta->select()
         ->from($dbMeta, ['segmentId'])
         ->where('taskGuid = ?', $this->task->getTaskGuid())
         ->where('termtagState IS NULL OR termtagState = ?', [$this::SEGMENT_STATE_RETAG])
         ->limit(1);
-        
+
         return array_column($dbMeta->fetchAll($sql)->toArray(), 'segmentId');
     }
-    
+
     /**
      * Creates a ServerCommunication-Object initialized with $task
      * inclusive all field of alls segments provided in $segmentIds
@@ -289,23 +289,23 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      * @return editor_Plugins_TermTagger_Service_ServerCommunication
      */
     private function fillServerCommunication (array $segmentIds) {
-        
+
         $serverCommunication = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service_ServerCommunication', array($this->task));
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
-        
+
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         /* @var $fieldManager editor_Models_SegmentFieldManager */
         $fieldManager->initFields($this->workerModel->getTaskGuid());
         $segmentFields = $fieldManager->getFieldList();
         $this->sourceFieldName = $fieldManager->getFirstSourceName();
-        
+
         foreach ($segmentIds as $segmentId) {
             $segment = ZfExtended_Factory::get('editor_Models_Segment');
             /* @var $segment editor_Models_Segment */
             $segment->load($segmentId);
-            
+
             $sourceText = $segment->get($this->sourceFieldName);
-            
+
             foreach ($segmentFields as $field) {
                 if($field->type != editor_Models_SegmentField::TYPE_TARGET || !$field->editable) {
                     continue;
@@ -314,10 +314,10 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                 $serverCommunication->addSegment($segment->getId(), $field->name, $sourceText, $targetText);
             }
         }
-        
+
         return $serverCommunication;
     }
-    
+
     /**
      * Save TermTagged-segments for $task povided in $segments
      *
@@ -327,19 +327,19 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         /* @var $fieldManager editor_Models_SegmentFieldManager */
         $fieldManager->initFields($this->workerModel->getTaskGuid());
-        
+
         $responses = $this->groupResponseById($segments);
-        
+
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         foreach ($responses as $segmentId => $responseGroup) {
             $segment->load($segmentId);
-        
+
             $segment->set($this->sourceFieldName, $responseGroup[0]->source);
             if ($this->task->getEnableSourceEditing()) {
                 $segment->set($fieldManager->getEditIndex($this->sourceFieldName), $responseGroup[0]->source);
             }
-        
+
             foreach ($responseGroup as $response) {
                 if(! $this->keepTargetOriginal) {
                     $segment->set($response->field, $response->target);
@@ -348,14 +348,14 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                     $segment->set($fieldManager->getEditIndex($response->field), $response->target);
                 }
             }
-        
+
             $segment->save();
-        
+
             $segment->meta()->setTermtagState($this::SEGMENT_STATE_TAGGED);
             $segment->meta()->save();
         }
     }
-    
+
     /**
      * sets the meta TermtagState of the given segment ids to SEGMENT_STATE_RETAG
      * @param editor_Models_Task $task
@@ -370,7 +370,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             'segmentId in (?)' => $segments,
         ]);
     }
-    
+
     /**
      * In case of multiple target-fields in one segment, there are multiple responses for the same segment.
      * This function groups this different responses under the same segmentId
@@ -380,40 +380,40 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      */
     private function groupResponseById($responses) {
         $return = array();
-        
+
         foreach ($responses as $response) {
             $return[$response->id][] = $response;
         }
-        
+
         return $return;
     }
-    
+
     private function reportDefectSegments($taskGuid) {
         // get list of defect segments
         $dbMeta = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
         /* @var $dbMeta editor_Models_Db_SegmentMeta */
-        
+
         $sql = $dbMeta->select()
         ->from($dbMeta, ['segmentId', 'termtagState'])
         ->where('taskGuid = ?', $this->task->getTaskGuid())
         ->where('termtagState IS NULL OR termtagState IN (?)', [$this::SEGMENT_STATE_DEFECT, $this::SEGMENT_STATE_OVERSIZE]);
-        
+
         $defectSegments = $dbMeta->fetchAll($sql)->toArray();
-        
+
         if (empty($defectSegments)) {
             return;
         }
-        
+
         $segmentsToLog = [];
         foreach ($defectSegments as $defectsegment) {
             $segment = ZfExtended_Factory::get('editor_Models_Segment');
             /* @var $segment editor_Models_Segment */
             $segment->load($defectsegment['segmentId']);
-            
+
             $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
             /* @var $fieldManager editor_Models_SegmentFieldManager */
             $fieldManager->initFields($taskGuid);
-            
+
             if($defectsegment['termtagState'] == $this::SEGMENT_STATE_DEFECT) {
                 $segmentsToLog[] = $segment->getSegmentNrInTask().'; Source-Text: '.strip_tags($segment->get($fieldManager->getFirstSourceName()));
             }
@@ -421,13 +421,13 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                 $segmentsToLog[] = $segment->getSegmentNrInTask().': Segment to long for TermTagger';
             }
         }
-        
+
         $this->logger->warn('E1123', 'Some segments could not be tagged by the TermTagger.', [
             'task' => $this->task,
             'untaggableSegments' => $segmentsToLog,
         ]);
     }
-    
+
     /***
      * Term tagging takes approximately 15 % of the import time
      * {@inheritDoc}

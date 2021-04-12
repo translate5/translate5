@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_Task_AbstractWorker {
-    
+
     /**
      * This check prevents the termtagger to process any segments to avoid problems with hanging termtagger
      * see TRANSLATE-2373
@@ -36,9 +36,9 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
     public static function isSourceAndTargetLanguageEqual(editor_Models_Task $task) : bool {
         return ($task->getSourceLang() === $task->getTargetLang());
     }
-    
+
     const TERMTAGGER_DOWN_CACHE_KEY = 'TermTaggerDownList';
-    
+
     /**
      * overwrites $this->workerModel->maxLifetime
      */
@@ -49,7 +49,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
      * @var string
      */
     protected $onlyOncePerTask = false;
-    
+
     /**
      * resourcePool for the different TermTagger-Operations;
      * Possible Values: $this->allowdResourcePools = array('default', 'gui', 'import');
@@ -61,13 +61,13 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
      * @var array(strings)
      */
     protected static $allowedResourcePools = array('default', 'gui', 'import');
-    
+
     /**
      * Praefix for workers resource-name
      * @var string
     */
     protected static $praefixResourceName = 'TermTagger_';
-    
+
     /**
      * Values for termtagging segment-states
      * @var array(strings)
@@ -80,7 +80,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
     const SEGMENT_STATE_OVERSIZE = 'oversized';
     const SEGMENT_STATE_IGNORE = 'ignore';
     //const SEGMENT_STATE_TARGETNOTFOUND = 'targetnotfound';
-    
+
     /**
      * Stores the init-paramters from the initial call
      * @var array
@@ -91,35 +91,35 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
      * @var editor_Models_Task
      */
     protected $task;
-    
+
     /**
      * @var editor_Plugins_TermTagger_RecalcTransFound
      */
     protected $markTransFound;
-    
+
     /**
      * @var ZfExtended_Logger
      */
     protected $logger;
-    
+
     /**
      * @var Zend_Cache_Core
      */
     protected $memCache;
-    
+
     public function init($taskGuid = NULL, $parameters = array()) {
         $return = parent::init($taskGuid, $parameters);
-        
+
         $taskGuid = $this->workerModel->getTaskGuid();
         $this->task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $this->task->loadByTaskGuid($taskGuid);
         $this->markTransFound = ZfExtended_Factory::get('editor_Plugins_TermTagger_RecalcTransFound', array($this->task));
         $this->memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
-        
+
         return $return;
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -140,9 +140,9 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
         $workerCountToStart = 0;
 
         $usedSlots = count($this->workerModel->getListSlotsCount(self::$resourceName));
-               
+
         $availableWorkerSlots = count($this->getAvailableSlots($this->resourcePool));
-        
+
         while(($usedSlots+$workerCountToStart)<($availableWorkerSlots+1)){
             $workerCountToStart++;
         }
@@ -160,7 +160,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
         if($workerCountToStart > 1 && static::isSourceAndTargetLanguageEqual($this->task)){
             $workerCountToStart = 1;
         }
-        
+
         for($i=0;$i<$workerCountToStart;$i++){
             $this->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
             parent::queue($parentId, $state);
@@ -184,10 +184,11 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
       string(149) "Il nuovo dépliant PRODUCT INFO <div title="" class="term admittedTerm transNotFound stemmed" data-tbxid="term_00_1_IT_1_08795">motori</div>"),
        another object, ...
      *
-     * @return stdClass $segments
+     * @return array
     }
      */
-    protected function markTransFound(array $segments) {
+    protected function markTransFound(array $segments): array
+    {
         return $this->markTransFound->recalcList($segments);
     }
 
@@ -198,8 +199,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
     protected function calculateDirectSlot() {
         return $this->calculateSlot($this->resourcePool);
     }
-    
-    
+
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::calculateQueuedSlot()
@@ -207,8 +208,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
     protected function calculateQueuedSlot() {
         return $this->calculateSlot($this->resourcePool);
     }
-    
-    
+
+
     /**
      * Calculates the resource and slot for the given $resourcePool
      * Some kind of "load-balancing" is used in calculations so every resource/slot-combination is used in the same weight
@@ -219,25 +220,25 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
     private function calculateSlot($resourcePool = 'default') {
         // detect defined slots for the resourcePool
         $availableSlots = $this->getAvailableSlots($resourcePool);
-        
+
         $usedSlots = $this->workerModel->getListSlotsCount(self::$resourceName, $availableSlots);
-        
+
         if(empty($availableSlots)) {
             return ['resource' => self::$resourceName, 'slot' => null];
         }
-        
+
         // all slotes in use
         if (count($usedSlots) == count($availableSlots)) {
             // take first slot in list of usedSlots which is the one with the min. number of counts
             $return = array('resource' => self::$resourceName, 'slot' => $usedSlots[0]['slot']);
             return $return;
         }
-        
+
         // some slots in use
         if (!empty($usedSlots)) {
             // select a random slot of the unused slots
             $unusedSlots = $availableSlots;
-            
+
             foreach ($usedSlots as $usedSlot) {
                 $key = array_search($usedSlot['slot'], $unusedSlots);
                 if($key!==false) {
@@ -245,17 +246,17 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
                 }
             }
             $unusedSlots = array_values($unusedSlots);
-            
+
             $return = array('resource' => self::$resourceName, 'slot' => $unusedSlots[array_rand($unusedSlots)]);
             return $return;
         }
-        
+
         // no slot in use
         $return = array('resource' => self::$resourceName, 'slot' => $availableSlots[array_rand($availableSlots)]);
         return $return;
     }
-    
-    
+
+
     /**
      *
      * @return array
@@ -263,39 +264,39 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
     protected function getAvailableSlots($resourcePool = 'default') {
         $config = Zend_Registry::get('config');
         $url = $config->runtimeOptions->termTagger->url;
-        
+
         switch ($resourcePool) {
             case 'gui':
                 $return = $url->gui->toArray();
                 break;
-            
+
             case 'import':
                 $return = $url->import->toArray();
                 break;
-            
+
             case 'default':
             default:
                 $return = $url->default->toArray();
                 break;
         }
-        
-        
+
+
         //remove not available termtaggers from configured list
         $downList = $this->memCache->load(self::TERMTAGGER_DOWN_CACHE_KEY);
-        
+
         if(!empty($downList) && is_array($downList)) {
             $return = array_diff($return, $downList);
         }
-        
+
         // no slots for this resourcePool defined
         if (empty($return) && $resourcePool != 'default') {
             // calculate slot from default resourcePool
             return $this->getAvailableSlots();
         }
-        
+
         return $return;
     }
-    
+
     /**
      * disables the given slot (URL) via memcache.
      * @param string $url
@@ -308,14 +309,14 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
         $list[] = $url;
         $this->memCache->save($list, self::TERMTAGGER_DOWN_CACHE_KEY);
     }
-    
+
     /**
      * @return SplFileInfo
      */
     protected function getTbxFilename() {
         return new SplFileInfo(editor_Models_Import_TermListParser_Tbx::getTbxPath($this->task));
     }
-    
+
     /**
      * Checks if tbx-file with hash $tbxHash is loaded on the TermTagger-server behind $url.
      * If not already loaded, tries to load the tbx-file from the task.
@@ -344,7 +345,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
             throw $e;
         }
     }
-    
+
     /**
      * returns the TBX string to be loaded into the termtagger
      * @throws editor_Plugins_TermTagger_Exception_Open
@@ -363,7 +364,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
             throw new editor_Plugins_TermTagger_Exception_Open('E1116', [], $e);
         }
     }
-    
+
     /***
      * Update the progres based on the tagged field in lek segments meta
      * {@inheritDoc}

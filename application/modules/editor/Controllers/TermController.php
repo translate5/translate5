@@ -78,7 +78,7 @@ class editor_TermController extends ZfExtended_RestController
         //todo: Sinisa, handle new TransacGrp
         //handle the term transac group attributes (modification/creation)
         /* @var $transacGrp editor_Models_Terminology_Models_TransacgrpModel */
-        $transacGrp->handleTransacGroup($this->entity);
+//        $transacGrp->handleTransacGroup($this->entity);
 
         $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
         /* @var $attribute editor_Models_Terminology_Models_AttributeModel */
@@ -154,8 +154,8 @@ class editor_TermController extends ZfExtended_RestController
             // todo: Sinisa, handle TransacGrp
             $transacGrp = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
             /* @var $transacGrp editor_Models_Terminology_Models_TransacgrpModel */
-            $transacGrp->createTransacGroup($entry,'creation');
-            $transacGrp->createTransacGroup($entry,'modification');
+//            $transacGrp->createTransacGroup($entry,'creation');
+//            $transacGrp->createTransacGroup($entry,'modification');
 
             $this->entity->setTermEntryId($entry->getId());
             $this->entity->setTermEntryTbxId($entry->getTermEntryTbxId());
@@ -184,11 +184,17 @@ class editor_TermController extends ZfExtended_RestController
     protected function convertToLanguageId()
     {
         //ignoring if already integer like value or empty
-        if (empty($this->data->language)) {
+        if (empty($this->data->language) && empty($this->data->languageId)) {
             return;
         }
 
-        $languages = explode(',', $this->data->language);
+        //ignoring if already integer like value or empty
+        if (!empty($this->data->language)) {
+            $languages = explode(',', $this->data->language);
+        } else {
+            $languages = explode(',', $this->data->languageId);
+        }
+
 
         if (empty($languages)) {
            return;
@@ -216,6 +222,7 @@ class editor_TermController extends ZfExtended_RestController
             return;
         }
         $this->data->language = $language->getId();
+        $this->data->languageId = $language->getId();
     }
 
     /**
@@ -244,12 +251,13 @@ class editor_TermController extends ZfExtended_RestController
         }
         if (empty($this->data->mid)) {
             $this->entity->setTermId(ZfExtended_Utils::uuid());
+            $this->entity->setGuid(ZfExtended_Utils::uuid());
         }
         $entry = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
         /* @var $entry editor_Models_Terminology_Models_TermEntryModel */
         if (empty($this->data->termEntryId)) {
             $entry->setCollectionId($this->data->collectionId);
-            $entry->setTermEntryTbxId(ZfExtended_Utils::uuid());
+            $entry->setTermEntryTbxId($entry->getEntryGuid());
             $entry->setIsProposal(true);
             $entry->setId($entry->save());
 
@@ -258,6 +266,8 @@ class editor_TermController extends ZfExtended_RestController
         } else {
             //when the term entry is provided, load the term entry and set the term groupId
             //this is the case when new term is proposed in the allready exisitn termEntry
+            $this->entity->setTermEntryTbxId($entry->getTermEntryTbxId());
+
             $entry->load($this->data->termEntryId);
             $this->entity->setTermEntryTbxId($entry->getTermEntryTbxId());
         }
@@ -490,6 +500,7 @@ class editor_TermController extends ZfExtended_RestController
         $term->setTermEntryTbxId($this->entity->getTermEntryTbxId());
         $term->setCollectionId($this->entity->getCollectionId());
         $term->setTermEntryId($this->entity->getTermEntryId());
+        $term->setGuid($this->entity->getGuid());
         $term->setUserGuid($this->entity->getUserGuid());
         $term->setUserName($this->entity->getUserName());
         $term->setCreated(null);

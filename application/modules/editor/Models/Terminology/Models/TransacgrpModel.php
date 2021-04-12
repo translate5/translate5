@@ -132,7 +132,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
         }
 
         if ($entity instanceof editor_Models_Terminology_Models_TermEntryModel){
-            $s->where('termEntryId=?', $entity->getId());
+            $s->where('id=?', $entity->getId());
         }
 
         return $this->db->fetchAll($s)->toArray();
@@ -141,7 +141,7 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
      * Create transac group attributes with its values. The type can be creation or modification
      * Depending on what kind of entity is passed, the appropriate attribute will be created(term attribute or term entry attribute)
      *
-     * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
+     * @param editor_Models_Terminology_Models_TermModel|editor_Models_Terminology_Models_TermEntryModel $entity
      * @param string $type
      * @return bool
      */
@@ -150,4 +150,18 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
 
         return true;
     }
+
+
+    /***
+     * Update the term transac group attributes from the proposal attributes
+     * @param editor_Models_Terminology_Models_TermModel $term
+     * @param editor_Models_Term_Proposal $proposal
+     * @return boolean
+     */
+    public function updateTermTransacGroupFromProposal(editor_Models_Terminology_Models_TermModel $term,editor_Models_Term_Proposal $proposal): bool
+    {
+
+        return true;
+    }
+
 }

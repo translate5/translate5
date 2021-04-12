@@ -286,32 +286,35 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
 
     /***
      * Check if for the current term there is a processStatus attribute. When there is no one, create it.
-     * @param int $termId
-     * @return NULL|mixed|array
+     * @param string $termId
      */
-    public function checkOrCreateProcessStatus(int $termId): ?array
+    public function checkOrCreateProcessStatus(string $termId)
     {
         $s=$this->db->select()
             ->where('termId=?',$termId)
             ->where('elementName="termNote"')
-            ->where('attrType="processStatus"');
+            ->where('type="processStatus"');
 
         $result=$this->db->fetchAll($s)->toArray();
-        if(count($result)>0){
-            return null;
+
+        if (count($result) > 0) {
+            return;
         }
 
-        $term=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
-        /* @var $term editor_Models_Term */
+        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $term editor_Models_Terminology_Models_TermModel */
         $term->load($termId);
 
-        $language=ZfExtended_Factory::get('editor_Models_Languages');
+        $language = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $language editor_Models_Languages */
 
         $language->loadById($term->getLanguage());
 
         $this->setCollectionId($term->getCollectionId());
-        $this->setTermId($term->getId());
+        $this->setTermId($term->getTermId());
+        $this->setGuid(ZfExtended_Utils::guid());
+        $this->setTermEntryId($term->getTermEntryId());
+        $this->setLangSetGuid($term->getLangSetGuid());
         $this->setLanguage($language->getRfc5646());
         $this->setElementName('termNote');
         $this->setType('processStatus');
@@ -328,7 +331,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $this->setProcessStatus($term->getProcessStatus());
         $this->setValue($term->getProcessStatus());
 
-        return $this->save();
+        $this->save();
     }
 
     /**
@@ -395,7 +398,7 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             'guid' => ZfExtended_Utils::guid(),
             'language' => strtolower($lang->getRfc5646()),
             'labelId' => $label->getId(),
-            'processStatus' => editor_Models_Term::PROCESS_STATUS_UNPROCESSED
+            'processStatus' => editor_Models_Terminology_Models_TermModel::PROCESS_STATUS_UNPROCESSED
         ]);
         $this->setValue(trim($termText));
         $sessionUser = new Zend_Session_Namespace('user');

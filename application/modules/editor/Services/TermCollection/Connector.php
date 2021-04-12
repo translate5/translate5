@@ -3,7 +3,7 @@
 START LICENSE AND COPYRIGHT
 
  This file is part of translate5
- 
+
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
@@ -13,11 +13,11 @@ START LICENSE AND COPYRIGHT
  included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+
  There is a plugin exception available for use with this release of translate5 for
  translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
@@ -35,13 +35,13 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @var integer
      */
     const TERMCOLLECTION_TAG_MATCH_VALUE = 99;
-    
+
     public function __construct() {
         parent::__construct();
         //the translations from the term collections are with high priority, that is why 104 (this is the highest matchrate in translate5)
         $this->defaultMatchRate = self::TERMCOLLECTION_MATCH_VALUE;
     }
-    
+
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
@@ -51,32 +51,32 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             //empty term collection
             return false;
         }
-        
+
         $import=ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         /* @var $import editor_Models_Import_TermListParser_Tbx */
-        
+
         $import->mergeTerms=isset($params['mergeTerms']) ? filter_var($params['mergeTerms'], FILTER_VALIDATE_BOOLEAN) : false;
-        
+
         $sessionUser = new Zend_Session_Namespace('user');
         $userGuid=$params['userGuid'] ?? $sessionUser->data->userGuid;
         $import->loadUser($userGuid);
-        
+
         //import the term collection
         if(!$import->parseTbxFile([$fileinfo],$this->languageResource->getId())){
             $this->logger->error('E1321', 'Term Collection Import: Errors on parsing the TBX, the file could not be imported.');
             return false;
         }
-        
-        $termModel=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $termModel editor_Models_Term */
+
+        $termModel=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $termModel editor_Models_Terminology_Models_TermModel */
         $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
         $validator = new Zend_Validate_Date();
         $validator->setFormat('Y-m-d H:i:s');
-        
+
         //delete collection term entries older then the parameter date
         if(isset($params['deleteTermsLastTouchedOlderThan']) && !empty($params['deleteTermsLastTouchedOlderThan'])){
-            
+
             if(!$validator->isValid($params['deleteTermsLastTouchedOlderThan'])){
                 $params['deleteTermsLastTouchedOlderThan'] = date('Y-m-d H:i:s', strtotime($params['deleteTermsLastTouchedOlderThan']));
             }
@@ -84,7 +84,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             //clean the old tbx files from the disc
             $collection->removeOldCollectionTbxFiles($this->languageResource->getId(), strtotime($params['deleteTermsLastTouchedOlderThan']));
         }
-        
+
         $deleteOlderThanCurrentImport=isset($params['deleteTermsOlderThanCurrentImport']) && filter_var($params['deleteTermsOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
         //delete termcollection terms older then current import date
         if($deleteOlderThanCurrentImport){
@@ -92,20 +92,20 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             //clean the old tbx files from the disc
             $collection->removeOldCollectionTbxFiles($this->languageResource->getId(), strtotime(NOW_ISO));
         }
-        
+
         //check if the delete proposal older than date is set
         $deleteProposalsDate=null;
         if(!empty($params['deleteProposalsLastTouchedOlderThan']) && !$validator->isValid($params['deleteProposalsLastTouchedOlderThan'])){
             //the date is set but it is not in the required format
             $deleteProposalsDate = date('Y-m-d H:i:s', strtotime($params['deleteProposalsLastTouchedOlderThan']));
         }
-        
+
         //the delet proposals older than the current import is set, use the now_iso as reference date
         $deleteProposalsOlderThanCurrentImport=isset($params['deleteProposalsOlderThanCurrentImport']) && filter_var($params['deleteProposalsOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
         if(empty($deleteProposalsDate) && $deleteProposalsOlderThanCurrentImport){
             $deleteProposalsDate=NOW_ISO;
         }
-        
+
         //delete term proposals
         if(!empty($deleteProposalsDate)){
             $proposals=ZfExtended_Factory::get('editor_Models_Term_Proposal');
@@ -117,15 +117,15 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             //remove the attirubte proposals
             $attributeProposals->removeOlderThan([$this->languageResource->getId()],$deleteProposalsDate);
         }
-        
+
         //remove all empty term entries from the same term collection
-        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
-        /* @var $termEntry editor_Models_TermCollection_TermEntry */
+        $termEntry=ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        /* @var $termEntry editor_Models_Terminology_Models_TermEntryModel */
         $termEntry->removeEmptyFromCollection([$this->languageResource->getId()]);
-        
+
         return true;
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see editor_Services_Connector_Abstract::query()
@@ -134,7 +134,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $qs = $this->getQueryStringAndSetAsDefault($segment);
         return $this->queryCollectionResults($this->tagHandler->prepareQuery($qs), true);
     }
-    
+
     /**
      * (non-PHPdoc)
      * @see editor_Services_Connector_Abstract::search()
@@ -143,7 +143,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $searchString='%'.$searchString.'%';
         return $this->queryCollectionResults($searchString,false,$field);
     }
-    
+
     /***
      * Search the resource for available translation. Where the source text is in resource source language and the received results
      * are in the resource target language
@@ -153,7 +153,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     public function translate(string $searchString){
         return $this->queryCollectionResults($searchString);
     }
-    
+
     /***
      * Search the terms in the term collection with the given query string
      * @param string $queryString
@@ -168,23 +168,23 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $entity=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $entity editor_Models_TermCollection_TermCollection */
         $entity->load($this->languageResource->getId());
-        
+
         $results=$entity->searchCollection($queryString,$this->sourceLang,$this->targetLang,$field);
-        
+
         //load all available languages, so we can set the term rfc value to the frontend
         $langModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $langModel editor_Models_Languages */
         $lngs=$langModel->loadAllKeyValueCustom('id','rfc5646');
-        
+
         $groupids=array_column($results, 'termEntryId');
         $groupids=array_unique($groupids);
-        
-        $term=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $term editor_Models_Term */
+
+        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $term editor_Models_Terminology_Models_TermModel */
         $definitions=$term->getDeffinitionsByEntryIds($groupids);
-        
-        $term=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $term editor_Models_Term */
+
+        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $term editor_Models_Terminology_Models_TermModel */
         $groups=$term->sortTerms([$results]);
         foreach ($groups as $group){
             foreach ($group as $res){
@@ -205,7 +205,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
                 $this->resultList->addResult($field == 'source' ? $res['term'] : $res['default'.$field],$matchRate,$res);
             }
         }
-        
+
         return $this->resultList;
     }
 
@@ -224,7 +224,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         }
         return $status;
     }
-    
+
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypes()
@@ -234,7 +234,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             'TBX' => ['application/xml','text/xml'],
         ];
     }
-    
+
     /**
      *
      * {@inheritdoc}
@@ -246,7 +246,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             'TBX' => 'application/xml',
         ];
     }
-    
+
     /***
      * Add/parce tbx file to the exsisting termcollection
      *
@@ -258,6 +258,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     }
 
     public function getTm($mime){
-        
+
     }
 }

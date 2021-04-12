@@ -31,9 +31,9 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Export_Terminology_Tbx {
     /**
-     * @var Iterator
+     * @var Zend_Db_Table_Rowset_Abstract|null
      */
-    protected Iterator $data;
+    protected Zend_Db_Table_Rowset_Abstract $data;
 
     /**
      * Holds the XML Tree
@@ -73,9 +73,8 @@ class editor_Models_Export_Terminology_Tbx {
     /**
      * Sets the Terminology data to be processed
      * Data must already be sorted by: groupId, language, id
-     * @param Iterator $data
      */
-    public function setData(Iterator $data)
+    public function setData($data)
     {
         $this->data = $data;
     }
@@ -122,35 +121,36 @@ class editor_Models_Export_Terminology_Tbx {
         $oldTermEntry = '';
         $oldLanguage = 0;
         foreach($this->data as $row) {
-            if($oldTermEntry != $row->groupId) {
+            if($oldTermEntry != $row->termEntryTbxId) {
                 $termEntry = $body->addChild('termEntry');
-                $termEntry->addAttribute('id', $row->groupId);
-                $oldTermEntry = $row->groupId;
+                $termEntry->addAttribute('id', $row->termEntryTbxId);
+                $oldTermEntry = $row->termEntryTbxId;
             }
-            if($oldLanguage != $row->language) {
+            if($oldLanguage != $row->languageId) {
                 $langSet = $termEntry->addChild('langSet');
-                $langSet->addAttribute('lang', $this->getLanguage($row->language));
-                $oldLanguage = $row->language;
+                $langSet->addAttribute('lang', $this->getLanguage($row->languageId));
+                $oldLanguage = $row->languageId;
             }
             $tig = $langSet->addChild('tig');
             if (isset($row->tigId)) {
                 $tigId = $row->tigId;
             }
             if (empty($tigId)) {
-                $tigId = $this->convertToTigId($row->mid);
+                $tigId = $this->convertToTigId($row->termId);
             }
             $tig->addAttribute('id', $tigId);
 
             $term = $tig->addChild('term', $row->term);
-            $term->addAttribute('id', $row->mid);
+            $term->addAttribute('id', $row->termId);
 
             $termNote = $tig->addChild('termNote', $row->status); //FIXME Status gemapped???
             $termNote->addAttribute('type', 'normativeAuthorization');
         }
         //SimpleXML throws an error when giving null, so we need this workaround:
-        if(empty($this->target) && $this->target !== '0') {
+        if (empty($this->target) && $this->target !== '0') {
             return $this->tbx->asXML();
         }
+
         return $this->tbx->asXML($this->target);
     }
 

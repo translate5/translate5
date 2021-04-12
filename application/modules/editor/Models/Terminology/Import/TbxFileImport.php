@@ -292,6 +292,7 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->attributeLabel[$attributeLabel['label'].'-'.$attributeLabel['type']] = $attributeLabel['id'];
         }
 
+        $this->attributeLabel = [];
         if ($mergeTerms) {
             $this->termEntriesCollection = $this->termEntryModel->getAllTermEntryAndCollection($this->collectionId);
             $this->attributesCollection = $this->attributeModel->getAttributeByCollectionId($this->collectionId);
@@ -345,7 +346,9 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $this->saveParsedTbx();
         }
 
-        $this->getTbxImages($tbxAsSimpleXml->text->back->refObjectList);
+        if ($tbxAsSimpleXml->text->back->refObjectList) {
+            $this->getTbxImages($tbxAsSimpleXml->text->back->refObjectList);
+        }
 
         $statisticEntry = "ENTRY sec.: " . (microtime(true) - $startEntryTime)
             . " - Memory usage: " . ((memory_get_usage() / 1024) / 1024) .' MB';
@@ -518,6 +521,11 @@ class editor_Models_Terminology_Import_TbxFileImport extends editor_Models_Termi
             $newTerm->setStatus($this->config->runtimeOptions->tbx->defaultTermStatus);
             $newTerm->setProcessStatus($newTerm::TERM_STANDARD_PROCESS_STATUS);
         }
+
+        if ($newTerm->getProcessStatus() === '') {
+            $newTerm->setProcessStatus($newTerm::TERM_STANDARD_PROCESS_STATUS);
+        }
+
         if (isset($tig->note)) {
             $newTerm->setNote($this->setAttributeTypes($tig->note));
         }

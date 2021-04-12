@@ -66,12 +66,19 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     const STAT_SUPERSEDED = 'supersededTerm';
     const STAT_NOT_FOUND = 'STAT_NOT_FOUND'; //Dieser Status ist nicht im Konzept definiert, sondern wird nur intern verwendet!
 
+    const TRANSSTAT_FOUND = 'transFound';
+    const TRANSSTAT_NOT_FOUND = 'transNotFound';
+    const TRANSSTAT_NOT_DEFINED ='transNotDefined';
+
+    const CSS_TERM_IDENTIFIER = 'term';
 
     /**
      * The above constants are needed in the application as list, since reflection usage is expensive we cache them here:
      * @var array
      */
     protected static array $statusCache = [];
+    protected static array $termEntryTbxIdCache = [];
+    protected editor_Models_Segment_TermTag $tagHelper;
 
     protected array $statOrder = [
         self::STAT_PREFERRED => 1,
@@ -88,11 +95,50 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      */
     public function __construct() {
         parent::__construct();
+        $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+    }
+    /**
+     * returns a map CONSTNAME => value of all term status
+     * @return array
+     */
+    static public function getAllStatus(): array
+    {
+        self::initConstStatus();
+
+        return self::$statusCache['status'];
+    }
+    /**
+     * returns an array with groupId and term to a given mid
+     * in old table was:
+     * termEntryTbxId = groupId
+     * termId = mid
+     *
+     * @param string $termId
+     * @param array $collectionIds
+     * @return array|Zend_Db_Table_Row_Abstract
+     */
+    public function getTermAndGroupIdToMid(string $termId, array $collectionIds): ?array
+    {
+        if (!empty(self::$termEntryTbxIdCache[$termId])) {
+            return self::$termEntryTbxIdCache[$termId];
+        }
+
+        $select = $this->db->select()
+            ->from($this->db, array('termEntryTbxId', 'term'))
+            ->where('collectionId IN(?)', $collectionIds)
+            ->where('termId = ?', $termId);
+        $res = $this->db->fetchRow($select);
+        if (empty($res)) {
+            return $res;
+        }
+        self::$termEntryTbxIdCache[$termId] = $res;
+
+        return $res->toArray();
     }
 
     /**
-     * $fullResult[$term['mid'].'-'.$term['groupId'].'-'.$term['collectionId']]
-     * $fullResult['termId-termEntryId-collectionId'] = TERM
+     * $fullResult[$term['termId'].'-'.$term['termEntryTbxId'].'-'.$term['collectionId']]
+     * $fullResult['termId-termEntryTbxId-collectionId'] = TERM
      *
      * $simpleResult[$term['term']]
      * $simpleResult['term'] = termId
@@ -118,11 +164,11 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      *
      * @return Zend_Db_Table_Rowset_Abstract
      */
-    public function getRestTermsOfTermEntry($groupId, $mid, $collectionId)
+    public function getRestTermsOfTermEntry($termEntryTbxId, $termId, $collectionId)
     {
         $s = $this->db->select()
-            ->where('termEntryId = ?', $groupId)
-            ->where('termId != ?', $mid)
+            ->where('termEntryTbxId = ?', $termEntryTbxId)
+            ->where('termId != ?', $termId)
             ->where('collectionId = ?',$collectionId);
 
         return $this->db->fetchAll($s);
@@ -162,15 +208,15 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             ->where('collectionId IN(?)', $collectionIds);
 
         if (!empty($langs)) {
-            $s->where('language in (?)', $langs);
+            $s->where('languageId in (?)', $langs);
         }
 
         $s->order('termEntryTbxId ASC')
-            ->order('language ASC')
+            ->order('languageId ASC')
             ->order('id ASC');
         $data = $this->db->fetchAll($s);
 
-        if ($data->count() == 0) {
+        if ($data->count() === 0) {
             return null;
         }
 
@@ -196,7 +242,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $queryString = str_replace("?","_",$queryString);
 
         //when limit is provided -> autocomplete search
-        if($limit){
+        if ($limit) {
             $queryString = $queryString.'%';
         }
 
@@ -328,7 +374,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $map = [];
         $termColumns = [
             'definition',
-            'groupId',
+            'termEntryTbxId',
             'label',
             'value',
             'desc',
@@ -485,7 +531,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     {
         $s = $this->db->select()
             ->where('term = ?', $termText)
-            ->where('language = ?', $languageId ?? $this->getLanguage())
+            ->where('languageId = ?', $languageId ?? $this->getLanguage())
             ->where('collectionId = ?',$termCollection ?? $this->getCollectionId());
 
         return $this->db->fetchAll($s);
@@ -499,7 +545,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     public function findTermAndAttributes(int $termId): array
     {
         $s = $this->getSearchTermSelect();
-        $s->where('terms_term.id=?', $termId)
+        $s->where('terms_term.termId=?', $termId)
             ->order('LEK_languages.rfc5646')
             ->order('terms_term.term');
 
@@ -543,7 +589,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             'id as termId',
             'termEntryId',
             'collectionId',
-            'language as languageId'
+            'languageId as languageId'
         ];
 
         $s = $this->db->select()
@@ -614,7 +660,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             $s = $this->db->select()
                 ->where('term = ?', $term->text)
                 ->where('collectionId IN(?)', $collectionIds)
-                ->where('language IN (?)',$language);
+                ->where('languageId IN (?)',$language);
             $terms = $this->db->fetchAll($s);
 
             if ($terms->count() === 0) {
@@ -633,5 +679,726 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $config = Zend_Registry::get('config');
 
         return $config->runtimeOptions->tbx->termLabelMap->toArray();
+    }
+    /**
+     * Returns term-informations for $segmentId in $taskGuid.
+     * Includes assoziated terms corresponding to the tagged terms
+     *
+     * @param string $taskGuid
+     * @param int $segmentId
+     * @return array
+     */
+    public function getByTaskGuidAndSegment(string $taskGuid, int $segmentId): array
+    {
+        if (empty($taskGuid) || empty($segmentId)) {
+            return array();
+        }
+
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+
+        if (!$task->getTerminologie()) {
+            return array();
+        }
+
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        $segment->load($segmentId);
+        $termIds = $this->getTermMidsFromTaskSegment($task, $segment);
+
+        if (empty($termIds)) {
+            return array();
+        }
+
+        $assoc = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $assoc editor_Models_TermCollection_TermCollection */
+        $collections = $assoc->getCollectionsForTask($task->getTaskGuid());
+        if (empty($collections)) {
+            return array();
+        }
+        $result = $this->getSortedTermGroups($collections, $termIds, $task->getSourceLang(), $task->getTargetLang());
+
+        if (empty($result)) {
+            return array();
+        }
+
+        return $this->sortTerms($result);
+    }
+    /**
+     * returns all term mids of the given segment in a multidimensional array.
+     * First level contains source or target (the fieldname)
+     * Second level contains a list of arrays with the found mids and div tags,
+     * the div tag is needed for transfound check
+     * @param editor_Models_Task $task
+     * @param editor_Models_Segment $segment
+     * @return array
+     */
+    protected function getTermMidsFromTaskSegment(editor_Models_Task $task, editor_Models_Segment $segment): array
+    {
+        $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        /* @var $fieldManager editor_Models_SegmentFieldManager */
+        $fieldManager->initFields($task->getTaskGuid());
+
+        //Currently only terminology is shown in the first fields see also TRANSLATE-461
+        if ($task->getEnableSourceEditing()) {
+            $sourceFieldName = $fieldManager->getEditIndex($fieldManager->getFirstSourceName());
+            $sourceText = $segment->get($sourceFieldName);
+        } else {
+            $sourceFieldName = $fieldManager->getFirstSourceName();
+            $sourceText = $segment->get($sourceFieldName);
+        }
+
+        $targetFieldName = $fieldManager->getEditIndex($fieldManager->getFirstTargetName());
+        $targetText = $segment->get($targetFieldName);
+
+        //tbxid should be sufficient as distinct identifier of term tags
+        $getTermIdRegEx = '/<div[^>]+data-tbxid="([^"]*)"[^>]*>/';
+        preg_match_all($getTermIdRegEx, $sourceText, $sourceMatches, PREG_SET_ORDER);
+        preg_match_all($getTermIdRegEx, $targetText, $targetMatches, PREG_SET_ORDER);
+
+        if (empty($sourceMatches) && empty($targetMatches)) {
+            return [];
+        }
+
+        return ['source' => $sourceMatches, 'target' => $targetMatches];
+    }
+    /***
+     * Export term and term attribute proposals in excel file.
+     * When no path is provided, redirect the output to a client's web browser (Excel)
+     *
+     * @param array $rows
+     * @param string $path: the path where the excel document will be saved
+     */
+    public function exportProposals(array $rows,string $path=null){
+        $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
+        /* @var $excel ZfExtended_Models_Entity_ExcelExport */
+
+        // set property for export-filename
+        $excel->setProperty('filename', 'Term and term attributes proposals');
+
+        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $t ZfExtended_Zendoverwrites_Translate */
+
+        // sample label-translations
+        $excel->setLabel('termEntryId', $t->_('Eintrag'));
+        $excel->setLabel('definition', $t->_('Definition'));
+        $excel->setLabel('language', $t->_('Sprache'));
+        $excel->setLabel('termId', $t->_('Term-Id'));
+        $excel->setLabel('term', $t->_('Term'));
+        $excel->setLabel('termProposal', $t->_('Änderung zu bestehendem Term'));
+        $excel->setLabel('processStatus', $t->_('Prozess-Status'));
+        $excel->setLabel('attributeName', $t->_('Attributs-Schlüssel'));
+        $excel->setLabel('attribute', $t->_('Attributs-Wert'));
+        $excel->setLabel('attributeProposal', $t->_('Änderung zu bestehendem Attributs-Wert'));
+        $excel->setLabel('lastEditor', $t->_('Letzter Bearbeiter'));
+        $excel->setLabel('lastEditedDate', $t->_('Bearbeitungsdatum'));
+
+
+        $autosizeCells=function($phpExcel) use ($excel){
+            foreach ($phpExcel->getWorksheetIterator() as $worksheet) {
+
+                $phpExcel->setActiveSheetIndex($phpExcel->getIndex($worksheet));
+
+                $sheet = $phpExcel->getActiveSheet();
+
+                //the highes column based on the current row columns
+                $highestColumn='M';
+                foreach(range('A',$highestColumn) as $column) {
+                    $sheet->getColumnDimension($column)->setAutoSize(true);
+                }
+
+
+                $highestColumnIndex = $excel->columnIndexFromString($highestColumn);
+
+                // expects same number of row records for all columns
+                $highestRow = $worksheet->getHighestRow();
+
+                for($col = 0; $col < $highestColumnIndex; $col++)
+                {
+                    // if you do not expect same number of row records for all columns
+                    // get highest row index for each column
+                    // $highestRow = $worksheet->getHighestRow();
+
+                    for ($row = 1; $row <= $highestRow; $row++)
+                    {
+                        $cell = $worksheet->getCellByColumnAndRow($col, $row);
+                        if(strpos($cell->getValue(), '<changemycolortag>') !== false){
+                            $cell->setValue(str_replace('<changemycolortag>','',$cell->getValue()));
+                            $sheet->getStyle($cell->getCoordinate())->getFill()->setFillType('solid')->getStartColor()->setRGB('f9f25c');
+                        }
+                    }
+                }
+            }
+        };
+
+        //if the path is provided, save the excel into the given path location
+        if(!empty($path)){
+            $excel->loadArrayData($rows);
+            $autosizeCells($excel->getSpreadsheet());
+            $excel->saveToDisc($path);
+            return;
+        }
+
+        //send the excel to browser download
+        $excel->simpleArrayToExcel($rows,$autosizeCells);
+    }
+    /***
+     * Update language assoc for given collections. The langages are merged from exsisting terms per collection.
+     * @param array|null $collectionIds
+     */
+    public function updateAssocLanguages(array $collectionIds = null)
+    {
+        $s = $this->db->select()
+            ->from(array('t' =>'terms_term'), ['t.languageId', 't.collectionId'])
+            ->join(array('l' =>'LEK_languages'), 't.languageId = l.id', 'rfc5646');
+
+        if(!empty($collectionIds)){
+            $s->where('t.collectionId IN(?)',$collectionIds);
+        }
+
+        $s->group('t.collectionId')->group('t.languageId')->setIntegrityCheck(false);
+
+        $ret = $this->db->fetchAll($s)->toArray();
+
+        $data = [];
+        foreach ($ret as $lng) {
+            if (!isset($data[$lng['collectionId']])) {
+                $data[$lng['collectionId']] = [];
+            }
+            array_push($data[$lng['collectionId']], $lng);
+        }
+
+        foreach ($data as $key => $value) {
+            $alreadyProcessed = array();
+            //the term collection contains terms with only one language
+            $isSingleCombination = count($value) == 1;
+            foreach ($value as $x) {
+                foreach ($value as $y) {
+                    //keep track of what is already processed
+                    $combination = array($x['languageId'], $y['languageId']);
+
+                    //it is not the same number or single language combination and thay are not already processed
+                    if (($x['languageId'] === $y['languageId'] && !$isSingleCombination) || in_array($combination, $alreadyProcessed)) {
+                        continue;
+                    }
+                    //Add it to the list of what you've already processed
+                    $alreadyProcessed[] = $combination;
+
+                    //save the language combination
+                    $model = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+                    /* @var $model editor_Models_LanguageResources_Languages */
+
+                    $model->setSourceLang($x['languageId']);
+                    $model->setSourceLangCode($x['rfc5646']);
+
+                    $model->setTargetLang($y['languageId']);
+                    $model->setTargetLangCode($y['rfc5646']);
+
+                    $model->setLanguageResourceId($key);
+                    $model->save();
+
+                }
+            }
+        }
+    }
+    /**
+     * exports all terms of all termCollections associated to the task in the task's languages.
+     * @param editor_Models_Task $task
+     * @return string
+     * @throws editor_Models_Term_TbxCreationException
+     */
+    public function exportForTagging(editor_Models_Task $task): string
+    {
+        $languageModel = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languageModel editor_Models_Languages */
+
+        $assoc = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $assoc editor_Models_TermCollection_TermCollection */
+        $collectionIds = $assoc->getCollectionsForTask($task->getTaskGuid());
+
+        if (empty($collectionIds)) {
+            //No term collection assigned to task although tasks terminology flag is true.
+            // This is normally not possible, since the terminology flag in the task is maintained on TC task assoc changes via API
+            throw new editor_Models_Term_TbxCreationException('E1113', [
+                'task' => $task
+            ]);
+        }
+
+        //get source and target language fuzzies
+        $langs = [];
+        $langs = array_merge($langs,$languageModel->getFuzzyLanguages($task->getSourceLang()));
+        $langs = array_merge($langs,$languageModel->getFuzzyLanguages($task->getTargetLang()));
+        if ($task->getRelaisLang() > 0) {
+            $langs = array_merge($langs,$languageModel->getFuzzyLanguages($task->getRelaisLang()));
+        }
+        $langs = array_unique($langs);
+
+        $data = $this->loadSortedByCollectionAndLanguages($collectionIds, $langs);
+        if (!$data) {
+            //The associated collections don't contain terms in the languages of the task.
+            // Should not be, should be checked already on assignment of collection to task.
+            // Colud happen when all terms of a language are removed from a TermCollection via term import after associating that term collection to a task.
+            throw new editor_Models_Term_TbxCreationException('E1114', [
+                'task' => $task,
+                'collectionIds' => $collectionIds,
+                'languageIds' => $langs,
+            ]);
+        }
+
+        $exporteur = ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx');
+        /* @var $exporteur editor_Models_Export_Terminology_Tbx */
+        $exporteur->setData($data);
+        $result = $exporteur->export();
+        if (empty($result)) {
+            //collected terms could not be converted to XML.
+            throw new editor_Models_Term_TbxCreationException('E1115', [
+                'task' => $task,
+                'collectionIds' => $collectionIds,
+                'languageIds' => $langs,
+            ]);
+        }
+        return $result;
+    }
+
+    /**
+     * Sortiert die Terme innerhalb der Termgruppen:
+     * @param array $termGroups
+     * @return array
+     */
+    public function sortTerms(array $termGroups): array
+    {
+        foreach ($termGroups as $groupId => $group) {
+            usort($group, [$this, 'compareTerms']);
+            $termGroups[$groupId] = $group;
+        }
+        return $termGroups;
+    }
+
+    /**
+     * Returns a multidimensional array.
+     * 1. level: keys: groupId, values: array of terms grouped by groupId
+     * 2. level: terms of group groupId
+     *
+     * !! TODO: Sortierung der Gruppen in der Reihenfolge wie sie im Segment auftauchen (order by seg2term.id sollte hinreichend sein)
+     *
+     * @param array $collectionIds term collections associated to the task
+     * @param array $termIds as 2-dimensional array('source' => array(), 'target' => array())
+     * @param $sourceLang
+     * @param $targetLang
+     *
+     * @return array
+     */
+    protected function getSortedTermGroups(array $collectionIds, array $termIds, $sourceLang, $targetLang): array
+    {
+        $lang = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $lang editor_Models_Languages */
+        $sourceLanguages = $lang->getFuzzyLanguages($sourceLang);
+        $targetLanguages = $lang->getFuzzyLanguages($targetLang);
+        $allLanguages = array_unique(array_merge($sourceLanguages, $targetLanguages));
+        $sourceIds = array_column($termIds['source'], 1);
+        $targetIds = array_column($termIds['target'], 1);
+        $transFoundSearch = array_column($termIds['source'], 0, 1) + array_column($termIds['target'], 0, 1);
+        $allIds = array_merge($sourceIds, $targetIds);
+
+        $sql = $this->db->getAdapter()->select()
+            ->from(['t1' =>'terms_term'], ['t2.*'])
+            ->distinct()
+            ->joinLeft(['t2' =>'terms_term'], 't1.termEntryId = t2.termEntryId AND t1.collectionId = t2.collectionId', null)
+            ->join(['l' =>'LEK_languages'], 't2.languageId = l.id', 'rtl')
+            ->where('t1.collectionId IN(?)', $collectionIds)
+            //->where('t2.collectionId IN(?)', $collectionIds)
+            ->where('t1.termId IN(?)', $allIds)
+            ->where('t1.languageId IN (?)', $allLanguages)
+            ->where('t2.languageId IN (?)', $allLanguages);
+
+        $terms = $this->db->getAdapter()->fetchAll($sql);
+
+        $termGroups = [];
+        foreach($terms as $term) {
+            $term = (object) $term;
+
+            settype($termGroups[$term->termEntryTbxId], 'array');
+
+            $term->used = in_array($term->mid, $allIds);
+            $term->isSource = in_array($term->language, $sourceLanguages);
+            $term->transFound = false;
+            if ($term->used) {
+                $term->transFound = preg_match('/class="[^"]*transFound[^"]*"/', $transFoundSearch[$term->termId]);
+            }
+
+            $termGroups[$term->termEntryTbxId][] = $term;
+        }
+
+        return $termGroups;
+    }
+    /***
+     * Remove terms where the updated date is older than the given one.
+     *
+     * @param array $collectionIds
+     * @param string $olderThan
+     * @return boolean
+     */
+    public function removeOldTerms(array $collectionIds, $olderThan): bool
+    {
+        //get all terms in the collection older than the date
+        $s = $this->db->select()
+            ->setIntegrityCheck(false)
+            ->from(['t'=>'terms_term'],['t.id'])
+            ->joinLeft(['p'=>'LEK_term_proposal'],'p.termId=t.id ',['p.term','p.created','p.userGuid','p.userName'])
+            ->where('t.updated < ?', $olderThan)
+            ->where('t.collectionId in (?)',$collectionIds)
+            ->where('t.processStatus NOT IN (?)',self::PROCESS_STATUS_UNPROCESSED);
+        $result = $this->db->fetchAll($s)->toArray();
+
+        if (empty($result)) {
+            return false;
+        }
+        $term = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
+        /* @var $term editor_Models_Terminology_Models_TermModel */
+        $transacGrp = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
+        /* @var $transacGrp editor_Models_Terminology_Models_TransacgrpModel */
+
+        $deleteProposals = [];
+        //for each of the terms with the proposals, use the proposal value as the
+        //new term value in the original term, after the original term is updated, remove
+        //the proposal
+        foreach ($result as $key=>$res){
+            if (empty($res['term'])) {
+                continue;
+            }
+            $proposal = ZfExtended_Factory::get('editor_Models_Term_Proposal');
+            /* @var $proposal editor_Models_Term_Proposal */
+            $proposal->init([
+                'created'=>$res['created'],
+                'userGuid'=>$res['userGuid'],
+                'userName'=>$res['userName'],
+            ]);
+
+            $term->load($res['id']);
+            $term->setTerm($res['term']);
+            $term->setCreated($res['created']);
+            $term->setUpdated(NOW_ISO);
+            $term->setUserGuid($res['userGuid']);
+            $term->setUserName($res['userName']);
+            $term->setProcessStatus(self::PROCESS_STATUS_UNPROCESSED);
+            //TODO: with the next termportal step(add new attribute and so)
+            //update/merge those new proposal attributes to
+            //now only the transac group should be modefied
+            // $transacGrp->updateTermTransacGroupFromProposal($term,$proposal);
+            // $transacGrp->updateTermProcessStatus($term, $term::PROCESS_STATUS_UNPROCESSED);
+            $term->save();
+            $deleteProposals[] = $res['id'];
+            unset($result[$key]);
+        }
+        //remove the collected proposals
+        if (!empty($deleteProposals)) {
+            $proposal = ZfExtended_Factory::get('editor_Models_Term_Proposal');
+            /* @var $proposal editor_Models_Term_Proposal */
+            $proposal->db->delete([
+                'termId IN(?)' => $deleteProposals
+            ]);
+        }
+
+        $result = array_column($result,'id');
+        if (empty($result)) {
+            return false;
+        }
+        //delete the collected old terms
+        return $this->db->delete(['id IN(?)' => $result])>0;
+    }
+    /***
+     * Load all term and attribute proposals, or if second parameter is given load only proposals younger as $youngerAs date within the given collection(s)
+     * @param array $collectionIds
+     * @param string $youngerAs optional, if omitted all proposals are loaded
+     */
+    public function loadProposalExportData(array $collectionIds, string $youngerAs = '')
+    {
+        if (empty($collectionIds)) {
+            return [];
+        }
+        $adapter = $this->db->getAdapter();
+        $bindParams = [];
+        $termYoungerSql = $attrYoungerSql = '';
+        if (!empty($youngerAs)) {
+            $bindParams[] = $youngerAs;
+            $bindParams[] = $youngerAs;
+            $termYoungerSql = ' and (t.created >=? || tp.created >= ?)';
+            $attrYoungerSql = ' and (ta.created >=? || tap.created >=?)';
+        }
+        //Info: why collection ids is not in bindParams
+        //binding multiple values to single param is not posible with $adapter->query . For more info see PDOStatement::execute
+        $termSql = "SELECT
+                    t.termEntryId as 'term-termEntryId',
+                    t.definition as 'term-definition',
+                    l.langName as 'term-language',
+                    t.id as 'term-Id',
+                    t.term as 'term-term',
+                    t.processStatus as 'term-processStatus',
+                    t.userName as 'term-lastEditor',
+                    t.updated as 'term-lastEditedDate',
+                    tp.id as 'termproposal-id',
+                    tp.term as 'termproposal-term',
+                    tp.created as 'termproposal-lastEditedDate',
+                    tp.userName as 'termproposal-lastEditor',
+                    null as 'attribute-id',
+                    null as 'attribute-name',
+                    null as 'attribute-value',
+                    null as 'attribute-lastEditedDate',
+                    null as 'attribute-lastEditor',
+                    null as 'attributeproposal-id',
+                    null as 'attributeproposal-value',
+                    null as 'attributeproposal-lastEditedDate',
+                    null as 'attributeproposal-lastEditor'
+                    FROM terms_term t
+                    LEFT OUTER JOIN LEK_term_proposal tp ON tp.termId = t.id
+                    INNER JOIN LEK_languages l ON t.language = l.id
+                WHERE ".$adapter->quoteInto('t.collectionId IN(?)',$collectionIds)
+            .$termYoungerSql."
+                AND (tp.term is not null or t.processStatus = 'unprocessed')
+                ORDER BY t.termEntryTbxId, t.term";
+
+        $termResult = $adapter->query($termSql,$bindParams)->fetchAll();
+
+        $attributeSql = "SELECT
+                        ta.id as 'attribute-id',
+                        ta.termId as 'term-Id',
+                        ta.termEntryId as 'attribute-termEntryId',
+                        ta.elementName as 'attribute-name',
+                        ta.value as 'attribute-value',
+                        ta.updated as 'attribute-lastEditedDate',
+                        ta.userName as 'attribute-lastEditor',
+                        ta.processStatus as 'attribute-processStatus',
+                        l.langName as 'term-language',
+                        tap.id as 'attributeproposal-id',
+                        tap.value as 'attributeproposal-value',
+                        tap.created as 'attributeproposal-lastEditedDate',
+                        tap.userName as 'attributeproposal-lastEditor',
+                        t.termEntryId as 'term-termEntryId',
+                        t.definition as 'term-definition',
+                        t.id as 'term-Id',
+                        t.term as 'term-term',
+                        t.processStatus as 'term-processStatus',
+                        t.userName as 'term-lastEditor',
+                        t.updated as 'term-lastEditedDate',
+                        tp.id as 'termproposal-id',
+                        tp.term as 'termproposal-term',
+                        tp.created as 'termproposal-lastEditedDate',
+                        tp.userName as 'termproposal-lastEditor'
+                    FROM terms_attributes ta
+                        LEFT OUTER JOIN LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
+                        LEFT OUTER JOIN terms_term t on ta.termId = t.id
+                        LEFT OUTER JOIN LEK_term_proposal tp on tp.termId = t.id
+                        LEFT OUTER JOIN LEK_languages l ON t.language = l.id
+                    WHERE ".$adapter->quoteInto('ta.collectionId IN(?)', $collectionIds).
+            $attrYoungerSql."
+                    AND (tap.value is not null or ta.processStatus = 'unprocessed')
+                    ORDER BY ta.termEntryId, ta.termId";
+
+        $attributeResult = $adapter->query($attributeSql,$bindParams)->fetchAll();
+
+        //merge term proposals with term attributes and term entry attributes proposals
+        $resultArray = array_merge($termResult, $attributeResult);
+
+        if (empty($resultArray)) {
+            return [];
+        }
+
+        return $this->groupProposalExportData($resultArray);
+    }
+    /***
+     * Group the term and attribute proposal data for the export
+     * @param array $data
+     * @return array
+     */
+    protected function groupProposalExportData(array $data): array
+    {
+        usort($data, function($a, $b) {
+            $retval = $a['term-Id'] <=> $b['term-Id'];
+            if ($retval == 0) {
+                $retval = $b['term-term'] <=> $a['term-term'];
+            }
+
+            return $retval;
+        });
+
+        $returnResult = [];
+        $tmpTerm = [];
+
+        //clange cell color by value on the excel export callback
+        $changeMyCollorTag = '<changemycolortag>';
+        foreach ($data as $row) {
+            $tmpTerm['termEntryId'] = $row['term-termEntryId'];
+            //if it is empty it is termEntryAttribute
+            if(empty($tmpTerm['termEntryId']) && !empty($row['attribute-termEntryId'])){
+                $tmpTerm['termEntryId'] = $row['attribute-termEntryId'];
+            }
+            $tmpTerm['definition'] = $row['term-definition'];
+            $tmpTerm['language'] = $row['term-language'];
+            $tmpTerm['termId'] = $row['term-Id'];
+            $tmpTerm['term'] = $changeMyCollorTag.$row['term-term'];
+            $tmpTerm['termProposal'] = '';
+            $tmpTerm['processStatus'] = $row['term-processStatus'];
+            $tmpTerm['attributeName'] = $row['attribute-name'];
+            $tmpTerm['attribute'] = $row['attribute-value'];
+            $tmpTerm['attributeProposal'] = '';
+            $tmpTerm['lastEditor'] = $changeMyCollorTag.$row['term-lastEditor'];
+            $tmpTerm['lastEditedDate'] = $changeMyCollorTag.$row['term-lastEditedDate'];
+
+            //if the proposal exist, set the change color and last editor for the proposal
+            if(!empty($row['termproposal-term'])){
+                $tmpTerm['term'] = str_replace($changeMyCollorTag,'',$row['term-term']);
+                $tmpTerm['termProposal'] = $changeMyCollorTag.$row['termproposal-term'];
+                $tmpTerm['lastEditor'] = $changeMyCollorTag.$row['termproposal-lastEditor'];
+                $tmpTerm['lastEditedDate'] = $changeMyCollorTag.$row['termproposal-lastEditedDate'];
+            }
+
+            if(isset($row['attribute-processStatus']) && $row['attribute-processStatus']==self::PROCESS_STATUS_UNPROCESSED){
+                $tmpTerm['attribute'] = $changeMyCollorTag.$row['attribute-value'];
+                $tmpTerm['lastEditor'] = $changeMyCollorTag.$row['attribute-lastEditor'];
+                $tmpTerm['lastEditedDate'] = $changeMyCollorTag.$row['attribute-lastEditedDate'];
+                $tmpTerm['term'] = str_replace($changeMyCollorTag,'',$row['term-term']);
+                $tmpTerm['termProposal'] = str_replace($changeMyCollorTag,'',$row['termproposal-term']);
+            }
+
+            //if the attribute proposal is set, set the change color and last editor for the attribute proposal
+            if(!empty($row['attributeproposal-value'])){
+                $tmpTerm['term'] = str_replace($changeMyCollorTag,'',$row['term-term']);
+                $tmpTerm['termProposal'] = str_replace($changeMyCollorTag,'',$row['termproposal-term']);
+                $tmpTerm['attribute'] = $row['attribute-value'];
+                $tmpTerm['attributeProposal'] = $changeMyCollorTag.$row['attributeproposal-value'];
+                $tmpTerm['lastEditor'] = $changeMyCollorTag.$row['attributeproposal-lastEditor'];
+                $tmpTerm['lastEditedDate'] = $changeMyCollorTag.$row['attributeproposal-lastEditedDate'];
+            }
+            $returnResult[] = $tmpTerm;
+            $tmpTerm = [];
+        }
+
+        return $returnResult;
+    }
+
+    /***
+     * Get all definitions in the given entryIds. The end results will be grouped by $entryIds as a key.
+     * @param array $entryIds
+     * @return array
+     */
+    public function getDeffinitionsByEntryIds(array $entryIds): array
+    {
+        if (empty($entryIds)) {
+            return [];
+        }
+        $s = $this->db->select()
+            ->where('termEntryId IN(?)', $entryIds);
+        $return = $this->db->fetchAll($s)->toArray();
+
+        if(empty($return)){
+            return [];
+        }
+
+        //group the definitions by termEntryId as a key
+        $result = [];
+        foreach ($return as $r) {
+            if (!isset($result[$r['termEntryId']])) {
+                $result[$r['termEntryId']] = [];
+            }
+
+            if (!in_array($r['definition'], $result[$r['termEntryId']]) && !empty($r['definition'])) {
+                $result[$r['termEntryId']][] = $r['definition'];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Is the term a "preferred" term according to the given status?
+     * @param string $termStatus
+     * @return boolean
+     */
+    static public function isPreferredTerm(string $termStatus): bool
+    {
+        $termStatusMap = self::getTermStatusMap();
+        if (!array_key_exists($termStatus, $termStatusMap)) {
+            return false;
+        }
+        return $termStatusMap[$termStatus] == 'preferred';
+    }
+    /**
+     * Is the term a "permitted" term according to the given status?
+     * @param string $termStatus
+     * @return boolean
+     */
+    static public function isPermittedTerm(string $termStatus): bool
+    {
+        $termStatusMap = self::getTermStatusMap();
+        if (!array_key_exists($termStatus, $termStatusMap)) {
+            return false;
+        }
+
+        return $termStatusMap[$termStatus] == 'permitted';
+    }
+
+    /**
+     *
+     * @param string $termId
+     * @param array $collectionIds
+     * @return Zend_Db_Table_Row_Abstract | null
+     */
+    public function loadByMid(string $termId, array $collectionIds): ?Zend_Db_Table_Row_Abstract
+    {
+        $s = $this->db->select(false);
+        $s->from($this->db);
+        $s->where('collectionId IN(?)', $collectionIds)->where('termId = ?', $termId);
+
+        $this->row = $this->db->fetchRow($s);
+        if (empty($this->row)) {
+            $this->notFound('#select', $s->assemble());
+        }
+
+        return $this->row;
+    }
+
+    /**
+     * returns all term mids from given segment content (allows and returns also duplicated mids)
+     * @param string $seg
+     * @return array values are the mids of the terms in the string
+     */
+    public function getTermMidsFromSegment(string $seg): array
+    {
+        return array_map(function($item) {
+            return $item['termId'];
+        }, $this->getTermInfosFromSegment($seg));
+    }
+
+    /**
+     * Returns term-informations for a given group id
+     *
+     * @param array $collectionIds
+     * @param string $termEntryTbxId
+     * @param array $languageIds 1-dim array with languageIds|default empty array;
+     *          if passed only terms with the passed languageIds are returned
+     * @return array  2-dim array (get term of first row like return[0]['term'])
+     */
+    public function getAllTermsOfGroup(array $collectionIds, string $termEntryTbxId, $languageIds = []): array
+    {
+        $db = $this->db;
+        $s = $db->select()
+            ->where('collectionId IN(?)', $collectionIds)
+            ->where('termEntryTbxId = ?', $termEntryTbxId);
+
+        if (!empty($languageIds)) {
+            $s->where('languageId in (?)', $languageIds);
+        }
+
+        return $db->fetchAll($s)->toArray();
+    }
+    /**
+     * returns mids and term flags (css classes) found in a string
+     * @param string $seg
+     * @return array 2D Array, first level are found terms, second level has key mid and key classes
+     */
+    public function getTermInfosFromSegment(string $seg): array
+    {
+        return $this->tagHelper->getInfos($seg);
     }
 }

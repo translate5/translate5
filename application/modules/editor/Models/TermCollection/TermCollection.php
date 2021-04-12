@@ -215,12 +215,14 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $s = $this->db->select()
         ->setIntegrityCheck(false)
         ->from(['tc' => 'LEK_languageresources'], ['id'])
-        ->join(['t' => 'terms_term'],'tc.id=t.collectionId', ['count(DISTINCT t.id) as termsCount'])
-        ->join(['ta' => 'terms_attributes'],'tc.id=ta.collectionId AND not ta.termId is null', ['count(DISTINCT ta.id) as termsAtributeCount'])
-        ->join(['tea' => 'terms_attributes'],'tc.id=tea.collectionId AND tea.termId is null', ['count(DISTINCT tea.id) as termsEntryAtributeCount'])
-        ->where('tc.id =?',$collectionId);
+        ->join(['t' => 'terms_term'],'tc.id = t.collectionId', ['count(DISTINCT t.id) as termsCount'])
+        ->join(['ta' => 'terms_attributes'],'tc.id = ta.collectionId AND not ta.termId is null', ['count(DISTINCT ta.id) as termsAtributeCount'])
+        ->join(['tea' => 'terms_transacgrp'],'tc.id = tea.collectionId', ['count(DISTINCT tea.id) as termsEntryAtributeCount'])
+        ->where('tc.id =?', $collectionId);
 
-        return $this->db->fetchRow($s)->toArray();
+        $result = $this->db->fetchRow($s)->toArray();
+
+        return $result;
     }
 
     /***
@@ -281,9 +283,9 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 
     /***
      * Check and remove the term collection if it is imported via task import
-     * @param array $taskGuid
+     * @param string $taskGuid
      */
-    public function checkAndRemoveTaskImported(array $taskGuid)
+    public function checkAndRemoveTaskImported(string $taskGuid)
     {
         //since the reference assoc → langres is not cascade delete, we have to delete them manually
         $taskAssocTable = ZfExtended_Factory::get('editor_Models_Db_Taskassoc');

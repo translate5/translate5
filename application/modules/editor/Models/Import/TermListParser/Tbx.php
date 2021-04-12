@@ -60,18 +60,18 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      * @var array
      */
     protected array $statusMap = [
-        'preferredTerm' => editor_Models_Term::STAT_PREFERRED,
-        'admittedTerm' => editor_Models_Term::STAT_ADMITTED,
-        'legalTerm' => editor_Models_Term::STAT_LEGAL,
-        'regulatedTerm' => editor_Models_Term::STAT_REGULATED,
-        'standardizedTerm' => editor_Models_Term::STAT_STANDARDIZED,
-        'deprecatedTerm' => editor_Models_Term::STAT_DEPRECATED,
-        'supersededTerm' => editor_Models_Term::STAT_SUPERSEDED,
+        'preferredTerm' => editor_Models_Terminology_Models_TermModel::STAT_PREFERRED,
+        'admittedTerm' => editor_Models_Terminology_Models_TermModel::STAT_ADMITTED,
+        'legalTerm' => editor_Models_Terminology_Models_TermModel::STAT_LEGAL,
+        'regulatedTerm' => editor_Models_Terminology_Models_TermModel::STAT_REGULATED,
+        'standardizedTerm' => editor_Models_Terminology_Models_TermModel::STAT_STANDARDIZED,
+        'deprecatedTerm' => editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED,
+        'supersededTerm' => editor_Models_Terminology_Models_TermModel::STAT_SUPERSEDED,
 
         //some more states (uncompleted!), see TRANSLATE-714
-        'proposed' => editor_Models_Term::STAT_PREFERRED,
-        'deprecated' => editor_Models_Term::STAT_DEPRECATED,
-        'admitted' => editor_Models_Term::STAT_ADMITTED,
+        'proposed' => editor_Models_Terminology_Models_TermModel::STAT_PREFERRED,
+        'deprecated' => editor_Models_Terminology_Models_TermModel::STAT_DEPRECATED,
+        'admitted' => editor_Models_Terminology_Models_TermModel::STAT_ADMITTED,
     ];
 
     /**
@@ -139,14 +139,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /***
      * Term entry model instance (this is a helper instance)
      *
-     * @var editor_Models_TermCollection_TermEntry
+     * @var editor_Models_Terminology_Models_TermEntryModel
      */
     protected $termEntryModel;
 
     /***
      * Term model instance (this is a helper instance)
      *
-     * @var editor_Models_Term
+     * @var editor_Models_Terminology_Models_TermModel
      */
     protected $termModel;
 
@@ -169,8 +169,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $this->logger = Zend_Registry::get('logger');
         $this->user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $this->termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        $this->termEntryModel = ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
-        $this->termModel = ZfExtended_Factory::get('editor_Models_Term');
+        $this->termEntryModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermEntryModel');
+        $this->termModel = ZfExtended_Factory::get('editor_Models_Terminology_Models_TermModel');
         $this->tbxFileImport = ZfExtended_Factory::get('editor_Models_Terminology_Import_TbxFileImport');
     }
 
@@ -277,9 +277,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      * checks if the needed TBX file exists, otherwise recreate if from DB
      * @param editor_Models_Task $task
      * @param SplFileInfo $tbxPath
-     * @return SimpleXMLElement
+     * @return string
      */
-    public function assertTbxExists(editor_Models_Task $task, SplFileInfo $tbxPath): SimpleXMLElement
+    public function assertTbxExists(editor_Models_Task $task, SplFileInfo $tbxPath): string
     {
         //fallback for recreation of TBX file:
         $tbxData = $this->termModel->exportForTagging($task);
