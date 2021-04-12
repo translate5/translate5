@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Enthält Methoden zum Fileparsing für den Export
+ * TODO AutoQA: generate internal tag errors from quality db and/or with new API
  */
 abstract class editor_Models_Export_FileParser {
     use editor_Models_Export_FileParser_MQMTrait;

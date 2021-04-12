@@ -41,6 +41,11 @@ Ext.define('Editor.view.quality.FilterPanelController', {
             '#Segments': {
                 chainEnd: 'onSegmentSaved'
             }
+        },
+        store: {
+            '#FilterQualities': {
+                load: 'onStoreLoaded'
+            }
         }
     },
     /**
@@ -48,6 +53,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      */
     onBeforeExpand: function(){
         this.loadStore();
+        this.getView().down('#modeSelector').setValue('all');
     },
     /**
      * When the view is collapsed we unload store to be clean
@@ -70,15 +76,6 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         }
     },    
     /**
-     * Prevents an item being checked when it has no qualities
-     * QUIRK: the "qroot" item (= All categories) can not be activated/deactivated more then once. Why ? Bug in ExtJS check propagation ?
-     */
-    onBeforeCheckChange (record, checkedState, e){
-        if(record.get('qcount') == 0){
-            return false;
-        }
-    },
-    /**
      * Changes the filter-mode initiated by the radio on top
      */
     onFilterModeChanged: function(comp, newVal, oldVal){
@@ -88,6 +85,10 @@ Ext.define('Editor.view.quality.FilterPanelController', {
             // TODO AUTOQA: remove
             console.log("FILTER MODE CHANGED, RELOAD QUALITIES STORE AND UPDATE GRID");
         }
+    },
+    onAnalysisButtonClick: function(btn){
+        // TODO AUTOQA: implement
+        console.log('onAnalysisButtonClick: ', btn);
     },
     /**
      * Called onsaving of segments (incl. alikes). We refresh our store then without updating the filtered grid if we are visible /show qualities
@@ -102,9 +103,18 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         }
     },
     /**
+     * Prevents an item being checked when it has no qualities
+     */
+    onBeforeCheckChange (record, checked, e){
+        if(record.isEmptyRubric()){
+            return false;
+        }
+    },
+    /**
      * Called for each checkbox when it is Changed, This makes a delayed update neccessaray to unify multiple changes to one
      */
-    onCheckChange: function(record, checkedState, e){
+    onCheckChange: function(record, checked, e){
+        record.propagateChecked(checked);
         if(this.delayedChange == null){
             var me = this;
             me.delayedChange = new Ext.util.DelayedTask(function(){
@@ -113,23 +123,32 @@ Ext.define('Editor.view.quality.FilterPanelController', {
             });
             me.delayedChange.delay(50);
         }
-    },    
+    },
+    /**
+     * Handles showing the loaded store & firing the filter event
+     */
+    onStoreLoaded: function(store){
+        var me = this, view = this.getView();
+        store.getRootNode().expand();
+        view.afterLoad();
+        me.delayedChange = new Ext.util.DelayedTask(function(){
+            me.delayedChange = null;
+            me.updateFilter(true);
+        });
+        me.delayedChange.delay(250);
+        this.qualitiesShown = true;
+    },
     /**
      * Loads the qualities before the panel is expanded or if a uncollapsed state is applied (to catch an initially open panel)
      */
     loadStore: function(){
-        var me = this;
-        this.getView().getStore().load({
-            callback: function(){
-                me.storeLoaded();
-            }
-        });
+        this.getView().getStore().load();
     },
     /**
      * Reloads the store and keeps the current selection
      */
     reloadStore: function(){
-        this.getView().getStore().reload({
+        this.getView().getStore().load({
             params: {
                 currentstate: this.getFilterValue(true)
             }
@@ -143,19 +162,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         this.fireEvent('qualityFilterChanged', '', doReloadStore);
         this.qualitiesShown = false;
     },
-    /**
-     * Handles showing the loaded store & firing the filter event
-     */
-    storeLoaded: function(){
-        this.getView().getStore().getRootNode().expand();
-        var me = this;
-        me.delayedChange = new Ext.util.DelayedTask(function(){
-            me.delayedChange = null;
-            me.updateFilter(true);
-        });
-        me.delayedChange.delay(250);
-        this.qualitiesShown = true;
-    },
+    
     /**
      * Fires the filter update event
      */
