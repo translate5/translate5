@@ -422,7 +422,7 @@ var Attribute={
 	 * @returns
 	 */
 	handleAttributeHeaderText:function(attribute,addColon){
-	    var noHeaderName=attribute.name + (attribute.attrType ? (" "+attribute.attrType) : ""),
+	    var noHeaderName = attribute.attrType ? attribute.attrType : attribute.name,//use attribute type as fallback header TRANSLATE-2325
 	    	headerText=attribute.headerText ? attribute.headerText :  noHeaderName,//if no headerText use attribute name + if exist attribute type
             headerTextTranslated = translations[headerText] ? translations[headerText] : headerText;
         return headerTextTranslated + (addColon ? ":" : "");
@@ -637,7 +637,8 @@ var Attribute={
     			return attributeLabels[i].labelText;
     		}
     	}
-    	return labelName+' '+labelType;
+    	//if label type exist, return the label type, otherwize return the label name
+    	return labelType ? labelType : labelName;
     },
     
     /***

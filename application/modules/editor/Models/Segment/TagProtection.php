@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Protects XML/HTML content / tags as internal tags
  */
+use \QueryPath\DOMQuery;
 class editor_Models_Segment_TagProtection {
     
     /**
@@ -55,6 +56,15 @@ class editor_Models_Segment_TagProtection {
      */
     public function protectTags(string $textNode, bool $entityCleanup = true) {
         //$textNode is now: Dies <strong>ist ein</strong> Test. &nbsp;
+        
+        $this->tagId = 1;
+        
+        //if there were cdata or comment blocks in the encoded area, we encode them and their content as a single tag
+        $textNode = preg_replace_callback('/(<!\[CDATA\[.*?\]\]>)|(<!--.*?-->)/s', function($item){
+            $originalTag = editor_Models_Segment_InternalTag::encodeTagContent($item[0]);
+            return $this->makeProtectedTag('single', $this->tagId++, $originalTag);
+        }, $textNode);
+        
         if($entityCleanup) {
             $textNode = editor_Models_Segment_Utility::foreachSegmentTextNode($textNode, function($text){
                 return editor_Models_Segment_Utility::entityCleanup($text);
@@ -66,10 +76,9 @@ class editor_Models_Segment_TagProtection {
             return $textNode;
         }
             
-        $this->tagId = 1;
-        
         try {
             $tempXml = qp('<?xml version="1.0"?><segment>'.$textNode.'</segment>', NULL, array('format_output' => false));
+            /* @var $tempXml \QueryPath\DOMQuery */
         }
         catch (Exception $e) {
             return $this->parseSegmentProtectInvalidHtml5($textNode);
@@ -78,10 +87,13 @@ class editor_Models_Segment_TagProtection {
         // mark single- or paired-tags
         foreach ($tempXml->find('segment *') as $element) {
             $tagType = 'singleTag';
+            if($element->tag() == 'protectedTag') {
+                //if it is already a protectedTag, we just do nothing with it
+                continue;
+            }
             if (!empty($element->innerXml())) {
                 $tagType = 'pairedTag';
             }
-            
             $element->wrap('<'.$tagType.'_'.$this->tagId++.'/>');
         }
         $textNode = $tempXml->find('segment')->innerXml();
@@ -97,7 +109,6 @@ class editor_Models_Segment_TagProtection {
      * @return string
      */
     protected function convertToPlaceholderTag($text) {
-        $placeholder = '<protectedTag data-type="%1$s" data-id="%2$d" data-content="%3$s"/>';
         $regexMap = [
             'single' => '/<singleTag_([0-9]+)[^>]*>(<[^>]+>)<\/singleTag_[0-9]+>/is',
             'open' => '/<pairedTag_([0-9]+)[^>]*>(<[^>]+>)/is',
@@ -116,7 +127,7 @@ class editor_Models_Segment_TagProtection {
                         $originalTag = $match[2];
                     }
                     $originalTag = editor_Models_Segment_InternalTag::encodeTagContent($originalTag);
-                    $text = str_replace($match[0], sprintf($placeholder, $type, $id, $originalTag), $text);
+                    $text = str_replace($match[0], $this->makeProtectedTag($type, $id, $originalTag), $text);
                 }
             }
         }
@@ -129,17 +140,29 @@ class editor_Models_Segment_TagProtection {
     protected function parseSegmentProtectInvalidHtml5($segment) {
         $replacer = function ($matches){
             $tagName = preg_replace('/<[\/]*([^ ]*).*>/i', '$1', $matches[0]);
-            // only replace HTML5 tags
-            if (!in_array($tagName, $this->html5Tags)) {
+            // only replace HTML5 tags, keep protectedTag in any case as original
+            if (!in_array($tagName, $this->html5Tags) || $tagName == 'protectedTag') {
                 return $matches[0];
             }
-            $id = $this->tagId++;
             
             $originalTag = editor_Models_Segment_InternalTag::encodeTagContent($matches[0]);
-            return str_replace($matches[0], '<protectedTag data-type="single" data-id="'.$id.'" data-content="'.$originalTag.'"/>', $matches[0]);
+            return $this->makeProtectedTag('single', $this->tagId++, $originalTag);
         };
         
         return preg_replace_callback('/(<[^><]+>)/is', $replacer, $segment);
+    }
+    
+
+    /**
+     * Creates a protected tag out of given data
+     * @param string $type
+     * @param string $id
+     * @param string $originalTag
+     * @return string
+     */
+    protected function makeProtectedTag(string $type, string $id, string $originalTag): string {
+        $placeholder = '<protectedTag data-type="%1$s" data-id="%2$d" data-content="%3$s"/>';
+        return sprintf($placeholder, $type, $id, $originalTag);
     }
     
     /**
