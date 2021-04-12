@@ -42,8 +42,8 @@ Ext.define('Editor.view.quality.FilterPanel', {
     itemId: 'qualityFilterPanel',
     cls: 'qualityFilterPanel',
     title: '#UT#Qualitätssicherung',
-    checkPropagation: 'both',
     rootVisible: false,
+    reAnalysisHidden: true,
     useArrows: true,
     // we catch the beforestaterestore event to load the store when the panel is initially open
     listeners: {
@@ -57,7 +57,10 @@ Ext.define('Editor.view.quality.FilterPanel', {
     strings: {
         modeAll: '#UT#Alle zeigen',
         modeErrors: '#UT#Nur Fehler',
-        modeFalsePositives: '#UT#Nur Falsch-Positive'
+        modeFalsePositives: '#UT#Nur Falsch-Positive',
+        incompleteCatCaption: '#UT#Unvollständig analysiert',
+        incompleteCatText: '#UT#Die Qualität wurde nicht oder nur unvollständig analysiert. Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben',
+        newAnalysis: '#UT#Neu analysieren',
     },
     initConfig: function(instanceConfig) {
         var me = this, config = {
@@ -67,14 +70,30 @@ Ext.define('Editor.view.quality.FilterPanel', {
                 xtype: 'treecolumn',
                 iconCls: 'x-tree-noicon',
                 dataIndex:'text',
-                renderer: function (text, meta, record){
-                    if(record.get('qroot')){
+                renderer: function (text, meta, record, rowIndex, colIndex, store, view){
+                    if(record.isQualityRoot()){
                         meta.tdCls = Ext.String.trim(meta.tdCls + ' x-tree-root');
                     }
-                    if(record.get('qcount') == 0){
+                    if(record.isEmptyRubric()){
                         meta.tdCls = Ext.String.trim(meta.tdCls + ' x-tree-check-disabled');
                     }
-                    return text + ' ('+record.get('qcount')+')';
+                    if(record.isFaulty()){
+                        meta.tdCls = Ext.String.trim(meta.tdCls + ' x-tree-faulty');
+                    }
+                    var symbol = '';
+                    // special for rubrics: add icon for incompletely tagged quality types
+                    if(record.isIncomplete()){
+                        symbol += '<span class="x-tree-symbol t5-quality-incomplete" data-qtip="'
+                            + '<b>' + me.strings.incompleteCatCaption +'</b><br/>' + me.strings.incompleteCatText + '">'
+                            + Ext.String.fromCodePoint(parseInt('0xf071', 16)) + '</span> ';
+                        me.reAnalysisHidden = false; // triggers the showing of the re-analysis toolbar/button
+                    }
+                    // special for mqm: add category-index / mqm-id
+                    if(record.get('qtype') == 'mqm' && record.get('qcatidx') > -1){
+                        symbol += '<img class="x-tree-symbol qmflag qmflag-' + record.get('qcatidx') + '" src="' 
+                            + Editor.data.segments.subSegment.tagPath + 'qmsubsegment-' + record.get('qcatidx') + '-left.png"> ';
+                    }
+                    return symbol + text + ' ('+record.get('qcount')+')';
                 },
                 sortable: true,
                 flex: 1
@@ -82,37 +101,41 @@ Ext.define('Editor.view.quality.FilterPanel', {
             dockedItems: [{
                 xtype: 'toolbar',
                 dock: 'top',
-                items: [
-                    {
-                        xtype: 'combo',
-                        displayField: 'text',
-                        valueField: 'mode',
-                        queryMode:'local',
-                        forceSelection: true,
-                        // selectOnFocus: true,
-                        value: 'all',
-                        listeners:{
-                            change: 'onFilterModeChanged'
-                        },
-                        store: Ext.create('Ext.data.Store', {
-                            fields: [ 'text', 'mode' ],
-                            data : [
-                                { 'text': me.strings.modeAll, 'mode': 'all' },
-                                { 'text': me.strings.modeErrors, 'mode': 'error' },
-                                { 'text': me.strings.modeFalsePositives, 'mode': 'falsepositive' }
-                            ]
-                        })
-                    }
-                ]
+                items: [{
+                    xtype: 'combo',
+                    displayField: 'text',
+                    valueField: 'mode',
+                    queryMode:'local',
+                    itemId: 'modeSelector',
+                    forceSelection: true,
+                    // selectOnFocus: true,
+                    value: 'all',
+                    listeners:{
+                       change: 'onFilterModeChanged'
+                    },
+                    store: Ext.create('Ext.data.Store', {
+                       fields: [ 'text', 'mode' ],
+                       data : [
+                           { 'text': me.strings.modeAll, 'mode': 'all' },
+                           { 'text': me.strings.modeErrors, 'mode': 'error' },
+                           { 'text': me.strings.modeFalsePositives, 'mode': 'falsepositive' }
+                       ]
+                    })
+                }]
             },{
-                // TODO: this will become the UI to refresh the qualities
                 xtype: 'toolbar',
                 dock: 'bottom',
-                hidden: true,
-                items: [
-                    {
+                ui: 'footer',
+                itemId: 'analysisToolbar',
+                hidden: !me.reAnalysisVisible,
+                items: [{
                         xtype: 'button',
-                        text: 'JUST A DUMMY'
+                        text: me.strings.newAnalysis,
+                        width:150,
+                        glyph: 'xf200@FontAwesome5FreeSolid',
+                        listeners: {
+                            click: 'onAnalysisButtonClick'
+                        }
                     }
                 ]
             }]
@@ -122,22 +145,18 @@ Ext.define('Editor.view.quality.FilterPanel', {
         }
         return me.callParent([config]);
     },
+    /**
+     * Used to finalize the view after the store was loaded
+     */
+    afterLoad: function(){
+        console.log("AFTER LOAD: ", this.reAnalysisHidden);
+        this.down('#analysisToolbar').setHidden(this.reAnalysisHidden);
+        this.reAnalysisHidden = true; // reset for the next load
+    },
+    setAnalysisVisible: function(){
+        console.log("SET ANALYSIS VISIBLE");
+    },
     uncheckAll: function(){
         this.getController().uncheckAll();
     }
-    /*
-    initComponent: function() {
-        Ext.applyIf(this, {
-            viewConfig: {
-                 singleSelect: true
-            }
-        });
-        this.callParent(arguments);
-    },
-    */
-    /*
-    viewConfig:{
-        markDirty: false
-    }
-    */
 });

@@ -1896,6 +1896,9 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QWxsZSB6ZWlnZW4='><source>Alle zeigen</source><target>Alle zeigen</target></trans-unit>
 <trans-unit id='TnVyIEZlaGxlcg=='><source>Nur Fehler</source><target>Nur Fehler</target></trans-unit>
 <trans-unit id='TnVyIEZhbHNjaC1Qb3NpdGl2ZQ=='><source>Nur Falsch-Positive</source><target>Nur Falsch-Positive</target></trans-unit>
+<trans-unit id='VW52b2xsc3TDpG5kaWcgYW5hbHlzaWVydA=='><source>Unvollständig analysiert</source><target>Unvollständig analysiert</target></trans-unit>
+<trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBuaWNodCBvZGVyIG51ciB1bnZvbGxzdMOkbmRpZyBhbmFseXNpZXJ0LiBCaXR0ZSBzdG/Dn2VuIFNpZSB1bnRlbiBlaW5lIG5ldWUgQW5hbHlzZSBhbiB1bSBkYXMgUHJvYmxlbSB6dSBiZWhlYmVu'><source>Die Qualität wurde nicht oder nur unvollständig analysiert. Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben</source><target>Die Qualität wurde nicht oder nur unvollständig analysiert. Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben</target></trans-unit>
+<trans-unit id='TmV1IGFuYWx5c2llcmVu'><source>Neu analysieren</source><target>Neu analysieren</target></trans-unit>
 <trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>Alle Kategorien</target></trans-unit>
 <trans-unit id='UUE6IEZhbHNjaC1Qb3NpdGl2ZQ=='><source>QA: Falsch-Positive</source><target>QA: Falsch-Positive</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>

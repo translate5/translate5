@@ -37,14 +37,6 @@ Ext.define('Editor.store.quality.Filter', {
     autoSync: false,
     folderSort: false,
     defaultRootId: 'quality',
-    listeners: {
-        metachange: function (store, meta) {
-            console.log("FilterQualities: metachange", meta);
-        }/*,
-        load : function (store, records) {
-            console.log("FilterQualities: load", records);
-        }*/
-    },
     root: {
         expanded: true,
         text: 'ROOT',

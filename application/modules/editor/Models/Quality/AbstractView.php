@@ -82,13 +82,17 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $dbRows;
     /**
-     * @var array
+     * @var stdClass[]
      */
     protected $rows = [];
     /**
-     * @var array
+     * @var stdClass[]
      */
     protected $rowsByType = [];
+    /**
+     * @var stdClass[]
+     */
+    protected $rowsByMqmCat;
     /**
      * @var integer
      */
@@ -132,6 +136,7 @@ abstract class editor_Models_Quality_AbstractView {
         $this->task = $task;
         $this->taskConfig = $this->task->getConfig();
         $this->manager = editor_Segment_Quality_Manager::instance();
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->excludeMQM = $excludeMQM;
         $this->table = new editor_Models_Db_SegmentQuality();
         // generate hashtable of filtered qualities and respect filter mode if the current state was sent
@@ -169,9 +174,9 @@ abstract class editor_Models_Quality_AbstractView {
         $root->qid = -1;
         $root->qtype = 'root'; // QUIRK: must not become a real quality ... highly unlikely, as we define the quality-types by code :-)
         $root->qcount = $this->numQualities;
+        $root->qtotal = $this->numQualities;
         $root->qcategory = null;
-        $root->qcomplete = true;
-        $root->qroot = true;
+        $root->qcomplete = true;        
         $root->expanded = true;
         $root->expandable = false;
         $root->checked = $this->getCheckedVal($root->qtype, $root->qcategory);
@@ -184,24 +189,24 @@ abstract class editor_Models_Quality_AbstractView {
      * Retrieves the metadata for the qualities (cleaned overall count, info about internal tag faults)
      * @return stdClass
      */
-    public function getMetaData(){
+    public function getMetaData() : stdClass {
         $metadata = new stdClass();
-        $metadata->numQualities = $this->numQualities;
+        $metadata->numSegments = $this->numQualities;
         $metadata->hasFaultyInternalTags = $this->hasFaultyInternalTags;
         return $metadata;
     }
     /**
      * Retrieves the processed data
-     * @return array
+     * @return stdClass[]
      */
-    public function getRows(){
+    public function getRows() : array {
         return $this->rows;
     }
     /**
      * Retrieves the intermediate internal model
-     * @return array
+     * @return stdClass[]
      */
-    public function getRowsByType(){
+    public function getRowsByType() : array {
         return $this->rowsByType;
     }
     /**
@@ -218,10 +223,8 @@ abstract class editor_Models_Quality_AbstractView {
             }
         }
         // since the QM type is not part of the LEK_segment_quality model we have to add it seperately
-        if(count($qmRows) > 0){
-            $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-            $rubrics[] = $this->createQmRow($this->translate->_(strtoupper($qmType)), '', true);
-        }
+        $rubrics[] = $this->createNonDbRow($this->translate->_(strtoupper($qmType)), $qmType, NULL);
+        
         usort($rubrics, 'editor_Models_Quality_AbstractView::compareByTitle');
         // create intermediate model
         foreach($rubrics as $rubric){
@@ -250,7 +253,7 @@ abstract class editor_Models_Quality_AbstractView {
             $utility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
             /* @var $utility editor_Models_Segment_Utility */
             // add QMs from the segments model
-            foreach($this->fetchQmRows() as $row){
+            foreach($qmRows as $row){
                 $segmentId = $row['id'];
                 foreach($utility->convertQmIds($row['qmId']) as $index => $name){
                     $category = $qmType.'_'.$index; // analogue to what is made with mqm-categories
@@ -260,7 +263,7 @@ abstract class editor_Models_Quality_AbstractView {
                     }
                     if($this->isTree){
                         if(!array_key_exists($category, $this->rowsByType[$qmType])){
-                            $this->rowsByType[$qmType][$category] = $this->createQmRow($this->translate->_($name), $category, false);
+                            $this->rowsByType[$qmType][$category] = $this->createNonDbRow($this->translate->_($name), $qmType, $category);
                         }
                         $this->rowsByType[$qmType][$category]->qcount++;
                         if($this->hasSegmentIds){
@@ -280,23 +283,28 @@ abstract class editor_Models_Quality_AbstractView {
     }
     /**
      * Hook to create the result rows
-     * @param array $rubrics
+     * @param stdClass[] $rubrics
      */
     protected function createRows(array $rubrics){
         foreach($rubrics as $rubric){
             if($this->isTree){
-                $rubric->children = [];
-                ksort($this->rowsByType[$rubric->qtype]);
-                foreach($this->rowsByType[$rubric->qtype] as $category => $row){
-                    if($category != self::RUBRIC){
-                        $rubric->children[] = $row;
+                $rubric->qtotal = $rubric->qcount;
+                if($rubric->qtype == editor_Segment_Tag::TYPE_MQM){
+                    // create mqm-subtree if we have mqms
+                    if($rubric->qcount > 0){
+                        $this->addMqmRows($rubric, $this->rowsByType[$rubric->qtype]);
                     }
-                }
-                if(count($rubric->children) == 0){
-                    $rubric->leaf = true;
-                    $rubric->checked = false;
-                }
+                } else {
+                    $rubric->children = [];
+                    ksort($this->rowsByType[$rubric->qtype]);
+                    foreach($this->rowsByType[$rubric->qtype] as $category => $row){
+                        if($category != self::RUBRIC){
+                            $rubric->children[] = $row;
+                        }
+                    }
+                }                
             }
+            $this->finalizeTree($rubric);
             $this->rows[] = $rubric;
         }
     }
@@ -311,11 +319,9 @@ abstract class editor_Models_Quality_AbstractView {
         $row->qtype = $type;
         $row->qcount = 0;
         $row->qcomplete = $this->manager->isFullyCheckedType($type, $this->taskConfig);
-        $row->checked = $this->getCheckedVal($type);
         if($this->isTree){
-            $row->qcategory = null;
-            $row->qroot = false;
-            $row->expanded = true;
+            $row->children = [];
+            $row->qcategory = NULL;
         }
         if($this->hasSegmentIds){
             $row->segmentIds = [];
@@ -324,7 +330,7 @@ abstract class editor_Models_Quality_AbstractView {
         return $row;
     }
     /**
-     * Creates a category row
+     * Creates a category rowbased based on a real DB-entry
      * @param editor_Models_Db_SegmentQualityRow $dbRow
      * @return stdClass
      */
@@ -334,11 +340,10 @@ abstract class editor_Models_Quality_AbstractView {
         $row->qtype = $dbRow->type;
         $row->qcount = 0;
         $row->qcomplete = true;
-        $row->checked = $this->getCheckedVal($dbRow->type, $dbRow->category);
         if($this->isTree){
+            $row->children = [];
             $row->qcategory = $dbRow->category;
-            $row->qroot = false;
-            $row->leaf = true;
+            $row->qcatidx = $dbRow->categoryIndex;
         }
         if($this->hasSegmentIds){
             $row->segmentIds = [];
@@ -347,31 +352,83 @@ abstract class editor_Models_Quality_AbstractView {
         return $row;
     }
     /**
-     * Creates a QM row
-     * @param editor_Models_Db_SegmentQualityRow $dbRow
+     * Creates a non-DB non-rubric row
+     * @param string $text
+     * @param string $type
+     * @param string $category
      * @return stdClass
      */
-    protected function createQmRow(string $text, string $category, bool $isRubric) : stdClass {
+    protected function createNonDbRow(string $text, string $type, string $category=NULL) : stdClass {
         $row = new stdClass();
         $row->qid = -1;
-        $row->qtype = editor_Segment_Tag::TYPE_QM;
+        $row->qtype = $type;
         $row->qcount = 0;
         $row->qcomplete = true;
-        $row->checked = $this->getCheckedVal(editor_Segment_Tag::TYPE_QM, $category);
         if($this->isTree){
-            $row->qcategory = ($isRubric) ? null : $category;
-            $row->qroot = false;
-            if($isRubric){
-                $row->expanded = true;
-            } else {
-                $row->leaf = false;
-            }
+            $row->children = [];
+            $row->qcategory = $category;
         }
         if($this->hasSegmentIds){
             $row->segmentIds = [];
         }
         $row->text = $text;
         return $row;
+    }
+    /**
+     * Adds the props that ExtJs needs to build a proper tree & repairs some of the quirks
+     * @param stdClass $row
+     * @param boolean $isRubric
+     */
+    protected function finalizeTree(stdClass $row, $isRubric=true){
+        if(property_exists($row, 'children') && count($row->children) > 0){
+            $row->expanded = true;
+            foreach($row->children as $child){
+                $this->finalizeTree($child, false);
+            }
+        } else {
+            if(property_exists($row, 'children')){
+                unset($row->children);
+            }
+            $row->leaf = true;
+        }
+        if($isRubric){
+            if(!property_exists($row, 'qtotal')){
+                $row->qtotal = $row->qcount;
+            }
+            // rubrics without segments shall not be checked
+            $row->checked = ($row->qtotal > 0) ? $this->getCheckedVal($row->qtype, $row->qcategory) : false;
+        } else {
+            $row->checked = $this->getCheckedVal($row->qtype, $row->qcategory);
+        }
+        // mark the faulty item
+        if($row->qtype == editor_Segment_Tag::TYPE_INTERNAL && $row->qcategory == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY){
+            $row->qfaulty = true;
+        }
+        // TO TEST THE incomplete & faulty configs in the frontend
+        /*
+        if($row->qtype == editor_Segment_Tag::TYPE_INTERNAL){
+            if($row->qcategory == NULL){
+                $row->qcomplete = false;
+            } else {
+                $row->qfaulty = true;
+            }
+        }
+        //*/
+    }
+    /**
+     * Evaluates the checked-value, if request-vals have been sent by request or by default-value otherwise
+     * @param string $type
+     * @param string $category
+     * @return bool
+     */
+    protected function getCheckedVal(string $type, string $category=null) : bool {
+        if($this->checkedQualities == null){
+            return self::CHECKED_DEFAULT;
+        }
+        if($category === null || $category === ''){
+            return array_key_exists($type, $this->checkedQualities);
+        }
+        return array_key_exists($type.':'.$category, $this->checkedQualities);
     }
     /**
      * 
@@ -391,18 +448,48 @@ abstract class editor_Models_Quality_AbstractView {
         return $this->table->fetchAll($select, 'id ASC')->toArray();
     }
     /**
-     * Evaluates the checked-value, if request-vals have been sent by request or by default-value otherwise
-     * @param string $type
-     * @param string $category
-     * @return bool
+     * Generates the MQM children, which usually are deeper nested
+     * @param stdClass $rubric
+     * @param stdClass[] $rowsByMqmCat
      */
-    protected function getCheckedVal(string $type, string $category=null) : bool {
-        if($this->checkedQualities == null){
-            return self::CHECKED_DEFAULT;
+    protected function addMqmRows(stdClass $rubric, array $rowsByMqmCat){
+        $this->rowsByMqmCat = $rowsByMqmCat;
+        // turn the mqm-tree to our model
+        $mqmNodes = $this->task->getMqmTypesTranslated(false);
+        foreach($mqmNodes as $mqmNode){
+            $child = $this->createMqmRowFromNode($mqmNode);
+            // only add mqm-children that have segments
+            if($child->qtotal > 0){
+                $rubric->children[] = $child;
+            }
         }
-        if($category === null || $category === ''){
-            return array_key_exists($type, $this->checkedQualities);
+    }
+    /**
+     * Recursive function to add a tree of mqm types as tree to our model
+     * @param stdClass $mqmType: a stdClass with the props id, text & children where children is optional
+     */
+    protected function createMqmRowFromNode(stdClass $mqmNode){
+        $category = editor_Segment_Mqm_Tag::createCategoryVal($mqmNode->id);
+        $hasChildren = (isset($mqmNode->children) && is_array($mqmNode->children) && count($mqmNode->children) > 0);
+        if(array_key_exists($category, $this->rowsByMqmCat)){
+            $row = $this->rowsByMqmCat[$category];
+        } else {
+            $row = $this->createNonDbRow($mqmNode->text, editor_Segment_Tag::TYPE_MQM, $category);
+            $row->qcatidx = $mqmNode->id;
         }
-        return array_key_exists($type.':'.$category, $this->checkedQualities);
+        if($hasChildren){
+            $addTotal = 0;
+            foreach($mqmNode->children as $mqmChild){
+                $child = $this->createMqmRowFromNode($mqmChild);
+                if($child->qtotal > 0){
+                    $addTotal += $child->qtotal;
+                    $row->children[] = $child;
+                }
+            }
+            $row->qtotal = $row->qcount + $addTotal;
+        } else {
+            $row->qtotal = $row->qcount;
+        }
+        return $row;
     }
 }

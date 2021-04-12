@@ -4014,6 +4014,11 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QWxsZSB6ZWlnZW4='><source>Alle zeigen</source><target>Show all</target></trans-unit>
 <trans-unit id='TnVyIEZlaGxlcg=='><source>Nur Fehler</source><target>Only errors</target></trans-unit>
 <trans-unit id='TnVyIEZhbHNjaC1Qb3NpdGl2ZQ=='><source>Nur Falsch-Positive</source><target>Only false positives</target></trans-unit>
+<trans-unit id='VW52b2xsc3TDpG5kaWcgYW5hbHlzaWVydA=='><source>Unvollständig analysiert</source><target>Analysis incomolete</target></trans-unit>
+<trans-unit id='RGllIFF1YWxpdMOkdCB3dXJkZSBuaWNodCBvZGVyIG51ciB1bnZvbGxzdMOkbmRpZyBhbmFseXNpZXJ0LiBCaXR0ZSBzdG/Dn2VuIFNpZSB1bnRlbiBlaW5lIG5ldWUgQW5hbHlzZSBhbiB1bSBkYXMgUHJvYmxlbSB6dSBiZWhlYmVu'>
+	<source>Die Qualität wurde nicht oder nur unvollständig analysiert. Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben</source>
+	<target>The quality was not or only partly analyzed. Please initiate a new analysis below to resolve the problem</target></trans-unit>
+<trans-unit id='TmV1IGFuYWx5c2llcmVu'><source>Neu analysieren</source><target>New analysis</target></trans-unit>
 <trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>All categories</target></trans-unit>
 <trans-unit id='UUE6IEZhbHNjaC1Qb3NpdGl2ZQ=='><source>QA: Falsch-Positive</source><target>QA: False positives</target></trans-unit>
 <trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='>

@@ -28,19 +28,99 @@ END LICENSE AND COPYRIGHT
 
 /**
  * The model for a quality filter entry
+ * This involves specialized checked propagation methods
  */
 Ext.define('Editor.model.quality.Filter', {
     extend: 'Ext.data.Model',
     fields: [
         { name:'qid', type:'int' },
         { name:'qtype', type:'string' },
-        { name:'qcount', type:'int' },
-        { name:'qcategory', type:'string' },
-        { name:'qroot', type:'boolean' },
-        { name:'qcomplete', type:'boolean' },
-        { name:'segmentIds' }
+        { name:'qcount', type:'int', defaultValue:0 },
+        { name:'qtotal', type:'int', defaultValue:0 },
+        { name:'qcategory', type:'string', defaultValue:'---' },
+        { name:'qcatidx', type:'int', defaultValue:-1 },
+        { name:'qcomplete', type:'boolean', defaultValue:true },
+        { name:'qfaulty', type:'boolean', defaultValue:false }
     ],
-    getSegmentIds: function(){
-        this.get('segmentIds');
+    /**
+     * Note that this is a virtual root (= the first child of the store root !)
+     */
+    isQualityRoot: function(){
+        return (this.get('qtype') == 'root');
+    },
+    /**
+     * Means that we are no quality root nor a rubric but have connected segments
+     */
+    isQuality: function(){
+        return (this.get('qcategory') != '' && this.get('qtype') != 'root');
+    },
+    isRubric: function(){
+        return (this.get('qcategory') == '' && this.get('qtype') != 'root');
+    },
+    isEmptyRubric: function(){
+        return (this.isRubric() && this.get('qtotal') == 0);
+    },
+    isIncomplete: function(){
+        return (this.get('qcomplete') == false);
+    },
+    isFaulty: function(){
+        return (this.get('qfaulty') == true);
+    },
+    propagateChecked: function(checked){
+        var qualityRoot = this.isQualityRoot();
+        if(qualityRoot || this.isRubric()){
+            this.propagateCheckedDown(checked);
+        }
+        if(!qualityRoot && this.parentNode){
+            this.parentNode.propagateCheckedUp(checked);
+        }
+    },
+    /**
+     * Propagates the checked state down
+     */
+    propagateCheckedDown: function(checked){
+        if(this.childNodes && this.childNodes.length > 0){
+            for(var i=0; i < this.childNodes.length; i++){
+                if(!this.childNodes[i].isEmptyRubric()){
+                    this.childNodes[i].set('checked', checked);
+                    this.childNodes[i].propagateCheckedDown(checked);
+                }
+            }
+        }
+    },
+    /**
+     * Propagate the checked state up
+     */
+    propagateCheckedUp: function(checked){
+        if(checked){
+            var rubric = this.isRubric();
+            if((this.isQualityRoot() || rubric) && this.childNodes && this.childNodes.length > 0){
+                if(this.allChildrenChecked(rubric, (rubric ? this.internalId : null))){
+                    this.set('checked', checked);
+                }
+            }
+        } else {
+            if(this.get('checked') && !this.isQuality()){
+                this.set('checked', false);
+            } 
+        }
+        if(!this.isQualityRoot() && this.parentNode){
+            this.parentNode.propagateCheckedUp(checked);
+        }
+    },
+    /**
+     * Check, if our children are all checked id prevents clicking on a rubric additional check
+     */
+    allChildrenChecked: function(deep, id){
+        if(this.childNodes && this.childNodes.length > 0){
+            for(var i=0; i < this.childNodes.length; i++){
+                if(!this.childNodes[i].isEmptyRubric() && id !== this.childNodes[i].internalId){
+                    if(!this.childNodes[i].get('checked') || (deep && !this.childNodes[i].allChildrenChecked(deep, id))){
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 });
