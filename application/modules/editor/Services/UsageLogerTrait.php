@@ -68,7 +68,8 @@ trait editor_Services_UsageLogerTrait {
         //if the query source is segment, the context is for task
         if($querySource instanceof editor_Models_Segment){
             
-            //set the request source to editor
+            
+            // init the default request source
             $mtlogger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_EDITOR);
             
             if($isSegmentRepetition){
@@ -83,9 +84,9 @@ trait editor_Services_UsageLogerTrait {
             
             //by default, set the customers to the task customer
             $mtlogger->setCustomers($this->taskFilePretranslate->getCustomerId());
-            
-            //if the task type is file-pretranslation, we need to load the pre-translation task user, and calculate the customers
-            if($this->taskFilePretranslate->getTaskType() == editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE){
+
+            //if the task type is hidden task( file-pretranslation), we need to load the pre-translation task user, and calculate the customers
+            if($this->taskFilePretranslate->isHiddenTask()){
                 
                 if(!isset($this->userFilePretranslate) || $this->userFilePretranslate->getUserGuid() != $this->taskFilePretranslate->getPmGuid()){
                     //when file is being pretranslated in instant translate, the task pm is always the user who runs the pretranslation
@@ -94,7 +95,8 @@ trait editor_Services_UsageLogerTrait {
                 }
                 //for instant translate, calculate the customers
                 $mtlogger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
-                //set the request source to instant-translate
+                
+                // set the request source to instant-translate
                 $mtlogger->setRequestSource(editor_Services_Connector::REQUEST_SOURCE_INSTANT_TRANSLATE);
             }
         }elseif(is_string($querySource)){//if the the querySource is string, the context is instant-translate (translate request)
