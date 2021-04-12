@@ -35,11 +35,11 @@ INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `valu
     ('runtimeOptions.worker.editor_Segment_Quality_ImportFinishingWorker.maxParallelWorkers', 1, 'editor', 'worker', '1', '1', '', 'integer', 'Max parallel running workers of the global quality check finishing worker', 1),
     ('runtimeOptions.worker.editor_Segment_Quality_ImportWorker.maxParallelWorkers', 1, 'editor', 'worker', '1', '1', '', 'integer', 'Max parallel running workers of the global quality check import worker.', 1);
     
-CREATE TABLE IF NOT EXISTS `LEK_segment_tags` (
+CREATE TABLE `LEK_segment_tags` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `taskGuid` varchar(38) NOT NULL COMMENT 'Foreign Key to LEK_task',
     `segmentId` int(11) NOT NULL COMMENT 'Foreign Key to LEK_segments',
-    `tags` longtext NOT NULL default '',
+    `tags` longtext NOT NULL,
     `status_term` int(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     UNIQUE (`segmentId`),
