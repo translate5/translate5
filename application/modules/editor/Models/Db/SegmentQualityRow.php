@@ -51,4 +51,11 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
      * @var string
      */
     public $processingState;
+    
+    /** can be used for debugging 
+    public function save(){
+        error_log('SAVED QUALITY '.$this->id.': type: '.$this->type.' category: '.$this->category.' falsePositive: '.$this->falsePositive);
+        parent::save();
+    }
+    //*/
 }

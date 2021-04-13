@@ -148,7 +148,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * For compatibility with old code/concepts some quality tags may not use the global date-attribute for the quality ID
      * @var string
      */
-    protected static $dataNameQualityId = null;
+    protected static $historicDataNameQid = null;
     /**
      * The start character Index of the Tag in relation to the segment's text
      * The opening tag will be rendered BEFORE this char
@@ -277,15 +277,24 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @return bool
      */
     public function hasQualityId() : bool {
-        return ($this->hasData($this->getDataNameQualityId()) && ctype_digit($this->getData($this->getDataNameQualityId())));
+        // Compatibility with old code: if there is a existing entry we simply turn it into the current format
+        if(static::$historicDataNameQid != NULL && $this->hasData(static::$historicDataNameQid)){
+            // transfer only if not present
+            if(!array_key_exists('data-'.self::DATA_NAME_QUALITYID, $this->attribs)){
+                $this->attribs['data-'.self::DATA_NAME_QUALITYID] = $this->attribs['data-'.static::$historicDataNameQid];
+            }
+            unset($this->attribs['data-'.static::$historicDataNameQid]);
+            return ctype_digit($this->getData(self::DATA_NAME_QUALITYID));
+        }
+        return ($this->hasData(self::DATA_NAME_QUALITYID) && ctype_digit($this->getData(self::DATA_NAME_QUALITYID)));
     }
     /**
-     * 
+     * Retrieves the quality ID. If not encoded in the tag, returns -1
      * @return int
      */
     public function getQualityId() : int {
         if($this->hasQualityId()){
-            return intval($this->getData($this->getDataNameQualityId()));
+            return intval($this->getData(self::DATA_NAME_QUALITYID));
         }
         return -1;
     }
@@ -295,7 +304,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @return editor_Tag|editor_Segment_Tag
      */
     public function setQualityId(int $qualityId) {
-        return $this->setData($this->getDataNameQualityId(), strval($qualityId));
+        return $this->setData(self::DATA_NAME_QUALITYID, strval($qualityId));
         return $this;
     }
     /**
@@ -303,10 +312,7 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      * @return string
      */
     public function getDataNameQualityId() : string {
-        if(static::$dataNameQualityId == NULL){
-            return self::DATA_NAME_QUALITYID;
-        }
-        return static::$dataNameQualityId;
+        return self::DATA_NAME_QUALITYID;
     }
     /**
      * 

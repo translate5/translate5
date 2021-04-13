@@ -209,8 +209,11 @@ trait editor_Models_Export_FileParser_MQMTrait {
      * @param bool $valueMustExist
      */
     protected function _getImgTagAttr($tag, $type, $numeric = false, $valueMustExist = true) {
-    	$a = '[^\"]*';
-    	if($numeric)$a = '\d+';
+        $a = ($numeric) ? '\d+' : '[^\"]*';
+        // combatibility with old data: formely the quality-id was encoded as data-seq
+        if($type == 'data-t5qid' && strpos($tag, $type) === false && strpos($tag, 'data-seq') !== false){
+            $type = 'data-seq';
+        }
     	$content = preg_replace('".*'.$type.'=\"('.$a.')\".*"', '\\1', $tag);
     	$this->_checkImageTag($type, $content, $tag, $valueMustExist);
         if($numeric){
@@ -247,7 +250,7 @@ trait editor_Models_Export_FileParser_MQMTrait {
     protected function _getXliffDataFromImg($img) {
     	$data = array();
     	$data['type'] = ($this->_isImageTag($img, 'open')) ? 'open' : 'close';
-    	$data['id'] = $this->_getImgTagAttr($img, 'data-seq',true);
+    	$data['id'] = $this->_getImgTagAttr($img, 'data-t5qid', true);
     	if ($data['type'] == 'open') {
             $data['class'] = $this->_getImgTagAttr($img, 'class');
             $data['comment'] = $this->_getImgTagAttr($img, 'data-comment', false, false);

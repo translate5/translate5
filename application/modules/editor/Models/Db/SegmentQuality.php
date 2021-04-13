@@ -30,13 +30,6 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
     
     /**
-     * Deletes all existing entries for the given segmentId
-     * @param int $segmentId
-     */
-    public static function deleteForSegment(int $segmentId){
-        self::deleteForSegments([$segmentId]);
-    }
-    /**
      * Deletes all existing entries for the given segmentIds
      * @param array $segmentIds
      */
@@ -184,6 +177,17 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             $order = [ 'type ASC', 'category ASC' ];
         }
         return $this->fetchAll($select, $order);
+    }
+    /**
+     * Deletes quality-entries by their ID
+     * @param array $qualityIds
+     */
+    public function deleteByIds(array $qualityIds){
+        if(count($qualityIds) > 0){
+            $db = $this->getAdapter();
+            $where = (count($qualityIds) > 1) ? $db->quoteInto('id IN (?)', $qualityIds) : $db->quoteInto('id = ?', $qualityIds[0]);
+            $db->delete($this->getName(), $where);
+        }
     }
     /**
      * 

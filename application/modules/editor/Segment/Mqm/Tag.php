@@ -36,9 +36,9 @@
  * Represents an MQM tag
  * this tag "really" represents two image tags wrapping the content
  * Example as sent from the Frontend:
- * OPENER: <img class="open minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />
- * CLOSER: <img class="close minor qmflag ownttip qmflag-13" data-seq="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />
- * TEMPLATE: <img class="%1$s qmflag ownttip %2$s qmflag-%3$d" data-seq="%4$d" data-comment="%5$s" src="%6$s" />
+ * OPENER: <img class="open minor qmflag ownttip qmflag-13" data-t5qid="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-left.png" />
+ * CLOSER: <img class="close minor qmflag ownttip qmflag-13" data-t5qid="633" data-comment="No Comment" src="/modules/editor/images/imageTags/qmsubsegment-13-right.png" />
+ * TEMPLATE: <img class="%1$s qmflag ownttip %2$s qmflag-%3$d" data-t5qid="%4$d" data-comment="%5$s" src="%6$s" />
  * 
  * @method editor_Segment_Mqm_Tag clone(boolean $withDataAttribs)
  * @method editor_Segment_Mqm_Tag createBaseClone()
@@ -92,10 +92,10 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
     
     protected static $identificationClass = self::CSS_CLASS;
     /**
-     * QUIRK / TODO AUTO QA: historically, the quality-id was encoded as data-seq
+     * COMPATIBILITY: historically, the quality-id was encoded as data-t5qid
      * @var string
      */
-    protected static $dataNameQualityId = 'seq';
+    protected static $historicDataNameQid = 'seq';
     
     /**
      * @var string
@@ -137,7 +137,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      */
     public static function renderTag($qualityId, bool $isOpen, int $categoryIndex, string $severity, string $comment) : string {
         // we follow the original code here
-        // <img class="%1$s qmflag ownttip %2$s qmflag-%3$d" data-seq="%4$d" data-comment="%5$s" src="%6$s" />
+        // <img class="%1$s qmflag ownttip %2$s qmflag-%3$d" data-t5qid="%4$d" data-comment="%5$s" src="%6$s" />
         $position = ($isOpen) ? 'left' : 'right';
         $posClass = ($isOpen) ? self::CSS_CLASS_OPEN : self::CSS_CLASS_CLOSE;
         $tag = editor_Tag::img(self::createImageSrc($categoryIndex, $position));
@@ -147,7 +147,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
             ->addClass(editor_Segment_Tag::CSS_CLASS_TOOLTIP)
             ->addClass($posClass)
             ->addClass(self::CSS_CLASS.'-'.strval($categoryIndex))
-            ->setData(static::$dataNameQualityId, strval($qualityId))
+            ->setData(editor_Segment_Tag::DATA_NAME_QUALITYID, $qualityId)
             ->setData('comment', $comment);
         return $tag->render();
     }
@@ -286,8 +286,8 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         }
         // TODO AUTOQA: Code is copied from editor_Models_Qmsubsegments, needed ??
         // tags spanning no text will be removed silently
-        if($this->getData(static::$dataNameQualityId) == null){
-            throw new Zend_Exception('MQM Tag found, but no quality-id (data-seq) was set in: '.$this->renderStart());
+        if($this->getQualityId() == null){
+            throw new Zend_Exception('MQM Tag found, but no quality-id (data-t5qid) was set in: '.$this->renderStart());
         } else if($this->categoryIndex == -1){
             throw new Zend_Exception('MQM Tag found, but no type index was set in: '.$this->renderStart());
         } else if($this->severity == ''){
@@ -301,7 +301,7 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
      * @see editor_Segment_Tag::pairWith()
      */
     public function pairWith(editor_Segment_Tag $tag) : bool {
-        if($this->getData(static::$dataNameQualityId) == null || $tag->getData(static::$dataNameQualityId) != $this->getData(static::$dataNameQualityId)){
+        if($this->getQualityId() == null || $tag->getQualityId() != $this->getQualityId()){
             return false;
         }
         if(editor_Segment_FieldTags::VALIDATION_MODE && $this->endIndex != $this->startIndex || $tag->endIndex != $tag->startIndex){

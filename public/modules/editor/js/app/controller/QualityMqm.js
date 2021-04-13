@@ -248,13 +248,13 @@ Ext.define('Editor.controller.QualityMqm', {
      */
     getImgTagDomConfig: function(qmid, comment, sev) {
     	var me = this, 
-    		uniqid = Ext.id(),
+    		uniqid = Ext.id(), // retrieves something like ext-1234. This is crucial to distinguish these IDs from real database quality id's
     		config = function(open){
     		return {
     			tag: 'img', 
     			id: 'qm-image-'+(open ? 'open' : 'close')+'-'+uniqid, 
     			'data-comment': (comment ? comment : ""), 
-    			'data-seq': uniqid, 
+    			'data-t5qid': uniqid, 
     			//minor qmflag qmflag-2 ownttip open
     			cls: sev+' qmflag ownttip '+(open ? 'open' : 'close')+' qmflag-'+qmid, 
     			src: me.getImgTagSrc(qmid, open)

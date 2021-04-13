@@ -58,6 +58,7 @@ class editor_Plugins_TermTagger_SegmentProcessor {
     public static function findAndAddQualitiesInTags(editor_Segment_Tags $tags){
         $type = editor_Plugins_TermTagger_Tag::TYPE;
         foreach($tags->getTagsByType($type) as $termTag){
+            /* @var $termTag editor_Plugins_TermTagger_Tag */
             if($termTag->hasCategory()){
                 $tags->addQualityByTag($termTag);
             }
@@ -98,7 +99,7 @@ class editor_Plugins_TermTagger_SegmentProcessor {
      * @throws ZfExtended_Exception
      */
     public function process(array $segmentsTags, string $slot, bool $doSaveTags) {
-
+        
         $this->communicationService = $this->config->createServerCommunicationServiceFromTags($segmentsTags);
         $termTagger = ZfExtended_Factory::get(
             'editor_Plugins_TermTagger_Service',

@@ -52,6 +52,7 @@ class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractVi
             $row->field = $dbRow->field;
             $row->type = $dbRow->type;
             $row->category = $dbRow->category;
+            $row->categoryIndex = $dbRow->categoryIndex;
             $row->falsePositive = $dbRow->falsePositive;
             $row->typeText = $this->manager->translateQualityType($dbRow->type);
             $row->text = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
@@ -63,12 +64,10 @@ class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractVi
                 $row->hasTag = false;
                 $row->tagName = '';
                 $row->cssClass = '';
-                $row->dataNameId = '';
             } else {
                 $row->hasTag = true;
                 $row->tagName = $provider->getTagNodeName();
                 $row->cssClass = $provider->getTagIndentificationClass();
-                $row->dataNameId = $provider->getTagQualityIdDataName();
             }
             $this->rows[] = $row;
         }
