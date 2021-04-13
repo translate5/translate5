@@ -186,10 +186,10 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         
         // check correction of overpapped QM Tags (only when there is no contents between them)
         $segToTest = $segments[6];
-        $tag1_open = '<img class="critical qmflag ownttip open qmflag-19" data-seq="497" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" />';
-        $tag1_close = '<img class="critical qmflag ownttip close qmflag-19" data-seq="497" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" />';
-        $tag2_open = '<img class="critical qmflag ownttip open qmflag-4" data-seq="498" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" />';
-        $tag2_close = '<img class="critical qmflag ownttip close qmflag-4" data-seq="498" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
+        $tag1_open = '<img class="critical qmflag ownttip open qmflag-19" data-t5qid="497" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-left.png" />';
+        $tag1_close = '<img class="critical qmflag ownttip close qmflag-19" data-t5qid="497" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-19-right.png" />';
+        $tag2_open = '<img class="critical qmflag ownttip open qmflag-4" data-t5qid="498" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-left.png" />';
+        $tag2_close = '<img class="critical qmflag ownttip close qmflag-4" data-t5qid="498" data-comment="" src="/modules/editor/images/imageTags/qmsubsegment-4-right.png" />';
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $tag1_open.'Apache 2.x'.$tag2_open.$tag1_close.' auf'.$tag2_close.' Unix-Systemen', $segToTest->id);
         $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         

@@ -204,8 +204,6 @@ final class editor_Segment_Quality_Manager {
      * @param string $processingMode
      */
     public function processSegment(editor_Models_Segment $segment, editor_Models_Task $task, string $processingMode){
-        // we remove all qualities as new ones will be written
-        editor_Models_Db_SegmentQuality::deleteForSegment($segment->getId());
         $qualityConfig = $task->getConfig()->runtimeOptions->autoQA; 
         $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, false);
         foreach($this->registry as $type => $provider){

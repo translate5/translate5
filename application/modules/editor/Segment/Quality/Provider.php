@@ -188,13 +188,6 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
         return NULL;
     }
     
-    public function getTagQualityIdDataName() : ?string {
-        if($this->hasSegmentTags()){
-            return $this->createSegmentTag(0, 0, 'span', [])->getDataNameQualityId();
-        }
-        return NULL;
-    }
-    
     public function getTagNodeName() : ?string {
         // Quirk: we must pass a node-name & classes here just to fulfill the interface which is meant to identify the class, those props are usually overwritten in the class
         if($this->hasSegmentTags()){

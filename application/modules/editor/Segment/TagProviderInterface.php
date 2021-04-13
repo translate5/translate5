@@ -67,11 +67,6 @@ interface editor_Segment_TagProviderInterface {
      */
     public function getTagIndentificationClass() : ?string;
     /**
-     * Retrieves the name of the data-property for the quality id (like data-NAME) or NULL, if the quality has no related tag
-     * @return string
-     */
-    public function getTagQualityIdDataName() : ?string;
-    /**
      * Retrieves the node-name of the related segment tag or NULL, if the quality has no related tag
      * @return string
      */

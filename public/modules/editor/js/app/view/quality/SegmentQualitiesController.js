@@ -35,7 +35,8 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.quality.SegmentQualitiesController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.segmentQualities',
-    falsePositiveCssClass: 't5qfalpos', // as defined in editor_segment_Tag. TODO FIXME: add to Editor.data ?
+    falsePositiveCssClass: 't5qfalpos', // as defined in editor_segment_Tag::CSS_CLASS_FALSEPOSITIVE. TODO FIXME: better add to Editor.data ?
+    qualityIdDataName: 't5qid', // as defined in editor_segment_Tag::DATA_NAME_QUALITYID. TODO FIXME: better add to Editor.data ?
     listen: {
         store: {
             '#SegmentQualities': {
@@ -63,10 +64,14 @@ Ext.define('Editor.view.quality.SegmentQualitiesController', {
             view.endEditing();
         }
     },
+    /**
+     * Handler to sync the new state with the server (to catch false positives without tags) & add decorations in the editor
+     */
     onFalsePositiveChanged: function(checkbox, checked){
         var qualityId = checkbox.inputValue, record = checkbox.qrecord, falsePositiveVal = (checked) ? 1 : 0;
         // if there are tags in the editor we need to decorate them (otherwise saving the editor would set the falsePositive value back to it's original state!)
-        if(record.get('hasTag') && !this.decoratefalsePositive(record, qualityId, checked)){
+        if(record.get('hasTag') && !this.decorateFalsePositive(record, qualityId, checked)){
+            // TODO AutoQA: what to do here ?
             console.log('DECORATE FALSE POSITIVE FAILED: ', qualityId, falsePositiveVal, record);
         }
         Ext.Ajax.request({
@@ -75,6 +80,7 @@ Ext.define('Editor.view.quality.SegmentQualitiesController', {
             params: { id: qualityId, falsePositive: falsePositiveVal },
             success: function(response){
                 record.set('falsePositive', falsePositiveVal); // updating store currently meaningless but who knows ...
+                // TODO AutoQA: remove
                 console.log('CHANGED FALSE POSITIVE: ', qualityId, falsePositiveVal, record);
             },
             failure: function(response){
@@ -85,16 +91,18 @@ Ext.define('Editor.view.quality.SegmentQualitiesController', {
     /**
      * Changes the decoration-class in the HtmlEditor of the tag
      */
-    decoratefalsePositive: function(record, qualityId, checked){ 
+    decorateFalsePositive: function(record, qualityId, checked){
         // reference to htmlEditor is somehow dirty, may add a global API to achieve this ? Hint: we're created too late to catch the HtmlEditors init event
-        var htmlEditor = Editor.app.getController('Editor').htmlEditor, fpc = this.falsePositiveCssClass;
+        var htmlEditor = Editor.app.getController('Editor').htmlEditor, fpc = this.falsePositiveCssClass, cfpc;
         if(htmlEditor){
-            var elements = htmlEditor.getElementsByProps(record.get('tagName'), record.get('cssClass'), [{ name: record.get('dataNameId'), value: qualityId }]);
-            if(elements){
+            // quirk: we can not use the tag-name because in the html-editor-markup these may are changed
+            var elements = htmlEditor.getElementsByProps(null, record.get('cssClass'), [{ name: this.qualityIdDataName, value: qualityId }]);
+            if(elements && elements.length > 0){
                 elements.forEach(function(element){
-                    if(checked && !element.classList.contains(fpc)){
+                    cfpc = element.classList.contains(fpc);
+                    if(checked && !cfpc){
                         element.classList.add(fpc);
-                    } else if(!checked && element.classList.contains(fpc)){
+                    } else if(!checked && cfpc){
                         element.classList.remove(fpc);
                     }
                 });

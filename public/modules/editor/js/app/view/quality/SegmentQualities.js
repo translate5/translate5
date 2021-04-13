@@ -38,6 +38,7 @@ Ext.define('Editor.view.quality.SegmentQualities', {
         'Editor.store.quality.Segment'
     ],
     controller: 'segmentQualities',
+    cls: 'segmentQualities',
     defaultType: 'checkbox',
     hidden: true,
     initConfig: function(instanceConfig) {
@@ -68,6 +69,12 @@ Ext.define('Editor.view.quality.SegmentQualities', {
         this.hide();            
     },
     addCheckbox: function(record){
+        // add the tag-icons for MQM to help to identify the MQMs in the markup
+        var label = record.get('typeText') + ' > ' + record.get('text');
+        if(record.get('type') == 'mqm' && record.get('categoryIndex') > -1){
+            label += ' <img class="x-label-symbol qmflag qmflag-' + record.get('categoryIndex') + '" src="' 
+                + Editor.data.segments.subSegment.tagPath + 'qmsubsegment-' + record.get('categoryIndex') + '-left.png"> ';
+        }
         this.add({
             xtype: 'checkbox',
             anchor: '100%',
@@ -75,7 +82,7 @@ Ext.define('Editor.view.quality.SegmentQualities', {
             inputValue: record.get('id'),
             value: (record.get('falsePositive') == 1),
             qrecord: record,
-            boxLabel: record.get('typeText') + ' > ' + record.get('text'),
+            boxLabel: label,
             listeners:{
                 change: 'onFalsePositiveChanged'
             }

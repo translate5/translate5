@@ -61,7 +61,7 @@ final class editor_Segment_Qualities {
      *
      * @var editor_Models_Db_SegmentQualityRow[]
      */
-    private $new = [];
+    private $added = [];
     /**
      * 
      * @param int $segmentId
@@ -100,9 +100,9 @@ final class editor_Segment_Qualities {
             $quality->falsePositive = ($falsePositive > -1) ? $falsePositive : 0;
             // new qualities without tags will be saved in a batch
             $quality->processingState = 'new';
-            $this->new[] = $quality;
+            $this->added[] = $quality;
         } else {
-            // since all props match we simply can keep te quality, just un case of chnged false-positiveness this has to be changed
+            // since all props match we simply can keep te quality, just in case of changed false-positiveness this has to be changed
             if($falsePositive > -1 && $falsePositive !== $quality->falsePositive){
                 $quality->falsePositive = $falsePositive;
                 $quality->save();
@@ -131,14 +131,14 @@ final class editor_Segment_Qualities {
             $quality->taskGuid = $this->taskGuid;
             $this->setQualityPropsByTag($quality, $tag, $field, true);
             $quality->save();
-            $this->new[] = $quality;
+            $this->added[] = $quality;
         } else {
             // the processing state decides, if the quality will be deleted, saved or stay as is
             if($this->setQualityPropsByTag($quality, $tag, $field, false)){
                 $quality->save();
             }
         }
-        // QUIRK the false quality prop is currently set by the frontend directly to the quality model. That need to be changed ...
+        // QUIRK the false quality prop is currently set by the frontend directly to the quality model. If that ever changes, this code has to change
         $tag->setFalsePositive($quality->falsePositive);
         $tag->setQualityId($quality->id);
         $quality->processingState = 'keep';
@@ -154,29 +154,32 @@ final class editor_Segment_Qualities {
                 $deleteIds[] = $quality->id;
             }
         }
-        editor_Models_Db_SegmentQuality::deleteForSegments($deleteIds);
-        foreach($this->new as $quality){
+        $this->table->deleteByIds($deleteIds);
+        foreach($this->added as $quality){
             if($quality->processingState == 'new'){
                 $newQualities[] = $quality;
             }
         }
         editor_Models_Db_SegmentQuality::saveRows($newQualities);
-        $this->new = [];
+        $this->added = [];
         $this->existing = [];
     }
     /**
-     * Retrieves all new qualities (not yet saved).
+     * Retrieves all "really" new qualities (added ones not yet savednot yet saved).
      * The cached new qualities will be reset when calling this API, so the consuming code is responsible to save those
      * @return editor_Models_Db_SegmentQualityRow[]
      */
     public function extractNewQualities(){
         $newQualities = [];
-        foreach($this->new as $quality){
+        $keptQualities = [];
+        foreach($this->added as $quality){
             if($quality->processingState == 'new'){
                 $newQualities[] = $quality;
+            } else {
+                $keptQualities[] = $quality;
             }
         }
-        $this->new = [];
+        $this->added = $keptQualities;
         return $newQualities;
     }
     /**

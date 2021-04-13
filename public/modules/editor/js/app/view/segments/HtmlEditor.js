@@ -107,21 +107,56 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.viewModesController = Editor.app.getController('ViewModes');
     me.metaPanelController = Editor.app.getController('Editor');
     me.segmentsController = Editor.app.getController('Segments');
-    me.imageTemplate = new Ext.Template([
+    me.intImgTpl = new Ext.Template([
       '<img id="'+me.idPrefix+'{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" data-pixellength="{pixellength}" />'
     ]);
-    me.imageTemplate.compile();
-    me.spanTemplate = new Ext.Template([
+    me.intImgTplQid = new Ext.Template([
+        '<img id="'+me.idPrefix+'{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" data-pixellength="{pixellength}" data-t5qid="{qualityId}" />'
+    ]);
+    me.intSpansTpl = new Ext.Template([
       '<span title="{title}" class="short">{shortTag}</span>',
       '<span data-originalid="{id}" data-length="{length}" class="full">{text}</span>'
     ]);
-    me.spanTemplate.compile();
+    me.termSpanTpl = new Ext.Template([
+        '<span class="{className}" title="{title}"">'
+    ]);
+    me.termSpanTplQid = new Ext.Template([
+        '<span class="{className}" title="{title}" data-t5qid="{qualityId}">'
+    ]);
+    me.intImgTpl.compile();
+    me.intImgTplQid.compile();
+    me.intSpansTpl.compile();
+    me.termSpanTpl.compile();
+    me.termSpanTplQid.compile();
     me.callParent(arguments);
     //add the status strip component to the row editor
     me.statusStrip = me.add({
         xtype:'segments.statusstrip',
         htmlEditor: me
     });
+  },
+  /**
+   * Applies our templates to the given data by type
+   * @returns string
+   */
+  applyTemplate: function(type, data){
+      switch(type){
+          case 'internalimg':
+              return (this.hasQIdProp(data) ? this.intImgTplQid.apply(data) : this.intImgTpl.apply(data));
+              
+          case 'internalspans':
+              return this.intSpansTpl.apply(data);
+              
+          case 'termspan':
+              return (this.hasQIdProp(data) ? this.termSpanTplQid.apply(data) : this.termSpanTpl.apply(data));
+              
+          default:
+              console.log('Invalid type "'+type+'" when using compileTemplate!');
+              return '';
+      }
+  },
+  hasQIdProp: function(data){
+      return (data.qualityId && data.qualityId != null && data.qualityId != '');
   },
   setHeight: function(height) {
       var me = this,
@@ -408,7 +443,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         data = me.getInitialData();
     
     Ext.each(rootnode.childNodes, function(item){
-      var termFoundCls;
       if(Ext.isTextNode(item)){
         var text = item.data.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
         me.result.push(Ext.htmlEncode(text));
@@ -449,16 +483,20 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           return;
       }
       // Span für Terminologie
-      if( /(^|[\s])term([\s]|$)/.test(item.className) ){
-        termFoundCls = item.className
-        if(me.fieldTypeToEdit) {
-            var replacement = me.fieldTypeToEdit+'-$1';
-            termFoundCls = termFoundCls.replace(/(transFound|transNotFound|transNotDefined)/, replacement);
-        }
-        me.result.push(Ext.String.format('<span class="{0}" title="{1}">', termFoundCls, item.title));
-        me.replaceTagToImage(item, plainContent);
-        me.result.push('</span>');
-        return;
+      if( /(^|[\s])term([\s]|$)/.test(item.className)){
+            var termdata = {
+                className: item.className,
+                title: item.title,
+                qualityId: me.getElementsQualityId(item)  
+            };
+            if(me.fieldTypeToEdit) {
+                var replacement = me.fieldTypeToEdit+'-$1';
+                termdata.className = termdata.className.replace(/(transFound|transNotFound|transNotDefined)/, replacement);
+            }
+            me.result.push(me.applyTemplate('termspan', termdata));
+            me.replaceTagToImage(item, plainContent);
+            me.result.push('</span>');
+            return;
       }
       //some tags are marked as to be igored in the editor, so we ignore them
       if(item.tagName == 'DIV' && /(^|[\s])ignoreInEditor([\s]|$)/.test(item.className)){
@@ -471,12 +509,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       data = me.getData(item, data); 
       
       if(me.viewModesController.isFullTag() || data.whitespaceTag) {
-        data.path = me.getSvg(data.text, data.fullWidth);
+          data.path = me.getSvg(data.text, data.fullWidth);
+      } else {
+          data.path = me.getSvg(data.shortTag, data.shortWidth);
       }
-      else {
-        data.path = me.getSvg(data.shortTag, data.shortWidth);
-      }
-      me.result.push(me.imageTemplate.apply(data));
+      me.result.push(me.applyTemplate('internalimg', data));
       plainContent.push(me.markupImages[data.key].html);
     });
   },
@@ -515,6 +552,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       spanShort = divItem.down('span.short');
       data.text = spanFull.dom.innerHTML.replace(/"/g, '&quot;');
       data.id = spanFull.getAttribute('data-originalid');
+      data.qualityId = me.getElementsQualityId(divItem);
       data.title = Ext.htmlEncode(spanShort.getAttribute('title'));
       data.length = spanFull.getAttribute('data-length');
       
@@ -529,7 +567,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(shortTagContent.search(/locked/)!==-1){
           data.nr = 'locked'+data.nr;
       }
-      //Fallunterscheidung Tag Typ
+      // Fallunterscheidung Tag Typ
       data = me.renderTagTypeInData(item.className, data);
 
       //if it is a whitespace tag we have to precalculate the pixel width of the tag (if possible)
@@ -604,9 +642,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @param object data
    * @return String
    */
-  renderInternalTags: function(className,data) {
+  renderInternalTags: function(className, data) {
       var me = this;
-      return '<div class="'+className+'">'+me.spanTemplate.apply(data)+'</div>';
+      return '<div class="'+className+'">'+me.applyTemplate('internalspans', data)+'</div>';
   },
   /**
    * Insert whitespace; we use the ("internal-tag"-)divs here, because insertMarkup() 
@@ -738,15 +776,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       var id = '', 
           src = imgNode.src.replace(/^.*\/\/[^\/]+/, ''),
           img = Ext.fly(imgNode),
-          comment = img.getAttribute('data-comment');
-      seq = img.getAttribute('data-seq');
+          comment = img.getAttribute('data-comment'),
+          qualityId = this.getElementsQualityId(img);
       if(markup) { //on markup an id is needed for remove orphaned tags
           //qm-image-open-#
           //qm-image-close-#
           id = (/open/.test(imgNode.className) ? 'open' : 'close');
-          id = ' id="qm-image-'+id+'-'+seq+'"';
+          id = ' id="qm-image-'+id+'-'+(qualityId ? qualityId : '')+'"';
       }
-      return Ext.String.format('<img{0} class="{1}" data-seq="{2}" data-comment="{3}" src="{4}" />', id, imgNode.className, seq, comment ? comment : '', src);
+      return Ext.String.format('<img{0} class="{1}" data-t5qid="{2}" data-comment="{3}" src="{4}" />', id, imgNode.className, (qualityId ? qualityId : ''), (comment ? comment : ''), src);
   },
   /**
    * returns a IMG tag with a segment identifier for "checkplausibilityofput" check in PHP
@@ -909,16 +947,16 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * Fixes duplicate img ids in the opened editor on unmarkup (MQM tags)
    * Works with <img> tags with the following specifications: 
    * IMG needs an id Attribute. Assuming that the id contains the strings "-open" or "-close". The rest of the id string is identical.
-   * Needs also an attribute "data-seq" which is containing the plain ID of the tag pair.
+   * Needs also an attribute "data-t5qid" which is containing the plain ID of the tag pair.
    * If a duplicated img tag is found, the "123" of the id will be replaced with a generated Ext.id()
    * 
    * example, tag with needed infos:
-   * <img id="foo-open-123" data-seq="123"/> open tag 
-   * <img id="foo-close-123" data-seq="123"/> close tag
+   * <img id="foo-open-123" data-t5qid="123"/> open tag 
+   * <img id="foo-close-123" data-t5qid="123"/> close tag
    * 
    * copying this tags will result in
-   * <img id="foo-open-ext-456" data-seq="ext-456"/> 
-   * <img id="foo-close-ext-456" data-seq="ext-456"/>
+   * <img id="foo-open-ext-456" data-t5qid="ext-456"/> 
+   * <img id="foo-close-ext-456" data-t5qid="ext-456"/>
    * 
    * Warning:
    * fixing IDs means that existing ids are wandering forward: 
@@ -935,15 +973,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  var me = this, 
 	      ids = {}, 
 	      stackList = {}, 
-	      updateId = function(img, newSeq, oldSeq) {
+	      updateId = function(img, newQid, oldQid) {
 	          //dieses img mit der neuen seq versorgen.
-	          img.id = img.id.replace(new RegExp(oldSeq+'$'), newSeq);
-	          img.setAttribute('data-seq', newSeq);
+	          img.id = img.id.replace(new RegExp(oldQid+'$'), newQid);
+	          img.setAttribute('data-t5qid', newQid);
 	      };
 	    //duplicate id fix vor removeOrphanedLogik, da diese auf eindeutigkeit der IDs baut
 	    //dupl id fix benötigt checkTagOrder, welcher sich aber mit removeOrphanedLogik beißt
 	    Ext.each(nodelist, function(img) {
-	    	var newSeq, oldSeq = img.getAttribute('data-seq'), id = img.id, pid, open;
+	    	var newQid, oldQid = me.getElementsQualityId(img), id = img.id, pid, open;
 	    	if(! id || me.isDuplicateSaveTag(img)) {
 	    		return;
 	    	}
@@ -955,8 +993,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 
 	    	//gibt es einen Stack mit inhalten für meine ID, dann hole die Seq vom Stack und verwende diese
 	    	if(stackList[id] && stackList[id].length > 0) {
-	    		newSeq = stackList[id].shift();
-	    		updateId(img, newSeq, oldSeq);
+	    		newQid = stackList[id].shift();
+	    		updateId(img, newQid, oldQid);
 	    		return;
 	    	}
     		//wenn nein, dann:
@@ -972,10 +1010,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     		if(!stackList[pid]) {
     			stackList[pid] = [];
     		}
-    		newSeq = Ext.id();
+    		newQid = Ext.id();
     		//die neue seq auf den Stack der PartnerId legen
-    		stackList[pid].push(newSeq);
-	    	updateId(img, newSeq, oldSeq);
+    		stackList[pid].push(newQid);
+	    	updateId(img, newQid, oldQid);
 	    });
   },
   
@@ -1202,12 +1240,23 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       div = null;
       return length;
   },
-  
   /**
    * returns the last calculated segment length (with tag lengths, without sibling lengths)
    * @return {Integer}
    */
   getLastSegmentLength: function() {
       return this.lastSegmentLength;
+  },
+  /**
+   * Comapatibility function to retrieve the quality id from a DOM node or a Ext Node
+   * NOTE: historically the quality-id was encoded as "data-seq"
+   * TODO FIXME: this is somehow a duplicate of Editor.util.SegmentEditor.fetchQualityId (wich works on DOM node). Unify ...
+   */
+  getElementsQualityId: function(ele){
+      var id = ele.getAttribute('data-t5qid');
+      if(!id && ele.getAttribute('data-seq')){
+          id = ele.getAttribute('data-seq');
+      }
+      return id;
   }
 });

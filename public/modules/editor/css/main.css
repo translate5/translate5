@@ -233,7 +233,7 @@ div.single + div {
 
 /* Term Tags, der folgende Code ist im HtmlEditor body css redundant vorhanden. Ebenso im Helper View_Helper_WorkflowNotifyHtmlMailSegmentList */
 .segment-tag-column div.x-grid-cell-inner div.term,
-.segment-tag-container div.term {background:transparent;border-bottom:1px solid #0000ff;}
+.segment-tag-container div.term { background:transparent; border-bottom:1px solid #0000ff; }
 
 #change-alike-window div.transNotFound,
 .segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound,
@@ -248,11 +248,10 @@ div.single + div {
 .segment-tag-column div.x-grid-cell-inner div.supersededTerm,
 .segment-tag-container div.supersededTerm,
 .segment-tag-column div.x-grid-cell-inner div.deprecatedTerm,
-.segment-tag-container div.deprecatedTerm
-{border-bottom:none;background-color:#fa51ff;}
+.segment-tag-container div.deprecatedTerm {border-bottom:none;background-color:#fa51ff;}
 
 /*qmflags*/
-#segment-grid-body img.qmflag {width: auto !important;height: 14px !important; vertical-align:middle;margin-left:1px;margin-right:1px;}
+#segment-grid-body img.qmflag { width: auto !important;height: 14px !important; vertical-align:middle;margin-left:1px;margin-right:1px; }
 .qmflag-menu .x-menu-item-link {padding-right:2px; padding-left:22px;margin-right:36px;}
 .qmflag-menu .x-menu-item-link .x-menu-item-text {padding: 0px !important; margin: 0px 17px 0px 0px !important; width: auto !important; height: auto !important}
 .qmflag-menu .x-menu-item-icon {right:2px;left:auto;height:14px;width: 22px !important}
@@ -815,9 +814,10 @@ a.x-btn span.task-confirmation {
 .qualityFilterPanel .x-grid-cell-inner > div { flex:none; }
 .qualityFilterPanel .x-grid-cell-inner .x-tree-node-text { padding-left:0; white-space:normal; }
 .qualityFilterPanel .x-tree-faulty .x-tree-node-text { color:#ee0000; }
-.qualityFilterPanel img.x-tree-symbol { vertical-align:middle; height:12px; }
-.qualityFilterPanel span.x-tree-symbol { font-family:FontAwesome; color:#5fa2dd; }
+.qualityFilterPanel img.x-tree-symbol, .segmentQualities label img.x-label-symbol { vertical-align:middle; height:12px; }
+.qualityFilterPanel span.x-tree-symbol, .segmentQualities label span.x-label-symbol { font-family:FontAwesome; color:#5fa2dd; }
 .qualityFilterPanel span.x-tree-symbol.t5-quality-incomplete { color:#fbbc28; }
+.qmflag
 
 /**
  * FIXME must be removed with next ext update, fixes T5DEV-181 / https://www.sencha.com/forum/showthread.php?330718-6-2-ColorField-color-preview-doesn-t-match-color

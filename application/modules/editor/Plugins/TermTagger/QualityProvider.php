@@ -83,15 +83,15 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
     }
     
     public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
-        
-        
+
         if($processingMode == editor_Segment_Processing::ALIKE){
             
-            // when copying alike tags, we just save the qualities extracted from the tags
-            
-            editor_Plugins_TermTagger_SegmentProcessor::findAndAddQualitiesInTags($tags);
-            $tags->saveQualities();
-            
+            // when copying alike tags, we just save the qualities extracted from the tags (if active in config)
+            if($task->getConfig()->runtimeOptions->termTagger->enableAutoQA){
+                
+                editor_Plugins_TermTagger_SegmentProcessor::findAndAddQualitiesInTags($tags);
+                $tags->saveQualities();
+            }
             
         } else if($processingMode == editor_Segment_Processing::EDIT){
             
@@ -100,12 +100,14 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
             $segment = $tags->getSegment();
             // no need to process if task has no terminologie or is not modified
             if (!$task->getTerminologie() || !$segment->isDataModified()) {
+                
                 return $tags;
             }
             $messages = Zend_Registry::get('rest_messages');
             /* @var $messages ZfExtended_Models_Messages */
             
             if($segment->meta()->getTermtagState() == editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE) {
+                
                 $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden: Das Segment ist zu lang.');
                 return $tags;
             }
