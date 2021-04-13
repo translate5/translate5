@@ -51,17 +51,17 @@ class editor_Models_TaskUsageLog extends ZfExtended_Models_Entity_Abstract {
      * Load task usage by taskType and customer.
      * 
      * @param int $customerId
-     * @param string $taskType
+     * @param array $taskTypes
      * @return array
      */
-    public function loadByTypeAndCustomer(int $customerId = null,string $taskType = null){
+    public function loadByTypeAndCustomer(int $customerId = null,array $taskTypes = []){
         $s=$this->db->select()
         ->from('LEK_task_usage_log',['customerId','sourceLang','targetLang','yearAndMonth','taskCount']);
         if(!empty($customerId)){
             $s->where('customerId = ?',$customerId);
         }
-        if(!empty($taskType)){
-            $s->where('taskType = ?',$taskType);
+        if(!empty($taskTypes)){
+            $s->where('taskType IN(?)',$taskTypes);
         }
         return $this->db->fetchAll($s)->toArray();
     }

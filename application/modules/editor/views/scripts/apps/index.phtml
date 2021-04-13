@@ -25,12 +25,16 @@
  
  END LICENSE AND COPYRIGHT
  */
+
+/* @var $this Zend_View */
+$version = '?v='.$this->appVersion;
+
 ?>
 <div id="appContainer">
 </div>
 
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/ErrorHandler.js"></script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/Apps.js"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/ErrorHandler.js<?php echo $version; ?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/Apps.js<?php echo $version; ?>"></script>
 
 <script type="text/javascript">
     $(function(){
