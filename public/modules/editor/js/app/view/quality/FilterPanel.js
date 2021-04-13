@@ -43,7 +43,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
     cls: 'qualityFilterPanel',
     title: '#UT#Qualitätssicherung',
     rootVisible: false,
-    reAnalysisHidden: true,
+    reAnalysisHidden: true, // quirky: this prop is set by the column-renderer and after tfhe store's "load" event it is evaluated in "afterLoad" where it steers the visibility of our footer
     useArrows: true,
     // we catch the beforestaterestore event to load the store when the panel is initially open
     listeners: {
@@ -149,12 +149,8 @@ Ext.define('Editor.view.quality.FilterPanel', {
      * Used to finalize the view after the store was loaded
      */
     afterLoad: function(){
-        console.log("AFTER LOAD: ", this.reAnalysisHidden);
         this.down('#analysisToolbar').setHidden(this.reAnalysisHidden);
         this.reAnalysisHidden = true; // reset for the next load
-    },
-    setAnalysisVisible: function(){
-        console.log("SET ANALYSIS VISIBLE");
     },
     uncheckAll: function(){
         this.getController().uncheckAll();

@@ -33,7 +33,11 @@ Ext.define('Editor.view.quality.SegmentQualities', {
     extend: 'Ext.form.FieldSet',
     alias: 'widget.segmentQualities',
     title: "#UT#QA: Falsch-Positive",
-    requires: [ 'Editor.store.quality.Segment' ], 
+    requires: [
+        'Editor.view.quality.SegmentQualitiesController',
+        'Editor.store.quality.Segment'
+    ],
+    controller: 'segmentQualities',
     defaultType: 'checkbox',
     hidden: true,
     initConfig: function(instanceConfig) {
@@ -46,75 +50,14 @@ Ext.define('Editor.view.quality.SegmentQualities', {
         return this.callParent([config]);
     },
     /**
-     * Changes a false positive value, via request and via GUI
-     */
-    changeFalsePositive: function(qualityId, checked, record){
-        if(record.get('hasTag')){
-            this.decoratefalsePositive(qualityId, checked, record);
-        }
-        Ext.Ajax.request({
-            url: Editor.data.restpath+'quality/falsepositive',
-            method: 'GET',
-            params: { id: qualityId, falsePositive: (checked ? '1' : '0') },
-            success: function(response){
-                // TODO AUTOQA: remove
-                console.log('CHANGED FALSE POSITIVE!!', qualityId, checked, record.get('type'));
-            },
-            failure: function(response){
-                Editor.app.getController('ServerException').handleException(response);
-            }
-        });        
-    },
-    /**
-     * Changes the decoration-class in the editor of the tag
-     */
-    decoratefalsePositive: function(qualityId, checked, record){
-     // TODO AUTOQA: implement
-        console.log('decoratefalsePositive: ', qualityId, checked, record);
-        // CSS_CLASS_FALSEPOSITIVE = 't5qfalpos'
-        // DATA_NAME_QUALITYID = 't5qid'; with MQM: seq
-    },
-    /**
-     * Creates the view from the loaded data. Note, that QM qualities are not falsifyable
-     */
-    qualitiesLoaded: function(qualities){
-        var me = this, added = false;
-        if(this.store.getCount() > 0){
-            this.store.each(function(record, idx){
-                if(record.get('falsifiable')){
-                    me.add({
-                        xtype: 'checkbox',
-                        anchor: '100%',
-                        name: 'segq' + record.get('id'),
-                        inputValue: record.get('id'),
-                        value: (record.get('falsePositive') == 1),
-                        qrecord: record,
-                        boxLabel: record.get('typeText') + ' > ' + record.get('text'),
-                        handler: function(checkbox, checked){
-                            me.changeFalsePositive(checkbox.inputValue, checked, checkbox.qrecord);
-                        }
-                    });
-                    added = true;
-                }
-            });
-        }
-        if(added){
-            this.show();
-        } else {
-            this.removeAll();
-            this.hide();
-        }
-    },
-    /**
      * Starts editing. Loads the Segment's qualities and shows the GUI if qualities found
      * @param {Integer} segmentId for which the qualities should be loaded 
      */
     startEditing: function(segmentId){
-        var me = this;
         this.store.load({
-            scope: this,
-            params: { segmentId: segmentId },
-            callback: function(){ this.qualitiesLoaded(); }
+            params: {
+                segmentId: segmentId
+            }
         });
     },
     /**
@@ -123,6 +66,20 @@ Ext.define('Editor.view.quality.SegmentQualities', {
     endEditing: function(){
         this.removeAll();
         this.hide();            
+    },
+    addCheckbox: function(record){
+        this.add({
+            xtype: 'checkbox',
+            anchor: '100%',
+            name: 'segq' + record.get('id'),
+            inputValue: record.get('id'),
+            value: (record.get('falsePositive') == 1),
+            qrecord: record,
+            boxLabel: record.get('typeText') + ' > ' + record.get('text'),
+            listeners:{
+                change: 'onFalsePositiveChanged'
+            }
+        });
     }
 });
 
