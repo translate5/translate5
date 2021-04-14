@@ -1123,54 +1123,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
 
     /***
-     * Update the $edit100PercentMatch flag for all segments in the task.
-     * @param editor_Models_Task $task
-     * @param bool $edit100PercentMatch
-     */
-    public function updateSegmentsEdit100PercentMatch(editor_Models_Task $task,bool $edit100PercentMatch){
-        // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
-         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$task->getTaskGuid()]);
-        /* @var $segments editor_Models_Segment_Iterator */
-        $segmentHistory=ZfExtended_Factory::get('editor_Models_SegmentHistory');
-        /* @var $segmentHistory editor_Models_SegmentHistory */
-        $autoState=ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        /* @var $autoState editor_Models_Segment_AutoStates */
-        foreach ($segments as $segment){
-            if($segment->getEditable() == $edit100PercentMatch || $segment->getMatchRate()<100){
-                continue;
-            }
-
-            $actualHistory=$segmentHistory->loadBySegmentId($segment->getId(),1);
-            $actualHistory=$actualHistory[0] ?? [];
-
-            $history=$segment->getNewHistoryEntity();
-
-            //it is full match always
-            $isFullMatch=true;
-            $isLocked = $segment->meta()->getLocked() && (bool) $task->getLockLocked();
-
-            $isEditable  = (!$isFullMatch || (bool) $edit100PercentMatch || $segment->meta()->getAutopropagated()) && !$isLocked;
-
-            $segment->setEditable($isEditable);
-
-            $autoStateId=$actualHistory['autoStateId'] ?? null;
-
-            //if the autostate does not exist in the history or it is blocked, calculate same as import
-            if(!$autoStateId || $autoStateId==$autoState::BLOCKED){
-                $autoStateId=$autoState->restoreImportState($isEditable, $segment->isTargetTranslated());
-            }
-            $segment->setAutoStateId($autoStateId);
-            $history->save();
-            $segment->save();
-        }
-        
-        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
-        /* @var $meta editor_Models_Segment_Meta */
-        //update task word count when 100% matches editable is changed
-        $task->setWordCount($meta->getWordCountSum($task));
-    }
-
-    /***
      * Update the segment finish count based on the task workflow step valid autostates
      * @param editor_Models_Task $task
      */
