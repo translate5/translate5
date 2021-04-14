@@ -40,7 +40,7 @@ class editor_Models_Validator_Term_Term extends ZfExtended_Models_Validator_Abst
     $this->addValidator('termEntryTbxId', 'stringLength', ['min' => 0, 'max' => 255]);
     $this->addValidator('languageId', 'int');
     $this->addValidator('language', 'stringLength', ['min' => 0, 'max' => 60]);
-    $this->addValidator('status', 'inArray', [editor_Models_Term::getAllStatus()]);
-    $this->addValidator('processStatus', 'inArray', [editor_Models_Term::getAllProcessStatus()]);
+    $this->addValidator('status', 'inArray', [editor_Models_Terminology_Models_TermModel::getAllStatus()]);
+    $this->addValidator('processStatus', 'inArray', [editor_Models_Terminology_Models_TermModel::getAllProcessStatus()]);
   }
 }
