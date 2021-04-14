@@ -289,6 +289,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('frontend.tasklist.pmMailTo', (boolean)$rop->frontend->tasklist->pmMailTo);
       
       $this->view->Php2JsVars()->set('frontend.importTask.edit100PercentMatch',(bool) $rop->frontend->importTask->edit100PercentMatch);
+
+      $this->view->Php2JsVars()->set('frontend.importTask.pivotDropdownVisible',(bool) $rop->frontend->importTask->pivotDropdownVisible);
       
       //is the openid data visible for the default customer
       $this->view->Php2JsVars()->set('customers.openid.showOpenIdDefaultCustomerData',(boolean)$rop->customers->openid->showOpenIdDefaultCustomerData);
@@ -313,16 +315,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       }
       //helpWindow config config values for each section (loaderUrl)
       $this->view->Php2JsVars()->set('frontend.helpWindow',$helpWindowConfig);
-      
-      $openId=ZfExtended_Factory::get('ZfExtended_OpenIDConnectClient',[
-          $this->getRequest()
-      ]);
-      /* @var $openId ZfExtended_OpenIDConnectClient */
-      //set the frontend flag, if the current domain is registered for one of the customers
-      $this->view->Php2JsVars()->set('frontend.isOpenIdCustomerDomain',$openId->isOpenIdCustomerSet());
-      $isOpenIdOnLoginRedirect=(boolean)$openId->getCustomer()->getOpenIdRedirectCheckbox() ?? false;
-      //is the user directly redirected to the openid sso provider on login
-      $this->view->Php2JsVars()->set('frontend.isOpenIdOnLoginRedirect',$isOpenIdOnLoginRedirect);
 
       //show references files popup
       $this->view->Php2JsVars()->set('frontend.showReferenceFilesPopup',$rop->editor->showReferenceFilesPopup);

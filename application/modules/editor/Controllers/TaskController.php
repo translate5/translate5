@@ -586,7 +586,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 $this->addDefaultLanguageResources($this->entity);
 
                 //if the current task type is for instant translate pretransaltion, the usage log requires different handling
-                if($this->entity->getTaskType()!==editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE){
+                if($this->entity->isHiddenTask() == false){
                     //update the task usage log for the current task
                     $this->insertTaskUsageLog($this->entity);
                 }
@@ -1027,6 +1027,9 @@ class editor_TaskController extends ZfExtended_RestController {
                 'Projekte können nicht bearbeitet werden.'
             ]);
         }
+        
+        // check if the user is allowed to open the task based on the session. The user is not able to open 2 different task in same time. 
+        $this->checkUserSessionAllowsOpen($this->entity->getTaskGuid());
 
         //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
         $this->entity->checkStateAllowsActions([editor_Models_Excel_AbstractExImport::TASK_STATE_ISEXCELEXPORTED]);
@@ -1545,7 +1548,6 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
 
-        
         $this->view->rows->workflowProgressSummary = $this->_helper->TaskStatistics->getWorkflowProgressSummary($this->entity);
     }
 
@@ -1829,7 +1831,30 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->view->index = $index;
         unset($this->view->rows);
     }
+    
+    
+    /***
+     * Report worker progress for given taskGuid
+     * @throws ZfExtended_ErrorCodeException
+     */
+    public function importprogressAction() {
+        $taskGuid = $this->getParam('taskGuid');
+        if(empty($taskGuid)){
+            throw new editor_Models_Task_Exception('E1339');
+        }
+        $this->view->progress = $this->getTaskImportProgres($taskGuid);
+    }
 
+    /***
+     * Get/calculate the taskImport progres for given taskGuid
+     * @param string $taskGuid
+     * @return number]
+     */
+    protected function getTaskImportProgres(string $taskGuid) {
+        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $worker ZfExtended_Models_Worker */
+        return $worker->calculateProgress($taskGuid);
+    }
     /***
      * Clone existing language resources from oldTaskGuid for newTaskGuid.
      */
@@ -1959,12 +1984,40 @@ class editor_TaskController extends ZfExtended_RestController {
     protected function insertTaskUsageLog(editor_Models_task $task) {
         $log = ZfExtended_Factory::get('editor_Models_TaskUsageLog');
         /* @var $log editor_Models_TaskUsageLog */
-        #id, taskType, sourceLang, targetLang, customerId, yearAndMonth, taskCount
         $log->setTaskType($task->getTaskType());
         $log->setSourceLang($task->getSourceLang());
         $log->setTargetLang($task->getTargetLang());
         $log->setCustomerId($task->getCustomerId());
         $log->setYearAndMonth(date('Y-m'));
         $log->updateInsertTaskCount();
+    }
+    
+    /***
+     * Check if the session allows the task to be opened for editing by the current user.
+     * If the user tries to open different task then the one in the session, exception is thrown
+     * INFO: the pmOverride is counted as opened editor
+     *       the user is not able to edit task propertie if he already edits different task
+     * @param string $taskGuid
+     */
+    protected function checkUserSessionAllowsOpen(string $taskGuid) {
+        $session = new Zend_Session_Namespace();
+        $sessionGuid = $session->taskGuid ?? null;
+        // if the task is with already active session for the user, ignore the check
+        if($sessionGuid == $taskGuid){
+            return;
+        }
+        $assoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $assoc editor_Models_TaskUserAssoc */
+        
+        //check if for the current user, there are task in use
+        if(empty($assoc->isUserInUse($this->user->data->userGuid))){
+            return;
+        }
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1341' => 'You tried to open or edit another task, but you have already opened another one in another window. Please press F5 to open the previous one here, or close this message to stay in the Taskoverview.'
+        ], 'editor.task');
+        throw new ZfExtended_UnprocessableEntity('E1341',[
+            'task' =>$this->entity //TODO: is this realy required ?
+        ]);
     }
 }

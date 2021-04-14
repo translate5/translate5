@@ -43,17 +43,27 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewCon
     onGlobaleseGroupChange:function(field,newValue,oldValue,eOpts){
         var me=this,
             view=me.getView(),
-            globaleseEngine=view.down('#globaleseEngine');
+            globaleseEngine=view.down('#globaleseEngine'),
+            engineStore = globaleseEngine.getStore();
+        
         if(globaleseEngine.isDisabled()){
             globaleseEngine.setDisabled(false);
         }
         
         globaleseEngine.setValue(null);
         
-        //filter engines by group
-        globaleseEngine.getStore().filter([{property:'group',value:newValue}]);
+        engineStore.clearFilter();
+        
+        engineStore.filterBy(function(record){
+            // load always stock engines
+            if(record.get('id') == 'stock'){
+                return true;
+            }
+            // if it is not stock engine, load only the selected group
+            return record.get('group') == newValue;
+        });
 
-        if(globaleseEngine.getStore().getCount()==1){
+        if(engineStore.getCount()==1){
             globaleseEngine.setValue(globaleseEngine.getStore().getAt(0));
         }
     },

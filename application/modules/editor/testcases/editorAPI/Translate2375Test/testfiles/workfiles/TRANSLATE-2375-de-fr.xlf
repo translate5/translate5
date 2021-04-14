@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:ax="AcrossXliff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd" ax:time-stamp="09/20/2018 13:59:36">
+  <file source-language="de-DE" ax:src-lang="152061af-fdfb-45a8-9a54-fe952a0eb060" target-language="fr-BE" ax:trg-lang="fdf52c48-ec49-410c-b6a2-92bf7625786d" original="x" datatype="x-across-translation" category="x" ax:start-date="09/20/2018 14:00:00" ax:due-date="09/25/2018 17:00:00">
+    <header>
+      <tool tool-id="Across.XLIFF" tool-name="Across.XLIFF" tool-version="1.2" tool-company="Across Systems GmbH" />
+    </header>
+    <body>
+      <trans-unit id="1" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source>Sobald  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt.</source>
+        <target>Dès , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint.</target>
+      </trans-unit>
+      <trans-unit id="2" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source>Sobald  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
+        <target>Dès , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
+      </trans-unit>
+      <trans-unit id="3" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source>Sobald <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
+        <target>Dès <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
+      </trans-unit>
+      <trans-unit id="4" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source>Sobald  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt.</source>
+        <target>Dès , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint.</target>
+      </trans-unit>
+      <trans-unit id="5" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source>Sobald  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
+        <target>Dès , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
+      </trans-unit>
+      <trans-unit id="6" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source>Sobald <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
+        <target>Dès <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> , et le symbole <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
+      </trans-unit>
+      <trans-unit id="7" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source>Sobald <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
+        <target>Dès <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> , et le symbole <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
+      </trans-unit>
+      <trans-unit id="8" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source>Sobald <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>  und das Symbol <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> erlischt<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</source>
+        <target>Dès <ph id="1" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> , et le symbole <ph id="3" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph> s'éteint<ph id="2" ax:element-id="0">&lt;sym&gt;&lt;/sym&gt;</ph>.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

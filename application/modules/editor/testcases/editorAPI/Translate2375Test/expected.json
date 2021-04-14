@@ -1,0 +1,47 @@
+[
+    {
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
+        "state": "open",
+        "role": "reviewer",
+        "segmentrange": null,
+        "usedState": null,
+        "isPmOverride": "0",
+        "deadlineDate": "2020-11-26",
+        "assignmentDate": "2020-11-21 00:00:00",
+        "finishedDate": null,
+        "login": "testtranslator",
+        "surName": "test",
+        "firstName": "translator",
+        "parentIds": null
+    },
+    {
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
+        "state": "waiting",
+        "role": "translator",
+        "segmentrange": null,
+        "usedState": null,
+        "isPmOverride": "0",
+        "deadlineDate": "2020-11-24",
+        "assignmentDate": "2020-11-21 00:00:00",
+        "finishedDate": null,
+        "login": "testtranslator",
+        "surName": "test",
+        "firstName": "translator",
+        "parentIds": null
+    },
+    {
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000003}",
+        "state": "waiting",
+        "role": "translatorCheck",
+        "segmentrange": null,
+        "usedState": null,
+        "isPmOverride": "0",
+        "deadlineDate": "2020-11-30",
+        "assignmentDate": "2020-11-21 00:00:00",
+        "finishedDate": null,
+        "login": "testtranslator",
+        "surName": "test",
+        "firstName": "translator",
+        "parentIds": null
+    }
+]

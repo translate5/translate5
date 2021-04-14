@@ -48,6 +48,19 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewModel', {
                 bindTo : '{currentTask}',
                 deep : true
             }
+        },
+        getEdit100PercentMatchLableText : {
+            get : function (task) {
+                if(!task){
+                    return false;
+                }
+                var strings = this.getView().strings;
+                return task.get('edit100PercentMatch') ? strings.edit100PercentMatchEnabledMessage : strings.edit100PercentMatchDisabledMessage;
+            },
+            bind : {
+                bindTo : '{currentTask}',
+                deep : true
+            }
         }
     },
 

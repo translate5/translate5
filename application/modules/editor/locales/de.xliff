@@ -747,7 +747,7 @@
 <trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbiAoQUxUICsgUyBkYW5hY2ggezB9KQ=='><source>Segment auf den ausgewählten Status setzen (ALT + S danach {0})</source><target>Segment auf den ausgewählten Status setzen (ALT + S danach {0})</target></trans-unit>
 <trans-unit id='U2VnbWVudCBhdWYgZGVuIGF1c2dld8OkaGx0ZW4gU3RhdHVzIHNldHplbg=='><source>Segment auf den ausgewählten Status setzen</source><target>Segment auf den ausgewählten Status setzen</target></trans-unit>
 <trans-unit id='U3RhdHVzIDQ='><source>Status 4</source><target>Status 4</target></trans-unit>
-<trans-unit id='SW4gaW1wb3J0aWVydGVyIERhdGVpIGdlc3BlcnJ0ZSBTZWdtZW50ZSBzaW5kIGluIHRyYW5zbGF0ZTUgZ2VzcGVycnQ='><source>In importierter Datei gesperrte Segmente sind in translate5 gesperrt</source><target>In importierter Datei gesperrte Segmente sind in translate5 gesperrt</target></trans-unit>
+<trans-unit id='TnVyIGbDvHIgU0RMWExJRkYgRGF0ZWllbjogSW4gaW1wb3J0aWVydGVyIERhdGVpIGV4cGxpeml0IGdlc3BlcnJ0ZSBTZWdtZW50ZSBzaW5kIGluIHRyYW5zbGF0ZTUgZWJlbmZhbGxzIGdlc3BlcnJ0'><source>Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt</source><target>Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt</target></trans-unit>
 <trans-unit id='SW52YWxpZCB0eXBlIGdpdmVuLiBTdHJpbmcgb3IgaW50ZWdlciBleHBlY3RlZA=='><source>Invalid type given. String or integer expected</source><target>Invalid type given. String or integer expected</target></trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgdGVpbHdlaXNlIGFiZ2VzY2hsb3NzZW4='><source>Translate5 - Aufgabe teilweise abgeschlossen</source><target>Translate5 - Aufgabe teilweise abgeschlossen</target></trans-unit>
 <trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZHVyY2ggZWluZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxpPntjdXJyZW50Um9sZX08L2k+IGFiZ2VzY2hsb3NzZW46PGJyIC8+'><source>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch einen Benutzer der Rolle <i>{currentRole}</i> abgeschlossen:<br /></source><target>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch einen Benutzer der Rolle <i>{currentRole}</i> abgeschlossen:<br /></target></trans-unit>
@@ -1375,6 +1375,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='S2VpbmUgVmVyYmluZHVuZyE='><source>Keine Verbindung!</source><target>Keine Verbindung!</target></trans-unit>
 <trans-unit id='S2VpbmUgZ8O8bHRpZ2UgTGl6ZW56Lg=='><source>Keine gültige Lizenz.</source><target>Keine gültige Lizenz.</target></trans-unit>
 <trans-unit id='aW1wb3J0aWVydA=='><source>importiert</source><target>importiert</target></trans-unit>
+<trans-unit id='SW1wb3J0IGzDpHVmdA=='><source>Import läuft</source><target>Import läuft</target></trans-unit>
 <trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'><source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source><target>Die angefragte OpenTM2 Instanz ist nicht erreichbar</target></trans-unit>
 <trans-unit id='S3VuZGUgYmVyZWl0cyBkZXIgUmVzc291cmNlIHswfSBhbHMgU3RhbmRhcmQgZsO8ciB7MX0gYmlzIHsyfSB6dWdld2llc2VuIC0gWnVvcmRudW5nIGVudGZlcm5lbiB1bmQgZGVyIGFrdHVlbGxlbiBSZXNzb3VyY2UgenV3ZWlzZW4/'><source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source><target>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</target></trans-unit>
 <trans-unit id='U3RhbmRhcmRrdW5kZQ=='><source>Standardkunde</source><target>Standardkunde</target></trans-unit>
@@ -1910,6 +1911,14 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='QW56YWhsIGRlciBtaXQgSW5zdGFudFRyYW5zbGF0ZSDDvGJlcnNldHp0ZW4gRG9rdW1lbnRl'><source>Anzahl der mit InstantTranslate übersetzten Dokumente</source><target>Anzahl der mit InstantTranslate übersetzten Dokumente</target></trans-unit>
 <trans-unit id='UmVzc291cmNlbi1OdXR6dW5nIEV4cG9ydGllcmVu'><source>Ressourcen-Nutzung Exportieren</source><target>Ressourcen-Nutzung Exportieren</target></trans-unit>
 <trans-unit id='S3VuZGVuIGJlYXJiZWl0ZW4='><source>Kunden bearbeiten</source><target>Kunden bearbeiten</target></trans-unit>
-</body>
+<trans-unit id='V2VubiBha3RpdmllcnQsIHdlcmRlbiBibG9ja2llcnRlIFNlZ21lbnRlIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4='><source>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</source><target>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</target></trans-unit>
+<trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGJsb2NraWVydGUgU2VnbWVudGUgbmljaHQgaW4gZGllIEFuYWx5c2UgdW5kIFdvcnRhbnphaGwgZWluYmV6b2dlbg=='><source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source><target>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</target></trans-unit>
+<trans-unit id='Y29uZmlnX292ZXJ3cml0ZV9zeXN0ZW0='><source>config_overwrite_system</source><target>config_overwrite_system</target></trans-unit>
+<trans-unit id='S29uZmlndXJhdGlvbiBnZXNwZWljaGVydA=='><source>Konfiguration gespeichert</source><target>Konfiguration gespeichert</target></trans-unit>
+<trans-unit id='VmFsdWU='><source>Value</source><target>Value</target></trans-unit>
+<trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse enthalten</source><target>Gesperrte Segmente sind in der Analyse enthalten</target></trans-unit>
+<trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgbmljaHQgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse nicht enthalten</source><target>Gesperrte Segmente sind in der Analyse nicht enthalten</target></trans-unit>
+<trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='><source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source><target>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</target></trans-unit>
+  </body>
  </file>
 </xliff>

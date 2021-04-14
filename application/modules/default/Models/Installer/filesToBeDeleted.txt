@@ -16,6 +16,7 @@
 /data/dummyTm_5
 /data/dummyTm_4
 /data/dummyTm_7
+/jira-cookie.txt
 /public/assets/js/jquery.min.js
 /public/modules/editor/termportal/js/jquery-ui-1.12.1/
 /application/modules/editor/Plugins/MatchResource/

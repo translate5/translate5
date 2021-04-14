@@ -1398,9 +1398,9 @@
 </trans-unit>
 <trans-unit id='IChBTFQrezB9KQ=='><source> (ALT+{0})</source><target> (ALT+{0})</target></trans-unit>
 <trans-unit id='IChBTFQrU0hJRlQrezB9KQ=='><source> (ALT+SHIFT+{0})</source><target> (ALT+SHIFT+{0})</target></trans-unit>
-<trans-unit id='SW4gaW1wb3J0aWVydGVyIERhdGVpIGdlc3BlcnJ0ZSBTZWdtZW50ZSBzaW5kIGluIHRyYW5zbGF0ZTUgZ2VzcGVycnQ='>
-  <source>In importierter Datei gesperrte Segmente sind in translate5 gesperrt</source>
-  <target>Locked segments in the imported file are also locked in translate5</target>
+<trans-unit id='TnVyIGbDvHIgU0RMWExJRkYgRGF0ZWllbjogSW4gaW1wb3J0aWVydGVyIERhdGVpIGV4cGxpeml0IGdlc3BlcnJ0ZSBTZWdtZW50ZSBzaW5kIGluIHRyYW5zbGF0ZTUgZWJlbmZhbGxzIGdlc3BlcnJ0'>
+  <source>Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt</source>
+  <target>For SDLXLIFF import files only: Explicitly locked segments in files are also locked in translate5</target>
 </trans-unit>
 <trans-unit id='RGllIFNvcnRpZXJ1bmcgYnp3LiBGaWx0ZXJ1bmcgd3VyZGUgZ2XDpG5kZXJ0LCBlcyBrYW5uIG5pY2h0IHp1bSBha3R1ZWxsZW4gU2VnbWVudCB6dXLDvGNrIGdlc3BydW5nZW4gd2VyZGVuLg=='>
   <source>Die Sortierung bzw. Filterung wurde geändert, es kann nicht zum aktuellen Segment zurück gesprungen werden.</source>
@@ -2986,7 +2986,10 @@ A task was associated to you in the task-portal {portalLink}.<br />
     <source>importiert</source>
     <target>importing</target>
 </trans-unit>
-
+<trans-unit id='SW1wb3J0IGzDpHVmdA=='>
+    <source>Import läuft</source>
+    <target>importing</target>
+</trans-unit>
 <trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'>
     <source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source>
     <target>The queried OpenTM2 instance is not available</target>
@@ -3997,6 +4000,18 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QW53ZW5kdW5nIHZlcmxhc3Nlbg=='>
     <source>Anwendung verlassen</source>
     <target>Leave application</target>
+</trans-unit>
+<trans-unit id='V2VubiBha3RpdmllcnQsIHdlcmRlbiBibG9ja2llcnRlIFNlZ21lbnRlIGluIGRpZSBBbmFseXNlIHVuZCBXb3J0YW56YWhsIGVpbmJlem9nZW4='>
+  <source>Wenn aktiviert, werden blockierte Segmente in die Analyse und Wortanzahl einbezogen</source>
+  <target>If enabled, blocked segments are included in the analysis and word count</target>
+</trans-unit>
+<trans-unit id='V2VubiBkZWFrdGl2aWVydCwgd2VyZGVuIGJsb2NraWVydGUgU2VnbWVudGUgbmljaHQgaW4gZGllIEFuYWx5c2UgdW5kIFdvcnRhbnphaGwgZWluYmV6b2dlbg=='>
+  <source>Wenn deaktiviert, werden blockierte Segmente nicht in die Analyse und Wortanzahl einbezogen</source>
+  <target>If disabled, blocked segments are not included in the analysis and word count</target>
+</trans-unit>
+<trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='>
+  <source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source>
+  <target>The parameter login containing the desired username is missing.</target>
 </trans-unit>
 </body>
   </file>

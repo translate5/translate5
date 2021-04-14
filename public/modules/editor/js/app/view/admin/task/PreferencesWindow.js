@@ -85,6 +85,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 store:'admin.task.Config',
                 title:me.strings.config,
                 bind:{
+                    disabled:'{disabledDuringTaskImport}',
                     extraParams:{
                         taskGuid : '{projectTaskSelection.taskGuid}'
                     }

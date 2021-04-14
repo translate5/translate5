@@ -35,6 +35,7 @@ class Editor_AppsController extends ZfExtended_Controllers_Action {
         Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
         $config = Zend_Registry::get('config');
         $this->view->render('apps/layoutConfig.php');
+        $this->view->appVersion = ZfExtended_Utils::getAppVersion();
         
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         

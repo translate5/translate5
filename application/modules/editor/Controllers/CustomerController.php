@@ -119,6 +119,11 @@ class Editor_CustomerController extends ZfExtended_RestController {
         }
         $export = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageExporter');
         /* @var $export editor_Models_LanguageResources_UsageExporter */
+        $taskType = $this->getRequest()->getParam('taskType',null);
+        if(!empty($taskType)){
+            $taskType = explode(',', $taskType);
+            $export->setDocumentTaskType($taskType);
+        }
         if($export->excel($customerId)){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
             $this->view->result = $t->_("Es wurden keine Ergebnisse gefunden");
@@ -229,6 +234,11 @@ class Editor_CustomerController extends ZfExtended_RestController {
         }
         $export = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageExporter');
         /* @var $export editor_Models_LanguageResources_UsageExporter */
+        $taskType = $this->getRequest()->getParam('taskType',null);
+        if(!empty($taskType)){
+            $taskType = explode(',', $taskType);
+            $export->setDocumentTaskType($taskType);
+        }
         $this->view->rows = $export->getExportRawDataTests($customerId);
     }
 }
