@@ -34,6 +34,7 @@
 
 /**
  * Abstraction to bundle the segment's internal tags per field to have a model to be passed across the quality providers
+ * These APIs are meant to be used by editor_Segment_Tags only !
  */
 final class editor_Segment_Qualities {
 
@@ -88,14 +89,17 @@ final class editor_Segment_Qualities {
     }
     /**
      * Adds a quality independently of a tag (usually do not use start & end index then)
+     * NOTE that the $additopnal data only can be a flat Object !
      * @param string $field
      * @param string $type
      * @param string $category
      * @param int $startIndex
      * @param int $endIndex
+     * @param stdClass $additionalData
      */
-    public function add(string $field, string $type, string $category, int $startIndex=0, int $endIndex=-1){
-        $quality = $this->findExistingByProps($field, $type, $category, $startIndex, $endIndex);
+    public function add(string $field, string $type, string $category, int $startIndex, int $endIndex, stdClass $additionalData=NULL){
+        // we can not compare the text indices because qualities added vie ->add() are qualities that relate to the whole segment content !
+        $quality = $this->findExistingByProps($field, $type, $category, $additionalData);
         if($quality == NULL){
             $quality = $this->table->createRow();
             /* @var $quality editor_Models_Db_SegmentQualityRow */
@@ -107,11 +111,19 @@ final class editor_Segment_Qualities {
             $quality->startIndex = $startIndex;
             $quality->endIndex = $endIndex;
             $quality->falsePositive = 0;
+            if($additionalData != NULL){
+                $quality->setAdditionalData($additionalData);
+            }
             // new qualities without tags will be saved in a batch
             $quality->processingState = 'new';
             $this->added[] = $quality;
         } else {
-            $quality->processingState = 'keep';
+            if($quality->startIndex != $startIndex || $quality->endIndex != $endIndex){
+                $quality->startIndex = $startIndex;
+                $quality->endIndex = $endIndex;
+                $quality->save();
+            }
+            $quality->processingState = 'keep';            
         }
     }
     /**
@@ -232,6 +244,11 @@ final class editor_Segment_Qualities {
             $quality->endIndex = $tag->endIndex;
             $changed = true;
         }
+        $additionalData = $tag->getAdditionalData();
+        if(!$quality->isAdditionalDataEqual($additionalData)){
+            $quality->setAdditionalData($additionalData);
+            $changed = true;
+        }
         if($tag->getType() == editor_Segment_Tag::TYPE_MQM){
             /* @var $tag editor_Segment_Mqm_Tag */
             if($quality->categoryIndex !== $tag->getCategoryIndex()){
@@ -265,45 +282,35 @@ final class editor_Segment_Qualities {
         return NULL;
     }
     /**
-     * Finds an existing quality that matches all given props
+     * Finds an existing quality that was not yet found that matches all given props. This is expected to be a quality without segment tags and thus must match the whole width of the segment
+     * Needed for persistance of falsePositive only
      * @param string $field
      * @param string $type
      * @param string $category
-     * @param int $startIndex
-     * @param int $endIndex
+     * @param stdClass $additionalData
      * @return editor_Models_Db_SegmentQualityRow|NULL
      */
-    private function findExistingByProps(string $field, string $type, string $category, int $startIndex, int $endIndex) : ?editor_Models_Db_SegmentQualityRow {
+    private function findExistingByProps(string $field, string $type, string $category, ?stdClass $additionalData) : ?editor_Models_Db_SegmentQualityRow {
         foreach($this->existing as $quality){
-            if($type === $quality->type && $field == $quality->field && $category == $quality->category && $startIndex === $quality->startIndex && $endIndex === $quality->endIndex){
+            if($quality->processingState == 'delete' && $type === $quality->type && $field == $quality->field && $category == $quality->category && $quality->isAdditionalDataEqual($additionalData)){
                 return $quality;
             }
         }
         return NULL;
     }
     /**
-     * Finds an existing quality entry for any tag spanning the whole width
+     * Finds an existing quality entry that was not yet found for a segment tag
+     * Needed for persistance of falsePositive only
      * @param editor_Segment_Tag $tag
      * @param string $field
      * @return editor_Models_Db_SegmentQualityRow|NULL
      */
     private function findExistingByTag(editor_Segment_Tag $tag, string $field) : ?editor_Models_Db_SegmentQualityRow {
         foreach($this->existing as $quality){
-            if($tag->getType() === $quality->type && $field == $quality->field && $tag->startIndex === $quality->startIndex && $tag->endIndex === $quality->endIndex){
-                if(($tag->getType() == editor_Segment_Tag::TYPE_MQM && $this->isMqmEqual($tag, $quality)) || $tag->getCategory() == $quality->category){
-                    return $quality;
-                }
+            if($quality->processingState == 'delete' && $tag->isQualityEqual($quality)){
+                return $quality;
             }
         }
         return NULL;
-    }
-    /**
-     * Checks the MQM specific props of a tag and a quality entry
-     * @param editor_Segment_Mqm_Tag $tag
-     * @param editor_Models_Db_SegmentQualityRow $quality
-     * @return boolean
-     */
-    private function isMqmEqual(editor_Segment_Mqm_Tag $tag, editor_Models_Db_SegmentQualityRow $quality) : bool {
-        return ($tag->getCategoryIndex() === $quality->categoryIndex && $tag->getSeverity() == $quality->severity && $tag->getComment() == $quality->comment);
     }
 }

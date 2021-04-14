@@ -168,10 +168,17 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
     public $isFullLength;
     /**
      * References the field the Tag belongs to
-     * This property is only set, if the tag is part of a FieldTags container and will not be serialized  !
+     * This property is only set, if the tag is part of a FieldTags container and will not be serialized !
      * @var string
      */
     public $field = null;
+    /**
+     * References the text content of the tag.
+     * This property is only set, if the tag is part of a FieldTags container and will not be serialized !
+     * This prop NEVER can be used to change segments in the DB or the like, it has only informative character and is used for internal comparisions
+     * @var string
+     */
+    public $content = '';
     /**
      * The category of tag we have, a further specification of type
      * might not be used by all internal tags
@@ -313,6 +320,45 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
      */
     public function getDataNameQualityId() : string {
         return self::DATA_NAME_QUALITYID;
+    }
+    /**
+     * Retrieves additional data to identify a tag from quality entries
+     * This data is stored in the quality entries
+     * This API can only be used after tags are part of a FieldTags container / unparsed from a segment
+     * This normally covers just a hash of the tags content, to add more data extend this method
+     * @return stdClass
+     */
+    public function getAdditionalData() : stdClass {
+        $data = new stdClass();
+        $data->hash = md5($this->content);
+        return $data;
+    }
+    /**
+     * Identifies a tag by a quality entry from the DB
+     * This is needed only for the persistance of the falsePositive flag, all other props will be re-evaluated anyway
+     * NOTE: this default implementation checks for the position in the segment OR the content of the tag. Note, that this implementation hypothetically can produce false results when qualities with the same content exist multiple times in the segment
+     * @param editor_Models_Db_SegmentQualityRow $quality
+     * @return boolean
+     */
+    public function isQualityEqual(editor_Models_Db_SegmentQualityRow $quality) : bool {
+        return ($this->isQualityGenerallyEqual($quality) && $this->isQualityContentEqual($quality));
+    }
+    /**
+     * Checks if type & category are equal between us and a quality entry from DB
+     * @param editor_Models_Db_SegmentQualityRow $quality
+     * @return boolean
+     */
+    protected function isQualityGenerallyEqual(editor_Models_Db_SegmentQualityRow $quality) : bool {
+        return ($this->getType() === $quality->type && $this->getCategory() == $quality->category);
+    }
+    /**
+     * Checks, if the quality content is equal. The base implementation compares the position in the segment or the content/text in the tag (comparing the tag content-hashes)
+     * This default implementation is not very specific (using text-position) and may leads to confusion of tags of the same type & category
+     * @param editor_Models_Db_SegmentQualityRow $quality
+     * @return boolean
+     */
+    protected function isQualityContentEqual(editor_Models_Db_SegmentQualityRow $quality) : bool {
+        return (($this->startIndex === $quality->startIndex && $this->endIndex === $quality->endIndex) || $quality->isAdditionalDataEqual($this->getAdditionalData()));
     }
     /**
      * Retrieves if the tag has the false-positive decorator

@@ -39,6 +39,7 @@ END LICENSE AND COPYRIGHT
  * @property int $startIndex
  * @property int $endIndex
  * @property int $falsePositive
+ * @property string $additionalData
  * @property int $categoryIndex
  * @property string $severity
  * @property string $comment
@@ -52,6 +53,53 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
      */
     public $processingState;
     
+    /**
+     * Retrieves the additionalData as decoded stdClass
+     * @return stdClass
+     */
+    public function getAdditionalData() : stdClass {
+        $data = (empty($this->additionalData)) ? NULL : json_decode($this->additionalData);
+        if(is_object($data)){
+            return $data;
+        }
+        return new stdClass();
+    }
+    /**
+     * Sets the additionalData, which can only be a flat stdClass Object, as encoded JSON
+     * An empy or missing Object will lead to NULL as column value
+     * @param stdClass $data
+     */
+    public function setAdditionalData(?stdClass $data){
+        if(is_object($data)){
+            foreach((array) $data as $key => $val){
+                if(is_object($val) || is_int($key)){
+                    throw new ZfExtended_Exception('Additional data for quality entities must be flat !');
+                }
+            }
+            $jsonString = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->additionalData = (empty($jsonString)) ? NULL : $jsonString;
+        } else {
+            $this->additionalData = NULL;
+        }
+    }
+    /**
+     * Compares our additionalData with the passed additional data if they are equal
+     * @param stdClass $data
+     * @return boolean
+     */
+    public function isAdditionalDataEqual(stdClass $data=NULL) : bool {
+        if($data == NULL){
+            return $this->additionalData === NULL;
+        }
+        $ours = (array) $this->getAdditionalData();
+        $theirs = (array) $data;
+        foreach($ours as $key => $val){
+            if(!array_key_exists($key, $theirs) || $theirs[$key] !== $val){
+                return false;
+            }
+        }
+        return (count($ours) == count($theirs));
+    }
     /** can be used for debugging TODO AutoQA: remove
     public function save(){
         error_log('SAVED QUALITY '.$this->id.': type: '.$this->type.' category: '.$this->category.' falsePositive: '.$this->falsePositive);
