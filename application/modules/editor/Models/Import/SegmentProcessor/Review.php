@@ -101,7 +101,7 @@ class editor_Models_Import_SegmentProcessor_Review extends editor_Models_Import_
         $seg->setMatchRateType($attributes->matchRateType);
         $seg->setEditable($attributes->editable);
         $seg->setAutoStateId($attributes->autoStateId);
-        $seg->setPretrans($attributes->isPreTranslated);
+        $seg->setPretrans($attributes->isPreTranslated ? $seg::PRETRANS_INITIAL : $seg::PRETRANS_NOTDONE);
         
         $this->segmentNrInTask++;
         $seg->setSegmentNrInTask($this->segmentNrInTask);

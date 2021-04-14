@@ -9,13 +9,13 @@ START LICENSE AND COPYRIGHT
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
@@ -45,23 +45,23 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
     
     
     protected $fieldsToUpdate=array(
-            'taskGuid', 
-            'userGuid', 
-            'userName', 
-            'timestamp', 
-            'editable', 
-            'pretrans', 
-            'qmId', 
-            'stateId', 
-            'autoStateId', 
-            'workflowStep', 
-            'workflowStepNr', 
-            'matchRate', 
+            'taskGuid',
+            'userGuid',
+            'userName',
+            'timestamp',
+            'editable',
+            'pretrans',
+            'qmId',
+            'stateId',
+            'autoStateId',
+            'workflowStep',
+            'workflowStepNr',
+            'matchRate',
             'matchRateType'
     );
     
     /**
-     * loads the history entries to one segment, DESC sorted by id (creation), can be limited with $limit parameter 
+     * loads the history entries to one segment, DESC sorted by id (creation), can be limited with $limit parameter
      * @param int $id
      * @param number $limit
      * @return array
@@ -169,7 +169,7 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
     }
     
     /**
-     * since the duration field is stored in the HistoryData Object but is not 
+     * since the duration field is stored in the HistoryData Object but is not
      * used transparently like the other alternate fields, we have to store it separtly
      * (duration is not needed in daily business in the segment grid, so does not exist in the MV!)
      * @param array $durations keys → fieldnames; values → durations
@@ -189,21 +189,21 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
     
     /***
      * Insert record(s) in segment history table for autostates and taskguid as condition
-     * Attention: no record in segment data history is inserted, because usage is where no related data was changed for the data table 
+     * Attention: no record in segment data history is inserted, because usage is where no related data was changed for the data table
      * @param string $taskGuid
      * @param array $autoStates
      */
     public function createHistoryByAutoState($taskGuid,array $autoStates){
         //get the updatable fields for LEK_segment_history table
-        $fieldsHistory=implode(',',$this->getFieldsToUpdate());
-        $fieldsSegments=implode(',seg.',$this->getFieldsToUpdate());
+        $fieldsHistory = implode('`,`',$this->getFieldsToUpdate());
+        $fieldsSegments = implode('`,seg.`',$this->getFieldsToUpdate());
         
-        $sql='INSERT INTO LEK_segment_history 
-                   (segmentId,'.$fieldsHistory.')
-              SELECT seg.id, seg.'.$fieldsSegments.'
+        $sql = 'INSERT INTO LEK_segment_history
+                   (segmentId, `'.$fieldsHistory.'`)
+              SELECT seg.id, seg.`'.$fieldsSegments.'`
               FROM LEK_segments as seg
-              WHERE seg.taskGuid=?
-              AND seg.autoStateId IN(?);';
-        $retval=$this->db->getAdapter()->query($sql,[$taskGuid,implode(',', $autoStates)]);
+              WHERE seg.taskGuid = ?
+              AND '.$this->db->getAdapter()->quoteInto('seg.autoStateId IN(?)', $autoStates);
+        $this->db->getAdapter()->query($sql, [$taskGuid]);
     }
 }

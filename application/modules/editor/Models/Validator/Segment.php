@@ -93,6 +93,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $this->addValidator('matchRate', 'between', array('min' => 0, 'max' => 104));
         $this->addValidator('matchRateType', 'stringLength', array('min' => 0, 'max' => 1084));
         $this->addValidator('workflowStepNr', 'int');
+        $this->addValidator('pretrans', 'inArray', [ZfExtended_Utils::getConstants('editor_Models_Segment', 'PRETRANS_')]);
         
         /* simplest way to get the correct workflow here: */
         $session = new Zend_Session_Namespace();

@@ -110,7 +110,7 @@ class editor_Plugins_GlobalesePreTranslation_SegmentUpdateProcessor extends edit
             $this->segment->setTargetMd5($data[$target]["originalMd5"]);
             $this->segment->setTargetEdit($updateContent);
             // set the AutoStatus to translated
-            $this->segment->setPretrans(true);
+            $this->segment->setPretrans($this->segment::PRETRANS_INITIAL);
             $this->segment->setAutoStateId(editor_Models_Segment_AutoStates::PRETRANSLATED);
             $this->segment->setMatchRateType('import;mt;globalese');
             $this->segment->save();

@@ -344,16 +344,15 @@ class editor_Models_Segment_AutoStates {
     }
     
     /**
-     * sets the untouched state for a given taskGuid
+     * sets the reviewer untouched state for a given taskGuid
      *
      * @param string $taskGuid
      */
     public function setUntouchedState(string $taskGuid, ZfExtended_Models_User $user) {
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
-        
-        $segment->setUserGuid($user->getUserGuid());
-        $segment->setUserName($user->getUserName());
+        $bulkUpdater = ZfExtended_Factory::get('editor_Models_Segment_AutoStates_BulkUpdater',[
+            $user
+        ]);
+        /* @var $bulkUpdater editor_Models_Segment_AutoStates_BulkUpdater */
         
         $history  = ZfExtended_Factory::get('editor_Models_SegmentHistory');
         /* @var $history editor_Models_SegmentHistory */
@@ -362,10 +361,18 @@ class editor_Models_Segment_AutoStates {
         //there is no related data change for this table
         
         //add record in the segment history
-        $history->createHistoryByAutoState($taskGuid,[self::TRANSLATED,self::NOT_TRANSLATED]);
+        $toBeUntouched = [
+            self::TRANSLATED,
+            self::TRANSLATED_AUTO,
+            self::NOT_TRANSLATED,
+            self::PRETRANSLATED
+        ];
         
-        $segment->updateAutoState($taskGuid, self::TRANSLATED, self::REVIEWED_UNTOUCHED);
-        $segment->updateAutoState($taskGuid, self::NOT_TRANSLATED, self::REVIEWED_UNTOUCHED);
+        $history->createHistoryByAutoState($taskGuid, $toBeUntouched);
+        
+        foreach($toBeUntouched as $state) {
+            $bulkUpdater->updateAutoState($taskGuid, $state, self::REVIEWED_UNTOUCHED);
+        }
     }
     
     /**
@@ -374,8 +381,8 @@ class editor_Models_Segment_AutoStates {
      * @param string $taskGuid
      */
     public function setInitialStates(string $taskGuid) {
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
+        $bulkUpdater = ZfExtended_Factory::get('editor_Models_Segment_AutoStates_BulkUpdater');
+        /* @var $bulkUpdater editor_Models_Segment_AutoStates_BulkUpdater */
         
         $history  = ZfExtended_Factory::get('editor_Models_SegmentHistory');
         /* @var $history editor_Models_SegmentHistory */
@@ -383,9 +390,7 @@ class editor_Models_Segment_AutoStates {
         //there is no related data change for this table
         $history->createHistoryByAutoState($taskGuid,[self::REVIEWED_UNTOUCHED]);
         
-        $segment->updateLastAuthorFromHistory($taskGuid, self::REVIEWED_UNTOUCHED);
-        $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::NOT_TRANSLATED, true);
-        $segment->updateAutoState($taskGuid, self::REVIEWED_UNTOUCHED, self::TRANSLATED);
+        $bulkUpdater->resetUntouchedFromHistory($taskGuid, self::REVIEWED_UNTOUCHED);
         
     }
     
@@ -468,5 +473,15 @@ class editor_Models_Segment_AutoStates {
             ]);
         }
         return $autoStates;
+    }
+    
+    /**
+     * returns true if the given state is state produced by a translator
+     * @param int $autoState
+     * @return bool
+     */
+    public function isTranslationState(int $autoState): bool
+    {
+        return in_array($autoState, [self::TRANSLATED, self::TRANSLATED_AUTO]);
     }
 }
