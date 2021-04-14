@@ -175,6 +175,9 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $tua->setState($state);
             $tua->setUserGuid($data['userGuid']);
             $tua->setTaskGuid($task->getTaskGuid());
+            
+            $this->setDefaultDeadlineDate($tua, $stepName);
+            
             //entity version?
             $tua->save();
             $workflow->doUserAssociationAdd($tua);
@@ -184,6 +187,34 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         if(!empty($tua)) {
             $task->updateWorkflowStep($stepName, false);
         }
+    }
+    
+    /***
+     * Set the default deadline date from config for given task user assoc
+     * @param editor_Models_TaskUserAssoc $tua
+     * @param string $workflowStep
+     */
+    protected function setDefaultDeadlineDate(editor_Models_TaskUserAssoc &$tua, string $workflowStep) {
+        $task = $this->config->task;
+        /* @var $task editor_Models_Task */
+        
+        // check if the order date is set. With empty order data, no deadline date from config is posible
+        if(empty($task->getOrderdate()) || is_null($task->getOrderdate())){
+            return;
+        }
+        
+        // get the config for the task workflow and the user assoc role workflow step
+        $configValue = $task->getConfig()->runtimeOptions->workflow->{$task->getWorkflow()}->{$workflowStep}->defaultDeadlineDate ?? 0;
+        if($configValue<1){
+            return;
+        }
+        // new deadline date = "task order date" + "configured days"
+        $newDeadline =date ('Y-m-d' , strtotime($task->getOrderdate().' +'.$configValue.' Weekday'));
+        //Add the current time to the new deadline. The order date by default is without timestamp (always 0:0:0 as time), and because of that
+        //the new deadline date will always be with 0:0:0 as timestamp. For the deadline date the time is important.
+        $dateAndTime = explode(" ", NOW_ISO);
+        $newDeadline .=' '.array_pop($dateAndTime);
+        $tua->setDeadlineDate($newDeadline);
     }
     
     /***
