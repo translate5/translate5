@@ -154,7 +154,6 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $role = $workflow::ROLE_REVIEWER;
             $stepName = $workflow::STEP_REVIEWING;
         }
-        
         $states = $workflow->getInitialStates();
         $state = $states[$stepName][$role];
         
