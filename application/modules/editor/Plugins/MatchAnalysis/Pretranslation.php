@@ -224,7 +224,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         //if there is no text, it should be blocked, also if it is not editable
         $pretrans = $hasText && $segment->isEditable();
         $segment->setAutoStateId($this->autoStates->calculatePretranslationState($pretrans));
-        $segment->setPretrans($pretrans);
+        $segment->setPretrans($pretrans ? $segment::PRETRANS_INITIAL : $segment::PRETRANS_NOTDONE);
         
         //check if the result is valid for log
         if($this->isResourceLogValid($languageResource, $segment->getMatchRate())){
