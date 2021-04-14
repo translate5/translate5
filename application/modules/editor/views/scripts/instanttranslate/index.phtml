@@ -28,7 +28,8 @@
 ?>
 
 <?php
-/* @var $this Zend_View */
+    /* @var $this Zend_View */
+    $version = '?v='.$this->appVersion;
 
     // Which languages are available according to the LanguageResources?
     // (We only the need the single lists here, not in which combination they work.)
@@ -57,7 +58,7 @@
     sort($allSourceLanguageLocales);
     sort($allTargetLanguageLocales);
     
-    // the lowest number of characters that any of the LanguageResources can handle 
+    // the lowest number of characters that any of the LanguageResources can handle
     // is our limit for what the user is allowed to enter:
     if(empty($allCharacterLimits)) {
         $characterLimit = 3;
@@ -72,7 +73,7 @@
 
 <div id="containerHeader" class="container">
     <div id="logo"></div>
-<?php 
+<?php
 
     //check if the user is allowed to acces the term portal
     if($this->isUserTermportalAllowed){
@@ -306,8 +307,8 @@ $( function() {
 } );
 </script>
 
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/ErrorHandler.js"></script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/ErrorHandler.js<?php echo $version; ?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js<?php echo $version; ?>"></script>
 
 <script type="text/javascript">
 // show list of available files

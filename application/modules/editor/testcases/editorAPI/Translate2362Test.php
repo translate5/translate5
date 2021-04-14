@@ -90,10 +90,16 @@ class Translate2362Test extends \ZfExtended_Test_ApiTestcase {
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit, $segToTest->id);
         $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
+        $segToTest = $segments[1];
+        $segToTest->targetEdit = str_replace(['comments and CDATA'], ['CDATA and comments'], $segToTest->targetEdit);
+        
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit, $segToTest->id);
+        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        
         //check direct PUT result
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=10');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        file_put_contents($this->api()->getFile('/expectedSegments-edited.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
+        //file_put_contents($this->api()->getFile('/expectedSegments-edited.json', null, false), json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegments-edited.json'), $data, 'Edited segments are not as expected!');
     }
     

@@ -53,7 +53,7 @@ Ext.define('Editor.util.Node', {
      * @param {Object} rangeForPositionToSplit
      * @returns {Object} splittedNodes
      */
-    splitNode: function(nodeToSplit,rangeForPositionToSplit) {
+    splitNode: function(nodeToSplit, rangeForPositionToSplit) {
         var me = this,
             splittedNodes = [],
             rangeForExtract = rangy.createRange(),
@@ -61,11 +61,13 @@ Ext.define('Editor.util.Node', {
             selectionStartOffset = rangeForPositionToSplit.startOffset,
             parentNode = nodeToSplit.parentNode;
         // extract what's on the left from the caret and insert it before the node as a new node
-        rangeForExtract.setStartBefore(nodeToSplit);
-        rangeForExtract.setEnd(selectionStartNode, selectionStartOffset);
-        splittedNodes[0] = rangeForExtract.extractContents();
-        splittedNodes[1] = nodeToSplit; // nodeToSplit: contains only the second half of the nodeToSplit after extractContents()
-        parentNode.insertBefore(splittedNodes[0], splittedNodes[1]); // TODO: Check if both parts of the splitted node share the same conditions (user, workflow, ...)
+        if(parentNode){
+            rangeForExtract.setStartBefore(nodeToSplit);
+            rangeForExtract.setEnd(selectionStartNode, selectionStartOffset);
+            splittedNodes[0] = rangeForExtract.extractContents();
+            splittedNodes[1] = nodeToSplit; // nodeToSplit: contains only the second half of the nodeToSplit after extractContents()
+            parentNode.insertBefore(splittedNodes[0], splittedNodes[1]); // TODO: Check if both parts of the splitted node share the same conditions (user, workflow, ...)
+        }
         return splittedNodes;
     },
     /**
