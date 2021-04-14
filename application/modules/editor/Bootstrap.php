@@ -305,6 +305,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('editorTaskKpi', $taskKpi);
         
+        $importprogress = new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/importprogress',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'importprogress'
+            ));
+        $this->front->getRouter()->addRoute('editorTaskImportprogress', $importprogress);
+        
         $workerRoute = new ZfExtended_Controller_RestLikeRoute(
             'editor/worker/queue/*',
             array(
@@ -465,6 +474,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'exportresource'
             ));
         $this->front->getRouter()->addRoute('customer_resourceexport', $customerResourceExport);
+        
+        $sessionImpersonate = new ZfExtended_Controller_RestLikeRoute(
+            'editor/session/impersonate',
+            array(
+                'module' => 'editor',
+                'controller' => 'session',
+                'action' => 'impersonate'
+            ));
+        $this->front->getRouter()->addRoute('editorSessionImpersonate', $sessionImpersonate);
     }
     
     

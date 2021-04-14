@@ -69,6 +69,12 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
      * @var array
      */
     protected $collectedMissingFiles = [];
+    
+    /***
+     * 
+     * @var editor_Models_Import_Configuration
+     */
+    protected $importConfig;
 
     public function __construct(){
         parent::__construct();
@@ -117,6 +123,7 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
             'fullPath' => $fullpath,
             'filePath' => $filepath,
             'taskGuid' => $this->getTaskGuid(),
+            'importConfig' => $this->importConfig//INFO:(TRANSLATE-1596)Afte we remove the depricate support for proofRead this can be removed
         ));
         $filepath = $path.$child->filename;
         
@@ -167,5 +174,9 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
     protected function isFileToImport(string $path) {
         return isset($this->relaisFilesStati[$path]) &&
             $this->relaisFilesStati[$path] == self::RELAIS_NOT_IMPORTED;
+    }
+    
+    public function setImportConfig(editor_Models_Import_Configuration $config) {
+        $this->importConfig=$config;
     }
 }

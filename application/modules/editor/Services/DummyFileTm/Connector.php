@@ -44,9 +44,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_FilebasedAbstract {
 
-    protected $tm;
-    protected $uploadedFile;
-
     /**
      * Paging information for search requests
      * @var integer
@@ -60,20 +57,35 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @var integer
      */
     protected $searchCount = 0;
+    
+    /**
+     * @var editor_Services_DummyFileTm_Db
+     */
+    protected $db;
 
     public function __construct() {
-        $eventManager = Zend_EventManager_StaticEventManager::getInstance();
-        $eventManager->attach('editor_Languageresourceinstance', 'afterPostAction', array($this, 'handleAfterLanguageResourceSaved'));
+        $this->db = new editor_Services_DummyFileTm_Db();
         parent::__construct();
     }
-
+    
     /**
      * (non-PHPdoc)
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
-    public function addTm(array $fileinfo,array $params=null){
-        $this->uploadedFile = $fileinfo['tmp_name'];
-        //do nothing here, since we need the entity ID to save the TM
+    public function addTm(array $fileinfo = null, array $params=null){
+        if(empty($fileinfo)) {
+            return true;
+        }
+        
+        $import = ZfExtended_Factory::get('editor_Services_DummyFileTm_ImportTmx');
+        /* @var $import editor_Services_DummyFileTm_ImportTmx */
+        
+        //TODO register another callback for the languages to be set in the language resource, so that the languages are automatically determined by the TMX content
+        $import->import(new SplFileInfo($fileinfo['tmp_name']), $this->languageResource, function($oneSegment){
+            //TODO prevent duplicates in DB. How???
+            $this->db->insert($oneSegment);
+        });
+        
         return true;
     }
     
@@ -82,37 +94,35 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @see editor_Services_Connector_Abstract::addAdditionalTm()
      */
     public function addAdditionalTm(array $fileinfo = null,array $params=null){
-        
+        //TODO
     }
     
     /**
      * (non-PHPdoc)
      * @see editor_Services_Connector_FilebasedAbstract::getTm()
      */
-    public function getTm(& $mime) {
-        $file = new SplFileInfo($this->getTmFile($this->languageResource->getId()));
-        if(!$file->isFile() || !$file->isReadable()) {
-            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the languageResourceId '.$this->languageResource->getId().' not found!');
-        }
-        $mime = 'application/csv';
-        return file_get_contents($file);
-    }
-
-    /**
-     * in our dummy file TM the TM can only be saved after the TM is in the DB, since the ID is needed for the filename
-     */
-    public function handleAfterLanguageResourceSaved() {
-        move_uploaded_file($this->uploadedFile, $this->getTmFile($this->languageResource->getId()));
-    }
-
-    protected function getTmFile($id) {
-        return APPLICATION_PATH.'/../data/dummyTm_'.$id;
+    public function getTm($mime) {
+        return false; //TODO generate TMX back from DB
     }
 
     public function update(editor_Models_Segment $segment) {
-        $messages = Zend_Registry::get('rest_messages');
-        /* @var $messages ZfExtended_Models_Messages */
-        $messages->addError('This is just to inform you, that the TM is not updated and the udpate handler is only for demonstration invoked.');
+        $source = $this->tagHandler->prepareQuery($this->getQueryString($segment));
+        $target = $this->tagHandler->prepareQuery($segment->getTargetEdit());
+        
+        $s = $this->db->select()->where('source = ?', $source);
+        $row = $this->db->fetchRow($s);
+        if($row) {
+            $row->target = $target;
+        }
+        else {
+            $row = $this->db->createRow([
+                'languageResourceId' => $this->languageResource->getId(),
+                'mid' => $segment->getMid(),
+                'source' => $source,
+                'target' => $target,
+            ]);
+        }
+        $row->save();
     }
     
     /**
@@ -146,26 +156,15 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
             sleep(rand(5, 15));
         }
         
-        $file = new SplFileInfo($this->getTmFile($this->languageResource->getId()));
-        if(!$file->isFile() || !$file->isReadable()) {
-            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the languageResourceId '.$this->languageResource->getId().' not found!');
-        }
-        $file = $file->openFile();
-
-        $result = array();
-        $i = 0;
-        while($line = $file->fgetcsv(",", '"', '"')) {
-            if($i++ == 0 || empty($line) || empty($line[0]) || empty($line[1]) || empty($line[2])){
-                continue;
-            }
-
+        $rowSet = $this->db->fetchAll($this->db->select());
+        foreach($rowSet as $row) {
             //simulate match query
             if(empty($field)) {
-                $this->makeMatch($queryString, $line[1], $line[2]);
+                $this->makeMatch($queryString, $row['source'], $row['target']);
                 continue;
             }
-            
-            $this->makeSearch($queryString, $line[1], $line[2], $field == 'source');
+            //TODO just copied from old filebased stuff, search could be refactored to real database based search instead of loop through all data
+            $this->makeSearch($queryString, $row['source'], $row['target'], $field == 'source');
         }
         
         if($this->searchCount > 0) {
@@ -231,19 +230,32 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @see editor_Services_Connector_FilebasedAbstract::delete()
      */
     public function delete() {
-        $file = new SplFileInfo($this->getTmFile($this->languageResource->getId()));
-        if($file->isFile()) {
-            unlink($file);
-        }
+        $this->db->delete(['languageResourceId = ?' => $this->languageResource->getId()]);
     }
-    public function getValidFiletypes()
-    {}
     
-    public function getValidExportTypes()
-    {}
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypes()
+     */
+    public function getValidFiletypes() {
+        return [
+            'TMX' => ['text/xml'],
+        ];
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypeForExport()
+     */
+    public function getValidExportTypes() {
+        return [
+            'CSV' => 'application/csv',
+        ];
+    }
 
-    public function getStatus(editor_Models_LanguageResources_Resource $resource)
-    {}
+    public function getStatus(editor_Models_LanguageResources_Resource $resource) {
+        return editor_Services_Connector_Abstract::STATUS_AVAILABLE;
+    }
 
     public function translate(string $searchString){
         return $this->search($searchString);

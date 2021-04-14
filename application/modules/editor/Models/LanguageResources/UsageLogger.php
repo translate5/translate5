@@ -44,6 +44,8 @@ END LICENSE AND COPYRIGHT
  * @method void setTimestamp() setTimestamp(string $timestamp)
  * @method string getCustomers() getCustomers()
  * @method void setCustomers() setCustomers(string $customerId)
+ * @method bool getRepetition() getRepetition()
+ * @method void setRepetition() setRepetition(bool $repetition)
  * 
  */
 class editor_Models_LanguageResources_UsageLogger extends ZfExtended_Models_Entity_Abstract {
@@ -68,6 +70,7 @@ class editor_Models_LanguageResources_UsageLogger extends ZfExtended_Models_Enti
             'log.targetLang',
             'log.timestamp',
             'log.customers',
+            'log.repetition',
             //devide the row characters count with the number of assigned characters for the row. This field represents characters per customer
             'ROUND((log.translatedCharacterCount  / (CHAR_LENGTH(TRIM( BOTH  "," FROM  log.customers )) - CHAR_LENGTH(REPLACE(log.customers, ",", "")) + 1))) as charactersPerCustomer'
         ])

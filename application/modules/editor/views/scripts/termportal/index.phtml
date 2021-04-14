@@ -30,7 +30,9 @@
 
 <div id="containerHeader" class="container">
     <div id="logo"></div>
-<?php 
+<?php
+    /* @var $this Zend_View */
+    $version = '?v='.$this->appVersion;
     // see View_Helper_LanguageSelector
     $session = new Zend_Session_Namespace();
     $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
@@ -64,18 +66,18 @@ if(!$this->isIpBasedUser){
 }
 ?>
 </div>
-<?php 
+<?php
 if(isset($this->error)){
     echo '<div class="container ui-state-error ui-corner-all">';
     echo $this->error;
     echo '</div>';
     return;
-}    
+}
 ?>
 <div id="container-content" class="container">
     <div class="wrap">
             <div id="searchFilterForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
-                <?php 
+                <?php
                 $clients = $this->clients;
                 $clientsNames = [];
                     if (count($clients) > 1) {
@@ -93,7 +95,7 @@ if(isset($this->error)){
                         }
                     }
                 ?>
-                <?php 
+                <?php
                     $collections = $this->collections;
                     $collectionsClients = [];
                     $collectionsNames = [];
@@ -115,7 +117,7 @@ if(isset($this->error)){
                         }
                     }
                 ?>
-                <?php 
+                <?php
                     $allProcessstatus = $this->allProcessstatus;
                     asort($allProcessstatus);
                     echo '<select class="search-filter" name="processStatus" id="processStatus"><option value="none">'.$this->translations["processstatus"].':</option>';
@@ -340,12 +342,12 @@ $( function() {
 } );
 
 </script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/ErrorHandler.js"></script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/ComponentEditor.js"></script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Attribute.js"></script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/TermEntry.js"></script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Term.js"></script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Termportal.js"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/apps/js/ErrorHandler.js<?php echo $version; ?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/ComponentEditor.js<?php echo $version; ?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Attribute.js<?php echo $version; ?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/TermEntry.js<?php echo $version; ?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Term.js<?php echo $version; ?>"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Termportal.js<?php echo $version; ?>"></script>
 <script type="text/javascript">
     var languageSelectForNewTerm = Term.renderLanguageSelect('term');
     clearResults();

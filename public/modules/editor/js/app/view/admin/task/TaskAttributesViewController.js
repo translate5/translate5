@@ -50,13 +50,14 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
     
     onSaveTaskAttributesClick:function(){
         var me=this;
+        me.mask();
         me.getCurrentTask().save({
             failure: function(record, operation) {
-                me.getView().getEl().unmask();
+                me.unmask();
                 Editor.app.getController('ServerException').handleException(operation.error.response);
             },
             success: function(record, operation) {
-                me.getView().getEl().unmask();
+                me.unmask();
                 Editor.MessageBox.addSuccess(me.getView().strings.successUpdate);
             },
         });
@@ -76,6 +77,47 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
         if(field.config.inputValue == 'simultaneous' && newVal && !Editor.plugins.FrontEndMessageBus) {
             Editor.MessageBox.addError('In order to use that mode the FrontEndMessageBus plug-in must be active!');
         }
+    },
+    
+    /***
+     * On 100 percent match checkbox change
+     */
+    onEdit100PercentMatchChange:function(field, newValue, oldValue){
+        var me=this,
+            task = me.getCurrentTask();
+        if(!task || newValue===oldValue){
+            return;
+        }
+        var recordValue = task.get('edit100PercentMatch'),
+            isNewValue = recordValue !== newValue,
+            view = me.getView();
+            
+        if(!isNewValue){
+            return;
+        }
+        
+        var message = newValue ? view.strings.edit100PercentMatchEnabledMessage : view.strings.edit100PercentMatchDisabledMessage;
+        
+        Ext.MessageBox.show({
+            title: '',
+            msg: message,
+            buttons: Ext.MessageBox.OK,
+            icon: Ext.MessageBox.WARNING
+        });
+    },
+    
+    /***
+     * Add loading mask to the task attribute panel
+     */
+    mask:function(){
+        this.getView().getEl().mask();
+    },
+    
+    /***
+     * Remove loading mask from task attribute panel
+     */
+    unmask:function(){
+        this.getView().getEl().unmask();
     },
     
     /***

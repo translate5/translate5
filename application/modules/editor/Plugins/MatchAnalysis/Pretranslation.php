@@ -226,10 +226,11 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $segment->setAutoStateId($this->autoStates->calculatePretranslationState($pretrans));
         $segment->setPretrans($pretrans);
         
-        //if it is tm or term collection and the matchrate is >=100, log the usage
-        if(($languageResource->isTm() || $languageResource->isTc()) && $segment->getMatchRate() >= editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE){
-            $this->connectors[$languageResourceid]->logAdapterUsage($segment);
+        //check if the result is valid for log
+        if($this->isResourceLogValid($languageResource, $segment->getMatchRate())){
+            $this->connectors[$languageResourceid]->logAdapterUsage($segment,$result->isRepetition ?? false);
         }
+        
         $segment->set($segmentField,$targetResult); //use sfm->getFirstTargetName here
         $segment->set($segmentFieldEdit,$targetResult); //use sfm->getFirstTargetName here
         
@@ -338,6 +339,18 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $tcs=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
         /* @var $tcs editor_Services_TermCollection_Service */
         return $lr->getServiceName()==$tcs->getName();
+    }
+    
+    /***
+     * Should the current language resources result with matchrate be logged in the languageresources ussage log table
+     *
+     * @param editor_Models_LanguageResources_LanguageResource $languageResource
+     * @param int $matchRate
+     * @return boolean
+     */
+    protected function isResourceLogValid(editor_Models_LanguageResources_LanguageResource $languageResource, int $matchRate) {
+        //check if it is tm or tc, an if the matchrate is >= 100
+        return ($languageResource->isTm() || $languageResource->isTc()) && $matchRate>=editor_Services_Connector_FilebasedAbstract::EXACT_MATCH_VALUE;
     }
     
     /***

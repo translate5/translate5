@@ -540,13 +540,20 @@ Ext.define('Editor.view.admin.customer.Panel', {
      * summ excel for all customers will be generated.
      */
     exportCustomerResourceUsage:function(id){
-        var me = this,
-            params = {},
-            method = 'POST',
-            url = Editor.data.restpath+'customer/exportresource';
+        var url = Editor.data.restpath+'customer/exportresource?format=resourceLogExport',
+            extraParams = [];
+        
         if(id){
-            url=url+'?'+Ext.urlEncode({customerId: id});
+            extraParams.push(Ext.urlEncode({customerId: id}));
         }
-        window.open(url+'?format=resourceLogExport'); 
+
+        // Fire before resources export event. 
+        this.fireEvent('beforeExportCustomerResourceUsage',extraParams);
+
+        Ext.each(extraParams, function(ob){
+            url += '&'+ob;
+        });
+
+        window.open(url); 
     }
 });
