@@ -77,14 +77,6 @@ abstract class editor_Segment_Quality_Provider implements editor_Segment_TagProv
         return false;
     }
     /**
-     * If this API returns true, then the tags of our provider type will be removed before the ::processSegment is called
-     * @param string $processingMode
-     * @return bool
-     */
-    public function removeOwnTagsBeforeProcessing(string $processingMode) : bool {
-        return false;
-    }
-    /**
      * 
      * @param editor_Models_Task $task
      * @param int $parentWorkerId

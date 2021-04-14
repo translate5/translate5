@@ -80,8 +80,6 @@ Ext.define('Editor.view.quality.SegmentQualitiesController', {
             params: { id: qualityId, falsePositive: falsePositiveVal },
             success: function(response){
                 record.set('falsePositive', falsePositiveVal); // updating store currently meaningless but who knows ...
-                // TODO AutoQA: remove
-                console.log('CHANGED FALSE POSITIVE: ', qualityId, falsePositiveVal, record);
             },
             failure: function(response){
                 Editor.app.getController('ServerException').handleException(response);
@@ -109,6 +107,7 @@ Ext.define('Editor.view.quality.SegmentQualitiesController', {
                 return true;
             }
         }
+        // TODO AUTOQA: try to change in other columns of segmentroweditor / #roweditor
         return false;
     }
 });

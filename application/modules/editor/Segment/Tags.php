@@ -118,7 +118,7 @@ class editor_Segment_Tags implements JsonSerializable {
      */
     private $task;
     /**
-     *
+     * see modes in editor_Segment_Processing
      * @var string
      */
     private $processingMode;
@@ -142,6 +142,11 @@ class editor_Segment_Tags implements JsonSerializable {
      * @var editor_Segment_Qualities
      */
     private $qualities = NULL;
+    /**
+     * A flag used by the TermTagger
+     * @var boolean
+     */
+    public $termtaggerProcessed = false;
     /**
      * 
      * @param editor_Models_Task $task
@@ -262,6 +267,7 @@ class editor_Segment_Tags implements JsonSerializable {
      */
     public function save(string $providerKey){
         $this->getSegment()->saveSegmentTagsJSON($this->toJson(), $providerKey);
+        $this->getQualities()->save();
     }
     /**
      * 
@@ -436,14 +442,14 @@ class editor_Segment_Tags implements JsonSerializable {
      * Adds a general quality to the tags (segment-quality model)
      * Note, that the qualities will be saved seperately from the tags-model and is NOT serialized
      * This also means, that during the import-process, the quality-entries will be written before the tags are written AFTER the import
-     * @param string[]|string $fields
+     * @param string $field
      * @param string $type
      * @param string $category
      * @param int $startIndex
      * @param int $endIndex
      */
-    public function addQuality(string $field, string $type, string $category, int $startIndex=0, int $endIndex=-1, $falsePositive=-1){
-        $this->getQualities()->add($field, $type, $category, $startIndex, $endIndex, $falsePositive);
+    public function addQuality(string $field, string $type, string $category, int $startIndex=0, int $endIndex=-1){
+        $this->getQualities()->add($field, $type, $category, $startIndex, $endIndex);
     }
     /**
      * Adds a quality entry by tag
@@ -454,7 +460,6 @@ class editor_Segment_Tags implements JsonSerializable {
         $this->getQualities()->addByTag($tag, $field);
     }
     /**
-     * // TODO AUTOQA CHANGE API
      * Adds a quality to the tags (segment-quality model) for all target fields
      * @param string $type
      * @param string $category
@@ -483,18 +488,12 @@ class editor_Segment_Tags implements JsonSerializable {
         return $this->getQualities()->extractNewQualities();
     }
     /**
-     * Saves all set qualities to the database after deleting the current ones
-     */
-    public function saveQualities(){
-        $this->getQualities()->save();
-    }
-    /**
      * internal
      * @return editor_Segment_Qualities
      */
     private function getQualities(){
         if($this->qualities == NULL){
-            $this->qualities = new editor_Segment_Qualities($this->segmentId, $this->task->getTaskGuid());
+            $this->qualities = new editor_Segment_Qualities($this->segmentId, $this->task->getTaskGuid(), $this->processingMode);
         }
         return $this->qualities;
     }
@@ -571,16 +570,18 @@ class editor_Segment_Tags implements JsonSerializable {
      * Debug output
      * @return string
      */
-    public function debug(){
+    public function debug($asMarkup=false){
         $debug = '';
+        $processor = ($asMarkup) ? 'htmlspecialchars' : 'trim';
+        $newline = ($asMarkup) ? '<br/>' : "\n";
         if($this->source != NULL){
-            $debug .= 'SOURCE: '.htmlspecialchars($this->source->render())."\n";
+            $debug .= 'SOURCE: '.$processor($this->source->render()).$newline;
         }
         if($this->sourceOriginal != NULL){
-            $debug .= 'SOURCE ORIGINAL: '.htmlspecialchars($this->sourceOriginal->render())."\n";
+            $debug .= 'SOURCE ORIGINAL: '.$processor($this->sourceOriginal->render()).$newline;
         }
         for($i=0; $i < count($this->targets); $i++){
-            $debug .= 'TARGET '.$i.': '.htmlspecialchars($this->targets[$i]->render())."\n";
+            $debug .= 'TARGET '.$i.': '.$processor($this->targets[$i]->render()).$newline;
         }
         return $debug;
     }

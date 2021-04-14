@@ -47,6 +47,11 @@ final class editor_Segment_Qualities {
      * @var string
      */
     private $taskGuid;
+    /**
+     * see modes in editor_Segment_Processing
+     * @var string
+     */
+    private $processingMode;
     /**    
      * 
      * @var editor_Models_Db_SegmentQuality
@@ -67,14 +72,18 @@ final class editor_Segment_Qualities {
      * @param int $segmentId
      * @param string $taskGuid
      */
-    public function __construct(int $segmentId, string $taskGuid){
+    public function __construct(int $segmentId, string $taskGuid, string $processingMode){
         $this->segmentId = $segmentId;
         $this->taskGuid = $taskGuid;
+        $this->processingMode = $processingMode;
         $this->table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        foreach($this->table->fetchBySegment($segmentId) as $quality){
-            /* @var $qualityRow editor_Models_Db_SegmentQualityRow */
-            $quality->processingState = 'delete';
-            $this->existing[] = $quality;
+        // we only overwrite/adjust existing entries when editing or saving Alike segments
+        if($this->processingMode == editor_Segment_Processing::EDIT || $this->processingMode == editor_Segment_Processing::ALIKE){
+            foreach($this->table->fetchBySegment($segmentId) as $quality){
+                /* @var $qualityRow editor_Models_Db_SegmentQualityRow */
+                $quality->processingState = 'delete';
+                $this->existing[] = $quality;
+            }
         }
     }
     /**
@@ -85,7 +94,7 @@ final class editor_Segment_Qualities {
      * @param int $startIndex
      * @param int $endIndex
      */
-    public function add(string $field, string $type, string $category, int $startIndex=0, int $endIndex=-1, $falsePositive=-1){
+    public function add(string $field, string $type, string $category, int $startIndex=0, int $endIndex=-1){
         $quality = $this->findExistingByProps($field, $type, $category, $startIndex, $endIndex);
         if($quality == NULL){
             $quality = $this->table->createRow();
@@ -97,16 +106,11 @@ final class editor_Segment_Qualities {
             $quality->category = $category;
             $quality->startIndex = $startIndex;
             $quality->endIndex = $endIndex;
-            $quality->falsePositive = ($falsePositive > -1) ? $falsePositive : 0;
+            $quality->falsePositive = 0;
             // new qualities without tags will be saved in a batch
             $quality->processingState = 'new';
             $this->added[] = $quality;
         } else {
-            // since all props match we simply can keep te quality, just in case of changed false-positiveness this has to be changed
-            if($falsePositive > -1 && $falsePositive !== $quality->falsePositive){
-                $quality->falsePositive = $falsePositive;
-                $quality->save();
-            }
             $quality->processingState = 'keep';
         }
     }
@@ -119,6 +123,7 @@ final class editor_Segment_Qualities {
         if($field == null){
             $field = $tag->field;
         }
+        $changed = false;
         // find by ID
         $quality = $this->findExistingById($tag->getQualityId());
         // Fallback: find by identity of props (mainly as fallback for not yet processed term tags when updating instance)
@@ -129,18 +134,33 @@ final class editor_Segment_Qualities {
             /* @var $quality editor_Models_Db_SegmentQualityRow */
             $quality->segmentId = $this->segmentId;
             $quality->taskGuid = $this->taskGuid;
-            $this->setQualityPropsByTag($quality, $tag, $field, true);
-            $quality->save();
+            $quality->falsePositive = 0;
+            $changed = $this->setQualityPropsByTag($quality, $tag, $field, true);
             $this->added[] = $quality;
         } else {
-            // the processing state decides, if the quality will be deleted, saved or stay as is
-            if($this->setQualityPropsByTag($quality, $tag, $field, false)){
-                $quality->save();
-            }
+            // it may be unneccessary to save the quality if everything stayed the way it was
+            $changed = $this->setQualityPropsByTag($quality, $tag, $field, false);
         }
-        // QUIRK the false quality prop is currently set by the frontend directly to the quality model. If that ever changes, this code has to change
-        $tag->setFalsePositive($quality->falsePositive);
+        // CRUCIAL: the false quality prop is currently set by the frontend directly async to the quality model. 
+        // so, normally the DB has priority of the frontend and the DB-val is transfered to the tag.
+        // the reason is, that the changing in the HTML editor may fails and some qualities simply have no tags in the markup. If that ever changes, this code has to change
+        // exception from this is the alike copying, where we reflect the copied tags completely
+        if($this->processingMode == editor_Segment_Processing::ALIKE){
+            if($quality->falsePositive != $tag->getFalsePositiveVal()){
+                $quality->falsePositive = $tag->getFalsePositiveVal();
+                $changed = true;
+            }
+        } else {
+            
+            $tag->setFalsePositive($quality->falsePositive);
+        }
+        // if anything changed, we need to save
+        if($changed){
+            $quality->save();
+        }
+        // CRUCIAL: transfer our ID back to the tag, otherwise it will not be identifyable in the editor nor in the next editing
         $tag->setQualityId($quality->id);
+        // triggers to keep the tag in the current state when saving the qualities
         $quality->processingState = 'keep';
     }
     /**
@@ -184,6 +204,7 @@ final class editor_Segment_Qualities {
     }
     /**
      * Transfers all props from a segment-tag to the quality entry and tracks, if the existing data had to be changed
+     * This will not process the falePositive val
      * @param editor_Models_Db_SegmentQualityRow $quality
      * @param editor_Segment_Tag $tag
      * @param string $field

@@ -178,9 +178,6 @@ final class editor_Segment_Quality_Manager {
             foreach($this->registry as $type => $provider){
                 /* @var $provider editor_Segment_Quality_Provider */
                 if(!$provider->hasImportWorker()){
-                    if($provider->removeOwnTagsBeforeProcessing($processingMode)){
-                        $tags->removeTagsByType($provider->getType());
-                    }
                     $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
                 }
             }
@@ -208,9 +205,6 @@ final class editor_Segment_Quality_Manager {
         $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, false);
         foreach($this->registry as $type => $provider){
             /* @var $provider editor_Segment_Quality_Provider */
-            if($provider->removeOwnTagsBeforeProcessing($processingMode)){
-                $tags->removeTagsByType($provider->getType());
-            }
             $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
         }
         $tags->flush();
