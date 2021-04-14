@@ -165,7 +165,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_T
             $this->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
             parent::queue($parentId, $state);
         }
-        return $parentId; //since we can't return multiple ids, we just return the given parent again
+        return (int) $parentId; //since we can't return multiple ids, we just return the given parent again
     }
     /**
      * marks terms in the source with transFound, if translation is present in the target

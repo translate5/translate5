@@ -178,6 +178,24 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->logout();
     }
     
+    /***
+     * Test session impersonate feature.
+     * 1. Login as manager
+     * 2. Impersonate testlector
+     * 3. Check if the current user is testlector
+     */
+    public function testSessionImpersonate() {
+        $this->api()->logout();
+        $this->api()->login('testmanager');
+        $this->assertLogin('testmanager');
+        // This will replace the testmanager session with testlector
+        $this->api()->request('editor/session/impersonate','GET',[
+            'login' => 'testlector'
+        ]);
+        $this->assertLogin('testlector');
+        $this->api()->logout();
+    }
+    
     public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase

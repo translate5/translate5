@@ -65,9 +65,11 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_languages' => false,
             // languageresources tables disabled for archiving, since task data is not depending from them, and existence of languageresources does not depend on the existence of the task
             'LEK_languageresources_customerassoc' => false,
+            'LEK_languageresources_internal_tm' => false,
             'LEK_languageresources_languages' => false,
             'LEK_languageresources_log' => false,
             'LEK_languageresources_usage_log' => false,
+            'LEK_languageresources_usage_log_sum' => false,
             'LEK_languageresources_taskassoc' => false,
             'LEK_languageresources' => false,
             'LEK_match_analysis' => 'taskGuid',
@@ -107,7 +109,6 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_user_changelog_info' => false,
             'LEK_user_config' => false,
             'LEK_user_meta' => false,
-            'LEK_languageresources_usage_log_sum' => false,
             'LEK_visualreview_files' => 'taskGuid',
             'LEK_visualreview_segmentmapping' => 'taskGuid',
             // visualreview font tables disabled for archiving, since task data is not depending from them and fonts can be reapplied

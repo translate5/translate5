@@ -97,6 +97,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         
         $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleOnAnalysisOperation'));
         $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleOnPretranslationOperation'));
+        $this->eventManager->attach('Editor_CronController', 'afterDailyAction', array($this, 'handleAfterDailyAction'));
     }
     
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
@@ -120,6 +121,16 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         //if the task is in import state -> queue the worker, set pretranslate to true in the worker and from the worker in the analysis
         //if the task is allready imported -> run the analysis directly, set pretranslate to true
         $this->handleOperation($event, true);
+    }
+    
+    /***
+     * Cron controller dayily action
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterDailyAction(Zend_EventManager_Event $event){
+        $batchCache = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_BatchResult');
+        /* @var $batchCache editor_Plugins_MatchAnalysis_Models_BatchResult */
+        $batchCache->deleteOlderRecords();
     }
     
     /***
@@ -173,6 +184,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             //you can not run analysis without resources to be associated to the task
             return false;
         }
+        
         $valid = $this->checkLanguageResources($taskGuid);
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
@@ -266,7 +278,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         if(count($result) > 0){
             return $result[0]['id'];
         }
-        return NULL;
+        return 0;
     }
     /***
      * Check if the given task has associated language resources
@@ -290,6 +302,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
+        
+        $this->resetBatchAssocs();
         
         $valid=[];
         foreach ($this->assocs as $assoc){
@@ -316,6 +330,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             
         }
         return $valid;
+    }
+    
+    /***
+     * Reset the collected batch language resources
+     */
+    protected function resetBatchAssocs() {
+        $this->batchAssocs = [];
     }
     
     /**
