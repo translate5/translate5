@@ -7,6 +7,11 @@
 <seg-source><mrk mid="0" mtype="seg">Dies &lt;strong id="123"&gt;ist &amp;lt; ein&lt;/strong&gt; &amp;quot;Test&amp;quot; &amp;amp; Cool. &amp;nbsp;</mrk></seg-source>
 <target xml:lang="de"><mrk mtype="seg" mid="0">This &lt;strong id="123"&gt;is &amp;gt; a&lt;/strong&gt; &amp;quot;test&amp;quot; &amp;amp; cool &amp;amp; cööler. &amp;nbsp;</mrk></target>
 </trans-unit>
+<trans-unit id="2">
+<source xml:lang="en">Dies &lt;!--&lt;strong id="123"&gt;ist &amp;lt; ein&lt;/strong&gt;--&gt; &amp;quot;Test mit Kommentaren und CDATA: &lt;![CDATA[ TEST ]]&gt;.</source>
+<seg-source><mrk mid="0" mtype="seg">Dies &lt;!--&lt;strong id="123"&gt;ist &amp;lt; ein&lt;/strong&gt;--&gt; &amp;quot;Test mit Kommentaren und CDATA: &lt;![CDATA[ TEST ]]&gt;.</mrk></seg-source>
+<target xml:lang="de"><mrk mtype="seg" mid="0">This &lt;!--&lt;strong id="123"&gt;is &amp;lt; a&lt;/strong&gt;--&gt; &amp;quot;test with CDATA and comments: &lt;![CDATA[ TEST ]]&gt;.</mrk></target>
+</trans-unit>
 </body>
 </file>
 </xliff>

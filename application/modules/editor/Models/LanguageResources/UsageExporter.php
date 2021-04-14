@@ -93,6 +93,12 @@ class editor_Models_LanguageResources_UsageExporter{
      */
     protected $worksheetIndex = 0;
     
+    /***
+     * Document usage task types
+     * @var array
+     */
+    protected $documentTaskType = [editor_Models_Task::INITIAL_TASKTYPE_DEFAULT,editor_Models_Task::INITIAL_TASKTYPE_PROJECT_TASK];
+    
     public function __construct() {
         $this->init();
     }
@@ -233,10 +239,9 @@ class editor_Models_LanguageResources_UsageExporter{
      * Load all required export data
      * 
      * @param int $customerId
-     * @param string $taskType
      * @return array
      */
-    public function getExportRawData(int $customerId = null,string $taskType = editor_Plugins_InstantTranslate_Filetranslationhelper::INITIAL_TASKTYPE_PRETRANSLATE) : array{
+    public function getExportRawData(int $customerId = null) : array{
         $rawData = [];
         
         $model = ZfExtended_Factory::get('editor_Models_LanguageResources_UsageSumLogger');
@@ -252,7 +257,7 @@ class editor_Models_LanguageResources_UsageExporter{
         $model = ZfExtended_Factory::get('editor_Models_TaskUsageLog');
         /* @var $model editor_Models_TaskUsageLog */
         
-        $rawData[self::DOCUMENT_USAGE] = $model->loadByTypeAndCustomer($customerId,$taskType);
+        $rawData[self::DOCUMENT_USAGE] = $model->loadByTypeAndCustomer($customerId,$this->documentTaskType);
         
         return $rawData;
     }
@@ -265,7 +270,7 @@ class editor_Models_LanguageResources_UsageExporter{
      */
     public function getExportRawDataTests(int $customerId = null) : array{
         
-        $result = $this->getExportRawData($customerId,editor_Models_Task::INITIAL_TASKTYPE_DEFAULT);
+        $result = $this->getExportRawData($customerId);
         
         $unset = ["customerId","yearAndMonth","timestamp","customers"];
         $languages = ZfExtended_Factory::get('editor_Models_Languages');
@@ -292,6 +297,14 @@ class editor_Models_LanguageResources_UsageExporter{
         $filterRows($unset,$result[self::DOCUMENT_USAGE]);
         
         return $result;
+    }
+    
+    /***
+     * 
+     * @param array $newTaskType
+     */
+    public function setDocumentTaskType(array $newTaskType) {
+        $this->documentTaskType = $newTaskType;
     }
     
     /***
