@@ -99,7 +99,10 @@ class editor_Plugins_TermTagger_SegmentProcessor {
      * @throws ZfExtended_Exception
      */
     public function process(array $segmentsTags, string $slot, bool $doSaveTags) {
-        
+        foreach($segmentsTags as $tags){            
+            $tags->removeTagsByType(editor_Plugins_TermTagger_Tag::TYPE);
+        }
+        // creating the communication service which passes the tags to a temporary model sent to the tagger
         $this->communicationService = $this->config->createServerCommunicationServiceFromTags($segmentsTags);
         $termTagger = ZfExtended_Factory::get(
             'editor_Plugins_TermTagger_Service',
@@ -116,6 +119,7 @@ class editor_Plugins_TermTagger_SegmentProcessor {
             if(array_key_exists($segmentId, $taggedSegmentsById)){
                 // bring the tagged segment content back to the tags model
                 $this->applyResponseToTags($taggedSegmentsById[$segmentId], $tags);
+                $tags->termtaggerProcessed = true;
                 // add qualities if found in the target tags
                 if($this->task->getConfig()->runtimeOptions->termTagger->enableAutoQA){
                     self::findAndAddQualitiesInTags($tags);
@@ -124,7 +128,6 @@ class editor_Plugins_TermTagger_SegmentProcessor {
                 if($doSaveTags){
                     if($this->processingMode == editor_Segment_Processing::IMPORT){
                         $tags->save(editor_Plugins_TermTagger_Tag::TYPE);
-                        $tags->saveQualities();
                     } else {
                         $tags->flush();
                     }

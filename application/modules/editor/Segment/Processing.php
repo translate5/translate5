@@ -53,7 +53,7 @@ class editor_Segment_Processing {
      */
     const ALIKE = 'alike';
     /**
-     * Used to indicate an retagging process
+     * Used to indicate an retagging process (rebuilding qualities)
      * @var string
      */
     const RETAG = 'retag';

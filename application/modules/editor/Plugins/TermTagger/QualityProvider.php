@@ -50,11 +50,6 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
         return true;
     }
     
-    public function removeOwnTagsBeforeProcessing(string $processingMode) : bool {
-        // Alike processing just copies the tags and in this case they must be preserved before processing
-        return ($processingMode != editor_Segment_Processing::ALIKE);
-    }
-    
     public function addWorker(editor_Models_Task $task, int $parentWorkerId, string $processingMode) {
         
         // if no terminology is present we return as well
@@ -90,7 +85,6 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
             if($task->getConfig()->runtimeOptions->termTagger->enableAutoQA){
                 
                 editor_Plugins_TermTagger_SegmentProcessor::findAndAddQualitiesInTags($tags);
-                $tags->saveQualities();
             }
             
         } else if($processingMode == editor_Segment_Processing::EDIT){
@@ -100,14 +94,16 @@ class editor_Plugins_TermTagger_QualityProvider extends editor_Segment_Quality_P
             $segment = $tags->getSegment();
             // no need to process if task has no terminologie or is not modified
             if (!$task->getTerminologie() || !$segment->isDataModified()) {
-                
+                // we need to process the qualities, otherwise the existing wil simply be deleted
+                editor_Plugins_TermTagger_SegmentProcessor::findAndAddQualitiesInTags($tags);
                 return $tags;
             }
             $messages = Zend_Registry::get('rest_messages');
             /* @var $messages ZfExtended_Models_Messages */
             
             if($segment->meta()->getTermtagState() == editor_Plugins_TermTagger_Configuration::SEGMENT_STATE_OVERSIZE) {
-                
+                // we need to process the qualities, otherwise the existing wil simply be deleted
+                editor_Plugins_TermTagger_SegmentProcessor::findAndAddQualitiesInTags($tags);
                 $messages->addError('Termini des zuletzt bearbeiteten Segments konnten nicht ausgezeichnet werden: Das Segment ist zu lang.');
                 return $tags;
             }

@@ -315,11 +315,21 @@ class editor_Segment_Tag extends editor_Tag implements JsonSerializable {
         return self::DATA_NAME_QUALITYID;
     }
     /**
-     * 
+     * Retrieves if the tag has the false-positive decorator
      * @return bool
      */
     public function isFalsePositive() : bool {
         return $this->hasClass(self::CSS_CLASS_FALSEPOSITIVE);
+    }
+    /**
+     * Retrieves the false-positiveness as DB val / int
+     * @return int
+     */
+    public function getFalsePositiveVal() : int {
+        if($this->isFalsePositive()){
+            return 1;
+        }
+        return 0;
     }
     /**
      * 

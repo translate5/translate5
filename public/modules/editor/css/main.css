@@ -250,12 +250,30 @@ div.single + div {
 .segment-tag-column div.x-grid-cell-inner div.deprecatedTerm,
 .segment-tag-container div.deprecatedTerm {border-bottom:none;background-color:#fa51ff;}
 
+/* false positive term tags */
+.segment-tag-column div.x-grid-cell-inner div.term.t5qfalpos,
+.segment-tag-container div.term.t5qfalpos { background:transparent; border-bottom:1px solid #4d31a4; }
+#change-alike-window div.transNotFound.t5qfalpos,
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotFound.t5qfalpos,
+.segment-tag-container.type-source div.transNotFound.t5qfalpos { border-bottom-color:#c96348; }
+#change-alike-window div.transNotDefined,.t5qfalpos
+.segment-tag-column.type-source div.x-grid-cell-inner div.transNotDefined.t5qfalpos,
+.segment-tag-container.type-source div.transNotDefined.t5qfalpos { border-bottom-color:#77584d; }
+.segment-tag-column div.x-grid-cell-inner div.notRecommended.t5qfalpos,
+.segment-tag-container div.notRecommended.t5qfalpos,
+.segment-tag-column div.x-grid-cell-inner div.supersededTerm.t5qfalpos,
+.segment-tag-container div.supersededTerm.t5qfalpos,
+.segment-tag-column div.x-grid-cell-inner div.deprecatedTerm.t5qfalpos,
+.segment-tag-container div.deprecatedTerm.t5qfalpos { background-color:#d080cf; }
+
 /*qmflags*/
 #segment-grid-body img.qmflag { width: auto !important;height: 14px !important; vertical-align:middle;margin-left:1px;margin-right:1px; }
 .qmflag-menu .x-menu-item-link {padding-right:2px; padding-left:22px;margin-right:36px;}
 .qmflag-menu .x-menu-item-link .x-menu-item-text {padding: 0px !important; margin: 0px 17px 0px 0px !important; width: auto !important; height: auto !important}
 .qmflag-menu .x-menu-item-icon {right:2px;left:auto;height:14px;width: 22px !important}
 .qmflag-menu .x-menu-icon-separator {right:34px;left:auto;}
+/* false positive qmflags */
+#segment-grid-body img.qmflag.t5qfalpos { opacity:60%; }
 
 .qmflag-menu .x-menu-item-arrow {
     right: auto;
