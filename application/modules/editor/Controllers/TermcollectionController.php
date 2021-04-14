@@ -75,7 +75,7 @@ class editor_TermcollectionController extends ZfExtended_RestController
 
         $data = $term->loadSortedByCollectionAndLanguages([$this->data->collectionId]);
         $export->setData($data);
-        $exportData=$export->export();
+        $exportData = $export->export();
 
         $this->view->filedata = $exportData;
     }

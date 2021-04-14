@@ -26,8 +26,6 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-use Doctrine\DBAL\Exception;
-
 /**
  * Class editor_Models_Terms_Images
  * TermsImage Instance
@@ -49,13 +47,6 @@ use Doctrine\DBAL\Exception;
  */
 class editor_Models_Terminology_Models_ImagesModel extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Terminology_Images';
-
-    /**
-     * editor_Models_Terms_Images constructor.
-     */
-    public function __construct() {
-        parent::__construct();
-    }
 
     /**
      * $fullResult[$term['mid'].'-'.$term['groupId'].'-'.$term['collectionId']]

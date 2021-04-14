@@ -73,7 +73,7 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Task_Abstrac
     /**
      * @var editor_Plugins_SegmentStatistics_Models_Statistics
      */
-    protected editor_Plugins_SegmentStatistics_Models_Statistics$stat;
+    protected editor_Plugins_SegmentStatistics_Models_Statistics $stat;
 
     /**
      * @var editor_Plugins_SegmentStatistics_Models_TermStatistics

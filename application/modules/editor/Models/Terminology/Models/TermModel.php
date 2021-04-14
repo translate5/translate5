@@ -1,7 +1,30 @@
 <?php
+/*
+START LICENSE AND COPYRIGHT
 
-use Doctrine\DBAL\Exception;
+ This file is part of translate5
 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
 /**
  * Class editor_Models_Terms_Term
  * Term Instance
@@ -97,6 +120,26 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         parent::__construct();
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
     }
+
+    /**
+     * creates a new, unsaved term history entity
+     * @return editor_Models_Term_History
+     */
+    public function getNewHistoryEntity(): editor_Models_Term_History
+    {
+        $history = ZfExtended_Factory::get('editor_Models_Term_History');
+        /* @var $history editor_Models_Term_History */
+        $history->setTermId($this->getId());
+        $history->setHistoryCreated(NOW_ISO);
+
+        $fields = $history->getFieldsToUpdate();
+        foreach ($fields as $field) {
+            $history->__call('set' . ucfirst($field), array($this->get($field)));
+        }
+
+        return $history;
+    }
+
     /**
      * returns a map CONSTNAME => value of all term status
      * @return array
@@ -222,7 +265,6 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
         return $data;
     }
-
 
     /**
      * Search terms in the term collection with the given search string and languages.
@@ -973,6 +1015,91 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             $termGroups[$groupId] = $group;
         }
         return $termGroups;
+    }
+
+    /**
+     * Bewertet die Terme nach den folgenden Kriterien (siehe auch http://php.net/usort/)
+     *  -- 1. Kriterium: Vorzugsbenennung vor erlaubter Benennung vor verbotener Benennung
+     *  -- 2. Kriterium: In Quelle vorhanden
+     *  -- 3. Kriterium: In Ziel vorhanden (damit ist die Original-Ãœbersetzung gemeint, nicht die editierte Variante)
+     *  -- 4. Kriterium: Alphanumerische Sortierung
+     *  Zusammenhang Parameter und Return Values siehe usort $cmp_function
+     *
+     *  @param array $term1
+     *  @param array $term2
+     *  @return int
+     */
+    protected function compareTerms(array $term1, array $term2): int
+    {
+        // return > 0 => t1 > t2
+        // return = 0 => t1 = t2
+        // return < 0 => t1 < t2
+        $term1 = is_array($term1) ? (object)$term1 : $term1;
+        $term2 = is_array($term2) ? (object)$term2 : $term2;
+        $status = $this->compareTermStatus($term1->status, $term2->status);
+
+        if ($status !== 0) {
+            return $status;
+        }
+
+        $isSource = 0;
+        if (isset($term1->isSource)){
+            $isSource = $this->compareTermLangUsage($term1->isSource, $term2->isSource);
+        }
+
+        if ($isSource !== 0) {
+            return $isSource;
+        }
+
+        //Kriterium 4 - alphanumerische Sortierung:
+        return strcmp(mb_strtolower($term1->term), mb_strtolower($term2->term));
+    }
+    /**
+     * Vergleicht die Term Status
+     * @param string $status1
+     * @param string $status2
+     * @return int
+     */
+    protected function compareTermStatus(string $status1, string $status2): int
+    {
+        //wenn beide stati gleich, dann wird kein weiterer Vergleich benoetigt
+        if ($status1 === $status2) {
+            return 0;
+        }
+        if (empty($this->statOrder[$status1])) {
+            $status1 = self::STAT_NOT_FOUND;
+        }
+        if (empty($this->statOrder[$status2])) {
+            $status2 = self::STAT_NOT_FOUND;
+        }
+
+        //je kleiner der statOrder, desto hÃ¶herwertiger ist der Status!
+        //Da Hoeherwertig aber bedeutet, dass es in der Sortierung weiter oben erscheinen soll,
+        //ist der Hoeherwertige Status im numerischen Wert kleiner!
+        if ($this->statOrder[$status1] < $this->statOrder[$status2]) {
+            return -1; //status1 ist hoeherwertiger, da der statOrdner kleiner ist
+        }
+
+        return 1; //status2 ist hoeherwertiger
+    }
+
+    /**
+     * Vergleicht die Term auf Verwendung in Quell oder Zielspalte
+     * @param string $isSource1
+     * @param string $isSource2
+     * @return int
+     */
+    protected function compareTermLangUsage(string $isSource1, string $isSource2): int
+    {
+        //Verwendung in Quelle ist hoeherwertiger als in Ziel (Kriterium 2 und 3)
+        if ($isSource1 === $isSource2) {
+            return 0;
+        }
+        if ($isSource1) {
+            return 1;
+        }
+
+        return -1;
     }
 
     /**

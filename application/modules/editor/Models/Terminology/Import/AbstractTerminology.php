@@ -1,12 +1,59 @@
 <?php
+/*
+START LICENSE AND COPYRIGHT
 
-class editor_Models_Terminology_Import_AbstractTerminology
+ This file is part of translate5
+
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/**
+ * Class to create or update TBX elements in database, called after each termEntry in TbxFileImport.php for termEntries
+ * and after parse <back> element
+ *
+ * METHODS:
+ * - createOrUpdateElement()
+ * prepare and check elements is for update or insert
+ * - prepareElement()
+ * get ClassName from object and first/last table fields to handle element as object
+ * - checkIsForUpdate()
+ * chek TBX element is for update or insert
+ * - prepareSqlInsert()
+ * prepare elements for multiple sql insert will call createTableParamString method to create string
+ * - prepareSqlUpdate()
+ * prepare elements as array for multiple sql update
+ * - createTableParamString()
+ * create sql params and values for sql insert into
+ * - prepareDiffArrayToCheck()
+ * prepare two arrays with same keys to check is element for update
+ *
+ * Class editor_Models_Terminology_Import_AbstractTerminology
+ */
+abstract class editor_Models_Terminology_Import_AbstractTerminology
 {
     public array $tableValues;
     protected string $elementClass; // get Class from $elementObject
     protected ?string $firstTableField; // first field from array
     protected ?string $lastTableField; // last field from array
-
 
     /**
      * Iterate over $element from given element and check if merge is set and than check if element to update.
@@ -27,7 +74,7 @@ class editor_Models_Terminology_Import_AbstractTerminology
         $count = 0;
         foreach ($parsedElements as $element) {
             if ($mergeTerms) {
-                $collectionKey = $element->getCollectionKey($element);
+                $collectionKey = $element->getCollectionKey($element); // getCollectionKey will get ArrayKey for each element to check if exist
                 $checked = $this->checkIsForUpdate($element, $elementCollection, $collectionKey);
 
                 if ($checked['isUpdate']) {
