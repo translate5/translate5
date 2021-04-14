@@ -492,7 +492,11 @@ class editor_Segment_FieldTags implements JsonSerializable {
      * @return string
      */
     public function getFieldTextPart(int $start, int $end) : string {
-        return mb_substr($this->fieldText, $start, ($end - $start));
+        // prevent any substr magic with negative offsets ...
+        if($end > $start){
+            return mb_substr($this->fieldText, $start, ($end - $start));
+        }
+        return '';
     }
     
     /* Unparsing API */
@@ -671,8 +675,10 @@ class editor_Segment_FieldTags implements JsonSerializable {
         $num = count($this->tags);
         $textLength = $this->getFieldTextLength();
         for($i=0; $i < $num; $i++){
-            $this->tags[$i]->isFullLength = ($this->tags[$i]->startIndex == 0 && $this->tags[$i]->endIndex >= $textLength);
-            $this->tags[$i]->field = $this->field;
+            $tag = $this->tags[$i];
+            $tag->isFullLength = ($tag->startIndex == 0 && $tag->endIndex >= $textLength);
+            $tag->field = $this->field;
+            $tag->content = $this->getFieldTextPart($tag->startIndex, $tag->endIndex);
         }
     }
 }

@@ -43,6 +43,11 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
      */
     const TYPE = 'term';
     /**
+     * Our related term-id
+     * @var string
+     */
+    const DATA_NAME_TBXID = 'tbxid';
+    /**
      * The central unique type amongst quality providersKey to identify termtagger-related stuff. Must match editor_Plugins_TermTagger_QualityProvider::$type
      * @var string
      */
@@ -62,6 +67,55 @@ class editor_Plugins_TermTagger_Tag extends editor_Segment_Tag {
             ->removeClass($this->category)
             ->addClass($category);
         $this->category = $category;
+        return $this;
+    }
+    /**
+     * Adds the TBX Id to our additional data
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::getAdditionalData()
+     */
+    public function getAdditionalData() : stdClass {
+        $data = parent::getAdditionalData();
+        if($this->hasData(self::DATA_NAME_TBXID)){
+            $data->tbxid = $this->getData(self::DATA_NAME_TBXID);
+        }
+        return $data;
+    }
+    /**
+     * Compares the TBX Id instead of the content
+     * {@inheritDoc}
+     * @see editor_Segment_Tag::isQualityContentEqual()
+     */
+    protected function isQualityContentEqual(editor_Models_Db_SegmentQualityRow $quality) : bool {
+        $data = $quality->getAdditionalData();
+        return ($this->hasTbxId() && property_exists($data, 'tbxid') && $data->tbxid == $this->getTbxId());
+    }
+    /**
+     * Retrieves the TBX Id if set, otherwise NULL
+     * @return string
+     */
+    public function getTbxId() : ?string {
+        if($this->hasTbxId()){
+            return $this->getData(self::DATA_NAME_TBXID);
+        }
+        return NULL;
+    }
+    /**
+     * Retrieves if a TBX Id is set as data attribute
+     * @return bool
+     */
+    public function hasTbxId() : bool {
+        return $this->hasData(self::DATA_NAME_TBXID);
+    }
+    /**
+     * Sets the TBX Id
+     * @param string $tbxId
+     * @return editor_Plugins_TermTagger_Tag
+     */
+    public function setTbxId(string $tbxId) : editor_Plugins_TermTagger_Tag {
+        if(strlen($tbxId) > 0){
+            $this->setData(self::DATA_NAME_TBXID, $tbxId);
+        }
         return $this;
     }
 }

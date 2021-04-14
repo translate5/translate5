@@ -57,6 +57,7 @@ CREATE TABLE `LEK_segment_quality` (
   `startIndex` int(11) NOT NULL DEFAULT 0,
   `endIndex` int(11) NOT NULL DEFAULT -1,
   `falsePositive` int(1) NOT NULL DEFAULT 0,
+  `additionalData` longtext DEFAULT NULL,  
   `categoryIndex` int(2) NOT NULL DEFAULT -1,
   `severity` varchar(255) DEFAULT NULL,
   `comment` longtext DEFAULT NULL,

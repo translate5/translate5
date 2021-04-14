@@ -210,6 +210,11 @@ final class editor_Segment_Mqm_Tag extends editor_Segment_Tag {
         // TODO AUTOQA: we may should raise an exception if this api is called unwantedly
         return $this;
     }
+    
+    protected function isQualityGenerallyEqual(editor_Models_Db_SegmentQualityRow $quality) : bool {
+        // checking our additional contents is mandatory ...
+        return ($this->getType() === $quality->type && $this->getCategoryIndex() === $quality->categoryIndex && $this->getSeverity() == $quality->severity && $this->getComment() == $quality->comment);
+    }
 
     /* Overwritten API to reflect pairing */
     

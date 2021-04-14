@@ -440,16 +440,18 @@ class editor_Segment_Tags implements JsonSerializable {
     
     /**
      * Adds a general quality to the tags (segment-quality model)
-     * Note, that the qualities will be saved seperately from the tags-model and is NOT serialized
+     * Do NOT use this API to add a quality that has related segment tags, use ::addQualityByTag instead
+     * Note, that the qualities will be saved seperately from the tags-model and are NOT serialized
      * This also means, that during the import-process, the quality-entries will be written before the tags are written AFTER the import
      * @param string $field
      * @param string $type
      * @param string $category
      * @param int $startIndex
      * @param int $endIndex
+     * @param stdClass $additionalData: a FLAT object with additional data needed for re-identification. Deeper nested objects will be ignored
      */
-    public function addQuality(string $field, string $type, string $category, int $startIndex=0, int $endIndex=-1){
-        $this->getQualities()->add($field, $type, $category, $startIndex, $endIndex);
+    public function addQuality(string $field, string $type, string $category, int $startIndex=0, int $endIndex=-1, stdClass $additionalData=NULL){
+        $this->getQualities()->add($field, $type, $category, $startIndex, $endIndex, $additionalData);
     }
     /**
      * Adds a quality entry by tag

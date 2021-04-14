@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 */
 /***
  * @property editor_Models_Db_SegmentQualityRow $row
+ * 
  * @method void setId() setId(int $id)
  * @method int getId() getId()
  * @method void setSegmentId() setSegmentId(int $segmentId)
@@ -58,4 +59,19 @@ class editor_Models_SegmentQuality extends ZfExtended_Models_Entity_Abstract {
     
     protected $dbInstanceClass = 'editor_Models_Db_SegmentQuality';
     protected $validatorInstanceClass = 'editor_Models_Validator_SegmentQuality';
+    
+    /**
+     * 
+     * @return stdClass
+     */
+    public function getAdditionalData() : stdClass {
+        return $this->row->getAdditionalData();
+    }
+    /**
+     * 
+     * @param stdClass $data
+     */
+    public function setAdditionalData(stdClass $data){
+        $this->row->setAdditionalData($data);
+    }
 }
