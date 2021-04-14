@@ -1147,8 +1147,8 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
             settype($termGroups[$term->termEntryTbxId], 'array');
 
-            $term->used = in_array($term->mid, $allIds);
-            $term->isSource = in_array($term->language, $sourceLanguages);
+            $term->used = in_array($term->termId, $allIds);
+            $term->isSource = in_array($term->languageId, $sourceLanguages);
             $term->transFound = false;
             if ($term->used) {
                 $term->transFound = preg_match('/class="[^"]*transFound[^"]*"/', $transFoundSearch[$term->termId]);
