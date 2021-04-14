@@ -1025,11 +1025,11 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      *  -- 4. Kriterium: Alphanumerische Sortierung
      *  Zusammenhang Parameter und Return Values siehe usort $cmp_function
      *
-     *  @param array $term1
-     *  @param array $term2
+     *  @param $term1
+     *  @param $term2
      *  @return int
      */
-    protected function compareTerms(array $term1, array $term2): int
+    protected function compareTerms($term1, $term2): int
     {
         // return > 0 => t1 > t2
         // return = 0 => t1 = t2
