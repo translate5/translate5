@@ -57,6 +57,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
       matchCount:'#UT#Gesamtzahl der Wörter',
       tabTitle:"#UT#Analyse",
       exportAnalysis:'#UT#Export',
+      exportAnalysisXML:'#UT#Export XML',
       noAnalysis:'#UT#Start der Analyse im Tab “Sprachressourcen zuweisen“',
       languageResources:'#UT#Sprachressourcen',
       analysisDate:'#UT#Datum',
@@ -243,6 +244,13 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                             text:me.strings.exportAnalysis,
                             listeners:{
                                 click:'onExcelExportClick'
+                            }},{
+                            xtype: 'button',
+                            glyph: 'f1c3@FontAwesome5FreeSolid',
+                            itemId:'exportXml',
+                            text:me.strings.exportAnalysisXML,
+                            listeners:{
+                                click:'onXmlExportClick'
                             }
                         }]
                     },{

@@ -35,10 +35,19 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
         	params = {},
             task= me.getView().lookupViewModel(true).get('currentTask');
         params["taskGuid"] = task.get('taskGuid');
+        params["type"] = "excel"
         window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
     },
-    
-    
+
+    onXmlExportClick:function(){
+        var me=this,
+            params = {},
+            task= me.getView().lookupViewModel(true).get('currentTask');
+        params["taskGuid"] = task.get('taskGuid');
+        params["type"] = "xml"
+        window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
+    },
+
     /***
      * On match analysis record is loaded in the store
      */
@@ -61,4 +70,5 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanelViewController', {
     	var me=this;
     	me.getView().down('#matchAnalysisGrid').getStore().load();
     }
+
 });
