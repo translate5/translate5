@@ -100,13 +100,14 @@ Ext.define('Editor.controller.QualityMqm', {
     },
     /**
      * initialises the QM SubSegment Fieldset in the MetaPanel
+     * TODO AUTOQA: should be a real panel with controller & this class here a view controller
      */
     initFieldSet: function() {
     	if(!Editor.data.task.hasMqm()){
     		return;
     	}
     	var mpForm = this.getMetaInfoForm(),
-    		pos = mpForm.items.findIndex('itemId', 'metaQm'); // MQM will be added after QM panel
+    		pos = mpForm.items.findIndex('itemId', 'segmentQm'); // MQM will be added after QM panel
     	mpForm.insert(pos, {xtype: 'qualityMqmFieldset', menuConfig: this.getMenuConfig()});
     },
     /**

@@ -76,14 +76,6 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
             $colPrefix = (empty($this->defaultTable)) ? '' : '`'.$this->defaultTable.'`.';
             $adapter = $this->entity->db->getAdapter();
             $conditions = [];
-            if($this->qualityState->hasCheckedQmIds()){
-                foreach($this->qualityState->getCheckedQmIds() as $qmId){
-                    $conditions[] = $adapter->quoteInto($colPrefix.'qmId = ?', $qmId);
-                    $conditions[] = $adapter->quoteInto($colPrefix.'qmId LIKE ?', '%;'.$qmId);
-                    $conditions[] = $adapter->quoteInto($colPrefix.'qmId LIKE ?', $qmId.';%');
-                    $conditions[] = $adapter->quoteInto($colPrefix.'qmId LIKE ?', '%;'.$qmId.';%');
-                }
-            }
             if($this->qualityState->hasCheckedCategoriesByType()){
                 $segmentIds = editor_Models_Db_SegmentQuality::getSegmentIdsForQualityFilter($this->qualityState, $this->taskGuid);
                 if(count($segmentIds) > 1){

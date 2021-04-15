@@ -26,15 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * MetaPanel Controller
- * @class Editor.controller.MetaPanel
+ * Editor Controller
+ * @class Editor.controller.Editor
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.controller.Editor', {

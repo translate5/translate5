@@ -50,8 +50,8 @@ CREATE TABLE `LEK_segment_tags` (
 CREATE TABLE `LEK_segment_quality` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `taskGuid` varchar(38) NOT NULL,
-  `segmentId` int(11) DEFAULT NULL,
-  `field` varchar(120) NOT NULL,
+  `segmentId` int(11) NOT NULL,
+  `field` varchar(120) NOT NULL DEFAULT '',
   `type` varchar(10) NOT NULL,
   `category` varchar(64) NOT NULL,
   `startIndex` int(11) NOT NULL DEFAULT 0,

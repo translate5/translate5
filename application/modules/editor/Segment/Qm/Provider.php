@@ -34,47 +34,40 @@
 
 /**
  * 
- * Adds the Segment Quality Entries for the MQM tags that may have been added (by the user only)
- * 
+ * Adds the Segment Quality Entries for the QM tags that are referenscing he whole segment and are set completely outside of the segment processing
+ * This class just provides the translations for the filter backend
  */
-class editor_Segment_Mqm_Provider extends editor_Segment_Quality_Provider {
+class editor_Segment_Qm_Provider extends editor_Segment_Quality_Provider {
 
-    protected static $type = editor_Segment_Tag::TYPE_MQM;
-    
-    protected static $segmentTagClass = 'editor_Segment_Mqm_Tag';
-
+    protected static $type = editor_Segment_Tag::TYPE_QM;
     /**
      * 
-     * @var array
+     * @var string[]
      */
-    private $typesByIndex = NULL;
-    
-    public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
-        
-        if($qualityConfig->enableMqmTags == 1){
-       
-            foreach($tags->getTagsByType(static::$type) as $mqmTag){
-                /* @var $mqmTag editor_Segment_Mqm_Tag */
-                // this will also update the ext-js sequence-id in the tag with the database-id of the bound quality in case of an extJs generated ID
-                $tags->addQualityByTag($mqmTag);
-            }
-        }
-        return $tags;
+    private $typesByIndex = null;
+    /**
+     * Creates the category of a QM tag out of it's category index (which will be saved seperately - what can be seen as a redundancy)
+     * @param int $categoryIndex
+     * @return string
+     */
+    public static function createCategoryVal(int $categoryIndex) : string {
+        return editor_Segment_Tag::TYPE_QM.'_'.strval($categoryIndex);
     }
     
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
-        return $translate->_('MQM');
+        return $translate->_('QM');
     }
     
     public function translateCategory(ZfExtended_Zendoverwrites_Translate $translate, string $category, editor_Models_Task $task) : string {
-        if($this->typesByIndex == NULL){
-            $this->typesByIndex = $task->getMqmTypesFlat();
+        if($this->typesByIndex == null){
+            $config =Zend_Registry::get('config');
+            $this->typesByIndex = $config->runtimeOptions->segments->qualityFlags->toArray();
         }
-        $categoryIndex = intval(str_replace(editor_Segment_Tag::TYPE_MQM.'_', '', $category)); // see editor_Models_Db_SegmentQuality::addMqm how we evaluate the index from the category
+        $categoryIndex = intval(str_replace(editor_Segment_Tag::TYPE_QM.'_', '', $category)); // see editor_Models_Db_SegmentQuality::addMqm how we evaluate the index from the category
         if(isset($this->typesByIndex[$categoryIndex])){
             return $translate->_($this->typesByIndex[$categoryIndex]);
         }
         // not worth an exception, should not happen if configuration correct
-        return 'UNKNOWN MQM-TYPE '.$categoryIndex;
+        return 'UNKNOWN QM-TYPE '.$categoryIndex;
     }
 }

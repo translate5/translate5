@@ -267,6 +267,7 @@ Ext.define('Editor.controller.Localizer', {
     	buttonTooltip10: '<?php echo $this->translate->_(' (ALT+{0})');?>',
     	buttonTooltip20: '<?php echo $this->translate->_(' (ALT+SHIFT+{0})');?>'
     };
+    Editor.view.quality.SegmentQm.prototype.title = '<?php echo $this->translate->_('QM');?>';
     Editor.view.quality.SegmentQualities.prototype.title = '<?php echo $this->translate->_('QA: Falsch-Positive');?>';
     
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
@@ -278,7 +279,6 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.preferences.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
 
     Editor.view.segments.MetaPanel.prototype.title = '<?php echo $this->translate->_('Segment-Metadaten');?>';
-    Editor.view.segments.MetaPanel.prototype.item_metaQm_title = '<?php echo $this->translate->_('QM');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaStates_title = '<?php echo $this->translate->_('Status');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaTerms_title = '<?php echo $this->translate->_('Terminologie');?>';
     Editor.view.segments.MetaPanel.prototype.item_metaStates_tooltip = '<?php echo $this->translate->_('Segment auf den ausgewählten Status setzen (ALT + S danach {0})');?>';

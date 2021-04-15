@@ -37,33 +37,6 @@ Ext.define('Editor.view.quality.SegmentQualitiesController', {
     alias: 'controller.segmentQualities',
     falsePositiveCssClass: 't5qfalpos', // as defined in editor_segment_Tag::CSS_CLASS_FALSEPOSITIVE. TODO FIXME: better add to Editor.data ?
     qualityIdDataName: 't5qid', // as defined in editor_segment_Tag::DATA_NAME_QUALITYID. TODO FIXME: better add to Editor.data ?
-    listen: {
-        store: {
-            '#SegmentQualities': {
-                load: 'onStoreLoaded'
-            }
-        }
-    },
-    /**
-     * Creates the checkbox components after a store load & evaluates the visibility of our view
-     */
-    onStoreLoaded: function(store){
-        console.log('onStoreLoaded', store);
-        var me = this, view = me.getView(), added = false;
-        if(store.getCount() > 0){
-            store.each(function(record, idx){
-                if(record.get('falsifiable')){
-                    view.addCheckbox(record);
-                    added = true;
-                }
-            });
-        }
-        if(added){
-            view.show();
-        } else {
-            view.endEditing();
-        }
-    },
     /**
      * Handler to sync the new state with the server (to catch false positives without tags) & add decorations in the editor
      */

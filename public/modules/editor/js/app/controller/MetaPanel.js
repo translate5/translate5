@@ -39,7 +39,11 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.MetaPanel', {
   extend : 'Ext.app.Controller',
-  requires: ['Editor.view.quality.mqm.Fieldset', 'Editor.view.quality.SegmentQualities'],
+  requires: [
+      'Editor.view.quality.mqm.Fieldset',
+      'Editor.view.quality.SegmentQualities',
+      'Editor.view.quality.SegmentQm',
+      'Editor.store.quality.Segment' ],
   models: ['SegmentUserAssoc'],
   messages: {
   },
@@ -49,6 +53,9 @@ Ext.define('Editor.controller.MetaPanel', {
   },{
     ref : 'metaTermPanel',
     selector : '#metapanel #metaTermPanel'
+  },{
+    ref : 'metaQmPanel',
+    selector : '#metapanel #segmentQm'
   },{
     ref : 'metaQualitiesPanel',
     selector : '#metapanel #segmentQualities'
@@ -86,9 +93,25 @@ Ext.define('Editor.controller.MetaPanel', {
           '#Editor': {
               changeState: 'changeState'
           }
+      },
+      store: {
+          '#SegmentQualities': {
+              load: 'handleQualitiesLoaded'
+          }
       }
   },
-  
+  /**
+   * If the QM qualities are enabled
+   */
+  hasQmQualities: false,
+  /**
+   * The store holding the segments qualiies. Data source for the segmentQualities panel and the segmentQm panel
+   */
+  qualitiesStore: null,
+  /**
+   * A flag specifying our editing mode. can be: 'none', 'readonly', 'edit'
+   */
+  editingMode: 'none',
   /**
    * Gibt die RowEditing Instanz des Grids zurück
    * @returns Editor.view.segments.RowEditing
@@ -96,11 +119,18 @@ Ext.define('Editor.controller.MetaPanel', {
   getEditPlugin: function() {
       return this.getSegmentGrid().editingPlugin;
   },
+  getQualitiesStore: function(){
+      if(this.qualitiesStore == null){
+          this.qualitiesStore = Ext.create('Editor.store.quality.Segment');
+      }
+      return this.qualitiesStore;
+  },
   initEditPluginHandler: function() {
       var me = this, 
           multiEdit = me.getSegmentGrid().query('contentEditableColumn').length > 1,
           useChangeAlikes = Editor.app.authenticatedUser.isAllowed('useChangeAlikes', Editor.data.task);
-
+      // creating the store for the segment's qualities on the first edit
+      me.getQualitiesStore();
       me.getLeftBtn().setVisible(multiEdit && ! useChangeAlikes);
       me.getRightBtn().setVisible(multiEdit && ! useChangeAlikes);
   },
@@ -139,22 +169,37 @@ Ext.define('Editor.controller.MetaPanel', {
         navi = me.getNavi(),
         but = Ext.getCmp('watchSegmentBtn'),
         tooltip = (isWatched) ? navi.item_stopWatchingSegment : navi.item_startWatchingSegment;
-        
+    me.editingMode = 'edit';
     but.toggle(isWatched, true);
     but.setTooltip({
         dismissDelay: 0,
         text: tooltip
     });
-    
     me.record = record;
     me.loadTermPanel(segmentId);
-    me.getMetaQualitiesPanel().startEditing(segmentId);
-    //bindStore(me.record.terms());
+    me.hasQmQualities = Editor.app.getTaskConfig('autoQA.enableQm');
+    // our component controllers are listening for the load event & create their views
+    me.getQualitiesStore().load({
+        params: { segmentId: segmentId }
+    });
     me.loadRecord(me.record);
     navi.show();
     navi.enable();
     me.getSegmentMeta().show();
     mp.enable();
+  },
+  /**
+   * Starts the creation of the segment's quality related GUIs
+   */
+  handleQualitiesLoaded: function(store, records){
+      // for cases where user is faster than store
+      if(this.editingMode == 'edit'){
+          var segmentId = this.record.get('id');
+          this.getMetaQualitiesPanel().startEditing(records, segmentId, true);
+          this.getMetaQmPanel().startEditing(records, segmentId, this.hasQmQualities);
+      } else {
+          store.removeAll(true);
+      }
   },
   /**
    * @param {Ext.selection.Model} sm current selection model of 
@@ -187,8 +232,9 @@ Ext.define('Editor.controller.MetaPanel', {
    * @param {Editor.model.Segment} record
    */
   openReadonly: function(record) {
-      var me = this,
+      var me = this,      
       mp = me.getMetaPanel();
+      me.editingMode = 'readonly';
       me.record = record;
       me.getSegmentMeta().hide();
       mp.enable();
@@ -199,36 +245,27 @@ Ext.define('Editor.controller.MetaPanel', {
    * @param {Ext.data.Model} record
    */
   loadRecord: function(record) {
-    var me = this,
-        mp = me.getMetaPanel(),
-        form = mp.down('#metaInfoForm'),
-        values = record.getQmAsArray(),
-        qmBoxes = mp.query('#metaQm checkbox');
-    
-    statBoxes = mp.query('#metaStates radio');
-    Ext.each(statBoxes, function(box){
-      box.setValue(false);
-    });
-    form.loadRecord(record);
-    Ext.each(qmBoxes, function(box){
-      box.setValue(Ext.Array.contains(values, box.inputValue));
-    });
+      var metaPanel = this.getMetaPanel(),
+          metaForm = metaPanel.down('#metaInfoForm'),    
+          statBoxes = metaPanel.query('#metaStates radio');
+      Ext.each(statBoxes, function(box){
+          box.setValue(false);
+      });
+      metaForm.loadRecord(record);
   },
   /**
    * Editor.view.segments.RowEditing edit handler, Speichert die Daten aus dem MetaPanel im record
    */
   saveEdit: function() {
-    var me = this,
-        mp = me.getMetaPanel(),
-        form = mp.down('#metaInfoForm'),
-        qmBoxes = mp.query('#metaQm checkbox'),
-        quality = [];
-    Ext.each(qmBoxes, function(box){box.getValue() && quality.push(box.inputValue);});
-    me.record.set('stateId', form.getValues().stateId);
-    me.record.setQmFromArray(quality);
-    //close the metapanel
-    mp.disable();
-    me.getMetaQualitiesPanel().endEditing();
+      var metaPanel = this.getMetaPanel(),
+          metaForm = metaPanel.down('#metaInfoForm');
+      this.record.set('stateId', metaForm.getValues().stateId);
+      //close the metapanel
+      metaPanel.disable();
+      this.getMetaQualitiesPanel().endEditing(true, true);
+      this.getMetaQmPanel().endEditing(me.hasQmQualities, true);
+      this.getQualitiesStore().removeAll(true);
+      this.editingMode = 'none';
   },
   /**
    * Editor.view.segments.RowEditing canceledit handler
@@ -236,7 +273,10 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   cancelEdit: function() {        
       this.getMetaPanel().disable();
-      this.getMetaQualitiesPanel().endEditing();
+      this.getMetaQualitiesPanel().endEditing(true, false);
+      this.getMetaQmPanel().endEditing(this.hasQmQualities, false);
+      this.getQualitiesStore().removeAll(true);
+      this.editingMode = 'none';
   },
   /**
    * Changes the state box by keyboard shortcut instead of mouseclick

@@ -215,16 +215,11 @@ abstract class editor_Models_Quality_AbstractView {
     protected function create(){
         // create ordered rubrics
         $rubrics = [];
-        $qmRows = $this->fetchQmRows();
-        $qmType = editor_Segment_Tag::TYPE_QM;
         foreach($this->manager->getAllTypes() as $type){
             if(!$this->excludeMQM || $type != editor_Segment_Tag::TYPE_MQM){
                 $rubrics[] = $this->createRubricRow($type);
             }
         }
-        // since the QM type is not part of the LEK_segment_quality model we have to add it seperately
-        $rubrics[] = $this->createNonDbRow($this->translate->_(strtoupper($qmType)), $qmType, NULL);
-        
         usort($rubrics, 'editor_Models_Quality_AbstractView::compareByTitle');
         // create intermediate model
         foreach($rubrics as $rubric){
@@ -246,32 +241,6 @@ abstract class editor_Models_Quality_AbstractView {
                     }
                 }
                 $this->numQualities++;
-            }
-        }
-        // add QM entries to our model if there are any
-        if(count($qmRows) > 0){
-            $utility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
-            /* @var $utility editor_Models_Segment_Utility */
-            // add QMs from the segments model
-            foreach($qmRows as $row){
-                $segmentId = $row['id'];
-                foreach($utility->convertQmIds($row['qmId']) as $index => $name){
-                    $category = $qmType.'_'.$index; // analogue to what is made with mqm-categories
-                    $this->rowsByType[$qmType][self::RUBRIC]->qcount++;
-                    if($this->hasSegmentIds){
-                        $this->rowsByType[$qmType][self::RUBRIC]->segmentIds[] = $segmentId;
-                    }
-                    if($this->isTree){
-                        if(!array_key_exists($category, $this->rowsByType[$qmType])){
-                            $this->rowsByType[$qmType][$category] = $this->createNonDbRow($this->translate->_($name), $qmType, $category);
-                        }
-                        $this->rowsByType[$qmType][$category]->qcount++;
-                        if($this->hasSegmentIds){
-                            $this->rowsByType[$qmType][$category]->segmentIds[] = $segmentId;
-                        }
-                    }
-                    $this->numQualities++;
-                }
             }
         }
         // check if we have a structural internal tag problem
@@ -429,23 +398,6 @@ abstract class editor_Models_Quality_AbstractView {
             return array_key_exists($type, $this->checkedQualities);
         }
         return array_key_exists($type.':'.$category, $this->checkedQualities);
-    }
-    /**
-     * 
-     * @return array
-     */
-    protected function fetchQmRows(){
-        // since QMs can not be false positive we exclude them when filtering for false positives
-        if($this->falsePositiveRestriction === 1){
-            return [];
-        }
-        $select = $this->table->select()
-            ->setIntegrityCheck(false)
-            ->from('LEK_segments', array('id', 'qmId'))
-            ->where('taskGuid = ?', $this->task->getTaskGuid())
-            ->where('qmId != ?', '')
-            ->where('qmId IS NOT NULL');
-        return $this->table->fetchAll($select, 'id ASC')->toArray();
     }
     /**
      * Generates the MQM children, which usually are deeper nested

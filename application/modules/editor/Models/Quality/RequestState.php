@@ -48,12 +48,7 @@ class editor_Models_Quality_RequestState {
      * @var string
      */
     private $catsByType = null;
-    /**
-     * Represents the transformed list of qmIds
-     * @var string
-     */
-    private $qmIds = null;
-    
+   
     public function __construct(string $requestValue){
         list($this->checked, $this->mode) = explode('|', $requestValue);
         if(empty($this->mode)){
@@ -72,23 +67,13 @@ class editor_Models_Quality_RequestState {
             $this->catsByType = [];
             $this->qmIds = [];
             if($this->checked != ''){
-                // we add only QMs if we are not filtering for false psitives !
-                $addQms = ($this->getFalsePositiveRestriction() !== 1);
                 foreach(explode(',', $this->checked) as $quality){
                     if(strpos($quality, ':') !== false){
                         list($type, $category) = explode(':', $quality);
-                        if($type == editor_Segment_Tag::TYPE_QM){
-                            if($addQms){
-                                // the qm-category is assembled as 'qm_'.$qmId
-                                list($type, $qmId) = explode('_', $category);
-                                $this->qmIds[] = $qmId;
-                            }
-                        } else {
-                            if(!array_key_exists($type, $this->catsByType)){
-                                $this->catsByType[$type] = [];
-                            }
-                            $this->catsByType[$type][] = $category;
+                        if(!array_key_exists($type, $this->catsByType)){
+                            $this->catsByType[$type] = [];
                         }
+                        $this->catsByType[$type][] = $category;
                     }
                 }
             }
@@ -131,22 +116,6 @@ class editor_Models_Quality_RequestState {
     public function hasCheckedCategoriesByType() : bool {
         $this->createSegmentFilters();
         return (count($this->catsByType) > 0);
-    }
-    /**
-     * Retrieves a flat list of $qmIds that were encoded as qualities
-     * @return array
-     */
-    public function getCheckedQmIds() : array {
-        $this->createSegmentFilters();
-        return $this->qmIds;
-    }
-    /**
-     * Retrieves if we have checked qmIds
-     * @return array
-     */
-    public function hasCheckedQmIds() : bool {
-        $this->createSegmentFilters();
-        return (count($this->qmIds) > 0);
     }
     /**
      * Retrieves the needed restriction for the falsePositive column
