@@ -281,20 +281,37 @@ class editor_Models_Segment_AutoStates {
     }
     
     /**
-     * calculates the initial autoStateId of an segment in the import process
+     * re calculates the autoStateId on un block of fullmatches
      * @param bool $isEditable
      * @param bool $isTranslated
      * @return integer
      */
-    public function restoreImportState($isEditable, $isTranslated): int
+    public function recalculateUnBlocked(bool $isTranslated, bool $preTranslated): int
     {
-        if(! $isEditable) {
-            return self::BLOCKED;
+        if(! $isTranslated) {
+            return self::NOT_TRANSLATED;
         }
-        if($isTranslated) {
-            return self::TRANSLATED;
+        return $preTranslated ? self::PRETRANSLATED : self::TRANSLATED;
+    }
+
+    /**
+     * re calculates the autoStateId on blocking of fullmatches
+     * @param int $isTranslated
+     */
+    public function recalculateBlocked(int $previousState): int
+    {
+        switch ($previousState) {
+            case self::TRANSLATED:
+            case self::REVIEWED_UNTOUCHED:
+            case self::REVIEWED_UNCHANGED:
+            case self::REVIEWED_UNCHANGED_AUTO:
+            case self::REVIEWED_PM_UNCHANGED:
+            case self::REVIEWED_PM_UNCHANGED_AUTO:
+            case self::PRETRANSLATED:
+                return self::BLOCKED;
+            default:
+                return $previousState;
         }
-        return self::NOT_TRANSLATED;
     }
     
     /**
@@ -302,7 +319,7 @@ class editor_Models_Segment_AutoStates {
      * @param bool $isEditable
      * @return integer
      */
-    public function calculatePretranslationState($isEditable): int
+    public function calculatePretranslationState(bool $isEditable): int
     {
         if(! $isEditable) {
             return self::BLOCKED;

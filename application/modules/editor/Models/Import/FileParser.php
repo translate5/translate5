@@ -413,7 +413,7 @@ abstract class editor_Models_Import_FileParser {
         
         //calculate isEditable only if it was not explicitly set
         if(!isset($attributes->editable)) {
-            //$isFullMatch implies that the
+            //$isFullMatch implies that the source was a TM (for imported data)
             $attributes->editable = (!$isFullMatch || (bool) $this->task->getEdit100PercentMatch() || $isAutoprop) && !$isLocked;
         }
         

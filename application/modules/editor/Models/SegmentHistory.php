@@ -77,6 +77,24 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
     }
     
     /**
+     * load the latest history entry data as array to a segment,
+     *  optionally filtered by the given filter parameters, passing key and values directly to a where command
+     * @param int $id
+     * @param array $filter
+     * @return array
+     */
+    public function loadLatestForSegment(int $id, array $filter = []): array {
+        $s = $this->db->select();
+        $s->where('segmentId = ?', $id)
+        ->order('id DESC')->limit(1);
+        foreach($filter as $field => $value) {
+            $s->where($field, $value);
+        }
+        $row = $this->db->fetchRow($s);
+        return $row ? $row->toArray() : [];
+    }
+    
+    /**
      * sets the field manager
      * @param editor_Models_SegmentFieldManager $sfm
      */
