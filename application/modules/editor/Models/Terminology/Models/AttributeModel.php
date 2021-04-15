@@ -235,7 +235,6 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             'terms_attributes.id AS attributeId',
             'terms_attributes.labelId as labelId',
             'terms_attributes.termEntryId AS termEntryId',
-//            'terms_attributes.parentId AS parentId',
             'terms_attributes.internalCount AS internalCount',
             'terms_attributes.language AS language',
             'terms_attributes.elementName AS name',
@@ -243,7 +242,6 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             'terms_attributes.dataType AS attrDataType',
             'terms_attributes.target AS attrTarget',
             'terms_attributes.guid AS attrId',
-//            'terms_attributes.attrLang AS attrLang',
             'terms_attributes.value AS attrValue',
             'terms_attributes.created AS attrCreated',
             'terms_attributes.updated AS attrUpdated',
@@ -256,7 +254,6 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
             ->join('terms_term_entry', 'terms_term_entry.id = terms_attributes.termEntryId', $cols)
             ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = terms_attributes.labelId', ['LEK_term_attributes_label.labelText as headerText']);
 
-        // todo: Sinisa, add transacGrp to attributes array
         $s->join('terms_transacgrp', 'terms_transacgrp.termEntryId = terms_term_entry.id',[
             'terms_transacgrp.transac as transac',
             'terms_transacgrp.transacNote as transacNote',
@@ -304,7 +301,6 @@ class editor_Models_Terminology_Models_AttributeModel extends ZfExtended_Models_
         $rows = array_map($mapProposal, $rows);
 
         return $rows;
-//        return $this->createChildTree($rows);
     }
 
     /***
