@@ -1092,9 +1092,9 @@ class editor_TaskController extends ZfExtended_RestController {
 
         //if the edit100PercentMatch is changed, update the value for all segments in the task
         if(isset($this->data->edit100PercentMatch)){
-            $segmentUtility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
-            /* @var editor_Models_Segment_Utility $segmentUtility */
-            $segmentUtility->updateSegmentsEdit100PercentMatch($this->entity, (boolean)$this->data->edit100PercentMatch);
+            $bulkUpdater = ZfExtended_Factory::get('editor_Models_Segment_AutoStates_BulkUpdater');
+            /* @var editor_Models_Segment_Utility $bulkUpdater */
+            $bulkUpdater->updateSegmentsEdit100PercentMatch($this->entity, (boolean)$this->data->edit100PercentMatch);
         }
 
         //if the totals segment count is not set, update it before the entity is saved

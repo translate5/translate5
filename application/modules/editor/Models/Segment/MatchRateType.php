@@ -421,6 +421,15 @@ class editor_Models_Segment_MatchRateType {
     }
     
     /**
+     * returns true if the given matchtype was imported from a TM
+     * @param string $type
+     * @return bool
+     */
+    public static function isFromTM(string $type): bool {
+        return strpos($type, self::PREFIX_IMPORT.';'.self::TYPE_TM) === 0 || strpos($type, self::PREFIX_PRETRANSLATED.';'.self::TYPE_TM) === 0;
+    }
+    
+    /**
      * returns true if the given type (as string parameter) is a pretranslation type (currently TM and MT)
      * @param string $type
      * @return bool

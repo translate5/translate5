@@ -72,7 +72,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       pmGuid: '#UT#Projektmanager',
       orderdate: '#UT#Bestelldatum',
       edit100PercentMatch: '#UT#100%-Treffer editierbar',
-      fullMatchEdit: '#UT#100% Matches sind editierbar',
+      fullMatchEdit: '#UT#unveränderte 100% TM Matches sind editierbar',
       emptyTargets: '#UT#Übersetzungsaufgabe (kein Review)',
       lockLocked: '#UT#Nur für SDLXLIFF Dateien: In importierter Datei explizit gesperrte Segmente sind in translate5 ebenfalls gesperrt',
       enableSourceEditing: '#UT#Quellsprache bearbeitbar',
