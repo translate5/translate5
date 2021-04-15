@@ -251,10 +251,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             $segment->setTargetMd5($segmentHash);
         }
         
-        //lock the pretranslations if 100 matches in the task are not editable
-        if($result->matchrate >= 100 && !$this->task->getEdit100PercentMatch()){
-            $segment->setEditable(false);
-        }
+        //negated explanation is easier: lock the pretranslations if 100 matches in the task are not editable
+        $segment->setEditable($result->matchrate < 100 || $this->task->getEdit100PercentMatch());
 
         //set the used language resource uuid in the segments meta table
         $segment->meta()->setPreTransLangResUuid($languageResource->getLangResUuid());

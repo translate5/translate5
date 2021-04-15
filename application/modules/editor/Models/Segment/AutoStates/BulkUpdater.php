@@ -227,6 +227,9 @@ class editor_Models_Segment_AutoStates_BulkUpdater {
         $autoState = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $autoState editor_Models_Segment_AutoStates */
         
+        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        /* @var $internalTag editor_Models_Segment_InternalTag */
+        
         // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
         //  since the first segment is loaded on construction, the construction must be directly before usage!
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$task->getTaskGuid()]);
@@ -242,10 +245,11 @@ class editor_Models_Segment_AutoStates_BulkUpdater {
             //is locked config has precendence over all other calculations!
             $isLocked = $segment->meta()->getLocked() && (bool) $task->getLockLocked();
             $history = $segment->getNewHistoryEntity();
+            $hasText = $internalTag->hasText($segment->getSource());
             
             //if we want editable 100% matches, the segment should be not ediable before, which is checked in the foreach head
-            // and not explicitly locked:
-            if($edit100PercentMatch && !$isLocked) {
+            // and not explicitly locked, and if source contains text:
+            if($edit100PercentMatch && !$isLocked && $hasText) {
 
                 // BLOCKED → to all previous non blocked states possible from history
                 $latest = $segmentHistory->loadLatestForSegment($segment->getId(), [
