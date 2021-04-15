@@ -129,6 +129,22 @@ class editor_QualityController extends ZfExtended_RestController {
         }
     }
     /**
+     * Sets a single qm for a segment
+     */
+    public function segmentqmAction(){
+        $segmentId = $this->getRequest()->getParam('segmentId', NULL);
+        $qmCatIndex = $this->getRequest()->getParam('categoryIndex', NULL);
+        $action = $this->getRequest()->getParam('qmaction', NULL);
+        $success = false;
+        if($segmentId != NULL && $qmCatIndex !== NULL && ($action == 'add' || $action == 'remove')){
+            $success = editor_Models_Db_SegmentQuality::addOrRemoveQmForSegment($this->fetchTaskGuid(), intval($segmentId), intval($qmCatIndex), $action);
+        } else {
+            ZfExtended_UnprocessableEntity::addCodes(['E1025' => 'Fields "segmentId", "categoryIndex" and "action" must be provided and valid.']);
+            throw new ZfExtended_UnprocessableEntity('E1025');
+        }
+        $this->view->success = ($success ? 1 : 0);
+    }
+    /** 
      * Retrieves the data for the qualities-overview of a task in the task info panel
      */
     public function taskAction(){

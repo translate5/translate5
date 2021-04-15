@@ -116,6 +116,9 @@ final class editor_Segment_Quality_Manager {
         // MQM
         $provider = new editor_Segment_Mqm_Provider();
         $this->registry[$provider->getType()] = $provider;
+        // QM
+        $provider = new editor_Segment_Qm_Provider();
+        $this->registry[$provider->getType()] = $provider;
     }
     /**
      * 

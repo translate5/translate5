@@ -117,6 +117,37 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         }
         return $segmentIds;
     }
+    /**
+     * 
+     * @param string $taskGuid
+     * @param int $segmentId
+     * @param int $qmCategoryIndex
+     * @param string $action
+     * @return boolean
+     */
+    public static function addOrRemoveQmForSegment(string $taskGuid, int $segmentId, int $qmCategoryIndex, string $action) : bool {
+        $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
+        $category = editor_Segment_Qm_Provider::createCategoryVal($qmCategoryIndex);
+        /* @var $table editor_Models_Db_SegmentQuality */
+        if($action == 'remove'){
+            $rows = $table->fetchFiltered($taskGuid, $segmentId, NULL, editor_Segment_Tag::TYPE_QM, false, $category);
+            if(count($rows) == 1){
+                $rows[0]->delete();
+                return true;
+            }
+        } else {
+            $row = $table->createRow();
+            /* @var $row editor_Models_Db_SegmentQualityRow */
+            $row->segmentId = $segmentId;
+            $row->taskGuid = $taskGuid;
+            $row->type = editor_Segment_Tag::TYPE_QM;
+            $row->category = $category;
+            $row->categoryIndex = $qmCategoryIndex;
+            $row->save();
+            return true;
+        }
+        return false;
+    }
     
     protected $_name  = 'LEK_segment_quality';
     
@@ -150,7 +181,8 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             }
         }
         if($field != NULL){
-            $select->where('field = ?', $field);
+            // a quality with no field set applies for all fields !
+            $select->where('field = ? OR field = \'\'', $field);
         }
         if(!empty($types)){ // $types can not be "0"...
             if(is_array($types) && count($types) > 1){
@@ -176,6 +208,8 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         if($order == NULL){
             $order = [ 'type ASC', 'category ASC' ];
         }
+        // TODO AUTOQA: remove
+        error_log('SELECT: '.$select->__toString());
         return $this->fetchAll($select, $order);
     }
     /**
@@ -188,14 +222,6 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             $where = (count($qualityIds) > 1) ? $db->quoteInto('id IN (?)', $qualityIds) : $db->quoteInto('id = ?', $qualityIds[0]);
             $db->delete($this->getName(), $where);
         }
-    }
-    /**
-     * 
-     * @param int $segmentId
-     * @return Zend_Db_Table_Rowset_Abstract
-     */
-    public function fetchBySegment(int $segmentId) : Zend_Db_Table_Rowset_Abstract {
-        return $this->fetchFiltered(NULL, $segmentId);
     }
     /**
      * 

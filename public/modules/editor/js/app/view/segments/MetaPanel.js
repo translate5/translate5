@@ -53,15 +53,13 @@ Ext.define('Editor.view.segments.MetaPanel', {
     layout: 'auto',
 
     item_metaTerms_title: '#UT#Terminologie',
-    item_metaQm_title: '#UT#QM',
     item_metaStates_title: '#UT#Status',
     item_metaStates_tooltip: '#UT#Segment auf den ausgewählten Status setzen (ALT + S danach {0})',
     item_metaStates_tooltip_nokey: '#UT#Segment auf den ausgewählten Status setzen',
     
     initComponent: function() {
       var me = this,
-          showStatus = Editor.app.getTaskConfig('segments.showStatus'),
-          showQM = Editor.app.getTaskConfig('autoQA.enableQm');
+          showStatus = Editor.app.getTaskConfig('segments.showStatus');
           
       Ext.applyIf(me, {
         title:me.title,
@@ -90,12 +88,9 @@ Ext.define('Editor.view.segments.MetaPanel', {
                       }
                   }]
               },{
-                  xtype: 'fieldset',
-                  itemId: 'metaQm',
-                  defaultType: 'checkbox',
-                  collapsible: true,
-                  hidden:  !showQM,
-                  title: me.item_metaQm_title
+                  xtype: 'segmentQm',
+                  itemId: 'segmentQm',
+                  collapsible: true
               },{
                   xtype: 'segmentQualities',
                   itemId: 'segmentQualities',
@@ -113,7 +108,6 @@ Ext.define('Editor.view.segments.MetaPanel', {
       });
 
       me.callParent(arguments);
-      me.addQualityFlags();
       me.addStateFlags();
     },
     /**
@@ -129,33 +123,15 @@ Ext.define('Editor.view.segments.MetaPanel', {
             var tooltip; 
             if(counter < 10) {
                 tooltip = Ext.String.format(me.item_metaStates_tooltip, counter++);
-            }
-            else {
+            } else {
                 tooltip = me.item_metaStates_tooltip_nokey;
             }
-          stati.add({
-            name: 'stateId',
-            anchor: '100%',
-            inputValue: item.id,
-            boxLabel: '<span data-qtip="'+tooltip+'">'+item.label+'</span>'
-          });
+            stati.add({
+                name: 'stateId',
+                anchor: '100%',
+                inputValue: item.id,
+                boxLabel: '<span data-qtip="'+tooltip+'">'+item.label+'</span>'
+            });
         });
-    },
-    /**
-     * Fügt anhand der php2js Daten die QM Felder hinzu
-     */
-    addQualityFlags: function() {
-      var me = this,
-      qm = me.down('#metaQm'),
-      flags = Editor.data.segments.qualityFlags;
-      Ext.each(flags, function(item){
-        qm.add({
-          xtype: 'checkbox',
-          name: 'qmId', 
-          anchor: '100%',
-          inputValue: item.id,
-          boxLabel: item.label
-        });
-      });
     }
   });

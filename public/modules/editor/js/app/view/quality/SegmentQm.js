@@ -21,23 +21,23 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 /**
- * Shows the Qualities for a Segment and enables to set those as false positive or not
+ * Shows the possible QMs for a Segment and enables to set them
  */
-Ext.define('Editor.view.quality.SegmentQualities', {
+Ext.define('Editor.view.quality.SegmentQm', {
     extend: 'Ext.form.FieldSet',
-    alias: 'widget.segmentQualities',
-    title: "#UT#QA: Falsch-Positive",
+    alias: 'widget.segmentQm',
+    title: "#UT#QM",
     requires: [
-        'Editor.view.quality.SegmentQualitiesController'        
+        'Editor.view.quality.SegmentQmController'
     ],
-    controller: 'segmentQualities',
-    cls: 'segmentQualities',
+    controller: 'segmentQm',
+    cls: 'segmentQM',
     defaultType: 'checkbox',
     hidden: true,
     initConfig: function(instanceConfig) {
@@ -50,58 +50,42 @@ Ext.define('Editor.view.quality.SegmentQualities', {
         return this.callParent([config]);
     },
     /**
-     * Creates the checkbox components after a store load & evaluates the visibility of our view
+     * Starts editing with the loaded records
      * @param {Editor.model.quality.Segment[]} records
      * @param {Integer} segmentId for which the qualities should be loaded
      * @param {boolean} isActive: if the component is active
      */
     startEditing: function(records, segmentId, isActive){
-        var added = false;
-        if(isActive && records.length > 0){
-            this.removeAll();
+        if(isActive){
+            var selectedIds = [];
             Ext.each(records, function(record){
-                if(record.get('falsifiable')){
-                    this.addCheckbox(record);
-                    added = true;
+                if(record.get('type') == 'qm'){
+                    selectedIds.push(record.get('categoryIndex'));
                 }
+            });
+            Ext.each(Editor.data.segments.qualityFlags, function(item){
+                this.add({
+                    xtype: 'checkbox',
+                    name: 'qmId', 
+                    anchor: '100%',
+                    checked: Ext.Array.contains(selectedIds, item.id),
+                    inputValue: item.id,
+                    boxLabel: item.label,
+                    segmentId: segmentId,
+                    listeners:{
+                        change: 'onQmChanged'
+                    }
+                });
             }, this);
-        }
-        if(added){
-            this.show();
-        } else {
-            this.endEditing(true, false);
+            this.setHidden(false);
         }
     },
     /**
-     * Adds a checkbox after the store was loaded
-     */
-    addCheckbox: function(record){
-        // add the tag-icons for MQM to help to identify the MQMs in the markup
-        var label = record.get('typeText') + ' > ' + record.get('text');
-        if(record.get('type') == 'mqm' && record.get('categoryIndex') > -1){
-            label += ' <img class="x-label-symbol qmflag qmflag-' + record.get('categoryIndex') + '" src="' 
-                + Editor.data.segments.subSegment.tagPath + 'qmsubsegment-' + record.get('categoryIndex') + '-left.png"> ';
-        }
-        this.add({
-            xtype: 'checkbox',
-            anchor: '100%',
-            name: 'segq' + record.get('id'),
-            inputValue: record.get('id'),
-            value: (record.get('falsePositive') == 1),
-            qrecord: record,
-            boxLabel: label,
-            listeners:{
-                change: 'onFalsePositiveChanged'
-            }
-        });
-    },
-    /**
-     * Hides the GUI if present
+     * Ends editing, remove our checkboxes
      */
     endEditing: function(isActive, isSaving){
         if(isActive){
             this.removeAll();
-            this.hide();
         }
     }
 });
