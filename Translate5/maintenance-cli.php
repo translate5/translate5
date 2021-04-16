@@ -53,6 +53,7 @@ use Translate5\MaintenanceCli\Command\{
     MaintenanceMessageCommand,
     SystemCheckCommand
 };
+use Translate5\MaintenanceCli\Command\SegmentHistoryCommand;
 
 $app = new Application('Translate5 CLI Maintenance', '1.0');
 $commands = [
@@ -62,6 +63,7 @@ $commands = [
     new WorkerListCommand(),
     new LogCommand(),
     new SessionImpersonateCommand(),
+    new SegmentHistoryCommand(),
     new ChangelogCommand(),
     new SystemCheckCommand(),
     new PluginListCommand(),
