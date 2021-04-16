@@ -587,8 +587,8 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     public function findTermAndAttributes(int $termId): array
     {
         $s = $this->getSearchTermSelect();
-        $s->where('terms_term.termId=?', $termId)
-            ->order('LEK_languages.rfc5646')
+        $s->where('terms_term.termId=?', $termId);
+            $s->order('LEK_languages.rfc5646')
             ->order('terms_term.term');
 
         return $this->db->fetchAll($s)->toArray();
@@ -637,7 +637,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         $s = $this->db->select()
             ->setIntegrityCheck(false)
             ->from($this->db, $cols)
-            ->joinLeft('terms_attributes', 'terms_attributes.termId = terms_term.termId', $attCols)
+            ->joinLeft('terms_attributes', 'terms_attributes.termId = terms_term.termId AND terms_attributes.collectionId = terms_term.collectionId ', $attCols)
             ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = terms_attributes.labelId',['LEK_term_attributes_label.labelText as headerText'])
             ->join('LEK_languages', 'terms_term.languageId = LEK_languages.id', ['LEK_languages.rfc5646 AS language']);
 
@@ -663,6 +663,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
             $s->where('terms_term.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED)
                 ->where('terms_attributes.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED);
         }
+
         return $s;
     }
     /***
@@ -810,9 +811,10 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
      * When no path is provided, redirect the output to a client's web browser (Excel)
      *
      * @param array $rows
-     * @param string $path: the path where the excel document will be saved
+     * @param string|null $path: the path where the excel document will be saved
      */
-    public function exportProposals(array $rows,string $path=null){
+    public function exportProposals(array $rows, string $path = null)
+    {
         $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
         /* @var $excel ZfExtended_Models_Entity_ExcelExport */
 
@@ -839,9 +841,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
         $autosizeCells=function($phpExcel) use ($excel){
             foreach ($phpExcel->getWorksheetIterator() as $worksheet) {
-
                 $phpExcel->setActiveSheetIndex($phpExcel->getIndex($worksheet));
-
                 $sheet = $phpExcel->getActiveSheet();
 
                 //the highes column based on the current row columns
@@ -850,23 +850,19 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
 
-
                 $highestColumnIndex = $excel->columnIndexFromString($highestColumn);
 
                 // expects same number of row records for all columns
                 $highestRow = $worksheet->getHighestRow();
 
-                for($col = 0; $col < $highestColumnIndex; $col++)
-                {
+                for ($col = 0; $col < $highestColumnIndex; $col++) {
                     // if you do not expect same number of row records for all columns
                     // get highest row index for each column
                     // $highestRow = $worksheet->getHighestRow();
-
-                    for ($row = 1; $row <= $highestRow; $row++)
-                    {
+                    for ($row = 1; $row <= $highestRow; $row++) {
                         $cell = $worksheet->getCellByColumnAndRow($col, $row);
-                        if(strpos($cell->getValue(), '<changemycolortag>') !== false){
-                            $cell->setValue(str_replace('<changemycolortag>','',$cell->getValue()));
+                        if (strpos($cell->getValue(), '<changemycolortag>') !== false) {
+                            $cell->setValue(str_replace('<changemycolortag>','', $cell->getValue()));
                             $sheet->getStyle($cell->getCoordinate())->getFill()->setFillType('solid')->getStartColor()->setRGB('f9f25c');
                         }
                     }
@@ -875,7 +871,7 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
         };
 
         //if the path is provided, save the excel into the given path location
-        if(!empty($path)){
+        if (!empty($path)) {
             $excel->loadArrayData($rows);
             $autosizeCells($excel->getSpreadsheet());
             $excel->saveToDisc($path);
@@ -892,15 +888,14 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
     public function updateAssocLanguages(array $collectionIds = null)
     {
         $s = $this->db->select()
-            ->from(array('t' =>'terms_term'), ['t.languageId', 't.collectionId'])
-            ->join(array('l' =>'LEK_languages'), 't.languageId = l.id', 'rfc5646');
+            ->from(['t' =>'terms_term'], ['t.languageId', 't.collectionId'])
+            ->join(['l' =>'LEK_languages'], 't.languageId = l.id', 'rfc5646');
 
-        if(!empty($collectionIds)){
+        if (!empty($collectionIds)) {
             $s->where('t.collectionId IN(?)',$collectionIds);
         }
 
         $s->group('t.collectionId')->group('t.languageId')->setIntegrityCheck(false);
-
         $ret = $this->db->fetchAll($s)->toArray();
 
         $data = [];
@@ -939,7 +934,6 @@ class editor_Models_Terminology_Models_TermModel extends ZfExtended_Models_Entit
 
                     $model->setLanguageResourceId($key);
                     $model->save();
-
                 }
             }
         }

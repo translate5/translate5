@@ -445,7 +445,7 @@ class editor_TermController extends ZfExtended_RestController
         $this->view->rows->proposal = null;
 
         //load all attributes for the term
-        $rows = $this->entity->findTermAndAttributes($this->entity->getId());
+        $rows = $this->entity->findTermAndAttributes($this->entity->getId(), $this->entity->getCollectionId());
         $rows = $this->entity->groupTermsAndAttributes($rows);
         if (!empty($rows) && !empty($rows[0]['attributes'])) {
             $this->view->rows->attributes = $rows[0]['attributes'];

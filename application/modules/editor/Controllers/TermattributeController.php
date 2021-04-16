@@ -121,7 +121,6 @@ class editor_TermattributeController extends ZfExtended_RestController
         $transacGrp = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
         /* @var $transacGrp editor_Models_Terminology_Models_TransacgrpModel */
 
-        // todo: Sinisa, handle new transacGrp
         $transacGrp->handleTransacGroup($termEntry);
 
         //update the view

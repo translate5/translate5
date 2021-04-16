@@ -151,8 +151,9 @@ class editor_Models_Terminology_Models_TransacgrpModel extends ZfExtended_Models
         if ($entity instanceof editor_Models_Terminology_Models_TermEntryModel){
             $s->where('id=?', $entity->getId());
         }
+        $result = $this->db->fetchAll($s)->toArray();
 
-        return $this->db->fetchAll($s)->toArray();
+        return $result;
     }
     /***
      * Create transac group attributes with its values. The type can be creation or modification
