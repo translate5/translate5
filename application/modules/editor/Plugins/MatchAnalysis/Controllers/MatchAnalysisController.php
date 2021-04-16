@@ -73,8 +73,8 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
 
     
     public function exportAction(){
-        $params=$this->getAllParams();
-        $rows=$this->entity->loadByBestMatchRate($params['taskGuid'],true);
+        $params = $this->getAllParams();
+        $rows = $this->entity->loadByBestMatchRate($params['taskGuid'],true);
         switch ($params["type"]) {
             case "excel":
                 ZfExtended_Factory::get($this->helperExcelClass)->generateExcel($rows);

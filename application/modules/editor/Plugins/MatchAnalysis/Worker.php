@@ -146,7 +146,10 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
         $this->analysis->setPretranslateMt($params['pretranslateMt']);
         $this->analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
         $this->analysis->setBatchQuery($params['batchQuery']);
-        
+        $type = $params['pretranslateMt'] == 1 ? "MT" : "";
+        $this->analysis->setUuid(ZfExtended_Utils::uuid());
+        $this->analysis->setType($type);
+
         $updateCounter = 0;
         $lastProgress=0;
         $return=$this->analysis->calculateMatchrate(function($progress) use (&$updateCounter,&$lastProgress){

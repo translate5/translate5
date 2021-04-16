@@ -190,7 +190,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-        
+
         $parentWorkerId = 0;
         if($task->isImporting()) {
             //on import we use the import worker as parentId
@@ -213,7 +213,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         
         $worker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Worker');
         /* @var $worker editor_Plugins_MatchAnalysis_Worker */
-        
+
         $user = new Zend_Session_Namespace('user');
         $workerParameters['userGuid'] = $user->data->userGuid;
         $workerParameters['userName'] = $user->data->userName;
