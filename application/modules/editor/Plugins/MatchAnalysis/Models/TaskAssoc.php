@@ -43,6 +43,9 @@ END LICENSE AND COPYRIGHT
  * 
  * @method integer getCreated() getCreated()
  * @method void setCreated() setCreated(string $created)
+ *
+ * @method integer getFinishedAt() getFinishedAt()
+ * @method void setFinishedAt() setFinishedAt(string $finishedAt)
  */
 class editor_Plugins_MatchAnalysis_Models_TaskAssoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_TaskAssoc';
