@@ -312,7 +312,6 @@ Ext.define('Editor.controller.ChangeAlike', {
     //Hier wird auch das Alike Segment vorübergehend auf nicht editierbar gesetzt, bis das OK vom Server kommt
     data = {
       stateId: rec.data.stateId,
-      qmId: rec.data.qmId,
       editable: 0,
       autoStateId: 999
     };

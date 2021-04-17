@@ -273,6 +273,15 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
         }
         return null;
     }
+    /**
+     * Retrieves the qualities for a segment as an assoc with the following keys: 'id', 'segmentId', 'type', 'category', 'categoryIndex', 'text'
+     * @param int $segmentId
+     * @return array
+     */
+    protected function fetchQualityData(int $segmentId){
+        $qualityExport = new editor_Models_Quality_XliffExport($this->task, [ $segmentId ]);
+        return $qualityExport->get($segmentId);
+    }
     
     protected function finishResult() {
         $this->result[] = '</xliff>';

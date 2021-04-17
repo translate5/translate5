@@ -40,17 +40,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * @var editor_Models_Segment
      */
     protected $entity;
-
-    /**
-     * mappt einen eingehenden Filtertyp auf einen anderen Filtertyp für ein bestimmtes
-     * Feld.
-     * @var array array($field => array(origType => newType),...)
-     */
-    protected $_filterTypeMap = [
-        'qmId' => ['list' => 'listAsString']
-    ];
     
-    /***
+    /**
      * Number to divide the segment duration
      *
      * @var integer
@@ -300,9 +291,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //set the editing durations for time tracking into the segment object
         settype($this->data->durations, 'object');
         $this->entity->setTimeTrackData($this->data->durations,$this->durationsDivisor);
-        $this->convertQmId();
 
-        $allowedToChange = array('qmId', 'stateId', 'autoStateId', 'matchRate', 'matchRateType');
+        $allowedToChange = array('stateId', 'autoStateId', 'matchRate', 'matchRateType');
         
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
 
@@ -619,16 +609,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     protected function isEditable(){
         return empty($this->entity->getEditable());
-    }
-
-    /**
-     * Die QM Id wird serverseitig als String und Clientseitig als Array gehandhabt
-     * Wenn ein QM Id Array reinkommt, wird es in einen String konvertiert.
-     */
-    protected function convertQmId() {
-        if (isset($this->data->qmId) && is_array($this->data->qmId)) {
-            $this->data->qmId = ';' . join(';', $this->data->qmId) . ';';
-        }
     }
     
     public function getAction() {

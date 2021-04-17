@@ -213,6 +213,24 @@ final class editor_Segment_Quality_Manager {
         $tags->flush();
     }
     /**
+     * Alike Segments have a special processing as they clone some qualities from their original segment
+     * @param editor_Models_Segment $segment
+     * @param editor_Models_Task $task
+     * @param editor_Segment_Alike_Qualities $alikeQualities
+     */
+    public function processAlikeSegment(editor_Models_Segment $segment, editor_Models_Task $task, editor_Segment_Alike_Qualities $alikeQualities){
+        $processingMode = editor_Segment_Processing::ALIKE;
+        $qualityConfig = $task->getConfig()->runtimeOptions->autoQA;
+        $tags = editor_Segment_Tags::fromSegment($task, $processingMode, $segment, false);
+        $tags->initAlikeQualities($alikeQualities);        
+        foreach($this->registry as $type => $provider){
+            /* @var $provider editor_Segment_Quality_Provider */
+            $tags = $provider->processSegment($task, $qualityConfig, $tags, $processingMode);
+        }
+        $tags->flush();
+    }
+        
+    /**
      * The central API to identify the needed Tag class by classnames and attributes
      * @param string $tagType
      * @param string $nodeName

@@ -70,10 +70,17 @@ final class editor_Segment_Qualities {
     private $added = [];
     /**
      * 
+     * @var editor_Segment_Alike_Qualities
+     */
+    private $alikeQualities = null;
+    /**
+     * 
      * @param int $segmentId
      * @param string $taskGuid
+     * @param string $processingMode
+     * @param editor_Segment_Alike_Qualities $alikeQualities: only needed for Alike processing
      */
-    public function __construct(int $segmentId, string $taskGuid, string $processingMode){
+    public function __construct(int $segmentId, string $taskGuid, string $processingMode, editor_Segment_Alike_Qualities $alikeQualities=NULL){
         $this->segmentId = $segmentId;
         $this->taskGuid = $taskGuid;
         $this->processingMode = $processingMode;
@@ -85,6 +92,9 @@ final class editor_Segment_Qualities {
                 /* @var $qualityRow editor_Models_Db_SegmentQualityRow */
                 $quality->processingState = 'delete';
                 $this->existing[] = $quality;
+            }
+            if($this->processingMode == editor_Segment_Processing::ALIKE){
+                $this->alikeQualities = $alikeQualities;
             }
         }
     }
@@ -164,7 +174,6 @@ final class editor_Segment_Qualities {
                 $changed = true;
             }
         } else {
-            
             $tag->setFalsePositive($quality->falsePositive);
         }
         // if anything changed, we need to save
@@ -175,6 +184,29 @@ final class editor_Segment_Qualities {
         $tag->setQualityId($quality->id);
         // triggers to keep the tag in the current state when saving the qualities
         $quality->processingState = 'keep';
+    }
+    /**
+     * Just needed for quality cloning in Alike processing
+     * @param editor_Models_Db_SegmentQualityRow $row
+     */
+    public function addNew(editor_Models_Db_SegmentQualityRow $row){
+        $row->segmentId = $this->segmentId;
+        $row->processingState = 'new';
+        $this->added[] = $row;
+    }
+    /**
+     * Clones qualities from the originating segment in a alike segment processing
+     * @param string $type
+     * @throws Exception
+     */
+    public function cloneAlikeType(string $type){
+        if($this->processingMode != editor_Segment_Processing::ALIKE){
+            throw new Exception('Called ::cloneAlikeType() but the current processing mode is not ALIKE');
+        } else if($this->alikeQualities == NULL){
+            throw new Exception('Called ::cloneAlikeType() but the AlikeQualities are not set');
+        } else {
+            $this->alikeQualities->cloneForType($type, $this);
+        }
     }
     /**
      * Saves the collected qualities back to the DB and resets all our cached qualities
@@ -202,7 +234,7 @@ final class editor_Segment_Qualities {
      * The cached new qualities will be reset when calling this API, so the consuming code is responsible to save those
      * @return editor_Models_Db_SegmentQualityRow[]
      */
-    public function extractNewQualities(){
+    public function extractNewQualities() : array {
         $newQualities = [];
         $keptQualities = [];
         foreach($this->added as $quality){

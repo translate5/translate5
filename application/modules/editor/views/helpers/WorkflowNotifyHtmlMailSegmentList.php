@@ -217,8 +217,8 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
                 $result[] = '<td valign="top">'.$this->prepareSegment($segment[$fieldName]).'</td>';
             }
             $result[] = '<td valign="top" nowrap="nowrap">'.$t->_($this->segmentUtility->convertStateId($segment['stateId'])).'</td>';
-            $qms = array_map($translateQm, $this->segmentUtility->convertQmIds($segment['qmId']));
-            $result[] = '<td valign="top" nowrap="nowrap">'.join(',<br />', $qms).'</td>';
+            $joinedQualities = (array_key_exists('qualities', $segment)) ? join(',<br />', $segment['qualities']) : '';
+            $result[] = '<td valign="top" nowrap="nowrap">'.$joinedQualities.'</td>';
             $result[] = '<td valign="top">'.$t->_($state).'</td>';
             $result[] = '<td valign="top">'.$segment['matchRate'].'%</td>';
             $result[] = '<td valign="top">'.$this->prepareComments($segment['comments']).'</td>';

@@ -406,7 +406,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * @param string $type
      * @return editor_Segment_Tag[]
      */
-    public function getTagsByType(string $type){
+    public function getTagsByType(string $type) : array {
         $result = [];
         foreach($this->getFieldTags() as $fieldTags){
             $result = array_merge($result, $fieldTags->getByType($type));
@@ -428,7 +428,7 @@ class editor_Segment_Tags implements JsonSerializable {
      * @param string $type
      * @return editor_Segment_Tag[]
      */
-    public function getEditableTagsByType(string $type){
+    public function getEditableTagsByType(string $type) : array {
         $result = [];
         foreach($this->getEditableFieldTags() as $fieldTags){
             $result = array_merge($result, $fieldTags->getByType($type));
@@ -472,10 +472,28 @@ class editor_Segment_Tags implements JsonSerializable {
         }
     }
     /**
+     * Inits our qualities for alike-segment processing. This API has to be called before the segment-tags are actually processed
+     * @param editor_Segment_Alike_Qualities $alikeQualities
+     */
+    public function initAlikeQualities(editor_Segment_Alike_Qualities $alikeQualities){
+        if($this->qualities == NULL){
+            $this->qualities = new editor_Segment_Qualities($this->segmentId, $this->task->getTaskGuid(), $this->processingMode, $alikeQualities);
+        } else {
+            throw new Exception('Called ::initAlikeQualities() after segment processing actually had started');
+        }
+    }
+    /**
+     * Clones all qualities of the given type from the original segment over to the alike segment
+     * @param string $type
+     */
+    public function cloneAlikeQualitiesByType(string $type){
+        $this->getQualities()->cloneAlikeType($type);
+    }
+    /**
      * Returnes the names of all our target fields
      * @return array
      */
-    private function getAllTargetFields(){
+    private function getAllTargetFields() : array {
         $fields = array();
         foreach($this->getTargets() as $target){
             $fields[] = $target->getField();
@@ -486,14 +504,14 @@ class editor_Segment_Tags implements JsonSerializable {
      * 
      * @return editor_Models_Db_SegmentQualityRow[]
      */
-    public function extractNewQualities(){
+    public function extractNewQualities() : array {
         return $this->getQualities()->extractNewQualities();
     }
     /**
      * internal
      * @return editor_Segment_Qualities
      */
-    private function getQualities(){
+    private function getQualities() : editor_Segment_Qualities {
         if($this->qualities == NULL){
             $this->qualities = new editor_Segment_Qualities($this->segmentId, $this->task->getTaskGuid(), $this->processingMode);
         }

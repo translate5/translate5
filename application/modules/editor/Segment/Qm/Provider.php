@@ -54,6 +54,14 @@ class editor_Segment_Qm_Provider extends editor_Segment_Quality_Provider {
         return editor_Segment_Tag::TYPE_QM.'_'.strval($categoryIndex);
     }
     
+    public function processSegment(editor_Models_Task $task, Zend_Config $qualityConfig, editor_Segment_Tags $tags, string $processingMode) : editor_Segment_Tags {
+        if($processingMode == editor_Segment_Processing::ALIKE){
+            // the only task we ever have to do is cloning the qm qualities in the alike copying process
+            $tags->cloneAlikeQualitiesByType(self::$type);
+        }
+        return $tags;
+    }
+    
     public function translateType(ZfExtended_Zendoverwrites_Translate $translate) : string {
         return $translate->_('QM');
     }
