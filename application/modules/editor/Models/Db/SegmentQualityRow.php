@@ -100,7 +100,7 @@ class editor_Models_Db_SegmentQualityRow extends Zend_Db_Table_Row_Abstract {
         }
         return (count($ours) == count($theirs));
     }
-    /** can be used for debugging TODO AutoQA: remove
+    /** can be used for debugging TODO AUTOQA: remove
     public function save(){
         error_log('SAVED QUALITY '.$this->id.': type: '.$this->type.' category: '.$this->category.' falsePositive: '.$this->falsePositive);
         parent::save();

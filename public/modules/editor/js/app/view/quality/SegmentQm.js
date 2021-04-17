@@ -66,7 +66,7 @@ Ext.define('Editor.view.quality.SegmentQm', {
             Ext.each(Editor.data.segments.qualityFlags, function(item){
                 this.add({
                     xtype: 'checkbox',
-                    name: 'qmId', 
+                    name: 'segmentQm', 
                     anchor: '100%',
                     checked: Ext.Array.contains(selectedIds, item.id),
                     inputValue: item.id,

@@ -56,8 +56,8 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
     }
     /**
      * sets the quality filter. This is a "OR" filter that is handled seperately from the main filtering
-     * @param array $segmentIds
-     * @param array $qmIds
+     * @param editor_Models_Quality_RequestState $requestState
+     * @param string $taskGuid
      */
     public function setQualityFilter(editor_Models_Quality_RequestState $requestState, string $taskGuid) {
         $this->qualityState = $requestState;

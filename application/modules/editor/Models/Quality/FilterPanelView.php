@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * 
+ * Provides the data for the qualities filter panel in the frontend
  */
 class editor_Models_Quality_FilterPanelView extends editor_Models_Quality_AbstractView {
     

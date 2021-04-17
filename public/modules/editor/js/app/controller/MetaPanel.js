@@ -263,7 +263,7 @@ Ext.define('Editor.controller.MetaPanel', {
       //close the metapanel
       metaPanel.disable();
       this.getMetaQualitiesPanel().endEditing(true, true);
-      this.getMetaQmPanel().endEditing(me.hasQmQualities, true);
+      this.getMetaQmPanel().endEditing(this.hasQmQualities, true);
       this.getQualitiesStore().removeAll(true);
       this.editingMode = 'none';
   },

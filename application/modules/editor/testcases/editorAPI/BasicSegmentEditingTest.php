@@ -102,7 +102,6 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
             else{
                 $this->assertEquals('1', $segment->editable);
             }
-            $this->assertEmpty($segment->qmId);
             $this->assertEquals(0, $segment->stateId);
             $this->assertEquals(0, $segment->fileOrder);
             $this->assertEmpty($segment->comments);

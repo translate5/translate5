@@ -92,9 +92,3 @@ WHERE name = 'runtimeOptions.editor.enableQmSubSegments';
 
 UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.autoQA.enableQm', `description` = 'If activated (default), the quality management for whole segments is active', `guiName` = 'Enable segment QM in the quality management' 
 WHERE name = 'runtimeOptions.segments.showQM';
-
-
--- Remove old statistics Endpoint
-DELETE FROM Zf_acl_rules WHERE `resource` = 'editor_qmstatistics';
--- Remove old MQM model
-DROP TABLE `LEK_qmsubsegments`;

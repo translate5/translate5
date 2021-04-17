@@ -162,7 +162,7 @@ abstract class editor_Models_Quality_AbstractView {
         
         // TODO AUTOQA: remove
         // error_log('PRESETS: '.print_r($this->checkedQualities, true).' / falsePositives:'.$this->falsePositiveRestriction.' / DBrows: '.count($this->dbRows));
-        
+     
         $this->create();
     }
     /**

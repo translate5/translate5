@@ -148,7 +148,7 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         }
         return false;
     }
-    
+
     protected $_name  = 'LEK_segment_quality';
     
     protected $_rowClass = 'editor_Models_Db_SegmentQualityRow';
@@ -208,8 +208,6 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
         if($order == NULL){
             $order = [ 'type ASC', 'category ASC' ];
         }
-        // TODO AUTOQA: remove
-        error_log('SELECT: '.$select->__toString());
         return $this->fetchAll($select, $order);
     }
     /**

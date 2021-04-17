@@ -65,7 +65,6 @@ class editor_Models_Quality_RequestState {
     private function createSegmentFilters(){
         if($this->catsByType === null){
             $this->catsByType = [];
-            $this->qmIds = [];
             if($this->checked != ''){
                 foreach(explode(',', $this->checked) as $quality){
                     if(strpos($quality, ':') !== false){

@@ -49,21 +49,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      */
     protected $entity;
     
-    /**
-     * mappt einen eingehenden Filtertyp auf einen anderen Filtertyp für ein bestimmtes
-     * Feld.
-     * @var array array($field => array(origType => newType),...)
-     */
-    protected $_filterTypeMap = [
-        'qmId' => ['list' => 'listAsString']
-    ];
-    
-    
     public function preDispatch() {
         parent::preDispatch();
         $this->entity->setEnableWatchlistJoin();
     }
-    
     /**
      * lädt das Zielsegment, und übergibt die Alikes zu diesem Segment an die View zur JSON Rückgabe
      * @see ZfExtended_RestController::getAction()
@@ -126,6 +115,8 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [ $this->entity, $task->getConfig() ]);
         /* @var $repetitionUpdater editor_Models_Segment_RepetitionUpdater */
         
+        $alikeQualities = new editor_Segment_Alike_Qualities($this->entity->getId());
+        
         $alikeCount = count($ids);
         foreach($ids as $id) {
             $id = (int) $id;
@@ -158,10 +149,8 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     continue;
                 }
                 // process all quality related stuff
-                editor_Segment_Quality_Manager::instance()->processSegment($entity, $task, editor_Segment_Processing::ALIKE);
-                // TODO AUTOQA: remove/refactor                
-                $entity->setQmId((string) $this->entity->getQmId());
-
+                editor_Segment_Quality_Manager::instance()->processAlikeSegment($entity, $task, $alikeQualities);
+  
                 if(!is_null($this->entity->getStateId())) {
                     $entity->setStateId($this->entity->getStateId());
                 }

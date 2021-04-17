@@ -59,8 +59,6 @@ END LICENSE AND COPYRIGHT
  * @method int getMatchRate() getMatchRate()
  * @method void setMatchRate() setMatchRate(int $matchrate)
  * @method string getMatchRateType() getMatchRateType()
- * @method string getQmId() getQmId()
- * @method void setQmId() setQmId(string $qmid)
  * @method int getStateId() getStateId()
  * @method void setStateId() setStateId(int $id)
  * @method integer getAutoStateId() getAutoStateId()
@@ -247,7 +245,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
          * SELECT id,rank FROM (
             	SELECT @rownum := @rownum + 1 AS rank,
             	   `id`, `segmentNrInTask`, `fileId`, `mid`, `userGuid`, `userName`, `taskGuid`, `timestamp`,
-            	   `editable`, `pretrans`, `matchRate`, `matchRateType`, `qmId`, `stateId`, `autoStateId`, `fileOrder`,
+            	   `editable`, `pretrans`, `matchRate`, `matchRateType`, `stateId`, `autoStateId`, `fileOrder`,
             	   `comments`, `workflowStepNr`, `workflowStep`, `source`, `sourceMd5`, `sourceToSort`, `target`,
             	   `targetMd5`, `targetToSort`, `targetEdit`, `targetEditToSort`
             	   FROM `LEK_segment_view_10ba195a738894769f296aee08364626`, (SELECT @rownum := 0) r
@@ -701,10 +699,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                 }
             }
         }
-    }
-    
-    public function setQmId($qmId) {
-        return parent::setQmId(trim($qmId, ';'));
     }
 
     /**
@@ -1196,7 +1190,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->segmentFieldManager->initFields($task->getTaskGuid());
         $this->reInitDb($task->getTaskGuid());
         
-        $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments', 'fileId', 'userGuid', 'userName', 'timestamp');
+        $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'comments', 'fileId', 'userGuid', 'userName', 'timestamp');
         $fields = array_merge($fields, $this->segmentFieldManager->getDataIndexList());
         
         $this->initDefaultSort();
@@ -1227,7 +1221,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                 $s->where($this->tableName.'.workflowStep = ?', $workflowStep);
                 break;
         }
-        return parent::loadFilterdCustom($s);
+        $list = parent::loadFilterdCustom($s);
+        
+        // add the Segment's Qualities (which are stored in the qualities table) as names
+        if(count($list) > 0){
+            // create the list of segment Ids
+            $segmentIds = [];
+            foreach($list as $item){
+                $segmentIds[] = $item['id'];
+            }
+            $qualityNotifications = new editor_Models_Quality_Notifications($task, $segmentIds);
+            foreach($list as $item){
+                $item['qualities'] = $qualityNotifications->get($item['id'], []);
+            }
+        }
+        return $list;
     }
 
     /**
