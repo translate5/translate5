@@ -124,6 +124,11 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $falsePositiveRestriction = NULL;
     /**
+     * The restriction for the current user
+     * @var string
+     */
+    protected $userGuidRestriction = NULL;
+    /**
      * 
      * @param editor_Models_Task $task
      * @param int $segmentId
@@ -144,6 +149,8 @@ abstract class editor_Models_Quality_AbstractView {
             $requestState = new editor_Models_Quality_RequestState($currentState);
             $this->checkedQualities = $requestState->getCheckedList();
             $this->falsePositiveRestriction = $requestState->getFalsePositiveRestriction();
+            // TODO AUTOQA: This seems incorrect filter for "editable segments"
+            $this->userGuidRestriction = $requestState->getUserRestriction();
         }
         $blacklist = NULL;
         if($onlyFilterTypes){
@@ -158,7 +165,16 @@ abstract class editor_Models_Quality_AbstractView {
             }
         }
         // ordering is crucial !
-        $this->dbRows = $this->table->fetchFiltered($task->getTaskGuid(), $segmentId, $field, $blacklist, true, NULL, $this->falsePositiveRestriction, ['type ASC','category ASC']);
+        $this->dbRows = $this->table->fetchFiltered(
+            $task->getTaskGuid(),
+            $segmentId,
+            $field,
+            $blacklist,
+            true,
+            NULL,
+            $this->falsePositiveRestriction,
+            $this->userGuidRestriction,
+            ['type ASC','category ASC']);
         
         // TODO AUTOQA: remove
         // error_log('PRESETS: '.print_r($this->checkedQualities, true).' / falsePositives:'.$this->falsePositiveRestriction.' / DBrows: '.count($this->dbRows));

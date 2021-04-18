@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Encapsulates all logic for global quality management
+ * Currently that is only the opening of the statistics window and the persistance of the filter mode of the qualities filter panel
  */
 Ext.define('Editor.controller.Quality', {
     extend : 'Ext.app.Controller',
@@ -35,6 +36,7 @@ Ext.define('Editor.controller.Quality', {
     requires: ['Editor.store.quality.Statistics'], // Statistics Store in "requires" instead "stores" to prevent automatic instantiation
     models: ['Editor.model.quality.Filter'],
     stores: ['Editor.store.quality.Filter'],
+    filterPanelMode: 'all', // the initial filter mode of the filter panel. Can be 'all' | 'error' | 'falsepositive'
     refs:[{
         ref : 'statisticsWindow',
         selector : '#qualityStatisticsWindow',
@@ -44,14 +46,29 @@ Ext.define('Editor.controller.Quality', {
     listen: {
         component: {
             '#segmentgrid #qualityStatisticsBtn': {
-                click:'showStatistics'
+                click:'onShowStatistics'
+            },
+            '#qualityFilterPanel #modeSelector': {
+                change:'onFilterModeChanged'
             }
         }
     },
     /**
      * displays the Statistics Window
      */
-    showStatistics: function() {
+    onShowStatistics: function() {
         this.getStatisticsWindow().show();
+    },
+    /**
+     * Changes the globally managed filter mode to ensure persistence
+     */
+    onFilterModeChanged: function(comp, newVal, oldVal) {
+        this.filterPanelMode = newVal;
+    },
+    /**
+     * Accessor for the filter mode
+     */
+    getFilterMode: function(){
+        return this.filterPanelMode;
     }
 });

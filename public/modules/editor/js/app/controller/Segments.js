@@ -83,6 +83,7 @@ Ext.define('Editor.controller.Segments', {
   loadingMaskRequests: 0,
   saveChainMutex: false,
   changeAlikeOperation: null,
+  isQualityFiltered: false,
   defaultRowHeight: 15,
   refs : [{
     ref : 'segmentGrid',
@@ -179,15 +180,15 @@ Ext.define('Editor.controller.Segments', {
           filters = store.filters;
     
       me.updateFilteredCountDisplay(newTotal);
-    
-    
-      if(filters.length > 0){
+
+      if(filters.length > 0 || me.isQualityFiltered){
           btn.addCls(cls);
-      }
-      else {
+      } else {
           btn.removeCls(cls);
+      }
+      if(filters.length == 0){
           btnWatchList.removeCls(cls);
-    }
+      }
   },
   /**
    * Displays / Updates the segment count in the reset button
@@ -269,6 +270,7 @@ Ext.define('Editor.controller.Segments', {
     me.clearSegmentSort();
     // reset the quality filter and uncheck any checked qualities
     store.setQualityFilter('');
+    me.isQualityFiltered = false;
     if(qualityPanel){
         qualityPanel.uncheckAll();
     }
@@ -702,20 +704,21 @@ Ext.define('Editor.controller.Segments', {
    */
   updateSegmentFinishCountViewModel:function(record){
 	  var me=this,
-	  	grid=me.getSegmentGrid(),
-	  	vm=grid.getViewModel(),
-	  	value=Ext.isNumber(record) ? record : record.get('segmentFinishCount');
+	  	grid = me.getSegmentGrid(),
+	  	vm = grid.getViewModel(),
+	  	value = Ext.isNumber(record) ? record : record.get('segmentFinishCount');
 	  vm.set('segmentFinishCount',value);
   },
   /**
-   * Listens to the filter panel controller and delegates it to our store
+   * Listens to the filter panel controller and delegates it to our store and changes the view if the stored filter changed
    */
-  onQualityFilterChanged: function(filter, doReloadStore){
+  onQualityFilterChanged: function(filter){
       var store = this.getSegmentsStore();
-      if(store.setQualityFilter(filter) && doReloadStore){
-          // TODO AUTOQA: remove
-          console.log("QUALITIES CHANGED, RELOAD GRID !!");
-          // this.clearSegmentSort();
+      // the store checks if the filter actually changed and we adjut the view only if requested
+      if(store.setQualityFilter(filter)){
+          // TODO AUTOQA remove
+          console.log('UPDATE GRID DUE TO QUALITIES: ', filter);
+          this.isQualityFiltered = (filter && filter != '');
           store.removeAll();
           store.reload();
       }

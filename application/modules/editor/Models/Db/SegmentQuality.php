@@ -123,17 +123,22 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param int $segmentId
      * @param int $qmCategoryIndex
      * @param string $action
-     * @return boolean
+     * @return stdClass
      */
-    public static function addOrRemoveQmForSegment(string $taskGuid, int $segmentId, int $qmCategoryIndex, string $action) : bool {
+    public static function addOrRemoveQmForSegment(string $taskGuid, int $segmentId, int $qmCategoryIndex, string $action) : stdClass {
+        $result = new stdClass();
+        $result->success = 0;
         $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
         $category = editor_Segment_Qm_Provider::createCategoryVal($qmCategoryIndex);
         /* @var $table editor_Models_Db_SegmentQuality */
         if($action == 'remove'){
             $rows = $table->fetchFiltered($taskGuid, $segmentId, NULL, editor_Segment_Tag::TYPE_QM, false, $category);
             if(count($rows) == 1){
-                $rows[0]->delete();
-                return true;
+                $result->row = new stdClass();
+                $result->row->id = $rows[0]->id;
+                $result->success = 1;
+                $rows[0]->delete();                
+                return $result;
             }
         } else {
             $row = $table->createRow();
@@ -144,9 +149,12 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             $row->category = $category;
             $row->categoryIndex = $qmCategoryIndex;
             $row->save();
-            return true;
+            // this will be the base for the returned data model in the quality controller
+            $result->row = (object) $row->toArray();
+            $result->success = 1;
+            return $result;
         }
-        return false;
+        return $result;
     }
 
     protected $_name  = 'LEK_segment_quality';
@@ -164,50 +172,66 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param bool $typesIsBlacklist
      * @param string|array $categories
      * @param int $falsePositive
+     * @param string $userGuid
      * @param string|array $order
      * @return Zend_Db_Table_Rowset_Abstract
      */
-    public function fetchFiltered(string $taskGuid=NULL, $segmentIds=NULL, string $field=NULL, $types=NULL, bool $typesIsBlacklist=false, $categories=NULL, int $falsePositive=NULL, $order=NULL) : Zend_Db_Table_Rowset_Abstract {
+    public function fetchFiltered(string $taskGuid=NULL, $segmentIds=NULL, string $field=NULL, $types=NULL, bool $typesIsBlacklist=false, $categories=NULL, int $falsePositive=NULL, string $userGuid=NULL, $order=NULL) : Zend_Db_Table_Rowset_Abstract {
+        $prefix = '';
         $select = $this->select();
+        // if a userGuid restriction is set we have to join with the segment table
+        // TODO AUTOQA: This seems incorrect filter for "editable segments"
+        if(!empty($userGuid)){
+            $prefix = 'qualities.';
+            $select
+                ->from(['qualities' => $this->_name])
+                ->join(['segments' => 'LEK_segments'], $prefix.'segmentId = segments.id', [])
+                ->where('segments.userGuid = ?', $userGuid);
+        }
         if(!empty($taskGuid)){
-            $select->where('taskGuid = ?', $taskGuid);
+            $select->where($prefix.'taskGuid = ?', $taskGuid);
         }
         if($segmentIds !== NULL){
             if(is_array($segmentIds) && count($segmentIds) > 1){
-                $select->where('segmentId IN (?)', $segmentIds, Zend_Db::INT_TYPE);
+                $select->where($prefix.'segmentId IN (?)', $segmentIds, Zend_Db::INT_TYPE);
             } else if(!is_array($segmentIds) || count($segmentIds) == 1){
                 $segmentId = is_array($segmentIds) ? $segmentIds[0] : $segmentIds;
-                $select->where('segmentId = ?', $segmentId, Zend_Db::INT_TYPE);
+                $select->where($prefix.'segmentId = ?', $segmentId, Zend_Db::INT_TYPE);
             }
         }
         if($field != NULL){
             // a quality with no field set applies for all fields !
-            $select->where('field = ? OR field = \'\'', $field);
+            $select->where($prefix.'field = ? OR '.$prefix.'field = \'\'', $field);
         }
         if(!empty($types)){ // $types can not be "0"...
             if(is_array($types) && count($types) > 1){
                 $operator = ($typesIsBlacklist) ? 'NOT IN' : 'IN';
-                $select->where('type '.$operator.' (?)', $types);
+                $select->where($prefix.'type '.$operator.' (?)', $types);
             } else {
                 $type = is_array($types) ? $types[0] : $types;
                 $operator = ($typesIsBlacklist) ? '!=' : '=';
-                $select->where('type '.$operator.' ?', $type);
+                $select->where($prefix.'type '.$operator.' ?', $type);
             }
         }
         if(!empty($categories)){ // $categories can not be "0"...
             if(is_array($categories) && count($categories) > 1){
-                $select->where('category IN (?)', $categories);
+                $select->where($prefix.'category IN (?)', $categories);
             } else {
                 $category = is_array($categories) ? $categories[0] : $categories;
-                $select->where('category = ?', $category);
+                $select->where($prefix.'category = ?', $category);
             }
         }
         if($falsePositive !== NULL){
-            $select->where('falsePositive = ?', $falsePositive, Zend_Db::INT_TYPE);
+            $select->where($prefix.'falsePositive = ?', $falsePositive, Zend_Db::INT_TYPE);
         }
         if($order == NULL){
-            $order = [ 'type ASC', 'category ASC' ];
+            $order = [ $prefix.'type ASC', $prefix.'category ASC' ];
+        } else if($prefix != '') {
+            $order = preg_filter('/^/', $prefix, $order);
         }
+
+        // error_log('FETCH FILTERD QUALITIES: '.$select->__toString().' / order: '.implode(', ', $order)); 
+        
         return $this->fetchAll($select, $order);
     }
     /**

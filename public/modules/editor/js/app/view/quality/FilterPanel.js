@@ -63,7 +63,9 @@ Ext.define('Editor.view.quality.FilterPanel', {
         newAnalysis: '#UT#Neu analysieren',
     },
     initConfig: function(instanceConfig) {
-        var me = this, config = {
+        var me = this,
+        filterMode = Editor.app.getController('Quality').getFilterMode(),
+        config = {
             title: this.title,
             store: Ext.create('Editor.store.quality.Filter'),
             columns: [{
@@ -108,8 +110,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
                     queryMode:'local',
                     itemId: 'modeSelector',
                     forceSelection: true,
-                    // selectOnFocus: true,
-                    value: 'all',
+                    value: filterMode,
                     listeners:{
                        change: 'onFilterModeChanged'
                     },
