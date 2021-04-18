@@ -1115,11 +1115,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->view->rows = (object)$row;
 
         if($this->isOpenTaskRequest()){
-            $this->addQmSubToResult();
+            $this->addMqmQualities();
         }
-        else {
-            unset($this->view->rows->qmSubsegmentFlags);
-        }
+        unset($this->view->rows->qmSubsegmentFlags);
 
         // Add pixelMapping-data for the fonts used in the task.
         // We do this here to have it immediately available e.g. when opening segments.
@@ -1459,7 +1457,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * Adds the Task Specific QM SUb Segment Infos to the request result.
      * Not usable for indexAction, must be called after entity->save and this->view->rows = Data
      */
-    protected function addQmSubToResult() {
+    protected function addMqmQualities() {
         $mqmFlags = $this->entity->getQmSubsegmentFlags();
         $this->view->rows->mqmEnabled = false;
         $taskConfig = $this->entity->getConfig();
@@ -1468,7 +1466,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->view->rows->mqmSeverities = $this->entity->getMqmSeveritiesTranslated(false);
             $this->view->rows->mqmEnabled = true;
         }
-        unset($this->view->rows->qmSubsegmentFlags);
     }
 
     /**

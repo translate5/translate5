@@ -34,8 +34,8 @@ Ext.define('Editor.view.quality.FilterPanelController', {
     alias: 'controller.qualityFilterPanel',
     delayedChange: null,
     qualitiesShown: false,
-    currentFilterMode: 'all', // the mode of shown qualities: all, just errors, just false positives
     preventNextFilterUpdate: false, // prevents the next filter update
+    currentFilterVal: null,
     listen: {
         controller: {
             '#Segments': {
@@ -52,14 +52,18 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      * When the view is expanded we load/reload the store
      */
     onBeforeExpand: function(){
-        this.loadStore();
-        this.getView().down('#modeSelector').setValue('all');
+        // if a filter was already set this is not the initial opening and we need to keep the persistence of this filter
+        if(this.currentFilterVal){
+            this.loadFilteredStrore(this.currentFilterVal);
+        } else {
+            this.loadStore();
+        }
     },
     /**
      * When the view is collapsed we unload store to be clean
      */
     onCollapse: function(){
-        this.unloadStore(true);
+        this.unloadStore(false);
     },
     /**
      * When the view is unloaded we unload store to be clean
@@ -72,7 +76,12 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      */
     onBeforeStateRestore: function(view, state){
         if(state.hasOwnProperty('collapsed') && state.collapsed === false){
-            this.loadStore();
+            var filterMode = Editor.app.getController('Quality').getFilterMode();
+            if(filterMode == 'all'){
+                this.loadStore();
+            } else {
+                this.loadFilteredStrore('NONE|' + filterMode);
+            }
         }
     },    
     /**
@@ -80,12 +89,13 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      */
     onFilterModeChanged: function(comp, newVal, oldVal){
         if(newVal != oldVal){
-            this.currentFilterMode = newVal;
-            this.reloadStore();
-            // TODO AUTOQA: remove
-            console.log("FILTER MODE CHANGED, RELOAD QUALITIES STORE AND UPDATE GRID");
+            // We have to set the filter mode explicitly here because the listener from the global Quality controller may be called after this listener
+            this.loadFilteredStrore(this.getFilterValue(true, newVal));
         }
     },
+    /**
+     * 
+     */
     onAnalysisButtonClick: function(btn){
         // TODO AUTOQA: implement
         console.log('onAnalysisButtonClick: ', btn);
@@ -97,9 +107,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         // we only refresh when being shown
         if(this.qualitiesShown){
             this.preventNextFilterUpdate = true;
-            this.reloadStore();
-            // TODO AUTOQA: remove
-            console.log("SEGMENT SAVED, RELOAD QUALITIES STORE WITHOUT UPDATING GRID");
+            this.loadFilteredStrore(this.getFilterValue(true, null));
         }
     },
     /**
@@ -147,30 +155,32 @@ Ext.define('Editor.view.quality.FilterPanelController', {
     /**
      * Reloads the store and keeps the current selection
      */
-    reloadStore: function(){
+    loadFilteredStrore: function(filterVal){
         this.getView().getStore().load({
             params: {
-                currentstate: this.getFilterValue(true)
+                currentstate: filterVal
             }
         });
     },
     /**
      * Unloads the qualities after the panel is collapsed
      */
-    unloadStore: function(doReloadStore){
+    unloadStore: function(doUpdateGrid){
         this.getView().getStore().getRootNode().removeAll(false);
-        this.fireEvent('qualityFilterChanged', '', doReloadStore);
+        if(doUpdateGrid){
+            this.fireEvent('qualityFilterChanged', '');
+        }
         this.qualitiesShown = false;
     },
     
     /**
      * Fires the filter update event
      */
-    updateFilter: function(doReloadStore){
+    updateFilter: function(doUpdateGrid){
         if(this.preventNextFilterUpdate){
             this.preventNextFilterUpdate = false;
-        } else {
-            this.fireEvent('qualityFilterChanged', this.getFilterValue(false), doReloadStore);
+        } else if(doUpdateGrid) {
+            this.fireEvent('qualityFilterChanged', this.getFilterValue(false, null));
         }
     },
     /**
@@ -182,30 +192,33 @@ Ext.define('Editor.view.quality.FilterPanelController', {
                 record.set('checked', false);
             });
         }
+        this.currentFilterVal = null;
     },
     /**
      * Creates the filte value
      */
-    getFilterValue: function(forStoreReload){
-        var filterVals = [];
+    getFilterValue: function(forStoreReload, modeVal){
+        var checkedVals = [];
+        if(!modeVal){
+            modeVal = Editor.app.getController('Quality').getFilterMode();
+        }
         Ext.Array.each(this.getView().getChecked(), function(record){
             // the rubrics will have an empty category, this will filter them out
             if(record.get('qcategory') != ''){
-                filterVals.push(record.get('qtype') + ':' + record.get('qcategory'));
+                checkedVals.push(record.get('qtype') + ':' + record.get('qcategory'));
             } else if(forStoreReload){
-                filterVals.push(record.get('qtype'));
+                checkedVals.push(record.get('qtype'));
             }
         });
-        if(filterVals.length > 0){
-            filterVals = Ext.Array.unique(filterVals); // just in Case
+        if(checkedVals.length > 0){
+            checkedVals = Ext.Array.unique(checkedVals); // just in Case
         }
-        // crucial: without checked categories we must not return the filter mode when evaluating the filter for a grid update!
-        // Otherwise the filter comparision in the Grid controller will not work properly
-        if(filterVals.length > 0){            
-            return filterVals.join(',') + '|' + this.currentFilterMode;
-        } else if(forStoreReload) {
-            return 'NONE|' + this.currentFilterMode;
+        this.currentFilterVal = (checkedVals.length > 0) ? (checkedVals.join(',') + '|' + modeVal) : ('NONE|' + modeVal);
+        // CRUCIAL: if we generate values for the segment Controller we must return an empty value in case nothing is checked
+        // the segments controller will manage only the two states 'not filtered' = empty value or 'filtered= = value with all filters
+        if(!forStoreReload && checkedVals.length == 0){
+            return '';
         }
-        return '';
+        return this.currentFilterVal;
     }
 });

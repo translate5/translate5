@@ -62,6 +62,26 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
     public function setQualityFilter(editor_Models_Quality_RequestState $requestState, string $taskGuid) {
         $this->qualityState = $requestState;
         $this->taskGuid = $taskGuid;
+        // if a quality filter is applied we must filter the qualities so that normal users just see their qualities
+        if($requestState->hasUserRestriction()){
+            $existingFilter = null;
+            if($this->hasFilter('userGuid', $existingFilter)){
+                // if a user filter is set but it is not "our" user we invalidate it so no entries are returned
+                if($existingFilter->value != $requestState->getUserRestriction()){
+                    $existingFilter->value = '{INVALID}';
+                }
+            } else {
+                $filter = new stdClass();
+                $filter->field = 'userGuid';
+                $filter->type = 'string';
+                $filter->comparison = 'eq';
+                $filter->value = $requestState->getUserRestriction();
+                $this->addFilter($filter);
+                
+                // TODO AUTOQA: remove
+                error_log('editor_Models_Filter_SegmentSpecific: Filter for User '.$requestState->getUserRestriction());
+            }
+        }
     }
     /**
      * Overwritten to apply the additional qualities filter
@@ -77,6 +97,7 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
             $adapter = $this->entity->db->getAdapter();
             $conditions = [];
             if($this->qualityState->hasCheckedCategoriesByType()){
+                // Note: the quality state's user filter is handled with a filter on the segment table so we don't need it here
                 $segmentIds = editor_Models_Db_SegmentQuality::getSegmentIdsForQualityFilter($this->qualityState, $this->taskGuid);
                 if(count($segmentIds) > 1){
                     $conditions[] = $adapter->quoteInto($colPrefix.'id IN (?)', $segmentIds, Zend_Db::INT_TYPE);

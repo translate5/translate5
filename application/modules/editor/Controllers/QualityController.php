@@ -135,14 +135,26 @@ class editor_QualityController extends ZfExtended_RestController {
         $segmentId = $this->getRequest()->getParam('segmentId', NULL);
         $qmCatIndex = $this->getRequest()->getParam('categoryIndex', NULL);
         $action = $this->getRequest()->getParam('qmaction', NULL);
-        $success = false;
         if($segmentId != NULL && $qmCatIndex !== NULL && ($action == 'add' || $action == 'remove')){
-            $success = editor_Models_Db_SegmentQuality::addOrRemoveQmForSegment($this->fetchTaskGuid(), intval($segmentId), intval($qmCatIndex), $action);
+            $result = editor_Models_Db_SegmentQuality::addOrRemoveQmForSegment($this->fetchTaskGuid(), intval($segmentId), intval($qmCatIndex), $action);            
+            // data-model must match that of editor_Models_Quality_SegmentView
+            if($result->success == 1 && $action == 'add'){
+                // data-model must match that of editor_Models_Quality_SegmentView
+                $manager = editor_Segment_Quality_Manager::instance();
+                $provider = $manager->getProvider(editor_Segment_Tag::TYPE_QM);
+                $result->row->filterable = $manager->isFilterableType(editor_Segment_Tag::TYPE_QM);
+                $result->row->falsifiable = $manager->canBeFalsePositiveCategory(editor_Segment_Tag::TYPE_QM, $result->row->category);
+                $result->row->hasTag = ($provider != NULL && !$provider->hasSegmentTags());
+                $result->row->tagName = ($result->row->hasTag) ? $provider->getTagNodeName() : '';
+                $result->row->cssClass = ($result->row->hasTag) ? $provider->getTagIndentificationClass() : '';
+            }
         } else {
             ZfExtended_UnprocessableEntity::addCodes(['E1025' => 'Fields "segmentId", "categoryIndex" and "action" must be provided and valid.']);
             throw new ZfExtended_UnprocessableEntity('E1025');
         }
-        $this->view->success = ($success ? 1 : 0);
+        $this->view->success = $result->success;
+        $this->view->row = ($result->success == 1) ? $result->row : NULL;
+        $this->view->action = $action;
     }
     /** 
      * Retrieves the data for the qualities-overview of a task in the task info panel

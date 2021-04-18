@@ -540,7 +540,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                     'action' => 'falsepositive'
                 )));
         $this->front->getRouter()->addRoute(
-            'editorQualityFalsepositive',
+            'editorQualitySegmentQm',
             new ZfExtended_Controller_RestLikeRoute(
                 'editor/quality/segmentqm/*',
                 array(

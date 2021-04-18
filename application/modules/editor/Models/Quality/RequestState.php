@@ -48,6 +48,11 @@ class editor_Models_Quality_RequestState {
      * @var string
      */
     private $catsByType = null;
+    /**
+     * The current user restriction
+     * @var string
+     */
+    private $userGuid = null;
    
     public function __construct(string $requestValue){
         list($this->checked, $this->mode) = explode('|', $requestValue);
@@ -57,6 +62,13 @@ class editor_Models_Quality_RequestState {
         // filter various unwanted states of the checked qualities out
         if(empty($this->checked) || $this->checked == 'NONE'|| $this->checked == 'root'){
             $this->checked = '';
+        }
+        // TODO AUTOQA: This seems incorrect filter for "editable segments"
+        //  our user restriction, depends on if the user is a normal editor or pm/admin
+        // TODO FIXME: This is so DIRTY, why is there no global user object (singleton) with API to provide such info ?
+        $sessionUser = new Zend_Session_Namespace('user');
+        if(!($sessionUser->data->roles && (in_array(ACL_ROLE_PM, $sessionUser->data->roles) || in_array(ACL_ROLE_ADMIN, $sessionUser->data->roles)))){
+            $this->userGuid = $sessionUser->data->userGuid;
         }
     }
     /**
@@ -142,5 +154,19 @@ class editor_Models_Quality_RequestState {
      */
     public function hasFalsePositiveRestriction() : bool {
         return ($this->getFalsePositiveRestriction() !== NULL);
+    }
+    /**
+     * Retrieves the needed restriction for the userGuid column of the related segment
+     * @return string|NULL
+     */
+    public function getUserRestriction() : ?string {
+        return $this->userGuid;
+    }
+    /**
+     * Retrieves if we have a user restriction (by userGuid)
+     * @return bool
+     */
+    public function hasUserRestriction() : bool {
+        return ($this->userGuid != NULL);
     }
 }

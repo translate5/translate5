@@ -955,7 +955,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function loadByTaskGuid($taskGuid, Closure $callback = null) {
         try {
-            return $this->_loadByTaskGuid($taskGuid,$callback);
+            return $this->_loadByTaskGuid($taskGuid, $callback);
         }
         catch(Zend_Db_Statement_Exception $e) {
             $this->catchMissingView($e);
@@ -1130,7 +1130,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $s = $this->addWhereTaskGuid($s, $taskGuid);
         
         if(!empty($callback)) {
-            $callback($s,$this->tableName);
+            $callback($s, $this->tableName);
         }
         
         return parent::loadFilterdCustom($s);
