@@ -54,7 +54,8 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen',
         customers:'#UT#Kunden',
-        useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
+        useAsDefault:'#UT#Leserechte standardmäßig',
+        writeAsDefault:'#UT#Schreibrechte standardmäßig',
         collection:'#UT#TBX-Datei',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
         categories: '#UT#Kategorien',
@@ -127,29 +128,49 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     fieldLabel: me.strings.target
                 }, langField),{
                     xtype:'customers',
-                    fieldLabel:me.strings.customers,
+                    name:'customerIds[]',
                     listeners:{
                         change:'onCustomersTagFieldChange'
                     },
+                    bind:{
+                        store:'{customers}'
+                    },
+                    fieldLabel:me.strings.customers,
                     itemId:'resourcesCustomers',
-                    name:'customerIds',
                     dataIndex:'customerIds',
-                    store:Ext.create('Ext.data.Store', {
-                        model:'Editor.model.admin.Customer',
-                        autoLoad:true
-                    })
+                    allowBlank: false,
+                    reference:'resourcesCustomers',
                 },{
                     xtype:'tagfield',
-                    name:'customerUseAsDefaultIds',
+                    name:'customerUseAsDefaultIds[]',
+                    listeners:{
+                        change:'onCustomersReadTagFieldChange'
+                    },
                     itemId:'useAsDefault',
+                    bind:{
+                        store:'{customersDefaultRead}'
+                    },
                     fieldLabel:me.strings.useAsDefault,
-                    store:Ext.create('Ext.data.Store', {
-                        model:'Editor.model.admin.Customer'
-                    }),
+                    reference:'useAsDefault',
                     displayField: 'name', 
                     valueField: 'id', 
                     queryMode: 'local', 
                     dataIndex:'customerUseAsDefaultIds'
+                },{
+                    xtype:'tagfield',
+                    name:'customerWriteAsDefaultIds[]',
+                    listeners:{
+                        change:'onCustomersWriteTagFieldChange'
+                    },
+                    itemId:'writeAsDefault',
+                    bind:{
+                        store:'{customersDefaultWrite}'
+                    },
+                    fieldLabel:me.strings.writeAsDefault,
+                    displayField: 'name', 
+                    valueField: 'id', 
+                    queryMode: 'local', 
+                    dataIndex:'customerWriteAsDefaultIds'
                 },{
                     xtype: 'colorfield',
                     fieldLabel: me.strings.color,

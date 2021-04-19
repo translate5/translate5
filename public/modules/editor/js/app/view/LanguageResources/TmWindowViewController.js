@@ -50,7 +50,6 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     onTmWindowRender:function(){
         var me=this,
             view=me.getView(),
-            resourcesCustomers=view.down('#resourcesCustomers'),
             sdlStore=Ext.StoreManager.get('sdlEngine');
 
         if(sdlStore){
@@ -59,22 +58,8 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         }
         
         view.getViewModel().set('uploadLabel',view.strings.file);
-        me.mergeCustomersToDefault();
-        resourcesCustomers.getStore().on({
-            load:{
-                fn:me.onResourceCustomersStoreLoad,
-                scope:me
-            }
-        })
     },
 
-    /***
-     * On resource customers load event handler
-     */
-    onResourceCustomersStoreLoad:function(){
-        this.mergeCustomersToDefault();
-    },
-    
     /**
      * Resource combo handler
      */
@@ -188,52 +173,15 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     },
 
     onCustomersTagFieldChange:function(field,newValue,oldValue,eOpts){
-        this.mergeCustomersToDefault();
+        this.getViewModel().set('selectedCustomers',newValue);
     },
 
-    /**
-     * Add all selected customers from the customers tag field, as select option to the default customers field
-     */
-    mergeCustomersToDefault:function(){
-        var me=this,
-            record=me.getView().down('form').getRecord(),
-            resourcesCustomers=me.getView().down('#resourcesCustomers'),
-            asDefaultField=me.getView().down('#useAsDefault'),
-            defaultStore=asDefaultField.getStore(),
-            selection = resourcesCustomers.getPicker().getSelectionModel().getSelection(),
-            asDefaultSelection=asDefaultField.getValue(),
-            records=[],
-            selectedValues=[];
-        
-        if(!asDefaultSelection || asDefaultSelection.length<1 && record){
-            asDefaultSelection=record.get('customerUseAsDefaultIds');
-        }
-        //INFO: bevause of extjs bug, unable to use the selected records from the customers as model data to the defaultCustomers store
-        //https://www.sencha.com/forum/showthread.php?304305-Uncaught-TypeError-Cannot-read-property-internalId-of-undefined
-        //collect all selected customers to additional array
-        selection.forEach(function(r){
-            records.push({
-                id:r.get('id'),
-                name:r.get('name'),
-            });
+    onCustomersReadTagFieldChange:function(field,newValue,oldValue,eOpts){
+        this.getViewModel().set('selectedCustomersRead',newValue);
+    },
 
-            //find all allready selected available values
-            asDefaultSelection.forEach(function(sv){
-                if(sv==r.get('id')){
-                    selectedValues.push(sv);
-                }
-            });
-        });
-        
-        //clean the selected values
-        asDefaultField.clearValue();
-        //clean the store
-        defaultStore.removeAll();
-
-        //add the available customers
-        defaultStore.add(records);
-        //apply the merged selected values
-        asDefaultField.setValue(selectedValues);
+    onCustomersWriteTagFieldChange:function(field,newValue,oldValue,eOpts){
+        this.getViewModel().set('selectedCustomersWrite',newValue);
     },
 
     /**

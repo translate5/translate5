@@ -1420,7 +1420,7 @@ Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskNam
 <trans-unit id='VGVybWUgbMO2c2NoZW4sIGRlcmVuIGxldHp0ZSBCZXLDvGhydW5nIGzDpG5nZXIgaGVyIGlzdCBhbHM='><source>Terme löschen, deren letzte Berührung länger her ist als</source><target>Terme löschen, deren letzte Berührung länger her ist als</target></trans-unit>
 <trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxzIGFrdHVlbGxlciBJbXBvcnQ='><source>Termeinträge löschen älter als aktueller Import</source><target>Termeinträge löschen älter als aktueller Import</target></trans-unit>
 <trans-unit id='SW5mbyB6dW0gVGVybS1Db2xsZWN0aW9u'><source>Info zum Term-Collection</source><target>Info zum Term-Collection</target></trans-unit>
-<trans-unit id='U3RhbmRhcmRtw6Rzc2lnIGFrdGl2IGbDvHI='><source>Standardmässig aktiv für</source><target>Standardmässig aktiv für</target></trans-unit>
+<trans-unit id='TGVzZXJlY2h0ZSBzdGFuZGFyZG3DpMOfaWc='><source>Leserechte standardmäßig</source><target>Leserechte standardmäßig</target></trans-unit>
 <trans-unit id='RsO8ciBkaWVzZSBLdW5kZW4gbnV0emVu'><source>Für diese Kunden nutzen</source><target>Für diese Kunden nutzen</target></trans-unit>
 <trans-unit id='VmVyYW50d29ydGxpY2g='><source>Verantwortlich</source><target>Verantwortlich</target></trans-unit>
 <trans-unit id='RGF0dW0='><source>Datum</source><target>Datum</target></trans-unit>
@@ -1918,6 +1918,7 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse enthalten</source><target>Gesperrte Segmente sind in der Analyse enthalten</target></trans-unit>
 <trans-unit id='R2VzcGVycnRlIFNlZ21lbnRlIHNpbmQgaW4gZGVyIEFuYWx5c2UgbmljaHQgZW50aGFsdGVu'><source>Gesperrte Segmente sind in der Analyse nicht enthalten</source><target>Gesperrte Segmente sind in der Analyse nicht enthalten</target></trans-unit>
 <trans-unit id='RGVyIFBhcmFtZXRlciBsb2dpbiBtaXQgZGVtIGdld8O8bnNjaHRlbiBCZW51dHplcm5hbWVuIGZlaGx0Lg=='><source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source><target>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</target></trans-unit>
+<trans-unit id='U2NocmVpYnJlY2h0ZSBzdGFuZGFyZG3DpMOfaWc='><source>Schreibrechte standardmäßig</source><target>Schreibrechte standardmäßig</target></trans-unit>
   </body>
  </file>
 </xliff>

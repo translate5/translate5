@@ -685,7 +685,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         
-        $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsDefault($this->data['customerId']);
+        //TODO: here write as reference also 
+        $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsUseAsDefault([$this->data['customerId']]);
         
         if(empty($allUseAsDefaultCustomers)) {
             return;
@@ -709,6 +710,9 @@ class editor_TaskController extends ZfExtended_RestController {
                 $taskAssoc->init();
                 $taskAssoc->setLanguageResourceId($languageResourceId);
                 $taskAssoc->setTaskGuid($task->getTaskGuid());
+                if(!empty($defaultCustomer['writeAsDefault'])){
+                    $taskAssoc->setSegmentsUpdateable(1);
+                }
                 $taskAssoc->save();
             }
         }

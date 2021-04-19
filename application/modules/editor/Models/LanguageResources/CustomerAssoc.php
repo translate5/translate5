@@ -38,6 +38,9 @@ END LICENSE AND COPYRIGHT
  *
  * @method integer getUseAsDefault() getUseAsDefault()
  * @method void setUseAsDefault() setUseAsDefault(int $useAsDefault)
+ * 
+ * @method integer getWriteAsDefault() getWriteAsDefault()
+ * @method void setWriteAsDefault() setWriteAsDefault(int $writeAsDefault)
  *
  */
 class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_Entity_Abstract {
@@ -52,8 +55,9 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * @param int $id
      * @param array $customers
      * @param array $useAsDefault
+     * @param array $writeAsDefault
      */
-    public function saveAssocRequest(int $id, array $customers, array $useAsDefault){
+    public function saveAssocRequest(int $id, array $customers, array $useAsDefault, array $writeAsDefault){
         // Check if (at least one) customer is set and use the 'defaultcustomer' if not
         if (empty($customers)) {
             $customer = ZfExtended_Factory::get('editor_Models_Customer');
@@ -62,9 +66,13 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
             $customers[] = $customer->getId();
         }
         
-        //ensure that only useAsDefault customers are used, which are added also as ccustomers
+        // ensure that only useAsDefault customers are used, which are added also as ccustomers
         $useAsDefault = array_intersect($useAsDefault, $customers);
-        $this->addAssocs($id, $customers, $useAsDefault);
+
+        // ensure that only writeAsDefault customers are used, which are added also as ccustomers
+        $writeAsDefault = array_intersect($writeAsDefault, $customers);
+        
+        $this->addAssocs($id, $customers, $useAsDefault,$writeAsDefault);
     }
     
     /**
@@ -72,27 +80,32 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * @param int $id
      * @param array $customers
      * @param array $useAsDefault
+     * @param array $writeAsDefault
      */
-    public function updateAssocRequest(int $id, array $customers, array $useAsDefault){
-        //remove old assocs for the curen languageResourceId
+    public function updateAssocRequest(int $id, array $customers, array $useAsDefault, array $writeAsDefault){
+        // remove old assocs for the curen languageResourceId
         $this->db->delete(['languageResourceId IN (?)' => $id]);
         
-        //save the new data
-        $this->saveAssocRequest($id, $customers, $useAsDefault);
+        // save the new data
+        $this->saveAssocRequest($id, $customers, $useAsDefault, $writeAsDefault);
     }
     
     /***
-     * Add assoc record to the database
-     * @param mixed $customers
+     * Add customer to language resources association into the database.
+     * 
      * @param int $languageResourceId
+     * @param array $customers
+     * @param array $useAsDefault : list of all customers which useAsDefault is 1
+     * @param array $writeAsDefault : list of all customers which writeAsDefault is 1
      */
-    public function addAssocs($languageResourceId, array $customers, array $useAsDefault = []){
+    public function addAssocs(int $languageResourceId, array $customers, array $useAsDefault = [], array $writeAsDefault = []){
         foreach ($customers as $id){
             $model = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
             /* @var $model editor_Models_LanguageResources_CustomerAssoc */
             $model->setCustomerId($id);
             $model->setLanguageResourceId($languageResourceId);
             $model->setUseAsDefault(in_array($id, $useAsDefault));
+            $model->setWriteAsDefault(in_array($id, $writeAsDefault));
             $model->save();
         }
     }
@@ -118,29 +131,48 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
      * @return array
      */
     public function loadByCustomerIds($customerIds=array()){
+        $s=$this->getCustomerIdsSelect($customerIds);
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /***
+     * @param array $customerIds
+     * @return Zend_Db_Table_Select
+     */
+    protected function getCustomerIdsSelect(array $customerIds = []){
         $s=$this->db->select();
         if(!empty($customerIds)){
             $s->where('customerId IN(?)',$customerIds);
         }
-        return $this->db->fetchAll($s)->toArray();
+        return $s;
     }
     
-    
     /***
-     * Get all default assocs by $customerIds
-     * If no $customerIds is provided, all default assoc will be loaded.
+     * Get all useAsDefault customer assocs for givent customer ids.
+     * If no $customerIds is provided, all results where useAsDefault is set to 1 will be returned.
      * INFO: this function is used by useAsDefault filter in the language resources. Do not change the layout.
      * @param array $customerIds
      * @return array
      */
-    public function loadByCustomerIdsDefault($customerIds=array()){
-        $s=$this->db->select();
-        if(!empty($customerIds)){
-            $s->where('customerId IN(?)',$customerIds);
-        }
+    public function loadByCustomerIdsUseAsDefault(array $customerIds = []){
+        $s=$this->getCustomerIdsSelect($customerIds);
         $s->where('useAsDefault=1');
         return $this->db->fetchAll($s)->toArray();
     }
+    
+    /***
+     * Get all writeAsDefault customer assocs for given customer ids
+     * If no $customerIds is provided, all results where writeAsDefault is set to 1 will be returned.
+     * INFO: this function is used by writeAsDefault filter in the language resources. Do not change the layout.
+     * @param array $customerIds
+     * @return array
+     */
+    public function loadByCustomerIdsWriteAsDefault(array $customerIds = []){
+        $s=$this->getCustomerIdsSelect($customerIds);
+        $s->where('writeAsDefault=1');
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
     
     /***
      * Get all customers for $languageResourceId (languageResourceId)

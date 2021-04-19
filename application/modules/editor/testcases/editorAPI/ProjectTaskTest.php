@@ -136,6 +136,7 @@ class ProjectTaskTest extends \ZfExtended_Test_ApiTestcase {
         $params['serviceType']='editor_Services_TermCollection';
         $params['customerIds'] = [self::$customerTest->id];
         $params['customerUseAsDefaultIds'] = [self::$customerTest->id];
+        $params['customerWriteAsDefaultIds'] = [];
         $params['serviceName']='TermCollection';
         $params['mergeTerms']=false;
         

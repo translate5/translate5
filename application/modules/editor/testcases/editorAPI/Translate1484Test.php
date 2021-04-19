@@ -120,6 +120,7 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
             'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_Moses',
             'serviceName'=> 'Moses',
             'name' => 'API Testing::MosesMt_'.__CLASS__
@@ -138,6 +139,7 @@ class Translate1484Test extends \ZfExtended_Test_ApiTestcase {
             'targetLang' => self::$targetLangRfc,
             'customerIds' => [self::$customerTest->id],
             'customerUseAsDefaultIds' => [],
+            'customerWriteAsDefaultIds' => [],
             'serviceType' => 'editor_Services_OpenTM2',
             'serviceName'=> 'OpenTM2',
             'name' => 'API Testing::OpenTm2Tm_'.__CLASS__

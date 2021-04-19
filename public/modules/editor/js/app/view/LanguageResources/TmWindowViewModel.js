@@ -35,7 +35,32 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
     alias: 'viewmodel.tmwindow',
     data: {
         serviceName: false,
-        uploadLabel:null
+        uploadLabel:null,
+        selectedCustomers : [],
+        selectedCustomersRead : [],
+        selectedCustomersWrite : []
+    },
+    stores: {
+        customers: {
+            model: 'Editor.model.admin.Customer',
+            autoLoad:true
+        },
+        customersDefaultRead: {
+            source: '{customers}',
+            filters: [{
+                property: 'id',
+                value: '{selectedCustomers}',
+                operator: 'in'
+            }],
+        },
+        customersDefaultWrite:{
+            source: '{customers}',
+            filters: [{
+                property: 'id',
+                value: '{selectedCustomersRead}',
+                operator: 'in'
+            }]
+        }
     },
     formulas: {
         isSdlResource: function(get){
