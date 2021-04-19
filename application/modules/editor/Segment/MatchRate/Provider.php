@@ -61,7 +61,6 @@ class editor_Segment_MatchRate_Provider extends editor_Segment_Quality_Provider 
         $segment = $tags->getSegment();
         // no need to check for edited 100% matches on import
         if($qualityConfig->enableEdited100MatchCheck && $processingMode != editor_Segment_Processing::IMPORT){
-            // TODO AUTOQA klären: 100% oder >= 100% ???
             if($segment->isEdited() && $segment->getMatchRate() >= 100){
                 $tags->addAllTargetsQuality(static::$type, self::EDITED_100PERCENT_MATCH);
             }

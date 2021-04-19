@@ -59,11 +59,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //update sortColMap and filterTypeMap in filter instance
         $filter->setMappings($this->_sortColMap, $this->_filterTypeMap);
         $filter->setSegmentFields(array_keys($this->_sortColMap));
-        // apply quality filter
-        if($this->getRequest()->getActionName() == 'index' && $this->getRequest()->getParam('qualities', '') != ''){
-            $qualityState = new editor_Models_Quality_RequestState($this->getRequest()->getParam('qualities'));
-            $filter->setQualityFilter($qualityState, $this->session->taskGuid);
-        }
     }
     /**
      * initiates the internal SegmentFieldManager
@@ -75,7 +70,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
     
     public function indexAction() {
+        
         $taskGuid = $this->session->taskGuid;
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        // apply quality filter
+        if($this->getRequest()->getParam('qualities', '') != ''){
+            $qualityState = new editor_Models_Quality_RequestState($this->getRequest()->getParam('qualities'));
+            $filter = $this->entity->getFilter();
+            $filter->setQualityFilter($qualityState, $task);
+        }
         $rows = $this->entity->loadByTaskGuid($taskGuid);
         $this->view->rows = $rows;
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);

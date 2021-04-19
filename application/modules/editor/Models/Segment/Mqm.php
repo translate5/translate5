@@ -29,8 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Segment QmSubsegments Helper Class
  * TODO convert this class to a "MqmTag" class
- *  TO BE COMPLETED: There are several more places in translate5 which can make use of this class
- *  TODO AUTOQA: move to new code
+ *  TO BE COMPLETED: There are several more places in translate5 which can make use of this class ... but better use the newer APIs editor_Segment_Fieldtags
  */
 class editor_Models_Segment_Mqm {
     
