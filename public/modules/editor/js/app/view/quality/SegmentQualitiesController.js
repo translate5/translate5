@@ -35,8 +35,21 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.quality.SegmentQualitiesController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.segmentQualities',
+    listen: {
+        store: {
+            '#SegmentQualities': {
+                datachanged: 'onQualitiesChanged'
+            }
+        }
+    },
     falsePositiveCssClass: 't5qfalpos', // as defined in editor_segment_Tag::CSS_CLASS_FALSEPOSITIVE. TODO FIXME: better add to Editor.data ?
     qualityIdDataName: 't5qid', // as defined in editor_segment_Tag::DATA_NAME_QUALITYID. TODO FIXME: better add to Editor.data ?
+    /**
+     * When QMs are set/unset, our store will have entries added/removed an we have to reflect this
+     */
+    onQualitiesChanged: function(store){
+        this.getView().rebuildByRecords(store.getRange());
+    },
     /**
      * Handler to sync the new state with the server (to catch false positives without tags) & add decorations in the editor
      */
@@ -52,7 +65,7 @@ Ext.define('Editor.view.quality.SegmentQualitiesController', {
             method: 'GET',
             params: { id: qualityId, falsePositive: falsePositiveVal },
             success: function(response){
-                record.set('falsePositive', falsePositiveVal); // updating store currently meaningless but who knows ...
+                record.set('falsePositive', falsePositiveVal); // updating store is currently meaningless but that may changes later on ...
             },
             failure: function(response){
                 Editor.app.getController('ServerException').handleException(response);

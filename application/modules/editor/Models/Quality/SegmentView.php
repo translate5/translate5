@@ -31,6 +31,45 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractView {
     
+    /**
+     * Creates an entry for the frontends segment-quality model (Editor.model.quality.Segment)
+     * @param editor_Models_Db_SegmentQualityRow $qualityRow
+     * @param editor_Segment_Quality_Manager $manager
+     * @param editor_Models_Task $task
+     * @return stdClass
+     */
+    public static function createResultRow(editor_Models_Db_SegmentQualityRow $qualityRow, editor_Segment_Quality_Manager $manager, editor_Models_Task $task) : stdClass {
+        $row = new stdClass();
+        $row->id = $qualityRow->id;
+        $row->segmentId = $qualityRow->segmentId;
+        $row->field = $qualityRow->field;
+        $row->type = $qualityRow->type;
+        $row->category = $qualityRow->category;
+        $row->categoryIndex = $qualityRow->categoryIndex;
+        $row->falsePositive = $qualityRow->falsePositive;
+        $row->typeText = $manager->translateQualityType($qualityRow->type);
+        $row->text = $manager->translateQualityCategory($qualityRow->type, $qualityRow->category, $task);
+        $row->filterable = $manager->isFilterableType($qualityRow->type);
+        $row->falsifiable = $manager->canBeFalsePositiveCategory($qualityRow->type, $qualityRow->category);
+        $provider = $manager->getProvider($qualityRow->type);
+        // add props to identify the tags in the editor
+        if($provider == NULL || !$provider->hasSegmentTags()){
+            $row->hasTag = false;
+            $row->tagName = '';
+            $row->cssClass = '';
+        } else {
+            $row->hasTag = true;
+            $row->tagName = $provider->getTagNodeName();
+            $row->cssClass = $provider->getTagIndentificationClass();
+        }
+        return $row;
+    }
+    /**
+     * Sorting function, sorts by typeText and text
+     * @param stdClass $a
+     * @param stdClass $b
+     * @return number
+     */
     public static function compareByTypeTitle(stdClass $a, stdClass $b){
         if($a->typeText == $b->typeText){
             return strnatcasecmp($a->text, $b->text);
@@ -46,29 +85,7 @@ class editor_Models_Quality_SegmentView extends editor_Models_Quality_AbstractVi
     protected function create(){
         foreach($this->dbRows as $dbRow){
             /* @var $dbRow editor_Models_Db_SegmentQualityRow */
-            $row = new stdClass();
-            $row->id = $dbRow->id;
-            $row->segmentId = $dbRow->segmentId;
-            $row->field = $dbRow->field;
-            $row->type = $dbRow->type;
-            $row->category = $dbRow->category;
-            $row->categoryIndex = $dbRow->categoryIndex;
-            $row->falsePositive = $dbRow->falsePositive;
-            $row->typeText = $this->manager->translateQualityType($dbRow->type);
-            $row->text = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
-            $row->filterable = $this->manager->isFilterableType($dbRow->type);
-            $row->falsifiable = $this->manager->canBeFalsePositiveCategory($dbRow->type, $dbRow->category);
-            $provider = $this->manager->getProvider($dbRow->type);
-            // add props to identify the tags in the editor
-            if($provider == NULL || !$provider->hasSegmentTags()){
-                $row->hasTag = false;
-                $row->tagName = '';
-                $row->cssClass = '';
-            } else {
-                $row->hasTag = true;
-                $row->tagName = $provider->getTagNodeName();
-                $row->cssClass = $provider->getTagIndentificationClass();
-            }
+            $row = self::createResultRow($dbRow, $this->manager, $this->task);
             $this->rows[] = $row;
         }
         usort($this->rows, 'editor_Models_Quality_SegmentView::compareByTypeTitle');

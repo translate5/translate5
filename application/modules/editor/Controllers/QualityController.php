@@ -132,28 +132,37 @@ class editor_QualityController extends ZfExtended_RestController {
      * Sets a single qm for a segment
      */
     public function segmentqmAction(){
+        $task = $this->fetchTask();
         $segmentId = $this->getRequest()->getParam('segmentId', NULL);
         $qmCatIndex = $this->getRequest()->getParam('categoryIndex', NULL);
         $action = $this->getRequest()->getParam('qmaction', NULL);
         if($segmentId != NULL && $qmCatIndex !== NULL && ($action == 'add' || $action == 'remove')){
-            $result = editor_Models_Db_SegmentQuality::addOrRemoveQmForSegment($this->fetchTaskGuid(), intval($segmentId), intval($qmCatIndex), $action);            
-            // data-model must match that of editor_Models_Quality_SegmentView
-            if($result->success == 1 && $action == 'add'){
-                // data-model must match that of editor_Models_Quality_SegmentView
-                $manager = editor_Segment_Quality_Manager::instance();
-                $provider = $manager->getProvider(editor_Segment_Tag::TYPE_QM);
-                $result->row->filterable = $manager->isFilterableType(editor_Segment_Tag::TYPE_QM);
-                $result->row->falsifiable = $manager->canBeFalsePositiveCategory(editor_Segment_Tag::TYPE_QM, $result->row->category);
-                $result->row->hasTag = ($provider != NULL && !$provider->hasSegmentTags());
-                $result->row->tagName = ($result->row->hasTag) ? $provider->getTagNodeName() : '';
-                $result->row->cssClass = ($result->row->hasTag) ? $provider->getTagIndentificationClass() : '';
+            /* 
+             Result looks like
+                 $result->qualityId => id of qualities row
+                 $result->qualityRow => editor_Models_Db_SegmentQualityRow (only on 'add')
+                 $result->success => bool
+             */
+            $result = editor_Models_Db_SegmentQuality::addOrRemoveQmForSegment($task, intval($segmentId), intval($qmCatIndex), $action);
+            if($result->success){
+                if($action == 'add'){
+                    // data-model must match that of editor_Models_Quality_SegmentView
+                    $result->row = editor_Models_Quality_SegmentView::createResultRow(
+                        $result->qualityRow,
+                        editor_Segment_Quality_Manager::instance(),
+                        $task);
+                } else {
+                    // the removed model needs only an ID ...
+                    $result->row = new stdClass();
+                    $result->row->id = $result->qualityId;
+                }
             }
         } else {
             ZfExtended_UnprocessableEntity::addCodes(['E1025' => 'Fields "segmentId", "categoryIndex" and "action" must be provided and valid.']);
             throw new ZfExtended_UnprocessableEntity('E1025');
         }
-        $this->view->success = $result->success;
-        $this->view->row = ($result->success == 1) ? $result->row : NULL;
+        $this->view->success = ($result->success) ? 1 : 0;
+        $this->view->row = ($result->success) ? $result->row : NULL;
         $this->view->action = $action;
     }
     /** 

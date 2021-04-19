@@ -43,12 +43,24 @@ Ext.define('Editor.view.quality.SegmentQmController', {
             method: 'GET',
             params: params,
             success: function(response){
+                // response will return a segments model in case of a succesful "add", a model containing only the id in case of "remove"
                 response = Ext.util.JSON.decode(response.responseText);
                 if(!response.success){
                     checkbox.suspendEvent('change');
                     checkbox.setValue(!checked);
                     checkbox.resumeEvent('change');
                     console.log('Updating the quality failed: ', response);
+                } else {
+                    var store = Ext.getStore('SegmentQualities'), record;
+                    if(response.action == 'remove'){
+                        record = store.getById(response.row.id);
+                        if(record){
+                            store.remove(record);
+                        }
+                    } else if(response.action == 'add'){
+                        record = Ext.create('Editor.model.quality.Segment', response.row);
+                        record = store.add(record);
+                    }
                 }
             },
             failure: function(response){
