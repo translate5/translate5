@@ -73,7 +73,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             novalidlicense: '#UT#Keine gültige Lizenz.'
         },
         customers:'#UT#Kunden',
-        useAsDefault:'#UT#Standardmässig aktiv für',
+        useAsDefault:'#UT#Leserechte standardmäßig',
+        writeAsDefault:'#UT#Schreibrechte standardmäßig',
         taskassocgridcell:'#UT#Zugewiesene Aufgaben',
         groupHeader: '#UT#Ressource: {name}'
     },
@@ -233,6 +234,17 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     },
                     text:me.strings.useAsDefault,
                     tooltip:me.strings.useAsDefault,
+                    renderer:me.defaultCustomersRenderer
+                },
+                {
+                    xtype: 'gridcolumn',
+                    width: 270,
+                    dataIndex:'customerWriteAsDefaultIds',
+                    filter: {
+                        type: 'string'
+                    },
+                    text:me.strings.writeAsDefault,
+                    tooltip:me.strings.writeAsDefault,
                     renderer:me.defaultCustomersRenderer
                 },
                 {
