@@ -5,10 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="23185d34-0db1-4542-8b37-59ea06a3eb43" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Analysis.php" beforeDir="false" afterPath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Analysis.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Controllers/MatchAnalysisController.php" beforeDir="false" afterPath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Controllers/MatchAnalysisController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Init.php" beforeDir="false" afterPath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Init.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Models/MatchAnalysis.php" beforeDir="false" afterPath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Models/MatchAnalysis.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Models/TaskAssoc.php" beforeDir="false" afterPath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Models/TaskAssoc.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Export/ExportXml.php" beforeDir="false" afterPath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Export/ExportXml.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Models/Validator/MatchAnalysis.php" beforeDir="false" afterPath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Models/Validator/MatchAnalysis.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Models/Validator/TaskAssoc.php" beforeDir="false" afterPath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Models/Validator/TaskAssoc.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Worker.php" beforeDir="false" afterPath="$PROJECT_DIR$/application/modules/editor/Plugins/MatchAnalysis/Worker.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -125,12 +127,14 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/application/modules/editor/database" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/application/modules/editor/testcases/editorAPI" />
     <property name="nodejs_package_manager_path" value="npm" />
+    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/application/modules/editor/testcases/editorAPI" />
       <recent name="$PROJECT_DIR$/application/modules/editor/database" />
     </key>
   </component>
@@ -146,7 +150,7 @@
       <workItem from="1617267681872" duration="22145000" />
       <workItem from="1618227417899" duration="102000" />
       <workItem from="1618227726843" duration="13971000" />
-      <workItem from="1618296468965" duration="32058000" />
+      <workItem from="1618296468965" duration="49957000" />
     </task>
     <servers />
   </component>

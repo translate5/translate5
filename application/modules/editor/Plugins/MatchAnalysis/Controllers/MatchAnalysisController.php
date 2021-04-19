@@ -28,7 +28,8 @@ END LICENSE AND COPYRIGHT
 
 /**
  */
-class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_RestController {
+class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_RestController
+{
 
     protected $entityClass = 'editor_Plugins_MatchAnalysis_Models_MatchAnalysis';
     protected $helperExcelClass = 'editor_Plugins_MatchAnalysis_Export_ExportExcel';
@@ -47,40 +48,44 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
      */
     protected $entity;
 
-    public function indexAction(){
+    public function indexAction()
+    {
         $taskGuid = $this->getParam('taskGuid', false);
-        if(empty($taskGuid)){
+        if (empty($taskGuid)) {
             //check if the taskGuid is provided via filter
-            $this->entity->getFilter()->hasFilter('taskGuid',$taskGuid);
-            $taskGuid=$taskGuid->value ?? null;
+            $this->entity->getFilter()->hasFilter('taskGuid', $taskGuid);
+            $taskGuid = $taskGuid->value ?? null;
         }
-        if(empty($taskGuid)) {
+        if (empty($taskGuid)) {
             // MatchAnalysis Plug-In: tried to load analysis data without providing a valid taskGuid
             // Reason is unfixed: TRANSLATE-1637: MatchAnalysis: Errors in Frontend when analysing multiple tasks
             throw new editor_Plugins_MatchAnalysis_Exception("E1103");
         }
-        
+
         //INFO: this is a non api property. It is used only for the tests
         //if not grouped is set, load all analysis records (only the last analysis) for the task guid
-        $notGrouped=$this->getParam('notGrouped', false);
-        if($notGrouped){
-            $this->view->rows=$this->entity->loadLastByTaskGuid($taskGuid);
+        $notGrouped = $this->getParam('notGrouped', false);
+        if ($notGrouped) {
+            $this->view->rows = $this->entity->loadLastByTaskGuid($taskGuid);
             return;
         }
-        $this->view->rows=$this->entity->loadByBestMatchRate($taskGuid);
+        $this->view->rows = $this->entity->loadByBestMatchRate($taskGuid);
     }
-    
 
-    
-    public function exportAction(){
+
+    public function exportAction()
+    {
         $params = $this->getAllParams();
-        $rows = $this->entity->loadByBestMatchRate($params['taskGuid'],true);
+
+        $rows = $this->entity->loadByBestMatchRate($params['taskGuid'], true);
+
+
         switch ($params["type"]) {
             case "excel":
                 ZfExtended_Factory::get($this->helperExcelClass)->generateExcel($rows);
                 break;
             case "xml":
-                $x = ZfExtended_Factory::get($this->helperXMLClass)->generateXML($rows);
+                $x = ZfExtended_Factory::get($this->helperXMLClass)->generateXML($rows, $params['taskGuid']);
                 echo $x->asXML();
 
                 break;
