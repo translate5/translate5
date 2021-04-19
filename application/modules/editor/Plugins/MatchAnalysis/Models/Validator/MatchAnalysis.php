@@ -39,5 +39,7 @@ class editor_Plugins_MatchAnalysis_Models_Validator_MatchAnalysis extends ZfExte
         $this->addValidator('segmentNrInTask', 'int');
         $this->addValidator('languageResourceid', 'int');
         $this->addValidator('matchRate', 'int');
+        $this->addValidator('uuid', 'varchar');
+        $this->addValidator('type', 'varchar');
     }
 }

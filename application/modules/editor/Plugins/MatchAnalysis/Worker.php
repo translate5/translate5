@@ -170,6 +170,12 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Task_AbstractWor
             $this->task->setState($this->taskOldState);
             $this->task->save();
         }
+
+        $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
+        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
+        $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($this->task->getTaskGuid());
+        $analysisAssoc->setFinishedAt(date('Y-m-d H:i:s'));
+        $analysisAssoc->save();
         $this->task->unlock();
         return $return;
     }

@@ -31,7 +31,6 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
 
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_BatchResult';
     public static $ATTRIBUTES = [
-        'segments',
         'words',
         'characters',
         'placeables',
@@ -76,7 +75,13 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
             $child = $object->batchTotal->analyse->addChild($childName);
             $child->addAttribute('min', $min);
             $child->addAttribute('max', $max);
-            $child = self::addAttributes($child, $data);
+            foreach (self::$ATTRIBUTES as $attr) {
+                if ($attr == 'words') {
+                    $child->addAttribute($attr, $data[$max]);
+                }else{
+                    $child->addAttribute($attr, '0');
+                }
+            }
         }
         return $object;
     }
@@ -90,6 +95,11 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
     {
         foreach (self::$ATTRIBUTES as $attr) {
             $child->addAttribute($attr, '0');
+            if ($attr == 'words' && $child->getName() == 'fuzzy') {
+                $attrib = (array)$child->attributes()->max;
+
+                $child->addAttribute($attr, $data[$attrib[0]]);
+            }
         }
 
         return $child;
@@ -108,7 +118,22 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
                 $object = self::addFuzzyChilds($object, $data);
             } else {
                 $child = $object->batchTotal->analyse->addChild($node);
-                $child = self::addAttributes($child, $data);
+                foreach (self::$ATTRIBUTES as $attr) {
+
+                    if ($attr == 'words' && $child->getName() == 'crossFileRepeated') {
+                        //crossFileRepeated are translate5s repetitions (which are represented by 102% matches)
+                        $child->addAttribute($attr, $data['102']);
+                    }elseif ($attr == 'words' && $child->getName() == 'inContextExact'){
+                        //inContextExact are 103%-Matches from translate5
+                        $child->addAttribute($attr, $data['103']);
+                    }elseif ($attr == 'words' && $child->getName() == 'exact'){
+                        //exact are 100% and 101% and 104%-Matches from translate5, since Trados does not know our 101 and 104%-Matches
+                        $value = $data['100'] + $data['101'] + $data['104'];
+                        $child->addAttribute($attr, $value);
+                    }else{
+                        $child->addAttribute($attr, '0');
+                    }
+                }
             }
         }
         return $object;
@@ -120,52 +145,123 @@ class editor_Plugins_MatchAnalysis_Export_ExportXml extends ZfExtended_Models_En
      * @throws Exception
      */
 
-    public static function generateXML($rows): SimpleXMLElement
+    public static function generateXML($rows, $taskGuid): SimpleXMLElement
     {
+
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+
+        $customer = ZfExtended_Factory::get('editor_Models_Customer');
+        /* @var $customer editor_Models_Customer */
+        $customerData = $customer->loadByIds([$task->getCustomerId()]);
+        $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
+        $assocs = $languageResource->loadByAssociatedTaskGuid($task->getTaskGuid());
+
+        $renderData = [
+            'resourceName' => '',
+            'resourceColor' => '',
+            'created' => '',
+            'internalFuzzy' => 'No',
+            '104' => 0,
+            '103' => 0,
+            '102' => 0,
+            '101' => 0,
+            '100' => 0,
+            '99' => 0,
+            '89' => 0,
+            '79' => 0,
+            '69' => 0,
+            '59' => 0,
+            'noMatch' => 0,
+            'wordCount' => 0,
+            'type' => ''
+        ];
+
+        foreach ($rows as $row) {
+            $renderData['resourceName'] .= $row['resourceName'].', ';
+            if($row['internalFuzzy'] == 'Yes'){
+                $renderData['internalFuzzy'] = 'Yes';
+            }
+            $renderData['104'] += $row['104'];
+            $renderData['103'] += $row['103'];
+            $renderData['102'] += $row['102'];
+            $renderData['101'] += $row['101'];
+            $renderData['100'] += $row['100'];
+            $renderData['99'] += $row['99'];
+            $renderData['89'] += $row['89'];
+            $renderData['79'] += $row['79'];
+            $renderData['69'] += $row['69'];
+            $renderData['59'] += $row['59'];
+            $renderData['wordCount'] += $row['wordCount'];
+
+        }
+
+
+        $analysisAssoc = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
+        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
+        $analysisAssoc = $analysisAssoc->loadNewestByTaskGuid($taskGuid);
+        $to_time = strtotime( $task->getOrderdate());
+
+        $from_time = strtotime($analysisAssoc['finishedAt']);
+        $difference = round(abs($to_time - $from_time) / 3600,2); //seconds
+
+
 
         $xml_header = '<?xml version="1.0" encoding="UTF-8"?><task name="analyse"></task>';
         $xml = new SimpleXMLElement($xml_header);
 
         $subnode1 = $xml->addChild('taskInfo');
-        $subnode1->addAttribute('taskId', '80094e22-25aa-4755-b8e3-7882535db225');
-        $subnode1->addAttribute('runAt', date('Y-m-d H:i:s'));
-        $subnode1->addAttribute('runTime', 'Less than 1 second');
+        $subnode1->addAttribute('taskId', $taskGuid);
+        $subnode1->addAttribute('runAt', $task->getOrderdate());
+        $subnode1->addAttribute('runTime', $difference. ' seconds');
 
         $subnode2 = $subnode1->addchild('project');
-        $subnode2->addAttribute('name', 'P1579');
-        $subnode2->addAttribute('number', '1.2');
+        $subnode2->addAttribute('name', $task->getTaskName());
+        $subnode2->addAttribute('number', $task->getId());
 
-        $inner_node1 = $subnode1->addChild('language');
-        $inner_node1->addAttribute('lcid', '1.2.1');
-        $inner_node1->addAttribute('name', 'English');
+        $innerNode1 = $subnode1->addChild('language');
+        $innerNode1->addAttribute('lcid', '1.2.1');
+        $innerNode1->addAttribute('name', 'English');
 
-        $inner_node2 = $subnode1->addChild('customer');
-        $inner_node2->addAttribute('name', '--');
+        $innerNode2 = $subnode1->addChild('customer');
+        $innerNode2->addAttribute('name', $customerData[0]['name']);
 
         $inner_node3 = $subnode1->addChild('tm');
-        $inner_node3->addAttribute('name', 'Q-Trials_IT_EN.sdltm');
+        $inner_node3->addAttribute('name', $renderData['resourceName']);
 
+        $internalFuzzy = $renderData['internalFuzzy'];
 
-        $inner_node4 = $subnode1->addChild('settings');
-        $inner_node4->addAttribute('reportInternalFuzzyLeverage', 'translate5Value');
-        $inner_node4->addAttribute('reportLockedSegmentsSeparately', 'no');
-        $inner_node4->addAttribute('reportCrossFileRepetitions', 'yes');
-        $inner_node4->addAttribute('minimumMatchScore', 'lowestFuzzyValueThatIsConfiguredToBeShownInTranslate5');
-        $inner_node4->addAttribute('searchMode', 'bestWins');
-        $inner_node4->addAttribute('missingFormattingPenalty', '1');
-        $inner_node4->addAttribute('differentFormattingPenalty', '1');
-        $inner_node4->addAttribute('multipleTranslationsPenalty', '1');
-        $inner_node4->addAttribute('autoLocalizationPenalty', '0');
-        $inner_node4->addAttribute('textReplacementPenalty', '0');
-        $inner_node4->addAttribute('fullRecallMatchedWords', '2');
-        $inner_node4->addAttribute('partialRecallMatchedWords', 'n/a');
-        $inner_node4->addAttribute('fullRecallSignificantWords', '2');
-        $inner_node4->addAttribute('partialRecallSignificantWords', 'n/a');
+        $innerNode4 = $subnode1->addChild('settings');
+        $innerNode4->addAttribute('reportInternalFuzzyLeverage', $internalFuzzy);
+        $innerNode4->addAttribute('reportLockedSegmentsSeparately', 'no');
+        $innerNode4->addAttribute('reportCrossFileRepetitions', 'yes');
+        $innerNode4->addAttribute('minimumMatchScore', 'lowestFuzzyValueThatIsConfiguredToBeShownInTranslate5');
+        $innerNode4->addAttribute('searchMode', 'bestWins');
+        $innerNode4->addAttribute('missingFormattingPenalty', '1');
+        $innerNode4->addAttribute('differentFormattingPenalty', '1');
+        $innerNode4->addAttribute('multipleTranslationsPenalty', '1');
+        $innerNode4->addAttribute('autoLocalizationPenalty', '0');
+        $innerNode4->addAttribute('textReplacementPenalty', '0');
+        $innerNode4->addAttribute('fullRecallMatchedWords', '2');
+        $innerNode4->addAttribute('partialRecallMatchedWords', 'n/a');
+        $innerNode4->addAttribute('fullRecallSignificantWords', '2');
+        $innerNode4->addAttribute('partialRecallSignificantWords', 'n/a');
 
 
         $batchTotal = $xml->addChild('batchTotal');
         $batchTotal->addChild('analyse');
-        return self::generateNodesWithAttributes($xml, $rows);
+        $fileName = 'report'. date('Y-m-d H:i:s').'.xml';
+
+        header('Content-disposition: attachment; filename='.$fileName);
+        header ("Content-Type:text/xml");
+//output the XML data
+        echo  $xml;
+        // if you want to directly download then set expires time
+        header("Expires: 0");
+
+        return self::generateNodesWithAttributes($xml, $renderData);
     }
 }
 
