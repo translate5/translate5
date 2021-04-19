@@ -13,6 +13,56 @@ All updates are (downwards) compatible! If not this is listed in the important r
 
 
 
+
+## [5.1.3] - 2021-04-15
+
+### Important Notes:
+ 
+
+
+### Added
+**[TRANSLATE-2363](https://jira.translate5.net/browse/TRANSLATE-2363): Development tool session:impersonate accessible via api** <br>
+Enables an API user to authenticate in a name of different user. This feature is only available via translate5 API and for users with api role. More info you can find here : https://confluence.translate5.net/display/TAD/Session
+
+
+### Bugfixes
+**[TRANSLATE-2471](https://jira.translate5.net/browse/TRANSLATE-2471): Auto-assigned users and deadline-date** <br>
+Fixes missing deadline date for auto assigned users.
+
+**[TRANSLATE-2470](https://jira.translate5.net/browse/TRANSLATE-2470): Errors on log mail delivery stops whole PHP process** <br>
+Errors on log e-mail delivery stops whole application process and leads to additional errors. The originating error is not logged in the translate5 log, only in the PHP log.
+
+**[TRANSLATE-2468](https://jira.translate5.net/browse/TRANSLATE-2468): Instant-translate custom title** <br>
+Enables instant-translate custom title definition in client-specific locales.
+
+**[TRANSLATE-2467](https://jira.translate5.net/browse/TRANSLATE-2467): RootCause Error "Cannot read property 'nodeName' of null"** <br>
+Fixed Bug in TrackChanges when editing already edited segments
+
+**[TRANSLATE-2465](https://jira.translate5.net/browse/TRANSLATE-2465): Add version parameter to instanttranslate and termportal assets** <br>
+The web assets (CSS and JS files) were not probably updated in termportal and instanttranslate after an update.
+
+**[TRANSLATE-2464](https://jira.translate5.net/browse/TRANSLATE-2464): Tag protection feature does not work if content contains XML comments or CDATA blocks** <br>
+The tag protection feature was not working properly if the content contains XML comments or CDATA blocks.
+
+**[TRANSLATE-2463](https://jira.translate5.net/browse/TRANSLATE-2463): Match analysis and batch worker fix** <br>
+Fixes that machine translation engines were queried to often with enabled batch quries and projects with multiple target languages and some other minor problems with match analysis and batch query workers.
+
+**[TRANSLATE-2461](https://jira.translate5.net/browse/TRANSLATE-2461): Non Public Plugin Classes referenced in public code** <br>
+Pure public translate5 installations were not usable due a code reference to non public code.
+
+**[TRANSLATE-2459](https://jira.translate5.net/browse/TRANSLATE-2459): Segments grid scroll-to uses private function** <br>
+Segments grid scroll to segment function improvement.
+
+**[TRANSLATE-2458](https://jira.translate5.net/browse/TRANSLATE-2458): Reenable logout on window close also for open id users** <br>
+Currently the logout on window close feature is not working for users logging in via OpenID connect.
+
+**[TRANSLATE-2457](https://jira.translate5.net/browse/TRANSLATE-2457): Globalese engines string IDs crash translate5 task import wizard** <br>
+Globalese may return also string based engine IDs, translate5 was only supporting integer ids so far.
+
+**[TRANSLATE-2431](https://jira.translate5.net/browse/TRANSLATE-2431): Errors on update with not configured mail server** <br>
+If there is no e-mail server configured, the update shows an error due missing SMTP config.
+
+
 ## [5.1.2] - 2021-03-31
 
 ### Important Notes:
