@@ -43,9 +43,9 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
     protected $qualityState = NULL;
     /**
      * 
-     * @var string
+     * @var editor_Models_Task
      */
-    protected $taskGuid = NULL;
+    protected $task = NULL;
     
     /**
      * sets the fields which should be filtered lowercase
@@ -57,29 +57,30 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
     /**
      * sets the quality filter. This is a "OR" filter that is handled seperately from the main filtering
      * @param editor_Models_Quality_RequestState $requestState
-     * @param string $taskGuid
+     * @param editor_Models_Task $task
      */
-    public function setQualityFilter(editor_Models_Quality_RequestState $requestState, string $taskGuid) {
+    public function setQualityFilter(editor_Models_Quality_RequestState $requestState, editor_Models_Task $task) {
         $this->qualityState = $requestState;
-        $this->taskGuid = $taskGuid;
+        $this->task = $task;
         // if a quality filter is applied we must filter the qualities so that normal users just see their qualities
-        if($requestState->hasUserRestriction()){
-            $existingFilter = null;
-            if($this->hasFilter('userGuid', $existingFilter)){
-                // if a user filter is set but it is not "our" user we invalidate it so no entries are returned
-                if($existingFilter->value != $requestState->getUserRestriction()){
-                    $existingFilter->value = '{INVALID}';
-                }
-            } else {
+        // this filtering is done in the main select and nod in the filtered segment-ids via ::getSegmentIdsForQualityFilter because it's much cheaper to do it there
+        if($this->qualityState->hasCheckedCategoriesByType() && $requestState->hasUserRestriction()){
+            // if the returned data is NULL this means, the state workflow does not justify filtering
+            $filteredSegmentNrs = $requestState->getUserRestrictedSegmentNrs($task);
+            if($filteredSegmentNrs !== NULL){                
                 $filter = new stdClass();
-                $filter->field = 'userGuid';
-                $filter->type = 'string';
-                $filter->comparison = 'eq';
-                $filter->value = $requestState->getUserRestriction();
+                $filter->field = 'segmentNrInTask';
+                if(count($filteredSegmentNrs) < 2){
+                    $filter->type = 'numeric';
+                    $filter->comparison = 'eq';
+                    // an empty segmentNr selection indicates no editable segments, we use the impossible nr -1 then
+                    $filter->value = (count($filteredSegmentNrs) == 1) ? $filteredSegmentNrs[0] : -1;
+                } else {
+                    $filter->type = 'list';
+                    $filter->comparison = 'in';
+                    $filter->value = $filteredSegmentNrs;
+                }
                 $this->addFilter($filter);
-                
-                // TODO AUTOQA: remove
-                error_log('editor_Models_Filter_SegmentSpecific: Filter for User '.$requestState->getUserRestriction());
             }
         }
     }
@@ -98,7 +99,7 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
             $conditions = [];
             if($this->qualityState->hasCheckedCategoriesByType()){
                 // Note: the quality state's user filter is handled with a filter on the segment table so we don't need it here
-                $segmentIds = editor_Models_Db_SegmentQuality::getSegmentIdsForQualityFilter($this->qualityState, $this->taskGuid);
+                $segmentIds = editor_Models_Db_SegmentQuality::getSegmentIdsForQualityFilter($this->qualityState, $this->task->getTaskGuid());
                 if(count($segmentIds) > 1){
                     $conditions[] = $adapter->quoteInto($colPrefix.'id IN (?)', $segmentIds, Zend_Db::INT_TYPE);
                 } else if(count($segmentIds) == 1){

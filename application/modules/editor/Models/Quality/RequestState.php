@@ -30,6 +30,7 @@ END LICENSE AND COPYRIGHT
  * Decodes the filter qualities sent by request
  * This is used for the qualities itself as well as the segment grid filter
  * The state is sent as a single string with the following "encoding": $quality_type1:$quality_category1,$quality_type2,$quality_type3:$quality_category3,...|$filter_mode
+ * NOTE: the user-restriction is not related to the Request obviously since it is session based but it is needed everywhere the other filters are needed ...
  */
 class editor_Models_Quality_RequestState {
     
@@ -54,16 +55,17 @@ class editor_Models_Quality_RequestState {
      */
     private $userGuid = null;
    
-    public function __construct(string $requestValue){
-        list($this->checked, $this->mode) = explode('|', $requestValue);
-        if(empty($this->mode)){
-            $this->mode = editor_Models_Quality_AbstractView::FILTER_MODE_DEFAULT;
+    public function __construct(string $requestValue=NULL){
+        if($requestValue != NULL && strpos($requestValue, '|') !== false){
+            list($this->checked, $this->mode) = explode('|', $requestValue);
+            if(empty($this->mode)){
+                $this->mode = editor_Models_Quality_AbstractView::FILTER_MODE_DEFAULT;
+            }
+            // filter various unwanted states of the checked qualities out
+            if(empty($this->checked) || $this->checked == 'NONE'|| $this->checked == 'root'){
+                $this->checked = '';
+            }
         }
-        // filter various unwanted states of the checked qualities out
-        if(empty($this->checked) || $this->checked == 'NONE'|| $this->checked == 'root'){
-            $this->checked = '';
-        }
-        // TODO AUTOQA: This seems incorrect filter for "editable segments"
         //  our user restriction, depends on if the user is a normal editor or pm/admin
         // TODO FIXME: This is so DIRTY, why is there no global user object (singleton) with API to provide such info ?
         $sessionUser = new Zend_Session_Namespace('user');
@@ -156,17 +158,27 @@ class editor_Models_Quality_RequestState {
         return ($this->getFalsePositiveRestriction() !== NULL);
     }
     /**
-     * Retrieves the needed restriction for the userGuid column of the related segment
-     * @return string|NULL
-     */
-    public function getUserRestriction() : ?string {
-        return $this->userGuid;
-    }
-    /**
      * Retrieves if we have a user restriction (by userGuid)
      * @return bool
      */
     public function hasUserRestriction() : bool {
         return ($this->userGuid != NULL);
+    }
+    /**
+     * 
+     * @param editor_Models_Task $task
+     * @return array|NULL
+     */
+    public function getUserRestrictedSegmentNrs(editor_Models_Task $task) : ?array {
+        if($this->userGuid != NULL){
+            $tua = editor_Models_Loaders_Taskuserassoc::loadByTaskForceWorkflowRole($this->userGuid, $task);
+            /* @var $tua editor_Models_TaskUserAssoc */
+            $role = $tua->getRole();
+            if(!$tua->isSegmentrangedTaskForRole($task, $role)){
+                return NULL;
+            }
+            return $tua->getAllAssignedSegmentsByUserAndRole($task->getTaskGuid(), $this->userGuid, $role);
+        }
+        return NULL;
     }
 }

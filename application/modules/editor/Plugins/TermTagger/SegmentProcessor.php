@@ -176,7 +176,7 @@ class editor_Plugins_TermTagger_SegmentProcessor {
                 $sourceText = $responseFields[$field]->source;
             }
             if(!array_key_exists($field, $responseFields)){
-                // TODO AUTOQA FIXME: proper exception
+                // TODO FIXME: proper exception
                 throw new ZfExtended_Exception('Response of termtagger did not contain the field "'.$field.'" for the segment ID '.$tags->getSegmentId());
             }
             $target->setTagsByText($responseFields[$field]->target);

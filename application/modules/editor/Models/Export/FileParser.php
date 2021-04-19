@@ -34,7 +34,6 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Enthält Methoden zum Fileparsing für den Export
- * TODO AUTOQA: generate internal tag errors from quality db and/or with new API
  */
 abstract class editor_Models_Export_FileParser {
     use editor_Models_Export_FileParser_MQMTrait;
@@ -364,6 +363,7 @@ abstract class editor_Models_Export_FileParser {
     
     /**
      * Compares the real tags (ignores whitespace tags) of a source and target string, track the differences between the both along the segmentNrInTask
+     * TODO AUTOQA: this can be done more precise with editor_Segment_FieldTags and editor_Segment_Internal_TagComparision
      * @param editor_Models_Segment $segment
      * @param string $target
      */

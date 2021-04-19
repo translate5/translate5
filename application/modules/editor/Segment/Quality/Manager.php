@@ -192,8 +192,7 @@ final class editor_Segment_Quality_Manager {
         // save qualities
         editor_Models_Db_SegmentQuality::saveRows($qualities);
         // remove segment tags model
-        // TODO AUTOQA REMOVE OUTCOMMENT
-        // editor_Models_Db_SegmentTags::removeByTaskGuid($task->getTaskGuid());
+        editor_Models_Db_SegmentTags::removeByTaskGuid($task->getTaskGuid());
         
         $db->getAdapter()->commit();
     }

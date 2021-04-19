@@ -172,8 +172,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     
     /**
      * Checks for segment repetititons and handles them if needed
-     * TODO AUTOQA: Do we need Quality Segment Processing here ?
-     * 
      * @param editor_Models_Segment $segment
      * @return stdClass
      */

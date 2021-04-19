@@ -716,8 +716,6 @@ Ext.define('Editor.controller.Segments', {
       var store = this.getSegmentsStore();
       // the store checks if the filter actually changed and we adjut the view only if requested
       if(store.setQualityFilter(filter)){
-          // TODO AUTOQA remove
-          console.log('UPDATE GRID DUE TO QUALITIES: ', filter);
           this.isQualityFiltered = (filter && filter != '');
           store.removeAll();
           store.reload();

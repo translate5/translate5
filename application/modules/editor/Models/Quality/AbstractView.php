@@ -127,7 +127,7 @@ abstract class editor_Models_Quality_AbstractView {
      * The restriction for the current user
      * @var string
      */
-    protected $userGuidRestriction = NULL;
+    protected $segmentNrRestriction = NULL;
     /**
      * 
      * @param editor_Models_Task $task
@@ -149,8 +149,13 @@ abstract class editor_Models_Quality_AbstractView {
             $requestState = new editor_Models_Quality_RequestState($currentState);
             $this->checkedQualities = $requestState->getCheckedList();
             $this->falsePositiveRestriction = $requestState->getFalsePositiveRestriction();
-            // TODO AUTOQA: This seems incorrect filter for "editable segments"
-            $this->userGuidRestriction = $requestState->getUserRestriction();
+            // The qualities may have to be limited to the visible segment-nrs for the current editor
+            $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs($this->task);
+            
+        } else if($this->isTree){
+            // In tree mode we need the user-restriction of the state also when no filtered state was send
+            $requestState = new editor_Models_Quality_RequestState('');
+            $this->segmentNrRestriction = $requestState->getUserRestrictedSegmentNrs($this->task);
         }
         $blacklist = NULL;
         if($onlyFilterTypes){
@@ -173,10 +178,9 @@ abstract class editor_Models_Quality_AbstractView {
             true,
             NULL,
             $this->falsePositiveRestriction,
-            $this->userGuidRestriction,
+            $this->segmentNrRestriction,
             ['type ASC','category ASC']);
         
-        // TODO AUTOQA: remove
         // error_log('PRESETS: '.print_r($this->checkedQualities, true).' / falsePositives:'.$this->falsePositiveRestriction.' / DBrows: '.count($this->dbRows));
      
         $this->create();

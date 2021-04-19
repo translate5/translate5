@@ -178,17 +178,26 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param string|array $order
      * @return Zend_Db_Table_Rowset_Abstract
      */
-    public function fetchFiltered(string $taskGuid=NULL, $segmentIds=NULL, string $field=NULL, $types=NULL, bool $typesIsBlacklist=false, $categories=NULL, int $falsePositive=NULL, string $userGuid=NULL, $order=NULL) : Zend_Db_Table_Rowset_Abstract {
+    public function fetchFiltered(string $taskGuid=NULL, $segmentIds=NULL, string $field=NULL, $types=NULL, bool $typesIsBlacklist=false, $categories=NULL, int $falsePositive=NULL, array $segmentNrs=NULL, $order=NULL) : Zend_Db_Table_Rowset_Abstract {
         $prefix = '';
         $select = $this->select();
-        // if a userGuid restriction is set we have to join with the segment table
-        // TODO AUTOQA: This seems incorrect filter for "editable segments"
-        if(!empty($userGuid)){
-            $prefix = 'qualities.';
-            $select
-                ->from(['qualities' => $this->_name])
-                ->join(['segments' => 'LEK_segments'], $prefix.'segmentId = segments.id', [])
-                ->where('segments.userGuid = ?', $userGuid);
+        // if a segmentNrs restriction is set we have to join with the segment table
+        if($segmentNrs !== NULL){
+            if(count($segmentNrs) > 0){
+                $prefix = 'qualities.';
+                $select
+                    ->from(['qualities' => $this->_name])
+                    ->join(['segments' => 'LEK_segments'], $prefix.'segmentId = segments.id', []);
+                if(count($segmentNrs) > 1){
+                    $select->where('segments.segmentNrInTask IN (?)', $segmentNrs);
+                } else {
+                    $select->where('segments.segmentNrInTask = ?', $segmentNrs[0]);
+                }
+            } else {
+                // an empty array means the user has no segments to edit and thus disables the filter
+                $select->where('0 = 1');
+            }
+            
         }
         if(!empty($taskGuid)){
             $select->where($prefix.'taskGuid = ?', $taskGuid);
