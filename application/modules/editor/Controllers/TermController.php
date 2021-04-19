@@ -78,7 +78,7 @@ class editor_TermController extends ZfExtended_RestController
         //todo: Sinisa, handle new TransacGrp
         //handle the term transac group attributes (modification/creation)
         /* @var $transacGrp editor_Models_Terminology_Models_TransacgrpModel */
-//        $transacGrp->handleTransacGroup($this->entity);
+        $transacGrp = $transacGrp->handleTransacGroup($this->entity);
 
         $attribute = ZfExtended_Factory::get('editor_Models_Terminology_Models_AttributeModel');
         /* @var $attribute editor_Models_Terminology_Models_AttributeModel */
@@ -276,7 +276,7 @@ class editor_TermController extends ZfExtended_RestController
         // todo: Sinisa, handle transacGrp
         $transacGrp = ZfExtended_Factory::get('editor_Models_Terminology_Models_TransacgrpModel');
         /* @var $transacGrp editor_Models_Terminology_Models_TransacgrpModel */
-        $transacGrp->handleTransacGroup($entry);
+        $transacGrp = $transacGrp->handleTransacGroup($entry);
     }
 
     /**
