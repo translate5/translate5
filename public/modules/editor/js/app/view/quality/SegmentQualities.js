@@ -40,6 +40,7 @@ Ext.define('Editor.view.quality.SegmentQualities', {
     cls: 'segmentQualities',
     defaultType: 'checkbox',
     hidden: true,
+    isActive: false,
     initConfig: function(instanceConfig) {
         var config = {
             title: this.title
@@ -56,16 +57,32 @@ Ext.define('Editor.view.quality.SegmentQualities', {
      * @param {boolean} isActive: if the component is active
      */
     startEditing: function(records, segmentId, isActive){
-        var added = false;
+        this.isActive = isActive;
         if(isActive && records.length > 0){
-            this.removeAll();
-            Ext.each(records, function(record){
-                if(record.get('falsifiable')){
-                    this.addCheckbox(record);
-                    added = true;
-                }
-            }, this);
+            this.createCheckboxes(records);
         }
+    },
+    /**
+     * Updates our view after a store change
+     * For simplicity we simply recreate it
+     */
+    rebuildByRecords: function(records){
+        if(this.isActive){
+            this.createCheckboxes(records);
+        }
+    },
+    /**
+     * Creates our GUI
+     */
+    createCheckboxes: function(records){
+        var added = false;
+        this.removeAll();
+        Ext.each(records, function(record){
+            if(record.get('falsifiable')){
+                this.addCheckbox(record);
+                added = true;
+            }
+        }, this);
         if(added){
             this.show();
         } else {

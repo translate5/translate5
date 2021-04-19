@@ -125,18 +125,19 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
      * @param string $action
      * @return stdClass
      */
-    public static function addOrRemoveQmForSegment(string $taskGuid, int $segmentId, int $qmCategoryIndex, string $action) : stdClass {
+    public static function addOrRemoveQmForSegment(editor_Models_Task $task, int $segmentId, int $qmCategoryIndex, string $action) : stdClass {
         $result = new stdClass();
-        $result->success = 0;
+        $result->success = false;
+        $result->qualityId = null;
+        $result->qualityRow = null;
         $table = ZfExtended_Factory::get('editor_Models_Db_SegmentQuality');
-        $category = editor_Segment_Qm_Provider::createCategoryVal($qmCategoryIndex);
         /* @var $table editor_Models_Db_SegmentQuality */
+        $category = editor_Segment_Qm_Provider::createCategoryVal($qmCategoryIndex);
         if($action == 'remove'){
-            $rows = $table->fetchFiltered($taskGuid, $segmentId, NULL, editor_Segment_Tag::TYPE_QM, false, $category);
+            $rows = $table->fetchFiltered($task->getTaskGuid(), $segmentId, NULL, editor_Segment_Tag::TYPE_QM, false, $category);
             if(count($rows) == 1){
-                $result->row = new stdClass();
-                $result->row->id = $rows[0]->id;
-                $result->success = 1;
+                $result->qualityId = $rows[0]->id;
+                $result->success = true;
                 $rows[0]->delete();                
                 return $result;
             }
@@ -144,14 +145,15 @@ class editor_Models_Db_SegmentQuality extends Zend_Db_Table_Abstract {
             $row = $table->createRow();
             /* @var $row editor_Models_Db_SegmentQualityRow */
             $row->segmentId = $segmentId;
-            $row->taskGuid = $taskGuid;
+            $row->taskGuid = $task->getTaskGuid();
             $row->type = editor_Segment_Tag::TYPE_QM;
             $row->category = $category;
             $row->categoryIndex = $qmCategoryIndex;
             $row->save();
             // this will be the base for the returned data model in the quality controller
-            $result->row = (object) $row->toArray();
-            $result->success = 1;
+            $result->qualityId = $row->id;
+            $result->qualityRow = $row;
+            $result->success = true;
             return $result;
         }
         return $result;
