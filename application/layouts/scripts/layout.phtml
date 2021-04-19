@@ -71,85 +71,11 @@ $config = Zend_Registry::get('config');
                     <a href="https://www.translate5.net/" target="_blank" class="logo"><img src="<?php echo APPLICATION_RUNDIR;?>/images/translate5-transparent.png" alt="translate5" /></a>
                 </div>
             </header>
-
-            <style>
-                .float-container {
-                    border: 3px solid #fff;
-                    padding: 20px;
-                }
-
-                .float-child {
-                    width: 50%;
-                    float: left;
-                }
-                .right-consortium img{
-                    width: 100%;
-                }
-                .left-consortium img{
-                    width: 100%;
-                }
-                .powered-text{
-                    color: #009de1;
-                    font-family: Open Sans,Arial,sans-serif;
-                    font-size: 15px;
-                    font-weight: 400;
-                    margin-bottom: -10px;
-                    margin-top: -10px;
-                }
-
-                @media screen and (max-width: 800px) {
-                    .float-child {
-                        width:auto;
-                    }
-                    #wrapper {
-                        padding-top: 10em;
-                    }
-                    .post > header {
-                        padding-top: 10px;
-                        padding-bottom: 10px;
-                    }
-                    .post > header .title{
-                        padding-bottom: 0px;
-                        margin-bottom: 0px;
-                    }
-
-                    @media screen and (max-width: 550px) {
-                        .float-child {
-                            width:auto;
-                        }
-                        #wrapper {
-                            padding-top: 6em;
-                        }
-                        .post > header {
-                            padding-top: 10px;
-                            padding-bottom: 10px;
-                        }
-                        .post > header .title{
-                            padding-bottom: 0px;
-                            margin-bottom: 0px;
-                        }
-                    }
-            </style>
-            <div class="float-container">
-                <div class="powered-text">
-                    <label class="powered-text">Powered by translate5 Consortium:</label>
-                </div>
-                <div class="float-child">
-                    <div class="left-consortium">
-                        <img src="https://www.translate5.net/wp-content/uploads/header-konsortium-links-hr.jpg"
-                             alt="translate5 consortium"
-                        >
-                    </div>
-                </div>
-
-                <div class="float-child">
-                    <div class="right-consortium">
-                        <img src="https://www.translate5.net/wp-content/uploads/header-konsortium-rechts-hr.jpg"
-                             alt="translate5 consortium"
-                        >
-                    </div>
-                </div>
-            </div>
+            <?php
+            if($this->getScriptPath('fragments/header-consortium-logos.phtml')) {
+                echo $this->render('fragments/header-consortium-logos.phtml');
+            }
+            ?>
 
             <div id="wrapper">
             <div id="main">
