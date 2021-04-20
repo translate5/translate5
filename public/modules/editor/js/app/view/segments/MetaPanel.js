@@ -92,8 +92,8 @@ Ext.define('Editor.view.segments.MetaPanel', {
                   itemId: 'segmentQm',
                   collapsible: true
               },{
-                  xtype: 'segmentQualities',
-                  itemId: 'segmentQualities',
+                  xtype: 'falsePositives',
+                  itemId: 'falsePositives',
                   collapsible: true
               },{
                   xtype: 'fieldset',

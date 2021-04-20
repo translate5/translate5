@@ -49,15 +49,15 @@ END LICENSE AND COPYRIGHT
  * Starting the save chain is done calling "saveChainStart".
  * 
  * The following Methods belongs to the save chain:
- * saveChainStart (accepts config with one time bindings to events "chainEnd" and "segmentUsageFinished")
+ * saveChainStart (accepts config with one time bindings to events "segmentEditSaved" and "segmentUsageFinished")
  * saveChainCheckAlikes
  * saveChainSave (fires event "afterSaveCall", returning false in the event prevents next step)
  * saveChainSaveCallback (fires event "saveComplete", returning false in the event prevents next step)
- * saveChainEnd (fires event "chainEnd")
+ * saveChainEnd (fires event "segmentEditSaved")
  * 
  * additional events:
- * segmentUsageFinished: called once after change alike handling or on chainEnd, if bound by config not called in case of an error on completing the editor
- * chainEnd: called at the very end of the save process, if bound by config not called in case of an error on completing the editor
+ * segmentUsageFinished: called once after change alike handling or on segmentEditSaved, if bound by config not called in case of an error on completing the editor
+ * segmentEditSaved: called at the very end of the save process, if bound by config not called in case of an error on completing the editor
  * 
  * The ChangeAlike Controller hooks into the save chain, @see Editor.controller.ChangeAlike
  * 
@@ -134,7 +134,8 @@ Ext.define('Editor.controller.Segments', {
           '#segmentgrid' : {
               afterrender: 'gridAfterRender',
               columnhide: 'handleColumnVisibility',
-              columnshow: 'handleColumnVisibility'
+              columnshow: 'handleColumnVisibility',
+              canceledit:'handleCancelEdit'
           },
           '#fileorderTree': {
               itemclick: 'handleFileClick'
@@ -476,7 +477,7 @@ Ext.define('Editor.controller.Segments', {
    * blocks with a loading mask if another savechain is running
    * next step in chain: saveChainCheckAlikes
    * @param {Object} config possible values are: 
-   *    chainEnd: callback method called ONCE after finishing the save chain
+   *    segmentEditSaved: callback method called ONCE after finishing the save chain
    *    segmentUsageFinished: callback method called ONCE after finishing the usage of the currently loaded segment
    *    scope: the scope of the given callbacks 
    */
@@ -512,8 +513,8 @@ Ext.define('Editor.controller.Segments', {
       //same again after segment was saved successfully
 
       //the following handlers should only be bound if no 
-      if(config.chainEnd && Ext.isFunction(config.chainEnd)) {
-          me.on('chainEnd', config.chainEnd, (config.scope || me), {single: true});
+      if(config.segmentEditSaved && Ext.isFunction(config.segmentEditSaved)) {
+          me.on('segmentEditSaved', config.segmentEditSaved, (config.scope || me), { single: true });
       }
       if(config.segmentUsageFinished && Ext.isFunction(config.segmentUsageFinished)) {
           me.on('segmentUsageFinished', config.segmentUsageFinished, (config.scope || me), {single: true});
@@ -673,14 +674,14 @@ Ext.define('Editor.controller.Segments', {
   
   /**
    * End of the save chain.
-   * fires event "chainEnd".
+   * fires event "segmentEditSaved".
    */
   saveChainEnd: function() {
       var me = this;
       me.delLoadMask();
       me.saveChainMutex = false;
       me.onSegmentUsageFinished();
-      me.fireEvent('chainEnd', me);
+      me.fireEvent('segmentEditSaved', me);
   },
   addLoadMask: function() {
       var me = this;
@@ -708,6 +709,14 @@ Ext.define('Editor.controller.Segments', {
 	  	vm = grid.getViewModel(),
 	  	value = Ext.isNumber(record) ? record : record.get('segmentFinishCount');
 	  vm.set('segmentFinishCount',value);
+  },
+  /**
+   * Handles the cancel edit of the segment grid
+   * Some View Controllers like qualities FilterPanelController can not listen to the #segmentgrid directly but can listen to this controller (Why???) so we forward the event
+   * Generally it would be great to have all events regarding segment editing being dispatched from one source which većentralizes them
+   */
+  handleCancelEdit(){
+      this.fireEvent('segmentEditCanceled', this);
   },
   /**
    * Listens to the filter panel controller and delegates it to our store and changes the view if the stored filter changed

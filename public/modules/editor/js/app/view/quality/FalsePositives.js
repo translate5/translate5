@@ -29,14 +29,14 @@ END LICENSE AND COPYRIGHT
 /**
  * Shows the Qualities for a Segment and enables to set those as false positive or not
  */
-Ext.define('Editor.view.quality.SegmentQualities', {
+Ext.define('Editor.view.quality.FalsePositives', {
     extend: 'Ext.form.FieldSet',
-    alias: 'widget.segmentQualities',
+    alias: 'widget.falsePositives',
     title: "#UT#QA: Falsch-Positive",
     requires: [
-        'Editor.view.quality.SegmentQualitiesController'        
+        'Editor.view.quality.FalsePositivesController'        
     ],
-    controller: 'segmentQualities',
+    controller: 'falsePositives',
     cls: 'segmentQualities',
     defaultType: 'checkbox',
     hidden: true,

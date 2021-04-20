@@ -32,13 +32,14 @@ END LICENSE AND COPYRIGHT
  * This contradicts the behaviour of the other panels in the east panel, which only save on commit of the editor
  * For qualities with tags visible in the HtmlEditor the change is done via Ajax AND in the HtmlEditor so it is done when saving or canceling the edit
  */
-Ext.define('Editor.view.quality.SegmentQualitiesController', {
+Ext.define('Editor.view.quality.FalsePositivesController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.segmentQualities',
+    alias: 'controller.falsePositives',
     listen: {
         store: {
             '#SegmentQualities': {
-                datachanged: 'onQualitiesChanged'
+                add: 'onQualitiesChanged',
+                remove: 'onQualitiesChanged'
             }
         }
     },
@@ -92,6 +93,10 @@ Ext.define('Editor.view.quality.SegmentQualitiesController', {
                 });
                 return true;
             }
+            // if not found in the html-editor we search in the other contents of the html-editor
+            
+            
+            // TODO
         }
         // TODO AUTOQA: try to change in other columns of segmentroweditor / #roweditor
         return false;

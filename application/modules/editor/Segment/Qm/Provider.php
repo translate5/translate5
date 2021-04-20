@@ -78,4 +78,8 @@ class editor_Segment_Qm_Provider extends editor_Segment_Quality_Provider {
         // not worth an exception, should not happen if configuration correct
         return 'UNKNOWN QM-TYPE '.$categoryIndex;
     }
+    
+    public function hasSegmentTags() : bool {
+        return false;
+    }
 }
