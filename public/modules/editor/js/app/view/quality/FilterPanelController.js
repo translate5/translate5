@@ -33,18 +33,25 @@ Ext.define('Editor.view.quality.FilterPanelController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.qualityFilterPanel',
     delayedChange: null,
-    qualitiesShown: false,
+    panelShown: false,
     preventNextFilterUpdate: false, // prevents the next filter update
     currentFilterVal: null,
+    qualitiesChanged: false,
     listen: {
         controller: {
             '#Segments': {
-                chainEnd: 'onSegmentSaved'
+                segmentEditSaved: 'onSegmentSaved',
+                segmentEditCanceled: 'onSegmentCanceled'
             }
         },
         store: {
             '#FilterQualities': {
-                load: 'onStoreLoaded'
+                load: 'onFilterStoreLoaded'
+            },
+            '#SegmentQualities': {
+                add: 'onSegQualStoreChanged',
+                remove: 'onSegQualStoreChanged',
+                update: 'onSegQualStoreChanged'
             }
         }
     },
@@ -101,14 +108,26 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         console.log('onAnalysisButtonClick: ', btn);
     },
     /**
-     * Called onsaving of segments (incl. alikes). We refresh our store then without updating the filtered grid if we are visible /show qualities
+     * Called on saving of segments (incl. alikes). We refresh our store then without updating the filtered grid if we are visible /show qualities
      */
     onSegmentSaved: function(){
         // we only refresh when being shown
-        if(this.qualitiesShown){
+        if(this.panelShown){
             this.preventNextFilterUpdate = true;
             this.loadFilteredStrore(this.getFilterValue(true, null));
         }
+        this.qualitiesChanged = false;
+    },
+    /**
+     * Called on a canceled segment edit
+     */
+    onSegmentCanceled: function(){
+        // after a cancled edit we only refresh if we are shown and the store has changed
+        if(this.panelShown && this.qualitiesChanged){
+            this.preventNextFilterUpdate = true;
+            this.loadFilteredStrore(this.getFilterValue(true, null));
+        }
+        this.qualitiesChanged = false;
     },
     /**
      * Prevents an item being checked when it has no qualities
@@ -135,7 +154,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
     /**
      * Handles showing the loaded store & firing the filter event
      */
-    onStoreLoaded: function(store){
+    onFilterStoreLoaded: function(store){
         var me = this, view = this.getView();
         store.getRootNode().expand();
         view.afterLoad();
@@ -144,7 +163,15 @@ Ext.define('Editor.view.quality.FilterPanelController', {
             me.updateFilter(true);
         });
         me.delayedChange.delay(250);
-        this.qualitiesShown = true;
+        this.panelShown = true;
+    },
+    /**
+     * Listen's to changes in the segments qualities store
+     * These changes could originate from the segmentQm or the falsePositives panel
+     * We have to refresh the qualities filterPanel if changes occured (if we are shown)
+     */
+    onSegQualStoreChanged: function(store){
+        this.qualitiesChanged = this.panelShown;
     },
     /**
      * Loads the qualities before the panel is expanded or if a uncollapsed state is applied (to catch an initially open panel)
@@ -170,7 +197,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         if(doUpdateGrid){
             this.fireEvent('qualityFilterChanged', '');
         }
-        this.qualitiesShown = false;
+        this.panelShown = false;
     },
     
     /**
@@ -187,7 +214,7 @@ Ext.define('Editor.view.quality.FilterPanelController', {
      * Unchecks all Checkboxes
      */
     uncheckAll: function(){
-        if(this.qualitiesShown){
+        if(this.panelShown){
             Ext.Array.each(this.getView().getChecked(), function(record){
                 record.set('checked', false);
             });

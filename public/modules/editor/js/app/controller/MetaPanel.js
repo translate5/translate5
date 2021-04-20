@@ -41,7 +41,7 @@ Ext.define('Editor.controller.MetaPanel', {
   extend : 'Ext.app.Controller',
   requires: [
       'Editor.view.quality.mqm.Fieldset',
-      'Editor.view.quality.SegmentQualities',
+      'Editor.view.quality.FalsePositives',
       'Editor.view.quality.SegmentQm',
       'Editor.store.quality.Segment' ],
   models: ['SegmentUserAssoc'],
@@ -57,8 +57,8 @@ Ext.define('Editor.controller.MetaPanel', {
     ref : 'metaQmPanel',
     selector : '#metapanel #segmentQm'
   },{
-    ref : 'metaQualitiesPanel',
-    selector : '#metapanel #segmentQualities'
+    ref : 'metaFalPosPanel',
+    selector : '#metapanel #falsePositives'
   },{
     ref : 'segmentMeta',
     selector : '#metapanel segmentsMetapanel'
@@ -105,7 +105,7 @@ Ext.define('Editor.controller.MetaPanel', {
    */
   hasQmQualities: false,
   /**
-   * The store holding the segments qualiies. Data source for the segmentQualities panel and the segmentQm panel
+   * The store holding the segments qualiies. Data source for the falsePositives panel and the segmentQm panel
    */
   qualitiesStore: null,
   /**
@@ -195,7 +195,7 @@ Ext.define('Editor.controller.MetaPanel', {
       // for cases where user is faster than store
       if(this.editingMode == 'edit'){
           var segmentId = this.record.get('id');
-          this.getMetaQualitiesPanel().startEditing(records, segmentId, true);
+          this.getMetaFalPosPanel().startEditing(records, segmentId, true);
           this.getMetaQmPanel().startEditing(records, segmentId, this.hasQmQualities);
       } else {
           store.removeAll(true);
@@ -262,7 +262,7 @@ Ext.define('Editor.controller.MetaPanel', {
       this.record.set('stateId', metaForm.getValues().stateId);
       //close the metapanel
       metaPanel.disable();
-      this.getMetaQualitiesPanel().endEditing(true, true);
+      this.getMetaFalPosPanel().endEditing(true, true);
       this.getMetaQmPanel().endEditing(this.hasQmQualities, true);
       this.getQualitiesStore().removeAll(true);
       this.editingMode = 'none';
@@ -271,9 +271,9 @@ Ext.define('Editor.controller.MetaPanel', {
    * Editor.view.segments.RowEditing canceledit handler
    * @hint metapanel
    */
-  cancelEdit: function() {        
+  cancelEdit: function() {
       this.getMetaPanel().disable();
-      this.getMetaQualitiesPanel().endEditing(true, false);
+      this.getMetaFalPosPanel().endEditing(true, false);
       this.getMetaQmPanel().endEditing(this.hasQmQualities, false);
       this.getQualitiesStore().removeAll(true);
       this.editingMode = 'none';
