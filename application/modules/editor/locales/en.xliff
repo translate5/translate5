@@ -4005,6 +4005,15 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source>
   <target>The parameter login containing the desired username is missing.</target>
 </trans-unit>
+<trans-unit id='U2VyYmlzY2ggKExhdGVpbiBTZXJiaWVuKQ=='><source>Serbisch (Latein Serbien)</source><target>Serbian (Latin Serbia)</target></trans-unit>
+<trans-unit id='U29tYWxpIChTb21hbGlhKQ=='><source>Somali (Somalia)</source><target>Somali (Somalia)</target></trans-unit>
+<trans-unit id='QW1oYXJpc2NoICjDhHRoaW9waWVuKQ=='><source>Amharisch (Äthiopien)</source><target>Amharic (Ethiopia)</target></trans-unit>
+<trans-unit id='UsOkdG9yb21hbmlzY2ggKFNjaHdlaXop'><source>Rätoromanisch (Schweiz)</source><target>Romansh (Switzerland)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFZlcmVpbmlndGUgU3RhYXRlbik='><source>Spanisch (Vereinigte Staaten)</source><target>Spanish (United States)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKExhdGVpbmFtZXJpa2EgdW5kIEthcmliaWsp'><source>Spanisch (Lateinamerika und Karibik)</source><target>Spanish (Latin America and the Caribbean)</target></trans-unit>
+<trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbiBBc2VyYmFpZHNjaGFuKQ=='><source>Aserbaidschanisch (Latein Aserbaidschan)</source><target>Azerbaijani (Latin Azerbaijan)</target></trans-unit>
+<trans-unit id='VXNiZWtpc2NoIChMYXRlaW4gVXNiZWtpc3Rhbik='><source>Usbekisch (Latein Usbekistan)</source><target>Uzbek (Latin Uzbekistan)</target></trans-unit>
+<trans-unit id='Qm9zbmlzY2ggKExhdGVpbiBCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Bosnisch (Latein Bosnien und Herzegowina)</source><target>Bosnian (Latin Bosnia and Herzegovina)</target></trans-unit>
 </body>
   </file>
 </xliff>
