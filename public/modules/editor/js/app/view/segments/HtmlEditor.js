@@ -284,28 +284,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     return result;
   },
   /**
-   * Finds Elements in the current Markup
-   * @param nodeName {String} the relevant node-name of the serched elements
-   * @param classNames {Array,String} like [class1, ..., classN] OR String the relevant class/classes of the searched elements
-   * @param dataProps {Array} like [{ name:'name1', value:'val1' }, ..., { name:'nameN', value:'valN' }] the relevant data-properties of the searched elements
-   * @return NodeList: list with elements or false if not found
+   * Finds Elements in the current Markup by Selector
+   * @return NodeList|bool: list with elements or false if not found
    */
-  getElementsByProps(nodeName, classNames, dataProps){
-      var body = this.getEditorBody(), selector = (nodeName) ? nodeName : '';
+  getElementsBySelector(selector){
+      var body = this.getEditorBody();
       if(!body){
           return false;
       }
-      if(classNames){
-          selector += (Array.isArray(classNames)) ? ('.' + classNames.join('.')) : ('.' + classNames.split(' ').join('.'));
-      }
-      if(dataProps && Array.isArray(dataProps)){
-          dataProps.forEach(function(prop){
-              if(prop.name && prop.value){
-                  selector += ("[data-" + prop.name + "='" + prop.value + "']");
-              }
-          });
-      }
-      if(selector != ''){
+      if(selector){
           return body.querySelectorAll(selector);
       }
       return false;

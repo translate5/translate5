@@ -78,27 +78,38 @@ Ext.define('Editor.view.quality.FalsePositivesController', {
      */
     decorateFalsePositive: function(record, qualityId, checked){
         // reference to htmlEditor is somehow dirty, may add a global API to achieve this ? Hint: we're created too late to catch the HtmlEditors init event
-        var htmlEditor = Editor.app.getController('Editor').htmlEditor, fpc = this.falsePositiveCssClass, cfpc;
+        var htmlEditor = Editor.app.getController('Editor').htmlEditor,
+            selector = Editor.util.Util.createSelectorFromProps(null, record.get('cssClass'), [{ name: this.qualityIdDataName, value: qualityId }]);
         if(htmlEditor){
             // quirk: we can not use the tag-name because in the html-editor-markup these may are changed
-            var elements = htmlEditor.getElementsByProps(null, record.get('cssClass'), [{ name: this.qualityIdDataName, value: qualityId }]);
-            if(elements && elements.length > 0){
-                elements.forEach(function(element){
-                    cfpc = element.classList.contains(fpc);
-                    if(checked && !cfpc){
-                        element.classList.add(fpc);
-                    } else if(!checked && cfpc){
-                        element.classList.remove(fpc);
-                    }
-                });
+            if(this.decorateElements(htmlEditor.getElementsBySelector(selector), checked)){
                 return true;
             }
-            // if not found in the html-editor we search in the other contents of the html-editor
-            
-            
-            // TODO
         }
-        // TODO AUTOQA: try to change in other columns of segmentroweditor / #roweditor
+        // if not found in the html-editor we search in the other contents of the html-editor. This is only for optical reasons
+        htmlEditor = Ext.ComponentQuery.query('#roweditor')[0];
+        if(htmlEditor){
+            elements = htmlEditor.getEl().dom.querySelectorAll('.segment-tag-container ' + selector);
+            return this.decorateElements(elements, checked);
+        }
+        return false;
+    },
+    /**
+     * Decorates a list of elements with the false-positive decorators
+     */
+    decorateElements: function(elements, checked){
+        var fpc = this.falsePositiveCssClass, cfpc;
+        if(elements && elements.length > 0){
+            elements.forEach(function(element){
+                cfpc = element.classList.contains(fpc);
+                if(checked && !cfpc){
+                    element.classList.add(fpc);
+                } else if(!checked && cfpc){
+                    element.classList.remove(fpc);
+                }
+            });
+            return true;
+        }
         return false;
     }
 });
