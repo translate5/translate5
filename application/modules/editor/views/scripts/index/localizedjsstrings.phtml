@@ -269,6 +269,20 @@ Ext.define('Editor.controller.Localizer', {
     };
     Editor.view.quality.SegmentQm.prototype.title = '<?php echo $this->translate->_('QM');?>';
     Editor.view.quality.FalsePositives.prototype.title = '<?php echo $this->translate->_('QA: Falsch-Positive');?>';
+    Editor.view.quality.admin.TaskQualities.prototype.title = '<?php echo $this->translate->_('Qualitätssicherung');?>';
+  	Editor.view.quality.admin.TaskQualities.prototype.strings = {
+		category: '<?php echo $this->translate->_('Kategorie');?>',
+        total: '<?php echo $this->translate->_('Anzahl');?>',
+        errors: '<?php echo $this->translate->_('Fehler');?>',
+        falsePositives: '<?php echo $this->translate->_('Falsch positive');?>',
+        status: '<?php echo $this->translate->_('Status');?>',
+        completeTipCaption: '<?php echo $this->translate->_('Vollständig analysiert');?>',
+        incompleteTipCaption: '<?php echo $this->translate->_('Unvollständig analysiert');?>',
+        incompleteTipText: '<?php echo $this->translate->_('Die Qualität wurde nicht oder nur unvollständig analysiert. Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben');?>',
+        faultyTipCaption: '<?php echo $this->translate->_('Interner Tag Fehler');?>',
+        faultyTipText: '<?php echo $this->translate->_('Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern');?>',
+        newAnalysis: '<?php echo $this->translate->_('Neu analysieren');?>',
+	};
     
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';

@@ -222,7 +222,9 @@ Ext.define('Editor.view.quality.FilterPanelController', {
         this.currentFilterVal = null;
     },
     /**
-     * Creates the filte value
+     * Creates the filter value which encodes the checked qualities as well as the current filter mode
+     * Note, that for filtering the grid we do not add entries for checked rubrics while for a reload of the filter panel we do.
+     * Also note, that en empty selection is marked with 'NONE', see backend code
      */
     getFilterValue: function(forStoreReload, modeVal){
         var checkedVals = [];

@@ -48,6 +48,11 @@ abstract class editor_Models_Quality_AbstractView {
      */
     const FILTER_MODE_DEFAULT = 'all';
     /**
+     * Only for frontend development: If true, the incompleteness & faultyness of quality types will be added to be able to test the frontends more easy
+     * @var boolean
+     */    
+    const EMULATE_PROBLEMS = false;
+    /**
      * 
      * @param stdClass $a
      * @param stdClass $b
@@ -56,7 +61,6 @@ abstract class editor_Models_Quality_AbstractView {
     public static function compareByTitle(stdClass $a, stdClass $b){
         return strnatcasecmp($a->text, $b->text);
     }
-   
     /**
      * @var editor_Models_Task
      */
@@ -98,10 +102,17 @@ abstract class editor_Models_Quality_AbstractView {
      */
     protected $numQualities = 0;
     /**
+     * Configures the generated data
      * @var boolean
      */
     protected $isTree = false;
     /**
+     * Configures the generated data (currently unused)
+     * @var boolean
+     */
+    protected $hasNumFalsePositives = false;
+    /**
+     * Configures the generated data (currently unused)
      * @var boolean
      */
     protected $hasSegmentIds = false;
@@ -251,6 +262,9 @@ abstract class editor_Models_Quality_AbstractView {
             /* @var $row editor_Models_Db_SegmentQualityRow */
             if(array_key_exists($row->type, $this->rowsByType)){
                 $this->rowsByType[$row->type][self::RUBRIC]->qcount++;
+                if($this->hasNumFalsePositives && $row->falsePositive == 1){
+                    $this->rowsByType[$row->type][self::RUBRIC]->qcountfp++;
+                }
                 if($this->isTree){
                     if(!array_key_exists($row->category, $this->rowsByType[$row->type])){
                         $this->rowsByType[$row->type][$row->category] = $this->createCategoryRow($row, false);
@@ -258,6 +272,9 @@ abstract class editor_Models_Quality_AbstractView {
                     $this->rowsByType[$row->type][$row->category]->qcount++;
                     if($this->hasSegmentIds){
                         $this->rowsByType[$row->type][$row->category]->segmentIds[] = $row->segmentId;
+                    }
+                    if($this->hasNumFalsePositives && $row->falsePositive == 1){
+                        $this->rowsByType[$row->type][$row->category]->qcountfp++;
                     }
                 }
                 $this->numQualities++;
@@ -271,7 +288,7 @@ abstract class editor_Models_Quality_AbstractView {
         $this->createRows($rubrics);
     }
     /**
-     * Hook to create the result rows
+     * Create the resulting view out of the database data
      * @param stdClass[] $rubrics
      */
     protected function createRows(array $rubrics){
@@ -291,77 +308,20 @@ abstract class editor_Models_Quality_AbstractView {
                             $rubric->children[] = $row;
                         }
                     }
-                }                
+                } 
+                $this->finalizeTree($rubric);
+            } else {
+                if($rubric->qtype == editor_Segment_Tag::TYPE_INTERNAL){
+                    if(self::EMULATE_PROBLEMS){
+                        $rubric->qcomplete = false;
+                        $rubric->qfaulty = true;
+                    } else if($this->hasFaultyInternalTags){
+                        $rubric->qfaulty = true;
+                    }
+                }
             }
-            $this->finalizeTree($rubric);
             $this->rows[] = $rubric;
         }
-    }
-    /**
-     * Creates a rubric row
-     * @param string $type
-     * @return stdClass
-     */
-    protected function createRubricRow(string $type) : stdClass {
-        $row = new stdClass();
-        $row->qid = -1;
-        $row->qtype = $type;
-        $row->qcount = 0;
-        $row->qcomplete = $this->manager->isFullyCheckedType($type, $this->taskConfig);
-        if($this->isTree){
-            $row->children = [];
-            $row->qcategory = NULL;
-        }
-        if($this->hasSegmentIds){
-            $row->segmentIds = [];
-        }
-        $row->text = $this->manager->translateQualityType($type);
-        return $row;
-    }
-    /**
-     * Creates a category rowbased based on a real DB-entry
-     * @param editor_Models_Db_SegmentQualityRow $dbRow
-     * @return stdClass
-     */
-    protected function createCategoryRow(editor_Models_Db_SegmentQualityRow $dbRow) : stdClass {
-        $row = new stdClass();
-        $row->qid = $dbRow->id;
-        $row->qtype = $dbRow->type;
-        $row->qcount = 0;
-        $row->qcomplete = true;
-        if($this->isTree){
-            $row->children = [];
-            $row->qcategory = $dbRow->category;
-            $row->qcatidx = $dbRow->categoryIndex;
-        }
-        if($this->hasSegmentIds){
-            $row->segmentIds = [];
-        }
-        $row->text = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
-        return $row;
-    }
-    /**
-     * Creates a non-DB non-rubric row
-     * @param string $text
-     * @param string $type
-     * @param string $category
-     * @return stdClass
-     */
-    protected function createNonDbRow(string $text, string $type, string $category=NULL) : stdClass {
-        $row = new stdClass();
-        $row->qid = -1;
-        $row->qtype = $type;
-        $row->qcount = 0;
-        $row->qcomplete = true;
-        if($this->isTree){
-            $row->children = [];
-            $row->qcategory = $category;
-        }
-        if($this->hasSegmentIds){
-            $row->segmentIds = [];
-        }
-        $row->text = $text;
-        return $row;
     }
     /**
      * Adds the props that ExtJs needs to build a proper tree & repairs some of the quirks
@@ -393,16 +353,91 @@ abstract class editor_Models_Quality_AbstractView {
         if($row->qtype == editor_Segment_Tag::TYPE_INTERNAL && $row->qcategory == editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY){
             $row->qfaulty = true;
         }
-        // TO TEST THE incomplete & faulty configs in the frontend
-        /*
-        if($row->qtype == editor_Segment_Tag::TYPE_INTERNAL){
-            if($row->qcategory == NULL){
-                $row->qcomplete = false;
-            } else {
-                $row->qfaulty = true;
+        // To easily test the incomplete & faulty configs in the frontend
+        if(self::EMULATE_PROBLEMS){
+            if($row->qtype == editor_Segment_Tag::TYPE_INTERNAL){
+                if($row->qcategory == NULL){
+                    $row->qcomplete = false;
+                } else {
+                    $row->qfaulty = true;
+                }
             }
         }
-        //*/
+    }
+    /**
+     * Creates a rubric row
+     * @param string $type
+     * @return stdClass
+     */
+    protected function createRubricRow(string $type) : stdClass {
+        $row = new stdClass();
+        $row->qid = -1;
+        $row->qtype = $type;
+        $row->qcount = 0;
+        $row->qcomplete = $this->manager->isFullyCheckedType($type, $this->taskConfig);
+        if($this->isTree){
+            $row->children = [];
+            $row->qcategory = NULL;
+        }
+        if($this->hasSegmentIds){
+            $row->segmentIds = [];
+        }
+        if($this->hasNumFalsePositives){
+            $row->qcountfp = 0;
+        }
+        $row->text = $this->manager->translateQualityType($type);
+        return $row;
+    }
+    /**
+     * Creates a category rowbased based on a real DB-entry
+     * @param editor_Models_Db_SegmentQualityRow $dbRow
+     * @return stdClass
+     */
+    protected function createCategoryRow(editor_Models_Db_SegmentQualityRow $dbRow) : stdClass {
+        $row = new stdClass();
+        $row->qid = $dbRow->id;
+        $row->qtype = $dbRow->type;
+        $row->qcount = 0;
+        $row->qcomplete = true;
+        if($this->isTree){
+            $row->children = [];
+            $row->qcategory = $dbRow->category;
+            $row->qcatidx = $dbRow->categoryIndex;
+        }
+        if($this->hasSegmentIds){
+            $row->segmentIds = [];
+        }
+        if($this->hasNumFalsePositives){
+            $row->qcountfp = 0;
+        }
+        $row->text = $this->manager->translateQualityCategory($dbRow->type, $dbRow->category, $this->task);
+        return $row;
+    }
+    /**
+     * Creates a non-DB non-rubric row
+     * @param string $text
+     * @param string $type
+     * @param string $category
+     * @return stdClass
+     */
+    protected function createNonDbRow(string $text, string $type, string $category=NULL) : stdClass {
+        $row = new stdClass();
+        $row->qid = -1;
+        $row->qtype = $type;
+        $row->qcount = 0;
+        $row->qcomplete = true;
+        if($this->isTree){
+            $row->children = [];
+            $row->qcategory = $category;
+        }
+        if($this->hasSegmentIds){
+            $row->segmentIds = [];
+        }
+        if($this->hasNumFalsePositives){
+            $row->qcountfp = 0;
+        }
+        $row->text = $text;
+        return $row;
     }
     /**
      * Evaluates the checked-value, if request-vals have been sent by request or by default-value otherwise

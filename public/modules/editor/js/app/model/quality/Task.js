@@ -21,31 +21,24 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 /**
- * The model for a segment's quality entry
+ * The model for a task quality entry
  */
-Ext.define('Editor.model.quality.Segment', {
+Ext.define('Editor.model.quality.Task', {
     extend: 'Ext.data.Model',
     fields: [
-        { name:'id', type:'int' },
-        { name:'segmentId', type:'int' },
-        { name:'field', type:'string' },
-        { name:'type', type:'string' },
-        { name:'typeTitle', type:'string' },
-        { name:'category', type:'string' },
-        { name:'categoryIndex', type:'int' },
-        { name:'title', type:'string' },
-        { name:'falsePositive', type:'int' },
-        { name:'filterable', type:'boolean' },
-        { name:'falsifiable', type:'boolean' },
-        { name:'hasTag', type:'boolean' },
-        { name:'tagName', type:'string' },
-        { name:'cssClass', type:'string' }
-    ],
-    idProperty: 'id'    
+        { name:'text', type:'string' },
+        { name:'qid', type:'int' },
+        { name:'qtype', type:'string' },
+        { name:'qcategory', type:'string', defaultValue:'---' },
+        { name:'qcount', type:'int', defaultValue:0 },
+        { name:'qcountfp', type:'int', defaultValue:0 },
+        { name:'qcomplete', type:'boolean', defaultValue:true },
+        { name:'qfaulty', type:'boolean', defaultValue:false }
+    ]
 });

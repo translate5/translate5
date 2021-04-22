@@ -72,7 +72,7 @@ Ext.define('Editor.view.quality.FilterPanel', {
                 xtype: 'treecolumn',
                 iconCls: 'x-tree-noicon',
                 dataIndex:'text',
-                renderer: function (text, meta, record, rowIndex, colIndex, store, view){
+                renderer: function (text, meta, record){
                     if(record.isQualityRoot()){
                         meta.tdCls = Ext.String.trim(meta.tdCls + ' x-tree-root');
                     }
@@ -130,15 +130,14 @@ Ext.define('Editor.view.quality.FilterPanel', {
                 itemId: 'analysisToolbar',
                 hidden: !me.reAnalysisVisible,
                 items: [{
-                        xtype: 'button',
-                        text: me.strings.newAnalysis,
-                        width:150,
-                        glyph: 'xf200@FontAwesome5FreeSolid',
-                        listeners: {
-                            click: 'onAnalysisButtonClick'
-                        }
+                    xtype: 'button',
+                    text: me.strings.newAnalysis,
+                    width: 150,
+                    glyph: 'xf200@FontAwesome5FreeSolid',
+                    listeners: {
+                        click: 'onAnalysisButtonClick'
                     }
-                ]
+                }]
             }]
         };
         if (instanceConfig) {

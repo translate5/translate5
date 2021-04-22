@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.model.quality.Filter', {
     extend: 'Ext.data.Model',
     fields: [
+        { name:'text', type:'string' },
         { name:'qid', type:'int' },
         { name:'qtype', type:'string' },
         { name:'qcount', type:'int', defaultValue:0 },
