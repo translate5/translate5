@@ -32,6 +32,4 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Quality_FilterPanelView extends editor_Models_Quality_AbstractView {
     
     protected $isTree = true;
-
-    protected $hasSegmentIds = false;
 }

@@ -1900,6 +1900,12 @@ Die folgende Aufgabe wurde mit Fehlern / Warnungen / Hinweisen importiert. Mit d
 <trans-unit id='TmV1IGFuYWx5c2llcmVu'><source>Neu analysieren</source><target>Neu analysieren</target></trans-unit>
 <trans-unit id='QWxsZSBLYXRlZ29yaWVu'><source>Alle Kategorien</source><target>Alle Kategorien</target></trans-unit>
 <trans-unit id='UUE6IEZhbHNjaC1Qb3NpdGl2ZQ=='><source>QA: Falsch-Positive</source><target>QA: Falsch-Positive</target></trans-unit>
+<trans-unit id='S2F0ZWdvcmll'><source>Kategorie</source><target>Kategorie</target></trans-unit>
+<trans-unit id='QW56YWhs'><source>Anzahl</source><target>Anzahl</target></trans-unit>
+<trans-unit id='RmFsc2NoIHBvc2l0aXZl'><source>Falsch positive</source><target>Falsch positive</target></trans-unit>
+<trans-unit id='Vm9sbHN0w6RuZGlnIGFuYWx5c2llcnQ='><source>Vollständig analysiert</source><target>Vollständig analysiert</target></trans-unit>
+<trans-unit id='SW50ZXJuZXIgVGFnIEZlaGxlcg=='><source>Interner Tag Fehler</source><target>Interner Tag Fehler</target></trans-unit>
+<trans-unit id='RXMgZ2lidCBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIGVpbmVuIGZlaGxlcmZyZWllbiBFeHBvcnQgZGVyIEF1ZmdhYmUgdmVyaGluZGVybg=='><source>Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern</source><target>Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ3k='><source>Terminology</source><target>Terminology</target></trans-unit>
 <trans-unit id='Q29udGVudA=='><source>Content</source><target>Content</target></trans-unit>
 <trans-unit id='U3R5bGU='><source>Style</source><target>Style</target></trans-unit>

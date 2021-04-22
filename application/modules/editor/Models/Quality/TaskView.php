@@ -31,7 +31,5 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Quality_TaskView extends editor_Models_Quality_AbstractView {
     
-    protected $isTree = false;
-    
-    protected $hasSegmentIds = false;
+    protected $hasNumFalsePositives = true;
 }

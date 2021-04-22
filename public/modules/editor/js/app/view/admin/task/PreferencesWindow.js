@@ -35,6 +35,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
        'Editor.view.admin.task.UserAssoc',
        'Editor.view.admin.task.Preferences',
        'Editor.view.admin.task.TaskAttributes',
+       'Editor.view.quality.admin.TaskQualities',
        'Editor.view.admin.task.LogGrid',
        'Editor.view.admin.task.LogWindow',
        'Editor.view.admin.config.Grid'
@@ -78,6 +79,18 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
         
+        // TODO AUTOQA: who should see the task's quality info ?
+        if(true) {
+            tabs.push({
+                xtype: 'taskQualities',
+                bind:{
+                    disabled:'{disabledDuringTaskImport}',
+                    extraParams:{
+                        taskGuid: '{projectTaskSelection.taskGuid}'
+                    }
+                }
+            });
+        }        
         
         if(auth.isAllowed('configOverwriteGrid')) {
             tabs.push({
@@ -87,7 +100,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 bind:{
                     disabled:'{disabledDuringTaskImport}',
                     extraParams:{
-                        taskGuid : '{projectTaskSelection.taskGuid}'
+                        taskGuid: '{projectTaskSelection.taskGuid}'
                     }
                 }
             });
@@ -98,7 +111,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'editorAdminTaskLogGrid',
                 title: this.strings.events,
                 bind:{
-                    task:'{currentTask}'
+                    task: '{currentTask}'
                 }
             });
         }

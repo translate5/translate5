@@ -21,31 +21,28 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
 /**
- * The model for a segment's quality entry
+ * The store for the task quality panel
  */
-Ext.define('Editor.model.quality.Segment', {
-    extend: 'Ext.data.Model',
-    fields: [
-        { name:'id', type:'int' },
-        { name:'segmentId', type:'int' },
-        { name:'field', type:'string' },
-        { name:'type', type:'string' },
-        { name:'typeTitle', type:'string' },
-        { name:'category', type:'string' },
-        { name:'categoryIndex', type:'int' },
-        { name:'title', type:'string' },
-        { name:'falsePositive', type:'int' },
-        { name:'filterable', type:'boolean' },
-        { name:'falsifiable', type:'boolean' },
-        { name:'hasTag', type:'boolean' },
-        { name:'tagName', type:'string' },
-        { name:'cssClass', type:'string' }
-    ],
-    idProperty: 'id'    
+Ext.define('Editor.store.quality.Task', {
+    extend : 'Ext.data.Store',
+    model: 'Editor.model.quality.Task',
+    storeId: 'TaskQualities',
+    autoLoad: false,
+    autoSync: false,
+    isLoaded: false,
+    pageSize: 0,
+    proxy: {
+        type: 'rest',
+        url: Editor.data.restpath+'quality/task',
+        reader: {
+            rootProperty: 'rows',
+            type: 'json'
+        }
+    }
 });

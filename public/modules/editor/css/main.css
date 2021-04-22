@@ -287,7 +287,7 @@ div.single + div {
 /*.x-tip .x-tip-body {white-space: nowrap;}*/
  /* END Fix for TRANSLATE-237 recheck on ExtJS update */
 
-/*qmsummary*/
+/*qmsummary TODO AUTO-QA: this seems to manipulate all trees ?*/
 .x-tree-view .x-grid-item:nth-of-type(odd) .x-grid-cell {
 background-color: #EAF1FB;
 }
@@ -825,6 +825,11 @@ a.x-btn span.task-confirmation {
     white-space: nowrap;
 }
 
+img.x-tree-symbol, img.x-grid-symbol, label img.x-label-symbol { vertical-align:middle; height:12px; }
+span.x-tree-symbol, span.x-grid-symbol, label span.x-label-symbol { font-family:FontAwesome; color:#5fa2dd; }
+span.x-tree-symbol.t5-quality-complete, span.x-grid-symbol.t5-quality-complete { color:#59a051; }
+span.x-tree-symbol.t5-quality-incomplete, span.x-grid-symbol.t5-quality-incomplete { color:#fbbc28; }
+span.x-tree-symbol.t5-quality-faulty, span.x-grid-symbol.t5-quality-faulty { color:#ee0000; }
 .qualityFilterPanel .x-grid-cell-inner-treecolumn > .x-tree-elbow-empty:first-child { display:none; }
 .qualityFilterPanel .x-tree-root .x-grid-cell-inner-treecolumn > .x-tree-elbow-img.x-tree-elbow-end { display:none; }
 .qualityFilterPanel .x-tree-check-disabled .x-tree-checkbox { color:#acacac; }
@@ -832,10 +837,7 @@ a.x-btn span.task-confirmation {
 .qualityFilterPanel .x-grid-cell-inner > div { flex:none; }
 .qualityFilterPanel .x-grid-cell-inner .x-tree-node-text { padding-left:0; white-space:normal; }
 .qualityFilterPanel .x-tree-faulty .x-tree-node-text { color:#ee0000; }
-.qualityFilterPanel img.x-tree-symbol, .segmentQualities label img.x-label-symbol { vertical-align:middle; height:12px; }
-.qualityFilterPanel span.x-tree-symbol, .segmentQualities label span.x-label-symbol { font-family:FontAwesome; color:#5fa2dd; }
-.qualityFilterPanel span.x-tree-symbol.t5-quality-incomplete { color:#fbbc28; }
-.qmflag
+.taskQualities .x-grid-faulty { color:#ee0000; }
 
 /**
  * FIXME must be removed with next ext update, fixes T5DEV-181 / https://www.sencha.com/forum/showthread.php?330718-6-2-ColorField-color-preview-doesn-t-match-color
