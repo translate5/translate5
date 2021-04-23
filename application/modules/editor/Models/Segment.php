@@ -970,20 +970,22 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
     /**
      * Load segments by taskGuid.
      * @param string $taskGuid
+     * @param bool $repetition
      * @param Closure $callback is called with the select statement as parameter before passing it to loadFilterdCustom Param: Zend_Db_Table_Select
      * @return array
      */
-    public function loadByTaskGuid($taskGuid, Closure $callback = null)
+    public function loadByTaskGuid($taskGuid, $repetition = false, Closure $callback = null)
     {
+
         try {
-            return $this->_loadByTaskGuid($taskGuid, $callback);
+            return $this->_loadByTaskGuid($taskGuid, $callback,  $repetition);
         } catch (Zend_Db_Statement_Exception $e) {
             $this->catchMissingView($e);
         }
         //fallback mechanism for not existing views. If not exists, we are trying to create it.
         $this->segmentFieldManager->initFields($taskGuid);
         $this->segmentFieldManager->getView()->create();
-        return $this->_loadByTaskGuid($taskGuid, $callback);
+        return $this->_loadByTaskGuid($taskGuid, $callback, $repetition);
     }
 
     /**
@@ -1000,6 +1002,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
             ->from($this->tableName, array('id', 'segmentNrInTask', 'editable', 'pretrans'))
             ->where($this->tableName . '.taskGuid = ?', $taskGuid)
             ->where($this->tableName . '.fileId = ?', $fileId);
+
         if ($ignoreLocked) {
             $s->join('LEK_segments_meta', $this->tableName . '.id = LEK_segments_meta.segmentId', array())
                 ->where('LEK_segments_meta.locked != 1 OR LEK_segments_meta.locked IS NULL');
@@ -1133,10 +1136,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
      * encapsulate the load by taskGuid code.
      * @param string $taskGuid
      * @param Closure $callback is called with the select statement as parameter before passing it to loadFilterdCustom Param: Zend_Db_Table_Select
+     * @param bool $repetition
      * @return array
      */
-    protected function _loadByTaskGuid($taskGuid, Closure $callback = null)
+    protected function _loadByTaskGuid($taskGuid, Closure $callback = null, $repetition = false)
     {
+
         $this->segmentFieldManager->initFields($taskGuid);
         $this->reInitDb($taskGuid);
 
@@ -1159,6 +1164,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
 
+
+        if($repetition){
+
+            $s->where($this->tableName . '.sourceMd5 IN((select sourceMd5 from '.$this->tableName.' group by sourceMd5 having count(*) > 1))');
+        }
         if (!empty($callback)) {
             $callback($s, $this->tableName);
         }
@@ -1432,18 +1442,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract
 
     public function getRepeatedSegments($taskGuid)
     {
-        $this->segmentFieldManager->initFields($taskGuid);
-        //if we are using alternates we cant use change alikes, that means we return an empty list here
-        if (!$this->segmentFieldManager->isDefaultLayout()) {
-            return array();
-        }
-        $segmentsViewName = $this->segmentFieldManager->getView()->getName();
-        $sql = $this->_getRepetitionSql($segmentsViewName);
-        $stmt = $this->db->getAdapter()->query($sql);
-        $repetitions = $stmt->fetchAll();
+        $adapter = $this->db->getAdapter();
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
+        /* @var $mv editor_Models_Segment_MaterializedView */
+        $mv->setTaskGuid($taskGuid);
+        $viewName = $mv->getName();
 
+        $sql = $this->_getRepetitionSql($viewName);
 
-        return $repetitions;
+        return $adapter->query($sql)->fetchAll();
     }
 
     /**
