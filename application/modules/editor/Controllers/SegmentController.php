@@ -84,7 +84,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $rows = $this->entity->loadByTaskGuid($taskGuid);
         $this->view->rows = $rows;
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
-        
+        $result = array_unique($rows);
+        foreach ($rows as $row){
+            $filterBy = $row['sourceMd5']; // or Finance etc.
+
+            $new = array_filter($rows, function ($var) use ($filterBy) {
+                return ($var['name'] == $filterBy);
+            });
+        }
+        echo '<pre>';
+        print_r($new);
+        die;
         $this->addIsWatchedFlag();
         $this->addFirstEditable();
         $this->addIsFirstFileInfo($taskGuid);
@@ -287,6 +297,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                 $row['segmentUserAssocId'] = $watchedById[$row['id']];
             }
         }
+    }
+
+    protected function addIsRepeated() {
+
+        $taskGuid = $this->session->taskGuid;
+        $rows = $this->entity->getAlikes($taskGuid);
+        $this->view->total = count($this->view->rows);
+        //get all segment IDs to be returned
     }
 
     public function putAction() {

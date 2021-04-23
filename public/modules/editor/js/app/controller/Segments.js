@@ -74,6 +74,7 @@ Ext.define('Editor.controller.Segments', {
         noSegmentToFilter: 'Kein Segment dieser Datei entspricht den Filterkriterien',
         otherFiltersActive: '#UT#ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind'
     },
+    repeatedSegmentsUrl:'',
     /**
      * Cache der Zuordnung fileId => Grid Index des ersten Segments der Datei.
      */
@@ -311,38 +312,34 @@ Ext.define('Editor.controller.Segments', {
     },
 
     repeatedFilter: function () {
-        var me = this,
-            grid = me.getSegmentGrid(),
-            gridFilters = grid.filters,
-            filters = gridFilters.store.filters,
-            found = false,
-            otherFound = false,
-            column;
+            var me = this,
+                grid = me.getSegmentGrid(),
+                //id des bearbeiteten Segments
+                gridFilters = grid.filters,
+                store = me.getStore('RepeatedSegments'),
+                segmentStore = me.getSegmentGrid().getStore(),
+                segmentsProxy = segmentStore.getProxy(),
+                params = {};
 
-        filters.each(function (filter, index, len) {
-            var isWatched = filter.getProperty() == 'isWatched';
-            found = found || isWatched;
-            otherFound = otherFound || !isWatched && filter.getDisabled() === false;
-        });
-        //remove watchlist filter
-        if (found) {
-            column = grid.columnManager.getHeaderByDataIndex('isWatched');
-            if (column && column.filter && column.filter.isGridFilter) {
-                column.filter.setActive(false);
+            if(me.isDisabled) {
+                return;
             }
-            return;
-        }
-        //add watchlist filter
-        gridFilters.addFilter({
-            dataIndex: 'isWatched',
-            type: 'boolean',
-            value: true,
-            disabled: false
-        });
-        // currently enabled at least one more filter:
-        if (otherFound) {
-            Editor.MessageBox.addSuccess(me.messages.otherFiltersActive);
-        }
+
+            params[segmentsProxy.getFilterParam()] = segmentsProxy.encodeFilters(segmentStore.getFilters().items);
+            params[segmentsProxy.getSortParam()] = segmentsProxy.encodeSorters(segmentStore.getSorters().items);
+
+            //stop loading first!
+            store.getProxy().abort();
+            store.load({
+                url: me.repeatedSedmentsUrl,
+                params: params,
+                //prevent default ServerException handling
+                preventDefaultHandler: true,
+                callback: function(recs, op, success) {
+                    success && me.handleAlikesRead(op, id);
+                }
+            });
+
     },
     /**
      * removes the segment from the grid if removed from the watchlist and watchlist filter is set
