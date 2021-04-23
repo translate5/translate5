@@ -738,7 +738,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * @return boolean
      */
     private function isMqmTask($taskGuid){
-        return editor_Models_Db_SegmentQuality::hasTypeForTask($taskGuid, editor_Segment_Tag::TYPE_MQM);
+        return editor_Models_Db_SegmentQuality::hasTypeCategoryForTask($taskGuid, editor_Segment_Tag::TYPE_MQM);
     }
     
     /***

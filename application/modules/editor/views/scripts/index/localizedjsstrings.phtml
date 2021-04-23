@@ -118,6 +118,10 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.app.Application.prototype.browserAdviceTextTitle = '<?php echo $this->translate->_('Nicht unterstützte Browser-Version');?>';
     Ext.app.Application.prototype.browserAdviceText = '<?php echo $disclaimer;?>';
+    
+    Editor.view.QuickTip.prototype.strings = {
+		loading: '<?php echo $this->translate->_('Loading...');?>'
+	};
 
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien und QA');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
@@ -255,7 +259,7 @@ Ext.define('Editor.controller.Localizer', {
 		modeFalsePositives: '<?php echo $this->translate->_('Nur Falsch-Positive');?>',
 		incompleteCatCaption: '<?php echo $this->translate->_('Unvollständig analysiert');?>',
 		incompleteCatText: '<?php echo $this->translate->_('Die Qualität wurde nicht oder nur unvollständig analysiert. Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben');?>',
-        newAnalysis: '<?php echo $this->translate->_('Neu analysieren');?>',
+        newAnalysis: '<?php echo $this->translate->_('Neu analysieren');?>'
 	};
   	Editor.view.quality.mqm.Fieldset.prototype.title = '<?php echo $this->translate->_('MQM');?>';
   	Editor.view.quality.mqm.Fieldset.prototype.strings = {
@@ -279,9 +283,9 @@ Ext.define('Editor.controller.Localizer', {
         completeTipCaption: '<?php echo $this->translate->_('Vollständig analysiert');?>',
         incompleteTipCaption: '<?php echo $this->translate->_('Unvollständig analysiert');?>',
         incompleteTipText: '<?php echo $this->translate->_('Die Qualität wurde nicht oder nur unvollständig analysiert. Bitte stoßen Sie unten eine neue Analyse an um das Problem zu beheben');?>',
-        faultyTipCaption: '<?php echo $this->translate->_('Interner Tag Fehler');?>',
+        faultyTipCaption: '<?php echo $this->translate->_('Interne Tag Fehler');?>',
         faultyTipText: '<?php echo $this->translate->_('Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern');?>',
-        newAnalysis: '<?php echo $this->translate->_('Neu analysieren');?>',
+        newAnalysis: '<?php echo $this->translate->_('Neu analysieren');?>'
 	};
     
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
@@ -550,7 +554,8 @@ Ext.define('Editor.controller.Localizer', {
             assignmentDateHeader: '<?php echo $this->translate->_('Zuweisungsdatum');?>',
             finishedDateHeader: '<?php echo $this->translate->_('Abschlussdatum');?>',
             deadlineDateHeader: '<?php echo $this->translate->_('Deadline Datum');?>',
-            exelExportedTooltip: '<?php echo $this->translate->_('Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.');?>'
+            exelExportedTooltip: '<?php echo $this->translate->_('Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.');?>',
+            qualityErrorCount: '<?php echo $this->translate->_('QA Fehler');?>'
         },
         text_cols: {
             taskNr: '<?php echo $this->translate->_('Auftragsnr.');?>',

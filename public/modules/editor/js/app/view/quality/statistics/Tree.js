@@ -82,7 +82,7 @@ Ext.define('Editor.view.quality.statistics.Tree', {
                     align: 'right',
                     sortable: true
                 });
-        var sev = Editor.data.task.get('mqmSeverities');
+        var sev = Editor.data.task.getMqmSeverities();
         Ext.each(sev, function(severity,index, myself) {
             this.sevCols.push({
                 text: this.treepanel_total+' '+ severity.text,

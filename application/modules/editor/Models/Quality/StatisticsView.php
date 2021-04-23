@@ -27,8 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * 
- * Creates the Data for the Qualities MQM Statistics REST Endpoint
+ * Creates the Data for the Qualities QA Statistics REST Endpoint
  */
 class editor_Models_Quality_StatisticsView {
     

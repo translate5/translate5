@@ -116,6 +116,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       addFilterText:'#UT#Erweiterte Filter',
       jobStatus:'#UT#Job-Status',
       exelExportedTooltip:'#UT#Gesperrt da als Excel exportiert. Zum Entsperren Excel re-importieren. Falls Excel nicht zur Hand: Neu exportieren.',
+      qualityErrorCount: '#UT#QA Fehler'
   },
   states: {
       open: '#UT#offen',
@@ -484,6 +485,22 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   totalField:'segmentFinishCount'
               },
               text: me.text_cols.segmentFinishCount
+          },{
+              xtype: 'gridcolumn',
+              width: 70,
+              dataIndex: 'qualityErrorCount',
+              stateId: 'qualityErrorCount',
+              renderer: function(val, meta, rec) {
+                  if(rec.get('qualityHasFaults')){
+                      val += ' <span class="x-grid-symbol t5-quality-faulty">' + Ext.String.fromCodePoint(parseInt('0xf057', 16)) + '</span>';
+                  }
+                  // We use the loader-feature of the qtips
+                  return '<span data-qtipurl="'+Editor.data.restpath+'quality/tasktooltip?taskGuid=' + rec.get('taskGuid') + '">' + val + '</span>';
+              },
+              filter: {
+                  type: 'numeric'
+              },
+              text: me.strings.qualityErrorCount
           },{
               xtype: 'gridcolumn',
               width: 70,

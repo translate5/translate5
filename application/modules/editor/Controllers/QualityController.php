@@ -176,11 +176,12 @@ class editor_QualityController extends ZfExtended_RestController {
         $this->view->metaData = $view->getMetaData();
     }
     /**
-     * Retrieves the data for the qualities tooltip of a task in the task info panel
-     * TODO AUTOQA: REMOVE ?
+     * Retrieves the markup for the qualities tooltip of a task in the task info panel
      */
     public function tasktooltipAction(){
-        $this->taskAction();
+        $task = $this->fetchTask();
+        $toolTip = new editor_Models_Quality_TaskTooltip($task, NULL, true);
+        echo $toolTip->getMarkup();
     }
     /**
      * @throws ZfExtended_Exception

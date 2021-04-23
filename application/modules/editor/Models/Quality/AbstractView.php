@@ -282,6 +282,7 @@ abstract class editor_Models_Quality_AbstractView {
         }
         // check if we have a structural internal tag problem
         if(array_key_exists(editor_Segment_Tag::TYPE_INTERNAL, $this->rowsByType) && $this->rowsByType[editor_Segment_Tag::TYPE_INTERNAL][self::RUBRIC]->qcount > 0){
+            // TODO AUTOQA: this violates the abstraction of faulty tags, move to editor_Segment_Internal_TagComparision somehow
             $this->hasFaultyInternalTags = array_key_exists(editor_Segment_Internal_TagComparision::TAG_STRUCTURE_FAULTY, $this->rowsByType[editor_Segment_Tag::TYPE_INTERNAL]);
         }
         // create result rows

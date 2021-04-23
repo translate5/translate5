@@ -4025,7 +4025,7 @@ The following task was imported with errors / warnings / notices. Please take ca
 <trans-unit id='QW56YWhs'><source>Anzahl</source><target>Amount</target></trans-unit>
 <trans-unit id='RmFsc2NoIHBvc2l0aXZl'><source>Falsch positive</source><target>False positives</target></trans-unit>
 <trans-unit id='Vm9sbHN0w6RuZGlnIGFuYWx5c2llcnQ='><source>Vollständig analysiert</source><target>Anylysis complete</target></trans-unit>
-<trans-unit id='SW50ZXJuZXIgVGFnIEZlaGxlcg=='><source>Interner Tag Fehler</source><target>Internal tag error</target></trans-unit>
+<trans-unit id='SW50ZXJuZSBUYWcgRmVobGVy'><source>Interne Tag Fehler</source><target>Internal tag errors</target></trans-unit>
 <trans-unit id='RXMgZ2lidCBJbnRlcm5lIFRhZyBGZWhsZXIgZGllIGVpbmVuIGZlaGxlcmZyZWllbiBFeHBvcnQgZGVyIEF1ZmdhYmUgdmVyaGluZGVybg=='>
 	<source>Es gibt Interne Tag Fehler die einen fehlerfreien Export der Aufgabe verhindern</source>
 	<target>There are problems with internal tags that prevent exporting this task</target>
@@ -4034,6 +4034,8 @@ The following task was imported with errors / warnings / notices. Please take ca
   <source>Der Parameter login mit dem gewünschten Benutzernamen fehlt.</source>
   <target>The parameter login containing the desired username is missing.</target>
 </trans-unit>
+<trans-unit id='UUEgRmVobGVy'><source>QA Fehler</source><target>QA Errors</target></trans-unit>
+<trans-unit id='TG9hZGluZy4uLg=='><source>Loading...</source><target>Loading...</target></trans-unit>
 </body>
   </file>
 </xliff>
