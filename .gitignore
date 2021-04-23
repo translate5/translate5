@@ -17,3 +17,6 @@ public/scheduled-tests/*
 /jira-cookie.txt
 cghooks.lock
 
+/.idea
+.idea
+translate5.bat
