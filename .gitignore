@@ -16,4 +16,7 @@ public/scheduled-tests/*
 # needed for ./translate5.sh release:notes
 /jira-cookie.txt
 cghooks.lock
+/.idea
+translate5.bat
+
 
