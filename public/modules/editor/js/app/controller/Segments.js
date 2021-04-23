@@ -66,6 +66,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.Segments', {
     extend: 'Ext.app.Controller',
     stores: ['Segments'],
+    repetitions: false,
     //views: ['segments.Scroller', 'segments.RowEditing', 'segments.HtmlEditor', 'segments.GridFilter'],
     views: ['segments.RowEditing', 'segments.HtmlEditor', 'ToolTip'],
     messages: {
@@ -74,7 +75,7 @@ Ext.define('Editor.controller.Segments', {
         noSegmentToFilter: 'Kein Segment dieser Datei entspricht den Filterkriterien',
         otherFiltersActive: '#UT#ACHTUNG: Ein weiterer Filter ist gesetzt. Es ist daher möglich, dass nicht alle Segmente der Lesezeichenliste sichtbar sind'
     },
-    repeatedSegmentsUrl:'',
+    repeatedSegmentsUrl: '',
     /**
      * Cache der Zuordnung fileId => Grid Index des ersten Segments der Datei.
      */
@@ -284,7 +285,6 @@ Ext.define('Editor.controller.Segments', {
             found = false,
             otherFound = false,
             column;
-
         filters.each(function (filter, index, len) {
             var isWatched = filter.getProperty() == 'isWatched';
             found = found || isWatched;
@@ -312,33 +312,39 @@ Ext.define('Editor.controller.Segments', {
     },
 
     repeatedFilter: function () {
-            var me = this,
-                grid = me.getSegmentGrid(),
-                //id des bearbeiteten Segments
-                gridFilters = grid.filters,
-                store = me.getStore('RepeatedSegments'),
-                segmentStore = me.getSegmentGrid().getStore(),
-                segmentsProxy = segmentStore.getProxy(),
-                params = {};
+        var me = this,
+            grid = me.getSegmentGrid(),
+            //id des bearbeiteten Segments
+            gridFilters = grid.filters,
+            filters = gridFilters.store.repetiton,
+            store = me.getStore('Segments'),
+            segmentStore = me.getSegmentGrid().getStore(),
+            segmentsProxy = segmentStore.getProxy();
+        console.log(me.repetitions);
+        if (!me.repetitions) {
+            me.repetitions = true;
+            params = {repetiton: true};
+        } else {
+            me.repetitions = false;
+            params = {repetiton: false};
+        }
 
-            if(me.isDisabled) {
-                return;
-            }
 
-            params[segmentsProxy.getFilterParam()] = segmentsProxy.encodeFilters(segmentStore.getFilters().items);
-            params[segmentsProxy.getSortParam()] = segmentsProxy.encodeSorters(segmentStore.getSorters().items);
+        if (me.isDisabled) {
+            return;
+        }
 
-            //stop loading first!
-            store.getProxy().abort();
-            store.load({
-                url: me.repeatedSedmentsUrl,
-                params: params,
-                //prevent default ServerException handling
-                preventDefaultHandler: true,
-                callback: function(recs, op, success) {
-                    success && me.handleAlikesRead(op, id);
-                }
-            });
+        params[segmentsProxy.getFilterParam()] = segmentsProxy.encodeFilters(segmentStore.getFilters().items);
+        params[segmentsProxy.getSortParam()] = segmentsProxy.encodeSorters(segmentStore.getSorters().items);
+        //stop loading first!
+        store.getProxy().abort();
+        store.load({
+            url: me.repeatedSedmentsUrl,
+            params: params,
+            //prevent default ServerException handling
+            preventDefaultHandler: true,
+
+        });
 
     },
     /**
